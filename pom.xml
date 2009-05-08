@@ -385,6 +385,25 @@
       <artifactId>onyx-core</artifactId>
 	</dependency>
 	
+	<!-- Logging -->
+    <!-- Every child should use SLF4J for logging -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    
+    <!-- We've excluded commons-logging from our transitive dependencies. We replace it here. -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl104-over-slf4j</artifactId>
+    </dependency>
+    
+    <!-- Internally, we'll use log4j when unit-testing (scope is defined above) -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+    </dependency>
+    
 	<dependency>
       <groupId>org.ow2.jotm</groupId>
       <artifactId>jotm-core</artifactId>
