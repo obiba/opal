@@ -11,6 +11,7 @@ package org.obiba.opal.core.datasource.onyx;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -26,6 +27,8 @@ public class ZipOnyxDataInputStrategy implements IChainingOnyxDataInputStrategy 
 
   private IOnyxDataInputStrategy delegate;
 
+  private String source;
+
   private ZipInputStream zipInputStream;
 
   //
@@ -38,23 +41,53 @@ public class ZipOnyxDataInputStrategy implements IChainingOnyxDataInputStrategy 
 
   /**
    * Calls the delegate's <code>getEntry<code> method to get an <code>InputStream</code> for the 
-   * data source indicated in <code>context</code> (it must be zip file), then creates a <code>ZipInputStream</code> on
+   * data source indicated in <code>context</code> (it must be a zip file), then creates a <code>ZipInputStream</code> on
    * top of it.
    * 
-   * The <code>ZipInputStream</code> created by this method is subsequently used by the <code>listEntries</code> metod
-   * to list zip file entries by the <code>getEntry</code> method to look up a specific entry.
+   * The <code>ZipInputStream</code> created by this method is subsequently used by the <code>listEntries</code> method
+   * to list zip file entries and by the <code>getEntry</code> method to return an <code>InputStream</code> for a specific entry.
    */
   public void prepare(OnyxDataInputContext context) {
     // Prepare delegate.
     delegate.prepare(context);
 
-    // Now get an InputStream from the delegate and create a ZipInputStream on top of it.
-    zipInputStream = new ZipInputStream(delegate.getEntry(context.getSource()));
+    // Initialize the data source.
+    source = context.getSource();
   }
 
+  /**
+   * Returns a list of the zip file's entries.
+   * 
+   * @return list of zip file entries (i.e., their names)
+   */
   public List<String> listEntries() {
-    // TODO Auto-generated method stub
-    return null;
+    if(source == null) {
+      throw new IllegalStateException("Null source (prepare method must be called prior to listEntries method");
+    }
+
+    // Get an InputStream from the delegate and create a ZipInputStream on top of it.
+    zipInputStream = new ZipInputStream(delegate.getEntry(source));
+
+    // Read all the zip entries and add their names to a list.
+    List<String> entries = new ArrayList<String>();
+
+    while(true) {
+      ZipEntry entry = null;
+
+      try {
+        entry = zipInputStream.getNextEntry();
+
+        if(entry == null) {
+          break;
+        }
+      } catch(IOException ex) {
+        throw new RuntimeException(ex);
+      }
+
+      entries.add(entry.getName());
+    }
+
+    return entries;
   }
 
   /**
@@ -63,16 +96,28 @@ public class ZipOnyxDataInputStrategy implements IChainingOnyxDataInputStrategy 
    * 
    * @param name entry name
    * @return <code>InputStream</code> positioned the specified entry (<code>null</code> if the entry was not found)
+   * @throws IllegalStateException if <code>prepare</code> method was not called
    */
   public InputStream getEntry(String name) {
-    boolean foundIt = false;
+    if(source == null) {
+      throw new IllegalStateException("Null source (prepare method must be called prior to getEntry method");
+    }
+
+    // Get an InputStream from the delegate and create a ZipInputStream on top of it.
+    zipInputStream = new ZipInputStream(delegate.getEntry(source));
 
     // Find the requested entry and return the InputStream, positioned at that entry.
+    boolean foundIt = false;
+
     while(true) {
       ZipEntry entry = null;
 
       try {
         entry = zipInputStream.getNextEntry();
+
+        if(entry == null) {
+          break;
+        }
       } catch(IOException ex) {
         throw new RuntimeException(ex);
       }
@@ -94,17 +139,23 @@ public class ZipOnyxDataInputStrategy implements IChainingOnyxDataInputStrategy 
    * @param the strategy's context
    */
   public void terminate(OnyxDataInputContext context) {
+    // Set the data source to null.
+    source = null;
+
+    // Close the current stream, if there is one.
     if(zipInputStream != null) {
       try {
         zipInputStream.close();
       } catch(IOException ex) {
         throw new RuntimeException(ex);
       } finally {
+        // Set the stream to null.
         zipInputStream = null;
       }
-
-      delegate.terminate(context);
     }
+
+    // Terminate the delegate.
+    delegate.terminate(context);
   }
 
 }
