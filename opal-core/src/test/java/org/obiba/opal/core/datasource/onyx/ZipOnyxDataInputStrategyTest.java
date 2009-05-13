@@ -35,7 +35,7 @@ public class ZipOnyxDataInputStrategyTest {
   "src" + File.separator + //
   "test" + File.separator + //
   "resources" + File.separator + //
-  "ZipOnyxDataInputStrategyTest" + File.separator + //
+  "OnyxDataInputStrategyTests" + File.separator + //
   "testArchive.zip";
 
   //
