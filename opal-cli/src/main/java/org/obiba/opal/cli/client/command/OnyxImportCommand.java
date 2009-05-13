@@ -49,6 +49,10 @@ public class OnyxImportCommand extends AbstractCommand<OnyxImportCommandOptions>
 
     // If user name and password have now been provided, go ahead and import the data.
     if(options.isUsername() && options.isPassword()) {
+      // Tell Carol not to initialize its CMI component. This helps us minimize dependencies brought in by JOTM.
+      // See: http://wiki.obiba.org/confluence/display/CAG/Technical+Requirements for details.
+      System.setProperty("cmi.disabled", "true");
+
       // First, lazily initialize the onyxImportService variable (fetch it from the Spring ApplicationContext).
       ApplicationContext context = loadContext();
       setOnyxImportService((OnyxImportService) context.getBean("onyxImportService"));
@@ -86,8 +90,7 @@ public class OnyxImportCommand extends AbstractCommand<OnyxImportCommandOptions>
    * Converts a <code>String</code> containing comma-separated values to a <code>List</code> of those values.
    * 
    * @param csv <code>String</code> of comma-separated values
-   * @return <code>List</code> of values (or <code>null</code> if <code>csv</code> is <code>null</code> or
-   * empty)
+   * @return <code>List</code> of values (or <code>null</code> if <code>csv</code> is <code>null</code> or empty)
    */
   private List<String> csvToList(String csv) {
     List<String> valueList = null;
