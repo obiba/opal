@@ -158,4 +158,11 @@ public class ZipOnyxDataInputStrategy implements IChainingOnyxDataInputStrategy 
     delegate.terminate(context);
   }
 
+  //
+  // Methods
+  //
+
+  public String getSource() {
+    return source;
+  }
 }
