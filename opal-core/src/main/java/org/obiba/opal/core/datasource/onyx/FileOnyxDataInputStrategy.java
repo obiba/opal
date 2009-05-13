@@ -42,6 +42,12 @@ public class FileOnyxDataInputStrategy implements IOnyxDataInputStrategy {
    */
   public InputStream getEntry(String name) {
     try {
+      // Close the current stream, if there is one.
+      if(fileInputStream != null) {
+        fileInputStream.close();
+      }
+
+      // Create a FileInputStream for the specified file (use the name argument as the file path).
       fileInputStream = new FileInputStream(name);
     } catch(IOException ex) {
       throw new RuntimeException(ex);
@@ -62,6 +68,7 @@ public class FileOnyxDataInputStrategy implements IOnyxDataInputStrategy {
    * @throws <code>RuntimeException</code> on any I/O exception
    */
   public void terminate(OnyxDataInputContext context) {
+    // Close the current stream, if there is one.
     if(fileInputStream != null) {
       try {
         fileInputStream.close();
@@ -72,5 +79,4 @@ public class FileOnyxDataInputStrategy implements IOnyxDataInputStrategy {
       }
     }
   }
-
 }
