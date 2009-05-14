@@ -14,9 +14,12 @@ import java.io.InputStream;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
+import java.util.Arrays;
+import java.util.Enumeration;
 
 import org.springframework.core.io.Resource;
 
@@ -36,6 +39,10 @@ public class OpalKeyStore implements IKeyProvider {
   //
 
   public KeyPair getKeyPair(String alias) {
+    if(keyStore == null) {
+      throw new IllegalStateException("Null keyStore (open method must be called prior to calling getKeyPair method)");
+    }
+
     KeyPair keyPair = null;
 
     try {
@@ -53,6 +60,33 @@ public class OpalKeyStore implements IKeyProvider {
       }
     } catch(Exception ex) {
       throw new RuntimeException(ex);
+    }
+
+    return keyPair;
+  }
+
+  public KeyPair getKeyPair(PublicKey publicKey) {
+    if(keyStore == null) {
+      throw new IllegalStateException("Null keyStore (open method must be called prior to calling getKeyPairFor method)");
+    }
+
+    Enumeration<String> aliases = null;
+    try {
+      aliases = keyStore.aliases();
+    } catch(KeyStoreException ex) {
+      throw new RuntimeException(ex);
+    }
+
+    KeyPair keyPair = null;
+
+    while(aliases.hasMoreElements()) {
+      String alias = aliases.nextElement();
+      KeyPair currentKeyPair = getKeyPair(alias);
+
+      if(Arrays.equals(currentKeyPair.getPublic().getEncoded(), publicKey.getEncoded())) {
+        keyPair = currentKeyPair;
+        break;
+      }
     }
 
     return keyPair;

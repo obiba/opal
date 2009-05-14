@@ -15,8 +15,13 @@ import java.security.AlgorithmParameters;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.EncodedKeySpec;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +50,10 @@ public class DecryptingOnyxDataInputStrategy implements IChainingOnyxDataInputSt
   private static final String METADATA_ENTRY = "encryption.xml";
 
   private static final String DIGEST_ENTRY_SUFFIX = ".sha512";
+
+  private static final String PKCS8_KEYSPEC_FORMAT = "PKCS#8";
+
+  private static final String X509_KEYSPEC_FORMAT = "X.509";
 
   //
   // Instance Variables
@@ -229,7 +238,41 @@ public class DecryptingOnyxDataInputStrategy implements IChainingOnyxDataInputSt
   }
 
   private Key getPrivateKey() {
-    KeyPair keyPair = keyProvider.getKeyPair("opal");
+    // TODO: Update Onyx to include publicKeyAlgorithm in the metadata.
+    String publicKeyAlgorithm = metadata.getEntry("publicKeyAlgorithm");
+    String publicKeyFormat = metadata.getEntry("publicKeyFormat");
+    byte[] encodedPublicKey = metadata.getEntry("publicKey");
+    PublicKey publicKey = getPublicKey(publicKeyAlgorithm, publicKeyFormat, encodedPublicKey);
+
+    KeyPair keyPair = keyProvider.getKeyPair(publicKey);
+    if(keyPair == null) {
+      throw new RuntimeException("KeyPair not found for specified public key");
+    }
+
     return keyPair.getPrivate();
+  }
+
+  private PublicKey getPublicKey(String algorithm, String format, byte[] encodedKey) {
+    PublicKey publicKey = null;
+
+    EncodedKeySpec keySpec = null;
+
+    if(format.equals(X509_KEYSPEC_FORMAT)) {
+      keySpec = new X509EncodedKeySpec(encodedKey);
+    } else if(format.equals(PKCS8_KEYSPEC_FORMAT)) {
+      keySpec = new PKCS8EncodedKeySpec(encodedKey);
+    } else {
+      // TODO: Support other formats.
+      throw new RuntimeException("Unsupported KeySpec format (" + format + ")");
+    }
+
+    try {
+      KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+      publicKey = keyFactory.generatePublic(keySpec);
+    } catch(Exception ex) {
+      throw new RuntimeException(ex);
+    }
+
+    return publicKey;
   }
 }

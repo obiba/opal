@@ -10,6 +10,7 @@
 package org.obiba.opal.core.datasource.onyx;
 
 import java.security.KeyPair;
+import java.security.PublicKey;
 
 /**
  * Interface for key providers.
@@ -20,10 +21,18 @@ import java.security.KeyPair;
 public interface IKeyProvider {
 
   /**
-   * Returns the specified key pair.
+   * Returns the key pair with the specified alias.
    * 
-   * @param alias the key pair's alias
-   * @return the key pair
+   * @param alias the <code>KeyPair</code>'s alias
+   * @return the <code>KeyPair</code> (<code>null</code> if not found)
    */
   public KeyPair getKeyPair(String alias);
+
+  /**
+   * Returns the <code>KeyPair</code> for the specified public key.
+   * 
+   * @param publicKey a public key
+   * @return the corresponding <code>KeyPair</code> (<code>null</code> if not found)
+   */
+  public KeyPair getKeyPair(PublicKey publicKey);
 }
