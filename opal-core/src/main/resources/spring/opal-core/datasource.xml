@@ -4,21 +4,31 @@
   <bean id="xaDataSource" class="org.enhydra.jdbc.pool.StandardXAPoolDataSource" destroy-method="shutdown">
     <property name="dataSource">
       <bean class="org.enhydra.jdbc.standard.StandardXADataSource" destroy-method="shutdown">
-      <!-- 
+      
+        <!-- MySql -->
+        <!--  
         <property name="driverName" value="com.mysql.jdbc.Driver" />
-        <property name="url" value="jdbc:mysql://localhost:3306/opal" />        
-        <property name="user" value="onyx" />
-        <property name="password" value="abc123" />
-        -->
-
+        <property name="url" value="jdbc:mysql://127.0.0.1:3306/opal" />
+        -->        
+               
+        <!-- Hsql --> 
         <property name="driverName" value="org.hsqldb.jdbcDriver" />
-        <property name="url" value="jdbc:hsqldb:file:target/opal_test.db;shutdown=true" />        
-        <property name="user" value="sa" />
-        <property name="password" value="" />
+        <property name="url" value="jdbc:hsqldb:file:target/opal_test.db;shutdown=true" />
+                
         <!-- Bind this XADataSource to the JTA TransactionManager -->
         <property name="transactionManager" ref="jotm" />
       </bean>
     </property>
+    
+    <!-- MySql -->
+    <!--  
+    <property name="user" value="onyx" />
+    <property name="password" value="abc123" />
+    -->
+    
+    <!-- Hsql --> 
+    <property name="user" value="sa" />
+    <property name="password" value="" />
 
     <property name="maxSize" value="10"/>
     <property name="minSize" value="3"/>
@@ -28,11 +38,11 @@
   <bean id="hibernateDbConfig" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
     <property name="properties">
       <props>
-        <!--  <prop key="hibernate.dialect">${org.obiba.onyx.datasource.dialect}</prop> -->
-        <!--  
+        <!--
         <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</prop>
-        -->
+        -->  
         <prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
+        
       </props>
     </property>
   </bean>
