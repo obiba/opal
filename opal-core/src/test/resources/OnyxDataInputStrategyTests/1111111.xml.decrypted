@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<variableDataSet>
+  <variableData path="/Onyx/SittingHeight/InstrumentRun/user" type="TEXT">
+    <string>administrator</string>
+  </variableData>
+  <variableData path="/Onyx/SittingHeight/InstrumentRun/timeStart" type="DATE">
+    <date>2009-05-13 16:18:35.281 EDT</date>
+  </variableData>
+  <variableData path="/Onyx/SittingHeight/InstrumentRun/timeEnd" type="DATE">
+    <date>2009-05-13 16:19:08.203 EDT</date>
+  </variableData>
+  <variableData path="/Onyx/SittingHeight/InstrumentRun/Instrument/name" type="TEXT">
+    <string>Stadiometer 1</string>
+  </variableData>
+  <variableData path="/Onyx/SittingHeight/InstrumentRun/Instrument/vendor" type="TEXT">
+    <string>Seca</string>
+  </variableData>
+  <variableData path="/Onyx/SittingHeight/InstrumentRun/Instrument/model" type="TEXT">
+    <string>Model 214</string>
+  </variableData>
+  <variableData path="/Onyx/SittingHeight/InstrumentRun/Instrument/serialNumber" type="TEXT">
+    <string>1234567890</string>
+  </variableData>
+  <variableData path="/Onyx/SittingHeight/InstrumentRun/Instrument/barcode" type="TEXT">
+    <string>sit01</string>
+  </variableData>
+  <variableData path="/Onyx/SittingHeight/Interpretive/IV_KYPHOSIS" type="TEXT">
+    <string>Yes</string>
+  </variableData>
+  <variableData path="/Onyx/SittingHeight/Input/INPUT_STOOL_HEIGHT" type="DECIMAL">
+    <double>39.5</double>
+  </variableData>
+  <variableData path="/Onyx/SittingHeight/Output/RES_FIRST_SITTING_HEIGHT" type="DECIMAL">
+    <double>110.0</double>
+  </variableData>
+  <variableData path="/Onyx/SittingHeight/Output/RES_SEC_SITTING_HEIGHT" type="DECIMAL">
+    <double>110.0</double>
+  </variableData>
+  <variableData path="/Onyx/SittingHeight/Output/RES_THIRD_SITTING_HEIGHT" type="DECIMAL">
+    <double>110.0</double>
+  </variableData>
+  <variableData path="/Onyx/SittingHeight/Output/CALC_AVG_SITTING_HEIGHT" type="DECIMAL">
+    <double>110.0</double>
+  </variableData>
+  <variableData path="/Onyx/SittingHeight/Output/CALC_DIFF_SITTING_HEIGHT" type="DECIMAL">
+    <double>70.5</double>
+  </variableData>
+  <variableData path="/Onyx/Admin/onyxVersion" type="TEXT">
+    <string>1.3.0-SNAPSHOT-b20090513160646</string>
+  </variableData>
+  <variableData path="/Onyx/Admin/ApplicationConfiguration/siteCode" type="TEXT">
+    <string>onyx001</string>
+  </variableData>
+  <variableData path="/Onyx/Admin/ApplicationConfiguration/siteName" type="TEXT">
+    <string>TEST-SITE</string>
+  </variableData>
+  <variableData path="/Onyx/Admin/ApplicationConfiguration/studyName" type="TEXT">
+    <string>TEST</string>
+  </variableData>
+  <variableData path="/Onyx/Admin/Participant/barcode" type="TEXT">
+    <string>1111111</string>
+  </variableData>
+  <variableData path="/Onyx/Admin/Interview/startDate" type="DATE">
+    <date>2009-05-13 16:17:12.219 EDT</date>
+  </variableData>
+  <variableData path="/Onyx/Admin/Interview/status" type="TEXT">
+    <string>IN_PROGRESS</string>
+  </variableData>
+  <variableData path="/Onyx/Admin/Action" type="TEXT">
+    <string>1</string>
+    <string>2</string>
+    <string>3</string>
+    <string>4</string>
+  </variableData>
+  <variableData path="/Onyx/Admin/Action/user">
+    <variableData path="/Onyx/Admin/Action/user?Action=1" type="TEXT">
+      <string>administrator</string>
+    </variableData>
+    <variableData path="/Onyx/Admin/Action/user?Action=2" type="TEXT">
+      <string>administrator</string>
+    </variableData>
+    <variableData path="/Onyx/Admin/Action/user?Action=3" type="TEXT">
+      <string>administrator</string>
+    </variableData>
+    <variableData path="/Onyx/Admin/Action/user?Action=4" type="TEXT">
+      <string>administrator</string>
+    </variableData>
+  </variableData>
+  <variableData path="/Onyx/Admin/Action/stage">
+    <variableData path="/Onyx/Admin/Action/stage?Action=1" type="TEXT">
+      <string>Consent</string>
+    </variableData>
+    <variableData path="/Onyx/Admin/Action/stage?Action=2" type="TEXT">
+      <string>Consent</string>
+    </variableData>
+    <variableData path="/Onyx/Admin/Action/stage?Action=3" type="TEXT">
+      <string>SittingHeight</string>
+    </variableData>
+    <variableData path="/Onyx/Admin/Action/stage?Action=4" type="TEXT">
+      <string>SittingHeight</string>
+    </variableData>
+  </variableData>
+  <variableData path="/Onyx/Admin/Action/actionType">
+    <variableData path="/Onyx/Admin/Action/actionType?Action=1" type="TEXT">
+      <string>EXECUTE</string>
+    </variableData>
+    <variableData path="/Onyx/Admin/Action/actionType?Action=2" type="TEXT">
+      <string>COMPLETE</string>
+    </variableData>
+    <variableData path="/Onyx/Admin/Action/actionType?Action=3" type="TEXT">
+      <string>EXECUTE</string>
+    </variableData>
+    <variableData path="/Onyx/Admin/Action/actionType?Action=4" type="TEXT">
+      <string>COMPLETE</string>
+    </variableData>
+  </variableData>
+  <variableData path="/Onyx/Admin/Action/dateTime">
+    <variableData path="/Onyx/Admin/Action/dateTime?Action=1" type="DATE">
+      <date>2009-05-13 16:17:47.484 EDT</date>
+    </variableData>
+    <variableData path="/Onyx/Admin/Action/dateTime?Action=2" type="DATE">
+      <date>2009-05-13 16:18:07.109 EDT</date>
+    </variableData>
+    <variableData path="/Onyx/Admin/Action/dateTime?Action=3" type="DATE">
+      <date>2009-05-13 16:18:35.203 EDT</date>
+    </variableData>
+    <variableData path="/Onyx/Admin/Action/dateTime?Action=4" type="DATE">
+      <date>2009-05-13 16:19:08.203 EDT</date>
+    </variableData>
+  </variableData>
+  <variableData path="/Onyx/Admin/Action/comment">
+    <variableData path="/Onyx/Admin/Action/comment?Action=1" type="TEXT">
+      <string>consent start comment</string>
+    </variableData>
+  </variableData>
+  <variableData path="/Onyx/Consent/mode" type="TEXT">
+    <string>MANUAL</string>
+  </variableData>
+  <variableData path="/Onyx/Consent/locale" type="TEXT">
+    <string>en</string>
+  </variableData>
+  <variableData path="/Onyx/Consent/accepted" type="BOOLEAN">
+    <boolean>true</boolean>
+  </variableData>
+</variableDataSet>
