@@ -1,6 +1,13 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
+  <!-- Property configurer -->
+  <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="location">
+      <value>classpath:spring/opal-cli/opal-config.properties</value>
+    </property>
+  </bean>
+
   <!-- Import opal-core's context -->
   <import resource="classpath:spring/opal-core/context.xml" />
 

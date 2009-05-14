@@ -1,0 +1,25 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:tx="http://www.springframework.org/schema/tx"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
+  http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+
+  <bean id="dataInputStrategy" class="org.obiba.opal.core.service.impl.DefaultOnyxImportServiceImpl">
+  </bean>
+
+  <bean id="opalKeyProvider" class="org.obiba.opal.core.datasource.onyx.OpalKeyStore" init-method="open" destroy-method="close">
+    <property name="keyStoreResource" value="${org.obiba.onyx.keystore.file}" />
+    <property name="keyStorePassword" value="${org.obiba.opal.keystore.password}" />
+  </bean>
+  
+  <bean id="onyxDataInputStrategy" class="org.obiba.opal.core.datasource.onyx.OnyxDataInputStrategyFactoryBean" scope="prototype">
+    <property name="chainedStrategies">
+      <list>
+        <bean class="org.obiba.opal.core.datasource.onyx.DecryptingOnyxDataInputStrategy">
+          <property name="keyProvider" ref="opalKeyProvider" />
+        </bean>
+        <bean class="org.obiba.opal.core.datasource.onyx.ZipOnyxDataInputStrategy" />
+        <bean class="org.obiba.opal.core.datasource.onyx.FileOnyxDataInputStrategy" />
+      </list>
+    </property>
+  </bean>
+</beans>

@@ -12,7 +12,6 @@ package org.obiba.opal.core.datasource.onyx;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.AlgorithmParameters;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyFactory;
@@ -145,7 +144,7 @@ public class DecryptingOnyxDataInputStrategy implements IChainingOnyxDataInputSt
     if(encryptedEntryStream != null) { // do nothing if the entry does not exist
       try {
         decryptedEntryStream = new CipherInputStream(encryptedEntryStream, getCipher());
-      } catch(Exception ex) {
+      } catch(CipherResolutionException ex) {
         throw new RuntimeException(ex);
       }
     }
@@ -192,24 +191,25 @@ public class DecryptingOnyxDataInputStrategy implements IChainingOnyxDataInputSt
    * <code>Cipher<code> is initialized based on the current metadata.
    * 
    * @return <code>Cipher</code> for decrypting entries
-   * @throws NoSuchPaddingException 
-   * @throws NoSuchAlgorithmException
-   * @throws InvalidKeyException
-   * @throws InvalidAlgorithmParameterException
-   * @throws IOException
+   * @throws CipherResolutionException if for any reason the requested <code>Cipher</code>
+   * could not be obtained or initialized as required
    */
-  private Cipher getCipher() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IOException {
+  private Cipher getCipher() throws CipherResolutionException {
     Cipher cipher = null;
 
     String transformation = metadata.getEntry("transformation");
     String[] transformationElements = transformation.split("/");
     String algorithm = transformationElements[0];
 
-    AlgorithmParameters algorithmParameters = getAlgorithmParameters(algorithm);
-    Key unwrappedKey = getUnwrappedKey(algorithm);
+    try {
+      AlgorithmParameters algorithmParameters = getAlgorithmParameters(algorithm);
+      Key unwrappedKey = getUnwrappedKey(algorithm);
 
-    cipher = Cipher.getInstance(transformation);
-    cipher.init(Cipher.DECRYPT_MODE, unwrappedKey, algorithmParameters);
+      cipher = Cipher.getInstance(transformation);
+      cipher.init(Cipher.DECRYPT_MODE, unwrappedKey, algorithmParameters);
+    } catch(Exception ex) {
+      throw new CipherResolutionException(ex);
+    }
 
     return cipher;
   }
