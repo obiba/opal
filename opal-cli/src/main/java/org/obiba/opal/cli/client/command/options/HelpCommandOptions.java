@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.cli.client.command.options;
 
+import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
+
 /**
  * This interface declares the options that may be used with the help command.
  * 
@@ -17,6 +19,7 @@ package org.obiba.opal.cli.client.command.options;
  * @author cag-dspathis
  * 
  */
+@CommandLineInterface(application = "help")
 public interface HelpCommandOptions {
   // no options
 }
