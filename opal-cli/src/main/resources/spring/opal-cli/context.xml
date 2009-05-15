@@ -4,7 +4,7 @@
   <!-- Property configurer -->
   <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
     <property name="location">
-      <value>classpath:spring/opal-cli/opal-config.properties</value>
+      <value>classpath:opal-config.properties</value>
     </property>
   </bean>
 

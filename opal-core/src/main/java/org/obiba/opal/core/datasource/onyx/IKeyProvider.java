@@ -21,6 +21,13 @@ import java.security.PublicKey;
 public interface IKeyProvider {
 
   /**
+   * Initializes the <code>IKeyProvider</code> with the specified argument string.
+   * 
+   * @param keyProviderArgs key provider argument string (format is provider-dependent)
+   */
+  public void init(String keyProviderArgs);
+
+  /**
    * Returns the key pair with the specified alias.
    * 
    * @param alias the <code>KeyPair</code>'s alias

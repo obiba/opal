@@ -6,9 +6,8 @@ xmlns:tx="http://www.springframework.org/schema/tx"
   <bean id="dataInputStrategy" class="org.obiba.opal.core.service.impl.DefaultOnyxImportServiceImpl">
   </bean>
 
-  <bean id="opalKeyProvider" class="org.obiba.opal.core.datasource.onyx.OpalKeyStore" init-method="open" destroy-method="close">
+  <bean id="opalKeyProvider" class="org.obiba.opal.core.datasource.onyx.OpalKeyStore">
     <property name="keyStoreResource" value="${org.obiba.opal.keystore.file}" />
-    <property name="keyStorePassword" value="${org.obiba.opal.keystore.password}" />
   </bean>
     
   <!-- 

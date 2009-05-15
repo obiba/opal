@@ -32,21 +32,25 @@ public class OpalKeyStore implements IKeyProvider {
 
   private Resource keyStoreResource;
 
-  private String keyStorePassword;
+  private char[] keyStorePassword;
 
   //
   // IKeyProvider Methods
   //
 
+  public void init(String keyProviderArgs) {
+    this.keyStorePassword = keyProviderArgs.toCharArray();
+  }
+
   public KeyPair getKeyPair(String alias) {
     if(keyStore == null) {
-      throw new IllegalStateException("Null keyStore (open method must be called prior to calling getKeyPair method)");
+      loadKeyStore();
     }
 
     KeyPair keyPair = null;
 
     try {
-      Key key = keyStore.getKey(alias, "password".toCharArray());
+      Key key = keyStore.getKey(alias, keyStorePassword);
 
       if(key instanceof PrivateKey) {
         // Get certificate of public key
@@ -67,7 +71,7 @@ public class OpalKeyStore implements IKeyProvider {
 
   public KeyPair getKeyPair(PublicKey publicKey) {
     if(keyStore == null) {
-      throw new IllegalStateException("Null keyStore (open method must be called prior to calling getKeyPairFor method)");
+      loadKeyStore();
     }
 
     Enumeration<String> aliases = null;
@@ -100,37 +104,29 @@ public class OpalKeyStore implements IKeyProvider {
     this.keyStoreResource = keyStoreResource;
   }
 
-  public void setKeyStorePassword(String keyStorePassword) {
-    this.keyStorePassword = keyStorePassword;
-  }
-
   /**
-   * Opens the KeyStore from the specified file using the specified password.
+   * Loads the KeyStore from the specified file using the specified password.
    * 
    * @throws RuntimeException
    */
-  public void open() {
+  public void loadKeyStore() {
     InputStream is = null;
 
     try {
       keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
       if(keyStoreResource.exists()) {
-        keyStore.load(is = keyStoreResource.getInputStream(), keyStorePassword.toCharArray());
+        keyStore.load(is = keyStoreResource.getInputStream(), keyStorePassword);
       } else {
-        keyStore.load(null, keyStorePassword.toCharArray());
+        keyStore.load(null, keyStorePassword);
       }
     } catch(Exception ex) {
       throw new RuntimeException(ex);
     } finally {
       if(is != null) try {
         is.close();
-      } catch(IOException e) {
+      } catch(IOException ex) {
         ; // nothing to do
       }
     }
-  }
-
-  public void close() {
-    keyStore = null;
   }
 }

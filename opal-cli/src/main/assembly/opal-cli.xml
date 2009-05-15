@@ -11,6 +11,13 @@
         <include>*.*</include>
       </includes>
     </fileSet>
+    <fileSet>
+      <directory>src/main/conf</directory>
+      <outputDirectory>conf</outputDirectory>
+      <includes>
+        <include>*.*</include>
+      </includes>
+    </fileSet>
   </fileSets>
   <dependencySets>
     <!-- Copy dependency jar files to 'lib' -->

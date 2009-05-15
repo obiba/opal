@@ -4,25 +4,19 @@ import java.io.File;
 import java.util.List;
 
 import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
-import uk.co.flamingpenguin.jewel.cli.Option;
 import uk.co.flamingpenguin.jewel.cli.Unparsed;
 
 /**
  * This interface declares the options that may be used with the decrypt command.
  * 
- * Note that the <code>getFile</code> method is used to access an (optional) unparsed file argument at the end of the
- * command line.
+ * Note that the <code>getFiles</code> method is used to access unparsed file arguments at the end of the command
+ * line.
  * 
  * @author cag-dspathis
  * 
  */
 @CommandLineInterface(application = "decrypt")
 public interface DecryptCommandOptions extends GlobalOptions {
-
-  @Option
-  public String getKeyStorePassword();
-
-  public boolean isKeyStorePassword();
 
   @Unparsed(name = "FILE")
   public List<File> getFiles();

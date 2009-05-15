@@ -84,6 +84,9 @@ public class DecryptingOnyxDataInputStrategy implements IChainingOnyxDataInputSt
     // Prepare delegate.
     delegate.prepare(context);
 
+    // Initialize the key provider.
+    keyProvider.init(context.getKeyProviderArgs());
+
     List<String> delegateEntries = delegate.listEntries();
     if(delegateEntries.contains(METADATA_ENTRY)) {
       // Get the metadata and initialize the strategy accordingly.

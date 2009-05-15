@@ -110,11 +110,17 @@ public class DecryptingOnyxDataInputStrategyTest {
   public void setUp() {
     context = new OnyxDataInputContext();
     context.setSource(TEST_ARCHIVE_WITH_META);
+    context.setKeyProviderArgs("password");
+
+    OpalKeyStore keyStore = new OpalKeyStore();
+    keyStore.init("password");
+    keyStore.setKeyStoreResource(new FileSystemResource(TEST_KEYSTORE));
 
     ZipOnyxDataInputStrategy zipStrategy = new ZipOnyxDataInputStrategy();
     zipStrategy.setDelegate(new FileOnyxDataInputStrategy());
 
     decryptingStrategy = new DecryptingOnyxDataInputStrategy();
+    decryptingStrategy.setKeyProvider(keyStore);
     decryptingStrategy.setDelegate(zipStrategy);
   }
 
@@ -190,12 +196,6 @@ public class DecryptingOnyxDataInputStrategyTest {
   @Test(timeout = 60000)
   public void testGetEntryWithOnyxDataExport() throws IOException {
     context.setSource(TEST_ARCHIVE_ONYX);
-
-    OpalKeyStore keyStore = new OpalKeyStore();
-    keyStore.setKeyStorePassword("password");
-    keyStore.setKeyStoreResource(new FileSystemResource(TEST_KEYSTORE));
-    keyStore.open();
-    decryptingStrategy.setKeyProvider(keyStore);
 
     decryptingStrategy.prepare(context);
 

@@ -20,6 +20,8 @@ public class OnyxDataInputContext {
 
   private String source;
 
+  private String keyProviderArgs;
+
   //
   // Methods
   //
@@ -38,5 +40,25 @@ public class OnyxDataInputContext {
    */
   public String getSource() {
     return source;
+  }
+
+  /**
+   * Indicates any arguments required by the <code>KeyProvider</code>.
+   * 
+   * Arguments are provided simply as a string. The format of this <code>String</code> is provider-dependent.
+   * 
+   * @param keyProviderArgs key provider arguments (in the case of a keystore, this could be the keystore's password)
+   */
+  public void setKeyProviderArgs(String keyProviderArgs) {
+    this.keyProviderArgs = keyProviderArgs;
+  }
+
+  /**
+   * Returns the <code>KeyProvider</code>'s argument string.
+   * 
+   * @return key provider arguments
+   */
+  public String getKeyProviderArgs() {
+    return keyProviderArgs;
   }
 }
