@@ -11,6 +11,8 @@ package org.obiba.opal.cli.client.command;
 
 import org.obiba.opal.cli.client.command.options.DecryptCommandOptions;
 import org.obiba.opal.core.datasource.onyx.IOnyxDataInputStrategy;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * Command to decrypt an Onyx data file.
@@ -37,6 +39,22 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
       // prompt for keyStorePassword
     }
 
-    System.out.println("<decrypt>");
+    // First, lazily initialize the dataInputStrategy variable (fetch it from the Spring ApplicationContext).
+    ApplicationContext context = loadContext();
+    setDataInputStrategy((IOnyxDataInputStrategy) context.getBean("onyxDataInputStrategy"));
+
+    System.out.println("<decrypt: " + dataInputStrategy.getClass().getSimpleName() + ">");
+  }
+
+  //
+  // Methods
+  //
+
+  public void setDataInputStrategy(IOnyxDataInputStrategy dataInputStrategy) {
+    this.dataInputStrategy = dataInputStrategy;
+  }
+
+  private ApplicationContext loadContext() {
+    return new ClassPathXmlApplicationContext("spring/opal-cli/context.xml");
   }
 }

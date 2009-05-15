@@ -13,15 +13,26 @@ import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
-public class OnyxDataInputStrategyFactoryBean implements FactoryBean, InitializingBean {
+public class OnyxDataInputStrategyFactoryBean implements FactoryBean, ApplicationContextAware, InitializingBean {
   //
   // Instance Variables
   //
 
-  private List<IOnyxDataInputStrategy> chainedStrategies;
+  private ApplicationContext applicationContext;
+
+  private List<String> chainedStrategies;
 
   //
+  // ApplicationContextAware Methods
+  //
+
+  public void setApplicationContext(ApplicationContext applicationContext) {
+    this.applicationContext = applicationContext;
+  }
+
   // InitializingBean Methods
   //
 
@@ -32,18 +43,6 @@ public class OnyxDataInputStrategyFactoryBean implements FactoryBean, Initializi
     if(chainedStrategies.size() == 0) {
       throw new IllegalStateException("chainedStrategies attribute must contain at least one element");
     }
-
-    // Build the chain of data input strategies.
-    IOnyxDataInputStrategy previousStrategy = chainedStrategies.get(0);
-    for(int i = 1; i < chainedStrategies.size(); i++) {
-      IOnyxDataInputStrategy delegate = chainedStrategies.get(i);
-      if(previousStrategy instanceof IChainingOnyxDataInputStrategy) {
-        ((IChainingOnyxDataInputStrategy) previousStrategy).setDelegate(delegate);
-        previousStrategy = delegate;
-      } else {
-        throw new IllegalArgumentException("Strategy type must implement IChainingOnyxDataInputStrategy in order to be chained with another. Violating type is " + previousStrategy.getClass().getName());
-      }
-    }
   }
 
   //
@@ -51,7 +50,21 @@ public class OnyxDataInputStrategyFactoryBean implements FactoryBean, Initializi
   //
 
   public Object getObject() throws Exception {
-    return chainedStrategies.get(0);
+    // Build the strategy chain.
+    IOnyxDataInputStrategy firstStrategy = (IOnyxDataInputStrategy) applicationContext.getBean(chainedStrategies.get(0));
+
+    IOnyxDataInputStrategy previousStrategy = firstStrategy;
+    for(int i = 1; i < chainedStrategies.size(); i++) {
+      IOnyxDataInputStrategy delegate = (IOnyxDataInputStrategy) applicationContext.getBean(chainedStrategies.get(i));
+      if(previousStrategy instanceof IChainingOnyxDataInputStrategy) {
+        ((IChainingOnyxDataInputStrategy) previousStrategy).setDelegate(delegate);
+        previousStrategy = delegate;
+      } else {
+        throw new IllegalArgumentException("Strategy type must implement IChainingOnyxDataInputStrategy in order to be chained with another. Violating type is " + previousStrategy.getClass().getName());
+      }
+    }
+
+    return firstStrategy;
   }
 
   public Class<?> getObjectType() {
@@ -66,7 +79,7 @@ public class OnyxDataInputStrategyFactoryBean implements FactoryBean, Initializi
   // Methods
   //
 
-  public void setChainedStrategies(List<IOnyxDataInputStrategy> chainedStrategies) {
+  public void setChainedStrategies(List<String> chainedStrategies) {
     this.chainedStrategies = chainedStrategies;
   }
 }

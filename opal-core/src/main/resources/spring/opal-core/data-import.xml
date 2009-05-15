@@ -7,19 +7,32 @@ xmlns:tx="http://www.springframework.org/schema/tx"
   </bean>
 
   <bean id="opalKeyProvider" class="org.obiba.opal.core.datasource.onyx.OpalKeyStore" init-method="open" destroy-method="close">
-    <property name="keyStoreResource" value="${org.obiba.onyx.keystore.file}" />
+    <property name="keyStoreResource" value="${org.obiba.opal.keystore.file}" />
     <property name="keyStorePassword" value="${org.obiba.opal.keystore.password}" />
   </bean>
-  
-  <bean id="onyxDataInputStrategy" class="org.obiba.opal.core.datasource.onyx.OnyxDataInputStrategyFactoryBean" scope="prototype">
+    
+  <!-- 
+    A FactoryBean that returns a (non-singleton) chain of strategies, for reading Onyx data.
+    
+    Note: The "chainedStrategies" property is an ordered list of strategies included in the chain
+    (each list item is a reference to the strategy's bean, a prototype).   
+  -->
+  <bean id="onyxDataInputStrategy" class="org.obiba.opal.core.datasource.onyx.OnyxDataInputStrategyFactoryBean">
     <property name="chainedStrategies">
       <list>
-        <bean class="org.obiba.opal.core.datasource.onyx.DecryptingOnyxDataInputStrategy">
-          <property name="keyProvider" ref="opalKeyProvider" />
-        </bean>
-        <bean class="org.obiba.opal.core.datasource.onyx.ZipOnyxDataInputStrategy" />
-        <bean class="org.obiba.opal.core.datasource.onyx.FileOnyxDataInputStrategy" />
+        <value>decryptingOnyxDataInputStrategy</value>
+        <value>zipOnyxDataInputStrategy</value>
+        <value>fileOnyxDataInputStrategy</value>
       </list>
     </property>
   </bean>
+  
+  <bean id="decryptingOnyxDataInputStrategy" class="org.obiba.opal.core.datasource.onyx.DecryptingOnyxDataInputStrategy" scope="prototype">
+    <property name="keyProvider" ref="opalKeyProvider" />
+  </bean>
+        
+  <bean id="zipOnyxDataInputStrategy" class="org.obiba.opal.core.datasource.onyx.ZipOnyxDataInputStrategy" scope="prototype" />
+  
+  <bean id="fileOnyxDataInputStrategy" class="org.obiba.opal.core.datasource.onyx.FileOnyxDataInputStrategy" scope="prototype" />
+
 </beans>
