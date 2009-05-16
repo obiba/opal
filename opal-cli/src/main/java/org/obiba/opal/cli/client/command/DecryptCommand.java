@@ -144,8 +144,14 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
     return outputDir;
   }
 
-  // TODO: Replace this code with code from org.apache.commons.io.IOUtils.
   private void persistDecryptedEntry(InputStream entryStream, File outputFile) throws IOException {
+    // Recursively create the parent directory if necessary.
+    if(outputFile.getParentFile() != null && !outputFile.getParentFile().isDirectory()) {
+      outputFile.getParentFile().mkdirs();
+    }
+
+    // Now read the entry's stream and persist it to a file.
+    // TODO: Replace this code with code from org.apache.commons.io.IOUtils.
     FileOutputStream fos = null;
     try {
       fos = new FileOutputStream(outputFile);
