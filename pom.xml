@@ -359,7 +359,12 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-log4j12</artifactId>
         <version>${slf4j.version}</version>
-        <scope>test</scope>
+        <!--
+          Previously, scope was "test" here and overridden as "runtime" in the opal-cli child POM.
+          But as of 2009/05/16, Maven seems to be behaving differently: The scope is not being overridden
+          as before, consequently this dependency is missing in opal-cli at runtime.
+        -->
+        <scope>runtime</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>

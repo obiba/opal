@@ -73,7 +73,7 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
   }
 
   private ApplicationContext loadContext() {
-    return new ClassPathXmlApplicationContext("spring/opal-cli/context.xml");
+    return new ClassPathXmlApplicationContext("spring/opal-cli/context-lite.xml");
   }
 
   private void processFile(File inputFile, String keystorePassword) {
