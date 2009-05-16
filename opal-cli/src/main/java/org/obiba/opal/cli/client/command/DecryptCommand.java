@@ -17,6 +17,7 @@ import java.io.InputStream;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.PasswordCallback;
 
+import org.obiba.core.util.FileUtil;
 import org.obiba.opal.cli.client.command.options.DecryptCommandOptions;
 import org.obiba.opal.core.datasource.onyx.IOnyxDataInputStrategy;
 import org.obiba.opal.core.datasource.onyx.OnyxDataInputContext;
@@ -46,19 +47,29 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
     }
 
     if(options.isFiles()) {
-      // Prompt user for keystore password.
-      String keystorePassword = promptForKeystorePassword();
-
-      // First, lazily initialize the dataInputStrategy variable (fetch it from the Spring ApplicationContext).
-      ApplicationContext context = loadContext();
-      setDataInputStrategy((IOnyxDataInputStrategy) context.getBean("onyxDataInputStrategy"));
-
-      // Now process each input file (Onyx data zip file) specified on the command line.
-      for(File inputFile : options.getFiles()) {
-        processFile(inputFile, keystorePassword);
+      // Validate/initialize output directory.
+      File outputDir = new File(".");
+      if(options.isOutput()) {
+        outputDir = getOutputDir(options.getOutput());
       }
 
-      System.out.println("Done!");
+      if(outputDir != null) {
+        // Prompt user for keystore password.
+        String keystorePassword = promptForKeystorePassword();
+
+        // First, lazily initialize the dataInputStrategy variable (fetch it from the Spring ApplicationContext).
+        ApplicationContext context = loadContext();
+        setDataInputStrategy((IOnyxDataInputStrategy) context.getBean("onyxDataInputStrategy"));
+
+        // Now process each input file (Onyx data zip file) specified on the command line.
+        for(File inputFile : options.getFiles()) {
+          processFile(inputFile, outputDir, keystorePassword);
+        }
+
+        System.out.println("Done!");
+      } else {
+        System.err.println("Invalid output directory");
+      }
     } else {
       System.err.println("No input file");
     }
@@ -76,7 +87,7 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
     return new ClassPathXmlApplicationContext("spring/opal-cli/context-lite.xml");
   }
 
-  private void processFile(File inputFile, String keystorePassword) {
+  private void processFile(File inputFile, File outputDir, String keystorePassword) {
     System.out.println("Processing input file " + inputFile.getPath());
 
     // Create and initialize the dataInputContext, based on the command-line options that
@@ -94,20 +105,50 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
       InputStream entryStream = dataInputStrategy.getEntry(entryName);
 
       try {
-        // Persist the decrypted entry. Put it in the current directory, and
-        // append ".decrypted" to the original entry name.
-        persistDecryptedEntry(entryStream, entryName + ".decrypted");
+        // Persist the decrypted entry.
+        persistDecryptedEntry(entryStream, new File(outputDir, entryName));
       } catch(IOException ex) {
         System.err.println("  ERROR: " + ex.getMessage());
       }
     }
   }
 
+  /**
+   * Given the name/path of a directory, returns that directory (creating it if necessary).
+   * 
+   * @param output the name/path of the directory
+   * @return the directory, as a <code>File</code> object (or <code>null</code> if the directory does not exist and
+   * could not be created
+   */
+  private File getOutputDir(String output) {
+    File outputDir = new File(output);
+
+    if(!outputDir.isDirectory()) {
+      if(!outputDir.isFile()) {
+        boolean dirCreated = outputDir.mkdirs();
+        if(!dirCreated) {
+          outputDir = null;
+
+          // Recursively delete the directory path, in case it was partially created.
+          try {
+            FileUtil.delete(outputDir);
+          } catch(IOException ex) {
+            ; // nothing to do
+          }
+        }
+      } else {
+        outputDir = null;
+      }
+    }
+
+    return outputDir;
+  }
+
   // TODO: Replace this code with code from org.apache.commons.io.IOUtils.
-  private void persistDecryptedEntry(InputStream entryStream, String fileName) throws IOException {
+  private void persistDecryptedEntry(InputStream entryStream, File outputFile) throws IOException {
     FileOutputStream fos = null;
     try {
-      fos = new FileOutputStream(fileName);
+      fos = new FileOutputStream(outputFile);
 
       while(true) {
         int entryByte = entryStream.read();
