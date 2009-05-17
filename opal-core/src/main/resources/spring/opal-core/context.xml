@@ -17,6 +17,8 @@ xmlns:tx="http://www.springframework.org/schema/tx"
   <import resource="hibernate-services.xml" />
   
   <bean id="onyxImportService" class="org.obiba.opal.core.service.impl.DefaultOnyxImportServiceImpl">
+    <property name="participantKeyReadRegistry" ref="participantKeyRegistry" />
+    <property name="participantKeyWriteRegistry" ref="participantKeyRegistry" />
   </bean>
   
   <bean id="participantIdentifier" class="org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl">

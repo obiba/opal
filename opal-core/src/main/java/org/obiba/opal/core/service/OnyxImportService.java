@@ -21,6 +21,9 @@ import java.util.List;
  */
 public interface OnyxImportService {
 
+  /** Name used by Onyx to store entries in the Participant Key database. */
+  public static final String PARTICIPANT_KEY_DB_ONYX_NAME = "ONYX";
+
   /**
    * Imports all data files, from the default import repository, exploring sub directories by date order, and site name
    * by alphabetical order.
@@ -39,8 +42,8 @@ public interface OnyxImportService {
    * @param password password (required for authentication)
    * @param date specifies the date of the data to import (if <code>null</code> all dates included)
    * @param site specifies the site origin of the data to import (if <code>null</code> all sites included)
-   * @param tags tags to be applied to created, updated elements (DEF, Variable) and added data (if <code>null</code>
-   * no tags applied)
+   * @param tags tags to be applied to created, updated elements (DEF, Variable) and added data (if <code>null</code> no
+   * tags applied)
    */
   public void importData(String username, String password, Date date, String site, List<String> tags);
 
@@ -53,8 +56,8 @@ public interface OnyxImportService {
    * @param password password (required for authentication)
    * @param date specifies the date of the data to import (if <code>null</code> all dates included)
    * @param site specifies the site origin of the data to import (if <code>null</code> all sites included)
-   * @param tags tags to be applied to created, updated elements (DEF, Variable) and added data (if <code>null</code>
-   * no tags applied)
+   * @param tags tags to be applied to created, updated elements (DEF, Variable) and added data (if <code>null</code> no
+   * tags applied)
    * @param source source of data to import (either the data file or the import directory)
    */
   public void importData(String username, String password, List<String> tags, File source);

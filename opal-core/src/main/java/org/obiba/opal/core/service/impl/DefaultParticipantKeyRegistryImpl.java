@@ -22,10 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public abstract class DefaultParticipantKeyRegistryImpl extends PersistenceManagerAwareService implements IParticipantKeyReadRegistry, IParticipantKeyWriteRegistry {
 
-  // TODO Move this to a better place.
-  /** Opal ID key name. This shouldn't be here. */
-  public final String OPAL_ID_KEY = "OPAL";
-
   private IParticipantIdentifier participantIndentifier;
 
   public void setParticipantIndentifier(IParticipantIdentifier participantIndentifier) {
@@ -84,18 +80,29 @@ public abstract class DefaultParticipantKeyRegistryImpl extends PersistenceManag
   private Participant createParticipant() {
     String opalId = createOpalId();
     Participant participant = new Participant();
-    participant.addEntry(OPAL_ID_KEY, opalId);
+    participant.addEntry(PARTICIPANT_KEY_DB_OPAL_NAME, opalId);
     return participant;
   }
 
   private String createOpalId() {
     for(int i = 0; i < 100; i++) {
       String opalId = participantIndentifier.generateParticipantIdentifier();
-      if(!hasParticipant(OPAL_ID_KEY, opalId)) {
+      if(!hasParticipant(PARTICIPANT_KEY_DB_OPAL_NAME, opalId)) {
         return opalId;
       }
     }
     throw new IllegalStateException("Unable to generate a unique opalId. One hundred attempts made.");
+  }
+
+  public void registerEntry(String owner, String key) {
+    if(owner == null) throw new IllegalArgumentException("The owner must not be null.");
+    if(key == null) throw new IllegalArgumentException("The key must not be null.");
+    // TODO The following constraints need to be added to the database.
+    if(hasParticipant(owner, key)) throw new IllegalStateException("Cannot register non unique key/value pair [" + owner + "]=[" + key + "].");
+
+    Participant participant = createParticipant();
+    participant.addEntry(owner, key);
+    getPersistenceManager().save(participant);
   }
 
   public void unregisterEntry(String owner, String key) {

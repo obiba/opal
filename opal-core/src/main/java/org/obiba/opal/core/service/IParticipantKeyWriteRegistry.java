@@ -25,6 +25,13 @@ public interface IParticipantKeyWriteRegistry {
   public void registerEntry(String refOwner, String refKey, String owner, String key);
 
   /**
+   * Method for creating a new participant and adding the supplied owner/key pair to that participant.
+   * @param owner New owner, we are going to add.
+   * @param key New key, we are going to add.
+   */
+  public void registerEntry(String owner, String key);
+
+  /**
    * Method for deleting an entry and only the entry corresponding to the given owner. If it was participant's only
    * entry, the participant is deleted. If there was no participant, the call simply returns.
    * @param owner Owner to be deleted.

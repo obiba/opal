@@ -13,12 +13,26 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 
+import org.obiba.opal.core.service.IParticipantKeyReadRegistry;
+import org.obiba.opal.core.service.IParticipantKeyWriteRegistry;
 import org.obiba.opal.core.service.OnyxImportService;
 
 /**
  * Default <code>OnyxImportService</code> implementation.
  */
 public class DefaultOnyxImportServiceImpl implements OnyxImportService {
+
+  IParticipantKeyReadRegistry participantKeyReadRegistry;
+
+  IParticipantKeyWriteRegistry participantKeyWriteRegistry;
+
+  public void setParticipantKeyReadRegistry(IParticipantKeyReadRegistry participantKeyReadRegistry) {
+    this.participantKeyReadRegistry = participantKeyReadRegistry;
+  }
+
+  public void setParticipantKeyWriteRegistry(IParticipantKeyWriteRegistry participantKeyWriteRegistry) {
+    this.participantKeyWriteRegistry = participantKeyWriteRegistry;
+  }
 
   public void importData(String username, String password) {
     // TODO Auto-generated method stub
@@ -33,6 +47,12 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
   public void importData(String username, String password, List<String> tags, File source) {
     // TODO Auto-generated method stub
     System.out.println("<importData(user: " + username + ", password: " + password + ", tags: " + tags + ", file: " + source.getPath() + ")>");
+  }
+
+  private void importParticipant(String onyxId) {
+    if(!participantKeyReadRegistry.hasParticipant(PARTICIPANT_KEY_DB_ONYX_NAME, onyxId)) {
+      participantKeyWriteRegistry.registerEntry(PARTICIPANT_KEY_DB_ONYX_NAME, onyxId);
+    }
   }
 
 }

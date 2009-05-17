@@ -16,6 +16,9 @@ import java.util.Collection;
  */
 public interface IParticipantKeyReadRegistry {
 
+  /** Name used by Opal to store entries in the Participant Key database. */
+  public static final String PARTICIPANT_KEY_DB_OPAL_NAME = "OPAL";
+
   /**
    * Method for getting the key list for a owner from a participant that can be identified by the reference owner/key
    * pair. If no participant is found with the reference entry, null is returned. If the participant was found but has
