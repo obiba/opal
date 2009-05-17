@@ -1,0 +1,121 @@
+/*******************************************************************************
+ * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
+ * 
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+package org.obiba.opal.core.service.impl;
+
+import java.util.Collection;
+import java.util.Collections;
+
+import org.obiba.core.service.impl.PersistenceManagerAwareService;
+import org.obiba.opal.core.domain.participant.Participant;
+import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
+import org.obiba.opal.core.service.IParticipantKeyReadRegistry;
+import org.obiba.opal.core.service.IParticipantKeyWriteRegistry;
+import org.springframework.transaction.annotation.Transactional;
+
+@Transactional
+public abstract class DefaultParticipantKeyRegistryImpl extends PersistenceManagerAwareService implements IParticipantKeyReadRegistry, IParticipantKeyWriteRegistry {
+
+  // TODO Move this to a better place.
+  /** Opal ID key name. This shouldn't be here. */
+  public final String OPAL_ID_KEY = "OPAL";
+
+  private IParticipantIdentifier participantIndentifier;
+
+  public void setParticipantIndentifier(IParticipantIdentifier participantIndentifier) {
+    this.participantIndentifier = participantIndentifier;
+  }
+
+  /**
+   * Returns a {@link Participant} that matches the owner/key pair, or null if one does not exist. This is available to
+   * service level code which must be taken when manipulating this object as all changes will be persisted.
+   * @param owner The {@code Participant} keyMap must have this value associated with the key.
+   * @param key The {@code Participant} keyMap must have this value associated with the owner.
+   * @return A matching {@code Participant}, or null.
+   */
+  protected abstract Participant getParticipant(String owner, String key);
+
+  public boolean hasParticipant(String owner, String key) {
+    if(owner == null) throw new IllegalArgumentException("The owner must not be null.");
+    if(key == null) throw new IllegalArgumentException("The key must not be null.");
+    if(getParticipant(owner, key) == null) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  public Collection<String> getEntry(String refOwner, String refKey, String owner) {
+    if(refOwner == null) throw new IllegalArgumentException("The refOwner must not be null.");
+    if(refKey == null) throw new IllegalArgumentException("The refKey must not be null.");
+    if(owner == null) throw new IllegalArgumentException("The owner must not be null.");
+    Participant participant = getParticipant(refOwner, refKey);
+    if(participant != null) {
+      return participant.getKey(owner);
+    } else {
+      return Collections.emptySet();
+    }
+
+  }
+
+  public void registerEntry(String refOwner, String refKey, String owner, String key) {
+    if(refOwner == null) throw new IllegalArgumentException("The refOwner must not be null.");
+    if(refKey == null) throw new IllegalArgumentException("The refKey must not be null.");
+    if(owner == null) throw new IllegalArgumentException("The owner must not be null.");
+    if(key == null) throw new IllegalArgumentException("The key must not be null.");
+    // TODO The following constraints need to be added to the database.
+    if(hasParticipant(owner, key)) throw new IllegalStateException("Cannot register non unique key/value pair [" + owner + "]=[" + key + "].");
+
+    Participant participant = getParticipant(refOwner, refKey);
+    if(participant == null) {
+      participant = createParticipant();
+      participant.addEntry(refOwner, refKey);
+    }
+    participant.addEntry(owner, key);
+    getPersistenceManager().save(participant);
+  }
+
+  private Participant createParticipant() {
+    String opalId = createOpalId();
+    Participant participant = new Participant();
+    participant.addEntry(OPAL_ID_KEY, opalId);
+    return participant;
+  }
+
+  private String createOpalId() {
+    for(int i = 0; i < 100; i++) {
+      String opalId = participantIndentifier.generateParticipantIdentifier();
+      if(!hasParticipant(OPAL_ID_KEY, opalId)) {
+        return opalId;
+      }
+    }
+    throw new IllegalStateException("Unable to generate a unique opalId. One hundred attempts made.");
+  }
+
+  public void unregisterEntry(String owner, String key) {
+    if(owner == null) throw new IllegalArgumentException("The owner must not be null.");
+    if(key == null) throw new IllegalArgumentException("The key must not be null.");
+    Participant participant = getParticipant(owner, key);
+    if(participant == null) return; // TODO Is this the right thing to do?
+    participant.removeEntry(owner, key);
+    if(participant.size() == 0) {
+      getPersistenceManager().delete(participant);
+    }
+
+  }
+
+  public void unregisterParticipant(String owner, String key) {
+    if(owner == null) throw new IllegalArgumentException("The owner must not be null.");
+    if(key == null) throw new IllegalArgumentException("The key must not be null.");
+    Participant participant = getParticipant(owner, key);
+    if(participant == null) return;
+    getPersistenceManager().delete(participant);
+  }
+
+}

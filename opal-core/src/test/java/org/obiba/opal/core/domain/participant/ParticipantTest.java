@@ -22,7 +22,7 @@ public class ParticipantTest {
 
   @Before
   public void setUp() throws Exception {
-    participant = new Participant("opalId");
+    participant = new Participant();
   }
 
   @Test(expected = IllegalArgumentException.class)

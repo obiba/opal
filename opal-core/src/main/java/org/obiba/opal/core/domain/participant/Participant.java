@@ -14,36 +14,39 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.CollectionOfElements;
 
 @Entity
 public final class Participant {
 
+  @SuppressWarnings("unused")
   @Id
-  private final String opalId;
+  @GeneratedValue
+  @Column
+  private long id;
 
   @CollectionOfElements
-  private final Map<String, Keys> keyMap = new HashMap<String, Keys>();
+  @OneToMany(cascade = { CascadeType.ALL })
+  private final Map<String, ParticipantKeys> keyMap = new HashMap<String, ParticipantKeys>();
 
-  public Participant(String opalId) {
+  public Participant() {
     super();
-    this.opalId = opalId;
-  }
-
-  public String getOpalId() {
-    return opalId;
   }
 
   public void addEntry(String keyOwner, String uniqueIdentifyingKey) {
     if(keyOwner == null) throw new IllegalArgumentException("The keyOwner must not be null.");
     if(uniqueIdentifyingKey == null) throw new IllegalArgumentException("The uniqueIdentifyingKey must not be null.");
     if(hasEntry(keyOwner, uniqueIdentifyingKey)) throw new IllegalStateException("The key/value pair [" + keyOwner + "]=[" + uniqueIdentifyingKey + "] already exists. Duplicates are not permitted.");
-    Keys keys = keyMap.get(keyOwner);
+    ParticipantKeys keys = keyMap.get(keyOwner);
     if(keys == null) {
-      keys = new Keys();
+      keys = new ParticipantKeys();
     }
     keys.addKey(uniqueIdentifyingKey);
     keyMap.put(keyOwner, keys);
@@ -55,7 +58,7 @@ public final class Participant {
    * @return Unique key used to identify the participant.
    */
   public Collection<String> getKey(String keyOwner) {
-    Keys keys = keyMap.get(keyOwner);
+    ParticipantKeys keys = keyMap.get(keyOwner);
     if(keys == null) {
       return Collections.emptySet();
     } else {
@@ -64,12 +67,27 @@ public final class Participant {
   }
 
   public boolean hasEntry(String keyOwner, String uniqueIdentifyingKey) {
-    Keys keys = keyMap.get(keyOwner);
+    ParticipantKeys keys = keyMap.get(keyOwner);
     if(keys == null) return false;
     if(keys.contains(uniqueIdentifyingKey)) {
       return true;
     } else {
       return false;
     }
+  }
+
+  public void removeEntry(String keyOwner, String uniqueIdentifyingKey) {
+    ParticipantKeys keys = keyMap.get(keyOwner);
+    if(keys == null) return;
+    if(keys.contains(uniqueIdentifyingKey)) {
+      keys.remove(uniqueIdentifyingKey);
+      if(keys.size() == 0) {
+        keyMap.remove(keyOwner);
+      }
+    }
+  }
+
+  public int size() {
+    return keyMap.size();
   }
 }

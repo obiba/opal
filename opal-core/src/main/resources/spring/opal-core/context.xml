@@ -15,8 +15,14 @@ xmlns:tx="http://www.springframework.org/schema/tx"
   <tx:annotation-driven transaction-manager="transactionManager" />
 
   <import resource="hibernate-services.xml" />
+  
   <bean id="onyxImportService" class="org.obiba.opal.core.service.impl.DefaultOnyxImportServiceImpl">
   </bean>
-
+  
+  <bean id="participantIdentifier" class="org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl">
+  </bean>
+  
+  <!-- 
   <import resource="data-import.xml" />
+  -->
 </beans>

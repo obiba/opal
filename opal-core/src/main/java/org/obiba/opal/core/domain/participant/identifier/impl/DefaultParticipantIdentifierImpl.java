@@ -17,7 +17,7 @@ import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
  * Provides a method to generate a random 10 digit {@link Participant} id. Clients are responsible to ensure that the id
  * is unique prior to use. Example ids: 7515827901, 4398790660, 0042480736.
  */
-public class DefaultParticipantIdentifierImpl implements IParticipantIdentifier {
+public final class DefaultParticipantIdentifierImpl implements IParticipantIdentifier {
 
   public String generateParticipantIdentifier() {
     Random generator = new Random();

@@ -69,13 +69,13 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
 
   <tx:annotation-driven transaction-manager="transactionManager" />
 
-  <bean id="participantService"
-    class="org.obiba.opal.core.service.impl.hibernate.ParticipantServiceHibernateImpl" scope="singleton">
+
+  <!-- Implements both IParticipantKeyReadRegistry and IParticipantKeyWriteRegistry. -->
+  <bean id="participantKeyRegistry"
+    class="org.obiba.opal.core.service.impl.hibernate.ParticipantKeyRegistryHibernateImpl" scope="singleton">
     <property name="sessionFactory" ref="sessionFactory" />
     <property name="persistenceManager" ref="persistenceManager" />
-  </bean>
-  
-
-  
+    <property name="participantIndentifier" ref="participantIdentifier" />
+  </bean> 
   
 </beans>

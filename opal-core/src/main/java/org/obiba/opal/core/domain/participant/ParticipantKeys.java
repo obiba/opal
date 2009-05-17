@@ -16,31 +16,45 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.hibernate.annotations.CollectionOfElements;
 
 @Entity
-public class Keys {
+@Table(name = "PARTICIPANT_KEYS")
+public class ParticipantKeys {
 
   @SuppressWarnings("unused")
   @Id
-  @Column(name = "id")
-  private Integer id;
+  @GeneratedValue
+  @Column
+  private long id;
 
-  @CollectionOfElements
-  private final Set<String> keys = new HashSet<String>();
+  // TODO Must add contraints to the database the "id" (owner) and value must be unique. eg. constrain(id, value.item).
+  @CollectionOfElements(targetElement = String.class)
+  @Column(name = "ITEMS", nullable = false)
+  private final Set<String> values = new HashSet<String>();
 
   void addKey(String key) {
-    keys.add(key);
+    values.add(key);
   }
 
   Collection<String> getKeys() {
-    return Collections.checkedCollection(keys, String.class);
+    return Collections.checkedCollection(values, String.class);
   }
 
   boolean contains(String key) {
-    return keys.contains(key);
+    return values.contains(key);
+  }
+
+  void remove(String key) {
+    values.remove(key);
+  }
+
+  int size() {
+    return values.size();
   }
 
 }
