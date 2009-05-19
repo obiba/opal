@@ -109,7 +109,7 @@ public abstract class DefaultParticipantKeyRegistryImpl extends PersistenceManag
     if(owner == null) throw new IllegalArgumentException("The owner must not be null.");
     if(key == null) throw new IllegalArgumentException("The key must not be null.");
     Participant participant = getParticipant(owner, key);
-    if(participant == null) return; // TODO Is this the right thing to do?
+    if(participant == null) return;
     participant.removeEntry(owner, key);
     if(participant.size() == 0) {
       getPersistenceManager().delete(participant);
