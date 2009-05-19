@@ -1,0 +1,3 @@
+#!/bin/sh
+
+java -Djava.ext.dirs=../lib org.obiba.opal.cli.client.impl.OpalClient *
