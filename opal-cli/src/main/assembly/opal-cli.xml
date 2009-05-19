@@ -8,9 +8,23 @@
       <directory>src/main/bin</directory>
       <outputDirectory>bin</outputDirectory>
       <includes>
+        <include>*.bat</include>
+      </includes>
+    </fileSet>
+    
+    <!-- Copy unix shell scripts. -->
+    <fileSet>
+      <directory>src/main/bin</directory>
+      <outputDirectory>bin</outputDirectory>
+      <fileMode>0755</fileMode>
+      <excludes>
+        <exclude>*.bat</exclude>
+      </excludes>
+      <includes>
         <include>*</include>
       </includes>
     </fileSet>
+    
     <fileSet>
       <directory>src/main/conf</directory>
       <outputDirectory>conf</outputDirectory>
