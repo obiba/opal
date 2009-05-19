@@ -1,5 +1,8 @@
 #!/bin/sh
 
+echo "JAVA_HOME=$JAVA_HOME"
+echo "OPAL_HOME=$OPAL_HOME"
+
 if [ -z "$JAVA_HOME" ]
 then
   echo "JAVA_HOME not set."
@@ -12,4 +15,4 @@ then
   exit 2;
 fi
 
-java -Djava.ext.dirs="$JAVA_HOME/jre/lib/ext;$OPAL_HOME/lib" -cp "$OPAL_HOME/conf" org.obiba.opal.cli.client.impl.OpalKeyClient *
+java -Djava.ext.dirs="$JAVA_HOME/jre/lib/ext:$OPAL_HOME/lib" -cp "$OPAL_HOME/conf" org.obiba.opal.cli.client.impl.OpalKeyClient *
