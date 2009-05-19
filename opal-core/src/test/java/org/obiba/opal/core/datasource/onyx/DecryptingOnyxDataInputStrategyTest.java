@@ -110,11 +110,12 @@ public class DecryptingOnyxDataInputStrategyTest {
   public void setUp() {
     context = new OnyxDataInputContext();
     context.setSource(TEST_ARCHIVE_WITH_META);
-    context.setKeyProviderArgs("password");
+    context.setKeyProviderArg(OpalKeyStore.KEYSTORE_PASSWORD_ARGKEY, "password");
+    context.setKeyProviderArg(OpalKeyStore.KEY_PASSWORD_ARGKEY, "password");
 
     OpalKeyStore keyStore = new OpalKeyStore();
-    keyStore.init("password");
     keyStore.setKeyStoreResource(new FileSystemResource(TEST_KEYSTORE));
+    keyStore.init(context.getKeyProviderArgs());
 
     ZipOnyxDataInputStrategy zipStrategy = new ZipOnyxDataInputStrategy();
     zipStrategy.setDelegate(new FileOnyxDataInputStrategy());

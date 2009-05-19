@@ -17,13 +17,23 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.Map;
 
 import org.springframework.core.io.Resource;
 
 public class OpalKeyStore implements IKeyProvider {
+  //
+  // Constants
+  //
+
+  public static final String KEYSTORE_PASSWORD_ARGKEY = "keystorePassword";
+
+  public static final String KEY_PASSWORD_ARGKEY = "keyPassword";
+
   //
   // Instance Variables
   //
@@ -32,25 +42,45 @@ public class OpalKeyStore implements IKeyProvider {
 
   private Resource keyStoreResource;
 
-  private char[] keyStorePassword;
+  private char[] keystorePassword;
+
+  private char[] keyPassword;
 
   //
   // IKeyProvider Methods
   //
 
-  public void init(String keyProviderArgs) {
-    this.keyStorePassword = keyProviderArgs.toCharArray();
+  public void init(Map<String, String> keyProviderArgs) {
+    if(!keyProviderArgs.containsKey(KEYSTORE_PASSWORD_ARGKEY)) {
+      throw new KeyProviderInitializationException("Key provider argument missing (keystorePassword)");
+    }
+
+    if(!keyProviderArgs.containsKey(KEY_PASSWORD_ARGKEY)) {
+      throw new KeyProviderInitializationException("Key provider argument missing (keyPassword)");
+    }
+
+    String keystorePassword = keyProviderArgs.get(KEYSTORE_PASSWORD_ARGKEY);
+    this.keystorePassword = (keystorePassword != null) ? keystorePassword.toCharArray() : null;
+
+    String keyPassword = keyProviderArgs.get(KEY_PASSWORD_ARGKEY);
+    this.keyPassword = (keyPassword != null) ? keyPassword.toCharArray() : null;
+
+    loadKeyStore();
   }
 
   public KeyPair getKeyPair(String alias) {
     if(keyStore == null) {
-      loadKeyStore();
+      throw new IllegalStateException("Null keystore (init method must be called prior to calling getKeyPair method)");
     }
 
     KeyPair keyPair = null;
 
     try {
-      Key key = keyStore.getKey(alias, keyStorePassword);
+      Key key = keyStore.getKey(alias, keyPassword);
+
+      if(key == null) {
+        throw new KeyPairNotFoundException("KeyPair not found for specified alias (" + alias + ")");
+      }
 
       if(key instanceof PrivateKey) {
         // Get certificate of public key
@@ -61,7 +91,13 @@ public class OpalKeyStore implements IKeyProvider {
 
         // Return a key pair
         keyPair = new KeyPair(publicKey, (PrivateKey) key);
+      } else {
+        throw new KeyPairNotFoundException("KeyPair not found for specified alias (" + alias + ")");
       }
+    } catch(KeyPairNotFoundException ex) {
+      throw ex;
+    } catch(UnrecoverableKeyException ex) {
+      throw new KeyProviderSecurityException("Wrong key password");
     } catch(Exception ex) {
       throw new RuntimeException(ex);
     }
@@ -71,7 +107,7 @@ public class OpalKeyStore implements IKeyProvider {
 
   public KeyPair getKeyPair(PublicKey publicKey) {
     if(keyStore == null) {
-      loadKeyStore();
+      throw new IllegalStateException("Null keystore (init method must be called prior to calling getKeyPair method)");
     }
 
     Enumeration<String> aliases = null;
@@ -93,6 +129,10 @@ public class OpalKeyStore implements IKeyProvider {
       }
     }
 
+    if(keyPair == null) {
+      throw new KeyPairNotFoundException("KeyPair not found for specified public key");
+    }
+
     return keyPair;
   }
 
@@ -107,18 +147,23 @@ public class OpalKeyStore implements IKeyProvider {
   /**
    * Loads the KeyStore from the specified file using the specified password.
    * 
-   * @throws RuntimeException
+   * @throws KeyProviderSecurityException if the keystore password is incorrect
    */
-  public void loadKeyStore() {
+  private void loadKeyStore() {
     InputStream is = null;
 
     try {
       keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
       if(keyStoreResource.exists()) {
-        keyStore.load(is = keyStoreResource.getInputStream(), keyStorePassword);
+        keyStore.load(is = keyStoreResource.getInputStream(), keystorePassword);
       } else {
-        keyStore.load(null, keyStorePassword);
+        throw new KeyProviderException("Keystore not found");
       }
+    } catch(IOException ex) {
+      if(ex.getCause() != null && ex.getCause() instanceof UnrecoverableKeyException) {
+        throw new KeyProviderSecurityException("Wrong keystore password");
+      }
+      throw new RuntimeException(ex);
     } catch(Exception ex) {
       throw new RuntimeException(ex);
     } finally {

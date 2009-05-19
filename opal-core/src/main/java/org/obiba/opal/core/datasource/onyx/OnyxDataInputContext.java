@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.core.datasource.onyx;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Provides an execution context for an <code>IOnyxDataInputStrategy</code> (specifically, for its
  * <code>prepare</code> and <code>terminate</code> methods). It contains information required by those methods.
@@ -20,7 +23,15 @@ public class OnyxDataInputContext {
 
   private String source;
 
-  private String keyProviderArgs;
+  private Map<String, String> keyProviderArgs;
+
+  //
+  // Constructors
+  //
+
+  public OnyxDataInputContext() {
+    keyProviderArgs = new HashMap<String, String>();
+  }
 
   //
   // Methods
@@ -43,22 +54,26 @@ public class OnyxDataInputContext {
   }
 
   /**
-   * Indicates any arguments required by the <code>KeyProvider</code>.
+   * Sets the value of an <code>IKeyProvider</code> argument.
    * 
-   * Arguments are provided simply as a string. The format of this <code>String</code> is provider-dependent.
-   * 
-   * @param keyProviderArgs key provider arguments (in the case of a keystore, this could be the keystore's password)
+   * @param argKey argument key
+   * @param argValue argument value
    */
-  public void setKeyProviderArgs(String keyProviderArgs) {
-    this.keyProviderArgs = keyProviderArgs;
+  public void setKeyProviderArg(String argKey, String argValue) {
+    keyProviderArgs.put(argKey, argValue);
   }
 
   /**
-   * Returns the <code>KeyProvider</code>'s argument string.
+   * Returns the value of the specified <code>IKeyProvider</code> argument.
    * 
-   * @return key provider arguments
+   * @param argKey argument key
+   * @return the argument value
    */
-  public String getKeyProviderArgs() {
-    return keyProviderArgs;
+  public String getKeyProviderArg(String argKey) {
+    return keyProviderArgs.get(argKey);
+  }
+
+  public Map<String, String> getKeyProviderArgs() {
+    return new HashMap<String, String>(keyProviderArgs);
   }
 }

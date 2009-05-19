@@ -20,7 +20,9 @@ import javax.security.auth.callback.PasswordCallback;
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.cli.client.command.options.DecryptCommandOptions;
 import org.obiba.opal.core.datasource.onyx.IOnyxDataInputStrategy;
+import org.obiba.opal.core.datasource.onyx.KeyProviderException;
 import org.obiba.opal.core.datasource.onyx.OnyxDataInputContext;
+import org.obiba.opal.core.datasource.onyx.OpalKeyStore;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -54,12 +56,12 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
       }
 
       if(outputDir != null) {
-        // Prompt user for keystore password.
-        String keystorePassword = promptForKeystorePassword();
-
         // First, lazily initialize the dataInputStrategy variable (fetch it from the Spring ApplicationContext).
         ApplicationContext context = loadContext();
         setDataInputStrategy((IOnyxDataInputStrategy) context.getBean("onyxDataInputStrategy"));
+
+        // Prompt user for keystore password.
+        String keystorePassword = promptForPassword("Enter keystore password: ");
 
         // Now process each input file (Onyx data zip file) specified on the command line.
         for(File inputFile : options.getFiles()) {
@@ -90,26 +92,39 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
   private void processFile(File inputFile, File outputDir, String keystorePassword) {
     System.out.println("Processing input file " + inputFile.getPath());
 
-    // Create and initialize the dataInputContext, based on the command-line options that
-    // were specified.
-    OnyxDataInputContext dataInputContext = new OnyxDataInputContext();
-    dataInputContext.setSource(inputFile.getPath());
-    dataInputContext.setKeyProviderArgs(keystorePassword);
+    // Prompt user for key password.
+    String keyPassword = promptForPassword("Enter key password (RETURN if same as keystore password): ");
+    if(keyPassword == null) {
+      keyPassword = keystorePassword;
+    }
 
-    // Prepare the dataInputStrategy.
-    dataInputStrategy.prepare(dataInputContext);
+    // Create the dataInputContext, based on the specified command-line options.
+    OnyxDataInputContext dataInputContext = new OnyxDataInputContext();
+    dataInputContext.setKeyProviderArg(OpalKeyStore.KEYSTORE_PASSWORD_ARGKEY, keystorePassword);
+    dataInputContext.setKeyProviderArg(OpalKeyStore.KEY_PASSWORD_ARGKEY, keyPassword);
+    dataInputContext.setSource(inputFile.getPath());
 
     // Decrypt all encrypted entries in the specified file.
-    for(String entryName : dataInputStrategy.listEntries()) {
-      System.out.println("  Decrypting " + entryName + "...");
-      InputStream entryStream = dataInputStrategy.getEntry(entryName);
+    try {
+      // Prepare the strategy.
+      dataInputStrategy.prepare(dataInputContext);
 
-      try {
-        // Persist the decrypted entry.
-        persistDecryptedEntry(entryStream, new File(outputDir, entryName));
-      } catch(IOException ex) {
-        System.err.println("  ERROR: " + ex.getMessage());
+      for(String entryName : dataInputStrategy.listEntries()) {
+        System.out.println("  Decrypting " + entryName + "...");
+        InputStream entryStream = dataInputStrategy.getEntry(entryName);
+
+        try {
+          // Persist the decrypted entry.
+          persistDecryptedEntry(entryStream, new File(outputDir, entryName));
+        } catch(IOException ex) {
+          System.err.println("  ERROR: " + ex.getMessage());
+        }
       }
+    } catch(KeyProviderException ex) {
+      System.err.println("  ERROR: " + ex.getMessage());
+    } finally {
+      // Terminate the strategy.
+      dataInputStrategy.terminate(dataInputContext);
     }
   }
 
@@ -174,19 +189,25 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
     }
   }
 
-  private String promptForKeystorePassword() {
-    String keystorePassword = null;
+  private String promptForPassword(String prompt) {
+    String password = null;
 
-    PasswordCallback passwordCallback = new PasswordCallback("keystore password: ", false);
+    PasswordCallback passwordCallback = new PasswordCallback(prompt, false);
     TextCallbackHandler handler = new TextCallbackHandler();
 
     try {
       handler.handle(new Callback[] { passwordCallback });
-      keystorePassword = new String(passwordCallback.getPassword());
+      if(passwordCallback.getPassword() != null) {
+        password = new String(passwordCallback.getPassword());
+
+        if(password.length() == 0) {
+          password = null;
+        }
+      }
     } catch(Exception ex) {
       // nothing to do
     }
 
-    return keystorePassword;
+    return password;
   }
 }

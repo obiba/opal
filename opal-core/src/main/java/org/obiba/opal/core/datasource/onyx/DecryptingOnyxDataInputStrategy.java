@@ -147,6 +147,8 @@ public class DecryptingOnyxDataInputStrategy implements IChainingOnyxDataInputSt
     if(encryptedEntryStream != null) { // do nothing if the entry does not exist
       try {
         decryptedEntryStream = new CipherInputStream(encryptedEntryStream, getCipher());
+      } catch(KeyProviderSecurityException ex) {
+        throw ex;
       } catch(CipherResolutionException ex) {
         throw new RuntimeException(ex);
       }
@@ -157,6 +159,9 @@ public class DecryptingOnyxDataInputStrategy implements IChainingOnyxDataInputSt
 
   public void terminate(OnyxDataInputContext context) {
     metadata = null;
+
+    // Terminate the delegate.
+    delegate.terminate(context);
   }
 
   //
@@ -210,6 +215,8 @@ public class DecryptingOnyxDataInputStrategy implements IChainingOnyxDataInputSt
 
       cipher = Cipher.getInstance(transformation);
       cipher.init(Cipher.DECRYPT_MODE, unwrappedKey, algorithmParameters);
+    } catch(KeyProviderSecurityException ex) {
+      throw ex;
     } catch(Exception ex) {
       throw new CipherResolutionException(ex);
     }
@@ -241,16 +248,12 @@ public class DecryptingOnyxDataInputStrategy implements IChainingOnyxDataInputSt
   }
 
   private Key getPrivateKey() {
-    // TODO: Update Onyx to include publicKeyAlgorithm in the metadata.
     String publicKeyAlgorithm = metadata.getEntry("publicKeyAlgorithm");
     String publicKeyFormat = metadata.getEntry("publicKeyFormat");
     byte[] encodedPublicKey = metadata.getEntry("publicKey");
     PublicKey publicKey = getPublicKey(publicKeyAlgorithm, publicKeyFormat, encodedPublicKey);
 
     KeyPair keyPair = keyProvider.getKeyPair(publicKey);
-    if(keyPair == null) {
-      throw new RuntimeException("KeyPair not found for specified public key");
-    }
 
     return keyPair.getPrivate();
   }
