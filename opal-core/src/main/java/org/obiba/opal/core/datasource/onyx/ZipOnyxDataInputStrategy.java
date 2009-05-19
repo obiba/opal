@@ -103,7 +103,7 @@ public class ZipOnyxDataInputStrategy implements IChainingOnyxDataInputStrategy 
       throw new IllegalStateException("Null source (prepare method must be called prior to getEntry method");
     }
 
-    // Get an InputStream from the delegate and create a ZipInputStream on top of it.
+    // Get the entry's InputStream from the delegate and create a ZipInputStream on top of it.
     zipInputStream = new ZipInputStream(delegate.getEntry(source));
 
     // Find the requested entry and return the InputStream, positioned at that entry.

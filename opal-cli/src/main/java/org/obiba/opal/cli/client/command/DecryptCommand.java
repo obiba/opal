@@ -19,6 +19,8 @@ import javax.security.auth.callback.PasswordCallback;
 
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.cli.client.command.options.DecryptCommandOptions;
+import org.obiba.opal.core.datasource.onyx.DigestMismatchException;
+import org.obiba.opal.core.datasource.onyx.DigestUtil;
 import org.obiba.opal.core.datasource.onyx.IOnyxDataInputStrategy;
 import org.obiba.opal.core.datasource.onyx.KeyProviderException;
 import org.obiba.opal.core.datasource.onyx.OnyxDataInputContext;
@@ -32,6 +34,14 @@ import com.sun.security.auth.callback.TextCallbackHandler;
  * Command to decrypt an Onyx data file.
  */
 public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
+  //
+  // Constants
+  //
+
+  public static final String DIGEST_ALGORITHM = "SHA-512";
+
+  public static final String DIGEST_ENTRY_SUFFIX = ".sha512";
+
   //
   // Instance Variables
   //
@@ -65,7 +75,11 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
 
         // Now process each input file (Onyx data zip file) specified on the command line.
         for(File inputFile : options.getFiles()) {
-          processFile(inputFile, outputDir, keystorePassword);
+          try {
+            processFile(inputFile, outputDir, keystorePassword);
+          } catch(DigestMismatchException ex) {
+            System.err.println(ex.getMessage());
+          }
         }
 
         System.out.println("Done!");
@@ -91,6 +105,10 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
 
   private void processFile(File inputFile, File outputDir, String keystorePassword) {
     System.out.println("Processing input file " + inputFile.getPath());
+
+    // Check the file against its digest. No point doing anything if the file is corrupted.
+    File digestFile = new File(inputFile.getPath() + DIGEST_ENTRY_SUFFIX);
+    DigestUtil.checkDigest(DIGEST_ALGORITHM, digestFile, inputFile);
 
     // Prompt user for key password.
     String keyPassword = promptForPassword("Enter key password (RETURN if same as keystore password): ");
@@ -121,6 +139,8 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
         }
       }
     } catch(KeyProviderException ex) {
+      System.err.println("  ERROR: " + ex.getMessage());
+    } catch(DigestMismatchException ex) {
       System.err.println("  ERROR: " + ex.getMessage());
     } finally {
       // Terminate the strategy.

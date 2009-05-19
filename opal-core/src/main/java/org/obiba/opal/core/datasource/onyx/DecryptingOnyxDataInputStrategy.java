@@ -28,6 +28,8 @@ import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.NoSuchPaddingException;
 
+import org.apache.commons.io.IOUtils;
+
 /**
  * <p>
  * DecryptingOnyxDataInputStrategy is an IOnyxDataInputStrategy used to acquire a decrypted Onyx data
@@ -46,13 +48,17 @@ public class DecryptingOnyxDataInputStrategy implements IChainingOnyxDataInputSt
   // Constants
   //
 
-  private static final String METADATA_ENTRY = "encryption.xml";
+  public static final String METADATA_ENTRY = "encryption.xml";
 
-  private static final String DIGEST_ENTRY_SUFFIX = ".sha512";
+  public static final String METADATA_ENTRY_PREFIX = "encryption.";
 
-  private static final String PKCS8_KEYSPEC_FORMAT = "PKCS#8";
+  public static final String DIGEST_ALGORITHM = "SHA-512";
 
-  private static final String X509_KEYSPEC_FORMAT = "X.509";
+  public static final String DIGEST_ENTRY_SUFFIX = ".sha512";
+
+  public static final String PKCS8_KEYSPEC_FORMAT = "PKCS#8";
+
+  public static final String X509_KEYSPEC_FORMAT = "X.509";
 
   //
   // Instance Variables
@@ -138,6 +144,21 @@ public class DecryptingOnyxDataInputStrategy implements IChainingOnyxDataInputSt
       return null;
     }
 
+    // Check the entry against its digest.
+    InputStream digestStream = null;
+    InputStream entryStream = null;
+
+    try {
+      byte[] digestBytes = IOUtils.toByteArray(delegate.getEntry(name + DIGEST_ENTRY_SUFFIX));
+      byte[] entryBytes = IOUtils.toByteArray(delegate.getEntry(name));
+      DigestUtil.checkDigest(DIGEST_ALGORITHM, digestBytes, entryBytes);
+    } catch(IOException ex) {
+      ex.printStackTrace();
+    } finally {
+      IOUtils.closeQuietly(digestStream);
+      IOUtils.closeQuietly(entryStream);
+    }
+
     // Get the entry's encrypted InputStream from the delegate.
     InputStream encryptedEntryStream = delegate.getEntry(name);
 
@@ -191,7 +212,7 @@ public class DecryptingOnyxDataInputStrategy implements IChainingOnyxDataInputSt
    * @return <code>true</code> if the entry is an encrypted entry
    */
   public boolean isEncryptedEntry(String entryName) {
-    return (entryName != null && !entryName.equals(METADATA_ENTRY) && !entryName.endsWith(DIGEST_ENTRY_SUFFIX));
+    return (entryName != null && !entryName.startsWith(METADATA_ENTRY_PREFIX) && !entryName.endsWith(DIGEST_ENTRY_SUFFIX));
   }
 
   /**
