@@ -21,6 +21,7 @@ import org.obiba.core.util.FileUtil;
 import org.obiba.opal.cli.client.command.options.DecryptCommandOptions;
 import org.obiba.opal.core.datasource.onyx.DigestMismatchException;
 import org.obiba.opal.core.datasource.onyx.DigestUtil;
+import org.obiba.opal.core.datasource.onyx.EncryptionDataMissingException;
 import org.obiba.opal.core.datasource.onyx.IOnyxDataInputStrategy;
 import org.obiba.opal.core.datasource.onyx.KeyProviderException;
 import org.obiba.opal.core.datasource.onyx.OnyxDataInputContext;
@@ -79,10 +80,13 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
             processFile(inputFile, outputDir, keystorePassword);
           } catch(DigestMismatchException ex) {
             System.err.println(ex.getMessage());
+          } catch(EncryptionDataMissingException ex) {
+            System.err.println(ex.getMessage());
+          } catch(KeyProviderException ex) {
+            System.err.println(ex.getMessage());
+            break; // break out of here, this is a fatal exception
           }
         }
-
-        System.out.println("Done!");
       } else {
         System.err.println("Invalid output directory");
       }
@@ -122,11 +126,11 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
     dataInputContext.setKeyProviderArg(OpalKeyStore.KEY_PASSWORD_ARGKEY, keyPassword);
     dataInputContext.setSource(inputFile.getPath());
 
+    // Prepare the strategy.
+    dataInputStrategy.prepare(dataInputContext);
+
     // Decrypt all encrypted entries in the specified file.
     try {
-      // Prepare the strategy.
-      dataInputStrategy.prepare(dataInputContext);
-
       for(String entryName : dataInputStrategy.listEntries()) {
         System.out.println("  Decrypting " + entryName + "...");
         InputStream entryStream = dataInputStrategy.getEntry(entryName);

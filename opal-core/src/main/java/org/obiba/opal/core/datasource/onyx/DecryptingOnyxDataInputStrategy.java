@@ -84,7 +84,7 @@ public class DecryptingOnyxDataInputStrategy implements IChainingOnyxDataInputSt
    * <code>InputStream</code> for this entry, reads the metadata, and initializes the strategy.
    * 
    * @param context the strategy's context
-   * @throws RuntimeException if the metadata entry could not be found
+   * @throws EncryptionDataMissingException if the metadata entry could not be found
    */
   public void prepare(OnyxDataInputContext context) {
     // Prepare delegate.
@@ -98,7 +98,7 @@ public class DecryptingOnyxDataInputStrategy implements IChainingOnyxDataInputSt
       // Get the metadata and initialize the strategy accordingly.
       metadata = EncryptionData.fromXml(delegate.getEntry(METADATA_ENTRY));
     } else {
-      throw new RuntimeException("Metadata entry (encryption.xml) not found");
+      throw new EncryptionDataMissingException("Metadata entry (encryption.xml) not found");
     }
   }
 

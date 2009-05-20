@@ -147,6 +147,7 @@ public class OpalKeyStore implements IKeyProvider {
   /**
    * Loads the KeyStore from the specified file using the specified password.
    * 
+   * @throws KeyProviderInitializationException if the keystore resource could not be found
    * @throws KeyProviderSecurityException if the keystore password is incorrect
    */
   private void loadKeyStore() {
@@ -157,8 +158,10 @@ public class OpalKeyStore implements IKeyProvider {
       if(keyStoreResource.exists()) {
         keyStore.load(is = keyStoreResource.getInputStream(), keystorePassword);
       } else {
-        throw new KeyProviderException("Keystore not found");
+        throw new KeyProviderInitializationException("Keystore not found");
       }
+    } catch(KeyProviderInitializationException ex) {
+      throw ex;
     } catch(IOException ex) {
       if(ex.getCause() != null && ex.getCause() instanceof UnrecoverableKeyException) {
         throw new KeyProviderSecurityException("Wrong keystore password");
