@@ -15,4 +15,4 @@ then
   exit 2;
 fi
 
-java -Djava.ext.dirs="$JAVA_HOME/jre/lib/ext:$OPAL_HOME/lib" -cp "$OPAL_HOME/conf" org.obiba.opal.cli.client.impl.OpalClient *
+java -Djava.ext.dirs="$JAVA_HOME/jre/lib/ext:$OPAL_HOME/lib" -cp "$OPAL_HOME/conf" org.obiba.opal.cli.client.impl.OpalClient $@
