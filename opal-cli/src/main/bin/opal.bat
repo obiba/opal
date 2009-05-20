@@ -1,6 +1,6 @@
 @echo off
-set JAVA_HOME=
-set OPAL_HOME=
+echo JAVA_HOME=%JAVA_HOME%
+echo OPAL_HOME=%OPAL_HOME%
 
 if "%JAVA_HOME%" == "" goto JAVA_HOME_NOT_SET
 if "%OPAL_HOME%" == "" goto OPAL_HOME_NOT_SET
