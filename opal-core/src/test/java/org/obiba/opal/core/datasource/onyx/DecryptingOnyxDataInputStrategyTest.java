@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -59,6 +60,10 @@ public class DecryptingOnyxDataInputStrategyTest {
   private static final String TEST_ARCHIVE_ONYX = //
   RESOURCE_DIR + File.separator + //
   "onyxDataExport.zip";
+
+  private static final String TEST_ARCHIVE_ONYX_WITH_ENTRY_DIGEST_MISMATCH = //
+  RESOURCE_DIR + File.separator + //
+  "onyxDataExportWithEntryDigestMismatch.zip";
 
   private static final String TEST_KEYSTORE = //
   RESOURCE_DIR + File.separator + //
@@ -201,12 +206,36 @@ public class DecryptingOnyxDataInputStrategyTest {
     decryptingStrategy.prepare(context);
 
     for(String entryName : decryptingStrategy.listEntries()) {
-      InputStream entryStream = decryptingStrategy.getEntry(entryName);
-      assertNotNull(entryStream);
+      InputStream entryStream = null;
 
-      String decryptedEntryName = entryName + ".decrypted";
-      persistDecryptedEntry(entryStream, decryptedEntryName);
-      assertTrue(compareFiles(new File(RESOURCE_DIR, decryptedEntryName), new File(TMP_DIR, decryptedEntryName)));
+      try {
+        entryStream = decryptingStrategy.getEntry(entryName);
+        assertNotNull(entryStream);
+
+        String decryptedEntryName = entryName + ".decrypted";
+        persistDecryptedEntry(entryStream, decryptedEntryName);
+        assertTrue(compareFiles(new File(RESOURCE_DIR, decryptedEntryName), new File(TMP_DIR, decryptedEntryName)));
+      } finally {
+        IOUtils.closeQuietly(entryStream);
+      }
+    }
+  }
+
+  @Test(timeout = 60000)
+  public void testGetEntryWithDigestMismatch() throws IOException {
+    context.setSource(TEST_ARCHIVE_ONYX_WITH_ENTRY_DIGEST_MISMATCH);
+
+    decryptingStrategy.prepare(context);
+
+    InputStream entryStream = null;
+
+    try {
+      entryStream = decryptingStrategy.getEntry("entryWithDigestMismatch.xml");
+      fail("Expected DigestMismatchException");
+    } catch(DigestMismatchException ex) {
+      assertEquals("Digest check failed", ex.getMessage());
+    } finally {
+      IOUtils.closeQuietly(entryStream);
     }
   }
 
