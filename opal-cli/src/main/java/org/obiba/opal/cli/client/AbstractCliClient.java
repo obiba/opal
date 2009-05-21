@@ -59,23 +59,29 @@ public abstract class AbstractCliClient implements CliClient {
   public abstract String getName();
 
   public void printUsage() {
-    String usage = "" + //
-    "Usage:" + //
-    "\n  " + getName() + " <command> <options> <args>" + //
-    "\n\n";
+    StringBuffer sb = new StringBuffer();
 
-    usage += "Commands:\n";
+    sb.append("Usage:");
+    sb.append("\n  ");
+    sb.append(getName());
+    sb.append(" <command> <options> <args>");
+    sb.append("\n\n");
+
+    sb.append("Commands:\n");
 
     for(String command : availableCommands()) {
-      usage += "  " + command + "\n";
+      sb.append("  ");
+      sb.append(command);
+      sb.append("\n");
     }
 
-    usage += "" + //
-    "\n" + //
-    "For help on a specific command, type:" + //
-    "\n  " + getName() + " <command> --help";
+    sb.append("\n");
+    sb.append("For help on a specific command, type:");
+    sb.append("\n  ");
+    sb.append(getName());
+    sb.append(" <command> --help");
 
-    System.err.println(usage);
+    System.err.println(sb.toString());
   }
 
   public List<String> availableCommands() {
