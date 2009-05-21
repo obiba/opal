@@ -19,6 +19,10 @@ xmlns:tx="http://www.springframework.org/schema/tx"
   <bean id="onyxImportService" class="org.obiba.opal.core.service.impl.DefaultOnyxImportServiceImpl">
     <property name="participantKeyReadRegistry" ref="participantKeyRegistry" />
     <property name="participantKeyWriteRegistry" ref="participantKeyRegistry" />
+    <!--  
+    <property name="keyStoreResource" value="/home/tdebat/data/opal-keys/opal.jks" />
+    -->
+    <property name="keyStoreResource" value="${org.obiba.opal.keystore.file}" />
   </bean>
   
   <bean id="participantIdentifier" class="org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl">
