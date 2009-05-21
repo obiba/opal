@@ -15,10 +15,12 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.PasswordCallback;
 
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.cli.client.command.options.DecryptCommandOptions;
+import org.obiba.opal.cli.util.ConsoleCallbackHandler;
 import org.obiba.opal.core.datasource.onyx.DigestMismatchException;
 import org.obiba.opal.core.datasource.onyx.DigestUtil;
 import org.obiba.opal.core.datasource.onyx.EncryptionDataMissingException;
@@ -28,8 +30,6 @@ import org.obiba.opal.core.datasource.onyx.OnyxDataInputContext;
 import org.obiba.opal.core.datasource.onyx.OpalKeyStore;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import com.sun.security.auth.callback.TextCallbackHandler;
 
 /**
  * Command to decrypt an Onyx data file.
@@ -217,7 +217,7 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
     String password = null;
 
     PasswordCallback passwordCallback = new PasswordCallback(prompt, false);
-    TextCallbackHandler handler = new TextCallbackHandler();
+    CallbackHandler handler = new ConsoleCallbackHandler();
 
     try {
       handler.handle(new Callback[] { passwordCallback });
@@ -230,6 +230,8 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
       }
     } catch(Exception ex) {
       // nothing to do
+    } finally {
+      passwordCallback.clearPassword();
     }
 
     return password;
