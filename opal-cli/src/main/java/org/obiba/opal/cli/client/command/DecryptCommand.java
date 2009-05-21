@@ -139,7 +139,7 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
           // Persist the decrypted entry.
           persistDecryptedEntry(entryStream, new File(outputDir, entryName));
         } catch(IOException ex) {
-          System.err.println("  ERROR: " + ex.getMessage());
+          System.err.println("  ERROR: Failed to persist decrypted entry (" + ex.getMessage() + ")");
         }
       }
     } catch(KeyProviderException ex) {
@@ -185,12 +185,25 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
 
   private void persistDecryptedEntry(InputStream entryStream, File outputFile) throws IOException {
     // Recursively create the parent directory if necessary.
-    if(outputFile.getParentFile() != null && !outputFile.getParentFile().isDirectory()) {
-      outputFile.getParentFile().mkdirs();
+    if(outputFile.getParentFile() != null) {
+      if(!outputFile.getParentFile().exists()) {
+        boolean dirCreated = outputFile.getParentFile().mkdirs();
+        if(!dirCreated) {
+          // Recursively delete the directory path, in case it was partially created.
+          try {
+            FileUtil.delete(outputFile.getParentFile());
+          } catch(IOException ex) {
+            ; // nothing to do
+          }
+
+          throw new IOException("Could not create parent directory " + outputFile.getParentFile().getPath());
+        }
+      } else if(!outputFile.getParentFile().isDirectory()) {
+        throw new IOException("Invalid parent directory " + outputFile.getParentFile().getPath());
+      }
     }
 
     // Now read the entry's stream and persist it to a file.
-    // TODO: Replace this code with code from org.apache.commons.io.IOUtils.
     FileOutputStream fos = null;
     try {
       fos = new FileOutputStream(outputFile);
