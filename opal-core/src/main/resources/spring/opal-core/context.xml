@@ -3,6 +3,8 @@ xmlns:tx="http://www.springframework.org/schema/tx"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
+  <import resource="data-input.xml" />
+
   <bean id="jotm" class="org.springframework.transaction.jta.JotmFactoryBean" />
 
   <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
@@ -19,10 +21,7 @@ xmlns:tx="http://www.springframework.org/schema/tx"
   <bean id="onyxImportService" class="org.obiba.opal.core.service.impl.DefaultOnyxImportServiceImpl">
     <property name="participantKeyReadRegistry" ref="participantKeyRegistry" />
     <property name="participantKeyWriteRegistry" ref="participantKeyRegistry" />
-    <!--  
-    <property name="keyStoreResource" value="/home/tdebat/data/opal-keys/opal.jks" />
-    -->
-    <property name="keyStoreResource" value="${org.obiba.opal.keystore.file}" />
+    <property name="dataInputStrategy" ref="onyxDataInputStrategy" />
   </bean>
   
   <bean id="participantIdentifier" class="org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl">

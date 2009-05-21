@@ -26,14 +26,12 @@ import org.obiba.onyx.engine.variable.util.VariableFinder;
 import org.obiba.onyx.engine.variable.util.VariableStreamer;
 import org.obiba.onyx.util.data.Data;
 import org.obiba.opal.core.datasource.onyx.DecryptingOnyxDataInputStrategy;
-import org.obiba.opal.core.datasource.onyx.FileOnyxDataInputStrategy;
+import org.obiba.opal.core.datasource.onyx.IOnyxDataInputStrategy;
 import org.obiba.opal.core.datasource.onyx.OnyxDataInputContext;
 import org.obiba.opal.core.datasource.onyx.OpalKeyStore;
-import org.obiba.opal.core.datasource.onyx.ZipOnyxDataInputStrategy;
 import org.obiba.opal.core.service.IParticipantKeyReadRegistry;
 import org.obiba.opal.core.service.IParticipantKeyWriteRegistry;
 import org.obiba.opal.core.service.OnyxImportService;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sun.security.auth.callback.TextCallbackHandler;
@@ -50,11 +48,7 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
 
   private IParticipantKeyWriteRegistry participantKeyWriteRegistry;
 
-  private OnyxDataInputContext context;
-
-  private DecryptingOnyxDataInputStrategy decryptingStrategy;
-
-  private String keyStoreResource;
+  private IOnyxDataInputStrategy dataInputStrategy;
 
   public void setParticipantKeyReadRegistry(IParticipantKeyReadRegistry participantKeyReadRegistry) {
     this.participantKeyReadRegistry = participantKeyReadRegistry;
@@ -64,8 +58,8 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
     this.participantKeyWriteRegistry = participantKeyWriteRegistry;
   }
 
-  public void setKeyStoreResource(String keyStoreResource) {
-    this.keyStoreResource = keyStoreResource;
+  public void setDataInputStrategy(IOnyxDataInputStrategy dataInputStrategy) {
+    this.dataInputStrategy = dataInputStrategy;
   }
 
   public void importData(String username, String password) {
@@ -80,33 +74,26 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
 
   public void importData(String username, String password, List<String> tags, File source) {
     System.out.println("<importData(user: " + username + ", password: " + password + ", tags: " + tags + ", file: " + source.getPath() + ")>\n");
-    context = new OnyxDataInputContext();
-    context.setSource(source.getPath());
 
     String keystorePassword = promptForPassword("Enter keystore password: ");
-    String keyPassword = promptForPassword("Enter key password: ");
-    context.setKeyProviderArg(OpalKeyStore.KEYSTORE_PASSWORD_ARGKEY, keystorePassword);
-    context.setKeyProviderArg(OpalKeyStore.KEY_PASSWORD_ARGKEY, keyPassword);
 
-    OpalKeyStore keyStore = new OpalKeyStore();
-    // keyStore.setKeyStoreResource(new FileSystemResource("/home/tdebat/data/opal-keys/opal.jks"));
-    // System.out.println("The key store resource is: " + keyStoreResource);
-    keyStore.setKeyStoreResource(new FileSystemResource(keyStoreResource));
-    keyStore.init(context.getKeyProviderArgs());
+    String keyPassword = promptForPassword("Enter key password (RETURN if same as keystore password): ");
+    if(keyPassword == null) {
+      keyPassword = keystorePassword;
+    }
 
-    ZipOnyxDataInputStrategy zipStrategy = new ZipOnyxDataInputStrategy();
-    zipStrategy.setDelegate(new FileOnyxDataInputStrategy());
+    // Create the dataInputContext, based on the specified command-line options.
+    OnyxDataInputContext dataInputContext = new OnyxDataInputContext();
+    dataInputContext.setKeyProviderArg(OpalKeyStore.KEYSTORE_PASSWORD_ARGKEY, keystorePassword);
+    dataInputContext.setKeyProviderArg(OpalKeyStore.KEY_PASSWORD_ARGKEY, keyPassword);
+    dataInputContext.setSource(source.getPath());
 
-    decryptingStrategy = new DecryptingOnyxDataInputStrategy();
-    decryptingStrategy.setKeyProvider(keyStore);
-    decryptingStrategy.setDelegate(zipStrategy);
-
-    decryptingStrategy.prepare(context);
+    dataInputStrategy.prepare(dataInputContext);
 
     Variable variableRoot = null;
-    for(String entryName : decryptingStrategy.listEntries()) {
+    for(String entryName : dataInputStrategy.listEntries()) {
       if(entryName.equalsIgnoreCase(VARIABLES_FILE)) {
-        InputStream entryStream = decryptingStrategy.getEntry(entryName);
+        InputStream entryStream = dataInputStrategy.getEntry(entryName);
         variableRoot = VariableStreamer.fromXML(entryStream);
       }
     }
@@ -114,9 +101,9 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
 
     int participantsProcessed = 0;
     int participantKeysRegistered = 0;
-    for(String entryName : decryptingStrategy.listEntries()) {
-      if(decryptingStrategy.isParticipantEntry(entryName)) {
-        InputStream entryStream = decryptingStrategy.getEntry(entryName);
+    for(String entryName : dataInputStrategy.listEntries()) {
+      if(((DecryptingOnyxDataInputStrategy) dataInputStrategy).isParticipantEntry(entryName)) {
+        InputStream entryStream = dataInputStrategy.getEntry(entryName);
 
         String opalKey = null; // Unique key used by Opal to identify this participant
 

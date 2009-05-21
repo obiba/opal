@@ -158,7 +158,7 @@ public class OpalKeyStore implements IKeyProvider {
       if(keyStoreResource.exists()) {
         keyStore.load(is = keyStoreResource.getInputStream(), keystorePassword);
       } else {
-        throw new KeyProviderInitializationException("Keystore not found");
+        throw new KeyProviderInitializationException("Keystore [" + keyStoreResource.getFile().getName() + "] not found.");
       }
     } catch(KeyProviderInitializationException ex) {
       throw ex;
