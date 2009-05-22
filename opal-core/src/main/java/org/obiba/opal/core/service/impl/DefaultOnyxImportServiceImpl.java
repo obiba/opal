@@ -73,8 +73,6 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
   }
 
   public void importData(String username, String password, List<String> tags, File source) {
-    System.out.println("<importData(user: " + username + ", password: " + password + ", tags: " + tags + ", file: " + source.getPath() + ")>\n");
-
     String keystorePassword = promptForPassword("Enter keystore password: ");
 
     String keyPassword = promptForPassword("Enter key password (RETURN if same as keystore password): ");
@@ -111,8 +109,8 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
         VariableFinder variableFinder = VariableFinder.getInstance(variableRoot, new DefaultVariablePathNamingStrategy());
         for(VariableData variableData : variableDataSetRoot.getVariableDatas()) {
           Variable var = variableFinder.findVariable(variableData.getVariablePath());
-
-          if(var != null && var.getKey() != null && !var.getKey().equals("")) {
+          // TODO Remove !var.getParent().isRepeatable() and handle repeatable variables correctly!
+          if(var != null && var.getKey() != null && !var.getKey().equals("") && !var.getParent().isRepeatable()) {
             // the data of this variable is a participant ID that should go to the participant key database
             for(Data data : variableData.getDatas()) {
               String participantID = data.getValueAsString();
@@ -135,6 +133,8 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
       }
     }
     System.out.println("Participants processed [" + participantsProcessed + "]    Participant Keys Registered [" + participantKeysRegistered + "]");
+    // TODO Not sure if this is the correct place to exit.
+    System.exit(0);
   }
 
   private String getOneOpalKey(String owner, String key) {
