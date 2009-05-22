@@ -133,8 +133,6 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
       }
     }
     System.out.println("Participants processed [" + participantsProcessed + "]    Participant Keys Registered [" + participantKeysRegistered + "]");
-    // TODO Not sure if this is the correct place to exit.
-    System.exit(0);
   }
 
   private String getOneOpalKey(String owner, String key) {
