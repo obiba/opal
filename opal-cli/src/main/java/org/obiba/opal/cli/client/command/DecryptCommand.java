@@ -14,13 +14,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.PasswordCallback;
-
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.cli.client.command.options.DecryptCommandOptions;
-import org.obiba.opal.cli.util.ConsoleCallbackHandler;
+import org.obiba.opal.cli.util.CliUtil;
 import org.obiba.opal.core.datasource.onyx.DigestMismatchException;
 import org.obiba.opal.core.datasource.onyx.DigestUtil;
 import org.obiba.opal.core.datasource.onyx.EncryptionDataMissingException;
@@ -72,7 +68,7 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
         setDataInputStrategy((IOnyxDataInputStrategy) context.getBean("onyxDataInputStrategy"));
 
         // Prompt user for keystore password.
-        String keystorePassword = promptForPassword("Enter keystore password: ");
+        String keystorePassword = CliUtil.promptForPassword("Enter keystore password: ");
 
         // Now process each input file (Onyx data zip file) specified on the command line.
         for(File inputFile : options.getFiles()) {
@@ -115,7 +111,7 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
     DigestUtil.checkDigest(DIGEST_ALGORITHM, digestFile, inputFile);
 
     // Prompt user for key password.
-    String keyPassword = promptForPassword("Enter key password (RETURN if same as keystore password): ");
+    String keyPassword = CliUtil.promptForPassword("Enter key password (RETURN if same as keystore password): ");
     if(keyPassword == null) {
       keyPassword = keystorePassword;
     }
@@ -224,29 +220,5 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
         }
       }
     }
-  }
-
-  private String promptForPassword(String prompt) {
-    String password = null;
-
-    PasswordCallback passwordCallback = new PasswordCallback(prompt, false);
-    CallbackHandler handler = new ConsoleCallbackHandler();
-
-    try {
-      handler.handle(new Callback[] { passwordCallback });
-      if(passwordCallback.getPassword() != null) {
-        password = new String(passwordCallback.getPassword());
-
-        if(password.length() == 0) {
-          password = null;
-        }
-      }
-    } catch(Exception ex) {
-      // nothing to do
-    } finally {
-      passwordCallback.clearPassword();
-    }
-
-    return password;
   }
 }

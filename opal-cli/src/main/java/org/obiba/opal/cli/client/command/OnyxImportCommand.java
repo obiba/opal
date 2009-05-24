@@ -16,8 +16,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.obiba.opal.cli.CliUtil;
 import org.obiba.opal.cli.client.command.options.OnyxImportCommandOptions;
+import org.obiba.opal.cli.util.CliUtil;
 import org.obiba.opal.core.service.OnyxImportService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
