@@ -10,6 +10,7 @@
 package org.obiba.opal.core.service.impl;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
@@ -87,21 +88,19 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
     Variable variableRoot = null;
     for(String entryName : dataInputStrategy.listEntries()) {
       if(entryName.equalsIgnoreCase(VARIABLES_FILE)) {
-        InputStream entryStream = dataInputStrategy.getEntry(entryName);
-        variableRoot = VariableStreamer.fromXML(entryStream);
+        variableRoot = getInputStreamFromFile(entryName);
       }
     }
-    if(variableRoot == null) throw new IllegalStateException("Unable to load variables from [variables.xml].");
 
     int participantsProcessed = 0;
     int participantKeysRegistered = 0;
     for(String entryName : dataInputStrategy.listEntries()) {
       if(((DecryptingOnyxDataInputStrategy) dataInputStrategy).isParticipantEntry(entryName)) {
-        InputStream entryStream = dataInputStrategy.getEntry(entryName);
 
         opalKey = participantKeyWriteRegistry.generateUniqueKey(IParticipantKeyReadRegistry.PARTICIPANT_KEY_DB_OPAL_NAME);
 
-        VariableDataSet variableDataSetRoot = VariableStreamer.fromXML(entryStream);
+        VariableDataSet variableDataSetRoot = getInputStreamFromFile(entryName);
+        // System.out.println(VariableStreamer.toXML(variableDataSetRoot));
         VariableFinder variableFinder = VariableFinder.getInstance(variableRoot, new DefaultVariablePathNamingStrategy());
         for(VariableData variableData : variableDataSetRoot.getVariableDatas()) {
           Variable variable = variableFinder.findVariable(variableData.getVariablePath());
@@ -121,6 +120,23 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
       }
     }
     System.out.println("Participants processed [" + participantsProcessed + "]    Participant Keys Registered [" + participantKeysRegistered + "]");
+  }
+
+  private <T> T getInputStreamFromFile(String filename) {
+    InputStream inputStream = null;
+    T object = null;
+    try {
+      inputStream = dataInputStrategy.getEntry(filename);
+      object = VariableStreamer.fromXML(inputStream);
+      if(object == null) throw new IllegalStateException("Unable to load variables from the file [" + filename + "].");
+    } finally {
+      try {
+        inputStream.close();
+      } catch(IOException e) {
+        throw new IllegalStateException("Could not close InputStream for file [" + filename + "].");
+      }
+    }
+    return object;
   }
 
   private void registerOwnerAndKeyInParticipantKeyDatabase(Variable variable, VariableData variableData) {
