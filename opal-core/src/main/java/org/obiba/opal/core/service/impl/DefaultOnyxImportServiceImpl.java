@@ -43,15 +43,12 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
 
   private static final String VARIABLES_FILE = "variables.xml";
 
-  private IParticipantKeyReadRegistry participantKeyReadRegistry;
-
   private IParticipantKeyWriteRegistry participantKeyWriteRegistry;
 
   private IOnyxDataInputStrategy dataInputStrategy;
 
-  public void setParticipantKeyReadRegistry(IParticipantKeyReadRegistry participantKeyReadRegistry) {
-    this.participantKeyReadRegistry = participantKeyReadRegistry;
-  }
+  /** The unique opal identifying key for the current participant being imported. */
+  private String opalKey;
 
   public void setParticipantKeyWriteRegistry(IParticipantKeyWriteRegistry participantKeyWriteRegistry) {
     this.participantKeyWriteRegistry = participantKeyWriteRegistry;
@@ -101,24 +98,21 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
     for(String entryName : dataInputStrategy.listEntries()) {
       if(((DecryptingOnyxDataInputStrategy) dataInputStrategy).isParticipantEntry(entryName)) {
         InputStream entryStream = dataInputStrategy.getEntry(entryName);
-        // System.out.println("processing: " + entryName);
 
-        String opalKey = participantKeyWriteRegistry.generateUniqueKey(IParticipantKeyReadRegistry.PARTICIPANT_KEY_DB_OPAL_NAME);
+        opalKey = participantKeyWriteRegistry.generateUniqueKey(IParticipantKeyReadRegistry.PARTICIPANT_KEY_DB_OPAL_NAME);
 
         VariableDataSet variableDataSetRoot = VariableStreamer.fromXML(entryStream);
         VariableFinder variableFinder = VariableFinder.getInstance(variableRoot, new DefaultVariablePathNamingStrategy());
         for(VariableData variableData : variableDataSetRoot.getVariableDatas()) {
           Variable variable = variableFinder.findVariable(variableData.getVariablePath());
-          // TODO Remove !var.getParent().isRepeatable() and handle repeatable variables correctly!
-          if(variable != null && variable.getKey() != null && !variable.getKey().equals("") && !variable.getParent().isRepeatable()) {
-            // the data of this variable is a participant ID that should go to the participant key database
-
-            for(Data data : variableData.getDatas()) {
-              String owner = variable.getKey();
-              String key = data.getValueAsString();
-              // System.out.println("processing: " + entryName + " key[" + owner + "] participantId[" + key +
-              // "] opalKey[" + opalKey + "] variablePath[" + variableData.getVariablePath() + "]");
-              participantKeyWriteRegistry.registerEntry(IParticipantKeyReadRegistry.PARTICIPANT_KEY_DB_OPAL_NAME, opalKey, owner, key);
+          if(variable != null && variable.getKey() != null && !variable.getKey().equals("")) {
+            if(variable.getParent().isRepeatable()) {
+              for(VariableData repeatVariableData : variableData.getVariableDatas()) {
+                registerOwnerAndKeyInParticipantKeyDatabase(variable, repeatVariableData);
+                participantKeysRegistered++;
+              }
+            } else {
+              registerOwnerAndKeyInParticipantKeyDatabase(variable, variableData);
               participantKeysRegistered++;
             }
           }
@@ -127,6 +121,16 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
       }
     }
     System.out.println("Participants processed [" + participantsProcessed + "]    Participant Keys Registered [" + participantKeysRegistered + "]");
+  }
+
+  private void registerOwnerAndKeyInParticipantKeyDatabase(Variable variable, VariableData variableData) {
+    String owner = variable.getKey();
+    for(Data data : variableData.getDatas()) {
+      String key = data.getValueAsString();
+      // System.out.println("processing: " + " key[" + owner + "] participantId[" + key + "] opalKey[" + opalKey +
+      // "] variablePath[" + variableData.getVariablePath() + "]");
+      participantKeyWriteRegistry.registerEntry(IParticipantKeyReadRegistry.PARTICIPANT_KEY_DB_OPAL_NAME, opalKey, owner, key);
+    }
   }
 
   private String promptForPassword(String prompt) {
