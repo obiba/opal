@@ -66,41 +66,13 @@ public abstract class DefaultParticipantKeyRegistryImpl extends PersistenceManag
     if(owner == null) throw new IllegalArgumentException("The owner must not be null.");
     if(key == null) throw new IllegalArgumentException("The key must not be null.");
     // TODO The following constraints need to be added to the database.
-    if(hasParticipant(owner, key)) throw new IllegalStateException("Cannot register non unique key/value pair [" + owner + "]=[" + key + "].");
+    if(hasParticipant(owner, key)) throw new IllegalStateException("Cannot register non unique owner/key pair [" + owner + "]=[" + key + "].");
 
     Participant participant = getParticipant(refOwner, refKey);
     if(participant == null) {
-      participant = createParticipant();
+      participant = new Participant();
       participant.addEntry(refOwner, refKey);
     }
-    participant.addEntry(owner, key);
-    getPersistenceManager().save(participant);
-  }
-
-  private Participant createParticipant() {
-    String opalId = createOpalId();
-    Participant participant = new Participant();
-    participant.addEntry(PARTICIPANT_KEY_DB_OPAL_NAME, opalId);
-    return participant;
-  }
-
-  private String createOpalId() {
-    for(int i = 0; i < 100; i++) {
-      String opalId = participantIndentifier.generateParticipantIdentifier();
-      if(!hasParticipant(PARTICIPANT_KEY_DB_OPAL_NAME, opalId)) {
-        return opalId;
-      }
-    }
-    throw new IllegalStateException("Unable to generate a unique opalId. One hundred attempts made.");
-  }
-
-  public void registerEntry(String owner, String key) {
-    if(owner == null) throw new IllegalArgumentException("The owner must not be null.");
-    if(key == null) throw new IllegalArgumentException("The key must not be null.");
-    // TODO The following constraints need to be added to the database.
-    if(hasParticipant(owner, key)) throw new IllegalStateException("Cannot register non unique key/value pair [" + owner + "]=[" + key + "].");
-
-    Participant participant = createParticipant();
     participant.addEntry(owner, key);
     getPersistenceManager().save(participant);
   }
@@ -123,6 +95,16 @@ public abstract class DefaultParticipantKeyRegistryImpl extends PersistenceManag
     Participant participant = getParticipant(owner, key);
     if(participant == null) return;
     getPersistenceManager().delete(participant);
+  }
+
+  public String generateUniqueKey(String owner) {
+    for(int i = 0; i < 100; i++) {
+      String uniqueId = participantIndentifier.generateParticipantIdentifier();
+      if(!hasParticipant(owner, uniqueId)) {
+        return uniqueId;
+      }
+    }
+    throw new IllegalStateException("Unable to generate a unique id for the owner [" + owner + "]. One hundred attempts made.");
   }
 
 }

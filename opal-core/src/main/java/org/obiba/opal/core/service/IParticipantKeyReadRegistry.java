@@ -28,6 +28,7 @@ public interface IParticipantKeyReadRegistry {
    * @param refKey Existing key.
    * @param owner Existing owner. We would like the keys associated with this owner.
    * @return All the keys associated with the owner.
+   * @throws IllegalArgumentException If any supplied argument is null.
    */
   public Collection<String> getEntry(String refOwner, String refKey, String owner);
 
@@ -36,6 +37,7 @@ public interface IParticipantKeyReadRegistry {
    * @param owner Owner associated with the Participant we are looking for.
    * @param key Key associated with the Participant we are looking for.
    * @return True if the Participant exists.
+   * @throws IllegalArgumentException If any supplied argument is null.
    */
   public boolean hasParticipant(String owner, String key);
 

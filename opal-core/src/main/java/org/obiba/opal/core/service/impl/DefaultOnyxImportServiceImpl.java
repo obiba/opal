@@ -11,7 +11,6 @@ package org.obiba.opal.core.service.impl;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -102,30 +101,25 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
     for(String entryName : dataInputStrategy.listEntries()) {
       if(((DecryptingOnyxDataInputStrategy) dataInputStrategy).isParticipantEntry(entryName)) {
         InputStream entryStream = dataInputStrategy.getEntry(entryName);
+        // System.out.println("processing: " + entryName);
 
-        String opalKey = null; // Unique key used by Opal to identify this participant
+        String opalKey = participantKeyWriteRegistry.generateUniqueKey(IParticipantKeyReadRegistry.PARTICIPANT_KEY_DB_OPAL_NAME);
 
         VariableDataSet variableDataSetRoot = VariableStreamer.fromXML(entryStream);
         VariableFinder variableFinder = VariableFinder.getInstance(variableRoot, new DefaultVariablePathNamingStrategy());
         for(VariableData variableData : variableDataSetRoot.getVariableDatas()) {
-          Variable var = variableFinder.findVariable(variableData.getVariablePath());
+          Variable variable = variableFinder.findVariable(variableData.getVariablePath());
           // TODO Remove !var.getParent().isRepeatable() and handle repeatable variables correctly!
-          if(var != null && var.getKey() != null && !var.getKey().equals("") && !var.getParent().isRepeatable()) {
+          if(variable != null && variable.getKey() != null && !variable.getKey().equals("") && !variable.getParent().isRepeatable()) {
             // the data of this variable is a participant ID that should go to the participant key database
+
             for(Data data : variableData.getDatas()) {
-              String participantID = data.getValueAsString();
-              if(participantKeyReadRegistry.hasParticipant(var.getKey(), participantID)) {
-                opalKey = getOneOpalKey(var.getKey(), participantID);
-              } else {
-                if(opalKey == null) {
-                  participantKeyWriteRegistry.registerEntry(var.getKey(), participantID);
-                  opalKey = getOneOpalKey(var.getKey(), participantID);
-                  participantKeysRegistered++;
-                } else {
-                  participantKeyWriteRegistry.registerEntry(IParticipantKeyReadRegistry.PARTICIPANT_KEY_DB_OPAL_NAME, opalKey, var.getKey(), participantID);
-                  participantKeysRegistered++;
-                }
-              }
+              String owner = variable.getKey();
+              String key = data.getValueAsString();
+              // System.out.println("processing: " + entryName + " key[" + owner + "] participantId[" + key +
+              // "] opalKey[" + opalKey + "] variablePath[" + variableData.getVariablePath() + "]");
+              participantKeyWriteRegistry.registerEntry(IParticipantKeyReadRegistry.PARTICIPANT_KEY_DB_OPAL_NAME, opalKey, owner, key);
+              participantKeysRegistered++;
             }
           }
         }
@@ -133,20 +127,6 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
       }
     }
     System.out.println("Participants processed [" + participantsProcessed + "]    Participant Keys Registered [" + participantKeysRegistered + "]");
-  }
-
-  private String getOneOpalKey(String owner, String key) {
-    Collection<String> opalKeys = participantKeyReadRegistry.getEntry(owner, key, IParticipantKeyReadRegistry.PARTICIPANT_KEY_DB_OPAL_NAME);
-    if(opalKeys.size() > 0) {
-      String returnValue = null;
-      for(String opalKey : opalKeys) {
-        returnValue = opalKey;
-        break;
-      }
-      return returnValue;
-    } else {
-      throw new IllegalStateException("The participant with the owner/key pair [" + owner + "]=[" + key + "] does not have an associated Opal key.");
-    }
   }
 
   private String promptForPassword(String prompt) {
