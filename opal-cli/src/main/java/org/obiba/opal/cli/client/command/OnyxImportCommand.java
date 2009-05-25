@@ -17,7 +17,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.obiba.opal.cli.client.command.options.OnyxImportCommandOptions;
-import org.obiba.opal.cli.util.CliUtil;
 import org.obiba.opal.core.service.OnyxImportService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -40,11 +39,6 @@ public class OnyxImportCommand extends AbstractCommand<OnyxImportCommandOptions>
     // Ensure that options have been set.
     if(options == null) {
       throw new IllegalStateException("Options not set (setOptions must be called before calling execute)");
-    }
-
-    // If user name and/or password have not been provided, prompt for them now.
-    if(!options.isUsername() || !options.isPassword()) {
-      CliUtil.promptForPassword(options);
     }
 
     // If user name and password have now been provided, go ahead and import the data.
@@ -90,7 +84,8 @@ public class OnyxImportCommand extends AbstractCommand<OnyxImportCommandOptions>
    * Converts a <code>String</code> containing comma-separated values to a <code>List</code> of those values.
    * 
    * @param csv <code>String</code> of comma-separated values
-   * @return <code>List</code> of values (or <code>null</code> if <code>csv</code> is <code>null</code> or empty)
+   * @return <code>List</code> of values (or <code>null</code> if <code>csv</code> is <code>null</code> or
+   * empty)
    */
   private List<String> csvToList(String csv) {
     List<String> valueList = null;

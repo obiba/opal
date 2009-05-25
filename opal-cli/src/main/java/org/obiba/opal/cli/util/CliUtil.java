@@ -13,23 +13,10 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.PasswordCallback;
 
-import org.obiba.opal.cli.client.command.options.AuthenticationOptions;
-
 /**
  * CLI utility methods.
  */
 public class CliUtil {
-
-  /**
-   * Prompts the user for his user name and password.
-   * 
-   * The information is captured and stored in the <code>options</code> argument.
-   * 
-   * @param options authentication options (for storing the user name and password)
-   */
-  public static void promptForPassword(AuthenticationOptions options) {
-    // TODO
-  }
 
   /**
    * Prompts the user for a password.
