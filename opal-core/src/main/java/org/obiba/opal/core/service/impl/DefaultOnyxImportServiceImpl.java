@@ -70,6 +70,7 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
   }
 
   public void importData(String username, String password, List<String> tags, File source) {
+
     String keystorePassword = promptForPassword("Enter keystore password: ");
 
     String keyPassword = promptForPassword("Enter key password (RETURN if same as keystore password): ");
@@ -85,23 +86,19 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
 
     dataInputStrategy.prepare(dataInputContext);
 
-    Variable variableRoot = null;
-    for(String entryName : dataInputStrategy.listEntries()) {
-      if(entryName.equalsIgnoreCase(VARIABLES_FILE)) {
-        variableRoot = getInputStreamFromFile(entryName);
-      }
-    }
+    Variable variableRoot = getVariableRoot();
 
     int participantsProcessed = 0;
     int participantKeysRegistered = 0;
+
     for(String entryName : dataInputStrategy.listEntries()) {
       if(((DecryptingOnyxDataInputStrategy) dataInputStrategy).isParticipantEntry(entryName)) {
 
         opalKey = participantKeyWriteRegistry.generateUniqueKey(IParticipantKeyReadRegistry.PARTICIPANT_KEY_DB_OPAL_NAME);
 
-        VariableDataSet variableDataSetRoot = getInputStreamFromFile(entryName);
-        // System.out.println(VariableStreamer.toXML(variableDataSetRoot));
+        VariableDataSet variableDataSetRoot = getVariableFromXmlFile(entryName);
         VariableFinder variableFinder = VariableFinder.getInstance(variableRoot, new DefaultVariablePathNamingStrategy());
+
         for(VariableData variableData : variableDataSetRoot.getVariableDatas()) {
           Variable variable = variableFinder.findVariable(variableData.getVariablePath());
           if(variable != null && variable.getKey() != null && !variable.getKey().equals("")) {
@@ -122,12 +119,35 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
     System.out.println("Participants processed [" + participantsProcessed + "]    Participant Keys Registered [" + participantKeysRegistered + "]");
   }
 
-  private <T> T getInputStreamFromFile(String filename) {
+  /**
+   * Returns the {@link Variable} root read from the {@code variables.xml} file found inside the
+   * {@link DataInputStrategy}.
+   * @return The root of all the {@code Variable} metadata used to describe all the {@link VariableData} found in each
+   * participant file.
+   */
+  private Variable getVariableRoot() {
+    Variable variableRoot = null;
+    for(String entryName : dataInputStrategy.listEntries()) {
+      if(entryName.equalsIgnoreCase(VARIABLES_FILE)) {
+        variableRoot = getVariableFromXmlFile(entryName);
+      }
+    }
+    if(variableRoot == null) throw new IllegalStateException("Unable to load variables. The file [" + VARIABLES_FILE + "] was not found.");
+    return variableRoot;
+  }
+
+  /**
+   * Converts an XML file into a Variable or VariableDataSet.
+   * @param <T> The type to be returned, such as Variable or VariableDataSet.
+   * @param filename The XML file to be converted.
+   * @return The root Variable or VariableDataSet
+   */
+  private <T> T getVariableFromXmlFile(String filename) {
     InputStream inputStream = null;
     T object = null;
     try {
       inputStream = dataInputStrategy.getEntry(filename);
-      object = VariableStreamer.<T>fromXML(inputStream);
+      object = VariableStreamer.<T> fromXML(inputStream);
       if(object == null) throw new IllegalStateException("Unable to load variables from the file [" + filename + "].");
     } finally {
       try {
@@ -143,8 +163,6 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
     String owner = variable.getKey();
     for(Data data : variableData.getDatas()) {
       String key = data.getValueAsString();
-      // System.out.println("processing: " + " key[" + owner + "] participantId[" + key + "] opalKey[" + opalKey +
-      // "] variablePath[" + variableData.getVariablePath() + "]");
       participantKeyWriteRegistry.registerEntry(IParticipantKeyReadRegistry.PARTICIPANT_KEY_DB_OPAL_NAME, opalKey, owner, key);
     }
   }
