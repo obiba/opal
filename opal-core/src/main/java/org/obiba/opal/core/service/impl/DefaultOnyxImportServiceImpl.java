@@ -127,7 +127,7 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
     T object = null;
     try {
       inputStream = dataInputStrategy.getEntry(filename);
-      object = VariableStreamer.fromXML(inputStream);
+      object = VariableStreamer.<T>fromXML(inputStream);
       if(object == null) throw new IllegalStateException("Unable to load variables from the file [" + filename + "].");
     } finally {
       try {
