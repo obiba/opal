@@ -17,6 +17,7 @@ import org.obiba.opal.core.domain.participant.Participant;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.service.IParticipantKeyReadRegistry;
 import org.obiba.opal.core.service.IParticipantKeyWriteRegistry;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -37,6 +38,7 @@ public abstract class DefaultParticipantKeyRegistryImpl extends PersistenceManag
    */
   protected abstract Participant getParticipant(String owner, String key);
 
+  @Transactional(propagation = Propagation.SUPPORTS)
   public boolean hasParticipant(String owner, String key) {
     if(owner == null) throw new IllegalArgumentException("The owner must not be null.");
     if(key == null) throw new IllegalArgumentException("The key must not be null.");
@@ -47,13 +49,14 @@ public abstract class DefaultParticipantKeyRegistryImpl extends PersistenceManag
     }
   }
 
+  @Transactional(propagation = Propagation.SUPPORTS)
   public Collection<String> getEntry(String refOwner, String refKey, String owner) {
     if(refOwner == null) throw new IllegalArgumentException("The refOwner must not be null.");
     if(refKey == null) throw new IllegalArgumentException("The refKey must not be null.");
     if(owner == null) throw new IllegalArgumentException("The owner must not be null.");
     Participant participant = getParticipant(refOwner, refKey);
     if(participant != null) {
-      return participant.getKey(owner);
+      return participant.getKeys(owner);
     } else {
       return Collections.emptySet();
     }

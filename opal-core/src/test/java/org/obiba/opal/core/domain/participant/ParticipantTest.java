@@ -46,9 +46,9 @@ public class ParticipantTest {
     participant.addEntry("Onyx", "OnyxUniqueId");
     participant.addEntry("DCC", "DCCUniqueId");
 
-    Assert.assertTrue(participant.getKey("Onyx").contains("OnyxUniqueId"));
-    Assert.assertTrue(participant.getKey("DCC").contains("DCCUniqueId"));
-    Assert.assertEquals(0, participant.getKey("KeyNotInMap").size());
+    Assert.assertTrue(participant.getKeys("Onyx").contains("OnyxUniqueId"));
+    Assert.assertTrue(participant.getKeys("DCC").contains("DCCUniqueId"));
+    Assert.assertEquals(0, participant.getKeys("KeyNotInMap").size());
   }
 
   @Test
@@ -57,7 +57,7 @@ public class ParticipantTest {
     participant.addEntry("BioBank", "TubeTwo");
     participant.addEntry("BioBank", "TubeThree");
 
-    Collection<String> keys = participant.getKey("BioBank");
+    Collection<String> keys = participant.getKeys("BioBank");
 
     Assert.assertEquals(3, keys.size());
     Assert.assertTrue(keys.contains("TubeOne"));
@@ -67,14 +67,14 @@ public class ParticipantTest {
 
   @Test
   public void testGetKeyWithNullValuesSupplied() {
-    Assert.assertEquals(0, participant.getKey(null).size());
+    Assert.assertEquals(0, participant.getKeys(null).size());
   }
 
   @Test(expected = UnsupportedOperationException.class)
   public void testImmutablityOfReturnedCollection() {
     participant.addEntry("BioBank", "TubeTwo");
 
-    participant.getKey("BioBank").remove("TubeTwo"); // Remove is not permitted.
+    participant.getKeys("BioBank").remove("TubeTwo"); // Remove is not permitted.
   }
 
   @Test

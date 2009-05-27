@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.obiba.opal.cli.client.command.options.OnyxImportCommandOptions;
+import org.obiba.opal.cli.util.CliUtil;
 import org.obiba.opal.core.service.OnyxImportService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -42,38 +43,40 @@ public class OnyxImportCommand extends AbstractCommand<OnyxImportCommandOptions>
       throw new IllegalStateException("Options not set (setOptions must be called before calling execute)");
     }
 
-    // If user name and password have now been provided, go ahead and import the data.
-    if(options.isUsername() && options.isPassword()) {
-      // Tell Carol not to initialize its CMI component. This helps us minimize dependencies brought in by JOTM.
-      // See: http://wiki.obiba.org/confluence/display/CAG/Technical+Requirements for details.
-      System.setProperty("cmi.disabled", "true");
+    // Tell Carol not to initialize its CMI component. This helps us minimize dependencies brought in by JOTM.
+    // See: http://wiki.obiba.org/confluence/display/CAG/Technical+Requirements for details.
+    System.setProperty("cmi.disabled", "true");
 
-      ApplicationContext context = null;
-      try {
-        // First, lazily initialize the onyxImportService variable (fetch it from the Spring ApplicationContext).
-        context = loadContext();
-        setOnyxImportService((OnyxImportService) context.getBean("onyxImportService"));
+    ApplicationContext context = null;
+    try {
+      // First, lazily initialize the onyxImportService variable (fetch it from the Spring ApplicationContext).
+      context = loadContext();
+      setOnyxImportService((OnyxImportService) context.getBean("onyxImportService"));
 
-        // Safely resolve optional option/arg values.
-        String date = options.isDate() ? options.getDate() : null;
-        String site = options.isSite() ? options.getSite() : null;
-        String tags = options.isTags() ? options.getTags() : null;
-        List<File> files = options.isFiles() ? options.getFiles() : null;
+      // Safely resolve optional option/arg values.
+      String date = options.isDate() ? options.getDate() : null;
+      String site = options.isSite() ? options.getSite() : null;
+      String tags = options.isTags() ? options.getTags() : null;
+      List<File> files = options.isFiles() ? options.getFiles() : null;
 
-        // Call the appropriate service method.
-        if(files != null) {
-          onyxImportService.importData(options.getUsername(), options.getPassword(), csvToList(tags), files.get(0));
-        } else if(options.isDate() || options.isSite()) {
-          onyxImportService.importData(options.getUsername(), options.getPassword(), stringToDate(date), site, csvToList(tags));
-        } else {
-          onyxImportService.importData(options.getUsername(), options.getPassword());
+      // Call the appropriate service method.
+      if(files != null) {
+        String keystorePassword = CliUtil.promptForPassword("Enter keystore password: ");
+        String keyPassword = CliUtil.promptForPassword("Enter key password (RETURN if same as keystore password): ");
+        if(keyPassword == null) {
+          keyPassword = keystorePassword;
         }
-      } finally {
-        // JOTM will shutdown when the Spring Application shutdown event occurs. Since we're running as a
-        // Stand alone command line application we will now send that shutdown event by calling close()
-        // manually on the application context.
-        ((ConfigurableApplicationContext) context).close();
+        onyxImportService.importData(csvToList(tags), files.get(0), keystorePassword, keyPassword);
+      } else if(options.isDate() || options.isSite()) {
+        onyxImportService.importData(stringToDate(date), site, csvToList(tags));
+      } else {
+        onyxImportService.importData();
       }
+    } finally {
+      // JOTM will shutdown when the Spring Application shutdown event occurs. Since we're running as a
+      // Stand alone command line application we will now send that shutdown event by calling close()
+      // manually on the application context.
+      ((ConfigurableApplicationContext) context).close();
     }
   }
 
@@ -93,8 +96,7 @@ public class OnyxImportCommand extends AbstractCommand<OnyxImportCommandOptions>
    * Converts a <code>String</code> containing comma-separated values to a <code>List</code> of those values.
    * 
    * @param csv <code>String</code> of comma-separated values
-   * @return <code>List</code> of values (or <code>null</code> if <code>csv</code> is <code>null</code> or
-   * empty)
+   * @return <code>List</code> of values (or <code>null</code> if <code>csv</code> is <code>null</code> or empty)
    */
   private List<String> csvToList(String csv) {
     List<String> valueList = null;

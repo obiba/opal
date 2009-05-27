@@ -26,7 +26,4 @@ xmlns:tx="http://www.springframework.org/schema/tx"
   <bean id="participantIdentifier" class="org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl">
   </bean>
   
-  <!-- 
-  <import resource="data-import.xml" />
-  -->
 </beans>

@@ -23,6 +23,9 @@ import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.CollectionOfElements;
 
+/**
+ * Represents a participant in the Participant Key Database.
+ */
 @Entity
 public final class Participant {
 
@@ -40,25 +43,32 @@ public final class Participant {
     super();
   }
 
-  public void addEntry(String keyOwner, String uniqueIdentifyingKey) {
-    if(keyOwner == null) throw new IllegalArgumentException("The keyOwner must not be null.");
-    if(uniqueIdentifyingKey == null) throw new IllegalArgumentException("The uniqueIdentifyingKey must not be null.");
-    if(hasEntry(keyOwner, uniqueIdentifyingKey)) throw new IllegalStateException("The key/value pair [" + keyOwner + "]=[" + uniqueIdentifyingKey + "] already exists. Duplicates are not permitted.");
-    ParticipantKeys keys = keyMap.get(keyOwner);
+  /**
+   * Adds the {@code owner/key} pair.
+   * @param owner The owner of the key.
+   * @param key The key associated with the owner.
+   * @throws IllegalArgumentException If any supplied argument is null.
+   * @throws IllegalStateException If supplied {@code owner/key} pair is not unique.
+   */
+  public void addEntry(String owner, String key) {
+    if(owner == null) throw new IllegalArgumentException("The owner must not be null.");
+    if(key == null) throw new IllegalArgumentException("The key must not be null.");
+    if(hasEntry(owner, key)) throw new IllegalStateException("The owner/key pair [" + owner + "]=[" + key + "] already exists. Duplicates are not permitted.");
+    ParticipantKeys keys = keyMap.get(owner);
     if(keys == null) {
       keys = new ParticipantKeys();
     }
-    keys.addKey(uniqueIdentifyingKey);
-    keyMap.put(keyOwner, keys);
+    keys.addKey(key);
+    keyMap.put(owner, keys);
   }
 
   /**
-   * Returns the unique key the supplied collection center uses to identify this participant.
-   * @param keyOwner Name of the collection center.
-   * @return Unique key used to identify the participant.
+   * Returns a {@link Collection} of keys associated with the owner.
+   * @param owner The owner of the keys.
+   * @return A {@code Collection} of keys.
    */
-  public Collection<String> getKey(String keyOwner) {
-    ParticipantKeys keys = keyMap.get(keyOwner);
+  public Collection<String> getKeys(String owner) {
+    ParticipantKeys keys = keyMap.get(owner);
     if(keys == null) {
       return Collections.emptySet();
     } else {
@@ -66,27 +76,43 @@ public final class Participant {
     }
   }
 
-  public boolean hasEntry(String keyOwner, String uniqueIdentifyingKey) {
-    ParticipantKeys keys = keyMap.get(keyOwner);
+  /**
+   * Returns true if the {@code owner/key} pair exists.
+   * @param owner The owner of the key.
+   * @param key The key associated with the owner.
+   * @return True if the {@code owner/key} pair exists, false otherwise.
+   */
+  public boolean hasEntry(String owner, String key) {
+    ParticipantKeys keys = keyMap.get(owner);
     if(keys == null) return false;
-    if(keys.contains(uniqueIdentifyingKey)) {
+    if(keys.contains(key)) {
       return true;
     } else {
       return false;
     }
   }
 
-  public void removeEntry(String keyOwner, String uniqueIdentifyingKey) {
-    ParticipantKeys keys = keyMap.get(keyOwner);
+  /**
+   * Removes the {@code owner/key} pair if they exist. This method does nothing if the {@code owner/key} pair does not
+   * exist.
+   * @param owner The owner of the key.
+   * @param key The key associated with the owner.
+   */
+  public void removeEntry(String owner, String key) {
+    ParticipantKeys keys = keyMap.get(owner);
     if(keys == null) return;
-    if(keys.contains(uniqueIdentifyingKey)) {
-      keys.remove(uniqueIdentifyingKey);
+    if(keys.contains(key)) {
+      keys.remove(key);
       if(keys.size() == 0) {
-        keyMap.remove(keyOwner);
+        keyMap.remove(owner);
       }
     }
   }
 
+  /**
+   * Returns the total number of owners.
+   * @return Total number of owners.
+   */
   public int size() {
     return keyMap.size();
   }

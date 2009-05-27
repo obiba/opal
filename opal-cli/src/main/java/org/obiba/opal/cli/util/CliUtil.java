@@ -30,6 +30,11 @@ public class CliUtil {
     PasswordCallback passwordCallback = new PasswordCallback(prompt, false);
     CallbackHandler handler = new ConsoleCallbackHandler();
 
+    // Use this handler temporarily when doing development from within eclipse.
+    // It is not possible to access the console from within eclipse.
+    // See https://bugs.eclipse.org/bugs/show_bug.cgi?id=122429
+    // CallbackHandler handler = new TextCallbackHandler();
+
     try {
       handler.handle(new Callback[] { passwordCallback });
       if(passwordCallback.getPassword() != null) {
@@ -40,11 +45,12 @@ public class CliUtil {
         }
       }
     } catch(Exception ex) {
-      // nothing to do
+      throw new IllegalStateException("Unable to prompt for password: " + ex.getMessage());
     } finally {
       passwordCallback.clearPassword();
     }
 
     return password;
   }
+
 }

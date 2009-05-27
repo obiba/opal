@@ -16,7 +16,7 @@ import uk.co.flamingpenguin.jewel.cli.Unparsed;
  * 
  */
 @CommandLineInterface(application = "onyx-import")
-public interface OnyxImportCommandOptions extends GlobalOptions, AuthenticationOptions, KeystoreOption, DateOption, SiteOption, TagsOption {
+public interface OnyxImportCommandOptions extends GlobalOptions, KeystoreOption, DateOption, SiteOption, TagsOption {
 
   @Unparsed(name = "FILE")
   public List<File> getFiles();
