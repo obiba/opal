@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -17,33 +18,33 @@
       <url>LICENSE</url>
     </license>
   </licenses>
-  
+
   <modules>
     <module>opal-core</module>
     <module>opal-cli</module>
   </modules>
-  
+
   <dependencyManagement>
     <dependencies>
-	  <!-- Obiba dependencies -->
-	  <dependency>
+      <!-- Obiba dependencies -->
+      <dependency>
         <groupId>org.obiba</groupId>
         <artifactId>obiba-core</artifactId>
         <version>${obiba.commons.version}</version>
       </dependency>
-	  
-	  <!-- Onyx dependencies -->
-	  <dependency>
+
+      <!-- Onyx dependencies -->
+      <dependency>
         <groupId>org.obiba.onyx</groupId>
         <artifactId>onyx-util</artifactId>
         <version>${onyx.version}</version>
       </dependency>
-	  <dependency>
+      <dependency>
         <groupId>org.obiba.onyx</groupId>
         <artifactId>onyx-core</artifactId>
         <version>${onyx.version}</version>
       </dependency>
-	  
+
       <!-- Definition of all Spring modules -->
       <dependency>
         <groupId>org.springframework</groupId>
@@ -220,41 +221,41 @@
         <version>${jta.version}</version>
       </dependency>
 
-	  <!-- JOTM dependencies -->
-  <dependency>
-    <groupId>org.ow2.jotm</groupId>
-    <artifactId>jotm-core</artifactId>
-    <version>${jotm.version}</version>
-    <exclusions>
-      <exclusion>
-        <groupId>org.ow2.carol.irmi</groupId>
-        <artifactId>irmi</artifactId>
-      </exclusion>
-      <exclusion>
-        <groupId>org.ow2.cmi</groupId>
-        <artifactId>cmi-admin</artifactId>
-      </exclusion>
-      <exclusion>
-        <groupId>org.ow2.cmi</groupId>
-        <artifactId>cmi-jndi</artifactId>
-      </exclusion>
-      <exclusion>
-        <groupId>org.jacorb</groupId>
-        <artifactId>jacorb</artifactId>
-      </exclusion>
-      <exclusion>
-        <groupId>org.jacorb</groupId>
-        <artifactId>jacorb-idl</artifactId>
-      </exclusion>
-      <exclusion>
-        <groupId>commons-logging</groupId>
-        <artifactId>commons-logging</artifactId>
-      </exclusion>
-    </exclusions>
-  </dependency>
-	  
-	  <!-- JOTM requires the Java Spec APIs; these are missing due to the exclusions declared above for the JOTM dependency. -->
-	  <dependency>
+      <!-- JOTM dependencies -->
+      <dependency>
+        <groupId>org.ow2.jotm</groupId>
+        <artifactId>jotm-core</artifactId>
+        <version>${jotm.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.ow2.carol.irmi</groupId>
+            <artifactId>irmi</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.ow2.cmi</groupId>
+            <artifactId>cmi-admin</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.ow2.cmi</groupId>
+            <artifactId>cmi-jndi</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.jacorb</groupId>
+            <artifactId>jacorb</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.jacorb</groupId>
+            <artifactId>jacorb-idl</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <!-- JOTM requires the Java Spec APIs; these are missing due to the exclusions declared above for the JOTM dependency. -->
+      <dependency>
         <groupId>org.ow2.spec.ee</groupId>
         <artifactId>ow2-connector-1.5-spec</artifactId>
         <version>${java.spec.version}</version>
@@ -264,7 +265,7 @@
         <artifactId>ow2-jta-1.1-spec</artifactId>
         <version>${java.spec.version}</version>
       </dependency>
-	  
+
       <dependency>
         <groupId>com.thoughtworks.xstream</groupId>
         <artifactId>xstream</artifactId>
@@ -368,73 +369,73 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-  
+
   <dependencies>
     <dependency>
-	  <groupId>org.obiba</groupId>
+      <groupId>org.obiba</groupId>
       <artifactId>obiba-core</artifactId>
-	</dependency>
-	
-	<dependency>
-	  <groupId>org.obiba</groupId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.obiba</groupId>
       <artifactId>obiba-core</artifactId>
-	</dependency>
-	
-	<dependency>
-	  <groupId>org.obiba.onyx</groupId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.obiba.onyx</groupId>
       <artifactId>onyx-util</artifactId>
-	</dependency>
-	
-	<dependency>
-	  <groupId>org.obiba.onyx</groupId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.obiba.onyx</groupId>
       <artifactId>onyx-core</artifactId>
-	</dependency>
-	
-	<!-- Logging -->
+    </dependency>
+
+    <!-- Logging -->
     <!-- Every child should use SLF4J for logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-    
+
     <!-- We've excluded commons-logging from our transitive dependencies. We replace it here. -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl104-over-slf4j</artifactId>
     </dependency>
-    
+
     <!-- Internally, we'll use log4j when unit-testing (scope is defined above) -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
     </dependency>
-    
-	<dependency>
+
+    <dependency>
       <groupId>org.ow2.jotm</groupId>
       <artifactId>jotm-core</artifactId>
     </dependency>
-	
-	<dependency>
+
+    <dependency>
       <groupId>org.ow2.spec.ee</groupId>
       <artifactId>ow2-connector-1.5-spec</artifactId>
-	</dependency>
-	
-	<dependency>
+    </dependency>
+
+    <dependency>
       <groupId>org.ow2.spec.ee</groupId>
       <artifactId>ow2-jta-1.1-spec</artifactId>
-	</dependency>
-	
-	<dependency>
+    </dependency>
+
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
-	
-	<dependency>
+
+    <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
-	</dependency>
+    </dependency>
   </dependencies>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -449,12 +450,32 @@
       </plugin>
     </plugins>
   </build>
-  
+
+  <repositories>
+    <repository>
+      <id>obiba.org</id>
+      <name>Obiba Maven 2.x Repository</name>
+      <url>http://www.obiba.org/maven2</url>
+    </repository>
+
+    <repository>
+      <id>snapshot.obiba.org</id>
+      <name>Obiba Snaphot Maven 2.x Repository</name>
+      <url>http://www.obiba.org/maven2-snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
   <scm>
     <connection>scm:svn:http://svn.obiba.org/opal/trunk</connection>
     <developerConnection>scm:svn:https://svn.obiba.org/opal/trunk</developerConnection>
   </scm>
-  
+
   <properties>
     <spring.version>2.5.6</spring.version>
     <slf4j.version>1.4.3</slf4j.version>
@@ -470,12 +491,12 @@
     <hibernate-annotations.version>3.3.1.GA</hibernate-annotations.version>
     <hibernate.version>3.2.6.ga</hibernate.version>
     <hibernate-commons-annotations.version>3.3.0.ga</hibernate-commons-annotations.version>
-	<jotm.version>2.1.4</jotm.version>
-	<java.spec.version>1.0.2</java.spec.version>
-	<obiba.commons.version>1.0.2</obiba.commons.version>
-	<onyx.version>1.3-SNAPSHOT</onyx.version>
+    <jotm.version>2.1.4</jotm.version>
+    <java.spec.version>1.0.2</java.spec.version>
+    <obiba.commons.version>1.0.2</obiba.commons.version>
+    <onyx.version>1.3-SNAPSHOT</onyx.version>
   </properties>
-  
+
   <reporting>
     <plugins>
 
@@ -509,7 +530,7 @@
 
     </plugins>
   </reporting>
-  
+
   <profiles>
     <profile>
       <!--
