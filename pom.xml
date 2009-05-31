@@ -22,6 +22,7 @@
   <modules>
     <module>opal-core</module>
     <module>opal-cli</module>
+    <module>opal-onyx-datasource</module>
   </modules>
 
   <dependencyManagement>
@@ -374,21 +375,6 @@
     <dependency>
       <groupId>org.obiba</groupId>
       <artifactId>obiba-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.obiba</groupId>
-      <artifactId>obiba-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.obiba.onyx</groupId>
-      <artifactId>onyx-util</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.obiba.onyx</groupId>
-      <artifactId>onyx-core</artifactId>
     </dependency>
 
     <!-- Logging -->

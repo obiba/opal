@@ -1,17 +1,18 @@
-<?xml version="1.0"?><project>
-  
+<?xml version="1.0"?>
+<project>
+
   <modelVersion>4.0.0</modelVersion>
-	
+
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
     <version>1.0-SNAPSHOT</version>
   </parent>
-   
+
   <groupId>org.obiba.opal</groupId>
   <artifactId>opal-cli</artifactId>
   <version>1.0-SNAPSHOT</version>
-  
+
   <name>opal-cli</name>
   <description>Opal Command-line Framework and Clients</description>
 
@@ -19,23 +20,28 @@
     <dependency>
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-core</artifactId>
-      <version>${opal-core.version}</version>
-	</dependency>
-	
-	<dependency>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-onyx-datasource</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <scope>runtime</scope>
     </dependency>
-    
+
     <!-- Command-line argument parser -->
     <dependency>
       <groupId>uk.co.flamingpenguin.jewelcli</groupId>
       <artifactId>jewelcli</artifactId>
-	  <version>${jewelcli.version}</version>
-	</dependency>
+      <version>${jewelcli.version}</version>
+    </dependency>
   </dependencies>
-  
   <build>
     <plugins>
       <plugin>
@@ -48,9 +54,8 @@
       </plugin>
     </plugins>
   </build>
-  
+
   <properties>
-    <opal-core.version>1.0-SNAPSHOT</opal-core.version>
     <jewelcli.version>0.6</jewelcli.version>
   </properties>
 </project>

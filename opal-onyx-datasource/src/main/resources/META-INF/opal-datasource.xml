@@ -1,0 +1,32 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
+  http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+
+  <bean id="onyxImportService" class="org.obiba.opal.datasource.onyx.service.impl.DefaultOnyxImportServiceImpl">
+    <property name="participantKeyWriteRegistry" ref="participantKeyRegistry" />
+    <property name="dataInputStrategy" ref="onyxDataInputStrategy" />
+  </bean>
+
+  <!--
+    A FactoryBean that returns a (non-singleton) chain of strategies, for reading Onyx data. Note: The "chainedStrategies" property is an ordered list of
+    strategies included in the chain (each list item is a reference to the strategy's bean, a prototype).
+  -->
+  <bean id="onyxDataInputStrategy" class="org.obiba.opal.datasource.onyx.OnyxDataInputStrategyFactoryBean">
+    <property name="chainedStrategies">
+      <list>
+        <value>decryptingOnyxDataInputStrategy</value>
+        <value>zipOnyxDataInputStrategy</value>
+        <value>fileOnyxDataInputStrategy</value>
+      </list>
+    </property>
+  </bean>
+
+  <bean id="decryptingOnyxDataInputStrategy" class="org.obiba.opal.datasource.onyx.DecryptingOnyxDataInputStrategy" scope="prototype">
+    <property name="keyProvider" ref="opalKeyProvider" />
+  </bean>
+
+  <bean id="zipOnyxDataInputStrategy" class="org.obiba.opal.datasource.onyx.ZipOnyxDataInputStrategy" scope="prototype" />
+
+  <bean id="fileOnyxDataInputStrategy" class="org.obiba.opal.datasource.onyx.FileOnyxDataInputStrategy" scope="prototype" />
+
+</beans>

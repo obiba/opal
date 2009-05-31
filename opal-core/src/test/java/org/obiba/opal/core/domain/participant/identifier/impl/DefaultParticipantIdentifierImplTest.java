@@ -57,7 +57,7 @@ public class DefaultParticipantIdentifierImplTest {
     Set<Character> keys = distributionMap.keySet();
     for(Character c : keys) {
       // All characters should be used roughly the same number of times
-      Assert.assertTrue("The distribution of [" + c + "] has the value [" + distributionMap.get(c) + "].", distributionMap.get(c) > 9700 && distributionMap.get(c) < 10300);
+      Assert.assertTrue("The distribution of [" + c + "] has the value [" + distributionMap.get(c) + "].", distributionMap.get(c) >= 9700 && distributionMap.get(c) <= 10300);
     }
   }
 }

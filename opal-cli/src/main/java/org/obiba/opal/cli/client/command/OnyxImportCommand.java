@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.obiba.opal.cli.client.command.options.OnyxImportCommandOptions;
 import org.obiba.opal.cli.util.CliUtil;
-import org.obiba.opal.core.service.OnyxImportService;
+import org.obiba.opal.datasource.onyx.service.OnyxImportService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -73,10 +73,12 @@ public class OnyxImportCommand extends AbstractCommand<OnyxImportCommandOptions>
         onyxImportService.importData();
       }
     } finally {
-      // JOTM will shutdown when the Spring Application shutdown event occurs. Since we're running as a
-      // Stand alone command line application we will now send that shutdown event by calling close()
-      // manually on the application context.
-      ((ConfigurableApplicationContext) context).close();
+      if(context != null) {
+        // JOTM will shutdown when the Spring Application shutdown event occurs. Since we're running as a
+        // Stand alone command line application we will now send that shutdown event by calling close()
+        // manually on the application context.
+        ((ConfigurableApplicationContext) context).close();
+      }
     }
   }
 
