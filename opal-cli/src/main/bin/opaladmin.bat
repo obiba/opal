@@ -10,10 +10,10 @@ goto :END
 
 :JAVA_HOME_NOT_SET
 echo JAVA_HOME not set
-exit
+goto :END
 
 :OPAL_HOME_NOT_SET
 echo OPAL_HOME not set
-exit
+goto :END
 
 :END
