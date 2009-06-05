@@ -11,6 +11,9 @@
     </property>
   </bean>
 
+  <bean id="memoryRepositoryFactory" class="org.obiba.opal.core.sesame.repository.impl.MemoryRepositoryFactory">
+  </bean>
+
   <bean id="nativeRepositoryFactory" class="org.obiba.opal.core.sesame.repository.impl.NativeRepositoryFactory">
     <property name="dataDir" value="target/catalog"/>
     <property name="tripleIndexes" value="spoc,posc,cosp"/>
