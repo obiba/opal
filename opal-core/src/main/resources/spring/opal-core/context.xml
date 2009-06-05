@@ -3,6 +3,8 @@
   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
   <import resource="classpath*:/META-INF/opal-datasource.xml" />
+  
+  <import resource="classpath*:/META-INF/beans.xml" />
 
   <bean id="opalKeyProvider" class="org.obiba.opal.core.crypt.OpalKeyStore">
     <property name="keyStoreResource" value="${org.obiba.opal.keystore.file}" />
