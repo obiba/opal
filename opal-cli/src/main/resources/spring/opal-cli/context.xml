@@ -10,5 +10,6 @@
 
   <!-- Import opal-core's context -->
   <import resource="classpath:spring/opal-core/context.xml" />
+  <import resource="classpath:/META-INF/opal/repository.xml" />
 
 </beans>

@@ -1,0 +1,54 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
+  http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+
+  <bean id="opalRepositoryManager" class="org.obiba.opal.sesame.repository.impl.OpalRepositoryManagerImpl" scope="singleton" init-method="initialize"
+    destroy-method="shutdown">
+    <property name="repositories">
+      <map>
+        <entry key="catalog" value-ref="nativeRepositoryFactory" />
+        <entry key="data" value-ref="dataRepository" />
+      </map>
+    </property>
+  </bean>
+
+  <bean id="memoryRepositoryFactory" class="org.obiba.opal.sesame.repository.impl.MemoryRepositoryFactory">
+  </bean>
+
+  <bean id="nativeRepositoryFactory" class="org.obiba.opal.sesame.repository.impl.NativeRepositoryFactory">
+    <property name="dataDir" value="target/catalog" />
+    <property name="tripleIndexes" value="spoc,posc,cosp" />
+    <property name="withInferencer" value="false" />
+  </bean>
+
+  <bean id="dataRepository" class="org.obiba.opal.sesame.repository.SailRepositoryFactoryBean">
+    <property name="sail" ref="dataStore" />
+  </bean>
+
+  <bean id="dataStore" class="org.obiba.opal.sesame.repository.rdbms.DatasourceStore">
+    <property name="dataSource">
+      <bean class="org.enhydra.jdbc.pool.StandardXAPoolDataSource" destroy-method="shutdown">
+        <property name="dataSource">
+          <bean class="org.enhydra.jdbc.standard.StandardXADataSource" destroy-method="shutdown">
+
+            <property name="driverName" value="${org.obiba.opal.datasource.opal.driver}" />
+            <property name="url" value="${org.obiba.opal.datasource.opal.url}" />
+
+            <!-- Bind this XADataSource to the JTA TransactionManager -->
+            <property name="transactionManager" ref="jotm" />
+          </bean>
+        </property>
+
+        <property name="user" value="${org.obiba.opal.datasource.opal.username}" />
+        <property name="password" value="${org.obiba.opal.datasource.opal.password}" />
+
+        <property name="maxSize" value="10" />
+        <property name="minSize" value="3" />
+
+      </bean>
+    </property>
+    <property name="indexed" value="false" />
+    <property name="maxNumberOfTripleTables" value="0" />
+  </bean>
+
+</beans>

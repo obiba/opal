@@ -22,6 +22,7 @@
     <module>opal-core</module>
     <module>opal-cli</module>
     <module>opal-onyx-datasource</module>
+    <module>opal-onyx-sesame</module>
   </modules>
 
   <dependencyManagement>
@@ -302,7 +303,7 @@
       <!-- Use commons-logging over slf4j in order to remove it completely from the runtime classpath -->
       <dependency>
         <groupId>org.slf4j</groupId>
-        <artifactId>jcl104-over-slf4j</artifactId>
+        <artifactId>jcl-over-slf4j</artifactId>
         <version>${slf4j.version}</version>
         <scope>runtime</scope>
       </dependency>
@@ -391,7 +392,7 @@
     <!-- We've excluded commons-logging from our transitive dependencies. We replace it here. -->
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>jcl104-over-slf4j</artifactId>
+      <artifactId>jcl-over-slf4j</artifactId>
     </dependency>
 
     <!-- Internally, we'll use log4j when unit-testing (scope is defined above) -->

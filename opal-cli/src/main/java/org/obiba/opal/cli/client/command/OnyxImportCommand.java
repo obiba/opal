@@ -91,7 +91,7 @@ public class OnyxImportCommand extends AbstractCommand<OnyxImportCommandOptions>
   }
 
   private ApplicationContext loadContext() {
-    return new ClassPathXmlApplicationContext("spring/opal-cli/context.xml");
+    return new ClassPathXmlApplicationContext("classpath:/spring/opal-cli/context.xml");
   }
 
   /**
