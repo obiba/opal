@@ -17,6 +17,11 @@
 
   <dependencies>
 
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+
     <!-- OpenRDF Sesame Elmo -->
     <dependency>
       <groupId>org.openrdf.elmo</groupId>
@@ -26,7 +31,7 @@
 
     <dependency>
       <groupId>org.openrdf.sesame</groupId>
-      <artifactId>sesame-repository-api</artifactId>
+      <artifactId>sesame-runtime</artifactId>
       <version>2.2.4</version>
     </dependency>
 

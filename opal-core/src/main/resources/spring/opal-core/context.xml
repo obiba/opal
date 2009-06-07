@@ -2,9 +2,8 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
+  <!-- Import opal datasources by classpath scanning. These provide bindings to sources of data (such as Onyx) -->
   <import resource="classpath*:/META-INF/opal-datasource.xml" />
-  
-  <import resource="classpath*:/META-INF/beans.xml" />
 
   <bean id="opalKeyProvider" class="org.obiba.opal.core.crypt.OpalKeyStore">
     <property name="keyStoreResource" value="${org.obiba.opal.keystore.file}" />

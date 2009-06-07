@@ -7,13 +7,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.sesame.repository.impl;
+package org.obiba.opal.sesame.repository.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.obiba.opal.core.sesame.repository.OpalRepositoryManager;
+import org.obiba.opal.sesame.repository.OpalRepositoryManager;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
 

@@ -1,5 +1,5 @@
-<?xml version="1.0"?>
-<project>
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -18,6 +18,21 @@
   <description>Opal Core Module</description>
 
   <dependencies>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-annotations</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>hsqldb</groupId>
@@ -42,25 +57,11 @@
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>net.sf.opencsv</groupId>
       <artifactId>opencsv</artifactId>
       <version>1.8</version>
-    </dependency>
-    
-    <!-- OpenRDF Sesame Elmo -->
-    
-    <dependency>
-      <groupId>org.openrdf.elmo</groupId>
-      <artifactId>elmo-sesame</artifactId>
-      <version>1.4</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.openrdf.sesame</groupId>
-      <artifactId>sesame-runtime</artifactId>
-      <version>2.2.3</version>
     </dependency>
 
     <!-- Used with JOTM to allow connections to multiple databases. -->
@@ -70,4 +71,5 @@
       <version>1.5.0</version>
     </dependency>
   </dependencies>
+
 </project>

@@ -15,19 +15,19 @@
   </bean>
 
   <bean id="nativeRepositoryFactory" class="org.obiba.opal.core.sesame.repository.impl.NativeRepositoryFactory">
-    <property name="dataDir" value="target/catalog"/>
-    <property name="tripleIndexes" value="spoc,posc,cosp"/>
-    <property name="withInferencer" value="false"/>
+    <property name="dataDir" value="target/catalog" />
+    <property name="tripleIndexes" value="spoc,posc,cosp" />
+    <property name="withInferencer" value="false" />
   </bean>
-  
+
   <bean id="mysqlRepositoryFactory" class="org.obiba.opal.core.sesame.repository.impl.NativeRepositoryFactory">
-    <property name="databaseName" value="opal-sesame"/>
-    <property name="serverName" value="localhost"/>
-    <property name="portNumber" value="3306"/>
-    <property name="user" value="root"/>
-    <property name="password" value="rootadmin"/>
-    <property name="indexed" value="false"/>
-    <property name="maxNumberOfTripleTables" value="0"/>
+    <property name="databaseName" value="opal-sesame" />
+    <property name="serverName" value="localhost" />
+    <property name="portNumber" value="3306" />
+    <property name="user" value="root" />
+    <property name="password" value="rootadmin" />
+    <property name="indexed" value="false" />
+    <property name="maxNumberOfTripleTables" value="0" />
   </bean>
 
 </beans>
