@@ -1,0 +1,15 @@
+<onyxImportConfiguration>
+  <includeAll>true</includeAll>
+  <filteredOutVariables>
+    <string>.+Questionnaire.+TIMESTAMP_.*</string>
+  </filteredOutVariables>
+  <filteredInVariables>
+    <string>.+Questionnaire.+TIMESTAMP.TIMESTAMP_.*</string>
+  </filteredInVariables>
+  
+  <!-- Variables that will be filtered: not in the catalog, but data with the participant keys.
+       This may override a variable owner description. -->
+  <keyVariables>
+    <keyVariable owner="sampleCollectionQA" path=".+RegisteredParticipantTube.barcode"/>
+  </keyVariables>
+</onyxImportConfiguration>
