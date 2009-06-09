@@ -25,7 +25,6 @@ import org.obiba.onyx.util.data.Data;
 import org.obiba.opal.core.crypt.OpalKeyStore;
 import org.obiba.opal.core.service.IParticipantKeyReadRegistry;
 import org.obiba.opal.core.service.IParticipantKeyWriteRegistry;
-import org.obiba.opal.datasource.onyx.DecryptingOnyxDataInputStrategy;
 import org.obiba.opal.datasource.onyx.IOnyxDataInputStrategy;
 import org.obiba.opal.datasource.onyx.OnyxDataInputContext;
 import org.obiba.opal.datasource.onyx.configuration.KeyVariable;
@@ -100,7 +99,7 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
     int participantKeysRegistered = 0;
 
     for(String entryName : dataInputStrategy.listEntries()) {
-      if(((DecryptingOnyxDataInputStrategy) dataInputStrategy).isParticipantEntry(entryName)) {
+      if(isParticipantEntry(entryName)) {
 
         opalKey = participantKeyWriteRegistry.generateUniqueKey(IParticipantKeyReadRegistry.PARTICIPANT_KEY_DB_OPAL_NAME);
 
@@ -177,4 +176,12 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
     }
   }
 
+  /**
+   * Returns true if the entryName is a Participant .xml datafile.
+   * @param entryName The name of the entry.
+   * @return True if the entryName is a Participant .xml datafile.
+   */
+  private boolean isParticipantEntry(String entryName) {
+    return (entryName != null && !entryName.equalsIgnoreCase(VARIABLES_FILE));
+  }
 }

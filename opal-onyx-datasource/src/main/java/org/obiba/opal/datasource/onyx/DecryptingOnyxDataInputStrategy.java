@@ -54,8 +54,6 @@ public class DecryptingOnyxDataInputStrategy implements IChainingOnyxDataInputSt
 
   public static final String METADATA_ENTRY_PREFIX = "encryption.";
 
-  public static final String VARIABLES_FILE_NAME = "variables.xml";
-
   public static final String PARTICIPANT_DATA_EXTENSION = ".xml";
 
   public static final String DIGEST_ALGORITHM = "SHA-512";
@@ -209,9 +207,9 @@ public class DecryptingOnyxDataInputStrategy implements IChainingOnyxDataInputSt
    * </p>
    * 
    * <p>
-   * This method is used by the <code>listEntries</code> method to filter the list returned by the delegate. It is also
-   * used by the <code>getEntry</code> method to block attempts to get an <code>InputStream</code> for an entry that is
-   * not an encrypted entry.
+   * This method is used by the <code>listEntries</code> method to filter the list returned by the delegate. It is
+   * also used by the <code>getEntry</code> method to block attempts to get an <code>InputStream</code> for an entry
+   * that is not an encrypted entry.
    * </p>
    * 
    * @param entryName the name of the entry
@@ -219,15 +217,6 @@ public class DecryptingOnyxDataInputStrategy implements IChainingOnyxDataInputSt
    */
   public boolean isEncryptedEntry(String entryName) {
     return (entryName != null && !entryName.startsWith(METADATA_ENTRY_PREFIX) && !entryName.endsWith(DIGEST_ENTRY_SUFFIX));
-  }
-
-  /**
-   * Returns true if the entryName is a Participant .xml datafile.
-   * @param entryName The name of the entry.
-   * @return True if the entryName is a Participant .xml datafile.
-   */
-  public boolean isParticipantEntry(String entryName) {
-    return (entryName != null && entryName.endsWith(PARTICIPANT_DATA_EXTENSION) && !entryName.equalsIgnoreCase(METADATA_ENTRY) && !entryName.equalsIgnoreCase(VARIABLES_FILE_NAME));
   }
 
   /**
