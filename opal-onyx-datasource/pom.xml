@@ -9,9 +9,7 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.obiba.opal</groupId>
   <artifactId>opal-onyx-datasource</artifactId>
-  <version>1.0-SNAPSHOT</version>
 
   <name>opal-onyx-datasource</name>
   <description>Onyx Datasource for Opal</description>
@@ -22,6 +20,12 @@
       <artifactId>opal-core</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-sesame</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
 
     <dependency>
       <groupId>org.springframework</groupId>
