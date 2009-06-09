@@ -5,6 +5,7 @@
   <bean id="onyxImportService" class="org.obiba.opal.datasource.onyx.service.impl.DefaultOnyxImportServiceImpl">
     <property name="participantKeyWriteRegistry" ref="participantKeyRegistry" />
     <property name="dataInputStrategy" ref="onyxDataInputStrategy" />
+    <property name="importConfiguration" value="classpath:onyx-import.xml"/>
   </bean>
 
   <!--

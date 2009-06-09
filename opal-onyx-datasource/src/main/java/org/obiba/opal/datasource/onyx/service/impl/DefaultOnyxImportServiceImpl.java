@@ -28,8 +28,15 @@ import org.obiba.opal.core.service.IParticipantKeyWriteRegistry;
 import org.obiba.opal.datasource.onyx.DecryptingOnyxDataInputStrategy;
 import org.obiba.opal.datasource.onyx.IOnyxDataInputStrategy;
 import org.obiba.opal.datasource.onyx.OnyxDataInputContext;
+import org.obiba.opal.datasource.onyx.configuration.KeyVariable;
+import org.obiba.opal.datasource.onyx.configuration.OnyxImportConfiguration;
 import org.obiba.opal.datasource.onyx.service.OnyxImportService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.thoughtworks.xstream.XStream;
 
 /**
  * Default <code>OnyxImportService</code> implementation.
@@ -37,11 +44,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class DefaultOnyxImportServiceImpl implements OnyxImportService {
 
+  private static final Logger log = LoggerFactory.getLogger(DefaultOnyxImportServiceImpl.class);
+
   private static final String VARIABLES_FILE = "variables.xml";
 
   private IParticipantKeyWriteRegistry participantKeyWriteRegistry;
 
   private IOnyxDataInputStrategy dataInputStrategy;
+
+  private OnyxImportConfiguration onyxImportConfiguration;
 
   /** The unique opal identifying key for the current participant being imported. */
   private String opalKey;
@@ -52,6 +63,15 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
 
   public void setDataInputStrategy(IOnyxDataInputStrategy dataInputStrategy) {
     this.dataInputStrategy = dataInputStrategy;
+  }
+
+  public void setImportConfiguration(Resource importConfiguration) throws IOException {
+    XStream xstream = new XStream();
+    xstream.processAnnotations(OnyxImportConfiguration.class);
+    xstream.processAnnotations(KeyVariable.class);
+    xstream.autodetectAnnotations(true);
+
+    this.onyxImportConfiguration = (OnyxImportConfiguration) xstream.fromXML(importConfiguration.getInputStream());
   }
 
   public void importData() {
@@ -89,7 +109,9 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
 
         for(VariableData variableData : variableDataSetRoot.getVariableDatas()) {
           Variable variable = variableFinder.findVariable(variableData.getVariablePath());
+          log.info("variable={}", variableData.getVariablePath());
           if(variable != null && variable.getKey() != null && !variable.getKey().equals("")) {
+            log.info("***** key={}", variable.getKey());
             if(variable.getParent().isRepeatable()) {
               for(VariableData repeatVariableData : variableData.getVariableDatas()) {
                 registerOwnerAndKeyInParticipantKeyDatabase(variable, repeatVariableData);
