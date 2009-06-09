@@ -31,7 +31,13 @@
 
     <dependency>
       <groupId>org.openrdf.sesame</groupId>
-      <artifactId>sesame-runtime</artifactId>
+      <artifactId>sesame-sail-rdbms</artifactId>
+      <version>2.2.4</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-sail-nativerdf</artifactId>
       <version>2.2.4</version>
     </dependency>
 
