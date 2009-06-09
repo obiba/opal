@@ -54,8 +54,6 @@ public class DecryptingOnyxDataInputStrategy implements IChainingOnyxDataInputSt
 
   public static final String METADATA_ENTRY_PREFIX = "encryption.";
 
-  public static final String PARTICIPANT_DATA_EXTENSION = ".xml";
-
   public static final String DIGEST_ALGORITHM = "SHA-512";
 
   public static final String DIGEST_ENTRY_SUFFIX = ".sha512";

@@ -47,6 +47,8 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
 
   private static final String VARIABLES_FILE = "variables.xml";
 
+  public static final String PARTICIPANT_DATA_EXTENSION = ".xml";
+
   private IParticipantKeyWriteRegistry participantKeyWriteRegistry;
 
   private IOnyxDataInputStrategy dataInputStrategy;
@@ -182,6 +184,6 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
    * @return True if the entryName is a Participant .xml datafile.
    */
   private boolean isParticipantEntry(String entryName) {
-    return (entryName != null && !entryName.equalsIgnoreCase(VARIABLES_FILE));
+    return (entryName != null && entryName.endsWith(PARTICIPANT_DATA_EXTENSION) && !entryName.equalsIgnoreCase(VARIABLES_FILE));
   }
 }
