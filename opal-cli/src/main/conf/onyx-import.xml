@@ -1,4 +1,5 @@
 <onyxImportConfiguration>
+  <!-- Variables filtering, optional. -->
   <includeAll>true</includeAll>
   <filteredOutVariables>
     <string>.+Questionnaire.+TIMESTAMP_.*</string>
@@ -7,9 +8,13 @@
     <string>.+Questionnaire.+TIMESTAMP.TIMESTAMP_.*</string>
   </filteredInVariables>
   
-  <!-- Variables that will be filtered: not in the catalog, but data with the participant keys.
-       This may override a variable owner description. -->
+  <!-- Participant key variables, this may override a variable owner description, optional. -->
   <keyVariables>
     <keyVariable owner="sampleCollectionQA" path=".+RegisteredParticipantTube.barcode"/>
   </keyVariables>
+  
+  <!-- Path to a XML variable file that must be used as the catalog for import instead of the one embedded with the data, optional.
+       Use classpath or URL localization. 
+  <catalog>classpath:variables.xml</catalog> -->
+  
 </onyxImportConfiguration>

@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
@@ -26,13 +29,16 @@ public class OnyxImportConfiguration implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @XStreamAsAttribute
-  private boolean includeAll;
+  private boolean includeAll = true;
 
   private List<String> filteredOutVariables;
 
   private List<String> filteredInVariables;
 
   private List<KeyVariable> keyVariables;
+
+  @XStreamAsAttribute
+  private String catalog;
 
   /**
    * Get if the variable is part of the import, given its path.
@@ -161,6 +167,13 @@ public class OnyxImportConfiguration implements Serializable {
 
   public void setIncludeAll(boolean includeAll) {
     this.includeAll = includeAll;
+  }
+
+  public Resource getCatalogResource() {
+    if(catalog == null) return null;
+
+    DefaultResourceLoader loder = new DefaultResourceLoader();
+    return loder.getResource(catalog);
   }
 
 }
