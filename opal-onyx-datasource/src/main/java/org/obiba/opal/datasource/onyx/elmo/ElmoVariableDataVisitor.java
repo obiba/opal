@@ -21,19 +21,24 @@ import org.obiba.opal.elmo.concepts.Category;
 import org.obiba.opal.elmo.concepts.ContinuousVariable;
 import org.obiba.opal.elmo.concepts.DataVariable;
 import org.obiba.opal.elmo.concepts.Dataset;
+import org.obiba.opal.elmo.concepts.Entity;
 import org.obiba.opal.elmo.concepts.MissingCategory;
 import org.obiba.opal.elmo.concepts.OccurrenceItem;
-import org.obiba.opal.elmo.concepts.Participant;
 import org.openrdf.OpenRDFException;
 import org.openrdf.concepts.owl.Class;
 import org.openrdf.elmo.ElmoQuery;
 import org.openrdf.elmo.sesame.SesameManager;
+import org.openrdf.elmo.sesame.SesameManagerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ElmoVariableDataVisitor implements VariableDataVisitor {
 
+  private static final Logger log = LoggerFactory.getLogger(ElmoVariableDataVisitor.class);
+
   final OpalOntologyManager opal;
 
-  final SesameManager manager;
+  final SesameManagerFactory managerFactory;
 
   final List<Handler> handlers = new LinkedList<Handler>();
 
@@ -41,8 +46,10 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
 
   private Dataset currentDataset;
 
-  public ElmoVariableDataVisitor(String base, SesameManager manager) throws OpenRDFException, IOException {
-    this.manager = manager;
+  private SesameManager manager;
+
+  public ElmoVariableDataVisitor(String base, SesameManagerFactory managerFactory) throws OpenRDFException, IOException {
+    this.managerFactory = managerFactory;
     this.opal = new OpalOntologyManager();
     qnameStrategy = new DefaultVariableQNameStrategy(base, new DefaultVariablePathNamingStrategy());
     handlers.add(new CategoryHandler());
@@ -51,12 +58,27 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
     handlers.add(new OccurrenceHandler());
   }
 
-  public void forParticipant(String id) {
-    System.out.println("Loading data for participant " + id);
-    Participant e = manager.create(Participant.class);
-    e.setIdentifier(id);
+  public void forEntity(java.lang.Class<? extends Entity> entityType, String id) {
+    if(manager == null) {
+      this.manager = managerFactory.createElmoManager();
+      this.manager.getTransaction().begin();
+    }
+    log.info("Loading data for participant {}", id);
+
+    Entity entity = null;
+    for(Entity e : manager.findAll(entityType)) {
+      if(id.equals(e.getIdentifier())) {
+        entity = e;
+        break;
+      }
+    }
+
+    if(entity == null) {
+      entity = manager.create(entityType);
+      entity.setIdentifier(id);
+    }
     currentDataset = manager.create(Dataset.class);
-    currentDataset.setForEntity(e);
+    currentDataset.setForEntity(entity);
   }
 
   public void visit(VariableData data) {
@@ -69,12 +91,21 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
     for(Handler h : handlers) {
       if(h.handles(opalOnyxVariable, data) == true) {
         h.handle(opalOnyxVariable, data);
+        System.out.print('.');
         break;
       }
     }
 
     for(VariableData child : data.getVariableDatas()) {
       visit(child);
+    }
+  }
+
+  public void end() {
+    if(manager != null) {
+      this.manager.getTransaction().commit();
+      manager.close();
+      manager = null;
     }
   }
 

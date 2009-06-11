@@ -1,8 +1,10 @@
 package org.obiba.opal.elmo;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
+import org.obiba.core.util.StreamUtil;
+import org.obiba.opal.elmo.concepts.Opal;
 import org.openrdf.OpenRDFException;
 import org.openrdf.elmo.ElmoModule;
 import org.openrdf.elmo.sesame.SesameManager;
@@ -15,10 +17,15 @@ public class OpalManagerFactory {
   }
 
   public static SesameManager createManager() throws OpenRDFException, IOException {
-    ElmoModule module = OpalElmoModuleFactory.createInstance();
+    ElmoModule module = new ElmoModule();
     SesameManagerFactory factory = new SesameManagerFactory(module);
     SesameManager manager = factory.createElmoManager();
-    manager.getConnection().add(new File("src/main/owl/opal.owl"), "http://www.obiba.org/owl/2009/05/opal", RDFFormat.RDFXML);
+    InputStream opalIs = OpalManagerFactory.class.getResourceAsStream("/META-INF/opal.owl");
+    try {
+      manager.getConnection().add(opalIs, Opal.BASE_URI, RDFFormat.RDFXML);
+    } finally {
+      StreamUtil.silentSafeClose(opalIs);
+    }
     return manager;
   }
 }

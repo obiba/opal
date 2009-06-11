@@ -1,0 +1,411 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY owl2xml "http://www.w3.org/2006/12/owl2-xml#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY opal "http://www.obiba.org/owl/2009/05/opal#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<rdf:RDF xmlns="http://www.obiba.org/owl/2009/05/opal#"
+     xml:base="http://www.obiba.org/owl/2009/05/opal"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl2xml="http://www.w3.org/2006/12/owl2-xml#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:opal="http://www.obiba.org/owl/2009/05/opal#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <owl:Ontology rdf:about=""/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#hasCategory -->
+
+    <owl:ObjectProperty rdf:about="#hasCategory">
+        <rdf:type rdf:resource="&owl;AsymmetricProperty"/>
+        <rdfs:range rdf:resource="#Category"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#hasData -->
+
+    <owl:ObjectProperty rdf:about="#hasData">
+        <rdf:type rdf:resource="&owl;AsymmetricProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#hasDataset -->
+
+    <owl:ObjectProperty rdf:about="#hasDataset">
+        <rdf:type rdf:resource="&owl;AsymmetricProperty"/>
+        <rdfs:range rdf:resource="#Dataset"/>
+        <owl:inverseOf rdf:resource="#isForEntity"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#hasOccurrenceData -->
+
+    <owl:ObjectProperty rdf:about="#hasOccurrenceData"/>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#isCategoryOf -->
+
+    <owl:ObjectProperty rdf:about="#isCategoryOf">
+        <owl:inverseOf rdf:resource="#hasCategory"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#isForEntity -->
+
+    <owl:ObjectProperty rdf:about="#isForEntity">
+        <rdf:type rdf:resource="&owl;AsymmetricProperty"/>
+        <rdfs:range rdf:resource="#Entity"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#withinDataset -->
+
+    <owl:ObjectProperty rdf:about="#withinDataset">
+        <rdf:type rdf:resource="&owl;AsymmetricProperty"/>
+        <rdfs:range rdf:resource="#Dataset"/>
+        <owl:inverseOf rdf:resource="#hasData"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#withinOccurrence -->
+
+    <owl:ObjectProperty rdf:about="#withinOccurrence">
+        <rdf:type rdf:resource="&owl;AsymmetricProperty"/>
+        <owl:inverseOf rdf:resource="#hasOccurrenceData"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#algorithm -->
+
+    <owl:DatatypeProperty rdf:about="#algorithm">
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#dataValue -->
+
+    <owl:DatatypeProperty rdf:about="#dataValue">
+        <rdfs:range rdf:resource="&xsd;anyType"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#identifier -->
+
+    <owl:DatatypeProperty rdf:about="#identifier"/>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#multiple -->
+
+    <owl:DatatypeProperty rdf:about="#multiple">
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#ordinal -->
+
+    <owl:DatatypeProperty rdf:about="#ordinal"/>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#repeatable -->
+
+    <owl:DatatypeProperty rdf:about="#repeatable">
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#unit -->
+
+    <owl:DatatypeProperty rdf:about="#unit">
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#CategoricalVariable -->
+
+    <owl:Class rdf:about="#CategoricalVariable">
+        <rdfs:subClassOf rdf:resource="#DataVariable"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasCategory"/>
+                <owl:someValuesFrom rdf:resource="#Category"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#Category -->
+
+    <owl:Class rdf:about="#Category">
+        <rdfs:subClassOf rdf:resource="#DataVariable"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#ContinuousVariable -->
+
+    <owl:Class rdf:about="#ContinuousVariable">
+        <rdfs:subClassOf rdf:resource="#DataVariable"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#unit"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#dataValue"/>
+                <owl:someValuesFrom rdf:resource="&xsd;anyType"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#DataEntryForm -->
+
+    <owl:Class rdf:about="#DataEntryForm">
+        <rdfs:subClassOf rdf:resource="#DataItem"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#DataItem -->
+
+    <owl:Class rdf:about="#DataItem">
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="#withinDataset"/>
+                        <owl:someValuesFrom rdf:resource="#Dataset"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="#withinDataset"/>
+                        <owl:allValuesFrom rdf:resource="#Dataset"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#DataVariable -->
+
+    <owl:Class rdf:about="#DataVariable">
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#DataItem"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="#multiple"/>
+                        <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                        <owl:onDataRange rdf:resource="&xsd;boolean"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#Dataset -->
+
+    <owl:Class rdf:about="#Dataset">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#isForEntity"/>
+                <owl:onClass rdf:resource="#Entity"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#Entity -->
+
+    <owl:Class rdf:about="#Entity">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#identifier"/>
+                <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasDataset"/>
+                <owl:someValuesFrom rdf:resource="#Dataset"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#Instrument -->
+
+    <owl:Class rdf:about="#Instrument">
+        <rdfs:subClassOf rdf:resource="#Entity"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#MissingCategory -->
+
+    <owl:Class rdf:about="#MissingCategory">
+        <rdfs:subClassOf rdf:resource="#Category"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#OccurrenceItem -->
+
+    <owl:Class rdf:about="#OccurrenceItem">
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#DataItem"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="#hasOccurrenceData"/>
+                        <owl:someValuesFrom rdf:resource="#DataVariable"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="#identifier"/>
+                        <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                        <owl:onDataRange rdf:resource="&xsd;string"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="#ordinal"/>
+                        <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                        <owl:onDataRange rdf:resource="&xsd;integer"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#Participant -->
+
+    <owl:Class rdf:about="#Participant">
+        <rdfs:subClassOf rdf:resource="#Entity"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#RepeatableVariable -->
+
+    <owl:Class rdf:about="#RepeatableVariable">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#DataVariable"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="#repeatable"/>
+                        <owl:hasValue rdf:datatype="&xsd;boolean">true</owl:hasValue>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#Site -->
+
+    <owl:Class rdf:about="#Site">
+        <rdfs:subClassOf rdf:resource="#Entity"/>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="#DataEntryForm"/>
+            <rdf:Description rdf:about="#DataVariable"/>
+            <rdf:Description rdf:about="#OccurrenceItem"/>
+        </owl:members>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="#Instrument"/>
+            <rdf:Description rdf:about="#Participant"/>
+            <rdf:Description rdf:about="#Site"/>
+        </owl:members>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 2.2.1.1101) http://owlapi.sourceforge.net -->
+

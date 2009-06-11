@@ -72,6 +72,9 @@ public class OnyxImportCommand extends AbstractCommand<OnyxImportCommandOptions>
       } else {
         onyxImportService.importData();
       }
+    } catch(RuntimeException e) {
+      System.err.println(e);
+      e.printStackTrace();
     } finally {
       if(context != null) {
         // JOTM will shutdown when the Spring Application shutdown event occurs. Since we're running as a
@@ -98,7 +101,8 @@ public class OnyxImportCommand extends AbstractCommand<OnyxImportCommandOptions>
    * Converts a <code>String</code> containing comma-separated values to a <code>List</code> of those values.
    * 
    * @param csv <code>String</code> of comma-separated values
-   * @return <code>List</code> of values (or <code>null</code> if <code>csv</code> is <code>null</code> or empty)
+   * @return <code>List</code> of values (or <code>null</code> if <code>csv</code> is <code>null</code> or
+   * empty)
    */
   private List<String> csvToList(String csv) {
     List<String> valueList = null;

@@ -27,41 +27,73 @@ import org.openrdf.concepts.owl.DatatypeProperty;
 import org.openrdf.concepts.owl.Ontology;
 import org.openrdf.concepts.owl.Restriction;
 import org.openrdf.elmo.sesame.SesameManager;
+import org.openrdf.elmo.sesame.SesameManagerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ElmoVariableVisitor implements VariableVisitor {
 
-  final OpalOntologyManager opal;
+  private static final Logger log = LoggerFactory.getLogger(ElmoVariableVisitor.class);
 
-  final SesameManager manager;
+  final String baseUri;
+
+  final OpalOntologyManager opal;
 
   final List<Handler> handlers = new LinkedList<Handler>();
 
   final IVariableQNameStrategy qnameStrategy;
 
-  public ElmoVariableVisitor(String base, SesameManager manager) throws OpenRDFException, IOException {
-    this.manager = manager;
+  private SesameManagerFactory managerFactory;
+
+  private SesameManager manager;
+
+  public ElmoVariableVisitor(String base, SesameManagerFactory managerFactory) throws OpenRDFException, IOException {
+    this.baseUri = base;
     this.opal = new OpalOntologyManager();
+    this.managerFactory = managerFactory;
+
     qnameStrategy = new DefaultVariableQNameStrategy(base, new DefaultVariablePathNamingStrategy());
     handlers.add(new CategoryHandler());
     handlers.add(new CategoricalHandler());
     handlers.add(new OccurrenceHandler());
     handlers.add(new ContinuousHandler());
 
-    Ontology ontology = manager.create(QName.valueOf(base), Ontology.class);
-    Ontology opalOntology = opal.getOpalNode(Opal.class, Ontology.class);
-    ontology.getOwlImports().add(opalOntology);
   }
 
   public void visit(Variable variable) {
+    if(manager == null) {
+      this.manager = managerFactory.createElmoManager();
+      this.manager.getTransaction().begin();
+      Ontology ontology = manager.create(QName.valueOf(baseUri), Ontology.class);
+      Ontology opalOntology = opal.getOpalNode(Opal.class, Ontology.class);
+      ontology.getOwlImports().add(opalOntology);
+    }
+
+    QName variableQName = qnameStrategy.getQName(variable);
+    if(manager.find(Class.class, variableQName) != null) {
+      log.debug("Variable already exists: {}", variableQName);
+      return;
+    }
+
     for(Handler h : handlers) {
       if(h.handles(variable)) {
         h.handle(variable);
+        System.out.print('.');
         break;
       }
     }
 
     for(Variable v : variable.getVariables()) {
       visit(v);
+    }
+
+  }
+
+  public void end() {
+    if(manager != null) {
+      this.manager.getTransaction().commit();
+      manager.close();
+      manager = null;
     }
   }
 

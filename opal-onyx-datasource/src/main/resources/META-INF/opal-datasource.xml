@@ -2,10 +2,30 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
+  <bean id="elmoManagerFactory" class="org.obiba.opal.elmo.SesameManagerFactoryBean">
+    <property name="repository">
+      <bean factory-bean="opalRepositoryManager" factory-method="getDataRepository" />
+    </property>
+  </bean>
+
   <bean id="onyxImportService" class="org.obiba.opal.datasource.onyx.service.impl.DefaultOnyxImportServiceImpl">
     <property name="participantKeyWriteRegistry" ref="participantKeyRegistry" />
+    <property name="participantKeyReadRegistry" ref="participantKeyRegistry" />
     <property name="dataInputStrategy" ref="onyxDataInputStrategy" />
-    <property name="importConfiguration" value="classpath:onyx-import.xml"/>
+    <property name="importConfiguration" value="classpath:onyx-import.xml" />
+
+    <property name="variableVisitor">
+      <bean class="org.obiba.opal.datasource.onyx.elmo.ElmoVariableVisitor">
+        <constructor-arg value="http://www.obiba.org/owl/2009/05/onyx/example/" />
+        <constructor-arg ref="elmoManagerFactory" />
+      </bean>
+    </property>
+    <property name="variableDataVisitor">
+      <bean class="org.obiba.opal.datasource.onyx.elmo.ElmoVariableDataVisitor">
+        <constructor-arg value="http://www.obiba.org/owl/2009/05/onyx/example/" />
+        <constructor-arg ref="elmoManagerFactory" />
+      </bean>
+    </property>
   </bean>
 
   <!--
@@ -15,7 +35,6 @@
   <bean id="onyxDataInputStrategy" class="org.obiba.opal.datasource.onyx.OnyxDataInputStrategyFactoryBean">
     <property name="chainedStrategies">
       <list>
-        <value>decryptingOnyxDataInputStrategy</value>
         <value>zipOnyxDataInputStrategy</value>
         <value>fileOnyxDataInputStrategy</value>
       </list>

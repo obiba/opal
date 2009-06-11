@@ -83,7 +83,9 @@ public class DatasourceStore extends RdbmsStore {
     while(providers.hasNext()) {
       RdbmsProvider provider = providers.next();
       factory = provider.createRdbmsConnectionFactory(dbn, dbv);
-      if(factory != null) return factory;
+      if(factory != null) {
+        return factory;
+      }
     }
     return new RdbmsConnectionFactory();
   }

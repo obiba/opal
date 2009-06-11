@@ -30,6 +30,9 @@ import org.obiba.opal.datasource.onyx.OnyxDataInputContext;
 import org.obiba.opal.datasource.onyx.configuration.KeyVariable;
 import org.obiba.opal.datasource.onyx.configuration.OnyxImportConfiguration;
 import org.obiba.opal.datasource.onyx.service.OnyxImportService;
+import org.obiba.opal.datasource.onyx.variable.VariableDataVisitor;
+import org.obiba.opal.datasource.onyx.variable.VariableVisitor;
+import org.obiba.opal.elmo.concepts.Participant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -51,19 +54,34 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
 
   private IParticipantKeyWriteRegistry participantKeyWriteRegistry;
 
+  private IParticipantKeyReadRegistry participantKeyReadRegistry;
+
   private IOnyxDataInputStrategy dataInputStrategy;
 
   private OnyxImportConfiguration onyxImportConfiguration;
 
-  /** The unique opal identifying key for the current participant being imported. */
-  private String opalKey;
+  private VariableDataVisitor variableDataVisitor;
+
+  private VariableVisitor variableVisitor;
 
   public void setParticipantKeyWriteRegistry(IParticipantKeyWriteRegistry participantKeyWriteRegistry) {
     this.participantKeyWriteRegistry = participantKeyWriteRegistry;
   }
 
+  public void setParticipantKeyReadRegistry(IParticipantKeyReadRegistry participantKeyReadRegistry) {
+    this.participantKeyReadRegistry = participantKeyReadRegistry;
+  }
+
   public void setDataInputStrategy(IOnyxDataInputStrategy dataInputStrategy) {
     this.dataInputStrategy = dataInputStrategy;
+  }
+
+  public void setVariableDataVisitor(VariableDataVisitor variableDataVisitor) {
+    this.variableDataVisitor = variableDataVisitor;
+  }
+
+  public void setVariableVisitor(VariableVisitor variableVisitor) {
+    this.variableVisitor = variableVisitor;
   }
 
   public void setImportConfiguration(Resource importConfiguration) throws IOException {
@@ -94,40 +112,96 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
     dataInputContext.setSource(source.getPath());
 
     dataInputStrategy.prepare(dataInputContext);
+    Variable root = loadVariables();
+    loadParticipants(root);
 
+  }
+
+  protected Variable loadVariables() {
     Variable variableRoot = getVariableRoot();
+    try {
+      for(Variable def : variableRoot.getVariables()) {
+        for(Variable v : def.getVariables()) {
+          variableVisitor.visit(v);
+        }
+      }
+    } finally {
+      variableVisitor.end();
+    }
+    return variableRoot;
+  }
 
+  protected void loadParticipants(Variable variableRoot) {
     int participantsProcessed = 0;
+    int skipped = 0;
+    int loaded = 0;
     int participantKeysRegistered = 0;
 
-    for(String entryName : dataInputStrategy.listEntries()) {
-      if(isParticipantEntry(entryName)) {
+    VariableFinder variableFinder = VariableFinder.getInstance(variableRoot, new DefaultVariablePathNamingStrategy());
+    try {
+      for(String entryName : dataInputStrategy.listEntries()) {
+        if(isParticipantEntry(entryName)) {
+          log.debug("Processing participant entry {}", entryName);
 
-        opalKey = participantKeyWriteRegistry.generateUniqueKey(IParticipantKeyReadRegistry.PARTICIPANT_KEY_DB_OPAL_NAME);
+          VariableDataSet variableDataSetRoot = getVariableFromXmlFile(entryName);
 
-        VariableDataSet variableDataSetRoot = getVariableFromXmlFile(entryName);
-        VariableFinder variableFinder = VariableFinder.getInstance(variableRoot, new DefaultVariablePathNamingStrategy());
+          if(isNewParticipant(variableFinder, variableDataSetRoot)) {
+            log.debug("Processing new participant data.");
+            String opalKey = participantKeyWriteRegistry.generateUniqueKey(IParticipantKeyReadRegistry.PARTICIPANT_KEY_DB_OPAL_NAME);
+            participantKeysRegistered += registerKeys(opalKey, variableFinder, variableDataSetRoot);
+            loadData(opalKey, variableDataSetRoot);
+            loaded++;
+          } else {
+            skipped++;
+          }
+          participantsProcessed++;
+        }
+      }
+    } finally {
+      variableDataVisitor.end();
+    }
 
-        for(VariableData variableData : variableDataSetRoot.getVariableDatas()) {
-          Variable variable = variableFinder.findVariable(variableData.getVariablePath());
-          log.info("variable={}", variableData.getVariablePath());
-          if(variable != null && variable.getKey() != null && !variable.getKey().equals("")) {
-            log.info("***** key={}", variable.getKey());
-            if(variable.getParent().isRepeatable()) {
-              for(VariableData repeatVariableData : variableData.getVariableDatas()) {
-                registerOwnerAndKeyInParticipantKeyDatabase(variable, repeatVariableData);
-                participantKeysRegistered++;
-              }
-            } else {
-              registerOwnerAndKeyInParticipantKeyDatabase(variable, variableData);
-              participantKeysRegistered++;
-            }
+    log.info("Participants processed [{}] (skipped {}, loaded {}) Participant Keys Registered [{}]", new Object[] { participantsProcessed, skipped, loaded, participantKeysRegistered });
+    // System.out.println("Participants processed [" + participantsProcessed + "] (skipped Participant Keys Registered
+    // [" + participantKeysRegistered + "]");
+  }
+
+  protected boolean isNewParticipant(VariableFinder variableFinder, VariableDataSet variableDataSetRoot) {
+    for(VariableData variableData : variableDataSetRoot.getVariableDatas()) {
+      Variable variable = variableFinder.findVariable(variableData.getVariablePath());
+      if(variable != null && variable.getKey() != null && !variable.getKey().equals("")) {
+        String owner = variable.getKey();
+        for(Data data : variableData.getDatas()) {
+          String key = data.getValueAsString();
+          if(participantKeyReadRegistry.hasParticipant(owner, key)) {
+            return false;
           }
         }
-        participantsProcessed++;
       }
     }
-    System.out.println("Participants processed [" + participantsProcessed + "]    Participant Keys Registered [" + participantKeysRegistered + "]");
+    return true;
+
+  }
+
+  protected int registerKeys(String opalKey, VariableFinder variableFinder, VariableDataSet variableDataSetRoot) {
+    int participantKeysRegistered = 0;
+    for(VariableData variableData : variableDataSetRoot.getVariableDatas()) {
+      Variable variable = variableFinder.findVariable(variableData.getVariablePath());
+      log.debug("variable={}", variableData.getVariablePath());
+      if(variable != null && variable.getKey() != null && !variable.getKey().equals("")) {
+        log.debug("***** key={}", variable.getKey());
+        if(variable.getParent().isRepeatable()) {
+          for(VariableData repeatVariableData : variableData.getVariableDatas()) {
+            registerOwnerAndKeyInParticipantKeyDatabase(opalKey, variable, repeatVariableData);
+            participantKeysRegistered++;
+          }
+        } else {
+          registerOwnerAndKeyInParticipantKeyDatabase(opalKey, variable, variableData);
+          participantKeysRegistered++;
+        }
+      }
+    }
+    return participantKeysRegistered;
   }
 
   /**
@@ -170,7 +244,7 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
     return object;
   }
 
-  private void registerOwnerAndKeyInParticipantKeyDatabase(Variable variable, VariableData variableData) {
+  private void registerOwnerAndKeyInParticipantKeyDatabase(String opalKey, Variable variable, VariableData variableData) {
     String owner = variable.getKey();
     for(Data data : variableData.getDatas()) {
       String key = data.getValueAsString();
@@ -185,5 +259,12 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
    */
   private boolean isParticipantEntry(String entryName) {
     return (entryName != null && entryName.endsWith(PARTICIPANT_DATA_EXTENSION) && !entryName.equalsIgnoreCase(VARIABLES_FILE));
+  }
+
+  private void loadData(String opalId, VariableDataSet vds) {
+    variableDataVisitor.forEntity(Participant.class, opalId);
+    for(VariableData vd : vds.getVariableDatas()) {
+      variableDataVisitor.visit(vd);
+    }
   }
 }

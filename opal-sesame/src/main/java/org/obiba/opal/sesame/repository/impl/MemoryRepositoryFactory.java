@@ -39,6 +39,7 @@ public class MemoryRepositoryFactory implements FactoryBean {
 
     if(dataDir != null) {
       store.setDataDir(dataDir);
+      store.setPersist(true);
     }
 
     if(withInferencer != null && withInferencer) {
