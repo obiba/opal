@@ -91,6 +91,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Hauteur du banc</value>
         </attribute>
+        <attribute key="source">
+          <value class="string">Data[DECIMAL:44.1]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="RES_FIRST_SITTING_HEIGHT" dataType="DECIMAL" unit="cm">
@@ -100,6 +103,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Lecture du stadiomètre</value>
+        </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[70.0 &lt; x &lt; 190.0], FEMALE[70.0 &lt; x &lt; 190.0]], IntegrityCheck-WARNING[MALE[130.0 &lt; x &lt; 171.0], FEMALE[130.0 &lt; x &lt; 150.0]]]</value>
         </attribute>
       </attributes>
     </variable>
@@ -133,7 +139,13 @@
         </attributes>
       </category>
     </variable>
-    <variable name="CALC_DIFF_SITTING_HEIGHT" dataType="DECIMAL" unit="cm"/>
+    <variable name="CALC_DIFF_SITTING_HEIGHT" dataType="DECIMAL" unit="cm">
+      <attributes>
+        <attribute key="source">
+          <value class="string">Computing[$1-$2,[Instrument[SittingHeight, RES_FIRST_SITTING_HEIGHT], Instrument[SittingHeight, INPUT_STOOL_HEIGHT]]]</value>
+        </attribute>
+      </attributes>
+    </variable>
   </variable>
   <variable name="Spirometry">
     <variable name="InstrumentRun">
@@ -147,7 +159,13 @@
         <variable name="type" dataType="TEXT"/>
       </variable>
     </variable>
-    <variable name="BEST_MEASUREMENTS_EXPECTED" dataType="INTEGER"/>
+    <variable name="BEST_MEASUREMENTS_EXPECTED" dataType="INTEGER">
+      <attributes>
+        <attribute key="source">
+          <value class="string">Data[INTEGER:3]</value>
+        </attribute>
+      </attributes>
+    </variable>
     <variable name="INPUT_PARTICIPANT_BARCODE" dataType="TEXT">
       <attributes>
         <attribute key="label" locale="en">
@@ -155,6 +173,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">ID Participant</value>
+        </attribute>
+        <attribute key="source">
+          <value class="string">ParticipantProperty[barcode]</value>
         </attribute>
       </attributes>
     </variable>
@@ -166,6 +187,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Nom</value>
         </attribute>
+        <attribute key="source">
+          <value class="string">ParticipantProperty[lastName]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="INPUT_PARTICIPANT_FIRST_NAME" dataType="TEXT">
@@ -175,6 +199,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Prénom</value>
+        </attribute>
+        <attribute key="source">
+          <value class="string">ParticipantProperty[firstName]</value>
         </attribute>
       </attributes>
     </variable>
@@ -186,6 +213,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Date de naissance</value>
         </attribute>
+        <attribute key="source">
+          <value class="string">ParticipantProperty[birthDate]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="INPUT_PARTICIPANT_GENDER" dataType="TEXT">
@@ -195,6 +225,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Sexe</value>
+        </attribute>
+        <attribute key="source">
+          <value class="string">ParticipantProperty[gender]</value>
         </attribute>
       </attributes>
     </variable>
@@ -206,6 +239,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Groupe ethnique du participant</value>
         </attribute>
+        <attribute key="source">
+          <value class="string">Data[INTEGER:1]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="INPUT_PARTICIPANT_HEIGHT" dataType="DECIMAL" unit="cm">
@@ -216,6 +252,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Hauteur debout du participant</value>
         </attribute>
+        <attribute key="source">
+          <value class="string">Instrument[StandingHeight, RES_FIRST_HEIGHT]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="INPUT_PARTICIPANT_WEIGHT" dataType="DECIMAL" unit="kg">
@@ -225,6 +264,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Poids du participant</value>
+        </attribute>
+        <attribute key="source">
+          <value class="string">FirstNotNull[Instrument[Impedance418, RES_WEIGHT], Instrument[Weight, RES_WEIGHT]]</value>
         </attribute>
       </attributes>
     </variable>
@@ -1019,6 +1061,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Poids</value>
         </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[2.0 &lt; x &lt; 270.0], FEMALE[2.0 &lt; x &lt; 270.0]]]</value>
+        </attribute>
       </attributes>
     </variable>
   </variable>
@@ -1041,6 +1086,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Lecture du stadiomètre</value>
+        </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[70.0 &lt; x &lt; 210.0], FEMALE[70.0 &lt; x &lt; 210.0]], IntegrityCheck-WARNING[MALE[160.0 &lt; x &lt; 190.0], FEMALE[148.0 &lt; x &lt; 176.0]]]</value>
         </attribute>
       </attributes>
     </variable>
@@ -1095,6 +1143,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Lecture de la mesure de la taille (1)</value>
         </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[50.0 &lt; x &lt; 199.0], FEMALE[50.0 &lt; x &lt; 199.0]], IntegrityCheck-WARNING[MALE[61.0 &lt; x &lt; 126.0], FEMALE[47.0 &lt; x &lt; 119.0]]]</value>
+        </attribute>
       </attributes>
     </variable>
   </variable>
@@ -1118,6 +1169,9 @@
         <attribute key="label" locale="fr">
           <value class="string">La force de préhension peut être mesurée sur le(s) côté(s) suivant(s):</value>
         </attribute>
+        <attribute key="source">
+          <value class="string">Variable[Onyx.CIPreliminaryQuestionnaire.GS_ACTIVE]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="RES_FIRST_RH_MUSCLE_STRENGTH" dataType="INTEGER" unit="kg">
@@ -1127,6 +1181,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Lecture du dynamomètre pour la main droite (1)</value>
+        </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[0 &lt; x &lt; 90 || ], FEMALE[0 &lt; x &lt; 90 || ]], IntegrityCheck-WARNING[MALE[36 &lt; x &lt; 64 || ], FEMALE[20 &lt; x &lt; 38 || ]]]</value>
         </attribute>
       </attributes>
     </variable>
@@ -1138,6 +1195,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Lecture du dynamomètre pour la main gauche (1)</value>
         </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[0 &lt; x &lt; 90 || ], FEMALE[0 &lt; x &lt; 90 || ]], IntegrityCheck-WARNING[MALE[36 &lt; x &lt; 64 || ], FEMALE[20 &lt; x &lt; 38 || ]]]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="RES_SEC_RH_MUSCLE_STRENGTH" dataType="INTEGER" unit="kg">
@@ -1147,6 +1207,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Lecture du dynamomètre pour la main droite (2)</value>
+        </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[0 &lt; x &lt; 90 || ], FEMALE[0 &lt; x &lt; 90 || ]], IntegrityCheck-WARNING[MALE[36 &lt; x &lt; 64 || ], FEMALE[20 &lt; x &lt; 38 || ]]]</value>
         </attribute>
       </attributes>
     </variable>
@@ -1158,6 +1221,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Lecture du dynamomètre pour la main gauche (2)</value>
         </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[0 &lt; x &lt; 90 || ], FEMALE[0 &lt; x &lt; 90 || ]], IntegrityCheck-WARNING[MALE[36 &lt; x &lt; 64 || ], FEMALE[20 &lt; x &lt; 38 || ]]]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="RES_THIRD_RH_MUSCLE_STRENGTH" dataType="INTEGER" unit="kg">
@@ -1167,6 +1233,12 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Lecture facultative du dynamomètre pour la main droite (3)</value>
+        </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[0 &lt; x &lt; 90 || ], FEMALE[0 &lt; x &lt; 90 || ]], IntegrityCheck-WARNING[MALE[36 &lt; x &lt; 64 || ], FEMALE[20 &lt; x &lt; 38 || ]]]</value>
+        </attribute>
+        <attribute key="condition">
+          <value class="string">Computing[Min[$1,$2] / Max[$1,$2] &lt; 0.9,[Instrument[GripStrength, RES_FIRST_RH_MUSCLE_STRENGTH], Instrument[GripStrength, RES_SEC_RH_MUSCLE_STRENGTH]]]</value>
         </attribute>
       </attributes>
     </variable>
@@ -1178,11 +1250,35 @@
         <attribute key="label" locale="fr">
           <value class="string">Lecture facultative du dynamomètre pour la main gauche (3)</value>
         </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[0 &lt; x &lt; 90 || ], FEMALE[0 &lt; x &lt; 90 || ]], IntegrityCheck-WARNING[MALE[36 &lt; x &lt; 64 || ], FEMALE[20 &lt; x &lt; 38 || ]]]</value>
+        </attribute>
+        <attribute key="condition">
+          <value class="string">Computing[Min[$1,$2] / Max[$1,$2] &lt; 0.9,[Instrument[GripStrength, RES_FIRST_LH_MUSCLE_STRENGTH], Instrument[GripStrength, RES_SEC_LH_MUSCLE_STRENGTH]]]</value>
+        </attribute>
       </attributes>
     </variable>
-    <variable name="CALC_MAX_RH_MUSCLE_STRENGTH" dataType="INTEGER" unit="kg"/>
-    <variable name="CALC_MAX_LH_MUSCLE_STRENGTH" dataType="INTEGER" unit="kg"/>
-    <variable name="CALC_SUM_MAX_MUSCLE_STRENGTH" dataType="INTEGER" unit="kg"/>
+    <variable name="CALC_MAX_RH_MUSCLE_STRENGTH" dataType="INTEGER" unit="kg">
+      <attributes>
+        <attribute key="source">
+          <value class="string">Computing[Max[Max[$1,$2],$3],[Instrument[GripStrength, RES_FIRST_RH_MUSCLE_STRENGTH], Instrument[GripStrength, RES_SEC_RH_MUSCLE_STRENGTH], Instrument[GripStrength, RES_THIRD_RH_MUSCLE_STRENGTH]]]</value>
+        </attribute>
+      </attributes>
+    </variable>
+    <variable name="CALC_MAX_LH_MUSCLE_STRENGTH" dataType="INTEGER" unit="kg">
+      <attributes>
+        <attribute key="source">
+          <value class="string">Computing[Max[Max[$1,$2],$3],[Instrument[GripStrength, RES_FIRST_LH_MUSCLE_STRENGTH], Instrument[GripStrength, RES_SEC_LH_MUSCLE_STRENGTH], Instrument[GripStrength, RES_THIRD_LH_MUSCLE_STRENGTH]]]</value>
+        </attribute>
+      </attributes>
+    </variable>
+    <variable name="CALC_SUM_MAX_MUSCLE_STRENGTH" dataType="INTEGER" unit="kg">
+      <attributes>
+        <attribute key="source">
+          <value class="string">Computing[($1 + $2),[Instrument[GripStrength, CALC_MAX_RH_MUSCLE_STRENGTH], Instrument[GripStrength, CALC_MAX_LH_MUSCLE_STRENGTH]]]</value>
+        </attribute>
+      </attributes>
+    </variable>
   </variable>
   <variable name="AnkleBrachial">
     <variable name="InstrumentRun">
@@ -1204,6 +1300,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Jambe suggérée pour la mesure</value>
         </attribute>
+        <attribute key="source">
+          <value class="string">Variable[Onyx.CIPreliminaryQuestionnaire.ABI_LEG_CHOSEN]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="IV_ABI_ARM_SUGG" dataType="TEXT">
@@ -1213,6 +1312,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Bras suggéré pour la mesure</value>
+        </attribute>
+        <attribute key="source">
+          <value class="string">Variable[Onyx.CIPreliminaryQuestionnaire.ABI_ARM_CHOSEN]</value>
         </attribute>
       </attributes>
     </variable>
@@ -1224,6 +1326,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Brachial BP</value>
         </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[30 &lt; x &lt; 200 || ], FEMALE[30 &lt; x &lt; 200 || ]], IntegrityCheck-WARNING[MALE[77 &lt; x &lt; 192 || ], FEMALE[77 &lt; x &lt; 192 || ]]]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="RES_DORSALIS_PEDIS_BP" dataType="INTEGER" unit="mmHg">
@@ -1234,6 +1339,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Dorsalis Pedis BP</value>
         </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[30 &lt; x &lt; 220 || ], FEMALE[30 &lt; x &lt; 220 || ]], IntegrityCheck-WARNING[MALE[70 &lt; x &lt; 220 || ], FEMALE[70 &lt; x &lt; 220 || ]]]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="RES_POSTERIOR_TIBIAL_BP" dataType="INTEGER" unit="mmHg">
@@ -1243,6 +1351,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Posterior Tibial BP</value>
+        </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[30 &lt; x &lt; 220 || ], FEMALE[30 &lt; x &lt; 220 || ]], IntegrityCheck-WARNING[MALE[70 &lt; x &lt; 220 || ], FEMALE[70 &lt; x &lt; 220 || ]]]</value>
         </attribute>
       </attributes>
     </variable>
@@ -1327,6 +1438,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Bras suggéré pour la mesure</value>
         </attribute>
+        <attribute key="source">
+          <value class="string">Variable[Onyx.CIPreliminaryQuestionnaire.BP_ARM_CHOSEN]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="IV_UPPER_ARM_CIRC" dataType="DECIMAL" unit="cm">
@@ -1336,6 +1450,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Circonférence du haut du bras</value>
+        </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[17.0 &lt; x &lt; 50.0], FEMALE[17.0 &lt; x &lt; 50.0]]]</value>
         </attribute>
       </attributes>
     </variable>
@@ -1397,6 +1514,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Lecture de la pression artérielle systolique  (1)</value>
         </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[30 &lt; x &lt; 300 || ], FEMALE[30 &lt; x &lt; 300 || ]], IntegrityCheck-WARNING[MALE[77 &lt; x &lt; 192 || ], FEMALE[77 &lt; x &lt; 192 || ]]]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="RES_FIRST_DIASTOLIC_BP" dataType="INTEGER" unit="mmHg">
@@ -1406,6 +1526,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Lecture de la pression artérielle diastolique (1)</value>
+        </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[30 &lt; x &lt; 200 || ], FEMALE[30 &lt; x &lt; 200 || ]], IntegrityCheck-WARNING[MALE[51 &lt; x &lt; 96 || ], FEMALE[51 &lt; x &lt; 96 || ]], IntegrityCheck-ERROR[x &lt; RES_FIRST_SYSTOLIC_BP]]</value>
         </attribute>
       </attributes>
     </variable>
@@ -1417,6 +1540,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Lecture de pouls (1)</value>
         </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[30 &lt; x &lt; 200 || ], FEMALE[30 &lt; x &lt; 200 || ]], IntegrityCheck-WARNING[MALE[40 &lt; x &lt; 100 || ], FEMALE[40 &lt; x &lt; 100 || ]]]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="RES_SEC_SYSTOLIC_BP" dataType="INTEGER" unit="mmHg">
@@ -1426,6 +1552,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Lecture de la pression artérielle systolique  (2)</value>
+        </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[30 &lt; x &lt; 300 || ], FEMALE[30 &lt; x &lt; 300 || ]], IntegrityCheck-WARNING[MALE[77 &lt; x &lt; 192 || ], FEMALE[77 &lt; x &lt; 192 || ]]]</value>
         </attribute>
       </attributes>
     </variable>
@@ -1437,6 +1566,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Lecture de la pression artérielle diastolique (2)</value>
         </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[30 &lt; x &lt; 200 || ], FEMALE[30 &lt; x &lt; 200 || ]], IntegrityCheck-WARNING[MALE[51 &lt; x &lt; 96 || ], FEMALE[51 &lt; x &lt; 96 || ]], IntegrityCheck-ERROR[x &lt; RES_SEC_SYSTOLIC_BP]]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="RES_SEC_PULSE_RATE" dataType="INTEGER" unit="Beats per Minute">
@@ -1446,6 +1578,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Lecture de pouls (2)</value>
+        </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[30 &lt; x &lt; 200 || ], FEMALE[30 &lt; x &lt; 200 || ]], IntegrityCheck-WARNING[MALE[40 &lt; x &lt; 100 || ], FEMALE[40 &lt; x &lt; 100 || ]]]</value>
         </attribute>
       </attributes>
     </variable>
@@ -1457,6 +1592,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Lecture de la pression artérielle systolique  (3)</value>
         </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[30 &lt; x &lt; 300 || ], FEMALE[30 &lt; x &lt; 300 || ]], IntegrityCheck-WARNING[MALE[77 &lt; x &lt; 192 || ], FEMALE[77 &lt; x &lt; 192 || ]]]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="RES_THIRD_DIASTOLIC_BP" dataType="INTEGER" unit="mmHg">
@@ -1466,6 +1604,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Lecture de la pression artérielle diastolique (3)</value>
+        </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[30 &lt; x &lt; 200 || ], FEMALE[30 &lt; x &lt; 200 || ]], IntegrityCheck-WARNING[MALE[51 &lt; x &lt; 96 || ], FEMALE[51 &lt; x &lt; 96 || ]], IntegrityCheck-ERROR[x &lt; RES_THIRD_SYSTOLIC_BP]]</value>
         </attribute>
       </attributes>
     </variable>
@@ -1477,6 +1618,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Lecture de pouls (3)</value>
         </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[30 &lt; x &lt; 200 || ], FEMALE[30 &lt; x &lt; 200 || ]], IntegrityCheck-WARNING[MALE[40 &lt; x &lt; 100 || ], FEMALE[40 &lt; x &lt; 100 || ]]]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="CALC_AVG_SYSTOLIC_BP" dataType="INTEGER" unit="mmHg">
@@ -1486,6 +1630,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Pression artérielle systolique moyenne</value>
+        </attribute>
+        <attribute key="source">
+          <value class="string">Computing[($1 + $2 + $3)/3,[Instrument[BloodPressure, RES_FIRST_SYSTOLIC_BP], Instrument[BloodPressure, RES_SEC_SYSTOLIC_BP], Instrument[BloodPressure, RES_THIRD_SYSTOLIC_BP]]]</value>
         </attribute>
       </attributes>
     </variable>
@@ -1497,6 +1644,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Pression artérielle diastolique moyenne</value>
         </attribute>
+        <attribute key="source">
+          <value class="string">Computing[($1 + $2 + $3)/3,[Instrument[BloodPressure, RES_FIRST_DIASTOLIC_BP], Instrument[BloodPressure, RES_SEC_DIASTOLIC_BP], Instrument[BloodPressure, RES_THIRD_DIASTOLIC_BP]]]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="CALC_AVG_PULSE_RATE" dataType="INTEGER" unit="">
@@ -1506,6 +1656,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Moyenne des lectures de pouls</value>
+        </attribute>
+        <attribute key="source">
+          <value class="string">Computing[($1 + $2 + $3)/3,[Instrument[BloodPressure, RES_FIRST_PULSE_RATE], Instrument[BloodPressure, RES_SEC_PULSE_RATE], Instrument[BloodPressure, RES_THIRD_PULSE_RATE]]]</value>
         </attribute>
       </attributes>
     </variable>
@@ -1560,6 +1713,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Poids des vêtements</value>
         </attribute>
+        <attribute key="source">
+          <value class="string">Data[DECIMAL:0.0]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="INPUT_PARTICIPANT_GENDER" dataType="TEXT">
@@ -1569,6 +1725,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Sexe</value>
+        </attribute>
+        <attribute key="source">
+          <value class="string">ParticipantProperty[gender]</value>
         </attribute>
       </attributes>
     </variable>
@@ -1580,6 +1739,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Type corporel</value>
         </attribute>
+        <attribute key="source">
+          <value class="string">Data[TEXT:STANDARD]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="INPUT_PARTICIPANT_AGE" dataType="INTEGER">
@@ -1590,6 +1752,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Age</value>
         </attribute>
+        <attribute key="source">
+          <value class="string">ParticipantProperty[age]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="INPUT_PARTICIPANT_HEIGHT" dataType="INTEGER" unit="cm">
@@ -1599,6 +1764,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Hauteur debout du participant</value>
+        </attribute>
+        <attribute key="source">
+          <value class="string">Instrument[StandingHeight, RES_FIRST_HEIGHT]</value>
         </attribute>
       </attributes>
     </variable>
@@ -1620,6 +1788,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Type corporel</value>
         </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[x == INPUT_BODY_TYPE]]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="OUTPUT_PARTICIPANT_GENDER" dataType="TEXT">
@@ -1629,6 +1800,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Sexe</value>
+        </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[x == INPUT_PARTICIPANT_GENDER]]</value>
         </attribute>
       </attributes>
     </variable>
@@ -1640,6 +1814,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Age</value>
         </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[x == INPUT_PARTICIPANT_AGE]]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="OUTPUT_PARTICIPANT_HEIGHT" dataType="INTEGER" unit="cm">
@@ -1649,6 +1826,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Hauteur debout du participant</value>
+        </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[x == INPUT_PARTICIPANT_HEIGHT]]</value>
         </attribute>
       </attributes>
     </variable>
@@ -1993,6 +2173,9 @@
         <attribute key="label" locale="fr">
           <value class="string">ID Participant</value>
         </attribute>
+        <attribute key="source">
+          <value class="string">ParticipantProperty[barcode]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="INPUT_PARTICIPANT_LAST_NAME" dataType="TEXT">
@@ -2002,6 +2185,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Nom</value>
+        </attribute>
+        <attribute key="source">
+          <value class="string">ParticipantProperty[lastName]</value>
         </attribute>
       </attributes>
     </variable>
@@ -2013,6 +2199,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Prénom</value>
         </attribute>
+        <attribute key="source">
+          <value class="string">ParticipantProperty[firstName]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="INPUT_PARTICIPANT_DATE_BIRTH" dataType="DATE">
@@ -2022,6 +2211,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Date de naissance</value>
+        </attribute>
+        <attribute key="source">
+          <value class="string">ParticipantProperty[birthDate]</value>
         </attribute>
       </attributes>
     </variable>
@@ -2033,6 +2225,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Sexe</value>
         </attribute>
+        <attribute key="source">
+          <value class="string">ParticipantProperty[gender]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="INPUT_FOOT_SCANNED" dataType="TEXT">
@@ -2042,6 +2237,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Pied à scanner</value>
+        </attribute>
+        <attribute key="source">
+          <value class="string">Variable[Onyx.CIPreliminaryQuestionnaire.BD_FOOT_CHOSEN]</value>
         </attribute>
       </attributes>
     </variable>
@@ -2053,6 +2251,9 @@
         <attribute key="label" locale="fr">
           <value class="string">ID Participant</value>
         </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[x == INPUT_PARTICIPANT_BARCODE]]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="OUTPUT_PARTICIPANT_LAST_NAME" dataType="TEXT" unit="">
@@ -2062,6 +2263,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Nom</value>
+        </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[x == INPUT_PARTICIPANT_LAST_NAME]]</value>
         </attribute>
       </attributes>
     </variable>
@@ -2073,6 +2277,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Prénom</value>
         </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[x == INPUT_PARTICIPANT_FIRST_NAME]]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="OUTPUT_PARTICIPANT_DATE_BIRTH" dataType="DATE" unit="">
@@ -2082,6 +2289,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Date de naissance</value>
+        </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[x == INPUT_PARTICIPANT_DATE_BIRTH]]</value>
         </attribute>
       </attributes>
     </variable>
@@ -2093,6 +2303,9 @@
         <attribute key="label" locale="fr">
           <value class="string">Sexe</value>
         </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[x == INPUT_PARTICIPANT_GENDER]]</value>
+        </attribute>
       </attributes>
     </variable>
     <variable name="OUTPUT_FOOT_SCANNED" dataType="TEXT" unit="">
@@ -2102,6 +2315,9 @@
         </attribute>
         <attribute key="label" locale="fr">
           <value class="string">Pied scanné</value>
+        </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[x == INPUT_FOOT_SCANNED]]</value>
         </attribute>
       </attributes>
     </variable>
@@ -2276,6 +2492,9 @@
         <attribute key="label" locale="fr">
           <value class="string">en: Arm span</value>
         </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[70.0 &lt; x &lt; 210.0], FEMALE[70.0 &lt; x &lt; 210.0]], IntegrityCheck-WARNING[MALE[107.0 &lt; x &lt; 196.0], FEMALE[103.0 &lt; x &lt; 178.0]]]</value>
+        </attribute>
       </attributes>
     </variable>
   </variable>
@@ -2299,9 +2518,18 @@
         <attribute key="label" locale="fr">
           <value class="string">Lecture de la mesure des hanches (1)</value>
         </attribute>
+        <attribute key="validation">
+          <value class="string">[IntegrityCheck-ERROR[MALE[50.0 &lt; x &lt; 199.0], FEMALE[50.0 &lt; x &lt; 199.0]], IntegrityCheck-WARNING[MALE[78.0 &lt; x &lt; 123.0], FEMALE[72.0 &lt; x &lt; 136.0]]]</value>
+        </attribute>
       </attributes>
     </variable>
-    <variable name="CALC_WAIST_TO_HIP_RATIO" dataType="DECIMAL" unit=""/>
+    <variable name="CALC_WAIST_TO_HIP_RATIO" dataType="DECIMAL" unit="">
+      <attributes>
+        <attribute key="source">
+          <value class="string">Computing[Round[($1/$2)*10]/10,[Instrument[Waist, RES_FIRST_WAIST_SIZE], Instrument[Hips, RES_FIRST_HIPS_SIZE]]]</value>
+        </attribute>
+      </attributes>
+    </variable>
   </variable>
   <variable name="SamplesCollection">
     <variable name="ParticipantTubeRegistration">
@@ -4005,7 +4233,7 @@
           <value class="string">It is recommended that the ABI measurement be made on the right arm and the left leg</value>
         </attribute>
         <attribute key="condition">
-          <value class="string">Computing[$1 &amp;&amp; ($2 || $3)  &amp;&amp; !$4 ,[Questionnaire[CIPreliminaryQuestionnaire.BP_ARM_CHOSEN.RIGHT_ARM], Questionnaire[CIPreliminaryQuestionnaire.ABI_CONTRAINDICATED_LEG.RIGHT], Questionnaire[CIPreliminaryQuestionnaire.VEINS_LEG_PROCEDURE_SIDE.RIGHT], Questionnaire[CIPreliminaryQuestionnaire.ABI_CI_BOTH_LEGS]]]</value>
+          <value class="string">Computing[$1 &amp;&amp; ($2 || $3) &amp;&amp; !$4,[Questionnaire[CIPreliminaryQuestionnaire.BP_ARM_CHOSEN.RIGHT_ARM], Questionnaire[CIPreliminaryQuestionnaire.ABI_CONTRAINDICATED_LEG.RIGHT], Questionnaire[CIPreliminaryQuestionnaire.VEINS_LEG_PROCEDURE_SIDE.RIGHT], Questionnaire[CIPreliminaryQuestionnaire.ABI_CI_BOTH_LEGS]]]</value>
         </attribute>
       </attributes>
       <variable name="active" dataType="BOOLEAN"/>
@@ -4016,7 +4244,7 @@
           <value class="string">It is recommended that the ABI measurement be made on the left arm and the right leg</value>
         </attribute>
         <attribute key="condition">
-          <value class="string">Computing[$1 &amp;&amp; ($2 || $3)  &amp;&amp; !$4 ,[Questionnaire[CIPreliminaryQuestionnaire.BLOOD_PRESSURE_MEASURE_SAFE_RIGHT.N], Questionnaire[CIPreliminaryQuestionnaire.ABI_CONTRAINDICATED_LEG.LEFT], Questionnaire[CIPreliminaryQuestionnaire.VEINS_LEG_PROCEDURE_SIDE.LEFT], Questionnaire[CIPreliminaryQuestionnaire.ABI_CI_BOTH_LEGS]]]</value>
+          <value class="string">Computing[$1 &amp;&amp; ($2 || $3) &amp;&amp; !$4,[Questionnaire[CIPreliminaryQuestionnaire.BLOOD_PRESSURE_MEASURE_SAFE_RIGHT.N], Questionnaire[CIPreliminaryQuestionnaire.ABI_CONTRAINDICATED_LEG.LEFT], Questionnaire[CIPreliminaryQuestionnaire.VEINS_LEG_PROCEDURE_SIDE.LEFT], Questionnaire[CIPreliminaryQuestionnaire.ABI_CI_BOTH_LEGS]]]</value>
         </attribute>
       </attributes>
       <variable name="active" dataType="BOOLEAN"/>
@@ -4470,7 +4698,7 @@
               <value class="string">(YYYY)</value>
             </attribute>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= CurrentDate.YEAR]]</value>
+              <value class="string">[Comparing[x &lt;= CurrentDate.YEAR]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -4586,7 +4814,7 @@
               <value class="string">(YYYY)</value>
             </attribute>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= CurrentDate.YEAR]]</value>
+              <value class="string">[Comparing[x &lt;= CurrentDate.YEAR]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -4631,7 +4859,7 @@
           <value class="string">Note that the bone fragility measurement should be taken on the right foot</value>
         </attribute>
         <attribute key="condition">
-          <value class="string">Computing[$1  &amp;&amp; ($2 || $3) &amp;&amp;($4|| $5 || $9)&amp;&amp; ($6 || $7 || $10) &amp;&amp; !$8,[Questionnaire[CIPreliminaryQuestionnaire.BD_HANDEDNESS.LEFT_HANDED], Questionnaire[CIPreliminaryQuestionnaire.FOOT_IMPLANT.N], Questionnaire[CIPreliminaryQuestionnaire.FOOT_IMPLANT_SIDE.LEFT], Questionnaire[CIPreliminaryQuestionnaire.LOWER_EXTREMITY_EVENT.N], Questionnaire[CIPreliminaryQuestionnaire.LOWER_EXTREMITY_EVENT_SIDE.LEFT], Questionnaire[CIPreliminaryQuestionnaire.LOWER_EXTREMITY_EVENT_2.N], Questionnaire[CIPreliminaryQuestionnaire.LOWER_EXTREMITY_EVENT_2_SIDE.LEFT], Questionnaire[CIPreliminaryQuestionnaire.FOOT_IMPLANT_SIDE.LEFT], Questionnaire[CIPreliminaryQuestionnaire.LOWER_EXTREMITY_EVENT_SIDE.BOTH], Questionnaire[CIPreliminaryQuestionnaire.LOWER_EXTREMITY_EVENT_2_SIDE.BOTH]]]</value>
+          <value class="string">Computing[$1 &amp;&amp; ($2 || $3) &amp;&amp;($4|| $5 || $9)&amp;&amp; ($6 || $7 || $10) &amp;&amp; !$8,[Questionnaire[CIPreliminaryQuestionnaire.BD_HANDEDNESS.LEFT_HANDED], Questionnaire[CIPreliminaryQuestionnaire.FOOT_IMPLANT.N], Questionnaire[CIPreliminaryQuestionnaire.FOOT_IMPLANT_SIDE.LEFT], Questionnaire[CIPreliminaryQuestionnaire.LOWER_EXTREMITY_EVENT.N], Questionnaire[CIPreliminaryQuestionnaire.LOWER_EXTREMITY_EVENT_SIDE.LEFT], Questionnaire[CIPreliminaryQuestionnaire.LOWER_EXTREMITY_EVENT_2.N], Questionnaire[CIPreliminaryQuestionnaire.LOWER_EXTREMITY_EVENT_2_SIDE.LEFT], Questionnaire[CIPreliminaryQuestionnaire.FOOT_IMPLANT_SIDE.LEFT], Questionnaire[CIPreliminaryQuestionnaire.LOWER_EXTREMITY_EVENT_SIDE.BOTH], Questionnaire[CIPreliminaryQuestionnaire.LOWER_EXTREMITY_EVENT_2_SIDE.BOTH]]]</value>
         </attribute>
       </attributes>
       <variable name="active" dataType="BOOLEAN"/>
@@ -6374,7 +6602,7 @@
               <value class="string">Year</value>
             </attribute>
             <attribute key="validation">
-              <value class="string">[Comparing[&gt;= Computing[$currentYear - 70]], Comparing[&lt;= Computing[$currentYear - 34]]]</value>
+              <value class="string">[Comparing[x &gt;= Computing[$currentYear - 70]], Comparing[x &lt;= Computing[$currentYear - 34]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -6528,7 +6756,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -7292,7 +7520,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -7369,7 +7597,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -7409,7 +7637,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -8065,7 +8293,7 @@
         <variable name="OPEN_N_NUMBER_OLDER_SIBLINGS" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$1 + $2,[Questionnaire[HealthQuestionnaireTouchScreen.NUMBER_SIBLINGS_ALL.OPEN_N_BROTHERS.OPEN_N_BROTHERS], Questionnaire[HealthQuestionnaireTouchScreen.NUMBER_SIBLINGS_ALL.OPEN_N_SISTERS.OPEN_N_SISTERS]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$1 + $2,[Questionnaire[HealthQuestionnaireTouchScreen.NUMBER_SIBLINGS_ALL.OPEN_N_BROTHERS.OPEN_N_BROTHERS], Questionnaire[HealthQuestionnaireTouchScreen.NUMBER_SIBLINGS_ALL.OPEN_N_SISTERS.OPEN_N_SISTERS]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -10185,7 +10413,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -10307,7 +10535,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -10456,7 +10684,7 @@
         <variable name="OPEN_N_0_NUMBER_PREGNANCIES_ALL" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Questionnaire[HealthQuestionnaireTouchScreen.NUMBER_PREGNANCIES_ALL.OPEN_N_0_77.OPEN_N_0_77]]]</value>
+              <value class="string">[Comparing[x &lt;= Questionnaire[HealthQuestionnaireTouchScreen.NUMBER_PREGNANCIES_ALL.OPEN_N_0_77.OPEN_N_0_77]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -10496,7 +10724,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -10536,7 +10764,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -10576,7 +10804,7 @@
         <variable name="OPEN_N_0_NUMBER_PREGNANCIES_ALL" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Questionnaire[HealthQuestionnaireTouchScreen.NUMBER_PREGNANCIES_ALL.OPEN_N_0_77.OPEN_N_0_77]]]</value>
+              <value class="string">[Comparing[x &lt;= Questionnaire[HealthQuestionnaireTouchScreen.NUMBER_PREGNANCIES_ALL.OPEN_N_0_77.OPEN_N_0_77]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -10857,7 +11085,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -10998,7 +11226,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -11168,7 +11396,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -11328,7 +11556,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -11408,7 +11636,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -16268,7 +16496,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -16308,7 +16536,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[Questionnaire[HealthQuestionnaireTouchScreen.DATE_OF_BIRTH.DOB.DOB_YEAR]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -23871,7 +24099,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -23885,7 +24113,7 @@
         <variable name="YEAR" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= CurrentDate.YEAR], Comparing[&gt;= ParticipantProperty[birthYear]]]</value>
+              <value class="string">[Comparing[x &lt;= CurrentDate.YEAR], Comparing[x &gt;= ParticipantProperty[birthYear]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -36622,7 +36850,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -36661,7 +36889,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -36700,7 +36928,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -36739,7 +36967,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -36778,7 +37006,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -36817,7 +37045,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -36856,7 +37084,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -36895,7 +37123,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -36934,7 +37162,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -36973,7 +37201,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -37012,7 +37240,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -37051,7 +37279,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -37090,7 +37318,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -37791,7 +38019,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -37830,7 +38058,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -38069,7 +38297,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -38108,7 +38336,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -38147,7 +38375,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -38186,7 +38414,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -38225,7 +38453,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -38264,7 +38492,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -38588,7 +38816,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -38722,7 +38950,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -38761,7 +38989,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -38988,7 +39216,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -39027,7 +39255,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -39066,7 +39294,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -39105,7 +39333,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -39144,7 +39372,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -39183,7 +39411,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -39222,7 +39450,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -39261,7 +39489,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -39708,7 +39936,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -39747,7 +39975,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -39786,7 +40014,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -39825,7 +40053,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -39864,7 +40092,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -39903,7 +40131,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -40251,7 +40479,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -40290,7 +40518,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -40329,7 +40557,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -40560,7 +40788,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -40599,7 +40827,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -40638,7 +40866,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -40845,7 +41073,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -40962,7 +41190,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -41427,7 +41655,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -41561,7 +41789,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -41695,7 +41923,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -41829,7 +42057,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -41963,7 +42191,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -42097,7 +42325,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -42231,7 +42459,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -42365,7 +42593,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -42499,7 +42727,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -42633,7 +42861,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -42767,7 +42995,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -42901,7 +43129,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -43035,7 +43263,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -43169,7 +43397,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -43303,7 +43531,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -43437,7 +43665,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -43571,7 +43799,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -43705,7 +43933,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -43839,7 +44067,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -43973,7 +44201,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -44107,7 +44335,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -44241,7 +44469,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -44375,7 +44603,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -44591,7 +44819,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -44630,7 +44858,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -44669,7 +44897,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -44708,7 +44936,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -44747,7 +44975,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -44786,7 +45014,7 @@
           <variable name="AGE" dataType="INTEGER">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -44967,7 +45195,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -45083,7 +45311,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -45199,7 +45427,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -45316,7 +45544,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -45396,7 +45624,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -45476,7 +45704,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -45556,7 +45784,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -45636,7 +45864,7 @@
         <variable name="AGE" dataType="INTEGER">
           <attributes>
             <attribute key="validation">
-              <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+              <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
             </attribute>
           </attributes>
         </variable>
@@ -48257,7 +48485,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -48296,7 +48524,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -48335,7 +48563,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -48374,7 +48602,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -48413,7 +48641,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -48452,7 +48680,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -48491,7 +48719,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -48530,7 +48758,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -48569,7 +48797,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -48608,7 +48836,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -48647,7 +48875,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -48686,7 +48914,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -48725,7 +48953,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -48764,7 +48992,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -48803,7 +49031,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -48842,7 +49070,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -48881,7 +49109,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -48920,7 +49148,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -50014,7 +50242,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -50048,7 +50276,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -50082,7 +50310,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -50116,7 +50344,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -50150,7 +50378,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -50184,7 +50412,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -50218,7 +50446,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -50252,7 +50480,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -50286,7 +50514,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -50320,7 +50548,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -50354,7 +50582,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -50388,7 +50616,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -50422,7 +50650,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -50456,7 +50684,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -50490,7 +50718,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -50524,7 +50752,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -50558,7 +50786,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -50592,7 +50820,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -50626,7 +50854,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -50660,7 +50888,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
@@ -50694,7 +50922,7 @@
           <variable name="AGE2" dataType="DECIMAL">
             <attributes>
               <attribute key="validation">
-                <value class="string">[Comparing[&lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
+                <value class="string">[Comparing[x &lt;= Computing[$currentYear - $1,[ParticipantProperty[birthYear]]]]]</value>
               </attribute>
             </attributes>
           </variable>
