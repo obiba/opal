@@ -47,6 +47,12 @@
       <artifactId>jewelcli</artifactId>
       <version>${jewelcli.version}</version>
     </dependency>
+    
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-queryresultio-sparqlxml</artifactId>
+    </dependency>
+    
   </dependencies>
 
   <build>

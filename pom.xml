@@ -373,6 +373,38 @@
         -->
         <scope>runtime</scope>
       </dependency>
+      
+      <!-- OpenRDF Sesame Elmo -->
+      <dependency>
+        <groupId>org.openrdf.elmo</groupId>
+        <artifactId>elmo-sesame</artifactId>
+        <version>${elmo.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.openrdf.elmo</groupId>
+        <artifactId>elmo-owl</artifactId>
+        <version>${elmo.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.openrdf.sesame</groupId>
+        <artifactId>sesame-sail-rdbms</artifactId>
+        <version>${sesame.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.openrdf.sesame</groupId>
+        <artifactId>sesame-sail-nativerdf</artifactId>
+        <version>${sesame.version}</version>
+      </dependency>
+    
+      <dependency>
+        <groupId>org.openrdf.sesame</groupId>
+        <artifactId>sesame-queryresultio-sparqlxml</artifactId>
+        <version>${sesame.version}</version>
+      </dependency>
+    
     </dependencies>
   </dependencyManagement>
 
@@ -425,6 +457,7 @@
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
     </dependency>
+    
   </dependencies>
 
   <build>
@@ -498,6 +531,8 @@
     <jotm.version>2.1.4</jotm.version>
     <java.spec.version>1.0.2</java.spec.version>
     <onyx.version>1.3.1</onyx.version>
+    <sesame.version>2.2.4</sesame.version>
+    <elmo.version>1.5</elmo.version>
   </properties>
 
   <reporting>

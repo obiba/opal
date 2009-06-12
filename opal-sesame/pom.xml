@@ -30,25 +30,21 @@
     <dependency>
       <groupId>org.openrdf.elmo</groupId>
       <artifactId>elmo-sesame</artifactId>
-      <version>1.5</version>
     </dependency>
 
     <dependency>
       <groupId>org.openrdf.elmo</groupId>
       <artifactId>elmo-owl</artifactId>
-      <version>1.5</version>
     </dependency>
 
     <dependency>
       <groupId>org.openrdf.sesame</groupId>
       <artifactId>sesame-sail-rdbms</artifactId>
-      <version>2.2.4</version>
     </dependency>
 
     <dependency>
       <groupId>org.openrdf.sesame</groupId>
       <artifactId>sesame-sail-nativerdf</artifactId>
-      <version>2.2.4</version>
     </dependency>
 
   </dependencies>
