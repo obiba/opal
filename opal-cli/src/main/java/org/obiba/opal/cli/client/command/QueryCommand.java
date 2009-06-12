@@ -12,11 +12,12 @@ package org.obiba.opal.cli.client.command;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import org.obiba.core.util.StreamUtil;
 import org.obiba.core.util.StringUtil;
-import org.obiba.opal.cli.client.command.options.SparqlCommandOptions;
+import org.obiba.opal.cli.client.command.options.QueryCommandOptions;
 import org.obiba.opal.elmo.concepts.Opal;
 import org.obiba.opal.sesame.repository.OpalRepositoryManager;
 import org.openrdf.model.Namespace;
@@ -32,6 +33,12 @@ import org.openrdf.query.resultio.sparqlxml.SPARQLResultsXMLWriter;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
+import org.openrdf.rio.RDFHandler;
+import org.openrdf.rio.n3.N3Writer;
+import org.openrdf.rio.owl.OntologyWriter;
+import org.openrdf.rio.rdfxml.RDFXMLWriter;
+import org.openrdf.rio.rss.RssWriter;
+import org.openrdf.rio.turtle.TurtleWriter;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -40,7 +47,7 @@ import uk.co.flamingpenguin.jewel.cli.CliFactory;
 import uk.co.flamingpenguin.jewel.cli.Option;
 import uk.co.flamingpenguin.jewel.cli.Unparsed;
 
-public class SparqlCommand extends AbstractCommand<SparqlCommandOptions> {
+public class QueryCommand extends AbstractCommand<QueryCommandOptions> {
 
   private OpalRepositoryManager repoManager;
 
@@ -50,7 +57,7 @@ public class SparqlCommand extends AbstractCommand<SparqlCommandOptions> {
 
   private QueryLanguage language = QueryLanguage.SPARQL;
 
-  private SparqlOptions prompt;
+  private PromptOptions prompt;
 
   public void execute() {
     // Ensure that options have been set.
@@ -79,6 +86,7 @@ public class SparqlCommand extends AbstractCommand<SparqlCommandOptions> {
           if(output.getName().equals("-")) {
             output = null;
           }
+          System.console().printf("Results will be output to: %s\n", (output != null ? output.getAbsolutePath() : "stdout"));
         } else if(this.prompt.isNs()) {
           iterateNamespaces(new NamespaceCallback() {
             public void callback(Namespace ns) {
@@ -91,6 +99,8 @@ public class SparqlCommand extends AbstractCommand<SparqlCommandOptions> {
           } catch(Exception e) {
             System.console().printf("Invalid query language [%s]\n", prompt.getLanguage());
           }
+        } else if(this.prompt.isDump()) {
+          dump(prompt.getDump());
         } else if(this.prompt.isQuery()) {
           query();
         }
@@ -118,8 +128,36 @@ public class SparqlCommand extends AbstractCommand<SparqlCommandOptions> {
     return new ClassPathXmlApplicationContext("classpath:/spring/opal-cli/context.xml");
   }
 
+  private void dump(String handlerType) {
+    DumpHandler handler = null;
+    try {
+      handler = DumpHandler.valueOf(handlerType.toUpperCase());
+    } catch(RuntimeException e) {
+      System.console().printf("Invalid dump handler type. Type must be one of %s\n", StringUtil.arrayToString((Object[]) DumpHandler.values()));
+      return;
+    }
+
+    if(output == null) {
+      System.console().printf("No output file specified. Specify one with -o option\n");
+      return;
+    }
+
+    FileOutputStream os = null;
+    try {
+      os = new FileOutputStream(output);
+      connection.export(handler.createHandler(os));
+    } catch(Exception e) {
+      System.console().printf("Error writing ontology: %s", e.getMessage());
+    } finally {
+      StreamUtil.silentSafeClose(os);
+    }
+  }
+
   private void query() throws RepositoryException {
     String queryString = StringUtil.collectionToString(this.prompt.getQuery(), " ");
+    if(queryString == null || queryString.trim().length() == 0) {
+      return;
+    }
 
     FileOutputStream os = null;
     try {
@@ -158,7 +196,7 @@ public class SparqlCommand extends AbstractCommand<SparqlCommandOptions> {
       System.console().printf("> ");
       String[] args = System.console().readLine().split(" ");
       try {
-        this.prompt = CliFactory.parseArguments(SparqlOptions.class, args);
+        this.prompt = CliFactory.parseArguments(PromptOptions.class, args);
       } catch(RuntimeException e) {
         System.err.println(e.getMessage());
       } catch(ArgumentValidationException e) {
@@ -208,10 +246,15 @@ public class SparqlCommand extends AbstractCommand<SparqlCommandOptions> {
     }
   }
 
-  public interface SparqlOptions {
+  public interface PromptOptions {
 
     @Option(longName = "ns")
     public boolean isNs();
+
+    @Option(shortName = "d", longName = "dump")
+    public String getDump();
+
+    public boolean isDump();
 
     @Option(shortName = { "q" }, longName = "quit")
     public boolean isQuit();
@@ -230,5 +273,40 @@ public class SparqlCommand extends AbstractCommand<SparqlCommandOptions> {
     public List<String> getQuery();
 
     public boolean isQuery();
+  }
+
+  public enum DumpHandler {
+    OWL {
+      @Override
+      public RDFHandler createHandler(OutputStream output) {
+        return new OntologyWriter(output);
+      }
+    },
+    RDFXML {
+      @Override
+      public RDFHandler createHandler(OutputStream output) {
+        return new RDFXMLWriter(output);
+      }
+    },
+    N3 {
+      @Override
+      public RDFHandler createHandler(OutputStream output) {
+        return new N3Writer(output);
+      }
+    },
+    TURTLE {
+      @Override
+      public RDFHandler createHandler(OutputStream output) {
+        return new TurtleWriter(output);
+      }
+    },
+    RSS {
+      @Override
+      public RDFHandler createHandler(OutputStream output) {
+        return new RssWriter(output);
+      }
+    };
+
+    public abstract RDFHandler createHandler(OutputStream output);
   }
 }

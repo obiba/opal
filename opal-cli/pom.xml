@@ -52,6 +52,22 @@
       <groupId>org.openrdf.sesame</groupId>
       <artifactId>sesame-queryresultio-sparqlxml</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-rio-turtle</artifactId>
+      <version>${sesame.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-rio-n3</artifactId>
+      <version>${sesame.version}</version>
+    </dependency>
+        <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-rio-rdfxml</artifactId>
+      <version>${sesame.version}</version>
+    </dependency>
     
   </dependencies>
 

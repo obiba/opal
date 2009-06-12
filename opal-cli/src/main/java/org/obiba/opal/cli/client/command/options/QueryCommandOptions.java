@@ -12,9 +12,9 @@ package org.obiba.opal.cli.client.command.options;
 import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
 
 /**
- *
+ * 
  */
-@CommandLineInterface(application = "sparql")
-public interface SparqlCommandOptions extends GlobalOptions {
+@CommandLineInterface(application = "query")
+public interface QueryCommandOptions extends GlobalOptions {
 
 }
