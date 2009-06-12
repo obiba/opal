@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.obiba.onyx.engine.variable.Attribute;
 import org.obiba.onyx.engine.variable.Category;
 import org.obiba.onyx.engine.variable.Variable;
 import org.obiba.opal.datasource.onyx.variable.IVariableQNameStrategy;
@@ -113,6 +114,7 @@ public class ElmoVariableVisitor implements VariableVisitor {
       QName parentQName = qnameStrategy.getQName(onyxVariable.getParent());
       Class parentVariable = manager.find(Class.class, parentQName);
 
+      // log.info("parentVariable {}", parentVariable.getClass().getInterfaces());
       for(Object c : parentVariable.getRdfsSubClassOf()) {
         if(c instanceof Restriction) {
           Restriction r = (Restriction) c;
@@ -122,6 +124,8 @@ public class ElmoVariableVisitor implements VariableVisitor {
           }
         }
       }
+
+      annotate(opalOnyxVariable, onyxVariable.getAttributes());
     }
 
     public boolean handles(Variable var) {
@@ -155,16 +159,7 @@ public class ElmoVariableVisitor implements VariableVisitor {
       r.setOwlAllValuesFrom(union);
       opalOnyxVariable.getRdfsSubClassOf().add(r);
 
-      // for(Attribute attr : onyxVariable.getAttributes()) {
-      // if(attr.getKey().equals("label")) {
-      // if(attr.getLocale() != null) {
-      // manager.setLocale(attr.getLocale());
-      // }
-      // // AnnotationProperty annot = manager.create(AnnotationProperty.class);
-      // // annot.setRdfsLabel(attr.toString());
-      // opalOnyxVariable.setRdfsLabel(attr.toString());
-      // }
-      // }
+      annotate(opalOnyxVariable, onyxVariable.getAttributes());
     }
 
     public boolean handles(Variable var) {
@@ -176,9 +171,9 @@ public class ElmoVariableVisitor implements VariableVisitor {
     public void handle(Variable onyxVariable) {
       QName qname = qnameStrategy.getQName(onyxVariable);
 
-      org.openrdf.concepts.owl.Class opalVariable = opal.getOpalClass(ContinuousVariable.class);
+      Class opalVariable = opal.getOpalClass(ContinuousVariable.class);
 
-      org.openrdf.concepts.owl.Class opalOnyxVariable = manager.create(qname, org.openrdf.concepts.owl.Class.class);
+      Class opalOnyxVariable = manager.create(qname, Class.class);
       opalOnyxVariable.getRdfsSubClassOf().add(opalVariable);
 
       Restriction r = manager.create(Restriction.class);
@@ -187,6 +182,7 @@ public class ElmoVariableVisitor implements VariableVisitor {
       r.setOwlCardinality(BigInteger.ONE);
       opalOnyxVariable.getRdfsSubClassOf().add(r);
 
+      annotate(opalOnyxVariable, onyxVariable.getAttributes());
     }
 
     public boolean handles(Variable var) {
@@ -206,6 +202,18 @@ public class ElmoVariableVisitor implements VariableVisitor {
 
     public boolean handles(Variable var) {
       return var.isRepeatable();
+    }
+  }
+
+  private void annotate(Class opalOnyxVariable, List<Attribute> attributes) {
+    for(Attribute attr : attributes) {
+      log.debug("{}@{}={}", new Object[] { attr.getKey(), attr.getLocale(), attr.getValue().toString() });
+      if(attr.getKey().equals("label")) {
+        if(attr.getLocale() != null) {
+          manager.setLocale(attr.getLocale());
+        }
+        opalOnyxVariable.setRdfsLabel(attr.getValue().toString());
+      }
     }
   }
 
