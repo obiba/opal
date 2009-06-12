@@ -50,6 +50,8 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
 
   private static final String VARIABLES_FILE = "variables.xml";
 
+  private static final String ENCRYPTION_FILE = "encryption.xml";
+
   public static final String PARTICIPANT_DATA_EXTENSION = ".xml";
 
   private IParticipantKeyWriteRegistry participantKeyWriteRegistry;
@@ -113,8 +115,10 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
 
     dataInputStrategy.prepare(dataInputContext);
     Variable root = loadVariables();
-    loadParticipants(root);
 
+    if(!onyxImportConfiguration.isCatalogOnly()) {
+      loadParticipants(root);
+    }
   }
 
   protected Variable loadVariables() {
@@ -210,9 +214,28 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
    */
   private Variable getVariableRoot() {
     Variable variableRoot = null;
-    for(String entryName : dataInputStrategy.listEntries()) {
-      if(entryName.equalsIgnoreCase(VARIABLES_FILE)) {
-        variableRoot = getVariableFromXmlFile(entryName);
+    if(onyxImportConfiguration.getCatalog() != null) {
+      log.info("catalog={}", onyxImportConfiguration.getCatalog());
+      InputStream stream = null;
+      try {
+        stream = onyxImportConfiguration.getCatalogResource().getInputStream();
+        variableRoot = VariableStreamer.fromXML(stream);
+      } catch(IOException e) {
+        throw new IllegalStateException("Unable to load variables from resource: " + onyxImportConfiguration.getCatalog());
+      } finally {
+        if(stream != null) {
+          try {
+            stream.close();
+          } catch(IOException e) {
+            throw new IllegalStateException("Could not close InputStream for variables resource: " + onyxImportConfiguration.getCatalog());
+          }
+        }
+      }
+    } else {
+      for(String entryName : dataInputStrategy.listEntries()) {
+        if(entryName.equalsIgnoreCase(VARIABLES_FILE)) {
+          variableRoot = getVariableFromXmlFile(entryName);
+        }
       }
     }
     if(variableRoot == null) throw new IllegalStateException("Unable to load variables. The file [" + VARIABLES_FILE + "] was not found.");
@@ -226,6 +249,7 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
    * @return The root Variable or VariableDataSet
    */
   private <T> T getVariableFromXmlFile(String filename) {
+    log.info("getVariableFromXmlFile({})", filename);
     InputStream inputStream = null;
     T object = null;
     try {
@@ -256,7 +280,7 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
    * @return True if the entryName is a Participant .xml datafile.
    */
   private boolean isParticipantEntry(String entryName) {
-    return (entryName != null && entryName.endsWith(PARTICIPANT_DATA_EXTENSION) && !entryName.equalsIgnoreCase(VARIABLES_FILE));
+    return (entryName != null && entryName.endsWith(PARTICIPANT_DATA_EXTENSION) && !entryName.equalsIgnoreCase(VARIABLES_FILE) && !entryName.equalsIgnoreCase(ENCRYPTION_FILE));
   }
 
   private void loadData(String opalId, VariableDataSet vds) {

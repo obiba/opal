@@ -154,6 +154,17 @@ public class ElmoVariableVisitor implements VariableVisitor {
       r.setOwlOnProperty(hasCategory);
       r.setOwlAllValuesFrom(union);
       opalOnyxVariable.getRdfsSubClassOf().add(r);
+
+      // for(Attribute attr : onyxVariable.getAttributes()) {
+      // if(attr.getKey().equals("label")) {
+      // if(attr.getLocale() != null) {
+      // manager.setLocale(attr.getLocale());
+      // }
+      // // AnnotationProperty annot = manager.create(AnnotationProperty.class);
+      // // annot.setRdfsLabel(attr.toString());
+      // opalOnyxVariable.setRdfsLabel(attr.toString());
+      // }
+      // }
     }
 
     public boolean handles(Variable var) {
