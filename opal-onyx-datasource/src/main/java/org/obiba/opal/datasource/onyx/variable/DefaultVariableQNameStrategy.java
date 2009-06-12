@@ -12,8 +12,7 @@ import org.obiba.onyx.engine.variable.IVariablePathNamingStrategy;
 import org.obiba.onyx.engine.variable.Variable;
 
 /**
- * A default implementation of {@link IVariableQNameStrategy}. This
- * implementation removes the
+ * A default implementation of {@link IVariableQNameStrategy}. This implementation removes the
  */
 public class DefaultVariableQNameStrategy implements IVariableQNameStrategy {
 
@@ -30,6 +29,10 @@ public class DefaultVariableQNameStrategy implements IVariableQNameStrategy {
 
   public void setBaseUri(String baseUri) {
     this.baseUri = baseUri;
+  }
+
+  public String getBaseUri() {
+    return this.baseUri;
   }
 
   public void setVariablePathNamingStrategy(IVariablePathNamingStrategy variablePathNamingStrategy) {
@@ -50,16 +53,16 @@ public class DefaultVariableQNameStrategy implements IVariableQNameStrategy {
     // Remove the root (root is represented by baseUri)
     parts.remove(variablePathNamingStrategy.getRootName());
 
-    if (parts.size() < 2) {
+    if(parts.size() < 2) {
       throw new IllegalArgumentException("Cannot build QName from path, not enough parts: " + path);
     }
 
     StringBuilder namespace = new StringBuilder();
     namespace.append(baseUri);
 
-    if (firstElementAsNamespace == true) {
+    if(firstElementAsNamespace == true) {
       int length = namespace.length();
-      if (namespace.charAt(length - 1) != '/') {
+      if(namespace.charAt(length - 1) != '/') {
         namespace.append('/');
       }
       // First element is part of namespace
@@ -69,8 +72,8 @@ public class DefaultVariableQNameStrategy implements IVariableQNameStrategy {
     namespace.append('#');
 
     StringBuilder sb = new StringBuilder();
-    for (String part : parts) {
-      if (sb.length() > 0) {
+    for(String part : parts) {
+      if(sb.length() > 0) {
         sb.append('.');
       }
       sb.append(part);
@@ -85,7 +88,7 @@ public class DefaultVariableQNameStrategy implements IVariableQNameStrategy {
 
   public QName getOccurenceVariable(String path) {
     Map<QName, String> occ = createOccurence(path);
-    if (occ != null) {
+    if(occ != null) {
       return occ.keySet().iterator().next();
     }
     return null;
@@ -93,7 +96,7 @@ public class DefaultVariableQNameStrategy implements IVariableQNameStrategy {
 
   public String getOccurenceValue(String path) {
     Map<QName, String> occ = createOccurence(path);
-    if (occ != null) {
+    if(occ != null) {
       return occ.values().iterator().next();
     }
     return null;
@@ -101,14 +104,14 @@ public class DefaultVariableQNameStrategy implements IVariableQNameStrategy {
 
   private Map<QName, String> createOccurence(String path) {
     Map<String, String> parameters = variablePathNamingStrategy.getParameters(path);
-    if (parameters != null && parameters.size() > 0) {
+    if(parameters != null && parameters.size() > 0) {
       String parentName = parameters.keySet().iterator().next();
       List<String> parts = variablePathNamingStrategy.getNormalizedNames(path);
       parts.remove(parts.size() - 1);
       Collections.reverse(parts);
-      for (Iterator<String> iterator = parts.iterator(); iterator.hasNext();) {
+      for(Iterator<String> iterator = parts.iterator(); iterator.hasNext();) {
         String string = iterator.next();
-        if (string.equals(parentName) == false) {
+        if(string.equals(parentName) == false) {
           iterator.remove();
         } else {
           break;
@@ -117,8 +120,8 @@ public class DefaultVariableQNameStrategy implements IVariableQNameStrategy {
       Collections.reverse(parts);
 
       StringBuilder parentPath = new StringBuilder();
-      for (String part : parts) {
-        if (parentPath.length() > 0) {
+      for(String part : parts) {
+        if(parentPath.length() > 0) {
           parentPath.append(variablePathNamingStrategy.getPathSeparator());
         }
         parentPath.append(part);

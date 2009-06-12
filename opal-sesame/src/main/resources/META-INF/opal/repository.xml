@@ -23,7 +23,7 @@
 
   <bean id="memoryRepositoryFactory" class="org.obiba.opal.sesame.repository.impl.MemoryRepositoryFactory"
     lazy-init="true">
-    <property name="dataDir" value="opal-data" />
+    <property name="dataDir" value="${org.obiba.opal.datasource.opal.dataDir}" />
   </bean>
 
   <bean id="nativeRepositoryFactory" class="org.obiba.opal.sesame.repository.impl.NativeRepositoryFactory"

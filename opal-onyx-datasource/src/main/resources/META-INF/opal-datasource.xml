@@ -2,6 +2,15 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
+  <bean id="qnameStrategy" class="org.obiba.opal.datasource.onyx.variable.DefaultVariableQNameStrategy">
+    <constructor-arg value="http://www.obiba.org/owl/2009/05/onyx/ohs"/>
+    <constructor-arg>
+      <bean class="org.obiba.onyx.engine.variable.impl.DefaultVariablePathNamingStrategy">
+        <property name="pathSeparator" value="/"/>
+      </bean>
+    </constructor-arg>
+  </bean>
+
   <bean id="elmoManagerFactory" class="org.obiba.opal.elmo.SesameManagerFactoryBean">
     <property name="repository">
       <bean factory-bean="opalRepositoryManager" factory-method="getDataRepository" />
@@ -16,13 +25,13 @@
 
     <property name="variableVisitor">
       <bean class="org.obiba.opal.datasource.onyx.elmo.ElmoVariableVisitor">
-        <constructor-arg value="http://www.obiba.org/owl/2009/05/onyx/example/" />
+        <constructor-arg ref="qnameStrategy" />
         <constructor-arg ref="elmoManagerFactory" />
       </bean>
     </property>
     <property name="variableDataVisitor">
       <bean class="org.obiba.opal.datasource.onyx.elmo.ElmoVariableDataVisitor">
-        <constructor-arg value="http://www.obiba.org/owl/2009/05/onyx/example/" />
+        <constructor-arg ref="qnameStrategy" />
         <constructor-arg ref="elmoManagerFactory" />
       </bean>
     </property>

@@ -12,16 +12,16 @@ import uk.co.flamingpenguin.jewel.cli.Option;
  */
 public interface GlobalOptions {
 
-  @Option(helpRequest = true, shortName = "h")
+  @Option(helpRequest = true, shortName = "h", description = "Display this help.")
   public boolean isHelp();
 
-  @Option(shortName = "q")
+  @Option(shortName = "q", description = "Quiet operation.")
   public boolean isQuiet();
 
-  @Option(shortName = "v")
+  @Option(shortName = "v", description = "Verbose operation")
   public boolean isVerbose();
 
-  @Option
+  @Option(description = "Directory where to output.")
   public String getOutput();
 
   public boolean isOutput();

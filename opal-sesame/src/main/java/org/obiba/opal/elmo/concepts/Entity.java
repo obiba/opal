@@ -6,8 +6,9 @@ import org.openrdf.elmo.annotations.rdf;
 @rdf(Opal.NS + "Entity")
 public interface Entity extends Class {
 
-  @rdf(Opal.NS + "identifer")
+  @rdf(Opal.NS + "identifier")
   public String getIdentifier();
+
   public void setIdentifier(String id);
 
 }

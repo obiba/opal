@@ -12,6 +12,7 @@ package org.obiba.opal.cli.client.impl;
 import org.obiba.opal.cli.client.AbstractCliClient;
 import org.obiba.opal.cli.client.command.HelpCommand;
 import org.obiba.opal.cli.client.command.OnyxImportCommand;
+import org.obiba.opal.cli.client.command.SparqlCommand;
 import org.obiba.opal.cli.client.command.VersionCommand;
 
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException;
@@ -39,6 +40,7 @@ public class OpalClient extends AbstractCliClient {
     addAvailableCommand(HelpCommand.class);
     addAvailableCommand(VersionCommand.class);
     addAvailableCommand(OnyxImportCommand.class);
+    addAvailableCommand(SparqlCommand.class);
   }
 
   //

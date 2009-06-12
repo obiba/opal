@@ -46,6 +46,11 @@ public abstract class AbstractCliClient implements CliClient {
 
   @SuppressWarnings("unchecked")
   public AbstractCliClient() {
+
+    // Tell Carol not to initialize its CMI component. This helps us minimize dependencies brought in by JOTM.
+    // See: http://wiki.obiba.org/confluence/display/CAG/Technical+Requirements for details.
+    System.setProperty("cmi.disabled", "true");
+
     commandMap = new HashMap<String, Class>();
     optionsMap = new HashMap<String, Class>();
 

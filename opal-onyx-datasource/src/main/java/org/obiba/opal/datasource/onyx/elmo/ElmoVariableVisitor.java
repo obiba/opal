@@ -9,8 +9,6 @@ import javax.xml.namespace.QName;
 
 import org.obiba.onyx.engine.variable.Category;
 import org.obiba.onyx.engine.variable.Variable;
-import org.obiba.onyx.engine.variable.impl.DefaultVariablePathNamingStrategy;
-import org.obiba.opal.datasource.onyx.variable.DefaultVariableQNameStrategy;
 import org.obiba.opal.datasource.onyx.variable.IVariableQNameStrategy;
 import org.obiba.opal.datasource.onyx.variable.VariableVisitor;
 import org.obiba.opal.elmo.OpalOntologyManager;
@@ -35,8 +33,6 @@ public class ElmoVariableVisitor implements VariableVisitor {
 
   private static final Logger log = LoggerFactory.getLogger(ElmoVariableVisitor.class);
 
-  final String baseUri;
-
   final OpalOntologyManager opal;
 
   final List<Handler> handlers = new LinkedList<Handler>();
@@ -47,24 +43,21 @@ public class ElmoVariableVisitor implements VariableVisitor {
 
   private SesameManager manager;
 
-  public ElmoVariableVisitor(String base, SesameManagerFactory managerFactory) throws OpenRDFException, IOException {
-    this.baseUri = base;
+  public ElmoVariableVisitor(IVariableQNameStrategy qnameStrategy, SesameManagerFactory managerFactory) throws OpenRDFException, IOException {
     this.opal = new OpalOntologyManager();
     this.managerFactory = managerFactory;
-
-    qnameStrategy = new DefaultVariableQNameStrategy(base, new DefaultVariablePathNamingStrategy());
+    this.qnameStrategy = qnameStrategy;
     handlers.add(new CategoryHandler());
     handlers.add(new CategoricalHandler());
     handlers.add(new OccurrenceHandler());
     handlers.add(new ContinuousHandler());
-
   }
 
   public void visit(Variable variable) {
     if(manager == null) {
       this.manager = managerFactory.createElmoManager();
       this.manager.getTransaction().begin();
-      Ontology ontology = manager.create(QName.valueOf(baseUri), Ontology.class);
+      Ontology ontology = manager.create(QName.valueOf(qnameStrategy.getBaseUri()), Ontology.class);
       Ontology opalOntology = opal.getOpalNode(Opal.class, Ontology.class);
       ontology.getOwlImports().add(opalOntology);
     }

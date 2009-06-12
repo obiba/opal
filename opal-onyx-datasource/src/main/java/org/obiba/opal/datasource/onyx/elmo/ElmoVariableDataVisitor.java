@@ -9,10 +9,8 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.obiba.onyx.engine.variable.VariableData;
-import org.obiba.onyx.engine.variable.impl.DefaultVariablePathNamingStrategy;
 import org.obiba.onyx.util.data.Data;
 import org.obiba.opal.datasource.onyx.openrdf.util.DataTypeUtil;
-import org.obiba.opal.datasource.onyx.variable.DefaultVariableQNameStrategy;
 import org.obiba.opal.datasource.onyx.variable.IVariableQNameStrategy;
 import org.obiba.opal.datasource.onyx.variable.VariableDataVisitor;
 import org.obiba.opal.elmo.OpalOntologyManager;
@@ -48,10 +46,10 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
 
   private SesameManager manager;
 
-  public ElmoVariableDataVisitor(String base, SesameManagerFactory managerFactory) throws OpenRDFException, IOException {
+  public ElmoVariableDataVisitor(IVariableQNameStrategy qnameStrategy, SesameManagerFactory managerFactory) throws OpenRDFException, IOException {
     this.managerFactory = managerFactory;
     this.opal = new OpalOntologyManager();
-    qnameStrategy = new DefaultVariableQNameStrategy(base, new DefaultVariablePathNamingStrategy());
+    this.qnameStrategy = qnameStrategy;
     handlers.add(new CategoryHandler());
     handlers.add(new CategoricalHandler());
     handlers.add(new ContinuousHandler());
@@ -62,6 +60,8 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
     if(manager == null) {
       this.manager = managerFactory.createElmoManager();
       this.manager.getTransaction().begin();
+    } else {
+      this.manager.flush();
     }
     log.info("Loading data for participant {}", id);
 
@@ -115,7 +115,7 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
       String id = qnameStrategy.getOccurenceValue(data.getVariablePath());
       OccurrenceItem repeated = findOccurrence(occurrence, id);
       if(repeated == null) {
-        System.out.println("Cannot find occurrence " + id + " for variable " + occurrence);
+        log.warn("Cannot find occurrence {} for variable {}", id, occurrence);
         return;
       }
       repeated.getHasOccurrenceData().add(occurrenceInstance);
@@ -189,7 +189,7 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
 
         Class categoryVariable = manager.find(Class.class, qname);
         if(categoryVariable == null) {
-          System.out.println("Cannot find Category " + qname);
+          log.warn("Cannot find Category {}", qname);
         } else {
           Category category = getSingleton(categoryVariable, Category.class);
           category.getWithinDataset().add(currentDataset);

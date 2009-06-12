@@ -162,8 +162,6 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
     }
 
     log.info("Participants processed [{}] (skipped {}, loaded {}) Participant Keys Registered [{}]", new Object[] { participantsProcessed, skipped, loaded, participantKeysRegistered });
-    // System.out.println("Participants processed [" + participantsProcessed + "] (skipped Participant Keys Registered
-    // [" + participantKeysRegistered + "]");
   }
 
   protected boolean isNewParticipant(VariableFinder variableFinder, VariableDataSet variableDataSetRoot) {
