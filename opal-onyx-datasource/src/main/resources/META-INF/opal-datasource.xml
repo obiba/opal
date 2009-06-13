@@ -6,7 +6,7 @@
     <constructor-arg value="http://www.obiba.org/owl/2009/05/onyx/ohs"/>
     <constructor-arg>
       <bean class="org.obiba.onyx.engine.variable.impl.DefaultVariablePathNamingStrategy">
-        <property name="pathSeparator" value="/"/>
+        <property name="pathSeparator" value="${org.obiba.onyx.pathSeparator}"/>
       </bean>
     </constructor-arg>
   </bean>
@@ -15,6 +15,7 @@
     <property name="repository">
       <bean factory-bean="opalRepositoryManager" factory-method="getDataRepository" />
     </property>
+    <property name="inferencingEnabled" value="true"/>
   </bean>
 
   <bean id="onyxImportService" class="org.obiba.opal.datasource.onyx.service.impl.DefaultOnyxImportServiceImpl">

@@ -38,10 +38,18 @@ public interface IVariableQNameStrategy {
    * @param child the child to add to the path
    * @return the {@code QName} for {@code child}
    */
-  public QName getQName(String parentPath, String child);
+  public QName getChildQName(String parentPath, String child);
 
   /**
-   * Given a path with a reference to another variable, this method returns the {@code QName} of the repeatable
+   * Produce a QName for the first parent of {@code child}
+   * 
+   * @param child the child for which to find the parent
+   * @return the {@code QName} for {@code child}
+   */
+  public QName getParentQName(String child);
+
+  /**
+   * Given a path with a reference to another variable, this method returns the {@code QName} of the referenced
    * variable.
    * 
    * @param path the path to check for a reference
@@ -50,11 +58,11 @@ public interface IVariableQNameStrategy {
   public QName getOccurenceVariable(String path);
 
   /**
-   * Given a path with a reference to another variable, this method returns the id of the occurrence.
+   * Given a path with a reference to another variable, this method returns the identifier of the occurrence.
    * 
    * @param path the path to check for a reference
    * @return the unique id of the occurrence, or null if path does not contain an occurrence reference.
    */
-  public String getOccurenceValue(String path);
+  public String getOccurenceIdentifier(String path);
 
 }

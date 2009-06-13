@@ -112,7 +112,7 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
   protected void handleOccurrence(VariableData data, DataVariable occurrenceInstance) {
     QName occurrence = qnameStrategy.getOccurenceVariable(data.getVariablePath());
     if(occurrence != null) {
-      String id = qnameStrategy.getOccurenceValue(data.getVariablePath());
+      String id = qnameStrategy.getOccurenceIdentifier(data.getVariablePath());
       OccurrenceItem repeated = findOccurrence(occurrence, id);
       if(repeated == null) {
         log.warn("Cannot find occurrence {} for variable {}", id, occurrence);
@@ -123,9 +123,11 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
   }
 
   protected OccurrenceItem findOccurrence(QName occurrence, String id) {
-    ElmoQuery query = manager.createNativeQuery("SELECT o FROM {o} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> {variable}, {o} <http://www.obiba.org/owl/2009/05/opal#identifier> {id}");
+    ElmoQuery query = manager.createNativeQuery("SELECT o FROM {o} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> {variable}, {o} <http://www.obiba.org/owl/2009/05/opal#identifier> {id}, {o} <http://www.obiba.org/owl/2009/05/opal#withinDataset> {ds}");
     query.setParameter("id", id);
     query.setQName("variable", occurrence);
+    query.setParameter("ds", currentDataset);
+
     for(Object result : query.getResultList()) {
       return manager.designateEntity(result, OccurrenceItem.class);
     }
@@ -185,7 +187,8 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
 
       // Data of a categorical variable is the name of the chosen category
       for(Data d : data.getDatas()) {
-        QName qname = qnameStrategy.getQName(data.getVariablePath(), d.getValueAsString());
+        // Build the QName of the Category (child of this variable)
+        QName qname = qnameStrategy.getChildQName(data.getVariablePath(), d.getValueAsString());
 
         Class categoryVariable = manager.find(Class.class, qname);
         if(categoryVariable == null) {

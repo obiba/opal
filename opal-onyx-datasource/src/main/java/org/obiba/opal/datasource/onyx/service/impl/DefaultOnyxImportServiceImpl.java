@@ -125,6 +125,7 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
     Variable variableRoot = getVariableRoot();
     try {
       for(Variable def : variableRoot.getVariables()) {
+        variableVisitor.forDataEntryForm(def);
         for(Variable v : def.getVariables()) {
           variableVisitor.visit(v);
         }
@@ -215,7 +216,7 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
   private Variable getVariableRoot() {
     Variable variableRoot = null;
     if(onyxImportConfiguration.getCatalog() != null) {
-      log.info("catalog={}", onyxImportConfiguration.getCatalog());
+      log.debug("catalog={}", onyxImportConfiguration.getCatalog());
       InputStream stream = null;
       try {
         stream = onyxImportConfiguration.getCatalogResource().getInputStream();
@@ -249,7 +250,7 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
    * @return The root Variable or VariableDataSet
    */
   private <T> T getVariableFromXmlFile(String filename) {
-    log.info("getVariableFromXmlFile({})", filename);
+    log.debug("getVariableFromXmlFile({})", filename);
     InputStream inputStream = null;
     T object = null;
     try {

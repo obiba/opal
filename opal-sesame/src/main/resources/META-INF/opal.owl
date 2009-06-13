@@ -19,7 +19,9 @@
      xmlns:opal="http://www.obiba.org/owl/2009/05/opal#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-    <owl:Ontology rdf:about=""/>
+    <owl:Ontology rdf:about="">
+        <owl:versionInfo>1.0</owl:versionInfo>
+    </owl:Ontology>
     
 
 
@@ -38,15 +40,39 @@
 
     <owl:ObjectProperty rdf:about="#hasCategory">
         <rdf:type rdf:resource="&owl;AsymmetricProperty"/>
+        <rdfs:comment xml:lang="en"
+            >Property of a thing that has a Category</rdfs:comment>
         <rdfs:range rdf:resource="#Category"/>
+        <rdfs:subPropertyOf rdf:resource="#hasDataItem"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://www.obiba.org/owl/2009/05/opal#hasData -->
+    <!-- http://www.obiba.org/owl/2009/05/opal#hasChild -->
 
-    <owl:ObjectProperty rdf:about="#hasData">
-        <rdf:type rdf:resource="&owl;AsymmetricProperty"/>
+    <owl:ObjectProperty rdf:about="#hasChild">
+        <rdfs:subPropertyOf rdf:resource="#hasDataItem"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#hasDataItem -->
+
+    <owl:ObjectProperty rdf:about="#hasDataItem">
+        <rdfs:comment xml:lang="en"
+            >Property of thing that has a relationship to a DataItem</rdfs:comment>
+        <rdfs:range rdf:resource="#DataItem"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#hasDataVariable -->
+
+    <owl:ObjectProperty rdf:about="#hasDataVariable">
+        <rdfs:comment xml:lang="en"
+            >Property of a thing that has a relationship to a DataVariable</rdfs:comment>
+        <rdfs:range rdf:resource="#DataVariable"/>
+        <rdfs:subPropertyOf rdf:resource="#hasDataItem"/>
     </owl:ObjectProperty>
     
 
@@ -61,9 +87,20 @@
     
 
 
-    <!-- http://www.obiba.org/owl/2009/05/opal#hasOccurrenceData -->
+    <!-- http://www.obiba.org/owl/2009/05/opal#hasOccurrence -->
 
-    <owl:ObjectProperty rdf:about="#hasOccurrenceData"/>
+    <owl:ObjectProperty rdf:about="#hasOccurrence">
+        <rdfs:range rdf:resource="#OccurrenceItem"/>
+        <rdfs:subPropertyOf rdf:resource="#hasDataItem"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#hasParent -->
+
+    <owl:ObjectProperty rdf:about="#hasParent">
+        <rdfs:subPropertyOf rdf:resource="#hasDataItem"/>
+    </owl:ObjectProperty>
     
 
 
@@ -89,7 +126,6 @@
     <owl:ObjectProperty rdf:about="#withinDataset">
         <rdf:type rdf:resource="&owl;AsymmetricProperty"/>
         <rdfs:range rdf:resource="#Dataset"/>
-        <owl:inverseOf rdf:resource="#hasData"/>
     </owl:ObjectProperty>
     
 
@@ -98,7 +134,7 @@
 
     <owl:ObjectProperty rdf:about="#withinOccurrence">
         <rdf:type rdf:resource="&owl;AsymmetricProperty"/>
-        <owl:inverseOf rdf:resource="#hasOccurrenceData"/>
+        <owl:inverseOf rdf:resource="#hasOccurrence"/>
     </owl:ObjectProperty>
     
 
@@ -118,6 +154,20 @@
 
     <owl:DatatypeProperty rdf:about="#algorithm">
         <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#annotation -->
+
+    <owl:DatatypeProperty rdf:about="#annotation"/>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#containsDataVariable -->
+
+    <owl:DatatypeProperty rdf:about="#containsDataVariable">
+        <rdfs:subPropertyOf rdf:resource="#annotation"/>
     </owl:DatatypeProperty>
     
 
@@ -162,6 +212,14 @@
 
     <owl:DatatypeProperty rdf:about="#unit">
         <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#withinDataEntryForm -->
+
+    <owl:DatatypeProperty rdf:about="#withinDataEntryForm">
+        <rdfs:subPropertyOf rdf:resource="#annotation"/>
     </owl:DatatypeProperty>
     
 
@@ -224,6 +282,21 @@
 
     <owl:Class rdf:about="#DataEntryForm">
         <rdfs:subClassOf rdf:resource="#DataItem"/>
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="#hasDataVariable"/>
+                        <owl:someValuesFrom rdf:resource="#DataVariable"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="#hasDataVariable"/>
+                        <owl:allValuesFrom rdf:resource="#DataVariable"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+        <owl:disjointWith rdf:resource="#DataVariable"/>
     </owl:Class>
     
 
@@ -325,7 +398,7 @@
                 <owl:intersectionOf rdf:parseType="Collection">
                     <rdf:Description rdf:about="#DataItem"/>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="#hasOccurrenceData"/>
+                        <owl:onProperty rdf:resource="#hasOccurrence"/>
                         <owl:someValuesFrom rdf:resource="#DataVariable"/>
                     </owl:Restriction>
                     <owl:Restriction>
@@ -390,17 +463,17 @@
     <rdf:Description>
         <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
         <owl:members rdf:parseType="Collection">
-            <rdf:Description rdf:about="#DataEntryForm"/>
-            <rdf:Description rdf:about="#DataVariable"/>
-            <rdf:Description rdf:about="#OccurrenceItem"/>
+            <rdf:Description rdf:about="#Instrument"/>
+            <rdf:Description rdf:about="#Participant"/>
+            <rdf:Description rdf:about="#Site"/>
         </owl:members>
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
         <owl:members rdf:parseType="Collection">
-            <rdf:Description rdf:about="#Instrument"/>
-            <rdf:Description rdf:about="#Participant"/>
-            <rdf:Description rdf:about="#Site"/>
+            <rdf:Description rdf:about="#CategoricalVariable"/>
+            <rdf:Description rdf:about="#Category"/>
+            <rdf:Description rdf:about="#ContinuousVariable"/>
         </owl:members>
     </rdf:Description>
 </rdf:RDF>

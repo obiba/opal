@@ -15,6 +15,10 @@ import org.obiba.opal.datasource.onyx.variable.VariableVisitor;
 import org.obiba.opal.elmo.OpalOntologyManager;
 import org.obiba.opal.elmo.concepts.CategoricalVariable;
 import org.obiba.opal.elmo.concepts.ContinuousVariable;
+import org.obiba.opal.elmo.concepts.DataEntryForm;
+import org.obiba.opal.elmo.concepts.DataEntryFormClass;
+import org.obiba.opal.elmo.concepts.DataItemClass;
+import org.obiba.opal.elmo.concepts.DataVariable;
 import org.obiba.opal.elmo.concepts.MissingCategory;
 import org.obiba.opal.elmo.concepts.OccurrenceItem;
 import org.obiba.opal.elmo.concepts.Opal;
@@ -44,17 +48,22 @@ public class ElmoVariableVisitor implements VariableVisitor {
 
   private SesameManager manager;
 
+  private DataEntryFormClass currentDEF;
+
   public ElmoVariableVisitor(IVariableQNameStrategy qnameStrategy, SesameManagerFactory managerFactory) throws OpenRDFException, IOException {
     this.opal = new OpalOntologyManager();
     this.managerFactory = managerFactory;
     this.qnameStrategy = qnameStrategy;
+
+    // Order of handler is important!
     handlers.add(new CategoryHandler());
     handlers.add(new CategoricalHandler());
     handlers.add(new OccurrenceHandler());
     handlers.add(new ContinuousHandler());
+    handlers.add(new DataVariableHandler());
   }
 
-  public void visit(Variable variable) {
+  public void forDataEntryForm(Variable def) {
     if(manager == null) {
       this.manager = managerFactory.createElmoManager();
       this.manager.getTransaction().begin();
@@ -63,6 +72,13 @@ public class ElmoVariableVisitor implements VariableVisitor {
       ontology.getOwlImports().add(opalOntology);
     }
 
+    QName qname = qnameStrategy.getQName(def);
+    Class opalDEF = opal.getOpalClass(DataEntryForm.class);
+    currentDEF = manager.create(qname, DataEntryFormClass.class);
+    currentDEF.getRdfsSubClassOf().add(opalDEF);
+  }
+
+  public void visit(Variable variable) {
     QName variableQName = qnameStrategy.getQName(variable);
     if(manager.find(Class.class, variableQName) != null) {
       log.debug("Variable already exists: {}", variableQName);
@@ -71,7 +87,8 @@ public class ElmoVariableVisitor implements VariableVisitor {
 
     for(Handler h : handlers) {
       if(h.handles(variable)) {
-        h.handle(variable);
+        Class opalOnyxVariable = h.handle(variable);
+        commonHandling(variable, opalOnyxVariable);
         System.out.print('.');
         break;
       }
@@ -91,14 +108,33 @@ public class ElmoVariableVisitor implements VariableVisitor {
     }
   }
 
+  protected void commonHandling(Variable variable, Class opalOnyxVariable) {
+    currentDEF.getDataVariables().add(opalOnyxVariable);
+    annotate(opalOnyxVariable, variable.getAttributes());
+    createHierarchy(variable);
+  }
+
+  protected void createHierarchy(Variable childVariable) {
+    QName childQName = qnameStrategy.getQName(childVariable);
+    QName parentQName = qnameStrategy.getQName(childVariable.getParent());
+    if(parentQName.equals(currentDEF.getQName())) {
+      return;
+    }
+    log.debug("parent {} child {}", parentQName, childQName);
+    DataItemClass child = manager.designate(childQName, DataItemClass.class);
+    DataItemClass parent = manager.find(DataItemClass.class, parentQName);
+    child.setParent(parent);
+    parent.getChildren().add(child);
+  }
+
   public interface Handler {
     public boolean handles(Variable var);
 
-    public void handle(Variable var);
+    public Class handle(Variable var);
   }
 
   public class CategoryHandler implements Handler {
-    public void handle(Variable onyxVariable) {
+    public Class handle(Variable onyxVariable) {
       QName qname = qnameStrategy.getQName(onyxVariable);
 
       Category onyxCategory = (Category) onyxVariable;
@@ -114,7 +150,6 @@ public class ElmoVariableVisitor implements VariableVisitor {
       QName parentQName = qnameStrategy.getQName(onyxVariable.getParent());
       Class parentVariable = manager.find(Class.class, parentQName);
 
-      // log.info("parentVariable {}", parentVariable.getClass().getInterfaces());
       for(Object c : parentVariable.getRdfsSubClassOf()) {
         if(c instanceof Restriction) {
           Restriction r = (Restriction) c;
@@ -125,7 +160,7 @@ public class ElmoVariableVisitor implements VariableVisitor {
         }
       }
 
-      annotate(opalOnyxVariable, onyxVariable.getAttributes());
+      return opalOnyxVariable;
     }
 
     public boolean handles(Variable var) {
@@ -134,7 +169,7 @@ public class ElmoVariableVisitor implements VariableVisitor {
   }
 
   public class CategoricalHandler implements Handler {
-    public void handle(Variable onyxVariable) {
+    public Class handle(Variable onyxVariable) {
       QName qname = qnameStrategy.getQName(onyxVariable);
 
       Class opalVariable = opal.getOpalClass(CategoricalVariable.class);
@@ -159,7 +194,7 @@ public class ElmoVariableVisitor implements VariableVisitor {
       r.setOwlAllValuesFrom(union);
       opalOnyxVariable.getRdfsSubClassOf().add(r);
 
-      annotate(opalOnyxVariable, onyxVariable.getAttributes());
+      return opalOnyxVariable;
     }
 
     public boolean handles(Variable var) {
@@ -168,7 +203,7 @@ public class ElmoVariableVisitor implements VariableVisitor {
   }
 
   public class ContinuousHandler implements Handler {
-    public void handle(Variable onyxVariable) {
+    public Class handle(Variable onyxVariable) {
       QName qname = qnameStrategy.getQName(onyxVariable);
 
       Class opalVariable = opal.getOpalClass(ContinuousVariable.class);
@@ -182,7 +217,7 @@ public class ElmoVariableVisitor implements VariableVisitor {
       r.setOwlCardinality(BigInteger.ONE);
       opalOnyxVariable.getRdfsSubClassOf().add(r);
 
-      annotate(opalOnyxVariable, onyxVariable.getAttributes());
+      return opalOnyxVariable;
     }
 
     public boolean handles(Variable var) {
@@ -190,14 +225,31 @@ public class ElmoVariableVisitor implements VariableVisitor {
     }
   }
 
+  public class DataVariableHandler implements Handler {
+    public Class handle(Variable onyxVariable) {
+      QName qname = qnameStrategy.getQName(onyxVariable);
+      Class opalVariable = opal.getOpalClass(DataVariable.class);
+      Class opalOnyxVariable = manager.create(qname, Class.class);
+      opalOnyxVariable.getRdfsSubClassOf().add(opalVariable);
+      return opalOnyxVariable;
+    }
+
+    public boolean handles(Variable var) {
+      // Catch all
+      return true;
+    }
+  }
+
   public class OccurrenceHandler implements Handler {
-    public void handle(Variable onyxVariable) {
+    public Class handle(Variable onyxVariable) {
       QName qname = qnameStrategy.getQName(onyxVariable);
 
       org.openrdf.concepts.owl.Class opalVariable = opal.getOpalClass(OccurrenceItem.class);
 
       org.openrdf.concepts.owl.Class opalOnyxVariable = manager.create(qname, org.openrdf.concepts.owl.Class.class);
       opalOnyxVariable.getRdfsSubClassOf().add(opalVariable);
+
+      return opalOnyxVariable;
     }
 
     public boolean handles(Variable var) {

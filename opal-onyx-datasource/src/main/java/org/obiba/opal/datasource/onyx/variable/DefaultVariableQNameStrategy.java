@@ -43,8 +43,16 @@ public class DefaultVariableQNameStrategy implements IVariableQNameStrategy {
     this.firstElementAsNamespace = firstElementAsNamespace;
   }
 
-  public QName getQName(String parentPath, String child) {
+  public QName getChildQName(String parentPath, String child) {
     return getQName(parentPath + variablePathNamingStrategy.getPathSeparator() + child);
+  }
+
+  public QName getParentQName(String child) {
+    int index = child.lastIndexOf(variablePathNamingStrategy.getPathSeparator());
+    if(index > 0) {
+      return getQName(child.substring(0, index));
+    }
+    return null;
   }
 
   public QName getQName(String path) {
@@ -53,7 +61,7 @@ public class DefaultVariableQNameStrategy implements IVariableQNameStrategy {
     // Remove the root (root is represented by baseUri)
     parts.remove(variablePathNamingStrategy.getRootName());
 
-    if(parts.size() < 2) {
+    if(parts.size() < 1) {
       throw new IllegalArgumentException("Cannot build QName from path, not enough parts: " + path);
     }
 
@@ -65,11 +73,17 @@ public class DefaultVariableQNameStrategy implements IVariableQNameStrategy {
       if(namespace.charAt(length - 1) != '/') {
         namespace.append('/');
       }
+
       // First element is part of namespace
       String first = parts.remove(0);
       namespace.append(first);
+      namespace.append('#');
+      if(parts.size() == 0) {
+        return new QName(namespace.toString(), first);
+      }
+    } else {
+      namespace.append('#');
     }
-    namespace.append('#');
 
     StringBuilder sb = new StringBuilder();
     for(String part : parts) {
@@ -94,7 +108,7 @@ public class DefaultVariableQNameStrategy implements IVariableQNameStrategy {
     return null;
   }
 
-  public String getOccurenceValue(String path) {
+  public String getOccurenceIdentifier(String path) {
     Map<QName, String> occ = createOccurence(path);
     if(occ != null) {
       return occ.values().iterator().next();

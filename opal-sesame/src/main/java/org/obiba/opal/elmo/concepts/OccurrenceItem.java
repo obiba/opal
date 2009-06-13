@@ -18,7 +18,7 @@ public interface OccurrenceItem extends DataItem {
 
   public void setOrdinal(Integer i);
 
-  @rdf(Opal.NS + "hasOccurrenceData")
+  @rdf(Opal.NS + "hasOccurrence")
   @inverseOf(Opal.NS + "withinOccurrence")
   public Set<DataVariable> getHasOccurrenceData();
 
