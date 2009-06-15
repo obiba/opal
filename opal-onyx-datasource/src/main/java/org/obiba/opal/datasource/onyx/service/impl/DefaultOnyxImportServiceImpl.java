@@ -95,23 +95,27 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
     this.onyxImportConfiguration = (OnyxImportConfiguration) xstream.fromXML(importConfiguration.getInputStream());
   }
 
-  public void importData() {
-    // TODO Auto-generated method stub
+  public void importData(boolean catalogOnly) {
+
     System.out.println("<importData>");
-    // if(onyxImportConfiguration.getCatalog() != null) {
-    // variableVisitor.setSource(onyxImportConfiguration.getCatalog());
-    // loadVariables();
-    // } else {
-    // log.error("Missing variable catalog to import, see onyx-import.xml.");
-    // }
+    if(onyxImportConfiguration.getCatalog() != null) {
+      variableVisitor.setSource(onyxImportConfiguration.getCatalog());
+      loadVariables();
+    } else {
+      log.error("Missing variable catalog to import, see onyx-import.xml.");
+    }
+
+    if(!catalogOnly) {
+      // TODO List of import files from import directory
+    }
   }
 
-  public void importData(Date date, String site, List<String> tags) {
+  public void importData(Date date, String site, List<String> tags, boolean catalogOnly) {
     // TODO Auto-generated method stub
     System.out.println("<importData(date: " + date.toString() + ", site: " + site + ", tags: " + tags + ")>");
   }
 
-  public void importData(List<String> tags, File source, final String keyStorePassword, final String keyPassword) {
+  public void importData(List<String> tags, File source, final String keyStorePassword, final String keyPassword, boolean catalogOnly) {
 
     // Create the dataInputContext, based on the specified command-line options.
     OnyxDataInputContext dataInputContext = new OnyxDataInputContext();
@@ -124,7 +128,7 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
     dataInputStrategy.prepare(dataInputContext);
     Variable root = loadVariables();
 
-    if(!onyxImportConfiguration.isCatalogOnly()) {
+    if(!catalogOnly) {
       loadParticipants(root);
     }
   }
@@ -294,7 +298,7 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
   }
 
   private void loadData(String opalId, VariableDataSet vds) {
-    variableDataVisitor.forEntity(Participant.class, opalId);
+    variableDataVisitor.forEntity(Participant.class, opalId, vds.getExportDate());
     for(VariableData vd : vds.getVariableDatas()) {
       variableDataVisitor.visit(vd);
     }

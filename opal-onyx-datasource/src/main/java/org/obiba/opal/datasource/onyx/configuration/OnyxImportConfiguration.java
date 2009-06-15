@@ -40,8 +40,6 @@ public class OnyxImportConfiguration implements Serializable {
   @XStreamAsAttribute
   private String catalog;
 
-  private boolean catalogOnly = false;
-
   /**
    * Get if the variable is part of the import, given its path.
    * @param path
@@ -180,10 +178,6 @@ public class OnyxImportConfiguration implements Serializable {
 
   public String getCatalog() {
     return catalog;
-  }
-
-  public boolean isCatalogOnly() {
-    return catalogOnly;
   }
 
 }

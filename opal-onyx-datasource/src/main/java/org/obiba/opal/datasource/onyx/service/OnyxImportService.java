@@ -28,7 +28,7 @@ public interface OnyxImportService {
    * Imports all data files, from the default import repository, exploring sub directories by date order, and site name
    * by alphabetical order.
    */
-  public void importData();
+  public void importData(boolean catalogOnly);
 
   /**
    * Imports data for the specified date and/or site.
@@ -37,10 +37,10 @@ public interface OnyxImportService {
    * 
    * @param date specifies the date of the data to import (if <code>null</code> all dates included)
    * @param site specifies the site origin of the data to import (if <code>null</code> all sites included)
-   * @param tags tags to be applied to created, updated elements (DEF, Variable) and added data (if <code>null</code> no
-   * tags applied)
+   * @param tags tags to be applied to created, updated elements (DEF, Variable) and added data (if <code>null</code>
+   * no tags applied)
    */
-  public void importData(Date date, String site, List<String> tags);
+  public void importData(Date date, String site, List<String> tags, boolean catalogOnly);
 
   /**
    * Imports data from the specified source file or directory.
@@ -49,11 +49,11 @@ public interface OnyxImportService {
    * 
    * @param date specifies the date of the data to import (if <code>null</code> all dates included)
    * @param site specifies the site origin of the data to import (if <code>null</code> all sites included)
-   * @param tags tags to be applied to created, updated elements (DEF, Variable) and added data (if <code>null</code> no
-   * tags applied)
+   * @param tags tags to be applied to created, updated elements (DEF, Variable) and added data (if <code>null</code>
+   * no tags applied)
    * @param source source of data to import (either the data file or the import directory)
    * @param keyStorePassword password used to unlock the key store containing the public/private keys used by opal
    * @param keyPassword password used to unlock individual keys stored inside the key store.
    */
-  public void importData(List<String> tags, File source, final String keyStorePassword, final String keyPassword);
+  public void importData(List<String> tags, File source, final String keyStorePassword, final String keyPassword, boolean catalogOnly);
 }

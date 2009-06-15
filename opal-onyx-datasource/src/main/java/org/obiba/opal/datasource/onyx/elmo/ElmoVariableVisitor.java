@@ -7,6 +7,8 @@ import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
@@ -41,8 +43,6 @@ import org.openrdf.elmo.sesame.SesameManager;
 import org.openrdf.elmo.sesame.SesameManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
 
 public class ElmoVariableVisitor implements VariableVisitor {
 
@@ -138,7 +138,13 @@ public class ElmoVariableVisitor implements VariableVisitor {
   private XMLGregorianCalendar toXMLGregorianCalendar(Date date) {
     GregorianCalendar cal = new GregorianCalendar();
     cal.setTime(date);
-    return new XMLGregorianCalendarImpl(cal);
+    try {
+      return DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
+    } catch(DatatypeConfigurationException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return null;
   }
 
   protected void createHierarchy(Variable childVariable, DataItemClass child) {

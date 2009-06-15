@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.List;
 
 import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
+import uk.co.flamingpenguin.jewel.cli.Option;
 import uk.co.flamingpenguin.jewel.cli.Unparsed;
 
 /**
@@ -22,4 +23,7 @@ public interface OnyxImportCommandOptions extends GlobalOptions, KeystoreOption,
   public List<File> getFiles();
 
   public boolean isFiles();
+
+  @Option(shortName = "c", defaultValue = "false")
+  public boolean getCatalogOnly();
 }

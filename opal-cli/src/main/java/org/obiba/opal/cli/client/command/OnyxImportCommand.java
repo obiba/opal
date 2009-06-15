@@ -66,11 +66,11 @@ public class OnyxImportCommand extends AbstractCommand<OnyxImportCommandOptions>
         if(keyPassword == null) {
           keyPassword = keystorePassword;
         }
-        onyxImportService.importData(csvToList(tags), files.get(0), keystorePassword, keyPassword);
+        onyxImportService.importData(csvToList(tags), files.get(0), keystorePassword, keyPassword, options.getCatalogOnly());
       } else if(options.isDate() || options.isSite()) {
-        onyxImportService.importData(stringToDate(date), site, csvToList(tags));
+        onyxImportService.importData(stringToDate(date), site, csvToList(tags), options.getCatalogOnly());
       } else {
-        onyxImportService.importData();
+        onyxImportService.importData(options.getCatalogOnly());
       }
     } catch(RuntimeException e) {
       System.err.println(e);
