@@ -34,14 +34,19 @@
      -->
 
     <owl:AnnotationProperty rdf:about="#category"/>
-    <owl:AnnotationProperty rdf:about="#parent"/>
     <owl:AnnotationProperty rdf:about="#children"/>
     <owl:AnnotationProperty rdf:about="#child"/>
-    <owl:AnnotationProperty rdf:about="#code"/>
-    <owl:AnnotationProperty rdf:about="#source"/>
     <owl:AnnotationProperty rdf:about="#occurrence"/>
     <owl:AnnotationProperty rdf:about="#validation"/>
     <owl:AnnotationProperty rdf:about="#condition"/>
+    <owl:AnnotationProperty rdf:about="#creationDate"/>
+    <owl:AnnotationProperty rdf:about="#className"/>
+    <owl:AnnotationProperty rdf:about="#parent"/>
+    <owl:AnnotationProperty rdf:about="#path"/>
+    <owl:AnnotationProperty rdf:about="#code"/>
+    <owl:AnnotationProperty rdf:about="#source"/>
+    <owl:AnnotationProperty rdf:about="#exportDate"/>
+    <owl:AnnotationProperty rdf:about="#name"/>
     
 
 
@@ -271,15 +276,15 @@
         <rdfs:subClassOf rdf:resource="#DataVariable"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#dataValue"/>
-                <owl:someValuesFrom rdf:resource="&xsd;anyType"/>
+                <owl:onProperty rdf:resource="#unit"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#unit"/>
-                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
-                <owl:onDataRange rdf:resource="&xsd;string"/>
+                <owl:onProperty rdf:resource="#dataValue"/>
+                <owl:someValuesFrom rdf:resource="&xsd;anyType"/>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -338,6 +343,16 @@
             >Repeatability of a occurrence item.</occurrence>
         <source xml:lang="en"
             >Source of the data for automatically provisionned data item.</source>
+        <creationDate xml:lang="en"
+            >The data item creation date.</creationDate>
+        <exportDate xml:lang="en"
+            >The data item export date.</exportDate>
+        <name xml:lang="en"
+            >The data item name.</name>
+        <path xml:lang="en"
+            >The data item path.</path>
+        <className xml:lang="en"
+            >The local part of the OWL Class QName.</className>
     </owl:Class>
     
 
@@ -483,17 +498,17 @@
     <rdf:Description>
         <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
         <owl:members rdf:parseType="Collection">
-            <rdf:Description rdf:about="#Instrument"/>
-            <rdf:Description rdf:about="#Participant"/>
-            <rdf:Description rdf:about="#Site"/>
+            <rdf:Description rdf:about="#CategoricalVariable"/>
+            <rdf:Description rdf:about="#Category"/>
+            <rdf:Description rdf:about="#ContinuousVariable"/>
         </owl:members>
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
         <owl:members rdf:parseType="Collection">
-            <rdf:Description rdf:about="#CategoricalVariable"/>
-            <rdf:Description rdf:about="#Category"/>
-            <rdf:Description rdf:about="#ContinuousVariable"/>
+            <rdf:Description rdf:about="#Instrument"/>
+            <rdf:Description rdf:about="#Participant"/>
+            <rdf:Description rdf:about="#Site"/>
         </owl:members>
     </rdf:Description>
 </rdf:RDF>

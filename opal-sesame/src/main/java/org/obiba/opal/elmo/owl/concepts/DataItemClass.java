@@ -11,6 +11,8 @@ package org.obiba.opal.elmo.owl.concepts;
 
 import java.util.Set;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+
 import org.obiba.opal.elmo.concepts.Opal;
 import org.openrdf.elmo.annotations.rdf;
 
@@ -34,23 +36,85 @@ public interface DataItemClass extends OpalClass {
 
   public void setMultiple(boolean multiple);
 
+  /**
+   * The condition information.
+   * @return
+   */
   @rdf(Opal.NS + "condition")
   public String getCondition();
 
   public void setCondition(String condition);
 
+  /**
+   * The occurrence information.
+   * @return
+   */
   @rdf(Opal.NS + "occurrence")
   public String getOccurrence();
 
   public void setOccurrence(String occurrence);
 
+  /**
+   * The source of information.
+   * @return
+   */
   @rdf(Opal.NS + "source")
   public String getSource();
 
   public void setSource(String source);
 
+  /**
+   * The validation information.
+   * @return
+   */
   @rdf(Opal.NS + "validation")
   public String getValidation();
 
   public void setValidation(String validation);
+
+  /**
+   * The name of the Onyx variable.
+   * @return
+   */
+  @rdf(Opal.NS + "name")
+  public String getName();
+
+  public void setName(String name);
+
+  /**
+   * The path of the Onyx variable.
+   * @return
+   */
+  @rdf(Opal.NS + "path")
+  public String getPath();
+
+  public void setPath(String path);
+
+  /**
+   * The export date of the Onyx variable.
+   * @return
+   */
+  @rdf(Opal.NS + "exportDate")
+  public XMLGregorianCalendar getExportDate();
+
+  public void setExportDate(XMLGregorianCalendar date);
+
+  /**
+   * The name of the Opal class.
+   * @return
+   */
+  @rdf(Opal.NS + "className")
+  public String getClassName();
+
+  public void setClassName(String name);
+
+  /**
+   * The creation date of the Opal class.
+   * @return
+   */
+  @rdf(Opal.NS + "creationDate")
+  public XMLGregorianCalendar getCreationDate();
+
+  public void setCreationDate(XMLGregorianCalendar date);
+
 }

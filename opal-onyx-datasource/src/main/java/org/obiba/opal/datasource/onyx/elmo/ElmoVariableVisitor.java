@@ -2,15 +2,20 @@ package org.obiba.opal.datasource.onyx.elmo;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
 import org.obiba.onyx.engine.variable.Attribute;
 import org.obiba.onyx.engine.variable.Category;
+import org.obiba.onyx.engine.variable.IVariablePathNamingStrategy;
 import org.obiba.onyx.engine.variable.Variable;
 import org.obiba.onyx.engine.variable.VariableHelper;
+import org.obiba.onyx.engine.variable.impl.DefaultVariablePathNamingStrategy;
 import org.obiba.opal.datasource.onyx.variable.IVariableQNameStrategy;
 import org.obiba.opal.datasource.onyx.variable.VariableVisitor;
 import org.obiba.opal.elmo.OpalOntologyManager;
@@ -37,6 +42,8 @@ import org.openrdf.elmo.sesame.SesameManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
+
 public class ElmoVariableVisitor implements VariableVisitor {
 
   private static final Logger log = LoggerFactory.getLogger(ElmoVariableVisitor.class);
@@ -52,6 +59,8 @@ public class ElmoVariableVisitor implements VariableVisitor {
   private SesameManager manager;
 
   private DataEntryFormClass currentDEF;
+
+  private IVariablePathNamingStrategy variablePathNamingStrategy = new DefaultVariablePathNamingStrategy();
 
   public ElmoVariableVisitor(IVariableQNameStrategy qnameStrategy, SesameManagerFactory managerFactory) throws OpenRDFException, IOException {
     this.opal = new OpalOntologyManager();
@@ -114,7 +123,18 @@ public class ElmoVariableVisitor implements VariableVisitor {
   protected void commonHandling(Variable variable, DataItemClass opalOnyxVariable) {
     currentDEF.getDataVariables().add(opalOnyxVariable);
     annotate(opalOnyxVariable, variable.getAttributes());
+    opalOnyxVariable.setName(variable.getName());
+    opalOnyxVariable.setPath(variablePathNamingStrategy.getPath(variable));
+    opalOnyxVariable.setClassName(opalOnyxVariable.getQName().getLocalPart());
+    opalOnyxVariable.setCreationDate(toXMLGregorianCalendar(new Date()));
+    // opalOnyxVariable.setExportDate(null);
     createHierarchy(variable, opalOnyxVariable);
+  }
+
+  private XMLGregorianCalendar toXMLGregorianCalendar(Date date) {
+    GregorianCalendar cal = new GregorianCalendar();
+    cal.setTime(date);
+    return new XMLGregorianCalendarImpl(cal);
   }
 
   protected void createHierarchy(Variable childVariable, DataItemClass child) {
