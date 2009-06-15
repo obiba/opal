@@ -9,8 +9,26 @@
  ******************************************************************************/
 package org.obiba.opal.elmo.owl.concepts;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import org.obiba.opal.elmo.concepts.Opal;
 import org.openrdf.concepts.owl.Class;
+import org.openrdf.elmo.annotations.rdf;
 
 public interface OpalClass extends Class {
+
+  /**
+   * The creation date of the Opal class.
+   * @return
+   */
+  @rdf(Opal.NS + "creationDate")
+  public XMLGregorianCalendar getCreationDate();
+
+  public void setCreationDate(XMLGregorianCalendar date);
+
+  @rdf(Opal.NS + "creationSource")
+  public String getCreationSource();
+
+  public void setCreationSource(String source);
 
 }

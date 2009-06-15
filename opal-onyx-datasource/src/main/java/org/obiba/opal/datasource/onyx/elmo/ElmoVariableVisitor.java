@@ -57,6 +57,8 @@ public class ElmoVariableVisitor implements VariableVisitor {
 
   private DataEntryFormClass currentDEF;
 
+  private Date creationDate;
+
   private String source;
 
   private IVariablePathNamingStrategy variablePathNamingStrategy = new DefaultVariablePathNamingStrategy();
@@ -87,6 +89,13 @@ public class ElmoVariableVisitor implements VariableVisitor {
     Class opalDEF = opal.getOpalClass(DataEntryForm.class);
     currentDEF = manager.create(qname, DataEntryFormClass.class);
     currentDEF.getRdfsSubClassOf().add(opalDEF);
+
+    creationDate = new Date();
+
+    currentDEF.setCreationDate(DataTypeUtil.toXMLGregorianCalendar(creationDate));
+    if(source != null) {
+      currentDEF.setCreationSource(source);
+    }
   }
 
   public void visit(Variable variable) {
@@ -125,11 +134,18 @@ public class ElmoVariableVisitor implements VariableVisitor {
     opalOnyxVariable.setName(variable.getName());
     opalOnyxVariable.setPath(variablePathNamingStrategy.getPath(variable));
     opalOnyxVariable.setClassName(opalOnyxVariable.getQName().getLocalPart());
-    opalOnyxVariable.setCreationDate(DataTypeUtil.toXMLGregorianCalendar(new Date()));
+    opalOnyxVariable.setCreationDate(DataTypeUtil.toXMLGregorianCalendar(getCurrentCreationDate()));
     if(source != null) {
       opalOnyxVariable.setCreationSource(source);
     }
     createHierarchy(variable, opalOnyxVariable);
+  }
+
+  private Date getCurrentCreationDate() {
+    if(creationDate == null) {
+      creationDate = new Date();
+    }
+    return creationDate;
   }
 
   protected void createHierarchy(Variable childVariable, DataItemClass child) {
