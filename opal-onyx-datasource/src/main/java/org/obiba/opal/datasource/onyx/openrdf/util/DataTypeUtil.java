@@ -5,6 +5,7 @@ import java.util.GregorianCalendar;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
 import org.obiba.onyx.util.data.Data;
@@ -43,12 +44,16 @@ public class DataTypeUtil {
   public static Object getValue(Data data) {
     switch(data.getType()) {
     case DATE:
-      GregorianCalendar c = new GregorianCalendar();
-      c.setTime((Date) data.getValue());
-      return factory.newXMLGregorianCalendar(c);
+      return toXMLGregorianCalendar((Date) data.getValue());
     default:
       return data.getValue();
     }
+  }
+
+  public static XMLGregorianCalendar toXMLGregorianCalendar(Date date) {
+    GregorianCalendar c = new GregorianCalendar();
+    c.setTime(date);
+    return factory.newXMLGregorianCalendar(c);
   }
 
 }

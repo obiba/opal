@@ -3,14 +3,10 @@ package org.obiba.opal.datasource.onyx.elmo;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
 import org.obiba.onyx.engine.variable.VariableData;
@@ -84,24 +80,12 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
     }
     currentDataset = manager.create(Dataset.class);
 
-    currentDataset.setCreationDate(toXMLGregorianCalendar(new Date()));
+    currentDataset.setCreationDate(DataTypeUtil.toXMLGregorianCalendar(new Date()));
     if(sourceDate != null) {
-      currentDataset.setSourceDate(toXMLGregorianCalendar(sourceDate));
+      currentDataset.setSourceDate(DataTypeUtil.toXMLGregorianCalendar(sourceDate));
     }
 
     currentDataset.setForEntity(entity);
-  }
-
-  private XMLGregorianCalendar toXMLGregorianCalendar(Date date) {
-    GregorianCalendar cal = new GregorianCalendar();
-    cal.setTime(date);
-    try {
-      return DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
-    } catch(DatatypeConfigurationException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    return null;
   }
 
   public void visit(VariableData data) {
