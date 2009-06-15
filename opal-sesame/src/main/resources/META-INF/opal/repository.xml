@@ -11,7 +11,7 @@
           <bean class="org.obiba.opal.sesame.repository.impl.MemoryRepositoryFactory" />
         </entry>
         <entry key="data">
-          <ref bean="memoryRepositoryFactory" />
+          <ref bean="nativeRepositoryFactory" />
           <!--           <bean class="org.obiba.opal.sesame.repository.spring.SpringTransactionalRepository">
             <constructor-arg ref="rdbmsRepository" />
             </bean>
@@ -28,7 +28,7 @@
 
   <bean id="nativeRepositoryFactory" class="org.obiba.opal.sesame.repository.impl.NativeRepositoryFactory"
     lazy-init="true">
-    <property name="dataDir" value="" />
+    <property name="dataDir" value="${org.obiba.opal.datasource.opal.dataDir}" />
     <property name="tripleIndexes" value="spoc,posc,cosp" />
     <property name="withInferencer" value="false" />
   </bean>

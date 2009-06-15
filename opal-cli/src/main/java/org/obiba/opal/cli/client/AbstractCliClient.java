@@ -10,14 +10,11 @@
 package org.obiba.opal.cli.client;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.obiba.opal.cli.client.command.AbstractCommand;
 import org.obiba.opal.cli.client.command.Command;
 
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException;
@@ -127,10 +124,7 @@ public abstract class AbstractCliClient implements CliClient {
    * 
    * @param commandClass command class
    */
-  @SuppressWarnings("unchecked")
-  protected <T> void addAvailableCommand(Class<? extends Command<T>> commandClass) {
-    Class<T> optionsClass = getOptionsClass(commandClass);
-
+  protected <T> void addAvailableCommand(Class<? extends Command<T>> commandClass, Class<T> optionsClass) {
     if(optionsClass != null) {
       Annotation annotation = optionsClass.getAnnotation(CommandLineInterface.class);
 
@@ -192,35 +186,4 @@ public abstract class AbstractCliClient implements CliClient {
     return command;
   }
 
-  @SuppressWarnings("unchecked")
-  private <T> Class<T> getOptionsClass(Class<? extends Command<T>> commandClass) {
-    Class<T> optionsClass = null;
-
-    // Assume the command class extends AbstractCommand (or a subclass), and extract
-    // the options class accordingly.
-    Type genericSuperclass = commandClass.getGenericSuperclass();
-    if(genericSuperclass instanceof ParameterizedType) {
-      ParameterizedType ptype = (ParameterizedType) genericSuperclass;
-      if(ptype.getRawType() instanceof Class && ((Class) ptype.getRawType()).isAssignableFrom(AbstractCommand.class)) {
-        optionsClass = (Class<T>) ptype.getActualTypeArguments()[0];
-      }
-    }
-
-    // If that didn't work, the command class must implement the Command interface directly.
-    // Extract the options class accordingly.
-    if(optionsClass == null) {
-      Type[] genericInterfaces = commandClass.getGenericInterfaces();
-      for(Type type : genericInterfaces) {
-        if(type instanceof ParameterizedType) {
-          ParameterizedType ptype = (ParameterizedType) type;
-          if(ptype.getRawType().equals(Command.class)) {
-            optionsClass = (Class<T>) ptype.getActualTypeArguments()[0];
-            break;
-          }
-        }
-      }
-    }
-
-    return optionsClass;
-  }
 }

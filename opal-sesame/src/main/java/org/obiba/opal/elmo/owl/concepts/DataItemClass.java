@@ -7,22 +7,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.elmo.concepts;
+package org.obiba.opal.elmo.owl.concepts;
 
 import java.util.Set;
 
-import org.openrdf.elmo.annotations.inverseOf;
+import org.obiba.opal.elmo.concepts.Opal;
 import org.openrdf.elmo.annotations.rdf;
 
 /**
  *
  */
-public interface DataEntryFormClass extends org.openrdf.concepts.owl.Class {
+public interface DataItemClass extends OpalClass {
 
-  @rdf(Opal.NS + "containsDataVariable")
-  @inverseOf(Opal.NS + "withinDataEntryForm")
-  public Set<org.openrdf.concepts.owl.Class> getDataVariables();
+  @rdf(Opal.NS + "hasParent")
+  public DataItemClass getParent();
 
-  public void setDataVariables(Set<org.openrdf.concepts.owl.Class> variables);
+  public void setParent(DataItemClass parent);
+
+  @rdf(Opal.NS + "children")
+  public Set<DataItemClass> getChildren();
+
+  public void setChildren(Set<DataItemClass> children);
+
+  @rdf(Opal.NS + "multiple")
+  public boolean isMultiple();
+
+  public void setMutiple(boolean multiple);
 
 }

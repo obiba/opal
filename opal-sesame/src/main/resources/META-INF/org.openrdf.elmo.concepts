@@ -2,9 +2,7 @@ org.obiba.opal.elmo.concepts.CategoricalVariable
 org.obiba.opal.elmo.concepts.Category
 org.obiba.opal.elmo.concepts.ContinuousVariable
 org.obiba.opal.elmo.concepts.DataEntryForm
-org.obiba.opal.elmo.concepts.DataEntryFormClass
 org.obiba.opal.elmo.concepts.DataItem
-org.obiba.opal.elmo.concepts.DataItemClass
 org.obiba.opal.elmo.concepts.Dataset
 org.obiba.opal.elmo.concepts.dataValue
 org.obiba.opal.elmo.concepts.DataVariable
@@ -16,3 +14,7 @@ org.obiba.opal.elmo.concepts.Opal
 org.obiba.opal.elmo.concepts.Participant
 org.obiba.opal.elmo.concepts.unit
 
+org.obiba.opal.elmo.owl.concepts.CategoryClass
+org.obiba.opal.elmo.owl.concepts.DataItemClass
+org.obiba.opal.elmo.owl.concepts.DataEntryFormClass
+org.obiba.opal.elmo.owl.concepts.OpalClass

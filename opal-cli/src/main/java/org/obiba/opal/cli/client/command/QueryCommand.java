@@ -21,6 +21,7 @@ import org.obiba.opal.cli.client.command.options.QueryCommandOptions;
 import org.obiba.opal.elmo.concepts.Opal;
 import org.obiba.opal.sesame.repository.OpalRepositoryManager;
 import org.openrdf.model.Namespace;
+import org.openrdf.model.Statement;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
@@ -39,15 +40,13 @@ import org.openrdf.rio.owl.OntologyWriter;
 import org.openrdf.rio.rdfxml.RDFXMLWriter;
 import org.openrdf.rio.rss.RssWriter;
 import org.openrdf.rio.turtle.TurtleWriter;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException;
 import uk.co.flamingpenguin.jewel.cli.CliFactory;
 import uk.co.flamingpenguin.jewel.cli.Option;
 import uk.co.flamingpenguin.jewel.cli.Unparsed;
 
-public class QueryCommand extends AbstractCommand<QueryCommandOptions> {
+public class QueryCommand extends AbstractContextLoadingCommand<QueryCommandOptions> {
 
   private OpalRepositoryManager repoManager;
 
@@ -59,18 +58,15 @@ public class QueryCommand extends AbstractCommand<QueryCommandOptions> {
 
   private PromptOptions prompt;
 
-  public void execute() {
+  @Override
+  public void executeWithContext() {
     // Ensure that options have been set.
     if(options == null) {
       throw new IllegalStateException("Options not set (setOptions must be called before calling execute)");
     }
 
-    ConfigurableApplicationContext context = null;
     try {
-      // Load Spring Context
-      System.console().printf("Loading context\n");
-      context = loadContext();
-      repoManager = (OpalRepositoryManager) context.getBean("opalRepositoryManager");
+      repoManager = getBean("opalRepositoryManager");
 
       connection = repoManager.getDataRepository().getConnection();
       if(connection.getNamespace("opal") == null) {
@@ -80,35 +76,10 @@ public class QueryCommand extends AbstractCommand<QueryCommandOptions> {
         connection.setNamespace("owl", OWL.NAMESPACE);
       }
 
-      while(prompt()) {
-        if(this.prompt.isOutput()) {
-          output = this.prompt.getOutput();
-          if(output.getName().equals("-")) {
-            output = null;
-          }
-          System.console().printf("Results will be output to: %s\n", (output != null ? output.getAbsolutePath() : "stdout"));
-        } else if(this.prompt.isNs()) {
-          iterateNamespaces(new NamespaceCallback() {
-            public void callback(Namespace ns) {
-              System.console().printf("%s:%s\n", ns.getPrefix(), ns.getName());
-            }
-          });
-        } else if(this.prompt.isLanguage()) {
-          try {
-            language = QueryLanguage.valueOf(prompt.getLanguage());
-          } catch(Exception e) {
-            System.console().printf("Invalid query language [%s]\n", prompt.getLanguage());
-          }
-        } else if(this.prompt.isDump()) {
-          dump(prompt.getDump());
-        } else if(this.prompt.isQuery()) {
-          query();
-        }
-      }
+      executeWithConnection();
 
     } catch(RuntimeException e) {
-      System.err.println(e);
-      e.printStackTrace();
+      throw e;
     } catch(RepositoryException e) {
       throw new RuntimeException(e);
     } finally {
@@ -118,14 +89,50 @@ public class QueryCommand extends AbstractCommand<QueryCommandOptions> {
         } catch(RepositoryException e) {
         }
       }
-      if(context != null) {
-        context.close();
+    }
+  }
+
+  protected void executeWithConnection() throws RepositoryException {
+    while(prompt()) {
+      if(this.prompt.isOutput()) {
+        output = this.prompt.getOutput();
+        if(output.getName().equals("-")) {
+          output = null;
+        }
+        System.console().printf("Results will be output to: %s\n", (output != null ? output.getAbsolutePath() : "stdout"));
+      } else if(this.prompt.isNs()) {
+        iterateNamespaces(new NamespaceCallback() {
+          public void callback(Namespace ns) {
+            System.console().printf("%s:%s\n", ns.getPrefix(), ns.getName());
+          }
+        });
+      } else if(this.prompt.isLanguage()) {
+        try {
+          language = QueryLanguage.valueOf(prompt.getLanguage());
+          System.console().printf("Query language set to [%s]\n", language.getName());
+        } catch(Exception e) {
+          System.console().printf("Invalid query language [%s]\n", prompt.getLanguage());
+        }
+      } else if(this.prompt.isStats()) {
+        stats();
+      } else if(this.prompt.isDump()) {
+        dump(prompt.getDump());
+      } else if(this.prompt.isQuery()) {
+        query();
       }
     }
   }
 
-  private ConfigurableApplicationContext loadContext() {
-    return new ClassPathXmlApplicationContext("classpath:/spring/opal-cli/context.xml");
+  private void stats() {
+    try {
+      System.console().printf("Computing statistics...\n");
+      RepositoryResult<Statement> rr = connection.getStatements(null, RDF.TYPE, connection.getValueFactory().createURI(Opal.NS + "Participant"), false);
+      int p = rr.asList().size();
+      System.console().printf("Number of participants: %d\n", p);
+      System.console().printf("Number of statements: %d\n", connection.size());
+    } catch(RepositoryException e) {
+      throw new RuntimeException();
+    }
   }
 
   private void dump(String handlerType) {
@@ -268,6 +275,9 @@ public class QueryCommand extends AbstractCommand<QueryCommandOptions> {
     public String getLanguage();
 
     public boolean isLanguage();
+
+    @Option(shortName = "s")
+    public boolean isStats();
 
     @Unparsed()
     public List<String> getQuery();

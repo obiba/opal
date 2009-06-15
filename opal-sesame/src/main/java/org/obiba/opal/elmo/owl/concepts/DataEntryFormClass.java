@@ -7,25 +7,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.elmo.concepts;
+package org.obiba.opal.elmo.owl.concepts;
 
 import java.util.Set;
 
+import org.obiba.opal.elmo.concepts.Opal;
+import org.openrdf.elmo.annotations.inverseOf;
 import org.openrdf.elmo.annotations.rdf;
 
 /**
  *
  */
-public interface DataItemClass extends org.openrdf.concepts.owl.Class {
+public interface DataEntryFormClass extends OpalClass {
 
-  @rdf(Opal.NS + "hasParent")
-  public org.openrdf.concepts.owl.Class getParent();
+  @rdf(Opal.NS + "containsDataVariable")
+  @inverseOf(Opal.NS + "withinDataEntryForm")
+  public Set<DataItemClass> getDataVariables();
 
-  public void setParent(org.openrdf.concepts.owl.Class parent);
-
-  @rdf(Opal.NS + "children")
-  public Set<org.openrdf.concepts.owl.Class> getChildren();
-
-  public void setChildren(Set<org.openrdf.concepts.owl.Class> children);
+  public void setDataVariables(Set<DataItemClass> variables);
 
 }

@@ -49,4 +49,5 @@ public interface Command<T> {
    * @throws IllegalArgumentException if options invalid (mutually inconsistent)
    */
   public void execute();
+
 }

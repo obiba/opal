@@ -39,5 +39,4 @@ public abstract class AbstractCommand<T> implements Command<T> {
   public void setOptions(T options) {
     this.options = options;
   }
-
 }
