@@ -15,8 +15,6 @@
   
   <!-- Path to a XML variable file that must be used as the catalog for import instead of the one embedded with the data, optional.
        Use classpath or URL localization. 
-  <catalog>classpath:variables.xml</catalog>
-  
-  <catalogOnly>true</catalogOnly> -->
+  <catalog>classpath:variables.xml</catalog> -->
   
 </onyxImportConfiguration>
