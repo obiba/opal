@@ -43,6 +43,7 @@
     <owl:AnnotationProperty rdf:about="#className"/>
     <owl:AnnotationProperty rdf:about="#parent"/>
     <owl:AnnotationProperty rdf:about="#path"/>
+    <owl:AnnotationProperty rdf:about="#creationSource"/>
     <owl:AnnotationProperty rdf:about="#code"/>
     <owl:AnnotationProperty rdf:about="#source"/>
     <owl:AnnotationProperty rdf:about="#exportDate"/>
@@ -341,6 +342,8 @@
             >Data validation constrains.</validation>
         <occurrence xml:lang="en"
             >Repeatability of a occurrence item.</occurrence>
+        <creationSource xml:lang="en"
+            >Source from which the data item was created.</creationSource>
         <source xml:lang="en"
             >Source of the data for automatically provisionned data item.</source>
         <creationDate xml:lang="en"
@@ -395,14 +398,14 @@
     <owl:Class rdf:about="#Entity">
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasDataset"/>
-                <owl:someValuesFrom rdf:resource="#Dataset"/>
+                <owl:onProperty rdf:resource="#identifier"/>
+                <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#identifier"/>
-                <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+                <owl:onProperty rdf:resource="#hasDataset"/>
+                <owl:someValuesFrom rdf:resource="#Dataset"/>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -498,17 +501,17 @@
     <rdf:Description>
         <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
         <owl:members rdf:parseType="Collection">
-            <rdf:Description rdf:about="#CategoricalVariable"/>
-            <rdf:Description rdf:about="#Category"/>
-            <rdf:Description rdf:about="#ContinuousVariable"/>
+            <rdf:Description rdf:about="#Instrument"/>
+            <rdf:Description rdf:about="#Participant"/>
+            <rdf:Description rdf:about="#Site"/>
         </owl:members>
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
         <owl:members rdf:parseType="Collection">
-            <rdf:Description rdf:about="#Instrument"/>
-            <rdf:Description rdf:about="#Participant"/>
-            <rdf:Description rdf:about="#Site"/>
+            <rdf:Description rdf:about="#CategoricalVariable"/>
+            <rdf:Description rdf:about="#Category"/>
+            <rdf:Description rdf:about="#ContinuousVariable"/>
         </owl:members>
     </rdf:Description>
 </rdf:RDF>

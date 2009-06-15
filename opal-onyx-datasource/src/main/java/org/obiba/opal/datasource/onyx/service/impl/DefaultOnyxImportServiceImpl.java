@@ -97,7 +97,13 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
 
   public void importData() {
     // TODO Auto-generated method stub
-    System.out.println("<importData()>");
+    System.out.println("<importData>");
+    // if(onyxImportConfiguration.getCatalog() != null) {
+    // variableVisitor.setSource(onyxImportConfiguration.getCatalog());
+    // loadVariables();
+    // } else {
+    // log.error("Missing variable catalog to import, see onyx-import.xml.");
+    // }
   }
 
   public void importData(Date date, String site, List<String> tags) {
@@ -112,6 +118,8 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
     dataInputContext.setKeyProviderArg(OpalKeyStore.KEYSTORE_PASSWORD_ARGKEY, keyStorePassword);
     dataInputContext.setKeyProviderArg(OpalKeyStore.KEY_PASSWORD_ARGKEY, keyPassword);
     dataInputContext.setSource(source.getPath());
+
+    variableVisitor.setSource(source.getName());
 
     dataInputStrategy.prepare(dataInputContext);
     Variable root = loadVariables();
@@ -217,6 +225,7 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
     Variable variableRoot = null;
     if(onyxImportConfiguration.getCatalog() != null) {
       log.debug("catalog={}", onyxImportConfiguration.getCatalog());
+      variableVisitor.setSource(onyxImportConfiguration.getCatalog());
       InputStream stream = null;
       try {
         stream = onyxImportConfiguration.getCatalogResource().getInputStream();

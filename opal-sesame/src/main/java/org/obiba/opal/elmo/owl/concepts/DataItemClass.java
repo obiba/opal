@@ -91,15 +91,6 @@ public interface DataItemClass extends OpalClass {
   public void setPath(String path);
 
   /**
-   * The export date of the Onyx variable.
-   * @return
-   */
-  @rdf(Opal.NS + "exportDate")
-  public XMLGregorianCalendar getExportDate();
-
-  public void setExportDate(XMLGregorianCalendar date);
-
-  /**
    * The name of the Opal class.
    * @return
    */
@@ -116,5 +107,10 @@ public interface DataItemClass extends OpalClass {
   public XMLGregorianCalendar getCreationDate();
 
   public void setCreationDate(XMLGregorianCalendar date);
+
+  @rdf(Opal.NS + "creationSource")
+  public String getCreationSource();
+
+  public void setCreationSource(String source);
 
 }

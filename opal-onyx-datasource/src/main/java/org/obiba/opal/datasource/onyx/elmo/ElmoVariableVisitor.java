@@ -60,6 +60,8 @@ public class ElmoVariableVisitor implements VariableVisitor {
 
   private DataEntryFormClass currentDEF;
 
+  private String source;
+
   private IVariablePathNamingStrategy variablePathNamingStrategy = new DefaultVariablePathNamingStrategy();
 
   public ElmoVariableVisitor(IVariableQNameStrategy qnameStrategy, SesameManagerFactory managerFactory) throws OpenRDFException, IOException {
@@ -127,7 +129,9 @@ public class ElmoVariableVisitor implements VariableVisitor {
     opalOnyxVariable.setPath(variablePathNamingStrategy.getPath(variable));
     opalOnyxVariable.setClassName(opalOnyxVariable.getQName().getLocalPart());
     opalOnyxVariable.setCreationDate(toXMLGregorianCalendar(new Date()));
-    // opalOnyxVariable.setExportDate(null);
+    if(source != null) {
+      opalOnyxVariable.setCreationSource(source);
+    }
     createHierarchy(variable, opalOnyxVariable);
   }
 
@@ -290,6 +294,10 @@ public class ElmoVariableVisitor implements VariableVisitor {
 
       manager.setLocale(null);
     }
+  }
+
+  public void setSource(String source) {
+    this.source = source;
   }
 
 }
