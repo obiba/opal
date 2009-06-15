@@ -23,6 +23,7 @@ import org.obiba.opal.elmo.concepts.OccurrenceItem;
 import org.obiba.opal.elmo.concepts.Opal;
 import org.obiba.opal.elmo.concepts.dataValue;
 import org.obiba.opal.elmo.concepts.hasCategory;
+import org.obiba.opal.elmo.owl.concepts.CategoricalVariableClass;
 import org.obiba.opal.elmo.owl.concepts.CategoryClass;
 import org.obiba.opal.elmo.owl.concepts.DataEntryFormClass;
 import org.obiba.opal.elmo.owl.concepts.DataItemClass;
@@ -148,17 +149,9 @@ public class ElmoVariableVisitor implements VariableVisitor {
       opalOnyxVariable.setCode(onyxCategory.getAlternateName());
 
       QName parentQName = qnameStrategy.getQName(onyxVariable.getParent());
-      org.openrdf.concepts.rdfs.Class parentVariable = manager.find(org.openrdf.concepts.rdfs.Class.class, parentQName);
+      CategoricalVariableClass parentVariable = manager.find(CategoricalVariableClass.class, parentQName);
 
-      for(Object c : parentVariable.getRdfsSubClassOf()) {
-        if(c instanceof Restriction) {
-          Restriction r = (Restriction) c;
-          if(r.getOwlAllValuesFrom() != null) {
-            Class allValues = (Class) r.getOwlAllValuesFrom();
-            allValues.getOwlUnionOf().add(opalOnyxVariable);
-          }
-        }
-      }
+      parentVariable.getCategories().add(opalOnyxVariable);
 
       return opalOnyxVariable;
     }
