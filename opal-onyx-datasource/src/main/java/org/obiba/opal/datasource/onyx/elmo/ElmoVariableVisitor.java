@@ -174,7 +174,7 @@ public class ElmoVariableVisitor implements VariableVisitor {
       Class opalVariable = opal.getOpalClass(CategoricalVariable.class);
       DataItemClass opalOnyxVariable = manager.create(qname, DataItemClass.class);
       opalOnyxVariable.getRdfsSubClassOf().add(opalVariable);
-      opalOnyxVariable.setMutiple(onyxVariable.isMultiple());
+      opalOnyxVariable.setMultiple(onyxVariable.isMultiple());
 
       Restriction r = manager.create(Restriction.class);
       org.openrdf.concepts.owl.ObjectProperty hasCategory = opal.getOpalProperty(hasCategory.class);

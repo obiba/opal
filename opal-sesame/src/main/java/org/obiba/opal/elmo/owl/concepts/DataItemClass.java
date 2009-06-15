@@ -15,7 +15,7 @@ import org.obiba.opal.elmo.concepts.Opal;
 import org.openrdf.elmo.annotations.rdf;
 
 /**
- *
+ * 
  */
 public interface DataItemClass extends OpalClass {
 
@@ -32,6 +32,6 @@ public interface DataItemClass extends OpalClass {
   @rdf(Opal.NS + "multiple")
   public boolean isMultiple();
 
-  public void setMutiple(boolean multiple);
+  public void setMultiple(boolean multiple);
 
 }
