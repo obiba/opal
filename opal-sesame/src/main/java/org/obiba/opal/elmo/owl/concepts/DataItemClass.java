@@ -19,12 +19,12 @@ import org.openrdf.elmo.annotations.rdf;
  */
 public interface DataItemClass extends OpalClass {
 
-  @rdf(Opal.NS + "hasParent")
+  @rdf(Opal.NS + "parent")
   public DataItemClass getParent();
 
   public void setParent(DataItemClass parent);
 
-  @rdf(Opal.NS + "children")
+  @rdf(Opal.NS + "child")
   public Set<DataItemClass> getChildren();
 
   public void setChildren(Set<DataItemClass> children);
