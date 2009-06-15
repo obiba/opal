@@ -34,4 +34,23 @@ public interface DataItemClass extends OpalClass {
 
   public void setMultiple(boolean multiple);
 
+  @rdf(Opal.NS + "condition")
+  public String getCondition();
+
+  public void setCondition(String condition);
+
+  @rdf(Opal.NS + "occurrence")
+  public String getOccurrence();
+
+  public void setOccurrence(String occurrence);
+
+  @rdf(Opal.NS + "source")
+  public String getSource();
+
+  public void setSource(String source);
+
+  @rdf(Opal.NS + "validation")
+  public String getValidation();
+
+  public void setValidation(String validation);
 }

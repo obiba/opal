@@ -10,6 +10,7 @@ import javax.xml.namespace.QName;
 import org.obiba.onyx.engine.variable.Attribute;
 import org.obiba.onyx.engine.variable.Category;
 import org.obiba.onyx.engine.variable.Variable;
+import org.obiba.onyx.engine.variable.VariableHelper;
 import org.obiba.opal.datasource.onyx.variable.IVariableQNameStrategy;
 import org.obiba.opal.datasource.onyx.variable.VariableVisitor;
 import org.obiba.opal.elmo.OpalOntologyManager;
@@ -147,7 +148,7 @@ public class ElmoVariableVisitor implements VariableVisitor {
       opalOnyxVariable.setCode(onyxCategory.getAlternateName());
 
       QName parentQName = qnameStrategy.getQName(onyxVariable.getParent());
-      Class parentVariable = manager.find(Class.class, parentQName);
+      org.openrdf.concepts.rdfs.Class parentVariable = manager.find(org.openrdf.concepts.rdfs.Class.class, parentQName);
 
       for(Object c : parentVariable.getRdfsSubClassOf()) {
         if(c instanceof Restriction) {
@@ -258,15 +259,23 @@ public class ElmoVariableVisitor implements VariableVisitor {
     }
   }
 
-  private void annotate(Class opalOnyxVariable, List<Attribute> attributes) {
+  private void annotate(DataItemClass opalOnyxVariable, List<Attribute> attributes) {
     for(Attribute attr : attributes) {
       log.debug("{}@{}={}", new Object[] { attr.getKey(), attr.getLocale(), attr.getValue().toString() });
+      manager.setLocale(attr.getLocale());
       if(attr.getKey().equals("label")) {
-        if(attr.getLocale() != null) {
-          manager.setLocale(attr.getLocale());
-        }
         opalOnyxVariable.setRdfsLabel(attr.getValue().toString());
+      } else if(attr.getKey().equals(VariableHelper.CONDITION)) {
+        opalOnyxVariable.setCondition(attr.getValue().toString());
+      } else if(attr.getKey().equals(VariableHelper.OCCURRENCE)) {
+        opalOnyxVariable.setOccurrence(attr.getValue().toString());
+      } else if(attr.getKey().equals(VariableHelper.SOURCE)) {
+        opalOnyxVariable.setSource(attr.getValue().toString());
+      } else if(attr.getKey().equals(VariableHelper.VALIDATION)) {
+        opalOnyxVariable.setValidation(attr.getValue().toString());
       }
+
+      manager.setLocale(null);
     }
   }
 
