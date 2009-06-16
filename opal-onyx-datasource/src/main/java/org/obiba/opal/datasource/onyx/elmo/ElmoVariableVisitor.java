@@ -285,9 +285,9 @@ public class ElmoVariableVisitor implements VariableVisitor {
 
   private void annotate(DataItemClass opalOnyxVariable, List<Attribute> attributes) {
     for(Attribute attr : attributes) {
-      log.debug("{}@{}={}", new Object[] { attr.getKey(), attr.getLocale(), attr.getValue().toString() });
+
       manager.setLocale(attr.getLocale());
-      if(attr.getKey().equals("label")) {
+      if(attr.getKey().equals(VariableHelper.LABEL)) {
         opalOnyxVariable.setRdfsLabel(attr.getValue().toString());
       } else if(attr.getKey().equals(VariableHelper.CONDITION)) {
         opalOnyxVariable.setCondition(attr.getValue().toString());
@@ -297,6 +297,10 @@ public class ElmoVariableVisitor implements VariableVisitor {
         opalOnyxVariable.setSource(attr.getValue().toString());
       } else if(attr.getKey().equals(VariableHelper.VALIDATION)) {
         opalOnyxVariable.setValidation(attr.getValue().toString());
+      } else if(attr.getKey().equals(VariableHelper.REQUIRED)) {
+        opalOnyxVariable.setRequired(Boolean.parseBoolean(attr.getValue().toString()));
+      } else {
+        log.info("{}@{}={}", new Object[] { attr.getKey(), attr.getLocale(), attr.getValue().toString() });
       }
 
       manager.setLocale(null);

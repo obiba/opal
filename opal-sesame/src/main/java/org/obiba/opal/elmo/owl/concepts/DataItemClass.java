@@ -70,6 +70,11 @@ public interface DataItemClass extends OpalClass {
 
   public void setValidation(String validation);
 
+  @rdf(Opal.NS + "required")
+  public Boolean getRequired();
+
+  public void setRequired(Boolean b);
+
   /**
    * The name of the Onyx variable.
    * @return
