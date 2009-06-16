@@ -3888,28 +3888,29 @@
       </variable>
       <category name="TIME_24" dataType="BOOLEAN">
         <attributes/>
-        <variable name="TIME_24" dataType="DATE">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="TODAY_YESTERDAY" dataType="TEXT">
           <attributes>
             <attribute key="label" locale="en">
               <value class="string">Day</value>
             </attribute>
-            <attribute key="TODAY" locale="en">
-              <value class="string">Today</value>
-            </attribute>
-            <attribute key="YESTERDAY" locale="en">
-              <value class="string">Yesterday</value>
-            </attribute>
             <attribute key="required">
               <value class="string">true</value>
             </attribute>
           </attributes>
+          <category name="TODAY" dataType="BOOLEAN" alt="1">
+            <attributes>
+              <attribute key="label" locale="en">
+                <value class="string">Today</value>
+              </attribute>
+            </attributes>
+          </category>
+          <category name="YESTERDAY" dataType="BOOLEAN" alt="2">
+            <attributes>
+              <attribute key="label" locale="en">
+                <value class="string">Yesterday</value>
+              </attribute>
+            </attributes>
+          </category>
         </variable>
         <variable name="HOUR_24" dataType="INTEGER">
           <attributes>
@@ -3918,78 +3919,6 @@
             </attribute>
             <attribute key="unitLabel" locale="en">
               <value class="string">:</value>
-            </attribute>
-            <attribute key="0" locale="en">
-              <value class="string">00</value>
-            </attribute>
-            <attribute key="1" locale="en">
-              <value class="string">01</value>
-            </attribute>
-            <attribute key="2" locale="en">
-              <value class="string">02</value>
-            </attribute>
-            <attribute key="3" locale="en">
-              <value class="string">03</value>
-            </attribute>
-            <attribute key="4" locale="en">
-              <value class="string">04</value>
-            </attribute>
-            <attribute key="5" locale="en">
-              <value class="string">05</value>
-            </attribute>
-            <attribute key="6" locale="en">
-              <value class="string">06</value>
-            </attribute>
-            <attribute key="7" locale="en">
-              <value class="string">07</value>
-            </attribute>
-            <attribute key="8" locale="en">
-              <value class="string">08</value>
-            </attribute>
-            <attribute key="9" locale="en">
-              <value class="string">09</value>
-            </attribute>
-            <attribute key="10" locale="en">
-              <value class="string">10</value>
-            </attribute>
-            <attribute key="11" locale="en">
-              <value class="string">11</value>
-            </attribute>
-            <attribute key="12" locale="en">
-              <value class="string">12</value>
-            </attribute>
-            <attribute key="13" locale="en">
-              <value class="string">13</value>
-            </attribute>
-            <attribute key="14" locale="en">
-              <value class="string">14</value>
-            </attribute>
-            <attribute key="15" locale="en">
-              <value class="string">15</value>
-            </attribute>
-            <attribute key="16" locale="en">
-              <value class="string">16</value>
-            </attribute>
-            <attribute key="17" locale="en">
-              <value class="string">17</value>
-            </attribute>
-            <attribute key="18" locale="en">
-              <value class="string">18</value>
-            </attribute>
-            <attribute key="19" locale="en">
-              <value class="string">19</value>
-            </attribute>
-            <attribute key="20" locale="en">
-              <value class="string">20</value>
-            </attribute>
-            <attribute key="21" locale="en">
-              <value class="string">21</value>
-            </attribute>
-            <attribute key="22" locale="en">
-              <value class="string">22</value>
-            </attribute>
-            <attribute key="23" locale="en">
-              <value class="string">23</value>
             </attribute>
             <attribute key="required">
               <value class="string">true</value>
@@ -4000,18 +3929,6 @@
           <attributes>
             <attribute key="label" locale="en">
               <value class="string">MM</value>
-            </attribute>
-            <attribute key="0" locale="en">
-              <value class="string">00</value>
-            </attribute>
-            <attribute key="15" locale="en">
-              <value class="string">15</value>
-            </attribute>
-            <attribute key="30" locale="en">
-              <value class="string">30</value>
-            </attribute>
-            <attribute key="45" locale="en">
-              <value class="string">45</value>
             </attribute>
             <attribute key="required">
               <value class="string">true</value>
@@ -4040,28 +3957,29 @@
       </variable>
       <category name="TIME_24" dataType="BOOLEAN">
         <attributes/>
-        <variable name="TIME_24" dataType="DATE">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="TODAY_YESTERDAY" dataType="TEXT">
           <attributes>
             <attribute key="label" locale="en">
               <value class="string">Day</value>
             </attribute>
-            <attribute key="TODAY" locale="en">
-              <value class="string">Today</value>
-            </attribute>
-            <attribute key="YESTERDAY" locale="en">
-              <value class="string">Yesterday</value>
-            </attribute>
             <attribute key="required">
               <value class="string">true</value>
             </attribute>
           </attributes>
+          <category name="TODAY" dataType="BOOLEAN" alt="1">
+            <attributes>
+              <attribute key="label" locale="en">
+                <value class="string">Today</value>
+              </attribute>
+            </attributes>
+          </category>
+          <category name="YESTERDAY" dataType="BOOLEAN" alt="2">
+            <attributes>
+              <attribute key="label" locale="en">
+                <value class="string">Yesterday</value>
+              </attribute>
+            </attributes>
+          </category>
         </variable>
         <variable name="HOUR_24" dataType="INTEGER">
           <attributes>
@@ -4070,78 +3988,6 @@
             </attribute>
             <attribute key="unitLabel" locale="en">
               <value class="string">:</value>
-            </attribute>
-            <attribute key="0" locale="en">
-              <value class="string">00</value>
-            </attribute>
-            <attribute key="1" locale="en">
-              <value class="string">01</value>
-            </attribute>
-            <attribute key="2" locale="en">
-              <value class="string">02</value>
-            </attribute>
-            <attribute key="3" locale="en">
-              <value class="string">03</value>
-            </attribute>
-            <attribute key="4" locale="en">
-              <value class="string">04</value>
-            </attribute>
-            <attribute key="5" locale="en">
-              <value class="string">05</value>
-            </attribute>
-            <attribute key="6" locale="en">
-              <value class="string">06</value>
-            </attribute>
-            <attribute key="7" locale="en">
-              <value class="string">07</value>
-            </attribute>
-            <attribute key="8" locale="en">
-              <value class="string">08</value>
-            </attribute>
-            <attribute key="9" locale="en">
-              <value class="string">09</value>
-            </attribute>
-            <attribute key="10" locale="en">
-              <value class="string">10</value>
-            </attribute>
-            <attribute key="11" locale="en">
-              <value class="string">11</value>
-            </attribute>
-            <attribute key="12" locale="en">
-              <value class="string">12</value>
-            </attribute>
-            <attribute key="13" locale="en">
-              <value class="string">13</value>
-            </attribute>
-            <attribute key="14" locale="en">
-              <value class="string">14</value>
-            </attribute>
-            <attribute key="15" locale="en">
-              <value class="string">15</value>
-            </attribute>
-            <attribute key="16" locale="en">
-              <value class="string">16</value>
-            </attribute>
-            <attribute key="17" locale="en">
-              <value class="string">17</value>
-            </attribute>
-            <attribute key="18" locale="en">
-              <value class="string">18</value>
-            </attribute>
-            <attribute key="19" locale="en">
-              <value class="string">19</value>
-            </attribute>
-            <attribute key="20" locale="en">
-              <value class="string">20</value>
-            </attribute>
-            <attribute key="21" locale="en">
-              <value class="string">21</value>
-            </attribute>
-            <attribute key="22" locale="en">
-              <value class="string">22</value>
-            </attribute>
-            <attribute key="23" locale="en">
-              <value class="string">23</value>
             </attribute>
             <attribute key="required">
               <value class="string">true</value>
@@ -4152,18 +3998,6 @@
           <attributes>
             <attribute key="label" locale="en">
               <value class="string">MM</value>
-            </attribute>
-            <attribute key="0" locale="en">
-              <value class="string">00</value>
-            </attribute>
-            <attribute key="15" locale="en">
-              <value class="string">15</value>
-            </attribute>
-            <attribute key="30" locale="en">
-              <value class="string">30</value>
-            </attribute>
-            <attribute key="45" locale="en">
-              <value class="string">45</value>
             </attribute>
             <attribute key="required">
               <value class="string">true</value>
@@ -4192,28 +4026,29 @@
       </variable>
       <category name="TIME_24" dataType="BOOLEAN">
         <attributes/>
-        <variable name="TIME_24" dataType="DATE">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="TODAY_YESTERDAY" dataType="TEXT">
           <attributes>
             <attribute key="label" locale="en">
               <value class="string">Day</value>
             </attribute>
-            <attribute key="TODAY" locale="en">
-              <value class="string">Today</value>
-            </attribute>
-            <attribute key="YESTERDAY" locale="en">
-              <value class="string">Yesterday</value>
-            </attribute>
             <attribute key="required">
               <value class="string">true</value>
             </attribute>
           </attributes>
+          <category name="TODAY" dataType="BOOLEAN" alt="1">
+            <attributes>
+              <attribute key="label" locale="en">
+                <value class="string">Today</value>
+              </attribute>
+            </attributes>
+          </category>
+          <category name="YESTERDAY" dataType="BOOLEAN" alt="2">
+            <attributes>
+              <attribute key="label" locale="en">
+                <value class="string">Yesterday</value>
+              </attribute>
+            </attributes>
+          </category>
         </variable>
         <variable name="HOUR_24" dataType="INTEGER">
           <attributes>
@@ -4222,78 +4057,6 @@
             </attribute>
             <attribute key="unitLabel" locale="en">
               <value class="string">:</value>
-            </attribute>
-            <attribute key="0" locale="en">
-              <value class="string">00</value>
-            </attribute>
-            <attribute key="1" locale="en">
-              <value class="string">01</value>
-            </attribute>
-            <attribute key="2" locale="en">
-              <value class="string">02</value>
-            </attribute>
-            <attribute key="3" locale="en">
-              <value class="string">03</value>
-            </attribute>
-            <attribute key="4" locale="en">
-              <value class="string">04</value>
-            </attribute>
-            <attribute key="5" locale="en">
-              <value class="string">05</value>
-            </attribute>
-            <attribute key="6" locale="en">
-              <value class="string">06</value>
-            </attribute>
-            <attribute key="7" locale="en">
-              <value class="string">07</value>
-            </attribute>
-            <attribute key="8" locale="en">
-              <value class="string">08</value>
-            </attribute>
-            <attribute key="9" locale="en">
-              <value class="string">09</value>
-            </attribute>
-            <attribute key="10" locale="en">
-              <value class="string">10</value>
-            </attribute>
-            <attribute key="11" locale="en">
-              <value class="string">11</value>
-            </attribute>
-            <attribute key="12" locale="en">
-              <value class="string">12</value>
-            </attribute>
-            <attribute key="13" locale="en">
-              <value class="string">13</value>
-            </attribute>
-            <attribute key="14" locale="en">
-              <value class="string">14</value>
-            </attribute>
-            <attribute key="15" locale="en">
-              <value class="string">15</value>
-            </attribute>
-            <attribute key="16" locale="en">
-              <value class="string">16</value>
-            </attribute>
-            <attribute key="17" locale="en">
-              <value class="string">17</value>
-            </attribute>
-            <attribute key="18" locale="en">
-              <value class="string">18</value>
-            </attribute>
-            <attribute key="19" locale="en">
-              <value class="string">19</value>
-            </attribute>
-            <attribute key="20" locale="en">
-              <value class="string">20</value>
-            </attribute>
-            <attribute key="21" locale="en">
-              <value class="string">21</value>
-            </attribute>
-            <attribute key="22" locale="en">
-              <value class="string">22</value>
-            </attribute>
-            <attribute key="23" locale="en">
-              <value class="string">23</value>
             </attribute>
             <attribute key="required">
               <value class="string">true</value>
@@ -4304,18 +4067,6 @@
           <attributes>
             <attribute key="label" locale="en">
               <value class="string">MM</value>
-            </attribute>
-            <attribute key="0" locale="en">
-              <value class="string">00</value>
-            </attribute>
-            <attribute key="15" locale="en">
-              <value class="string">15</value>
-            </attribute>
-            <attribute key="30" locale="en">
-              <value class="string">30</value>
-            </attribute>
-            <attribute key="45" locale="en">
-              <value class="string">45</value>
             </attribute>
             <attribute key="required">
               <value class="string">true</value>
@@ -4351,28 +4102,29 @@
       </variable>
       <category name="TIME_24" dataType="BOOLEAN">
         <attributes/>
-        <variable name="TIME_24" dataType="DATE">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="TODAY_YESTERDAY" dataType="TEXT">
           <attributes>
             <attribute key="label" locale="en">
               <value class="string">Day</value>
             </attribute>
-            <attribute key="TODAY" locale="en">
-              <value class="string">Today</value>
-            </attribute>
-            <attribute key="YESTERDAY" locale="en">
-              <value class="string">Yesterday</value>
-            </attribute>
             <attribute key="required">
               <value class="string">true</value>
             </attribute>
           </attributes>
+          <category name="TODAY" dataType="BOOLEAN" alt="1">
+            <attributes>
+              <attribute key="label" locale="en">
+                <value class="string">Today</value>
+              </attribute>
+            </attributes>
+          </category>
+          <category name="YESTERDAY" dataType="BOOLEAN" alt="2">
+            <attributes>
+              <attribute key="label" locale="en">
+                <value class="string">Yesterday</value>
+              </attribute>
+            </attributes>
+          </category>
         </variable>
         <variable name="HOUR_24" dataType="INTEGER">
           <attributes>
@@ -4381,78 +4133,6 @@
             </attribute>
             <attribute key="unitLabel" locale="en">
               <value class="string">:</value>
-            </attribute>
-            <attribute key="0" locale="en">
-              <value class="string">00</value>
-            </attribute>
-            <attribute key="1" locale="en">
-              <value class="string">01</value>
-            </attribute>
-            <attribute key="2" locale="en">
-              <value class="string">02</value>
-            </attribute>
-            <attribute key="3" locale="en">
-              <value class="string">03</value>
-            </attribute>
-            <attribute key="4" locale="en">
-              <value class="string">04</value>
-            </attribute>
-            <attribute key="5" locale="en">
-              <value class="string">05</value>
-            </attribute>
-            <attribute key="6" locale="en">
-              <value class="string">06</value>
-            </attribute>
-            <attribute key="7" locale="en">
-              <value class="string">07</value>
-            </attribute>
-            <attribute key="8" locale="en">
-              <value class="string">08</value>
-            </attribute>
-            <attribute key="9" locale="en">
-              <value class="string">09</value>
-            </attribute>
-            <attribute key="10" locale="en">
-              <value class="string">10</value>
-            </attribute>
-            <attribute key="11" locale="en">
-              <value class="string">11</value>
-            </attribute>
-            <attribute key="12" locale="en">
-              <value class="string">12</value>
-            </attribute>
-            <attribute key="13" locale="en">
-              <value class="string">13</value>
-            </attribute>
-            <attribute key="14" locale="en">
-              <value class="string">14</value>
-            </attribute>
-            <attribute key="15" locale="en">
-              <value class="string">15</value>
-            </attribute>
-            <attribute key="16" locale="en">
-              <value class="string">16</value>
-            </attribute>
-            <attribute key="17" locale="en">
-              <value class="string">17</value>
-            </attribute>
-            <attribute key="18" locale="en">
-              <value class="string">18</value>
-            </attribute>
-            <attribute key="19" locale="en">
-              <value class="string">19</value>
-            </attribute>
-            <attribute key="20" locale="en">
-              <value class="string">20</value>
-            </attribute>
-            <attribute key="21" locale="en">
-              <value class="string">21</value>
-            </attribute>
-            <attribute key="22" locale="en">
-              <value class="string">22</value>
-            </attribute>
-            <attribute key="23" locale="en">
-              <value class="string">23</value>
             </attribute>
             <attribute key="required">
               <value class="string">true</value>
@@ -4463,18 +4143,6 @@
           <attributes>
             <attribute key="label" locale="en">
               <value class="string">MM</value>
-            </attribute>
-            <attribute key="0" locale="en">
-              <value class="string">00</value>
-            </attribute>
-            <attribute key="15" locale="en">
-              <value class="string">15</value>
-            </attribute>
-            <attribute key="30" locale="en">
-              <value class="string">30</value>
-            </attribute>
-            <attribute key="45" locale="en">
-              <value class="string">45</value>
             </attribute>
             <attribute key="required">
               <value class="string">true</value>
@@ -4543,28 +4211,29 @@
       </variable>
       <category name="TIME_24" dataType="BOOLEAN">
         <attributes/>
-        <variable name="TIME_24" dataType="DATE">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="TODAY_YESTERDAY" dataType="TEXT">
           <attributes>
             <attribute key="label" locale="en">
               <value class="string">Day</value>
             </attribute>
-            <attribute key="TODAY" locale="en">
-              <value class="string">Today</value>
-            </attribute>
-            <attribute key="YESTERDAY" locale="en">
-              <value class="string">Yesterday</value>
-            </attribute>
             <attribute key="required">
               <value class="string">true</value>
             </attribute>
           </attributes>
+          <category name="TODAY" dataType="BOOLEAN" alt="1">
+            <attributes>
+              <attribute key="label" locale="en">
+                <value class="string">Today</value>
+              </attribute>
+            </attributes>
+          </category>
+          <category name="YESTERDAY" dataType="BOOLEAN" alt="2">
+            <attributes>
+              <attribute key="label" locale="en">
+                <value class="string">Yesterday</value>
+              </attribute>
+            </attributes>
+          </category>
         </variable>
         <variable name="HOUR_24" dataType="INTEGER">
           <attributes>
@@ -4573,78 +4242,6 @@
             </attribute>
             <attribute key="unitLabel" locale="en">
               <value class="string">:</value>
-            </attribute>
-            <attribute key="0" locale="en">
-              <value class="string">00</value>
-            </attribute>
-            <attribute key="1" locale="en">
-              <value class="string">01</value>
-            </attribute>
-            <attribute key="2" locale="en">
-              <value class="string">02</value>
-            </attribute>
-            <attribute key="3" locale="en">
-              <value class="string">03</value>
-            </attribute>
-            <attribute key="4" locale="en">
-              <value class="string">04</value>
-            </attribute>
-            <attribute key="5" locale="en">
-              <value class="string">05</value>
-            </attribute>
-            <attribute key="6" locale="en">
-              <value class="string">06</value>
-            </attribute>
-            <attribute key="7" locale="en">
-              <value class="string">07</value>
-            </attribute>
-            <attribute key="8" locale="en">
-              <value class="string">08</value>
-            </attribute>
-            <attribute key="9" locale="en">
-              <value class="string">09</value>
-            </attribute>
-            <attribute key="10" locale="en">
-              <value class="string">10</value>
-            </attribute>
-            <attribute key="11" locale="en">
-              <value class="string">11</value>
-            </attribute>
-            <attribute key="12" locale="en">
-              <value class="string">12</value>
-            </attribute>
-            <attribute key="13" locale="en">
-              <value class="string">13</value>
-            </attribute>
-            <attribute key="14" locale="en">
-              <value class="string">14</value>
-            </attribute>
-            <attribute key="15" locale="en">
-              <value class="string">15</value>
-            </attribute>
-            <attribute key="16" locale="en">
-              <value class="string">16</value>
-            </attribute>
-            <attribute key="17" locale="en">
-              <value class="string">17</value>
-            </attribute>
-            <attribute key="18" locale="en">
-              <value class="string">18</value>
-            </attribute>
-            <attribute key="19" locale="en">
-              <value class="string">19</value>
-            </attribute>
-            <attribute key="20" locale="en">
-              <value class="string">20</value>
-            </attribute>
-            <attribute key="21" locale="en">
-              <value class="string">21</value>
-            </attribute>
-            <attribute key="22" locale="en">
-              <value class="string">22</value>
-            </attribute>
-            <attribute key="23" locale="en">
-              <value class="string">23</value>
             </attribute>
             <attribute key="required">
               <value class="string">true</value>
@@ -4655,18 +4252,6 @@
           <attributes>
             <attribute key="label" locale="en">
               <value class="string">MM</value>
-            </attribute>
-            <attribute key="0" locale="en">
-              <value class="string">00</value>
-            </attribute>
-            <attribute key="15" locale="en">
-              <value class="string">15</value>
-            </attribute>
-            <attribute key="30" locale="en">
-              <value class="string">30</value>
-            </attribute>
-            <attribute key="45" locale="en">
-              <value class="string">45</value>
             </attribute>
             <attribute key="required">
               <value class="string">true</value>
@@ -6095,13 +5680,6 @@
       </variable>
       <category name="YEAR_MONTH" dataType="BOOLEAN">
         <attributes/>
-        <variable name="YEAR_MONTH" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="YEAR" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -6254,13 +5832,6 @@
       </variable>
       <category name="YEAR_MONTH" dataType="BOOLEAN">
         <attributes/>
-        <variable name="YEAR_MONTH" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="YEAR" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -7618,28 +7189,29 @@
       </variable>
       <category name="TIME_24" dataType="BOOLEAN">
         <attributes/>
-        <variable name="TIME_24" dataType="DATE">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="TODAY_YESTERDAY" dataType="TEXT">
           <attributes>
             <attribute key="label" locale="en">
               <value class="string">Day</value>
             </attribute>
-            <attribute key="TODAY" locale="en">
-              <value class="string">Today</value>
-            </attribute>
-            <attribute key="YESTERDAY" locale="en">
-              <value class="string">Yesterday</value>
-            </attribute>
             <attribute key="required">
               <value class="string">true</value>
             </attribute>
           </attributes>
+          <category name="TODAY" dataType="BOOLEAN" alt="1">
+            <attributes>
+              <attribute key="label" locale="en">
+                <value class="string">Today</value>
+              </attribute>
+            </attributes>
+          </category>
+          <category name="YESTERDAY" dataType="BOOLEAN" alt="2">
+            <attributes>
+              <attribute key="label" locale="en">
+                <value class="string">Yesterday</value>
+              </attribute>
+            </attributes>
+          </category>
         </variable>
         <variable name="HOUR_24" dataType="INTEGER">
           <attributes>
@@ -7648,78 +7220,6 @@
             </attribute>
             <attribute key="unitLabel" locale="en">
               <value class="string">:</value>
-            </attribute>
-            <attribute key="0" locale="en">
-              <value class="string">00</value>
-            </attribute>
-            <attribute key="1" locale="en">
-              <value class="string">01</value>
-            </attribute>
-            <attribute key="2" locale="en">
-              <value class="string">02</value>
-            </attribute>
-            <attribute key="3" locale="en">
-              <value class="string">03</value>
-            </attribute>
-            <attribute key="4" locale="en">
-              <value class="string">04</value>
-            </attribute>
-            <attribute key="5" locale="en">
-              <value class="string">05</value>
-            </attribute>
-            <attribute key="6" locale="en">
-              <value class="string">06</value>
-            </attribute>
-            <attribute key="7" locale="en">
-              <value class="string">07</value>
-            </attribute>
-            <attribute key="8" locale="en">
-              <value class="string">08</value>
-            </attribute>
-            <attribute key="9" locale="en">
-              <value class="string">09</value>
-            </attribute>
-            <attribute key="10" locale="en">
-              <value class="string">10</value>
-            </attribute>
-            <attribute key="11" locale="en">
-              <value class="string">11</value>
-            </attribute>
-            <attribute key="12" locale="en">
-              <value class="string">12</value>
-            </attribute>
-            <attribute key="13" locale="en">
-              <value class="string">13</value>
-            </attribute>
-            <attribute key="14" locale="en">
-              <value class="string">14</value>
-            </attribute>
-            <attribute key="15" locale="en">
-              <value class="string">15</value>
-            </attribute>
-            <attribute key="16" locale="en">
-              <value class="string">16</value>
-            </attribute>
-            <attribute key="17" locale="en">
-              <value class="string">17</value>
-            </attribute>
-            <attribute key="18" locale="en">
-              <value class="string">18</value>
-            </attribute>
-            <attribute key="19" locale="en">
-              <value class="string">19</value>
-            </attribute>
-            <attribute key="20" locale="en">
-              <value class="string">20</value>
-            </attribute>
-            <attribute key="21" locale="en">
-              <value class="string">21</value>
-            </attribute>
-            <attribute key="22" locale="en">
-              <value class="string">22</value>
-            </attribute>
-            <attribute key="23" locale="en">
-              <value class="string">23</value>
             </attribute>
             <attribute key="required">
               <value class="string">true</value>
@@ -7730,18 +7230,6 @@
           <attributes>
             <attribute key="label" locale="en">
               <value class="string">MM</value>
-            </attribute>
-            <attribute key="0" locale="en">
-              <value class="string">00</value>
-            </attribute>
-            <attribute key="15" locale="en">
-              <value class="string">15</value>
-            </attribute>
-            <attribute key="30" locale="en">
-              <value class="string">30</value>
-            </attribute>
-            <attribute key="45" locale="en">
-              <value class="string">45</value>
             </attribute>
             <attribute key="required">
               <value class="string">true</value>
@@ -8580,13 +8068,6 @@
       </variable>
       <category name="DOB" dataType="BOOLEAN">
         <attributes/>
-        <variable name="DOB" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="DOB_YEAR" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -11898,13 +11379,6 @@
       </variable>
       <category name="OPEN_WEIGHT_BABY" dataType="BOOLEAN">
         <attributes/>
-        <variable name="OPEN_WEIGHT_BABY" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="OPEN_WEIGHT_LBS" dataType="DECIMAL">
           <attributes>
             <attribute key="label" locale="en">
@@ -19389,13 +18863,6 @@
       </variable>
       <category name="ACTIVITY_TIME_DAY_AM" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY_AM" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY_AM" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -19431,13 +18898,6 @@
       </category>
       <category name="ACTIVITY_TIME_DAY_PM" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY_PM" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY_PM" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -19503,13 +18963,6 @@
       </variable>
       <category name="ACTIVITY_TIME_DAY_AM" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY_AM" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY_AM" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -19545,13 +18998,6 @@
       </category>
       <category name="ACTIVITY_TIME_DAY_PM" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY_PM" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY_PM" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -19661,13 +19107,6 @@
       </variable>
       <category name="ACTIVITY_TIME_DAY_AM" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY_AM" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY_AM" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -19703,13 +19142,6 @@
       </category>
       <category name="ACTIVITY_TIME_DAY_PM" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY_PM" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY_PM" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -19863,13 +19295,6 @@
       </variable>
       <category name="ACTIVITY_TIME_DAY_AM" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY_AM" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY_AM" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -19905,13 +19330,6 @@
       </category>
       <category name="ACTIVITY_TIME_DAY_PM" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY_PM" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY_PM" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -19977,13 +19395,6 @@
       </variable>
       <category name="ACTIVITY_TIME_DAY_AM" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY_AM" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY_AM" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -20019,13 +19430,6 @@
       </category>
       <category name="ACTIVITY_TIME_DAY_PM" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY_PM" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY_PM" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -20135,13 +19539,6 @@
       </variable>
       <category name="ACTIVITY_TIME_DAY_AM" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY_AM" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY_AM" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -20177,13 +19574,6 @@
       </category>
       <category name="ACTIVITY_TIME_DAY_PM" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY_PM" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY_PM" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -22714,13 +22104,6 @@
       </variable>
       <category name="ACTIVITY_TIME_DAY" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -22840,13 +22223,6 @@
       </variable>
       <category name="ACTIVITY_TIME_DAY" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -22966,13 +22342,6 @@
       </variable>
       <category name="ACTIVITY_TIME_DAY" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -23102,13 +22471,6 @@
       </variable>
       <category name="ACTIVITY_TIME_DAY" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -23225,13 +22587,6 @@
       </variable>
       <category name="ACTIVITY_TIME_DAY" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -23348,13 +22703,6 @@
       </variable>
       <category name="ACTIVITY_TIME_DAY" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -23484,13 +22832,6 @@
       </variable>
       <category name="ACTIVITY_TIME_DAY" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -23607,13 +22948,6 @@
       </variable>
       <category name="ACTIVITY_TIME_DAY" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -23730,13 +23064,6 @@
       </variable>
       <category name="ACTIVITY_TIME_DAY" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -23866,13 +23193,6 @@
       </variable>
       <category name="ACTIVITY_TIME_DAY" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -23989,13 +23309,6 @@
       </variable>
       <category name="ACTIVITY_TIME_DAY" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -24112,13 +23425,6 @@
       </variable>
       <category name="ACTIVITY_TIME_DAY" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -24191,13 +23497,6 @@
       </variable>
       <category name="ACTIVITY_TIME_DAY" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">
@@ -24257,13 +23556,6 @@
       </variable>
       <category name="ACTIVITY_TIME_DAY" dataType="BOOLEAN">
         <attributes/>
-        <variable name="ACTIVITY_TIME_DAY" dataType="INTEGER">
-          <attributes>
-            <attribute key="required">
-              <value class="string">true</value>
-            </attribute>
-          </attributes>
-        </variable>
         <variable name="ACTIVITY_HOURS_DAY" dataType="INTEGER">
           <attributes>
             <attribute key="label" locale="en">

@@ -36,6 +36,7 @@
     <owl:AnnotationProperty rdf:about="#category"/>
     <owl:AnnotationProperty rdf:about="#children"/>
     <owl:AnnotationProperty rdf:about="#child"/>
+    <owl:AnnotationProperty rdf:about="#minCount"/>
     <owl:AnnotationProperty rdf:about="#validation"/>
     <owl:AnnotationProperty rdf:about="#condition"/>
     <owl:AnnotationProperty rdf:about="#required"/>
@@ -46,8 +47,12 @@
     <owl:AnnotationProperty rdf:about="#path"/>
     <owl:AnnotationProperty rdf:about="#creationSource"/>
     <owl:AnnotationProperty rdf:about="#code"/>
-    <owl:AnnotationProperty rdf:about="#source"/>
+    <owl:AnnotationProperty rdf:about="#specifications"/>
+    <owl:AnnotationProperty rdf:about="#instructions"/>
     <owl:AnnotationProperty rdf:about="#exportDate"/>
+    <owl:AnnotationProperty rdf:about="#source"/>
+    <owl:AnnotationProperty rdf:about="#description"/>
+    <owl:AnnotationProperty rdf:about="#maxCount"/>
     <owl:AnnotationProperty rdf:about="#name"/>
     
 
@@ -351,14 +356,24 @@
             >Source of the data for automatically provisionned data item.</source>
         <creationDate xml:lang="en"
             >The data item creation date.</creationDate>
+        <description xml:lang="en"
+            >The data item description.</description>
         <exportDate xml:lang="en"
             >The data item export date.</exportDate>
+        <instructions xml:lang="en"
+            >The data item instructions.</instructions>
         <name xml:lang="en"
             >The data item name.</name>
         <path xml:lang="en"
             >The data item path.</path>
+        <specifications xml:lang="en"
+            >The data item specifications.</specifications>
         <className xml:lang="en"
             >The local part of the OWL Class QName.</className>
+        <maxCount xml:lang="en"
+            >The maximum count of data item.</maxCount>
+        <minCount xml:lang="en"
+            >The minimum count of data item.</minCount>
     </owl:Class>
     
 

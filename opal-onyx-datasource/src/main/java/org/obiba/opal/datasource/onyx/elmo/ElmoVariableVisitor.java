@@ -289,6 +289,12 @@ public class ElmoVariableVisitor implements VariableVisitor {
       manager.setLocale(attr.getLocale());
       if(attr.getKey().equals(VariableHelper.LABEL)) {
         opalOnyxVariable.setRdfsLabel(attr.getValue().toString());
+      } else if(attr.getKey().equals("description")) {
+        opalOnyxVariable.setDescription(attr.getValue().toString());
+      } else if(attr.getKey().equals("instructions")) {
+        opalOnyxVariable.setInstructions(attr.getValue().toString());
+      } else if(attr.getKey().equals("specifications")) {
+        opalOnyxVariable.setSpecifications(attr.getValue().toString());
       } else if(attr.getKey().equals(VariableHelper.CONDITION)) {
         opalOnyxVariable.setCondition(attr.getValue().toString());
       } else if(attr.getKey().equals(VariableHelper.OCCURRENCECOUNT)) {
@@ -299,8 +305,12 @@ public class ElmoVariableVisitor implements VariableVisitor {
         opalOnyxVariable.setValidation(attr.getValue().toString());
       } else if(attr.getKey().equals(VariableHelper.REQUIRED)) {
         opalOnyxVariable.setRequired(Boolean.parseBoolean(attr.getValue().toString()));
+      } else if(attr.getKey().equals(VariableHelper.MINCOUNT)) {
+        opalOnyxVariable.setMinCount(Integer.parseInt(attr.getValue().toString()));
+      } else if(attr.getKey().equals(VariableHelper.MAXCOUNT)) {
+        opalOnyxVariable.setMaxCount(Integer.parseInt(attr.getValue().toString()));
       } else {
-        log.info("{}@{}={}", new Object[] { attr.getKey(), attr.getLocale(), attr.getValue().toString() });
+        log.debug("No annotation for: {}@{}={}", new Object[] { attr.getKey(), attr.getLocale(), attr.getValue().toString() });
       }
 
       manager.setLocale(null);

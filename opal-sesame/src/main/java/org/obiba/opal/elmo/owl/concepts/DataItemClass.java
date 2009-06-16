@@ -75,6 +75,31 @@ public interface DataItemClass extends OpalClass {
 
   public void setRequired(Boolean b);
 
+  @rdf(Opal.NS + "instructions")
+  public String getInstructions();
+
+  public void setInstructions(String inst);
+
+  @rdf(Opal.NS + "specifications")
+  public String getSpecifications();
+
+  public void setSpecifications(String spec);
+
+  @rdf(Opal.NS + "description")
+  public String getDescription();
+
+  public void setDescription(String desc);
+
+  @rdf(Opal.NS + "minCount")
+  public Integer getMinCount();
+
+  public void setMinCount(Integer count);
+
+  @rdf(Opal.NS + "maxCount")
+  public Integer getMaxCount();
+
+  public void setMaxCount(Integer count);
+
   /**
    * The name of the Onyx variable.
    * @return
