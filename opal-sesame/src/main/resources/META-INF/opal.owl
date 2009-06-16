@@ -36,7 +36,7 @@
     <owl:AnnotationProperty rdf:about="#category"/>
     <owl:AnnotationProperty rdf:about="#children"/>
     <owl:AnnotationProperty rdf:about="#child"/>
-    <owl:AnnotationProperty rdf:about="#occurrence"/>
+    <owl:AnnotationProperty rdf:about="#occurrenceCount"/>
     <owl:AnnotationProperty rdf:about="#validation"/>
     <owl:AnnotationProperty rdf:about="#condition"/>
     <owl:AnnotationProperty rdf:about="#creationDate"/>
@@ -340,8 +340,8 @@
             >Data item parent.</parent>
         <validation xml:lang="en"
             >Data validation constrains.</validation>
-        <occurrence xml:lang="en"
-            >Repeatability of a occurrence item.</occurrence>
+        <occurrenceCount xml:lang="en"
+            >Repeatability of a occurrence item.</occurrenceCount>
         <creationSource xml:lang="en"
             >Source from which the data item was created.</creationSource>
         <source xml:lang="en"

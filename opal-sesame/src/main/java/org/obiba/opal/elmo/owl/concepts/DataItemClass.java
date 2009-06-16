@@ -47,10 +47,10 @@ public interface DataItemClass extends OpalClass {
    * The occurrence information.
    * @return
    */
-  @rdf(Opal.NS + "occurrence")
-  public String getOccurrence();
+  @rdf(Opal.NS + "occurrenceCount")
+  public String getOccurrenceCount();
 
-  public void setOccurrence(String occurrence);
+  public void setOccurrenceCount(String occurrence);
 
   /**
    * The source of information.

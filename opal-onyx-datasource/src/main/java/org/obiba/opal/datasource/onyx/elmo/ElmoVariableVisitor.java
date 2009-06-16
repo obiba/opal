@@ -291,8 +291,8 @@ public class ElmoVariableVisitor implements VariableVisitor {
         opalOnyxVariable.setRdfsLabel(attr.getValue().toString());
       } else if(attr.getKey().equals(VariableHelper.CONDITION)) {
         opalOnyxVariable.setCondition(attr.getValue().toString());
-      } else if(attr.getKey().equals(VariableHelper.OCCURRENCE)) {
-        opalOnyxVariable.setOccurrence(attr.getValue().toString());
+      } else if(attr.getKey().equals(VariableHelper.OCCURRENCECOUNT)) {
+        opalOnyxVariable.setOccurrenceCount(attr.getValue().toString());
       } else if(attr.getKey().equals(VariableHelper.SOURCE)) {
         opalOnyxVariable.setSource(attr.getValue().toString());
       } else if(attr.getKey().equals(VariableHelper.VALIDATION)) {
