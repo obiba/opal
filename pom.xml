@@ -23,6 +23,7 @@
     <module>opal-cli</module>
     <module>opal-onyx-datasource</module>
     <module>opal-sesame</module>
+    <module>opal-report</module>
   </modules>
 
   <dependencyManagement>

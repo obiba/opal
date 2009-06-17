@@ -24,6 +24,6 @@ public interface OnyxImportCommandOptions extends GlobalOptions, KeystoreOption,
 
   public boolean isFiles();
 
-  @Option(shortName = "c", defaultValue = "false")
-  public boolean getCatalogOnly();
+  @Option(shortName = "c")
+  public boolean isCatalogOnly();
 }

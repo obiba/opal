@@ -66,11 +66,11 @@ public class OnyxImportCommand extends AbstractCommand<OnyxImportCommandOptions>
         if(keyPassword == null) {
           keyPassword = keystorePassword;
         }
-        onyxImportService.importData(csvToList(tags), files.get(0), keystorePassword, keyPassword, options.getCatalogOnly());
+        onyxImportService.importData(csvToList(tags), files.get(0), keystorePassword, keyPassword, options.isCatalogOnly());
       } else if(options.isDate() || options.isSite()) {
-        onyxImportService.importData(stringToDate(date), site, csvToList(tags), options.getCatalogOnly());
+        onyxImportService.importData(stringToDate(date), site, csvToList(tags), options.isCatalogOnly());
       } else {
-        onyxImportService.importData(options.getCatalogOnly());
+        onyxImportService.importData(options.isCatalogOnly());
       }
     } catch(RuntimeException e) {
       System.err.println(e);
@@ -101,8 +101,7 @@ public class OnyxImportCommand extends AbstractCommand<OnyxImportCommandOptions>
    * Converts a <code>String</code> containing comma-separated values to a <code>List</code> of those values.
    * 
    * @param csv <code>String</code> of comma-separated values
-   * @return <code>List</code> of values (or <code>null</code> if <code>csv</code> is <code>null</code> or
-   * empty)
+   * @return <code>List</code> of values (or <code>null</code> if <code>csv</code> is <code>null</code> or empty)
    */
   private List<String> csvToList(String csv) {
     List<String> valueList = null;

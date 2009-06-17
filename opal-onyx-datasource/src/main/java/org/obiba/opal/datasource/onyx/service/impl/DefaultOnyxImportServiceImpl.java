@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
+import org.obiba.core.util.StringUtil;
 import org.obiba.onyx.engine.variable.Variable;
 import org.obiba.onyx.engine.variable.VariableData;
 import org.obiba.onyx.engine.variable.VariableDataSet;
@@ -116,6 +117,8 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
   }
 
   public void importData(List<String> tags, File source, final String keyStorePassword, final String keyPassword, boolean catalogOnly) {
+
+    log.debug("onyx-import file {} catalogOnly {} tags {}", new Object[] { source.getAbsolutePath(), catalogOnly, StringUtil.collectionToString(tags) });
 
     // Create the dataInputContext, based on the specified command-line options.
     OnyxDataInputContext dataInputContext = new OnyxDataInputContext();

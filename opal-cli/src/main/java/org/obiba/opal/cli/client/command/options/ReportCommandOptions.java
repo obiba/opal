@@ -25,8 +25,8 @@ public interface ReportCommandOptions {
   @Option(shortName = "o", longName = "output")
   public File getOutput();
 
-  @Option(shortName = "t", longName = "type")
-  public String getType();
+  @Option(shortName = "r", longName = "report")
+  public File getReport();
 
   @Unparsed(name = "report options")
   public List<String> getOptions();

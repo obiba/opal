@@ -173,6 +173,7 @@ public class QueryCommand extends AbstractContextLoadingCommand<QueryCommandOpti
       queryString = p.appendQuery(queryString);
       System.console().printf("Parsing [%s]\n", queryString);
       TupleQuery query = connection.prepareTupleQuery(language, queryString);
+      System.console().printf(query.toString());
       SPARQLResultsXMLWriter writer = null;
       if(output != null) {
         writer = new SPARQLResultsXMLWriter(os = new FileOutputStream(output));
