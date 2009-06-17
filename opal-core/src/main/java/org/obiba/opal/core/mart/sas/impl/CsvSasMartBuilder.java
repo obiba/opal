@@ -91,6 +91,8 @@ public class CsvSasMartBuilder implements ISasMartBuilder {
     for(int i = 0; i < values.length; i++) {
       if(values[i] == null) {
         data[i + 1] = SAS_NULL_VALUE;
+      } else if(values[i] instanceof Boolean) {
+        data[i + 1] = ((Boolean) values[i]) ? "1" : "0";
       } else {
         data[i + 1] = values[i].toString();
       }
