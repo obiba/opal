@@ -16,6 +16,7 @@ org.obiba.opal.elmo.concepts.unit
 
 org.obiba.opal.elmo.owl.concepts.CategoryClass
 org.obiba.opal.elmo.owl.concepts.CategoricalVariableClass
+org.obiba.opal.elmo.owl.concepts.ContinuousVariableClass
 org.obiba.opal.elmo.owl.concepts.DataItemClass
 org.obiba.opal.elmo.owl.concepts.DataEntryFormClass
 org.obiba.opal.elmo.owl.concepts.OpalClass

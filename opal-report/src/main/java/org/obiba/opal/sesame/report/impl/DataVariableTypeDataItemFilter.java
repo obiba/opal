@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.sesame.report.impl;
 
-import java.util.Arrays;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
@@ -18,7 +17,7 @@ import org.obiba.opal.elmo.concepts.Opal;
 import org.obiba.opal.elmo.owl.concepts.DataItemClass;
 import org.obiba.opal.sesame.report.IDataItemFilter;
 import org.obiba.opal.sesame.report.ReportQueryBuilder;
-import org.openrdf.concepts.rdfs.Class;
+import org.openrdf.elmo.Entity;
 import org.openrdf.elmo.sesame.SesameManager;
 import org.openrdf.model.URI;
 
@@ -34,14 +33,11 @@ public class DataVariableTypeDataItemFilter implements IDataItemFilter {
   private QName superClassQName;
 
   public boolean accept(DataItemClass dataItem) {
-    System.out.println("dataItem " + dataItem.getQName() + ": " + Arrays.toString(dataItem.getClass().getInterfaces()));
-    Class dataItemClass = org.openrdf.concepts.rdfs.Class.class.cast(dataItem);
-    Set<?> superClasses = dataItemClass.getRdfsSubClassOf();
+    Set<?> superClasses = dataItem.getRdfsSubClassOf();
     for(Object superClass : superClasses) {
-      System.out.println("superClass " + superClass.toString() + ": " + Arrays.toString(superClass.getClass().getInterfaces()));
-    }
-    for (Class superClass : dataItemClass.getRdfsSubClassOf()) {
-      if (superClass.getQName().equals(getQName())) {
+      Entity elmoEntity = (Entity) superClass;
+      System.out.println("Entity QName: " + elmoEntity.getQName());
+      if(elmoEntity.getQName() != null && elmoEntity.getQName().equals(getQName())) {
         // QName matches, accept only if filterOut is false;
         return filterOut == false;
       }
@@ -51,7 +47,7 @@ public class DataVariableTypeDataItemFilter implements IDataItemFilter {
   }
 
   protected QName getQName() {
-    if (superClassQName == null) {
+    if(superClassQName == null) {
       superClassQName = new QName(Opal.NS, type);
     }
     return superClassQName;
@@ -59,7 +55,7 @@ public class DataVariableTypeDataItemFilter implements IDataItemFilter {
 
   public void contribute(ReportQueryBuilder builder, SesameManager manager) {
     URI superClassUri = manager.getConnection().getValueFactory().createURI(getQName().getNamespaceURI(), getQName().getLocalPart());
-    if (filterOut == false) {
+    if(filterOut == false) {
       builder.joinVariablePredicateValue("rdfs:subClassOf", superClassUri);
     } else {
       // Left join and add filter on variable not bound

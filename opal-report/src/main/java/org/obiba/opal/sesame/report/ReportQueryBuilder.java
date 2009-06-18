@@ -47,7 +47,7 @@ public class ReportQueryBuilder {
   public TupleQuery build(SesameManager manager) throws MalformedQueryException, RepositoryException {
 
     StringBuilder queryString = new StringBuilder();
-    queryString.append("SELECT ?sid ?var ?value {_:entity opal:identifier ?sid . _:entity rdf:type opal:Participant . _:ds opal:isForEntity _:entity . ?varData opal:withinDataset _:ds . ?varData rdf:type ?var");
+    queryString.append("SELECT ?sid ?occ ?var ?value {_:entity opal:identifier ?sid . _:entity rdf:type opal:Participant . _:ds opal:isForEntity _:entity . ?varData opal:withinDataset _:ds . ?varData rdf:type ?var ");
 
     for(CharSequence seq : joinPatterns) {
       queryString.append(" . ").append(seq);
@@ -61,7 +61,7 @@ public class ReportQueryBuilder {
       queryString.append(" . FILTER (").append(seq).append(")");
     }
 
-    queryString.append(" . OPTIONAL { {?varData opal:dataValue ?value} UNION {?varData opal:hasCategory ?c . ?c rdf:type [ opal:code ?value ]} UNION {?varData rdf:type [ opal:code ?value ] }} } ORDER BY ?sid");
+    queryString.append(" . OPTIONAL { {?varData opal:dataValue ?value} UNION {?varData opal:hasCategory ?c . ?c rdf:type [ opal:code ?value ]} UNION {?varData rdf:type [ opal:code ?value ]}} } ORDER BY ?sid ?occ");
 
     QueryUtil.prefixQuery(manager.getConnection(), queryString);
 
@@ -82,7 +82,12 @@ public class ReportQueryBuilder {
   public String nextBinding() {
     return "tmp" + this.nextBindingId++;
   }
-
+  
+  public ReportQueryBuilder withOccurrence() {
+    join("?varData opal:withinOccurrence [ opal:ordinal ?occ ]");
+    return this;
+  }
+  
   public ReportQueryBuilder joinVariablePredicateValue(String predicate, Value value) {
     if(predicate == null) {
       throw new IllegalArgumentException("pattern cannot be null");
@@ -98,11 +103,17 @@ public class ReportQueryBuilder {
     if(predicate == null) {
       throw new IllegalArgumentException("pattern cannot be null");
     }
-    String bindingVar = nextBinding();
-    StringBuilder sb = new StringBuilder(getVariableBindingName()).append(" ").append(predicate).append(" ?").append(bindingVar);
+    // Create a temp variable for testing if it is bound
+    String tempVar = nextBinding();
+    // Create a variable for replacing with the predicate value
+    String valueVar = nextBinding();
+    
+    // ?varData rdf:type ?tmpVar . ?tmpVar <predicate> ?valueVar
+    StringBuilder sb = new StringBuilder("?varData rdf:type ?").append(tempVar).append(" . ?").append(tempVar).append(" ").append(predicate).append(" ?").append(valueVar);
     leftJoin(sb);
-    withBinding(bindingVar, value);
-    withFilter("!bound(?" + bindingVar + ")");
+    withBinding(valueVar, value);
+    // Add a filter that will remove "rows" where ?tmpVar is non-null
+    withFilter("!bound(?" + tempVar + ")");
     return this;
   }
 

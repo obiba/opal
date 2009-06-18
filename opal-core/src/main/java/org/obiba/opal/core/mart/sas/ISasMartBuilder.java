@@ -16,6 +16,8 @@ import org.obiba.opal.core.mart.IMartBuilder;
  */
 public interface ISasMartBuilder extends IMartBuilder {
 
+  public void enableOccurrences();
+
   /**
    * Declares the variable names.
    * @param headers
@@ -28,5 +30,12 @@ public interface ISasMartBuilder extends IMartBuilder {
    * @param values
    */
   public void withData(String participantId, Object... values);
+
+  /**
+   * Set the values in the same order, including null values, than the variable names.
+   * @param participantId
+   * @param values
+   */
+  public void withData(String participantId, int occurrence, Object... values);
 
 }

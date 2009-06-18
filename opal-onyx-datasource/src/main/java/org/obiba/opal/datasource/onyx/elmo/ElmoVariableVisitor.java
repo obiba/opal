@@ -1,7 +1,6 @@
 package org.obiba.opal.datasource.onyx.elmo;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,17 +24,14 @@ import org.obiba.opal.elmo.concepts.DataVariable;
 import org.obiba.opal.elmo.concepts.MissingCategory;
 import org.obiba.opal.elmo.concepts.OccurrenceItem;
 import org.obiba.opal.elmo.concepts.Opal;
-import org.obiba.opal.elmo.concepts.dataValue;
-import org.obiba.opal.elmo.concepts.hasCategory;
 import org.obiba.opal.elmo.owl.concepts.CategoricalVariableClass;
 import org.obiba.opal.elmo.owl.concepts.CategoryClass;
+import org.obiba.opal.elmo.owl.concepts.ContinuousVariableClass;
 import org.obiba.opal.elmo.owl.concepts.DataEntryFormClass;
 import org.obiba.opal.elmo.owl.concepts.DataItemClass;
 import org.openrdf.OpenRDFException;
 import org.openrdf.concepts.owl.Class;
-import org.openrdf.concepts.owl.DatatypeProperty;
 import org.openrdf.concepts.owl.Ontology;
-import org.openrdf.concepts.owl.Restriction;
 import org.openrdf.elmo.sesame.SesameManager;
 import org.openrdf.elmo.sesame.SesameManagerFactory;
 import org.slf4j.Logger;
@@ -201,24 +197,6 @@ public class ElmoVariableVisitor implements VariableVisitor {
       opalOnyxVariable.getRdfsSubClassOf().add(opalVariable);
       opalOnyxVariable.setMultiple(onyxVariable.isMultiple());
 
-      Restriction r = manager.create(Restriction.class);
-      org.openrdf.concepts.owl.ObjectProperty hasCategory = opal.getOpalProperty(hasCategory.class);
-      r.setOwlOnProperty(hasCategory);
-      if(onyxVariable.isMultiple()) {
-        r.setOwlMinCardinality(BigInteger.ONE);
-      } else {
-        r.setOwlCardinality(BigInteger.ONE);
-      }
-      opalOnyxVariable.getRdfsSubClassOf().add(r);
-
-      r = manager.create(Restriction.class);
-      Class union = manager.create(Class.class);
-      org.openrdf.concepts.rdf.List<? extends Class> l = manager.create(org.openrdf.concepts.rdf.List.class);
-      union.setOwlUnionOf(l);
-      r.setOwlOnProperty(hasCategory);
-      r.setOwlAllValuesFrom(union);
-      opalOnyxVariable.getRdfsSubClassOf().add(r);
-
       return opalOnyxVariable;
     }
 
@@ -233,14 +211,9 @@ public class ElmoVariableVisitor implements VariableVisitor {
 
       Class opalVariable = opal.getOpalClass(ContinuousVariable.class);
 
-      DataItemClass opalOnyxVariable = manager.create(qname, DataItemClass.class);
+      ContinuousVariableClass opalOnyxVariable = manager.create(qname, ContinuousVariableClass.class);
       opalOnyxVariable.getRdfsSubClassOf().add(opalVariable);
-
-      Restriction r = manager.create(Restriction.class);
-      DatatypeProperty dataValue = opal.getOpalProperty(dataValue.class);
-      r.setOwlOnProperty(dataValue);
-      r.setOwlCardinality(BigInteger.ONE);
-      opalOnyxVariable.getRdfsSubClassOf().add(r);
+      opalOnyxVariable.setUnit(onyxVariable.getUnit());
 
       return opalOnyxVariable;
     }

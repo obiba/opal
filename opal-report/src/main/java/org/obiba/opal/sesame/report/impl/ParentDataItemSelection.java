@@ -27,13 +27,17 @@ import org.openrdf.model.URI;
 public class ParentDataItemSelection implements IDataItemSelection {
 
   private String name;
+
   private QName qname;
 
   private boolean recursive = false;
 
   public Set<DataItemClass> getSelection(SesameManager manager) {
     DataItemClass dataItem = manager.find(DataItemClass.class, getQName());
-    if (recursive == false) {
+    if(dataItem == null) {
+      throw new IllegalArgumentException("No such variable " + getQName());
+    }
+    if(recursive == false) {
       return Collections.unmodifiableSet(dataItem.getChildren());
     } else {
       Set<DataItemClass> dataItems = new LinkedHashSet<DataItemClass>();
@@ -48,17 +52,17 @@ public class ParentDataItemSelection implements IDataItemSelection {
     }
     return qname;
   }
-  
+
   public void contribute(ReportQueryBuilder builder, SesameManager manager) {
     URI parentUri = manager.getConnection().getValueFactory().createURI(getQName().getNamespaceURI(), getQName().getLocalPart());
-    builder.join(builder.getVariableBindingName() + " opal:parent ?parent").withBinding("parent", parentUri);
+    builder.joinVariablePredicateValue("opal:parent", parentUri);
 
     // FIXME: handle recursive flag.
   }
 
   private void addChildren(DataItemClass parent, Set<DataItemClass> dataItems) {
     dataItems.addAll(parent.getChildren());
-    for (DataItemClass child : parent.getChildren()) {
+    for(DataItemClass child : parent.getChildren()) {
       addChildren(child, dataItems);
     }
   }

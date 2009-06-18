@@ -10,9 +10,4 @@ public interface ContinuousVariable extends DataVariable {
 
   public void setValue(Object value);
 
-  @rdf(Opal.NS + "unit")
-  public String getUnit();
-
-  public void setUnit(String unit);
-
 }

@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 import org.obiba.opal.core.mart.sas.ISasMartBuilder;
@@ -29,6 +31,8 @@ public class CsvSasMartBuilder implements ISasMartBuilder {
 
   private static final String PARTICIPANT_HEADER = "Participant";
 
+  private static final String OCCURRENCE_HEADER = "Occurrence";
+
   private CSVWriter csvWriter;
 
   private File csvDirectory;
@@ -39,7 +43,9 @@ public class CsvSasMartBuilder implements ISasMartBuilder {
 
   private char separator = CSVWriter.DEFAULT_SEPARATOR;
 
-  private int variablesCount;
+  private boolean withOccurrence = false;
+
+  private String[] data;
 
   /**
    * Set the directory where to output the files, required.
@@ -74,31 +80,48 @@ public class CsvSasMartBuilder implements ISasMartBuilder {
     this.separator = separator;
   }
 
-  public void setVariableNames(String... names) {
-    variablesCount = names.length;
-    String[] headers = new String[variablesCount + 1];
-    headers[0] = PARTICIPANT_HEADER;
-    for(int i = 0; i < names.length; i++) {
-      headers[i + 1] = names[i];
-    }
-    csvWriter.writeNext(headers);
+  public void enableOccurrences() {
+    withOccurrence = true;
   }
 
-  public void withData(String participantId, Object... values) {
-    String[] data = new String[variablesCount + 1];
-    data[0] = participantId;
+  public void setVariableNames(String... names) {
+    ArrayList<String> headers = new ArrayList<String>();
+    headers.add(PARTICIPANT_HEADER);
+    if(withOccurrence) {
+      headers.add(OCCURRENCE_HEADER);
+    }
+    for(int i = 0; i < names.length; i++) {
+      headers.add(names[i]);
+    }
+    csvWriter.writeNext(headers.toArray(new String[headers.size()]));
 
+    data = new String[headers.size()];
+    Arrays.fill(data, SAS_NULL_VALUE);
+  }
+
+  public void withData(String participantId, int occurrence, Object... values) {
+    data[0] = participantId;
+    int offset = 1;
+    if(withOccurrence) {
+      data[1] = Integer.toString(occurrence);
+      offset = 2;
+    }
     for(int i = 0; i < values.length; i++) {
       if(values[i] == null) {
-        data[i + 1] = SAS_NULL_VALUE;
+        data[i + offset] = SAS_NULL_VALUE;
       } else if(values[i] instanceof Boolean) {
-        data[i + 1] = ((Boolean) values[i]) ? "1" : "0";
+        data[i + offset] = ((Boolean) values[i]) ? "1" : "0";
       } else {
-        data[i + 1] = values[i].toString();
+        data[i + offset] = values[i].toString();
       }
     }
 
     csvWriter.writeNext(data);
+    Arrays.fill(data, SAS_NULL_VALUE);
+  }
+
+  public void withData(String participantId, Object... values) {
+    withData(participantId, 0, values);
   }
 
   /**
