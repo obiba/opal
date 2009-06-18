@@ -16,12 +16,12 @@ import org.openrdf.elmo.annotations.inverseOf;
 import org.openrdf.elmo.annotations.rdf;
 
 /**
- *
+ * 
  */
 public interface DataEntryFormClass extends OpalClass {
 
-  @rdf(Opal.NS + "containsDataVariable")
-  @inverseOf(Opal.NS + "withinDataEntryForm")
+  @rdf(Opal.NS + "dataVariable")
+  @inverseOf(Opal.NS + "dataEntryForm")
   public Set<DataItemClass> getDataVariables();
 
   public void setDataVariables(Set<DataItemClass> variables);

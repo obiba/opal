@@ -23,8 +23,10 @@ import org.obiba.opal.elmo.concepts.Dataset;
 import org.obiba.opal.elmo.concepts.Entity;
 import org.obiba.opal.elmo.concepts.MissingCategory;
 import org.obiba.opal.elmo.concepts.OccurrenceItem;
+import org.obiba.opal.elmo.owl.concepts.DataItemClass;
 import org.openrdf.OpenRDFException;
 import org.openrdf.concepts.owl.Class;
+import org.openrdf.concepts.rdfs.Resource;
 import org.openrdf.elmo.ElmoQuery;
 import org.openrdf.elmo.sesame.SesameManager;
 import org.openrdf.elmo.sesame.SesameManagerFactory;
@@ -90,7 +92,7 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
 
   public void visit(VariableData data) {
     QName qname = qnameStrategy.getQName(data.getVariablePath());
-    Class opalOnyxVariable = manager.find(Class.class, qname);
+    DataItemClass opalOnyxVariable = manager.find(DataItemClass.class, qname);
     if(opalOnyxVariable == null) {
       throw new IllegalArgumentException("No variable for path " + data.getVariablePath() + " (QName " + qname + ")");
     }
@@ -151,11 +153,7 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
     return null;
   }
 
-  protected <T> T findSingleton(Class variable, java.lang.Class<T> type) {
-    return findSingleton(variable.getQName(), type);
-  }
-
-  protected <T extends Class> T getSingleton(Class variable, java.lang.Class<T> type) {
+  protected <T extends Resource> T getSingleton(Class variable, java.lang.Class<T> type) {
     T c = findSingleton(variable.getQName(), type);
     if(c == null) {
       c = manager.create(type);
@@ -165,20 +163,20 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
   }
 
   public interface Handler {
-    public boolean handles(Class opalOnyxVariable, VariableData data);
+    public boolean handles(DataItemClass opalOnyxVariable, VariableData data);
 
-    public void handle(Class opalOnyxVariable, VariableData data);
+    public void handle(DataItemClass opalOnyxVariable, VariableData data);
   }
 
   public class CategoryHandler implements Handler {
 
-    public void handle(Class opalOnyxVariable, VariableData data) {
+    public void handle(DataItemClass opalOnyxVariable, VariableData data) {
       Category c = getSingleton(opalOnyxVariable, Category.class);
       c.getWithinDataset().add(currentDataset);
       handleOccurrence(data, c);
     }
 
-    public boolean handles(Class opalOnyxVariable, VariableData data) {
+    public boolean handles(DataItemClass opalOnyxVariable, VariableData data) {
       Set<?> subClassOf = opalOnyxVariable.getRdfsSubClassOf();
       return subClassOf.contains(opal.getOpalClass(Category.class)) || subClassOf.contains(opal.getOpalClass(MissingCategory.class));
     }
@@ -187,7 +185,7 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
 
   public class CategoricalHandler implements Handler {
 
-    public void handle(Class opalOnyxVariable, VariableData data) {
+    public void handle(DataItemClass opalOnyxVariable, VariableData data) {
       CategoricalVariable c = manager.create(CategoricalVariable.class);
       c.setRdfTypes(Collections.singleton(opalOnyxVariable));
       c.getWithinDataset().add(currentDataset);
@@ -209,7 +207,7 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
       handleOccurrence(data, c);
     }
 
-    public boolean handles(Class opalOnyxVariable, VariableData data) {
+    public boolean handles(DataItemClass opalOnyxVariable, VariableData data) {
       return opalOnyxVariable.getRdfsSubClassOf().contains(opal.getOpalClass(CategoricalVariable.class));
     }
 
@@ -217,10 +215,14 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
 
   public class ContinuousHandler implements Handler {
 
-    public void handle(Class opalOnyxVariable, VariableData data) {
+    public void handle(DataItemClass opalOnyxVariable, VariableData data) {
       ContinuousVariable c = manager.create(ContinuousVariable.class);
       c.setRdfTypes(Collections.singleton(opalOnyxVariable));
       c.getWithinDataset().add(currentDataset);
+      List<Data> values = data.getDatas();
+      if(values.size() > 1) {
+        throw new IllegalArgumentException("ContinuousVariable " + opalOnyxVariable.getClassName() + " cannot have multiple values.");
+      }
       for(Data d : data.getDatas()) {
         c.setValue(DataTypeUtil.getValue(d));
         break;
@@ -228,7 +230,7 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
       handleOccurrence(data, c);
     }
 
-    public boolean handles(Class opalOnyxVariable, VariableData data) {
+    public boolean handles(DataItemClass opalOnyxVariable, VariableData data) {
       return opalOnyxVariable.getRdfsSubClassOf().contains(opal.getOpalClass(ContinuousVariable.class));
     }
 
@@ -236,7 +238,7 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
 
   public class OccurrenceHandler implements Handler {
 
-    public void handle(Class opalOnyxVariable, VariableData data) {
+    public void handle(DataItemClass opalOnyxVariable, VariableData data) {
       int i = 1;
       for(Data d : data.getDatas()) {
         OccurrenceItem c = manager.create(OccurrenceItem.class);
@@ -247,7 +249,7 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
       }
     }
 
-    public boolean handles(Class opalOnyxVariable, VariableData data) {
+    public boolean handles(DataItemClass opalOnyxVariable, VariableData data) {
       return opalOnyxVariable.getRdfsSubClassOf().contains(opal.getOpalClass(OccurrenceItem.class));
     }
 

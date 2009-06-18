@@ -33,28 +33,28 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    <owl:AnnotationProperty rdf:about="#category"/>
-    <owl:AnnotationProperty rdf:about="#children"/>
     <owl:AnnotationProperty rdf:about="#child"/>
-    <owl:AnnotationProperty rdf:about="#minCount"/>
-    <owl:AnnotationProperty rdf:about="#validation"/>
     <owl:AnnotationProperty rdf:about="#condition"/>
-    <owl:AnnotationProperty rdf:about="#required"/>
-    <owl:AnnotationProperty rdf:about="#creationDate"/>
     <owl:AnnotationProperty rdf:about="#className"/>
     <owl:AnnotationProperty rdf:about="#parent"/>
     <owl:AnnotationProperty rdf:about="#occurrenceCount"/>
-    <owl:AnnotationProperty rdf:about="#path"/>
     <owl:AnnotationProperty rdf:about="#creationSource"/>
-    <owl:AnnotationProperty rdf:about="#code"/>
     <owl:AnnotationProperty rdf:about="#specifications"/>
-    <owl:AnnotationProperty rdf:about="#instructions"/>
     <owl:AnnotationProperty rdf:about="#exportDate"/>
+    <owl:AnnotationProperty rdf:about="#dataVariable"/>
+    <owl:AnnotationProperty rdf:about="#category"/>
+    <owl:AnnotationProperty rdf:about="#minCount"/>
+    <owl:AnnotationProperty rdf:about="#validation"/>
+    <owl:AnnotationProperty rdf:about="#dataEntryForm"/>
+    <owl:AnnotationProperty rdf:about="#required"/>
+    <owl:AnnotationProperty rdf:about="#creationDate"/>
+    <owl:AnnotationProperty rdf:about="#path"/>
+    <owl:AnnotationProperty rdf:about="#code"/>
+    <owl:AnnotationProperty rdf:about="#instructions"/>
     <owl:AnnotationProperty rdf:about="#source"/>
     <owl:AnnotationProperty rdf:about="#description"/>
     <owl:AnnotationProperty rdf:about="#maxCount"/>
     <owl:AnnotationProperty rdf:about="#name"/>
-    
 
 
     <!-- 
@@ -174,20 +174,6 @@
     
 
 
-    <!-- http://www.obiba.org/owl/2009/05/opal#annotation -->
-
-    <owl:DatatypeProperty rdf:about="#annotation"/>
-    
-
-
-    <!-- http://www.obiba.org/owl/2009/05/opal#containsDataVariable -->
-
-    <owl:DatatypeProperty rdf:about="#containsDataVariable">
-        <rdfs:subPropertyOf rdf:resource="#annotation"/>
-    </owl:DatatypeProperty>
-    
-
-
     <!-- http://www.obiba.org/owl/2009/05/opal#dataValue -->
 
     <owl:DatatypeProperty rdf:about="#dataValue">
@@ -228,14 +214,6 @@
 
     <owl:DatatypeProperty rdf:about="#unit">
         <rdfs:range rdf:resource="&xsd;string"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://www.obiba.org/owl/2009/05/opal#withinDataEntryForm -->
-
-    <owl:DatatypeProperty rdf:about="#withinDataEntryForm">
-        <rdfs:subPropertyOf rdf:resource="#annotation"/>
     </owl:DatatypeProperty>
     
 
@@ -306,17 +284,18 @@
             <owl:Class>
                 <owl:intersectionOf rdf:parseType="Collection">
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="#hasDataVariable"/>
+                        <owl:onProperty rdf:resource="#hasDataItem"/>
                         <owl:someValuesFrom rdf:resource="#DataVariable"/>
                     </owl:Restriction>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="#hasDataVariable"/>
+                        <owl:onProperty rdf:resource="#hasDataItem"/>
                         <owl:allValuesFrom rdf:resource="#DataVariable"/>
                     </owl:Restriction>
                 </owl:intersectionOf>
             </owl:Class>
         </rdfs:subClassOf>
         <owl:disjointWith rdf:resource="#DataVariable"/>
+        <dataVariable rdf:datatype="&xsd;string">A DataVariable contained in this Data Entry Form</dataVariable>
     </owl:Class>
     
 
@@ -393,6 +372,7 @@
                 </owl:intersectionOf>
             </owl:Class>
         </rdfs:subClassOf>
+        <dataEntryForm rdf:datatype="&xsd;string">The Data Entry Form containing this DataVariable.</dataEntryForm>
     </owl:Class>
     
 
@@ -416,14 +396,14 @@
     <owl:Class rdf:about="#Entity">
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasDataset"/>
-                <owl:someValuesFrom rdf:resource="#Dataset"/>
+                <owl:onProperty rdf:resource="#identifier"/>
+                <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#identifier"/>
-                <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+                <owl:onProperty rdf:resource="#hasDataset"/>
+                <owl:someValuesFrom rdf:resource="#Dataset"/>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>

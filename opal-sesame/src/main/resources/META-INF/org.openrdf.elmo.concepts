@@ -4,15 +4,12 @@ org.obiba.opal.elmo.concepts.ContinuousVariable
 org.obiba.opal.elmo.concepts.DataEntryForm
 org.obiba.opal.elmo.concepts.DataItem
 org.obiba.opal.elmo.concepts.Dataset
-org.obiba.opal.elmo.concepts.dataValue
 org.obiba.opal.elmo.concepts.DataVariable
 org.obiba.opal.elmo.concepts.Entity
-org.obiba.opal.elmo.concepts.hasCategory
 org.obiba.opal.elmo.concepts.MissingCategory
 org.obiba.opal.elmo.concepts.OccurrenceItem
 org.obiba.opal.elmo.concepts.Opal
 org.obiba.opal.elmo.concepts.Participant
-org.obiba.opal.elmo.concepts.unit
 
 org.obiba.opal.elmo.owl.concepts.CategoryClass
 org.obiba.opal.elmo.owl.concepts.CategoricalVariableClass
