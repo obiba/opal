@@ -36,7 +36,6 @@ public class DataVariableTypeDataItemFilter implements IDataItemFilter {
     Set<?> superClasses = dataItem.getRdfsSubClassOf();
     for(Object superClass : superClasses) {
       Entity elmoEntity = (Entity) superClass;
-      System.out.println("Entity QName: " + elmoEntity.getQName());
       if(elmoEntity.getQName() != null && elmoEntity.getQName().equals(getQName())) {
         // QName matches, accept only if filterOut is false;
         return filterOut == false;

@@ -44,6 +44,6 @@ public class DataEntryFormSelection implements IDataItemSelection {
 
   public void contribute(ReportQueryBuilder builder, SesameManager manager) {
     URI defUri = manager.getConnection().getValueFactory().createURI(getQName().getNamespaceURI(), getQName().getLocalPart());
-    builder.joinVariablePredicateValue("opal:withinDataEntryForm", defUri);
+    builder.joinVariablePredicateValue("opal:dataEntryForm", defUri);
   }
 }
