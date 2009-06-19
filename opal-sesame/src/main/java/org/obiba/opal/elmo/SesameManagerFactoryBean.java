@@ -14,13 +14,16 @@ import org.openrdf.elmo.sesame.SesameManagerFactory;
 import org.openrdf.repository.Repository;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InitializingBean;
 
 /**
  * 
  */
-public class SesameManagerFactoryBean implements FactoryBean, DisposableBean {
+public class SesameManagerFactoryBean implements FactoryBean, InitializingBean, DisposableBean {
 
   private Repository repository;
+
+  private boolean handleRepositoryLifecycle = false;
 
   private boolean inferencingEnabled = false;
 
@@ -32,6 +35,14 @@ public class SesameManagerFactoryBean implements FactoryBean, DisposableBean {
 
   public void setRepository(Repository repository) {
     this.repository = repository;
+  }
+
+  public void setHandleRepositoryLifecycle(boolean handleRepositoryLifecycle) {
+    this.handleRepositoryLifecycle = handleRepositoryLifecycle;
+  }
+
+  public boolean isHandleRepositoryLifecycle() {
+    return handleRepositoryLifecycle;
   }
 
   public Object getObject() throws Exception {
@@ -49,9 +60,19 @@ public class SesameManagerFactoryBean implements FactoryBean, DisposableBean {
     return true;
   }
 
+  public void afterPropertiesSet() throws Exception {
+    if(isHandleRepositoryLifecycle()) {
+      repository.initialize();
+    }
+  }
+
   public void destroy() throws Exception {
     if(factory != null) {
       factory.close();
+    }
+
+    if(isHandleRepositoryLifecycle()) {
+      repository.shutDown();
     }
   }
 

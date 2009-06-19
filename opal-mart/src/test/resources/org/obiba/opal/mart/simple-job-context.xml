@@ -1,0 +1,95 @@
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="
+           http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/batch 
+           http://www.springframework.org/schema/batch/spring-batch-2.0.xsd">
+
+  <beans:bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+
+  <beans:bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+    <beans:property name="transactionManager" ref="transactionManager" />
+  </beans:bean>
+
+  <beans:bean class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+    <beans:property name="jobRepository" ref="jobRepository" />
+  </beans:bean>
+
+  <job id="ioSampleJob" restartable="false">
+    <step id="step1">
+      <tasklet>
+        <chunk reader="aggregatingReader" writer="itemWriter" commit-interval="1" />
+      </tasklet>
+    </step>
+  </job>
+
+  <beans:bean id="aggregatingReader" class="org.obiba.opal.mart.reader.AggregatingQueryResultReader">
+    <beans:property name="itemReader" ref="itemReader" />
+    <beans:property name="aggregator">
+      <!-- <beans:bean class="org.obiba.opal.mart.aggregate.EntityIdAggregatingQueryResultItemProcessor" /> -->
+      <!--
+        <beans:bean class="org.obiba.opal.mart.aggregate.VariableValueFrequencyQueryResultAggregator"> <beans:property name="aggregatedVariableName"
+        value="CURRENT_OCCUPATION"/> </beans:bean>
+      -->
+      <beans:bean class="org.obiba.opal.mart.aggregate.CrossVariableValueFrequencyQueryResultAggregator">
+        <beans:property name="crossedVariables">
+          <beans:set>
+            <beans:value>SEX</beans:value>
+          </beans:set>
+        </beans:property>
+      </beans:bean>
+    </beans:property>
+  </beans:bean>
+
+  <beans:bean id="itemReader" class="org.obiba.opal.mart.reader.SesameRepositoryReader">
+    <beans:property name="manager">
+      <beans:bean class="org.obiba.opal.elmo.SesameManagerFactoryBean">
+        <beans:property name="handleRepositoryLifecycle" value="true" />
+        <beans:property name="repository">
+          <beans:bean class="org.obiba.opal.sesame.repository.impl.NativeRepositoryFactory">
+            <beans:property name="dataDir" value="/media/truecrypt1/2009.06/small-opal-data" />
+            <beans:property name="tripleIndexes" value="spoc,posc,cosp" />
+            <beans:property name="withInferencer" value="false" />
+          </beans:bean>
+        </beans:property>
+      </beans:bean>
+    </beans:property>
+    <beans:property name="query">
+      <beans:value>
+<![CDATA[PREFIX opal:<http://www.obiba.org/owl/2009/05/opal#> 
+PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?sid ?var ?value 
+{
+_:entity a <http://www.obiba.org/owl/2009/05/onyx/ohs/Admin#ApplicationConfiguration.siteCode> .
+_:entity opal:dataValue ?sid . 
+_:entity opal:withinDataset _:ds . 
+?varData opal:withinDataset _:ds . 
+?varData rdf:type ?var . 
+?var rdfs:subClassOf opal:CategoricalVariable .
+OPTIONAL { {?varData opal:dataValue ?value} UNION {?varData opal:hasCategory [ rdf:type [ opal:code ?value ] ] } UNION {?varData rdf:type [ opal:code ?value ]}}
+} ORDER BY ?sid]]>
+      </beans:value>
+      <!--
+        <beans:value> <![CDATA[PREFIX opal:<http://www.obiba.org/owl/2009/05/opal#> PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX
+        rdfs:<http://www.w3.org/2000/01/rdf-schema#> SELECT ?sid ?occ ?var ?value { _:entity opal:identifier ?sid . _:entity rdf:type opal:Participant . _:ds
+        opal:isForEntity _:entity . ?varData opal:withinDataset _:ds . ?varData rdf:type ?var . ?varData opal:hasCategory [ rdf:type [ opal:className ?value ] ]
+        . ?var opal:dataEntryForm <http://www.obiba.org/owl/2009/05/onyx/ohs/HealthQuestionnaireTouchScreen#HealthQuestionnaireTouchScreen> } ORDER BY ?sid]]>
+        </beans:value>
+      -->
+      <!--
+        <beans:value> <![CDATA[PREFIX opal:<http://www.obiba.org/owl/2009/05/opal#> PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX
+        rdfs:<http://www.w3.org/2000/01/rdf-schema#> SELECT ?sid ?occ ?var ?value { _:entity opal:identifier ?sid . _:entity rdf:type opal:Participant . _:ds
+        opal:isForEntity _:entity . ?varData opal:withinDataset _:ds . ?varData rdf:type ?var . ?varData opal:dataValue ?value } ORDER BY ?sid]]> </beans:value>
+      -->
+    </beans:property>
+  </beans:bean>
+
+  <beans:bean id="itemWriter" class="org.obiba.opal.mart.writer.support.LoggingItemWriter" />
+  <beans:bean id="fileItemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+    <beans:property name="resource" value="file:target/result.csv" />
+    <beans:property name="lineAggregator">
+      <beans:bean class="org.obiba.opal.mart.writer.support.AggregateQueryResultLineAggregator" />
+    </beans:property>
+  </beans:bean>
+</beans:beans>
