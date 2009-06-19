@@ -3,6 +3,7 @@ package org.obiba.opal.mart.aggregate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class AggregateQueryResult {
 
@@ -24,6 +25,10 @@ public class AggregateQueryResult {
 
   public void addValue(Object key, Object value) {
     this.values.put(key, value);
+  }
+  
+  public Set<Object> keys() {
+    return values.keySet();
   }
 
   public <T> T getValue(Object key) {

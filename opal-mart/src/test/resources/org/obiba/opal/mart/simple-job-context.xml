@@ -18,7 +18,7 @@
   <job id="ioSampleJob" restartable="false">
     <step id="step1">
       <tasklet>
-        <chunk reader="aggregatingReader" writer="itemWriter" commit-interval="1" />
+        <chunk reader="aggregatingReader" writer="chartWriter" commit-interval="1" />
       </tasklet>
     </step>
   </job>
@@ -67,7 +67,7 @@ _:entity opal:withinDataset _:ds .
 ?varData opal:withinDataset _:ds . 
 ?varData rdf:type ?var . 
 ?var rdfs:subClassOf opal:CategoricalVariable .
-OPTIONAL { {?varData opal:dataValue ?value} UNION {?varData opal:hasCategory [ rdf:type [ opal:code ?value ] ] } UNION {?varData rdf:type [ opal:code ?value ]}}
+OPTIONAL { {?varData opal:dataValue ?value} UNION {?varData opal:hasCategory [ rdf:type [ opal:className ?value ] ] } UNION {?varData rdf:type [ opal:code ?value ]}}
 } ORDER BY ?sid]]>
       </beans:value>
       <!--
@@ -91,5 +91,7 @@ OPTIONAL { {?varData opal:dataValue ?value} UNION {?varData opal:hasCategory [ r
     <beans:property name="lineAggregator">
       <beans:bean class="org.obiba.opal.mart.writer.support.AggregateQueryResultLineAggregator" />
     </beans:property>
+  </beans:bean>
+  <beans:bean id="chartWriter" class="org.obiba.opal.mart.writer.support.GoogleChartItemWriter">
   </beans:bean>
 </beans:beans>
