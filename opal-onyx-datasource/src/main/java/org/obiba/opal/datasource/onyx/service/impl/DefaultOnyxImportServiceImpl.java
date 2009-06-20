@@ -44,7 +44,9 @@ import com.thoughtworks.xstream.XStream;
 /**
  * Default <code>OnyxImportService</code> implementation.
  */
-@Transactional
+// Transaction timeout needs to be specified, otherwise, the default value of 60 seconds is used.
+// Alternative (better) solution would be to commit batches of data instead of the whole import.
+@Transactional(timeout = 3600 * 24 * 7)
 public class DefaultOnyxImportServiceImpl implements OnyxImportService {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultOnyxImportServiceImpl.class);
