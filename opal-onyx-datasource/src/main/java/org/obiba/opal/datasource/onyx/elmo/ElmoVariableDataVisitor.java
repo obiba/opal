@@ -62,7 +62,6 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
   public void forEntity(java.lang.Class<? extends Entity> entityType, String id, Date sourceDate) {
     if(manager == null) {
       this.manager = managerFactory.createElmoManager();
-      this.manager.getTransaction().begin();
     } else {
       this.manager.flush();
     }
@@ -112,7 +111,7 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
 
   public void end() {
     if(manager != null) {
-      this.manager.getTransaction().commit();
+      manager.flush();
       manager.close();
       manager = null;
     }

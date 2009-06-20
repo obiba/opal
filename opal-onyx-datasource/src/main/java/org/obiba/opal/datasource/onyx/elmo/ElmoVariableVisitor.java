@@ -75,7 +75,7 @@ public class ElmoVariableVisitor implements VariableVisitor {
   public void forDataEntryForm(Variable def) {
     if(manager == null) {
       this.manager = managerFactory.createElmoManager();
-      this.manager.getTransaction().begin();
+      // this.manager.getTransaction().begin();
       Ontology ontology = manager.create(QName.valueOf(qnameStrategy.getBaseUri()), Ontology.class);
       Ontology opalOntology = opal.getOpalNode(Opal.class, Ontology.class);
       ontology.getOwlImports().add(opalOntology);
@@ -118,7 +118,7 @@ public class ElmoVariableVisitor implements VariableVisitor {
 
   public void end() {
     if(manager != null) {
-      this.manager.getTransaction().commit();
+      manager.flush();
       manager.close();
       manager = null;
     }
