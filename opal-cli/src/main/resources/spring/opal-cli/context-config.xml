@@ -3,12 +3,12 @@
 
   <!-- Property configurer -->
   <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-    <property name="location">
-      <value>classpath:opal-config.properties</value>
+    <property name="properties">
+      <bean class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="locations" value="classpath*:/META-INF/defaults.properties"/>
+      </bean>
     </property>
+    <property name="location" value="classpath:opal-config.properties"/>
   </bean>
-
-  <!-- Import opal-core's lightweight context -->
-  <import resource="classpath:spring/opal-core/context-lite.xml" />
 
 </beans>

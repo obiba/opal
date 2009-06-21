@@ -7,35 +7,19 @@
     <property name="repositories">
       <map>
         <entry key="catalogue">
-          <bean class="org.obiba.opal.sesame.repository.impl.MemoryRepositoryFactory" />
-        </entry>
-        <entry key="data">
-
           <bean class="org.obiba.opal.sesame.repository.xa.XARepository">
             <property name="transactionManager" ref="jotm" />
-            <property name="delegate" ref="nativeRepositoryFactory" />
+            <property name="delegate" ref="catalogueRepository" />
           </bean>
-
+        </entry>
+        <entry key="data">
+          <bean class="org.obiba.opal.sesame.repository.xa.XARepository">
+            <property name="transactionManager" ref="jotm" />
+            <property name="delegate" ref="dataRepository" />
+          </bean>
         </entry>
       </map>
     </property>
-  </bean>
-
-  <bean id="memoryRepositoryFactory" class="org.obiba.opal.sesame.repository.impl.MemoryRepositoryFactory" lazy-init="true">
-    <property name="dataDir" value="${org.obiba.opal.datasource.opal.dataDir}" />
-  </bean>
-
-  <bean id="nativeRepositoryFactory" class="org.obiba.opal.sesame.repository.impl.NativeRepositoryFactory" lazy-init="true">
-    <property name="dataDir" value="${org.obiba.opal.datasource.opal.dataDir}" />
-    <property name="tripleIndexes" value="spoc,posc,cosp" />
-    <property name="withInferencer" value="false" />
-  </bean>
-
-  <bean id="rdbmsRepository" class="org.obiba.opal.sesame.repository.impl.MySqlRepositoryFactory" lazy-init="true">
-    <property name="databaseName" value="opal" />
-    <property name="serverName" value="localhost" />
-    <property name="user" value="opal" />
-    <property name="password" value="opal" />
   </bean>
 
 </beans>

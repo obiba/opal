@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.datasource.onyx;
 
-import java.util.List;
-
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -23,7 +21,7 @@ public class OnyxDataInputStrategyFactoryBean implements FactoryBean, Applicatio
 
   private ApplicationContext applicationContext;
 
-  private List<String> chainedStrategies;
+  private String[] chainedStrategies;
 
   //
   // ApplicationContextAware Methods
@@ -40,7 +38,7 @@ public class OnyxDataInputStrategyFactoryBean implements FactoryBean, Applicatio
     if(chainedStrategies == null) {
       throw new IllegalStateException("chainedStrategies attribute must be set");
     }
-    if(chainedStrategies.size() == 0) {
+    if(chainedStrategies.length == 0) {
       throw new IllegalStateException("chainedStrategies attribute must contain at least one element");
     }
   }
@@ -51,11 +49,11 @@ public class OnyxDataInputStrategyFactoryBean implements FactoryBean, Applicatio
 
   public Object getObject() throws Exception {
     // Build the strategy chain.
-    IOnyxDataInputStrategy firstStrategy = (IOnyxDataInputStrategy) applicationContext.getBean(chainedStrategies.get(0));
+    IOnyxDataInputStrategy firstStrategy = (IOnyxDataInputStrategy) applicationContext.getBean(chainedStrategies[0]);
 
     IOnyxDataInputStrategy previousStrategy = firstStrategy;
-    for(int i = 1; i < chainedStrategies.size(); i++) {
-      IOnyxDataInputStrategy delegate = (IOnyxDataInputStrategy) applicationContext.getBean(chainedStrategies.get(i));
+    for(int i = 1; i < chainedStrategies.length; i++) {
+      IOnyxDataInputStrategy delegate = (IOnyxDataInputStrategy) applicationContext.getBean(chainedStrategies[i]);
       if(previousStrategy instanceof IChainingOnyxDataInputStrategy) {
         ((IChainingOnyxDataInputStrategy) previousStrategy).setDelegate(delegate);
         previousStrategy = delegate;
@@ -79,7 +77,7 @@ public class OnyxDataInputStrategyFactoryBean implements FactoryBean, Applicatio
   // Methods
   //
 
-  public void setChainedStrategies(List<String> chainedStrategies) {
-    this.chainedStrategies = chainedStrategies;
+  public void setChainedStrategies(String chainedStrategies) {
+    this.chainedStrategies = chainedStrategies.split(",");
   }
 }

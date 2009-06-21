@@ -5,9 +5,7 @@
   <!-- Import opal datasources by classpath scanning. These provide bindings to sources of data (such as Onyx) -->
   <import resource="classpath*:/META-INF/opal-datasource.xml" />
 
-  <bean id="opalKeyProvider" class="org.obiba.opal.core.crypt.OpalKeyStore">
-    <property name="keyStoreResource" value="${org.obiba.opal.keystore.file}" />
-  </bean>
+  <import resource="crypt.xml" />
 
   <bean id="jotm" class="org.springframework.transaction.jta.JotmFactoryBean" />
 

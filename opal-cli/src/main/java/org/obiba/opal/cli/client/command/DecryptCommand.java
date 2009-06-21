@@ -100,7 +100,7 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
   }
 
   private ApplicationContext loadContext() {
-    return new ClassPathXmlApplicationContext("spring/opal-cli/context-lite.xml");
+    return new ClassPathXmlApplicationContext(new String[] { "/spring/opal-cli/context-config.xml", "/spring/opal-core/crypt.xml", "/META-INF/onyx-data-input.xml" });
   }
 
   private void processFile(File inputFile, File outputDir, String keystorePassword) {
@@ -108,7 +108,11 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
 
     // Check the file against its digest. No point doing anything if the file is corrupted.
     File digestFile = new File(inputFile.getPath() + DIGEST_ENTRY_SUFFIX);
-    DigestUtil.checkDigest(DIGEST_ALGORITHM, digestFile, inputFile);
+    if(digestFile.exists()) {
+      DigestUtil.checkDigest(DIGEST_ALGORITHM, digestFile, inputFile);
+    } else {
+      System.err.println("WARN: digest file " + digestFile + " not found. Cannot check file integrity.");
+    }
 
     // Prompt user for key password.
     String keyPassword = CliUtil.promptForPassword("Enter key password (RETURN if same as keystore password): ");
