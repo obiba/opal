@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 
 import org.obiba.opal.sesame.repository.OpalRepositoryManager;
 import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
 /**
@@ -24,13 +25,21 @@ public class OpalRepositoryManagerImpl implements OpalRepositoryManager {
 
   private Map<String, Repository> repositories = new HashMap<String, Repository>();
 
+  private Map<String, String> namespaces = new HashMap<String, String>();
+
   public void setRepositories(Map<String, Repository> repositories) {
     this.repositories = repositories;
   }
 
+  public void setNamespaces(Map<String, String> namespaces) {
+    this.namespaces = namespaces;
+  }
+
   public void initialize() throws RepositoryException {
     for(Entry<String, Repository> entry : repositories.entrySet()) {
-      entry.getValue().initialize();
+      Repository repository = entry.getValue();
+      repository.initialize();
+      addNamespaces(repository);
     }
   }
 
@@ -58,6 +67,22 @@ public class OpalRepositoryManagerImpl implements OpalRepositoryManager {
 
   public Repository getDataRepository() {
     return getRepository(OpalRepository.DATA.toString().toLowerCase());
+  }
+
+  protected void addNamespaces(Repository repository) throws RepositoryException {
+    RepositoryConnection connection = null;
+    try {
+      connection = repository.getConnection();
+      for(Entry<String, String> namespace : namespaces.entrySet()) {
+        if(connection.getNamespace(namespace.getKey()) == null) {
+          connection.setNamespace(namespace.getKey(), namespace.getValue());
+        }
+      }
+    } finally {
+      if(connection != null) {
+        connection.close();
+      }
+    }
   }
 
 }

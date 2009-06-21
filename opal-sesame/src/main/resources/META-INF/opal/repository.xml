@@ -20,6 +20,13 @@
         </entry>
       </map>
     </property>
+    <property name="namespaces">
+      <map>
+        <entry key="opal" value="http://www.obiba.org/owl/2009/05/opal#" />
+        <entry key="rdf" value="http://www.w3.org/1999/02/22-rdf-syntax-ns#" />
+        <entry key="rdfs" value="http://www.w3.org/2000/01/rdf-schema#" />
+        <entry key="owl" value="http://www.w3.org/2002/07/owl#" />
+      </map>
+    </property>
   </bean>
-
 </beans>

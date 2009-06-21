@@ -72,6 +72,7 @@ public class XARepositoryConnection extends RepositoryConnectionWrapper implemen
   @Override
   public void close() throws RepositoryException {
     if(enlisted() == false) {
+      TransactionSynchronizationManager.unbindResource(xaRepository);
       super.close();
     }
   }

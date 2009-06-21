@@ -22,9 +22,7 @@ import org.obiba.opal.elmo.concepts.Opal;
 import org.obiba.opal.sesame.repository.OpalRepositoryManager;
 import org.openrdf.model.Namespace;
 import org.openrdf.model.Statement;
-import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
-import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
@@ -67,15 +65,7 @@ public class QueryCommand extends AbstractContextLoadingCommand<QueryCommandOpti
 
     try {
       repoManager = getBean("opalRepositoryManager");
-
       connection = repoManager.getDataRepository().getConnection();
-      if(connection.getNamespace("opal") == null) {
-        connection.setNamespace("opal", Opal.NS);
-        connection.setNamespace("rdf", RDF.NAMESPACE);
-        connection.setNamespace("rdfs", RDFS.NAMESPACE);
-        connection.setNamespace("owl", OWL.NAMESPACE);
-      }
-
       executeWithConnection();
 
     } catch(RuntimeException e) {
