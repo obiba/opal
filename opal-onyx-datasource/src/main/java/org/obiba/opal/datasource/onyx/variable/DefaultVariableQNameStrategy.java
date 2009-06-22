@@ -44,7 +44,8 @@ public class DefaultVariableQNameStrategy implements IVariableQNameStrategy {
   }
 
   public QName getChildQName(String parentPath, String child) {
-    return getQName(parentPath + variablePathNamingStrategy.getPathSeparator() + child);
+    String parentVariable = variablePathNamingStrategy.getVariablePath(parentPath);
+    return getQName(parentVariable + variablePathNamingStrategy.getPathSeparator() + child);
   }
 
   public QName getParentQName(String child) {

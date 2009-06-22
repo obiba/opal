@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
+import org.obiba.core.util.StreamUtil;
 import org.obiba.core.util.StringUtil;
 import org.obiba.onyx.engine.variable.Variable;
 import org.obiba.onyx.engine.variable.VariableData;
@@ -159,10 +160,20 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
     int loaded = 0;
     int participantKeysRegistered = 0;
 
+    int totalParticipants = 0;
+    for(String entryName : dataInputStrategy.listEntries()) {
+      if(isParticipantEntry(entryName)) {
+        totalParticipants++;
+      }
+    }
+
+    log.info("{} participants to process.", totalParticipants);
+
     VariableFinder variableFinder = VariableFinder.getInstance(variableRoot, new DefaultVariablePathNamingStrategy());
     try {
       for(String entryName : dataInputStrategy.listEntries()) {
         if(isParticipantEntry(entryName)) {
+          log.info("Processing participant {}/{}", (participantsProcessed + 1), totalParticipants);
           log.debug("Processing participant entry {}", entryName);
 
           VariableDataSet variableDataSetRoot = getVariableFromXmlFile(entryName);
@@ -242,13 +253,7 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
       } catch(IOException e) {
         throw new IllegalStateException("Unable to load variables from resource: " + onyxImportConfiguration.getCatalog());
       } finally {
-        if(stream != null) {
-          try {
-            stream.close();
-          } catch(IOException e) {
-            throw new IllegalStateException("Could not close InputStream for variables resource: " + onyxImportConfiguration.getCatalog());
-          }
-        }
+        StreamUtil.silentSafeClose(stream);
       }
     } else {
       for(String entryName : dataInputStrategy.listEntries()) {
@@ -274,13 +279,11 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
     try {
       inputStream = dataInputStrategy.getEntry(filename);
       object = VariableStreamer.<T> fromXML(inputStream);
-      if(object == null) throw new IllegalStateException("Unable to load variables from the file [" + filename + "].");
-    } finally {
-      try {
-        inputStream.close();
-      } catch(IOException e) {
-        throw new IllegalStateException("Could not close InputStream for file [" + filename + "].");
+      if(object == null) {
+        throw new IllegalStateException("Unable to load variables from the file [" + filename + "].");
       }
+    } finally {
+      StreamUtil.silentSafeClose(inputStream);
     }
     return object;
   }

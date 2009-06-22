@@ -96,11 +96,15 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
       throw new IllegalArgumentException("No variable for path " + data.getVariablePath() + " (QName " + qname + ")");
     }
 
-    for(Handler h : handlers) {
-      if(h.handles(opalOnyxVariable, data) == true) {
-        h.handle(opalOnyxVariable, data);
-        System.out.print('.');
-        break;
+    // Skip variables without data. These happen with repeatable variables.
+    List<Data> dataValues = data.getDatas();
+    if(dataValues != null && dataValues.size() > 0) {
+      for(Handler h : handlers) {
+        if(h.handles(opalOnyxVariable, data) == true) {
+          h.handle(opalOnyxVariable, data);
+          System.out.print('.');
+          break;
+        }
       }
     }
 
@@ -185,6 +189,7 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
   public class CategoricalHandler implements Handler {
 
     public void handle(DataItemClass opalOnyxVariable, VariableData data) {
+
       CategoricalVariable c = manager.create(CategoricalVariable.class);
       c.setRdfTypes(Collections.singleton(opalOnyxVariable));
       c.getWithinDataset().add(currentDataset);
@@ -193,6 +198,7 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
       for(Data d : data.getDatas()) {
         // Build the QName of the Category (child of this variable)
         QName qname = qnameStrategy.getChildQName(data.getVariablePath(), d.getValueAsString());
+        log.info("Category QName {}", qname);
 
         Class categoryVariable = manager.find(Class.class, qname);
         if(categoryVariable == null) {
