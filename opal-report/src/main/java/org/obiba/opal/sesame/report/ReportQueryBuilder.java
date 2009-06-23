@@ -82,15 +82,15 @@ public class ReportQueryBuilder {
   public String nextBinding() {
     return "tmp" + this.nextBindingId++;
   }
-  
+
   public ReportQueryBuilder withOccurrence() {
-    join("?varData opal:withinOccurrence [ opal:ordinal ?occ ]");
+    join("?varData opal:withinOccurrence [ opal:ordinal ?occ ; opal:withinDataset _:ds ]");
     return this;
   }
-  
+
   public ReportQueryBuilder joinVariablePredicateValue(String predicate, Value value) {
     if(predicate == null) {
-      throw new IllegalArgumentException("pattern cannot be null");
+      throw new IllegalArgumentException("predicate cannot be null");
     }
     String bindingVar = nextBinding();
     StringBuilder sb = new StringBuilder(getVariableBindingName()).append(" ").append(predicate).append(" ?").append(bindingVar);
@@ -99,19 +99,44 @@ public class ReportQueryBuilder {
     return this;
   }
 
+  public ReportQueryBuilder joinVariableCriteria(String criteria) {
+    if(criteria == null) {
+      throw new IllegalArgumentException("criteria cannot be null");
+    }
+    StringBuilder sb = new StringBuilder(getVariableBindingName()).append(" ").append(criteria);
+    join(sb);
+    return this;
+  }
+
   public ReportQueryBuilder filterVariablePredicateValue(String predicate, Value value) {
     if(predicate == null) {
-      throw new IllegalArgumentException("pattern cannot be null");
+      throw new IllegalArgumentException("predicate cannot be null");
     }
     // Create a temp variable for testing if it is bound
     String tempVar = nextBinding();
     // Create a variable for replacing with the predicate value
     String valueVar = nextBinding();
-    
+
     // ?varData rdf:type ?tmpVar . ?tmpVar <predicate> ?valueVar
     StringBuilder sb = new StringBuilder("?varData rdf:type ?").append(tempVar).append(" . ?").append(tempVar).append(" ").append(predicate).append(" ?").append(valueVar);
     leftJoin(sb);
     withBinding(valueVar, value);
+    // Add a filter that will remove "rows" where ?tmpVar is non-null
+    withFilter("!bound(?" + tempVar + ")");
+    return this;
+  }
+
+  public ReportQueryBuilder filterVariableCriteria(String criteria) {
+    if(criteria == null) {
+      throw new IllegalArgumentException("criteria cannot be null");
+    }
+    // Create a temp variable for testing if it is bound
+    String tempVar = nextBinding();
+
+    // ?varData rdf:type ?tmpVar . ?tmpVar <criteria>
+    StringBuilder sb = new StringBuilder("?varData rdf:type ?").append(tempVar).append(" . ?").append(tempVar).append(" ").append(criteria);
+    leftJoin(sb);
+
     // Add a filter that will remove "rows" where ?tmpVar is non-null
     withFilter("!bound(?" + tempVar + ")");
     return this;

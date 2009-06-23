@@ -198,7 +198,6 @@ public class ElmoVariableDataVisitor implements VariableDataVisitor {
       for(Data d : data.getDatas()) {
         // Build the QName of the Category (child of this variable)
         QName qname = qnameStrategy.getChildQName(data.getVariablePath(), d.getValueAsString());
-        log.info("Category QName {}", qname);
 
         Class categoryVariable = manager.find(Class.class, qname);
         if(categoryVariable == null) {

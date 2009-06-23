@@ -13,8 +13,8 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import org.obiba.opal.elmo.concepts.Opal;
-import org.obiba.opal.elmo.owl.concepts.CategoricalVariableClass;
+import org.obiba.opal.elmo.concepts.Category;
+import org.obiba.opal.elmo.concepts.MissingCategory;
 import org.obiba.opal.elmo.owl.concepts.DataItemClass;
 import org.obiba.opal.sesame.report.IDataItemFilter;
 import org.obiba.opal.sesame.report.ReportQueryBuilder;
@@ -22,28 +22,32 @@ import org.openrdf.elmo.Entity;
 import org.openrdf.elmo.sesame.SesameManager;
 
 /**
- * 
+ * Filters categories of CategoricalVariables that are have multiple set to false
  */
 public class CategoryFilter implements IDataItemFilter {
 
-  QName categoricalQName;
-
   public boolean accept(DataItemClass dataItem) {
-    categoricalQName = new QName(Opal.NS, "CategoricalVariable");
     Set<?> superClasses = dataItem.getRdfsSubClassOf();
     for(Object superClass : superClasses) {
       Entity elmoEntity = (Entity) superClass;
-      if(elmoEntity != null && elmoEntity.getQName() != null) {
-        if(categoricalQName.equals(elmoEntity.getQName())) {
-          CategoricalVariableClass cvc = (CategoricalVariableClass) dataItem;
-          return cvc.isMultiple() == false;
-        }
+      if(isCategory(elmoEntity.getQName())) {
+        boolean parentMultiple = dataItem.getParent().isMultiple();
+        return parentMultiple == true;
       }
     }
     // No-say on everything else.
     return true;
   }
 
+  boolean isCategory(QName qname) {
+    if(qname != null) {
+      return Category.QNAME.equals(qname) || MissingCategory.QNAME.equals(qname);
+    }
+    return false;
+  }
+
   public void contribute(ReportQueryBuilder builder, SesameManager manager) {
+    // Filter out categories that have a parent CategoricalVariable that is NOT multiple
+    builder.filterVariableCriteria("opal:parent [ rdfs:subClassOf opal:CategoricalVariable ; opal:multiple false]");
   }
 }

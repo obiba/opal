@@ -35,11 +35,16 @@ public class ReportCommand extends AbstractContextLoadingCommand<ReportCommandOp
       manager = managerFactory.createElmoManager();
 
       CsvSasMartBuilder martBuilder = new CsvSasMartBuilder();
-      martBuilder.setCsvDirectory(this.options.getOutput());
+      if(this.options.getOutput().isDirectory()) {
+        martBuilder.setCsvDirectory(this.options.getOutput());
+      } else {
+        martBuilder.setCsvFileName(this.options.getOutput().getAbsolutePath());
+      }
 
       try {
-        martBuilder.initialize();
         Report report = new XStreamReportLoader().loadReport(new FileInputStream(options.getReport()));
+
+        martBuilder.initialize();
         report.build(manager, martBuilder);
       } catch(Exception e) {
         throw new RuntimeException(e);
