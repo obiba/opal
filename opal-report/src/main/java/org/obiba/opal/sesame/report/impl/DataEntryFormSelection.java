@@ -32,6 +32,9 @@ public class DataEntryFormSelection implements IDataItemSelection {
 
   public Set<DataItemClass> getSelection(SesameManager manager) {
     DataEntryFormClass def = manager.find(DataEntryFormClass.class, getQName());
+    if(def == null) {
+      throw new IllegalArgumentException("No such DEF " + getQName());
+    }
     return Collections.unmodifiableSet(def.getDataVariables());
   }
 
