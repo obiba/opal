@@ -48,6 +48,6 @@ public class CategoryFilter implements IDataItemFilter {
 
   public void contribute(ReportQueryBuilder builder, SesameManager manager) {
     // Filter out categories that have a parent CategoricalVariable that is NOT multiple
-    builder.filterVariableCriteria("opal:parent [ rdfs:subClassOf opal:CategoricalVariable ; opal:multiple false]");
+//    builder.filterVariableCriteria("opal:parent [ rdfs:subClassOf opal:CategoricalVariable ; opal:multiple false]");
   }
 }

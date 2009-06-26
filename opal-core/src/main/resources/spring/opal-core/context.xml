@@ -1,4 +1,5 @@
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:tx="http://www.springframework.org/schema/tx"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
@@ -16,11 +17,17 @@
     <!-- No need to set "transactionManager" property since the jotm bean implements both interfaces and Spring's JtaTransactionManager will detect this. -->
   </bean>
 
+  <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate"
+    scope="prototype">
+    <property name="transactionManager" ref="transactionManager" />
+  </bean>
+
   <tx:annotation-driven transaction-manager="transactionManager" />
 
   <import resource="hibernate-services.xml" />
 
-  <bean id="participantIdentifier" class="org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl">
+  <bean id="participantIdentifier"
+    class="org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl">
   </bean>
 
 </beans>

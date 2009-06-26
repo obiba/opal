@@ -45,23 +45,34 @@ public class ReportQueryBuilder {
   private Map<CharSequence, Value> bindings = new LinkedHashMap<CharSequence, Value>();;
 
   public TupleQuery build(SesameManager manager) throws MalformedQueryException, RepositoryException {
-
     StringBuilder queryString = new StringBuilder();
-    queryString.append("SELECT ?sid ?occ ?var ?value {_:entity opal:identifier ?sid . _:entity rdf:type opal:Participant . _:ds opal:isForEntity _:entity . ?varData opal:withinDataset _:ds . ?varData rdf:type ?var ");
-
     for(CharSequence seq : joinPatterns) {
-      queryString.append(" . ").append(seq);
+      if(queryString.length() > 0) {
+        queryString.append(" . ");
+      }
+      queryString.append(seq);
     }
 
     for(CharSequence seq : leftJoinPatterns) {
-      queryString.append(" . OPTIONAL {").append(seq).append("}");
+      if(queryString.length() > 0) {
+        queryString.append(" . ");
+      }
+      queryString.append("OPTIONAL {").append(seq).append("}");
     }
 
     for(CharSequence seq : filters) {
-      queryString.append(" . FILTER (").append(seq).append(")");
+      if(queryString.length() > 0) {
+        queryString.append(" . ");
+      }
+      queryString.append("FILTER (").append(seq).append(")");
     }
 
-    queryString.append(" . OPTIONAL { {?varData opal:dataValue ?value} UNION {?varData opal:hasCategory ?c . ?c rdf:type [ opal:code ?value ]} UNION {?varData rdf:type [ opal:code ?value ]}} } ORDER BY ?sid ?occ");
+    // Insert bindings
+    queryString.insert(0, "SELECT ?sid ?occ ?var ?value {");
+    // Join datasets
+    queryString.append(". ?varData rdf:type ?var . ?varData opal:withinDataset _:ds . _:ds opal:isForEntity [ opal:identifier ?sid ]");
+    // Left join on the value
+    queryString.append(" . OPTIONAL { {?varData opal:dataValue ?value} UNION {?varData opal:hasCategory [ rdf:type [ opal:code ?value ] ] } } } ORDER BY ?sid ?occ");
 
     QueryUtil.prefixQuery(manager.getConnection(), queryString);
 

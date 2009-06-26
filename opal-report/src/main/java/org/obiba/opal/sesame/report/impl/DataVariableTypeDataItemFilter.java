@@ -58,7 +58,7 @@ public class DataVariableTypeDataItemFilter implements IDataItemFilter {
       builder.joinVariablePredicateValue("rdfs:subClassOf", superClassUri);
     } else {
       // Left join and add filter on variable not bound
-      builder.filterVariablePredicateValue("rdfs:subClassOf", superClassUri);
+//      builder.filterVariablePredicateValue("rdfs:subClassOf", superClassUri);
     }
   }
 }

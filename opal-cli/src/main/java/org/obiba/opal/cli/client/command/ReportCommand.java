@@ -14,10 +14,14 @@ import java.io.FileInputStream;
 import org.obiba.opal.cli.client.command.options.ReportCommandOptions;
 import org.obiba.opal.core.mart.sas.impl.CsvSasMartBuilder;
 import org.obiba.opal.sesame.report.Report;
+import org.obiba.opal.sesame.report.ReportBuilder;
 import org.obiba.opal.sesame.report.XStreamReportLoader;
 import org.openrdf.elmo.sesame.SesameManager;
 import org.openrdf.elmo.sesame.SesameManagerFactory;
 import org.openrdf.query.QueryLanguage;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 public class ReportCommand extends AbstractContextLoadingCommand<ReportCommandOptions> {
   private SesameManager manager;
@@ -28,39 +32,46 @@ public class ReportCommand extends AbstractContextLoadingCommand<ReportCommandOp
     if(options == null) {
       throw new IllegalStateException("Options not set (setOptions must be called before calling execute)");
     }
-    SesameManagerFactory managerFactory = getBean("elmoManagerFactory");
+    TransactionTemplate transaction = getBean("transactionTemplate");
 
-    try {
-      managerFactory.setQueryLanguage(QueryLanguage.SPARQL);
-      manager = managerFactory.createElmoManager();
-
-      CsvSasMartBuilder martBuilder = new CsvSasMartBuilder();
-      if(this.options.getOutput().isDirectory()) {
-        martBuilder.setCsvDirectory(this.options.getOutput());
-      } else {
-        martBuilder.setCsvFileName(this.options.getOutput().getAbsolutePath());
-      }
-
-      try {
-        Report report = new XStreamReportLoader().loadReport(new FileInputStream(options.getReport()));
-
-        martBuilder.initialize();
-        report.build(manager, martBuilder);
-      } catch(Exception e) {
-        throw new RuntimeException(e);
-      } finally {
+    transaction.execute(new TransactionCallback() {
+      public Object doInTransaction(TransactionStatus status) {
         try {
-          martBuilder.shutdown();
+          SesameManagerFactory managerFactory = getBean("elmoManagerFactory");
+          managerFactory.setQueryLanguage(QueryLanguage.SPARQL);
+          manager = managerFactory.createElmoManager();
+
+          CsvSasMartBuilder martBuilder = new CsvSasMartBuilder();
+          if(options.getOutput().isDirectory()) {
+            martBuilder.setCsvDirectory(options.getOutput());
+          } else {
+            martBuilder.setCsvFileName(options.getOutput().getAbsolutePath());
+          }
+
+          try {
+            Report report = new XStreamReportLoader().loadReport(new FileInputStream(options.getReport()));
+            ReportBuilder reportBuilder = new ReportBuilder(report, manager);
+            reportBuilder.initialize();
+            martBuilder.initialize();
+            reportBuilder.build(martBuilder);
+          } catch(Exception e) {
+            throw new RuntimeException(e);
+          } finally {
+            try {
+              martBuilder.shutdown();
+            } catch(Exception e) {
+            }
+          }
         } catch(Exception e) {
+          throw new RuntimeException(e);
+        } finally {
+          if(manager != null) {
+            manager.close();
+          }
         }
+        return null;
       }
-    } catch(Exception e) {
-      throw new RuntimeException(e);
-    } finally {
-      if(manager != null) {
-        manager.close();
-      }
-    }
+    });
 
   }
 
