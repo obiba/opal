@@ -20,6 +20,8 @@
   <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate"
     scope="prototype">
     <property name="transactionManager" ref="transactionManager" />
+    <!-- Set a very high timeout (10 days) -->
+    <property name="timeout" value="864000" />
   </bean>
 
   <tx:annotation-driven transaction-manager="transactionManager" />
