@@ -1,14 +1,17 @@
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
-  http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
-  
-  <import resource="onyx-data-input.xml"/>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:tx="http://www.springframework.org/schema/tx" xmlns:batch="http://www.springframework.org/schema/batch"
+  xsi:schemaLocation="
+  http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
+  http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd 
+  http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd">
+
+  <import resource="onyx-data-input.xml" />
 
   <bean id="qnameStrategy" class="org.obiba.opal.datasource.onyx.variable.DefaultVariableQNameStrategy">
-    <constructor-arg value="${org.obiba.opal.study.baseUri}/onyx"/>
+    <constructor-arg value="${org.obiba.opal.study.baseUri}/onyx" />
     <constructor-arg>
       <bean class="org.obiba.onyx.engine.variable.impl.DefaultVariablePathNamingStrategy">
-        <property name="pathSeparator" value="${org.obiba.onyx.pathSeparator}"/>
+        <property name="pathSeparator" value="${org.obiba.onyx.pathSeparator}" />
       </bean>
     </constructor-arg>
   </bean>
@@ -17,27 +20,21 @@
     <property name="repository">
       <bean factory-bean="opalRepositoryManager" factory-method="getDataRepository" />
     </property>
-    <property name="inferencingEnabled" value="true"/>
+    <property name="inferencingEnabled" value="true" />
   </bean>
 
-  <bean id="onyxImportService" class="org.obiba.opal.datasource.onyx.service.impl.DefaultOnyxImportServiceImpl">
-    <property name="participantKeyWriteRegistry" ref="participantKeyRegistry" />
-    <property name="participantKeyReadRegistry" ref="participantKeyRegistry" />
-    <property name="dataInputStrategy" ref="onyxDataInputStrategy" />
-    <property name="importConfiguration" value="classpath:onyx-import.xml" />
+  <batch:job id="onyx-import" parent="abstractDatasetImportJob" restartable="false">
+    <batch:step id="importXml" parent="abstractDatasetImportStep">
+      <batch:tasklet>
+        <batch:chunk reader="onyxDatasetReader" />
+      </batch:tasklet>
+    </batch:step>
+  </batch:job>
 
-    <property name="variableVisitor">
-      <bean class="org.obiba.opal.datasource.onyx.elmo.ElmoVariableVisitor">
-        <constructor-arg ref="qnameStrategy" />
-        <constructor-arg ref="elmoManagerFactory" />
-      </bean>
-    </property>
-    <property name="variableDataVisitor">
-      <bean class="org.obiba.opal.datasource.onyx.elmo.ElmoVariableDataVisitor">
-        <constructor-arg ref="qnameStrategy" />
-        <constructor-arg ref="elmoManagerFactory" />
-      </bean>
-    </property>
+  <bean id="onyxDatasetReader" class="org.obiba.opal.datasource.onyx.OnyxDatasetReader" scope="step">
+    <property name="resource" value="#{jobParameters[input.file.name]}" />
+    <property name="dataInputStrategy" ref="onyxDataInputStrategy" />
+    <property name="entityProvider" ref="entityProvider" />
   </bean>
 
 </beans>

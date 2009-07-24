@@ -25,8 +25,7 @@ import org.obiba.onyx.engine.variable.util.VariableFinder;
 import org.obiba.onyx.engine.variable.util.VariableStreamer;
 import org.obiba.onyx.util.data.Data;
 import org.obiba.opal.core.crypt.OpalKeyStore;
-import org.obiba.opal.core.service.IParticipantKeyReadRegistry;
-import org.obiba.opal.core.service.IParticipantKeyWriteRegistry;
+import org.obiba.opal.core.service.IOpalKeyRegistry;
 import org.obiba.opal.datasource.onyx.IOnyxDataInputStrategy;
 import org.obiba.opal.datasource.onyx.OnyxDataInputContext;
 import org.obiba.opal.datasource.onyx.configuration.KeyVariable;
@@ -42,9 +41,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.thoughtworks.xstream.XStream;
 
-/**
- * Default <code>OnyxImportService</code> implementation.
- */
 // Transaction timeout needs to be specified, otherwise, the default value of 60 seconds is used.
 // Alternative (better) solution would be to commit batches of data instead of the whole import.
 @Transactional(timeout = 3600 * 24 * 7)
@@ -58,9 +54,7 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
 
   public static final String PARTICIPANT_DATA_EXTENSION = ".xml";
 
-  private IParticipantKeyWriteRegistry participantKeyWriteRegistry;
-
-  private IParticipantKeyReadRegistry participantKeyReadRegistry;
+  private IOpalKeyRegistry opalKeyRegistry;
 
   private IOnyxDataInputStrategy dataInputStrategy;
 
@@ -70,12 +64,8 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
 
   private VariableVisitor variableVisitor;
 
-  public void setParticipantKeyWriteRegistry(IParticipantKeyWriteRegistry participantKeyWriteRegistry) {
-    this.participantKeyWriteRegistry = participantKeyWriteRegistry;
-  }
-
-  public void setParticipantKeyReadRegistry(IParticipantKeyReadRegistry participantKeyReadRegistry) {
-    this.participantKeyReadRegistry = participantKeyReadRegistry;
+  public void setOpalKeyRegistry(IOpalKeyRegistry opalKeyRegistry) {
+    this.opalKeyRegistry = opalKeyRegistry;
   }
 
   public void setDataInputStrategy(IOnyxDataInputStrategy dataInputStrategy) {
@@ -180,7 +170,7 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
 
           if(isNewParticipant(variableFinder, variableDataSetRoot)) {
             log.debug("Processing new participant data.");
-            String opalKey = participantKeyWriteRegistry.generateUniqueKey(IParticipantKeyReadRegistry.PARTICIPANT_KEY_DB_OPAL_NAME);
+            String opalKey = opalKeyRegistry.registerNewOpalKey();
             participantKeysRegistered += registerKeys(opalKey, variableFinder, variableDataSetRoot);
             loadData(opalKey, variableDataSetRoot);
             loaded++;
@@ -204,7 +194,7 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
         String owner = variable.getKey();
         for(Data data : variableData.getDatas()) {
           String key = data.getValueAsString();
-          if(participantKeyReadRegistry.hasParticipant(owner, key)) {
+          if(opalKeyRegistry.hasOpalKey(owner, key)) {
             return false;
           }
         }
@@ -292,7 +282,7 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
     String owner = variable.getKey();
     for(Data data : variableData.getDatas()) {
       String key = data.getValueAsString();
-      participantKeyWriteRegistry.registerEntry(IParticipantKeyReadRegistry.PARTICIPANT_KEY_DB_OPAL_NAME, opalKey, owner, key);
+      opalKeyRegistry.registerKey(opalKey, owner, key);
     }
   }
 

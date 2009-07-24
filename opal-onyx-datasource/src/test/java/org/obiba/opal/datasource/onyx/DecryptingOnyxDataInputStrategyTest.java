@@ -23,13 +23,13 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.obiba.core.util.FileUtil;
+import org.obiba.core.util.StreamUtil;
 import org.obiba.opal.core.crypt.OpalKeyStore;
 import org.springframework.core.io.FileSystemResource;
 
@@ -217,7 +217,7 @@ public class DecryptingOnyxDataInputStrategyTest {
         persistDecryptedEntry(entryStream, decryptedEntryName);
         assertTrue(compareFiles(new File(RESOURCE_DIR, decryptedEntryName), new File(TMP_DIR, decryptedEntryName)));
       } finally {
-        IOUtils.closeQuietly(entryStream);
+        StreamUtil.silentSafeClose(entryStream);
       }
     }
   }
@@ -236,7 +236,7 @@ public class DecryptingOnyxDataInputStrategyTest {
     } catch(DigestMismatchException ex) {
       assertEquals("Digest check failed", ex.getMessage());
     } finally {
-      IOUtils.closeQuietly(entryStream);
+      StreamUtil.silentSafeClose(entryStream);
     }
   }
 

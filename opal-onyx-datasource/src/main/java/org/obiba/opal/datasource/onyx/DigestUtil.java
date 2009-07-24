@@ -14,7 +14,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 
-import org.apache.commons.io.IOUtils;
+import org.obiba.core.util.StreamUtil;
 
 /**
  * <code>MessageDigest</code> utilities.
@@ -30,20 +30,14 @@ public class DigestUtil {
    * @throws DigestMismatchException if the check fails (or if it could not be performed)
    */
   public static void checkDigest(String digestAlgorithm, File digestFile, File dataFile) throws DigestMismatchException {
-    FileInputStream digestFileStream = null;
-    FileInputStream dataFileStream = null;
-
     try {
-      digestFileStream = new FileInputStream(digestFile);
-      dataFileStream = new FileInputStream(dataFile);
-      checkDigest(digestAlgorithm, IOUtils.toByteArray(digestFileStream), IOUtils.toByteArray(dataFileStream));
+      byte[] digestBytes = StreamUtil.readFully(new FileInputStream(digestFile));
+      byte[] dataBytes = StreamUtil.readFully(new FileInputStream(dataFile));
+      checkDigest(digestAlgorithm, digestBytes, dataBytes);
     } catch(DigestMismatchException ex) {
       throw ex;
     } catch(IOException ex) {
       throw new DigestMismatchException("Digest check could not be performed (" + ex.getMessage() + ")");
-    } finally {
-      IOUtils.closeQuietly(digestFileStream);
-      IOUtils.closeQuietly(dataFileStream);
     }
   }
 

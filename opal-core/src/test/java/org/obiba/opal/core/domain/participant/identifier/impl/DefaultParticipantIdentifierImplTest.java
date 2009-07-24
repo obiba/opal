@@ -15,13 +15,13 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
-import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 
 public class DefaultParticipantIdentifierImplTest {
 
-  private IParticipantIdentifier participantIdentifier;
+  private DefaultParticipantIdentifierImpl participantIdentifier;
 
   @Before
   public void setUp() throws Exception {
@@ -39,7 +39,19 @@ public class DefaultParticipantIdentifierImplTest {
   }
 
   @Test
+  public void testGenerateParticipantIdentifierDoesntStartWithZero() {
+    // Only run test if the instance is configured that way.
+    Assume.assumeTrue(participantIdentifier.isAllowStartWithZero() == false);
+    for(int i = 0; i < 10000; i++) { // Generate 10000 ids.
+      Assert.assertTrue("Participant Identifier not expected to start with '0'", participantIdentifier.generateParticipantIdentifier().charAt(0) != '0');
+    }
+  }
+
+  @Test
   public void testRandomDistributionForGeneratedIdentifiers() {
+    // Allow start with zero to obtain a uniform distribution.
+    participantIdentifier.setAllowStartWithZero(true);
+
     Map<Character, Integer> distributionMap = new HashMap<Character, Integer>();
     for(int i = 0; i < 10000; i++) { // Generate 10000 ids.
       String id = participantIdentifier.generateParticipantIdentifier();

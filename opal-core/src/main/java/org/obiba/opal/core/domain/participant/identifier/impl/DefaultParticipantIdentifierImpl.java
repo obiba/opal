@@ -9,8 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.core.domain.participant.identifier.impl;
 
+import java.security.SecureRandom;
 import java.util.Random;
 
+import org.obiba.opal.core.domain.participant.Participant;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 
 /**
@@ -19,10 +21,42 @@ import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
  */
 public final class DefaultParticipantIdentifierImpl implements IParticipantIdentifier {
 
+  private Random generator = new SecureRandom();
+
+  private int keySize = 10;
+
+  private boolean allowStartWithZero = false;
+
+  public void setKeySize(int keySize) {
+    this.keySize = keySize;
+  }
+
+  public int getKeySize() {
+    return keySize;
+  }
+
+  public void setAllowStartWithZero(boolean allowStartWithZero) {
+    this.allowStartWithZero = allowStartWithZero;
+  }
+
+  public boolean isAllowStartWithZero() {
+    return allowStartWithZero;
+  }
+
   public String generateParticipantIdentifier() {
-    Random generator = new Random();
-    StringBuilder sb = new StringBuilder(10);
-    for(int i = 0; i < 10; i++) {
+    if(keySize < 1) {
+      throw new IllegalStateException("keySize must be at least 1: " + keySize);
+    }
+
+    StringBuilder sb = new StringBuilder(keySize);
+    if(allowStartWithZero == false) {
+      // Generate a random number between 0 and 8, then add 1.
+      sb.append(generator.nextInt(9) + 1);
+    } else {
+      sb.append(generator.nextInt(10));
+    }
+
+    for(int i = 1; i < keySize; i++) {
       sb.append(generator.nextInt(10));
     }
     return sb.toString();

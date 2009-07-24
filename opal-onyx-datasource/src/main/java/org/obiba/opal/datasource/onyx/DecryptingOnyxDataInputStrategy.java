@@ -28,7 +28,7 @@ import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.NoSuchPaddingException;
 
-import org.apache.commons.io.IOUtils;
+import org.obiba.core.util.StreamUtil;
 import org.obiba.opal.core.crypt.IKeyProvider;
 import org.obiba.opal.core.crypt.KeyProviderSecurityException;
 
@@ -147,18 +147,12 @@ public class DecryptingOnyxDataInputStrategy implements IChainingOnyxDataInputSt
     }
 
     // Check the entry against its digest.
-    InputStream digestStream = null;
-    InputStream entryStream = null;
-
     try {
-      byte[] digestBytes = IOUtils.toByteArray(delegate.getEntry(name + DIGEST_ENTRY_SUFFIX));
-      byte[] entryBytes = IOUtils.toByteArray(delegate.getEntry(name));
+      byte[] digestBytes = StreamUtil.readFully(delegate.getEntry(name + DIGEST_ENTRY_SUFFIX));
+      byte[] entryBytes = StreamUtil.readFully(delegate.getEntry(name));
       DigestUtil.checkDigest(DIGEST_ALGORITHM, digestBytes, entryBytes);
     } catch(IOException ex) {
       ex.printStackTrace();
-    } finally {
-      IOUtils.closeQuietly(digestStream);
-      IOUtils.closeQuietly(entryStream);
     }
 
     // Get the entry's encrypted InputStream from the delegate.
@@ -205,9 +199,9 @@ public class DecryptingOnyxDataInputStrategy implements IChainingOnyxDataInputSt
    * </p>
    * 
    * <p>
-   * This method is used by the <code>listEntries</code> method to filter the list returned by the delegate. It is
-   * also used by the <code>getEntry</code> method to block attempts to get an <code>InputStream</code> for an entry
-   * that is not an encrypted entry.
+   * This method is used by the <code>listEntries</code> method to filter the list returned by the delegate. It is also
+   * used by the <code>getEntry</code> method to block attempts to get an <code>InputStream</code> for an entry that is
+   * not an encrypted entry.
    * </p>
    * 
    * @param entryName the name of the entry

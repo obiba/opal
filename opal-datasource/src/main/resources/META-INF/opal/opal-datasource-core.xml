@@ -1,0 +1,66 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:tx="http://www.springframework.org/schema/tx" xmlns:batch="http://www.springframework.org/schema/batch"
+  xsi:schemaLocation="
+  http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
+  http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd 
+  http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd">
+
+  <batch:job-repository id="jobRepository" data-source="opalDataSource" isolation-level-for-create="DEFAULT" />
+
+  <bean id="jobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean">
+    <property name="dataSource" ref="opalDataSource" />
+  </bean>
+
+  <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+    <property name="jobRepository" ref="jobRepository" />
+  </bean>
+
+  <!--
+    bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.ClassPathXmlJobRegistry">
+    <property name="jobPaths" value="classpath*:/META-INF/opal-datasource.xml" /> </bean
+  -->
+
+  <bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry">
+
+  </bean>
+
+  <bean id="jobRegistryBeanPostProcessor" class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
+    <property name="jobRegistry" ref="jobRegistry" />
+  </bean>
+
+  <bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator">
+    <property name="jobExplorer" ref="jobExplorer" />
+    <property name="jobRepository" ref="jobRepository" />
+    <property name="jobRegistry" ref="jobRegistry" />
+    <property name="jobLauncher" ref="jobLauncher" />
+  </bean>
+
+  <bean id="datasetWriter" class="org.springframework.batch.item.database.HibernateItemWriter">
+    <property name="sessionFactory" ref="opalSessionFactory" />
+  </bean>
+
+  <bean id="entityProvider" class="org.obiba.opal.datasource.support.DefaultEntityProvider">
+    <property name="opalKeyRegistry" ref="opalKeyRegistry" />
+    <property name="sessionFactory" ref="opalSessionFactory" />
+    <property name="entityType" value="PARTICIPANT" />
+  </bean>
+
+  <bean id="listener" class="org.obiba.opal.datasource.support.DatasetImportCountingListener">
+  </bean>
+
+  <batch:job id="abstractDatasetImportJob" abstract="true" job-repository="jobRepository">
+  </batch:job>
+
+  <batch:step id="abstractDatasetImportStep" abstract="true">
+    <batch:tasklet>
+      <batch:chunk writer="datasetWriter" commit-interval="5" />
+      <batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED" />
+      <batch:listeners>
+        <batch:listener ref="listener" />
+      </batch:listeners>
+    </batch:tasklet>
+  </batch:step>
+  
+  <import resource="classpath*:/META-INF/opal-datasource.xml" />
+
+</beans>

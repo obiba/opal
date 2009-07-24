@@ -34,6 +34,8 @@ public class ReportQueryBuilder {
    */
   private String variableBindingName = "?var";
 
+  private String variableDataBindingName = "?varData";
+
   private int nextBindingId = 0;
 
   private Set<CharSequence> joinPatterns = new LinkedHashSet<CharSequence>();
@@ -88,6 +90,10 @@ public class ReportQueryBuilder {
 
   public String getVariableBindingName() {
     return variableBindingName;
+  }
+
+  public String getVariableDataBindingName() {
+    return variableDataBindingName;
   }
 
   public String nextBinding() {

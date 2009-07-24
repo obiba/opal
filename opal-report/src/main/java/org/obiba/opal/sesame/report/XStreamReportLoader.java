@@ -4,6 +4,7 @@ import java.io.InputStream;
 
 import org.obiba.opal.sesame.report.impl.CategoryFilter;
 import org.obiba.opal.sesame.report.impl.DataEntryFormSelection;
+import org.obiba.opal.sesame.report.impl.DataItemNameSelection;
 import org.obiba.opal.sesame.report.impl.DataVariableTypeDataItemFilter;
 import org.obiba.opal.sesame.report.impl.NameRegexDataItemFilter;
 import org.obiba.opal.sesame.report.impl.ParentDataItemSelection;
@@ -17,6 +18,7 @@ public class XStreamReportLoader {
   public XStreamReportLoader() {
     xstream = new XStream();
     xstream.alias("report", Report.class);
+    xstream.alias("variables", DataItemNameSelection.class);
     xstream.alias("def", DataEntryFormSelection.class);
     xstream.alias("parent", ParentDataItemSelection.class);
     xstream.alias("nameRegex", NameRegexDataItemFilter.class);
