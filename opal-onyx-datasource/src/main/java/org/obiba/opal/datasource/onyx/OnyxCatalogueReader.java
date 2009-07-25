@@ -11,18 +11,17 @@ package org.obiba.opal.datasource.onyx;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Locale;
 
 import org.obiba.core.util.StreamUtil;
-import org.obiba.onyx.engine.variable.VariableData;
-import org.obiba.onyx.engine.variable.VariableDataSet;
+import org.obiba.onyx.engine.variable.Attribute;
+import org.obiba.onyx.engine.variable.Category;
+import org.obiba.onyx.engine.variable.IVariablePathNamingStrategy;
+import org.obiba.onyx.engine.variable.Variable;
 import org.obiba.onyx.engine.variable.util.VariableStreamer;
-import org.obiba.onyx.util.data.Data;
-import org.obiba.opal.core.domain.data.DataItem;
-import org.obiba.opal.core.domain.data.Dataset;
-import org.obiba.opal.core.domain.data.Entity;
-import org.obiba.opal.datasource.EntityProvider;
+import org.obiba.opal.core.domain.metadata.Catalogue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
@@ -35,61 +34,79 @@ import org.springframework.core.io.Resource;
 /**
  *
  */
-public class OnyxDatasetReader implements ItemStreamReader<Dataset> {
+public class OnyxCatalogueReader implements ItemStreamReader<Catalogue> {
 
-  private static final Logger log = LoggerFactory.getLogger(OnyxDatasetReader.class);
+  private static final Logger log = LoggerFactory.getLogger(OnyxCatalogueReader.class);
 
   private static final String VARIABLES_FILE = "variables.xml";
-
-  public static final String PARTICIPANT_DATA_EXTENSION = ".xml";
 
   private Resource resource;
 
   private IOnyxDataInputStrategy dataInputStrategy;
 
-  private EntityProvider entityProvider;
+  private IVariablePathNamingStrategy pathNamingStrategy;
 
   private OnyxDataInputContext dataInputContext;
 
-  private Iterator<String> entryIterator;
+  private Iterator<Variable> catalogues;
 
   public void setDataInputStrategy(IOnyxDataInputStrategy dataInputStrategy) {
     this.dataInputStrategy = dataInputStrategy;
+  }
+
+  public void setPathNamingStrategy(IVariablePathNamingStrategy pathNamingStrategy) {
+    this.pathNamingStrategy = pathNamingStrategy;
   }
 
   public void setResource(Resource resource) {
     this.resource = resource;
   }
 
-  public void setEntityProvider(EntityProvider entityProvider) {
-    this.entityProvider = entityProvider;
+  public Catalogue read() throws Exception, UnexpectedInputException, ParseException {
+    if(catalogues.hasNext() == false) {
+      return null;
+    }
+
+    // TODO: we should probably not make one catalogue per DEF. There should be one catalogue for the whole
+    // variables.xml file.
+
+    Variable catalogueVariable = catalogues.next();
+    Catalogue catalogue = new Catalogue(catalogueVariable.getName(), "onyx");
+    doAddVariable(catalogue, catalogueVariable);
+    return catalogue;
   }
 
-  public Dataset read() throws Exception, UnexpectedInputException, ParseException {
-    if(entryIterator.hasNext()) {
-      String entryName = entryIterator.next();
-      while(isParticipantEntry(entryName) == false && entryIterator.hasNext()) {
-        entryName = entryIterator.next();
-      }
-      if(isParticipantEntry(entryName)) {
-        log.info("Processing entry {}", entryName);
-        VariableDataSet variableDataSetRoot = getVariableFromXmlFile(entryName);
+  protected void doAddVariable(Catalogue catalogue, Variable variable) {
+    org.obiba.opal.core.domain.metadata.Variable opalVar = catalogue.addVariable(pathNamingStrategy.getPath(variable));
 
-        Entity entity = entityProvider.fetchEntity("onyx", entryName.replace(".xml", ""));
-        Dataset dataset = new Dataset(entity, "onyx", variableDataSetRoot.getExportDate());
+    opalVar.addAttribute("dataType", variable.getDataType());
+    opalVar.addAttribute("categorical", variable.isCategorial());
+    opalVar.addAttribute("multiple", variable.isMultiple());
+    opalVar.addAttribute("repeatable", variable.isRepeatable());
+    opalVar.addAttribute("mimeType", variable.getMimeType());
+    opalVar.addAttribute("unit", variable.getUnit());
 
-        for(VariableData vd : variableDataSetRoot.getVariableDatas()) {
-          List<Data> datum = vd.getDatas();
-          // TODO: OPAL-30 handle occurrences correctly
-          if(datum.size() == 1) {
-            DataItem dataItem = new DataItem(dataset, vd.getVariablePath(), datum.get(0).getValueAsString());
-            dataset.getDataItems().add(dataItem);
-          }
-        }
-        return dataset;
-      }
+    if(variable instanceof Category) {
+      Category category = (Category) variable;
+      opalVar.addAttribute("category", true);
+      opalVar.addAttribute("escape", category.getEscape());
+      opalVar.addAttribute("alternateName", category.getAlternateName());
     }
-    return null;
+
+    for(Attribute a : variable.getAttributes()) {
+      Serializable s = a.getValue();
+      // TODO: maybe we should store the attribute's type (integer, decimal, etc.)
+      Locale lc = a.getLocale();
+      opalVar.addAttribute(a.getKey(), s != null ? s.toString() : null, lc);
+    }
+
+    for(Variable child : variable.getVariables()) {
+      doAddVariable(catalogue, child);
+    }
+
+    for(Category child : variable.getCategories()) {
+      doAddVariable(catalogue, child);
+    }
   }
 
   public void close() throws ItemStreamException {
@@ -104,7 +121,10 @@ public class OnyxDatasetReader implements ItemStreamReader<Dataset> {
       throw new ItemStreamException(e);
     }
     dataInputStrategy.prepare(dataInputContext);
-    this.entryIterator = dataInputStrategy.listEntries().iterator();
+
+    Variable root = getVariableFromXmlFile(VARIABLES_FILE);
+    // Each first-level variable becomes a catalogue.
+    this.catalogues = root.getVariables().iterator();
   }
 
   public void update(ExecutionContext executionContext) throws ItemStreamException {
@@ -117,6 +137,7 @@ public class OnyxDatasetReader implements ItemStreamReader<Dataset> {
    * @return The root Variable or VariableDataSet
    */
   private <T> T getVariableFromXmlFile(String filename) {
+    log.debug("getVariableFromXmlFile({})", filename);
     InputStream inputStream = null;
     T object = null;
     try {
@@ -129,15 +150,6 @@ public class OnyxDatasetReader implements ItemStreamReader<Dataset> {
       StreamUtil.silentSafeClose(inputStream);
     }
     return object;
-  }
-
-  /**
-   * Returns true if the entryName is a Participant .xml datafile.
-   * @param entryName The name of the entry.
-   * @return True if the entryName is a Participant .xml datafile.
-   */
-  private boolean isParticipantEntry(String entryName) {
-    return (entryName != null && entryName.endsWith(PARTICIPANT_DATA_EXTENSION) && !entryName.equalsIgnoreCase(VARIABLES_FILE));
   }
 
 }

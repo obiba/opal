@@ -62,6 +62,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         <property name="searchPatterns">
           <set>
             <value>classpath*:org/obiba/opal/core/domain/data/**/*.class</value>
+            <value>classpath*:org/obiba/opal/core/domain/metadata/**/*.class</value>
           </set>
         </property>
         <!-- Specify annotations to look for in classes -->

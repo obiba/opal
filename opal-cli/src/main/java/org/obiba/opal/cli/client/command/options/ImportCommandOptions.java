@@ -11,13 +11,16 @@ import uk.co.flamingpenguin.jewel.cli.Unparsed;
 @CommandLineInterface(application = "import")
 public interface ImportCommandOptions extends GlobalOptions, KeystoreOption, DateOption, SiteOption, TagsOption {
 
-  @Option(shortName = { "l" })
+  @Option(shortName = "l")
   public boolean isListJobs();
 
-  @Option(shortName = { "r" })
+  @Option(shortName = "r")
   public String getRun();
 
   public boolean isRun();
+
+  @Option(shortName = "f")
+  public boolean isForce();
 
   @Unparsed(name = "Job Parmaters")
   public List<String> getJobParameters();

@@ -15,17 +15,8 @@
     <property name="jobRepository" ref="jobRepository" />
   </bean>
 
-  <!--
-    bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.ClassPathXmlJobRegistry">
-    <property name="jobPaths" value="classpath*:/META-INF/opal-datasource.xml" /> </bean
-  -->
-
-  <bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry">
-
-  </bean>
-
-  <bean id="jobRegistryBeanPostProcessor" class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
-    <property name="jobRegistry" ref="jobRegistry" />
+  <bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.ClassPathXmlJobRegistry">
+    <property name="jobPaths" value="classpath*:/META-INF/opal-datasource.xml" />
   </bean>
 
   <bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator">
@@ -35,7 +26,7 @@
     <property name="jobLauncher" ref="jobLauncher" />
   </bean>
 
-  <bean id="datasetWriter" class="org.springframework.batch.item.database.HibernateItemWriter">
+  <bean id="itemWriter" class="org.springframework.batch.item.database.HibernateItemWriter">
     <property name="sessionFactory" ref="opalSessionFactory" />
   </bean>
 
@@ -53,14 +44,19 @@
 
   <batch:step id="abstractDatasetImportStep" abstract="true">
     <batch:tasklet>
-      <batch:chunk writer="datasetWriter" commit-interval="5" />
+      <batch:chunk writer="itemWriter" commit-interval="5" />
       <batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED" />
       <batch:listeners>
         <batch:listener ref="listener" />
       </batch:listeners>
     </batch:tasklet>
   </batch:step>
-  
-  <import resource="classpath*:/META-INF/opal-datasource.xml" />
+
+  <batch:step id="abstractCatalogueImportStep" abstract="true">
+    <batch:tasklet>
+      <batch:chunk writer="itemWriter" commit-interval="1" />
+      <batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED" />
+    </batch:tasklet>
+  </batch:step>
 
 </beans>
