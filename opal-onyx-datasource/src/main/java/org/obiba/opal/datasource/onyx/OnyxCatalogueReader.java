@@ -31,10 +31,16 @@ public class OnyxCatalogueReader extends AbstractOnyxReader<Catalogue> {
 
   private IVariablePathNamingStrategy pathNamingStrategy;
 
+  private String catalogueName;
+
   private Iterator<Variable> variables;
 
   public void setPathNamingStrategy(IVariablePathNamingStrategy pathNamingStrategy) {
     this.pathNamingStrategy = pathNamingStrategy;
+  }
+
+  public void setCatalogueName(String catalogueName) {
+    this.catalogueName = catalogueName;
   }
 
   public void doOpen(ExecutionContext executionContext) throws ItemStreamException {
@@ -48,7 +54,7 @@ public class OnyxCatalogueReader extends AbstractOnyxReader<Catalogue> {
       return null;
     }
 
-    Catalogue catalogue = new Catalogue("onyx", "onyx");
+    Catalogue catalogue = new Catalogue("onyx", catalogueName);
 
     while(variables.hasNext()) {
       doAddVariable(catalogue, variables.next());
@@ -81,7 +87,7 @@ public class OnyxCatalogueReader extends AbstractOnyxReader<Catalogue> {
       opalVar.addAttribute(a.getKey(), s != null ? s.toString() : null, lc);
     }
 
-    for(Variable child : variable.getVariables()) {
+    for(Variable child : variable.getRegularVariables()) {
       doAddVariable(catalogue, child);
     }
 

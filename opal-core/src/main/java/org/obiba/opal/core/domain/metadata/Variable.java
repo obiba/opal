@@ -17,6 +17,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.obiba.core.domain.AbstractEntity;
 
@@ -24,9 +26,7 @@ import org.obiba.core.domain.AbstractEntity;
  *
  */
 @javax.persistence.Entity
-// Commented because MySQL has limits on the size of an index. It will refuse to create an index on columns that add up
-// to more than 767 bytes.
-// @Table(uniqueConstraints = @UniqueConstraint(columnNames = { "catalogue", "name" }))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "catalogue", "name" }))
 public class Variable extends AbstractEntity {
 
   private static final long serialVersionUID = 1L;
@@ -34,7 +34,8 @@ public class Variable extends AbstractEntity {
   @ManyToOne(optional = false)
   private Catalogue catalogue;
 
-  @Column(nullable = false, length = 2000)
+  // MySQL has a limitation on the index size (see uniqueConstraints above). The maximum key size is 767 bytes (wtf?)
+  @Column(nullable = false, length = 767)
   private String name;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "variable")

@@ -30,25 +30,21 @@
     <property name="sessionFactory" ref="opalSessionFactory" />
   </bean>
 
-  <bean id="entityProvider" class="org.obiba.opal.datasource.support.DefaultEntityProvider">
-    <property name="opalKeyRegistry" ref="opalKeyRegistry" />
-    <property name="sessionFactory" ref="opalSessionFactory" />
-    <property name="entityType" value="PARTICIPANT" />
-  </bean>
-
   <bean id="listener" class="org.obiba.opal.datasource.support.DatasetImportCountingListener">
   </bean>
 
-  <bean id="datasetProcessor" class="org.obiba.opal.datasource.support.ExistingDatasetProcessor">
+  <bean id="abstractDatasourceService" class="org.obiba.opal.datasource.impl.DefaultDatasourceServiceImpl" abstract="true">
+    <property name="opalKeyRegistry" ref="opalKeyRegistry"/>
     <property name="sessionFactory" ref="opalSessionFactory" />
+    <property name="metaDataService" ref="metaDataService"/>
   </bean>
 
-  <batch:job id="abstractDatasetImportJob" abstract="true" job-repository="jobRepository">
+  <batch:job id="abstractImportJob" abstract="true" job-repository="jobRepository">
   </batch:job>
 
   <batch:step id="abstractDatasetImportStep" abstract="true">
     <batch:tasklet>
-      <batch:chunk processor="datasetProcessor" writer="itemWriter" commit-interval="5" />
+      <batch:chunk writer="itemWriter" commit-interval="5" />
       <batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED" />
       <batch:listeners>
         <batch:listener ref="listener" />

@@ -102,10 +102,14 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     </property>
     <property name="participantIndentifier" ref="participantIdentifier" />
   </bean>
-
+  
   <bean id="opalKeyRegistry" class="org.obiba.opal.core.service.impl.DefaultOpalKeyRegistry">
     <property name="keyReader" ref="participantKeyRegistry" />
     <property name="keyWriter" ref="participantKeyRegistry" />
+  </bean>
+
+  <bean id="metaDataService" class="org.obiba.opal.core.service.impl.hibernate.MetaDataServiceHibernateImpl">
+    <property name="sessionFactory" ref="opalSessionFactory"/>
   </bean>
 
 </beans>

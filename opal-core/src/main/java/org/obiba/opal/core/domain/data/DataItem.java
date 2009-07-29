@@ -23,10 +23,10 @@ public class DataItem extends AbstractEntity {
 
   private static final long serialVersionUID = 1L;
 
-  @ManyToOne
+  @ManyToOne(optional = false)
   private Dataset dataset;
 
-  @Column(length = 2000)
+  @Column(nullable = false, length = 2000)
   private String variable;
 
   @Lob

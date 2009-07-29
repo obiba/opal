@@ -18,7 +18,8 @@ import org.obiba.onyx.util.data.Data;
 import org.obiba.opal.core.domain.data.DataItem;
 import org.obiba.opal.core.domain.data.Dataset;
 import org.obiba.opal.core.domain.data.Entity;
-import org.obiba.opal.datasource.EntityProvider;
+import org.obiba.opal.core.domain.metadata.Catalogue;
+import org.obiba.opal.datasource.DatasourceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
@@ -34,12 +35,20 @@ public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements It
 
   private static final Logger log = LoggerFactory.getLogger(OnyxDatasetReader.class);
 
-  private EntityProvider entityProvider;
+  private String catalogueName;
+
+  private DatasourceService datasourceService;
 
   private Iterator<String> entryIterator;
 
-  public void setEntityProvider(EntityProvider entityProvider) {
-    this.entityProvider = entityProvider;
+  private Catalogue catalogue;
+
+  public void setDatasourceService(DatasourceService datasourceService) {
+    this.datasourceService = datasourceService;
+  }
+
+  public void setCatalogueName(String catalogueName) {
+    this.catalogueName = catalogueName;
   }
 
   @Override
@@ -48,6 +57,9 @@ public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements It
   }
 
   public Dataset read() throws Exception, UnexpectedInputException, ParseException {
+    if(this.catalogue == null) {
+      this.catalogue = datasourceService.loadCatalogue(catalogueName);
+    }
     if(entryIterator.hasNext()) {
       String entryName = entryIterator.next();
       while(isParticipantEntry(entryName) == false && entryIterator.hasNext()) {
@@ -57,11 +69,9 @@ public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements It
         log.info("Processing entry {}", entryName);
         VariableDataSet variableDataSetRoot = readVariableDataset(entryName);
 
-        Entity entity = entityProvider.fetchEntity("onyx", entryName.replace(".xml", ""));
+        Entity entity = datasourceService.fetchEntity(entryName.replace(".xml", ""));
 
-        // TODO: Lookup an existing dataset with same datasource and extraction date. If it already exists, then we
-        // should skip it
-        Dataset dataset = new Dataset(entity, "onyx", variableDataSetRoot.getExportDate());
+        Dataset dataset = new Dataset(entity, catalogue, variableDataSetRoot.getExportDate());
 
         for(VariableData vd : variableDataSetRoot.getVariableDatas()) {
           List<Data> datum = vd.getDatas();

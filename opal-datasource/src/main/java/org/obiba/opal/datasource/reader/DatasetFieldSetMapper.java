@@ -7,7 +7,7 @@ import java.util.Date;
 import org.obiba.opal.core.domain.data.DataItem;
 import org.obiba.opal.core.domain.data.Dataset;
 import org.obiba.opal.core.domain.data.Entity;
-import org.obiba.opal.datasource.EntityProvider;
+import org.obiba.opal.datasource.DatasourceService;
 import org.springframework.batch.item.file.LineCallbackHandler;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
@@ -15,9 +15,9 @@ import org.springframework.batch.item.file.transform.LineTokenizer;
 
 public class DatasetFieldSetMapper implements LineCallbackHandler, FieldSetMapper<Dataset> {
 
-  private EntityProvider entityProvider;
+  private DatasourceService datasourceService;
 
-  private String datasource;
+  private String catalogueName;
 
   private Date extractionDate;
 
@@ -27,16 +27,16 @@ public class DatasetFieldSetMapper implements LineCallbackHandler, FieldSetMappe
   /** FieldSet that contains the header of each column. Used to obtain the name of a DataItem */
   private FieldSet fieldNames;
 
-  public void setEntityProvider(EntityProvider entityProvider) {
-    this.entityProvider = entityProvider;
+  public void setCatalogueName(String catalogueName) {
+    this.catalogueName = catalogueName;
+  }
+
+  public void setDatasourceService(DatasourceService datasourceService) {
+    this.datasourceService = datasourceService;
   }
 
   public void setLineTokenizer(LineTokenizer lineTokenizer) {
     this.lineTokenizer = lineTokenizer;
-  }
-
-  public void setDatasource(String datasource) {
-    this.datasource = datasource;
   }
 
   public void setExtractionDate(String extractionDate) {
@@ -62,8 +62,8 @@ public class DatasetFieldSetMapper implements LineCallbackHandler, FieldSetMappe
 
   public Dataset mapFieldSet(FieldSet fieldSet) {
     String entityId = fieldSet.readString(0);
-    Entity entity = entityProvider.fetchEntity(datasource, entityId);
-    Dataset ds = new Dataset(entity, datasource, extractionDate);
+    Entity entity = datasourceService.fetchEntity(entityId);
+    Dataset ds = new Dataset(entity, datasourceService.loadCatalogue(catalogueName), extractionDate);
     for(int i = 1; i < fieldSet.getFieldCount(); i++) {
       String dataItemValue = fieldSet.readString(i);
       ds.getDataItems().add(new DataItem(ds, getName(i), dataItemValue));

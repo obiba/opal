@@ -16,8 +16,10 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
 
 import org.obiba.core.domain.AbstractEntity;
 
@@ -25,15 +27,16 @@ import org.obiba.core.domain.AbstractEntity;
  *
  */
 @javax.persistence.Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "datasource", "name" }))
 public class Catalogue extends AbstractEntity {
 
   private static final long serialVersionUID = 1L;
 
   @Column(nullable = false)
-  private String name;
+  private String datasource;
 
   @Column(nullable = false)
-  private String datasource;
+  private String name;
 
   @Temporal(TemporalType.TIMESTAMP)
   @Column(nullable = false, updatable = false)
@@ -46,9 +49,9 @@ public class Catalogue extends AbstractEntity {
 
   }
 
-  public Catalogue(String name, String datasource) {
-    this.name = name;
+  public Catalogue(String datasource, String name) {
     this.datasource = datasource;
+    this.name = name;
     this.creationDate = new Date();
   }
 

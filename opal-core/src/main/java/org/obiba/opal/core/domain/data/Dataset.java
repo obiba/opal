@@ -21,6 +21,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.obiba.core.domain.AbstractEntity;
+import org.obiba.opal.core.domain.metadata.Catalogue;
 
 /**
  * 
@@ -30,14 +31,16 @@ public class Dataset extends AbstractEntity {
 
   private static final long serialVersionUID = 1L;
 
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne(optional = false, cascade = CascadeType.ALL)
   private Entity entity;
 
-  private String datasource;
+  @ManyToOne(optional = false)
+  private Catalogue catalogue;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataset")
   private List<DataItem> dataItems;
 
+  @Column(nullable = false)
   @Temporal(TemporalType.DATE)
   private Date extractionDate;
 
@@ -49,9 +52,9 @@ public class Dataset extends AbstractEntity {
 
   }
 
-  public Dataset(Entity entity, String datasource, Date extractionDate) {
+  public Dataset(Entity entity, Catalogue catalogue, Date extractionDate) {
     this.entity = entity;
-    this.datasource = datasource;
+    this.catalogue = catalogue;
     this.extractionDate = extractionDate;
     this.creationDate = new Date();
   }
@@ -60,12 +63,8 @@ public class Dataset extends AbstractEntity {
     return entity;
   }
 
-  public void setEntity(Entity entity) {
-    this.entity = entity;
-  }
-
-  public String getDatasource() {
-    return datasource;
+  public Catalogue getCatalogue() {
+    return catalogue;
   }
 
   public Date getExtractionDate() {

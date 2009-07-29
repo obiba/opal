@@ -5,13 +5,18 @@
   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd 
   http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd">
 
-  <batch:job id="csv-import" parent="abstractDatasetImportJob" restartable="false">
+  <batch:job id="csv-import" parent="abstractImportJob" restartable="false">
     <batch:step id="importCsv" parent="abstractDatasetImportStep">
       <batch:tasklet>
         <batch:chunk reader="csvDatasetReader" />
       </batch:tasklet>
     </batch:step>
   </batch:job>
+
+  <bean id="datasourceService" parent="abstractDatasourceService" scope="step">
+    <property name="datasourceName" value="#{jobParameters[input.datasource.name]}"/>
+    <property name="entityType" value="PARTICIPANT" />
+  </bean>
 
   <bean id="csvDatasetReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
     <property name="resource" value="#{jobParameters[input.file.name]}" />
@@ -31,9 +36,9 @@
   </bean>
 
   <bean id="datasetMapper" class="org.obiba.opal.datasource.reader.DatasetFieldSetMapper" scope="step">
-    <property name="datasource" value="#{jobParameters[input.datasource.name]}" />
+    <property name="catalogueName" value="#{jobParameters[input.catalogue.name]}" />
     <property name="extractionDate" value="#{jobParameters[input.extraction.date]}" />
-    <property name="entityProvider" ref="entityProvider" />
+    <property name="datasourceService" ref="datasourceService"/>
     <property name="lineTokenizer">
       <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer" />
     </property>
