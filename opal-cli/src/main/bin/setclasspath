@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Include Opal's conf directory in the classpath.
+CLASSPATH=$OPAL_HOME/conf
+
+# Add all JARs in Opal's lib directory to the classpath.
+for f in $(find $OPAL_HOME/lib -type f -name *.jar); do
+  CLASSPATH=$CLASSPATH:$f
+done

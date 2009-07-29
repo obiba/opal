@@ -15,4 +15,6 @@ then
   exit 2;
 fi
 
-java -Djava.ext.dirs="$JAVA_HOME/jre/lib/ext:$OPAL_HOME/lib" -cp "$OPAL_HOME/conf" org.obiba.opal.cli.client.impl.OpalAdminClient $@
+. $OPAL_HOME/bin/setclasspath
+
+java -cp "$CLASSPATH" org.obiba.opal.cli.client.impl.OpalAdminClient $@
