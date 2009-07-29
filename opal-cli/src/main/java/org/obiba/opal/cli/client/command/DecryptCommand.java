@@ -100,7 +100,7 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
   }
 
   private ApplicationContext loadContext() {
-    return new ClassPathXmlApplicationContext(new String[] { "/spring/opal-cli/context-config.xml", "/spring/opal-core/crypt.xml", "/META-INF/onyx-data-input.xml" });
+    return new ClassPathXmlApplicationContext(new String[] { "/META-INF/opal/context-config.xml", "/spring/opal-core/crypt.xml", "/META-INF/onyx-data-input.xml" });
   }
 
   private void processFile(File inputFile, File outputDir, String keystorePassword) {
