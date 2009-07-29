@@ -9,15 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.datasource.onyx;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 
-import org.obiba.core.util.StreamUtil;
 import org.obiba.onyx.engine.variable.VariableData;
 import org.obiba.onyx.engine.variable.VariableDataSet;
-import org.obiba.onyx.engine.variable.util.VariableStreamer;
 import org.obiba.onyx.util.data.Data;
 import org.obiba.opal.core.domain.data.DataItem;
 import org.obiba.opal.core.domain.data.Dataset;
@@ -30,39 +26,25 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.core.io.Resource;
 
 /**
  *
  */
-public class OnyxDatasetReader implements ItemStreamReader<Dataset> {
+public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements ItemStreamReader<Dataset> {
 
   private static final Logger log = LoggerFactory.getLogger(OnyxDatasetReader.class);
 
-  private static final String VARIABLES_FILE = "variables.xml";
-
-  public static final String PARTICIPANT_DATA_EXTENSION = ".xml";
-
-  private Resource resource;
-
-  private IOnyxDataInputStrategy dataInputStrategy;
-
   private EntityProvider entityProvider;
-
-  private OnyxDataInputContext dataInputContext;
 
   private Iterator<String> entryIterator;
 
-  public void setDataInputStrategy(IOnyxDataInputStrategy dataInputStrategy) {
-    this.dataInputStrategy = dataInputStrategy;
-  }
-
-  public void setResource(Resource resource) {
-    this.resource = resource;
-  }
-
   public void setEntityProvider(EntityProvider entityProvider) {
     this.entityProvider = entityProvider;
+  }
+
+  @Override
+  protected void doOpen(ExecutionContext executionContext) throws ItemStreamException {
+    this.entryIterator = getDataInputStrategy().listEntries().iterator();
   }
 
   public Dataset read() throws Exception, UnexpectedInputException, ParseException {
@@ -73,9 +55,12 @@ public class OnyxDatasetReader implements ItemStreamReader<Dataset> {
       }
       if(isParticipantEntry(entryName)) {
         log.info("Processing entry {}", entryName);
-        VariableDataSet variableDataSetRoot = getVariableFromXmlFile(entryName);
+        VariableDataSet variableDataSetRoot = readVariableDataset(entryName);
 
         Entity entity = entityProvider.fetchEntity("onyx", entryName.replace(".xml", ""));
+
+        // TODO: Lookup an existing dataset with same datasource and extraction date. If it already exists, then we
+        // should skip it
         Dataset dataset = new Dataset(entity, "onyx", variableDataSetRoot.getExportDate());
 
         for(VariableData vd : variableDataSetRoot.getVariableDatas()) {
@@ -90,54 +75,6 @@ public class OnyxDatasetReader implements ItemStreamReader<Dataset> {
       }
     }
     return null;
-  }
-
-  public void close() throws ItemStreamException {
-    dataInputStrategy.terminate(dataInputContext);
-  }
-
-  public void open(ExecutionContext executionContext) throws ItemStreamException {
-    dataInputContext = new OnyxDataInputContext();
-    try {
-      dataInputContext.setSource(resource.getFile().getPath());
-    } catch(IOException e) {
-      throw new ItemStreamException(e);
-    }
-    dataInputStrategy.prepare(dataInputContext);
-    this.entryIterator = dataInputStrategy.listEntries().iterator();
-  }
-
-  public void update(ExecutionContext executionContext) throws ItemStreamException {
-  }
-
-  /**
-   * Converts an XML file into a Variable or VariableDataSet.
-   * @param <T> The type to be returned, such as Variable or VariableDataSet.
-   * @param filename The XML file to be converted.
-   * @return The root Variable or VariableDataSet
-   */
-  private <T> T getVariableFromXmlFile(String filename) {
-    InputStream inputStream = null;
-    T object = null;
-    try {
-      inputStream = dataInputStrategy.getEntry(filename);
-      object = VariableStreamer.<T> fromXML(inputStream);
-      if(object == null) {
-        throw new IllegalStateException("Unable to load variables from the file [" + filename + "].");
-      }
-    } finally {
-      StreamUtil.silentSafeClose(inputStream);
-    }
-    return object;
-  }
-
-  /**
-   * Returns true if the entryName is a Participant .xml datafile.
-   * @param entryName The name of the entry.
-   * @return True if the entryName is a Participant .xml datafile.
-   */
-  private boolean isParticipantEntry(String entryName) {
-    return (entryName != null && entryName.endsWith(PARTICIPANT_DATA_EXTENSION) && !entryName.equalsIgnoreCase(VARIABLES_FILE));
   }
 
 }

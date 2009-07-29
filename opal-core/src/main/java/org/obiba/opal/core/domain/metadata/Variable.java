@@ -24,11 +24,14 @@ import org.obiba.core.domain.AbstractEntity;
  *
  */
 @javax.persistence.Entity
+// Commented because MySQL has limits on the size of an index. It will refuse to create an index on columns that add up
+// to more than 767 bytes.
+// @Table(uniqueConstraints = @UniqueConstraint(columnNames = { "catalogue", "name" }))
 public class Variable extends AbstractEntity {
 
   private static final long serialVersionUID = 1L;
 
-  @ManyToOne
+  @ManyToOne(optional = false)
   private Catalogue catalogue;
 
   @Column(nullable = false, length = 2000)

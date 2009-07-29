@@ -25,11 +25,11 @@
   </bean>
 
   <batch:job id="onyx-import" parent="abstractDatasetImportJob" restartable="true">
-    <batch:step id="importCatalogue" parent="abstractCatalogueImportStep">
+    <!-- >batch:step id="importCatalogue" parent="abstractCatalogueImportStep" next="importDataset">
       <batch:tasklet>
         <batch:chunk reader="onyxCatalogueReader" />
       </batch:tasklet>
-    </batch:step>
+    </batch:step-->
     <batch:step id="importDataset" parent="abstractDatasetImportStep">
       <batch:tasklet>
         <batch:chunk reader="onyxDatasetReader" />

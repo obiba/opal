@@ -24,7 +24,7 @@ public class VariableAttribute extends AbstractEntity {
 
   private static final long serialVersionUID = 1L;
 
-  @ManyToOne
+  @ManyToOne(optional = false)
   private Variable variable;
 
   @Column(nullable = false, length = 2000)
