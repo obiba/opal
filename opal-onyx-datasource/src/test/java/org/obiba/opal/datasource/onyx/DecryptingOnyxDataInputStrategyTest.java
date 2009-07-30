@@ -22,6 +22,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
+
 import org.apache.commons.codec.binary.Base64;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -116,11 +121,10 @@ public class DecryptingOnyxDataInputStrategyTest {
   public void setUp() {
     context = new OnyxDataInputContext();
     context.setSource(TEST_ARCHIVE_WITH_META);
-    context.setKeyProviderArg(OpalKeyStore.KEYSTORE_PASSWORD_ARGKEY, "password");
-    context.setKeyProviderArg(OpalKeyStore.KEY_PASSWORD_ARGKEY, "password");
 
     OpalKeyStore keyStore = new OpalKeyStore();
     keyStore.setKeyStoreResource(new FileSystemResource(TEST_KEYSTORE));
+    keyStore.setCallbackHandler(new TestCallbackHandler());
     keyStore.init(context.getKeyProviderArgs());
 
     ZipOnyxDataInputStrategy zipStrategy = new ZipOnyxDataInputStrategy();
@@ -315,5 +319,19 @@ public class DecryptingOnyxDataInputStrategyTest {
     }
 
     return true;
+  }
+
+  class TestCallbackHandler implements CallbackHandler {
+    public void handle(Callback[] callbacks) throws java.io.IOException, UnsupportedCallbackException {
+
+      for(Callback c : callbacks) {
+        if(c instanceof PasswordCallback) {
+          PasswordCallback passwordCallback = (PasswordCallback) c;
+          passwordCallback.setPassword("password".toCharArray());
+        } else {
+          throw new UnsupportedCallbackException(c);
+        }
+      }
+    }
   }
 }

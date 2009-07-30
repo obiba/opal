@@ -17,7 +17,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.obiba.opal.cli.client.command.options.OnyxImportCommandOptions;
-import org.obiba.opal.cli.util.CliUtil;
 import org.obiba.opal.datasource.onyx.service.OnyxImportService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -61,12 +60,7 @@ public class OnyxImportCommand extends AbstractCommand<OnyxImportCommandOptions>
 
       // Call the appropriate service method.
       if(files != null) {
-        String keystorePassword = CliUtil.promptForPassword("Enter keystore password: ");
-        String keyPassword = CliUtil.promptForPassword("Enter key password (RETURN if same as keystore password): ");
-        if(keyPassword == null) {
-          keyPassword = keystorePassword;
-        }
-        onyxImportService.importData(csvToList(tags), files.get(0), keystorePassword, keyPassword, options.isCatalogOnly());
+        onyxImportService.importData(csvToList(tags), files.get(0), null, null, options.isCatalogOnly());
       } else if(options.isDate() || options.isSite()) {
         onyxImportService.importData(stringToDate(date), site, csvToList(tags), options.isCatalogOnly());
       } else {
@@ -101,7 +95,8 @@ public class OnyxImportCommand extends AbstractCommand<OnyxImportCommandOptions>
    * Converts a <code>String</code> containing comma-separated values to a <code>List</code> of those values.
    * 
    * @param csv <code>String</code> of comma-separated values
-   * @return <code>List</code> of values (or <code>null</code> if <code>csv</code> is <code>null</code> or empty)
+   * @return <code>List</code> of values (or <code>null</code> if <code>csv</code> is <code>null</code> or
+   * empty)
    */
   private List<String> csvToList(String csv) {
     List<String> valueList = null;

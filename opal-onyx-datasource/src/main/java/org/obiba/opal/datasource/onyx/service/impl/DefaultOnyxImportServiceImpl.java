@@ -24,7 +24,6 @@ import org.obiba.onyx.engine.variable.impl.DefaultVariablePathNamingStrategy;
 import org.obiba.onyx.engine.variable.util.VariableFinder;
 import org.obiba.onyx.engine.variable.util.VariableStreamer;
 import org.obiba.onyx.util.data.Data;
-import org.obiba.opal.core.crypt.OpalKeyStore;
 import org.obiba.opal.core.service.IOpalKeyRegistry;
 import org.obiba.opal.datasource.onyx.IOnyxDataInputStrategy;
 import org.obiba.opal.datasource.onyx.OnyxDataInputContext;
@@ -115,8 +114,6 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
 
     // Create the dataInputContext, based on the specified command-line options.
     OnyxDataInputContext dataInputContext = new OnyxDataInputContext();
-    dataInputContext.setKeyProviderArg(OpalKeyStore.KEYSTORE_PASSWORD_ARGKEY, keyStorePassword);
-    dataInputContext.setKeyProviderArg(OpalKeyStore.KEY_PASSWORD_ARGKEY, keyPassword);
     dataInputContext.setSource(source.getPath());
 
     variableVisitor.setSource(source.getName());

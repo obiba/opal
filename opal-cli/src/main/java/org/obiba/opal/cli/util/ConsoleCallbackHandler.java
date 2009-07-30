@@ -11,12 +11,16 @@ package org.obiba.opal.cli.util;
 
 import java.io.Console;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.TextInputCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
+
+import org.obiba.opal.core.crypt.CacheablePasswordCallback;
+import org.obiba.opal.core.crypt.CachingCallbackHandler;
 
 /**
  * <p>
@@ -31,7 +35,25 @@ import javax.security.auth.callback.UnsupportedCallbackException;
  * </ul>
  * </p>
  */
-public class ConsoleCallbackHandler implements CallbackHandler {
+public class ConsoleCallbackHandler implements CachingCallbackHandler {
+  //
+  // Instance Variables
+  //
+
+  private Map<String, char[]> passwordCache;
+
+  //
+  // Constructors
+  //
+
+  public ConsoleCallbackHandler() {
+    passwordCache = new HashMap<String, char[]>();
+  }
+
+  //
+  // CallbackHandler Methods
+  //
+
   /**
    * Handles the specified callbacks.
    * 
@@ -52,10 +74,29 @@ public class ConsoleCallbackHandler implements CallbackHandler {
         textCallback.setText(console.readLine("%s", textCallback.getPrompt()));
       } else if(c instanceof PasswordCallback) {
         PasswordCallback passwordCallback = (PasswordCallback) c;
-        passwordCallback.setPassword(console.readPassword("%s", passwordCallback.getPrompt()));
+
+        if(passwordCallback instanceof CacheablePasswordCallback) {
+          String passwordKey = ((CacheablePasswordCallback) passwordCallback).getPasswordKey();
+
+          if(passwordCache.containsKey(passwordKey)) {
+            passwordCallback.setPassword(passwordCache.get(passwordKey));
+          } else {
+            passwordCallback.setPassword(console.readPassword("%s", passwordCallback.getPrompt()));
+            passwordCache.put(passwordKey, passwordCallback.getPassword());
+          }
+        } else {
+          passwordCallback.setPassword(console.readPassword("%s", passwordCallback.getPrompt()));
+        }
       } else {
         throw new UnsupportedCallbackException(c);
       }
+    }
+  }
+
+  public void cacheCallbackResult(Callback callback) {
+    if(callback instanceof CacheablePasswordCallback) {
+      CacheablePasswordCallback cacheableCallback = (CacheablePasswordCallback) callback;
+      passwordCache.put(cacheableCallback.getPasswordKey(), cacheableCallback.getPassword());
     }
   }
 }

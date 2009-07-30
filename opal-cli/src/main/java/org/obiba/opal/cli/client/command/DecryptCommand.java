@@ -16,9 +16,7 @@ import java.io.InputStream;
 
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.cli.client.command.options.DecryptCommandOptions;
-import org.obiba.opal.cli.util.CliUtil;
 import org.obiba.opal.core.crypt.KeyProviderException;
-import org.obiba.opal.core.crypt.OpalKeyStore;
 import org.obiba.opal.datasource.onyx.DigestMismatchException;
 import org.obiba.opal.datasource.onyx.DigestUtil;
 import org.obiba.opal.datasource.onyx.EncryptionDataMissingException;
@@ -67,13 +65,10 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
         ApplicationContext context = loadContext();
         setDataInputStrategy((IOnyxDataInputStrategy) context.getBean("onyxDataInputStrategy"));
 
-        // Prompt user for keystore password.
-        String keystorePassword = CliUtil.promptForPassword("Enter keystore password: ");
-
         // Now process each input file (Onyx data zip file) specified on the command line.
         for(File inputFile : options.getFiles()) {
           try {
-            processFile(inputFile, outputDir, keystorePassword);
+            processFile(inputFile, outputDir, null);
           } catch(DigestMismatchException ex) {
             System.err.println(ex.getMessage());
           } catch(EncryptionDataMissingException ex) {
@@ -114,16 +109,8 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
       System.err.println("WARN: digest file " + digestFile + " not found. Cannot check file integrity.");
     }
 
-    // Prompt user for key password.
-    String keyPassword = CliUtil.promptForPassword("Enter key password (RETURN if same as keystore password): ");
-    if(keyPassword == null) {
-      keyPassword = keystorePassword;
-    }
-
     // Create the dataInputContext, based on the specified command-line options.
     OnyxDataInputContext dataInputContext = new OnyxDataInputContext();
-    dataInputContext.setKeyProviderArg(OpalKeyStore.KEYSTORE_PASSWORD_ARGKEY, keystorePassword);
-    dataInputContext.setKeyProviderArg(OpalKeyStore.KEY_PASSWORD_ARGKEY, keyPassword);
     dataInputContext.setSource(inputFile.getPath());
 
     // Prepare the strategy.

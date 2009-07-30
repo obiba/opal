@@ -23,17 +23,14 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Map;
 
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
+
 import org.springframework.core.io.Resource;
 
 public class OpalKeyStore implements IKeyProvider {
-  //
-  // Constants
-  //
-
-  public static final String KEYSTORE_PASSWORD_ARGKEY = "keystorePassword";
-
-  public static final String KEY_PASSWORD_ARGKEY = "keyPassword";
-
   //
   // Instance Variables
   //
@@ -42,29 +39,13 @@ public class OpalKeyStore implements IKeyProvider {
 
   private Resource keyStoreResource;
 
-  private char[] keystorePassword;
-
-  private char[] keyPassword;
+  private CallbackHandler callbackHandler;
 
   //
   // IKeyProvider Methods
   //
 
   public void init(Map<String, String> keyProviderArgs) {
-    if(!keyProviderArgs.containsKey(KEYSTORE_PASSWORD_ARGKEY)) {
-      throw new KeyProviderInitializationException("Key provider argument missing (keystorePassword)");
-    }
-
-    if(!keyProviderArgs.containsKey(KEY_PASSWORD_ARGKEY)) {
-      throw new KeyProviderInitializationException("Key provider argument missing (keyPassword)");
-    }
-
-    String keystorePassword = keyProviderArgs.get(KEYSTORE_PASSWORD_ARGKEY);
-    this.keystorePassword = (keystorePassword != null) ? keystorePassword.toCharArray() : null;
-
-    String keyPassword = keyProviderArgs.get(KEY_PASSWORD_ARGKEY);
-    this.keyPassword = (keyPassword != null) ? keyPassword.toCharArray() : null;
-
     loadKeyStore();
   }
 
@@ -76,7 +57,8 @@ public class OpalKeyStore implements IKeyProvider {
     KeyPair keyPair = null;
 
     try {
-      Key key = keyStore.getKey(alias, keyPassword);
+      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(alias, "Password for key " + alias, false);
+      Key key = keyStore.getKey(alias, getKeyPassword(passwordCallback));
 
       if(key == null) {
         throw new KeyPairNotFoundException("KeyPair not found for specified alias (" + alias + ")");
@@ -93,6 +75,11 @@ public class OpalKeyStore implements IKeyProvider {
         keyPair = new KeyPair(publicKey, (PrivateKey) key);
       } else {
         throw new KeyPairNotFoundException("KeyPair not found for specified alias (" + alias + ")");
+      }
+
+      // If the callbackHandler supports it, cache the password.
+      if(callbackHandler instanceof CachingCallbackHandler) {
+        ((CachingCallbackHandler) callbackHandler).cacheCallbackResult(passwordCallback);
       }
     } catch(KeyPairNotFoundException ex) {
       throw ex;
@@ -144,6 +131,10 @@ public class OpalKeyStore implements IKeyProvider {
     this.keyStoreResource = keyStoreResource;
   }
 
+  public void setCallbackHandler(CallbackHandler callbackHandler) {
+    this.callbackHandler = callbackHandler;
+  }
+
   /**
    * Loads the KeyStore from the specified file using the specified password.
    * 
@@ -154,14 +145,17 @@ public class OpalKeyStore implements IKeyProvider {
     InputStream is = null;
 
     try {
-      keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
       if(keyStoreResource.exists()) {
-        keyStore.load(is = keyStoreResource.getInputStream(), keystorePassword);
+        KeyStore.ProtectionParameter protectionParameter = new KeyStore.CallbackHandlerProtection(callbackHandler);
+        KeyStore.Builder keyStoreBuilder = KeyStore.Builder.newInstance(KeyStore.getDefaultType(), null, keyStoreResource.getFile(), protectionParameter);
+        keyStore = keyStoreBuilder.getKeyStore();
       } else {
         throw new KeyProviderInitializationException("Keystore [" + keyStoreResource.getFile().getName() + "] not found.");
       }
     } catch(KeyProviderInitializationException ex) {
       throw ex;
+    } catch(KeyStoreException ex) {
+      throw new KeyProviderSecurityException("Wrong keystore password or keystore was tampered with");
     } catch(IOException ex) {
       if(ex.getCause() != null && ex.getCause() instanceof UnrecoverableKeyException) {
         throw new KeyProviderSecurityException("Wrong keystore password");
@@ -176,5 +170,10 @@ public class OpalKeyStore implements IKeyProvider {
         ; // nothing to do
       }
     }
+  }
+
+  private char[] getKeyPassword(PasswordCallback passwordCallback) throws UnsupportedCallbackException, IOException {
+    callbackHandler.handle(new Callback[] { passwordCallback });
+    return passwordCallback.getPassword();
   }
 }
