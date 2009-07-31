@@ -11,10 +11,11 @@ package org.obiba.opal.core.service.impl.hibernate;
 
 import java.util.List;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.obiba.opal.core.domain.participant.Participant;
+import org.obiba.opal.core.domain.participant.ParticipantKey;
 import org.obiba.opal.core.service.impl.DefaultParticipantKeyRegistryImpl;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,13 +37,10 @@ public final class ParticipantKeyRegistryHibernateImpl extends DefaultParticipan
     assert owner != null : "The owner must not be null.";
     assert key != null : "The key must not be null.";
 
-    Query q = getSession().createQuery("select p from Participant p where p.keyMap[:owner] = (select pk from ParticipantKeys pk where :key in elements(pk.values))");
-    q.setString("owner", owner);
-    q.setString("key", key);
+    List<ParticipantKey> result = getSession().createCriteria(ParticipantKey.class).add(Restrictions.eq("owner", owner)).add(Restrictions.eq("value", key)).list();
 
-    List<Participant> result = q.list();
     if(result.size() == 1) {
-      return result.get(0);
+      return result.get(0).getParticipant();
     } else if(result.size() == 0) {
       return null;
     } else {

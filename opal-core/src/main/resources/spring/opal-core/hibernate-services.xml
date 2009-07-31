@@ -100,7 +100,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         <property name="sessionFactory" ref="keySessionFactory" />
       </bean>
     </property>
-    <property name="participantIndentifier" ref="participantIdentifier" />
+    <property name="participantIdentifier" ref="participantIdentifier" />
   </bean>
   
   <bean id="opalKeyRegistry" class="org.obiba.opal.core.service.impl.DefaultOpalKeyRegistry">

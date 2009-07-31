@@ -9,10 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.core.domain.participant;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -21,13 +21,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import org.hibernate.annotations.CollectionOfElements;
-
 /**
  * Represents a participant in the Participant Key Database.
  */
 @Entity
 public final class Participant {
+  //
+  // Instance Variables
+  //
 
   @SuppressWarnings("unused")
   @Id
@@ -35,13 +36,20 @@ public final class Participant {
   @Column
   private long id;
 
-  @CollectionOfElements
-  @OneToMany(cascade = { CascadeType.ALL })
-  private final Map<String, ParticipantKeys> keyMap = new HashMap<String, ParticipantKeys>();
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "participant")
+  private List<ParticipantKey> keys;
+
+  //
+  // Constructors
+  //
 
   public Participant() {
-    super();
+    keys = new ArrayList<ParticipantKey>();
   }
+
+  //
+  // Methods
+  //
 
   /**
    * Adds the {@code owner/key} pair.
@@ -54,12 +62,12 @@ public final class Participant {
     if(owner == null) throw new IllegalArgumentException("The owner must not be null.");
     if(key == null) throw new IllegalArgumentException("The key must not be null.");
     if(hasEntry(owner, key)) throw new IllegalStateException("The owner/key pair [" + owner + "]=[" + key + "] already exists. Duplicates are not permitted.");
-    ParticipantKeys keys = keyMap.get(owner);
-    if(keys == null) {
-      keys = new ParticipantKeys();
-    }
-    keys.addKey(key);
-    keyMap.put(owner, keys);
+
+    ParticipantKey participantKey = new ParticipantKey();
+    participantKey.setParticipant(this);
+    participantKey.setOwner(owner);
+    participantKey.setValue(key);
+    keys.add(participantKey);
   }
 
   /**
@@ -68,12 +76,14 @@ public final class Participant {
    * @return A {@code Collection} of keys.
    */
   public Collection<String> getKeys(String owner) {
-    ParticipantKeys keys = keyMap.get(owner);
-    if(keys == null) {
-      return Collections.emptySet();
-    } else {
-      return Collections.unmodifiableCollection(keys.getKeys());
+    List<String> ownerKeys = new ArrayList<String>();
+    for(ParticipantKey key : keys) {
+      if(key.getOwner().equals(owner)) {
+        ownerKeys.add(key.getValue());
+      }
     }
+
+    return Collections.unmodifiableCollection(ownerKeys);
   }
 
   /**
@@ -83,13 +93,13 @@ public final class Participant {
    * @return True if the {@code owner/key} pair exists, false otherwise.
    */
   public boolean hasEntry(String owner, String key) {
-    ParticipantKeys keys = keyMap.get(owner);
-    if(keys == null) return false;
-    if(keys.contains(key)) {
-      return true;
-    } else {
-      return false;
+    for(ParticipantKey aKey : keys) {
+      if(aKey.getOwner().equals(owner) && aKey.getValue().equals(key)) {
+        return true;
+      }
     }
+
+    return false;
   }
 
   /**
@@ -99,13 +109,17 @@ public final class Participant {
    * @param key The key associated with the owner.
    */
   public void removeEntry(String owner, String key) {
-    ParticipantKeys keys = keyMap.get(owner);
-    if(keys == null) return;
-    if(keys.contains(key)) {
-      keys.remove(key);
-      if(keys.size() == 0) {
-        keyMap.remove(owner);
+    ParticipantKey matchingEntry = null;
+
+    for(ParticipantKey aKey : keys) {
+      if(aKey.getOwner().equals(owner) && aKey.getValue().equals(key)) {
+        matchingEntry = aKey;
+        break;
       }
+    }
+
+    if(matchingEntry != null) {
+      keys.remove(matchingEntry);
     }
   }
 
@@ -114,6 +128,6 @@ public final class Participant {
    * @return Total number of owners.
    */
   public int size() {
-    return keyMap.size();
+    return keys.size();
   }
 }

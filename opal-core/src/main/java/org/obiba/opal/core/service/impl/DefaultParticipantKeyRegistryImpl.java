@@ -23,10 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public abstract class DefaultParticipantKeyRegistryImpl extends PersistenceManagerAwareService implements IParticipantKeyReadRegistry, IParticipantKeyWriteRegistry {
 
-  private IParticipantIdentifier participantIndentifier;
+  private IParticipantIdentifier participantIdentifier;
 
-  public void setParticipantIndentifier(IParticipantIdentifier participantIndentifier) {
-    this.participantIndentifier = participantIndentifier;
+  public void setParticipantIdentifier(IParticipantIdentifier participantIdentifier) {
+    this.participantIdentifier = participantIdentifier;
   }
 
   /**
@@ -102,7 +102,7 @@ public abstract class DefaultParticipantKeyRegistryImpl extends PersistenceManag
 
   public String generateUniqueKey(String owner) {
     for(int i = 0; i < 100; i++) {
-      String uniqueId = participantIndentifier.generateParticipantIdentifier();
+      String uniqueId = participantIdentifier.generateParticipantIdentifier();
       if(!hasParticipant(owner, uniqueId)) {
         return uniqueId;
       }
