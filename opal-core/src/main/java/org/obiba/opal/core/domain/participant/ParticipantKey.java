@@ -9,13 +9,17 @@
  ******************************************************************************/
 package org.obiba.opal.core.domain.participant;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 @Entity
+@Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "owner", "value" }) })
 public class ParticipantKey {
   //
   // Instance Variables
@@ -27,11 +31,13 @@ public class ParticipantKey {
   private Long id;
 
   @ManyToOne
-  @JoinColumn(name = "participant_id")
+  @JoinColumn(name = "participant_id", nullable = false)
   private Participant participant;
 
+  @Column(nullable = false)
   private String owner;
 
+  @Column(nullable = false)
   private String value;
 
   //
