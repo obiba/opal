@@ -7,10 +7,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.domain.data;
+package org.obiba.opal.core.domain.metadata;
+
+import java.util.Locale;
 
 import javax.persistence.Column;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
 import org.obiba.core.domain.AbstractEntity;
@@ -19,50 +20,49 @@ import org.obiba.core.domain.AbstractEntity;
  * 
  */
 @javax.persistence.Entity
-public class DataItem extends AbstractEntity {
+public class DataItemAttribute extends AbstractEntity {
 
   private static final long serialVersionUID = 1L;
 
   @ManyToOne(optional = false)
-  private Dataset dataset;
+  private DataItem dataItem;
 
   @Column(nullable = false, length = 2000)
-  private String variable;
+  private String name;
 
-  @Lob
   @Column(length = Integer.MAX_VALUE)
   private String value;
 
-  private Integer occurrence;
+  @Column(length = 10)
+  private Locale locale;
 
-  public DataItem() {
-
+  public DataItemAttribute() {
   }
 
-  public DataItem(Dataset dataset, String variable, String value) {
-    this(dataset, variable, value, null);
+  public DataItemAttribute(DataItem dataItem, String name, String value) {
+    this(dataItem, name, value, null);
   }
 
-  public DataItem(Dataset dataset, String variable, String value, Integer occurrence) {
-    this.dataset = dataset;
-    this.variable = variable;
+  public DataItemAttribute(DataItem dataItem, String name, String value, Locale locale) {
+    this.dataItem = dataItem;
+    this.name = name;
     this.value = value;
-    this.occurrence = occurrence;
+    this.locale = locale;
   }
 
-  public Dataset getDataset() {
-    return dataset;
+  public DataItem getDataItem() {
+    return dataItem;
   }
 
-  public String getVariable() {
-    return variable;
+  public String getName() {
+    return name;
   }
 
   public String getValue() {
     return value;
   }
 
-  public Integer getOccurrence() {
-    return occurrence;
+  public Locale getLocale() {
+    return locale;
   }
 }

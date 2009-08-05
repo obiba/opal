@@ -64,27 +64,27 @@ public class OnyxCatalogueReader extends AbstractOnyxReader<Catalogue> {
 
   protected void doAddVariable(Catalogue catalogue, Variable variable) {
     log.debug("Processing variable {}", pathNamingStrategy.getPath(variable));
-    org.obiba.opal.core.domain.metadata.Variable opalVar = catalogue.addVariable(pathNamingStrategy.getPath(variable));
+    org.obiba.opal.core.domain.metadata.DataItem opalDataItem = catalogue.addDataItem(pathNamingStrategy.getPath(variable));
 
-    opalVar.addAttribute("dataType", variable.getDataType());
-    opalVar.addAttribute("categorical", variable.isCategorial());
-    opalVar.addAttribute("multiple", variable.isMultiple());
-    opalVar.addAttribute("repeatable", variable.isRepeatable());
-    opalVar.addAttribute("mimeType", variable.getMimeType());
-    opalVar.addAttribute("unit", variable.getUnit());
+    opalDataItem.addAttribute("dataType", variable.getDataType());
+    opalDataItem.addAttribute("categorical", variable.isCategorial());
+    opalDataItem.addAttribute("multiple", variable.isMultiple());
+    opalDataItem.addAttribute("repeatable", variable.isRepeatable());
+    opalDataItem.addAttribute("mimeType", variable.getMimeType());
+    opalDataItem.addAttribute("unit", variable.getUnit());
 
     if(variable instanceof Category) {
       Category category = (Category) variable;
-      opalVar.addAttribute("category", true);
-      opalVar.addAttribute("escape", category.getEscape());
-      opalVar.addAttribute("alternateName", category.getAlternateName());
+      opalDataItem.addAttribute("category", true);
+      opalDataItem.addAttribute("escape", category.getEscape());
+      opalDataItem.addAttribute("alternateName", category.getAlternateName());
     }
 
     for(Attribute a : variable.getAttributes()) {
       Serializable s = a.getValue();
       // TODO: maybe we should store the attribute's type (integer, decimal, etc.)
       Locale lc = a.getLocale();
-      opalVar.addAttribute(a.getKey(), s != null ? s.toString() : null, lc);
+      opalDataItem.addAttribute(a.getKey(), s != null ? s.toString() : null, lc);
     }
 
     for(Variable child : variable.getRegularVariables()) {

@@ -15,11 +15,11 @@ public class DatasetImportCountingListener implements ItemWriteListener<Dataset>
   private StepExecution stepExecution;
 
   public void afterWrite(List<? extends Dataset> items) {
-    int dataItemCount = 0;
+    int dataPointCount = 0;
     for(Dataset dataset : items) {
-      dataItemCount += dataset.getDataItems().size();
+      dataPointCount += dataset.getDataPoints().size();
     }
-    doIncrementCount(stepExecution, dataItemCount);
+    doIncrementCount(stepExecution, dataPointCount);
   }
 
   public void beforeWrite(List<? extends Dataset> items) {

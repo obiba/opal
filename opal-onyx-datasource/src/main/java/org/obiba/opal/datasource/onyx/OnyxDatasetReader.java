@@ -15,7 +15,7 @@ import java.util.List;
 import org.obiba.onyx.engine.variable.VariableData;
 import org.obiba.onyx.engine.variable.VariableDataSet;
 import org.obiba.onyx.util.data.Data;
-import org.obiba.opal.core.domain.data.DataItem;
+import org.obiba.opal.core.domain.data.DataPoint;
 import org.obiba.opal.core.domain.data.Dataset;
 import org.obiba.opal.core.domain.data.Entity;
 import org.obiba.opal.core.domain.metadata.Catalogue;
@@ -29,7 +29,7 @@ import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 
 /**
- *
+ * 
  */
 public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements ItemStreamReader<Dataset> {
 
@@ -77,8 +77,8 @@ public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements It
           List<Data> datum = vd.getDatas();
           // TODO: OPAL-30 handle occurrences correctly
           if(datum.size() == 1) {
-            DataItem dataItem = new DataItem(dataset, vd.getVariablePath(), datum.get(0).getValueAsString());
-            dataset.getDataItems().add(dataItem);
+            DataPoint dataPoint = new DataPoint(dataset, vd.getVariablePath(), datum.get(0).getValueAsString());
+            dataset.getDataPoints().add(dataPoint);
           }
         }
         return dataset;

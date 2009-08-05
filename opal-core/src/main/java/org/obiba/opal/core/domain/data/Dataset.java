@@ -38,7 +38,7 @@ public class Dataset extends AbstractEntity {
   private Catalogue catalogue;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataset")
-  private List<DataItem> dataItems;
+  private List<DataPoint> dataPoints;
 
   @Column(nullable = false)
   @Temporal(TemporalType.DATE)
@@ -75,8 +75,8 @@ public class Dataset extends AbstractEntity {
     return creationDate;
   }
 
-  public List<DataItem> getDataItems() {
-    return dataItems != null ? dataItems : (dataItems = new ArrayList<DataItem>());
+  public List<DataPoint> getDataPoints() {
+    return dataPoints != null ? dataPoints : (dataPoints = new ArrayList<DataPoint>());
   }
 
 }

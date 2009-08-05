@@ -27,7 +27,7 @@ import org.obiba.core.domain.AbstractEntity;
  */
 @javax.persistence.Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = { "catalogue", "name" }))
-public class Variable extends AbstractEntity {
+public class DataItem extends AbstractEntity {
 
   private static final long serialVersionUID = 1L;
 
@@ -39,13 +39,13 @@ public class Variable extends AbstractEntity {
   private String name;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "variable")
-  private List<VariableAttribute> attributes;
+  private List<DataItemAttribute> attributes;
 
-  public Variable() {
+  public DataItem() {
 
   }
 
-  public Variable(Catalogue catalogue, String name) {
+  public DataItem(Catalogue catalogue, String name) {
     this.catalogue = catalogue;
     this.name = name;
   }
@@ -58,26 +58,26 @@ public class Variable extends AbstractEntity {
     return catalogue;
   }
 
-  public List<VariableAttribute> getAttributes() {
-    return attributes != null ? attributes : (attributes = new ArrayList<VariableAttribute>());
+  public List<DataItemAttribute> getAttributes() {
+    return attributes != null ? attributes : (attributes = new ArrayList<DataItemAttribute>());
   }
 
-  public VariableAttribute addAttribute(String name, Object value) {
+  public DataItemAttribute addAttribute(String name, Object value) {
     return this.addAttribute(name, value != null ? value.toString() : null);
   }
 
-  public VariableAttribute addAttribute(String name, boolean value) {
+  public DataItemAttribute addAttribute(String name, boolean value) {
     return this.addAttribute(name, Boolean.toString(value));
   }
 
-  public VariableAttribute addAttribute(String name, String value) {
-    VariableAttribute va = new VariableAttribute(this, name, value);
+  public DataItemAttribute addAttribute(String name, String value) {
+    DataItemAttribute va = new DataItemAttribute(this, name, value);
     getAttributes().add(va);
     return va;
   }
 
-  public VariableAttribute addAttribute(String name, String value, Locale lc) {
-    VariableAttribute va = new VariableAttribute(this, name, value, lc);
+  public DataItemAttribute addAttribute(String name, String value, Locale lc) {
+    DataItemAttribute va = new DataItemAttribute(this, name, value, lc);
     getAttributes().add(va);
     return va;
   }

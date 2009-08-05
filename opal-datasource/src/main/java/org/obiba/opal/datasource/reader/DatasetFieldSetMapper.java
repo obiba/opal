@@ -4,7 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.obiba.opal.core.domain.data.DataItem;
+import org.obiba.opal.core.domain.data.DataPoint;
 import org.obiba.opal.core.domain.data.Dataset;
 import org.obiba.opal.core.domain.data.Entity;
 import org.obiba.opal.datasource.DatasourceService;
@@ -24,7 +24,7 @@ public class DatasetFieldSetMapper implements LineCallbackHandler, FieldSetMappe
   /** Used to tokenize the header line */
   private LineTokenizer lineTokenizer;
 
-  /** FieldSet that contains the header of each column. Used to obtain the name of a DataItem */
+  /** FieldSet that contains the header of each column. Used to obtain the name of a DataPoint */
   private FieldSet fieldNames;
 
   public void setCatalogueName(String catalogueName) {
@@ -65,8 +65,8 @@ public class DatasetFieldSetMapper implements LineCallbackHandler, FieldSetMappe
     Entity entity = datasourceService.fetchEntity(entityId);
     Dataset ds = new Dataset(entity, datasourceService.loadCatalogue(catalogueName), extractionDate);
     for(int i = 1; i < fieldSet.getFieldCount(); i++) {
-      String dataItemValue = fieldSet.readString(i);
-      ds.getDataItems().add(new DataItem(ds, getName(i), dataItemValue));
+      String dataPointValue = fieldSet.readString(i);
+      ds.getDataPoints().add(new DataPoint(ds, getName(i), dataPointValue));
     }
     return ds;
   }

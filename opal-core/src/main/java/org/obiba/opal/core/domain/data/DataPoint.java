@@ -7,62 +7,62 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.domain.metadata;
-
-import java.util.Locale;
+package org.obiba.opal.core.domain.data;
 
 import javax.persistence.Column;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
 import org.obiba.core.domain.AbstractEntity;
 
 /**
- *
+ * 
  */
 @javax.persistence.Entity
-public class VariableAttribute extends AbstractEntity {
+public class DataPoint extends AbstractEntity {
 
   private static final long serialVersionUID = 1L;
 
   @ManyToOne(optional = false)
-  private Variable variable;
+  private Dataset dataset;
 
   @Column(nullable = false, length = 2000)
-  private String name;
+  private String variable;
 
+  @Lob
   @Column(length = Integer.MAX_VALUE)
   private String value;
 
-  @Column(length = 10)
-  private Locale locale;
+  private Integer occurrence;
 
-  public VariableAttribute() {
+  public DataPoint() {
+
   }
 
-  public VariableAttribute(Variable variable, String name, String value) {
-    this(variable, name, value, null);
+  public DataPoint(Dataset dataset, String variable, String value) {
+    this(dataset, variable, value, null);
   }
 
-  public VariableAttribute(Variable variable, String name, String value, Locale locale) {
+  public DataPoint(Dataset dataset, String variable, String value, Integer occurrence) {
+    this.dataset = dataset;
     this.variable = variable;
-    this.name = name;
     this.value = value;
-    this.locale = locale;
+    this.occurrence = occurrence;
   }
 
-  public Variable getVariable() {
+  public Dataset getDataset() {
+    return dataset;
+  }
+
+  public String getVariable() {
     return variable;
-  }
-
-  public String getName() {
-    return name;
   }
 
   public String getValue() {
     return value;
   }
 
-  public Locale getLocale() {
-    return locale;
+  public Integer getOccurrence() {
+    return occurrence;
   }
 }

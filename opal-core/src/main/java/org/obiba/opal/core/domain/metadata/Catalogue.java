@@ -24,7 +24,7 @@ import javax.persistence.UniqueConstraint;
 import org.obiba.core.domain.AbstractEntity;
 
 /**
- *
+ * 
  */
 @javax.persistence.Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = { "datasource", "name" }))
@@ -43,7 +43,7 @@ public class Catalogue extends AbstractEntity {
   private Date creationDate;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "catalogue")
-  private List<Variable> variables;
+  private List<DataItem> dataItems;
 
   public Catalogue() {
 
@@ -67,14 +67,14 @@ public class Catalogue extends AbstractEntity {
     return creationDate;
   }
 
-  public List<Variable> getVariables() {
-    return variables != null ? variables : (variables = new ArrayList<Variable>());
+  public List<DataItem> getDataItems() {
+    return dataItems != null ? dataItems : (dataItems = new ArrayList<DataItem>());
   }
 
-  public Variable addVariable(String name) {
+  public DataItem addDataItem(String name) {
     if(name == null) throw new IllegalArgumentException("name cannot be null");
-    Variable v = new Variable(this, name);
-    getVariables().add(v);
+    DataItem v = new DataItem(this, name);
+    getDataItems().add(v);
     return v;
   }
 }
