@@ -19,6 +19,8 @@ public class DefaultDatasourceServiceImpl implements DatasourceService, Initiali
 
   private String datasourceName;
 
+  private String datasourceType;
+
   /** Type of entity created by this datasource */
   private String entityType;
 
@@ -44,6 +46,10 @@ public class DefaultDatasourceServiceImpl implements DatasourceService, Initiali
     this.datasourceName = datasourceName;
   }
 
+  public void setDatasourceType(String datasourceType) {
+    this.datasourceType = datasourceType;
+  }
+
   public void setMetaDataService(MetaDataService metaDataService) {
     this.metaDataService = metaDataService;
   }
@@ -52,11 +58,16 @@ public class DefaultDatasourceServiceImpl implements DatasourceService, Initiali
     if(opalKeyRegistry == null) throw new IllegalStateException("opalKeyRegistry is required");
     if(entityType == null) throw new IllegalStateException("entityType is required");
     if(datasourceName == null) throw new IllegalStateException("datasourceName is required");
+    if(datasourceType == null) throw new IllegalStateException("datasourceType is required");
     if(metaDataService == null) throw new IllegalStateException("metaDataService is required");
   }
 
   public String getName() {
     return datasourceName;
+  }
+
+  public String getType() {
+    return datasourceType;
   }
 
   public boolean hasDataset(Entity entity, Catalogue catalogue, Date extractionDate) {

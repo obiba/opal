@@ -15,6 +15,7 @@
 
   <bean id="datasourceService" parent="abstractDatasourceService" scope="step">
     <property name="datasourceName" value="#{jobParameters[input.datasource.name]}"/>
+    <property name="datasourceType" value="csv"/>
     <property name="entityType" value="PARTICIPANT" />
   </bean>
 

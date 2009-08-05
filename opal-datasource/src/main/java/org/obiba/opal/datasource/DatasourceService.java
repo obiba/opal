@@ -8,10 +8,12 @@ import org.obiba.opal.core.domain.metadata.Catalogue;
 public interface DatasourceService {
 
   public String getName();
+  
+  public String getType();
 
   public Entity fetchEntity(String entityId);
 
-  public Catalogue loadCatalogue(String name);
+  public Catalogue loadCatalogue(String name) throws InvalidCatalogueException;
 
   public boolean hasDataset(Entity entity, Catalogue catalogue, Date extractionDate);
 

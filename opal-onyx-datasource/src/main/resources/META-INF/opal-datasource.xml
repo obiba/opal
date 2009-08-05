@@ -26,6 +26,7 @@
 
   <bean id="datasourceService" parent="abstractDatasourceService" abstract="false">
     <property name="datasourceName" value="onyx" />
+    <property name="datasourceType" value="onyx" />
     <property name="entityType" value="PARTICIPANT" />
   </bean>
 
