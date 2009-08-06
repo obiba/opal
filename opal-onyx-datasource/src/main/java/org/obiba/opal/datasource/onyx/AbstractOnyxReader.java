@@ -22,7 +22,7 @@ import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.core.io.Resource;
 
 /**
- *
+ * 
  */
 public abstract class AbstractOnyxReader<T> implements ItemStreamReader<T> {
 
@@ -35,6 +35,8 @@ public abstract class AbstractOnyxReader<T> implements ItemStreamReader<T> {
   private IOnyxDataInputStrategy dataInputStrategy;
 
   private OnyxDataInputContext dataInputContext;
+
+  protected Variable variableRoot;
 
   public void setResource(Resource resource) {
     this.resource = resource;
@@ -68,7 +70,7 @@ public abstract class AbstractOnyxReader<T> implements ItemStreamReader<T> {
   }
 
   protected void doOpen(ExecutionContext executionContext) throws ItemStreamException {
-
+    variableRoot = readVariables();
   }
 
   protected VariableDataSet readVariableDataset(String entryName) {

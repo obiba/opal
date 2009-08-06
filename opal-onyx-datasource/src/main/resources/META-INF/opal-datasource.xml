@@ -62,6 +62,7 @@
     <property name="resource" value="#{jobParameters[input.file.name]}" />
     <property name="catalogueName" value="#{jobParameters[input.catalogue.name]}" />
     <property name="dataInputStrategy" ref="onyxDataInputStrategy" />
+    <property name="variablePathNamingStrategy" ref="pathNamingStrategy" />
   </bean>
 
 </beans>

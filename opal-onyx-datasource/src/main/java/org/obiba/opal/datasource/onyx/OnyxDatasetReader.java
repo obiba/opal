@@ -9,11 +9,17 @@
  ******************************************************************************/
 package org.obiba.opal.datasource.onyx;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
+import org.obiba.onyx.engine.variable.IVariablePathNamingStrategy;
+import org.obiba.onyx.engine.variable.Variable;
 import org.obiba.onyx.engine.variable.VariableData;
 import org.obiba.onyx.engine.variable.VariableDataSet;
+import org.obiba.onyx.engine.variable.util.VariableFinder;
 import org.obiba.onyx.util.data.Data;
 import org.obiba.opal.core.domain.data.DataPoint;
 import org.obiba.opal.core.domain.data.Dataset;
@@ -43,12 +49,18 @@ public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements It
 
   private Catalogue catalogue;
 
+  private IVariablePathNamingStrategy variablePathNamingStrategy;
+
   public void setDatasourceService(DatasourceService datasourceService) {
     this.datasourceService = datasourceService;
   }
 
   public void setCatalogueName(String catalogueName) {
     this.catalogueName = catalogueName;
+  }
+
+  public void setVariablePathNamingStrategy(IVariablePathNamingStrategy variablePathNamingStrategy) {
+    this.variablePathNamingStrategy = variablePathNamingStrategy;
   }
 
   @Override
@@ -74,12 +86,7 @@ public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements It
         Dataset dataset = new Dataset(entity, catalogue, variableDataSetRoot.getExportDate());
 
         for(VariableData vd : variableDataSetRoot.getVariableDatas()) {
-          List<Data> datum = vd.getDatas();
-          // TODO: OPAL-30 handle occurrences correctly
-          if(datum.size() == 1) {
-            DataPoint dataPoint = new DataPoint(dataset, vd.getVariablePath(), datum.get(0).getValueAsString());
-            dataset.getDataPoints().add(dataPoint);
-          }
+          handleVariableData(dataset, vd, null);
         }
         return dataset;
       }
@@ -87,4 +94,118 @@ public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements It
     return null;
   }
 
+  /**
+   * Given a <code>Dataset</code> and <code>VariableData</code>, recursively adds the necessary
+   * <code>DataPoint</code>s to the <code>Dataset</code>
+   * 
+   * @param dataset dataset
+   * @param variableData variableData
+   * @param parentDatas datas of variableData's parent (<code>null</code> if none)
+   */
+  private void handleVariableData(Dataset dataset, VariableData variableData, List<Integer> parentOccurrenceIds) {
+    List<Data> datas = variableData.getDatas();
+    List<Integer> occurrenceIds = null;
+
+    // Look up variableData's variable.
+    VariableFinder variableFinder = VariableFinder.getInstance(variableRoot, variablePathNamingStrategy);
+    Variable variable = variableFinder.findVariable(variableData.getVariablePath());
+
+    if(!variable.isMultiple() && !variable.isRepeatable()) {
+      // Variable is NON-MULTIPLE and NON-REPEATABLE. Add a DataPoint containing the data value.
+      Data data = datas.get(0);
+      DataPoint dataPoint = new DataPoint(dataset, variableData.getVariablePath(), data.getValueAsString());
+      dataset.getDataPoints().add(dataPoint);
+    } else if(variable.isCategorial() && variable.isMultiple()) {
+      // Variable is CATEGORIAL and MULTIPLE. Add a DataPoint with a comma-separated list of data values.
+      DataPoint dataPoint = null;
+      String values = toCommaSeparatedValues(datas);
+
+      if(variable.isRepeatable()) {
+        // Determine the occurrence id and use this to create the DataPoint.
+        int occurrenceId = getOccurrenceId(variableData.getVariablePath());
+        int normalizedOccurrenceId = getNormalizedOccurrenceId(parentOccurrenceIds, occurrenceId);
+        dataPoint = new DataPoint(dataset, variableData.getVariablePath(), values, normalizedOccurrenceId);
+      } else {
+        dataPoint = new DataPoint(dataset, variableData.getVariablePath(), values);
+      }
+      dataset.getDataPoints().add(dataPoint);
+    } else if(!variable.isCategorial() && variable.isMultiple() && !variable.isRepeatable()) {
+      // Variable is NON-CATEGORIAL, MULTIPLE and NON-REPEATABLE. This must mean that it has
+      // REPEATABLE children. Its data consists of a list of occurrence ids. Convert to a list
+      // of Integers and pass it along to the children-handling code.
+      occurrenceIds = new ArrayList<Integer>();
+      for(Data data : datas) {
+        occurrenceIds.add(Integer.valueOf(data.getValueAsString()));
+      }
+    } else if(!variable.isMultiple() && variable.isRepeatable()) {
+      // Variable is NON-MULTIPLE and REPEATABLE. Determine its occurrence id and add a DataPoint.
+      int occurrenceId = getOccurrenceId(variableData.getVariablePath());
+      int normalizedOccurrenceId = getNormalizedOccurrenceId(parentOccurrenceIds, occurrenceId);
+
+      DataPoint dataPoint = new DataPoint(dataset, variableData.getVariablePath(), datas.get(0).getValueAsString(), normalizedOccurrenceId);
+      dataset.getDataPoints().add(dataPoint);
+    } else if(!variable.isCategorial() && variable.isMultiple() && variable.isRepeatable()) {
+      // TODO: Is this case even possible? This would be a REPEATABLE variable with REPEATABLE children.
+      // Does it have any data of its own? Or is the data simply a list of occurrence ids? Both? How is
+      // one distinguished from the other? Do nothing for now.
+    }
+
+    // Recurse on variableData children.
+    for(VariableData child : variableData.getVariableDatas()) {
+      handleVariableData(dataset, child, occurrenceIds);
+    }
+  }
+
+  private Integer getOccurrenceId(String variablePath) {
+    Map<String, String> parameters = variablePathNamingStrategy.getParameters(variablePath);
+    if(parameters != null && parameters.size() > 0) {
+      String parentName = parameters.keySet().iterator().next();
+      List<String> parts = variablePathNamingStrategy.getNormalizedNames(variablePath);
+      parts.remove(parts.size() - 1);
+      Collections.reverse(parts);
+      for(Iterator<String> iterator = parts.iterator(); iterator.hasNext();) {
+        String string = iterator.next();
+        if(string.equals(parentName) == false) {
+          iterator.remove();
+        } else {
+          break;
+        }
+      }
+      Collections.reverse(parts);
+
+      StringBuilder parentPath = new StringBuilder();
+      for(String part : parts) {
+        if(parentPath.length() > 0) {
+          parentPath.append(variablePathNamingStrategy.getPathSeparator());
+        }
+        parentPath.append(part);
+      }
+
+      String occurrenceId = parameters.values().iterator().next();
+      return Integer.valueOf(occurrenceId);
+    }
+    return null;
+  }
+
+  private Integer getNormalizedOccurrenceId(List<Integer> parentOccurrenceIds, Integer occurrenceId) {
+    for(Integer aParentOccurrenceId : parentOccurrenceIds) {
+      if(aParentOccurrenceId.equals(occurrenceId)) {
+        return aParentOccurrenceId;
+      }
+    }
+
+    return null;
+  }
+
+  private String toCommaSeparatedValues(List<Data> datas) {
+    StringBuffer values = new StringBuffer();
+    for(int i = 0; i < datas.size(); i++) {
+      values.append(datas.get(0).getValueAsString());
+      if(i < datas.size() - 1) {
+        values.append(", ");
+      }
+    }
+
+    return values.toString();
+  }
 }
