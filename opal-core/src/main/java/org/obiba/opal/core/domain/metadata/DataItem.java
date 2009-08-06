@@ -38,7 +38,7 @@ public class DataItem extends AbstractEntity {
   @Column(nullable = false, length = 767)
   private String name;
 
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "variable")
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataItem")
   private List<DataItemAttribute> attributes;
 
   public DataItem() {
