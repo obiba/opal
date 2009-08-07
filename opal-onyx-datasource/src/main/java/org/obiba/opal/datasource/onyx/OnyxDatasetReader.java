@@ -103,57 +103,61 @@ public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements It
    * @param parentDatas datas of variableData's parent (<code>null</code> if none)
    */
   private void handleVariableData(Dataset dataset, VariableData variableData, List<Integer> parentOccurrenceIds) {
-    List<Data> datas = variableData.getDatas();
-    List<Integer> occurrenceIds = null;
-
-    // Look up variableData's variable.
     VariableFinder variableFinder = VariableFinder.getInstance(variableRoot, variablePathNamingStrategy);
     Variable variable = variableFinder.findVariable(variableData.getVariablePath());
 
+    List<Data> datas = variableData.getDatas();
+    List<Integer> occurrenceIds = null;
+
     if(!variable.isMultiple() && !variable.isRepeatable()) {
-      // Variable is NON-MULTIPLE and NON-REPEATABLE. Add a DataPoint containing the data value.
-      Data data = datas.get(0);
-      DataPoint dataPoint = new DataPoint(dataset, variableData.getVariablePath(), data.getValueAsString());
-      dataset.getDataPoints().add(dataPoint);
+      addDataPoint(dataset, variableData.getVariablePath(), datas.get(0).getValueAsString(), null);
     } else if(variable.isCategorial() && variable.isMultiple()) {
-      // Variable is CATEGORIAL and MULTIPLE. Add a DataPoint with a comma-separated list of data values.
-      DataPoint dataPoint = null;
       String values = toCommaSeparatedValues(datas);
 
+      // If the variable is repeatable, determine its occurrence id and use it to create the DataPoint.
+      Integer normalizedOccurrenceId = null;
       if(variable.isRepeatable()) {
-        // Determine the occurrence id and use this to create the DataPoint.
-        int occurrenceId = getOccurrenceId(variableData.getVariablePath());
-        int normalizedOccurrenceId = getNormalizedOccurrenceId(parentOccurrenceIds, occurrenceId);
-        dataPoint = new DataPoint(dataset, variableData.getVariablePath(), values, normalizedOccurrenceId);
-      } else {
-        dataPoint = new DataPoint(dataset, variableData.getVariablePath(), values);
+        normalizedOccurrenceId = getNormalizedOccurrenceId(variableData, parentOccurrenceIds);
       }
-      dataset.getDataPoints().add(dataPoint);
+      addDataPoint(dataset, variableData.getVariablePath(), values, normalizedOccurrenceId);
     } else if(!variable.isCategorial() && variable.isMultiple() && !variable.isRepeatable()) {
-      // Variable is NON-CATEGORIAL, MULTIPLE and NON-REPEATABLE. This must mean that it has
-      // REPEATABLE children. Its data consists of a list of occurrence ids. Convert to a list
-      // of Integers and pass it along to the children-handling code.
-      occurrenceIds = new ArrayList<Integer>();
-      for(Data data : datas) {
-        occurrenceIds.add(Integer.valueOf(data.getValueAsString()));
-      }
+      // Variable has repeatable children, so its data consists of a list of occurrence ids.
+      // Extract them and remember them.
+      occurrenceIds = extractOccurrences(datas);
     } else if(!variable.isMultiple() && variable.isRepeatable()) {
-      // Variable is NON-MULTIPLE and REPEATABLE. Determine its occurrence id and add a DataPoint.
-      int occurrenceId = getOccurrenceId(variableData.getVariablePath());
-      int normalizedOccurrenceId = getNormalizedOccurrenceId(parentOccurrenceIds, occurrenceId);
-
-      DataPoint dataPoint = new DataPoint(dataset, variableData.getVariablePath(), datas.get(0).getValueAsString(), normalizedOccurrenceId);
-      dataset.getDataPoints().add(dataPoint);
+      Integer normalizedOccurrenceId = getNormalizedOccurrenceId(variableData, parentOccurrenceIds);
+      addDataPoint(dataset, variableData.getVariablePath(), datas.get(0).getValueAsString(), normalizedOccurrenceId);
     } else if(!variable.isCategorial() && variable.isMultiple() && variable.isRepeatable()) {
-      // TODO: Is this case even possible? This would be a REPEATABLE variable with REPEATABLE children.
-      // Does it have any data of its own? Or is the data simply a list of occurrence ids? Both? How is
-      // one distinguished from the other? Do nothing for now.
+      // Q: Is this case even possible? Variable has repeatable children AND is repeatable itself.
+      // Treat its data as BOTH a list of occurrence ids AND as data of its own.
+
+      // First, extract and remember the occurrence ids.
+      occurrenceIds = extractOccurrences(datas);
+
+      // Second, determine variableData's own occurrence id and add a DataPoint with a
+      // comma-separated list of values.
+      Integer normalizedOccurrenceId = getNormalizedOccurrenceId(variableData, parentOccurrenceIds);
+      addDataPoint(dataset, variableData.getVariablePath(), toCommaSeparatedValues(datas), normalizedOccurrenceId);
     }
 
     // Recurse on variableData children.
     for(VariableData child : variableData.getVariableDatas()) {
       handleVariableData(dataset, child, occurrenceIds);
     }
+  }
+
+  private void addDataPoint(Dataset dataset, String variablePath, String value, Integer occurrenceId) {
+    DataPoint dataPoint = new DataPoint(dataset, variablePath, value, occurrenceId);
+    dataset.getDataPoints().add(dataPoint);
+  }
+
+  private List<Integer> extractOccurrences(List<Data> datas) {
+    List<Integer> occurrenceIds = new ArrayList<Integer>();
+    for(Data data : datas) {
+      occurrenceIds.add(Integer.valueOf(data.getValueAsString()));
+    }
+
+    return occurrenceIds;
   }
 
   private Integer getOccurrenceId(String variablePath) {
@@ -187,7 +191,9 @@ public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements It
     return null;
   }
 
-  private Integer getNormalizedOccurrenceId(List<Integer> parentOccurrenceIds, Integer occurrenceId) {
+  private Integer getNormalizedOccurrenceId(VariableData variableData, List<Integer> parentOccurrenceIds) {
+    Integer occurrenceId = getOccurrenceId(variableData.getVariablePath());
+
     for(Integer aParentOccurrenceId : parentOccurrenceIds) {
       if(aParentOccurrenceId.equals(occurrenceId)) {
         return aParentOccurrenceId;
