@@ -8,10 +8,6 @@
   <import resource="classpath:/META-INF/opal/context-config.xml" />
   <import resource="onyx-data-input.xml" />
 
-  <bean id="pathNamingStrategy" class="org.obiba.onyx.engine.variable.impl.DefaultVariablePathNamingStrategy">
-    <property name="pathSeparator" value="${org.obiba.onyx.pathSeparator}" />
-  </bean>
-
   <bean id="qnameStrategy" class="org.obiba.opal.datasource.onyx.variable.DefaultVariableQNameStrategy">
     <constructor-arg value="${org.obiba.opal.study.baseUri}/onyx" />
     <constructor-arg ref="pathNamingStrategy" />

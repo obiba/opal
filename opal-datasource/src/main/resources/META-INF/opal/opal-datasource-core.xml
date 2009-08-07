@@ -1,9 +1,11 @@
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
-  xmlns:batch="http://www.springframework.org/schema/batch"
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:tx="http://www.springframework.org/schema/tx" xmlns:batch="http://www.springframework.org/schema/batch"
   xsi:schemaLocation="
   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd 
   http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd">
+
+  <import resource="classpath*:/META-INF/opal-datasource-common.xml" />
 
   <batch:job-repository id="jobRepository" data-source="opalDataSource" isolation-level-for-create="DEFAULT" />
 
@@ -33,10 +35,11 @@
   <bean id="listener" class="org.obiba.opal.datasource.support.DatasetImportCountingListener">
   </bean>
 
-  <bean id="abstractDatasourceService" class="org.obiba.opal.datasource.impl.DefaultDatasourceServiceImpl" abstract="true">
-    <property name="opalKeyRegistry" ref="opalKeyRegistry"/>
+  <bean id="abstractDatasourceService" class="org.obiba.opal.datasource.impl.DefaultDatasourceServiceImpl"
+    abstract="true">
+    <property name="opalKeyRegistry" ref="opalKeyRegistry" />
     <property name="sessionFactory" ref="opalSessionFactory" />
-    <property name="metaDataService" ref="metaDataService"/>
+    <property name="metaDataService" ref="metaDataService" />
   </bean>
 
   <batch:job id="abstractImportJob" abstract="true" job-repository="jobRepository">
@@ -55,7 +58,7 @@
   <batch:step id="abstractCatalogueImportStep" abstract="true">
     <batch:tasklet>
       <batch:chunk writer="itemWriter" commit-interval="1" />
-      <batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED" />
+      <batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED" timeout="600" />
     </batch:tasklet>
   </batch:step>
 

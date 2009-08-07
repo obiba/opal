@@ -1,9 +1,10 @@
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:tx="http://www.springframework.org/schema/tx"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
-  <bean id="opalRepositoryManager" class="org.obiba.opal.sesame.repository.impl.OpalRepositoryManagerImpl" scope="singleton" init-method="initialize"
-    destroy-method="shutdown">
+  <bean id="opalRepositoryManager" class="org.obiba.opal.sesame.repository.impl.OpalRepositoryManagerImpl" scope="singleton"
+    init-method="initialize" destroy-method="shutdown">
     <property name="repositories">
       <map>
         <entry key="catalogue">
@@ -29,4 +30,11 @@
       </map>
     </property>
   </bean>
+
+  <bean id="namespaces" class="org.obiba.opal.sesame.repository.NamespaceSetFactoryBean">
+    <property name="repository">
+      <bean factory-bean="opalRepositoryManager" factory-method="getDataRepository"/>
+    </property>
+  </bean>
+
 </beans>

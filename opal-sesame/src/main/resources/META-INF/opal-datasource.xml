@@ -1,0 +1,70 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:tx="http://www.springframework.org/schema/tx" xmlns:batch="http://www.springframework.org/schema/batch"
+  xmlns:util="http://www.springframework.org/schema/util"
+  xsi:schemaLocation="
+  http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
+  http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
+  http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd 
+  http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd">
+
+  <bean id="pathNamingStrategy" class="org.obiba.onyx.engine.variable.impl.DefaultVariablePathNamingStrategy">
+    <property name="pathSeparator" value="." />
+  </bean>
+
+  <bean id="semanticMapXStream" class="org.obiba.core.spring.xstream.XStreamFactoryBean">
+    <property name="aliasMap">
+      <util:map>
+        <entry key="uri" value="org.openrdf.model.URI" />
+        <entry key="semanticMap" value="org.obiba.opal.map.SemanticMap" />
+        <entry key="defaultGraphFactory" value="org.obiba.opal.map.DefaultGraphFactory" />
+        <entry key="dataItemPropertyRule" value="org.obiba.opal.map.DataItemPropertyRule" />
+        <entry key="simpleAttributeRule" value="org.obiba.opal.map.SimpleAttributeRule" />
+        <entry key="conditionalAttributeRule" value="org.obiba.opal.map.ConditionalAttributeRule" />
+        <entry key="nameCondition" value="org.obiba.opal.map.condition.AttributeNameCondition" />
+        <entry key="nameValueCondition" value="org.obiba.opal.map.condition.AttributeValueCondition" />
+        <entry key="addLiteral" value="org.obiba.opal.map.consequence.LiteralConsequence" />
+        <entry key="addType" value="org.obiba.opal.map.consequence.TypeConsequence" />
+        <entry key="multipleConsequence" value="org.obiba.opal.map.consequence.MultipleConsequence" />
+      </util:map>
+    </property>
+    <property name="converters">
+      <set>
+        <bean class="org.obiba.opal.map.support.UriConverter">
+          <property name="namespaces" ref="namespaces" />
+        </bean>
+      </set>
+    </property>
+  </bean>
+
+  <batch:job id="semantic-map">
+    <batch:step id="mapCatalogue">
+      <batch:tasklet>
+        <batch:chunk reader="dataItemReader" processor="dataItemSemanticMapper" writer="graphWriter"
+          commit-interval="5" />
+        <batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED" />
+      </batch:tasklet>
+    </batch:step>
+  </batch:job>
+
+  <bean id="dataItemReader" class="org.obiba.opal.map.batch.DataItemReader" scope="step">
+    <property name="metadataService" ref="metaDataService" />
+    <property name="sessionFactory" ref="opalSessionFactory" />
+    <property name="datasource" value="#{jobParameters[input.datasource.name]}" />
+    <property name="catalogueName" value="#{jobParameters[input.catalogue.name]}" />
+  </bean>
+
+  <bean id="dataItemSemanticMapper" class="org.obiba.opal.map.batch.DataItemSemanticMapper" scope="step">
+    <property name="semanticMap">
+      <bean class="org.obiba.opal.map.support.XStreamSemanticMapFactory">
+        <property name="resource" value="#{jobParameters[input.map.file.name]}" />
+        <property name="xstream" ref="semanticMapXStream" />
+      </bean>
+    </property>
+  </bean>
+
+  <bean id="graphWriter" class="org.obiba.opal.map.batch.GraphWriter">
+    <property name="repository">
+      <bean factory-bean="opalRepositoryManager" factory-method="getDataRepository" />
+    </property>
+  </bean>
+</beans>
