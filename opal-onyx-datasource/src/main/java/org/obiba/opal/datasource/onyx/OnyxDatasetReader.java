@@ -138,13 +138,25 @@ public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements It
       }
     }
 
-    // Create and add a DataPoint, EXCEPT in the following two cases:
+    // Create and add a DataPoint, EXCEPT in the following cases:
     // CASE 1: Variable is repeatable (in which case it has no data of its own).
     // CASE 2: Variable has a repeatable ancestor and the data is contained in its children (this filters out bogus
     // variableData which are simply containers).
-    if(!variable.isRepeatable() && !(repeatableAncestor != null && !variableData.getVariableDatas().isEmpty())) {
+    // CASE 3: Variable is a key (OPAL-35).
+    // boolean variableDataContainer =
+    boolean isRepeatableDataContainer = repeatableAncestor != null && !variableData.getVariableDatas().isEmpty();
+    boolean isKeyVariable = variable.getKey() != null && !variable.getKey().equals("");
+    if(!variable.isRepeatable() && !isRepeatableDataContainer && !isKeyVariable) {
       String variablePathWithoutParams = variablePathNamingStrategy.getVariablePath(variableData.getVariablePath());
       addDataPoint(dataset, variablePathWithoutParams, value, occurrenceId);
+    }
+
+    // If the variable is a key variable, register the key (if not already registered).
+    if(isKeyVariable && !isRepeatableDataContainer) {
+      String opalKey = dataset.getEntity().getIdentifier();
+      String owner = variable.getKey();
+      String ownerKey = datas.get(0).getValueAsString();
+      datasourceService.registerKey(opalKey, owner, ownerKey);
     }
 
     // Recurse on children.

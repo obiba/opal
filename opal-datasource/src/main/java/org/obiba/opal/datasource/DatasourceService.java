@@ -13,6 +13,8 @@ public interface DatasourceService {
 
   public Entity fetchEntity(String entityId);
 
+  public void registerKey(String entityId, String owner, String ownerKey);
+  
   public Catalogue loadCatalogue(String name) throws InvalidCatalogueException;
 
   public boolean hasDataset(Entity entity, Catalogue catalogue, Date extractionDate);

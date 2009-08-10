@@ -11,6 +11,7 @@ package org.obiba.opal.datasource.onyx;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
@@ -19,12 +20,14 @@ import static org.junit.Assert.assertNotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.onyx.engine.variable.IVariablePathNamingStrategy;
 import org.obiba.onyx.engine.variable.impl.DefaultVariablePathNamingStrategy;
 import org.obiba.opal.core.domain.data.DataPoint;
 import org.obiba.opal.core.domain.data.Dataset;
+import org.obiba.opal.core.domain.data.Entity;
 import org.obiba.opal.datasource.DatasourceService;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -69,6 +72,8 @@ public class OnyxDatasetReaderTest {
     Resource variableFileResource = new ClassPathResource(TEST_DIR + "/" + variableFile);
     String exportFile = "1111111.xml";
     Resource exportFileResource = new ClassPathResource(TEST_DIR + "/" + exportFile);
+    String opalKey = "1234567";
+    Entity entity = new Entity("PARTICIPANT", opalKey);
     OnyxDatasetReader reader = createReader(catalogueName, exportFileResource);
 
     // Record expectations.
@@ -81,7 +86,9 @@ public class OnyxDatasetReaderTest {
     expect(dataInputStrategy.getEntry(exportFile)).andReturn(exportFileResource.getInputStream());
 
     expect(datasourceService.loadCatalogue(catalogueName)).andReturn(null);
-    expect(datasourceService.fetchEntity(exportFile.replace(".xml", ""))).andReturn(null);
+    expect(datasourceService.fetchEntity(exportFile.replace(".xml", ""))).andReturn(entity);
+    datasourceService.registerKey((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject());
+    expectLastCall().anyTimes();
 
     replay(dataInputStrategy);
     replay(datasourceService);
@@ -100,10 +107,11 @@ public class OnyxDatasetReaderTest {
     // minus
     // # of variableData tags for repeatable variables (2)
     // # of variableData tags for bogus variableData (27)
+    // # of variableData tags for key variables (17)
     assertNotNull(dataset);
     List<DataPoint> dataPoints = dataset.getDataPoints();
     assertNotNull(dataPoints);
-    assertEquals(dataPoints.size(), 1159);
+    assertEquals(dataPoints.size(), 1142);
   }
 
   //

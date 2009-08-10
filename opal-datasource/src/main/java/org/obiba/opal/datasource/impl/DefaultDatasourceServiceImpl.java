@@ -16,7 +16,7 @@ import org.obiba.opal.datasource.InvalidCatalogueException;
 import org.springframework.beans.factory.InitializingBean;
 
 public class DefaultDatasourceServiceImpl implements DatasourceService, InitializingBean {
-
+      
   private String datasourceName;
 
   private String datasourceType;
@@ -97,6 +97,12 @@ public class DefaultDatasourceServiceImpl implements DatasourceService, Initiali
     return entity;
   }
 
+  public void registerKey(String entityId, String owner, String ownerKey) {
+    if (!opalKeyRegistry.hasOpalKey(owner, ownerKey)) {
+      opalKeyRegistry.registerKey(entityId, owner, ownerKey);
+    }
+  }
+  
   /**
    * Lookup an existing entity in order to re-use it.
    * @param type

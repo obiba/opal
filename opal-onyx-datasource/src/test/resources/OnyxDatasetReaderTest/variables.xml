@@ -3358,7 +3358,7 @@
       <variable name="cohortCode" dataType="TEXT">
         <attributes/>
       </variable>
-      <variable name="participantCode" dataType="TEXT">
+      <variable name="participantCode" dataType="TEXT" key="ruby">
         <attributes/>
       </variable>
       <variable name="tubeAssessmentCentreCode" dataType="TEXT">
