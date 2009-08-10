@@ -12,6 +12,9 @@ package org.obiba.opal.datasource.onyx;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +23,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obiba.onyx.engine.variable.IVariablePathNamingStrategy;
 import org.obiba.onyx.engine.variable.impl.DefaultVariablePathNamingStrategy;
+import org.obiba.opal.core.domain.data.DataPoint;
+import org.obiba.opal.core.domain.data.Dataset;
 import org.obiba.opal.datasource.DatasourceService;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -58,19 +63,15 @@ public class OnyxDatasetReaderTest {
 
   @Test
   public void testRead() throws Exception {
+    // Create an OnyxDatasetReader.
     String catalogueName = "catalogue";
     String variableFile = "variables.xml";
     Resource variableFileResource = new ClassPathResource(TEST_DIR + "/" + variableFile);
     String exportFile = "1111111.xml";
     Resource exportFileResource = new ClassPathResource(TEST_DIR + "/" + exportFile);
+    OnyxDatasetReader reader = createReader(catalogueName, exportFileResource);
 
-    OnyxDatasetReader reader = new OnyxDatasetReader();
-    reader.setCatalogueName(catalogueName);
-    reader.setVariablePathNamingStrategy(variablePathNamingStrategy);
-    reader.setDataInputStrategy(dataInputStrategy);
-    reader.setResource(exportFileResource);
-    reader.setDatasourceService(datasourceService);
-
+    // Record expectations.
     dataInputStrategy.prepare((OnyxDataInputContext) org.easymock.EasyMock.anyObject());
     expect(dataInputStrategy.getEntry(variableFile)).andReturn(variableFileResource.getInputStream());
 
@@ -85,7 +86,38 @@ public class OnyxDatasetReaderTest {
     replay(dataInputStrategy);
     replay(datasourceService);
 
+    // Open the OnyxDatasetReader and read the Dataset.
     reader.open(null);
-    reader.read();
+    Dataset dataset = reader.read();
+
+    // Verify expectations.
+    verify(dataInputStrategy);
+    verify(datasourceService);
+
+    // Verify resulting Dataset.
+    // Note: The number of expected DataPoints was arrived at as follows:
+    // # of variableData tags (1188)
+    // minus
+    // # of variableData tags for repeatable variables (2)
+    // # of variableData tags for bogus variableData (27)
+    assertNotNull(dataset);
+    List<DataPoint> dataPoints = dataset.getDataPoints();
+    assertNotNull(dataPoints);
+    assertEquals(dataPoints.size(), 1159);
+  }
+
+  //
+  // Helper Methods
+  //
+
+  private OnyxDatasetReader createReader(String catalogueName, Resource exportFileResource) {
+    OnyxDatasetReader reader = new OnyxDatasetReader();
+    reader.setCatalogueName(catalogueName);
+    reader.setVariablePathNamingStrategy(variablePathNamingStrategy);
+    reader.setDataInputStrategy(dataInputStrategy);
+    reader.setResource(exportFileResource);
+    reader.setDatasourceService(datasourceService);
+
+    return reader;
   }
 }

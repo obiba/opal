@@ -27,6 +27,7 @@ import org.obiba.opal.core.domain.data.Dataset;
 import org.obiba.opal.core.domain.data.Entity;
 import org.obiba.opal.core.domain.metadata.Catalogue;
 import org.obiba.opal.datasource.DatasourceService;
+import org.obiba.opal.datasource.util.DatasourceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
@@ -35,9 +36,6 @@ import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 
-/**
- * 
- */
 public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements ItemStreamReader<Dataset> {
 
   private static final Logger log = LoggerFactory.getLogger(OnyxDatasetReader.class);
@@ -111,10 +109,11 @@ public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements It
 
     List<Data> datas = variableData.getDatas();
 
-    // If the variable's parent is repeatable, determine the occurrence we are dealing with.
+    // If the variable has a repeatable ancestor, determine the occurrence we are dealing with.
     Integer occurrenceId = null;
-    if(variable.getParent() != null && variable.getParent().isRepeatable()) {
-      occurrenceId = getNormalizedOccurrenceId(variable.getParent(), variableData, occurrencesMap);
+    Variable repeatableAncestor = getRepeatableAncestor(variable);
+    if(repeatableAncestor != null) {
+      occurrenceId = getNormalizedOccurrenceId(repeatableAncestor, variableData, occurrencesMap);
     }
 
     // If the variable is itself repeatable, add its occurrences to the occurrencesMap.
@@ -128,21 +127,28 @@ public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements It
     // CASE 3: Variable is repeatable. Variable has no value of its own.
     String value = null;
     if(variable.isMultiple()) {
-      value = toCommaSeparatedValues(datas);
+      List<String> multipleDataValues = new ArrayList<String>();
+      for(Data data : datas) {
+        multipleDataValues.add(data.getValueAsString());
+      }
+      value = DatasourceUtil.getDataPointValue(multipleDataValues);
     } else if(!variable.isRepeatable()) {
       if(datas.size() != 0) {
         value = datas.get(0).getValueAsString();
       }
     }
 
-    // Create and add a DataPoint, except if the variable is repeatable (in which case it has
-    // no data of its own).
-    if(!variable.isRepeatable()) {
-      addDataPoint(dataset, variableData.getVariablePath(), value, occurrenceId);
+    // Create and add a DataPoint, EXCEPT in the following two cases:
+    // CASE 1: Variable is repeatable (in which case it has no data of its own).
+    // CASE 2: Variable has a repeatable ancestor and the data is contained in its children (this filters out bogus
+    // variableData which are simply containers).
+    if(!variable.isRepeatable() && !(repeatableAncestor != null && !variableData.getVariableDatas().isEmpty())) {
+      String variablePathWithoutParams = variablePathNamingStrategy.getVariablePath(variableData.getVariablePath());
+      addDataPoint(dataset, variablePathWithoutParams, value, occurrenceId);
     }
 
     // Recurse on children.
-    if(variableData.getVariableDatas() != null) {
+    if(!variableData.getVariableDatas().isEmpty()) {
       for(VariableData child : variableData.getVariableDatas()) {
         handleVariableData(dataset, child, occurrencesMap);
       }
@@ -152,6 +158,23 @@ public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements It
   private void addDataPoint(Dataset dataset, String variablePath, String value, Integer occurrenceId) {
     DataPoint dataPoint = new DataPoint(dataset, variablePath, value, occurrenceId);
     dataset.getDataPoints().add(dataPoint);
+  }
+
+  private Variable getRepeatableAncestor(Variable variable) {
+    Variable repeatableAncestor = null;
+
+    Variable ancestor = variable.getParent();
+
+    while(ancestor != null) {
+      if(ancestor.isRepeatable()) {
+        repeatableAncestor = ancestor;
+        break;
+      }
+
+      ancestor = ancestor.getParent();
+    }
+
+    return repeatableAncestor;
   }
 
   private List<Integer> extractOccurrences(List<Data> datas) {
@@ -197,29 +220,15 @@ public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements It
   private Integer getNormalizedOccurrenceId(Variable parent, VariableData variableData, Map<Variable, List<Integer>> occurrencesMap) {
     Integer occurrenceId = getOccurrenceId(variableData.getVariablePath());
 
-    List<Integer> parentOccurrenceIds = occurrencesMap.get(parent);
-    if(parentOccurrenceIds != null) {
-      for(Integer aParentOccurrenceId : parentOccurrenceIds) {
-        if(aParentOccurrenceId.equals(occurrenceId)) {
-          return aParentOccurrenceId;
+    if(occurrenceId != null) {
+      List<Integer> parentOccurrenceIds = occurrencesMap.get(parent);
+      if(parentOccurrenceIds != null) {
+        for(Integer aParentOccurrenceId : parentOccurrenceIds) {
+          if(aParentOccurrenceId.equals(occurrenceId)) {
+            return aParentOccurrenceId;
+          }
         }
       }
-    }
-
-    return null;
-  }
-
-  private String toCommaSeparatedValues(List<Data> datas) {
-    if(datas.size() != 0) {
-      StringBuffer values = new StringBuffer();
-      for(int i = 0; i < datas.size(); i++) {
-        values.append(datas.get(i).getValueAsString());
-        if(i < datas.size() - 1) {
-          values.append(", ");
-        }
-      }
-
-      return values.toString();
     }
 
     return null;
