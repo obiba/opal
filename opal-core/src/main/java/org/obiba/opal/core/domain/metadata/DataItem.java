@@ -17,13 +17,15 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.obiba.core.domain.AbstractEntity;
 
 /**
- *
+ * 
  */
 @javax.persistence.Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = { "catalogue", "name" }))
@@ -38,6 +40,9 @@ public class DataItem extends AbstractEntity {
   @Column(nullable = false, length = 767)
   private String name;
 
+  @OneToOne(optional = false, cascade = CascadeType.ALL)
+  private CodeSequence code;
+
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataItem")
   private List<DataItemAttribute> attributes;
 
@@ -48,10 +53,16 @@ public class DataItem extends AbstractEntity {
   public DataItem(Catalogue catalogue, String name) {
     this.catalogue = catalogue;
     this.name = name;
+    this.code = new CodeSequence();
   }
 
   public String getName() {
     return name;
+  }
+
+  @Transient
+  public Long getCode() {
+    return (code != null) ? (Long) code.getId() : null;
   }
 
   public Catalogue getCatalogue() {
