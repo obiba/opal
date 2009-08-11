@@ -19,7 +19,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.obiba.core.domain.AbstractEntity;
@@ -60,7 +59,6 @@ public class DataItem extends AbstractEntity {
     return name;
   }
 
-  @Transient
   public Long getCode() {
     return (code != null) ? (Long) code.getId() : null;
   }
