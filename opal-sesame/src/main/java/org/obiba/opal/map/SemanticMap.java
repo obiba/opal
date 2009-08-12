@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.obiba.opal.core.domain.metadata.DataItem;
 import org.obiba.opal.core.domain.metadata.DataItemAttribute;
-import org.obiba.opal.vocabulary.Opal;
+import org.obiba.opal.elmo.concepts.Opal;
 import org.openrdf.model.Graph;
 import org.openrdf.model.impl.URIImpl;
 
