@@ -9,7 +9,7 @@ setlocal ENABLEDELAYEDEXPANSION
 
 call "%OPAL_HOME%\bin\setclasspath.bat"
 
-java -cp "%CLASSPATH%" org.obiba.opal.cli.client.impl.OpalClient %*
+java -Xmx512m -cp "%CLASSPATH%" org.obiba.opal.cli.client.impl.OpalClient %*
 goto :END
 
 :JAVA_HOME_NOT_SET
