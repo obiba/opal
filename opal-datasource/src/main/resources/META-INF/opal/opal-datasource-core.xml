@@ -18,7 +18,12 @@
   </bean>
 
   <bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.ClassPathXmlJobRegistry">
-    <property name="jobPaths" value="classpath*:/META-INF/opal-datasource.xml" />
+    <property name="jobPaths">
+      <list>
+        <value>classpath*:/META-INF/opal-datasource.xml</value>
+        <value>classpath*:/META-INF/opal-mart.xml</value>
+      </list>
+    </property>
   </bean>
 
   <bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator">
