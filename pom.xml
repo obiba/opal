@@ -26,6 +26,7 @@
     <module>opal-datasource</module>
     <module>opal-sesame</module>
     <module>opal-report</module>
+    <module>jdbc-mart</module>
   </modules>
 
   <dependencyManagement>
