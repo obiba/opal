@@ -15,24 +15,21 @@ import org.obiba.opal.core.domain.metadata.DataItem;
 import org.obiba.opal.elmo.concepts.Opal;
 import org.obiba.opal.map.GraphBuilder;
 import org.obiba.opal.map.ItemRule;
-import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 
 /**
  *
  */
-public class DefRule extends AbstractOnyxRule implements ItemRule {
+public class NameRule extends AbstractOnyxRule implements ItemRule {
 
   public void execute(GraphBuilder builder, DataItem item) {
     String path = item.getName();
-
     List<String> parts = getPathNamingStrategy().getNormalizedNames(path);
-
     if(parts.size() > 2) {
-      String defName = parts.get(1);
-      URI defURI = getResourceFactory().getResource(new URIImpl(Opal.NS + "DataEntryForm"), defName);
-      builder.withRelation(new URIImpl(Opal.NS + "dataEntryForm"), defURI);
-      builder.withInverseRelation(new URIImpl(Opal.NS + "hasDataItem"), defURI);
+      parts.remove(0);
+      parts.remove(0);
+      String name = mergeParts(parts);
+      builder.withLiteral(new URIImpl(Opal.NS + "name"), name);
     }
   }
 }

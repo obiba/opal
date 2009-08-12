@@ -30,6 +30,8 @@ public class NamespaceSetFactoryBean implements FactoryBean {
   }
 
   public Object getObject() throws Exception {
+    if(repository == null) throw new IllegalStateException("repository cannot be null");
+
     RepositoryConnection connection = repository.getConnection();
     try {
       RepositoryResult<Namespace> result = connection.getNamespaces();

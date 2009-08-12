@@ -63,8 +63,6 @@
   </bean>
 
   <bean id="graphWriter" class="org.obiba.opal.map.batch.GraphWriter">
-    <property name="repository">
-      <bean factory-bean="opalRepositoryManager" factory-method="getDataRepository" />
-    </property>
+    <property name="repository" ref="opalCatalogueRepository"/>
   </bean>
 </beans>

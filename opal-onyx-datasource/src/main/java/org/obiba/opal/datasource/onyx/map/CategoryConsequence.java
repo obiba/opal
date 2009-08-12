@@ -11,28 +11,29 @@ package org.obiba.opal.datasource.onyx.map;
 
 import java.util.List;
 
-import org.obiba.opal.core.domain.metadata.DataItem;
+import org.obiba.opal.core.domain.metadata.DataItemAttribute;
 import org.obiba.opal.elmo.concepts.Opal;
+import org.obiba.opal.map.AttributeRuleConsequence;
 import org.obiba.opal.map.GraphBuilder;
-import org.obiba.opal.map.ItemRule;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 
 /**
  *
  */
-public class DefRule extends AbstractOnyxRule implements ItemRule {
+public class CategoryConsequence extends AbstractOnyxRule implements AttributeRuleConsequence {
 
-  public void execute(GraphBuilder builder, DataItem item) {
-    String path = item.getName();
+  public void apply(GraphBuilder builder, DataItemAttribute dataItemAttribute) {
+    String path = dataItemAttribute.getDataItem().getName();
 
     List<String> parts = getPathNamingStrategy().getNormalizedNames(path);
+    parts.remove(parts.size() - 1);
+    String parentPath = mergeParts(parts);
 
-    if(parts.size() > 2) {
-      String defName = parts.get(1);
-      URI defURI = getResourceFactory().getResource(new URIImpl(Opal.NS + "DataEntryForm"), defName);
-      builder.withRelation(new URIImpl(Opal.NS + "dataEntryForm"), defURI);
-      builder.withInverseRelation(new URIImpl(Opal.NS + "hasDataItem"), defURI);
+    URI resource = getResourceFactory().findResource(new URIImpl(Opal.NS + "DataItem"), new URIImpl(Opal.NS + "path"), parentPath);
+    if(resource != null) {
+      builder.withRelation(new URIImpl(Opal.NS + "isCategoryFor"), resource);
+      builder.withInverseRelation(new URIImpl(Opal.NS + "hasCategory"), resource);
     }
   }
 }

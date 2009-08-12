@@ -13,11 +13,9 @@ import java.util.List;
 
 import org.obiba.opal.core.domain.metadata.DataItem;
 import org.obiba.opal.core.domain.metadata.DataItemAttribute;
-import org.obiba.opal.elmo.concepts.Opal;
+import org.obiba.opal.vocabulary.Opal;
 import org.openrdf.model.Graph;
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.model.impl.URIImpl;
 
 /**
  *
@@ -26,7 +24,7 @@ public class SemanticMap {
 
   private GraphFactory graphFactory;
 
-  private String baseUri;
+  private ResourceFactory resourceFactory;
 
   private List<ItemRule> itemRules;
 
@@ -36,13 +34,14 @@ public class SemanticMap {
     this.graphFactory = graphFactory;
   }
 
+  public void setResourceFactory(ResourceFactory resourceFactory) {
+    this.resourceFactory = resourceFactory;
+  }
+
   public Graph process(DataItem dataItem) {
-    GraphBuilder builder = new GraphBuilder(graphFactory.newGraph(), baseUri);
+    GraphBuilder builder = new GraphBuilder(graphFactory.newGraph());
 
-    builder.forResource("DataItem", dataItem.getId().toString());
-
-    URI type = new ValueFactoryImpl().createURI(Opal.NS + "DataItem");
-    builder.withRelation(RDF.TYPE, type);
+    builder.forResource(resourceFactory.getResource(new URIImpl(Opal.NS + "DataItem"), dataItem.getCode().toString()));
 
     builder.clearChanged();
 

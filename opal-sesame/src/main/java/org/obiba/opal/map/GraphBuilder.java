@@ -27,19 +27,16 @@ public class GraphBuilder {
 
   private Graph graph;
 
-  private String baseUri;
-
   private Resource resource;
 
   private boolean changed = false;
 
-  public GraphBuilder(Graph graph, String baseUri) {
+  public GraphBuilder(Graph graph) {
     this.graph = graph;
-    this.baseUri = baseUri;
   }
 
-  public GraphBuilder forResource(String type, String localName) {
-    this.resource = graph.getValueFactory().createURI(baseUri + "/" + type + "/", localName);
+  public GraphBuilder forResource(URI resource) {
+    this.resource = resource;
     return this;
   }
 
@@ -58,7 +55,7 @@ public class GraphBuilder {
   public GraphBuilder withLiteral(URI predicate, String value, Locale locale) {
     if(value == null) throw new IllegalArgumentException("Cannot add predicate '" + predicate + "': literal value cannot be null");
     Literal literal = graph.getValueFactory().createLiteral(value, locale != null ? locale.getLanguage() : null);
-    log.info("adding statement {} {} {}", new Object[] { resource, predicate, literal });
+    log.debug("adding statement {} {} {}", new Object[] { resource, predicate, literal });
     trackChange(graph.add(resource, predicate, literal));
     return this;
   }
@@ -71,19 +68,20 @@ public class GraphBuilder {
     return changed;
   }
 
-  public GraphBuilder withRelation(URI predicate, String type, String related) {
-    URI relation = graph.getValueFactory().createURI(baseUri + "/" + type + "/", related);
-    return withRelation(predicate, relation);
+  public GraphBuilder withRelation(URI predicate, URI related) {
+    log.debug("adding statement {} {} {}", new Object[] { resource, predicate, related });
+    trackChange(graph.add(resource, predicate, related));
+    return this;
   }
 
-  public GraphBuilder withRelation(URI predicate, URI related) {
-    log.info("adding statement {} {} {}", new Object[] { resource, predicate, related });
-    trackChange(graph.add(resource, predicate, related));
+  public GraphBuilder withInverseRelation(URI predicate, URI related) {
+    log.debug("adding statement {} {} {}", new Object[] { related, predicate, resource });
+    trackChange(graph.add(related, predicate, resource));
     return this;
   }
 
   protected void trackChange(boolean change) {
     changed = changed || change;
-    log.info("graph changed {}", changed);
+    log.debug("graph changed {}", changed);
   }
 }

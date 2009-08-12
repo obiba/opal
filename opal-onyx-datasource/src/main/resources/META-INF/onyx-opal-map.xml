@@ -1,0 +1,130 @@
+<semanticMap>
+
+  <graphFactory class="defaultGraphFactory" />
+
+  <itemRules>
+
+    <itemRule class="dataItemPropertyRule">
+      <property>code</property>
+      <uri>opal:identifier</uri>
+    </itemRule>
+    <itemRule class="dataItemPropertyRule">
+      <property>name</property>
+      <uri>opal:path</uri>
+    </itemRule>
+
+    <itemRule class="org.obiba.opal.datasource.onyx.map.NameRule" />
+
+    <itemRule class="org.obiba.opal.datasource.onyx.map.DefRule" />
+
+    <itemRule class="org.obiba.opal.datasource.onyx.map.HierarchyRule" />
+
+  </itemRules>
+
+  <attributeRules>
+
+    <attributeRule class="simpleAttributeRule">
+      <map>
+        <entry>
+          <string>label</string>
+          <uri>rdfs:label</uri>
+        </entry>
+        <entry>
+          <string>instructions</string>
+          <uri>opal:instructions</uri>
+        </entry>
+        <entry>
+          <string>specifications</string>
+          <uri>opal:specifications</uri>
+        </entry>
+        <entry>
+          <string>unit</string>
+          <uri>opal:measurementUnit</uri>
+        </entry>
+        <entry>
+          <string>sections</string>
+          <uri>opal:sections</uri>
+        </entry>
+        <entry>
+          <string>condition</string>
+          <uri>opal:condition</uri>
+        </entry>
+        <entry>
+          <string>validation</string>
+          <uri>opal:validation</uri>
+        </entry>
+        <entry>
+          <string>mimeType</string>
+          <uri>opal:mimeType</uri>
+        </entry>
+        <entry>
+          <string>dataType</string>
+          <uri>opal:dataType</uri>
+        </entry>
+        <entry>
+          <string>alternateName</string>
+          <uri>opal:code</uri>
+        </entry>
+        <entry>
+          <string>maxCount</string>
+          <uri>opal:maxCount</uri>
+        </entry>
+        <entry>
+          <string>minCount</string>
+          <uri>opal:minCount</uri>
+        </entry>
+        <entry>
+          <string>repeatable</string>
+          <uri>opal:repeatable</uri>
+        </entry>
+      </map>
+    </attributeRule>
+
+    <attributeRule class="conditionalAttributeRule">
+      <when class="nameValueCondition">
+        <name>category</name>
+        <value>true</value>
+      </when>
+      <then class="multipleConsequence">
+        <consequences>
+          <attributeRuleConsequence class="org.obiba.opal.datasource.onyx.map.CategoryConsequence" />
+          <addType>
+            <uri>opal:Category</uri>
+          </addType>
+        </consequences>
+      </then>
+    </attributeRule>
+
+    <attributeRule class="conditionalAttributeRule">
+      <when class="nameValueCondition">
+        <name>escape</name>
+        <value>true</value>
+      </when>
+      <then class="addType">
+        <uri>opal:MissingCategory</uri>
+      </then>
+    </attributeRule>
+
+    <attributeRule class="conditionalAttributeRule">
+      <when class="nameValueCondition">
+        <name>categorical</name>
+        <value>true</value>
+      </when>
+      <then class="addType">
+        <uri>opal:CategoricalVariable</uri>
+      </then>
+    </attributeRule>
+
+    <attributeRule class="conditionalAttributeRule">
+      <when class="nameValueCondition">
+        <name>continuous</name>
+        <value>true</value>
+      </when>
+      <then class="addType">
+        <uri>opal:ContinuousVariable</uri>
+      </then>
+    </attributeRule>
+
+  </attributeRules>
+
+</semanticMap>

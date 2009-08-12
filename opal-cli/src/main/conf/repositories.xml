@@ -4,14 +4,13 @@
 
   <!-- This file must define two beans of type org.openrdf.repository.Repository: catalogueRepository and dataRepository -->
 
-  <alias name="memoryRepositoryFactory" alias="catalogueRepository" />
-  <alias name="nativeRepositoryFactory" alias="dataRepository" />
-
-  <bean id="memoryRepositoryFactory" class="org.obiba.opal.sesame.repository.impl.MemoryRepositoryFactory">
+  <bean id="catalogueRepository" class="org.obiba.opal.sesame.repository.impl.NativeRepositoryFactory">
     <property name="dataDir" value="${org.obiba.opal.datasource.opal.dataDir}/catalogue" />
+    <property name="tripleIndexes" value="spoc,posc,cosp" />
+    <property name="withInferencer" value="true" />
   </bean>
 
-  <bean id="nativeRepositoryFactory" class="org.obiba.opal.sesame.repository.impl.NativeRepositoryFactory">
+  <bean id="dataRepository" class="org.obiba.opal.sesame.repository.impl.NativeRepositoryFactory">
     <property name="dataDir" value="${org.obiba.opal.datasource.opal.dataDir}/data" />
     <property name="tripleIndexes" value="spoc,posc,cosp" />
     <property name="withInferencer" value="false" />

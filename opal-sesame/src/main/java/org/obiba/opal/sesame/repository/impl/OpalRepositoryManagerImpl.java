@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.sesame.repository.impl;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,6 +18,9 @@ import org.obiba.opal.sesame.repository.OpalRepositoryManager;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParseException;
+import org.springframework.core.io.Resource;
 
 /**
  * 
@@ -27,6 +31,8 @@ public class OpalRepositoryManagerImpl implements OpalRepositoryManager {
 
   private Map<String, String> namespaces = new HashMap<String, String>();
 
+  private Resource[] ontologies;
+
   public void setRepositories(Map<String, Repository> repositories) {
     this.repositories = repositories;
   }
@@ -35,12 +41,17 @@ public class OpalRepositoryManagerImpl implements OpalRepositoryManager {
     this.namespaces = namespaces;
   }
 
+  public void setOntologies(Resource[] ontologies) {
+    this.ontologies = ontologies;
+  }
+
   public void initialize() throws RepositoryException {
     for(Entry<String, Repository> entry : repositories.entrySet()) {
       Repository repository = entry.getValue();
       repository.initialize();
       addNamespaces(repository);
     }
+    addOntologies(getCatalogRepository());
   }
 
   public void shutdown() throws RepositoryException {
@@ -67,6 +78,27 @@ public class OpalRepositoryManagerImpl implements OpalRepositoryManager {
 
   public Repository getDataRepository() {
     return getRepository(OpalRepository.DATA.toString().toLowerCase());
+  }
+
+  protected void addOntologies(Repository repository) throws RepositoryException {
+    if(ontologies == null) {
+      return;
+    }
+    for(Resource ontology : ontologies) {
+      RepositoryConnection connection = null;
+      try {
+        connection = repository.getConnection();
+        connection.add(ontology.getInputStream(), "http://www.obiba.org/owl/2009/05/opal#", RDFFormat.RDFXML);
+      } catch(RDFParseException e) {
+        throw new RepositoryException(e);
+      } catch(IOException e) {
+        throw new RepositoryException(e);
+      } finally {
+        if(connection != null) {
+          connection.close();
+        }
+      }
+    }
   }
 
   protected void addNamespaces(Repository repository) throws RepositoryException {

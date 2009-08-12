@@ -21,18 +21,25 @@ import org.openrdf.model.impl.URIImpl;
 /**
  *
  */
-public class DefRule extends AbstractOnyxRule implements ItemRule {
+public class HierarchyRule extends AbstractOnyxRule implements ItemRule {
 
   public void execute(GraphBuilder builder, DataItem item) {
     String path = item.getName();
 
     List<String> parts = getPathNamingStrategy().getNormalizedNames(path);
 
-    if(parts.size() > 2) {
-      String defName = parts.get(1);
-      URI defURI = getResourceFactory().getResource(new URIImpl(Opal.NS + "DataEntryForm"), defName);
-      builder.withRelation(new URIImpl(Opal.NS + "dataEntryForm"), defURI);
-      builder.withInverseRelation(new URIImpl(Opal.NS + "hasDataItem"), defURI);
+    StringBuilder parentPath = new StringBuilder();
+
+    for(String part : parts) {
+      if(parentPath.length() > 0) {
+        parentPath.append(getPathNamingStrategy().getPathSeparator());
+      }
+      parentPath.append(part);
+      URI parent = getResourceFactory().findResource(new URIImpl(Opal.NS + "DataItem"), new URIImpl(Opal.NS + "path"), parentPath.toString());
+      if(parent != null) {
+        builder.withRelation(new URIImpl(Opal.NS + "hasParent"), parent);
+        builder.withInverseRelation(new URIImpl(Opal.NS + "hasChild"), parent);
+      }
     }
   }
 }

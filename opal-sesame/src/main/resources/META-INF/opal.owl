@@ -28,43 +28,17 @@
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
-    // Annotation properties
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////
-     -->
-
-    <owl:AnnotationProperty rdf:about="#child"/>
-    <owl:AnnotationProperty rdf:about="#condition"/>
-    <owl:AnnotationProperty rdf:about="#className"/>
-    <owl:AnnotationProperty rdf:about="#parent"/>
-    <owl:AnnotationProperty rdf:about="#occurrenceCount"/>
-    <owl:AnnotationProperty rdf:about="#creationSource"/>
-    <owl:AnnotationProperty rdf:about="#specifications"/>
-    <owl:AnnotationProperty rdf:about="#exportDate"/>
-    <owl:AnnotationProperty rdf:about="#dataVariable"/>
-    <owl:AnnotationProperty rdf:about="#category"/>
-    <owl:AnnotationProperty rdf:about="#minCount"/>
-    <owl:AnnotationProperty rdf:about="#validation"/>
-    <owl:AnnotationProperty rdf:about="#dataEntryForm"/>
-    <owl:AnnotationProperty rdf:about="#required"/>
-    <owl:AnnotationProperty rdf:about="#creationDate"/>
-    <owl:AnnotationProperty rdf:about="#path"/>
-    <owl:AnnotationProperty rdf:about="#code"/>
-    <owl:AnnotationProperty rdf:about="#instructions"/>
-    <owl:AnnotationProperty rdf:about="#source"/>
-    <owl:AnnotationProperty rdf:about="#description"/>
-    <owl:AnnotationProperty rdf:about="#maxCount"/>
-    <owl:AnnotationProperty rdf:about="#name"/>
-
-
-    <!-- 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    //
     // Object Properties
     //
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#dataEntryForm -->
+
+    <owl:ObjectProperty rdf:about="#dataEntryForm"/>
     
 
 
@@ -80,23 +54,21 @@
     
 
 
+    <!-- http://www.obiba.org/owl/2009/05/opal#hasChild -->
+
+    <owl:ObjectProperty rdf:about="#hasChild">
+        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
+        <rdfs:subPropertyOf rdf:resource="#hasDataItem"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://www.obiba.org/owl/2009/05/opal#hasDataItem -->
 
     <owl:ObjectProperty rdf:about="#hasDataItem">
         <rdfs:comment xml:lang="en"
             >Property of thing that has a relationship to a DataItem</rdfs:comment>
         <rdfs:range rdf:resource="#DataItem"/>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://www.obiba.org/owl/2009/05/opal#hasDataVariable -->
-
-    <owl:ObjectProperty rdf:about="#hasDataVariable">
-        <rdfs:comment xml:lang="en"
-            >Property of a thing that has a relationship to a DataVariable</rdfs:comment>
-        <rdfs:range rdf:resource="#DataVariable"/>
-        <rdfs:subPropertyOf rdf:resource="#hasDataItem"/>
     </owl:ObjectProperty>
     
 
@@ -111,10 +83,10 @@
     
 
 
-    <!-- http://www.obiba.org/owl/2009/05/opal#hasOccurrence -->
+    <!-- http://www.obiba.org/owl/2009/05/opal#hasParent -->
 
-    <owl:ObjectProperty rdf:about="#hasOccurrence">
-        <rdfs:range rdf:resource="#OccurrenceItem"/>
+    <owl:ObjectProperty rdf:about="#hasParent">
+        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
         <rdfs:subPropertyOf rdf:resource="#hasDataItem"/>
     </owl:ObjectProperty>
     
@@ -133,24 +105,6 @@
     <owl:ObjectProperty rdf:about="#isForEntity">
         <rdf:type rdf:resource="&owl;AsymmetricProperty"/>
         <rdfs:range rdf:resource="#Entity"/>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://www.obiba.org/owl/2009/05/opal#withinDataset -->
-
-    <owl:ObjectProperty rdf:about="#withinDataset">
-        <rdf:type rdf:resource="&owl;AsymmetricProperty"/>
-        <rdfs:range rdf:resource="#Dataset"/>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://www.obiba.org/owl/2009/05/opal#withinOccurrence -->
-
-    <owl:ObjectProperty rdf:about="#withinOccurrence">
-        <rdf:type rdf:resource="&owl;AsymmetricProperty"/>
-        <owl:inverseOf rdf:resource="#hasOccurrence"/>
     </owl:ObjectProperty>
     
 
@@ -174,14 +128,6 @@
     
 
 
-    <!-- http://www.obiba.org/owl/2009/05/opal#dataValue -->
-
-    <owl:DatatypeProperty rdf:about="#dataValue">
-        <rdfs:range rdf:resource="&xsd;anyType"/>
-    </owl:DatatypeProperty>
-    
-
-
     <!-- http://www.obiba.org/owl/2009/05/opal#identifier -->
 
     <owl:DatatypeProperty rdf:about="#identifier"/>
@@ -196,10 +142,13 @@
     
 
 
-    <!-- http://www.obiba.org/owl/2009/05/opal#ordinal -->
+    <!-- http://www.obiba.org/owl/2009/05/opal#path -->
 
-    <owl:DatatypeProperty rdf:about="#ordinal"/>
+    <owl:DatatypeProperty rdf:about="#path">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+    </owl:DatatypeProperty>
     
+
 
 
     <!-- http://www.obiba.org/owl/2009/05/opal#repeatable -->
@@ -216,8 +165,36 @@
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
+    <owl:DatatypeProperty rdf:about="#condition"/>
 
+    <owl:DatatypeProperty rdf:about="#occurrenceCount"/>
 
+    <owl:DatatypeProperty rdf:about="#creationSource"/>
+
+    <owl:DatatypeProperty rdf:about="#specifications"/>
+
+    <owl:DatatypeProperty rdf:about="#exportDate"/>
+
+    <owl:DatatypeProperty rdf:about="#minCount"/>
+
+    <owl:DatatypeProperty rdf:about="#validation"/>
+
+    <owl:DatatypeProperty rdf:about="#required"/>
+
+    <owl:DatatypeProperty rdf:about="#creationDate"/>
+
+    <owl:DatatypeProperty rdf:about="#code"/>
+
+    <owl:DatatypeProperty rdf:about="#instructions"/>
+
+    <owl:DatatypeProperty rdf:about="#source"/>
+
+    <owl:DatatypeProperty rdf:about="#description"/>
+
+    <owl:DatatypeProperty rdf:about="#maxCount"/>
+
+    <owl:DatatypeProperty rdf:about="#name"/>
+    
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
@@ -232,15 +209,13 @@
     <!-- http://www.obiba.org/owl/2009/05/opal#CategoricalVariable -->
 
     <owl:Class rdf:about="#CategoricalVariable">
-        <rdfs:subClassOf rdf:resource="#DataVariable"/>
+        <rdfs:subClassOf rdf:resource="#DataItem"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="#hasCategory"/>
                 <owl:someValuesFrom rdf:resource="#Category"/>
             </owl:Restriction>
         </rdfs:subClassOf>
-        <category xml:lang="en"
-            >One of the categorical variable categories.</category>
     </owl:Class>
     
 
@@ -248,9 +223,7 @@
     <!-- http://www.obiba.org/owl/2009/05/opal#Category -->
 
     <owl:Class rdf:about="#Category">
-        <rdfs:subClassOf rdf:resource="#DataVariable"/>
-        <code
-            >Category code value.</code>
+        <rdfs:subClassOf rdf:resource="#DataItem"/>
     </owl:Class>
     
 
@@ -258,13 +231,7 @@
     <!-- http://www.obiba.org/owl/2009/05/opal#ContinuousVariable -->
 
     <owl:Class rdf:about="#ContinuousVariable">
-        <rdfs:subClassOf rdf:resource="#DataVariable"/>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="#dataValue"/>
-                <owl:someValuesFrom rdf:resource="&xsd;anyType"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
+        <rdfs:subClassOf rdf:resource="#DataItem"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="#unit"/>
@@ -279,23 +246,7 @@
     <!-- http://www.obiba.org/owl/2009/05/opal#DataEntryForm -->
 
     <owl:Class rdf:about="#DataEntryForm">
-        <rdfs:subClassOf rdf:resource="#DataItem"/>
-        <rdfs:subClassOf>
-            <owl:Class>
-                <owl:intersectionOf rdf:parseType="Collection">
-                    <owl:Restriction>
-                        <owl:onProperty rdf:resource="#hasDataItem"/>
-                        <owl:someValuesFrom rdf:resource="#DataVariable"/>
-                    </owl:Restriction>
-                    <owl:Restriction>
-                        <owl:onProperty rdf:resource="#hasDataItem"/>
-                        <owl:allValuesFrom rdf:resource="#DataVariable"/>
-                    </owl:Restriction>
-                </owl:intersectionOf>
-            </owl:Class>
-        </rdfs:subClassOf>
-        <owl:disjointWith rdf:resource="#DataVariable"/>
-        <dataVariable rdf:datatype="&xsd;string">A DataVariable contained in this Data Entry Form</dataVariable>
+        <rdfs:label>DataEntryForm</rdfs:label>
     </owl:Class>
     
 
@@ -303,76 +254,7 @@
     <!-- http://www.obiba.org/owl/2009/05/opal#DataItem -->
 
     <owl:Class rdf:about="#DataItem">
-        <rdfs:subClassOf>
-            <owl:Class>
-                <owl:intersectionOf rdf:parseType="Collection">
-                    <owl:Restriction>
-                        <owl:onProperty rdf:resource="#withinDataset"/>
-                        <owl:someValuesFrom rdf:resource="#Dataset"/>
-                    </owl:Restriction>
-                    <owl:Restriction>
-                        <owl:onProperty rdf:resource="#withinDataset"/>
-                        <owl:allValuesFrom rdf:resource="#Dataset"/>
-                    </owl:Restriction>
-                </owl:intersectionOf>
-            </owl:Class>
-        </rdfs:subClassOf>
-        <condition xml:lang="en"
-            >Condition at which the data item is asked for data.</condition>
-        <child xml:lang="en"
-            >Data item children.</child>
-        <parent xml:lang="en"
-            >Data item parent.</parent>
-        <validation xml:lang="en"
-            >Data validation constrains.</validation>
-        <required xml:lang="en"
-            >If answering is required.</required>
-        <occurrenceCount xml:lang="en"
-            >Repeatability of a occurrence item.</occurrenceCount>
-        <creationSource xml:lang="en"
-            >Source from which the data item was created.</creationSource>
-        <source xml:lang="en"
-            >Source of the data for automatically provisionned data item.</source>
-        <creationDate xml:lang="en"
-            >The data item creation date.</creationDate>
-        <description xml:lang="en"
-            >The data item description.</description>
-        <exportDate xml:lang="en"
-            >The data item export date.</exportDate>
-        <instructions xml:lang="en"
-            >The data item instructions.</instructions>
-        <name xml:lang="en"
-            >The data item name.</name>
-        <path xml:lang="en"
-            >The data item path.</path>
-        <specifications xml:lang="en"
-            >The data item specifications.</specifications>
-        <className xml:lang="en"
-            >The local part of the OWL Class QName.</className>
-        <maxCount xml:lang="en"
-            >The maximum count of data item.</maxCount>
-        <minCount xml:lang="en"
-            >The minimum count of data item.</minCount>
-    </owl:Class>
-    
-
-
-    <!-- http://www.obiba.org/owl/2009/05/opal#DataVariable -->
-
-    <owl:Class rdf:about="#DataVariable">
-        <rdfs:subClassOf>
-            <owl:Class>
-                <owl:intersectionOf rdf:parseType="Collection">
-                    <rdf:Description rdf:about="#DataItem"/>
-                    <owl:Restriction>
-                        <owl:onProperty rdf:resource="#multiple"/>
-                        <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-                        <owl:onDataRange rdf:resource="&xsd;boolean"/>
-                    </owl:Restriction>
-                </owl:intersectionOf>
-            </owl:Class>
-        </rdfs:subClassOf>
-        <dataEntryForm rdf:datatype="&xsd;string">The Data Entry Form containing this DataVariable.</dataEntryForm>
+        <rdfs:label>DataItem</rdfs:label>
     </owl:Class>
     
 
@@ -410,14 +292,6 @@
     
 
 
-    <!-- http://www.obiba.org/owl/2009/05/opal#Instrument -->
-
-    <owl:Class rdf:about="#Instrument">
-        <rdfs:subClassOf rdf:resource="#Entity"/>
-    </owl:Class>
-    
-
-
     <!-- http://www.obiba.org/owl/2009/05/opal#MissingCategory -->
 
     <owl:Class rdf:about="#MissingCategory">
@@ -426,63 +300,9 @@
     
 
 
-    <!-- http://www.obiba.org/owl/2009/05/opal#OccurrenceItem -->
-
-    <owl:Class rdf:about="#OccurrenceItem">
-        <rdfs:subClassOf>
-            <owl:Class>
-                <owl:intersectionOf rdf:parseType="Collection">
-                    <rdf:Description rdf:about="#DataItem"/>
-                    <owl:Restriction>
-                        <owl:onProperty rdf:resource="#hasOccurrence"/>
-                        <owl:someValuesFrom rdf:resource="#DataVariable"/>
-                    </owl:Restriction>
-                    <owl:Restriction>
-                        <owl:onProperty rdf:resource="#identifier"/>
-                        <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-                        <owl:onDataRange rdf:resource="&xsd;string"/>
-                    </owl:Restriction>
-                    <owl:Restriction>
-                        <owl:onProperty rdf:resource="#ordinal"/>
-                        <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-                        <owl:onDataRange rdf:resource="&xsd;integer"/>
-                    </owl:Restriction>
-                </owl:intersectionOf>
-            </owl:Class>
-        </rdfs:subClassOf>
-    </owl:Class>
-    
-
-
     <!-- http://www.obiba.org/owl/2009/05/opal#Participant -->
 
     <owl:Class rdf:about="#Participant">
-        <rdfs:subClassOf rdf:resource="#Entity"/>
-    </owl:Class>
-    
-
-
-    <!-- http://www.obiba.org/owl/2009/05/opal#RepeatableVariable -->
-
-    <owl:Class rdf:about="#RepeatableVariable">
-        <owl:equivalentClass>
-            <owl:Class>
-                <owl:intersectionOf rdf:parseType="Collection">
-                    <rdf:Description rdf:about="#DataVariable"/>
-                    <owl:Restriction>
-                        <owl:onProperty rdf:resource="#repeatable"/>
-                        <owl:hasValue rdf:datatype="&xsd;boolean">true</owl:hasValue>
-                    </owl:Restriction>
-                </owl:intersectionOf>
-            </owl:Class>
-        </owl:equivalentClass>
-    </owl:Class>
-    
-
-
-    <!-- http://www.obiba.org/owl/2009/05/opal#Site -->
-
-    <owl:Class rdf:about="#Site">
         <rdfs:subClassOf rdf:resource="#Entity"/>
     </owl:Class>
     
@@ -496,14 +316,6 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    <rdf:Description>
-        <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
-        <owl:members rdf:parseType="Collection">
-            <rdf:Description rdf:about="#Instrument"/>
-            <rdf:Description rdf:about="#Participant"/>
-            <rdf:Description rdf:about="#Site"/>
-        </owl:members>
-    </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
         <owl:members rdf:parseType="Collection">
