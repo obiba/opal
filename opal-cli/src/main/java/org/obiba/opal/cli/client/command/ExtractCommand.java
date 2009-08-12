@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.cli.client.command;
 
-import org.obiba.opal.cli.client.command.options.ImportCommandOptions;
+import org.obiba.opal.cli.client.command.options.ExtractCommandOptions;
 
-public class ImportCommand extends JobRunningCommand<ImportCommandOptions> {
+public class ExtractCommand extends JobRunningCommand<ExtractCommandOptions> {
 
 }
