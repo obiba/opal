@@ -441,6 +441,12 @@
         <version>${sesame.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.liquibase</groupId>
+        <artifactId>liquibase-core</artifactId>
+        <version>${liquibase.version}</version>
+      </dependency>
+      
     </dependencies>
   </dependencyManagement>
 
@@ -566,6 +572,7 @@
     <onyx.version>1.3.3</onyx.version>
     <sesame.version>2.2.4</sesame.version>
     <elmo.version>1.5</elmo.version>
+    <liquibase.version>1.9.2</liquibase.version>
   </properties>
 
   <reporting>
