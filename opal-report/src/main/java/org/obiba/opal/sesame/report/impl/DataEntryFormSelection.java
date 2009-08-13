@@ -14,8 +14,8 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import org.obiba.opal.elmo.owl.concepts.DataEntryFormClass;
-import org.obiba.opal.elmo.owl.concepts.DataItemClass;
+import org.obiba.opal.elmo.concepts.DataEntryForm;
+import org.obiba.opal.elmo.concepts.DataItem;
 import org.obiba.opal.sesame.report.IDataItemSelection;
 import org.obiba.opal.sesame.report.ReportQueryBuilder;
 import org.openrdf.elmo.sesame.SesameManager;
@@ -30,12 +30,12 @@ public class DataEntryFormSelection implements IDataItemSelection {
 
   private QName qname;
 
-  public Set<DataItemClass> getSelection(SesameManager manager) {
-    DataEntryFormClass def = manager.find(DataEntryFormClass.class, getQName());
+  public Set<DataItem> getSelection(SesameManager manager) {
+    DataEntryForm def = manager.find(DataEntryForm.class, getQName());
     if(def == null) {
       throw new IllegalArgumentException("No such DEF " + getQName());
     }
-    return Collections.unmodifiableSet(def.getDataVariables());
+    return Collections.unmodifiableSet(def.getDataItems());
   }
 
   private QName getQName() {

@@ -24,7 +24,7 @@ public class VariableValueFrequencyQueryResultAggregator implements QueryResultA
       currentAggregation = new AggregateQueryResult(aggregatedVariableName);
     }
 
-    if (item.getDataItemClass().getClassName().equals(aggregatedVariableName)) {
+    if (item.getDataItemClass().getName().equals(aggregatedVariableName)) {
       Object value = item.getValue();
       Integer frequency = currentAggregation.getValue(value);
       if (frequency == null) {

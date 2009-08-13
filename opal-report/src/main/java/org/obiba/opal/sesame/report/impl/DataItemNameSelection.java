@@ -15,7 +15,7 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import org.obiba.opal.elmo.owl.concepts.DataItemClass;
+import org.obiba.opal.elmo.concepts.DataItem;
 import org.obiba.opal.sesame.report.IDataItemSelection;
 import org.obiba.opal.sesame.report.ReportQueryBuilder;
 import org.openrdf.elmo.sesame.SesameManager;
@@ -30,11 +30,11 @@ public class DataItemNameSelection implements IDataItemSelection {
 
   private Set<String> names;
 
-  public Set<DataItemClass> getSelection(SesameManager manager) {
+  public Set<DataItem> getSelection(SesameManager manager) {
 
-    Set<DataItemClass> vars = new LinkedHashSet<DataItemClass>();
+    Set<DataItem> vars = new LinkedHashSet<DataItem>();
     for(String name : names) {
-      DataItemClass dataItem = manager.find(DataItemClass.class, getQName(name));
+      DataItem dataItem = manager.find(DataItem.class, getQName(name));
       if(dataItem == null) {
         throw new IllegalArgumentException("No such variable " + getQName(name));
       }
@@ -45,7 +45,7 @@ public class DataItemNameSelection implements IDataItemSelection {
   }
 
   private QName getQName(String name) {
-    return QName.valueOf(baseUri+name);
+    return QName.valueOf(baseUri + name);
   }
 
   public void contribute(ReportQueryBuilder builder, SesameManager manager) {

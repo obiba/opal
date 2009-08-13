@@ -11,7 +11,7 @@ package org.obiba.opal.sesame.report;
 
 import java.util.Set;
 
-import org.obiba.opal.elmo.owl.concepts.DataItemClass;
+import org.obiba.opal.elmo.concepts.DataItem;
 import org.openrdf.elmo.sesame.SesameManager;
 
 /**
@@ -19,7 +19,7 @@ import org.openrdf.elmo.sesame.SesameManager;
  */
 public interface IDataItemSelection {
 
-  public Set<DataItemClass> getSelection(SesameManager manager);
+  public Set<DataItem> getSelection(SesameManager manager);
 
   public void contribute(ReportQueryBuilder builder, SesameManager manager);
 

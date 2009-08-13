@@ -1,6 +1,6 @@
 package org.obiba.opal.mart;
 
-import org.obiba.opal.elmo.owl.concepts.DataItemClass;
+import org.obiba.opal.elmo.concepts.DataItem;
 
 public interface QueryResult {
 
@@ -10,7 +10,7 @@ public interface QueryResult {
 
 	public int getOccurrence();
 
-	public DataItemClass getDataItemClass();
+	public DataItem getDataItemClass();
 
 	public Object getValue();
 

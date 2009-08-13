@@ -2,7 +2,7 @@ package org.obiba.opal.mart.reader.sesame;
 
 import javax.xml.namespace.QName;
 
-import org.obiba.opal.elmo.owl.concepts.DataItemClass;
+import org.obiba.opal.elmo.concepts.DataItem;
 import org.obiba.opal.mart.QueryResult;
 import org.openrdf.elmo.sesame.SesameManager;
 import org.openrdf.elmo.sesame.SesameManagerFactory;
@@ -43,11 +43,11 @@ public class QueryResultBindingSetMapper implements BindingSetMapper<QueryResult
       this.bindingSet = bindingSet;
     }
 
-    public DataItemClass getDataItemClass() {
+    public DataItem getDataItemClass() {
       Binding varBinding = bindingSet.getBinding("var");
       URI varURI = (URI) varBinding.getValue();
       QName varQName = new QName(varURI.getNamespace(), varURI.getLocalName());
-      return manager.find(DataItemClass.class, varQName);
+      return manager.find(DataItem.class, varQName);
     }
 
     public int getOccurrence() {

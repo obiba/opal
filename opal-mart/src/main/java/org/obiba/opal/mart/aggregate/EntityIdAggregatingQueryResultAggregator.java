@@ -20,11 +20,11 @@ public class EntityIdAggregatingQueryResultAggregator implements QueryResultAggr
     }
 
     if (currentAggregation.isFor(entityId)) {
-      currentAggregation.addValue(item.getDataItemClass().getClassName(), item.getValue());
+      currentAggregation.addValue(item.getDataItemClass().getName(), item.getValue());
     } else {
       AggregateQueryResult oldAggregate = currentAggregation;
       currentAggregation = new AggregateQueryResult(entityId);
-      currentAggregation.addValue(item.getDataItemClass().getClassName(), item.getValue());
+      currentAggregation.addValue(item.getDataItemClass().getName(), item.getValue());
       return oldAggregate;
     }
 

@@ -11,7 +11,7 @@ package org.obiba.opal.sesame.report.impl;
 
 import java.util.regex.Pattern;
 
-import org.obiba.opal.elmo.owl.concepts.DataItemClass;
+import org.obiba.opal.elmo.concepts.DataItem;
 import org.obiba.opal.sesame.report.IDataItemFilter;
 import org.obiba.opal.sesame.report.ReportQueryBuilder;
 import org.openrdf.elmo.sesame.SesameManager;
@@ -32,7 +32,7 @@ public class NameRegexDataItemFilter implements IDataItemFilter {
     filterOut = true;
   }
 
-  public boolean accept(DataItemClass dataItem) {
+  public boolean accept(DataItem dataItem) {
     if (dataItem == null) {
       throw new NullPointerException("dataItem cannot be null");
     }

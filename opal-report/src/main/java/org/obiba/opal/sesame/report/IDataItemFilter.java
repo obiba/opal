@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.sesame.report;
 
-import org.obiba.opal.elmo.owl.concepts.DataItemClass;
+import org.obiba.opal.elmo.concepts.DataItem;
 import org.openrdf.elmo.sesame.SesameManager;
 
 /**
@@ -23,7 +23,7 @@ public interface IDataItemFilter {
    * @param dataItem
    * @return
    */
-  public boolean accept(DataItemClass dataItem);
+  public boolean accept(DataItem dataItem);
 
   public void contribute(ReportQueryBuilder builder, SesameManager manager);
 }

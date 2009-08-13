@@ -5,21 +5,14 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
 import org.obiba.opal.core.mart.sas.ISasMartBuilder;
-import org.obiba.opal.elmo.concepts.CategoricalVariable;
+import org.obiba.opal.elmo.concepts.CategoricalItem;
 import org.obiba.opal.elmo.concepts.Category;
-import org.obiba.opal.elmo.concepts.ContinuousVariable;
-import org.obiba.opal.elmo.concepts.MissingCategory;
-import org.obiba.opal.elmo.owl.concepts.CategoricalVariableClass;
-import org.obiba.opal.elmo.owl.concepts.CategoryClass;
-import org.obiba.opal.elmo.owl.concepts.ContinuousVariableClass;
-import org.obiba.opal.elmo.owl.concepts.DataItemClass;
-import org.openrdf.elmo.Entity;
+import org.obiba.opal.elmo.concepts.DataItem;
 import org.openrdf.elmo.sesame.SesameManager;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
@@ -42,7 +35,7 @@ public class ReportBuilder {
 
   private Map<QName, IVariableNullValueHandler> variableNullValueHandlers = new HashMap<QName, IVariableNullValueHandler>();
 
-  List<DataItemClass> reportedItems = new LinkedList<DataItemClass>();
+  List<DataItem> reportedItems = new LinkedList<DataItem>();
 
   Map<QName, Integer> varIndex = new HashMap<QName, Integer>();
 
@@ -56,7 +49,7 @@ public class ReportBuilder {
   public void initialize() {
     List<IDataItemFilter> filters = report.getFilters();
     for(IDataItemSelection s : report.getSelections()) {
-      for(DataItemClass dataItem : s.getSelection(manager)) {
+      for(DataItem dataItem : s.getSelection(manager)) {
         boolean accept = true;
         for(IDataItemFilter filter : filters) {
           if(filter.accept(dataItem) == false) {
@@ -68,17 +61,10 @@ public class ReportBuilder {
         if(accept == true) {
           int itemIndex = reportedItems.size();
           StringBuilder name = new StringBuilder(dataItem.getQName().getLocalPart());
-          if(dataItem instanceof ContinuousVariableClass) {
-            ContinuousVariableClass cv = (ContinuousVariableClass) dataItem;
-            String unit = cv.getUnit();
-            if(unit != null && unit.length() > 0) {
-              name.append(" (").append(unit).append(")");
-            }
-          }
           names.add(name.toString());
           varIndex.put(dataItem.getQName(), itemIndex);
           reportedItems.add(dataItem);
-          createValueHandler(dataItem);
+//          createValueHandler(dataItem);
           log.debug("reported item {}: {}", itemIndex, dataItem.getQName());
         }
 
@@ -175,42 +161,6 @@ public class ReportBuilder {
     martBuilder.withData(item.id, item.occurrence, values);
   }
 
-  public void createValueHandler(DataItemClass dataItem) {
-    if(isContinuous(dataItem)) {
-      this.variableValueHandlers.put(dataItem.getQName(), ContinuousVariableValueHandler.instance);
-    } else if(isCategorical(dataItem)) {
-      if(dataItem.isMultiple() == false) {
-        this.variableValueHandlers.put(dataItem.getQName(), new SingleChoiceCategoryValueHandler(dataItem));
-      }
-    } else if(isCategory(dataItem)) {
-      this.variableValueHandlers.put(dataItem.getQName(), MultipleChoiceCategoryValueHandler.instance);
-      this.variableNullValueHandlers.put(dataItem.getQName(), MultipleChoiceCategoryValueHandler.instance);
-    }
-  }
-
-  boolean isCategory(DataItemClass di) {
-    return hasSuperClass(di, Category.QNAME) || hasSuperClass(di, MissingCategory.QNAME);
-  }
-
-  boolean isContinuous(DataItemClass di) {
-    return hasSuperClass(di, ContinuousVariable.QNAME);
-  }
-
-  boolean isCategorical(DataItemClass di) {
-    return hasSuperClass(di, CategoricalVariable.QNAME);
-  }
-
-  boolean hasSuperClass(DataItemClass di, QName parentClass) {
-    Set<?> superClasses = di.getRdfsSubClassOf();
-    for(Object superClass : superClasses) {
-      Entity elmoEntity = (Entity) superClass;
-      if(parentClass.equals(elmoEntity.getQName())) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   private interface IVariableValueHandler {
     Object getValue(SesameManager manager, QName variable, BindingSet set);
   }
@@ -233,12 +183,12 @@ public class ReportBuilder {
 
   private class SingleChoiceCategoryValueHandler implements IVariableValueHandler {
 
-    private Map<String, String> categoryCode = new HashMap<String, String>();
+    private Map<String, Integer> categoryCode = new HashMap<String, Integer>();
 
-    SingleChoiceCategoryValueHandler(DataItemClass dataItem) {
-      CategoricalVariableClass categorical = (CategoricalVariableClass) dataItem;
-      for(CategoryClass category : categorical.getCategories()) {
-        categoryCode.put(category.getClassName(), category.getCode());
+    SingleChoiceCategoryValueHandler(DataItem dataItem) {
+      CategoricalItem categorical = (CategoricalItem) dataItem;
+      for(Category category : categorical.getCategories()) {
+        categoryCode.put(category.getRdfsLabel(), category.getCode());
       }
 
     }

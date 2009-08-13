@@ -34,7 +34,7 @@ public class CrossVariableValueFrequencyQueryResultAggregator implements QueryRe
       currentAggregation = new AggregateQueryResult(entityId);
     }
 
-    if (crossedVariables.contains(item.getDataItemClass().getClassName())) {
+    if (crossedVariables.contains(item.getDataItemClass().getName())) {
       Object value = item.getValue();
       Integer frequency = currentAggregation.getValue(value);
       if (frequency == null) {
