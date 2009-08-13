@@ -1,0 +1,21 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:tx="http://www.springframework.org/schema/tx" xmlns:batch="http://www.springframework.org/schema/batch"
+  xsi:schemaLocation="
+  http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
+  http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd 
+  http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd">
+
+  <import resource="classpath:/META-INF/opal/context-config.xml" />
+
+  <batch:job id="jdbc-extract">
+    <batch:step id="test">
+      <batch:tasklet ref="testTasklet" />
+    </batch:step>
+  </batch:job>
+  
+  <!-- To be removed. For testing integration of jdbc-extract job. -->
+  <bean id="testTasklet" class="org.springframework.batch.core.step.tasklet.SystemCommandTasklet">
+    <property name="command" value="java --version" />
+    <property name="timeout" value="10000" />
+  </bean>
+</beans>

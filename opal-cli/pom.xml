@@ -47,6 +47,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>jdbc-mart</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <scope>runtime</scope>

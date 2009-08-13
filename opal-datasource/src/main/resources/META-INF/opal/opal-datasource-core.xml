@@ -20,8 +20,8 @@
   <bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.ClassPathXmlJobRegistry">
     <property name="jobPaths">
       <list>
-        <value>classpath*:/META-INF/opal-datasource.xml</value>
-        <value>classpath*:/META-INF/opal-mart.xml</value>
+        <value>classpath*:META-INF/opal-datasource.xml</value>
+        <value>classpath*:mart/*-mart.xml</value>
       </list>
     </property>
   </bean>
