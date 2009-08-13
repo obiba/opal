@@ -21,7 +21,7 @@ public class SchemaChangeSqlVisitor extends AbstractSqlVisitor {
 
   public String modifySql(String sql, Database database) {
     // For MySQL, modify the SQL to specify InnoDB tables and the latin1 charset.
-    if (database instanceof MySQLDatabase) {
+    if (database.getTypeName().equals("mysql")) {
       sql += MYSQL_MODIFICATION;  
     }
     
