@@ -8,14 +8,20 @@
   <import resource="classpath:/META-INF/opal/context-config.xml" />
 
   <batch:job id="jdbc-extract">
-    <batch:step id="test">
-      <batch:tasklet ref="testTasklet" />
+    <batch:step id="createSchema">
+      <batch:tasklet ref="createSchemaTasklet" />
     </batch:step>
   </batch:job>
   
-  <!-- To be removed. For testing integration of jdbc-extract job. -->
-  <bean id="testTasklet" class="org.springframework.batch.core.step.tasklet.SystemCommandTasklet">
-    <property name="command" value="java --version" />
-    <property name="timeout" value="10000" />
+  <bean id="createSchemaTasklet" class="org.obiba.opal.jdbcmart.batch.CreateSchemaTasklet">
+    <property name="dataSource" ref="dataSource" />
   </bean>
+  
+  <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+    <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+    <property name="url" value="jdbc:mysql://localhost:3306/mart" />
+    <property name="username" value="root" />
+    <property name="password" value="youshouldencryptthispassword" />
+  </bean>
+  
 </beans>
