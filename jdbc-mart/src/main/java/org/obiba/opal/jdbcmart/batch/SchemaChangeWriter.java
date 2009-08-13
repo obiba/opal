@@ -26,6 +26,8 @@ public class SchemaChangeWriter extends AbstractItemStreamItemWriter<Change> {
   
   private Database database;
   
+  private SqlVisitor sqlVisitor;
+    
   //
   // AbstractItemStreamItemWriter Methods
   //
@@ -62,8 +64,13 @@ public class SchemaChangeWriter extends AbstractItemStreamItemWriter<Change> {
   }
   
   public void write(List<? extends Change> items) throws Exception {
+    List<SqlVisitor> sqlVisitors = new ArrayList<SqlVisitor>();
+    if (sqlVisitor != null) {
+      sqlVisitors.add(sqlVisitor);
+    }
+    
     for (Change schemaChange : items) {
-      schemaChange.executeStatements(database, new ArrayList<SqlVisitor>());
+      schemaChange.executeStatements(database, sqlVisitors);
     }
   }
 
@@ -74,5 +81,9 @@ public class SchemaChangeWriter extends AbstractItemStreamItemWriter<Change> {
   public void setDataSource(DataSource dataSource)
   {
     this.dataSource = dataSource;
+  }
+  
+  public void setSqlVisitor(SqlVisitor sqlVisitor) {
+    this.sqlVisitor = sqlVisitor;
   }
 }

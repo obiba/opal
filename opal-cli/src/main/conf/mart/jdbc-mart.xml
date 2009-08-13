@@ -19,6 +19,16 @@
   
   <bean id="schemaChangeWriter" class="org.obiba.opal.jdbcmart.batch.SchemaChangeWriter">
     <property name="dataSource" ref="dataSource" />
+    
+    <property name="sqlVisitor">
+      <bean class="org.obiba.opal.jdbcmart.batch.SchemaChangeSqlVisitor">
+        <property name="applicableDbms">
+          <list>
+            <value>mysql</value>
+          </list>
+        </property>
+      </bean>
+    </property>
   </bean>
   
   <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
