@@ -12,8 +12,6 @@ import org.obiba.opal.core.domain.metadata.DataItem;
 import org.obiba.opal.core.domain.metadata.DataItemSet;
 import org.springframework.batch.item.ItemProcessor;
 
-import com.sun.corba.se.impl.orbutil.closure.Constant;
-
 public class DataItemSetToSchemaChangeProcessor implements ItemProcessor<DataItemSet, Change> {
   //
   // Constants
