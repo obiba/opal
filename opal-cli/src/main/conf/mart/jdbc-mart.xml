@@ -17,7 +17,18 @@
     
   <bean id="dataItemSetReader" class="org.obiba.opal.jdbcmart.batch.DataItemSetReader" />
   
-  <bean id="dataItemSetProcessor" class="org.obiba.opal.jdbcmart.batch.DataItemSetToSchemaChangeProcessor" />
+  <bean id="dataItemSetProcessor" class="org.obiba.opal.jdbcmart.batch.DataItemSetToSchemaChangeProcessor">
+    <property name="typeMap">
+      <map>
+        <entry key="BOOLEAN" value="BOOLEAN" />
+        <entry key="DATA" value="BLOB" />
+        <entry key="DATE" value="DATETIME" />
+        <entry key="DECIMAL" value="java.sql.Types.DECIMAL" />
+        <entry key="INTEGER" value="BIGINT" />
+        <entry key="TEXT" value="java.sql.Types.VARCHAR(2000)" />
+      </map>
+    </property>
+  </bean>
   
   <bean id="schemaChangeWriter" class="org.obiba.opal.jdbcmart.batch.SchemaChangeWriter">
     <property name="dataSource" ref="dataSource" />
