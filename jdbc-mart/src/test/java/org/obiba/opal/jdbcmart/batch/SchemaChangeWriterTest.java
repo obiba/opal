@@ -34,6 +34,10 @@ public class SchemaChangeWriterTest {
   public void setUp() {
     ApplicationContext context = new ClassPathXmlApplicationContext("test-context.xml");
     dataSource = (DataSource)context.getBean("dataSource");
+    
+    // Drop "table1" table if it exists.
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+    jdbcTemplate.execute("drop table if exists table1");
   }
   
   //

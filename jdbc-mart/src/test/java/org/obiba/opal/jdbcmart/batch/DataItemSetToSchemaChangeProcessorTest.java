@@ -21,6 +21,7 @@ import org.obiba.opal.core.domain.metadata.DataItem;
 import org.obiba.opal.core.domain.metadata.DataItemSet;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 public class DataItemSetToSchemaChangeProcessorTest {
   //
@@ -41,6 +42,10 @@ public class DataItemSetToSchemaChangeProcessorTest {
     ApplicationContext context = new ClassPathXmlApplicationContext("test-context.xml");
     dataSource = (DataSource)context.getBean("dataSource");
     typeMap = (Map<String, String>)context.getBean("typeMap");
+    
+    // Drop "test" table if it exists.
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+    jdbcTemplate.execute("drop table if exists test");
   }
   
   //
