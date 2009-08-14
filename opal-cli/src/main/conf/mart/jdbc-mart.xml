@@ -9,13 +9,15 @@
 
   <batch:job id="jdbc-extract">
     <batch:step id="createSchema">
-      <batch:tasklet ref="createSchemaTasklet" />
+      <batch:tasklet>
+        <batch:chunk reader="dataItemSetReader" processor="dataItemSetProcessor" writer="schemaChangeWriter" commit-interval="1" />
+      </batch:tasklet>
     </batch:step>
   </batch:job>
+    
+  <bean id="dataItemSetReader" class="org.obiba.opal.jdbcmart.batch.DataItemSetReader" />
   
-  <bean id="createSchemaTasklet" class="org.obiba.opal.jdbcmart.batch.CreateSchemaTasklet">
-    <property name="dataSource" ref="dataSource" />
-  </bean>
+  <bean id="dataItemSetProcessor" class="org.obiba.opal.jdbcmart.batch.DataItemSetToSchemaChangeProcessor" />
   
   <bean id="schemaChangeWriter" class="org.obiba.opal.jdbcmart.batch.SchemaChangeWriter">
     <property name="dataSource" ref="dataSource" />
