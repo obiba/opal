@@ -7,18 +7,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.cli.client.command.options;
+package org.obiba.opal.sesame.support;
 
-import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
-import uk.co.flamingpenguin.jewel.cli.Option;
+import javax.xml.namespace.QName;
+
+import org.openrdf.model.URI;
+import org.openrdf.model.impl.URIImpl;
 
 /**
- * 
+ *
  */
-@CommandLineInterface(application = "query")
-public interface QueryCommandOptions extends GlobalOptions {
+public final class SesameUtil {
 
-  @Option(shortName = "r", defaultValue = "data")
-  public String getRepository();
+  public final static URI toUri(QName qname) {
+    return new URIImpl(qname.getNamespaceURI() + qname.getLocalPart());
+  }
 
 }

@@ -20,6 +20,7 @@ import org.obiba.core.util.StringUtil;
 import org.obiba.opal.cli.client.command.options.QueryCommandOptions;
 import org.obiba.opal.elmo.concepts.Opal;
 import org.obiba.opal.sesame.repository.OpalRepositoryManager;
+import org.obiba.opal.sesame.repository.OpalRepositoryManager.OpalRepository;
 import org.openrdf.model.Namespace;
 import org.openrdf.model.Statement;
 import org.openrdf.model.vocabulary.RDF;
@@ -65,7 +66,8 @@ public class QueryCommand extends AbstractContextLoadingCommand<QueryCommandOpti
 
     try {
       repoManager = getBean("opalRepositoryManager");
-      connection = repoManager.getDataRepository().getConnection();
+      OpalRepository repo = OpalRepository.valueOf(options.getRepository().toUpperCase());
+      connection = repoManager.getRepository(repo.toString().toLowerCase()).getConnection();
       executeWithConnection();
 
     } catch(RuntimeException e) {

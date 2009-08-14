@@ -153,6 +153,14 @@
     
 
 
+    <!-- http://www.obiba.org/owl/2009/05/opal#dataType -->
+
+    <owl:DatatypeProperty rdf:about="#dataType">
+        <rdfs:range rdf:resource="&xsd;QName"/>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://www.obiba.org/owl/2009/05/opal#description -->
 
     <owl:DatatypeProperty rdf:about="#description"/>
@@ -265,20 +273,28 @@
     <!-- http://www.obiba.org/owl/2009/05/opal#CategoricalItem -->
 
     <owl:Class rdf:about="#CategoricalItem">
-        <owl:equivalentClass>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasCategory"/>
-                <owl:someValuesFrom rdf:resource="#Category"/>
-            </owl:Restriction>
-        </owl:equivalentClass>
-        <rdfs:subClassOf rdf:resource="#DataItem"/>
+        <rdfs:label>CategoricalItem</rdfs:label>
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#DataItem"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="#hasCategory"/>
+                        <owl:someValuesFrom rdf:resource="#Category"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+        <owl:disjointWith rdf:resource="#OpenItem"/>
     </owl:Class>
     
 
 
     <!-- http://www.obiba.org/owl/2009/05/opal#Category -->
 
-    <owl:Class rdf:about="#Category"/>
+    <owl:Class rdf:about="#Category">
+        <rdfs:label>Category</rdfs:label>
+    </owl:Class>
     
 
 
@@ -317,14 +333,14 @@
     <owl:Class rdf:about="#Entity">
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#identifier"/>
-                <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+                <owl:onProperty rdf:resource="#hasDataset"/>
+                <owl:someValuesFrom rdf:resource="#Dataset"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasDataset"/>
-                <owl:someValuesFrom rdf:resource="#Dataset"/>
+                <owl:onProperty rdf:resource="#identifier"/>
+                <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -334,7 +350,27 @@
     <!-- http://www.obiba.org/owl/2009/05/opal#MissingCategory -->
 
     <owl:Class rdf:about="#MissingCategory">
+        <rdfs:label>MissingCategory</rdfs:label>
         <rdfs:subClassOf rdf:resource="#Category"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.obiba.org/owl/2009/05/opal#OpenItem -->
+
+    <owl:Class rdf:about="#OpenItem">
+        <rdfs:label>ContinuousItem</rdfs:label>
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#DataItem"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="#dataType"/>
+                        <owl:someValuesFrom rdf:resource="&xsd;QName"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
     </owl:Class>
     
 

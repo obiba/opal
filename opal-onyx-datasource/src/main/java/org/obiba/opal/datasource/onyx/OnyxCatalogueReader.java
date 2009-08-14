@@ -78,6 +78,9 @@ public class OnyxCatalogueReader extends AbstractOnyxReader<Catalogue> {
       opalDataItem.addAttribute("category", true);
       opalDataItem.addAttribute("escape", category.getEscape());
       opalDataItem.addAttribute("alternateName", category.getAlternateName());
+
+      opalDataItem.addAttribute("continuous", variable.getParent().isMultiple());
+
     } else {
       opalDataItem.addAttribute("continuous", variable.isCategorial() == false && variable.getDataType() != null);
     }

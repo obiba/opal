@@ -13,9 +13,7 @@ import java.util.List;
 
 import org.obiba.opal.core.domain.metadata.DataItem;
 import org.obiba.opal.core.domain.metadata.DataItemAttribute;
-import org.obiba.opal.elmo.concepts.Opal;
 import org.openrdf.model.Graph;
-import org.openrdf.model.impl.URIImpl;
 
 /**
  *
@@ -41,7 +39,7 @@ public class SemanticMap {
   public Graph process(DataItem dataItem) {
     GraphBuilder builder = new GraphBuilder(graphFactory.newGraph());
 
-    builder.forResource(resourceFactory.getResource(new URIImpl(Opal.NS + "DataItem"), dataItem.getCode().toString()));
+    builder.forResource(resourceFactory.getResource(org.obiba.opal.elmo.concepts.DataItem.URI, dataItem.getCode().toString()));
 
     builder.clearChanged();
 

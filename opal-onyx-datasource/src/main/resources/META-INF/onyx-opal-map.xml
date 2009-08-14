@@ -77,6 +77,10 @@
           <string>repeatable</string>
           <uri>opal:repeatable</uri>
         </entry>
+        <entry>
+          <string>multiple</string>
+          <uri>opal:multiple</uri>
+        </entry>
       </map>
     </attributeRule>
 
@@ -111,7 +115,7 @@
         <value>true</value>
       </when>
       <then class="addType">
-        <uri>opal:CategoricalVariable</uri>
+        <uri>opal:CategoricalItem</uri>
       </then>
     </attributeRule>
 
@@ -121,7 +125,7 @@
         <value>true</value>
       </when>
       <then class="addType">
-        <uri>opal:ContinuousVariable</uri>
+        <uri>opal:OpenItem</uri>
       </then>
     </attributeRule>
 

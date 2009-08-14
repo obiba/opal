@@ -12,6 +12,7 @@ package org.obiba.opal.datasource.onyx.map;
 import java.util.List;
 
 import org.obiba.opal.core.domain.metadata.DataItemAttribute;
+import org.obiba.opal.elmo.concepts.DataItem;
 import org.obiba.opal.elmo.concepts.Opal;
 import org.obiba.opal.map.AttributeRuleConsequence;
 import org.obiba.opal.map.GraphBuilder;
@@ -30,10 +31,11 @@ public class CategoryConsequence extends AbstractOnyxRule implements AttributeRu
     parts.remove(parts.size() - 1);
     String parentPath = mergeParts(parts);
 
-    URI resource = getResourceFactory().findResource(new URIImpl(Opal.NS + "DataItem"), new URIImpl(Opal.NS + "path"), parentPath);
+    URI resource = getResourceFactory().findResource(DataItem.URI, new URIImpl(Opal.NS + "path"), parentPath);
     if(resource != null) {
       builder.withRelation(new URIImpl(Opal.NS + "isCategoryFor"), resource);
       builder.withInverseRelation(new URIImpl(Opal.NS + "hasCategory"), resource);
     }
+
   }
 }
