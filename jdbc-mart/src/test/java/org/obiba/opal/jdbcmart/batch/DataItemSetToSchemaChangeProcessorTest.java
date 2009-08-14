@@ -1,20 +1,48 @@
 package org.obiba.opal.jdbcmart.batch;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import javax.sql.DataSource;
 
 import liquibase.change.Change;
 import liquibase.change.ColumnConfig;
 import liquibase.change.CreateTableChange;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.domain.metadata.DataItem;
 import org.obiba.opal.core.domain.metadata.DataItemSet;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class DataItemSetToSchemaChangeProcessorTest {
-
+  //
+  // Instance Variables
+  //
+  
+  private DataSource dataSource;
+  
+  private Map<String, String> typeMap;
+  
+  //
+  // Fixture Methods (setUp / tearDown)
+  //
+  
+  @SuppressWarnings("unchecked")
+  @Before
+  public void setUp() {
+    ApplicationContext context = new ClassPathXmlApplicationContext("test-context.xml");
+    dataSource = (DataSource)context.getBean("dataSource");
+    typeMap = (Map<String, String>)context.getBean("typeMap");
+  }
+  
   //
   // Test Methods
   //
@@ -22,6 +50,8 @@ public class DataItemSetToSchemaChangeProcessorTest {
   @Test
   public void testProcess() throws Exception {
     DataItemSetToSchemaChangeProcessor processor = new DataItemSetToSchemaChangeProcessor();
+    processor.setDataSource(dataSource);
+    processor.setTypeMap(typeMap);
     
     DataItemSet dataItemSet = new DataItemSet("test");
     dataItemSet.setDataItems(createDataItems());
@@ -45,7 +75,7 @@ public class DataItemSetToSchemaChangeProcessorTest {
           fail("Unexpected column '"+columnName+"'");
         }
         
-        assertEquals(column.getType(), getColumnTypeFor(dataItem));
+        assertEquals(getColumnTypeFor(dataItem), column.getType());
       }
     }
   }
@@ -63,6 +93,7 @@ public class DataItemSetToSchemaChangeProcessorTest {
       DataItem dataItem = new DataItem() {
         private static final long serialVersionUID = 1L;
 
+        @Override
         public Long getCode() {
           return code;
         }
@@ -85,6 +116,7 @@ public class DataItemSetToSchemaChangeProcessorTest {
   }
   
   private String getColumnTypeFor(DataItem dataItem) {
-    return "INTEGER";
+    // TODO: Assuming INTEGER for now, but this will need to be updated.
+    return typeMap.get("INTEGER");
   }
 }

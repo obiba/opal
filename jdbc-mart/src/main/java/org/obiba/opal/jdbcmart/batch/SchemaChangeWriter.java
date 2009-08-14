@@ -25,9 +25,9 @@ public class SchemaChangeWriter extends AbstractItemStreamItemWriter<Change> {
   private DataSource dataSource;
   
   private Database database;
-  
+ 
   private List<SqlVisitor> sqlVisitors;
-    
+  
   //
   // Constructors
   //
@@ -40,6 +40,7 @@ public class SchemaChangeWriter extends AbstractItemStreamItemWriter<Change> {
   // AbstractItemStreamItemWriter Methods
   //
   
+  @Override
   public void open(ExecutionContext executionContext) throws ItemStreamException {
     Connection connection = null;
     
@@ -54,13 +55,14 @@ public class SchemaChangeWriter extends AbstractItemStreamItemWriter<Change> {
     // Find an appropriate database instance for the connection.
     try {
       DatabaseFactory databaseFactory = DatabaseFactory.getInstance();
-      database = databaseFactory.findCorrectDatabaseImplementation(connection);
+      database = databaseFactory.findCorrectDatabaseImplementation(connection);      
     }
     catch(JDBCException ex) {
       throw new ItemStreamException("Could not locate a database implementation for the connection", ex);
     }
   }
   
+  @Override
   public void close() throws ItemStreamException {
     // Close the database connection.
     try {
@@ -71,7 +73,7 @@ public class SchemaChangeWriter extends AbstractItemStreamItemWriter<Change> {
     }
   }
   
-  public void write(List<? extends Change> items) throws Exception {
+  public void write(List<? extends Change> items) throws Exception {    
     for (Change schemaChange : items) {
       schemaChange.executeStatements(database, sqlVisitors);
     }

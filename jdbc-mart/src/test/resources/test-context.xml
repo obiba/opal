@@ -1,9 +1,11 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:tx="http://www.springframework.org/schema/tx" xmlns:batch="http://www.springframework.org/schema/batch"
+  xmlns:util="http://www.springframework.org/schema/util"
   xsi:schemaLocation="
   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd 
-  http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd">
+  http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
+  http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
   
   <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
     <property name="driverClassName" value="org.hsqldb.jdbcDriver" />
@@ -21,4 +23,13 @@
   </bean>
   -->
   
+  <util:map id="typeMap">
+    <entry key="BOOLEAN" value="BOOLEAN" />
+    <entry key="DATA" value="BLOB" />
+    <entry key="DATE" value="DATETIME" />
+    <entry key="DECIMAL" value="java.sql.Types.DECIMAL" />
+    <entry key="INTEGER" value="BIGINT" />
+    <entry key="TEXT" value="java.sql.Types.VARCHAR(2000)" />
+  </util:map>
+
 </beans>

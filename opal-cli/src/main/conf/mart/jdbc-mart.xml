@@ -18,6 +18,8 @@
   <bean id="dataItemSetReader" class="org.obiba.opal.jdbcmart.batch.DataItemSetReader" />
   
   <bean id="dataItemSetProcessor" class="org.obiba.opal.jdbcmart.batch.DataItemSetToSchemaChangeProcessor">
+    <property name="dataSource" ref="dataSource" />
+    
     <property name="typeMap">
       <map>
         <entry key="BOOLEAN" value="BOOLEAN" />

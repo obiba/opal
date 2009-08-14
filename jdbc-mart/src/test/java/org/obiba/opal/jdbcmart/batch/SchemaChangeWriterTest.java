@@ -1,6 +1,7 @@
 package org.obiba.opal.jdbcmart.batch;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ public class SchemaChangeWriterTest {
   
   @Before
   public void setUp() {
-    ApplicationContext context = new ClassPathXmlApplicationContext("SchemaChangeWriterTest/test-context.xml");
+    ApplicationContext context = new ClassPathXmlApplicationContext("test-context.xml");
     dataSource = (DataSource)context.getBean("dataSource");
   }
   
