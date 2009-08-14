@@ -22,18 +22,7 @@
     
     <property name="sqlVisitors">
       <list>
-        <bean class="org.obiba.opal.jdbcmart.batch.MySQLSchemaChangeSqlVisitor">
-          <property name="typeMap">
-            <map>
-              <entry key="BOOLEAN" value="bit(1)" />
-              <entry key="DATA" value="longblob" />
-              <entry key="DATE" value="datetime" />
-              <entry key="DECIMAL" value="double" />
-              <entry key="INTEGER" value="bigint(20)" />
-              <entry key="TEXT" value="varchar(2000)" />
-            </map>
-          </property>
-        </bean>
+        <bean class="org.obiba.opal.jdbcmart.batch.MySQLSchemaChangeSqlVisitor" />
       </list>
     </property>
   </bean>
