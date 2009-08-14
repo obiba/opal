@@ -8,6 +8,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import liquibase.change.ColumnConfig;
+import liquibase.change.ConstraintsConfig;
 import liquibase.change.CreateTableChange;
 
 import org.junit.Before;
@@ -71,6 +72,8 @@ public class SchemaChangeWriterTest {
   private void addTableChange(List<CreateTableChange> items, String tableName, String... columns) {
     CreateTableChange c = new CreateTableChange();
     c.setTableName(tableName);
+   
+    addPrimaryKeyColumn(c);
     
     for (int i=0; i<columns.length-1; i+=2) {
       ColumnConfig column = new ColumnConfig();
@@ -81,5 +84,19 @@ public class SchemaChangeWriterTest {
     }
     
     items.add(c);
+  }
+  
+  private void addPrimaryKeyColumn(CreateTableChange schemaChange) {
+    ColumnConfig primaryKey = new ColumnConfig();
+    
+    primaryKey.setName("id");
+    primaryKey.setAutoIncrement(true);
+    primaryKey.setType("BIGINT");
+    
+    ConstraintsConfig constraints = new ConstraintsConfig();
+    constraints.setPrimaryKey(true);
+    primaryKey.setConstraints(constraints);
+    
+    schemaChange.addColumn(primaryKey);
   }
 }
