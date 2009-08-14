@@ -85,6 +85,6 @@ public class DataItemSetToSchemaChangeProcessorTest {
   }
   
   private String getColumnTypeFor(DataItem dataItem) {
-    return "varchar(255)";
+    return "INTEGER";
   }
 }
