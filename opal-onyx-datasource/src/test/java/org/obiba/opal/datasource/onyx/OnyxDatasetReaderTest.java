@@ -28,6 +28,7 @@ import org.obiba.onyx.engine.variable.impl.DefaultVariablePathNamingStrategy;
 import org.obiba.opal.core.domain.data.DataPoint;
 import org.obiba.opal.core.domain.data.Dataset;
 import org.obiba.opal.core.domain.data.Entity;
+import org.obiba.opal.core.domain.metadata.Catalogue;
 import org.obiba.opal.datasource.DatasourceService;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -85,7 +86,7 @@ public class OnyxDatasetReaderTest {
     expect(dataInputStrategy.listEntries()).andReturn(entryList);
     expect(dataInputStrategy.getEntry(exportFile)).andReturn(exportFileResource.getInputStream());
 
-    expect(datasourceService.loadCatalogue(catalogueName)).andReturn(null);
+    expect(datasourceService.loadCatalogue(catalogueName)).andReturn(new Catalogue("onyx", "test"));
     expect(datasourceService.fetchEntity(exportFile.replace(".xml", ""))).andReturn(entity);
     datasourceService.registerKey((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject());
     expectLastCall().anyTimes();
