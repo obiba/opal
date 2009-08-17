@@ -39,7 +39,6 @@ public class DatasetToSchemaChangeProcessor implements ItemProcessor<Dataset, Ch
     CompositeChange composite = new CompositeChange();
     Map<String, DataPoint> points = mapify(dataset);
     for(Report report : reports) {
-      System.out.println("report " + report.getName());
       composite.addChange(doCreateInsert(report, dataset, points));
     }
     return composite;
@@ -80,7 +79,6 @@ public class DatasetToSchemaChangeProcessor implements ItemProcessor<Dataset, Ch
   protected Map<String, DataPoint> mapify(Dataset dataset) {
     Map<String, DataPoint> map = new HashMap<String, DataPoint>();
     for(DataPoint point : dataset.getDataPoints()) {
-      System.out.println("dataItem " + point.getDataItem().getCode() + ": " + point.getValue());
       map.put(point.getDataItem().getCode().toString(), point);
     }
     return map;

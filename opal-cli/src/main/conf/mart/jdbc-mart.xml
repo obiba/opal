@@ -1,5 +1,6 @@
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
-  xmlns:batch="http://www.springframework.org/schema/batch" xmlns:util="http://www.springframework.org/schema/util"
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:tx="http://www.springframework.org/schema/tx" xmlns:batch="http://www.springframework.org/schema/batch"
+  xmlns:util="http://www.springframework.org/schema/util"
   xsi:schemaLocation="
   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
   http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
@@ -11,12 +12,14 @@
   <batch:job id="jdbc-extract">
     <batch:step id="createSchema" next="populateSchema">
       <batch:tasklet>
-        <batch:chunk reader="dataItemSetReader" processor="dataItemSetProcessor" writer="schemaChangeWriter" commit-interval="1" />
+        <batch:chunk reader="dataItemSetReader" processor="dataItemSetProcessor" writer="schemaChangeWriter"
+          commit-interval="1" />
       </batch:tasklet>
     </batch:step>
     <batch:step id="populateSchema">
       <batch:tasklet>
-        <batch:chunk reader="datasetReader" processor="datasetProcessor" writer="schemaChangeWriter" commit-interval="10" />
+        <batch:chunk reader="datasetReader" processor="datasetProcessor" writer="schemaChangeWriter"
+          commit-interval="10" />
       </batch:tasklet>
     </batch:step>
   </batch:job>
@@ -82,12 +85,21 @@
     <property name="reports" ref="reports" />
   </bean>
 
-  <bean id="dataSource" class="org.enhydra.jdbc.standard.StandardXADataSource" destroy-method="shutdown">
-    <property name="driverName" value="com.mysql.jdbc.Driver" />
-    <property name="url" value="jdbc:mysql://localhost:3306/mart" />
+  <bean id="dataSource" class="org.enhydra.jdbc.pool.StandardXAPoolDataSource" destroy-method="shutdown">
+    <property name="dataSource">
+      <bean class="org.enhydra.jdbc.standard.StandardXADataSource" destroy-method="shutdown">
+        <property name="driverName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/mart" />
+        <property name="transactionManager" ref="jotm" />
+      </bean>
+    </property>
+
     <property name="user" value="root" />
     <property name="password" value="youshouldencryptthispassword" />
-    <property name="transactionManager" ref="jotm" />
+
+    <property name="maxSize" value="10" />
+    <property name="minSize" value="3" />
+
   </bean>
 
 </beans>

@@ -56,11 +56,11 @@ public class AbstractSparqlSelection {
       connection = repositoryManager.getCatalogRepository().getConnection();
       StringBuilder builder = new StringBuilder(sparql);
       QueryUtil.prefixQuery(connection, builder);
-      log.info("Executing query: {}", builder);
+      log.debug("Executing query: {}", builder);
       TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, builder.toString());
 
       for(Map.Entry<String, Value> entry : getBindings().entrySet()) {
-        log.info("{}={}", entry.getKey(), entry.getValue());
+        log.debug("{}={}", entry.getKey(), entry.getValue());
         query.setBinding(entry.getKey(), entry.getValue());
       }
 
