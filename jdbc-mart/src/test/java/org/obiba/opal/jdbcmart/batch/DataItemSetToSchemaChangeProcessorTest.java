@@ -78,7 +78,7 @@ public class DataItemSetToSchemaChangeProcessorTest {
       String columnName = column.getName();
 
       if(column.getConstraints() == null || !column.getConstraints().isPrimaryKey()) {
-        DataItem dataItem = getDataItemByCode(dataItemSet.getDataItems(), Long.valueOf(columnName.substring(DataItemSetToSchemaChangeProcessor.COLUMN_NAME_PREFIX.length())));
+        DataItem dataItem = getDataItemByCode(dataItemSet.getDataItems(), Long.valueOf(columnName.substring(SchemaChangeConstants.COLUMN_NAME_PREFIX.length())));
         if(dataItem == null) {
           fail("Unexpected column '" + columnName + "'");
         }

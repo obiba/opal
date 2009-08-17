@@ -18,12 +18,6 @@ import org.springframework.batch.item.ItemProcessor;
 
 public class DatasetToSchemaChangeProcessor implements ItemProcessor<Dataset, Change> {
 
-  private static final String COLUMN_NAME_PREFIX = "OPAL_";
-
-  private static final String ENTITY_KEY_NAME = "entity_id";
-
-  private static final String OCCURRENCE_COLUMN_NAME = "occurrence";
-
   private List<Report> reports;
 
   private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -49,7 +43,7 @@ public class DatasetToSchemaChangeProcessor implements ItemProcessor<Dataset, Ch
     idc.setTableName(report.getName());
 
     ColumnConfig cc = new ColumnConfig();
-    cc.setName(ENTITY_KEY_NAME);
+    cc.setName(SchemaChangeConstants.ENTITY_KEY_NAME);
     cc.setValue(dataset.getEntity().getIdentifier());
     idc.addColumn(cc);
 
@@ -58,7 +52,7 @@ public class DatasetToSchemaChangeProcessor implements ItemProcessor<Dataset, Ch
         continue;
       }
       cc = new ColumnConfig();
-      cc.setName(COLUMN_NAME_PREFIX + dataItem.getIdentifier());
+      cc.setName(SchemaChangeConstants.COLUMN_NAME_PREFIX + dataItem.getIdentifier());
       cc.setValue(null);
       idc.addColumn(cc);
 

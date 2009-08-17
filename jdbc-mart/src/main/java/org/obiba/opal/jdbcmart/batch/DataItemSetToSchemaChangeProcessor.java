@@ -32,13 +32,7 @@ public class DataItemSetToSchemaChangeProcessor implements ItemProcessor<DataIte
   // Constants
   //
 
-  public static final String COLUMN_NAME_PREFIX = "OPAL_";
-
-  public static final String ENTITY_KEY_NAME = "entity_id";
-
-  public static final String ENTITY_KEY_TYPE = "varchar(200)";
-
-  private static final String OCCURRENCE_COLUMN_NAME = "occurrence";
+  private static final String ENTITY_KEY_TYPE = "varchar(200)";
 
   private static final String OCCURRENCE_COLUMN_TYPE = "BIGINT";
 
@@ -159,7 +153,7 @@ public class DataItemSetToSchemaChangeProcessor implements ItemProcessor<DataIte
 
     column = new ColumnConfig();
     column.setName("variable");
-    column.setValue(COLUMN_NAME_PREFIX + dataItem.getIdentifier());
+    column.setValue(SchemaChangeConstants.COLUMN_NAME_PREFIX + dataItem.getIdentifier());
     schemaChange.addColumn(column);
 
     column = new ColumnConfig();
@@ -208,7 +202,7 @@ public class DataItemSetToSchemaChangeProcessor implements ItemProcessor<DataIte
 
   private void addEntityKeyColumn(ChangeWithColumns schemaChange) {
     ColumnConfig primaryKey = new ColumnConfig();
-    primaryKey.setName(ENTITY_KEY_NAME);
+    primaryKey.setName(SchemaChangeConstants.ENTITY_KEY_NAME);
     primaryKey.setType(ENTITY_KEY_TYPE);
 
     ConstraintsConfig constraints = new ConstraintsConfig();
@@ -221,7 +215,7 @@ public class DataItemSetToSchemaChangeProcessor implements ItemProcessor<DataIte
   private void addOccurrenceColumn(ChangeWithColumns schemaChange) {
     ColumnConfig occurrence = new ColumnConfig();
 
-    occurrence.setName(OCCURRENCE_COLUMN_NAME);
+    occurrence.setName(SchemaChangeConstants.OCCURRENCE_COLUMN_NAME);
     occurrence.setType(OCCURRENCE_COLUMN_TYPE);
 
     ConstraintsConfig constraints = new ConstraintsConfig();
@@ -238,7 +232,7 @@ public class DataItemSetToSchemaChangeProcessor implements ItemProcessor<DataIte
     ColumnConfig column = new ColumnConfig();
 
     // Column name: Set to COLUMN_NAME_PREFIX + dataItem.getCode().
-    column.setName(COLUMN_NAME_PREFIX + dataItem.getIdentifier());
+    column.setName(SchemaChangeConstants.COLUMN_NAME_PREFIX + dataItem.getIdentifier());
 
     // Column type: From the DataItem's metadata.
     column.setType(getTypeForDataItem(dataItem));
