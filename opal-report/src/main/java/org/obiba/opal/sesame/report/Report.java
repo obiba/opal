@@ -15,7 +15,7 @@ import java.util.Set;
 
 import org.obiba.opal.elmo.concepts.DataItem;
 import org.obiba.opal.sesame.support.SesameUtil;
-import org.openrdf.elmo.ElmoManager;
+import org.openrdf.elmo.sesame.SesameManager;
 import org.openrdf.elmo.sesame.SesameManagerFactory;
 import org.openrdf.model.URI;
 
@@ -29,9 +29,11 @@ public class Report implements DataItemSet {
   private boolean withOccurrence;
 
   private List<IDataItemSelection> selections;
-  
+
   private SesameManagerFactory sesameManagerFactory;
-  
+
+  private Set<DataItem> dataItemCache;
+
   public void setSesameManagerFactory(SesameManagerFactory sesameManagerFactory) {
     this.sesameManagerFactory = sesameManagerFactory;
   }
@@ -45,18 +47,23 @@ public class Report implements DataItemSet {
   }
 
   public Set<DataItem> getDataItems() {
-    ElmoManager manager = sesameManagerFactory.createElmoManager();
-    Set<DataItem> items = new LinkedHashSet<DataItem>();
-    try {
-      for(IDataItemSelection selection : selections) {
-        for(URI item : selection.getSelection()) {
-          items.add(manager.designate(SesameUtil.toQName(item), DataItem.class));
+    if(dataItemCache == null) {
+      SesameManager manager = sesameManagerFactory.createElmoManager();
+      dataItemCache = new LinkedHashSet<DataItem>();
+      try {
+        for(IDataItemSelection selection : selections) {
+          for(URI item : selection.getSelection()) {
+            DataItem dataItem = manager.find(DataItem.class, SesameUtil.toQName(item));
+            if(dataItem != null) {
+              dataItemCache.add(dataItem);
+            }
+          }
         }
+      } finally {
+        // manager.close();
       }
-    } finally {
-//      manager.close();
     }
-    return items;
+    return dataItemCache;
   }
 
   public List<IDataItemSelection> getSelections() {

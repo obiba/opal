@@ -14,6 +14,7 @@ import java.util.List;
 import org.obiba.opal.core.domain.metadata.DataItem;
 import org.obiba.opal.core.domain.metadata.DataItemAttribute;
 import org.openrdf.model.Graph;
+import org.openrdf.model.vocabulary.RDFS;
 
 /**
  *
@@ -39,7 +40,7 @@ public class SemanticMap {
   public Graph process(DataItem dataItem) {
     GraphBuilder builder = new GraphBuilder(graphFactory.newGraph());
 
-    builder.forResource(resourceFactory.getResource(org.obiba.opal.elmo.concepts.DataItem.URI, dataItem.getCode().toString()));
+    builder.forResource(resourceFactory.getResource(RDFS.RESOURCE, dataItem.getCode().toString()));
 
     builder.clearChanged();
 
@@ -52,6 +53,7 @@ public class SemanticMap {
         rule.execute(builder, attribute);
       }
     }
+
     return builder.build();
   }
 }

@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.map.consequence;
 
+import java.util.Set;
+
 import org.obiba.opal.core.domain.metadata.DataItemAttribute;
 import org.obiba.opal.map.AttributeRuleConsequence;
 import org.obiba.opal.map.GraphBuilder;
@@ -22,8 +24,17 @@ public class TypeConsequence implements AttributeRuleConsequence {
 
   private URI uri;
 
+  private Set<URI> uris;
+
   public void apply(GraphBuilder builder, DataItemAttribute dataItemAttribute) {
-    builder.withRelation(RDF.TYPE, uri);
+    if(uri != null) {
+      builder.withRelation(RDF.TYPE, uri);
+    }
+    if(uris != null) {
+      for(URI uri : uris) {
+        builder.withRelation(RDF.TYPE, uri);
+      }
+    }
   }
 
 }

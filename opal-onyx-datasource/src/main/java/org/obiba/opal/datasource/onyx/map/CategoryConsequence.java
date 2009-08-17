@@ -34,8 +34,6 @@ public class CategoryConsequence extends AbstractOnyxRule implements AttributeRu
     if(resource != null) {
       builder.withRelation(new URIImpl(Opal.NS + "isCategoryFor"), resource);
       builder.withInverseRelation(new URIImpl(Opal.NS + "hasCategory"), resource);
-    } else {
-      System.out.println("Cannot find categorical item for " + dataItemAttribute.getDataItem().getName());
     }
 
   }

@@ -115,7 +115,10 @@
         <value>true</value>
       </when>
       <then class="addType">
-        <uri>opal:CategoricalItem</uri>
+        <uris>
+          <uri>opal:DataItem</uri>
+          <uri>opal:CategoricalItem</uri>
+        </uris>
       </then>
     </attributeRule>
 
@@ -125,7 +128,10 @@
         <value>true</value>
       </when>
       <then class="addType">
-        <uri>opal:OpenItem</uri>
+        <uris>
+          <uri>opal:DataItem</uri>
+          <uri>opal:OpenItem</uri>
+        </uris>
       </then>
     </attributeRule>
 

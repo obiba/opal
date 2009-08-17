@@ -127,7 +127,8 @@ public class RepositoryResourceFactory implements ResourceFactory {
     RepositoryResult<Statement> labels = connection.getStatements(type, RDFS.LABEL, null, false);
     try {
       if(labels == null || labels.hasNext() == false) {
-        throw new IllegalStateException("cannot determine rdfs:label for type " + type);
+        // Return a default label
+        return "Resource";
       }
       return labels.next().getObject().stringValue();
     } finally {

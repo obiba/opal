@@ -68,7 +68,6 @@
     <owl:ObjectProperty rdf:about="#hasDataItem">
         <rdfs:comment xml:lang="en"
             >Property of thing that has a relationship to a DataItem</rdfs:comment>
-        <rdfs:range rdf:resource="#DataItem"/>
     </owl:ObjectProperty>
     
 
@@ -333,14 +332,14 @@
     <owl:Class rdf:about="#Entity">
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasDataset"/>
-                <owl:someValuesFrom rdf:resource="#Dataset"/>
+                <owl:onProperty rdf:resource="#identifier"/>
+                <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#identifier"/>
-                <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+                <owl:onProperty rdf:resource="#hasDataset"/>
+                <owl:someValuesFrom rdf:resource="#Dataset"/>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>

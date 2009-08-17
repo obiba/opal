@@ -15,7 +15,7 @@ public class ChildrenItemSelection extends AbstractSparqlSelection implements ID
 
   public Set<URI> getSelection() {
     prepare();
-    return doSelectDataItem("select ?dataItem {_:parent opal:hasChild ?dataItem ; opal:path ?path}");
+    return doSelectDataItem("select ?dataItem {_:parent opal:hasChild ?dataItem ; opal:path ?path ; a opal:DataItem}");
   }
 
 }

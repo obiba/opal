@@ -16,7 +16,7 @@ public class DataEntryFormItemSelection extends AbstractSparqlSelection implemen
 
   public Set<URI> getSelection() {
     prepare();
-    return doSelectDataItem("select ?dataItem {?dataItem opal:dataEntryForm ?def}");
+    return doSelectDataItem("select ?dataItem {?dataItem a opal:DataItem ; opal:dataEntryForm ?def}");
   }
 
 }

@@ -33,6 +33,8 @@
             <entry key="report" value="org.obiba.opal.sesame.report.Report" />
             <entry key="def" value="org.obiba.opal.sesame.report.selection.DataEntryFormItemSelection" />
             <entry key="children" value="org.obiba.opal.sesame.report.selection.ChildrenItemSelection" />
+            <entry key="namePattern" value="org.obiba.opal.sesame.report.selection.ItemNameSelection" />
+            <entry key="and" value="org.obiba.opal.sesame.report.selection.IntersectingSelection" />
           </util:map>
         </property>
         <property name="converters">

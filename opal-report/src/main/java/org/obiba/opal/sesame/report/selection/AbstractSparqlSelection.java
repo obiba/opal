@@ -73,6 +73,7 @@ public class AbstractSparqlSelection {
         items.add((URI) b.getValue());
       }
       tqr.close();
+      log.debug("Query returned {} items", items.size());
       return items;
     } catch(RepositoryException e) {
       throw new RuntimeException(e);
