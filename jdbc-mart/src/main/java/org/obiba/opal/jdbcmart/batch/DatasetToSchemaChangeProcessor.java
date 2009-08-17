@@ -67,7 +67,6 @@ public class DatasetToSchemaChangeProcessor implements ItemProcessor<Dataset, Ch
 
     if (occurrence != null) {
       addOccurrenceValue(idc, occurrence);
-      System.out.println("Added occurrence value "+occurrence);
     }
     
     for(DataItem dataItem : report.getDataItems()) {
