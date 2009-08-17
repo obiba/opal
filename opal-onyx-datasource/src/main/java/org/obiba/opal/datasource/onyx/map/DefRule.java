@@ -12,6 +12,7 @@ package org.obiba.opal.datasource.onyx.map;
 import java.util.List;
 
 import org.obiba.opal.core.domain.metadata.DataItem;
+import org.obiba.opal.elmo.concepts.DataEntryForm;
 import org.obiba.opal.elmo.concepts.Opal;
 import org.obiba.opal.map.GraphBuilder;
 import org.obiba.opal.map.ItemRule;
@@ -30,7 +31,7 @@ public class DefRule extends AbstractOnyxRule implements ItemRule {
 
     if(parts.size() > 2) {
       String defName = parts.get(1);
-      URI defURI = getResourceFactory().getResource(new URIImpl(Opal.NS + "DataEntryForm"), defName);
+      URI defURI = getResourceFactory().getResource(DataEntryForm.URI, defName);
       builder.withRelation(new URIImpl(Opal.NS + "dataEntryForm"), defURI);
       builder.withInverseRelation(new URIImpl(Opal.NS + "hasDataItem"), defURI);
     }

@@ -35,7 +35,7 @@ public class HierarchyRule extends AbstractOnyxRule implements ItemRule {
         parentPath.append(getPathNamingStrategy().getPathSeparator());
       }
       parentPath.append(part);
-      URI parent = getResourceFactory().findResource(new URIImpl(Opal.NS + "DataItem"), new URIImpl(Opal.NS + "path"), parentPath.toString());
+      URI parent = getResourceFactory().findResource(Opal.NS + "path", parentPath.toString());
       if(parent != null) {
         builder.withRelation(new URIImpl(Opal.NS + "hasParent"), parent);
         builder.withInverseRelation(new URIImpl(Opal.NS + "hasChild"), parent);

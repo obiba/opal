@@ -16,8 +16,10 @@ import org.openrdf.model.URI;
  */
 public interface ResourceFactory {
 
-  public URI findResource(URI type, URI property, String value);
+  public URI findResource(String property, String value);
 
-  public URI getResource(URI type, String name);
+  public URI findResource(URI type, String identifier);
+
+  public URI getResource(URI type, String identifier);
 
 }

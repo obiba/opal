@@ -9,6 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.core.domain.data;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -27,6 +32,9 @@ public class Entity extends AbstractEntity {
 
   private String identifier;
 
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "entity")
+  private List<Dataset> datasets;
+
   public Entity() {
 
   }
@@ -42,5 +50,9 @@ public class Entity extends AbstractEntity {
 
   public String getType() {
     return type;
+  }
+
+  public List<Dataset> getDatasets() {
+    return datasets != null ? datasets : (datasets = new ArrayList<Dataset>());
   }
 }

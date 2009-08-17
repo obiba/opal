@@ -66,7 +66,8 @@ public class DatasetFieldSetMapper implements LineCallbackHandler, FieldSetMappe
     Dataset ds = new Dataset(entity, datasourceService.loadCatalogue(catalogueName), extractionDate);
     for(int i = 1; i < fieldSet.getFieldCount(); i++) {
       String dataPointValue = fieldSet.readString(i);
-      ds.getDataPoints().add(new DataPoint(ds, getName(i), dataPointValue));
+      // TODO: Lookup DataIem
+      ds.getDataPoints().add(new DataPoint(ds, null, dataPointValue));
     }
     return ds;
   }

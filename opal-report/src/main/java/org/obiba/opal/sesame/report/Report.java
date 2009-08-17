@@ -9,34 +9,58 @@
  ******************************************************************************/
 package org.obiba.opal.sesame.report;
 
-import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.obiba.opal.elmo.concepts.DataItem;
+import org.obiba.opal.sesame.support.SesameUtil;
+import org.openrdf.elmo.ElmoManager;
+import org.openrdf.elmo.sesame.SesameManagerFactory;
+import org.openrdf.model.URI;
 
 /**
  * 
  */
-public class Report {
+public class Report implements DataItemSet {
 
-  private static final Logger log = LoggerFactory.getLogger(Report.class);
+  private String name;
 
   private boolean withOccurrence;
 
   private List<IDataItemSelection> selections;
+  
+  private SesameManagerFactory sesameManagerFactory;
+  
+  public void setSesameManagerFactory(SesameManagerFactory sesameManagerFactory) {
+    this.sesameManagerFactory = sesameManagerFactory;
+  }
 
-  private List<IDataItemFilter> filters;
+  public String getName() {
+    return name;
+  }
 
-  public boolean isWithOccurrence() {
+  public boolean hasOccurrence() {
     return withOccurrence;
+  }
+
+  public Set<DataItem> getDataItems() {
+    ElmoManager manager = sesameManagerFactory.createElmoManager();
+    Set<DataItem> items = new LinkedHashSet<DataItem>();
+    try {
+      for(IDataItemSelection selection : selections) {
+        for(URI item : selection.getSelection()) {
+          items.add(manager.designate(SesameUtil.toQName(item), DataItem.class));
+        }
+      }
+    } finally {
+//      manager.close();
+    }
+    return items;
   }
 
   public List<IDataItemSelection> getSelections() {
     return selections;
   }
 
-  public List<IDataItemFilter> getFilters() {
-    return (List<IDataItemFilter>) (filters != null ? filters : Collections.emptyList());
-  }
 }

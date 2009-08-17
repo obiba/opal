@@ -1,25 +1,55 @@
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:tx="http://www.springframework.org/schema/tx" xmlns:batch="http://www.springframework.org/schema/batch"
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+  xmlns:batch="http://www.springframework.org/schema/batch" xmlns:util="http://www.springframework.org/schema/util"
   xsi:schemaLocation="
   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
+  http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd 
   http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd">
 
   <import resource="classpath:/META-INF/opal/context-config.xml" />
 
   <batch:job id="jdbc-extract">
-    <batch:step id="createSchema">
+    <batch:step id="createSchema" next="populateSchema">
       <batch:tasklet>
         <batch:chunk reader="dataItemSetReader" processor="dataItemSetProcessor" writer="schemaChangeWriter" commit-interval="1" />
       </batch:tasklet>
     </batch:step>
+    <batch:step id="populateSchema">
+      <batch:tasklet>
+        <batch:chunk reader="datasetReader" processor="datasetProcessor" writer="schemaChangeWriter" commit-interval="10" />
+      </batch:tasklet>
+    </batch:step>
   </batch:job>
-    
-  <bean id="dataItemSetReader" class="org.obiba.opal.jdbcmart.batch.DataItemSetReader" />
-  
+
+  <bean id="reports" class="org.obiba.opal.jdbcmart.batch.DataItemSetFactoryBean" scope="step">
+    <property name="reportDescriptor" value="#{jobParameters[input.file.name]}" />
+    <property name="xstream">
+      <bean class="org.obiba.core.spring.xstream.XStreamFactoryBean">
+        <property name="aliasMap">
+          <util:map>
+            <entry key="report" value="org.obiba.opal.sesame.report.Report" />
+            <entry key="def" value="org.obiba.opal.sesame.report.selection.DataEntryFormItemSelection" />
+            <entry key="children" value="org.obiba.opal.sesame.report.selection.ChildrenItemSelection" />
+          </util:map>
+        </property>
+        <property name="converters">
+          <set>
+            <bean class="org.obiba.opal.map.support.UriConverter">
+              <property name="namespaces" ref="namespaces" />
+            </bean>
+          </set>
+        </property>
+      </bean>
+    </property>
+  </bean>
+
+  <bean id="dataItemSetReader" class="org.obiba.opal.jdbcmart.batch.DataItemSetReader">
+    <property name="reports" ref="reports" />
+  </bean>
+
   <bean id="dataItemSetProcessor" class="org.obiba.opal.jdbcmart.batch.DataItemSetToSchemaChangeProcessor">
     <property name="dataSource" ref="dataSource" />
-    
+
     <property name="typeMap">
       <map>
         <entry key="BOOLEAN" value="BOOLEAN" />
@@ -27,26 +57,37 @@
         <entry key="DATE" value="DATETIME" />
         <entry key="DECIMAL" value="java.sql.Types.DECIMAL" />
         <entry key="INTEGER" value="BIGINT" />
-        <entry key="TEXT" value="java.sql.Types.VARCHAR(2000)" />
+        <entry key="TEXT" value="TEXT" />
       </map>
     </property>
   </bean>
-  
+
   <bean id="schemaChangeWriter" class="org.obiba.opal.jdbcmart.batch.SchemaChangeWriter">
     <property name="dataSource" ref="dataSource" />
-    
+
     <property name="sqlVisitors">
       <list>
         <bean class="org.obiba.opal.jdbcmart.batch.MySQLSchemaChangeSqlVisitor" />
       </list>
     </property>
   </bean>
-  
-  <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-    <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-    <property name="url" value="jdbc:mysql://localhost:3306/mart" />
-    <property name="username" value="root" />
-    <property name="password" value="youshouldencryptthispassword" />
+
+  <bean id="datasetReader" class="org.springframework.batch.item.database.HibernateCursorItemReader">
+    <property name="queryString" value="from Dataset" />
+    <property name="useStatelessSession" value="false" />
+    <property name="sessionFactory" ref="opalSessionFactory" />
   </bean>
-  
+
+  <bean id="datasetProcessor" class="org.obiba.opal.jdbcmart.batch.DatasetToSchemaChangeProcessor">
+    <property name="reports" ref="reports" />
+  </bean>
+
+  <bean id="dataSource" class="org.enhydra.jdbc.standard.StandardXADataSource" destroy-method="shutdown">
+    <property name="driverName" value="com.mysql.jdbc.Driver" />
+    <property name="url" value="jdbc:mysql://localhost:3306/mart" />
+    <property name="user" value="root" />
+    <property name="password" value="youshouldencryptthispassword" />
+    <property name="transactionManager" ref="jotm" />
+  </bean>
+
 </beans>

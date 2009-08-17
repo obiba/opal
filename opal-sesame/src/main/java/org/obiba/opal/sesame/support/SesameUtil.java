@@ -23,4 +23,7 @@ public final class SesameUtil {
     return new URIImpl(qname.getNamespaceURI() + qname.getLocalPart());
   }
 
+  public final static QName toQName(URI uri) {
+    return new QName(uri.getNamespace(), uri.getLocalName());
+  }
 }

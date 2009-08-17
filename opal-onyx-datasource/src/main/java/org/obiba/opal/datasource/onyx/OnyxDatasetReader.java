@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.datasource.onyx;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import org.obiba.opal.core.domain.data.DataPoint;
 import org.obiba.opal.core.domain.data.Dataset;
 import org.obiba.opal.core.domain.data.Entity;
 import org.obiba.opal.core.domain.metadata.Catalogue;
+import org.obiba.opal.core.domain.metadata.DataItem;
 import org.obiba.opal.datasource.DatasourceService;
 import org.obiba.opal.datasource.util.DatasourceUtil;
 import org.slf4j.Logger;
@@ -49,6 +51,8 @@ public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements It
   private Catalogue catalogue;
 
   private IVariablePathNamingStrategy variablePathNamingStrategy;
+
+  private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
   public void setDatasourceService(DatasourceService datasourceService) {
     this.datasourceService = datasourceService;
@@ -96,8 +100,8 @@ public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements It
   }
 
   /**
-   * Given a <code>Dataset</code> and <code>VariableData</code>, recursively adds the necessary
-   * <code>DataPoint</code>s to the <code>Dataset</code>
+   * Given a <code>Dataset</code> and <code>VariableData</code>, recursively adds the necessary <code>DataPoint</code>s
+   * to the <code>Dataset</code>
    * 
    * @param dataset dataset
    * @param variableData variableData
@@ -134,7 +138,14 @@ public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements It
       value = DatasourceUtil.getDataPointValue(multipleDataValues);
     } else if(!variable.isRepeatable()) {
       if(datas.size() != 0) {
-        value = datas.get(0).getValueAsString();
+        Data data = datas.get(0);
+        switch(data.getType()) {
+        case DATE:
+          value = sdf.format(data.getValue());
+          break;
+        default:
+          value = data.getValueAsString();
+        }
       }
     }
 
@@ -168,8 +179,17 @@ public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements It
   }
 
   private void addDataPoint(Dataset dataset, String variablePath, String value, Integer occurrenceId) {
-    DataPoint dataPoint = new DataPoint(dataset, variablePath, value, occurrenceId);
+    DataPoint dataPoint = new DataPoint(dataset, lookupDataItem(variablePath), value, occurrenceId);
     dataset.getDataPoints().add(dataPoint);
+  }
+
+  private DataItem lookupDataItem(String name) {
+    for(DataItem item : catalogue.getDataItems()) {
+      if(item.getName().equals(name)) {
+        return item;
+      }
+    }
+    return null;
   }
 
   private Variable getRepeatableAncestor(Variable variable) {

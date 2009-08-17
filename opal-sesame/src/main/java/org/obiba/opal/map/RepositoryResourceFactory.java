@@ -47,13 +47,12 @@ public class RepositoryResourceFactory implements ResourceFactory {
     this.baseUri = baseUri;
   }
 
-  public URI findResource(URI type, URI property, String value) {
+  public URI findResource(String property, String value) {
     RepositoryConnection connection = null;
     try {
       connection = doGetConnection();
-      TupleQuery q = connection.prepareTupleQuery(QueryLanguage.SPARQL, "select ?s {?s a ?type ; ?property ?value}");
-      q.setBinding("type", type);
-      q.setBinding("property", property);
+      TupleQuery q = connection.prepareTupleQuery(QueryLanguage.SPARQL, "select ?s {?s ?property ?value}");
+      q.setBinding("property", repository.getValueFactory().createURI(property));
       q.setBinding("value", repository.getValueFactory().createLiteral(value));
       TupleQueryResult result = q.evaluate();
       if(result.hasNext()) {
@@ -76,11 +75,21 @@ public class RepositoryResourceFactory implements ResourceFactory {
     }
   }
 
-  public URI getResource(URI type, String name) {
+  public URI findResource(URI type, String identifier) {
     try {
       String resourceLabel = doGetLabel(type);
-      URI resource = repository.getValueFactory().createURI(baseUri + "/" + resourceLabel + "/" + name);
-      cacheResource(type, name, resource);
+      URI resource = repository.getValueFactory().createURI(baseUri + "/" + resourceLabel + "/" + identifier);
+      return resource;
+    } catch(RepositoryException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public URI getResource(URI type, String identifier) {
+    try {
+      String resourceLabel = doGetLabel(type);
+      URI resource = repository.getValueFactory().createURI(baseUri + "/" + resourceLabel + "/" + identifier);
+      cacheResource(type, identifier, resource);
       return resource;
     } catch(RepositoryException e) {
       throw new RuntimeException(e);

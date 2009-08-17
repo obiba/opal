@@ -14,6 +14,7 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
 import org.obiba.core.domain.AbstractEntity;
+import org.obiba.opal.core.domain.metadata.DataItem;
 
 /**
  * 
@@ -26,8 +27,8 @@ public class DataPoint extends AbstractEntity {
   @ManyToOne(optional = false)
   private Dataset dataset;
 
-  @Column(nullable = false, length = 2000)
-  private String variable;
+  @ManyToOne(optional = false)
+  private DataItem dataItem;
 
   @Lob
   @Column(length = Integer.MAX_VALUE)
@@ -39,13 +40,13 @@ public class DataPoint extends AbstractEntity {
 
   }
 
-  public DataPoint(Dataset dataset, String variable, String value) {
-    this(dataset, variable, value, null);
+  public DataPoint(Dataset dataset, DataItem item, String value) {
+    this(dataset, item, value, null);
   }
 
-  public DataPoint(Dataset dataset, String variable, String value, Integer occurrence) {
+  public DataPoint(Dataset dataset, DataItem item, String value, Integer occurrence) {
     this.dataset = dataset;
-    this.variable = variable;
+    this.dataItem = item;
     this.value = value;
     this.occurrence = occurrence;
   }
@@ -54,8 +55,8 @@ public class DataPoint extends AbstractEntity {
     return dataset;
   }
 
-  public String getVariable() {
-    return variable;
+  public DataItem getDataItem() {
+    return dataItem;
   }
 
   public String getValue() {

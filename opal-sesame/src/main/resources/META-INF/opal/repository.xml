@@ -35,6 +35,10 @@
   <bean id="opalCatalogueRepository" factory-bean="opalRepositoryManager" factory-method="getCatalogRepository" />
 
   <bean id="opalDataRepository" factory-bean="opalRepositoryManager" factory-method="getDataRepository" />
+  
+  <bean id="sesameManagerFactory" class="org.obiba.opal.elmo.SesameManagerFactoryBean">
+    <property name="repository" ref="opalCatalogueRepository"/>
+  </bean>
 
   <bean id="namespaces" class="org.obiba.opal.sesame.repository.NamespaceSetFactoryBean">
     <property name="repository" ref="opalCatalogueRepository" />

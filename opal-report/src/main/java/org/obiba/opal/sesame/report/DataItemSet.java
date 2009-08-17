@@ -11,13 +11,14 @@ package org.obiba.opal.sesame.report;
 
 import java.util.Set;
 
-import org.openrdf.model.URI;
+import org.obiba.opal.elmo.concepts.DataItem;
 
-/**
- * 
- */
-public interface IDataItemSelection {
+public interface DataItemSet {
 
-  public Set<URI> getSelection();
+  public String getName();
+
+  public boolean hasOccurrence();
+
+  public Set<DataItem> getDataItems();
 
 }

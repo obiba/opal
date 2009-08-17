@@ -9,13 +9,13 @@ public class MySQLSchemaChangeSqlVisitor implements SqlVisitor {
   //
   // Constants
   //
-  
+
   public static final String CREATE_TABLE_SUFFIX = " ENGINE=InnoDB DEFAULT CHARSET=latin1";
-  
+
   //
   // SqlVisitor Methods
   //
-  
+
   public String getTagName() {
     return "mysqlSchemaChangeSqlVisitor";
   }
@@ -24,15 +24,17 @@ public class MySQLSchemaChangeSqlVisitor implements SqlVisitor {
   public void setApplicableDbms(Collection applicableDbms) {
     // no-op
   }
-  
+
   public boolean isApplicable(Database database) {
-    return database.getTypeName().equals("mysql");  
+    return database.getTypeName().equals("mysql");
   }
-  
+
   public String modifySql(String sql, Database database) {
     // Append suffix indicating InnoDB and latin1 charset.
-    sql += CREATE_TABLE_SUFFIX;  
-    
+    if(sql.toUpperCase().startsWith("CREATE TABLE")) {
+      sql += CREATE_TABLE_SUFFIX;
+    }
+
     return sql;
   }
 }

@@ -40,7 +40,7 @@
     <batch:step id="mapCatalogue">
       <batch:tasklet>
         <batch:chunk reader="dataItemReader" processor="dataItemSemanticMapper" writer="graphWriter"
-          commit-interval="5" />
+          commit-interval="1" />
         <batch:transaction-attributes isolation="DEFAULT" propagation="REQUIRED" />
       </batch:tasklet>
     </batch:step>
