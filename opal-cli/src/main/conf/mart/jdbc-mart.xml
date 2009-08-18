@@ -9,7 +9,7 @@
 
   <import resource="classpath:/META-INF/opal/context-config.xml" />
 
-  <batch:job id="jdbc-extract">
+  <batch:job id="jdbc-extract" incrementer="runIdIncrementer">
     <batch:step id="createSchema" next="populateSchema">
       <batch:tasklet>
         <batch:chunk reader="dataItemSetReader" processor="dataItemSetProcessor" writer="schemaChangeWriter"
@@ -35,6 +35,7 @@
             <entry key="children" value="org.obiba.opal.sesame.report.selection.ChildrenItemSelection" />
             <entry key="namePattern" value="org.obiba.opal.sesame.report.selection.ItemNameSelection" />
             <entry key="and" value="org.obiba.opal.sesame.report.selection.IntersectingSelection" />
+            <entry key="or" value="org.obiba.opal.sesame.report.selection.UnionSelection" />
           </util:map>
         </property>
         <property name="converters">
@@ -69,12 +70,13 @@
 
   <bean id="schemaChangeWriter" class="org.obiba.opal.jdbcmart.batch.SchemaChangeWriter">
     <property name="dataSource" ref="dataSource" />
-
+<!-- Commented by PL: we can't use InnoDB, because some tables have > 1000 columns. MyISAM supports up to 4096 columns.  
     <property name="sqlVisitors">
       <list>
         <bean class="org.obiba.opal.jdbcmart.batch.MySQLSchemaChangeSqlVisitor" />
       </list>
     </property>
+-->
   </bean>
 
   <bean id="datasetReader" class="org.springframework.batch.item.database.HibernateCursorItemReader">

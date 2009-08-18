@@ -18,6 +18,9 @@ public interface JobRunningCommandOptions extends GlobalOptions {
   @Option(shortName = "f")
   public boolean isForce();
 
+  @Option(shortName = "n")
+  public boolean isNext();
+
   @Unparsed(name = "Job Parameters")
   public List<String> getJobParameters();
 

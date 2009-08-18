@@ -1,5 +1,5 @@
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:tx="http://www.springframework.org/schema/tx" xmlns:batch="http://www.springframework.org/schema/batch"
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+  xmlns:batch="http://www.springframework.org/schema/batch"
   xsi:schemaLocation="
   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd 
@@ -40,12 +40,13 @@
   <bean id="listener" class="org.obiba.opal.datasource.support.DatasetImportCountingListener">
   </bean>
 
-  <bean id="abstractDatasourceService" class="org.obiba.opal.datasource.impl.DefaultDatasourceServiceImpl"
-    abstract="true">
+  <bean id="abstractDatasourceService" class="org.obiba.opal.datasource.impl.DefaultDatasourceServiceImpl" abstract="true">
     <property name="opalKeyRegistry" ref="opalKeyRegistry" />
     <property name="sessionFactory" ref="opalSessionFactory" />
     <property name="metaDataService" ref="metaDataService" />
   </bean>
+
+  <bean id="runIdIncrementer" class="org.obiba.opal.batch.RunIdIncrementer" />
 
   <batch:job id="abstractImportJob" abstract="true" job-repository="jobRepository">
   </batch:job>
