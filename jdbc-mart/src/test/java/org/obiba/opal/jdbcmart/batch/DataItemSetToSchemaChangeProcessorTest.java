@@ -1,9 +1,7 @@
 package org.obiba.opal.jdbcmart.batch;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -12,12 +10,9 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import liquibase.change.Change;
-import liquibase.change.ColumnConfig;
-import liquibase.change.CreateTableChange;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.obiba.opal.elmo.concepts.DataItem;
 import org.obiba.opal.sesame.report.DataItemSet;
@@ -54,7 +49,6 @@ public class DataItemSetToSchemaChangeProcessorTest {
   // Test Methods
   //
 
-  @Ignore
   @Test
   public void testProcess() throws Exception {
     DataItemSetToSchemaChangeProcessor processor = new DataItemSetToSchemaChangeProcessor();
@@ -63,31 +57,15 @@ public class DataItemSetToSchemaChangeProcessorTest {
 
     DataItemSet dataItemSet = EasyMock.createMock(DataItemSet.class);
     EasyMock.expect(dataItemSet.getName()).andReturn("MySet").anyTimes();
+    EasyMock.expect(dataItemSet.hasOccurrence()).andReturn(false).anyTimes();
     EasyMock.expect(dataItemSet.getDataItems()).andReturn(createDataItems()).anyTimes();
     EasyMock.replay(dataItemSet);
 
     // Basic verification.
     Change schemaChange = processor.process(dataItemSet);
     assertNotNull(schemaChange);
-    assertTrue(schemaChange instanceof CreateTableChange);
+    assertTrue(schemaChange instanceof CompositeChange);
 
-    // Verify the table name.
-    CreateTableChange createTableChange = (CreateTableChange) schemaChange;
-    assertEquals("MySet", createTableChange.getTableName());
-
-    // Verify table columns.
-    for(ColumnConfig column : createTableChange.getColumns()) {
-      String columnName = column.getName();
-
-      if(column.getConstraints() == null || !column.getConstraints().isPrimaryKey()) {
-        DataItem dataItem = getDataItemByCode(dataItemSet.getDataItems(), Long.valueOf(columnName.substring(SchemaChangeConstants.COLUMN_NAME_PREFIX.length())));
-        if(dataItem == null) {
-          fail("Unexpected column '" + columnName + "'");
-        }
-
-        assertEquals(getColumnTypeFor(dataItem), column.getType());
-      }
-    }
   }
 
   //
@@ -101,6 +79,9 @@ public class DataItemSetToSchemaChangeProcessorTest {
       final long code = i;
 
       DataItem dataItem = EasyMock.createMock(DataItem.class);
+      EasyMock.expect(dataItem.getName()).andReturn("Item-" + code).anyTimes();
+      EasyMock.expect(dataItem.getUnit()).andReturn("cm").anyTimes();
+      EasyMock.expect(dataItem.getRdfsLabel()).andReturn("label").anyTimes();
       EasyMock.expect(dataItem.getIdentifier()).andReturn(code + "").anyTimes();
       EasyMock.expect(dataItem.getDataType()).andReturn("INTEGER").anyTimes();
       EasyMock.replay(dataItem);
@@ -117,10 +98,5 @@ public class DataItemSetToSchemaChangeProcessorTest {
       }
     }
     return null;
-  }
-
-  private String getColumnTypeFor(DataItem dataItem) {
-    // TODO: Assuming INTEGER for now, but this will need to be updated.
-    return typeMap.get("INTEGER");
   }
 }
