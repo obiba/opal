@@ -74,27 +74,41 @@ public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements It
 
   public Dataset read() throws Exception, UnexpectedInputException, ParseException {
     if(this.catalogue == null) {
-      this.catalogue = datasourceService.loadCatalogue(catalogueName);
+      synchronized(this) {
+        if(this.catalogue == null) {
+          this.catalogue = datasourceService.loadCatalogue(catalogueName);
+          this.catalogue.getDataItems().iterator();
+        }
+      }
     }
+    String entryName = doGetNextValidEntry();
+    if(entryName == null) {
+      return null;
+    }
+    log.info("Processing entry {}", entryName);
+    VariableDataSet variableDataSetRoot = readVariableDataset(entryName);
+
+    Entity entity = datasourceService.fetchEntity(entryName.replace(".xml", ""));
+
+    Dataset dataset = new Dataset(entity, catalogue, variableDataSetRoot.getExportDate());
+
+    Map<Variable, List<Integer>> occurrencesMap = new HashMap<Variable, List<Integer>>();
+    for(VariableData vd : variableDataSetRoot.getVariableDatas()) {
+      handleVariableData(dataset, vd, occurrencesMap);
+    }
+    return dataset;
+  }
+
+  synchronized private String doGetNextValidEntry() {
+    String entryName = null;
     if(entryIterator.hasNext()) {
-      String entryName = entryIterator.next();
+      entryName = entryIterator.next();
       while(isParticipantEntry(entryName) == false && entryIterator.hasNext()) {
         entryName = entryIterator.next();
       }
-      if(isParticipantEntry(entryName)) {
-        log.info("Processing entry {}", entryName);
-        VariableDataSet variableDataSetRoot = readVariableDataset(entryName);
-
-        Entity entity = datasourceService.fetchEntity(entryName.replace(".xml", ""));
-
-        Dataset dataset = new Dataset(entity, catalogue, variableDataSetRoot.getExportDate());
-
-        Map<Variable, List<Integer>> occurrencesMap = new HashMap<Variable, List<Integer>>();
-        for(VariableData vd : variableDataSetRoot.getVariableDatas()) {
-          handleVariableData(dataset, vd, occurrencesMap);
-        }
-        return dataset;
-      }
+    }
+    if(isParticipantEntry(entryName)) {
+      return entryName;
     }
     return null;
   }

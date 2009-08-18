@@ -30,10 +30,15 @@
     <property name="datasourceService" ref="datasourceService" />
   </bean>
 
+  <bean id="async" class="org.springframework.core.task.SimpleAsyncTaskExecutor">
+    <property name="threadGroupName" value="JDBC-MART" />
+    <property name="concurrencyLimit" value="5" />
+  </bean>
+
   <batch:job id="onyx-import" parent="abstractImportJob">
     <batch:step id="importDataset" parent="abstractDatasetImportStep">
       <batch:tasklet>
-        <batch:chunk processor="datasetProcessor" reader="onyxDatasetReader" />
+        <batch:chunk processor="datasetProcessor" reader="onyxDatasetReader" task-executor="async"/>
       </batch:tasklet>
     </batch:step>
   </batch:job>

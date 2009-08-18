@@ -39,41 +39,45 @@ public class DatasetToSchemaChangeProcessor implements ItemProcessor<Dataset, Ch
     return composite;
   }
 
-  protected void addChanges(CompositeChange compositeChange, Report report, Dataset dataset) throws ParseException { 
-    if (!report.hasOccurrence()) {
+  protected void addChanges(CompositeChange compositeChange, Report report, Dataset dataset) throws ParseException {
+    if(!report.hasOccurrence()) {
       Map<String, DataPoint> points = mapify(dataset, null);
       compositeChange.addChange(doCreateInsert(report, dataset, points, null));
-    }
-    else {
+    } else {
       Set<Integer> occurrences = new HashSet<Integer>();
-      for (DataPoint dataPoint : dataset.getDataPoints()) {
-        if (dataPoint.getOccurrence() != null) {
+      for(DataPoint dataPoint : dataset.getDataPoints()) {
+        if(dataPoint.getOccurrence() != null) {
           occurrences.add(dataPoint.getOccurrence());
         }
       }
-      
-      for (Integer occurrence : occurrences) {
+
+      for(Integer occurrence : occurrences) {
         Map<String, DataPoint> points = mapify(dataset, occurrence);
-        compositeChange.addChange(doCreateInsert(report, dataset, points, occurrence));
+        for(DataItem item : report.getDataItems()) {
+          if(points.containsKey(item.getIdentifier())) {
+            compositeChange.addChange(doCreateInsert(report, dataset, points, occurrence));
+            break;
+          }
+        }
       }
     }
   }
-  
+
   protected Change doCreateInsert(Report report, Dataset dataset, Map<String, DataPoint> points, Integer occurrence) throws ParseException {
     InsertDataChange idc = new InsertDataChange();
     idc.setTableName(report.getName());
 
     addEntityKeyValue(idc, dataset.getEntity().getIdentifier());
 
-    if (occurrence != null) {
+    if(occurrence != null) {
       addOccurrenceValue(idc, occurrence);
     }
-    
+
     for(DataItem dataItem : report.getDataItems()) {
       if(dataItem.getDataType() == null) {
         continue;
       }
-      
+
       addDataPointValue(idc, dataItem, points.get(dataItem.getIdentifier()));
     }
     return idc;
@@ -82,27 +86,27 @@ public class DatasetToSchemaChangeProcessor implements ItemProcessor<Dataset, Ch
   protected Map<String, DataPoint> mapify(Dataset dataset, Integer occurrence) {
     Map<String, DataPoint> map = new HashMap<String, DataPoint>();
     for(DataPoint point : dataset.getDataPoints()) {
-      if (occurrence == null || (point.getOccurrence() != null && point.getOccurrence().equals(occurrence))) {
+      if(occurrence == null || (point.getOccurrence() != null && point.getOccurrence().equals(occurrence))) {
         map.put(point.getDataItem().getCode().toString(), point);
       }
     }
     return map;
   }
-  
+
   private void addEntityKeyValue(InsertDataChange idc, String entityId) {
     ColumnConfig cc = new ColumnConfig();
     cc.setName(SchemaChangeConstants.ENTITY_KEY_NAME);
     cc.setValue(entityId);
     idc.addColumn(cc);
   }
-  
+
   private void addOccurrenceValue(InsertDataChange idc, Integer occurrence) {
     ColumnConfig oc = new ColumnConfig();
     oc.setName(SchemaChangeConstants.OCCURRENCE_COLUMN_NAME);
     oc.setValueNumeric(occurrence);
     idc.addColumn(oc);
   }
-  
+
   private void addDataPointValue(InsertDataChange idc, DataItem dataItem, DataPoint dataPoint) throws ParseException {
     ColumnConfig cc = new ColumnConfig();
     cc.setName(SchemaChangeConstants.COLUMN_NAME_PREFIX + dataItem.getIdentifier());
@@ -117,6 +121,6 @@ public class DatasetToSchemaChangeProcessor implements ItemProcessor<Dataset, Ch
       } else {
         cc.setValue(dataPoint.getValue());
       }
-    }    
+    }
   }
 }

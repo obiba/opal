@@ -87,7 +87,7 @@ public abstract class AbstractOnyxReader<T> implements ItemStreamReader<T> {
    * @param filename The XML file to be converted.
    * @return The root Variable or VariableDataSet
    */
-  protected <E> E getVariableFromXmlFile(String filename) {
+  synchronized protected <E> E getVariableFromXmlFile(String filename) {
     InputStream inputStream = null;
     E object = null;
     try {
