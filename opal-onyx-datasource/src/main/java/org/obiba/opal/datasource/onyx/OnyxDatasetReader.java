@@ -114,8 +114,8 @@ public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements It
   }
 
   /**
-   * Given a <code>Dataset</code> and <code>VariableData</code>, recursively adds the necessary <code>DataPoint</code>s
-   * to the <code>Dataset</code>
+   * Given a <code>Dataset</code> and <code>VariableData</code>, recursively adds the necessary
+   * <code>DataPoint</code>s to the <code>Dataset</code>
    * 
    * @param dataset dataset
    * @param variableData variableData
@@ -269,11 +269,8 @@ public class OnyxDatasetReader extends AbstractOnyxReader<Dataset> implements It
     if(occurrenceId != null) {
       List<Integer> parentOccurrenceIds = occurrencesMap.get(parent);
       if(parentOccurrenceIds != null) {
-        for(Integer aParentOccurrenceId : parentOccurrenceIds) {
-          if(aParentOccurrenceId.equals(occurrenceId)) {
-            return aParentOccurrenceId;
-          }
-        }
+        int index = parentOccurrenceIds.indexOf(occurrenceId);
+        return (index != -1) ? index + 1 : null;
       }
     }
 
