@@ -61,7 +61,7 @@
         <entry key="BOOLEAN" value="BOOLEAN" />
         <entry key="DATA" value="BLOB" />
         <entry key="DATE" value="DATETIME" />
-        <entry key="DECIMAL" value="java.sql.Types.DECIMAL" />
+        <entry key="DECIMAL" value="DOUBLE" />
         <entry key="INTEGER" value="BIGINT" />
         <entry key="TEXT" value="TEXT" />
       </map>
