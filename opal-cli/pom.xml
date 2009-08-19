@@ -58,6 +58,13 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!-- Some Upgrade Manager code requires runtime scope for spring-test. -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <scope>runtime</scope>            
+    </dependency>
+    
     <!-- Command-line argument parser -->
     <dependency>
       <groupId>uk.co.flamingpenguin.jewelcli</groupId>

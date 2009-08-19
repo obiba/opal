@@ -1,0 +1,54 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+  <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+    <property name="customEditors">
+      <map>
+        <entry key="org.obiba.runtime.Version">
+          <bean id="versionEditor" class="org.obiba.runtime.upgrade.support.VersionPropertyEditor" />
+        </entry>
+      </map>
+    </property>
+  </bean>
+
+  <bean id="upgradeManager" class="org.obiba.runtime.upgrade.support.DefaultUpgradeManager">
+    <property name="dataSource" ref="dataSource" />
+
+    <property name="currentVersionProvider">
+      <bean class="org.obiba.runtime.upgrade.JdbcVersionModifier">
+        <property name="datasource" ref="dataSource" />
+        <property name="versionBeingInstalled" ref="version" />
+      </bean>
+    </property>
+    <property name="runtimeVersionProvider">
+      <bean class="org.obiba.runtime.upgrade.VersionBeanVersionProvider">
+        <property name="version" ref="version" />
+      </bean>
+    </property>
+    <property name="installSteps">
+      <list>
+        <ref bean="createSpringBatchSchema" />
+      </list>
+    </property>
+    <property name="upgradeSteps">
+      <list>
+      </list>
+    </property>
+    <property name="stepListeners">
+      <list>
+        <bean class="org.obiba.runtime.upgrade.support.LoggingUpgradeManagerListener" />
+      </list>
+    </property>
+  </bean>
+
+  <bean id="createSpringBatchSchema" class="org.obiba.runtime.upgrade.InstallStepAdapter">
+    <property name="upgradeStep">
+      <bean class="org.obiba.runtime.upgrade.support.SqlScriptUpgradeStep">
+        <property name="dataSource" ref="dataSource" />
+        <property name="script" value="classpath:/upgrade-script/schema-mysql.sql" />
+        <property name="description" value="Install Spring Batch Schema." />
+      </bean>
+    </property>
+  </bean>
+
+</beans>
