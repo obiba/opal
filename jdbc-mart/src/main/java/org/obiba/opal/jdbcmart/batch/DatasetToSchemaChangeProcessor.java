@@ -115,7 +115,7 @@ public class DatasetToSchemaChangeProcessor implements ItemProcessor<Dataset, Ch
 
     if(dataPoint != null) {
       if(dataItem.getDataType().equals("DATE")) {
-        cc.setValueDate(new java.sql.Date(sdf.parse(dataPoint.getValue()).getTime()));
+        cc.setValueDate(new java.sql.Timestamp(sdf.parse(dataPoint.getValue()).getTime()));
       } else if(dataItem.getDataType().equals("BOOLEAN")) {
         cc.setValueBoolean(Boolean.valueOf(dataPoint.getValue()));
       } else {
