@@ -2,12 +2,20 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
   <import resource="classpath:META-INF/opal/property-configurer.xml" />
+  <import resource="hibernate-session.xml" />
   
-  <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+  <bean id="opalDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
     <property name="driverClassName" value="${org.obiba.opal.datasource.opal.driver}" />
     <property name="url" value="${org.obiba.opal.datasource.opal.url}" />
     <property name="username" value="${org.obiba.opal.datasource.opal.username}" />
     <property name="password" value="${org.obiba.opal.datasource.opal.password}" />
   </bean>
-
+  
+  <bean id="keyDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+    <property name="driverClassName" value="${org.obiba.opal.datasource.key.driver}" />
+    <property name="url" value="${org.obiba.opal.datasource.key.url}" />
+    <property name="username" value="${org.obiba.opal.datasource.key.username}" />
+    <property name="password" value="${org.obiba.opal.datasource.key.password}" />
+  </bean>
+  
 </beans>

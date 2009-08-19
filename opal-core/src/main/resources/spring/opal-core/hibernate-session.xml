@@ -1,0 +1,91 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+  xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+
+  <!-- The Hibernate SessionFactory -->
+  <bean id="keySessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+    <property name="dataSource">
+      <ref bean="keyDataSource" />
+    </property>
+    <property name="namingStrategy">
+      <bean class="org.hibernate.cfg.ImprovedNamingStrategy" />
+    </property>
+    <property name="annotatedClasses">
+      <bean class="org.obiba.onyx.spring.AnnotatedBeanFinderFactoryBean">
+        <!-- Use Apache Ant Pattern -->
+        <property name="searchPatterns">
+          <set>
+            <value>classpath*:org/obiba/opal/core/domain/participant/**/*.class</value>
+          </set>
+        </property>
+        <!-- Specify annotations to look for in classes -->
+        <property name="annotationClasses">
+          <set>
+            <value>javax.persistence.Entity</value>
+            <value>javax.persistence.Embeddable</value>
+            <value>javax.persistence.MappedSuperclass</value>
+          </set>
+        </property>
+      </bean>
+    </property>
+    <property name="configurationClass" value="org.hibernate.cfg.AnnotationConfiguration" />
+    <property name="hibernateProperties">
+      <bean class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties">
+          <props>
+            <prop key="hibernate.generate_statistics">true</prop>
+            <prop key="hibernate.cache.use_structured_entries">true</prop>
+            <prop key="hibernate.cache.use_query_cache">true</prop>
+            <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
+            <prop key="hibernate.dialect">${org.obiba.opal.datasource.key.dialect}</prop>
+          </props>
+        </property>
+      </bean>
+    </property>
+  </bean>
+
+  <!-- The Hibernate SessionFactory -->
+  <bean id="opalSessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+    <property name="dataSource">
+      <ref bean="opalDataSource" />
+    </property>
+    <property name="namingStrategy">
+      <bean class="org.hibernate.cfg.ImprovedNamingStrategy" />
+    </property>
+    <property name="annotatedClasses">
+      <bean class="org.obiba.onyx.spring.AnnotatedBeanFinderFactoryBean">
+        <!-- Use Apache Ant Pattern -->
+        <property name="searchPatterns">
+          <set>
+            <value>classpath*:org/obiba/opal/core/domain/data/**/*.class</value>
+            <value>classpath*:org/obiba/opal/core/domain/metadata/**/*.class</value>
+          </set>
+        </property>
+        <!-- Specify annotations to look for in classes -->
+        <property name="annotationClasses">
+          <set>
+            <value>javax.persistence.Entity</value>
+            <value>javax.persistence.Embeddable</value>
+            <value>javax.persistence.MappedSuperclass</value>
+          </set>
+        </property>
+      </bean>
+    </property>
+    <property name="configurationClass" value="org.hibernate.cfg.AnnotationConfiguration" />
+    <property name="hibernateProperties">
+      <bean class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties">
+          <props>
+            <prop key="hibernate.generate_statistics">true</prop>
+            <prop key="hibernate.cache.use_structured_entries">true</prop>
+            <prop key="hibernate.cache.use_query_cache">true</prop>
+            <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>            
+            <prop key="hibernate.dialect">${org.obiba.opal.datasource.opal.dialect}</prop>
+          </props>
+        </property>
+      </bean>
+    </property>
+  </bean>
+
+</beans>

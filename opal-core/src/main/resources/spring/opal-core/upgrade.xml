@@ -12,11 +12,11 @@
   </bean>
 
   <bean id="upgradeManager" class="org.obiba.runtime.upgrade.support.DefaultUpgradeManager">
-    <property name="dataSource" ref="dataSource" />
+    <property name="dataSource" ref="opalDataSource" />
 
     <property name="currentVersionProvider">
       <bean class="org.obiba.runtime.upgrade.JdbcVersionModifier">
-        <property name="datasource" ref="dataSource" />
+        <property name="datasource" ref="opalDataSource" />
         <property name="versionBeingInstalled" ref="version" />
       </bean>
     </property>
@@ -28,6 +28,8 @@
     <property name="installSteps">
       <list>
         <ref bean="createSpringBatchSchema" />
+        <ref bean="createOpalSchema" />
+        <ref bean="createKeySchema" />
       </list>
     </property>
     <property name="upgradeSteps">
@@ -44,11 +46,31 @@
   <bean id="createSpringBatchSchema" class="org.obiba.runtime.upgrade.InstallStepAdapter">
     <property name="upgradeStep">
       <bean class="org.obiba.runtime.upgrade.support.SqlScriptUpgradeStep">
-        <property name="dataSource" ref="dataSource" />
-        <property name="script" value="classpath:/upgrade-script/schema-mysql.sql" />
         <property name="description" value="Install Spring Batch Schema." />
+        <property name="dataSource" ref="opalDataSource" />
+        <property name="script" value="classpath:/upgrade-script/schema-mysql.sql" />
       </bean>
     </property>
   </bean>
 
+  <bean id="createOpalSchema" class="org.obiba.runtime.upgrade.InstallStepAdapter">
+    <property name="upgradeStep">
+      <bean class="org.obiba.runtime.upgrade.support.MethodInvokingUpgradeStep">
+        <property name="description" value="Install Opal Schema." />
+        <property name="methodOwner" ref="&amp;opalSessionFactory" />
+        <property name="methodName" value="createDatabaseSchema" />
+      </bean>
+    </property>
+  </bean>
+  
+  <bean id="createKeySchema" class="org.obiba.runtime.upgrade.InstallStepAdapter">
+    <property name="upgradeStep">
+      <bean class="org.obiba.runtime.upgrade.support.MethodInvokingUpgradeStep">
+        <property name="description" value="Install Key Schema." />
+        <property name="methodOwner" ref="&amp;keySessionFactory" />
+        <property name="methodName" value="createDatabaseSchema" />
+      </bean>
+    </property>
+  </bean>
+  
 </beans>
