@@ -128,7 +128,6 @@ public class DecryptingOnyxDataInputStrategyTest {
     keyStore.init(context.getKeyProviderArgs());
 
     ZipOnyxDataInputStrategy zipStrategy = new ZipOnyxDataInputStrategy();
-    zipStrategy.setDelegate(new FileOnyxDataInputStrategy());
 
     decryptingStrategy = new DecryptingOnyxDataInputStrategy();
     decryptingStrategy.setKeyProvider(keyStore);

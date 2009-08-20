@@ -56,7 +56,6 @@ public class ZipOnyxDataInputStrategyTest {
     context.setSource(TEST_ARCHIVE);
 
     zipStrategy = new ZipOnyxDataInputStrategy();
-    zipStrategy.setDelegate(new FileOnyxDataInputStrategy());
   }
 
   @After

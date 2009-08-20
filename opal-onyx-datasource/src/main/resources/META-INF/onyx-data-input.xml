@@ -15,6 +15,4 @@
 
   <bean id="zip" class="org.obiba.opal.datasource.onyx.ZipOnyxDataInputStrategy" scope="prototype" />
 
-  <bean id="file" class="org.obiba.opal.datasource.onyx.FileOnyxDataInputStrategy" scope="prototype" />
-
 </beans>
