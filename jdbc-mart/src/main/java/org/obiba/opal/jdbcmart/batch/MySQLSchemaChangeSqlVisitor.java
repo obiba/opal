@@ -18,7 +18,7 @@ public class MySQLSchemaChangeSqlVisitor implements SqlVisitor {
 
   public static final int MAX_INNODB_COLUMNS = 1000;
 
-  private static final String MART_COLUMN_PREFIX = "OPAL_";
+  private static final Pattern MART_COLUMN_PATTERN = Pattern.compile("OPAL_");
 
   //
   // SqlVisitor Methods
@@ -62,8 +62,7 @@ public class MySQLSchemaChangeSqlVisitor implements SqlVisitor {
    * @return columns in the table (1 entity_id column + N columns named "OPAL_*")
    */
   public int getColumnCount(String createTableSql) {
-    Pattern p = Pattern.compile(MART_COLUMN_PREFIX);
-    Matcher m = p.matcher(createTableSql);
+    Matcher m = MART_COLUMN_PATTERN.matcher(createTableSql);
 
     // Start columnCount at 1 (there is at least the entity_id column).
     int columnCount = 1;
