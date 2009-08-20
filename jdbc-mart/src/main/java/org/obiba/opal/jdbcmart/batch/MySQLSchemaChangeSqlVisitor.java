@@ -18,7 +18,15 @@ public class MySQLSchemaChangeSqlVisitor implements SqlVisitor {
 
   public static final int MAX_INNODB_COLUMNS = 1000;
 
-  private static final Pattern MART_COLUMN_PATTERN = Pattern.compile("OPAL_");
+  private static final String ENTITY_KEY_COLUMN_REGEX = "`" + SchemaChangeConstants.ENTITY_KEY_NAME + "` ";
+
+  private static final String OCCURRENCE_COLUMN_REGEX = "`" + SchemaChangeConstants.OCCURRENCE_COLUMN_NAME + "` ";
+
+  //
+  // Instance Variables
+  //
+
+  private String studyPrefix;
 
   //
   // SqlVisitor Methods
@@ -55,17 +63,25 @@ public class MySQLSchemaChangeSqlVisitor implements SqlVisitor {
   // Methods
   //
 
+  public void setStudyPrefix(String studyPrefix) {
+    this.studyPrefix = (studyPrefix != null) ? studyPrefix : "";
+  }
+
   /**
    * Returns the number of columns in the specified table.
    * 
    * @param createTableSql table creation SQL
-   * @return columns in the table (1 entity_id column + N columns named "OPAL_*")
+   * @return columns in the table
    */
   public int getColumnCount(String createTableSql) {
-    Matcher m = MART_COLUMN_PATTERN.matcher(createTableSql);
+    String opalColumnRegex = "`" + studyPrefix + "\\S+` ";
 
-    // Start columnCount at 1 (there is at least the entity_id column).
-    int columnCount = 1;
+    String columnRegex = ENTITY_KEY_COLUMN_REGEX + "|" + OCCURRENCE_COLUMN_REGEX + "|" + opalColumnRegex;
+
+    Pattern p = Pattern.compile(columnRegex);
+    Matcher m = p.matcher(createTableSql);
+
+    int columnCount = 0;
 
     while(m.find()) {
       columnCount++;

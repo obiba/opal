@@ -74,7 +74,9 @@
   
     <property name="sqlVisitors">
       <list>
-        <bean class="org.obiba.opal.jdbcmart.batch.MySQLSchemaChangeSqlVisitor" />
+        <bean class="org.obiba.opal.jdbcmart.batch.MySQLSchemaChangeSqlVisitor">
+          <property name="studyPrefix" value="${org.obiba.opal.study.prefix}" />
+        </bean>
       </list>
     </property>
   </bean>
