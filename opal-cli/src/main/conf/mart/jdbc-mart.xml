@@ -55,7 +55,8 @@
 
   <bean id="dataItemSetProcessor" class="org.obiba.opal.jdbcmart.batch.DataItemSetToSchemaChangeProcessor">
     <property name="dataSource" ref="dataSource" />
-
+    <property name="studyPrefix" value="${org.obiba.opal.study.prefix}" />
+    
     <property name="typeMap">
       <map>
         <entry key="BOOLEAN" value="BOOLEAN" />
@@ -86,6 +87,7 @@
 
   <bean id="datasetProcessor" class="org.obiba.opal.jdbcmart.batch.DatasetToSchemaChangeProcessor">
     <property name="reports" ref="reports" />
+    <property name="studyPrefix" value="${org.obiba.opal.study.prefix}" />
   </bean>
 
   <bean id="dataSource" class="org.enhydra.jdbc.pool.StandardXAPoolDataSource" destroy-method="shutdown">

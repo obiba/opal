@@ -24,11 +24,17 @@ public class DatasetToSchemaChangeProcessor implements ItemProcessor<Dataset, Ch
 
   private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
+  private String studyPrefix;
+
   public DatasetToSchemaChangeProcessor() {
   }
 
   public void setReports(List<Report> reports) {
     this.reports = reports;
+  }
+
+  public void setStudyPrefix(String studyPrefix) {
+    this.studyPrefix = (studyPrefix != null) ? studyPrefix : "";
   }
 
   public Change process(Dataset dataset) throws Exception {
@@ -109,7 +115,7 @@ public class DatasetToSchemaChangeProcessor implements ItemProcessor<Dataset, Ch
 
   private void addDataPointValue(InsertDataChange idc, DataItem dataItem, DataPoint dataPoint) throws ParseException {
     ColumnConfig cc = new ColumnConfig();
-    cc.setName(SchemaChangeConstants.COLUMN_NAME_PREFIX + dataItem.getIdentifier());
+    cc.setName(studyPrefix + dataItem.getIdentifier());
     cc.setValue(null);
     idc.addColumn(cc);
 

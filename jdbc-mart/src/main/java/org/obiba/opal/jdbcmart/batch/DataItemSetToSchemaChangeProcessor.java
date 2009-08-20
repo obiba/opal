@@ -49,6 +49,11 @@ public class DataItemSetToSchemaChangeProcessor implements ItemProcessor<DataIte
    */
   private Map<String, String> typeMap;
 
+  /**
+   * Study prefix. Applied to names of <code>DataItem</code> table columns.
+   */
+  private String studyPrefix;
+
   private DatabaseSnapshot databaseSnapshot;
 
   //
@@ -98,6 +103,10 @@ public class DataItemSetToSchemaChangeProcessor implements ItemProcessor<DataIte
     if(typeMap != null) {
       this.typeMap.putAll(typeMap);
     }
+  }
+
+  public void setStudyPrefix(String studyPrefix) {
+    this.studyPrefix = (studyPrefix != null) ? studyPrefix : "";
   }
 
   protected Change doCreateMetaDataTableChange(DataItemSet dataItemSet) {
@@ -153,7 +162,7 @@ public class DataItemSetToSchemaChangeProcessor implements ItemProcessor<DataIte
 
     column = new ColumnConfig();
     column.setName("variable");
-    column.setValue(SchemaChangeConstants.COLUMN_NAME_PREFIX + dataItem.getIdentifier());
+    column.setValue(studyPrefix + dataItem.getIdentifier());
     schemaChange.addColumn(column);
 
     column = new ColumnConfig();
@@ -231,8 +240,8 @@ public class DataItemSetToSchemaChangeProcessor implements ItemProcessor<DataIte
     }
     ColumnConfig column = new ColumnConfig();
 
-    // Column name: Set to COLUMN_NAME_PREFIX + dataItem.getCode().
-    column.setName(SchemaChangeConstants.COLUMN_NAME_PREFIX + dataItem.getIdentifier());
+    // Column name: Set to studyPrefix + dataItem.getCode().
+    column.setName(studyPrefix + dataItem.getIdentifier());
 
     // Column type: From the DataItem's metadata.
     column.setType(getTypeForDataItem(dataItem));
