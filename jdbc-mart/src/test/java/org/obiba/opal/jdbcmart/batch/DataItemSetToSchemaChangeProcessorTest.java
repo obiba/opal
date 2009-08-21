@@ -55,14 +55,17 @@ public class DataItemSetToSchemaChangeProcessorTest {
     processor.setDataSource(dataSource);
     processor.setTypeMap(typeMap);
 
+    // Record expectations.
     DataItemSet dataItemSet = EasyMock.createMock(DataItemSet.class);
     EasyMock.expect(dataItemSet.getName()).andReturn("MySet").anyTimes();
     EasyMock.expect(dataItemSet.hasOccurrence()).andReturn(false).anyTimes();
     EasyMock.expect(dataItemSet.getDataItems()).andReturn(createDataItems()).anyTimes();
     EasyMock.replay(dataItemSet);
 
-    // Basic verification.
+    processor.open(null);
     Change schemaChange = processor.process(dataItemSet);
+
+    // Basic verification.
     assertNotNull(schemaChange);
     assertTrue(schemaChange instanceof CompositeChange);
 

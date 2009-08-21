@@ -24,10 +24,12 @@ import liquibase.exception.JDBCException;
 
 import org.obiba.opal.elmo.concepts.DataItem;
 import org.obiba.opal.sesame.report.DataItemSet;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 
-public class DataItemSetToSchemaChangeProcessor implements ItemProcessor<DataItemSet, Change> {
+public class DataItemSetToSchemaChangeProcessor implements ItemStream, ItemProcessor<DataItemSet, Change> {
   //
   // Constants
   //
@@ -54,6 +56,8 @@ public class DataItemSetToSchemaChangeProcessor implements ItemProcessor<DataIte
    */
   private String studyPrefix;
 
+  private Connection connection;
+
   private DatabaseSnapshot databaseSnapshot;
 
   //
@@ -62,6 +66,34 @@ public class DataItemSetToSchemaChangeProcessor implements ItemProcessor<DataIte
 
   public DataItemSetToSchemaChangeProcessor() {
     typeMap = new HashMap<String, String>();
+  }
+
+  //
+  // ItemStream Methods
+  //
+
+  public void open(ExecutionContext executionContext) throws ItemStreamException {
+    // Get a connection to the dataSource.
+    try {
+      connection = dataSource.getConnection();
+    } catch(SQLException ex) {
+      throw new ItemStreamException("Could not acquire a connection to the dataSource", ex);
+    }
+  }
+
+  public void update(ExecutionContext executionContext) throws ItemStreamException {
+
+  }
+
+  public void close() throws ItemStreamException {
+    // Close the connection to the dataSource.
+    if(connection != null) {
+      try {
+        connection.close();
+      } catch(SQLException ex) {
+        throw new ItemStreamException("Could not close connection to the dataSource", ex);
+      }
+    }
   }
 
   //
@@ -316,14 +348,6 @@ public class DataItemSetToSchemaChangeProcessor implements ItemProcessor<DataIte
   private DatabaseSnapshot createDatabaseSnapshot() {
     DatabaseSnapshot databaseSnapshot = null;
 
-    // Get a connection to the dataSource.
-    Connection connection = null;
-    try {
-      connection = dataSource.getConnection();
-    } catch(SQLException ex) {
-      throw new ItemStreamException("Could not acquire a connection to the dataSource", ex);
-    }
-
     // Find an appropriate database instance for the connection.
     try {
       DatabaseFactory databaseFactory = DatabaseFactory.getInstance();
@@ -331,14 +355,6 @@ public class DataItemSetToSchemaChangeProcessor implements ItemProcessor<DataIte
       databaseSnapshot = database.createDatabaseSnapshot(null, null);
     } catch(JDBCException ex) {
       throw new ItemStreamException("Could not locate a database implementation for the connection", ex);
-    } finally {
-      if(connection != null) {
-        try {
-          connection.close();
-        } catch(SQLException e) {
-          // Ignore
-        }
-      }
     }
 
     return databaseSnapshot;
