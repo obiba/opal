@@ -1,6 +1,5 @@
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:tx="http://www.springframework.org/schema/tx" xmlns:batch="http://www.springframework.org/schema/batch"
-  xmlns:util="http://www.springframework.org/schema/util"
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+  xmlns:batch="http://www.springframework.org/schema/batch" xmlns:util="http://www.springframework.org/schema/util"
   xsi:schemaLocation="
   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
   http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
@@ -12,14 +11,12 @@
   <batch:job id="jdbc-extract" incrementer="runIdIncrementer">
     <batch:step id="createSchema" next="populateSchema">
       <batch:tasklet>
-        <batch:chunk reader="dataItemSetReader" processor="dataItemSetProcessor" writer="schemaChangeWriter"
-          commit-interval="1" />
+        <batch:chunk reader="dataItemSetReader" processor="dataItemSetProcessor" writer="schemaChangeWriter" commit-interval="1" />
       </batch:tasklet>
     </batch:step>
     <batch:step id="populateSchema">
       <batch:tasklet>
-        <batch:chunk reader="datasetReader" processor="datasetProcessor" writer="schemaChangeWriter"
-          commit-interval="10" />
+        <batch:chunk reader="datasetReader" processor="datasetProcessor" writer="schemaChangeWriter" commit-interval="10" />
       </batch:tasklet>
     </batch:step>
   </batch:job>
@@ -55,15 +52,15 @@
 
   <bean id="dataItemSetProcessor" class="org.obiba.opal.jdbcmart.batch.DataItemSetToSchemaChangeProcessor">
     <property name="dataSource" ref="dataSource" />
-    <property name="studyPrefix" value="${org.obiba.opal.study.prefix}" />
-    
+    <property name="columnNamingStrategy" ref="columnNamingStrategy" />
+
     <property name="typeMap">
       <map>
         <entry key="BOOLEAN" value="BOOLEAN" />
         <entry key="DATA" value="BLOB" />
         <entry key="DATE" value="DATETIME" />
-        <entry key="DECIMAL" value="DOUBLE" />
-        <entry key="INTEGER" value="BIGINT" />
+        <entry key="DECIMAL" value="FLOAT" />
+        <entry key="INTEGER" value="INT" />
         <entry key="TEXT" value="TEXT" />
       </map>
     </property>
@@ -71,7 +68,7 @@
 
   <bean id="schemaChangeWriter" class="org.obiba.opal.jdbcmart.batch.SchemaChangeWriter">
     <property name="dataSource" ref="dataSource" />
-  
+
     <property name="sqlVisitors">
       <list>
         <bean class="org.obiba.opal.jdbcmart.batch.MySQLSchemaChangeSqlVisitor">
@@ -89,7 +86,37 @@
 
   <bean id="datasetProcessor" class="org.obiba.opal.jdbcmart.batch.DatasetToSchemaChangeProcessor">
     <property name="reports" ref="reports" />
-    <property name="studyPrefix" value="${org.obiba.opal.study.prefix}" />
+    <property name="columnNamingStrategy" ref="columnNamingStrategy" />
+  </bean>
+
+  <bean id="columnNamingStrategy" class="org.obiba.opal.jdbcmart.batch.naming.DefaultColumnNamingStrategy">
+    <property name="prefix" value="${org.obiba.opal.study.prefix}" />
+    <property name="trims">
+      <util:map>
+        <entry key="HYPERTENSION" value="HPTNSN" />
+        <entry key="SUPPLEMENTS" value="SPLMNT" />
+        <entry key="PARKINSONS" value="PRKNSNS" />
+        <entry key="OCCURRENCE" value="OCRNC" />
+        <entry key="DEPRESSION" value="DPRSN" />
+        <entry key="TIMESTAMP" value="TS" />
+        <entry key="TREATMENT" value="TMNT" />
+        <entry key="DIABETES" value="DBTS" />
+        <entry key="DAUGHTER" value="DGHTR" />
+        <entry key="RELATIVE" value="RLTV" />
+        <entry key="SPECIFY" value="SPFY" />
+        <entry key="CURRENT" value="CRNT" />
+        <entry key="BROTHER" value="BRTHR" />
+        <entry key="NUMBER" value="NBR" />
+        <entry key="MOTHER" value="MTHR" />
+        <entry key="SISTER" value="SSTR" />
+        <entry key="FATHER" value="FTHR" />
+        <entry key="CANCER" value="CNCR" />
+        <entry key="OTHER" value="OTHR" />
+        <entry key="TYPES" value="TPS" />
+        <entry key="EVER" value="EVR" />
+        <entry key="OPEN" value="OPN" />
+      </util:map>
+    </property>
   </bean>
 
   <bean id="dataSource" class="org.enhydra.jdbc.pool.StandardXAPoolDataSource" destroy-method="shutdown">

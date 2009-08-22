@@ -15,6 +15,7 @@ import liquibase.change.InsertDataChange;
 import org.obiba.opal.core.domain.data.DataPoint;
 import org.obiba.opal.core.domain.data.Dataset;
 import org.obiba.opal.elmo.concepts.DataItem;
+import org.obiba.opal.jdbcmart.batch.naming.DefaultColumnNamingStrategy;
 import org.obiba.opal.sesame.report.Report;
 import org.springframework.batch.item.ItemProcessor;
 
@@ -24,7 +25,7 @@ public class DatasetToSchemaChangeProcessor implements ItemProcessor<Dataset, Ch
 
   private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
-  private String studyPrefix;
+  private IColumnNamingStrategy columnNamingStrategy = new DefaultColumnNamingStrategy();
 
   public DatasetToSchemaChangeProcessor() {
   }
@@ -32,14 +33,15 @@ public class DatasetToSchemaChangeProcessor implements ItemProcessor<Dataset, Ch
   public void setReports(List<Report> reports) {
     this.reports = reports;
   }
-
-  public void setStudyPrefix(String studyPrefix) {
-    this.studyPrefix = (studyPrefix != null) ? studyPrefix : "";
+  
+  public void setColumnNamingStrategy(IColumnNamingStrategy columnNamingStrategy) {
+    this.columnNamingStrategy = columnNamingStrategy;
   }
 
   public Change process(Dataset dataset) throws Exception {
     CompositeChange composite = new CompositeChange();
     for(Report report : reports) {
+      columnNamingStrategy.prepare(report);
       addChanges(composite, report, dataset);
     }
     return composite;
@@ -115,7 +117,7 @@ public class DatasetToSchemaChangeProcessor implements ItemProcessor<Dataset, Ch
 
   private void addDataPointValue(InsertDataChange idc, DataItem dataItem, DataPoint dataPoint) throws ParseException {
     ColumnConfig cc = new ColumnConfig();
-    cc.setName(studyPrefix + dataItem.getIdentifier());
+    cc.setName(columnNamingStrategy.getColumnName(dataItem));
     cc.setValue(null);
     idc.addColumn(cc);
 

@@ -23,6 +23,7 @@ import liquibase.database.structure.Table;
 import liquibase.exception.JDBCException;
 
 import org.obiba.opal.elmo.concepts.DataItem;
+import org.obiba.opal.jdbcmart.batch.naming.DefaultColumnNamingStrategy;
 import org.obiba.opal.sesame.report.DataItemSet;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
@@ -46,15 +47,12 @@ public class DataItemSetToSchemaChangeProcessor implements ItemStream, ItemProce
 
   private DataSource dataSource;
 
+  private IColumnNamingStrategy columnNamingStrategy = new DefaultColumnNamingStrategy();
+
   /**
    * Mapping from <code>DataItem</code> types to LiquiBase vendor-neutral column types.
    */
   private Map<String, String> typeMap;
-
-  /**
-   * Study prefix. Applied to names of <code>DataItem</code> table columns.
-   */
-  private String studyPrefix;
 
   private Connection connection;
 
@@ -66,6 +64,10 @@ public class DataItemSetToSchemaChangeProcessor implements ItemStream, ItemProce
 
   public DataItemSetToSchemaChangeProcessor() {
     typeMap = new HashMap<String, String>();
+  }
+
+  public void setColumnNamingStrategy(IColumnNamingStrategy columnNamingStrategy) {
+    this.columnNamingStrategy = columnNamingStrategy;
   }
 
   //
@@ -101,6 +103,9 @@ public class DataItemSetToSchemaChangeProcessor implements ItemStream, ItemProce
   //
 
   public Change process(DataItemSet dataItemSet) throws Exception {
+
+    columnNamingStrategy.prepare(dataItemSet);
+
     CompositeChange composite = new CompositeChange();
 
     // Create the metadata table if necessary
@@ -135,10 +140,6 @@ public class DataItemSetToSchemaChangeProcessor implements ItemStream, ItemProce
     if(typeMap != null) {
       this.typeMap.putAll(typeMap);
     }
-  }
-
-  public void setStudyPrefix(String studyPrefix) {
-    this.studyPrefix = (studyPrefix != null) ? studyPrefix : "";
   }
 
   protected Change doCreateMetaDataTableChange(DataItemSet dataItemSet) {
@@ -194,7 +195,7 @@ public class DataItemSetToSchemaChangeProcessor implements ItemStream, ItemProce
 
     column = new ColumnConfig();
     column.setName("variable");
-    column.setValue(studyPrefix + dataItem.getIdentifier());
+    column.setValue(columnNamingStrategy.getColumnName(dataItem));
     schemaChange.addColumn(column);
 
     column = new ColumnConfig();
@@ -273,7 +274,7 @@ public class DataItemSetToSchemaChangeProcessor implements ItemStream, ItemProce
     ColumnConfig column = new ColumnConfig();
 
     // Column name: Set to studyPrefix + dataItem.getCode().
-    column.setName(studyPrefix + dataItem.getIdentifier());
+    column.setName(columnNamingStrategy.getColumnName(dataItem));
 
     // Column type: From the DataItem's metadata.
     column.setType(getTypeForDataItem(dataItem));
