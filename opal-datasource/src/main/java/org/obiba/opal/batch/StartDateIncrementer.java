@@ -13,7 +13,7 @@ public class StartDateIncrementer implements JobParametersIncrementer {
   // Constants
   //
 
-  public static final String START_DATE_KEY = "startDate";
+  public static final String START_DATE_KEY = "input.startDate";
 
   //
   // Instance Variables
