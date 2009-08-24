@@ -7,8 +7,8 @@
   http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd">
 
   <import resource="classpath:/META-INF/opal/context-config.xml" />
-
-  <batch:job id="jdbc-extract" incrementer="runIdIncrementer">
+  
+  <batch:job id="jdbc-extract" incrementer="jdbcExtractStartDateIncrementer">
     <batch:step id="createSchema" next="populateSchema">
       <batch:tasklet>
         <batch:chunk reader="dataItemSetReader" processor="dataItemSetProcessor" writer="schemaChangeWriter" commit-interval="1" />
@@ -21,6 +21,11 @@
     </batch:step>
   </batch:job>
 
+  <bean id="jdbcExtractStartDateIncrementer" class="org.obiba.opal.batch.StartDateIncrementer">
+    <property name="jobRepository" ref="jobRepository" />
+    <property name="jobName" value="jdbc-extract" />
+  </bean>
+  
   <bean id="reports" class="org.obiba.opal.jdbcmart.batch.DataItemSetFactoryBean" scope="step">
     <property name="reportDescriptor" value="#{jobParameters[input.file.name]}" />
     <property name="xstream">
@@ -78,8 +83,9 @@
     </property>
   </bean>
 
-  <bean id="datasetReader" class="org.springframework.batch.item.database.HibernateCursorItemReader">
-    <property name="queryString" value="from Dataset" />
+  <bean id="datasetReader" class="org.obiba.opal.jdbcmart.batch.DatasetReader" scope="step">
+    <property name="jobParameters" value="#{jobParameters}" />
+    <property name="queryString" value="from Dataset d where d.creationDate > :startDate" />
     <property name="useStatelessSession" value="false" />
     <property name="sessionFactory" ref="opalSessionFactory" />
   </bean>
