@@ -104,6 +104,7 @@
         <entry key="PARKINSONS" value="PRKNSNS" />
         <entry key="OCCURRENCE" value="OCRNC" />
         <entry key="DEPRESSION" value="DPRSN" />
+        <entry key="TIMESTAMP_" value="" />
         <entry key="TIMESTAMP" value="TS" />
         <entry key="TREATMENT" value="TMNT" />
         <entry key="DIABETES" value="DBTS" />
