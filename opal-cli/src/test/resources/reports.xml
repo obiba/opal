@@ -8,7 +8,42 @@
       </children>
     </selections>
   </report>
-  
+  <report>
+    <name>ParticipantInterview</name>
+    <selections>
+      <children>
+        <path>Onyx.Admin.Participant</path>
+      </children>
+      <children>
+        <path>Onyx.Admin.Interview</path>
+      </children>
+    </selections>
+  </report>
+  <report>
+    <name>SamplesCollection</name>
+    <selections>
+      <and>
+        <selections>
+          <def>
+            <name>SamplesCollection</name>
+          </def>
+          <namePattern>
+            <pattern>RegisteredParticipantTube.*</pattern>
+            <exclude>true</exclude>
+          </namePattern>
+        </selections>
+      </and>    
+    </selections>
+  </report>
+  <report>
+    <name>RegisteredParticipantTube</name>
+    <withOccurrence>true</withOccurrence>
+    <selections>
+      <children>
+        <path>Onyx.SamplesCollection.RegisteredParticipantTube</path>
+      </children>
+    </selections>
+  </report>
   <report>
     <name>AnkleBrachial</name>
     <selections>
@@ -36,7 +71,41 @@
   <report>
     <name>CIPreliminaryQuestionnaire</name>
     <selections>
-      <def><name>CIPreliminaryQuestionnaire</name></def>
+      <and>
+        <selections>
+          <def><name>CIPreliminaryQuestionnaire</name></def>
+          <namePattern>
+            <pattern>.*comment$</pattern>
+            <exclude>true</exclude>
+          </namePattern>
+          <namePattern>
+            <pattern>.*active$</pattern>
+            <exclude>true</exclude>
+          </namePattern>
+        </selections>
+      </and>
+    </selections>
+  </report>
+  <report>
+    <name>CIPreliminaryQuestionnaireLog</name>
+    <selections>
+      <and>
+        <selections>
+          <def>
+            <name>CIPreliminaryQuestionnaire</name>
+          </def>
+          <or>
+            <selections>          
+              <namePattern>
+                <pattern>.*comment$</pattern>
+              </namePattern>
+              <namePattern>
+                <pattern>.*active$</pattern>
+              </namePattern>
+            </selections>
+          </or>
+        </selections>
+      </and>
     </selections>
   </report>
   <report>
@@ -46,27 +115,95 @@
     </selections>
   </report>
   <report>
-    <name>GripStrenght</name>
+    <name>GripStrength</name>
     <selections>
-      <def><name>GripStrenght</name></def>
+      <def><name>GripStrength</name></def>
     </selections>
   </report>
   <report>
     <name>HealthQuestionnaireNurse</name>
     <selections>
-      <def><name>HealthQuestionnaireNurse</name></def>
+      <and>
+        <selections>
+          <def><name>HealthQuestionnaireNurse</name></def>
+          <namePattern>
+            <pattern>.*comment$</pattern>
+            <exclude>true</exclude>
+          </namePattern>
+          <namePattern>
+            <pattern>.*active$</pattern>
+            <exclude>true</exclude>
+          </namePattern>
+        </selections>
+      </and>
+    </selections>
+  </report>
+  <report>
+    <name>HealthQuestionnaireNurseLog</name>
+    <selections>
+      <and>
+        <selections>
+          <def>
+            <name>HealthQuestionnaireNurse</name>
+          </def>
+          <or>
+            <selections>          
+              <namePattern>
+                <pattern>.*comment$</pattern>
+              </namePattern>
+              <namePattern>
+                <pattern>.*active$</pattern>
+              </namePattern>
+            </selections>
+          </or>
+        </selections>
+      </and>
+    </selections>
+  </report>
+  <report>
+    <name>HealthQuestionnaireTouchScreenLog</name>
+    <selections>
+      <and>
+        <selections>
+          <def>
+            <name>HealthQuestionnaireTouchScreen</name>
+          </def>
+          <or>
+            <selections>          
+              <namePattern>
+                <pattern>.*comment$</pattern>
+              </namePattern>
+              <namePattern>
+                <pattern>.*active$</pattern>
+              </namePattern>
+            </selections>
+          </or>
+        </selections>
+      </and>
     </selections>
   </report>
   <report>
     <name>HealthQuestionnaireTouchScreen</name>
     <selections>
-      <def><name>HealthQuestionnaireTouchScreen</name></def>
+      <and>
+        <selections>
+          <def><name>HealthQuestionnaireTouchScreen</name></def>
+          <namePattern>
+            <pattern>.*comment$</pattern>
+            <exclude>true</exclude>
+          </namePattern>
+          <namePattern>
+            <pattern>.*active$</pattern>
+            <exclude>true</exclude>
+          </namePattern>
+        </selections>
+      </and>
     </selections>
   </report>
   <report>
-    <name>Impedence418</name>
+    <name>Impedance418</name>
     <selections>
-      <def><name>Impedence418</name></def>
+      <def><name>Impedance418</name></def>
     </selections>
   </report>
   <report>
