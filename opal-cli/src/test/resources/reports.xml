@@ -138,10 +138,6 @@
             <pattern>^TIMESTAMP</pattern>
             <exclude>true</exclude>
           </namePattern>
-          <namePattern>
-            <pattern>\.TIMESTAMP\.</pattern>
-            <exclude>false</exclude>
-          </namePattern>
         </selections>
       </and>
     </selections>
@@ -161,6 +157,9 @@
               </namePattern>
               <namePattern>
                 <pattern>.*active$</pattern>
+              </namePattern>
+              <namePattern>
+                <pattern>.*TIMESTAMP.TIMESTAMP_.*</pattern>
               </namePattern>
             </selections>
           </or>
@@ -184,6 +183,9 @@
               <namePattern>
                 <pattern>.*active$</pattern>
               </namePattern>
+              <namePattern>
+                <pattern>.*TIMESTAMP.TIMESTAMP_.*</pattern>
+              </namePattern>
             </selections>
           </or>
         </selections>
@@ -202,6 +204,10 @@
           </namePattern>
           <namePattern>
             <pattern>.*active$</pattern>
+            <exclude>true</exclude>
+          </namePattern>
+          <namePattern>
+            <pattern>^TIMESTAMP</pattern>
             <exclude>true</exclude>
           </namePattern>
         </selections>
