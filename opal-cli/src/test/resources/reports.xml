@@ -134,6 +134,14 @@
             <pattern>.*active$</pattern>
             <exclude>true</exclude>
           </namePattern>
+          <namePattern>
+            <pattern>^TIMESTAMP</pattern>
+            <exclude>true</exclude>
+          </namePattern>
+          <namePattern>
+            <pattern>\.TIMESTAMP\.</pattern>
+            <exclude>false</exclude>
+          </namePattern>
         </selections>
       </and>
     </selections>
