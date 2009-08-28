@@ -10,18 +10,32 @@
 package org.obiba.opal.cli.client.command;
 
 import org.obiba.opal.cli.client.command.options.VersionCommandOptions;
+import org.obiba.runtime.Version;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * Version command.
  */
-public class VersionCommand extends AbstractCommand<VersionCommandOptions> {
+public class VersionCommand extends AbstractContextLoadingCommand<VersionCommandOptions> {
   //
-  // AbstractCommand Methods
+  // Constants
   //
 
-  public void execute() {
-    // TODO: Get the version from opal-cli's POM.
-    System.out.println("version 0.1");
+  private static final String[] CONTEXT_PATHS = { // 
+  "classpath:/spring/opal-core/version.xml", //
+  };
+
+  //
+  // AbstractContextLoadingCommand Methods
+  //
+
+  public void executeWithContext() {
+    Version opalVersion = getBean("version");
+    System.out.println("version " + opalVersion);
   }
 
+  protected ConfigurableApplicationContext loadContext() {
+    return new ClassPathXmlApplicationContext(CONTEXT_PATHS);
+  }
 }
