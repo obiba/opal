@@ -18,7 +18,7 @@ import uk.co.flamingpenguin.jewel.cli.Option;
 @CommandLineInterface(application = "query")
 public interface QueryCommandOptions extends GlobalOptions {
 
-  @Option(shortName = "r", defaultValue = "data")
+  @Option(shortName = "r", defaultValue = "catalog")
   public String getRepository();
 
 }
