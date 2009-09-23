@@ -170,7 +170,22 @@ public class DataItemSetToSchemaChangeProcessor implements ItemStream, ItemProce
     column.setName("label");
     column.setType("varchar(2000)");
     schemaChange.addColumn(column);
+    
+    column = new ColumnConfig();
+    column.setName("dataType");
+    column.setType("varchar(255)");
+    schemaChange.addColumn(column);
 
+    column = new ColumnConfig();
+    column.setName("multiple");
+    column.setType("BOOLEAN");
+    schemaChange.addColumn(column);
+    
+    column = new ColumnConfig();
+    column.setName("repeatable");
+    column.setType("BOOLEAN");
+    schemaChange.addColumn(column);
+    
     return schemaChange;
   }
 
@@ -179,7 +194,7 @@ public class DataItemSetToSchemaChangeProcessor implements ItemStream, ItemProce
 
     for(DataItem dataItem : dataItemSet.getDataItems()) {
       InsertDataChange schemaChange = new InsertDataChange();
-      schemaChange.setTableName("variables");
+      schemaChange.setTableName(METADATA_TABLE_NAME);
       addRowForDataItem(schemaChange, dataItemSet, dataItem);
       composite.addChange(schemaChange);
     }
@@ -211,6 +226,21 @@ public class DataItemSetToSchemaChangeProcessor implements ItemStream, ItemProce
     column = new ColumnConfig();
     column.setName("label");
     column.setValue(dataItem.getRdfsLabel());
+    schemaChange.addColumn(column);
+    
+    column = new ColumnConfig();
+    column.setName("dataType");
+    column.setValue(dataItem.getDataType());
+    schemaChange.addColumn(column);
+    
+    column = new ColumnConfig();
+    column.setName("multiple");
+    column.setValueBoolean(dataItem.isMultiple());
+    schemaChange.addColumn(column);
+    
+    column = new ColumnConfig();
+    column.setName("repeatable");
+    column.setValueBoolean(dataItem.isRepeatable());
     schemaChange.addColumn(column);
   }
 

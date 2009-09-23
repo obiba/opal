@@ -87,9 +87,8 @@ public class OnyxCatalogueReader extends AbstractOnyxReader<Catalogue> {
 
     for(Attribute a : variable.getAttributes()) {
       Serializable s = a.getValue();
-      // TODO: maybe we should store the attribute's type (integer, decimal, etc.)
       Locale lc = a.getLocale();
-      opalDataItem.addAttribute(a.getKey(), s != null ? s.toString() : null, lc);
+      opalDataItem.addAttribute(a.getKey(), s, lc);
     }
 
     for(Variable child : variable.getRegularVariables()) {

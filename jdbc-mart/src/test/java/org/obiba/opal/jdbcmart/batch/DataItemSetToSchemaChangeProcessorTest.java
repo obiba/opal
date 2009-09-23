@@ -85,6 +85,8 @@ public class DataItemSetToSchemaChangeProcessorTest {
       EasyMock.expect(dataItem.getName()).andReturn("Item-" + code).anyTimes();
       EasyMock.expect(dataItem.getUnit()).andReturn("cm").anyTimes();
       EasyMock.expect(dataItem.getRdfsLabel()).andReturn("label").anyTimes();
+      EasyMock.expect(dataItem.isMultiple()).andReturn(false).anyTimes();
+      EasyMock.expect(dataItem.isRepeatable()).andReturn(false).anyTimes();
       EasyMock.expect(dataItem.getIdentifier()).andReturn(code + "").anyTimes();
       EasyMock.expect(dataItem.getDataType()).andReturn("INTEGER").anyTimes();
       EasyMock.replay(dataItem);

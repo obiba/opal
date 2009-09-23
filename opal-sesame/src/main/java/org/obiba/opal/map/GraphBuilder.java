@@ -9,7 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.map;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.GregorianCalendar;
 import java.util.Locale;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 
 import org.openrdf.model.Graph;
 import org.openrdf.model.Literal;
@@ -19,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * 
  */
 public class GraphBuilder {
 
@@ -53,8 +59,48 @@ public class GraphBuilder {
   }
 
   public GraphBuilder withLiteral(URI predicate, String value, Locale locale) {
+    return this.withLiteral(predicate, value, locale, "string");
+  }
+
+  public GraphBuilder withLiteral(URI predicate, String value, Locale locale, String type) {
     if(value == null) throw new IllegalArgumentException("Cannot add predicate '" + predicate + "': literal value cannot be null");
-    Literal literal = graph.getValueFactory().createLiteral(value, locale != null ? locale.getLanguage() : null);
+    Literal literal = null;
+    if(locale != null) {
+      // if it is localized, it is a string
+      literal = graph.getValueFactory().createLiteral(value, locale.toString());
+    } else if(type != null) {
+      if(type.equals("boolean")) {
+        literal = graph.getValueFactory().createLiteral(Boolean.parseBoolean(value));
+      } else if(type.equals("byte")) {
+        literal = graph.getValueFactory().createLiteral(Byte.parseByte(value));
+      } else if(type.equals("float")) {
+        literal = graph.getValueFactory().createLiteral(Float.parseFloat(value));
+      } else if(type.equals("double")) {
+        literal = graph.getValueFactory().createLiteral(Double.parseDouble(value));
+      } else if(type.equals("integer")) {
+        literal = graph.getValueFactory().createLiteral(Integer.parseInt(value));
+      } else if(type.equals("long")) {
+        literal = graph.getValueFactory().createLiteral(Long.parseLong(value));
+      } else if(type.equals("date")) {
+        try {
+          GregorianCalendar calendar = (GregorianCalendar) GregorianCalendar.getInstance();
+          calendar.setTime(SimpleDateFormat.getInstance().parse(value));
+          literal = graph.getValueFactory().createLiteral(DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar));
+        } catch(ParseException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        } catch(DatatypeConfigurationException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+      } else if(type.equals("string")) {
+        literal = graph.getValueFactory().createLiteral(value);
+      }
+    }
+
+    if(literal == null) {
+      literal = graph.getValueFactory().createLiteral(value);
+    }
     log.debug("adding statement {} {} {}", new Object[] { resource, predicate, literal });
     trackChange(graph.add(resource, predicate, literal));
     return this;

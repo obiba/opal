@@ -72,22 +72,13 @@ public class DataItem extends AbstractEntity {
   }
 
   public DataItemAttribute addAttribute(String name, Object value) {
-    return this.addAttribute(name, value != null ? value.toString() : null);
+    return this.addAttribute(name, value, null);
   }
 
-  public DataItemAttribute addAttribute(String name, boolean value) {
-    return this.addAttribute(name, Boolean.toString(value));
-  }
-
-  public DataItemAttribute addAttribute(String name, String value) {
-    DataItemAttribute va = new DataItemAttribute(this, name, value);
-    getAttributes().add(va);
-    return va;
-  }
-
-  public DataItemAttribute addAttribute(String name, String value, Locale lc) {
+  public DataItemAttribute addAttribute(String name, Object value, Locale lc) {
     DataItemAttribute va = new DataItemAttribute(this, name, value, lc);
     getAttributes().add(va);
     return va;
   }
+
 }

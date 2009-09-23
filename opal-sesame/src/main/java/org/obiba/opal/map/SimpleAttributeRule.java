@@ -15,7 +15,7 @@ import org.obiba.opal.core.domain.metadata.DataItemAttribute;
 import org.openrdf.model.URI;
 
 /**
- *
+ * 
  */
 public class SimpleAttributeRule implements AttributeRule {
 
@@ -24,7 +24,7 @@ public class SimpleAttributeRule implements AttributeRule {
   public void execute(GraphBuilder builder, DataItemAttribute attribute) {
     if(attribute.getValue() != null) {
       if(map.containsKey(attribute.getName())) {
-        builder.withLiteral(map.get(attribute.getName()), attribute.getValue(), attribute.getLocale());
+        builder.withLiteral(map.get(attribute.getName()), attribute.getValue(), attribute.getLocale(), attribute.getType());
       }
     }
   }

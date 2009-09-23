@@ -36,18 +36,28 @@ public class DataItemAttribute extends AbstractEntity {
   @Column(length = 10)
   private Locale locale;
 
+  @Column(length = 10)
+  private String type;
+
   public DataItemAttribute() {
   }
 
-  public DataItemAttribute(DataItem dataItem, String name, String value) {
+  public DataItemAttribute(DataItem dataItem, String name, Object value) {
     this(dataItem, name, value, null);
   }
 
-  public DataItemAttribute(DataItem dataItem, String name, String value, Locale locale) {
+  public DataItemAttribute(DataItem dataItem, String name, Object value, Locale locale) {
     this.dataItem = dataItem;
     this.name = name;
-    this.value = value;
     this.locale = locale;
+    if(value != null) {
+      this.value = value.toString();
+      this.type = value.getClass().getSimpleName().toLowerCase();
+      // case of anonymous classes
+      if(type.length() == 0) {
+        this.type = "string";
+      }
+    }
   }
 
   public DataItem getDataItem() {
@@ -64,5 +74,9 @@ public class DataItemAttribute extends AbstractEntity {
 
   public Locale getLocale() {
     return locale;
+  }
+
+  public String getType() {
+    return type;
   }
 }
