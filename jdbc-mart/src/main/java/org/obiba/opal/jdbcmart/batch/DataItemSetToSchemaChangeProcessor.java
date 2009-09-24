@@ -22,7 +22,10 @@ import liquibase.database.structure.DatabaseSnapshot;
 import liquibase.database.structure.Table;
 import liquibase.exception.JDBCException;
 
+import org.obiba.opal.elmo.concepts.CategoricalItem;
+import org.obiba.opal.elmo.concepts.Category;
 import org.obiba.opal.elmo.concepts.DataItem;
+import org.obiba.opal.elmo.concepts.MissingCategory;
 import org.obiba.opal.jdbcmart.batch.naming.DefaultColumnNamingStrategy;
 import org.obiba.opal.sesame.report.DataItemSet;
 import org.springframework.batch.item.ExecutionContext;
@@ -39,7 +42,9 @@ public class DataItemSetToSchemaChangeProcessor implements ItemStream, ItemProce
 
   private static final String OCCURRENCE_COLUMN_TYPE = "BIGINT";
 
-  private static final String METADATA_TABLE_NAME = "variables";
+  private static final String VARIABLES_METADATA_TABLE_NAME = "variables";
+
+  private static final String CATEGORIES_METADATA_TABLE_NAME = "categories";
 
   //
   // Instance Variables
@@ -109,13 +114,17 @@ public class DataItemSetToSchemaChangeProcessor implements ItemStream, ItemProce
     CompositeChange composite = new CompositeChange();
 
     // Create the metadata table if necessary
-    if(doesTableExist(METADATA_TABLE_NAME) == false) {
-      composite.addChange(doCreateMetaDataTableChange(dataItemSet));
+    if(doesTableExist(VARIABLES_METADATA_TABLE_NAME) == false) {
+      composite.addChange(doCreateVariablesMetaDataTableChange(dataItemSet));
+    }
+    if(doesTableExist(CATEGORIES_METADATA_TABLE_NAME) == false) {
+      composite.addChange(doCreateCategoriesMetaDataTableChange(dataItemSet));
     }
 
     if(doesTableExist(dataItemSet.getName()) == false) {
       // Insert metadata
-      composite.addChange(doInsertMetaDataTableChange(dataItemSet));
+      composite.addChange(doInsertVariablesMetaDataTableChange(dataItemSet));
+      composite.addChange(doInsertCategoriesMetaDataTableChange(dataItemSet));
       composite.addChange(doCreateTableChange(dataItemSet));
       composite.addChange(doCreateEntityIndex(dataItemSet));
     }
@@ -142,9 +151,9 @@ public class DataItemSetToSchemaChangeProcessor implements ItemStream, ItemProce
     }
   }
 
-  protected Change doCreateMetaDataTableChange(DataItemSet dataItemSet) {
+  protected Change doCreateVariablesMetaDataTableChange(DataItemSet dataItemSet) {
     CreateTableChange schemaChange = new CreateTableChange();
-    schemaChange.setTableName(METADATA_TABLE_NAME);
+    schemaChange.setTableName(VARIABLES_METADATA_TABLE_NAME);
 
     ColumnConfig column = new ColumnConfig();
     column.setName("report");
@@ -170,7 +179,7 @@ public class DataItemSetToSchemaChangeProcessor implements ItemStream, ItemProce
     column.setName("label");
     column.setType("varchar(2000)");
     schemaChange.addColumn(column);
-    
+
     column = new ColumnConfig();
     column.setName("dataType");
     column.setType("varchar(255)");
@@ -180,26 +189,117 @@ public class DataItemSetToSchemaChangeProcessor implements ItemStream, ItemProce
     column.setName("multiple");
     column.setType("BOOLEAN");
     schemaChange.addColumn(column);
-    
+
     column = new ColumnConfig();
     column.setName("repeatable");
     column.setType("BOOLEAN");
     schemaChange.addColumn(column);
-    
+
+    column = new ColumnConfig();
+    column.setName("categorical");
+    column.setType("BOOLEAN");
+    schemaChange.addColumn(column);
+
     return schemaChange;
   }
 
-  protected Change doInsertMetaDataTableChange(DataItemSet dataItemSet) {
+  protected Change doCreateCategoriesMetaDataTableChange(DataItemSet dataItemSet) {
+    CreateTableChange schemaChange = new CreateTableChange();
+    schemaChange.setTableName(CATEGORIES_METADATA_TABLE_NAME);
+
+    ColumnConfig column = new ColumnConfig();
+    column.setName("report");
+    column.setType("varchar(255)");
+    schemaChange.addColumn(column);
+
+    column = new ColumnConfig();
+    column.setName("variable");
+    column.setType("varchar(255)");
+    schemaChange.addColumn(column);
+
+    column = new ColumnConfig();
+    column.setName("name");
+    column.setType("varchar(255)");
+    schemaChange.addColumn(column);
+
+    column = new ColumnConfig();
+    column.setName("label");
+    column.setType("varchar(2000)");
+    schemaChange.addColumn(column);
+
+    column = new ColumnConfig();
+    column.setName("code");
+    column.setType("INT");
+    schemaChange.addColumn(column);
+
+    column = new ColumnConfig();
+    column.setName("missing");
+    column.setType("BOOLEAN");
+    schemaChange.addColumn(column);
+
+    return schemaChange;
+  }
+
+  protected Change doInsertVariablesMetaDataTableChange(DataItemSet dataItemSet) {
     CompositeChange composite = new CompositeChange();
 
     for(DataItem dataItem : dataItemSet.getDataItems()) {
       InsertDataChange schemaChange = new InsertDataChange();
-      schemaChange.setTableName(METADATA_TABLE_NAME);
+      schemaChange.setTableName(VARIABLES_METADATA_TABLE_NAME);
       addRowForDataItem(schemaChange, dataItemSet, dataItem);
       composite.addChange(schemaChange);
     }
 
     return composite;
+  }
+
+  protected Change doInsertCategoriesMetaDataTableChange(DataItemSet dataItemSet) {
+    CompositeChange composite = new CompositeChange();
+
+    for(DataItem dataItem : dataItemSet.getDataItems()) {
+      if(dataItem instanceof CategoricalItem) {
+        for(Category category : ((CategoricalItem) dataItem).getCategories()) {
+          InsertDataChange schemaChange = new InsertDataChange();
+          schemaChange.setTableName(CATEGORIES_METADATA_TABLE_NAME);
+          addRowForCategory(schemaChange, dataItemSet, (CategoricalItem) dataItem, category);
+          composite.addChange(schemaChange);
+        }
+      }
+    }
+
+    return composite;
+  }
+
+  protected void addRowForCategory(InsertDataChange schemaChange, DataItemSet set, CategoricalItem categoricalItem, Category category) {
+    ColumnConfig column = new ColumnConfig();
+    column.setName("report");
+    column.setValue(set.getName());
+    schemaChange.addColumn(column);
+
+    column = new ColumnConfig();
+    column.setName("variable");
+    column.setValue(columnNamingStrategy.getColumnName(categoricalItem));
+    schemaChange.addColumn(column);
+
+    column = new ColumnConfig();
+    column.setName("name");
+    column.setValue(category.getShortName());
+    schemaChange.addColumn(column);
+
+    column = new ColumnConfig();
+    column.setName("label");
+    column.setValue(category.getRdfsLabel());
+    schemaChange.addColumn(column);
+
+    column = new ColumnConfig();
+    column.setName("code");
+    column.setValueNumeric(category.getCode());
+    schemaChange.addColumn(column);
+
+    column = new ColumnConfig();
+    column.setName("missing");
+    column.setValueBoolean(category instanceof MissingCategory);
+    schemaChange.addColumn(column);
   }
 
   protected void addRowForDataItem(InsertDataChange schemaChange, DataItemSet set, DataItem dataItem) {
@@ -227,20 +327,25 @@ public class DataItemSetToSchemaChangeProcessor implements ItemStream, ItemProce
     column.setName("label");
     column.setValue(dataItem.getRdfsLabel());
     schemaChange.addColumn(column);
-    
+
     column = new ColumnConfig();
     column.setName("dataType");
     column.setValue(dataItem.getDataType());
     schemaChange.addColumn(column);
-    
+
     column = new ColumnConfig();
     column.setName("multiple");
     column.setValueBoolean(dataItem.isMultiple());
     schemaChange.addColumn(column);
-    
+
     column = new ColumnConfig();
     column.setName("repeatable");
     column.setValueBoolean(dataItem.isRepeatable());
+    schemaChange.addColumn(column);
+
+    column = new ColumnConfig();
+    column.setName("categorical");
+    column.setValueBoolean(dataItem instanceof CategoricalItem);
     schemaChange.addColumn(column);
   }
 

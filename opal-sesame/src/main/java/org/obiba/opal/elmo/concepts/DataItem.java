@@ -25,6 +25,11 @@ public interface DataItem extends Resource {
 
   public void setName(String name);
 
+  @rdf(Opal.NS + "shortName")
+  public String getShortName();
+
+  public void setShortName(String shortName);
+
   @rdf(Opal.NS + "dataEntryForm")
   @inverseOf(Opal.NS + "hasDataItem")
   public DataEntryForm getDataEntryForm();

@@ -52,10 +52,10 @@ public class DataItemAttribute extends AbstractEntity {
     this.locale = locale;
     if(value != null) {
       this.value = value.toString();
-      this.type = value.getClass().getSimpleName().toLowerCase();
+      this.type = value.getClass().getSimpleName();
       // case of anonymous classes
       if(type.length() == 0) {
-        this.type = "string";
+        this.type = "String";
       }
     }
   }

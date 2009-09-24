@@ -19,6 +19,16 @@ public interface Category extends Resource {
 
   public void setCategoricalItem();
 
+  @rdf(Opal.NS + "name")
+  public String getName();
+
+  public void setName(String name);
+
+  @rdf(Opal.NS + "shortName")
+  public String getShortName();
+
+  public void setShortName(String shortName);
+
   @rdf(Opal.NS + "code")
   public int getCode();
 

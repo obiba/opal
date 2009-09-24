@@ -69,19 +69,19 @@ public class GraphBuilder {
       // if it is localized, it is a string
       literal = graph.getValueFactory().createLiteral(value, locale.toString());
     } else if(type != null) {
-      if(type.equals("boolean")) {
+      if(type.equalsIgnoreCase("boolean")) {
         literal = graph.getValueFactory().createLiteral(Boolean.parseBoolean(value));
-      } else if(type.equals("byte")) {
+      } else if(type.equalsIgnoreCase("byte")) {
         literal = graph.getValueFactory().createLiteral(Byte.parseByte(value));
-      } else if(type.equals("float")) {
+      } else if(type.equalsIgnoreCase("float")) {
         literal = graph.getValueFactory().createLiteral(Float.parseFloat(value));
-      } else if(type.equals("double")) {
+      } else if(type.equalsIgnoreCase("double")) {
         literal = graph.getValueFactory().createLiteral(Double.parseDouble(value));
-      } else if(type.equals("integer")) {
+      } else if(type.equalsIgnoreCase("integer")) {
         literal = graph.getValueFactory().createLiteral(Integer.parseInt(value));
-      } else if(type.equals("long")) {
+      } else if(type.equalsIgnoreCase("long")) {
         literal = graph.getValueFactory().createLiteral(Long.parseLong(value));
-      } else if(type.equals("date")) {
+      } else if(type.equalsIgnoreCase("date")) {
         try {
           GregorianCalendar calendar = (GregorianCalendar) GregorianCalendar.getInstance();
           calendar.setTime(SimpleDateFormat.getInstance().parse(value));
@@ -93,7 +93,7 @@ public class GraphBuilder {
           // TODO Auto-generated catch block
           e.printStackTrace();
         }
-      } else if(type.equals("string")) {
+      } else if(type.equalsIgnoreCase("string")) {
         literal = graph.getValueFactory().createLiteral(value);
       }
     }
