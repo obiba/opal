@@ -29,6 +29,8 @@ public class SchemaChangeWriter extends AbstractItemStreamItemWriter<Change> {
 
   private DataSource dataSource;
 
+  private Connection connection;
+
   private Database database;
 
   private List<SqlVisitor> sqlVisitors;
@@ -47,8 +49,6 @@ public class SchemaChangeWriter extends AbstractItemStreamItemWriter<Change> {
 
   @Override
   public void open(ExecutionContext executionContext) throws ItemStreamException {
-    Connection connection = null;
-
     // Get a connection to the dataSource.
     try {
       connection = dataSource.getConnection();
@@ -67,13 +67,15 @@ public class SchemaChangeWriter extends AbstractItemStreamItemWriter<Change> {
 
   @Override
   public void close() throws ItemStreamException {
-    // Close the database connection.
-    try {
-      if(database != null) {
-        database.close();
+    // Close the connection to the dataSource.
+    if(connection != null) {
+      try {
+        if(!connection.isClosed()) {
+          connection.close();
+        }
+      } catch(SQLException ex) {
+        throw new ItemStreamException("Could not close connection to the dataSource", ex);
       }
-    } catch(JDBCException ex) {
-      throw new ItemStreamException("Could not close the database connection", ex);
     }
   }
 
