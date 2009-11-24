@@ -288,7 +288,7 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
    * @param entryName The name of the entry.
    * @return True if the entryName is a Participant .xml datafile.
    */
-  private boolean isParticipantEntry(String entryName) {
+  protected boolean isParticipantEntry(String entryName) {
     return (entryName != null && entryName.endsWith(PARTICIPANT_DATA_EXTENSION) && !entryName.equalsIgnoreCase(VARIABLES_FILE) && !entryName.equalsIgnoreCase(ENCRYPTION_FILE));
   }
 
@@ -297,5 +297,13 @@ public class DefaultOnyxImportServiceImpl implements OnyxImportService {
     for(VariableData vd : vds.getVariableDatas()) {
       variableDataVisitor.visit(vd);
     }
+  }
+
+  public IOnyxDataInputStrategy getDataInputStrategy() {
+    return dataInputStrategy;
+  }
+
+  public VariableVisitor getVariableVisitor() {
+    return variableVisitor;
   }
 }
