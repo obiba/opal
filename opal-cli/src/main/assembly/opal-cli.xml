@@ -37,9 +37,15 @@
     <!-- Copy dependency jar files to 'lib' -->
     <dependencySet>
       <outputDirectory>lib</outputDirectory>
-      <includes>
-        <include>*:jar:*</include>
-      </includes>
+      <scope>runtime</scope>      
     </dependencySet>
+    <!-- Copy spring-test.jar to 'lib' -->
+    <dependencySet>
+      <scope>test</scope>
+      <outputDirectory>lib</outputDirectory>
+      <includes>
+        <include>org.springframework:spring-test</include>
+      </includes>      
+    </dependencySet>    
   </dependencySets>
 </assembly>

@@ -62,7 +62,14 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
-      <scope>runtime</scope>            
+      <scope>runtime</scope>
+      <version>${spring.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     
     <!-- Command-line argument parser -->
