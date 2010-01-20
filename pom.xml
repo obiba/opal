@@ -37,7 +37,14 @@
         <artifactId>obiba-core</artifactId>
         <version>${obiba.commons.version}</version>
       </dependency>
-
+    
+      <!-- Magma dependencies -->
+      <dependency>
+        <groupId>org.obiba.magma</groupId>
+        <artifactId>magma-api</artifactId>
+        <version>${magma.version}</version>
+      </dependency>
+    
       <!-- Onyx dependencies -->
       <dependency>
         <groupId>org.obiba.onyx</groupId>
@@ -551,6 +558,7 @@
 
   <properties>
     <obiba.commons.version>1.1-SNAPSHOT</obiba.commons.version>
+    <magma.version>1.0-SNAPSHOT</magma.version>
     <spring.version>2.5.6</spring.version>
     <spring-batch.version>2.0.2.RELEASE</spring-batch.version>
     <slf4j.version>1.5.6</slf4j.version>
