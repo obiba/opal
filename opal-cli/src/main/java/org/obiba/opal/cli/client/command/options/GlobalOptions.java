@@ -25,4 +25,15 @@ public interface GlobalOptions {
   public String getOutput();
 
   public boolean isOutput();
+
+  @Option(shortName = "u", description = "Username to use when connecting to Opal.")
+  public String getUsername();
+
+  public boolean isUsername();
+
+  @Option(shortName = "p", description = "Password to use when connecting to Opal.")
+  public String getPassword();
+
+  public boolean isPassword();
+
 }
