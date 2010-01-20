@@ -11,21 +11,46 @@ package org.obiba.opal.core.xstream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.InputStream;
 import java.util.Set;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngineExtension;
+import org.obiba.magma.datasource.hibernate.SessionFactoryProvider;
+import org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory;
+import org.obiba.magma.datasource.hibernate.support.SpringBeanSessionFactoryProvider;
 import org.obiba.magma.support.MagmaEngineFactory;
 import org.obiba.opal.core.cfg.OpalConfiguration;
-import org.springframework.context.support.StaticApplicationContext;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * Unit tests for XStreamOpalConfigurationFactory.
  */
 public class XStreamOpalConfigurationFactoryTest {
+  //
+  // Instance Variables
+  //
+
+  private ApplicationContext applicationContext;
+
+  //
+  // Fixture Methods (setUp / tearDown)
+  //
+
+  @Before
+  public void setUp() throws Exception {
+    applicationContext = new ClassPathXmlApplicationContext("test-spring-context.xml");
+  }
+
+  //
+  // Test Methods
+  //
 
   /**
    * Test method for
@@ -33,18 +58,19 @@ public class XStreamOpalConfigurationFactoryTest {
    * .
    */
   @Test
-  public void testNewConfiguration() {
+  public void testFromXML() {
     OpalConfiguration opalConfiguration = null;
 
     // Deserialize an OpalConfiguration.
     InputStream serializedConfiguration = ClassLoader.getSystemResourceAsStream("XStreamOpalConfigurationFactoryTest/opal-config.xml");
-    opalConfiguration = XStreamOpalConfigurationFactory.fromXML(new StaticApplicationContext(), serializedConfiguration);
+    opalConfiguration = XStreamOpalConfigurationFactory.fromXML(applicationContext, serializedConfiguration);
 
     // Verify OpalConfiguration was deserialized (not null).
     assertNotNull(opalConfiguration);
 
     // Verify configured engine class.
     MagmaEngineFactory magmaEngineFactory = opalConfiguration.getMagmaEngineFactory();
+    assertNotNull(magmaEngineFactory);
     assertEquals("org.obiba.magma.MagmaEngine", magmaEngineFactory.getEngineClass());
 
     // Verify configured engine extensions.
@@ -52,6 +78,19 @@ public class XStreamOpalConfigurationFactoryTest {
     if(!containsEngineExtension(magmaEngineFactory.extensions(), "magma-js") || !containsEngineExtension(magmaEngineFactory.extensions(), "magma-xstream")) {
       fail("Missing engine extensions");
     }
+
+    // Verify configured datasource factories.
+    assertEquals(1, magmaEngineFactory.factories().size());
+    DatasourceFactory<?> datasourceFactory = magmaEngineFactory.factories().iterator().next();
+    assertTrue(datasourceFactory instanceof HibernateDatasourceFactory);
+    HibernateDatasourceFactory hibernateDatasourceFactory = (HibernateDatasourceFactory) datasourceFactory;
+    SessionFactoryProvider sessionFactoryProvider = hibernateDatasourceFactory.getSessionFactoryProvider();
+    assertNotNull(sessionFactoryProvider);
+    assertEquals("my-datasource", hibernateDatasourceFactory.getDatasourceName());
+    assertTrue(sessionFactoryProvider instanceof SpringBeanSessionFactoryProvider);
+    SpringBeanSessionFactoryProvider springBeanSessionFactoryProvider = (SpringBeanSessionFactoryProvider) sessionFactoryProvider;
+    assertNotNull(springBeanSessionFactoryProvider.getBeanFactory());
+    assertEquals("hibernateSessionFactoryBeanName", springBeanSessionFactoryProvider.getBeanName());
   }
 
   //

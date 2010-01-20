@@ -57,6 +57,12 @@
         <version>${magma.version}</version>
       </dependency>
       
+      <dependency>
+        <groupId>org.obiba.magma</groupId>
+        <artifactId>magma-datasource-hibernate</artifactId>
+        <version>${magma.version}</version>
+      </dependency>
+      
       <!-- Onyx dependencies -->
       <dependency>
         <groupId>org.obiba.onyx</groupId>
