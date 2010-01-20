@@ -1,0 +1,10 @@
+<org.obiba.opal.core.cfg.OpalConfiguration>
+  <magmaEngineFactory>
+    <engineClass>org.obiba.magma.MagmaEngine</engineClass>
+
+    <extensions>
+      <org.obiba.magma.js.MagmaJsExtension />
+      <org.obiba.magma.xstream.MagmaXStreamExtension />
+    </extensions>
+  </magmaEngineFactory>
+</org.obiba.opal.core.cfg.OpalConfiguration>
