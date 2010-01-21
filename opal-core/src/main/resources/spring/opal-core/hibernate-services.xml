@@ -26,4 +26,5 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <property name="sessionFactory" ref="opalSessionFactory"/>
   </bean>
 
+  <bean id="importService" class="org.obiba.opal.core.service.impl.DefaultImportService" />
 </beans>

@@ -16,6 +16,7 @@ import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.springframework.context.ApplicationContext;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 
 /**
  * XStream-based factory for creating (deserializing) an {@link OpalConfiguration}.
@@ -26,7 +27,7 @@ public class XStreamOpalConfigurationFactory {
   //
 
   public static OpalConfiguration fromXML(ApplicationContext applicationContext, InputStream serializedConfiguration) {
-    XStream xstream = new XStream(new InjectingReflectionProviderWrapper((new XStream()).getReflectionProvider(), applicationContext));
+    XStream xstream = new XStream(new InjectingReflectionProviderWrapper(new PureJavaReflectionProvider(), applicationContext));
 
     OpalConfiguration opalConfiguration = (OpalConfiguration) xstream.fromXML(serializedConfiguration);
 
