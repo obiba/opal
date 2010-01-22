@@ -14,6 +14,6 @@ import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
  * 
  */
 @CommandLineInterface(application = "import")
-public interface ImportCommandOptions extends DatasourceOption, FileListOption, HelpOption {
+public interface ImportCommandOptions extends DatasourceOption, FileListOption, HelpOption, AuthenticationOptions {
   // inherited options only
 }

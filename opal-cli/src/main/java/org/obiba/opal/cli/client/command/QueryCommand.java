@@ -59,6 +59,7 @@ public class QueryCommand extends AbstractContextLoadingCommand<QueryCommandOpti
 
   @Override
   public void executeWithContext() {
+    new UserAuthentication(options).authenticate();
     // Ensure that options have been set.
     if(options == null) {
       throw new IllegalStateException("Options not set (setOptions must be called before calling execute)");

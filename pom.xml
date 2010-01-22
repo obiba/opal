@@ -478,6 +478,13 @@
         <version>${liquibase.version}</version>
       </dependency>
       
+      <!-- Shiro dependencies -->
+      <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-core</artifactId>
+        <version>${shiro.version}</version>
+      </dependency>
+      
     </dependencies>
   </dependencyManagement>
 
@@ -605,6 +612,7 @@
     <sesame.version>2.2.4</sesame.version>
     <elmo.version>1.5</elmo.version>
     <liquibase.version>1.9.4</liquibase.version>
+    <shiro.version>1.0-incubating-r901735</shiro.version>
   </properties>
 
   <reporting>

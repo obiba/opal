@@ -9,14 +9,13 @@ import uk.co.flamingpenguin.jewel.cli.Unparsed;
 /**
  * This interface declares the options that may be used with the decrypt command.
  * 
- * Note that the <code>getFiles</code> method is used to access unparsed file arguments at the end of the command
- * line.
+ * Note that the <code>getFiles</code> method is used to access unparsed file arguments at the end of the command line.
  * 
  * @author cag-dspathis
  * 
  */
 @CommandLineInterface(application = "decrypt")
-public interface DecryptCommandOptions extends GlobalOptions {
+public interface DecryptCommandOptions extends GlobalOptions, AuthenticationOptions {
 
   @Unparsed(name = "FILE")
   public List<File> getFiles();

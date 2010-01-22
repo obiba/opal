@@ -48,6 +48,7 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
   //
 
   public void execute() {
+    new UserAuthentication(options).authenticate();
     // Ensure that options have been set.
     if(options == null) {
       throw new IllegalStateException("Options not set (setOptions must be called before calling execute)");

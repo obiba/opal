@@ -42,6 +42,8 @@ public class UpgradeCommand extends AbstractContextLoadingCommand<UpgradeCommand
   //
 
   public void executeWithContext() {
+    new UserAuthentication(options).authenticate();
+
     String runtimeDatabase = getRuntimeDatabase();
 
     if(supportsDatabase(runtimeDatabase)) {

@@ -28,6 +28,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
 
   @Override
   public void executeWithContext() {
+    new UserAuthentication(options).authenticate();
     if(options.isFiles()) {
       List<File> filesToImport = resolveFiles();
       if(!filesToImport.isEmpty()) {
