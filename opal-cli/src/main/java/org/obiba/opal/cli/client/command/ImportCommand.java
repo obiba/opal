@@ -17,12 +17,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.obiba.magma.NoSuchDatasourceException;
-import org.obiba.magma.support.MagmaEngineFactory;
 import org.obiba.opal.cli.client.command.options.ImportCommandOptions;
-import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.service.ImportService;
 
-public class ImportCommand extends AbstractContextLoadingCommand<ImportCommandOptions> {
+public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCommandOptions> {
 
   //
   // AbstractContextLoadingCommand Methods
@@ -31,7 +29,16 @@ public class ImportCommand extends AbstractContextLoadingCommand<ImportCommandOp
   @Override
   public void executeWithContext() {
     if(options.isFiles()) {
-      importFiles();
+      List<File> filesToImport = resolveFiles();
+      if(!filesToImport.isEmpty()) {
+        try {
+          importFiles(filesToImport);
+        } catch(Exception ex) {
+          System.err.println(ex.getMessage());
+        }
+      } else {
+        System.err.println("No files found");
+      }
     } else {
       System.err.println("No input (specify one or more directories of files to import");
     }
@@ -41,40 +48,33 @@ public class ImportCommand extends AbstractContextLoadingCommand<ImportCommandOp
   // Methods
   //
 
-  private void importFiles() {
-    List<File> filesToImport = resolveFiles();
+  private void importFiles(List<File> filesToImport) {
+    initRuntime();
 
-    if(!filesToImport.isEmpty()) {
-      OpalConfiguration opalConfiguration = getBean("opalConfiguration");
-      ImportService importService = getBean("importService");
+    ImportService importService = getBean("importService");
 
-      String destination = options.getDatasource();
+    String destination = options.getDatasource();
 
-      for(File file : filesToImport) {
-        System.out.println("Importing " + file.getPath() + "...");
+    System.out.println("Importing files");
 
-        try {
-          // Instantiate a MagmaEngine using the configured factory.
-          MagmaEngineFactory magmaEngineFactory = opalConfiguration.getMagmaEngineFactory();
-          magmaEngineFactory.create();
+    for(File file : filesToImport) {
+      System.out.println("\t" + file.getPath());
 
-          importService.importData(destination, file);
-        } catch(NoSuchDatasourceException ex) {
-          // Fatal exception - break out of here.
-          System.err.println(ex.getMessage());
-          break;
-        } catch(IllegalArgumentException ex) {
-          // Shouldn't never get here -- method resolveFiles() returns only valid files.
-          System.err.println(ex.getMessage());
-          continue;
-        } catch(IOException ex) {
-          // Possibly a non-fatal exception - report an error and continue with the next file.
-          System.err.println("I/O error: " + ex.getMessage());
-          continue;
-        }
+      try {
+        importService.importData(destination, file);
+      } catch(NoSuchDatasourceException ex) {
+        // Fatal exception - break out of here.
+        System.err.println(ex.getMessage());
+        break;
+      } catch(IllegalArgumentException ex) {
+        // Should never get here -- method resolveFiles() returns only valid files.
+        System.err.println(ex.getMessage());
+        continue;
+      } catch(IOException ex) {
+        // Possibly a non-fatal exception - report an error and continue with the next file.
+        System.err.println("I/O error: " + ex.getMessage());
+        continue;
       }
-    } else {
-      System.out.println("No files found");
     }
   }
 
