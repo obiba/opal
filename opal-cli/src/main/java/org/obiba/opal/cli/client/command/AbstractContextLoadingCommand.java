@@ -24,7 +24,7 @@ public abstract class AbstractContextLoadingCommand<T> extends AbstractCommand<T
   public void execute() {
     try {
       context = loadContext();
-      executeWithContext();
+      afterContextLoaded();
     } finally {
       if(context != null) {
         context.close();
@@ -32,8 +32,13 @@ public abstract class AbstractContextLoadingCommand<T> extends AbstractCommand<T
     }
   }
 
-  public abstract void executeWithContext();
+  protected void afterContextLoaded() {
+    executeWithContext();
+  }
 
+  protected abstract void executeWithContext();
+
+  @SuppressWarnings("unchecked")
   protected <E> E getBean(String name) {
     return (E) context.getBean(name);
   }

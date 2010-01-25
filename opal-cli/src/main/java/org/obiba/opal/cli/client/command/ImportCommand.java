@@ -41,7 +41,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
         System.err.println("No files found");
       }
     } else {
-      System.err.println("No input (specify one or more directories of files to import");
+      System.err.println("No input (specify one or more directories of files to import)");
     }
   }
 
@@ -50,8 +50,6 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   //
 
   private void importFiles(List<File> filesToImport) {
-    initRuntime();
-
     ImportService importService = getBean("importService");
 
     String destination = options.getDatasource();

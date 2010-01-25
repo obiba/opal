@@ -21,7 +21,6 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.Map;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -29,10 +28,12 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.obiba.magma.crypt.KeyPairProvider;
+import org.obiba.magma.crypt.support.CacheablePasswordCallback;
+import org.obiba.magma.crypt.support.CachingCallbackHandler;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 
-public class OpalKeyStore implements IKeyProvider, KeyPairProvider, InitializingBean {
+public class OpalKeyStore implements KeyPairProvider, InitializingBean {
   //
   // Instance Variables
   //
@@ -44,19 +45,8 @@ public class OpalKeyStore implements IKeyProvider, KeyPairProvider, Initializing
   private CallbackHandler callbackHandler;
 
   //
-  // InitializingBean Methods
-
-  public void afterPropertiesSet() {
-    init(null);
-  }
-
+  // KeyPairProvider Methods
   //
-  // IKeyProvider Methods
-  //
-
-  public void init(Map<String, String> keyProviderArgs) {
-    loadKeyStore();
-  }
 
   public KeyPair getKeyPair(String alias) {
     if(keyStore == null) {
@@ -130,6 +120,14 @@ public class OpalKeyStore implements IKeyProvider, KeyPairProvider, Initializing
     }
 
     return keyPair;
+  }
+
+  //
+  // InitializingBean Methods
+  //
+
+  public void afterPropertiesSet() {
+    loadKeyStore();
   }
 
   //

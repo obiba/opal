@@ -16,16 +16,26 @@ import org.obiba.opal.core.runtime.OpalRuntime;
  */
 public abstract class AbstractOpalRuntimeDependentCommand<T> extends AbstractContextLoadingCommand<T> {
   //
+  // AbstractContextLoadingCommand Methods
+  //
+
+  /**
+   * Overrides the <code>afterContextLoaded</code> method to first initialize the Opal runtime environment.
+   */
+  @Override
+  protected void afterContextLoaded() {
+    initRuntime();
+    super.afterContextLoaded();
+  }
+
+  //
   // Methods
   //
 
   /**
    * Initializes the {@link OpalRuntime} bean in the context.
-   * 
-   * Subclasses should call this method after the context has been loaded (i.e., after <code>execute(),
-   * typically during somewhere within <code>executeWithContext</code>).
    */
-  public void initRuntime() {
+  protected void initRuntime() {
     try {
       OpalRuntime opalRuntime = getBean("opalRuntime");
       opalRuntime.init();
