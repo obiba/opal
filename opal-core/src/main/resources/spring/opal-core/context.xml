@@ -2,8 +2,6 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
-  <import resource="classpath:/META-INF/opal/opal-datasource-core.xml" />
-
   <import resource="crypt.xml" />
 
   <bean id="jotm" class="org.springframework.transaction.jta.JotmFactoryBean" />

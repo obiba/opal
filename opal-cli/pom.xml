@@ -22,47 +22,31 @@
       <version>${project.version}</version>
     </dependency>
 
+    <!-- Required to get AnnotatedBeanFinderFactoryBean -->
     <dependency>
-      <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-datasource</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.obiba.onyx</groupId>
+      <artifactId>onyx-core</artifactId>
+      <version>1.6.0</version>
+      <scope>runtime</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-onyx-datasource</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-sesame</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-report</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.obiba.opal</groupId>
-      <artifactId>jdbc-mart</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <scope>runtime</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.springframework.batch</groupId>
+      <artifactId>spring-batch-core</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
     <!-- Some Upgrade Manager code requires runtime scope for spring-test. -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
-      <scope>runtime</scope>
+      <scope>compile</scope>
       <version>${spring.version}</version>
       <exclusions>
         <exclusion>
@@ -71,33 +55,17 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+      <scope>compile</scope>
+    </dependency>
     
     <!-- Command-line argument parser -->
     <dependency>
       <groupId>uk.co.flamingpenguin.jewelcli</groupId>
       <artifactId>jewelcli</artifactId>
       <version>${jewelcli.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.openrdf.sesame</groupId>
-      <artifactId>sesame-queryresultio-sparqlxml</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.openrdf.sesame</groupId>
-      <artifactId>sesame-rio-turtle</artifactId>
-      <version>${sesame.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.openrdf.sesame</groupId>
-      <artifactId>sesame-rio-n3</artifactId>
-      <version>${sesame.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.openrdf.sesame</groupId>
-      <artifactId>sesame-rio-rdfxml</artifactId>
-      <version>${sesame.version}</version>
     </dependency>
 
     <dependency>
@@ -124,6 +92,11 @@
       <artifactId>xapool</artifactId>
       <version>1.5.0</version>
       <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-dbcp</groupId>
+      <artifactId>commons-dbcp</artifactId>
     </dependency>
     
     <dependency>

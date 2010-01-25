@@ -22,11 +22,6 @@
   <modules>
     <module>opal-core</module>
     <module>opal-cli</module>
-    <module>opal-onyx-datasource</module>
-    <module>opal-datasource</module>
-    <module>opal-sesame</module>
-    <module>opal-report</module>
-    <module>jdbc-mart</module>
   </modules>
 
   <dependencyManagement>
@@ -37,73 +32,42 @@
         <artifactId>obiba-core</artifactId>
         <version>${obiba.commons.version}</version>
       </dependency>
-    
+
       <!-- Magma dependencies -->
       <dependency>
         <groupId>org.obiba.magma</groupId>
         <artifactId>magma-api</artifactId>
         <version>${magma.version}</version>
       </dependency>
-    
+
       <dependency>
         <groupId>org.obiba.magma</groupId>
         <artifactId>magma-js</artifactId>
         <version>${magma.version}</version>
       </dependency>
-      
+
       <dependency>
         <groupId>org.obiba.magma</groupId>
         <artifactId>magma-xstream</artifactId>
         <version>${magma.version}</version>
       </dependency>
-      
+
       <dependency>
         <groupId>org.obiba.magma</groupId>
         <artifactId>magma-datasource-fs</artifactId>
         <version>${magma.version}</version>
       </dependency>
-    
+
       <dependency>
         <groupId>org.obiba.magma</groupId>
         <artifactId>magma-datasource-hibernate</artifactId>
         <version>${magma.version}</version>
       </dependency>
-      
+
       <dependency>
         <groupId>org.obiba.magma</groupId>
         <artifactId>magma-crypt</artifactId>
         <version>${magma.version}</version>
-      </dependency>
-      
-      <!-- Onyx dependencies -->
-      <dependency>
-        <groupId>org.obiba.onyx</groupId>
-        <artifactId>onyx-util</artifactId>
-        <version>${onyx.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.obiba.onyx</groupId>
-        <artifactId>onyx-core</artifactId>
-        <version>${onyx.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.apache.wicket</groupId>
-            <artifactId>wicket</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.apache.wicket</groupId>
-            <artifactId>wicket-extensions</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.apache.wicket</groupId>
-            <artifactId>wicket-spring</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.apache.wicket</groupId>
-            <artifactId>wicket-spring-annot</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <!-- Definition of all Spring modules -->
@@ -223,12 +187,24 @@
         <groupId>org.springframework.batch</groupId>
         <artifactId>spring-batch-core</artifactId>
         <version>${spring-batch.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.springframework.batch</groupId>
         <artifactId>spring-batch-test</artifactId>
         <version>${spring-batch.version}</version>
         <scope>test</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <!-- Hibernate Dependencies -->
@@ -334,7 +310,10 @@
         </exclusions>
       </dependency>
 
-      <!-- JOTM requires the Java Spec APIs; these are missing due to the exclusions declared above for the JOTM dependency. -->
+      <!--
+        JOTM requires the Java Spec APIs; these are missing due to the exclusions declared above for the JOTM
+        dependency.
+      -->
       <dependency>
         <groupId>org.ow2.spec.ee</groupId>
         <artifactId>ow2-connector-1.5-spec</artifactId>
@@ -441,8 +420,9 @@
         <artifactId>slf4j-log4j12</artifactId>
         <version>${slf4j.version}</version>
         <!--
-          Previously, scope was "test" here and overridden as "runtime" in the opal-cli child POM. But as of 2009/05/16, Maven seems to be behaving differently:
-          The scope is not being overridden as before, consequently this dependency is missing in opal-cli at runtime.
+          Previously, scope was "test" here and overridden as "runtime" in the opal-cli child POM. But as of 2009/05/16,
+          Maven seems to be behaving differently: The scope is not being overridden as before, consequently this
+          dependency is missing in opal-cli at runtime.
         -->
         <scope>runtime</scope>
       </dependency>
@@ -483,14 +463,14 @@
         <artifactId>liquibase-core</artifactId>
         <version>${liquibase.version}</version>
       </dependency>
-      
+
       <!-- Shiro dependencies -->
       <dependency>
         <groupId>org.apache.shiro</groupId>
         <artifactId>shiro-core</artifactId>
         <version>${shiro.version}</version>
       </dependency>
-      
+
     </dependencies>
   </dependencyManagement>
 
@@ -594,27 +574,28 @@
   </scm>
 
   <properties>
+    <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+
     <obiba.commons.version>1.1-SNAPSHOT</obiba.commons.version>
     <magma.version>1.0-SNAPSHOT</magma.version>
     <spring.version>2.5.6</spring.version>
-    <spring-batch.version>2.0.2.RELEASE</spring-batch.version>
-    <slf4j.version>1.5.6</slf4j.version>
+    <spring-batch.version>2.0.3.RELEASE</spring-batch.version>
+    <slf4j.version>1.5.8</slf4j.version>
     <jta.version>1.0.1B</jta.version>
     <jpa.version>1.0</jpa.version>
     <hsqldb.version>1.8.0.7</hsqldb.version>
     <dbunit.version>2.2.2</dbunit.version>
-    <junit.version>4.4</junit.version>
+    <junit.version>4.7</junit.version>
     <easymock.version>2.4</easymock.version>
     <mysql-connector-java.version>5.1.6</mysql-connector-java.version>
     <commons-dbcp.version>1.2.2</commons-dbcp.version>
-    <xstream.version>1.3</xstream.version>
+    <xstream.version>1.3.1</xstream.version>
     <hibernate-search.version>3.0.1.GA</hibernate-search.version>
     <hibernate-annotations.version>3.3.1.GA</hibernate-annotations.version>
     <hibernate.version>3.2.6.ga</hibernate.version>
     <hibernate-commons-annotations.version>3.3.0.ga</hibernate-commons-annotations.version>
     <jotm.version>2.1.4</jotm.version>
     <java.spec.version>1.0.2</java.spec.version>
-    <onyx.version>1.6-SNAPSHOT</onyx.version>
     <sesame.version>2.2.4</sesame.version>
     <elmo.version>1.5</elmo.version>
     <liquibase.version>1.9.4</liquibase.version>
@@ -658,8 +639,9 @@
   <profiles>
     <profile>
       <!--
-        A profile for the builds NOT performed by the continuous integration server. This profile is active by default, which means that it will be deactivated
-        if any other profile is specifically activated (ie: using mvn -P build-id).
+        A profile for the builds NOT performed by the continuous integration server. This profile is active by default,
+        which means that it will be deactivated if any other profile is specifically activated (ie: using mvn -P
+        build-id).
       -->
       <activation>
         <activeByDefault>true</activeByDefault>

@@ -13,13 +13,11 @@ import org.obiba.opal.cli.client.AbstractCliClient;
 import org.obiba.opal.cli.client.command.ExtractCommand;
 import org.obiba.opal.cli.client.command.HelpCommand;
 import org.obiba.opal.cli.client.command.ImportCommand;
-import org.obiba.opal.cli.client.command.QueryCommand;
 import org.obiba.opal.cli.client.command.UpgradeCommand;
 import org.obiba.opal.cli.client.command.VersionCommand;
 import org.obiba.opal.cli.client.command.options.ExtractCommandOptions;
 import org.obiba.opal.cli.client.command.options.HelpCommandOptions;
 import org.obiba.opal.cli.client.command.options.ImportCommandOptions;
-import org.obiba.opal.cli.client.command.options.QueryCommandOptions;
 import org.obiba.opal.cli.client.command.options.UpgradeCommandOptions;
 import org.obiba.opal.cli.client.command.options.VersionCommandOptions;
 
@@ -49,7 +47,6 @@ public class OpalClient extends AbstractCliClient {
     addAvailableCommand(VersionCommand.class, VersionCommandOptions.class);
     addAvailableCommand(ImportCommand.class, ImportCommandOptions.class);
     addAvailableCommand(ExtractCommand.class, ExtractCommandOptions.class);
-    addAvailableCommand(QueryCommand.class, QueryCommandOptions.class);
     addAvailableCommand(UpgradeCommand.class, UpgradeCommandOptions.class);
     // addAvailableCommand(ReportCommand.class, ReportCommandOptions.class);
   }

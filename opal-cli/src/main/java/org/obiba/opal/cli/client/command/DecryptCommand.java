@@ -17,11 +17,6 @@ import java.io.InputStream;
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.cli.client.command.options.DecryptCommandOptions;
 import org.obiba.opal.core.crypt.KeyProviderException;
-import org.obiba.opal.datasource.onyx.DigestMismatchException;
-import org.obiba.opal.datasource.onyx.DigestUtil;
-import org.obiba.opal.datasource.onyx.EncryptionDataMissingException;
-import org.obiba.opal.datasource.onyx.IOnyxDataInputStrategy;
-import org.obiba.opal.datasource.onyx.OnyxDataInputContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -40,8 +35,6 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
   //
   // Instance Variables
   //
-
-  private IOnyxDataInputStrategy dataInputStrategy;
 
   //
   // AbstractCommand Methods
@@ -64,16 +57,11 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
       if(outputDir != null) {
         // First, lazily initialize the dataInputStrategy variable (fetch it from the Spring ApplicationContext).
         ApplicationContext context = loadContext();
-        setDataInputStrategy((IOnyxDataInputStrategy) context.getBean("onyxDataInputStrategy"));
 
         // Now process each input file (Onyx data zip file) specified on the command line.
         for(File inputFile : options.getFiles()) {
           try {
             processFile(inputFile, outputDir, null);
-          } catch(DigestMismatchException ex) {
-            System.err.println(ex.getMessage());
-          } catch(EncryptionDataMissingException ex) {
-            System.err.println(ex.getMessage());
           } catch(KeyProviderException ex) {
             System.err.println(ex.getMessage());
             break; // break out of here, this is a fatal exception
@@ -91,10 +79,6 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
   // Methods
   //
 
-  public void setDataInputStrategy(IOnyxDataInputStrategy dataInputStrategy) {
-    this.dataInputStrategy = dataInputStrategy;
-  }
-
   private ApplicationContext loadContext() {
     return new ClassPathXmlApplicationContext(new String[] { "/META-INF/opal/context-config.xml", "/spring/opal-core/crypt.xml", "/META-INF/onyx-data-input.xml" });
   }
@@ -102,42 +86,6 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
   private void processFile(File inputFile, File outputDir, String keystorePassword) {
     System.out.println("Processing input file " + inputFile.getPath());
 
-    // Check the file against its digest. No point doing anything if the file is corrupted.
-    File digestFile = new File(inputFile.getPath() + DIGEST_ENTRY_SUFFIX);
-    if(digestFile.exists()) {
-      DigestUtil.checkDigest(DIGEST_ALGORITHM, digestFile, inputFile);
-    } else {
-      System.err.println("WARN: digest file " + digestFile + " not found. Cannot check file integrity.");
-    }
-
-    // Create the dataInputContext, based on the specified command-line options.
-    OnyxDataInputContext dataInputContext = new OnyxDataInputContext();
-    dataInputContext.setSource(inputFile.getPath());
-
-    // Prepare the strategy.
-    dataInputStrategy.prepare(dataInputContext);
-
-    // Decrypt all encrypted entries in the specified file.
-    try {
-      for(String entryName : dataInputStrategy.listEntries()) {
-        System.out.println("  Decrypting " + entryName + "...");
-        InputStream entryStream = dataInputStrategy.getEntry(entryName);
-
-        try {
-          // Persist the decrypted entry.
-          persistDecryptedEntry(entryStream, new File(outputDir, entryName));
-        } catch(IOException ex) {
-          System.err.println("  ERROR: Failed to persist decrypted entry (" + ex.getMessage() + ")");
-        }
-      }
-    } catch(KeyProviderException ex) {
-      System.err.println("  ERROR: " + ex.getMessage());
-    } catch(DigestMismatchException ex) {
-      System.err.println("  ERROR: " + ex.getMessage());
-    } finally {
-      // Terminate the strategy.
-      dataInputStrategy.terminate(dataInputContext);
-    }
   }
 
   /**
