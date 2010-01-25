@@ -44,7 +44,7 @@ public class DefaultOpalKeyRegistry implements IOpalKeyRegistry {
       return null;
     }
     if(keys.size() > 1) {
-      throw new IllegalStateException("Unexpected multiple opal keys for " + owner + ":" + ownerKey);
+      throw new IllegalStateException("Unexpected multiple opal keys for owner " + owner + " and key " + ownerKey);
     }
     return keys.iterator().next();
   }
@@ -54,6 +54,20 @@ public class DefaultOpalKeyRegistry implements IOpalKeyRegistry {
     if(ownerKey == null) throw new IllegalArgumentException("ownerKey cannot be null");
 
     return keyReader.hasParticipant(owner, ownerKey);
+  }
+
+  public String findOwnerKey(String owner, String opalKey) {
+    if(owner == null) throw new IllegalArgumentException("owner cannot be null");
+    if(opalKey == null) throw new IllegalArgumentException("opalKey cannot be null");
+
+    Collection<String> keys = keyReader.getEntry(OPAL_KEY_NAME, opalKey, owner);
+    if(keys == null || keys.size() == 0) {
+      return null;
+    }
+    if(keys.size() > 1) {
+      throw new IllegalStateException("Unexpected multiple keys for owner " + owner + " and opal key " + opalKey);
+    }
+    return keys.iterator().next();
   }
 
   public void registerKey(String opalKey, String owner, String ownerKey) {

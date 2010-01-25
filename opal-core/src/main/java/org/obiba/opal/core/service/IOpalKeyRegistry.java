@@ -34,6 +34,15 @@ public interface IOpalKeyRegistry {
   public boolean hasOpalKey(String owner, String ownerKey);
 
   /**
+   * Given an owner and Opal key, returns the associated non-Opal key.
+   * 
+   * @param owner an owner
+   * @param opalKey an Opal key
+   * @return the key mapped to the specified Opal key, for the specified owner
+   */
+  public String findOwnerKey(String owner, String opalKey);
+
+  /**
    * Generates a new Opal key and returns it
    * 
    * @return
