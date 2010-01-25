@@ -58,8 +58,6 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         <!-- Use Apache Ant Pattern -->
         <property name="searchPatterns">
           <set>
-            <value>classpath*:org/obiba/opal/core/domain/data/**/*.class</value>
-            <value>classpath*:org/obiba/opal/core/domain/metadata/**/*.class</value>
             <value>classpath*:org/obiba/magma/datasource/hibernate/domain/**/*.class</value>
           </set>
         </property>

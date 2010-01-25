@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -23,32 +24,32 @@
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-api</artifactId>
     </dependency>
-      
+
     <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-js</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-xstream</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-datasource-fs</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-datasource-hibernate</artifactId>
     </dependency>
-        
+
     <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-crypt</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
@@ -58,12 +59,12 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-tx</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-orm</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-annotations</artifactId>
@@ -89,12 +90,6 @@
     </dependency>
 
     <dependency>
-      <groupId>net.sf.opencsv</groupId>
-      <artifactId>opencsv</artifactId>
-      <version>1.8</version>
-    </dependency>
-
-    <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
     </dependency>
@@ -108,5 +103,5 @@
       </resource>
     </resources>
   </build>
-  
+
 </project>
