@@ -56,13 +56,13 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
 
     String destination = options.getDatasource();
 
-    System.out.println("Importing files");
+    System.out.println("Importing files (encrypted: " + options.getEncrypted() + ")");
 
     for(File file : filesToImport) {
       System.out.println("\t" + file.getPath());
 
       try {
-        importService.importData(destination, file);
+        importService.importData(destination, file, options.getEncrypted());
       } catch(NoSuchDatasourceException ex) {
         // Fatal exception - break out of here.
         System.err.println(ex.getMessage());

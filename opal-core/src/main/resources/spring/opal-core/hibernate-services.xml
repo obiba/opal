@@ -26,5 +26,12 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <property name="sessionFactory" ref="opalSessionFactory"/>
   </bean>
 
-  <bean id="importService" class="org.obiba.opal.core.service.impl.DefaultImportService" />
+  <bean id="importService" class="org.obiba.opal.core.service.impl.DefaultImportService">
+    <property name="datasourceEncryptionStrategy">
+      <bean class="org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy">
+        <constructor-arg ref="opalKeyProvider" />
+      </bean>
+    </property>
+  </bean>
+  
 </beans>

@@ -28,9 +28,11 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
+import org.obiba.magma.crypt.KeyPairProvider;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 
-public class OpalKeyStore implements IKeyProvider {
+public class OpalKeyStore implements IKeyProvider, KeyPairProvider, InitializingBean {
   //
   // Instance Variables
   //
@@ -40,6 +42,13 @@ public class OpalKeyStore implements IKeyProvider {
   private Resource keyStoreResource;
 
   private CallbackHandler callbackHandler;
+
+  //
+  // InitializingBean Methods
+
+  public void afterPropertiesSet() {
+    init(null);
+  }
 
   //
   // IKeyProvider Methods
