@@ -12,9 +12,11 @@ package org.obiba.opal.cli.client.impl;
 import org.obiba.opal.cli.client.AbstractCliClient;
 import org.obiba.opal.cli.client.command.DecryptCommand;
 import org.obiba.opal.cli.client.command.HelpCommand;
+import org.obiba.opal.cli.client.command.KeyCommand;
 import org.obiba.opal.cli.client.command.VersionCommand;
 import org.obiba.opal.cli.client.command.options.DecryptCommandOptions;
 import org.obiba.opal.cli.client.command.options.HelpCommandOptions;
+import org.obiba.opal.cli.client.command.options.KeyCommandOptions;
 import org.obiba.opal.cli.client.command.options.VersionCommandOptions;
 
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException;
@@ -42,6 +44,7 @@ public class OpalKeyClient extends AbstractCliClient {
     addAvailableCommand(HelpCommand.class, HelpCommandOptions.class);
     addAvailableCommand(VersionCommand.class, VersionCommandOptions.class);
     addAvailableCommand(DecryptCommand.class, DecryptCommandOptions.class);
+    addAvailableCommand(KeyCommand.class, KeyCommandOptions.class);
   }
 
   //
