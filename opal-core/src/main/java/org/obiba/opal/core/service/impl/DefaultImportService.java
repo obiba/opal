@@ -16,8 +16,8 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
-import org.obiba.magma.datasource.fs.DatasourceCopier;
 import org.obiba.magma.datasource.fs.FsDatasource;
+import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.opal.core.service.ImportService;
 import org.springframework.transaction.annotation.Transactional;
 
