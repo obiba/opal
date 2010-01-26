@@ -53,8 +53,14 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
   }
 
   public VariableEntity createPublicEntity(ValueSet privateValueSet, Iterable<VariableValueSource> privateVariables) {
-    // TODO: Persist private variables as keys in the opal key database.
+    // Create the "public" entity.
     String publicIdentifier = opalKeyRegistry.registerNewOpalKey(owner, privateValueSet.getVariableEntity().getIdentifier());
+
+    // Persist private variables as keys in the opal key database.
+    for(VariableValueSource variableValueSource : privateVariables) {
+      opalKeyRegistry.registerKey(publicIdentifier, variableValueSource.getVariable().getName(), variableValueSource.getValue(privateValueSet).toString());
+    }
+
     return new VariableEntityBean(privateValueSet.getVariableEntity().getType(), publicIdentifier);
   }
 
