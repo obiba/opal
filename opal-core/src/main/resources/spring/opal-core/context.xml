@@ -26,12 +26,12 @@
   <bean id="participantIdentifier" class="org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl">
   </bean>
   
-  <bean id="opalConfiguration" class="org.obiba.opal.core.cfg.OpalConfigurationFactoryBean">
-    <property name="configFile" value="classpath:opal-config.xml" />
-  </bean>
-
   <bean id="opalRuntime" class="org.obiba.opal.core.runtime.OpalRuntime">
-    <property name="opalConfiguration" ref="opalConfiguration" />
+    <property name="opalConfiguration">
+      <bean id="opalConfiguration" class="org.obiba.opal.core.cfg.OpalConfigurationFactoryBean">
+        <property name="configFile" value="classpath:opal-config.xml" />
+      </bean>
+    </property>
   </bean>
   
 </beans>
