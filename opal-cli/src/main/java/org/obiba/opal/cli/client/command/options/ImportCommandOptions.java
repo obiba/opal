@@ -10,6 +10,8 @@ import uk.co.flamingpenguin.jewel.cli.Option;
  * 
  * The <code>encrypted</code> option indicates whether the files to be imported are encrypted.
  * 
+ * The <code>owner</code> option indicates the "owner" of any identifiers used in the data to be imported.
+ * 
  * The file list option (a list of unparsed file arguments at the end of the command line) indicates one or more
  * directories containing the files to be imported into the datasource.
  * 
@@ -18,6 +20,9 @@ import uk.co.flamingpenguin.jewel.cli.Option;
  */
 @CommandLineInterface(application = "import")
 public interface ImportCommandOptions extends DatasourceOption, FileListOption, HelpOption, AuthenticationOptions {
+
+  @Option(shortName = "o")
+  public String getOwner();
 
   @Option(shortName = "e")
   public boolean getEncrypted();

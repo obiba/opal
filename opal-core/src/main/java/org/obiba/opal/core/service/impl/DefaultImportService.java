@@ -15,10 +15,16 @@ import java.io.IOException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
+import org.obiba.magma.ValueTable;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
+import org.obiba.magma.views.SelectClause;
+import org.obiba.opal.core.magma.PrivateVariableEntityValueTable;
+import org.obiba.opal.core.service.IOpalKeyRegistry;
 import org.obiba.opal.core.service.ImportService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -27,8 +33,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class DefaultImportService implements ImportService {
   //
+  // Constants
+  //
+
+  private static final Logger log = LoggerFactory.getLogger(DefaultImportService.class);
+
+  //
   // Instance Variables
   //
+
+  private IOpalKeyRegistry opalKeyRegistry;
 
   private DatasourceEncryptionStrategy dsEncryptionStrategy;
 
@@ -36,34 +50,38 @@ public class DefaultImportService implements ImportService {
   // ImportService Methods
   //
 
-  public void importData(String datasourceName, File file, boolean encrypted) throws NoSuchDatasourceException, IllegalArgumentException, IOException {
+  public void importData(String datasourceName, String owner, File file, boolean encrypted) throws NoSuchDatasourceException, IllegalArgumentException, IOException {
     // Validate the file.
     if(!file.isFile()) {
       throw new IllegalArgumentException("No such file (" + file.getPath() + ")");
     }
 
     // Validate the datasource name.
-    Datasource dsDestination = MagmaEngine.get().getDatasource(datasourceName);
-    if(dsDestination == null) {
+    Datasource destinationDatasource = MagmaEngine.get().getDatasource(datasourceName);
+    if(destinationDatasource == null) {
       throw new NoSuchDatasourceException("No such datasource (" + datasourceName + ")");
     }
 
     // Create an FsDatasource for the specified file.
-    FsDatasource dsSource = null;
+    FsDatasource sourceDatasource = null;
     if(encrypted) {
-      dsSource = new FsDatasource(file.getName(), file, dsEncryptionStrategy);
+      sourceDatasource = new FsDatasource(file.getName(), file, dsEncryptionStrategy);
     } else {
-      dsSource = new FsDatasource(file.getName(), file);
+      sourceDatasource = new FsDatasource(file.getName(), file);
     }
-    MagmaEngine.get().addDatasource(dsSource);
 
-    // Copy the FsDatasource to the specified destination datasource.
-    DatasourceCopier copier = new DatasourceCopier();
+    // Copy the FsDatasource to the destination datasource.
     try {
-      copier.copy(file.getName(), datasourceName);
+      MagmaEngine.get().addDatasource(sourceDatasource);
+      copyValueTables(sourceDatasource, destinationDatasource, owner);
+    } catch(IOException ex) {
+      log.error("DSPATHIS caught it in the service!", ex);
+      throw ex;
+    } catch(NullPointerException ex) {
+      log.error("DSPATHIS caught it in the service!", ex);
+      throw ex;
     } finally {
-      // Always disconnect the FsDatasource after copying it (even if an exception occurs).
-      MagmaEngine.get().removeDatasource(dsSource);
+      MagmaEngine.get().removeDatasource(sourceDatasource);
     }
   }
 
@@ -71,7 +89,45 @@ public class DefaultImportService implements ImportService {
   // Methods
   //
 
+  public void setOpalKeyRegistry(IOpalKeyRegistry opalKeyRegistry) {
+    this.opalKeyRegistry = opalKeyRegistry;
+  }
+
   public void setDatasourceEncryptionStrategy(DatasourceEncryptionStrategy dsEncryptionStrategy) {
     this.dsEncryptionStrategy = dsEncryptionStrategy;
+  }
+
+  private void copyValueTables(Datasource source, Datasource destination, String owner) throws IOException {
+    DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build();
+
+    for(ValueTable valueTable : source.getValueTables()) {
+      log.info("Copying valueTable with entity type {}", valueTable.getEntityType());
+      if(valueTable.isForEntityType("Participant")) {
+        try {
+          copyParticipants(valueTable, destination, copier, owner);
+        } catch(Exception ex) {
+          log.error("DSPATHIS caught it in copy", ex);
+        }
+      } else {
+        copier.copy(valueTable, destination);
+      }
+      log.info("END: Copying valueTable with entity type {}", valueTable.getEntityType());
+    }
+  }
+
+  private void copyParticipants(ValueTable participantTable, Datasource destination, DatasourceCopier copier, String owner) throws IOException {
+    // Create an entity map, that maps private entities to public entities, and vice-versa.
+    OpalPrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap();
+    entityMap.setOpalKeyRegistry(opalKeyRegistry);
+    entityMap.setOwner(owner);
+
+    // Create a SelectClause that selects all identifier variables.
+    SelectClause privateSelectClause = null; // new JavascriptClause("$var().attribute('identifier')");
+
+    // Now create a "view" of the participant table, that exposes only the public data.
+    PrivateVariableEntityValueTable privateTable = new PrivateVariableEntityValueTable(participantTable.getName(), participantTable, entityMap, privateSelectClause);
+
+    // Copy the view.
+    copier.copy(privateTable, destination);
   }
 }

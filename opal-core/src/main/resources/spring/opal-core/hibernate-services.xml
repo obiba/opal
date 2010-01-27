@@ -22,6 +22,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
   </bean>
 
   <bean id="importService" class="org.obiba.opal.core.service.impl.DefaultImportService">
+    <property name="opalKeyRegistry" ref="opalKeyRegistry" />
     <property name="datasourceEncryptionStrategy">
       <bean class="org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy">
         <constructor-arg ref="opalKeyProvider" />

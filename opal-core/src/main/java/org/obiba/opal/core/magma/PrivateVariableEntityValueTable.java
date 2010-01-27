@@ -9,9 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.core.magma;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.obiba.magma.NoSuchValueSetException;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
@@ -23,6 +20,7 @@ import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
 /**
@@ -52,6 +50,7 @@ public class PrivateVariableEntityValueTable extends View {
   public PrivateVariableEntityValueTable(String name, ValueTable privateTable, PrivateVariableEntityMap privateMap, SelectClause privateSelectClause) {
     super(name, privateTable);
 
+    this.privateMap = privateMap;
     this.privateSelectClause = privateSelectClause;
   }
 
@@ -97,16 +96,14 @@ public class PrivateVariableEntityValueTable extends View {
 
   private Iterable<Variable> getPrivateVariables() {
     Iterable<Variable> variables = getWrappedValueTable().getVariables();
-    List<Variable> variablesToRetain = new ArrayList<Variable>();
-
     if(privateSelectClause != null) {
-      for(Variable variable : variables) {
-        if(privateSelectClause.select(variable)) {
-          variablesToRetain.add(variable);
+      Iterable<Variable> filteredVariables = Iterables.filter(variables, new Predicate<Variable>() {
+        public boolean apply(Variable input) {
+          return privateSelectClause.select(input);
         }
-      }
+      });
+      return filteredVariables;
     }
-    Iterables.retainAll(variables, variablesToRetain);
 
     return variables;
   }

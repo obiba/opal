@@ -60,7 +60,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       System.out.println("\t" + file.getPath());
 
       try {
-        importService.importData(destination, file, options.getEncrypted());
+        importService.importData(destination, options.getOwner(), file, options.getEncrypted());
       } catch(NoSuchDatasourceException ex) {
         // Fatal exception - break out of here.
         System.err.println(ex.getMessage());
