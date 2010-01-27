@@ -21,7 +21,6 @@ public abstract class AbstractCommand<T> implements Command<T> {
 
   private CliClient client;
 
-  @SuppressWarnings("unused")
   protected T options;
 
   //

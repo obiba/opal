@@ -50,8 +50,6 @@ public class OpalKeyClient extends AbstractCliClient {
   //
   // Methods
   //
-
-  @SuppressWarnings("unchecked")
   public static void main(String[] args) {
     OpalKeyClient client = new OpalKeyClient();
 
