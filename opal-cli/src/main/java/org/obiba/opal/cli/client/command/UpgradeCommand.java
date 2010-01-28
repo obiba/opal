@@ -23,11 +23,7 @@ public class UpgradeCommand extends AbstractCommand<UpgradeCommandOptions> {
   // Constants
   //
 
-  private static final String[] CONTEXT_PATHS = { // 
-  "classpath:/spring/opal-core/upgrade-context.xml", // 
-  "classpath:/spring/opal-core/version.xml", //
-  "classpath:/spring/opal-core/upgrade.xml" //
-  };
+  private static final String[] CONTEXT_PATHS = { "classpath:/spring/opal-core/upgrade-context.xml" };
 
   //
   // AbstractContextLoadingCommand Methods
