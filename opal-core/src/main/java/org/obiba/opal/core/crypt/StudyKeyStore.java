@@ -17,22 +17,27 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.Arrays;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
 
+import org.obiba.magma.crypt.support.CacheablePasswordCallback;
 import org.springframework.util.Assert;
 
 /**
  * Contains a study id and its associated KeyStore.
  */
 @Entity
-@Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "study_id" }) })
+@Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "studyId" }) })
 public class StudyKeyStore {
 
   @SuppressWarnings("unused")
@@ -47,6 +52,13 @@ public class StudyKeyStore {
   @Column(nullable = false)
   private byte[] javaKeyStore;
 
+  @Transient
+  private CallbackHandler callbackHandler;
+
+  public void setCallbackHander(CallbackHandler callbackHander) {
+    this.callbackHandler = callbackHander;
+  }
+
   public String getStudyId() {
     return studyId;
   }
@@ -55,11 +67,12 @@ public class StudyKeyStore {
     this.studyId = studyId;
   }
 
-  public KeyStore getKeyStore(char[] password) {
+  public KeyStore getKeyStore() {
     KeyStore keyStore = null;
     try {
-      keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-      keyStore.load(new ByteArrayInputStream(javaKeyStore), password);
+      keyStore = KeyStore.getInstance("JCEKS");
+      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for key " + studyId, false);
+      keyStore.load(new ByteArrayInputStream(javaKeyStore), getKeyPassword(passwordCallback));
     } catch(KeyStoreException e) {
       throw new KeyProviderSecurityException("Wrong keystore password or keystore was tampered with");
     } catch(NoSuchAlgorithmException e) {
@@ -71,16 +84,19 @@ public class StudyKeyStore {
         throw new KeyProviderSecurityException("Wrong keystore password");
       }
       throw new RuntimeException(ex);
+    } catch(UnsupportedCallbackException e) {
+      throw new RuntimeException(e);
     }
 
     return keyStore;
   }
 
-  public void setKeyStore(KeyStore keyStore, char[] password) {
+  public void setKeyStore(KeyStore keyStore) {
     ByteArrayOutputStream b = new ByteArrayOutputStream();
 
     try {
-      keyStore.store(b, password);
+      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for key " + studyId, false);
+      keyStore.store(b, getKeyPassword(passwordCallback));
     } catch(KeyStoreException e) {
       throw new KeyProviderSecurityException("Wrong keystore password or keystore was tampered with");
     } catch(NoSuchAlgorithmException e) {
@@ -92,14 +108,21 @@ public class StudyKeyStore {
         throw new KeyProviderSecurityException("Wrong keystore password");
       }
       throw new RuntimeException(ex);
+    } catch(UnsupportedCallbackException e) {
+      throw new RuntimeException(e);
     }
     this.javaKeyStore = b.toByteArray();
+  }
+
+  private char[] getKeyPassword(PasswordCallback passwordCallback) throws UnsupportedCallbackException, IOException {
+    callbackHandler.handle(new Callback[] { passwordCallback });
+    return passwordCallback.getPassword();
   }
 
   public static class Builder {
     private String studyId;
 
-    private char[] password;
+    private CallbackHandler callbackHandler;
 
     public static Builder newStore() {
       return new Builder();
@@ -110,18 +133,28 @@ public class StudyKeyStore {
       return this;
     }
 
-    public Builder password(char[] password) {
-      this.password = password;
+    public Builder passwordPrompt(CallbackHandler callbackHandler) {
+      this.callbackHandler = callbackHandler;
       return this;
+    }
+
+    private char[] getKeyPassword(PasswordCallback passwordCallback) throws UnsupportedCallbackException, IOException {
+      callbackHandler.handle(new Callback[] { passwordCallback });
+      return passwordCallback.getPassword();
     }
 
     public StudyKeyStore build() {
       Assert.hasText(studyId, "studyId must not be null or empty");
-      Assert.notNull(password, "password must not be null");
+      Assert.notNull(callbackHandler, "callbackHander must not be null");
+
+      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for key " + studyId, false);
       KeyStore keyStore = null;
       try {
-        keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        keyStore.load(null, password);
+        keyStore = KeyStore.getInstance("JCEKS");
+        KeyStore.ProtectionParameter protectionParameter = new KeyStore.CallbackHandlerProtection(callbackHandler);
+        // System.out.println("password:  " + Arrays.toString(getKeyPassword(passwordCallback)));
+        keyStore.load(null, getKeyPassword(passwordCallback));
+        // KeyStore.Builder b = KeyStore.Builder.newInstance(keyStore, protectionParameter);
       } catch(KeyStoreException e) {
         throw new KeyProviderSecurityException("Wrong keystore password or keystore was tampered with");
       } catch(NoSuchAlgorithmException e) {
@@ -133,12 +166,14 @@ public class StudyKeyStore {
           throw new KeyProviderSecurityException("Wrong keystore password");
         }
         throw new RuntimeException(ex);
+      } catch(UnsupportedCallbackException e) {
+        throw new RuntimeException(e);
       }
 
       StudyKeyStore studyKeyStore = new StudyKeyStore();
       studyKeyStore.setStudyId(studyId);
-      studyKeyStore.setKeyStore(keyStore, password);
-      Arrays.fill(password, ' '); // Zero password to remove it from memory.
+      studyKeyStore.setCallbackHander(callbackHandler);
+      studyKeyStore.setKeyStore(keyStore);
       return studyKeyStore;
     }
   }
