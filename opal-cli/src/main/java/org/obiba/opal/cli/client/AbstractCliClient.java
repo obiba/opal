@@ -35,8 +35,6 @@ public abstract class AbstractCliClient implements CliClient {
   @SuppressWarnings("unchecked")
   private Map<String, Class> optionsMap;
 
-  private Command<?> command;
-
   //
   // Constructors
   //
@@ -65,8 +63,7 @@ public abstract class AbstractCliClient implements CliClient {
 
     sb.append("Usage:");
     sb.append("\n  ");
-    sb.append(getName());
-    sb.append(" <command> <options> <args>");
+    sb.append("<command> <options> <args>");
     sb.append("\n\n");
 
     sb.append("Commands:\n");
@@ -90,21 +87,8 @@ public abstract class AbstractCliClient implements CliClient {
     return new ArrayList<String>(commandMap.keySet());
   }
 
-  public <T> void setCommand(String[] cmdline) throws IllegalArgumentException, ArgumentValidationException {
-    Command<T> command = parseCommand(cmdline);
-    setCommand(command);
-  }
-
-  public <T> void setCommand(Command<T> command) {
-    this.command = command;
-  }
-
-  public void executeCommand() {
-    if(command == null) {
-      throw new IllegalStateException("Null command (setCommand must be called before calling execute)");
-    }
-
-    command.execute();
+  public boolean hasCommand(String commandName) {
+    return commandMap.containsKey(commandName);
   }
 
   //
@@ -144,7 +128,6 @@ public abstract class AbstractCliClient implements CliClient {
    * @throws IllegalArgumentException if the command line specifies an invalid command
    * @throws ArgumentValidationException if the command line specifies invalid command options
    */
-  @SuppressWarnings("unchecked")
   protected <T> Command<T> parseCommand(String[] cmdline) throws IllegalArgumentException, ArgumentValidationException {
     if(cmdline.length == 0) {
       throw new IllegalArgumentException("No command");
@@ -154,33 +137,36 @@ public abstract class AbstractCliClient implements CliClient {
     String[] commandArgs = new String[cmdline.length - 1];
     System.arraycopy(cmdline, 1, commandArgs, 0, commandArgs.length);
 
+    return newCommand(commandName, commandArgs);
+  }
+
+  @SuppressWarnings("unchecked")
+  protected <T> Command<T> newCommand(String commandName, String[] commandArgs) throws ArgumentValidationException {
     Command<T> command = null;
+    Class commandClass = commandMap.get(commandName);
+    if(commandClass == null) {
+      throw new IllegalArgumentException("Command not found (" + commandName + ")");
+    }
 
     try {
       // Create the command object.
-      Class commandClass = commandMap.get(commandName);
-      if(commandClass != null) {
-        command = (Command<T>) commandClass.newInstance();
-        command.setClient(this);
+      command = (Command<T>) commandClass.newInstance();
+      command.setClient(this);
 
-        // Create the options object.
-        Class optionsClass = optionsMap.get(commandName);
-        if(optionsClass != null) {
-          T options = (T) CliFactory.parseArguments(optionsClass, commandArgs);
+      // Create the options object.
+      Class optionsClass = optionsMap.get(commandName);
+      if(optionsClass != null) {
+        T options = (T) CliFactory.parseArguments(optionsClass, commandArgs);
 
-          // Set the command's options.
-          command.setOptions(options);
-        } else {
-          // should never get here
-        }
-
+        // Set the command's options.
+        command.setOptions(options);
       } else {
-        throw new IllegalArgumentException("Command not found (" + commandName + ")");
+        throw new IllegalStateException("No option class for command class " + commandClass.getName());
       }
-    } catch(ArgumentValidationException ex) {
-      throw ex;
-    } catch(Exception ex) {
-      throw new IllegalArgumentException(ex.getMessage());
+    } catch(ArgumentValidationException e) {
+      throw e;
+    } catch(Exception e) {
+      throw new IllegalArgumentException(e.getMessage());
     }
 
     return command;

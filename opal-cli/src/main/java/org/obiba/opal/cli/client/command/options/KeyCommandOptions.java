@@ -10,7 +10,7 @@ import uk.co.flamingpenguin.jewel.cli.Option;
  * This interface declares the options that may be used with the "key" command.
  */
 @CommandLineInterface(application = "key")
-public interface KeyCommandOptions extends GlobalOptions, AuthenticationOptions {
+public interface KeyCommandOptions extends GlobalOptions {
 
   @Option(description = "Specify the alias name for the keystore entry.")
   public String getAlias();

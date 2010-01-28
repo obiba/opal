@@ -19,6 +19,7 @@ import java.util.List;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.opal.cli.client.command.options.ImportCommandOptions;
 import org.obiba.opal.core.service.ImportService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCommandOptions> {
 
@@ -26,9 +27,10 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   // AbstractContextLoadingCommand Methods
   //
 
-  @Override
-  public void executeWithContext() {
-    new UserAuthentication(options).authenticate();
+  @Autowired
+  private ImportService importService;
+
+  public void execute() {
     if(options.isFiles()) {
       List<File> filesToImport = resolveFiles();
       if(!filesToImport.isEmpty()) {
@@ -50,8 +52,6 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   //
 
   private void importFiles(List<File> filesToImport) {
-    ImportService importService = getBean("importService");
-
     String destination = options.getDatasource();
 
     System.out.println("Importing files (encrypted: " + options.getEncrypted() + ")");

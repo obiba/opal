@@ -21,8 +21,4 @@ public interface GlobalOptions {
   @Option(shortName = "v", description = "Verbose operation")
   public boolean isVerbose();
 
-  @Option(description = "Directory where to output.")
-  public String getOutput();
-
-  public boolean isOutput();
 }

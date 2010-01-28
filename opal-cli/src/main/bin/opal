@@ -15,6 +15,9 @@ then
   exit 2;
 fi
 
-. $OPAL_HOME/bin/setclasspath
+CLASSPATH=$OPAL_HOME/conf
+for f in $(find $OPAL_HOME/lib -type f -name *.jar); do
+  CLASSPATH=$CLASSPATH:$f
+done
 
-java -cp "$CLASSPATH" org.obiba.opal.cli.client.impl.OpalClient $@
+java -cp "$CLASSPATH" org.obiba.opal.cli.client.OpalConsole $@

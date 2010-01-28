@@ -18,7 +18,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 /**
  * Command to perform an upgrade (i.e., invoke the upgrade manager).
  */
-public class UpgradeCommand extends AbstractContextLoadingCommand<UpgradeCommandOptions> {
+public class UpgradeCommand extends AbstractCommand<UpgradeCommandOptions> {
   //
   // Constants
   //
@@ -33,14 +33,18 @@ public class UpgradeCommand extends AbstractContextLoadingCommand<UpgradeCommand
   // AbstractContextLoadingCommand Methods
   //
 
-  public void executeWithContext() {
-    new UserAuthentication(options).authenticate();
+  public void execute() {
+    ConfigurableApplicationContext ctx = loadContext();
 
-    UpgradeManager upgradeManager = getBean("upgradeManager");
     try {
-      upgradeManager.executeUpgrade();
-    } catch(UpgradeException upgradeFailed) {
-      throw new RuntimeException("An error occurred while running the upgrade manager", upgradeFailed);
+      UpgradeManager upgradeManager = (UpgradeManager) ctx.getBean("upgradeManager");
+      try {
+        upgradeManager.executeUpgrade();
+      } catch(UpgradeException upgradeFailed) {
+        throw new RuntimeException("An error occurred while running the upgrade manager", upgradeFailed);
+      }
+    } finally {
+      ctx.close();
     }
   }
 

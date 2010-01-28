@@ -11,10 +11,6 @@ package org.obiba.opal.cli.client;
 
 import java.util.List;
 
-import org.obiba.opal.cli.client.command.Command;
-
-import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException;
-
 /**
  * Interface for CLI clients.
  */
@@ -26,6 +22,8 @@ public interface CliClient {
    * @return name of client
    */
   public String getName();
+
+  public void quit();
 
   /**
    * Prints usage information for the client.
@@ -40,26 +38,4 @@ public interface CliClient {
    */
   public List<String> availableCommands();
 
-  /**
-   * Sets the command to be executed by the client.
-   * 
-   * @param cmdline command line
-   * @throws IllegalArgumentException if the command line specifies an invalid command
-   * @throws ArgumentValidationException if the command line specifies invalid command options
-   */
-  public <T> void setCommand(String[] cmdline) throws IllegalArgumentException, ArgumentValidationException;
-
-  /**
-   * Sets the command to be executed by the client.
-   * 
-   * @param command command
-   */
-  public <T> void setCommand(Command<T> command);
-
-  /**
-   * Executes the current command (i.e., the command last set with the <code>setCommand</code> method).
-   * 
-   * @throws IllegalStateException if no command has been set
-   */
-  public void executeCommand();
 }

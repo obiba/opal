@@ -21,4 +21,8 @@ public interface DecryptCommandOptions extends GlobalOptions, AuthenticationOpti
   public List<File> getFiles();
 
   public boolean isFiles();
+
+  public boolean isOutput();
+
+  public String getOutput();
 }

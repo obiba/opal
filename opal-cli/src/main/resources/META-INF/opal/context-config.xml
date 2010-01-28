@@ -3,7 +3,7 @@
 
   <import resource="property-configurer.xml" />
 
-  <bean id="opalKeyProvider" parent="baseOpalKeyProvider">
+  <bean id="opalKeyProvider" parent="baseOpalKeyProvider" lazy-init="true">
     <property name="callbackHandler">
       <bean class="org.obiba.opal.cli.util.ConsoleCallbackHandler" />  
     </property>

@@ -9,26 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.cli.client.command;
 
-import org.obiba.opal.cli.client.command.options.VersionCommandOptions;
-import org.obiba.runtime.Version;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.obiba.opal.cli.client.command.options.QuitCommandOptions;
 
 /**
- * Version command.
+ * Quit command. Tells the {@code CliClient} to exit.
  */
-public class VersionCommand extends AbstractCommand<VersionCommandOptions> {
-  //
-  // Constants
-  //
-
-  @Autowired
-  private Version opalVersion;
-
-  //
-  // AbstractContextLoadingCommand Methods
-  //
+public class QuitCommand extends AbstractCommand<QuitCommandOptions> {
 
   public void execute() {
-    System.out.println("version " + opalVersion);
+    getClient().quit();
   }
+
 }

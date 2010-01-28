@@ -26,19 +26,21 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.support.PropertiesConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class JobRunningCommand<T extends JobRunningCommandOptions> extends AbstractContextLoadingCommand<T> {
+public class JobRunningCommand<T extends JobRunningCommandOptions> extends AbstractCommand<T> {
 
-  @Override
-  public void executeWithContext() {
-    new UserAuthentication(options).authenticate();
+  @Autowired
+  private JobOperator jobOperator;
+
+  @Autowired
+  private JobRepository jobRepository;
+
+  public void execute() {
     // Ensure that options have been set.
     if(options == null) {
       throw new IllegalStateException("Options not set (setOptions must be called before calling execute)");
     }
-
-    JobOperator jobOperator = getBean("jobOperator");
-    JobRepository jobRepository = getBean("jobRepository");
 
     if(options.isListJobs()) {
       Set<String> jobs = jobOperator.getJobNames();

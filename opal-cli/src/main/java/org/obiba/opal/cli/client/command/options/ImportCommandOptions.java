@@ -19,7 +19,7 @@ import uk.co.flamingpenguin.jewel.cli.Option;
  * 
  */
 @CommandLineInterface(application = "import")
-public interface ImportCommandOptions extends DatasourceOption, FileListOption, HelpOption, AuthenticationOptions {
+public interface ImportCommandOptions extends DatasourceOption, FileListOption, HelpOption {
 
   @Option(shortName = "o")
   public String getOwner();

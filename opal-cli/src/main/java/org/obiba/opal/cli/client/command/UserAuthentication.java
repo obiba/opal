@@ -38,12 +38,12 @@ public class UserAuthentication {
 
   private char[] password;
 
-  UserAuthentication(AuthenticationOptions options) {
+  public UserAuthentication(AuthenticationOptions options) {
     this.options = options;
     initShiro();
   }
 
-  void authenticate() {
+  public void authenticate() {
     promptForUsername();
     promptForPassword();
     // String foo = new String(password);
@@ -52,7 +52,7 @@ public class UserAuthentication {
     Subject currentUser = SecurityUtils.getSubject();
     if(!currentUser.isAuthenticated()) {
       UsernamePasswordToken token = new UsernamePasswordToken(username, password);
-      token.setRememberMe(true);
+      // token.setRememberMe(true);
       try {
         currentUser.login(token);
       } catch(AuthenticationException ae) {

@@ -11,7 +11,7 @@
         <include>*.bat</include>
       </includes>
     </fileSet>
-    
+
     <!-- Copy unix shell scripts. -->
     <fileSet>
       <directory>src/main/bin</directory>
@@ -24,7 +24,7 @@
         <include>*</include>
       </includes>
     </fileSet>
-    
+
     <fileSet>
       <directory>src/main/conf</directory>
       <outputDirectory>conf</outputDirectory>
@@ -37,15 +37,7 @@
     <!-- Copy dependency jar files to 'lib' -->
     <dependencySet>
       <outputDirectory>lib</outputDirectory>
-      <scope>runtime</scope>      
+      <scope>runtime</scope>
     </dependencySet>
-    <!-- Copy spring-test.jar to 'lib' -->
-    <dependencySet>
-      <scope>test</scope>
-      <outputDirectory>lib</outputDirectory>
-      <includes>
-        <include>org.springframework:spring-test</include>
-      </includes>      
-    </dependencySet>    
   </dependencySets>
 </assembly>

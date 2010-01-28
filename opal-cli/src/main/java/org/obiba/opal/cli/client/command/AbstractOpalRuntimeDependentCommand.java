@@ -10,23 +10,18 @@
 package org.obiba.opal.cli.client.command;
 
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
  */
-public abstract class AbstractOpalRuntimeDependentCommand<T> extends AbstractContextLoadingCommand<T> {
+public abstract class AbstractOpalRuntimeDependentCommand<T> extends AbstractCommand<T> {
   //
   // AbstractContextLoadingCommand Methods
   //
 
-  /**
-   * Overrides the <code>afterContextLoaded</code> method to first initialize the Opal runtime environment.
-   */
-  @Override
-  protected void afterContextLoaded() {
-    initRuntime();
-    super.afterContextLoaded();
-  }
+  @Autowired
+  private OpalRuntime opalRuntime;
 
   //
   // Methods
@@ -35,12 +30,7 @@ public abstract class AbstractOpalRuntimeDependentCommand<T> extends AbstractCon
   /**
    * Initializes the {@link OpalRuntime} bean in the context.
    */
-  protected void initRuntime() {
-    try {
-      OpalRuntime opalRuntime = getBean("opalRuntime");
-      opalRuntime.init();
-    } catch(Exception ex) {
-      throw new RuntimeException("Initialization error: " + ex.getMessage());
-    }
+  protected OpalRuntime getOpalRuntime() {
+    return opalRuntime;
   }
 }

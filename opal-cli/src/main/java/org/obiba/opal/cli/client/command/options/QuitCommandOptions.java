@@ -7,18 +7,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.cli.client.command;
+package org.obiba.opal.cli.client.command.options;
 
-import org.obiba.opal.cli.client.command.options.KeyCommandOptions;
+import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
 
 /**
- * Provides key management allowing for key creation, deletion, importing and exporting of keys.
+ * This interface declares the options that may be used with the quit command.
+ * 
+ * Note that there <bold>no</bold> options for this command.
  */
-public class KeyCommand extends AbstractCommand<KeyCommandOptions> {
-
-  // @Override
-  public void execute() {
-    System.out.println("The key command.");
-  }
-
+@CommandLineInterface(application = "quit")
+public interface QuitCommandOptions {
+  // no options
 }

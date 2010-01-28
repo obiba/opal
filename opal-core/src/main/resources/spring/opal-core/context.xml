@@ -1,4 +1,5 @@
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:tx="http://www.springframework.org/schema/tx"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
@@ -12,7 +13,10 @@
     <property name="userTransaction">
       <ref local="jotm" />
     </property>
-    <!-- No need to set "transactionManager" property since the jotm bean implements both interfaces and Spring's JtaTransactionManager will detect this. -->
+    <!--
+      No need to set "transactionManager" property since the jotm bean implements both interfaces and Spring's
+      JtaTransactionManager will detect this.
+    -->
   </bean>
 
   <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate" scope="prototype">
@@ -25,13 +29,13 @@
 
   <bean id="participantIdentifier" class="org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl">
   </bean>
-  
-  <bean id="opalRuntime" class="org.obiba.opal.core.runtime.OpalRuntime">
+
+  <bean id="opalRuntime" class="org.obiba.opal.core.runtime.OpalRuntime" init-method="init" lazy-init="true">
     <property name="opalConfiguration">
-      <bean id="opalConfiguration" class="org.obiba.opal.core.cfg.OpalConfigurationFactoryBean">
+      <bean class="org.obiba.opal.core.cfg.OpalConfigurationFactoryBean">
         <property name="configFile" value="classpath:opal-config.xml" />
       </bean>
     </property>
   </bean>
-  
+
 </beans>
