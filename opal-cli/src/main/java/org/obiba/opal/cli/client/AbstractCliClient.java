@@ -77,8 +77,7 @@ public abstract class AbstractCliClient implements CliClient {
     sb.append("\n");
     sb.append("For help on a specific command, type:");
     sb.append("\n  ");
-    sb.append(getName());
-    sb.append(" <command> --help");
+    sb.append("<command> --help");
 
     System.err.println(sb.toString());
   }
