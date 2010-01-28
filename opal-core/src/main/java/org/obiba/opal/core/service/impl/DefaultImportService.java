@@ -12,6 +12,7 @@ package org.obiba.opal.core.service.impl;
 import java.io.File;
 import java.io.IOException;
 
+import org.obiba.core.util.FileUtil;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
@@ -49,6 +50,8 @@ public class DefaultImportService implements ImportService {
 
   private DatasourceEncryptionStrategy dsEncryptionStrategy;
 
+  private String archiveDirectory;
+
   //
   // ImportService Methods
   //
@@ -80,6 +83,9 @@ public class DefaultImportService implements ImportService {
     } finally {
       MagmaEngine.get().removeDatasource(sourceDatasource);
     }
+
+    // Archive the file.
+    archiveData(file);
   }
 
   //
@@ -92,6 +98,10 @@ public class DefaultImportService implements ImportService {
 
   public void setDatasourceEncryptionStrategy(DatasourceEncryptionStrategy dsEncryptionStrategy) {
     this.dsEncryptionStrategy = dsEncryptionStrategy;
+  }
+
+  public void setArchiveDirectory(String archiveDirectory) {
+    this.archiveDirectory = archiveDirectory;
   }
 
   private void copyValueTables(Datasource source, Datasource destination, String owner) throws IOException {
@@ -125,5 +135,24 @@ public class DefaultImportService implements ImportService {
 
     // Copy the view.
     copier.copy(privateTable, destination);
+  }
+
+  private void archiveData(File file) {
+    // Was an archive directory configured? If not, do nothing.
+    if(archiveDirectory == null || archiveDirectory.isEmpty()) {
+      log.info("No archive directory configured");
+      return;
+    }
+
+    // Create the archive directory if necessary.
+    File archiveDir = new File(archiveDirectory);
+    archiveDir.mkdirs();
+
+    // Move the file there.
+    try {
+      FileUtil.moveFile(file, archiveDir);
+    } catch(IOException ex) {
+      log.error("Failed to archive file {}", file);
+    }
   }
 }

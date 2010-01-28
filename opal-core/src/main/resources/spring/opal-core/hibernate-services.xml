@@ -28,6 +28,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         <constructor-arg ref="opalKeyProvider" />
       </bean>
     </property>
+    <property name="archiveDirectory" value="${org.obiba.opal.import.archiveDirectory}" />
   </bean>
 
 </beans>
