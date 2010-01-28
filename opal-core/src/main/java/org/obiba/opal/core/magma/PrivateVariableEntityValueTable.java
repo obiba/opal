@@ -9,13 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.core.magma;
 
+import java.util.Collections;
+
 import org.obiba.magma.NoSuchValueSetException;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
-import org.obiba.magma.support.ValueSetBean;
 import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
 
@@ -75,17 +76,34 @@ public class PrivateVariableEntityValueTable extends View {
   }
 
   /**
-   * Override <code>getValueSetTransformer</code> so that the {@link ValueSet} returned references its "public" entity.
+   * Override <code>getVariableEntityTransformer</code> to transform "private" entities into "public" entities.
+   */
+  public Function<VariableEntity, VariableEntity> getVariableEntityTransformer() {
+    return new Function<VariableEntity, VariableEntity>() {
+      public VariableEntity apply(VariableEntity from) {
+        VariableEntity publicEntity = privateMap.publicEntity(from);
+        if(publicEntity == null) {
+          throw new RuntimeException("Private entity " + from + " not mapped to a public entity");
+        }
+        return publicEntity;
+      }
+    };
+  }
+
+  /**
+   * Override <code>getValueSetTransformer</code> to create the "public" entity if necessary.
    */
   @Override
-  protected Function<ValueSet, ValueSet> getValueSetTransformer() {
+  public Function<ValueSet, ValueSet> getValueSetTransformer() {
+    final Function<ValueSet, ValueSet> baseTransformer = super.getValueSetTransformer();
+
     return new Function<ValueSet, ValueSet>() {
       public ValueSet apply(ValueSet from) {
         VariableEntity publicEntity = privateMap.publicEntity(from.getVariableEntity());
         if(publicEntity == null) {
           publicEntity = privateMap.createPublicEntity(from, getPrivateVariableValueSources());
         }
-        return new ValueSetBean(PrivateVariableEntityValueTable.this, publicEntity);
+        return baseTransformer.apply(from);
       }
     };
   }
@@ -95,17 +113,17 @@ public class PrivateVariableEntityValueTable extends View {
   //
 
   private Iterable<Variable> getPrivateVariables() {
-    Iterable<Variable> variables = getWrappedValueTable().getVariables();
+    Iterable<Variable> privateVariables = Collections.emptyList();
     if(privateSelectClause != null) {
-      Iterable<Variable> filteredVariables = Iterables.filter(variables, new Predicate<Variable>() {
+      Iterable<Variable> variables = getWrappedValueTable().getVariables();
+      privateVariables = Iterables.filter(variables, new Predicate<Variable>() {
         public boolean apply(Variable input) {
           return privateSelectClause.select(input);
         }
       });
-      return filteredVariables;
     }
 
-    return variables;
+    return privateVariables;
   }
 
   private Iterable<VariableValueSource> getPrivateVariableValueSources() {
