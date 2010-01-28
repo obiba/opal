@@ -19,19 +19,19 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 /**
  * This test callbackhandler always returns the password supplied to the constructor. Use this for unit testing only.
  */
-public class TestCallbackHandler implements CallbackHandler {
+public class StudyKeyStoreCallbackHandler implements CallbackHandler {
 
   private char[] password;
 
-  TestCallbackHandler(char[] password) {
+  StudyKeyStoreCallbackHandler(char[] password) {
     super();
     this.password = password;
   }
 
   public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
     for(Callback callback : callbacks) {
-      if(callback instanceof TestPasswordCallback) {
-        TestPasswordCallback testPasswordCallback = (TestPasswordCallback) callback;
+      if(callback instanceof StudyKeyStorePasswordCallback) {
+        StudyKeyStorePasswordCallback testPasswordCallback = (StudyKeyStorePasswordCallback) callback;
         testPasswordCallback.setPassword(password);
       } else if(callback instanceof PasswordCallback) {
         PasswordCallback passwordCallback = (PasswordCallback) callback;

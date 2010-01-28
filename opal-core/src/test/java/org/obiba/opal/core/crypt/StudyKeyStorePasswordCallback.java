@@ -14,11 +14,11 @@ import javax.security.auth.callback.PasswordCallback;
 /**
  * Test password callback used my junit tests only.
  */
-public class TestPasswordCallback extends PasswordCallback {
+public class StudyKeyStorePasswordCallback extends PasswordCallback {
 
   private static final long serialVersionUID = 1L;
 
-  public TestPasswordCallback(String prompt, boolean echoOn) {
+  public StudyKeyStorePasswordCallback(String prompt, boolean echoOn) {
     super(prompt, echoOn);
   }
 

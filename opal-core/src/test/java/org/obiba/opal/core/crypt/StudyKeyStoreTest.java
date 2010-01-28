@@ -33,7 +33,7 @@ public class StudyKeyStoreTest {
 
   @Before
   public void setUp() throws Exception {
-    callbackHandler = new TestCallbackHandler(PASSWORD);
+    callbackHandler = new StudyKeyStoreCallbackHandler(PASSWORD);
     studyKeyStore = StudyKeyStore.Builder.newStore().studyId("test").passwordPrompt(callbackHandler).build();
   }
 
@@ -46,7 +46,7 @@ public class StudyKeyStoreTest {
 
   @Test
   public void testPasswordReturnedByTestPasswordCallback() throws Exception {
-    TestPasswordCallback passwordCallback = new TestPasswordCallback("prompt", true);
+    StudyKeyStorePasswordCallback passwordCallback = new StudyKeyStorePasswordCallback("prompt", true);
     callbackHandler.handle(new Callback[] { passwordCallback });
     Assert.assertArrayEquals(PASSWORD, passwordCallback.getPassword());
   }
