@@ -16,9 +16,12 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
+import org.obiba.magma.type.BooleanType;
+import org.obiba.magma.type.TextType;
 import org.obiba.magma.views.SelectClause;
 import org.obiba.opal.core.magma.PrivateVariableEntityValueTable;
 import org.obiba.opal.core.service.IOpalKeyRegistry;
@@ -110,7 +113,12 @@ public class DefaultImportService implements ImportService {
     entityMap.setOwner(owner);
 
     // Create a SelectClause that selects all identifier variables.
-    SelectClause privateSelectClause = null; // new JavascriptClause("$var().attribute('identifier')");
+    // TODO: Replace this with a JavascriptClause.
+    SelectClause privateSelectClause = new SelectClause() {
+      public boolean select(Variable variable) {
+        return variable.hasAttribute("identifier") && (variable.getAttribute("identifier").getValue().equals(BooleanType.get().trueValue()) || variable.getAttribute("identifier").getValue().equals(TextType.get().valueOf("true")));
+      }
+    };
 
     // Now create a "view" of the participant table, that exposes only the public data.
     PrivateVariableEntityValueTable privateTable = new PrivateVariableEntityValueTable(participantTable.getName(), participantTable, entityMap, privateSelectClause);

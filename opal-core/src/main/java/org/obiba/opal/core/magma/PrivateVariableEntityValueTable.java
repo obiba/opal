@@ -129,7 +129,7 @@ public class PrivateVariableEntityValueTable extends View {
   private Iterable<VariableValueSource> getPrivateVariableValueSources() {
     return Iterables.transform(getPrivateVariables(), new Function<Variable, VariableValueSource>() {
       public VariableValueSource apply(Variable from) {
-        return getVariableValueSource(from.getName());
+        return PrivateVariableEntityValueTable.this.getWrappedValueTable().getVariableValueSource(from.getName());
       }
     });
   }

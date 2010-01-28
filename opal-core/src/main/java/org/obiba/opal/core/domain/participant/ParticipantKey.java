@@ -34,10 +34,10 @@ public class ParticipantKey {
   @JoinColumn(name = "participant_id", nullable = false)
   private Participant participant;
 
-  @Column(nullable = false)
+  @Column(length = 512, nullable = false)
   private String owner;
 
-  @Column(nullable = false)
+  @Column(length = 512, nullable = false)
   private String value;
 
   //
