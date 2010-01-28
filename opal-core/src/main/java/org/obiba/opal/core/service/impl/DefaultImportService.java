@@ -74,12 +74,6 @@ public class DefaultImportService implements ImportService {
     try {
       MagmaEngine.get().addDatasource(sourceDatasource);
       copyValueTables(sourceDatasource, destinationDatasource, owner);
-    } catch(IOException ex) {
-      log.error("DSPATHIS caught it in the service!", ex);
-      throw ex;
-    } catch(NullPointerException ex) {
-      log.error("DSPATHIS caught it in the service!", ex);
-      throw ex;
     } finally {
       MagmaEngine.get().removeDatasource(sourceDatasource);
     }
@@ -101,17 +95,11 @@ public class DefaultImportService implements ImportService {
     DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build();
 
     for(ValueTable valueTable : source.getValueTables()) {
-      log.info("Copying valueTable with entity type {}", valueTable.getEntityType());
       if(valueTable.isForEntityType("Participant")) {
-        try {
-          copyParticipants(valueTable, destination, copier, owner);
-        } catch(Exception ex) {
-          log.error("DSPATHIS caught it in copy", ex);
-        }
+        copyParticipants(valueTable, destination, copier, owner);
       } else {
         copier.copy(valueTable, destination);
       }
-      log.info("END: Copying valueTable with entity type {}", valueTable.getEntityType());
     }
   }
 
