@@ -12,8 +12,10 @@ package org.obiba.opal.core.service.impl;
 import org.obiba.core.service.impl.PersistenceManagerAwareService;
 import org.obiba.opal.core.crypt.StudyKeyStore;
 import org.obiba.opal.core.service.StudyKeyStoreService;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+@Transactional
 public abstract class DefaultStudyKeyStoreServiceImpl extends PersistenceManagerAwareService implements StudyKeyStoreService {
 
   public StudyKeyStore getStudyKeyStore(String studyId) {

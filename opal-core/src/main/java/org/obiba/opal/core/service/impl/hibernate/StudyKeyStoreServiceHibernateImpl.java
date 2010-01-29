@@ -17,7 +17,9 @@ import java.util.Set;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.obiba.opal.core.service.impl.DefaultStudyKeyStoreServiceImpl;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 public class StudyKeyStoreServiceHibernateImpl extends DefaultStudyKeyStoreServiceImpl {
 
   private SessionFactory factory;
@@ -28,7 +30,7 @@ public class StudyKeyStoreServiceHibernateImpl extends DefaultStudyKeyStoreServi
 
   @SuppressWarnings("unchecked")
   public Set<String> getStudyIds() {
-    String queryString = "studyId from StudyKeyStore;";
+    String queryString = "select studyId from org.obiba.opal.core.crypt.StudyKeyStore";
     Query query = factory.getCurrentSession().createQuery(queryString);
 
     List<String> studyIds = query.list();
