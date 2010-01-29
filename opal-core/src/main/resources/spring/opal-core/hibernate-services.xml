@@ -32,11 +32,14 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
   </bean>
 
   <bean id="studyKeyStoreService" class="org.obiba.opal.core.service.impl.hibernate.StudyKeyStoreServiceHibernateImpl">
-    <property name="sessionFactory" ref="keySessionFactory" />
+    <property name="sessionFactory" ref="opalSessionFactory" />
     <property name="persistenceManager">
       <bean class="org.obiba.core.service.impl.hibernate.PersistenceManagerHibernateImpl">
-        <property name="sessionFactory" ref="keySessionFactory" />
+        <property name="sessionFactory" ref="opalSessionFactory" />
       </bean>
+    </property>
+    <property name="callbackHandler">
+      <bean class="org.obiba.opal.cli.util.ConsoleCallbackHandler" />  
     </property>
   </bean>
 
