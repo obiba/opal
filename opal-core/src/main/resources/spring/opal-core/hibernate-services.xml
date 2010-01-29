@@ -31,4 +31,13 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <property name="archiveDirectory" value="${org.obiba.opal.import.archiveDirectory}" />
   </bean>
 
+  <bean id="studyKeyStoreService" class="org.obiba.opal.core.service.impl.hibernate.StudyKeyStoreServiceHibernateImpl">
+    <property name="sessionFactory" ref="keySessionFactory" />
+    <property name="persistenceManager">
+      <bean class="org.obiba.core.service.impl.hibernate.PersistenceManagerHibernateImpl">
+        <property name="sessionFactory" ref="keySessionFactory" />
+      </bean>
+    </property>
+  </bean>
+
 </beans>

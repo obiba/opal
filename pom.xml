@@ -471,6 +471,12 @@
         <version>${shiro.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-ext-jdk15</artifactId>
+        <version>${bouncycastle.version}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
@@ -600,6 +606,7 @@
     <elmo.version>1.5</elmo.version>
     <liquibase.version>1.9.4</liquibase.version>
     <shiro.version>1.0-incubating-r901735</shiro.version>
+    <bouncycastle.version>1.45</bouncycastle.version>
   </properties>
 
   <reporting>
