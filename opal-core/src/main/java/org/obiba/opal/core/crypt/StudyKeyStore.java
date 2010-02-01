@@ -12,45 +12,50 @@ package org.obiba.opal.core.crypt;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import org.obiba.magma.crypt.support.CacheablePasswordCallback;
+import org.obiba.core.domain.AbstractEntity;
 import org.springframework.util.Assert;
 
 /**
  * Contains a study id and its associated KeyStore.
  */
 @Entity
-@Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "studyId" }) })
-public class StudyKeyStore {
+@Table(name = "study_key_store", uniqueConstraints = { @UniqueConstraint(columnNames = { "studyId" }) })
+public class StudyKeyStore extends AbstractEntity {
 
-  @SuppressWarnings("unused")
-  @Id
-  @GeneratedValue
-  @Column
-  private long id;
+  private static final long serialVersionUID = 1L;
 
   @Column(nullable = false)
   private String studyId;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 1048576)
   private byte[] javaKeyStore;
+
+  @Transient
+  KeyStore store;
 
   @Transient
   private CallbackHandler callbackHandler;
@@ -114,8 +119,8 @@ public class StudyKeyStore {
     this.javaKeyStore = b.toByteArray();
   }
 
-  private char[] getKeyPassword(PasswordCallback passwordCallback) throws UnsupportedCallbackException, IOException {
-    callbackHandler.handle(new Callback[] { passwordCallback });
+  private char[] getKeyPassword(CacheablePasswordCallback passwordCallback) throws UnsupportedCallbackException, IOException {
+    callbackHandler.handle(new CacheablePasswordCallback[] { passwordCallback });
     return passwordCallback.getPassword();
   }
 
@@ -138,8 +143,8 @@ public class StudyKeyStore {
       return this;
     }
 
-    private char[] getKeyPassword(PasswordCallback passwordCallback) throws UnsupportedCallbackException, IOException {
-      callbackHandler.handle(new Callback[] { passwordCallback });
+    private char[] getKeyPassword(CacheablePasswordCallback passwordCallback) throws UnsupportedCallbackException, IOException {
+      callbackHandler.handle(new CacheablePasswordCallback[] { passwordCallback });
       return passwordCallback.getPassword();
     }
 
@@ -147,14 +152,11 @@ public class StudyKeyStore {
       Assert.hasText(studyId, "studyId must not be null or empty");
       Assert.notNull(callbackHandler, "callbackHander must not be null");
 
-      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for key " + studyId, false);
+      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for new keystore [" + studyId + "]:  ", false);
       KeyStore keyStore = null;
       try {
         keyStore = KeyStore.getInstance("JCEKS");
-        KeyStore.ProtectionParameter protectionParameter = new KeyStore.CallbackHandlerProtection(callbackHandler);
-        // System.out.println("password:  " + Arrays.toString(getKeyPassword(passwordCallback)));
         keyStore.load(null, getKeyPassword(passwordCallback));
-        // KeyStore.Builder b = KeyStore.Builder.newInstance(keyStore, protectionParameter);
       } catch(KeyStoreException e) {
         throw new KeyProviderSecurityException("Wrong keystore password or keystore was tampered with");
       } catch(NoSuchAlgorithmException e) {
@@ -178,4 +180,65 @@ public class StudyKeyStore {
     }
   }
 
+  public static X509Certificate makeCertificate(PrivateKey issuerPrivateKey, PublicKey subjectPublicKey, String certificateInfo, String signatureAlgorithm) throws SignatureException, InvalidKeyException, CertificateEncodingException, NoSuchAlgorithmException {
+
+    final org.bouncycastle.asn1.x509.X509Name issuerDN = new org.bouncycastle.asn1.x509.X509Name(certificateInfo);
+    final org.bouncycastle.asn1.x509.X509Name subjectDN = new org.bouncycastle.asn1.x509.X509Name(certificateInfo);
+    final int daysTillExpiry = 30 * 365;
+
+    final Calendar expiry = Calendar.getInstance();
+    expiry.add(Calendar.DAY_OF_YEAR, daysTillExpiry);
+
+    final org.bouncycastle.x509.X509V3CertificateGenerator certificateGenerator = new org.bouncycastle.x509.X509V3CertificateGenerator();
+
+    certificateGenerator.setSerialNumber(java.math.BigInteger.valueOf(System.currentTimeMillis()));
+    certificateGenerator.setIssuerDN(issuerDN);
+    certificateGenerator.setSubjectDN(subjectDN);
+    certificateGenerator.setPublicKey(subjectPublicKey);
+    certificateGenerator.setNotBefore(new Date());
+    certificateGenerator.setNotAfter(expiry.getTime());
+    certificateGenerator.setSignatureAlgorithm(signatureAlgorithm);
+
+    return certificateGenerator.generate(issuerPrivateKey);
+  }
+
+  public void createOfUpdateKey(String alias, String algorithm, int size, String certificateInfo) {
+    try {
+      KeyPairGenerator keyPairGenerator;
+
+      keyPairGenerator = KeyPairGenerator.getInstance(algorithm);
+
+      keyPairGenerator.initialize(size);
+      KeyPair keyPair = keyPairGenerator.generateKeyPair();
+      X509Certificate cert = StudyKeyStore.makeCertificate(keyPair.getPrivate(), keyPair.getPublic(), certificateInfo, chooseSignatureAlgorithm(algorithm));
+
+      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for key " + studyId, false);
+
+      KeyStore keyStore = getKeyStore();
+      keyStore.setKeyEntry(alias, keyPair.getPrivate(), getKeyPassword(passwordCallback), new X509Certificate[] { cert });
+      setKeyStore(keyStore);
+    } catch(NoSuchAlgorithmException e) {
+      throw new RuntimeException(e);
+    } catch(InvalidKeyException e) {
+      throw new RuntimeException(e);
+    } catch(CertificateEncodingException e) {
+      throw new RuntimeException(e);
+    } catch(SignatureException e) {
+      throw new RuntimeException(e);
+    } catch(KeyStoreException e) {
+      throw new RuntimeException(e);
+    } catch(UnsupportedCallbackException e) {
+      throw new RuntimeException(e);
+    } catch(IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private String chooseSignatureAlgorithm(String keyAlgorithm) {
+    // TODO add more algorithms here.
+    if(keyAlgorithm.equals("DSA")) {
+      return "SHA1withDSA";
+    }
+    return "SHA1WithRSA";
+  }
 }
