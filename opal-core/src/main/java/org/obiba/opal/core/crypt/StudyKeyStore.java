@@ -11,7 +11,11 @@ package org.obiba.opal.core.crypt;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -36,6 +40,9 @@ import javax.persistence.UniqueConstraint;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMReader;
+import org.bouncycastle.openssl.PasswordFinder;
 import org.obiba.core.domain.AbstractEntity;
 import org.springframework.util.Assert;
 
@@ -76,7 +83,7 @@ public class StudyKeyStore extends AbstractEntity {
     KeyStore keyStore = null;
     try {
       keyStore = KeyStore.getInstance("JCEKS");
-      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for key " + studyId, false);
+      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for key [" + studyId + "]:  ", false);
       keyStore.load(new ByteArrayInputStream(javaKeyStore), getKeyPassword(passwordCallback));
     } catch(KeyStoreException e) {
       throw new KeyProviderSecurityException("Wrong keystore password or keystore was tampered with");
@@ -100,7 +107,7 @@ public class StudyKeyStore extends AbstractEntity {
     ByteArrayOutputStream b = new ByteArrayOutputStream();
 
     try {
-      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for key " + studyId, false);
+      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for key [" + studyId + "]:  ", false);
       keyStore.store(b, getKeyPassword(passwordCallback));
     } catch(KeyStoreException e) {
       throw new KeyProviderSecurityException("Wrong keystore password or keystore was tampered with");
@@ -151,6 +158,8 @@ public class StudyKeyStore extends AbstractEntity {
     public StudyKeyStore build() {
       Assert.hasText(studyId, "studyId must not be null or empty");
       Assert.notNull(callbackHandler, "callbackHander must not be null");
+
+      StudyKeyStore.loadBouncyCastle();
 
       CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for new keystore [" + studyId + "]:  ", false);
       KeyStore keyStore = null;
@@ -212,7 +221,7 @@ public class StudyKeyStore extends AbstractEntity {
       KeyPair keyPair = keyPairGenerator.generateKeyPair();
       X509Certificate cert = StudyKeyStore.makeCertificate(keyPair.getPrivate(), keyPair.getPublic(), certificateInfo, chooseSignatureAlgorithm(algorithm));
 
-      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for key " + studyId, false);
+      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for key [" + studyId + "]:  ", false);
 
       KeyStore keyStore = getKeyStore();
       keyStore.setKeyEntry(alias, keyPair.getPrivate(), getKeyPassword(passwordCallback), new X509Certificate[] { cert });
@@ -268,6 +277,108 @@ public class StudyKeyStore extends AbstractEntity {
       return keyStore.containsAlias(alias);
     } catch(KeyStoreException e) {
       throw new KeyProviderException(e);
+    }
+  }
+
+  public static void loadBouncyCastle() {
+    if(java.security.Security.getProvider("BC") == null) java.security.Security.addProvider(new BouncyCastleProvider());
+  }
+
+  /**
+   * Import a private key and it's associated certificate into the keystore at the given alias.
+   * @param alias name of the key
+   * @param privateKey private key in the PEM format
+   * @param certificate certificate in the PEM format
+   */
+  public void importKey(String alias, File privateKey, File certificate) {
+    KeyPair keyPair = getKeyPairFromFile(privateKey);
+    X509Certificate cert = getCertificateFromFile(certificate);
+    KeyStore keyStore = getKeyStore();
+    CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for key [" + alias + "]:  ", false);
+    try {
+      keyStore.setKeyEntry(alias, keyPair.getPrivate(), getKeyPassword(passwordCallback), new X509Certificate[] { cert });
+      setKeyStore(keyStore);
+    } catch(KeyStoreException e) {
+      throw new RuntimeException(e);
+    } catch(UnsupportedCallbackException e) {
+      throw new RuntimeException(e);
+    } catch(IOException e) {
+      throw new RuntimeException(e);
+    }
+
+  }
+
+  /**
+   * Import a private key into the keystore and generate an associated certificate at the given alias.
+   * @param alias name of the key
+   * @param privateKey private key in the PEM format
+   * @param certificateInfo Certificate attributes as a String (e.g. CN=Administrator, OU=Bioinformatics, O=GQ,
+   * L=Montreal, ST=Quebec, C=CA)
+   */
+  public void importKey(String alias, File privateKey, String certificateInfo) {
+    KeyPair keyPair = getKeyPairFromFile(privateKey);
+    X509Certificate cert;
+    try {
+      cert = StudyKeyStore.makeCertificate(keyPair.getPrivate(), keyPair.getPublic(), certificateInfo, chooseSignatureAlgorithm(keyPair.getPrivate().getAlgorithm()));
+      KeyStore keyStore = getKeyStore();
+      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for key [" + alias + "]:  ", false);
+      keyStore.setKeyEntry(alias, keyPair.getPrivate(), getKeyPassword(passwordCallback), new X509Certificate[] { cert });
+      setKeyStore(keyStore);
+    } catch(InvalidKeyException e) {
+      throw new RuntimeException(e);
+    } catch(CertificateEncodingException e) {
+      throw new RuntimeException(e);
+    } catch(SignatureException e) {
+      throw new RuntimeException(e);
+    } catch(NoSuchAlgorithmException e) {
+      throw new RuntimeException(e);
+    } catch(KeyStoreException e) {
+      throw new RuntimeException(e);
+    } catch(UnsupportedCallbackException e) {
+      throw new RuntimeException(e);
+    } catch(IOException e) {
+      throw new RuntimeException(e);
+    }
+
+  }
+
+  private KeyPair getKeyPairFromFile(File privateKey) {
+    try {
+      PEMReader pemReader = new PEMReader(new InputStreamReader(new FileInputStream(privateKey)), new PasswordFinder() {
+
+        public char[] getPassword() {
+          return System.console().readPassword("%s:  ", "Password for imported private key");
+        }
+      });
+      Object object = pemReader.readObject();
+      if(object instanceof KeyPair) {
+        return (KeyPair) object;
+      }
+      throw new RuntimeException("Unexpected type [" + object + "]. Expected KeyPair.");
+    } catch(FileNotFoundException e) {
+      throw new RuntimeException(e);
+    } catch(IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private X509Certificate getCertificateFromFile(File certificate) {
+    try {
+      PEMReader pemReader = new PEMReader(new InputStreamReader(new FileInputStream(certificate)), new PasswordFinder() {
+
+        public char[] getPassword() {
+          return System.console().readPassword("%s:  ", "Password for imported certificate");
+        }
+      });
+      Object object = pemReader.readObject();
+      if(object instanceof X509Certificate) {
+        return (X509Certificate) object;
+      }
+      throw new RuntimeException("Unexpected type [" + object + "]. Expected X509Certificate.");
+    } catch(FileNotFoundException e) {
+      throw new RuntimeException(e);
+    } catch(IOException e) {
+      throw new RuntimeException(e);
     }
   }
 }

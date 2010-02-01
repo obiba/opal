@@ -1,7 +1,6 @@
 package org.obiba.opal.cli.client.command.options;
 
 import java.io.File;
-import java.util.List;
 
 import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
 import uk.co.flamingpenguin.jewel.cli.Option;
@@ -29,12 +28,12 @@ public interface KeyCommandOptions extends GlobalOptions {
   public boolean isSize();
 
   @Option(description = "Provides the private key file.")
-  public List<File> getPrivate();
+  public File getPrivate();
 
   public boolean isPrivate();
 
   @Option(description = "Provides the certified public key file, if omitted the user is prompt for creating one.")
-  public List<File> getCertificate();
+  public File getCertificate();
 
   public boolean isCertificate();
 }

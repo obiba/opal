@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.core.service.impl;
 
+import java.io.File;
 import java.security.KeyStoreException;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -31,6 +32,7 @@ public abstract class DefaultStudyKeyStoreServiceImpl extends PersistenceManager
     StudyKeyStore studyKeyStore = getPersistenceManager().matchOne(template);
     if(studyKeyStore != null) {
       studyKeyStore.setCallbackHander(callbackHandler);
+      StudyKeyStore.loadBouncyCastle();
     }
     return studyKeyStore;
   }
@@ -80,6 +82,28 @@ public abstract class DefaultStudyKeyStoreServiceImpl extends PersistenceManager
       throw new RuntimeException("The key store [" + DEFAULT_STUDY_ID + "] does not exist.");
     }
     return defaultStore.aliasExists(alias);
+  }
+
+  public void importKey(String alias, File privateKey, File certificate) {
+    Assert.hasText(alias, "alias must not be null or empty");
+    Assert.notNull(privateKey, "privateKey must not be null");
+    Assert.notNull(certificate, "certificate must not be null");
+    StudyKeyStore defaultStore = getStudyKeyStore(DEFAULT_STUDY_ID);
+    if(defaultStore == null) {
+      defaultStore = StudyKeyStore.Builder.newStore().studyId(DEFAULT_STUDY_ID).passwordPrompt(callbackHandler).build();
+    }
+    defaultStore.importKey(alias, privateKey, certificate);
+  }
+
+  public void importKey(String alias, File privateKey, String certificateInfo) {
+    Assert.hasText(alias, "alias must not be null or empty");
+    Assert.notNull(privateKey, "privateKey must not be null");
+    Assert.hasText(certificateInfo, "certificateInfo must not be null or empty");
+    StudyKeyStore defaultStore = getStudyKeyStore(DEFAULT_STUDY_ID);
+    if(defaultStore == null) {
+      defaultStore = StudyKeyStore.Builder.newStore().studyId(DEFAULT_STUDY_ID).passwordPrompt(callbackHandler).build();
+    }
+    defaultStore.importKey(alias, privateKey, certificateInfo);
   }
 
 }

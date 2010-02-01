@@ -48,7 +48,18 @@ public class KeyCommand extends AbstractCommand<KeyCommandOptions> {
         studyKeyStoreService.createOrUpdateKey(options.getAlias(), options.getAlgorithm(), options.getSize(), certificateInfo);
       }
     } else if(options.isPrivate()) {
-      System.out.println("import");
+      boolean createKeyConfirmation = true;
+      if(aliasAlreadyExists(options.getAlias())) {
+        createKeyConfirmation = confirmKeyOverWrite();
+      }
+      if(createKeyConfirmation) {
+        if(options.isCertificate()) {
+          studyKeyStoreService.importKey(options.getAlias(), options.getPrivate(), options.getCertificate());
+        } else {
+          String certificateInfo = new CertificateInfo().getCertificateInfoAsString();
+          studyKeyStoreService.importKey(options.getAlias(), options.getPrivate(), certificateInfo);
+        }
+      }
     } else {
       unrecognizedOptionsHelp();
     }

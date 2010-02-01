@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.core.service;
 
+import java.io.File;
 import java.util.Set;
 
 import org.obiba.opal.core.crypt.StudyKeyStore;
@@ -62,5 +63,22 @@ public interface StudyKeyStoreService {
    * @return true is the alias exists.
    */
   public boolean aliasExists(String alias);
+
+  /**
+   * Import a private key and it's associated certificate into the keystore at the given alias.
+   * @param alias name of the key
+   * @param privateKey private key in the PEM format
+   * @param certificate certificate in the PEM format
+   */
+  public void importKey(String alias, File privateKey, File certificate);
+
+  /**
+   * Import a private key into the keystore and generate an associated certificate at the given alias.
+   * @param alias name of the key
+   * @param privateKey private key in the PEM format
+   * @param certificateInfo Certificate attributes as a String (e.g. CN=Administrator, OU=Bioinformatics, O=GQ,
+   * L=Montreal, ST=Quebec, C=CA)
+   */
+  public void importKey(String alias, File privateKey, String certificateInfo);
 
 }
