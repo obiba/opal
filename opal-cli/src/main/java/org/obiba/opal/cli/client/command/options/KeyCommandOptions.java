@@ -24,7 +24,7 @@ public interface KeyCommandOptions extends GlobalOptions {
   public boolean isAlgorithm();
 
   @Option(description = "Specify the key size.")
-  public String getSize();
+  public int getSize();
 
   public boolean isSize();
 

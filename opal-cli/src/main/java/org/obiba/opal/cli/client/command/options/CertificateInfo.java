@@ -39,9 +39,9 @@ public class CertificateInfo {
   private String getDnString() {
     StringBuilder sb = new StringBuilder();
     for(Attribute attribute : infoList) {
-      sb.append(attribute.getName()).append("=").append(attribute.getValue()).append(" ");
+      sb.append(attribute.getName()).append("=").append(attribute.getValue()).append(", ");
     }
-    sb.setLength(sb.length() - 1);
+    sb.setLength(sb.length() - 2);
     return sb.toString();
   }
 

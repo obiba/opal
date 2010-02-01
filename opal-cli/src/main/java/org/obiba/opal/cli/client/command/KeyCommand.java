@@ -9,10 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.cli.client.command;
 
+import java.security.KeyStoreException;
+
 import org.obiba.opal.cli.client.command.options.CertificateInfo;
 import org.obiba.opal.cli.client.command.options.KeyCommandOptions;
+import org.obiba.opal.core.crypt.StudyKeyStore;
 import org.obiba.opal.core.service.StudyKeyStoreService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 
 /**
  * Provides key management allowing for key creation, deletion, importing and exporting of keys.
@@ -26,17 +30,52 @@ public class KeyCommand extends AbstractCommand<KeyCommandOptions> {
     if(options.isDelete()) {
       System.out.println("delete");
     } else if(options.isAlgorithm() && options.isSize()) {
-      System.out.println("create key");
-      // check if alias already exists. If yes, then confirm the overwrite.
-      for(String id : studyKeyStoreService.getStudyIds()) {
-        System.out.println(id);
+      boolean createKeyConfirmation = true;
+      if(aliasAlreadyExists(options.getAlias())) {
+        createKeyConfirmation = confirmKeyOverWrite();
       }
-      CertificateInfo info = new CertificateInfo();
-      System.out.println(info.getCertificateInfoAsString());
+      if(createKeyConfirmation) {
+        String certificateInfo = new CertificateInfo().getCertificateInfoAsString();
+        studyKeyStoreService.createOrUpdateKey(options.getAlias(), options.getAlgorithm(), options.getSize(), certificateInfo);
+      }
     } else if(options.isPrivate()) {
       System.out.println("import");
     } else {
       unrecognizedOptionsHelp();
+    }
+  }
+
+  private boolean confirmKeyOverWrite() {
+    if(confirm("A key already exists for the alias [" + options.getAlias() + "]. Would you like to overwrite it?")) {
+      return confirm("Please confirm a second time. Are you sure you want to overwrite the key with the alias [" + options.getAlias() + "]?");
+    }
+    return false;
+  }
+
+  private boolean confirm(String question) {
+    System.console().printf("%s\n", question);
+    String ans = "no";
+    do {
+      String answer = System.console().readLine("  [%s]:  ", ans);
+      if(answer != null && !answer.equals("")) {
+        ans = answer;
+      }
+    } while(!(ans.equalsIgnoreCase("yes") || ans.equalsIgnoreCase("no") || ans.equalsIgnoreCase("y") || ans.equalsIgnoreCase("n")));
+    if(ans.equalsIgnoreCase("yes") || ans.equalsIgnoreCase("y")) {
+      return true;
+    }
+    return false;
+  }
+
+  private boolean aliasAlreadyExists(String alias) {
+    Assert.hasText(alias, "alias must not be empty or null");
+    StudyKeyStore studyKeyStore = studyKeyStoreService.getStudyKeyStore(StudyKeyStoreService.DEFAULT_STUDY_ID);
+    if(studyKeyStore == null) return false; // The KeyStore doesn't exist.
+    try {
+      return studyKeyStore.getKeyStore().containsAlias(alias);
+    } catch(KeyStoreException e) {
+      System.out.println("not loaded");
+      throw new RuntimeException(e);
     }
   }
 
