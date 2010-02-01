@@ -60,9 +60,21 @@
 
       <dependency>
         <groupId>org.obiba.magma</groupId>
-        <artifactId>magma-datasource-hibernate</artifactId>
+        <artifactId>magma-hibernate-common</artifactId>
         <version>${magma.version}</version>
       </dependency>
+
+      <dependency>
+        <groupId>org.obiba.magma</groupId>
+        <artifactId>magma-hibernate-datasource</artifactId>
+        <version>${magma.version}</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.obiba.magma</groupId>
+        <artifactId>magma-hibernate-audit</artifactId>
+        <version>${magma.version}</version>
+      </dependency>      
 
       <dependency>
         <groupId>org.obiba.magma</groupId>

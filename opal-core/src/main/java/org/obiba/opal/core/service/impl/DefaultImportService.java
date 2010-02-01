@@ -18,6 +18,7 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
+import org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
@@ -51,6 +52,8 @@ public class DefaultImportService implements ImportService {
   private DatasourceEncryptionStrategy dsEncryptionStrategy;
 
   private String archiveDirectory;
+
+  private HibernateVariableEntityAuditLogManager auditLogManager;
 
   //
   // ImportService Methods
@@ -104,8 +107,12 @@ public class DefaultImportService implements ImportService {
     this.archiveDirectory = archiveDirectory;
   }
 
+  public void setAuditLogManager(HibernateVariableEntityAuditLogManager auditLogManager) {
+    this.auditLogManager = auditLogManager;
+  }
+
   private void copyValueTables(Datasource source, Datasource destination, String owner) throws IOException {
-    DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build();
+    DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, source, destination).build();
 
     for(ValueTable valueTable : source.getValueTables()) {
       if(valueTable.isForEntityType("Participant")) {
@@ -155,4 +162,5 @@ public class DefaultImportService implements ImportService {
       log.error("Failed to archive file {}", file);
     }
   }
+
 }

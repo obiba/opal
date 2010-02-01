@@ -42,8 +42,18 @@
 
     <dependency>
       <groupId>org.obiba.magma</groupId>
-      <artifactId>magma-datasource-hibernate</artifactId>
+      <artifactId>magma-hibernate-common</artifactId>
+    </dependency>   
+
+    <dependency>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-hibernate-datasource</artifactId>
     </dependency>
+    
+    <dependency>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-hibernate-audit</artifactId>
+    </dependency>    
 
     <dependency>
       <groupId>org.obiba.magma</groupId>
@@ -98,6 +108,11 @@
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-ext-jdk15</artifactId>     
     </dependency>
+    
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-core</artifactId>
+    </dependency>    
 
   </dependencies>
 

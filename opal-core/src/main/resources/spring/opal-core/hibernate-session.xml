@@ -59,6 +59,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         <property name="searchPatterns">
           <set>
             <value>classpath*:org/obiba/magma/datasource/hibernate/domain/**/*.class</value>
+            <value>classpath*:org/obiba/magma/audit/hibernate/domain/**/*.class</value>            
             <value>classpath*:org/obiba/opal/core/crypt/**/*.class</value>
           </set>
         </property>

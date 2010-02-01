@@ -40,5 +40,12 @@
       </bean>
     </property>
   </bean>
+  
+  <bean id="auditLogManager" class="org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager">
+    <property name="sessionFactory" ref="opalSessionFactory" />
+    <property name="userProvider">
+      <bean class="org.obiba.opal.audit.OpalUserProvider"/>
+    </property>      
+  </bean>
 
 </beans>
