@@ -63,4 +63,23 @@ public abstract class DefaultStudyKeyStoreServiceImpl extends PersistenceManager
   public void setCallbackHandler(CallbackHandler callbackHandler) {
     this.callbackHandler = callbackHandler;
   }
+
+  public void deleteKey(String alias) {
+    Assert.hasText(alias, "alias must not be null or empty");
+    StudyKeyStore defaultStore = getStudyKeyStore(DEFAULT_STUDY_ID);
+    if(defaultStore == null) {
+      throw new RuntimeException("The key store [" + DEFAULT_STUDY_ID + "] does not exist. Nothing to delete.");
+    }
+    defaultStore.deleteKey(alias);
+  }
+
+  public boolean aliasExists(String alias) {
+    Assert.hasText(alias, "alias must not be null or empty");
+    StudyKeyStore defaultStore = getStudyKeyStore(DEFAULT_STUDY_ID);
+    if(defaultStore == null) {
+      throw new RuntimeException("The key store [" + DEFAULT_STUDY_ID + "] does not exist.");
+    }
+    return defaultStore.aliasExists(alias);
+  }
+
 }

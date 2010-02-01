@@ -241,4 +241,33 @@ public class StudyKeyStore extends AbstractEntity {
     }
     return "SHA1WithRSA";
   }
+
+  /**
+   * Deletes the key associated with the provided alias.
+   * @param alias key to delete
+   */
+  public void deleteKey(String alias) {
+    KeyStore keyStore = getKeyStore();
+    try {
+      keyStore.deleteEntry(alias);
+      setKeyStore(keyStore);
+    } catch(KeyStoreException e) {
+      throw new KeyProviderException(e);
+    }
+
+  }
+
+  /**
+   * Returns true if the provided alias exists.
+   * @param alias check if this alias exists in the KeyStore.
+   * @return true if the alias exists
+   */
+  public boolean aliasExists(String alias) {
+    KeyStore keyStore = getKeyStore();
+    try {
+      return keyStore.containsAlias(alias);
+    } catch(KeyStoreException e) {
+      throw new KeyProviderException(e);
+    }
+  }
 }

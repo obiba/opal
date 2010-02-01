@@ -50,4 +50,17 @@ public interface StudyKeyStoreService {
    */
   public void createOrUpdateKey(String alias, String algorithm, int size, String certificateInfo);
 
+  /**
+   * Deletes a public/private key pair specified by alias.
+   * @param alias name of the public/private key pair to be deleted
+   */
+  public void deleteKey(String alias);
+
+  /**
+   * Returns true if the supplied alias exists.
+   * @param alias test if this alias exists.
+   * @return true is the alias exists.
+   */
+  public boolean aliasExists(String alias);
+
 }

@@ -28,7 +28,16 @@ public class KeyCommand extends AbstractCommand<KeyCommandOptions> {
 
   public void execute() {
     if(options.isDelete()) {
-      System.out.println("delete");
+      StudyKeyStore studyKeyStore = studyKeyStoreService.getStudyKeyStore(StudyKeyStoreService.DEFAULT_STUDY_ID);
+      if(studyKeyStore == null) {
+        System.out.println("keystore doesn't exist");
+      } else {
+        if(studyKeyStoreService.aliasExists(options.getAlias())) {
+          studyKeyStoreService.deleteKey(options.getAlias());
+        } else {
+          System.out.println("The alias [" + options.getAlias() + "] does not exist.");
+        }
+      }
     } else if(options.isAlgorithm() && options.isSize()) {
       boolean createKeyConfirmation = true;
       if(aliasAlreadyExists(options.getAlias())) {
