@@ -17,6 +17,7 @@ import org.obiba.opal.cli.client.command.Command;
 import org.obiba.opal.cli.client.command.HelpCommand;
 import org.obiba.opal.cli.client.command.ImportCommand;
 import org.obiba.opal.cli.client.command.KeyCommand;
+import org.obiba.opal.cli.client.command.PublicCommand;
 import org.obiba.opal.cli.client.command.QuitCommand;
 import org.obiba.opal.cli.client.command.UpgradeCommand;
 import org.obiba.opal.cli.client.command.UserAuthentication;
@@ -25,6 +26,7 @@ import org.obiba.opal.cli.client.command.options.GlobalOptions;
 import org.obiba.opal.cli.client.command.options.HelpCommandOptions;
 import org.obiba.opal.cli.client.command.options.ImportCommandOptions;
 import org.obiba.opal.cli.client.command.options.KeyCommandOptions;
+import org.obiba.opal.cli.client.command.options.PublicCommandOptions;
 import org.obiba.opal.cli.client.command.options.QuitCommandOptions;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -63,6 +65,7 @@ public class OpalConsole extends AbstractCliClient {
     addAvailableCommand(QuitCommand.class, QuitCommandOptions.class);
     addAvailableCommand(ImportCommand.class, ImportCommandOptions.class);
     addAvailableCommand(KeyCommand.class, KeyCommandOptions.class);
+    addAvailableCommand(PublicCommand.class, PublicCommandOptions.class);
   }
 
   private OpalConsole(OpalConsoleOptions options) {
@@ -117,6 +120,7 @@ public class OpalConsole extends AbstractCliClient {
             printHelp(commandName, e);
           } catch(RuntimeException e) {
             System.console().printf("Error executing command '%s'.\n", commandName);
+            e.printStackTrace();
             System.err.println(e);
           }
         } else {
