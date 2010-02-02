@@ -10,7 +10,7 @@ import uk.co.flamingpenguin.jewel.cli.Option;
  * This interface declares the options that may be used with the "public" command.
  */
 @CommandLineInterface(application = "public")
-public interface PublicCommandOptions extends GlobalOptions {
+public interface PublicCommandOptions extends HelpOption {
 
   @Option(description = "Specify the alias name for the keystore entry.")
   public String getAlias();

@@ -20,6 +20,6 @@ import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
  * 
  */
 @CommandLineInterface(application = "version")
-public interface VersionCommandOptions {
+public interface VersionCommandOptions extends HelpOption {
   // no options
 }

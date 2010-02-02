@@ -16,9 +16,10 @@ import uk.co.flamingpenguin.jewel.cli.Unparsed;
  * 
  */
 @CommandLineInterface(application = "decrypt")
-public interface DecryptCommandOptions extends GlobalOptions {
+public interface DecryptCommandOptions extends HelpOption {
 
   @Unparsed(name = "FILE")
+  @Option(description = "A list of files to be decrypted.")
   public List<File> getFiles();
 
   public boolean isFiles();

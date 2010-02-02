@@ -1,7 +1,11 @@
 package org.obiba.opal.cli.client.command.options;
 
+import java.io.File;
+import java.util.List;
+
 import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
 import uk.co.flamingpenguin.jewel.cli.Option;
+import uk.co.flamingpenguin.jewel.cli.Unparsed;
 
 /**
  * This interface declares the options that may be used with the <code>import</code> command.
@@ -19,11 +23,20 @@ import uk.co.flamingpenguin.jewel.cli.Option;
  * 
  */
 @CommandLineInterface(application = "import")
-public interface ImportCommandOptions extends DatasourceOption, FileListOption, HelpOption {
+public interface ImportCommandOptions extends HelpOption {
 
-  @Option(shortName = "o")
+  @Unparsed(name = "FILE")
+  @Option(description = "A list of files to be imported.")
+  public List<File> getFiles();
+
+  public boolean isFiles();
+
+  @Option(shortName = "d", description = "Indicates the destination datasource.")
+  public String getDatasource();
+
+  @Option(shortName = "o", description = "Indicates the owner of any identifiers used in the data to be imported.")
   public String getOwner();
 
-  @Option(shortName = "e")
+  @Option(shortName = "e", description = "Indicates that the files to be imported are encrypted.")
   public boolean getEncrypted();
 }

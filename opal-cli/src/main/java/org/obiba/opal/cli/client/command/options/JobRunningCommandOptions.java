@@ -5,7 +5,7 @@ import java.util.List;
 import uk.co.flamingpenguin.jewel.cli.Option;
 import uk.co.flamingpenguin.jewel.cli.Unparsed;
 
-public interface JobRunningCommandOptions extends GlobalOptions, AuthenticationOptions {
+public interface JobRunningCommandOptions extends HelpOption, AuthenticationOptions {
 
   @Option(shortName = "l")
   public boolean isListJobs();

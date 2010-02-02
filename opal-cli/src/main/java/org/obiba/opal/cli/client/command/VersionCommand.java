@@ -29,6 +29,6 @@ public class VersionCommand extends AbstractCommand<VersionCommandOptions> {
   //
 
   public void execute() {
-    System.out.println("version " + opalVersion);
+    System.out.println("The current version of Opal is " + opalVersion);
   }
 }

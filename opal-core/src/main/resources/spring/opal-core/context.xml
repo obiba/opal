@@ -47,5 +47,7 @@
       <bean class="org.obiba.opal.audit.OpalUserProvider"/>
     </property>      
   </bean>
+  
+  <import resource="version.xml" />
 
 </beans>
