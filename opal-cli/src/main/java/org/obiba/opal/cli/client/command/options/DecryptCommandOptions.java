@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.List;
 
 import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
+import uk.co.flamingpenguin.jewel.cli.Option;
 import uk.co.flamingpenguin.jewel.cli.Unparsed;
 
 /**
@@ -15,7 +16,7 @@ import uk.co.flamingpenguin.jewel.cli.Unparsed;
  * 
  */
 @CommandLineInterface(application = "decrypt")
-public interface DecryptCommandOptions extends GlobalOptions, AuthenticationOptions {
+public interface DecryptCommandOptions extends GlobalOptions {
 
   @Unparsed(name = "FILE")
   public List<File> getFiles();
@@ -24,5 +25,9 @@ public interface DecryptCommandOptions extends GlobalOptions, AuthenticationOpti
 
   public boolean isOutput();
 
-  public String getOutput();
+  @Option(description = "File into which the decrypted file is written.")
+  public File getOutput();
+
+  @Option(description = "Specify the alias name for the keystore entry.")
+  public String getAlias();
 }

@@ -14,6 +14,7 @@ import java.util.Arrays;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.util.LifecycleUtils;
 import org.obiba.opal.cli.client.command.Command;
+import org.obiba.opal.cli.client.command.DecryptCommand;
 import org.obiba.opal.cli.client.command.HelpCommand;
 import org.obiba.opal.cli.client.command.ImportCommand;
 import org.obiba.opal.cli.client.command.KeyCommand;
@@ -22,6 +23,7 @@ import org.obiba.opal.cli.client.command.QuitCommand;
 import org.obiba.opal.cli.client.command.UpgradeCommand;
 import org.obiba.opal.cli.client.command.UserAuthentication;
 import org.obiba.opal.cli.client.command.options.AuthenticationOptions;
+import org.obiba.opal.cli.client.command.options.DecryptCommandOptions;
 import org.obiba.opal.cli.client.command.options.GlobalOptions;
 import org.obiba.opal.cli.client.command.options.HelpCommandOptions;
 import org.obiba.opal.cli.client.command.options.ImportCommandOptions;
@@ -66,6 +68,7 @@ public class OpalConsole extends AbstractCliClient {
     addAvailableCommand(ImportCommand.class, ImportCommandOptions.class);
     addAvailableCommand(KeyCommand.class, KeyCommandOptions.class);
     addAvailableCommand(PublicCommand.class, PublicCommandOptions.class);
+    addAvailableCommand(DecryptCommand.class, DecryptCommandOptions.class);
   }
 
   private OpalConsole(OpalConsoleOptions options) {

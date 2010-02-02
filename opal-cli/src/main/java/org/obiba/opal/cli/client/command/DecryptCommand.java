@@ -17,8 +17,6 @@ import java.io.InputStream;
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.cli.client.command.options.DecryptCommandOptions;
 import org.obiba.opal.core.crypt.KeyProviderException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * Command to decrypt an Onyx data file.
@@ -41,7 +39,6 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
   //
 
   public void execute() {
-    new UserAuthentication(options).authenticate();
     // Ensure that options have been set.
     if(options == null) {
       throw new IllegalStateException("Options not set (setOptions must be called before calling execute)");
@@ -55,9 +52,6 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
       }
 
       if(outputDir != null) {
-        // First, lazily initialize the dataInputStrategy variable (fetch it from the Spring ApplicationContext).
-        ApplicationContext context = loadContext();
-
         // Now process each input file (Onyx data zip file) specified on the command line.
         for(File inputFile : options.getFiles()) {
           try {
@@ -79,10 +73,6 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
   // Methods
   //
 
-  private ApplicationContext loadContext() {
-    return new ClassPathXmlApplicationContext(new String[] { "/META-INF/opal/context-config.xml", "/spring/opal-core/crypt.xml", "/META-INF/onyx-data-input.xml" });
-  }
-
   private void processFile(File inputFile, File outputDir, String keystorePassword) {
     System.out.println("Processing input file " + inputFile.getPath());
 
@@ -95,9 +85,7 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
    * @return the directory, as a <code>File</code> object (or <code>null</code> if the directory does not exist and
    * could not be created
    */
-  private File getOutputDir(String output) {
-    File outputDir = new File(output);
-
+  private File getOutputDir(File outputDir) {
     if(!outputDir.isDirectory()) {
       if(!outputDir.isFile()) {
         boolean dirCreated = outputDir.mkdirs();
