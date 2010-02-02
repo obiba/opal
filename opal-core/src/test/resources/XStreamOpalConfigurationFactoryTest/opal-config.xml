@@ -16,7 +16,7 @@
 
         <!-- Use a transformer to add views to the factory-create datasource.         
         <transformer class="org.obiba.magma.views.support.ViewAwareDatasourceTransformer">
-          <name>my-views</name>
+          <name>my-datasource-with-views</name>
           <views>
             <view class="org.obiba.magma.views.View">
               <name>MySmokersView</name>
