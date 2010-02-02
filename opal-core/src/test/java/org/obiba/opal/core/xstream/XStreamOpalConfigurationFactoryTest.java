@@ -81,7 +81,7 @@ public class XStreamOpalConfigurationFactoryTest {
 
     // Verify configured datasource factories.
     assertEquals(1, magmaEngineFactory.factories().size());
-    DatasourceFactory<?> datasourceFactory = magmaEngineFactory.factories().iterator().next();
+    DatasourceFactory datasourceFactory = magmaEngineFactory.factories().iterator().next();
     assertTrue(datasourceFactory instanceof HibernateDatasourceFactory);
     HibernateDatasourceFactory hibernateDatasourceFactory = (HibernateDatasourceFactory) datasourceFactory;
     SessionFactoryProvider sessionFactoryProvider = hibernateDatasourceFactory.getSessionFactoryProvider();
