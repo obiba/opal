@@ -13,6 +13,27 @@
         <sessionFactoryProvider class="org.obiba.magma.datasource.hibernate.support.SpringBeanSessionFactoryProvider">
           <beanName>hibernateSessionFactoryBeanName</beanName>
         </sessionFactoryProvider>
+
+        <!-- Use a transformer to add views to the factory-create datasource.         
+        <transformer class="org.obiba.magma.views.support.ViewAwareDatasourceTransformer">
+          <name>my-views</name>
+          <views>
+            <view class="org.obiba.magma.views.View">
+              <name>MySmokersView</name>
+              <select class="org.obiba.magma.js.views.JavascriptClause">
+                <script>variable().name().matches(/Participant.*/, /DO_YOU_SMOKE/)</script>
+              </select>
+              <from class="org.obiba.magma.support.ValueTableReference">
+                <reference>my-datasource.Participants</reference>
+              </from>
+              <where class="org.obiba.magma.js.views.JavascriptClause">
+                <script>$('DO_YOU_SMOKE').any('DNK', 'PNA').not()</script>
+              </where>
+            </view>
+          </views>
+        </transformer>
+        -->
+
       </org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
     </factories>
   </magmaEngineFactory>
