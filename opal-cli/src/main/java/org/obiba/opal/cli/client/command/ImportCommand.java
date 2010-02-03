@@ -21,6 +21,7 @@ import org.obiba.opal.cli.client.command.options.ImportCommandOptions;
 import org.obiba.opal.core.service.ImportService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@CommandUsage(description = "Imports a list of Onyx data files to a destination datasource.")
 public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCommandOptions> {
 
   //

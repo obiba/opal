@@ -14,6 +14,7 @@ import org.obiba.opal.cli.client.command.options.QuitCommandOptions;
 /**
  * Quit command. Tells the {@code CliClient} to exit.
  */
+@CommandUsage(description = "Shuts down Opal.")
 public class QuitCommand extends AbstractCommand<QuitCommandOptions> {
 
   public void execute() {

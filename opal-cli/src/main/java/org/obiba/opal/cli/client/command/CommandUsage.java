@@ -7,19 +7,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.cli.client.command.options;
+package org.obiba.opal.cli.client.command;
 
-import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-/**
- * This interface declares the options that may be used with the help command.
- * 
- * Note that there <bold>no</bold> options for this command.
- * 
- * @author cag-dspathis
- * 
- */
-@CommandLineInterface(application = "help")
-public interface HelpCommandOptions extends HelpOption {
-  // no options
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface CommandUsage {
+  String description() default "";
 }

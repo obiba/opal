@@ -21,6 +21,7 @@ import org.obiba.opal.core.crypt.KeyProviderException;
 /**
  * Command to decrypt an Onyx data file.
  */
+@CommandUsage(description = "Decrypts a list of Onyx data files.")
 public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
   //
   // Constants

@@ -17,6 +17,7 @@ import org.obiba.opal.cli.client.command.options.HelpCommandOptions;
  * Note: This command provides help on the client itself (basic syntax), not context-sensitive help on specific
  * commands. The latter should be provided by each command's "--help" option.
  */
+@CommandUsage(description = "Displays the list of available commands for Opal.")
 public class HelpCommand extends AbstractCommand<HelpCommandOptions> {
   //
   // AbstractCommand Methods

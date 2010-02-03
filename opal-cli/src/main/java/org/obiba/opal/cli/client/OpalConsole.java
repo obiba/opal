@@ -138,6 +138,7 @@ public class OpalConsole extends AbstractCliClient {
 
   private void printHelp(String commandName, ArgumentValidationException e) {
     boolean helpRequested = false;
+    System.console().printf(getCommandUsageDescription(commandName) + "\n");
     for(ValidationError error : e.getValidationErrors()) {
       System.err.println(error);
       if(error.getErrorType() == ValidationError.ErrorType.HelpRequested) {

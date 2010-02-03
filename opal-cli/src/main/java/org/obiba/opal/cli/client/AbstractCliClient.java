@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.obiba.opal.cli.client.command.Command;
+import org.obiba.opal.cli.client.command.CommandUsage;
 
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException;
 import uk.co.flamingpenguin.jewel.cli.CliFactory;
@@ -120,6 +121,20 @@ public abstract class AbstractCliClient implements CliClient {
   }
 
   /**
+   * Retrieves the command usage description.
+   * 
+   * @param commandName The command name.
+   */
+  protected String getCommandUsageDescription(String commandName) {
+    Annotation commandUsage = commandMap.get(commandName).getAnnotation(CommandUsage.class);
+    String commandUsageDescription = "";
+    if(commandUsage != null) {
+      commandUsageDescription = ((CommandUsage) commandUsage).description();
+    }
+    return commandUsageDescription;
+  }
+
+  /**
    * Parses the specified command line and returns the corresponding <code>Command</code> object.
    * 
    * @param cmdline command line
@@ -170,5 +185,4 @@ public abstract class AbstractCliClient implements CliClient {
 
     return command;
   }
-
 }

@@ -17,6 +17,6 @@ import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
  * Note that there <bold>no</bold> options for this command.
  */
 @CommandLineInterface(application = "quit")
-public interface QuitCommandOptions {
+public interface QuitCommandOptions extends HelpOption {
   // no options
 }

@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Version command.
  */
+@CommandUsage(description = "Displays the current version of Opal.")
 public class VersionCommand extends AbstractCommand<VersionCommandOptions> {
   //
   // Constants

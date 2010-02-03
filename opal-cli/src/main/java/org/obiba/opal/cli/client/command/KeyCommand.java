@@ -21,6 +21,7 @@ import org.springframework.util.Assert;
 /**
  * Provides key management allowing for key creation, deletion, importing and exporting of keys.
  */
+@CommandUsage(description = "Allows key creation, deletion, import and export.")
 public class KeyCommand extends AbstractCommand<KeyCommandOptions> {
 
   @Autowired

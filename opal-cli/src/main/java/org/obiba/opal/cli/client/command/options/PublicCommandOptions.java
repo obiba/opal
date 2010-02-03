@@ -12,10 +12,10 @@ import uk.co.flamingpenguin.jewel.cli.Option;
 @CommandLineInterface(application = "public")
 public interface PublicCommandOptions extends HelpOption {
 
-  @Option(description = "Specify the alias name for the keystore entry.")
+  @Option(description = "Specify the alias name of the public key.")
   public String getAlias();
 
-  @Option(description = "Export to this file. Base64 Encoded.")
+  @Option(description = "Export the certificate to this file. Base64 Encoded.")
   public List<File> getRfc();
 
   public boolean isRfc();
