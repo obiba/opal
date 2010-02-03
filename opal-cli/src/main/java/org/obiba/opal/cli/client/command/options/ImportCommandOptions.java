@@ -26,7 +26,6 @@ import uk.co.flamingpenguin.jewel.cli.Unparsed;
 public interface ImportCommandOptions extends HelpOption {
 
   @Unparsed(name = "FILE")
-  @Option(description = "A list of files to be imported.")
   public List<File> getFiles();
 
   public boolean isFiles();

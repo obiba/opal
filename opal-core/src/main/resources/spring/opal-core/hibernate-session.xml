@@ -12,22 +12,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
       <bean class="org.hibernate.cfg.ImprovedNamingStrategy" />
     </property>
     <property name="annotatedClasses">
-      <bean class="org.obiba.onyx.spring.AnnotatedBeanFinderFactoryBean">
-        <!-- Use Apache Ant Pattern -->
-        <property name="searchPatterns">
-          <set>
-            <value>classpath*:org/obiba/opal/core/domain/participant/**/*.class</value>
-          </set>
-        </property>
-        <!-- Specify annotations to look for in classes -->
-        <property name="annotationClasses">
-          <set>
-            <value>javax.persistence.Entity</value>
-            <value>javax.persistence.Embeddable</value>
-            <value>javax.persistence.MappedSuperclass</value>
-          </set>
-        </property>
-      </bean>
+      <bean class="org.obiba.opal.core.support.KeyAnnotationConfigurationHelper"/>
     </property>
     <property name="configurationClass" value="org.hibernate.cfg.AnnotationConfiguration" />
     <property name="hibernateProperties">
@@ -54,24 +39,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
       <bean class="org.hibernate.cfg.ImprovedNamingStrategy" />
     </property>
     <property name="annotatedClasses">
-      <bean class="org.obiba.onyx.spring.AnnotatedBeanFinderFactoryBean">
-        <!-- Use Apache Ant Pattern -->
-        <property name="searchPatterns">
-          <set>
-            <value>classpath*:org/obiba/magma/datasource/hibernate/domain/**/*.class</value>
-            <value>classpath*:org/obiba/magma/audit/hibernate/domain/**/*.class</value>            
-            <value>classpath*:org/obiba/opal/core/crypt/**/*.class</value>
-          </set>
-        </property>
-        <!-- Specify annotations to look for in classes -->
-        <property name="annotationClasses">
-          <set>
-            <value>javax.persistence.Entity</value>
-            <value>javax.persistence.Embeddable</value>
-            <value>javax.persistence.MappedSuperclass</value>
-          </set>
-        </property>
-      </bean>
+      <bean class="org.obiba.opal.core.support.OpalAnnotationConfigurationHelper"/>
     </property>
     <property name="configurationClass" value="org.hibernate.cfg.AnnotationConfiguration" />
     <property name="hibernateProperties">
