@@ -10,34 +10,32 @@
 package org.obiba.opal.cli.client.command;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.obiba.core.util.FileUtil;
+import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.opal.cli.client.command.options.DecryptCommandOptions;
 import org.obiba.opal.core.crypt.KeyProviderException;
+import org.obiba.opal.core.service.DecryptService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Command to decrypt an Onyx data file.
  */
 @CommandUsage(description = "Decrypts a list of Onyx data files.")
-public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
+public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptCommandOptions> {
   //
   // Constants
   //
 
-  public static final String DIGEST_ALGORITHM = "SHA-512";
-
-  public static final String DIGEST_ENTRY_SUFFIX = ".sha512";
+  public static final String DECRYPT_DATASOURCE_NAME = "decrypt-datasource";
 
   //
   // Instance Variables
   //
-
-  //
-  // AbstractCommand Methods
-  //
+  @Autowired
+  private DecryptService decryptService;
 
   public void execute() {
     // Ensure that options have been set.
@@ -75,8 +73,18 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
   //
 
   private void processFile(File inputFile, File outputDir, String keystorePassword) {
-    System.out.println("Processing input file " + inputFile.getPath());
+    String outputFilename = inputFile.getName().substring(0, inputFile.getName().length() - 5);
+    File outputFile = new File(outputDir, outputFilename + "-plaintext.zip");
+    FsDatasource outputDatasource = new FsDatasource(DECRYPT_DATASOURCE_NAME, outputFile);
 
+    MagmaEngine.get().addDatasource(outputDatasource);
+    try {
+      decryptService.decryptData(DECRYPT_DATASOURCE_NAME, inputFile, true);
+    } catch(IllegalArgumentException e) {
+      throw new RuntimeException(e);
+    } catch(IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
@@ -108,46 +116,4 @@ public class DecryptCommand extends AbstractCommand<DecryptCommandOptions> {
     return outputDir;
   }
 
-  private void persistDecryptedEntry(InputStream entryStream, File outputFile) throws IOException {
-    // Recursively create the parent directory if necessary.
-    if(outputFile.getParentFile() != null) {
-      if(!outputFile.getParentFile().exists()) {
-        boolean dirCreated = outputFile.getParentFile().mkdirs();
-        if(!dirCreated) {
-          // Recursively delete the directory path, in case it was partially created.
-          try {
-            FileUtil.delete(outputFile.getParentFile());
-          } catch(IOException ex) {
-            ; // nothing to do
-          }
-
-          throw new IOException("Could not create parent directory " + outputFile.getParentFile().getPath());
-        }
-      } else if(!outputFile.getParentFile().isDirectory()) {
-        throw new IOException("Invalid parent directory " + outputFile.getParentFile().getPath());
-      }
-    }
-
-    // Now read the entry's stream and persist it to a file.
-    FileOutputStream fos = null;
-    try {
-      fos = new FileOutputStream(outputFile);
-
-      while(true) {
-        int entryByte = entryStream.read();
-        if(entryByte == -1) {
-          break;
-        }
-
-        fos.write(entryByte);
-      }
-    } finally {
-      if(fos != null) {
-        try {
-          fos.close();
-        } catch(IOException ex) {
-        }
-      }
-    }
-  }
 }
