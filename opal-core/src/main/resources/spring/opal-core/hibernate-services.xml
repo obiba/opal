@@ -31,6 +31,15 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     </property>
     <property name="archiveDirectory" value="${org.obiba.opal.import.archiveDirectory}" />
   </bean>
+  
+  <bean id="decryptService" class="org.obiba.opal.core.service.impl.DefaultDecryptService" lazy-init="true">
+    <property name="auditLogManager" ref="auditLogManager" />
+    <property name="datasourceEncryptionStrategy">
+      <bean class="org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy">
+        <constructor-arg ref="opalKeyProvider" />
+      </bean>
+    </property>
+  </bean>
 
   <bean id="studyKeyStoreService" class="org.obiba.opal.core.service.impl.hibernate.StudyKeyStoreServiceHibernateImpl">
     <property name="sessionFactory" ref="opalSessionFactory" />

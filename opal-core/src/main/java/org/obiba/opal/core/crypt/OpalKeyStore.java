@@ -10,7 +10,6 @@
 package org.obiba.opal.core.crypt;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyStore;
@@ -30,17 +29,15 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.obiba.magma.crypt.KeyPairProvider;
 import org.obiba.magma.crypt.support.CacheablePasswordCallback;
 import org.obiba.magma.crypt.support.CachingCallbackHandler;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.core.io.Resource;
+import org.obiba.opal.core.service.StudyKeyStoreService;
+import org.obiba.opal.core.service.impl.DefaultStudyKeyStoreServiceImpl;
 
-public class OpalKeyStore implements KeyPairProvider, InitializingBean {
+public class OpalKeyStore implements KeyPairProvider {
   //
   // Instance Variables
   //
 
-  private KeyStore keyStore;
-
-  private Resource keyStoreResource;
+  private StudyKeyStoreService studyKeyStoreService;
 
   private CallbackHandler callbackHandler;
 
@@ -49,9 +46,12 @@ public class OpalKeyStore implements KeyPairProvider, InitializingBean {
   //
 
   public KeyPair getKeyPair(String alias) {
-    if(keyStore == null) {
-      throw new IllegalStateException("Null keystore (init method must be called prior to calling getKeyPair method)");
+    StudyKeyStore studyKeyStore = studyKeyStoreService.getStudyKeyStore(DefaultStudyKeyStoreServiceImpl.DEFAULT_STUDY_ID);
+    if(studyKeyStore == null) {
+      throw new IllegalStateException("The key store [" + DefaultStudyKeyStoreServiceImpl.DEFAULT_STUDY_ID + "] does not exist. ");
     }
+
+    KeyStore keyStore = studyKeyStore.getKeyStore();
 
     KeyPair keyPair = null;
 
@@ -92,9 +92,12 @@ public class OpalKeyStore implements KeyPairProvider, InitializingBean {
   }
 
   public KeyPair getKeyPair(PublicKey publicKey) {
-    if(keyStore == null) {
-      throw new IllegalStateException("Null keystore (init method must be called prior to calling getKeyPair method)");
+    StudyKeyStore studyKeyStore = studyKeyStoreService.getStudyKeyStore(DefaultStudyKeyStoreServiceImpl.DEFAULT_STUDY_ID);
+    if(studyKeyStore == null) {
+      throw new IllegalStateException("The key store [" + DefaultStudyKeyStoreServiceImpl.DEFAULT_STUDY_ID + "] does not exist. ");
     }
+
+    KeyStore keyStore = studyKeyStore.getKeyStore();
 
     Enumeration<String> aliases = null;
     try {
@@ -123,60 +126,15 @@ public class OpalKeyStore implements KeyPairProvider, InitializingBean {
   }
 
   //
-  // InitializingBean Methods
-  //
-
-  public void afterPropertiesSet() {
-    loadKeyStore();
-  }
-
-  //
   // Methods
   //
-
-  public void setKeyStoreResource(Resource keyStoreResource) {
-    this.keyStoreResource = keyStoreResource;
-  }
 
   public void setCallbackHandler(CallbackHandler callbackHandler) {
     this.callbackHandler = callbackHandler;
   }
 
-  /**
-   * Loads the KeyStore from the specified file using the specified password.
-   * 
-   * @throws KeyProviderInitializationException if the keystore resource could not be found
-   * @throws KeyProviderSecurityException if the keystore password is incorrect
-   */
-  private void loadKeyStore() {
-    InputStream is = null;
-
-    try {
-      if(keyStoreResource.exists()) {
-        KeyStore.ProtectionParameter protectionParameter = new KeyStore.CallbackHandlerProtection(callbackHandler);
-        KeyStore.Builder keyStoreBuilder = KeyStore.Builder.newInstance(KeyStore.getDefaultType(), null, keyStoreResource.getFile(), protectionParameter);
-        keyStore = keyStoreBuilder.getKeyStore();
-      } else {
-        throw new KeyProviderInitializationException("Keystore [" + keyStoreResource.getFile().getName() + "] not found.");
-      }
-    } catch(KeyProviderInitializationException ex) {
-      throw ex;
-    } catch(KeyStoreException ex) {
-      throw new KeyProviderSecurityException("Wrong keystore password or keystore was tampered with");
-    } catch(IOException ex) {
-      if(ex.getCause() != null && ex.getCause() instanceof UnrecoverableKeyException) {
-        throw new KeyProviderSecurityException("Wrong keystore password");
-      }
-      throw new RuntimeException(ex);
-    } catch(Exception ex) {
-      throw new RuntimeException(ex);
-    } finally {
-      if(is != null) try {
-        is.close();
-      } catch(IOException ex) {
-        ; // nothing to do
-      }
-    }
+  public void setStudyKeyStoreService(StudyKeyStoreService studyKeyStoreService) {
+    this.studyKeyStoreService = studyKeyStoreService;
   }
 
   private char[] getKeyPassword(PasswordCallback passwordCallback) throws UnsupportedCallbackException, IOException {

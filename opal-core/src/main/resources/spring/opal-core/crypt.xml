@@ -2,7 +2,7 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
   <bean id="baseOpalKeyProvider" class="org.obiba.opal.core.crypt.OpalKeyStore" abstract="true">
-    <property name="keyStoreResource" value="${org.obiba.opal.keystore.file}" />
+    <property name="studyKeyStoreService" ref="studyKeyStoreService" />
   </bean>
 
 </beans>
