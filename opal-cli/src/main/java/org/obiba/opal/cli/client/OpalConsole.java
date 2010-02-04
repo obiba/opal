@@ -155,9 +155,6 @@ public class OpalConsole extends AbstractCliClient {
       new OpalConsole(CliFactory.parseArguments(OpalConsoleOptions.class, args));
     } catch(ArgumentValidationException e) {
       System.err.println(e.getMessage());
-      for(ValidationError error : e.getValidationErrors()) {
-        System.err.println(error.getMessage());
-      }
     }
   }
 }
