@@ -138,12 +138,12 @@ public class OpalConsole extends AbstractCliClient {
 
   private void printHelp(String commandName, ArgumentValidationException e) {
     boolean helpRequested = false;
-    System.console().printf(getCommandUsageDescription(commandName) + "\n");
     for(ValidationError error : e.getValidationErrors()) {
-      System.err.println(error);
       if(error.getErrorType() == ValidationError.ErrorType.HelpRequested) {
         helpRequested = true;
+        System.console().printf(getCommandUsageDescription(commandName) + "\n\n");
       }
+      System.err.println(error);
     }
     if(helpRequested == false) {
       System.console().printf("Type '%s --help' for command usage.\n", commandName);
@@ -154,6 +154,7 @@ public class OpalConsole extends AbstractCliClient {
     try {
       new OpalConsole(CliFactory.parseArguments(OpalConsoleOptions.class, args));
     } catch(ArgumentValidationException e) {
+      System.err.println(e.getMessage());
       for(ValidationError error : e.getValidationErrors()) {
         System.err.println(error.getMessage());
       }
