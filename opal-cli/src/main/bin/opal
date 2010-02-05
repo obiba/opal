@@ -15,9 +15,18 @@ then
   exit 2;
 fi
 
+# Are we under cygwin environment ?
+WINDOWS=`echo $OS | grep -ci windows`
+
 CLASSPATH=$OPAL_HOME/conf
-for f in $(find $OPAL_HOME/lib -type f -name *.jar); do
-  CLASSPATH=$CLASSPATH:$f
+for f in $(ls "$OPAL_HOME/lib" | grep jar$); do
+  if [ $WINDOWS ]
+  then
+    CLASSPATH=$CLASSPATH\;$OPAL_HOME/lib/$f
+  else
+    CLASSPATH=$CLASSPATH:$OPAL_HOME/lib/$f
+  fi
 done
+
 
 java -cp "$CLASSPATH" org.obiba.opal.cli.client.OpalConsole $@
