@@ -64,7 +64,7 @@ public abstract class AbstractCliClient implements CliClient {
 
     sb.append("Usage:");
     sb.append("\n  ");
-    sb.append("<command> <options> <args>");
+    sb.append("<command> <options> <arguments>");
     sb.append("\n\n");
 
     sb.append("Commands:\n");

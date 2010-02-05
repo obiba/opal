@@ -21,7 +21,7 @@ import org.springframework.util.Assert;
 /**
  * Provides key management allowing for key creation, deletion, importing and exporting of keys.
  */
-@CommandUsage(description = "Allows key creation, deletion, import and export.")
+@CommandUsage(description = "Encryption key pairs creation, import or deletion.\n\nSyntax: keystore --alias NAME (--delete | --algo NAME --size INT | --private FILE [--certificate FILE])")
 public class KeyCommand extends AbstractCommand<KeyCommandOptions> {
 
   @Autowired
@@ -31,7 +31,7 @@ public class KeyCommand extends AbstractCommand<KeyCommandOptions> {
     if(options.isDelete()) {
       StudyKeyStore studyKeyStore = studyKeyStoreService.getStudyKeyStore(StudyKeyStoreService.DEFAULT_STUDY_ID);
       if(studyKeyStore == null) {
-        System.out.println("keystore doesn't exist");
+        System.out.println("Keystore doesn't exist");
       } else {
         if(studyKeyStoreService.aliasExists(options.getAlias())) {
           studyKeyStoreService.deleteKey(options.getAlias());
@@ -102,11 +102,11 @@ public class KeyCommand extends AbstractCommand<KeyCommandOptions> {
 
   private void unrecognizedOptionsHelp() {
     System.out.println("This combination of options was unrecognized." + "\nSyntax:" //
-        + "\n   opalkey key --alias=NAME (--delete | --algo=NAME --size=INT | --private=FILE [--certificate=FILE])" //
+        + "\n  key --alias NAME (--delete | --algo NAME --size INT | --private FILE [--certificate FILE])" //
         + "\nExamples:" //
-        + "\n   opalkey key --alias=onyx --algo=RSA --size=2048" //
-        + "\n   opalkey key --alias=onyx --private=private_key.pem --certificate=public_key.pem" //
-        + "\n  opalkey key -alias=onyx --delete"); //
+        + "\n  key --alias onyx --algo RSA --size 2048" //
+        + "\n  key --alias onyx --private private_key.pem --certificate public_key.pem" //
+        + "\n  key -alias onyx --delete"); //
   }
 
 }

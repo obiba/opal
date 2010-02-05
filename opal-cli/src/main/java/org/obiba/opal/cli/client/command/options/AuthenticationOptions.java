@@ -17,12 +17,12 @@ import uk.co.flamingpenguin.jewel.cli.Option;
  */
 public interface AuthenticationOptions {
 
-  @Option(shortName = "u", description = "Username to use when connecting to Opal.")
+  @Option(shortName = "u", description = "User name to use when connecting to Opal.")
   public String getUsername();
 
   public boolean isUsername();
 
-  @Option(shortName = "p", description = "Password to use when connecting to Opal.")
+  @Option(shortName = "p", description = "User password to use when connecting to Opal.")
   public String getPassword();
 
   public boolean isPassword();

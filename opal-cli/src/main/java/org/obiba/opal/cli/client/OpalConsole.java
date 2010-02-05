@@ -42,13 +42,13 @@ import uk.co.flamingpenguin.jewel.cli.Option;
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException.ValidationError;
 
 /**
- *
+ * 
  */
 public class OpalConsole extends AbstractCliClient {
 
   public interface OpalConsoleOptions extends HelpOption, AuthenticationOptions {
 
-    @Option(description = "Performs an upgrade.")
+    @Option(description = "Performs an Opal upgrade. Required after Opal installation.")
     public boolean isUpgrade();
 
   }
@@ -106,7 +106,7 @@ public class OpalConsole extends AbstractCliClient {
 
   private void prompt(ConfigurableApplicationContext cac) {
     while(quit == false) {
-      String cmdline = System.console().readLine("%s@opal>", SecurityUtils.getSubject().getPrincipal());
+      String cmdline = System.console().readLine("%s@opal> ", SecurityUtils.getSubject().getPrincipal());
       if(cmdline == null) {
         break;
       }

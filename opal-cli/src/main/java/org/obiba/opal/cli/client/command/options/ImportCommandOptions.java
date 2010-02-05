@@ -30,10 +30,10 @@ public interface ImportCommandOptions extends HelpOption {
 
   public boolean isFiles();
 
-  @Option(shortName = "d", description = "Indicates the destination datasource.")
+  @Option(shortName = "d", description = "The destination datasource into which the variable catalogue and the participants data will be imported.")
   public String getDatasource();
 
-  @Option(shortName = "o", description = "Indicates the owner of any identifiers used in the data to be imported.")
+  @Option(shortName = "o", description = "The name under which the participants identifiers that will be stored in the participants key database.")
   public String getOwner();
 
   @Option(shortName = "e", description = "Indicates that the files to be imported are encrypted.")

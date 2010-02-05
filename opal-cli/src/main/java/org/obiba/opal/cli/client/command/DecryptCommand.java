@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Command to decrypt an Onyx data file.
  */
-@CommandUsage(description = "Decrypts a list of Onyx data files.")
+@CommandUsage(description = "Decrypts a list of Onyx data files into a directory.\n\nSyntax: decrypt --alias NAME --files FILE [FILE...]")
 public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptCommandOptions> {
   //
   // Constants
@@ -43,29 +43,29 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
       throw new IllegalStateException("Options not set (setOptions must be called before calling execute)");
     }
 
-    if(options.isFiles()) {
-      // Validate/initialize output directory.
-      File outputDir = new File(".");
-      if(options.isOutput()) {
-        outputDir = getOutputDir(options.getOutput());
-      }
+    // if(options.isFiles()) {
+    // Validate/initialize output directory.
+    File outputDir = new File(".");
+    if(options.isOutput()) {
+      outputDir = getOutputDir(options.getOutput());
+    }
 
-      if(outputDir != null) {
-        // Now process each input file (Onyx data zip file) specified on the command line.
-        for(File inputFile : options.getFiles()) {
-          try {
-            processFile(inputFile, outputDir, null);
-          } catch(KeyProviderException ex) {
-            System.err.println(ex.getMessage());
-            break; // break out of here, this is a fatal exception
-          }
+    if(outputDir != null) {
+      // Now process each input file (Onyx data zip file) specified on the command line.
+      for(File inputFile : options.getFiles()) {
+        try {
+          processFile(inputFile, outputDir, null);
+        } catch(KeyProviderException ex) {
+          System.err.println(ex.getMessage());
+          break; // break out of here, this is a fatal exception
         }
-      } else {
-        System.err.println("Invalid output directory");
       }
     } else {
-      System.err.println("No input file");
+      System.err.println("Invalid output directory");
     }
+    // } else {
+    // System.err.println("No input file");
+    // }
   }
 
   //

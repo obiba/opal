@@ -27,7 +27,7 @@ import sun.misc.BASE64Encoder;
 /**
  * Exports public key certificates.
  */
-@CommandUsage(description = "Export the public key certificate for the specified key.")
+@CommandUsage(description = "Export the public key certificate for the specified key pair alias.\n\nSyntax: certificate --alias NAME [--out FILE]")
 public class PublicCommand extends AbstractCommand<PublicCommandOptions> {
 
   @Autowired
@@ -36,15 +36,15 @@ public class PublicCommand extends AbstractCommand<PublicCommandOptions> {
   public void execute() {
     StudyKeyStore studyKeyStore = studyKeyStoreService.getStudyKeyStore(StudyKeyStoreService.DEFAULT_STUDY_ID);
     if(studyKeyStore == null) {
-      System.out.println("keystore doesn't exist");
-    } else if(options.isRfc()) {
+      System.out.println("Keystore doesn't exist");
+    } else if(options.isOut()) {
       FileWriter fstream;
       BufferedWriter out = null;
       try {
-        fstream = new FileWriter(options.getRfc().get(0));
+        fstream = new FileWriter(options.getOut());
         out = new BufferedWriter(fstream);
         out.write(getCertificateAsString(studyKeyStore));
-        System.console().printf("%s\n", "Certificate written to the file [" + options.getRfc().get(0) + "]");
+        System.console().printf("%s\n", "Certificate written to the file [" + options.getOut() + "]");
       } catch(IOException e) {
         throw new RuntimeException(e);
       } finally {
