@@ -43,7 +43,6 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
       throw new IllegalStateException("Options not set (setOptions must be called before calling execute)");
     }
 
-    // if(options.isFiles()) {
     // Validate/initialize output directory.
     File outputDir = new File(".");
     if(options.isOutput()) {
@@ -63,9 +62,6 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
     } else {
       System.err.println("Invalid output directory");
     }
-    // } else {
-    // System.err.println("No input file");
-    // }
   }
 
   //
