@@ -140,6 +140,14 @@ public class DefaultImportService implements ImportService {
     // Now create a "view" of the participant table, that exposes only the public data.
     PrivateVariableEntityValueTable privateTable = new PrivateVariableEntityValueTable(participantTable.getName(), participantTable, entityMap, privateSelectClause);
 
+    // Filter out private data.
+    SelectClause publicSelectClause = new SelectClause() {
+      public boolean select(Variable variable) {
+        return !variable.hasAttribute("identifier") || (variable.hasAttribute("identifier") && (variable.getAttribute("identifier").getValue().equals(BooleanType.get().falseValue()) || variable.getAttribute("identifier").getValue().equals(TextType.get().valueOf("false"))));
+      }
+    };
+    privateTable.setSelectClause(publicSelectClause);
+
     // Copy the view.
     copier.copy(privateTable, destination);
   }
