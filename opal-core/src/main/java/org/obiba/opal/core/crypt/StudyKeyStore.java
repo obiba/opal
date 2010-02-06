@@ -17,6 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
@@ -291,12 +292,12 @@ public class StudyKeyStore extends AbstractEntity {
    * @param certificate certificate in the PEM format
    */
   public void importKey(String alias, File privateKey, File certificate) {
-    KeyPair keyPair = getKeyPairFromFile(privateKey);
+    Key key = getPrivateKeyFile(privateKey);
     X509Certificate cert = getCertificateFromFile(certificate);
     KeyStore keyStore = getKeyStore();
     CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for key [" + alias + "]:  ", false);
     try {
-      keyStore.setKeyEntry(alias, keyPair.getPrivate(), getKeyPassword(passwordCallback), new X509Certificate[] { cert });
+      keyStore.setKeyEntry(alias, key, getKeyPassword(passwordCallback), new X509Certificate[] { cert });
       setKeyStore(keyStore);
     } catch(KeyStoreException e) {
       throw new RuntimeException(e);
@@ -351,10 +352,37 @@ public class StudyKeyStore extends AbstractEntity {
         }
       });
       Object object = pemReader.readObject();
-      if(object instanceof KeyPair) {
+      if(object == null) {
+        throw new RuntimeException("The file [" + privateKey.getName() + "] does not contain a PEM file.");
+      } else if(object instanceof KeyPair) {
         return (KeyPair) object;
       }
       throw new RuntimeException("Unexpected type [" + object + "]. Expected KeyPair.");
+    } catch(FileNotFoundException e) {
+      throw new RuntimeException(e);
+    } catch(IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private Key getPrivateKeyFile(File privateKey) {
+    try {
+      PEMReader pemReader = new PEMReader(new InputStreamReader(new FileInputStream(privateKey)), new PasswordFinder() {
+
+        public char[] getPassword() {
+          return System.console().readPassword("%s:  ", "Password for imported private key");
+        }
+      });
+      Object object = pemReader.readObject();
+      if(object == null) {
+        throw new RuntimeException("The file [" + privateKey.getName() + "] does not contain a PEM file.");
+      } else if(object instanceof KeyPair) {
+        KeyPair keyPair = (KeyPair) object;
+        return keyPair.getPrivate();
+      } else if(object instanceof Key) {
+        return (Key) object;
+      }
+      throw new RuntimeException("Unexpected type [" + object + "]. Expected KeyPair or Key.");
     } catch(FileNotFoundException e) {
       throw new RuntimeException(e);
     } catch(IOException e) {

@@ -30,9 +30,18 @@ public interface StudyKeyStoreService {
   /**
    * Gets the {@link StudyKeyStore} for the study identified by the provided studyId.
    * @param studyId uniquely identifies a study.
-   * @return A StudyKeyStore which allows management of the associated KeyStore.
+   * @return A StudyKeyStore which allows management of the associated KeyStore or null if the StudyKeyStore doesn't
+   * exist.
    */
   public StudyKeyStore getStudyKeyStore(String studyId);
+
+  /**
+   * Get an existing {@link StudyKeyStore} with the given studyId or if it doesn't exist, create, persist and return a
+   * new {@link StudyKeyStore} with the provided studyId.
+   * @param studyId uniquely identifies a study.
+   * @return A StudyKeyStore which allows management of the associated KeyStore.
+   */
+  public StudyKeyStore getOrCreateStudyKeyStore(String studyId);
 
   /**
    * Save the provided {@link StudyKeyStore}. This will presist any updates made to the KeyStore.

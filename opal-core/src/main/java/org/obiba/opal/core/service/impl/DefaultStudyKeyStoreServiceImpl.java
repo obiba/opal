@@ -37,6 +37,16 @@ public abstract class DefaultStudyKeyStoreServiceImpl extends PersistenceManager
     return studyKeyStore;
   }
 
+  public StudyKeyStore getOrCreateStudyKeyStore(String studyId) {
+    Assert.hasText(studyId, "studyId must not be null or empty");
+    StudyKeyStore studyKeyStore = getStudyKeyStore(studyId);
+    if(studyKeyStore == null) {
+      studyKeyStore = StudyKeyStore.Builder.newStore().studyId(DEFAULT_STUDY_ID).passwordPrompt(callbackHandler).build();
+      saveStudyKeyStore(studyKeyStore);
+    }
+    return studyKeyStore;
+  }
+
   public void saveStudyKeyStore(StudyKeyStore studyKeyStore) {
     Assert.notNull(studyKeyStore, "studyKeyStore must not be null");
     getPersistenceManager().save(studyKeyStore);
