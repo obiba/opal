@@ -22,14 +22,6 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- Required to get AnnotatedBeanFinderFactoryBean -->
-    <dependency>
-      <groupId>org.obiba.onyx</groupId>
-      <artifactId>onyx-core</artifactId>
-      <version>1.6.0</version>
-      <scope>runtime</scope>
-    </dependency>
-
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
