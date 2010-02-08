@@ -20,11 +20,11 @@ WINDOWS=`echo $OS | grep -ci windows`
 
 CLASSPATH=$OPAL_HOME/conf
 for f in $(ls "$OPAL_HOME/lib" | grep jar$); do
-  if [ $WINDOWS ]
+  if [ x"$WINDOWS" = x0 ]
   then
-    CLASSPATH=$CLASSPATH\;$OPAL_HOME/lib/$f
-  else
     CLASSPATH=$CLASSPATH:$OPAL_HOME/lib/$f
+  else
+    CLASSPATH=$CLASSPATH\;$OPAL_HOME/lib/$f
   fi
 done
 
