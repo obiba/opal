@@ -21,7 +21,7 @@
             <view class="org.obiba.magma.views.View">
               <name>MySmokersView</name>
               <select class="org.obiba.magma.js.views.JavascriptClause">
-                <script>variable().name().matches(/Participant.*/, /DO_YOU_SMOKE/)</script>
+                <script>name().matches(/Participant.*/, /DO_YOU_SMOKE/)</script>
               </select>
               <from class="org.obiba.magma.support.ValueTableReference">
                 <reference>my-datasource.Participants</reference>
