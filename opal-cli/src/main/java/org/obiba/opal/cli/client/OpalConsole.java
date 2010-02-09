@@ -21,6 +21,7 @@ import org.obiba.opal.cli.client.command.ImportCommand;
 import org.obiba.opal.cli.client.command.KeyCommand;
 import org.obiba.opal.cli.client.command.PublicCommand;
 import org.obiba.opal.cli.client.command.QuitCommand;
+import org.obiba.opal.cli.client.command.ShowCommand;
 import org.obiba.opal.cli.client.command.UpgradeCommand;
 import org.obiba.opal.cli.client.command.UserAuthentication;
 import org.obiba.opal.cli.client.command.VersionCommand;
@@ -33,6 +34,7 @@ import org.obiba.opal.cli.client.command.options.ImportCommandOptions;
 import org.obiba.opal.cli.client.command.options.KeyCommandOptions;
 import org.obiba.opal.cli.client.command.options.PublicCommandOptions;
 import org.obiba.opal.cli.client.command.options.QuitCommandOptions;
+import org.obiba.opal.cli.client.command.options.ShowCommandOptions;
 import org.obiba.opal.cli.client.command.options.VersionCommandOptions;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -74,6 +76,7 @@ public class OpalConsole extends AbstractCliClient {
     addAvailableCommand(PublicCommand.class, PublicCommandOptions.class);
     addAvailableCommand(DecryptCommand.class, DecryptCommandOptions.class);
     addAvailableCommand(VersionCommand.class, VersionCommandOptions.class);
+    addAvailableCommand(ShowCommand.class, ShowCommandOptions.class);
     addAvailableCommand(ExportCommand.class, ExportCommandOptions.class);
   }
 
