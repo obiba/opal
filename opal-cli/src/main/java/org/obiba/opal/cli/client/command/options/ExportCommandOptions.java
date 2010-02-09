@@ -1,5 +1,6 @@
 package org.obiba.opal.cli.client.command.options;
 
+import java.io.File;
 import java.util.List;
 
 import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
@@ -17,7 +18,7 @@ public interface ExportCommandOptions extends HelpOption {
   public boolean isDestination();
 
   @Option(shortName = "o", description = "Export to this Excel file.")
-  public String getOut();
+  public File getOut();
 
   public boolean isOut();
 

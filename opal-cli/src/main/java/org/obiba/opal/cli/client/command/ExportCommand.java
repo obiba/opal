@@ -10,6 +10,8 @@
 package org.obiba.opal.cli.client.command;
 
 import org.obiba.opal.cli.client.command.options.ExportCommandOptions;
+import org.obiba.opal.core.service.ExportService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Provides ability to export Magma tables to an existing datasource or an Excel file.
@@ -17,12 +19,15 @@ import org.obiba.opal.cli.client.command.options.ExportCommandOptions;
 @CommandUsage(description = "Export Magma tables to an existing destination datasource or out to a specified Excel file.\n\nSyntax: export (--destination NAME | --out FILE) --tables NAME [NAME...]")
 public class ExportCommand extends AbstractCommand<ExportCommandOptions> {
 
+  @Autowired
+  private ExportService exportService;
+
   public void execute() {
     validateOptions();
     if(options.isDestination()) {
-      System.out.println("export to datasource...");
+      exportService.exportTablesToDatasource(options.getTables(), options.getDestination());
     } else if(options.isOut()) {
-      throw new UnsupportedOperationException("Exporting to an Excel file is not currently supported.");
+      exportService.exportTablesToExcelFile(options.getTables(), options.getOut());
     }
   }
 

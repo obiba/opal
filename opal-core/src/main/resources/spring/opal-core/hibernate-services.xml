@@ -32,6 +32,10 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <property name="archiveDirectory" value="${org.obiba.opal.import.archiveDirectory}" />
   </bean>
   
+  <bean id="exportService" class="org.obiba.opal.core.service.impl.DefaultExportServiceImpl" lazy-init="true">
+    <property name="auditLogManager" ref="auditLogManager" />
+  </bean>  
+  
   <bean id="decryptService" class="org.obiba.opal.core.service.impl.DefaultDecryptService" lazy-init="true">
     <property name="auditLogManager" ref="auditLogManager" />
     <property name="datasourceEncryptionStrategy">
