@@ -12,6 +12,8 @@ package org.obiba.opal.core.service;
 import java.io.File;
 import java.util.List;
 
+import org.obiba.magma.NoSuchDatasourceException;
+
 /**
  * Service for export operations. Export allows Magma tables to be copied to an existing Datasource or to an Excel file.
  */
@@ -21,6 +23,7 @@ public interface ExportService {
    * Export tables to an existing Datasource.
    * @param fromTableNames tables to export.
    * @param destinationDatasourceName tables will be copied to this existing Datasource.
+   * @throws NoSuchDatasourceException if the destinationDatasourceName does not exist.
    */
   public void exportTablesToDatasource(List<String> fromTableNames, String destinationDatasourceName);
 

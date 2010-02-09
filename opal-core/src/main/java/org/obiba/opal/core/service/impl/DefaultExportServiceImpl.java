@@ -12,6 +12,9 @@ package org.obiba.opal.core.service.impl;
 import java.io.File;
 import java.util.List;
 
+import org.obiba.magma.Datasource;
+import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager;
 import org.obiba.opal.core.service.ExportService;
 
@@ -27,11 +30,20 @@ public class DefaultExportServiceImpl implements ExportService {
   }
 
   public void exportTablesToDatasource(List<String> fromTableNames, String destinationDatasourceName) {
+    Datasource destinationDatasource = getDatasourceByName(destinationDatasourceName);
     throw new UnsupportedOperationException("Exporting to an existing datasource destination is not currently supported.");
   }
 
   public void exportTablesToExcelFile(List<String> fromTableNames, File destinationExcelFile) {
     throw new UnsupportedOperationException("Exporting to an Excel file is not currently supported.");
+  }
+
+  private Datasource getDatasourceByName(String datasourceName) {
+    Datasource datasource = MagmaEngine.get().getDatasource(datasourceName);
+    if(datasource == null) {
+      throw new NoSuchDatasourceException("No such datasource '" + datasourceName + "'.");
+    }
+    return datasource;
   }
 
 }
