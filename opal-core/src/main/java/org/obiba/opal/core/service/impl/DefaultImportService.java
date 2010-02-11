@@ -112,7 +112,7 @@ public class DefaultImportService implements ImportService {
   }
 
   private void copyValueTables(Datasource source, Datasource destination, String owner) throws IOException {
-    DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, source, destination).build();
+    DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, destination).build();
 
     for(ValueTable valueTable : source.getValueTables()) {
       if(valueTable.isForEntityType("Participant")) {

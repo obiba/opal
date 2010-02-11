@@ -45,8 +45,12 @@ public class DefaultExportServiceImpl implements ExportService {
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName must not be null or empty");
     Datasource destinationDatasource = getDatasourceByName(destinationDatasourceName);
     Set<ValueTable> sourceTables = getValueTablesByName(sourceTableNames);
-    DatasourceCopier datasourceCopier = DatasourceCopier.Builder.newCopier().build();
-    exportTablesToDatasource(sourceTables, destinationDatasource, datasourceCopier);
+    DatasourceCopier datasourceCopier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, destinationDatasource).build();
+    try {
+      exportTablesToDatasource(sourceTables, destinationDatasource, datasourceCopier);
+    } finally {
+      MagmaEngine.get().removeDatasource(destinationDatasource);
+    }
   }
 
   public void exportTablesToDatasource(List<String> sourceTableNames, String destinationDatasourceName, DatasourceCopier datasourceCopier) {
@@ -54,7 +58,11 @@ public class DefaultExportServiceImpl implements ExportService {
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName must not be null or empty");
     Datasource destinationDatasource = getDatasourceByName(destinationDatasourceName);
     Set<ValueTable> sourceTables = getValueTablesByName(sourceTableNames);
-    exportTablesToDatasource(sourceTables, destinationDatasource, datasourceCopier);
+    try {
+      exportTablesToDatasource(sourceTables, destinationDatasource, datasourceCopier);
+    } finally {
+      MagmaEngine.get().removeDatasource(destinationDatasource);
+    }
   }
 
   public void exportTablesToDatasource(Set<ValueTable> sourceTables, Datasource destinationDatasource, DatasourceCopier datasourceCopier) {
@@ -62,18 +70,15 @@ public class DefaultExportServiceImpl implements ExportService {
     Assert.notNull(destinationDatasource, "destinationDatasource must not be null");
     Assert.notNull(datasourceCopier, "datasourceCopier must not be null");
     validateSourceDatasourceNotEqualDestinationDatasource(sourceTables, destinationDatasource);
-    System.out.println("There are " + sourceTables.size() + " tables");
-
     try {
       for(ValueTable table : sourceTables) {
         datasourceCopier.copy(table, destinationDatasource);
       }
     } catch(IOException ex) {
+      // When implementing the ExcelDatasource:
+      // Determine if this the ExcelDatasource. If yes then display the filename.
       throw new ExportException("An error was encountered while exporting to datasource : " + destinationDatasource, ex);
-    } finally {
-      // destinationDatasource.dispose();
     }
-
   }
 
   public void exportTablesToExcelFile(List<String> sourceTableNames, File destinationExcelFile) {
@@ -110,16 +115,5 @@ public class DefaultExportServiceImpl implements ExportService {
       }
     }
   }
-
-  // private void copyValueTables(Set<ValueTable> sourceTables, Datasource destination, String owner) throws IOException
-  // {
-  // DatasourceCopier copier =
-  // DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager,
-  // source, destination).build();
-  //
-  // for(ValueTable valueTable : sourceTables) {
-  // copier.copy(valueTable, destination);
-  // }
-  // }
 
 }

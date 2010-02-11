@@ -91,7 +91,7 @@ public class DefaultDecryptService implements DecryptService {
   }
 
   private void copyValueTables(Datasource source, Datasource destination) throws IOException {
-    DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, source, destination).build();
+    DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, destination).build();
     copier.copy(source, destination);
   }
 
