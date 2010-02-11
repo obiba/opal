@@ -32,6 +32,9 @@ public class ExportCommand extends AbstractOpalRuntimeDependentCommand<ExportCom
   }
 
   private void validateOptions() {
+    if(!options.isDestination() && !options.isOut()) {
+      throw new IllegalArgumentException("Must provide either the 'destination' option or the 'out' option.");
+    }
     if(options.isDestination() && options.isOut()) {
       throw new IllegalArgumentException("The 'destination' option and the 'out' option are mutually exclusive.");
     }
