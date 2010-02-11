@@ -25,21 +25,21 @@ public interface ExportService {
 
   /**
    * Export tables to an existing Datasource.
-   * @param fromTableNames tables to export.
+   * @param sourceTableNames tables to export.
    * @param destinationDatasourceName tables will be copied to this existing Datasource.
    * @throws NoSuchDatasourceException if the destinationDatasourceName does not exist.
    */
-  public void exportTablesToDatasource(List<String> fromTableNames, String destinationDatasourceName);
+  public void exportTablesToDatasource(List<String> sourceTableNames, String destinationDatasourceName);
 
-  public void exportTablesToDatasource(List<String> fromTableNames, String destinationDatasourceName, DatasourceCopier datasourceCopier);
+  public void exportTablesToDatasource(List<String> sourceTableNames, String destinationDatasourceName, DatasourceCopier datasourceCopier);
 
-  public void exportTablesToDatasource(Set<ValueTable> fromTables, Datasource destinationDatasource, DatasourceCopier datasourceCopier);
+  public void exportTablesToDatasource(Set<ValueTable> sourceTables, Datasource destinationDatasource, DatasourceCopier datasourceCopier);
 
   /**
    * Export tables to an Excel file.
-   * @param fromTableNames tables to export.
+   * @param sourceTableNames tables to export.
    * @param destinationExcelFilename tables will be copied to this Excel file.
    */
-  public void exportTablesToExcelFile(List<String> fromTableNames, File destinationExcelFile);
+  public void exportTablesToExcelFile(List<String> sourceTableNames, File destinationExcelFile);
 
 }

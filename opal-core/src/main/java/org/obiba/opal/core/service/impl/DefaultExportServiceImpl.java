@@ -23,6 +23,7 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
+import org.obiba.opal.core.service.ExportException;
 import org.obiba.opal.core.service.ExportService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -39,46 +40,44 @@ public class DefaultExportServiceImpl implements ExportService {
     this.auditLogManager = auditLogManager;
   }
 
-  public void exportTablesToDatasource(List<String> fromTableNames, String destinationDatasourceName) {
+  public void exportTablesToDatasource(List<String> sourceTableNames, String destinationDatasourceName) {
+    Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName must not be null or empty");
-    Assert.notEmpty(fromTableNames, "fromTableNames must not be null or empty");
     Datasource destinationDatasource = getDatasourceByName(destinationDatasourceName);
-    Set<ValueTable> sourceTables = getValueTablesByName(fromTableNames);
+    Set<ValueTable> sourceTables = getValueTablesByName(sourceTableNames);
     DatasourceCopier datasourceCopier = DatasourceCopier.Builder.newCopier().build();
     exportTablesToDatasource(sourceTables, destinationDatasource, datasourceCopier);
   }
 
-  public void exportTablesToDatasource(List<String> fromTableNames, String destinationDatasourceName, DatasourceCopier datasourceCopier) {
+  public void exportTablesToDatasource(List<String> sourceTableNames, String destinationDatasourceName, DatasourceCopier datasourceCopier) {
+    Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName must not be null or empty");
-    Assert.notEmpty(fromTableNames, "fromTableNames must not be null or empty");
     Datasource destinationDatasource = getDatasourceByName(destinationDatasourceName);
-    Set<ValueTable> sourceTables = getValueTablesByName(fromTableNames);
+    Set<ValueTable> sourceTables = getValueTablesByName(sourceTableNames);
     exportTablesToDatasource(sourceTables, destinationDatasource, datasourceCopier);
   }
 
-  public void exportTablesToDatasource(Set<ValueTable> fromTables, Datasource destinationDatasource, DatasourceCopier datasourceCopier) {
-
-    Assert.notEmpty(fromTables, "fromTables must not be null or empty");
+  public void exportTablesToDatasource(Set<ValueTable> sourceTables, Datasource destinationDatasource, DatasourceCopier datasourceCopier) {
+    Assert.notEmpty(sourceTables, "sourceTables must not be null or empty");
     Assert.notNull(destinationDatasource, "destinationDatasource must not be null");
     Assert.notNull(datasourceCopier, "datasourceCopier must not be null");
-
-    validateSourceDatasourceNotEqualDestinationDatasource(fromTables, destinationDatasource);
-    System.out.println("There are " + fromTables.size() + " tables");
+    validateSourceDatasourceNotEqualDestinationDatasource(sourceTables, destinationDatasource);
+    System.out.println("There are " + sourceTables.size() + " tables");
 
     try {
-      for(ValueTable table : fromTables) {
+      for(ValueTable table : sourceTables) {
         datasourceCopier.copy(table, destinationDatasource);
       }
     } catch(IOException ex) {
-      throw new RuntimeException("An error was encountered while exporting to datasource : " + destinationDatasource, ex);
+      throw new ExportException("An error was encountered while exporting to datasource : " + destinationDatasource, ex);
     } finally {
       // destinationDatasource.dispose();
     }
 
   }
 
-  public void exportTablesToExcelFile(List<String> fromTableNames, File destinationExcelFile) {
-    Assert.notEmpty(fromTableNames, "fromTableNames must not be null or empty");
+  public void exportTablesToExcelFile(List<String> sourceTableNames, File destinationExcelFile) {
+    Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
     Assert.notNull(destinationExcelFile, "destinationExcelFile must not be null");
     // Create ExcelDatasource
     // Call exportTablesToDatasource with the ExcelDatasource
@@ -87,7 +86,6 @@ public class DefaultExportServiceImpl implements ExportService {
 
   private Datasource getDatasourceByName(String datasourceName) {
     Datasource datasource = MagmaEngine.get().getDatasource(datasourceName);
-
     if(datasource == null) {
       throw new NoSuchDatasourceException("No such datasource '" + datasourceName + "'.");
     }
@@ -123,14 +121,5 @@ public class DefaultExportServiceImpl implements ExportService {
   // copier.copy(valueTable, destination);
   // }
   // }
-
-  private class ExportException extends RuntimeException {
-    private static final long serialVersionUID = 1L;
-
-    public ExportException(String string) {
-      super(string);
-    }
-
-  }
 
 }
