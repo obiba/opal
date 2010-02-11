@@ -5,6 +5,7 @@ import java.util.List;
 
 import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
 import uk.co.flamingpenguin.jewel.cli.Option;
+import uk.co.flamingpenguin.jewel.cli.Unparsed;
 
 /**
  * This interface declares the options that may be used with the "export" command.
@@ -22,6 +23,6 @@ public interface ExportCommandOptions extends HelpOption {
 
   public boolean isOut();
 
-  @Option(shortName = "t", description = "Fully qualified Magma table names.")
+  @Unparsed(name = "MAGMA_TABLE_NAME")
   public List<String> getTables();
 }
