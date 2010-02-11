@@ -10,6 +10,7 @@
 package org.obiba.opal.core.service.impl;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,13 +21,16 @@ import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager;
+import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.opal.core.service.ExportService;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 /**
  * Default implementation of {@link ExportService}.
  */
+@Transactional
 public class DefaultExportServiceImpl implements ExportService {
 
   private HibernateVariableEntityAuditLogManager auditLogManager;
@@ -36,13 +40,41 @@ public class DefaultExportServiceImpl implements ExportService {
   }
 
   public void exportTablesToDatasource(List<String> fromTableNames, String destinationDatasourceName) {
-    Assert.notEmpty(fromTableNames, "fromTableNames must not be null or empty");
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName must not be null or empty");
+    Assert.notEmpty(fromTableNames, "fromTableNames must not be null or empty");
     Datasource destinationDatasource = getDatasourceByName(destinationDatasourceName);
     Set<ValueTable> sourceTables = getValueTablesByName(fromTableNames);
-    validateSourceDatasourceNotEqualDestinationDatasource(sourceTables, destinationDatasource);
-    System.out.println("There are " + sourceTables.size() + " tables");
-    throw new UnsupportedOperationException("Exporting to an existing datasource destination is not currently supported.");
+    DatasourceCopier datasourceCopier = DatasourceCopier.Builder.newCopier().build();
+    exportTablesToDatasource(sourceTables, destinationDatasource, datasourceCopier);
+  }
+
+  public void exportTablesToDatasource(List<String> fromTableNames, String destinationDatasourceName, DatasourceCopier datasourceCopier) {
+    Assert.hasText(destinationDatasourceName, "destinationDatasourceName must not be null or empty");
+    Assert.notEmpty(fromTableNames, "fromTableNames must not be null or empty");
+    Datasource destinationDatasource = getDatasourceByName(destinationDatasourceName);
+    Set<ValueTable> sourceTables = getValueTablesByName(fromTableNames);
+    exportTablesToDatasource(sourceTables, destinationDatasource, datasourceCopier);
+  }
+
+  public void exportTablesToDatasource(Set<ValueTable> fromTables, Datasource destinationDatasource, DatasourceCopier datasourceCopier) {
+
+    Assert.notEmpty(fromTables, "fromTables must not be null or empty");
+    Assert.notNull(destinationDatasource, "destinationDatasource must not be null");
+    Assert.notNull(datasourceCopier, "datasourceCopier must not be null");
+
+    validateSourceDatasourceNotEqualDestinationDatasource(fromTables, destinationDatasource);
+    System.out.println("There are " + fromTables.size() + " tables");
+
+    try {
+      for(ValueTable table : fromTables) {
+        datasourceCopier.copy(table, destinationDatasource);
+      }
+    } catch(IOException ex) {
+      throw new RuntimeException("An error was encountered while exporting to datasource : " + destinationDatasource, ex);
+    } finally {
+      // destinationDatasource.dispose();
+    }
+
   }
 
   public void exportTablesToExcelFile(List<String> fromTableNames, File destinationExcelFile) {
