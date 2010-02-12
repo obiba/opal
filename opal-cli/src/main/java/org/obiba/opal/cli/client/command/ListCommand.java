@@ -60,7 +60,7 @@ public class ListCommand extends AbstractOpalRuntimeDependentCommand<ListCommand
         try {
           MagmaEngine.get().removeDatasource(outputDatasource);
         } catch(Exception e) {
-          log.warn("Could remove the following datasource : {}", outputDatasource.getName(), e);
+          log.warn("Could not remove the following datasource : {}", outputDatasource.getName(), e);
         }
       }
 

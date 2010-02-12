@@ -10,14 +10,14 @@
 package org.obiba.opal.cli.client.command;
 
 import java.io.File;
-import java.io.IOException;
 
-import org.obiba.core.util.FileUtil;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.opal.cli.client.command.options.DecryptCommandOptions;
 import org.obiba.opal.core.crypt.KeyProviderException;
 import org.obiba.opal.core.service.DecryptService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -25,6 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @CommandUsage(description = "Decrypts a list of Onyx data files into a directory.\n\nSyntax: decrypt --alias NAME [--out FILE] _FILE_...")
 public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptCommandOptions> {
+
+  private static final Logger log = LoggerFactory.getLogger(DecryptCommand.class);
+
   //
   // Constants
   //
@@ -73,17 +76,31 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
   //
 
   private void processFile(File inputFile, File outputDir, String keystorePassword) {
-    String outputFilename = inputFile.getName().substring(0, inputFile.getName().length() - 5);
-    File outputFile = new File(outputDir, outputFilename + "-plaintext.zip");
+
+    String inputFilename = inputFile.getName();
+    String inputFilenameExt = "";
+    String inputFilenamePrefix = "";
+    int inputFilenameExtIndex = inputFilename.lastIndexOf(".");
+    if(inputFilenameExtIndex > 0) {
+      inputFilenamePrefix = inputFilename.substring(0, inputFilenameExtIndex);
+      inputFilenameExt = inputFilename.substring(inputFilenameExtIndex, inputFilename.length());
+    }
+
+    File outputFile = new File(outputDir, inputFilenamePrefix + "-plaintext" + inputFilenameExt);
     FsDatasource outputDatasource = new FsDatasource(DECRYPT_DATASOURCE_NAME, outputFile);
 
     MagmaEngine.get().addDatasource(outputDatasource);
     try {
       decryptService.decryptData(DECRYPT_DATASOURCE_NAME, inputFile, true);
-    } catch(IllegalArgumentException e) {
-      throw new RuntimeException(e);
-    } catch(IOException e) {
-      throw new RuntimeException(e);
+    } catch(Exception e) {
+      log.info("The following file either does not exist or could not be decrypted : {}", inputFile);
+      System.err.printf("The following file either does not exist or could not be decrypted : %s\n", inputFile);
+    } finally {
+      try {
+        MagmaEngine.get().removeDatasource(outputDatasource);
+      } catch(Exception e) {
+        log.warn("Could not remove the following datasource : {}", outputDatasource.getName(), e);
+      }
     }
   }
 
@@ -95,24 +112,12 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
    * could not be created
    */
   private File getOutputDir(File outputDir) {
-    if(!outputDir.isDirectory()) {
-      if(!outputDir.isFile()) {
-        boolean dirCreated = outputDir.mkdirs();
-        if(!dirCreated) {
-          outputDir = null;
-
-          // Recursively delete the directory path, in case it was partially created.
-          try {
-            FileUtil.delete(outputDir);
-          } catch(IOException ex) {
-            ; // nothing to do
-          }
-        }
-      } else {
+    if(!outputDir.exists()) {
+      boolean dirCreated = outputDir.mkdirs();
+      if(!dirCreated) {
         outputDir = null;
       }
     }
-
     return outputDir;
   }
 
