@@ -122,7 +122,7 @@ public class DefaultImportService implements ImportService {
       if(valueTable.isForEntityType("Participant")) {
         copyParticipants(valueTable, source, destination, owner);
       } else {
-        DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, source, destination).build();
+        DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, destination).build();
         copier.copy(valueTable, destination);
       }
     }
@@ -205,7 +205,7 @@ public class DefaultImportService implements ImportService {
     privateTable.initialise();
 
     // Copy the view to the destination datasource.
-    DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, source, destination).build();
+    DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, destination).build();
     copier.copy(privateTable, destination);
   }
 
