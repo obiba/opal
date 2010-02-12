@@ -61,20 +61,33 @@ public class PublicCommand extends AbstractCommand<PublicCommandOptions> {
   }
 
   private String getCertificateAsString(StudyKeyStore studyKeyStore) {
+
     Assert.notNull(studyKeyStore, "studyKeyStore can not be null");
-    StringBuilder sb = new StringBuilder();
+    String alias = options.getAlias();
+
+    Certificate certificate;
     try {
-      Certificate certificate = studyKeyStore.getKeyStore().getCertificate(options.getAlias());
-      BASE64Encoder encoder = new BASE64Encoder();
-      String encoded = encoder.encode(certificate.getEncoded());
-      sb.append("-----BEGIN CERTIFICATE-----\n");
-      sb.append(encoded).append("\n");
-      sb.append("-----END CERTIFICATE-----\n");
-    } catch(KeyStoreException e) {
-      throw new RuntimeException(e);
-    } catch(CertificateEncodingException e) {
-      throw new RuntimeException(e);
+      certificate = studyKeyStore.getKeyStore().getCertificate(alias);
+    } catch(KeyStoreException keystoreNotInitialized) {
+      throw new RuntimeException(keystoreNotInitialized);
     }
+
+    StringBuilder sb = new StringBuilder();
+    if(certificate == null) {
+      System.err.printf("No certificate was found for alias '%s'.\n", alias);
+    } else {
+      try {
+        BASE64Encoder encoder = new BASE64Encoder();
+        String encoded = encoder.encode(certificate.getEncoded());
+        sb.append("-----BEGIN CERTIFICATE-----\n");
+        sb.append(encoded).append("\n");
+        sb.append("-----END CERTIFICATE-----\n");
+
+      } catch(CertificateEncodingException errorWhileEncondingCertificate) {
+        throw new RuntimeException(errorWhileEncondingCertificate);
+      }
+    }
+
     return sb.toString();
   }
 
