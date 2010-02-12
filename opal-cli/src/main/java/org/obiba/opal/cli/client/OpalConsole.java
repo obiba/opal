@@ -19,6 +19,7 @@ import org.obiba.opal.cli.client.command.ExportCommand;
 import org.obiba.opal.cli.client.command.HelpCommand;
 import org.obiba.opal.cli.client.command.ImportCommand;
 import org.obiba.opal.cli.client.command.KeyCommand;
+import org.obiba.opal.cli.client.command.ListCommand;
 import org.obiba.opal.cli.client.command.PublicCommand;
 import org.obiba.opal.cli.client.command.QuitCommand;
 import org.obiba.opal.cli.client.command.ShowCommand;
@@ -32,6 +33,7 @@ import org.obiba.opal.cli.client.command.options.HelpCommandOptions;
 import org.obiba.opal.cli.client.command.options.HelpOption;
 import org.obiba.opal.cli.client.command.options.ImportCommandOptions;
 import org.obiba.opal.cli.client.command.options.KeyCommandOptions;
+import org.obiba.opal.cli.client.command.options.ListCommandOptions;
 import org.obiba.opal.cli.client.command.options.PublicCommandOptions;
 import org.obiba.opal.cli.client.command.options.QuitCommandOptions;
 import org.obiba.opal.cli.client.command.options.ShowCommandOptions;
@@ -78,6 +80,7 @@ public class OpalConsole extends AbstractCliClient {
     addAvailableCommand(VersionCommand.class, VersionCommandOptions.class);
     addAvailableCommand(ShowCommand.class, ShowCommandOptions.class);
     addAvailableCommand(ExportCommand.class, ExportCommandOptions.class);
+    addAvailableCommand(ListCommand.class, ListCommandOptions.class);
   }
 
   private OpalConsole(OpalConsoleOptions options) {
