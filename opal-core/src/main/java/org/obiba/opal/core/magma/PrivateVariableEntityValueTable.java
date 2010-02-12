@@ -9,32 +9,20 @@
  ******************************************************************************/
 package org.obiba.opal.core.magma;
 
-import java.util.Collections;
-
 import org.obiba.magma.NoSuchValueSetException;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
-import org.obiba.magma.VariableValueSource;
-import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
 
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 
-/**
- *
- */
 public class PrivateVariableEntityValueTable extends View {
   //
   // Instance Variables
   //
 
   private PrivateVariableEntityMap privateMap;
-
-  private SelectClause privateSelectClause;
 
   //
   // Constructors
@@ -48,11 +36,10 @@ public class PrivateVariableEntityValueTable extends View {
    * @param privateMap bidirectional entity map (public <--> private)
    * @param privateSelectClause selects variables that should part of the private entry in the bidirectional map
    */
-  public PrivateVariableEntityValueTable(String name, ValueTable privateTable, PrivateVariableEntityMap privateMap, SelectClause privateSelectClause) {
+  public PrivateVariableEntityValueTable(String name, ValueTable privateTable, PrivateVariableEntityMap privateMap) {
     super(name, privateTable);
 
     this.privateMap = privateMap;
-    this.privateSelectClause = privateSelectClause;
   }
 
   //
@@ -83,7 +70,7 @@ public class PrivateVariableEntityValueTable extends View {
       public VariableEntity apply(VariableEntity from) {
         VariableEntity publicEntity = privateMap.publicEntity(from);
         if(publicEntity == null) {
-          throw new RuntimeException("Private entity " + from + " not mapped to a public entity");
+          publicEntity = privateMap.createPublicEntity(from);
         }
         return publicEntity;
       }
@@ -101,36 +88,10 @@ public class PrivateVariableEntityValueTable extends View {
       public ValueSet apply(ValueSet from) {
         VariableEntity publicEntity = privateMap.publicEntity(from.getVariableEntity());
         if(publicEntity == null) {
-          publicEntity = privateMap.createPublicEntity(from, getPrivateVariableValueSources());
+          publicEntity = privateMap.createPublicEntity(from.getVariableEntity());
         }
         return baseTransformer.apply(from);
       }
     };
-  }
-
-  //
-  // Methods
-  //
-
-  private Iterable<Variable> getPrivateVariables() {
-    Iterable<Variable> privateVariables = Collections.emptyList();
-    if(privateSelectClause != null) {
-      Iterable<Variable> variables = getWrappedValueTable().getVariables();
-      privateVariables = Iterables.filter(variables, new Predicate<Variable>() {
-        public boolean apply(Variable input) {
-          return privateSelectClause.select(input);
-        }
-      });
-    }
-
-    return privateVariables;
-  }
-
-  private Iterable<VariableValueSource> getPrivateVariableValueSources() {
-    return Iterables.transform(getPrivateVariables(), new Function<Variable, VariableValueSource>() {
-      public VariableValueSource apply(Variable from) {
-        return PrivateVariableEntityValueTable.this.getWrappedValueTable().getVariableValueSource(from.getName());
-      }
-    });
   }
 }

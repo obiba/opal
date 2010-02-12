@@ -5,25 +5,10 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
   <import resource="datasource.xml" />
   <import resource="hibernate-session.xml" />
-  <!-- Implements both IParticipantKeyReadRegistry and IParticipantKeyWriteRegistry. -->
-  <bean id="participantKeyRegistry" class="org.obiba.opal.core.service.impl.hibernate.ParticipantKeyRegistryHibernateImpl">
-    <property name="sessionFactory" ref="keySessionFactory" />
-    <property name="persistenceManager">
-      <bean class="org.obiba.core.service.impl.hibernate.PersistenceManagerHibernateImpl">
-        <property name="sessionFactory" ref="keySessionFactory" />
-      </bean>
-    </property>
-    <property name="participantIdentifier" ref="participantIdentifier" />
-  </bean>
-
-  <bean id="opalKeyRegistry" class="org.obiba.opal.core.service.impl.DefaultOpalKeyRegistry">
-    <property name="keyReader" ref="participantKeyRegistry" />
-    <property name="keyWriter" ref="participantKeyRegistry" />
-  </bean>
 
   <bean id="importService" class="org.obiba.opal.core.service.impl.DefaultImportService" lazy-init="true">
+    <property name="participantIdentifier" ref="participantIdentifier" />
   	<property name="auditLogManager" ref="auditLogManager" />
-    <property name="opalKeyRegistry" ref="opalKeyRegistry" />
     <property name="datasourceEncryptionStrategy">
       <bean class="org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy">
         <constructor-arg ref="opalKeyProvider" />

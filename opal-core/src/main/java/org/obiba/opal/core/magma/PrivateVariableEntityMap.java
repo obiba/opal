@@ -9,9 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.core.magma;
 
-import org.obiba.magma.ValueSet;
 import org.obiba.magma.VariableEntity;
-import org.obiba.magma.VariableValueSource;
 
 /**
  * Interface that defines the contract of mapping private VariableEntity to public instances and for creating public
@@ -25,5 +23,5 @@ public interface PrivateVariableEntityMap {
 
   public boolean hasPrivateEntity(VariableEntity privateEntity);
 
-  public VariableEntity createPublicEntity(ValueSet privateValueSet, Iterable<VariableValueSource> privateVariables);
+  public VariableEntity createPublicEntity(VariableEntity privateEntity);
 }

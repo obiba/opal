@@ -9,15 +9,20 @@
  ******************************************************************************/
 package org.obiba.opal.core.service.impl;
 
+import org.obiba.magma.Datasource;
+import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
-import org.obiba.magma.VariableValueSource;
+import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.VariableEntityBean;
+import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
-import org.obiba.opal.core.service.IOpalKeyRegistry;
 
 /**
- * An Opal implementation of {@link PrivateVariableEntityMap}, on top of {@link IOpalKeyRegistry}.
+ * An Opal implementation of {@link PrivateVariableEntityMap}, on top of a Magma Datasource ("key-datasource").
  */
 public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
   //
@@ -26,44 +31,69 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
 
   private String owner;
 
-  private IOpalKeyRegistry opalKeyRegistry;
+  private IParticipantIdentifier participantIdentifier;
 
   //
   // PrivateVariableEntityMap Methods
   //
 
   public VariableEntity publicEntity(VariableEntity privateEntity) {
-    String publicIdentifier = opalKeyRegistry.findOpalKey(owner, privateEntity.getIdentifier());
-    if(publicIdentifier != null) {
-      return new VariableEntityBean(privateEntity.getType(), publicIdentifier);
+    ValueTable keyTable = getKeyValueTable();
+
+    // TODO: Shouldn't have to re-initialize the table over and over again. This is
+    // necessary at the moment because certain changes to the table (adding a ValueSet)
+    // are not being sync'ed.
+    Initialisables.initialise(keyTable);
+
+    Variable ownerVariable = keyTable.getVariable(owner);
+    for(ValueSet valueSet : keyTable.getValueSets()) {
+      Value ownerVariableValue = keyTable.getValue(ownerVariable, valueSet);
+      if(ownerVariableValue.toString().equals(privateEntity.getIdentifier())) {
+        return valueSet.getVariableEntity();
+      }
     }
+
     return null;
   }
 
   public VariableEntity privateEntity(VariableEntity publicEntity) {
-    String privateIdentifier = opalKeyRegistry.findOwnerKey(owner, publicEntity.getIdentifier());
-    if(privateIdentifier != null) {
-      return new VariableEntityBean(publicEntity.getType(), privateIdentifier);
-    }
-    return null;
+    ValueTable keyTable = getKeyValueTable();
+
+    // TODO: Shouldn't have to re-initialize the table over and over again. This is
+    // necessary at the moment because certain changes to the table (adding a ValueSet)
+    // are not being sync'ed.
+    Initialisables.initialise(keyTable);
+
+    Variable ownerVariable = keyTable.getVariable(owner);
+    ValueSet publicValueSet = keyTable.getValueSet(publicEntity);
+    Value ownerValue = keyTable.getValue(ownerVariable, publicValueSet);
+
+    return new VariableEntityBean(publicValueSet.getVariableEntity().getType(), ownerValue.toString());
   }
 
   public boolean hasPrivateEntity(VariableEntity privateEntity) {
-    return opalKeyRegistry.hasOpalKey(owner, privateEntity.getIdentifier());
-  }
+    ValueTable keyTable = getKeyValueTable();
 
-  public VariableEntity createPublicEntity(ValueSet privateValueSet, Iterable<VariableValueSource> privateVariables) {
-    // Create the "public" entity.
-    String publicIdentifier = opalKeyRegistry.registerNewOpalKey(owner, privateValueSet.getVariableEntity().getIdentifier());
-
-    // Persist private variables as keys in the opal key database.
-    for(VariableValueSource variableValueSource : privateVariables) {
-      if(!variableValueSource.getValue(privateValueSet).isNull()) {
-        opalKeyRegistry.registerKey(publicIdentifier, variableValueSource.getVariable().getName(), variableValueSource.getValue(privateValueSet).toString());
+    for(Variable variable : keyTable.getVariables()) {
+      if(variable.getName().equals(owner)) {
+        return true;
       }
     }
 
-    return new VariableEntityBean(privateValueSet.getVariableEntity().getType(), publicIdentifier);
+    return false;
+  }
+
+  public VariableEntity createPublicEntity(VariableEntity privateEntity) {
+    ValueTable keyTable = getKeyValueTable();
+
+    for(int i = 0; i < 100; i++) {
+      VariableEntity publicEntity = new VariableEntityBean(privateEntity.getType(), participantIdentifier.generateParticipantIdentifier());
+      if(!keyTable.hasValueSet(publicEntity)) {
+        return publicEntity;
+      }
+    }
+
+    throw new IllegalStateException("Unable to generate a unique public entity for the owner [" + owner + "] and private entity [" + privateEntity.getIdentifier() + "]. " + "One hundred attempts made.");
   }
 
   //
@@ -74,7 +104,12 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     this.owner = owner;
   }
 
-  public void setOpalKeyRegistry(IOpalKeyRegistry opalKeyRegistry) {
-    this.opalKeyRegistry = opalKeyRegistry;
+  public void setParticipantIdentifier(IParticipantIdentifier participantIdentifier) {
+    this.participantIdentifier = participantIdentifier;
+  }
+
+  private ValueTable getKeyValueTable() {
+    Datasource keyDatasource = MagmaEngine.get().getDatasource("key-datasource");
+    return keyDatasource.getValueTable("keys");
   }
 }

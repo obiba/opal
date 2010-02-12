@@ -12,7 +12,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
       <bean class="org.hibernate.cfg.ImprovedNamingStrategy" />
     </property>
     <property name="annotatedClasses">
-      <bean class="org.obiba.opal.core.support.KeyAnnotationConfigurationHelper"/>
+      <bean class="org.obiba.magma.datasource.hibernate.support.AnnotationConfigurationHelper" factory-method="getAnnotatedTypes" />
     </property>
     <property name="configurationClass" value="org.hibernate.cfg.AnnotationConfiguration" />
     <property name="hibernateProperties">
