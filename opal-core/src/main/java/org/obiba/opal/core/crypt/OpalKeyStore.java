@@ -21,14 +21,10 @@ import java.security.cert.Certificate;
 import java.util.Arrays;
 import java.util.Enumeration;
 
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.obiba.magma.crypt.KeyPairProvider;
-import org.obiba.magma.crypt.support.CacheablePasswordCallback;
-import org.obiba.magma.crypt.support.CachingCallbackHandler;
 import org.obiba.opal.core.service.StudyKeyStoreService;
 import org.obiba.opal.core.service.impl.DefaultStudyKeyStoreServiceImpl;
 
@@ -56,7 +52,7 @@ public class OpalKeyStore implements KeyPairProvider {
     KeyPair keyPair = null;
 
     try {
-      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(alias, "Password for key " + alias, false);
+      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(DefaultStudyKeyStoreServiceImpl.DEFAULT_STUDY_ID, "Password for key " + alias, false);
       Key key = keyStore.getKey(alias, getKeyPassword(passwordCallback));
 
       if(key == null) {
@@ -75,14 +71,12 @@ public class OpalKeyStore implements KeyPairProvider {
       } else {
         throw new KeyPairNotFoundException("KeyPair not found for specified alias (" + alias + ")");
       }
-
-      // If the callbackHandler supports it, cache the password.
-      if(callbackHandler instanceof CachingCallbackHandler) {
-        ((CachingCallbackHandler) callbackHandler).cacheCallbackResult(passwordCallback);
-      }
     } catch(KeyPairNotFoundException ex) {
       throw ex;
     } catch(UnrecoverableKeyException ex) {
+      if(callbackHandler instanceof CachingCallbackHandler) {
+        ((CachingCallbackHandler) callbackHandler).clearPasswordCache(DefaultStudyKeyStoreServiceImpl.DEFAULT_STUDY_ID);
+      }
       throw new KeyProviderSecurityException("Wrong key password");
     } catch(Exception ex) {
       throw new RuntimeException(ex);
@@ -137,8 +131,8 @@ public class OpalKeyStore implements KeyPairProvider {
     this.studyKeyStoreService = studyKeyStoreService;
   }
 
-  private char[] getKeyPassword(PasswordCallback passwordCallback) throws UnsupportedCallbackException, IOException {
-    callbackHandler.handle(new Callback[] { passwordCallback });
+  private char[] getKeyPassword(CacheablePasswordCallback passwordCallback) throws UnsupportedCallbackException, IOException {
+    callbackHandler.handle(new CacheablePasswordCallback[] { passwordCallback });
     return passwordCallback.getPassword();
   }
 }

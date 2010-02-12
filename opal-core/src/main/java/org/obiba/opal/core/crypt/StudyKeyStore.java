@@ -87,12 +87,14 @@ public class StudyKeyStore extends AbstractEntity {
       CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for key [" + studyId + "]:  ", false);
       keyStore.load(new ByteArrayInputStream(javaKeyStore), getKeyPassword(passwordCallback));
     } catch(KeyStoreException e) {
+      clearPasswordCache(studyId);
       throw new KeyProviderSecurityException("Wrong keystore password or keystore was tampered with");
     } catch(NoSuchAlgorithmException e) {
       throw new RuntimeException(e);
     } catch(CertificateException e) {
       throw new RuntimeException(e);
     } catch(IOException ex) {
+      clearPasswordCache(studyId);
       if(ex.getCause() != null && ex.getCause() instanceof UnrecoverableKeyException) {
         throw new KeyProviderSecurityException("Wrong keystore password");
       }
@@ -111,12 +113,14 @@ public class StudyKeyStore extends AbstractEntity {
       CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for key [" + studyId + "]:  ", false);
       keyStore.store(b, getKeyPassword(passwordCallback));
     } catch(KeyStoreException e) {
+      clearPasswordCache(studyId);
       throw new KeyProviderSecurityException("Wrong keystore password or keystore was tampered with");
     } catch(NoSuchAlgorithmException e) {
       throw new RuntimeException(e);
     } catch(CertificateException e) {
       throw new RuntimeException(e);
     } catch(IOException ex) {
+      clearPasswordCache(studyId);
       if(ex.getCause() != null && ex.getCause() instanceof UnrecoverableKeyException) {
         throw new KeyProviderSecurityException("Wrong keystore password");
       }
@@ -168,12 +172,14 @@ public class StudyKeyStore extends AbstractEntity {
         keyStore = KeyStore.getInstance("JCEKS");
         keyStore.load(null, getKeyPassword(passwordCallback));
       } catch(KeyStoreException e) {
+        clearPasswordCache(studyId);
         throw new KeyProviderSecurityException("Wrong keystore password or keystore was tampered with");
       } catch(NoSuchAlgorithmException e) {
         throw new RuntimeException(e);
       } catch(CertificateException e) {
         throw new RuntimeException(e);
       } catch(IOException ex) {
+        clearPasswordCache(studyId);
         if(ex.getCause() != null && ex.getCause() instanceof UnrecoverableKeyException) {
           throw new KeyProviderSecurityException("Wrong keystore password");
         }
@@ -187,6 +193,12 @@ public class StudyKeyStore extends AbstractEntity {
       studyKeyStore.setCallbackHander(callbackHandler);
       studyKeyStore.setKeyStore(keyStore);
       return studyKeyStore;
+    }
+
+    public void clearPasswordCache(String alias) {
+      if(callbackHandler instanceof CachingCallbackHandler) {
+        ((CachingCallbackHandler) callbackHandler).clearPasswordCache(alias);
+      }
     }
   }
 
@@ -407,6 +419,12 @@ public class StudyKeyStore extends AbstractEntity {
       throw new RuntimeException(e);
     } catch(IOException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  public void clearPasswordCache(String alias) {
+    if(callbackHandler instanceof CachingCallbackHandler) {
+      ((CachingCallbackHandler) callbackHandler).clearPasswordCache(alias);
     }
   }
 }

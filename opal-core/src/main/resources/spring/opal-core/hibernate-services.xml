@@ -37,9 +37,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         <property name="sessionFactory" ref="opalSessionFactory" />
       </bean>
     </property>
-    <property name="callbackHandler">
-      <bean class="org.obiba.opal.cli.util.ConsoleCallbackHandler" />  
-    </property>
+    <property name="callbackHandler" ref="consoleCallbackHandler" />
   </bean>
 
 </beans>

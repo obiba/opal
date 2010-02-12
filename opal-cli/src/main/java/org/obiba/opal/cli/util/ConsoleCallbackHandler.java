@@ -99,4 +99,8 @@ public class ConsoleCallbackHandler implements CachingCallbackHandler {
       passwordCache.put(cacheableCallback.getPasswordKey(), cacheableCallback.getPassword());
     }
   }
+
+  public void clearPasswordCache(String alias) {
+    passwordCache.remove(alias);
+  }
 }

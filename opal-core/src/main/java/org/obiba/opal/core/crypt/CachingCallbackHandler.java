@@ -15,4 +15,10 @@ import javax.security.auth.callback.CallbackHandler;
 public interface CachingCallbackHandler extends CallbackHandler {
 
   public void cacheCallbackResult(Callback callback);
+
+  /**
+   * Removes password specified by the alias from the password cache.
+   * @param alias the alias of the password to be removed from the cache.
+   */
+  public void clearPasswordCache(String alias);
 }
