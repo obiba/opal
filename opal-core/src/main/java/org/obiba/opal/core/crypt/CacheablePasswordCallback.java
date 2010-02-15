@@ -24,9 +24,19 @@ public class CacheablePasswordCallback extends PasswordCallback {
 
   private String passwordKey;
 
+  private String confirmationPrompt;
+
   //
   // Constructors
   //
+
+  public void setConfirmationPrompt(String confirmationPrompt) {
+    this.confirmationPrompt = confirmationPrompt;
+  }
+
+  public boolean isConfirmationPrompt() {
+    return confirmationPrompt != null && !confirmationPrompt.equals("");
+  }
 
   public CacheablePasswordCallback(String passwordKey, String prompt, boolean echoOn) {
     super(prompt, echoOn);
@@ -45,5 +55,12 @@ public class CacheablePasswordCallback extends PasswordCallback {
    */
   public String getPasswordKey() {
     return passwordKey;
+  }
+
+  /**
+   * @return
+   */
+  public String getConfirmationPrompt() {
+    return confirmationPrompt;
   }
 }

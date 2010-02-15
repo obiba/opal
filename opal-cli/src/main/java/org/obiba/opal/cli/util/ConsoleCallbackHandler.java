@@ -11,6 +11,7 @@ package org.obiba.opal.cli.util;
 
 import java.io.Console;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -81,7 +82,12 @@ public class ConsoleCallbackHandler implements CachingCallbackHandler {
           if(passwordCache.containsKey(passwordKey)) {
             passwordCallback.setPassword(passwordCache.get(passwordKey));
           } else {
-            passwordCallback.setPassword(console.readPassword("%s", passwordCallback.getPrompt()));
+            CacheablePasswordCallback cachablePasswordCallback = (CacheablePasswordCallback) passwordCallback;
+            if(cachablePasswordCallback.isConfirmationPrompt()) {
+              passwordCallback.setPassword(promptAndConfirmPassword(cachablePasswordCallback, console));
+            } else {
+              passwordCallback.setPassword(console.readPassword(" %s", cachablePasswordCallback.getPrompt()));
+            }
             passwordCache.put(passwordKey, passwordCallback.getPassword());
           }
         } else {
@@ -91,6 +97,19 @@ public class ConsoleCallbackHandler implements CachingCallbackHandler {
         throw new UnsupportedCallbackException(c);
       }
     }
+  }
+
+  private char[] promptAndConfirmPassword(CacheablePasswordCallback callback, Console console) {
+    char[] passwordOne;
+    char[] passwordTwo;
+    boolean firstTime = true;
+    do {
+      if(!firstTime) console.printf("%s\n", "Passwords do not match. Try again:");
+      if(firstTime) firstTime = false;
+      passwordOne = console.readPassword(" %s", callback.getPrompt());
+      passwordTwo = console.readPassword(" %s", callback.getConfirmationPrompt());
+    } while(!Arrays.equals(passwordOne, passwordTwo));
+    return passwordOne;
   }
 
   public void cacheCallbackResult(Callback callback) {

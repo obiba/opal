@@ -166,7 +166,8 @@ public class StudyKeyStore extends AbstractEntity {
 
       StudyKeyStore.loadBouncyCastle();
 
-      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for new keystore [" + studyId + "]:  ", false);
+      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Enter '" + studyId + "' keystore password:  ", false);
+      passwordCallback.setConfirmationPrompt("Re-enter '" + studyId + "' keystore password:  ");
       KeyStore keyStore = null;
       try {
         keyStore = KeyStore.getInstance("JCEKS");

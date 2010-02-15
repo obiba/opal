@@ -46,6 +46,7 @@ public class KeyCommand extends AbstractCommand<KeyCommandOptions> {
       }
       if(createKeyConfirmation) {
         String certificateInfo = new CertificateInfo().getCertificateInfoAsString();
+        System.console().printf("%s:\n", "Keystore creation");
         studyKeyStoreService.createOrUpdateKey(options.getAlias(), options.getAlgorithm(), options.getSize(), certificateInfo);
       }
     } else if(options.isPrivate()) {

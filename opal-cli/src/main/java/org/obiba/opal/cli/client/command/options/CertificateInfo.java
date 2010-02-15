@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.cli.client.command.options;
 
+import java.io.Console;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,14 +62,15 @@ public class CertificateInfo {
   }
 
   private void getCertificateInfoAttributes() {
+    System.console().printf("%s:\n", "Certificate creation");
     for(CertificateInfo.Attribute attribute : infoList) {
-      System.console().printf("%s\n", attribute.getQuestion());
+      System.console().printf(" %s\n", attribute.getQuestion());
       attribute.setValue(System.console().readLine("%s", attribute.getPrompt()));
     }
   }
 
   private boolean isCertificateCorrect() {
-    System.console().printf("%s\n", getConfirmationQuestion());
+    System.console().printf(" %s\n", getConfirmationQuestion());
     String ans = "no";
     do {
       String answer = System.console().readLine("%s", getConfirmationPrompt(ans));
