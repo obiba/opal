@@ -1,5 +1,10 @@
 @echo off
+
+if "%JAVA_OPTS%" == "" goto DEFAULT_JAVA_OPTS
+
+:INVOKE
 echo JAVA_HOME=%JAVA_HOME%
+echo JAVA_OPTS=%JAVA_OPTS%
 echo OPAL_HOME=%OPAL_HOME%
 
 if "%JAVA_HOME%" == "" goto JAVA_HOME_NOT_SET
@@ -9,8 +14,12 @@ setlocal ENABLEDELAYEDEXPANSION
 
 call "%OPAL_HOME%\bin\setclasspath.bat"
 
-java -Xmx512m -cp "%CLASSPATH%" org.obiba.opal.cli.client.OpalConsole %*
+java %JAVA_OPTS% -cp "%CLASSPATH%" org.obiba.opal.cli.client.OpalConsole %*
 goto :END
+
+:DEFAULT_JAVA_OPTS
+set JAVA_OPTS=-Xmx512M
+goto :INVOKE
 
 :JAVA_HOME_NOT_SET
 echo JAVA_HOME not set

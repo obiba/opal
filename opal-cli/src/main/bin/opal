@@ -1,6 +1,13 @@
 #!/bin/sh
 
+if [ -z "$JAVA_OPTS" ]
+then
+  # Set default JAVA_OPTS
+  JAVA_OPTS="-Xmx512M"
+fi
+
 echo "JAVA_HOME=$JAVA_HOME"
+echo "JAVA_OPTS=$JAVA_OPTS"
 echo "OPAL_HOME=$OPAL_HOME"
 
 if [ -z "$JAVA_HOME" ]
@@ -29,4 +36,4 @@ for f in $(ls "$OPAL_HOME/lib" | grep jar$); do
 done
 
 
-java -cp "$CLASSPATH" org.obiba.opal.cli.client.OpalConsole $@
+java $JAVA_OPTS -cp "$CLASSPATH" org.obiba.opal.cli.client.OpalConsole $@
