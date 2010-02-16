@@ -22,7 +22,7 @@ import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager;
 import org.obiba.magma.support.DatasourceCopier;
-import org.obiba.magma.support.MagmaEngineReferenceResolver;
+import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.core.service.ExportException;
 import org.obiba.opal.core.service.ExportService;
 import org.springframework.transaction.annotation.Transactional;
@@ -100,8 +100,7 @@ public class DefaultExportServiceImpl implements ExportService {
   private Set<ValueTable> getValueTablesByName(List<String> tableNames) throws NoSuchDatasourceException, NoSuchValueTableException, ExportException {
     Set<ValueTable> tables = new HashSet<ValueTable>();
     for(String tableName : tableNames) {
-      // Resolver expects ValueTable names to be delimited with a colon.
-      if(!tables.add(MagmaEngineReferenceResolver.valueOf(tableName + ":").resolveTable())) {
+      if(!tables.add(MagmaEngineTableResolver.valueOf(tableName).resolveTable())) {
         throw new ExportException("Source tables include duplicate '" + tableName + "'.");
       }
     }

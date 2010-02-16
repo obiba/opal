@@ -18,7 +18,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
-import org.obiba.magma.support.MagmaEngineReferenceResolver;
+import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.cli.client.command.options.ListCommandOptions;
 import org.obiba.opal.core.service.ExportService;
 import org.slf4j.Logger;
@@ -87,7 +87,7 @@ public class ListCommand extends AbstractOpalRuntimeDependentCommand<ListCommand
       boolean isValid = true;
       for(String tableName : tableNames) {
         try {
-          MagmaEngineReferenceResolver.valueOf(tableName + ":").resolveTable();
+          MagmaEngineTableResolver.valueOf(tableName).resolveTable();
         } catch(Exception e) {
           System.err.printf("'%s' does not exist or is not a valid table name.\n", tableName);
           isValid = false;
