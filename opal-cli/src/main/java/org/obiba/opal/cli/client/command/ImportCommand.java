@@ -35,11 +35,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     if(options.isFiles()) {
       List<File> filesToImport = resolveFiles();
       if(!filesToImport.isEmpty()) {
-        try {
-          importFiles(filesToImport);
-        } catch(Exception ex) {
-          System.err.println(ex.getMessage());
-        }
+        importFiles(filesToImport);
       } else {
         System.err.println("No files found");
       }

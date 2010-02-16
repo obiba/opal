@@ -1,0 +1,27 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
+  http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+  <tx:annotation-driven transaction-manager="transactionManager" />
+
+  <bean id="jotm" class="org.springframework.transaction.jta.JotmFactoryBean" />
+
+  <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
+    <!-- Set a very high timeout (10 days) -->
+    <property name="defaultTimeout" value="864000" />
+    <property name="userTransaction">
+      <ref local="jotm" />
+    </property>
+    <!--
+      No need to set "transactionManager" property since the jotm bean implements both interfaces and Spring's
+      JtaTransactionManager will detect this.
+    -->
+  </bean>
+
+  <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate" scope="prototype">
+    <property name="transactionManager" ref="transactionManager" />
+  </bean>
+
+</beans>

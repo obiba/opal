@@ -7,6 +7,8 @@
 
         <property name="driverName" value="${org.obiba.opal.datasource.key.driver}" />
         <property name="url" value="${org.obiba.opal.datasource.key.url}" />
+        <property name="user" value="${org.obiba.opal.datasource.key.username}" />
+        <property name="password" value="${org.obiba.opal.datasource.key.password}" />
 
         <!-- Bind this XADataSource to the JTA TransactionManager -->
         <property name="transactionManager" ref="jotm" />
@@ -15,7 +17,6 @@
 
     <property name="user" value="${org.obiba.opal.datasource.key.username}" />
     <property name="password" value="${org.obiba.opal.datasource.key.password}" />
-
     <property name="maxSize" value="10" />
     <property name="minSize" value="3" />
 
@@ -27,6 +28,8 @@
 
         <property name="driverName" value="${org.obiba.opal.datasource.opal.driver}" />
         <property name="url" value="${org.obiba.opal.datasource.opal.url}" />
+        <property name="user" value="${org.obiba.opal.datasource.opal.username}" />
+        <property name="password" value="${org.obiba.opal.datasource.opal.password}" />
 
         <!-- Bind this XADataSource to the JTA TransactionManager -->
         <property name="transactionManager" ref="jotm" />
@@ -35,7 +38,6 @@
 
     <property name="user" value="${org.obiba.opal.datasource.opal.username}" />
     <property name="password" value="${org.obiba.opal.datasource.opal.password}" />
-
     <property name="maxSize" value="10" />
     <property name="minSize" value="3" />
 

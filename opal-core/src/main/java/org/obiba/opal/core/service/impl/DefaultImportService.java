@@ -73,9 +73,6 @@ public class DefaultImportService implements ImportService {
 
     // Validate the datasource name.
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(datasourceName);
-    if(destinationDatasource == null) {
-      throw new NoSuchDatasourceException("No such datasource (" + datasourceName + ")");
-    }
 
     // Create an FsDatasource for the specified file.
     FsDatasource sourceDatasource = null;
@@ -223,8 +220,8 @@ public class DefaultImportService implements ImportService {
     // Move the file there.
     try {
       FileUtil.moveFile(file, archiveDir);
-    } catch(IOException ex) {
-      log.error("Failed to archive file {}", file);
+    } catch(IOException e) {
+      log.error("Failed to archive file {} to dir {}. Error reported: {}", new Object[] { file, archiveDir, e.getMessage() });
     }
   }
 
