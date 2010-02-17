@@ -215,7 +215,7 @@ public class DefaultImportService implements ImportService {
     privateTable.initialise();
 
     // Copy the view to the destination datasource.
-    DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, destination).build();
+    DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withThroughtputListener().withVariableEntityCopyEventListener(auditLogManager, destination).build();
     copier.copy(privateTable, destination);
   }
 
