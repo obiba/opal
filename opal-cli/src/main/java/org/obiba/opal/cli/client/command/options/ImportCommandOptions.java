@@ -12,8 +12,6 @@ import uk.co.flamingpenguin.jewel.cli.Unparsed;
  * 
  * The <code>datasource</code> option indicates the destination datasource.
  * 
- * The <code>encrypted</code> option indicates whether the files to be imported are encrypted.
- * 
  * The <code>owner</code> option indicates the "owner" of any identifiers used in the data to be imported.
  * 
  * The file list option (a list of unparsed file arguments at the end of the command line) indicates one or more
@@ -33,9 +31,7 @@ public interface ImportCommandOptions extends HelpOption {
   @Option(shortName = "d", description = "The destination datasource into which the variable catalogue and the participants data will be imported.")
   public String getDatasource();
 
-  @Option(shortName = "o", description = "The name under which the participants identifiers that will be stored in the participants key database.")
+  @Option(shortName = "o", description = "The variable name under which the participants identifiers that will be stored in the participants key database.")
   public String getOwner();
 
-  @Option(shortName = "e", description = "Indicates that the files to be imported are encrypted.")
-  public boolean getEncrypted();
 }

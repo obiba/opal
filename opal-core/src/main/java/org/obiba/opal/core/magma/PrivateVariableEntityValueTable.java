@@ -70,7 +70,7 @@ public class PrivateVariableEntityValueTable extends View {
       public VariableEntity apply(VariableEntity from) {
         VariableEntity publicEntity = privateMap.publicEntity(from);
         if(publicEntity == null) {
-          publicEntity = privateMap.createPublicEntity(from);
+          throw new NoSuchValueSetException(PrivateVariableEntityValueTable.this, null);
         }
         return publicEntity;
       }
@@ -88,7 +88,7 @@ public class PrivateVariableEntityValueTable extends View {
       public ValueSet apply(ValueSet from) {
         VariableEntity publicEntity = privateMap.publicEntity(from.getVariableEntity());
         if(publicEntity == null) {
-          publicEntity = privateMap.createPublicEntity(from.getVariableEntity());
+          throw new NoSuchValueSetException(PrivateVariableEntityValueTable.this, null);
         }
         return baseTransformer.apply(from);
       }

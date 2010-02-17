@@ -1,4 +1,5 @@
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:tx="http://www.springframework.org/schema/tx"
   xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
@@ -14,6 +15,10 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <property name="annotatedClasses">
       <bean class="org.obiba.magma.datasource.hibernate.support.AnnotationConfigurationHelper" factory-method="getAnnotatedTypes" />
     </property>
+
+    <!-- This is required to allow Hibernate to register transaction synchronisations. -->
+    <property name="jtaTransactionManager" ref="jotm" />
+
     <property name="configurationClass" value="org.hibernate.cfg.AnnotationConfiguration" />
     <property name="hibernateProperties">
       <bean class="org.springframework.beans.factory.config.PropertiesFactoryBean">
@@ -24,6 +29,11 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
             <prop key="hibernate.cache.use_query_cache">true</prop>
             <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
             <prop key="hibernate.dialect">${org.obiba.opal.datasource.key.dialect}</prop>
+
+            <!-- Overridden to lookup the JOTM UserTransaction directly instead of a JNDI lookup -->
+            <prop key="hibernate.transaction.factory_class">org.obiba.opal.core.tx.JOTMTransactionFactory</prop>
+            <prop key="hibernate.connection.release_mode">after_transaction</prop>
+            <prop key="hibernate.transaction.auto_close_session">true</prop>
           </props>
         </property>
       </bean>
@@ -39,8 +49,12 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
       <bean class="org.hibernate.cfg.ImprovedNamingStrategy" />
     </property>
     <property name="annotatedClasses">
-      <bean class="org.obiba.opal.core.support.OpalAnnotationConfigurationHelper"/>
+      <bean class="org.obiba.opal.core.support.OpalAnnotationConfigurationHelper" />
     </property>
+
+    <!-- This is required to allow Hibernate to register transaction synchronisations. -->
+    <property name="jtaTransactionManager" ref="jotm" />
+
     <property name="configurationClass" value="org.hibernate.cfg.AnnotationConfiguration" />
     <property name="hibernateProperties">
       <bean class="org.springframework.beans.factory.config.PropertiesFactoryBean">
@@ -49,8 +63,13 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
             <prop key="hibernate.generate_statistics">true</prop>
             <prop key="hibernate.cache.use_structured_entries">true</prop>
             <prop key="hibernate.cache.use_query_cache">true</prop>
-            <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>            
+            <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
             <prop key="hibernate.dialect">${org.obiba.opal.datasource.opal.dialect}</prop>
+
+            <!-- Overridden to lookup the JOTM UserTransaction directly instead of a JNDI lookup -->
+            <prop key="hibernate.transaction.factory_class">org.obiba.opal.core.tx.JOTMTransactionFactory</prop>
+            <prop key="hibernate.connection.release_mode">after_transaction</prop>
+            <prop key="hibernate.transaction.auto_close_session">true</prop>
           </props>
         </property>
       </bean>

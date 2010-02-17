@@ -25,10 +25,9 @@ public interface ImportService {
    * @param datasource name of the destination datasource
    * @param owner "owner" of identifiers in the data
    * @param file data file to be imported
-   * @param encrypted flag indicating whether the data file is encrypted or not
    * @throws NoSuchDatasourceException if the specified datasource does not exist
    * @throws IllegalArgumentException if the specified file does not exist or is not a normal file
    * @throws IOException on any I/O error
    */
-  public void importData(String datasourceName, String owner, File file, boolean encrypted) throws IllegalArgumentException, IOException;
+  public void importData(String datasourceName, String owner, File file) throws IllegalArgumentException, IOException;
 }

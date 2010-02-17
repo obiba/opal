@@ -9,45 +9,54 @@
  ******************************************************************************/
 package org.obiba.opal.core.service.impl;
 
-import org.obiba.magma.Datasource;
-import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
-import org.obiba.magma.support.Initialisables;
+import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
 
 /**
- * An Opal implementation of {@link PrivateVariableEntityMap}, on top of a Magma Datasource ("key-datasource").
+ * An Opal implementation of {@code PrivateVariableEntityMap}, on top of a Magma {@code ValueTable}.
  */
 public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
   //
   // Instance Variables
   //
 
-  private String owner;
+  private final ValueTable keysValueTable;
 
-  private IParticipantIdentifier participantIdentifier;
+  private final Variable ownerVariable;
+
+  private final IParticipantIdentifier participantIdentifier;
+
+  /**
+   * 
+   */
+  public OpalPrivateVariableEntityMap(ValueTable keysValueTable, Variable ownerVariable, IParticipantIdentifier participantIdentifier) {
+    if(keysValueTable == null) throw new IllegalArgumentException("keysValueTable cannot be null");
+    if(ownerVariable == null) throw new IllegalArgumentException("ownerVariable cannot be null");
+    if(participantIdentifier == null) throw new IllegalArgumentException("participantIdentifier cannot be null");
+
+    this.keysValueTable = keysValueTable;
+    this.ownerVariable = ownerVariable;
+    this.participantIdentifier = participantIdentifier;
+  }
 
   //
   // PrivateVariableEntityMap Methods
   //
 
   public VariableEntity publicEntity(VariableEntity privateEntity) {
+    if(privateEntity == null) throw new IllegalArgumentException("privateEntity cannot be null");
+
     ValueTable keyTable = getKeyValueTable();
-
-    // TODO: Shouldn't have to re-initialize the table over and over again. This is
-    // necessary at the moment because certain changes to the table (adding a ValueSet)
-    // are not being sync'ed.
-    Initialisables.initialise(keyTable);
-
-    Variable ownerVariable = keyTable.getVariable(owner);
+    VariableValueSource ownerVariableSource = keyTable.getVariableValueSource(ownerVariable.getName());
     for(ValueSet valueSet : keyTable.getValueSets()) {
-      Value ownerVariableValue = keyTable.getValue(ownerVariable, valueSet);
+      Value ownerVariableValue = ownerVariableSource.getValue(valueSet);
       if(ownerVariableValue.toString().equals(privateEntity.getIdentifier())) {
         return valueSet.getVariableEntity();
       }
@@ -57,33 +66,32 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
   }
 
   public VariableEntity privateEntity(VariableEntity publicEntity) {
+    if(publicEntity == null) throw new IllegalArgumentException("publicEntity cannot be null");
+
     ValueTable keyTable = getKeyValueTable();
-
-    // TODO: Shouldn't have to re-initialize the table over and over again. This is
-    // necessary at the moment because certain changes to the table (adding a ValueSet)
-    // are not being sync'ed.
-    Initialisables.initialise(keyTable);
-
-    Variable ownerVariable = keyTable.getVariable(owner);
-    ValueSet publicValueSet = keyTable.getValueSet(publicEntity);
-    Value ownerValue = keyTable.getValue(ownerVariable, publicValueSet);
-
-    return new VariableEntityBean(publicValueSet.getVariableEntity().getType(), ownerValue.toString());
+    ValueSet valueSet = keyTable.getValueSet(publicEntity);
+    VariableValueSource ownerVariableSource = keyTable.getVariableValueSource(ownerVariable.getName());
+    Value ownerKey = ownerVariableSource.getValue(valueSet);
+    return new VariableEntityBean(publicEntity.getType(), ownerKey.toString());
   }
 
   public boolean hasPrivateEntity(VariableEntity privateEntity) {
-    ValueTable keyTable = getKeyValueTable();
+    if(privateEntity == null) throw new IllegalArgumentException("privateEntity cannot be null");
 
-    for(Variable variable : keyTable.getVariables()) {
-      if(variable.getName().equals(owner)) {
+    ValueTable keyTable = getKeyValueTable();
+    VariableValueSource ownerVariableSource = keyTable.getVariableValueSource(ownerVariable.getName());
+    for(ValueSet keysValueSet : keyTable.getValueSets()) {
+      Value privateIdentifier = ownerVariableSource.getValue(keysValueSet);
+      if(privateIdentifier.toString().equals(privateEntity.getIdentifier())) {
         return true;
       }
     }
-
     return false;
   }
 
   public VariableEntity createPublicEntity(VariableEntity privateEntity) {
+    if(privateEntity == null) throw new IllegalArgumentException("privateEntity cannot be null");
+
     ValueTable keyTable = getKeyValueTable();
 
     for(int i = 0; i < 100; i++) {
@@ -93,23 +101,10 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
       }
     }
 
-    throw new IllegalStateException("Unable to generate a unique public entity for the owner [" + owner + "] and private entity [" + privateEntity.getIdentifier() + "]. " + "One hundred attempts made.");
-  }
-
-  //
-  // Methods
-  //
-
-  public void setOwner(String owner) {
-    this.owner = owner;
-  }
-
-  public void setParticipantIdentifier(IParticipantIdentifier participantIdentifier) {
-    this.participantIdentifier = participantIdentifier;
+    throw new IllegalStateException("Unable to generate a unique public entity for the owner [" + ownerVariable + "] and private entity [" + privateEntity.getIdentifier() + "]. " + "One hundred attempts made.");
   }
 
   private ValueTable getKeyValueTable() {
-    Datasource keyDatasource = MagmaEngine.get().getDatasource("key-datasource");
-    return keyDatasource.getValueTable("keys");
+    return keysValueTable;
   }
 }

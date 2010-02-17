@@ -16,21 +16,22 @@ import org.obiba.core.util.FileUtil;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
-import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
+import org.obiba.magma.VariableEntity;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
+import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.type.BooleanType;
 import org.obiba.magma.type.TextType;
 import org.obiba.magma.views.SelectClause;
-import org.obiba.magma.views.ValueSetWrapper;
+import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.magma.PrivateVariableEntityValueTable;
 import org.obiba.opal.core.service.ImportService;
@@ -57,6 +58,10 @@ public class DefaultImportService implements ImportService {
 
   private String archiveDirectory;
 
+  private String keysTableReference = "key-datasource.keys";
+
+  private String keysTableEntityType = "Participant";
+
   private HibernateVariableEntityAuditLogManager auditLogManager;
 
   private IParticipantIdentifier participantIdentifier;
@@ -65,7 +70,7 @@ public class DefaultImportService implements ImportService {
   // ImportService Methods
   //
 
-  public void importData(String datasourceName, String owner, File file, boolean encrypted) throws NoSuchDatasourceException, IllegalArgumentException, IOException {
+  public void importData(String datasourceName, String owner, File file) throws NoSuchDatasourceException, IllegalArgumentException, IOException {
     // Validate the file.
     if(!file.isFile()) {
       throw new IllegalArgumentException("No such file (" + file.getPath() + ")");
@@ -75,12 +80,7 @@ public class DefaultImportService implements ImportService {
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(datasourceName);
 
     // Create an FsDatasource for the specified file.
-    FsDatasource sourceDatasource = null;
-    if(encrypted) {
-      sourceDatasource = new FsDatasource(file.getName(), file, dsEncryptionStrategy);
-    } else {
-      sourceDatasource = new FsDatasource(file.getName(), file);
-    }
+    FsDatasource sourceDatasource = new FsDatasource(file.getName(), file, dsEncryptionStrategy);
 
     // Copy the FsDatasource to the destination datasource.
     try {
@@ -106,6 +106,14 @@ public class DefaultImportService implements ImportService {
     this.dsEncryptionStrategy = dsEncryptionStrategy;
   }
 
+  public void setKeysTableReference(String keysTableReference) {
+    this.keysTableReference = keysTableReference;
+  }
+
+  public void setKeysTableEntityType(String keysTableEntityType) {
+    this.keysTableEntityType = keysTableEntityType;
+  }
+
   public void setArchiveDirectory(String archiveDirectory) {
     this.archiveDirectory = archiveDirectory;
   }
@@ -116,7 +124,7 @@ public class DefaultImportService implements ImportService {
 
   private void copyValueTables(Datasource source, Datasource destination, String owner) throws IOException {
     for(ValueTable valueTable : source.getValueTables()) {
-      if(valueTable.isForEntityType("Participant")) {
+      if(valueTable.isForEntityType(keysTableEntityType)) {
         copyParticipants(valueTable, source, destination, owner);
       } else {
         DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, destination).build();
@@ -126,15 +134,6 @@ public class DefaultImportService implements ImportService {
   }
 
   private void copyParticipants(ValueTable participantTable, Datasource source, Datasource destination, String owner) throws IOException {
-    copyParticipantIdentifiers(participantTable, source, owner);
-    copyParticipantDataAndMetadata(participantTable, source, destination, owner);
-  }
-
-  // TODO: This method needs refactoring.
-  private void copyParticipantIdentifiers(ValueTable participantTable, Datasource source, String owner) throws IOException {
-    OpalPrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap();
-    entityMap.setOwner(owner);
-    entityMap.setParticipantIdentifier(participantIdentifier);
 
     // Create a SelectClause that selects all identifier variables.
     SelectClause selectClause = new SelectClause() {
@@ -143,50 +142,64 @@ public class DefaultImportService implements ImportService {
       }
     };
 
-    // Create a view of the participant table that wraps entities with "public" entities, and that
-    // selects only IDENTIFIER variables.
-    PrivateVariableEntityValueTable privateTable = new PrivateVariableEntityValueTable(participantTable.getName(), participantTable, entityMap);
-    privateTable.setSelectClause(selectClause);
-    privateTable.initialise();
+    View privateView = View.Builder.newView(participantTable.getName(), participantTable).select(selectClause).build();
+    Variable ownerVariable = prepareKeysTable(privateView, owner);
 
-    Datasource destination = MagmaEngine.get().getDatasource("key-datasource");
-    ValueTableWriter tableWriter = destination.createWriter("keys", privateTable.getEntityType());
+    copyParticipantIdentifiers(privateView, source, ownerVariable);
+    copyParticipantDataAndMetadata(participantTable, source, destination, ownerVariable);
+  }
+
+  private Variable prepareKeysTable(ValueTable privateView, String owner) throws IOException {
+
+    Variable ownerVariable = Variable.Builder.newVariable(owner, TextType.get(), privateView.getEntityType()).build();
+
+    ValueTableWriter writer = writeToKeysTable();
     try {
-      // First write the variables (owner + identifiers).
-      VariableWriter variableWriter = tableWriter.writeVariables();
-      Variable ownerVariable = Variable.Builder.newVariable(owner, TextType.get(), participantTable.getEntityType()).build();
+      VariableWriter vw = writer.writeVariables();
       try {
-        variableWriter.writeVariable(ownerVariable);
-        for(Variable variable : privateTable.getVariables()) {
-          variableWriter.writeVariable(variable);
-        }
+        // Create private variables
+        vw.writeVariable(ownerVariable);
+        DatasourceCopier.Builder.newCopier().dontCopyValues().build().copy(privateView, vw);
       } finally {
-        variableWriter.close();
+        vw.close();
       }
-      // Next write the ValueSets.
-      for(ValueSet valueSet : privateTable.getValueSets()) {
-        ValueSetWriter valueSetWriter = tableWriter.writeValueSet(valueSet.getVariableEntity());
+    } finally {
+      writer.close();
+    }
+    return ownerVariable;
+  }
+
+  private void copyParticipantIdentifiers(ValueTable privateView, Datasource source, Variable ownerVariable) throws IOException {
+    ValueTableWriter writer = writeToKeysTable();
+    try {
+      // Copy private entities to keys table.
+      OpalPrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(lookupKeysTable(), ownerVariable, participantIdentifier);
+      for(ValueSet privateValueSet : privateView.getValueSets()) {
+        VariableEntity privateEntity = privateValueSet.getVariableEntity();
+        VariableEntity publicEntity;
+        if(entityMap.hasPrivateEntity(privateEntity) == false) {
+          publicEntity = entityMap.createPublicEntity(privateEntity);
+        } else {
+          publicEntity = entityMap.publicEntity(privateEntity);
+        }
+
+        ValueSetWriter vsw = writer.writeValueSet(publicEntity);
         try {
-          valueSetWriter.writeValue(ownerVariable, TextType.get().valueOf(((ValueSetWrapper) valueSet).getWrappedValueSet().getVariableEntity().getIdentifier()));
-          for(Variable variable : privateTable.getVariables()) {
-            Value value = privateTable.getValue(variable, valueSet);
-            if(!value.isNull()) {
-              valueSetWriter.writeValue(variable, value);
-            }
-          }
+          // Write the private identifier value to the "owner" variable in the keys valueSet
+          vsw.writeValue(ownerVariable, TextType.get().valueOf(privateEntity.getIdentifier()));
+          // Copy all other private variable values
+          DatasourceCopier.Builder.newCopier().dontCopyMetadata().build().copy(privateView, privateValueSet, vsw);
         } finally {
-          valueSetWriter.close();
+          vsw.close();
         }
       }
     } finally {
-      tableWriter.close();
+      writer.close();
     }
   }
 
-  private void copyParticipantDataAndMetadata(ValueTable participantTable, Datasource source, Datasource destination, String owner) throws IOException {
-    OpalPrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap();
-    entityMap.setOwner(owner);
-    entityMap.setParticipantIdentifier(participantIdentifier);
+  private void copyParticipantDataAndMetadata(ValueTable participantTable, Datasource source, Datasource destination, Variable ownerVariable) throws IOException {
+    OpalPrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(lookupKeysTable(), ownerVariable, participantIdentifier);
 
     // Create a SelectClause that selects all NON-IDENTIFIER variables.
     SelectClause selectClause = new SelectClause() {
@@ -223,6 +236,15 @@ public class DefaultImportService implements ImportService {
     } catch(IOException e) {
       log.error("Failed to archive file {} to dir {}. Error reported: {}", new Object[] { file, archiveDir, e.getMessage() });
     }
+  }
+
+  private ValueTable lookupKeysTable() {
+    return MagmaEngineTableResolver.valueOf(keysTableReference).resolveTable();
+  }
+
+  private ValueTableWriter writeToKeysTable() {
+    MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(keysTableReference);
+    return MagmaEngine.get().getDatasource(resolver.getDatasourceName()).createWriter(resolver.getTableName(), keysTableEntityType);
   }
 
 }
