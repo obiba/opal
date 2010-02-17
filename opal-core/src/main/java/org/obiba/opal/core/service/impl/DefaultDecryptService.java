@@ -63,7 +63,6 @@ public class DefaultDecryptService implements DecryptService {
     // Create an FsDatasource for the specified file.
     FsDatasource sourceDatasource = null;
     if(encrypted) {
-      System.out.println("yes it's encrypted");
       sourceDatasource = new FsDatasource(file.getName(), file, dsEncryptionStrategy);
     } else {
       sourceDatasource = new FsDatasource(file.getName(), file);

@@ -27,7 +27,4 @@ public interface DecryptCommandOptions extends HelpOption {
   public File getOutput();
 
   public boolean isOutput();
-
-  @Option(shortName = "a", description = "The alias name of the encryption key pair.")
-  public String getAlias();
 }
