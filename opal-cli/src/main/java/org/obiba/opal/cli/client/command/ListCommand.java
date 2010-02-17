@@ -16,6 +16,8 @@ import java.util.List;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.NoSuchDatasourceException;
+import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineTableResolver;
@@ -88,7 +90,10 @@ public class ListCommand extends AbstractOpalRuntimeDependentCommand<ListCommand
       for(String tableName : tableNames) {
         try {
           MagmaEngineTableResolver.valueOf(tableName).resolveTable();
-        } catch(Exception e) {
+        } catch(NoSuchDatasourceException e) {
+          System.err.printf("'%s' does not exist or is not a valid datasource name.\n", tableName);
+          isValid = false;
+        } catch(NoSuchValueTableException e) {
           System.err.printf("'%s' does not exist or is not a valid table name.\n", tableName);
           isValid = false;
         }
