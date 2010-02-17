@@ -57,10 +57,7 @@ public abstract class DefaultStudyKeyStoreServiceImpl extends PersistenceManager
     Assert.hasText(algorithm, "algorithm must not be null or empty");
     Assert.notNull(size, "size must not be null");
     Assert.hasText(certificateInfo, "studyId must not be null or empty");
-    StudyKeyStore defaultStore = getStudyKeyStore(DEFAULT_STUDY_ID);
-    if(defaultStore == null) {
-      defaultStore = StudyKeyStore.Builder.newStore().studyId(DEFAULT_STUDY_ID).passwordPrompt(callbackHandler).build();
-    }
+    StudyKeyStore defaultStore = getOrCreateStudyKeyStore(DEFAULT_STUDY_ID);
     try {
       if(defaultStore.getKeyStore().containsAlias(alias)) {
         defaultStore.getKeyStore().deleteEntry(alias);
@@ -98,10 +95,7 @@ public abstract class DefaultStudyKeyStoreServiceImpl extends PersistenceManager
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(privateKey, "privateKey must not be null");
     Assert.notNull(certificate, "certificate must not be null");
-    StudyKeyStore defaultStore = getStudyKeyStore(DEFAULT_STUDY_ID);
-    if(defaultStore == null) {
-      defaultStore = StudyKeyStore.Builder.newStore().studyId(DEFAULT_STUDY_ID).passwordPrompt(callbackHandler).build();
-    }
+    StudyKeyStore defaultStore = getOrCreateStudyKeyStore(DEFAULT_STUDY_ID);
     defaultStore.importKey(alias, privateKey, certificate);
   }
 
@@ -109,10 +103,7 @@ public abstract class DefaultStudyKeyStoreServiceImpl extends PersistenceManager
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(privateKey, "privateKey must not be null");
     Assert.hasText(certificateInfo, "certificateInfo must not be null or empty");
-    StudyKeyStore defaultStore = getStudyKeyStore(DEFAULT_STUDY_ID);
-    if(defaultStore == null) {
-      defaultStore = StudyKeyStore.Builder.newStore().studyId(DEFAULT_STUDY_ID).passwordPrompt(callbackHandler).build();
-    }
+    StudyKeyStore defaultStore = getOrCreateStudyKeyStore(DEFAULT_STUDY_ID);
     defaultStore.importKey(alias, privateKey, certificateInfo);
   }
 

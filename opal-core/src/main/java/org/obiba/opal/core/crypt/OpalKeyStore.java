@@ -52,7 +52,7 @@ public class OpalKeyStore implements KeyPairProvider {
     KeyPair keyPair = null;
 
     try {
-      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(DefaultStudyKeyStoreServiceImpl.DEFAULT_STUDY_ID, "Password for key " + alias, false);
+      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(DefaultStudyKeyStoreServiceImpl.DEFAULT_STUDY_ID).prompt("Password for '" + alias + "':  ").build();
       Key key = keyStore.getKey(alias, getKeyPassword(passwordCallback));
 
       if(key == null) {

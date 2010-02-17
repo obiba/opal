@@ -56,6 +56,8 @@ public class StudyKeyStore extends AbstractEntity {
 
   private static final long serialVersionUID = 1L;
 
+  private static final String PASSWORD_FOR = "Password for";
+
   @Column(nullable = false)
   private String studyId;
 
@@ -84,7 +86,7 @@ public class StudyKeyStore extends AbstractEntity {
     KeyStore keyStore = null;
     try {
       keyStore = KeyStore.getInstance("JCEKS");
-      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for key [" + studyId + "]:  ", false);
+      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(studyId).prompt(getPasswordFor(studyId)).build();
       keyStore.load(new ByteArrayInputStream(javaKeyStore), getKeyPassword(passwordCallback));
     } catch(KeyStoreException e) {
       clearPasswordCache(studyId);
@@ -110,7 +112,7 @@ public class StudyKeyStore extends AbstractEntity {
     ByteArrayOutputStream b = new ByteArrayOutputStream();
 
     try {
-      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for key [" + studyId + "]:  ", false);
+      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(studyId).prompt(getPasswordFor(studyId)).build();
       keyStore.store(b, getKeyPassword(passwordCallback));
     } catch(KeyStoreException e) {
       clearPasswordCache(studyId);
@@ -166,8 +168,7 @@ public class StudyKeyStore extends AbstractEntity {
 
       StudyKeyStore.loadBouncyCastle();
 
-      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Enter '" + studyId + "' keystore password:  ", false);
-      passwordCallback.setConfirmationPrompt("Re-enter '" + studyId + "' keystore password:  ");
+      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(studyId).prompt("Enter '" + studyId + "' keystore password:  ").confirmation("Re-enter '" + studyId + "' keystore password:  ").build();
       KeyStore keyStore = null;
       try {
         keyStore = KeyStore.getInstance("JCEKS");
@@ -235,7 +236,7 @@ public class StudyKeyStore extends AbstractEntity {
       KeyPair keyPair = keyPairGenerator.generateKeyPair();
       X509Certificate cert = StudyKeyStore.makeCertificate(keyPair.getPrivate(), keyPair.getPublic(), certificateInfo, chooseSignatureAlgorithm(algorithm));
 
-      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for key [" + studyId + "]:  ", false);
+      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(studyId).prompt(getPasswordFor(studyId)).build();
 
       KeyStore keyStore = getKeyStore();
       keyStore.setKeyEntry(alias, keyPair.getPrivate(), getKeyPassword(passwordCallback), new X509Certificate[] { cert });
@@ -308,7 +309,7 @@ public class StudyKeyStore extends AbstractEntity {
     Key key = getPrivateKeyFile(privateKey);
     X509Certificate cert = getCertificateFromFile(certificate);
     KeyStore keyStore = getKeyStore();
-    CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for key [" + alias + "]:  ", false);
+    CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(studyId).prompt(getPasswordFor(alias)).build();
     try {
       keyStore.setKeyEntry(alias, key, getKeyPassword(passwordCallback), new X509Certificate[] { cert });
       setKeyStore(keyStore);
@@ -335,7 +336,8 @@ public class StudyKeyStore extends AbstractEntity {
     try {
       cert = StudyKeyStore.makeCertificate(keyPair.getPrivate(), keyPair.getPublic(), certificateInfo, chooseSignatureAlgorithm(keyPair.getPrivate().getAlgorithm()));
       KeyStore keyStore = getKeyStore();
-      CacheablePasswordCallback passwordCallback = new CacheablePasswordCallback(studyId, "Password for key [" + alias + "]:  ", false);
+      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(studyId).prompt(getPasswordFor(alias)).build();
+
       keyStore.setKeyEntry(alias, keyPair.getPrivate(), getKeyPassword(passwordCallback), new X509Certificate[] { cert });
       setKeyStore(keyStore);
     } catch(InvalidKeyException e) {
@@ -427,5 +429,12 @@ public class StudyKeyStore extends AbstractEntity {
     if(callbackHandler instanceof CachingCallbackHandler) {
       ((CachingCallbackHandler) callbackHandler).clearPasswordCache(alias);
     }
+  }
+
+  /**
+   * Returns "Password for 'name':  ".
+   */
+  private String getPasswordFor(String name) {
+    return new StringBuilder().append(PASSWORD_FOR).append(" '").append(name).append("':  ").toString();
   }
 }

@@ -11,6 +11,8 @@ package org.obiba.opal.core.crypt;
 
 import javax.security.auth.callback.PasswordCallback;
 
+import org.springframework.util.Assert;
+
 public class CacheablePasswordCallback extends PasswordCallback {
   //
   // Constants
@@ -38,7 +40,7 @@ public class CacheablePasswordCallback extends PasswordCallback {
     return confirmationPrompt != null && !confirmationPrompt.equals("");
   }
 
-  public CacheablePasswordCallback(String passwordKey, String prompt, boolean echoOn) {
+  private CacheablePasswordCallback(String passwordKey, String prompt, boolean echoOn) {
     super(prompt, echoOn);
 
     this.passwordKey = passwordKey;
@@ -62,5 +64,60 @@ public class CacheablePasswordCallback extends PasswordCallback {
    */
   public String getConfirmationPrompt() {
     return confirmationPrompt;
+  }
+
+  public static class Builder {
+
+    private String passwordKey;
+
+    private String prompt;
+
+    private String confirmationPrompt;
+
+    private boolean echoOn = false;
+
+    public static Builder newCallback() {
+      return new Builder();
+    }
+
+    /**
+     * Key used to cache password.
+     */
+    public Builder key(String Key) {
+      this.passwordKey = Key;
+      return this;
+    }
+
+    /**
+     * Password prompt.
+     */
+    public Builder prompt(String prompt) {
+      this.prompt = prompt;
+      return this;
+    }
+
+    /**
+     * Password confirmation prompt. (optional)
+     */
+    public Builder confirmation(String confirmationPrompt) {
+      this.confirmationPrompt = confirmationPrompt;
+      return this;
+    }
+
+    /**
+     * Turns password echoing on. Echoing is off by default.
+     */
+    public Builder echoOn() {
+      this.echoOn = true;
+      return this;
+    }
+
+    public CacheablePasswordCallback build() {
+      Assert.hasText(passwordKey, "key must not be null or empty");
+      Assert.hasText(prompt, "prompt must not be null or empty");
+      CacheablePasswordCallback cacheablePasswordCallback = new CacheablePasswordCallback(passwordKey, prompt, echoOn);
+      cacheablePasswordCallback.setConfirmationPrompt(confirmationPrompt);
+      return cacheablePasswordCallback;
+    }
   }
 }
