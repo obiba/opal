@@ -1,38 +1,41 @@
 package org.obiba.opal.core.support;
 
-import org.obiba.core.domain.AbstractEntity;
-import org.obiba.magma.audit.hibernate.domain.HibernateVariableEntityAuditEvent;
-import org.obiba.magma.audit.hibernate.domain.HibernateVariableEntityAuditLog;
-import org.obiba.magma.datasource.hibernate.domain.CategoryState;
-import org.obiba.magma.datasource.hibernate.domain.DatasourceState;
-import org.obiba.magma.datasource.hibernate.domain.ValueSetState;
-import org.obiba.magma.datasource.hibernate.domain.ValueSetValue;
-import org.obiba.magma.datasource.hibernate.domain.ValueTableState;
-import org.obiba.magma.datasource.hibernate.domain.VariableEntityState;
-import org.obiba.magma.datasource.hibernate.domain.VariableState;
-import org.obiba.magma.datasource.hibernate.domain.attribute.AttributeAwareAdapter;
-import org.obiba.magma.datasource.hibernate.domain.attribute.HibernateAttribute;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
 import org.obiba.opal.core.crypt.StudyKeyStore;
 import org.springframework.beans.factory.FactoryBean;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 public class OpalAnnotationConfigurationHelper implements FactoryBean {
 
-  private ImmutableSet<Class<? extends AbstractEntity>> annotatedClasses;
+  private final Set<Class<?>> annotatedClasses = new ImmutableSet.Builder<Class<?>>().add(StudyKeyStore.class).build();
 
-  @SuppressWarnings("unchecked")
+  private final List<Class<?>> additionalClasses = Lists.newArrayList();
+
   public Object getObject() throws Exception {
-    annotatedClasses = ImmutableSet.of(AttributeAwareAdapter.class, HibernateAttribute.class, StudyKeyStore.class, HibernateVariableEntityAuditEvent.class, HibernateVariableEntityAuditLog.class, CategoryState.class, DatasourceState.class, ValueSetState.class, ValueSetValue.class, ValueTableState.class, VariableEntityState.class, VariableState.class);
-    return annotatedClasses;
+    return ImmutableSet.copyOf(Iterables.concat(annotatedClasses, additionalClasses));
   }
 
   public Class<?> getObjectType() {
-    return annotatedClasses.getClass();
+    return Set.class;
   }
 
   public boolean isSingleton() {
     return true;
+  }
+
+  public void setAdditionalClasses(Collection<?> additionalClasses) {
+    for(Collection<?> c : Iterables.filter(additionalClasses, Collection.class)) {
+      setAdditionalClasses(c);
+    }
+    for(Class<?> c : Iterables.filter(additionalClasses, Class.class)) {
+      this.additionalClasses.add(c);
+    }
   }
 
 }

@@ -4,6 +4,9 @@
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
+  <bean id="datasourceClasses" class="org.obiba.magma.datasource.hibernate.support.AnnotationConfigurationHelper" />
+  <bean id="auditClasses" class="org.obiba.magma.audit.hibernate.support.AnnotationConfigurationHelper" />
+
   <!-- The Hibernate SessionFactory -->
   <bean id="keySessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
     <property name="dataSource">
@@ -13,7 +16,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
       <bean class="org.hibernate.cfg.ImprovedNamingStrategy" />
     </property>
     <property name="annotatedClasses">
-      <bean class="org.obiba.magma.datasource.hibernate.support.AnnotationConfigurationHelper" factory-method="getAnnotatedTypes" />
+      <bean factory-bean="datasourceClasses" factory-method="getAnnotatedTypes" />
     </property>
 
     <!-- This is required to allow Hibernate to register transaction synchronisations. -->
@@ -49,7 +52,14 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
       <bean class="org.hibernate.cfg.ImprovedNamingStrategy" />
     </property>
     <property name="annotatedClasses">
-      <bean class="org.obiba.opal.core.support.OpalAnnotationConfigurationHelper" />
+      <bean class="org.obiba.opal.core.support.OpalAnnotationConfigurationHelper">
+        <property name="additionalClasses">
+          <list>
+            <bean factory-bean="datasourceClasses" factory-method="getAnnotatedTypes" />
+            <bean factory-bean="auditClasses" factory-method="getAnnotatedTypes" />
+          </list>
+        </property>
+      </bean>
     </property>
 
     <!-- This is required to allow Hibernate to register transaction synchronisations. -->
