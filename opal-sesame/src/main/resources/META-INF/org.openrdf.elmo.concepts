@@ -1,9 +1,0 @@
-org.obiba.opal.elmo.concepts.CategoricalItem
-org.obiba.opal.elmo.concepts.Category
-org.obiba.opal.elmo.concepts.DataEntryForm
-org.obiba.opal.elmo.concepts.DataItem
-org.obiba.opal.elmo.concepts.Dataset
-org.obiba.opal.elmo.concepts.Entity
-org.obiba.opal.elmo.concepts.MissingCategory
-org.obiba.opal.elmo.concepts.Opal
-org.obiba.opal.elmo.concepts.Participant

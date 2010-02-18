@@ -12,7 +12,6 @@ package org.obiba.opal.core.domain.participant.identifier.impl;
 import java.security.SecureRandom;
 import java.util.Random;
 
-import org.obiba.opal.core.domain.participant.Participant;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 
 /**

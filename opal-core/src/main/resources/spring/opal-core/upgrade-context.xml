@@ -58,16 +58,6 @@
         <bean class="org.obiba.runtime.upgrade.support.VersionTableInstallStep">
           <property name="dataSource" ref="opalDataSource" />
         </bean>
-        <bean id="createSpringBatchSchema" class="org.obiba.runtime.upgrade.InstallStepAdapter">
-          <property name="upgradeStep">
-            <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
-              <property name="description" value="Install Spring Batch Schema." />
-              <property name="dataSource" ref="opalDataSource" />
-              <property name="scriptPath" value="classpath:/META-INF/opal/install-scripts/spring-batch/" />
-              <property name="scriptBasename" value="schema"/>
-            </bean>
-          </property>
-        </bean>
         <bean class="org.obiba.runtime.upgrade.InstallStepAdapter">
           <property name="upgradeStep">
             <bean class="org.obiba.runtime.upgrade.support.MethodInvokingUpgradeStep">
@@ -86,6 +76,18 @@
             </bean>
           </property>
         </bean>
+        <!--  
+        <bean id="createSpringBatchSchema" class="org.obiba.runtime.upgrade.InstallStepAdapter">
+          <property name="upgradeStep">
+            <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
+              <property name="description" value="Install Spring Batch Schema." />
+              <property name="dataSource" ref="opalDataSource" />
+              <property name="scriptPath" value="classpath:/META-INF/opal/install-scripts/spring-batch/" />
+              <property name="scriptBasename" value="schema"/>
+            </bean>
+          </property>
+        </bean>
+         -->
       </list>
     </property>
 
