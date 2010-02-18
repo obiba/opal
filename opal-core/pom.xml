@@ -52,6 +52,11 @@
 
     <dependency>
       <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-datasource-excel</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.obiba.magma</groupId>
       <artifactId>magma-hibernate-audit</artifactId>
     </dependency>
 
