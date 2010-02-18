@@ -13,7 +13,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
       <ref bean="keyDataSource" />
     </property>
     <property name="namingStrategy">
-      <bean class="org.hibernate.cfg.ImprovedNamingStrategy" />
+      <bean class="org.obiba.magma.hibernate.cfg.MagmaNamingStrategy" />
     </property>
     <property name="annotatedClasses">
       <bean factory-bean="datasourceClasses" factory-method="getAnnotatedTypes" />
@@ -49,7 +49,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
       <ref bean="opalDataSource" />
     </property>
     <property name="namingStrategy">
-      <bean class="org.hibernate.cfg.ImprovedNamingStrategy" />
+      <bean class="org.obiba.magma.hibernate.cfg.MagmaNamingStrategy" />
     </property>
     <property name="annotatedClasses">
       <bean class="org.obiba.opal.core.support.OpalAnnotationConfigurationHelper">
