@@ -18,7 +18,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
-import org.obiba.magma.datasource.fs.FsDatasource;
+import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.cli.client.command.options.ListCommandOptions;
@@ -44,7 +44,7 @@ public class ListCommand extends AbstractOpalRuntimeDependentCommand<ListCommand
 
       // TODO: This is a temporary implementation that writes to a FsDatasource instead of an ExcelDatasource. We will
       // have to change this once ExcelDatasource is available.
-      Datasource outputDatasource = new FsDatasource(getOuputFile().getName(), getOuputFile());
+      Datasource outputDatasource = new ExcelDatasource(getOuputFile().getName(), getOuputFile());
 
       try {
 
@@ -131,7 +131,7 @@ public class ListCommand extends AbstractOpalRuntimeDependentCommand<ListCommand
 
       // Generate a file name automatically when not specified by user.
       SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
-      return new File("variables-" + dateFormatter.format(new Date()) + ".zip");
+      return new File("variables-" + dateFormatter.format(new Date()) + ".xls");
     }
 
   }
