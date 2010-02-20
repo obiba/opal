@@ -63,7 +63,13 @@
         <artifactId>magma-datasource-excel</artifactId>
         <version>${magma.version}</version>
       </dependency>
-
+      
+      <dependency>
+        <groupId>org.obiba.magma</groupId>
+        <artifactId>magma-datasource-jdbc</artifactId>
+        <version>${magma.version}</version>
+      </dependency>
+      
       <dependency>
         <groupId>org.obiba.magma</groupId>
         <artifactId>magma-hibernate-common</artifactId>
