@@ -135,8 +135,8 @@ public class OpalConsole extends AbstractCliClient {
             printHelp(commandName, e);
           } catch(RuntimeException e) {
             System.console().printf("Error executing command '%s'.\n", commandName);
-            e.printStackTrace();
-            System.err.println(e);
+            if(e.getMessage() != null) System.err.println(e.getMessage());
+            System.console().printf("Type '%s --help' for command usage.\n", commandName);
           }
         } else {
           System.console().printf("Unknown command '%s'. Type help to get help.\n", commandName);

@@ -23,11 +23,15 @@ public class ExportCommand extends AbstractOpalRuntimeDependentCommand<ExportCom
   private ExportService exportService;
 
   public void execute() {
-    validateOptions();
-    if(options.isDestination()) {
-      exportService.exportTablesToDatasource(options.getTables(), options.getDestination());
-    } else if(options.isOut()) {
-      exportService.exportTablesToExcelFile(options.getTables(), options.getOut());
+    if(options.getTables() != null) {
+      validateOptions();
+      if(options.isDestination()) {
+        exportService.exportTablesToDatasource(options.getTables(), options.getDestination());
+      } else if(options.isOut()) {
+        exportService.exportTablesToExcelFile(options.getTables(), options.getOut());
+      }
+    } else {
+      throw new IllegalArgumentException("No input (specify one or more Magma table names to export)");
     }
   }
 
