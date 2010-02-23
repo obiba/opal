@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Provides ability to export Magma tables to an existing datasource or an Excel file.
  */
-@CommandUsage(description = "Export Magma tables to an existing destination datasource or out to a specified Excel file.\n\nSyntax: export (--destination NAME | --out FILE) MAGMA_TABLE_NAME...")
+@CommandUsage(description = "Exports tables to an existing datasource or to the specified Excel file.", syntax = "Syntax: export (--destination NAME | --out FILE) TABLE_NAME...")
 public class ExportCommand extends AbstractOpalRuntimeDependentCommand<ExportCommandOptions> {
 
   @Autowired
@@ -31,7 +31,7 @@ public class ExportCommand extends AbstractOpalRuntimeDependentCommand<ExportCom
         exportService.exportTablesToExcelFile(options.getTables(), options.getOut());
       }
     } else {
-      throw new IllegalArgumentException("No input (specify one or more Magma table names to export)");
+      throw new IllegalArgumentException("No input (specify one or more table names to export)");
     }
   }
 

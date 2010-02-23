@@ -27,7 +27,7 @@ import sun.misc.BASE64Encoder;
 /**
  * Exports public key certificates.
  */
-@CommandUsage(description = "Export the public key certificate for the specified key pair alias.\n\nSyntax: certificate --alias NAME [--out FILE]")
+@CommandUsage(description = "Exports the public key certificate for the specified key pair alias.", syntax = "Syntax: certificate --alias NAME [--out FILE]")
 public class PublicCommand extends AbstractCommand<PublicCommandOptions> {
 
   @Autowired

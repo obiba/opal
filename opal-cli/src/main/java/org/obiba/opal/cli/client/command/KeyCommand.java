@@ -21,7 +21,7 @@ import org.springframework.util.Assert;
 /**
  * Provides key management allowing for key creation, deletion, importing and exporting of keys.
  */
-@CommandUsage(description = "Encryption key pairs creation, import or deletion.\n\nSyntax: keystore --alias NAME (--delete | --algo NAME --size INT | --private FILE [--certificate FILE])")
+@CommandUsage(description = "Encryption key pairs creation, import or deletion.", syntax = "Syntax: keystore --alias NAME (--delete | --algo NAME --size INT | --private FILE [--certificate FILE])")
 public class KeyCommand extends AbstractCommand<KeyCommandOptions> {
 
   @Autowired

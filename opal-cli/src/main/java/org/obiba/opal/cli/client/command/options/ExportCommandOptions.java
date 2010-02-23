@@ -23,6 +23,6 @@ public interface ExportCommandOptions extends HelpOption {
 
   public boolean isOut();
 
-  @Unparsed(name = "MAGMA_TABLE_NAME")
+  @Unparsed(name = "TABLE_NAME")
   public List<String> getTables();
 }

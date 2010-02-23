@@ -19,7 +19,7 @@ import org.obiba.opal.cli.client.command.options.ShowCommandOptions;
 /**
  * Displays on the standard output the fully qualified name of elements that are available in Opal.
  */
-@CommandUsage(description = "Display the fully qualified name of each data elements which is currently available in Opal.\n\nSyntax: show [--datasources] [--tables]")
+@CommandUsage(description = "Displays the fully qualified name of each data element currently available in Opal.", syntax = "Syntax: show [--datasources] [--tables]")
 public class ShowCommand extends AbstractOpalRuntimeDependentCommand<ShowCommandOptions> {
 
   public void execute() {

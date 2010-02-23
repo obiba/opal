@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Command to decrypt an Onyx data file.
  */
-@CommandUsage(description = "Decrypts a list of Onyx data files into a directory.\n\nSyntax: decrypt [--out FILE] _FILE_...")
+@CommandUsage(description = "Decrypts one or more Onyx data files.", syntax = "Syntax: decrypt [--out FILE] _FILE_...")
 public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptCommandOptions> {
 
   private static final Logger log = LoggerFactory.getLogger(DecryptCommand.class);

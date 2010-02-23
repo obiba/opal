@@ -150,13 +150,29 @@ public class OpalConsole extends AbstractCliClient {
     for(ValidationError error : e.getValidationErrors()) {
       if(error.getErrorType() == ValidationError.ErrorType.HelpRequested) {
         helpRequested = true;
-        System.console().printf(getCommandUsageDescription(commandName) + "\n\n");
+        System.console().printf("%s\n\n", getCommandDescriptionAndSyntax(commandName));
       }
       System.err.println(error);
     }
     if(helpRequested == false) {
       System.console().printf("Type '%s --help' for command usage.\n", commandName);
     }
+  }
+
+  private String getCommandDescriptionAndSyntax(String commandName) {
+    String description = getCommandDescription(commandName);
+    String syntax = getCommandSyntax(commandName);
+
+    StringBuilder sb = new StringBuilder();
+    if(description.length() != 0) {
+      sb.append(description);
+    }
+    if(syntax.length() != 0) {
+      sb.append("\n\n");
+      sb.append(syntax);
+    }
+
+    return sb.toString();
   }
 
   public static void main(String[] args) {

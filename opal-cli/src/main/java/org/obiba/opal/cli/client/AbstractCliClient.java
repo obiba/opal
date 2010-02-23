@@ -31,7 +31,7 @@ public abstract class AbstractCliClient implements CliClient {
   //
 
   @SuppressWarnings("unchecked")
-  private Map<String, Class> commandMap;
+  private Map<String, Class<? extends Command>> commandMap;
 
   @SuppressWarnings("unchecked")
   private Map<String, Class> optionsMap;
@@ -47,7 +47,7 @@ public abstract class AbstractCliClient implements CliClient {
     // See: http://wiki.obiba.org/confluence/display/CAG/Technical+Requirements for details.
     System.setProperty("cmi.disabled", "true");
 
-    commandMap = new HashMap<String, Class>();
+    commandMap = new HashMap<String, Class<? extends Command>>();
     optionsMap = new HashMap<String, Class>();
 
     initAvailableCommands();
@@ -72,7 +72,10 @@ public abstract class AbstractCliClient implements CliClient {
     for(String command : availableCommands()) {
       sb.append("  ");
       sb.append(command);
-      sb.append("\n");
+      sb.append("\n\n");
+      sb.append("     ");
+      sb.append(getCommandDescription(command));
+      sb.append("\n\n");
     }
 
     sb.append("\n");
@@ -125,13 +128,22 @@ public abstract class AbstractCliClient implements CliClient {
    * 
    * @param commandName The command name.
    */
-  protected String getCommandUsageDescription(String commandName) {
+  protected String getCommandDescription(String commandName) {
     Annotation commandUsage = commandMap.get(commandName).getAnnotation(CommandUsage.class);
     String commandUsageDescription = "";
     if(commandUsage != null) {
       commandUsageDescription = ((CommandUsage) commandUsage).description();
     }
     return commandUsageDescription;
+  }
+
+  protected String getCommandSyntax(String commandName) {
+    Annotation commandUsage = commandMap.get(commandName).getAnnotation(CommandUsage.class);
+    String commandSyntax = "";
+    if(commandUsage != null) {
+      commandSyntax = ((CommandUsage) commandUsage).syntax();
+    }
+    return commandSyntax;
   }
 
   /**
