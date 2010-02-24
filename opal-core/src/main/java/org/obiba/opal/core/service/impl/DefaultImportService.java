@@ -58,7 +58,7 @@ public class DefaultImportService implements ImportService {
 
   private String archiveDirectory;
 
-  private String keysTableReference = "key-datasource.keys";
+  private String keysTableReference = "opal-keys.keys";
 
   private String keysTableEntityType = "Participant";
 
