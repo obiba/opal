@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.core.runtime;
 
+import org.obiba.magma.MagmaEngine;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -37,6 +38,15 @@ public class OpalRuntime {
     new TransactionTemplate(txManager).execute(new TransactionCallback() {
       public Object doInTransaction(TransactionStatus status) {
         return opalConfiguration.getMagmaEngineFactory().create();
+      }
+    });
+  }
+
+  public void destroy() throws Exception {
+    new TransactionTemplate(txManager).execute(new TransactionCallback() {
+      public Object doInTransaction(TransactionStatus status) {
+        MagmaEngine.get().shutdown();
+        return null;
       }
     });
   }

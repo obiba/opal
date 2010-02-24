@@ -46,11 +46,7 @@ public class DefaultExportServiceImpl implements ExportService {
     Datasource destinationDatasource = getDatasourceByName(destinationDatasourceName);
     Set<ValueTable> sourceTables = getValueTablesByName(sourceTableNames);
     DatasourceCopier datasourceCopier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, destinationDatasource).build();
-    try {
-      exportTablesToDatasource(sourceTables, destinationDatasource, datasourceCopier);
-    } finally {
-      MagmaEngine.get().removeDatasource(destinationDatasource);
-    }
+    exportTablesToDatasource(sourceTables, destinationDatasource, datasourceCopier);
   }
 
   public void exportTablesToDatasource(List<String> sourceTableNames, String destinationDatasourceName, DatasourceCopier datasourceCopier) {
@@ -58,11 +54,7 @@ public class DefaultExportServiceImpl implements ExportService {
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName must not be null or empty");
     Datasource destinationDatasource = getDatasourceByName(destinationDatasourceName);
     Set<ValueTable> sourceTables = getValueTablesByName(sourceTableNames);
-    try {
-      exportTablesToDatasource(sourceTables, destinationDatasource, datasourceCopier);
-    } finally {
-      MagmaEngine.get().removeDatasource(destinationDatasource);
-    }
+    exportTablesToDatasource(sourceTables, destinationDatasource, datasourceCopier);
   }
 
   public void exportTablesToDatasource(Set<ValueTable> sourceTables, Datasource destinationDatasource, DatasourceCopier datasourceCopier) {
@@ -90,11 +82,7 @@ public class DefaultExportServiceImpl implements ExportService {
   }
 
   private Datasource getDatasourceByName(String datasourceName) {
-    Datasource datasource = MagmaEngine.get().getDatasource(datasourceName);
-    if(datasource == null) {
-      throw new NoSuchDatasourceException("No such datasource '" + datasourceName + "'.");
-    }
-    return datasource;
+    return MagmaEngine.get().getDatasource(datasourceName);
   }
 
   private Set<ValueTable> getValueTablesByName(List<String> tableNames) throws NoSuchDatasourceException, NoSuchValueTableException, ExportException {

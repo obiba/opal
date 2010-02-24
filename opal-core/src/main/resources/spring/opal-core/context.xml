@@ -14,7 +14,7 @@
   <bean id="participantIdentifier" class="org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl">
   </bean>
 
-  <bean id="opalRuntime" class="org.obiba.opal.core.runtime.OpalRuntime" init-method="init" lazy-init="true">
+  <bean id="opalRuntime" class="org.obiba.opal.core.runtime.OpalRuntime" init-method="init" destroy-method="destroy" lazy-init="true">
     <property name="opalConfiguration">
       <bean class="org.obiba.opal.core.cfg.OpalConfigurationFactoryBean">
         <property name="configFile" value="classpath:opal-config.xml" />
