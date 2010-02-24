@@ -72,8 +72,7 @@ public abstract class AbstractCliClient implements CliClient {
     for(String command : availableCommands()) {
       sb.append("  ");
       sb.append(command);
-      sb.append("\n\n");
-      sb.append("     ");
+      sb.append("\t");
       sb.append(getCommandDescription(command));
       sb.append("\n\n");
     }
