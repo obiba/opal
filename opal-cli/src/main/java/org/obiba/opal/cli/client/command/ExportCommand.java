@@ -10,6 +10,7 @@
 package org.obiba.opal.cli.client.command;
 
 import org.obiba.opal.cli.client.command.options.ExportCommandOptions;
+import org.obiba.opal.core.service.ExportException;
 import org.obiba.opal.core.service.ExportService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,10 +26,15 @@ public class ExportCommand extends AbstractOpalRuntimeDependentCommand<ExportCom
   public void execute() {
     if(options.getTables() != null) {
       validateOptions();
-      if(options.isDestination()) {
-        exportService.exportTablesToDatasource(options.getTables(), options.getDestination());
-      } else if(options.isOut()) {
-        exportService.exportTablesToExcelFile(options.getTables(), options.getOut());
+      try {
+        if(options.isDestination()) {
+          exportService.exportTablesToDatasource(options.getTables(), options.getDestination());
+        } else if(options.isOut()) {
+          exportService.exportTablesToExcelFile(options.getTables(), options.getOut());
+        }
+      } catch(ExportException e) {
+        System.err.println("Unrecoverable error during export: " + e.getMessage());
+        throw e;
       }
     } else {
       throw new IllegalArgumentException("No input (specify one or more table names to export)");

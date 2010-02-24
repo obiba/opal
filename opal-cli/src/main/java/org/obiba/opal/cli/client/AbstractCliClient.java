@@ -60,29 +60,16 @@ public abstract class AbstractCliClient implements CliClient {
   public abstract String getName();
 
   public void printUsage() {
-    StringBuffer sb = new StringBuffer();
-
-    sb.append("Usage:");
-    sb.append("\n  ");
-    sb.append("<command> <options> <arguments>");
-    sb.append("\n\n");
-
-    sb.append("Commands:\n");
-
+    int maxSize = Integer.MIN_VALUE;
     for(String command : availableCommands()) {
-      sb.append("  ");
-      sb.append(command);
-      sb.append("\t");
-      sb.append(getCommandDescription(command));
-      sb.append("\n\n");
+      maxSize = Math.max(maxSize, command.length() + 2);
     }
-
-    sb.append("\n");
-    sb.append("For help on a specific command, type:");
-    sb.append("\n  ");
-    sb.append("<command> --help");
-
-    System.err.println(sb.toString());
+    System.console().printf("Usage:\n  <command> <options> <arguments>\n\nCommands:\n");
+    for(String command : availableCommands()) {
+      // %-<maxSize>s: constantly print <maxSize> characters, left-justified
+      System.console().printf("  %-" + maxSize + "s%s\n", command, getCommandDescription(command));
+    }
+    System.console().printf("\nFor help on a specific command, type:\n<command> --help\n");
   }
 
   public List<String> availableCommands() {
@@ -191,7 +178,7 @@ public abstract class AbstractCliClient implements CliClient {
     } catch(ArgumentValidationException e) {
       throw e;
     } catch(Exception e) {
-      throw new IllegalArgumentException(e.getMessage());
+      throw new IllegalArgumentException(e);
     }
 
     return command;

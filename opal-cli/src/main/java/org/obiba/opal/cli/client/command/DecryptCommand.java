@@ -14,7 +14,6 @@ import java.io.File;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.opal.cli.client.command.options.DecryptCommandOptions;
-import org.obiba.opal.core.crypt.KeyProviderException;
 import org.obiba.opal.core.service.DecryptService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,28 +45,29 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
       throw new IllegalStateException("Options not set (setOptions must be called before calling execute)");
     }
 
-    if(options.isFiles()) {
-      // Validate/initialize output directory.
-      File outputDir = new File(".");
-      if(options.isOutput()) {
-        outputDir = getOutputDir(options.getOutput());
-      }
+    if(options.getFiles() == null) {
+      System.console().printf("No input file(s) specified.\n");
+      return;
+    }
 
-      if(outputDir != null) {
-        // Now process each input file (Onyx data zip file) specified on the command line.
-        for(File inputFile : options.getFiles()) {
-          try {
-            processFile(inputFile, outputDir, null);
-          } catch(KeyProviderException ex) {
-            System.err.println(ex.getMessage());
-            break; // break out of here, this is a fatal exception
-          }
+    // Validate/initialize output directory.
+    File outputDir = new File(".");
+    if(options.isOutput()) {
+      outputDir = getOutputDir(options.getOutput());
+    }
+
+    if(outputDir != null) {
+      // Now process each input file (Onyx data zip file) specified on the command line.
+      for(File inputFile : options.getFiles()) {
+        if(inputFile.exists() == false) {
+          System.console().printf("Skipping non-existant input file %s\n", inputFile.getName());
+        } else {
+          System.console().printf("Decrypting input file %s\n", inputFile.getName());
+          processFile(inputFile, outputDir, null);
         }
-      } else {
-        System.err.println("Invalid output directory");
       }
     } else {
-      System.err.println("No input file");
+      System.err.println("Invalid output directory");
     }
   }
 

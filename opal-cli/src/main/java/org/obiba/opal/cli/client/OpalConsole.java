@@ -114,6 +114,7 @@ public class OpalConsole extends AbstractCliClient {
   }
 
   private void prompt(ConfigurableApplicationContext cac) {
+    System.console().printf("Welcome to opal.\nType help to get a list of available commands.\n");
     while(quit == false) {
       String cmdline = System.console().readLine("%s@opal> ", SecurityUtils.getSubject().getPrincipal());
       if(cmdline == null) {
@@ -135,8 +136,9 @@ public class OpalConsole extends AbstractCliClient {
             printHelp(commandName, e);
           } catch(RuntimeException e) {
             System.console().printf("Error executing command '%s'.\n", commandName);
-            if(e.getMessage() != null) System.err.println(e.getMessage());
-            System.console().printf("Type '%s --help' for command usage.\n", commandName);
+            if(e.getMessage() != null) System.console().printf("Error message: %s.\n", e.getMessage());
+            System.console().printf("See log file for error details.\n");
+            e.printStackTrace(System.err);
           }
         } else {
           System.console().printf("Unknown command '%s'. Type help to get help.\n", commandName);
@@ -152,7 +154,7 @@ public class OpalConsole extends AbstractCliClient {
         helpRequested = true;
         System.console().printf("%s\n\n", getCommandDescriptionAndSyntax(commandName));
       }
-      System.err.println(error);
+      System.console().printf("%s\n", error);
     }
     if(helpRequested == false) {
       System.console().printf("Type '%s --help' for command usage.\n", commandName);
@@ -179,7 +181,7 @@ public class OpalConsole extends AbstractCliClient {
     try {
       new OpalConsole(CliFactory.parseArguments(OpalConsoleOptions.class, args));
     } catch(ArgumentValidationException e) {
-      System.err.println(e.getMessage());
+      System.console().printf("%s\n", e.getMessage());
     }
   }
 }

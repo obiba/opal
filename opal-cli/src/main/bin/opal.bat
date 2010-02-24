@@ -14,7 +14,8 @@ setlocal ENABLEDELAYEDEXPANSION
 
 call "%OPAL_HOME%\bin\setclasspath.bat"
 
-java %JAVA_OPTS% -cp "%CLASSPATH%" org.obiba.opal.cli.client.OpalConsole %*
+IF NOT EXIST %OPAL_HOME%\logs mkdir %OPAL_HOME%\logs
+java %JAVA_OPTS% -cp "%CLASSPATH%" org.obiba.opal.cli.client.OpalConsole %* 2> %OPAL_HOME%\logs\opal.log
 goto :END
 
 :DEFAULT_JAVA_OPTS

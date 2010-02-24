@@ -35,5 +35,5 @@ for f in $(ls "$OPAL_HOME/lib" | grep jar$); do
   fi
 done
 
-
-java $JAVA_OPTS -cp "$CLASSPATH" org.obiba.opal.cli.client.OpalConsole $@
+[ -e $OPAL_HOME/logs ] || mkdir $OPAL_HOME/logs
+java $JAVA_OPTS -cp "$CLASSPATH" org.obiba.opal.cli.client.OpalConsole $@ 2> $OPAL_HOME/logs/opal.log

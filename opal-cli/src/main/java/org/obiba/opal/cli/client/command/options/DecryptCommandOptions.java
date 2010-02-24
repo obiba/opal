@@ -21,8 +21,6 @@ public interface DecryptCommandOptions extends HelpOption {
   @Unparsed(name = "FILE")
   public List<File> getFiles();
 
-  public boolean isFiles();
-
   @Option(shortName = "o", longName = "out", description = "The directory into which the decrypted files are written. Default is current directory.")
   public File getOutput();
 

@@ -41,23 +41,12 @@ public class ListCommand extends AbstractOpalRuntimeDependentCommand<ListCommand
 
     // Make sure that each table exist, before launching the export.
     if(validateTableNames(tableNames)) {
-
-      // TODO: This is a temporary implementation that writes to a FsDatasource instead of an ExcelDatasource. We will
-      // have to change this once ExcelDatasource is available.
       Datasource outputDatasource = new ExcelDatasource(getOuputFile().getName(), getOuputFile());
-
+      MagmaEngine.get().addDatasource(outputDatasource);
       try {
-
-        MagmaEngine.get().addDatasource(outputDatasource);
-
         // Create a DatasourceCopier that will copy only the metadata and export.
         DatasourceCopier metaDataCopier = DatasourceCopier.Builder.newCopier().dontCopyValues().build();
         exportService.exportTablesToDatasource(tableNames, outputDatasource.getName(), metaDataCopier);
-
-      } catch(Exception couldNotExecuteListCommand) {
-        log.error("An error was encountered while executing the 'list' command.", couldNotExecuteListCommand);
-        System.err.println("An error was encountered while executing the 'list' command.");
-
       } finally {
         try {
           MagmaEngine.get().removeDatasource(outputDatasource);
@@ -81,26 +70,22 @@ public class ListCommand extends AbstractOpalRuntimeDependentCommand<ListCommand
 
     // No table.
     if(tableNames == null || tableNames.size() < 1) {
-      System.err.println("You must specify at least one table to export.\nType 'list --help' for command usage.\n");
+      System.console().printf("At least one table to export must be specified.\nType 'list --help' for command usage.\n");
       return false;
-
       // One or more table to validate.
     } else {
       boolean isValid = true;
       for(String tableName : tableNames) {
+        MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
         try {
-          MagmaEngineTableResolver.valueOf(tableName).resolveTable();
+          resolver.resolveTable();
         } catch(NoSuchDatasourceException e) {
-          System.err.printf("'%s' does not exist or is not a valid datasource name.\n", tableName);
+          System.console().printf("'%s' refers to an unknown datasource: '%s'.\n", tableName, resolver.getDatasourceName());
           isValid = false;
         } catch(NoSuchValueTableException e) {
-          System.err.printf("'%s' does not exist or is not a valid table name.\n", tableName);
+          System.console().printf("Table '%s' does not exist in datasource : '%s'.\n", resolver.getTableName(), resolver.getDatasourceName());
           isValid = false;
         }
-      }
-
-      if(!isValid) {
-        System.err.println();
       }
 
       return isValid;
