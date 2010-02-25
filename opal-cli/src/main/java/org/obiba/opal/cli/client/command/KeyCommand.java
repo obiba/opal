@@ -35,6 +35,7 @@ public class KeyCommand extends AbstractCommand<KeyCommandOptions> {
       } else {
         if(studyKeyStoreService.aliasExists(options.getAlias())) {
           studyKeyStoreService.deleteKey(options.getAlias());
+          System.console().printf("%s '%s'.\n", "Deleted key with alias", options.getAlias());
         } else {
           System.out.println("The alias [" + options.getAlias() + "] does not exist.");
         }
@@ -46,8 +47,8 @@ public class KeyCommand extends AbstractCommand<KeyCommandOptions> {
       }
       if(createKeyConfirmation) {
         String certificateInfo = new CertificateInfo().getCertificateInfoAsString();
-        System.console().printf("%s:\n", "Keystore creation");
         studyKeyStoreService.createOrUpdateKey(options.getAlias(), options.getAlgorithm(), options.getSize(), certificateInfo);
+        System.console().printf("%s '%s'.\n", "Key generated with alias", options.getAlias());
       }
     } else if(options.isPrivate()) {
       boolean createKeyConfirmation = true;
@@ -61,6 +62,7 @@ public class KeyCommand extends AbstractCommand<KeyCommandOptions> {
           String certificateInfo = new CertificateInfo().getCertificateInfoAsString();
           studyKeyStoreService.importKey(options.getAlias(), options.getPrivate(), certificateInfo);
         }
+        System.console().printf("%s '%s'.\n", "Key imported with alias", options.getAlias());
       }
     } else {
       unrecognizedOptionsHelp();
