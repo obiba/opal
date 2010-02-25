@@ -88,8 +88,12 @@ public class DefaultExportServiceImpl implements ExportService {
   private Set<ValueTable> getValueTablesByName(List<String> tableNames) throws NoSuchDatasourceException, NoSuchValueTableException, ExportException {
     Set<ValueTable> tables = new HashSet<ValueTable>();
     for(String tableName : tableNames) {
-      if(!tables.add(MagmaEngineTableResolver.valueOf(tableName).resolveTable())) {
-        throw new ExportException("Source tables include duplicate '" + tableName + "'.");
+      try {
+        if(!tables.add(MagmaEngineTableResolver.valueOf(tableName).resolveTable())) {
+          throw new ExportException("Source tables include duplicate '" + tableName + "'.");
+        }
+      } catch(IllegalArgumentException e) {
+        throw new ExportException("Source table '" + tableName + "' does not exist");
       }
     }
     return tables;
