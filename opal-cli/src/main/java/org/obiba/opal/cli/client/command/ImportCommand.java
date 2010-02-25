@@ -61,12 +61,11 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       } catch(NoSuchDatasourceException ex) {
         // Fatal exception - break out of here.
         System.console().printf("%s\n", ex.getMessage());
-        System.err.println(ex);
         break;
       } catch(IOException ex) {
         // Possibly a non-fatal exception - report an error and continue with the next file.
         System.console().printf("I/O error: %s\n", ex.getMessage());
-        System.err.println(ex);
+        ex.printStackTrace(System.err);
         continue;
       }
     }
