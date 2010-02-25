@@ -14,12 +14,13 @@
   <bean id="participantIdentifier" class="org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl">
   </bean>
 
-  <bean id="opalRuntime" class="org.obiba.opal.core.runtime.OpalRuntime" init-method="init" destroy-method="destroy" lazy-init="true">
-    <property name="opalConfiguration">
+  <bean id="opalRuntime" class="org.obiba.opal.core.runtime.OpalRuntime" init-method="init" destroy-method="destroy"
+    lazy-init="true">
+    <constructor-arg>
       <bean class="org.obiba.opal.core.cfg.OpalConfigurationFactoryBean">
-        <property name="configFile" value="classpath:opal-config.xml" />
+        <property name="configFile" value="${OPAL_HOME}/conf/opal-config.xml" />
       </bean>
-    </property>
+    </constructor-arg>
   </bean>
 
   <bean id="auditLogManager" class="org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager">

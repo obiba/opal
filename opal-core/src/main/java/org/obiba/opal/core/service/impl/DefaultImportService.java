@@ -58,9 +58,11 @@ public class DefaultImportService implements ImportService {
 
   private String archiveDirectory;
 
-  private String keysTableReference = "opal-keys.keys";
+  /** Configured through org.obiba.opal.keys.tableReference */
+  private String keysTableReference;
 
-  private String keysTableEntityType = "Participant";
+  /** Configured through org.obiba.opal.keys.entityType */
+  private String keysTableEntityType;
 
   private HibernateVariableEntityAuditLogManager auditLogManager;
 

@@ -34,12 +34,17 @@ public class OpalRuntime {
   // InitializingBean Methods
   //
 
+  public OpalRuntime(OpalConfiguration opalConfiguration) {
+    this.opalConfiguration = opalConfiguration;
+  }
+
   public void init() throws Exception {
     new TransactionTemplate(txManager).execute(new TransactionCallback() {
       public Object doInTransaction(TransactionStatus status) {
         return opalConfiguration.getMagmaEngineFactory().create();
       }
     });
+
   }
 
   public void destroy() throws Exception {
@@ -51,7 +56,8 @@ public class OpalRuntime {
     });
   }
 
-  public void setOpalConfiguration(OpalConfiguration opalConfiguration) {
-    this.opalConfiguration = opalConfiguration;
+  public OpalConfiguration getOpalConfiguration() {
+    return opalConfiguration;
   }
+
 }
