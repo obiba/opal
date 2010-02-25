@@ -40,7 +40,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
         throw new IllegalArgumentException("Input file(s) do not exist");
       }
     } else {
-      throw new IllegalArgumentException("No input (specify one or more files to import)");
+      throw new IllegalArgumentException("No input. Specify one or more files (or directories of files) to import)");
     }
   }
 
