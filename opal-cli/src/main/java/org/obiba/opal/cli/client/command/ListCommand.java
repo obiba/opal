@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@CommandUsage(description = "Lists the metadata (variables, categories and attributes) for one or more tables. The output of this command is written to an Excel file.", syntax = "Syntax: list [--out FILE] TABLE [TABLE...]")
+@CommandUsage(description = "Lists the metadata (variables, categories and attributes) for one or more tables. The output of this command is written to an Excel file.", syntax = "Syntax: list [--outputFile FILE] TABLE [TABLE...]")
 public class ListCommand extends AbstractOpalRuntimeDependentCommand<ListCommandOptions> {
 
   @Autowired
