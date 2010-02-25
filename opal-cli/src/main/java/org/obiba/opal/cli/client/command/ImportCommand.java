@@ -37,10 +37,10 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       if(!filesToImport.isEmpty()) {
         importFiles(filesToImport);
       } else {
-        System.err.println("No files found");
+        throw new IllegalArgumentException("Input file(s) do not exist");
       }
     } else {
-      System.err.println("No input (specify one or directories or files to import)");
+      throw new IllegalArgumentException("No input (specify one or more files to import)");
     }
   }
 
@@ -60,11 +60,13 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
         importService.importData(destination, options.getOwner(), file);
       } catch(NoSuchDatasourceException ex) {
         // Fatal exception - break out of here.
-        System.err.println(ex.getMessage());
+        System.console().printf("%s\n", ex.getMessage());
+        System.err.println(ex);
         break;
       } catch(IOException ex) {
         // Possibly a non-fatal exception - report an error and continue with the next file.
-        System.err.println("I/O error: " + ex.getMessage());
+        System.console().printf("I/O error: %s\n", ex.getMessage());
+        System.err.println(ex);
         continue;
       }
     }
