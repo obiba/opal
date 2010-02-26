@@ -596,6 +596,25 @@
       </plugin>
 
     </plugins>
+    
+    <testResources>
+      <testResource>
+        <directory>${project.basedir}/src/test/java</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+        <filtering>false</filtering>
+      </testResource>
+
+      <testResource>
+        <directory>${project.basedir}/src/test/resources</directory>
+        <includes>
+          <include>**</include>
+        </includes>
+        <filtering>false</filtering>
+      </testResource>
+    </testResources>
+    
   </build>
 
   <repositories>

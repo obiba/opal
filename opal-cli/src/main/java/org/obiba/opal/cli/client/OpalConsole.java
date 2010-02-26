@@ -9,7 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.cli.client;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.util.LifecycleUtils;
@@ -122,7 +125,7 @@ public class OpalConsole extends AbstractCliClient {
       }
 
       if(cmdline.trim().length() > 0) {
-        String args[] = cmdline.trim().split("\\s");
+        String args[] = parseArguments(cmdline.trim());
         String commandName = args[0];
 
         if(hasCommand(commandName)) {
@@ -183,5 +186,43 @@ public class OpalConsole extends AbstractCliClient {
     } catch(ArgumentValidationException e) {
       System.console().printf("%s\n", e.getMessage());
     }
+  }
+
+  private static final String WHITESPACE_AND_QUOTE = " \t\r\n\"";
+
+  private static final String QUOTE_ONLY = "\"";
+
+  /**
+   * Parses array of arguments using spaces as delimiters. Quoted strings (including spaces) are considered a single
+   * argument. For example the command line:<br>{@code export --destination=opal onyx.Participants "onyx.Instrument Logs"}<br/>
+   * would yield the array:<br/>
+   * a[0] = export<br/>
+   * a[1] = --destination=opal<br/>
+   * a[2] = onyx.Participants<br/>
+   * a[3] = onyx.Instrument Logs<br/>
+   * @param string A command line of arguments to be parsed.
+   * @return An array of arguments.
+   */
+  public static String[] parseArguments(String commandLine) {
+    List<String> arguments = new ArrayList<String>();
+    String deliminator = WHITESPACE_AND_QUOTE;
+    StringTokenizer parser = new StringTokenizer(commandLine, deliminator, true);
+
+    String token = null;
+    while(parser.hasMoreTokens()) {
+      token = parser.nextToken(deliminator);
+      if(!token.equals(QUOTE_ONLY)) {
+        if(!token.trim().equals("")) {
+          arguments.add(token);
+        }
+      } else {
+        if(deliminator.equals(WHITESPACE_AND_QUOTE)) {
+          deliminator = QUOTE_ONLY;
+        } else {
+          deliminator = WHITESPACE_AND_QUOTE;
+        }
+      }
+    }
+    return arguments.toArray(new String[0]);
   }
 }
