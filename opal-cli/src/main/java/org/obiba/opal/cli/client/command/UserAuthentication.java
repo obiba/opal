@@ -46,8 +46,6 @@ public class UserAuthentication {
   public void authenticate() {
     promptForUsername();
     promptForPassword();
-    // String foo = new String(password);
-    // System.console().printf("username [%s] password [%s]\n", username, foo);
     // get the currently executing user:
     Subject currentUser = SecurityUtils.getSubject();
     if(!currentUser.isAuthenticated()) {
@@ -62,7 +60,7 @@ public class UserAuthentication {
       }
     }
     if(!currentUser.isAuthenticated()) {
-      System.err.printf("%s", "Authentication failed.\n");
+      System.console().printf("%s", "Authentication failed.\n");
       System.exit(2);
     }
   }
