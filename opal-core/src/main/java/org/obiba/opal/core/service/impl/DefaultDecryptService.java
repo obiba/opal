@@ -15,7 +15,7 @@ import java.io.IOException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
-import org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager;
+import org.obiba.magma.audit.VariableEntityAuditLogManager;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
@@ -42,13 +42,9 @@ public class DefaultDecryptService implements DecryptService {
 
   private DatasourceEncryptionStrategy dsEncryptionStrategy;
 
-  private HibernateVariableEntityAuditLogManager auditLogManager;
+  private VariableEntityAuditLogManager auditLogManager;
 
-  //
-  // ImportService Methods
-  //
-
-  public void decryptData(String datasourceName, File file, boolean encrypted) throws NoSuchDatasourceException, IllegalArgumentException, IOException {
+  public void decryptData(String datasourceName, File file) throws NoSuchDatasourceException, IllegalArgumentException, IOException {
     // Validate the file.
     if(!file.isFile()) {
       throw new IllegalArgumentException("No such file (" + file.getPath() + ")");
@@ -56,17 +52,9 @@ public class DefaultDecryptService implements DecryptService {
 
     // Validate the datasource name.
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(datasourceName);
-    if(destinationDatasource == null) {
-      throw new NoSuchDatasourceException("No such datasource (" + datasourceName + ")");
-    }
 
     // Create an FsDatasource for the specified file.
-    FsDatasource sourceDatasource = null;
-    if(encrypted) {
-      sourceDatasource = new FsDatasource(file.getName(), file, dsEncryptionStrategy);
-    } else {
-      sourceDatasource = new FsDatasource(file.getName(), file);
-    }
+    FsDatasource sourceDatasource = new FsDatasource(file.getName(), file, dsEncryptionStrategy);
 
     // Copy the FsDatasource to the destination datasource.
     try {
@@ -85,7 +73,7 @@ public class DefaultDecryptService implements DecryptService {
     this.dsEncryptionStrategy = dsEncryptionStrategy;
   }
 
-  public void setAuditLogManager(HibernateVariableEntityAuditLogManager auditLogManager) {
+  public void setAuditLogManager(VariableEntityAuditLogManager auditLogManager) {
     this.auditLogManager = auditLogManager;
   }
 

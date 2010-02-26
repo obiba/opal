@@ -21,10 +21,9 @@ public interface DecryptService {
    * Decrypts data into an Opal datasource.
    * @param datasourceName name of the destination datasource
    * @param file data file to be decrypted
-   * @param encrypted flag indicating whether the data file is encrypted or not
    * @throws IllegalArgumentException if the specified datasource does not exist
    * @throws IOException if the specified file does not exist or is not a normal file
    */
-  public void decryptData(String datasourceName, File file, boolean encrypted) throws IllegalArgumentException, IOException;
+  public void decryptData(String datasourceName, File file) throws IllegalArgumentException, IOException;
 
 }
