@@ -1,253 +1,108 @@
 <org.obiba.opal.core.cfg.OpalConfiguration>
-	<magmaEngineFactory>
-		<engineClass>org.obiba.magma.MagmaEngine</engineClass>
+  <magmaEngineFactory>
 
-		<extensions>
-			<org.obiba.magma.js.MagmaJsExtension />
-			<org.obiba.magma.xstream.MagmaXStreamExtension />
-		</extensions>
+    <extensions>
+      <org.obiba.magma.js.MagmaJsExtension />
+      <org.obiba.magma.xstream.MagmaXStreamExtension />
+    </extensions>
 
-		<factories>
-		
-			<!-- Opal keys storage -->
-			<org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
-				<name>opal-keys</name>
-				<sessionFactoryProvider
-					class="org.obiba.magma.datasource.hibernate.support.SpringBeanSessionFactoryProvider">
-					<beanName>keySessionFactory</beanName>
-				</sessionFactoryProvider>
-			</org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
+    <factories>
 
-			<!-- Opal data storage -->
-			<org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
-				<name>opal-data</name>
-				<sessionFactoryProvider
-					class="org.obiba.magma.datasource.hibernate.support.SpringBeanSessionFactoryProvider">
-					<beanName>opalSessionFactory</beanName>
-				</sessionFactoryProvider>
-			</org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
+      <!--
+        Configure available datasources in this section. Opal requires at least two datasources: one for the Participant
+        keys, one for the Participant Data.
+      -->
 
-			<!-- Opal views definition -->
-			<org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
-				<name>example</name>
-				<sessionFactoryProvider
-					class="org.obiba.magma.datasource.hibernate.support.SpringBeanSessionFactoryProvider">
-					<beanName>opalSessionFactory</beanName>
-				</sessionFactoryProvider>
+      <!-- Two types of datasources can be configured here : Hibernate and JDBC -->
 
-				<transformer
-					class="org.obiba.magma.views.support.ViewAwareDatasourceTransformer">
-					<views>
+      <!-- Opal keys storage -->
+      <org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
+        <name>opal-keys</name>
+        <sessionFactoryProvider class="org.obiba.magma.datasource.hibernate.support.SpringBeanSessionFactoryProvider">
+          <beanName>keySessionFactory</beanName>
+        </sessionFactoryProvider>
+      </org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
 
-						<org.obiba.magma.views.View>
-							<name>Admin</name>
-							<select class="org.obiba.magma.js.views.JavascriptClause">
-								<script>name().matches(/Admin.*/)</script>
-							</select>
-							<from class="org.obiba.magma.support.ValueTableReference">
-								<reference>opal-data.Participants</reference>
-							</from>
-						</org.obiba.magma.views.View>
+      <!-- Opal data storage -->
+      <org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
+        <name>opal-data</name>
+        <sessionFactoryProvider class="org.obiba.magma.datasource.hibernate.support.SpringBeanSessionFactoryProvider">
+          <beanName>opalSessionFactory</beanName>
+        </sessionFactoryProvider>
+      </org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
 
-						<org.obiba.magma.views.View>
-							<name>BoneDensity</name>
-							<select class="org.obiba.magma.js.views.JavascriptClause">
-								<script>attribute('stage').any('BoneDensity')</script>
-							</select>
-							<from class="org.obiba.magma.support.ValueTableReference">
-								<reference>opal-data.Participants</reference>
-							</from>
-						</org.obiba.magma.views.View>
+      <!-- An example JDBC Datasource configuration -->
+      <!--
+      <org.obiba.magma.datasource.jdbc.JdbcDatasourceFactory>
+        <name>sql-datasource</name>
 
-						<org.obiba.magma.views.View>
-							<name>SittingHeight</name>
-							<select class="org.obiba.magma.js.views.JavascriptClause">
-								<script>attribute('stage').any('SittingHeight')</script>
-							</select>
-							<from class="org.obiba.magma.support.ValueTableReference">
-								<reference>opal-data.Participants</reference>
-							</from>
-						</org.obiba.magma.views.View>
+        <jdbcProperties>
+          <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+          <property name="url" value="jdbc:mysql://localhost:3306/opal" />
+          <property name="username" value="theUser" />
+          <property name="password" value="theirPassword" />
+        </jdbcProperties>
 
-						<org.obiba.magma.views.View>
-							<name>Spirometry</name>
-							<select class="org.obiba.magma.js.views.JavascriptClause">
-								<script>attribute('stage').any('Spirometry')</script>
-							</select>
-							<from class="org.obiba.magma.support.ValueTableReference">
-								<reference>opal-data.Participants</reference>
-							</from>
-						</org.obiba.magma.views.View>
+        <settings>
+          <defaultEntityType>Participant</defaultEntityType>
+        </settings>
+      </org.obiba.magma.datasource.jdbc.JdbcDatasourceFactory>
+      -->
 
-						<org.obiba.magma.views.View>
-							<name>Weight</name>
-							<select class="org.obiba.magma.js.views.JavascriptClause">
-								<script>attribute('stage').any('Weight')</script>
-							</select>
-							<from class="org.obiba.magma.support.ValueTableReference">
-								<reference>opal-data.Participants</reference>
-							</from>
-						</org.obiba.magma.views.View>
+      <!--
+        Creating views. Views can be added to any datasource, see the example below. Note that views are not
+        materialised. They're attached to a datasource, but the data is not stored within that datasource.
+      -->
+      
+      <!-- 
+      <org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
+        <name>a-datasource-with-views</name>
+        <sessionFactoryProvider class="org.obiba.magma.datasource.hibernate.support.SpringBeanSessionFactoryProvider">
+          <beanName>opalSessionFactory</beanName>
+        </sessionFactoryProvider>
 
-						<org.obiba.magma.views.View>
-							<name>StandingHeight</name>
-							<select class="org.obiba.magma.js.views.JavascriptClause">
-								<script>attribute('stage').any('StandingHeight')</script>
-							</select>
-							<from class="org.obiba.magma.support.ValueTableReference">
-								<reference>opal-data.Participants</reference>
-							</from>
-						</org.obiba.magma.views.View>
-
-						<org.obiba.magma.views.View>
-							<name>HipsWaist</name>
-							<select class="org.obiba.magma.js.views.JavascriptClause">
-								<script>attribute('stage').any('HipsWaist')</script>
-							</select>
-							<from class="org.obiba.magma.support.ValueTableReference">
-								<reference>opal-data.Participants</reference>
-							</from>
-						</org.obiba.magma.views.View>
-
-						<org.obiba.magma.views.View>
-							<name>GripStrength</name>
-							<select class="org.obiba.magma.js.views.JavascriptClause">
-								<script>attribute('stage').any('GripStrength')</script>
-							</select>
-							<from class="org.obiba.magma.support.ValueTableReference">
-								<reference>opal-data.Participants</reference>
-							</from>
-						</org.obiba.magma.views.View>
-
-						<org.obiba.magma.views.View>
-							<name>CognitiveTest</name>
-							<select class="org.obiba.magma.js.views.JavascriptClause">
-								<script>attribute('stage').any('CognitiveTest')</script>
-							</select>
-							<from class="org.obiba.magma.support.ValueTableReference">
-								<reference>opal-data.Participants</reference>
-							</from>
-						</org.obiba.magma.views.View>
-
-						<org.obiba.magma.views.View>
-							<name>BloodPressure</name>
-							<select class="org.obiba.magma.js.views.JavascriptClause">
-								<script>attribute('stage').any('BloodPressure')</script>
-							</select>
-							<from class="org.obiba.magma.support.ValueTableReference">
-								<reference>opal-data.Participants</reference>
-							</from>
-						</org.obiba.magma.views.View>
-
-						<org.obiba.magma.views.View>
-							<name>Impedance310</name>
-							<select class="org.obiba.magma.js.views.JavascriptClause">
-								<script>attribute('stage').any('Impedance310')</script>
-							</select>
-							<from class="org.obiba.magma.support.ValueTableReference">
-								<reference>opal-data.Participants</reference>
-							</from>
-						</org.obiba.magma.views.View>
-
-						<org.obiba.magma.views.View>
-							<name>ECG</name>
-							<select class="org.obiba.magma.js.views.JavascriptClause">
-								<script>attribute('stage').any('ECG')</script>
-							</select>
-							<from class="org.obiba.magma.support.ValueTableReference">
-								<reference>opal-data.Participants</reference>
-							</from>
-						</org.obiba.magma.views.View>
-
-						<org.obiba.magma.views.View>
-							<name>ArtStiffness</name>
-							<select class="org.obiba.magma.js.views.JavascriptClause">
-								<script>attribute('stage').any('ArtStiffness')</script>
-							</select>
-							<from class="org.obiba.magma.support.ValueTableReference">
-								<reference>opal-data.Participants</reference>
-							</from>
-						</org.obiba.magma.views.View>
-
-						<org.obiba.magma.views.View>
-							<name>BloodUrineSamplesCollection</name>
-							<select class="org.obiba.magma.js.views.JavascriptClause">
-								<script>attribute('stage').any('BloodUrineSamplesCollection')
-								</script>
-							</select>
-							<from class="org.obiba.magma.support.ValueTableReference">
-								<reference>opal-data.Participants</reference>
-							</from>
-						</org.obiba.magma.views.View>
-
-						<org.obiba.magma.views.View>
-							<name>UrineSamplesCollection</name>
-							<select class="org.obiba.magma.js.views.JavascriptClause">
-								<script>attribute('stage').any('UrineSamplesCollection')
-								</script>
-							</select>
-							<from class="org.obiba.magma.support.ValueTableReference">
-								<reference>opal-data.Participants</reference>
-							</from>
-						</org.obiba.magma.views.View>
-
-						<org.obiba.magma.views.View>
-							<name>Consent</name>
-							<select class="org.obiba.magma.js.views.JavascriptClause">
-								<script>attribute('stage').any('Consent')</script>
-							</select>
-							<from class="org.obiba.magma.support.ValueTableReference">
-								<reference>opal-data.Participants</reference>
-							</from>
-						</org.obiba.magma.views.View>
-
-						<org.obiba.magma.views.View>
-							<name>CIPreliminaryQuestionnaire</name>
-							<select class="org.obiba.magma.js.views.JavascriptClause">
-								<script>attribute('stage').any('CIPreliminaryQuestionnaire')
-								</script>
-							</select>
-							<from class="org.obiba.magma.support.ValueTableReference">
-								<reference>opal-data.Participants</reference>
-							</from>
-						</org.obiba.magma.views.View>
-
-						<org.obiba.magma.views.View>
-							<name>HealthQuestionnaireSelfAdministered</name>
-							<select class="org.obiba.magma.js.views.JavascriptClause">
-								<script>attribute('stage').any('HealthQuestionnaireSelfAdministered')
-								</script>
-							</select>
-							<from class="org.obiba.magma.support.ValueTableReference">
-								<reference>opal-data.Participants</reference>
-							</from>
-						</org.obiba.magma.views.View>
-
-						<org.obiba.magma.views.View>
-							<name>QuartzDemoQuestionnaire</name>
-							<select class="org.obiba.magma.js.views.JavascriptClause">
-								<script>attribute('stage').any('QuartzDemoQuestionnaire')
-								</script>
-							</select>
-							<from class="org.obiba.magma.support.ValueTableReference">
-								<reference>opal-data.Participants</reference>
-							</from>
-						</org.obiba.magma.views.View>
-
-						<org.obiba.magma.views.View>
-							<name>ConclusionQuestionnaire</name>
-							<select class="org.obiba.magma.js.views.JavascriptClause">
-								<script>attribute('stage').any('ConclusionQuestionnaire')
-								</script>
-							</select>
-							<from class="org.obiba.magma.support.ValueTableReference">
-								<reference>opal-data.Participants</reference>
-							</from>
-						</org.obiba.magma.views.View>
-
-					</views>
-				</transformer>
-			</org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
-		</factories>
-	</magmaEngineFactory>
+        <transformer class="org.obiba.magma.views.support.ViewAwareDatasourceTransformer">
+          <views>
+            <org.obiba.magma.views.View>
+            -->
+              <!-- Name the view. This cannot be the name of an existing table in the underlying datasource
+              <name>Recruitment</name>
+              -->
+              <!-- Select clause. This selects the variables from the table referenced by the From clause below.
+              <select class="org.obiba.magma.js.views.JavascriptClause">
+                <script>name().matches(/Admin.Participant.*/, /Admin.Interview.*/)</script>
+              </select>
+              -->
+              <!-- From clause. This is the table where the variables and value sets come from.
+              <from class="org.obiba.magma.support.ValueTableReference">
+                <reference>opal-data.Participants</reference>
+              </from>
+              -->
+              <!--  Where clause. This allows choosing which entities are included in the view.
+              <where class="org.obiba.magma.js.views.JavascriptClause">
+                <script>$('Admin.Interview.status').any('COMPLETE')</script>
+              </where>
+            </org.obiba.magma.views.View>
+            -->
+            
+            <!--
+            <org.obiba.magma.views.View>
+              <name>BoneDensityStage</name>
+              -->
+              <!-- Selects variables based on an attribute's value
+              <select class="org.obiba.magma.js.views.JavascriptClause">
+                <script>attribute('stage').any('BoneDensity')</script>
+              </select>
+              <from class="org.obiba.magma.support.ValueTableReference">
+                <reference>opal-data.Participants</reference>
+              </from>
+            </org.obiba.magma.views.View>
+            -->
+          <!--
+          </views>
+        </transformer>
+      </org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
+      -->
+    </factories>
+  </magmaEngineFactory>
 </org.obiba.opal.core.cfg.OpalConfiguration>
