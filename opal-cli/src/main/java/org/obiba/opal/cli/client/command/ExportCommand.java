@@ -25,29 +25,34 @@ public class ExportCommand extends AbstractOpalRuntimeDependentCommand<ExportCom
 
   public void execute() {
     if(options.getTables() != null) {
-      validateOptions();
-      try {
-        if(options.isDestination()) {
-          exportService.exportTablesToDatasource(options.getTables(), options.getDestination(), !options.getNonIncremental());
-        } else if(options.isOut()) {
-          exportService.exportTablesToExcelFile(options.getTables(), options.getOut(), !options.getNonIncremental());
+      if(validateOptions()) {
+        try {
+          if(options.isDestination()) {
+            exportService.exportTablesToDatasource(options.getTables(), options.getDestination(), !options.getNonIncremental());
+          } else if(options.isOut()) {
+            exportService.exportTablesToExcelFile(options.getTables(), options.getOut(), !options.getNonIncremental());
+          }
+        } catch(ExportException e) {
+          System.err.println("Unrecoverable error during export: " + e.getMessage());
+          throw e;
         }
-      } catch(ExportException e) {
-        System.err.println("Unrecoverable error during export: " + e.getMessage());
-        throw e;
       }
     } else {
-      throw new IllegalArgumentException("No input (specify one or more table names to export)");
+      System.console().printf("%s\n", "No table name(s) specified.");
     }
   }
 
-  private void validateOptions() {
+  private boolean validateOptions() {
+    boolean validated = true;
     if(!options.isDestination() && !options.isOut()) {
-      throw new IllegalArgumentException("Must provide either the 'destination' option or the 'out' option.");
+      System.console().printf("%s\n", "Must provide either the 'destination' option or the 'out' option.");
+      validated = false;
     }
     if(options.isDestination() && options.isOut()) {
-      throw new IllegalArgumentException("The 'destination' option and the 'out' option are mutually exclusive.");
+      System.console().printf("%s\n", "The 'destination' option and the 'out' option are mutually exclusive.");
+      validated = false;
     }
+    return validated;
   }
 
 }
