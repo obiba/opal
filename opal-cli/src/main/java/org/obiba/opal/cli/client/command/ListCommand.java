@@ -46,7 +46,7 @@ public class ListCommand extends AbstractOpalRuntimeDependentCommand<ListCommand
       try {
         // Create a DatasourceCopier that will copy only the metadata and export.
         DatasourceCopier metaDataCopier = DatasourceCopier.Builder.newCopier().dontCopyValues().build();
-        exportService.exportTablesToDatasource(tableNames, outputDatasource.getName(), metaDataCopier);
+        exportService.exportTablesToDatasource(tableNames, outputDatasource.getName(), metaDataCopier, false);
       } finally {
         try {
           MagmaEngine.get().removeDatasource(outputDatasource);

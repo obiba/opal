@@ -23,6 +23,9 @@ public interface ExportCommandOptions extends HelpOption {
 
   public boolean isOut();
 
+  @Option(shortName = "n", description = "Non-incremental export (i.e., export all data not just updates).")
+  public boolean getNonIncremental();
+
   @Unparsed(name = "TABLE_NAME")
   public List<String> getTables();
 }

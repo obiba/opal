@@ -23,6 +23,8 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.obiba.magma.views.IncrementalWhereClause;
+import org.obiba.magma.views.View;
 import org.obiba.opal.core.service.ExportException;
 import org.obiba.opal.core.service.ExportService;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,31 +42,31 @@ public class DefaultExportServiceImpl implements ExportService {
     this.auditLogManager = auditLogManager;
   }
 
-  public void exportTablesToDatasource(List<String> sourceTableNames, String destinationDatasourceName) {
+  public void exportTablesToDatasource(List<String> sourceTableNames, String destinationDatasourceName, boolean incremental) {
     Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName must not be null or empty");
     Datasource destinationDatasource = getDatasourceByName(destinationDatasourceName);
     Set<ValueTable> sourceTables = getValueTablesByName(sourceTableNames);
     DatasourceCopier datasourceCopier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, destinationDatasource).build();
-    exportTablesToDatasource(sourceTables, destinationDatasource, datasourceCopier);
+    exportTablesToDatasource(sourceTables, destinationDatasource, datasourceCopier, incremental);
   }
 
-  public void exportTablesToDatasource(List<String> sourceTableNames, String destinationDatasourceName, DatasourceCopier datasourceCopier) {
+  public void exportTablesToDatasource(List<String> sourceTableNames, String destinationDatasourceName, DatasourceCopier datasourceCopier, boolean incremental) {
     Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName must not be null or empty");
     Datasource destinationDatasource = getDatasourceByName(destinationDatasourceName);
     Set<ValueTable> sourceTables = getValueTablesByName(sourceTableNames);
-    exportTablesToDatasource(sourceTables, destinationDatasource, datasourceCopier);
+    exportTablesToDatasource(sourceTables, destinationDatasource, datasourceCopier, incremental);
   }
 
-  public void exportTablesToDatasource(Set<ValueTable> sourceTables, Datasource destinationDatasource, DatasourceCopier datasourceCopier) {
+  public void exportTablesToDatasource(Set<ValueTable> sourceTables, Datasource destinationDatasource, DatasourceCopier datasourceCopier, boolean incremental) {
     Assert.notEmpty(sourceTables, "sourceTables must not be null or empty");
     Assert.notNull(destinationDatasource, "destinationDatasource must not be null");
     Assert.notNull(datasourceCopier, "datasourceCopier must not be null");
     validateSourceDatasourceNotEqualDestinationDatasource(sourceTables, destinationDatasource);
     try {
       for(ValueTable table : sourceTables) {
-        datasourceCopier.copy(table, destinationDatasource);
+        datasourceCopier.copy(incremental ? getIncrementalView(table, destinationDatasource) : table, destinationDatasource);
       }
     } catch(IOException ex) {
       // When implementing the ExcelDatasource:
@@ -73,7 +75,7 @@ public class DefaultExportServiceImpl implements ExportService {
     }
   }
 
-  public void exportTablesToExcelFile(List<String> sourceTableNames, File destinationExcelFile) {
+  public void exportTablesToExcelFile(List<String> sourceTableNames, File destinationExcelFile, boolean incremental) {
     Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
     Assert.notNull(destinationExcelFile, "destinationExcelFile must not be null");
     // Create ExcelDatasource
@@ -107,4 +109,12 @@ public class DefaultExportServiceImpl implements ExportService {
     }
   }
 
+  private View getIncrementalView(ValueTable valueTable, Datasource destination) {
+    View incrementalView = new View(valueTable.getName(), valueTable);
+    IncrementalWhereClause incrementalWhereClause = new IncrementalWhereClause(destination.getName() + "." + valueTable.getName());
+    incrementalWhereClause.setAuditLogManager(auditLogManager);
+    incrementalView.setWhereClause(incrementalWhereClause);
+
+    return incrementalView;
+  }
 }

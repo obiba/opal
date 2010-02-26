@@ -28,12 +28,13 @@ public interface ExportService {
    * Export tables to an existing Datasource. This export operation will be logged.
    * @param sourceTableNames tables to export.
    * @param destinationDatasourceName tables will be copied to this existing Datasource.
+   * @param incremental if <code>true</code> the tables are exported incrementally (updates only)
    * @throws NoSuchDatasourceException if the destinationDatasourceName does not exist.
    * @throws NoSuchValueTableException if a sourceTableName does not exist.
    * @throws ExportException if the sourceTableNames are not unique or if the datasource of a sourceTableName matches
    * the destinationDatasource.
    */
-  public void exportTablesToDatasource(List<String> sourceTableNames, String destinationDatasourceName);
+  public void exportTablesToDatasource(List<String> sourceTableNames, String destinationDatasourceName, boolean incremental);
 
   /**
    * Export tables to an existing Datasource using the provided {@link DatasourceCopier}. If logging is required ensure
@@ -41,12 +42,13 @@ public interface ExportService {
    * @param sourceTableNames tables to export.
    * @param destinationDatasourceName tables will be copied to this existing Datasource.
    * @param datasourceCopier copier used to perform the copy.
+   * @param incremental if <code>true</code> the tables are exported incrementally (updates only)
    * @throws NoSuchDatasourceException if the destinationDatasourceName does not exist.
    * @throws NoSuchValueTableException if a sourceTableName does not exist.
    * @throws ExportException if the sourceTableNames are not unique or if the datasource of a sourceTableName matches
    * the destinationDatasource.
    */
-  public void exportTablesToDatasource(List<String> sourceTableNames, String destinationDatasourceName, DatasourceCopier datasourceCopier);
+  public void exportTablesToDatasource(List<String> sourceTableNames, String destinationDatasourceName, DatasourceCopier datasourceCopier, boolean incremental);
 
   /**
    * Export tables to the provided {@link Datasource} using the provided {@link DatasourceCopier}. If logging is
@@ -55,16 +57,18 @@ public interface ExportService {
    * @param sourceTables tables to export.
    * @param destinationDatasource tables will be copied to this existing Datasource.
    * @param datasourceCopier copier used to perform the copy.
+   * @param incremental if <code>true</code> the tables are exported incrementally (updates only)
    * @throws ExportException if the datasource of a sourceTable matches the destinationDatasource.
    */
-  public void exportTablesToDatasource(Set<ValueTable> sourceTables, Datasource destinationDatasource, DatasourceCopier datasourceCopier);
+  public void exportTablesToDatasource(Set<ValueTable> sourceTables, Datasource destinationDatasource, DatasourceCopier datasourceCopier, boolean incremental);
 
   /**
    * Export tables to an Excel file. This export operation will be logged.
    * @param sourceTableNames tables to export.
    * @param destinationExcelFilename tables will be copied to this Excel file.
+   * @param incremental if <code>true</code> the tables are exported incrementally (updates only)
    * @throws UnsupportedOperationException Exporting to an Excel file is not currently implemented.
    */
-  public void exportTablesToExcelFile(List<String> sourceTableNames, File destinationExcelFile);
+  public void exportTablesToExcelFile(List<String> sourceTableNames, File destinationExcelFile, boolean incremental);
 
 }

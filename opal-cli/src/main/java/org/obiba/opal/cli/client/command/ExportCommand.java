@@ -28,9 +28,9 @@ public class ExportCommand extends AbstractOpalRuntimeDependentCommand<ExportCom
       validateOptions();
       try {
         if(options.isDestination()) {
-          exportService.exportTablesToDatasource(options.getTables(), options.getDestination());
+          exportService.exportTablesToDatasource(options.getTables(), options.getDestination(), !options.getNonIncremental());
         } else if(options.isOut()) {
-          exportService.exportTablesToExcelFile(options.getTables(), options.getOut());
+          exportService.exportTablesToExcelFile(options.getTables(), options.getOut(), !options.getNonIncremental());
         }
       } catch(ExportException e) {
         System.err.println("Unrecoverable error during export: " + e.getMessage());
