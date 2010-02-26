@@ -51,20 +51,19 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   private void importFiles(List<File> filesToImport) {
     String destination = options.getDatasource();
 
-    System.out.println("Importing files");
-
+    System.console().printf("Importing %d file%s :\n", filesToImport.size(), (filesToImport.size() > 1 ? "s" : ""));
     for(File file : filesToImport) {
-      System.out.println("\t" + file.getPath());
+      System.console().printf("  %s\n", file.getPath());
 
       try {
         importService.importData(destination, options.getOwner(), file);
       } catch(NoSuchDatasourceException ex) {
         // Fatal exception - break out of here.
-        System.console().printf("%s\n", ex.getMessage());
+        System.console().printf("Destination datasource '%s' does not exist. Cannot import.\n", ex.getDatasourceName());
         break;
       } catch(IOException ex) {
         // Possibly a non-fatal exception - report an error and continue with the next file.
-        System.console().printf("I/O error: %s\n", ex.getMessage());
+        System.console().printf("Unrecoverable import exception: %s\n", ex.getMessage());
         ex.printStackTrace(System.err);
         continue;
       }
