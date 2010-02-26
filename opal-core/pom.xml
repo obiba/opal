@@ -54,12 +54,12 @@
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-datasource-excel</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-datasource-jdbc</artifactId>
     </dependency>
-      
+
     <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-hibernate-audit</artifactId>
@@ -80,6 +80,12 @@
       <artifactId>spring-tx</artifactId>
     </dependency>
 
+    <!-- @Transactional annotations require spring-aop -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-aop</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-orm</artifactId>
@@ -88,11 +94,6 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-annotations</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>javax.transaction</groupId>
-      <artifactId>jta</artifactId>
     </dependency>
 
     <dependency>
