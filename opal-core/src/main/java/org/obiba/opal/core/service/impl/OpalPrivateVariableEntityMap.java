@@ -82,8 +82,10 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     VariableValueSource ownerVariableSource = keyTable.getVariableValueSource(ownerVariable.getName());
     for(ValueSet keysValueSet : keyTable.getValueSets()) {
       Value privateIdentifier = ownerVariableSource.getValue(keysValueSet);
-      if(privateIdentifier.toString().equals(privateEntity.getIdentifier())) {
-        return true;
+      if(!privateIdentifier.isNull()) { // ValueSets from different owners will not have a value for this owner variable
+        if(privateIdentifier.toString().equals(privateEntity.getIdentifier())) {
+          return true;
+        }
       }
     }
     return false;
