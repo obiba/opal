@@ -47,7 +47,7 @@ public class DefaultExportServiceImpl implements ExportService {
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName must not be null or empty");
     Datasource destinationDatasource = getDatasourceByName(destinationDatasourceName);
     Set<ValueTable> sourceTables = getValueTablesByName(sourceTableNames);
-    DatasourceCopier datasourceCopier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, destinationDatasource).build();
+    DatasourceCopier datasourceCopier = DatasourceCopier.Builder.newCopier().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, destinationDatasource).build();
     exportTablesToDatasource(sourceTables, destinationDatasource, datasourceCopier, incremental);
   }
 
