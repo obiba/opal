@@ -29,44 +29,72 @@ public class KeyCommand extends AbstractCommand<KeyCommandOptions> {
 
   public void execute() {
     if(options.isDelete()) {
-      StudyKeyStore studyKeyStore = studyKeyStoreService.getStudyKeyStore(StudyKeyStoreService.DEFAULT_STUDY_ID);
-      if(studyKeyStore == null) {
-        System.out.println("Keystore doesn't exist");
-      } else {
-        if(studyKeyStoreService.aliasExists(options.getAlias())) {
-          studyKeyStoreService.deleteKey(options.getAlias());
-          System.console().printf("%s '%s'.\n", "Deleted key with alias", options.getAlias());
-        } else {
-          System.out.println("The alias [" + options.getAlias() + "] does not exist.");
-        }
-      }
+      deleteKey();
     } else if(options.isAlgorithm() && options.isSize()) {
-      boolean createKeyConfirmation = true;
-      if(aliasAlreadyExists(options.getAlias())) {
-        createKeyConfirmation = confirmKeyOverWrite();
-      }
-      if(createKeyConfirmation) {
-        String certificateInfo = new CertificateInfo().getCertificateInfoAsString();
-        studyKeyStoreService.createOrUpdateKey(options.getAlias(), options.getAlgorithm(), options.getSize(), certificateInfo);
-        System.console().printf("%s '%s'.\n", "Key generated with alias", options.getAlias());
-      }
+      createKey();
     } else if(options.isPrivate()) {
-      boolean createKeyConfirmation = true;
-      if(aliasAlreadyExists(options.getAlias())) {
-        createKeyConfirmation = confirmKeyOverWrite();
-      }
-      if(createKeyConfirmation) {
-        if(options.isCertificate()) {
-          studyKeyStoreService.importKey(options.getAlias(), options.getPrivate(), options.getCertificate());
-        } else {
-          String certificateInfo = new CertificateInfo().getCertificateInfoAsString();
-          studyKeyStoreService.importKey(options.getAlias(), options.getPrivate(), certificateInfo);
-        }
-        System.console().printf("%s '%s'.\n", "Key imported with alias", options.getAlias());
-      }
+      importKey();
     } else {
       unrecognizedOptionsHelp();
     }
+  }
+
+  private void deleteKey() {
+    StudyKeyStore studyKeyStore = studyKeyStoreService.getStudyKeyStore(StudyKeyStoreService.DEFAULT_STUDY_ID);
+    if(studyKeyStore == null) {
+      System.out.println("Keystore doesn't exist");
+    } else {
+      if(studyKeyStoreService.aliasExists(options.getAlias())) {
+        studyKeyStoreService.deleteKey(options.getAlias());
+        System.console().printf("Deleted key with alias '%s'.\n", options.getAlias());
+      } else {
+        System.console().printf("The alias '%s' does not exist. No key deleted.\n", options.getAlias());
+      }
+    }
+
+  }
+
+  private void createKey() {
+    boolean createKeyConfirmation = true;
+    if(aliasAlreadyExists(options.getAlias())) {
+      createKeyConfirmation = confirmKeyOverWrite();
+    }
+
+    if(createKeyConfirmation) {
+      String certificateInfo = new CertificateInfo().getCertificateInfoAsString();
+      studyKeyStoreService.createOrUpdateKey(options.getAlias(), options.getAlgorithm(), options.getSize(), certificateInfo);
+      System.console().printf("Key generated with alias '%s'.\n", options.getAlias());
+    }
+
+  }
+
+  private void importKey() {
+    // Private key file is required.
+    if(options.getPrivate().exists() == false) {
+      System.console().printf("Private key file '%s' does not exist. Cannot import key.\n", options.getPrivate().getPath());
+      return;
+    }
+    // If specified, certificate file must exist.
+    if(options.isCertificate() && options.getCertificate().exists() == false) {
+      System.console().printf("Certificate file '%s' does not exist. Cannot import key.\n", options.getCertificate().getPath());
+      return;
+    }
+
+    boolean createKeyConfirmation = true;
+    if(aliasAlreadyExists(options.getAlias())) {
+      createKeyConfirmation = confirmKeyOverWrite();
+    }
+
+    if(createKeyConfirmation) {
+      if(options.isCertificate()) {
+        studyKeyStoreService.importKey(options.getAlias(), options.getPrivate(), options.getCertificate());
+      } else {
+        String certificateInfo = new CertificateInfo().getCertificateInfoAsString();
+        studyKeyStoreService.importKey(options.getAlias(), options.getPrivate(), certificateInfo);
+      }
+      System.console().printf("Key imported with alias '%s'.\n", options.getAlias());
+    }
+
   }
 
   private boolean confirmKeyOverWrite() {
