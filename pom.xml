@@ -21,7 +21,6 @@
   <modules>
     <module>opal-core</module>
     <module>opal-cli</module>
-    <module>opal-server</module>
   </modules>
 
   <dependencyManagement>
