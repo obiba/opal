@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.cli.client.command;
 
+import org.obiba.magma.NoSuchDatasourceException;
+import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.opal.cli.client.command.options.ExportCommandOptions;
 import org.obiba.opal.core.service.ExportException;
 import org.obiba.opal.core.service.ExportService;
@@ -33,8 +35,15 @@ public class ExportCommand extends AbstractOpalRuntimeDependentCommand<ExportCom
             exportService.exportTablesToExcelFile(options.getTables(), options.getOut(), !options.getNonIncremental());
           }
         } catch(ExportException e) {
-          System.err.println("Unrecoverable error during export: " + e.getMessage());
-          throw e;
+          System.console().printf("%s\n", e.getMessage());
+          System.err.println(e);
+        } catch(NoSuchDatasourceException e) {
+          System.console().printf("%s\n", "Destination datasource \'" + options.getDestination() + "\' does not exist.");
+        } catch(NoSuchValueTableException e) {
+          System.console().printf("%s\n", e.getMessage());
+          System.err.println(e);
+        } catch(UnsupportedOperationException e) {
+          System.console().printf("%s\n", e.getMessage());
         }
       }
     } else {

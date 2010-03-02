@@ -71,7 +71,7 @@ public class DefaultExportServiceImpl implements ExportService {
     } catch(IOException ex) {
       // When implementing the ExcelDatasource:
       // Determine if this the ExcelDatasource. If yes then display the filename.
-      throw new ExportException("An error was encountered while exporting to datasource : " + destinationDatasource, ex);
+      throw new ExportException("An error was encountered while exporting to datasource '" + destinationDatasource + "'.", ex);
     }
   }
 
@@ -95,7 +95,7 @@ public class DefaultExportServiceImpl implements ExportService {
           throw new ExportException("Source tables include duplicate '" + tableName + "'.");
         }
       } catch(IllegalArgumentException e) {
-        throw new ExportException("Source table '" + tableName + "' does not exist");
+        throw new ExportException("Source table '" + tableName + "' does not exist.");
       }
     }
     return tables;
