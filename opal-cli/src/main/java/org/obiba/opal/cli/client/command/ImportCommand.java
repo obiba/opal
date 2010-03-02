@@ -37,10 +37,10 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       if(!filesToImport.isEmpty()) {
         importFiles(filesToImport);
       } else {
-        throw new IllegalArgumentException("Input file(s) do not exist");
+        System.console().printf("No files found. Import canceled.\n");
       }
     } else {
-      throw new IllegalArgumentException("No input. Specify one or more files (or directories of files) to import)");
+      System.console().printf("At least one file (or directory) to import must be specified. Use 'import --help' for more information.\n");
     }
   }
 
@@ -74,6 +74,10 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     List<File> files = new ArrayList<File>();
 
     for(File file : options.getFiles()) {
+      if(file.exists() == false) {
+        System.console().printf("'%s' does not exist.\n", file.getPath());
+        continue;
+      }
       if(file.isDirectory()) {
         File[] filesInDir = file.listFiles(new FileFilter() {
           public boolean accept(File dirFile) {
