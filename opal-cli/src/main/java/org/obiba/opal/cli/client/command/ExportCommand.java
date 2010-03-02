@@ -38,7 +38,7 @@ public class ExportCommand extends AbstractOpalRuntimeDependentCommand<ExportCom
           System.console().printf("%s\n", e.getMessage());
           System.err.println(e);
         } catch(NoSuchDatasourceException e) {
-          System.console().printf("%s\n", "Destination datasource \'" + options.getDestination() + "\' does not exist.");
+          System.console().printf("Destination datasource '%s' does not exist.\n", options.getDestination());
         } catch(NoSuchValueTableException e) {
           System.console().printf("%s\n", e.getMessage());
           System.err.println(e);
@@ -54,11 +54,11 @@ public class ExportCommand extends AbstractOpalRuntimeDependentCommand<ExportCom
   private boolean validateOptions() {
     boolean validated = true;
     if(!options.isDestination() && !options.isOut()) {
-      System.console().printf("%s\n", "Must provide either the 'destination' option or the 'out' option.");
+      System.console().printf("Must provide either the 'destination' option or the 'out' option.\n");
       validated = false;
     }
     if(options.isDestination() && options.isOut()) {
-      System.console().printf("%s\n", "The 'destination' option and the 'out' option are mutually exclusive.");
+      System.console().printf("The 'destination' option and the 'out' option are mutually exclusive.\n");
       validated = false;
     }
     return validated;
