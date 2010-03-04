@@ -14,11 +14,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.obiba.opal.core.xstream.XStreamOpalConfigurationFactory;
+import org.obiba.core.spring.xstream.InjectingReflectionProviderWrapper;
+import org.obiba.core.util.StreamUtil;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 
 /**
  * Spring FactoryBean that returns a singleton {@link OpalConfiguration}.
@@ -33,6 +37,8 @@ public class OpalConfigurationFactoryBean implements FactoryBean, ApplicationCon
   private OpalConfiguration opalConfiguration;
 
   private File configFile;
+
+  private XStream xstream;
 
   //
   // FactoryBean Methods
@@ -70,18 +76,24 @@ public class OpalConfigurationFactoryBean implements FactoryBean, ApplicationCon
     this.configFile = configFile;
   }
 
+  public void setXstream(XStream xstream) {
+    this.xstream = xstream;
+  }
+
+  protected XStream doCreateXStreamInstance(ApplicationContext applicationContext) {
+    return new XStream(new InjectingReflectionProviderWrapper(new PureJavaReflectionProvider(), applicationContext));
+  }
+
   private void initObject() throws IOException {
     InputStream serializedConfiguration = null;
     try {
-      serializedConfiguration = new FileInputStream(configFile);
-      opalConfiguration = (OpalConfiguration) XStreamOpalConfigurationFactory.fromXML(applicationContext, serializedConfiguration);
-    } finally {
-      if(serializedConfiguration != null) {
-        try {
-          serializedConfiguration.close();
-        } catch(IOException ex) {
-        }
+      if(xstream == null) {
+        xstream = doCreateXStreamInstance(applicationContext);
       }
+      serializedConfiguration = new FileInputStream(configFile);
+      opalConfiguration = (OpalConfiguration) xstream.fromXML(serializedConfiguration);
+    } finally {
+      StreamUtil.silentSafeClose(serializedConfiguration);
     }
   }
 }

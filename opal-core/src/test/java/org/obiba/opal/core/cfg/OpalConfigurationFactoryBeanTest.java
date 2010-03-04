@@ -7,14 +7,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.xstream;
+package org.obiba.opal.core.cfg;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.InputStream;
+import java.io.File;
 import java.util.Set;
 
 import org.junit.Before;
@@ -25,14 +25,13 @@ import org.obiba.magma.datasource.hibernate.SessionFactoryProvider;
 import org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory;
 import org.obiba.magma.datasource.hibernate.support.SpringBeanSessionFactoryProvider;
 import org.obiba.magma.support.MagmaEngineFactory;
-import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * Unit tests for XStreamOpalConfigurationFactory.
  */
-public class XStreamOpalConfigurationFactoryTest {
+public class OpalConfigurationFactoryBeanTest {
   //
   // Instance Variables
   //
@@ -56,14 +55,16 @@ public class XStreamOpalConfigurationFactoryTest {
    * Test method for
    * {@link org.obiba.opal.core.xstream.XStreamOpalConfigurationFactory#newConfiguration(org.springframework.context.ApplicationContext, java.io.InputStream)}
    * .
+   * @throws Exception
    */
   @Test
-  public void testFromXML() {
-    OpalConfiguration opalConfiguration = null;
+  public void testFromXML() throws Exception {
 
-    // Deserialize an OpalConfiguration.
-    InputStream serializedConfiguration = ClassLoader.getSystemResourceAsStream("XStreamOpalConfigurationFactoryTest/opal-config.xml");
-    opalConfiguration = XStreamOpalConfigurationFactory.fromXML(applicationContext, serializedConfiguration);
+    OpalConfigurationFactoryBean factoryBean = new OpalConfigurationFactoryBean();
+
+    factoryBean.setConfigFile(new File("src/test/resources/XStreamOpalConfigurationFactoryTest/opal-config.xml"));
+    factoryBean.setApplicationContext(applicationContext);
+    OpalConfiguration opalConfiguration = (OpalConfiguration) factoryBean.getObject();
 
     // Verify OpalConfiguration was deserialized (not null).
     assertNotNull(opalConfiguration);
