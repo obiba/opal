@@ -5,7 +5,6 @@
 
   <context:annotation-config />
 
-  <import resource="classpath:META-INF/opal/property-configurer.xml" />
   <import resource="tx.xml" />
   <import resource="version.xml" />
   <import resource="hibernate-session.xml" />

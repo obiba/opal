@@ -1,0 +1,27 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+  <import resource="config.xml" />
+  <import resource="classpath:spring/opal-core/context.xml" />
+
+  <bean id="opalShellHolder" class="org.obiba.opal.shell.security.ShiroSessionOpalShellHolder" />
+
+  <bean id="consoleCallbackHandler" class="org.obiba.opal.shell.security.ShellCallbackHandler">
+    <constructor-arg ref="opalShellHolder" />
+  </bean>
+
+  <bean id="opalKeyProvider" parent="baseOpalKeyProvider" lazy-init="true">
+    <property name="callbackHandler" ref="consoleCallbackHandler" />
+  </bean>
+
+  <bean class="org.obiba.opal.server.sshd.OpalSshServer" init-method="start" destroy-method="stop">
+    <constructor-arg>
+      <bean class="org.obiba.opal.server.sshd.SecureShellCommandRegistry" />
+    </constructor-arg>
+    <constructor-arg>
+      <bean class="org.obiba.opal.shell.jline.JLineOpalShellFactory" />
+    </constructor-arg>
+    <constructor-arg ref="opalShellHolder" />
+  </bean>
+
+</beans>
