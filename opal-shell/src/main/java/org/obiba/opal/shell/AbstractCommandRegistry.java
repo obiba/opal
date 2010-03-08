@@ -26,7 +26,8 @@ import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
 import com.google.common.collect.ImmutableSet;
 
 /**
- * 
+ * An abstract implementation of {@code CommandRegistry}. Extending classes should invoke the {@code
+ * addAvailableCommand(Class, Class)} method with all commands that should be made available.
  */
 public abstract class AbstractCommandRegistry implements CommandRegistry {
   //

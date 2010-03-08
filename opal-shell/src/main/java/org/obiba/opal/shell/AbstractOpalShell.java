@@ -12,6 +12,11 @@ import org.obiba.opal.shell.commands.CommandUsage;
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException;
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException.ValidationError;
 
+/**
+ * Implements {@code OpalShell} but does not specify how user interactions are implemented. Extending classes must
+ * implement three methods {@code printf(String, Object...)}, {@code passwordPrompt(String, Object...)} and {@code
+ * prompt(String, Object...)}
+ */
 public abstract class AbstractOpalShell implements OpalShell {
 
   private static final String WHITESPACE_AND_QUOTE = " \t\r\n\"";

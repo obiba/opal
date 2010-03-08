@@ -17,7 +17,16 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface CommandUsage {
-  String description() default "";
 
+  /**
+   * One-sentence description of the command's purpose.
+   * @return
+   */
+  String description();
+
+  /**
+   * Command's syntax. Specifies how the command may be invoked.
+   * @return
+   */
   String syntax() default "";
 }

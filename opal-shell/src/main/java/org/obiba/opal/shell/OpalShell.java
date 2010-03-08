@@ -1,7 +1,9 @@
 package org.obiba.opal.shell;
 
 /**
- * The {@code OpalShell} is used to interact with the user through input and output streams.
+ * The {@code OpalShell} is used to interact with the user through input and output streams. Consider extending {@code
+ * AbstractOpalShell} instead of implementing this interface directly.
+ * @see AbstractOpalShell
  */
 public interface OpalShell extends Runnable {
 

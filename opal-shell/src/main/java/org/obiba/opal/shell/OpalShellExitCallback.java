@@ -10,10 +10,13 @@
 package org.obiba.opal.shell;
 
 /**
- *
+ * Callback interface for things that need to be notified that the shell is exiting.
  */
 public interface OpalShellExitCallback {
 
+  /**
+   * Invoked when the shell is exiting.
+   */
   public void onExit();
 
 }
