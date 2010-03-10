@@ -35,7 +35,7 @@ public class JLineOpalShell extends AbstractOpalShell {
 
   public char[] passwordPrompt(String format, Object... args) {
     try {
-      return consoleReader.readLine(String.format(format, args), new Character((char) 0)).toCharArray();
+      return consoleReader.readLine(String.format(format, args), Character.valueOf((char) 0)).toCharArray();
     } catch(IOException e) {
       throw new RuntimeException(e);
     }
