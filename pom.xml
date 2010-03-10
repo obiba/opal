@@ -23,6 +23,7 @@
     <module>opal-sshd</module>
     <module>opal-shell</module>
     <module>opal-server</module>
+    <module>opal-fs</module>
   </modules>
 
   <dependencyManagement>
