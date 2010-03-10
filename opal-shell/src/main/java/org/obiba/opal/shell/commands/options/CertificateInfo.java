@@ -89,7 +89,7 @@ public class CertificateInfo {
     return false;
   }
 
-  public class Attribute {
+  public static class Attribute {
 
     private final String name;
 
