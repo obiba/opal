@@ -10,22 +10,25 @@
 package org.obiba.opal.core.cfg;
 
 import org.obiba.magma.support.MagmaEngineFactory;
+import org.obiba.opal.fs.OpalFileSystem;
 
-/**
- * Opal configuration.
- */
 public class OpalConfiguration {
-  //
-  // Instance Variables
-  //
+
+  private String fileSystemRoot;
+
+  private OpalFileSystem opalFileSystem;
 
   private MagmaEngineFactory magmaEngineFactory;
 
-  //
-  // Methods
-  //
-
   public MagmaEngineFactory getMagmaEngineFactory() {
     return magmaEngineFactory;
+  }
+
+  public OpalFileSystem getFileSystem() {
+    if(opalFileSystem == null) {
+      opalFileSystem = new OpalFileSystem(fileSystemRoot);
+    }
+    return opalFileSystem;
+
   }
 }
