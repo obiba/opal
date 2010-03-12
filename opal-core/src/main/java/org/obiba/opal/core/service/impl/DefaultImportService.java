@@ -12,7 +12,9 @@ package org.obiba.opal.core.service.impl;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.obiba.core.util.FileUtil;
 import org.obiba.magma.Datasource;
@@ -154,10 +156,45 @@ public class DefaultImportService implements ImportService {
     View privateView = View.Builder.newView(participantTable.getName(), participantTable).select(selectClause).build();
     Variable ownerVariable = prepareKeysTable(privateView, owner);
 
-    copyParticipantIdentifiers(privateView, source, ownerVariable);
-    copyParticipantDataAndMetadata(participantTable, source, destination, ownerVariable, dispatchAttribute);
+    OpalPrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(lookupKeysTable(), ownerVariable, participantIdentifier);
+
+    List<ValueTable> participantTables = prepareParticipantTables(participantTable, source, destination, dispatchAttribute, entityMap);
+
+    // prepare for copying participant data
+    ValueTableWriter keysTableWriter = writeToKeysTable();
+
+    DatasourceCopier dataCopier = DatasourceCopier.Builder.newCopier().dontCopyMetadata().withLoggingListener().withThroughtputListener().withVariableEntityCopyEventListener(auditLogManager, destination).build();
+    Map<String, ValueTableWriter> valueTableWriters = new HashMap<String, ValueTableWriter>();
+    for(ValueTable valueTable : participantTables) {
+      valueTableWriters.put(valueTable.getName(), dataCopier.createValueTableWriter(valueTable, destination));
+    }
+
+    try {
+      // for each value set, dispatch values in all participant tables
+      for(ValueSet valueSet : participantTable.getValueSets()) {
+        // copy participant identifiers and update entity map
+        copyParticipantIdentifiers(privateView, ownerVariable, keysTableWriter, entityMap, valueSet);
+
+        // copy participant data
+        for(ValueTable valueTable : participantTables) {
+          copyParticipantData(valueTable, source, destination, dataCopier, valueTableWriters.get(valueTable.getName()), entityMap, valueSet);
+        }
+      }
+    } finally {
+      keysTableWriter.close();
+      for(ValueTable valueTable : participantTables) {
+        dataCopier.closeValueTableWriter(valueTableWriters.get(valueTable.getName()), valueTable);
+      }
+    }
   }
 
+  /**
+   * Write the key variable.
+   * @param privateView
+   * @param owner
+   * @return
+   * @throws IOException
+   */
   private Variable prepareKeysTable(ValueTable privateView, String owner) throws IOException {
 
     Variable ownerVariable = Variable.Builder.newVariable(owner, TextType.get(), privateView.getEntityType()).build();
@@ -178,37 +215,17 @@ public class DefaultImportService implements ImportService {
     return ownerVariable;
   }
 
-  private void copyParticipantIdentifiers(ValueTable privateView, Datasource source, Variable ownerVariable) throws IOException {
-    ValueTableWriter writer = writeToKeysTable();
-    try {
-      // Copy private entities to keys table.
-      OpalPrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(lookupKeysTable(), ownerVariable, participantIdentifier);
-      for(ValueSet privateValueSet : privateView.getValueSets()) {
-        VariableEntity privateEntity = privateValueSet.getVariableEntity();
-        VariableEntity publicEntity;
-        if(entityMap.hasPrivateEntity(privateEntity) == false) {
-          publicEntity = entityMap.createPublicEntity(privateEntity);
-        } else {
-          publicEntity = entityMap.publicEntity(privateEntity);
-        }
-
-        ValueSetWriter vsw = writer.writeValueSet(publicEntity);
-        try {
-          // Write the private identifier value to the "owner" variable in the keys valueSet
-          vsw.writeValue(ownerVariable, TextType.get().valueOf(privateEntity.getIdentifier()));
-          // Copy all other private variable values
-          DatasourceCopier.Builder.newCopier().dontCopyMetadata().build().copy(privateView, privateValueSet, vsw);
-        } finally {
-          vsw.close();
-        }
-      }
-    } finally {
-      writer.close();
-    }
-  }
-
-  private void copyParticipantDataAndMetadata(ValueTable participantTable, Datasource source, Datasource destination, Variable ownerVariable, String dispatchAttribute) throws IOException {
-    OpalPrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(lookupKeysTable(), ownerVariable, participantIdentifier);
+  /**
+   * Dispatch variables in value tables according to the value of the dispatch attribute and write the variables.
+   * @param participantTable
+   * @param source
+   * @param destination
+   * @param dispatchAttribute
+   * @param entityMap
+   * @return
+   * @throws IOException
+   */
+  private List<ValueTable> prepareParticipantTables(ValueTable participantTable, Datasource source, Datasource destination, String dispatchAttribute, OpalPrivateVariableEntityMap entityMap) throws IOException {
 
     List<ValueTable> tables = new ArrayList<ValueTable>();
     List<String> dispatchTables = getDispatchAttributeValues(participantTable, dispatchAttribute);
@@ -234,9 +251,65 @@ public class DefaultImportService implements ImportService {
     }
 
     // Copy the view to the destination datasource.
-    DatasourceCopier copier = DatasourceCopier.Builder.newCopier().withLoggingListener().withThroughtputListener().withVariableEntityCopyEventListener(auditLogManager, destination).build();
+    DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyValues().build();
     for(ValueTable table : tables) {
       copier.copy(table, destination);
+    }
+
+    return tables;
+  }
+
+  /**
+   * Write the key variable and the identifier variables values; update the participant key private/public map.
+   * @param privateView
+   * @param ownerVariable
+   * @param writer
+   * @param entityMap
+   * @param valueSet
+   * @throws IOException
+   */
+  private void copyParticipantIdentifiers(ValueTable privateView, Variable ownerVariable, ValueTableWriter writer, OpalPrivateVariableEntityMap entityMap, ValueSet valueSet) throws IOException {
+    VariableEntity privateEntity = valueSet.getVariableEntity();
+    VariableEntity publicEntity;
+    if(entityMap.hasPrivateEntity(privateEntity) == false) {
+      publicEntity = entityMap.createPublicEntity(privateEntity);
+    } else {
+      publicEntity = entityMap.publicEntity(privateEntity);
+    }
+
+    ValueSetWriter vsw = writer.writeValueSet(publicEntity);
+    try {
+      // Write the private identifier value to the "owner" variable in the keys valueSet
+      vsw.writeValue(ownerVariable, TextType.get().valueOf(privateEntity.getIdentifier()));
+      // Copy all other private variable values
+      DatasourceCopier.Builder.newCopier().dontCopyMetadata().build().copy(privateView, valueSet, vsw);
+    } finally {
+      vsw.close();
+    }
+  }
+
+  /**
+   * Write the variables values.
+   * @param privateView
+   * @param source
+   * @param destination
+   * @param copier
+   * @param writer
+   * @param entityMap
+   * @param valueSet
+   * @throws IOException
+   */
+  private void copyParticipantData(ValueTable privateView, Datasource source, Datasource destination, DatasourceCopier copier, ValueTableWriter writer, OpalPrivateVariableEntityMap entityMap, ValueSet valueSet) throws IOException {
+    VariableEntity privateEntity = valueSet.getVariableEntity();
+    // entity exists
+    VariableEntity publicEntity = entityMap.publicEntity(privateEntity);
+
+    ValueSetWriter vsw = writer.writeValueSet(publicEntity);
+    try {
+      // Copy all other variable values
+      copier.copy(privateView, valueSet, vsw);
+    } finally {
+      vsw.close();
     }
   }
 
