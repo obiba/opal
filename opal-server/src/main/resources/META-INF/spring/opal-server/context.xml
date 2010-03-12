@@ -22,6 +22,7 @@
       <bean class="org.obiba.opal.shell.jline.JLineOpalShellFactory" />
     </constructor-arg>
     <constructor-arg ref="opalShellHolder" />
+    <constructor-arg value="${org.obiba.opal.ssh.port}" />
   </bean>
 
 </beans>

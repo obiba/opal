@@ -30,13 +30,13 @@ public class OpalSshServer {
 
   private final OpalShellFactory shellFactory;
 
-  public OpalSshServer(CommandRegistry commandRegistry, OpalShellFactory shellFactory, OpalShellHolder opalShellHolder) {
+  public OpalSshServer(CommandRegistry commandRegistry, OpalShellFactory shellFactory, OpalShellHolder opalShellHolder, Integer port) {
     this.commandRegistry = commandRegistry;
     this.shellFactory = shellFactory;
     this.opalShellHolder = opalShellHolder;
 
     sshd = SshServer.setUpDefaultServer();
-    sshd.setPort(8022);
+    sshd.setPort(port);
     sshd.setKeyPairProvider(new PEMGeneratorHostKeyProvider(System.getProperty("OPAL_HOME") + "/conf/sshd.pem", "RSA", 2048));
     sshd.setShellFactory(new Factory<Command>() {
 
