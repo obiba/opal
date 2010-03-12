@@ -9,13 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.shell.commands;
 
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
 import org.bouncycastle.openssl.PEMWriter;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.opal.core.crypt.StudyKeyStore;
@@ -28,7 +30,7 @@ import org.springframework.util.Assert;
  * Exports public key certificates.
  */
 @CommandUsage(description = "Exports the public key certificate for the specified key pair alias.", syntax = "Syntax: certificate --alias NAME [--out FILE]")
-public class PublicCommand extends AbstractCommand<PublicCommandOptions> {
+public class PublicCommand extends AbstractOpalRuntimeDependentCommand<PublicCommandOptions> {
 
   @Autowired
   private StudyKeyStoreService studyKeyStoreService;
@@ -42,7 +44,9 @@ public class PublicCommand extends AbstractCommand<PublicCommandOptions> {
     Writer certificateWriter = null;
     try {
       if(options.isOut()) {
-        certificateWriter = new FileWriter(options.getOut());
+        FileObject outputFile = getFileSystemRoot().resolveFile(options.getOut());
+        certificateWriter = new OutputStreamWriter(outputFile.getContent().getOutputStream());
+
       } else {
         certificateWriter = new StringWriter();
       }
@@ -52,6 +56,8 @@ public class PublicCommand extends AbstractCommand<PublicCommandOptions> {
       } else {
         getShell().printf(((StringWriter) certificateWriter).getBuffer().toString());
       }
+    } catch(FileSystemException e) {
+      getShell().printf("%s in an invalid output file.  Please make sure that you have a specified a valid path.", options.getOut());
     } catch(IOException e) {
       throw new RuntimeException(e);
     } finally {

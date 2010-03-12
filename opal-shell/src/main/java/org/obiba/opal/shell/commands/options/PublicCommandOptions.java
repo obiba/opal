@@ -1,7 +1,5 @@
 package org.obiba.opal.shell.commands.options;
 
-import java.io.File;
-
 import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
 import uk.co.flamingpenguin.jewel.cli.Option;
 
@@ -15,7 +13,7 @@ public interface PublicCommandOptions extends HelpOption {
   public String getAlias();
 
   @Option(shortName = "o", description = "Export the certificate to the specified file, in pem format")
-  public File getOut();
+  public String getOut();
 
   public boolean isOut();
 

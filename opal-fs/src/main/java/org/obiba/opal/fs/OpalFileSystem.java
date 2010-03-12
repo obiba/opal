@@ -17,6 +17,9 @@ public class OpalFileSystem {
     try {
       FileSystemManager fsm = VFS.getManager();
       FileObject vfsRoot = fsm.resolveFile("file://" + root);
+
+      Assert.isTrue(vfsRoot.isWriteable(), "The root of the Opal File System is not writable.  Please reconfigure the Opal File System with a writable root.");
+
       // This is similar to what chroot does. We obtain a "filesystem" that appears to be rooted at vfsRoot
       this.root = fsm.createVirtualFileSystem(vfsRoot);
     } catch(FileSystemException e) {
