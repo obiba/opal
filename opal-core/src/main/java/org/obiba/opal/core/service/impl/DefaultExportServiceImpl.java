@@ -21,6 +21,7 @@ import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager;
+import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.views.IncrementalWhereClause;
@@ -78,9 +79,16 @@ public class DefaultExportServiceImpl implements ExportService {
   public void exportTablesToExcelFile(List<String> sourceTableNames, File destinationExcelFile, boolean incremental) {
     Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
     Assert.notNull(destinationExcelFile, "destinationExcelFile must not be null");
-    // Create ExcelDatasource
-    // Call exportTablesToDatasource with the ExcelDatasource
-    throw new UnsupportedOperationException("Exporting to an Excel file is not currently supported.");
+
+    Datasource outputDatasource = new ExcelDatasource(destinationExcelFile.getName(), destinationExcelFile);
+    MagmaEngine.get().addDatasource(outputDatasource);
+    try {
+      // Create a DatasourceCopier that will copy only the metadata and export.
+      exportTablesToDatasource(sourceTableNames, outputDatasource.getName(), incremental);
+    } finally {
+      MagmaEngine.get().removeDatasource(outputDatasource);
+    }
+
   }
 
   private Datasource getDatasourceByName(String datasourceName) {
