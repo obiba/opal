@@ -11,6 +11,8 @@ package org.obiba.opal.core.service.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.obiba.core.util.FileUtil;
 import org.obiba.magma.Datasource;
@@ -73,6 +75,11 @@ public class DefaultImportService implements ImportService {
   //
 
   public void importData(String datasourceName, String owner, File file) throws NoSuchDatasourceException, IllegalArgumentException, IOException {
+    // OPAL-170 Dispatch the variables in tables corresponding to Onyx stage attribute value.
+    importData(datasourceName, owner, file, "stage");
+  }
+
+  public void importData(String datasourceName, String owner, File file, String dispatchAttribute) throws NoSuchDatasourceException, IllegalArgumentException, IOException {
     // Validate the file.
     if(!file.isFile()) {
       throw new IllegalArgumentException("No such file (" + file.getPath() + ")");
@@ -87,7 +94,7 @@ public class DefaultImportService implements ImportService {
     // Copy the FsDatasource to the destination datasource.
     try {
       MagmaEngine.get().addDatasource(sourceDatasource);
-      copyValueTables(sourceDatasource, destinationDatasource, owner);
+      copyValueTables(sourceDatasource, destinationDatasource, owner, dispatchAttribute);
     } finally {
       MagmaEngine.get().removeDatasource(sourceDatasource);
     }
@@ -124,10 +131,10 @@ public class DefaultImportService implements ImportService {
     this.auditLogManager = auditLogManager;
   }
 
-  private void copyValueTables(Datasource source, Datasource destination, String owner) throws IOException {
+  private void copyValueTables(Datasource source, Datasource destination, String owner, String dispatchAttribute) throws IOException {
     for(ValueTable valueTable : source.getValueTables()) {
       if(valueTable.isForEntityType(keysTableEntityType)) {
-        copyParticipants(valueTable, source, destination, owner);
+        copyParticipants(valueTable, source, destination, owner, dispatchAttribute);
       } else {
         DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, destination).build();
         copier.copy(valueTable, destination);
@@ -135,12 +142,12 @@ public class DefaultImportService implements ImportService {
     }
   }
 
-  private void copyParticipants(ValueTable participantTable, Datasource source, Datasource destination, String owner) throws IOException {
+  private void copyParticipants(ValueTable participantTable, Datasource source, Datasource destination, String owner, String dispatchAttribute) throws IOException {
 
     // Create a SelectClause that selects all identifier variables.
     SelectClause selectClause = new SelectClause() {
       public boolean select(Variable variable) {
-        return variable.hasAttribute("identifier") && (variable.getAttribute("identifier").getValue().equals(BooleanType.get().trueValue()) || variable.getAttribute("identifier").getValue().equals(TextType.get().valueOf("true")));
+        return isIdentifierVariable(variable);
       }
     };
 
@@ -148,7 +155,7 @@ public class DefaultImportService implements ImportService {
     Variable ownerVariable = prepareKeysTable(privateView, owner);
 
     copyParticipantIdentifiers(privateView, source, ownerVariable);
-    copyParticipantDataAndMetadata(participantTable, source, destination, ownerVariable);
+    copyParticipantDataAndMetadata(participantTable, source, destination, ownerVariable, dispatchAttribute);
   }
 
   private Variable prepareKeysTable(ValueTable privateView, String owner) throws IOException {
@@ -200,25 +207,63 @@ public class DefaultImportService implements ImportService {
     }
   }
 
-  private void copyParticipantDataAndMetadata(ValueTable participantTable, Datasource source, Datasource destination, Variable ownerVariable) throws IOException {
+  private void copyParticipantDataAndMetadata(ValueTable participantTable, Datasource source, Datasource destination, Variable ownerVariable, String dispatchAttribute) throws IOException {
     OpalPrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(lookupKeysTable(), ownerVariable, participantIdentifier);
 
-    // Create a SelectClause that selects all NON-IDENTIFIER variables.
-    SelectClause selectClause = new SelectClause() {
-      public boolean select(Variable variable) {
-        return !variable.hasAttribute("identifier") || (variable.hasAttribute("identifier") && (variable.getAttribute("identifier").getValue().equals(BooleanType.get().falseValue()) || variable.getAttribute("identifier").getValue().equals(TextType.get().valueOf("false"))));
-      }
-    };
+    List<ValueTable> tables = new ArrayList<ValueTable>();
+    List<String> dispatchTables = getDispatchAttributeValues(participantTable, dispatchAttribute);
+
+    PrivateVariableEntityValueTable privateTable;
 
     // Create a view of the participant table that wraps entities with "public" entities, and that
     // selects only NON-IDENTIFIER variables.
-    PrivateVariableEntityValueTable privateTable = new PrivateVariableEntityValueTable(participantTable.getName(), participantTable, entityMap);
-    privateTable.setSelectClause(selectClause);
+    privateTable = new PrivateVariableEntityValueTable(participantTable.getName(), participantTable, entityMap);
+    privateTable.setSelectClause(new CopySelectClause(dispatchAttribute));
     privateTable.initialise();
+
+    // do not copy a table without variables (that may result from the select clause)
+    if(privateTable.getVariables().iterator().hasNext()) {
+      tables.add(privateTable);
+    }
+
+    for(String dispatchTable : dispatchTables) {
+      privateTable = new PrivateVariableEntityValueTable(dispatchTable, participantTable, entityMap);
+      privateTable.setSelectClause(new CopySelectClause(dispatchAttribute, dispatchTable));
+      privateTable.initialise();
+      tables.add(privateTable);
+    }
 
     // Copy the view to the destination datasource.
     DatasourceCopier copier = DatasourceCopier.Builder.newCopier().withLoggingListener().withThroughtputListener().withVariableEntityCopyEventListener(auditLogManager, destination).build();
-    copier.copy(privateTable, destination);
+    for(ValueTable table : tables) {
+      copier.copy(table, destination);
+    }
+  }
+
+  /**
+   * Get the distinct values for given variable attribute.
+   * @param participantTable
+   * @param dispatchAttribute
+   * @return
+   */
+  private List<String> getDispatchAttributeValues(ValueTable participantTable, String dispatchAttribute) {
+    List<String> stages = new ArrayList<String>();
+
+    if(dispatchAttribute != null) {
+      for(Variable variable : participantTable.getVariables()) {
+        if(variable.hasAttribute(dispatchAttribute) && !isIdentifierVariable(variable)) {
+          String value = variable.getAttributeStringValue(dispatchAttribute);
+          if(value != null) {
+            value = value.trim();
+            if(value.length() > 0 && !stages.contains(value)) {
+              stages.add(value.trim());
+            }
+          }
+        }
+      }
+    }
+
+    return stages;
   }
 
   private void archiveData(File file) {
@@ -247,6 +292,44 @@ public class DefaultImportService implements ImportService {
   private ValueTableWriter writeToKeysTable() {
     MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(keysTableReference);
     return MagmaEngine.get().getDatasource(resolver.getDatasourceName()).createWriter(resolver.getTableName(), keysTableEntityType);
+  }
+
+  private boolean isIdentifierVariable(Variable variable) {
+    return variable.hasAttribute("identifier") && (variable.getAttribute("identifier").getValue().equals(BooleanType.get().trueValue()) || variable.getAttribute("identifier").getValue().equals(TextType.get().valueOf("true")));
+  }
+
+  /**
+   * Create a SelectClause that selects all NON-IDENTIFIER variables and variables from a particular attribute.
+   */
+  private class CopySelectClause implements SelectClause {
+
+    private String dispatchValue;
+
+    private String dispatchAttribute;
+
+    public CopySelectClause(String dispatchAttribute, String dispatchValue) {
+      super();
+      this.dispatchValue = dispatchValue;
+      this.dispatchAttribute = dispatchAttribute;
+    }
+
+    public CopySelectClause(String dispatchAttribute) {
+      this(dispatchAttribute, null);
+    }
+
+    public boolean select(Variable variable) {
+      boolean selected = true;
+      if(dispatchAttribute != null) {
+        if(dispatchValue != null) {
+          selected = variable.hasAttribute(dispatchAttribute) && variable.getAttributeStringValue(dispatchAttribute).equals(dispatchValue);
+        } else {
+          selected = !variable.hasAttribute(dispatchAttribute);
+        }
+      }
+
+      return selected && !isIdentifierVariable(variable);
+    }
+
   }
 
 }
