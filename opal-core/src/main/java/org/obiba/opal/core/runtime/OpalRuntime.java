@@ -11,6 +11,7 @@ package org.obiba.opal.core.runtime;
 
 import org.obiba.magma.MagmaEngine;
 import org.obiba.opal.core.cfg.OpalConfiguration;
+import org.obiba.opal.fs.OpalFileSystem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -58,6 +59,10 @@ public class OpalRuntime {
 
   public OpalConfiguration getOpalConfiguration() {
     return opalConfiguration;
+  }
+
+  public OpalFileSystem getFileSystem() {
+    return opalConfiguration.getFileSystem();
   }
 
 }
