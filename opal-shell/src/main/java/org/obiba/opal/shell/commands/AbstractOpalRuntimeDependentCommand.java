@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.shell.commands;
 
+import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,10 @@ public abstract class AbstractOpalRuntimeDependentCommand<T> extends AbstractCom
     return opalRuntime;
   }
 
+  protected OpalConfiguration getOpalConfiguration() {
+    return opalRuntime.getOpalConfiguration();
+  }
+  
   public OpalFileSystem getFileSystem() {
     return opalRuntime.getFileSystem();
   }

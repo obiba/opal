@@ -21,4 +21,6 @@ public interface ShowCommandOptions extends HelpOption {
   @Option(shortName = "t", description = "List the tables.")
   public boolean getTables();
 
+  @Option(shortName = "u", description = "List the functional units.")
+  public boolean getUnits();
 }

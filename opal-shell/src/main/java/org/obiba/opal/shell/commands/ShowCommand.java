@@ -14,6 +14,7 @@ import java.util.Set;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
+import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.shell.commands.options.ShowCommandOptions;
 
 /**
@@ -23,16 +24,14 @@ import org.obiba.opal.shell.commands.options.ShowCommandOptions;
 public class ShowCommand extends AbstractOpalRuntimeDependentCommand<ShowCommandOptions> {
 
   public void execute() {
+    // If no options specified, show everything (datasources, tables and units).
+    boolean showAll = !options.getDatasources() && !options.getTables() && !options.getUnits();
 
-    boolean displayDatasources = options.getDatasources();
-    boolean displayTables = options.getTables();
+    showDatasourcesAndTables(options.getDatasources() || showAll, options.getTables() || showAll);
+    showUnits(options.getUnits() || showAll);
+  }
 
-    // If no options are specified, default behavior is to list both datasources and tables.
-    if(!displayDatasources && !displayTables) {
-      displayDatasources = true;
-      displayTables = true;
-    }
-
+  private void showDatasourcesAndTables(boolean displayDatasources, boolean displayTables) {
     for(Datasource datasource : MagmaEngine.get().getDatasources()) {
 
       if(displayDatasources) {
@@ -46,6 +45,13 @@ public class ShowCommand extends AbstractOpalRuntimeDependentCommand<ShowCommand
         }
       }
     }
+  }
 
+  private void showUnits(boolean displayUnits) {
+    if(displayUnits) {
+      for(FunctionalUnit unit : getOpalConfiguration().getFunctionalUnits()) {
+        getShell().printf("functional unit [%s], with key variable [%s]\n", unit.getName(), unit.getKeyVariableName());
+      }
+    }
   }
 }
