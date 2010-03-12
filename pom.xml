@@ -478,6 +478,18 @@
         <artifactId>bcprov-ext-jdk15</artifactId>
         <version>${bouncycastle.version}</version>
       </dependency>
+      
+	  <dependency>
+	    <groupId>org.apache.commons</groupId>
+		<artifactId>commons-vfs</artifactId>
+		<version>${commons-vfs.version}</version>
+		<exclusions>
+		  <exclusion>
+		    <groupId>commons-logging</groupId>
+		    <artifactId>commons-logging</artifactId>
+		  </exclusion>
+		</exclusions>
+	  </dependency>      
 
     </dependencies>
   </dependencyManagement>
@@ -657,6 +669,7 @@
     <liquibase.version>1.9.4</liquibase.version>
     <shiro.version>1.0-incubating-r901735</shiro.version>
     <bouncycastle.version>1.45</bouncycastle.version>
+    <commons-vfs.version>2.0-SNAPSHOT</commons-vfs.version>      
   </properties>
 
   <profiles>
