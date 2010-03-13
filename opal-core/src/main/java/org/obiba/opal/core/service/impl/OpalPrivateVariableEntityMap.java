@@ -9,13 +9,19 @@
  ******************************************************************************/
 package org.obiba.opal.core.service.impl;
 
+import java.io.IOException;
+
+import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
+import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.support.VariableEntityBean;
+import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
 
@@ -101,6 +107,15 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     for(int i = 0; i < 100; i++) {
       VariableEntity publicEntity = new VariableEntityBean(privateEntity.getType(), participantIdentifier.generateParticipantIdentifier());
       if(!keyTable.hasValueSet(publicEntity)) {
+        try {
+          ValueTableWriter vtw = keyTable.getDatasource().createWriter(keyTable.getName(), keyTable.getEntityType());
+          ValueSetWriter vsw = vtw.writeValueSet(publicEntity);
+          vsw.writeValue(this.ownerVariable, TextType.get().valueOf(privateEntity.getIdentifier()));
+          vsw.close();
+          vtw.close();
+        } catch(IOException e) {
+          throw new MagmaRuntimeException(e);
+        }
         return publicEntity;
       }
     }

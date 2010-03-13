@@ -17,6 +17,10 @@ import org.obiba.magma.views.View;
 
 import com.google.common.base.Function;
 
+/**
+ * A view that uses a {@code PrivateVariableEntityMap} instance to map private entity identifiers to public ones and
+ * only expose public identifiers.
+ */
 public class PrivateVariableEntityValueTable extends View {
   //
   // Instance Variables
@@ -70,7 +74,7 @@ public class PrivateVariableEntityValueTable extends View {
       public VariableEntity apply(VariableEntity from) {
         VariableEntity publicEntity = privateMap.publicEntity(from);
         if(publicEntity == null) {
-          throw new NoSuchValueSetException(PrivateVariableEntityValueTable.this, null);
+          publicEntity = privateMap.createPublicEntity(from);
         }
         return publicEntity;
       }
@@ -88,7 +92,7 @@ public class PrivateVariableEntityValueTable extends View {
       public ValueSet apply(ValueSet from) {
         VariableEntity publicEntity = privateMap.publicEntity(from.getVariableEntity());
         if(publicEntity == null) {
-          throw new NoSuchValueSetException(PrivateVariableEntityValueTable.this, null);
+          publicEntity = privateMap.createPublicEntity(from.getVariableEntity());
         }
         return baseTransformer.apply(from);
       }
