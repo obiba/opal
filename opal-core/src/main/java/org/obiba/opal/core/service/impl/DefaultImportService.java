@@ -171,12 +171,16 @@ public class DefaultImportService implements ImportService {
     final ValueTableWriter keysTableWriter = writeToKeysTable();
 
     try {
-      DatasourceCopyValueSetEventListener l = new DatasourceCopyValueSetEventListener() {
+      // This listener will insert all participant identifiers in the keys datasource prior to copying the valueset to
+      // the data datasource.
+      // It will also generate the public variable entity if it does not exist yet. As such, it must be executed before
+      // the ValueSet is copied to the data datasource otherwise, it will not have an associated entity.
+      DatasourceCopyValueSetEventListener createKeysListener = new DatasourceCopyValueSetEventListener() {
 
-        public void onValueSetCopied(ValueTable source, ValueSet valueSet, String destination) {
+        public void onValueSetCopied(ValueTable source, ValueSet valueSet, String... destination) {
         }
 
-        public void onValueSetCopy(ValueTable source, ValueSet valueSet, String destination) {
+        public void onValueSetCopy(ValueTable source, ValueSet valueSet) {
           copyParticipantIdentifiers(valueSet.getVariableEntity(), privateView, ownerVariable, keysTableWriter, entityMap);
         }
 
@@ -184,11 +188,11 @@ public class DefaultImportService implements ImportService {
 
       DatasourceCopier dataCopier = DatasourceCopier.Builder.newCopier() //
       .withLoggingListener().withThroughtputListener() //
-      .withListener(l) //
+      .withListener(createKeysListener) //
       .withVariableEntityCopyEventListener(auditLogManager, destination)//
       .withMultiplexingStrategy(new VariableAttributeMutiplexingStrategy(dispatchAttribute, publicTable.getName()))//
       .withVariableTransformer(new VariableTransformer() {
-        /** Remove the dispatch attribute from the variable name */
+        /** Remove the dispatch attribute from the variable name. This is onyx-specific. See OPAL-170 */
         public Variable transform(Variable variable) {
           return Variable.Builder.sameAs(variable).name(variable.hasAttribute(dispatchAttribute) ? variable.getName().replaceFirst("^.*\\.?" + variable.getAttributeStringValue(dispatchAttribute) + "\\.", "") : variable.getName()).build();
         }
@@ -218,7 +222,7 @@ public class DefaultImportService implements ImportService {
       try {
         // Create private variables
         vw.writeVariable(ownerVariable);
-        DatasourceCopier.Builder.newCopier().dontCopyValues().build().copy(privateView, vw);
+        DatasourceCopier.Builder.newCopier().dontCopyValues().build().copy(privateView, lookupKeysTable().getName(), vw);
       } finally {
         vw.close();
       }
@@ -237,7 +241,7 @@ public class DefaultImportService implements ImportService {
     ValueSetWriter vsw = writer.writeValueSet(publicEntity);
     try {
       // Copy all other private variable values
-      DatasourceCopier.Builder.newCopier().dontCopyMetadata().build().copy(privateView, privateView.getValueSet(privateEntity), vsw);
+      DatasourceCopier.Builder.newCopier().dontCopyMetadata().build().copy(privateView, privateView.getValueSet(privateEntity), lookupKeysTable().getName(), vsw);
     } finally {
       try {
         vsw.close();
