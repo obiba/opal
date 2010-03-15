@@ -10,6 +10,7 @@
 package org.obiba.opal.core.unit;
 
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
+import org.obiba.opal.core.domain.unit.UnitKeyStore;
 
 /**
  * Represents an organization that fulfils the role of a "functional unit" of a Biobank.
