@@ -25,6 +25,7 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager;
+import org.obiba.magma.crypt.KeyProvider;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
@@ -72,6 +73,11 @@ public class DefaultImportService implements ImportService {
 
   private IParticipantIdentifier participantIdentifier;
 
+  /**
+   * TO BE REMOVED
+   */
+  private KeyProvider opalKeyProvider;
+
   //
   // ImportService Methods
   //
@@ -109,12 +115,24 @@ public class DefaultImportService implements ImportService {
   // Methods
   //
 
+  /**
+   * TO BE REMOVED
+   */
+  public void setOpalKeyProvider(KeyProvider opalKeyProvider) {
+    this.opalKeyProvider = opalKeyProvider;
+  }
+
   public void setParticipantIdentifier(IParticipantIdentifier participantIdentifier) {
     this.participantIdentifier = participantIdentifier;
   }
 
   public void setDatasourceEncryptionStrategy(DatasourceEncryptionStrategy dsEncryptionStrategy) {
     this.dsEncryptionStrategy = dsEncryptionStrategy;
+
+    // Temporarily, for backward compatibility.
+    if(dsEncryptionStrategy != null) {
+      dsEncryptionStrategy.setKeyProvider(opalKeyProvider);
+    }
   }
 
   public void setKeysTableReference(String keysTableReference) {

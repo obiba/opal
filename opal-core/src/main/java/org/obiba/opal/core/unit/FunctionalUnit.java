@@ -11,6 +11,7 @@ package org.obiba.opal.core.unit;
 
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.opal.core.domain.unit.UnitKeyStore;
+import org.obiba.opal.core.service.UnitKeyStoreService;
 
 /**
  * Represents an organization that fulfils the role of a "functional unit" of a Biobank.
@@ -25,6 +26,8 @@ public class FunctionalUnit {
   private String keyVariableName;
 
   private DatasourceEncryptionStrategy datasourceEncryptionStrategy;
+
+  private UnitKeyStoreService unitKeyStoreService;
 
   //
   // Constructors
@@ -43,6 +46,10 @@ public class FunctionalUnit {
   // Methods
   //
 
+  public void setUnitKeyStoreService(UnitKeyStoreService unitKeyStoreService) {
+    this.unitKeyStoreService = unitKeyStoreService;
+  }
+
   public String getName() {
     return name;
   }
@@ -60,6 +67,7 @@ public class FunctionalUnit {
   }
 
   public DatasourceEncryptionStrategy getDatasourceEncryptionStrategy() {
+    datasourceEncryptionStrategy.setKeyProvider(getKeyStore());
     return datasourceEncryptionStrategy;
   }
 
@@ -68,7 +76,6 @@ public class FunctionalUnit {
   }
 
   public UnitKeyStore getKeyStore() {
-    // TODO: Use a UnitKeyStoreService to look up the unit's keystore.
-    return null;
+    return unitKeyStoreService.getUnitKeyStore(getName());
   }
 }

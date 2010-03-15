@@ -16,6 +16,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.audit.VariableEntityAuditLogManager;
+import org.obiba.magma.crypt.KeyProvider;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
@@ -44,6 +45,11 @@ public class DefaultDecryptService implements DecryptService {
 
   private VariableEntityAuditLogManager auditLogManager;
 
+  /**
+   * TO BE REMOVED
+   */
+  private KeyProvider opalKeyProvider;
+
   public void decryptData(String datasourceName, File file) throws NoSuchDatasourceException, IllegalArgumentException, IOException {
     // Validate the file.
     if(!file.isFile()) {
@@ -69,8 +75,20 @@ public class DefaultDecryptService implements DecryptService {
   // Methods
   //
 
+  /**
+   * TO BE REMOVED
+   */
+  public void setOpalKeyProvider(KeyProvider opalKeyProvider) {
+    this.opalKeyProvider = opalKeyProvider;
+  }
+
   public void setDatasourceEncryptionStrategy(DatasourceEncryptionStrategy dsEncryptionStrategy) {
     this.dsEncryptionStrategy = dsEncryptionStrategy;
+
+    // Temporarily, for backward compatibility.
+    if(dsEncryptionStrategy != null) {
+      dsEncryptionStrategy.setKeyProvider(opalKeyProvider);
+    }
   }
 
   public void setAuditLogManager(VariableEntityAuditLogManager auditLogManager) {

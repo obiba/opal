@@ -24,11 +24,14 @@ import java.util.Enumeration;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import org.obiba.magma.crypt.KeyPairProvider;
+import org.obiba.magma.Datasource;
+import org.obiba.magma.crypt.KeyProvider;
+import org.obiba.magma.crypt.NoSuchKeyException;
 import org.obiba.opal.core.service.StudyKeyStoreService;
 import org.obiba.opal.core.service.impl.DefaultStudyKeyStoreServiceImpl;
 
-public class OpalKeyStore implements KeyPairProvider {
+//TODO: Remove the OpalKeyStore class.
+public class OpalKeyStore implements KeyProvider {
   //
   // Instance Variables
   //
@@ -117,6 +120,21 @@ public class OpalKeyStore implements KeyPairProvider {
     }
 
     return keyPair;
+  }
+
+  //
+  // PublicKeyProvider Methods
+  //
+
+  /**
+   * This method has been added so that OpalKeyStore can implement the KeyProvider interface (previously, it implemented
+   * the KeyPairProvider interface). This allows OpalKeyStore to be passed as an argument of
+   * DatasourceEncryptionStrategy's setKeyProvider method in ImportService and DecryptService (temporarily, until those
+   * services are properly implemented in terms of multiple FunctionalUnit keystores).
+   * 
+   */
+  public PublicKey getPublicKey(Datasource datasource) throws NoSuchKeyException {
+    return null;
   }
 
   //

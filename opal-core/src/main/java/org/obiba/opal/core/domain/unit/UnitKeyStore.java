@@ -26,11 +26,14 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Enumeration;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -45,8 +48,13 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PasswordFinder;
 import org.obiba.core.domain.AbstractEntity;
+import org.obiba.magma.Datasource;
+import org.obiba.magma.crypt.KeyProvider;
+import org.obiba.magma.crypt.MagmaCryptRuntimeException;
+import org.obiba.magma.crypt.NoSuchKeyException;
 import org.obiba.opal.core.crypt.CacheablePasswordCallback;
 import org.obiba.opal.core.crypt.CachingCallbackHandler;
+import org.obiba.opal.core.crypt.KeyPairNotFoundException;
 import org.obiba.opal.core.crypt.KeyProviderException;
 import org.obiba.opal.core.crypt.KeyProviderSecurityException;
 import org.obiba.opal.core.unit.FunctionalUnit;
@@ -57,7 +65,7 @@ import org.springframework.util.Assert;
  */
 @Entity
 @Table(name = "unit_key_store", uniqueConstraints = { @UniqueConstraint(columnNames = { "unit" }) })
-public class UnitKeyStore extends AbstractEntity {
+public class UnitKeyStore extends AbstractEntity implements KeyProvider {
   //
   // Constants
   //
@@ -81,6 +89,98 @@ public class UnitKeyStore extends AbstractEntity {
 
   @Transient
   private CallbackHandler callbackHandler;
+
+  //
+  // KeyProvider Methods
+  //
+
+  public KeyPair getKeyPair(String alias) throws NoSuchKeyException, org.obiba.magma.crypt.KeyProviderSecurityException {
+    KeyStore ks = getKeyStore();
+    KeyPair keyPair = null;
+
+    try {
+      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unit).prompt("Password for '" + alias + "':  ").build();
+      keyPair = findKeyPairForPrivateKey(alias, ks, keyPair, passwordCallback);
+    } catch(KeyPairNotFoundException ex) {
+      throw ex;
+    } catch(UnrecoverableKeyException ex) {
+      if(callbackHandler instanceof CachingCallbackHandler) {
+        ((CachingCallbackHandler) callbackHandler).clearPasswordCache(unit);
+      }
+      throw new KeyProviderSecurityException("Wrong key password");
+    } catch(Exception ex) {
+      throw new RuntimeException(ex);
+    }
+
+    return keyPair;
+  }
+
+  private KeyPair findKeyPairForPrivateKey(String alias, KeyStore ks, KeyPair keyPair, CacheablePasswordCallback passwordCallback) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedCallbackException, IOException {
+    Key key = ks.getKey(alias, getKeyPassword(passwordCallback));
+    if(key == null) {
+      throw new KeyPairNotFoundException("KeyPair not found for specified alias (" + alias + ")");
+    }
+
+    if(key instanceof PrivateKey) {
+      // Get certificate of public key
+      Certificate cert = ks.getCertificate(alias);
+
+      // Get public key
+      PublicKey publicKey = cert.getPublicKey();
+
+      // Return a key pair
+      keyPair = new KeyPair(publicKey, (PrivateKey) key);
+    } else {
+      throw new KeyPairNotFoundException("KeyPair not found for specified alias (" + alias + ")");
+    }
+    return keyPair;
+  }
+
+  public KeyPair getKeyPair(PublicKey publicKey) throws NoSuchKeyException, org.obiba.magma.crypt.KeyProviderSecurityException {
+    KeyStore ks = getKeyStore();
+
+    Enumeration<String> aliases = null;
+    try {
+      aliases = ks.aliases();
+    } catch(KeyStoreException ex) {
+      throw new RuntimeException(ex);
+    }
+
+    return findKeyPairForPublicKey(publicKey, aliases);
+  }
+
+  private KeyPair findKeyPairForPublicKey(PublicKey publicKey, Enumeration<String> aliases) {
+    KeyPair keyPair = null;
+
+    while(aliases.hasMoreElements()) {
+      String alias = aliases.nextElement();
+      KeyPair currentKeyPair = getKeyPair(alias);
+
+      if(Arrays.equals(currentKeyPair.getPublic().getEncoded(), publicKey.getEncoded())) {
+        keyPair = currentKeyPair;
+        break;
+      }
+    }
+
+    if(keyPair == null) {
+      throw new KeyPairNotFoundException("KeyPair not found for specified public key");
+    }
+    return keyPair;
+  }
+
+  public PublicKey getPublicKey(Datasource datasource) throws NoSuchKeyException {
+    KeyStore ks = getKeyStore();
+
+    try {
+      Certificate cert = ks.getCertificate(datasource.getName());
+      if(cert != null) {
+        return cert.getPublicKey();
+      }
+    } catch(KeyStoreException e) {
+      throw new MagmaCryptRuntimeException(e);
+    }
+    throw new NoSuchKeyException(datasource.getName(), "No PublicKey for Datasource '" + datasource.getName() + "'");
+  }
 
   //
   // Methods

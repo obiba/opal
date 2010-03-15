@@ -10,13 +10,14 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <property name="participantIdentifier" ref="participantIdentifier" />
   	<property name="auditLogManager" ref="auditLogManager" />
     <property name="datasourceEncryptionStrategy">
-      <bean class="org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy">
-        <constructor-arg ref="opalKeyProvider" />
-      </bean>
+      <bean class="org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy" />
     </property>
     <property name="archiveDirectory" value="${org.obiba.opal.import.archiveDirectory}" />
     <property name="keysTableReference" value="${org.obiba.opal.keys.tableReference}"/>
     <property name="keysTableEntityType" value="${org.obiba.opal.keys.entityType}"/>
+    
+    <!-- TO BE REMOVED -->
+    <property name="opalKeyProvider" ref="opalKeyProvider" />
   </bean>
   
   <bean id="exportService" class="org.obiba.opal.core.service.impl.DefaultExportServiceImpl" lazy-init="true">
@@ -26,12 +27,23 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
   <bean id="decryptService" class="org.obiba.opal.core.service.impl.DefaultDecryptService" lazy-init="true">
     <property name="auditLogManager" ref="auditLogManager" />
     <property name="datasourceEncryptionStrategy">
-      <bean class="org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy">
-        <constructor-arg ref="opalKeyProvider" />
-      </bean>
+      <bean class="org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy" />
     </property>
+    
+    <!-- TO BE REMOVED -->
+    <property name="opalKeyProvider" ref="opalKeyProvider" />
   </bean>
 
+  <bean id="unitKeyStoreService" class="org.obiba.opal.core.service.impl.DefaultUnitKeyStoreServiceImpl">
+    <property name="persistenceManager">
+      <bean class="org.obiba.core.service.impl.hibernate.PersistenceManagerHibernateImpl">
+        <property name="sessionFactory" ref="opalSessionFactory" />
+      </bean>
+    </property>
+    <property name="callbackHandler" ref="consoleCallbackHandler" />
+  </bean>
+  
+  <!--  TODO: Remove studyKeyStoreService bean -->
   <bean id="studyKeyStoreService" class="org.obiba.opal.core.service.impl.hibernate.StudyKeyStoreServiceHibernateImpl">
     <property name="sessionFactory" ref="opalSessionFactory" />
     <property name="persistenceManager">
