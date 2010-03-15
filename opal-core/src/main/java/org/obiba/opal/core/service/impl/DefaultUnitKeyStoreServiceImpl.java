@@ -9,11 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.core.service.impl;
 
-import java.io.File;
 import java.security.KeyStoreException;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import org.apache.commons.vfs.FileObject;
 import org.obiba.core.service.impl.PersistenceManagerAwareService;
 import org.obiba.opal.core.domain.unit.UnitKeyStore;
 import org.obiba.opal.core.service.UnitKeyStoreService;
@@ -102,7 +102,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     unitKeyStore.deleteKey(alias);
   }
 
-  public void importKey(String unitName, String alias, File privateKey, File certificate) {
+  public void importKey(String unitName, String alias, FileObject privateKey, FileObject certificate) {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(privateKey, "privateKey must not be null");
@@ -112,7 +112,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     unitKeyStore.importKey(alias, privateKey, certificate);
   }
 
-  public void importKey(String unitName, String alias, File privateKey, String certificateInfo) {
+  public void importKey(String unitName, String alias, FileObject privateKey, String certificateInfo) {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(privateKey, "privateKey must not be null");

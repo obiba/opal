@@ -9,8 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.core.service;
 
-import java.io.File;
-
+import org.apache.commons.vfs.FileObject;
 import org.obiba.opal.core.domain.unit.UnitKeyStore;
 import org.obiba.opal.core.unit.FunctionalUnit;
 
@@ -79,7 +78,7 @@ public interface UnitKeyStoreService {
    * @param privateKey private key in the PEM format
    * @param certificate certificate in the PEM format
    */
-  public void importKey(String unitName, String alias, File privateKey, File certificate);
+  public void importKey(String unitName, String alias, FileObject privateKey, FileObject certificate);
 
   /**
    * Import a private key into the specified keystore and generate an associated certificate at the given alias.
@@ -89,6 +88,6 @@ public interface UnitKeyStoreService {
    * @param certificateInfo Certificate attributes as a String (e.g. CN=Administrator, OU=Bioinformatics, O=GQ,
    * L=Montreal, ST=Quebec, C=CA)
    */
-  public void importKey(String unitName, String alias, File privateKey, String certificateInfo);
+  public void importKey(String unitName, String alias, FileObject privateKey, String certificateInfo);
 
 }
