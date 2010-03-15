@@ -17,11 +17,10 @@ import org.apache.commons.vfs.FileObject;
 import org.obiba.core.service.impl.PersistenceManagerAwareService;
 import org.obiba.opal.core.domain.unit.UnitKeyStore;
 import org.obiba.opal.core.service.UnitKeyStoreService;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-/**
- *
- */
+@Transactional
 public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareService implements UnitKeyStoreService {
   //
   // Instance Variables
@@ -68,7 +67,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     Assert.notNull(size, "size must not be null");
     Assert.hasText(certificateInfo, "certificateInfo must not be null or empty");
 
-    UnitKeyStore unitKeyStore = getOrCreateUnitKeyStore(certificateInfo);
+    UnitKeyStore unitKeyStore = getOrCreateUnitKeyStore(unitName);
     try {
       if(unitKeyStore.getKeyStore().containsAlias(alias)) {
         unitKeyStore.getKeyStore().deleteEntry(alias);

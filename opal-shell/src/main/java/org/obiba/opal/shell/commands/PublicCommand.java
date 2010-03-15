@@ -20,8 +20,9 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.bouncycastle.openssl.PEMWriter;
 import org.obiba.core.util.StreamUtil;
-import org.obiba.opal.core.crypt.StudyKeyStore;
-import org.obiba.opal.core.service.StudyKeyStoreService;
+import org.obiba.opal.core.domain.unit.UnitKeyStore;
+import org.obiba.opal.core.service.UnitKeyStoreService;
+import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.shell.commands.options.PublicCommandOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -29,44 +30,68 @@ import org.springframework.util.Assert;
 /**
  * Exports public key certificates.
  */
-@CommandUsage(description = "Exports the public key certificate for the specified key pair alias.", syntax = "Syntax: certificate --alias NAME [--out FILE]")
+@CommandUsage(description = "Exports the public key certificate for the specified key pair alias.", syntax = "Syntax: certificate [--unit NAME] --alias NAME [--out FILE]")
 public class PublicCommand extends AbstractOpalRuntimeDependentCommand<PublicCommandOptions> {
+  //
+  // Instance Variables
+  //
 
   @Autowired
-  private StudyKeyStoreService studyKeyStoreService;
+  private UnitKeyStoreService unitKeyStoreService;
+
+  //
+  // AbstractOpalRuntimeDependentCommand Methods
+  //
 
   public void execute() {
-    StudyKeyStore studyKeyStore = studyKeyStoreService.getStudyKeyStore(StudyKeyStoreService.DEFAULT_STUDY_ID);
-    if(studyKeyStore == null) {
+    UnitKeyStore unitKeyStore = getUnitKeyStore();
+    if(unitKeyStore == null) {
       getShell().printf("Keystore doesn't exist\n");
       return;
     }
+
     Writer certificateWriter = null;
     try {
-      if(options.isOut()) {
-        FileObject outputFile = getFileSystemRoot().resolveFile(options.getOut());
-        certificateWriter = new OutputStreamWriter(outputFile.getContent().getOutputStream());
-
-      } else {
-        certificateWriter = new StringWriter();
-      }
-      writeCertificate(studyKeyStore, certificateWriter);
-      if(options.isOut()) {
-        getShell().printf("Certificate written to the file [%s]\n", options.getOut());
-      } else {
-        getShell().printf(((StringWriter) certificateWriter).getBuffer().toString());
-      }
+      certificateWriter = getCertificateWriter();
+      writeCertificate(unitKeyStore, certificateWriter);
+      printResult(certificateWriter);
     } catch(FileSystemException e) {
-      getShell().printf("%s in an invalid output file.  Please make sure that you have a specified a valid path.", options.getOut());
+      getShell().printf("%s in an invalid output file.  Please make sure that you have specified a valid path.", options.getOut());
     } catch(IOException e) {
       throw new RuntimeException(e);
     } finally {
       StreamUtil.silentSafeClose(certificateWriter);
     }
-
   }
 
-  private void writeCertificate(StudyKeyStore studyKeyStore, Writer writer) throws IOException {
+  //
+  // Methods
+  //
+
+  private UnitKeyStore getUnitKeyStore() {
+    UnitKeyStore unitKeyStore = null;
+    if(options.isUnit()) {
+      FunctionalUnit unit = getOpalConfiguration().getFunctionalUnit(options.getUnit());
+      unitKeyStore = unit.getKeyStore();
+    } else {
+      unitKeyStore = unitKeyStoreService.getUnitKeyStore(UnitKeyStoreService.OPAL_INSTANCE_KEYSTORE);
+    }
+    return unitKeyStore;
+  }
+
+  private Writer getCertificateWriter() throws FileSystemException {
+    Writer certificateWriter;
+    if(options.isOut()) {
+      FileObject outputFile = getFileSystemRoot().resolveFile(options.getOut());
+      certificateWriter = new OutputStreamWriter(outputFile.getContent().getOutputStream());
+
+    } else {
+      certificateWriter = new StringWriter();
+    }
+    return certificateWriter;
+  }
+
+  private void writeCertificate(UnitKeyStore studyKeyStore, Writer writer) throws IOException {
     Assert.notNull(studyKeyStore, "studyKeyStore can not be null");
     String alias = options.getAlias();
 
@@ -85,4 +110,11 @@ public class PublicCommand extends AbstractOpalRuntimeDependentCommand<PublicCom
     }
   }
 
+  private void printResult(Writer certificateWriter) {
+    if(options.isOut()) {
+      getShell().printf("Certificate written to the file [%s]\n", options.getOut());
+    } else {
+      getShell().printf(((StringWriter) certificateWriter).getBuffer().toString());
+    }
+  }
 }

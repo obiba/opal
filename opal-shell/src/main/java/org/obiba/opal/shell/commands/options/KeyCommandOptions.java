@@ -8,6 +8,10 @@ import uk.co.flamingpenguin.jewel.cli.Option;
  */
 @CommandLineInterface(application = "keystore")
 public interface KeyCommandOptions extends HelpOption {
+  @Option(shortName = "u", description = "The functional unit. Defaults to 'OpalInstance'.")
+  public String getUnit();
+
+  public boolean isUnit();
 
   @Option(shortName = "a", description = "The alias name of the encryption key pair.")
   public String getAlias();
@@ -30,7 +34,7 @@ public interface KeyCommandOptions extends HelpOption {
 
   public boolean isPrivate();
 
-  @Option(shortName = "c", description = "Provides the certified public key file that matches the private key file. If omitted the user is prompt for creating one.")
+  @Option(shortName = "c", description = "Provides the certified public key file that matches the private key file. If omitted the user is prompted to create one.")
   public String getCertificate();
 
   public boolean isCertificate();

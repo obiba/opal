@@ -9,24 +9,27 @@
  ******************************************************************************/
 package org.obiba.opal.shell.commands;
 
-import java.security.KeyStoreException;
-
 import org.apache.commons.vfs.FileSystemException;
-import org.obiba.opal.core.crypt.StudyKeyStore;
-import org.obiba.opal.core.service.StudyKeyStoreService;
+import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.shell.commands.options.CertificateInfo;
 import org.obiba.opal.shell.commands.options.KeyCommandOptions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
 
 /**
  * Provides key management allowing for key creation, deletion, importing and exporting of keys.
  */
-@CommandUsage(description = "Encryption key pairs creation, import or deletion.", syntax = "Syntax: keystore --alias NAME (--delete | --algo NAME --size INT | --private FILE [--certificate FILE])")
+@CommandUsage(description = "Encryption key pairs creation, import or deletion.", syntax = "Syntax: keystore [--unit NAME] --alias NAME (--delete | --algo NAME --size INT | --private FILE [--certificate FILE])")
 public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOptions> {
+  //
+  // Instance Variables
+  //
 
   @Autowired
-  private StudyKeyStoreService studyKeyStoreService;
+  private UnitKeyStoreService unitKeyStoreService;
+
+  //
+  // AbstractOpalRuntimeDependentCommand Methods
+  //
 
   public void execute() {
     if(options.isDelete()) {
@@ -44,62 +47,58 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
     }
   }
 
-  private void deleteKey() {
-    StudyKeyStore studyKeyStore = studyKeyStoreService.getStudyKeyStore(StudyKeyStoreService.DEFAULT_STUDY_ID);
-    if(studyKeyStore == null) {
-      getShell().printf("Keystore doesn't exist\n");
-    } else {
-      if(studyKeyStoreService.aliasExists(options.getAlias())) {
-        studyKeyStoreService.deleteKey(options.getAlias());
-        getShell().printf("Deleted key with alias '%s'.\n", options.getAlias());
-      } else {
-        getShell().printf("The alias '%s' does not exist. No key deleted.\n", options.getAlias());
-      }
-    }
+  //
+  // Methods
+  //
 
+  private void deleteKey() {
+    String unit = options.isUnit() ? options.getUnit() : UnitKeyStoreService.OPAL_INSTANCE_KEYSTORE;
+
+    if(unitKeyStoreService.aliasExists(unit, options.getAlias())) {
+      unitKeyStoreService.deleteKey(unit, options.getAlias());
+      getShell().printf("Deleted key with alias '%s' from keystore '%s'.\n", options.getAlias(), unit);
+    } else {
+      getShell().printf("The alias '%s' does not exist in keystore '%s'. No key deleted.\n", options.getAlias(), unit);
+    }
   }
 
   private void createKey() {
-    boolean createKeyConfirmation = true;
-    if(aliasAlreadyExists(options.getAlias())) {
-      createKeyConfirmation = confirmKeyOverWrite();
-    }
+    String unit = options.isUnit() ? options.getUnit() : UnitKeyStoreService.OPAL_INSTANCE_KEYSTORE;
 
-    if(createKeyConfirmation) {
+    if(keyDoesNotExistOrOverwriteConfirmed(unit, options.getAlias())) {
       String certificateInfo = new CertificateInfo(getShell()).getCertificateInfoAsString();
-      studyKeyStoreService.createOrUpdateKey(options.getAlias(), options.getAlgorithm(), options.getSize(), certificateInfo);
+      unitKeyStoreService.createOrUpdateKey(unit, options.getAlias(), options.getAlgorithm(), options.getSize(), certificateInfo);
       getShell().printf("Key generated with alias '%s'.\n", options.getAlias());
     }
-
   }
 
   private void importKey() throws FileSystemException {
-    // Private key file is required.
+    String unit = options.isUnit() ? options.getUnit() : UnitKeyStoreService.OPAL_INSTANCE_KEYSTORE;
+
     if(getFile(options.getPrivate()).exists() == false) {
       getShell().printf("Private key file '%s' does not exist. Cannot import key.\n", options.getPrivate());
       return;
     }
-    // If specified, certificate file must exist.
     if(options.isCertificate() && getFile(options.getCertificate()).exists() == false) {
       getShell().printf("Certificate file '%s' does not exist. Cannot import key.\n", options.getCertificate());
       return;
     }
-
-    boolean createKeyConfirmation = true;
-    if(aliasAlreadyExists(options.getAlias())) {
-      createKeyConfirmation = confirmKeyOverWrite();
-    }
-
-    if(createKeyConfirmation) {
+    if(keyDoesNotExistOrOverwriteConfirmed(unit, options.getAlias())) {
       if(options.isCertificate()) {
-        studyKeyStoreService.importKey(options.getAlias(), getFile(options.getPrivate()), getFile(options.getCertificate()));
+        unitKeyStoreService.importKey(unit, options.getAlias(), getFile(options.getPrivate()), getFile(options.getCertificate()));
       } else {
-        String certificateInfo = new CertificateInfo(getShell()).getCertificateInfoAsString();
-        studyKeyStoreService.importKey(options.getAlias(), getFile(options.getPrivate()), certificateInfo);
+        unitKeyStoreService.importKey(unit, options.getAlias(), getFile(options.getPrivate()), new CertificateInfo(getShell()).getCertificateInfoAsString());
       }
       getShell().printf("Key imported with alias '%s'.\n", options.getAlias());
     }
+  }
 
+  private boolean keyDoesNotExistOrOverwriteConfirmed(String unit, String alias) {
+    boolean createKeyConfirmation = true;
+    if(unitKeyStoreService.getUnitKeyStore(unit) != null && unitKeyStoreService.aliasExists(unit, options.getAlias())) {
+      createKeyConfirmation = confirmKeyOverWrite();
+    }
+    return createKeyConfirmation;
   }
 
   private boolean confirmKeyOverWrite() {
@@ -124,25 +123,13 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
     return false;
   }
 
-  private boolean aliasAlreadyExists(String alias) {
-    Assert.hasText(alias, "alias must not be empty or null");
-    StudyKeyStore studyKeyStore = studyKeyStoreService.getStudyKeyStore(StudyKeyStoreService.DEFAULT_STUDY_ID);
-    if(studyKeyStore == null) return false; // The KeyStore doesn't exist.
-    try {
-      return studyKeyStore.getKeyStore().containsAlias(alias);
-    } catch(KeyStoreException e) {
-      getShell().printf("not loaded\n");
-      throw new RuntimeException(e);
-    }
-  }
-
   private void unrecognizedOptionsHelp() {
     getShell().printf("This combination of options was unrecognized." + "\nSyntax:" //
-        + "\n  key --alias NAME (--delete | --algo NAME --size INT | --private FILE [--certificate FILE])" //
+        + "\n  key [--unit NAME] --alias NAME (--delete | --algo NAME --size INT | --private FILE [--certificate FILE])" //
         + "\nExamples:" //
-        + "\n  key --alias onyx --algo RSA --size 2048" //
-        + "\n  key --alias onyx --private private_key.pem --certificate public_key.pem" //
-        + "\n  key -alias onyx --delete\n"); //
+        + "\n  key [--unit NAME] --alias onyx --algo RSA --size 2048" //
+        + "\n  key [--unit NAME] --alias onyx --private private_key.pem --certificate public_key.pem" //
+        + "\n  key [--unit NAME] -alias onyx --delete\n"); //
   }
 
 }

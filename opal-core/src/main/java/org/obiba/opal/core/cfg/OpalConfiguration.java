@@ -64,6 +64,15 @@ public class OpalConfiguration {
     this.magmaEngineFactory = magmaEngineFactory;
   }
 
+  public FunctionalUnit getFunctionalUnit(String unitName) {
+    for(FunctionalUnit unit : functionalUnits) {
+      if(unit.getName().equals(unitName)) {
+        return unit;
+      }
+    }
+    return null;
+  }
+
   public Set<FunctionalUnit> getFunctionalUnits() {
     return Collections.unmodifiableSet(functionalUnits);
   }

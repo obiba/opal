@@ -115,27 +115,6 @@ public class UnitKeyStore extends AbstractEntity implements KeyProvider {
     return keyPair;
   }
 
-  private KeyPair findKeyPairForPrivateKey(String alias, KeyStore ks, KeyPair keyPair, CacheablePasswordCallback passwordCallback) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedCallbackException, IOException {
-    Key key = ks.getKey(alias, getKeyPassword(passwordCallback));
-    if(key == null) {
-      throw new KeyPairNotFoundException("KeyPair not found for specified alias (" + alias + ")");
-    }
-
-    if(key instanceof PrivateKey) {
-      // Get certificate of public key
-      Certificate cert = ks.getCertificate(alias);
-
-      // Get public key
-      PublicKey publicKey = cert.getPublicKey();
-
-      // Return a key pair
-      keyPair = new KeyPair(publicKey, (PrivateKey) key);
-    } else {
-      throw new KeyPairNotFoundException("KeyPair not found for specified alias (" + alias + ")");
-    }
-    return keyPair;
-  }
-
   public KeyPair getKeyPair(PublicKey publicKey) throws NoSuchKeyException, org.obiba.magma.crypt.KeyProviderSecurityException {
     KeyStore ks = getKeyStore();
 
@@ -147,25 +126,6 @@ public class UnitKeyStore extends AbstractEntity implements KeyProvider {
     }
 
     return findKeyPairForPublicKey(publicKey, aliases);
-  }
-
-  private KeyPair findKeyPairForPublicKey(PublicKey publicKey, Enumeration<String> aliases) {
-    KeyPair keyPair = null;
-
-    while(aliases.hasMoreElements()) {
-      String alias = aliases.nextElement();
-      KeyPair currentKeyPair = getKeyPair(alias);
-
-      if(Arrays.equals(currentKeyPair.getPublic().getEncoded(), publicKey.getEncoded())) {
-        keyPair = currentKeyPair;
-        break;
-      }
-    }
-
-    if(keyPair == null) {
-      throw new KeyPairNotFoundException("KeyPair not found for specified public key");
-    }
-    return keyPair;
   }
 
   public PublicKey getPublicKey(Datasource datasource) throws NoSuchKeyException {
@@ -248,6 +208,46 @@ public class UnitKeyStore extends AbstractEntity implements KeyProvider {
     ks = KeyStore.getInstance("JCEKS");
     ks.load(new ByteArrayInputStream(keyStore), getKeyPassword(passwordCallback));
     return ks;
+  }
+
+  private KeyPair findKeyPairForPrivateKey(String alias, KeyStore ks, KeyPair keyPair, CacheablePasswordCallback passwordCallback) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedCallbackException, IOException {
+    Key key = ks.getKey(alias, getKeyPassword(passwordCallback));
+    if(key == null) {
+      throw new KeyPairNotFoundException("KeyPair not found for specified alias (" + alias + ")");
+    }
+
+    if(key instanceof PrivateKey) {
+      // Get certificate of public key
+      Certificate cert = ks.getCertificate(alias);
+
+      // Get public key
+      PublicKey publicKey = cert.getPublicKey();
+
+      // Return a key pair
+      keyPair = new KeyPair(publicKey, (PrivateKey) key);
+    } else {
+      throw new KeyPairNotFoundException("KeyPair not found for specified alias (" + alias + ")");
+    }
+    return keyPair;
+  }
+
+  private KeyPair findKeyPairForPublicKey(PublicKey publicKey, Enumeration<String> aliases) {
+    KeyPair keyPair = null;
+
+    while(aliases.hasMoreElements()) {
+      String alias = aliases.nextElement();
+      KeyPair currentKeyPair = getKeyPair(alias);
+
+      if(Arrays.equals(currentKeyPair.getPublic().getEncoded(), publicKey.getEncoded())) {
+        keyPair = currentKeyPair;
+        break;
+      }
+    }
+
+    if(keyPair == null) {
+      throw new KeyPairNotFoundException("KeyPair not found for specified public key");
+    }
+    return keyPair;
   }
 
   private static void translateAndRethrowKeyStoreIOException(IOException ex) {
