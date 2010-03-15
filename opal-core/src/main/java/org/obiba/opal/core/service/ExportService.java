@@ -71,4 +71,14 @@ public interface ExportService {
    */
   public void exportTablesToExcelFile(List<String> sourceTableNames, File destinationExcelFile, boolean incremental);
 
+  /**
+   * Export tables to an Excel file. This export operation will be logged.
+   * @param sourceTableNames tables to export.
+   * @param destinationExcelFilename tables will be copied to this Excel file.
+   * @param datasourceCopier copier used to perform the copy.
+   * @param incremental if <code>true</code> the tables are exported incrementally (updates only)
+   * @throws UnsupportedOperationException Exporting to an Excel file is not currently implemented.
+   */
+  public void exportTablesToExcelFile(List<String> sourceTableNames, File destinationExcelFile, DatasourceCopier datasourceCopier, boolean incremental);
+
 }
