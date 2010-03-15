@@ -25,6 +25,13 @@ import org.obiba.magma.support.DatasourceCopier;
 public interface ExportService {
 
   /**
+   * Get a new datasource builder, with default logging facilities.
+   * @param destinationDatasource
+   * @return
+   */
+  public DatasourceCopier.Builder newCopier(Datasource destinationDatasource);
+
+  /**
    * Export tables to an existing Datasource. This export operation will be logged.
    * @param sourceTableNames tables to export.
    * @param destinationDatasourceName tables will be copied to this existing Datasource.

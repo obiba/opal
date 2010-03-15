@@ -24,6 +24,7 @@ import org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.obiba.magma.support.DatasourceCopier.Builder;
 import org.obiba.magma.views.IncrementalWhereClause;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.service.ExportException;
@@ -48,7 +49,7 @@ public class DefaultExportServiceImpl implements ExportService {
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName must not be null or empty");
     Datasource destinationDatasource = getDatasourceByName(destinationDatasourceName);
     Set<ValueTable> sourceTables = getValueTablesByName(sourceTableNames);
-    DatasourceCopier datasourceCopier = DatasourceCopier.Builder.newCopier().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, destinationDatasource).build();
+    DatasourceCopier datasourceCopier = newCopier(destinationDatasource).build();
     exportTablesToDatasource(sourceTables, destinationDatasource, datasourceCopier, incremental);
   }
 
@@ -144,6 +145,10 @@ public class DefaultExportServiceImpl implements ExportService {
     incrementalView.setWhereClause(incrementalWhereClause);
 
     return incrementalView;
+  }
+
+  public Builder newCopier(Datasource destinationDatasource) {
+    return DatasourceCopier.Builder.newCopier().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, destinationDatasource);
   }
 
 }

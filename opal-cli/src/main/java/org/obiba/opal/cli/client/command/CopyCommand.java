@@ -9,14 +9,16 @@
  ******************************************************************************/
 package org.obiba.opal.cli.client.command;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.support.JavascriptMultiplexingStrategy;
 import org.obiba.magma.js.support.JavascriptVariableTransformer;
 import org.obiba.magma.support.DatasourceCopier;
@@ -39,34 +41,35 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     if(options.getTables() != null && !options.isSource()) {
       if(validateOptions()) {
         try {
-          if(!options.isMultiplex() && !options.isTransform()) {
-            if(options.isDestination()) {
-              exportService.exportTablesToDatasource(getTableNames(), options.getDestination(), !options.getNonIncremental());
-            } else if(options.isOut()) {
-              exportService.exportTablesToExcelFile(getTableNames(), options.getOut(), !options.getNonIncremental());
-            }
+          Datasource destinationDatasource;
+          if(options.isDestination()) {
+            destinationDatasource = getDatasourceByName(options.getDestination());
           } else {
-            // build a datasource copier according to options
-            DatasourceCopier.Builder builder = DatasourceCopier.Builder.newCopier().withLoggingListener();
-
-            if(options.isMultiplex()) {
-              builder.withMultiplexingStrategy(new JavascriptMultiplexingStrategy(options.getMultiplex()));
-            }
-
-            if(options.isTransform()) {
-              builder.withVariableTransformer(new JavascriptVariableTransformer(options.getTransform()));
-            }
-
-            if(options.getCatalogue()) {
-              builder.dontCopyValues();
-            }
-
-            if(options.isDestination()) {
-              exportService.exportTablesToDatasource(getTableNames(), options.getDestination(), builder.build(), !options.getNonIncremental());
-            } else if(options.isOut()) {
-              exportService.exportTablesToExcelFile(getTableNames(), options.getOut(), builder.build(), !options.getNonIncremental());
-            }
+            destinationDatasource = new ExcelDatasource(options.getOut().getName(), options.getOut());
+            MagmaEngine.get().addDatasource(destinationDatasource);
           }
+
+          // build a datasource copier according to options
+          DatasourceCopier.Builder builder = exportService.newCopier(destinationDatasource);
+
+          if(options.isMultiplex()) {
+            builder.withMultiplexingStrategy(new JavascriptMultiplexingStrategy(options.getMultiplex()));
+          }
+
+          if(options.isTransform()) {
+            builder.withVariableTransformer(new JavascriptVariableTransformer(options.getTransform()));
+          }
+
+          if(options.getCatalogue()) {
+            builder.dontCopyValues();
+          }
+
+          exportService.exportTablesToDatasource(getValueTables(), destinationDatasource, builder.build(), !options.getNonIncremental());
+
+          if(options.isOut()) {
+            MagmaEngine.get().removeDatasource(destinationDatasource);
+          }
+
         } catch(ExportException e) {
           System.console().printf("%s\n", e.getMessage());
           System.err.println(e);
@@ -79,24 +82,24 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     }
   }
 
-  private List<String> getTableNames() {
-    ArrayList<String> names = new ArrayList<String>();
+  private Set<ValueTable> getValueTables() {
+    HashMap<String, ValueTable> names = new HashMap<String, ValueTable>();
 
     if(options.isSource()) {
       for(ValueTable table : getDatasourceByName(options.getSource()).getValueTables()) {
-        names.add(options.getSource() + "." + table.getName());
+        names.put(table.getDatasource().getName() + "." + table.getName(), table);
       }
     }
 
     if(options.getTables() != null) {
       for(String name : options.getTables()) {
-        if(!names.contains(name)) {
-          names.add(name);
+        if(!names.containsKey(name)) {
+          names.put(name, MagmaEngineTableResolver.valueOf(name).resolveTable());
         }
       }
     }
 
-    return names;
+    return new TreeSet<ValueTable>(names.values());
   }
 
   private Datasource getDatasourceByName(String datasourceName) {
