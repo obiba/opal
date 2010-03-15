@@ -11,8 +11,6 @@ package org.obiba.opal.core.crypt;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -41,6 +39,7 @@ import javax.persistence.UniqueConstraint;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
+import org.apache.commons.vfs.FileObject;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PasswordFinder;
@@ -305,7 +304,7 @@ public class StudyKeyStore extends AbstractEntity {
    * @param privateKey private key in the PEM format
    * @param certificate certificate in the PEM format
    */
-  public void importKey(String alias, File privateKey, File certificate) {
+  public void importKey(String alias, FileObject privateKey, FileObject certificate) {
     Key key = getPrivateKeyFile(privateKey);
     X509Certificate cert = getCertificateFromFile(certificate);
     KeyStore keyStore = getKeyStore();
@@ -330,7 +329,7 @@ public class StudyKeyStore extends AbstractEntity {
    * @param certificateInfo Certificate attributes as a String (e.g. CN=Administrator, OU=Bioinformatics, O=GQ,
    * L=Montreal, ST=Quebec, C=CA)
    */
-  public void importKey(String alias, File privateKey, String certificateInfo) {
+  public void importKey(String alias, FileObject privateKey, String certificateInfo) {
     KeyPair keyPair = getKeyPairFromFile(privateKey);
     X509Certificate cert;
     try {
@@ -358,9 +357,9 @@ public class StudyKeyStore extends AbstractEntity {
 
   }
 
-  private KeyPair getKeyPairFromFile(File privateKey) {
+  private KeyPair getKeyPairFromFile(FileObject privateKey) {
     try {
-      PEMReader pemReader = new PEMReader(new InputStreamReader(new FileInputStream(privateKey)), new PasswordFinder() {
+      PEMReader pemReader = new PEMReader(new InputStreamReader(privateKey.getContent().getInputStream()), new PasswordFinder() {
 
         public char[] getPassword() {
           return System.console().readPassword("%s:  ", "Password for imported private key");
@@ -380,9 +379,9 @@ public class StudyKeyStore extends AbstractEntity {
     }
   }
 
-  private Key getPrivateKeyFile(File privateKey) {
+  private Key getPrivateKeyFile(FileObject privateKey) {
     try {
-      PEMReader pemReader = new PEMReader(new InputStreamReader(new FileInputStream(privateKey)), new PasswordFinder() {
+      PEMReader pemReader = new PEMReader(new InputStreamReader(privateKey.getContent().getInputStream()), new PasswordFinder() {
 
         public char[] getPassword() {
           return System.console().readPassword("%s:  ", "Password for imported private key");
@@ -405,9 +404,9 @@ public class StudyKeyStore extends AbstractEntity {
     }
   }
 
-  private X509Certificate getCertificateFromFile(File certificate) {
+  private X509Certificate getCertificateFromFile(FileObject certificate) {
     try {
-      PEMReader pemReader = new PEMReader(new InputStreamReader(new FileInputStream(certificate)), new PasswordFinder() {
+      PEMReader pemReader = new PEMReader(new InputStreamReader(certificate.getContent().getInputStream()), new PasswordFinder() {
 
         public char[] getPassword() {
           return System.console().readPassword("%s:  ", "Password for imported certificate");

@@ -1,7 +1,5 @@
 package org.obiba.opal.shell.commands.options;
 
-import java.io.File;
-
 import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
 import uk.co.flamingpenguin.jewel.cli.Option;
 
@@ -28,12 +26,12 @@ public interface KeyCommandOptions extends HelpOption {
   public boolean isSize();
 
   @Option(shortName = "p", description = "Provides the private key file.")
-  public File getPrivate();
+  public String getPrivate();
 
   public boolean isPrivate();
 
   @Option(shortName = "c", description = "Provides the certified public key file that matches the private key file. If omitted the user is prompt for creating one.")
-  public File getCertificate();
+  public String getCertificate();
 
   public boolean isCertificate();
 }

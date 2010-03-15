@@ -10,6 +10,7 @@
 package org.obiba.opal.shell.commands;
 
 import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,10 @@ public abstract class AbstractOpalRuntimeDependentCommand<T> extends AbstractCom
 
   public FileObject getFileSystemRoot() {
     return opalRuntime.getFileSystem().getRoot();
+  }
+
+  public FileObject getFile(String path) throws FileSystemException {
+    return getFileSystemRoot().resolveFile(path);
   }
 
   protected OpalConfiguration getOpalConfiguration() {

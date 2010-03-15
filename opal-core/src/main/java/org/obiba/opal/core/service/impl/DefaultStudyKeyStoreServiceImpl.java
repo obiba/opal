@@ -9,11 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.core.service.impl;
 
-import java.io.File;
 import java.security.KeyStoreException;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import org.apache.commons.vfs.FileObject;
 import org.obiba.core.service.impl.PersistenceManagerAwareService;
 import org.obiba.opal.core.crypt.StudyKeyStore;
 import org.obiba.opal.core.service.StudyKeyStoreService;
@@ -91,7 +91,7 @@ public abstract class DefaultStudyKeyStoreServiceImpl extends PersistenceManager
     return defaultStore.aliasExists(alias);
   }
 
-  public void importKey(String alias, File privateKey, File certificate) {
+  public void importKey(String alias, FileObject privateKey, FileObject certificate) {
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(privateKey, "privateKey must not be null");
     Assert.notNull(certificate, "certificate must not be null");
@@ -99,7 +99,7 @@ public abstract class DefaultStudyKeyStoreServiceImpl extends PersistenceManager
     defaultStore.importKey(alias, privateKey, certificate);
   }
 
-  public void importKey(String alias, File privateKey, String certificateInfo) {
+  public void importKey(String alias, FileObject privateKey, String certificateInfo) {
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(privateKey, "privateKey must not be null");
     Assert.hasText(certificateInfo, "certificateInfo must not be null or empty");

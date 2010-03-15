@@ -9,9 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.core.service;
 
-import java.io.File;
 import java.util.Set;
 
+import org.apache.commons.vfs.FileObject;
 import org.obiba.opal.core.crypt.StudyKeyStore;
 
 /**
@@ -79,7 +79,7 @@ public interface StudyKeyStoreService {
    * @param privateKey private key in the PEM format
    * @param certificate certificate in the PEM format
    */
-  public void importKey(String alias, File privateKey, File certificate);
+  public void importKey(String alias, FileObject privateKey, FileObject certificate);
 
   /**
    * Import a private key into the keystore and generate an associated certificate at the given alias.
@@ -88,6 +88,6 @@ public interface StudyKeyStoreService {
    * @param certificateInfo Certificate attributes as a String (e.g. CN=Administrator, OU=Bioinformatics, O=GQ,
    * L=Montreal, ST=Quebec, C=CA)
    */
-  public void importKey(String alias, File privateKey, String certificateInfo);
+  public void importKey(String alias, FileObject privateKey, String certificateInfo);
 
 }

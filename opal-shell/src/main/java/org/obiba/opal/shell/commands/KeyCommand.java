@@ -11,6 +11,7 @@ package org.obiba.opal.shell.commands;
 
 import java.security.KeyStoreException;
 
+import org.apache.commons.vfs.FileSystemException;
 import org.obiba.opal.core.crypt.StudyKeyStore;
 import org.obiba.opal.core.service.StudyKeyStoreService;
 import org.obiba.opal.shell.commands.options.CertificateInfo;
@@ -22,7 +23,7 @@ import org.springframework.util.Assert;
  * Provides key management allowing for key creation, deletion, importing and exporting of keys.
  */
 @CommandUsage(description = "Encryption key pairs creation, import or deletion.", syntax = "Syntax: keystore --alias NAME (--delete | --algo NAME --size INT | --private FILE [--certificate FILE])")
-public class KeyCommand extends AbstractCommand<KeyCommandOptions> {
+public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOptions> {
 
   @Autowired
   private StudyKeyStoreService studyKeyStoreService;
@@ -33,7 +34,11 @@ public class KeyCommand extends AbstractCommand<KeyCommandOptions> {
     } else if(options.isAlgorithm() && options.isSize()) {
       createKey();
     } else if(options.isPrivate()) {
-      importKey();
+      try {
+        importKey();
+      } catch(FileSystemException e) {
+        throw new RuntimeException("An error occured while reading the encryption key files.", e);
+      }
     } else {
       unrecognizedOptionsHelp();
     }
@@ -68,15 +73,15 @@ public class KeyCommand extends AbstractCommand<KeyCommandOptions> {
 
   }
 
-  private void importKey() {
+  private void importKey() throws FileSystemException {
     // Private key file is required.
-    if(options.getPrivate().exists() == false) {
-      getShell().printf("Private key file '%s' does not exist. Cannot import key.\n", options.getPrivate().getPath());
+    if(getFile(options.getPrivate()).exists() == false) {
+      getShell().printf("Private key file '%s' does not exist. Cannot import key.\n", options.getPrivate());
       return;
     }
     // If specified, certificate file must exist.
-    if(options.isCertificate() && options.getCertificate().exists() == false) {
-      getShell().printf("Certificate file '%s' does not exist. Cannot import key.\n", options.getCertificate().getPath());
+    if(options.isCertificate() && getFile(options.getCertificate()).exists() == false) {
+      getShell().printf("Certificate file '%s' does not exist. Cannot import key.\n", options.getCertificate());
       return;
     }
 
@@ -87,10 +92,10 @@ public class KeyCommand extends AbstractCommand<KeyCommandOptions> {
 
     if(createKeyConfirmation) {
       if(options.isCertificate()) {
-        studyKeyStoreService.importKey(options.getAlias(), options.getPrivate(), options.getCertificate());
+        studyKeyStoreService.importKey(options.getAlias(), getFile(options.getPrivate()), getFile(options.getCertificate()));
       } else {
         String certificateInfo = new CertificateInfo(getShell()).getCertificateInfoAsString();
-        studyKeyStoreService.importKey(options.getAlias(), options.getPrivate(), certificateInfo);
+        studyKeyStoreService.importKey(options.getAlias(), getFile(options.getPrivate()), certificateInfo);
       }
       getShell().printf("Key imported with alias '%s'.\n", options.getAlias());
     }
