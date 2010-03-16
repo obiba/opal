@@ -92,7 +92,6 @@ public class OpalConfigurationFactoryBean implements FactoryBean, ApplicationCon
       }
       serializedConfiguration = new FileInputStream(configFile);
       opalConfiguration = (OpalConfiguration) xstream.fromXML(serializedConfiguration);
-      opalConfiguration.init();
     } finally {
       StreamUtil.silentSafeClose(serializedConfiguration);
     }

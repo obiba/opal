@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.core.cfg;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
 
@@ -75,10 +74,6 @@ public class OpalConfiguration {
     if(functionalUnits != null) {
       this.functionalUnits.addAll(functionalUnits);
     }
-  }
-
-  public void init() throws IOException {
-
   }
 
 }
