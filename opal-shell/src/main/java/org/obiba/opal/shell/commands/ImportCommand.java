@@ -49,7 +49,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   //
 
   private void importFiles(List<File> filesToImport) {
-    String destination = options.getDatasource();
+    String destination = options.getDestination();
 
     getShell().printf("Importing %d file%s :\n", filesToImport.size(), (filesToImport.size() > 1 ? "s" : ""));
     for(File file : filesToImport) {

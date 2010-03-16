@@ -10,7 +10,7 @@ import uk.co.flamingpenguin.jewel.cli.Unparsed;
 /**
  * This interface declares the options that may be used with the <code>import</code> command.
  * 
- * The <code>datasource</code> option indicates the destination datasource.
+ * The <code>destination</code> option indicates the destination datasource.
  * 
  * The <code>owner</code> option indicates the "owner" of any identifiers used in the data to be imported.
  * 
@@ -29,7 +29,7 @@ public interface ImportCommandOptions extends HelpOption {
   public boolean isFiles();
 
   @Option(shortName = "d", description = "The destination datasource into which the variable catalogue and the participants data will be imported.")
-  public String getDatasource();
+  public String getDestination();
 
   @Option(shortName = "o", description = "The variable name under which the participants identifiers that will be stored in the participants key database.")
   public String getOwner();
