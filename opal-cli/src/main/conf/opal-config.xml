@@ -1,5 +1,5 @@
 <org.obiba.opal.core.cfg.OpalConfiguration>
-  <fileSystemRoot>c:/opal-file-system</fileSystemRoot>
+  <fileSystemRoot>file://c:/opal-file-system</fileSystemRoot>
 
   <magmaEngineFactory>
 

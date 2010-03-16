@@ -491,6 +491,19 @@
 		</exclusions>
 	  </dependency>      
 
+	  <dependency>
+	    <groupId>org.mockftpserver</groupId>
+	    <artifactId>MockFtpServer</artifactId>
+	    <version>${mockftpserver.version}</version>
+	    <scope>test</scope>
+	    <exclusions>
+	      <exclusion>
+	        <groupId>commons-logging</groupId>
+	        <artifactId>commons-logging</artifactId>
+	      </exclusion>
+	    </exclusions>	  
+	  </dependency>
+
     </dependencies>
   </dependencyManagement>
 
@@ -669,7 +682,8 @@
     <liquibase.version>1.9.4</liquibase.version>
     <shiro.version>1.0-incubating-r919598</shiro.version>
     <bouncycastle.version>1.45</bouncycastle.version>
-    <commons-vfs.version>2.0-SNAPSHOT</commons-vfs.version>      
+    <commons-vfs.version>2.0-SNAPSHOT</commons-vfs.version>   
+    <mockftpserver.version>2.1</mockftpserver.version>
   </properties>
 
   <profiles>

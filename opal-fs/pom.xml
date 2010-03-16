@@ -23,6 +23,11 @@
       <artifactId>spring-core</artifactId>
     </dependency>    
     
+	<dependency>
+	  <groupId>org.mockftpserver</groupId>
+	  <artifactId>MockFtpServer</artifactId>
+	</dependency>
+    
   </dependencies>
 
   <repositories>
