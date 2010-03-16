@@ -24,6 +24,7 @@ import org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.obiba.magma.support.DatasourceCopier.Builder;
 import org.obiba.magma.views.IncrementalWhereClause;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.service.ExportException;
@@ -48,7 +49,7 @@ public class DefaultExportServiceImpl implements ExportService {
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName must not be null or empty");
     Datasource destinationDatasource = getDatasourceByName(destinationDatasourceName);
     Set<ValueTable> sourceTables = getValueTablesByName(sourceTableNames);
-    DatasourceCopier datasourceCopier = DatasourceCopier.Builder.newCopier().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, destinationDatasource).build();
+    DatasourceCopier datasourceCopier = newCopier(destinationDatasource).build();
     exportTablesToDatasource(sourceTables, destinationDatasource, datasourceCopier, incremental);
   }
 
@@ -80,8 +81,7 @@ public class DefaultExportServiceImpl implements ExportService {
     Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
     Assert.notNull(destinationExcelFile, "destinationExcelFile must not be null");
 
-    Datasource outputDatasource = new ExcelDatasource(destinationExcelFile.getName(), destinationExcelFile);
-    MagmaEngine.get().addDatasource(outputDatasource);
+    Datasource outputDatasource = buildExcelDatasource(destinationExcelFile);
     try {
       // Create a DatasourceCopier that will copy only the metadata and export.
       exportTablesToDatasource(sourceTableNames, outputDatasource.getName(), incremental);
@@ -89,6 +89,27 @@ public class DefaultExportServiceImpl implements ExportService {
       MagmaEngine.get().removeDatasource(outputDatasource);
     }
 
+  }
+
+  public void exportTablesToExcelFile(List<String> sourceTableNames, File destinationExcelFile, DatasourceCopier datasourceCopier, boolean incremental) {
+    Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
+    Assert.notNull(destinationExcelFile, "destinationExcelFile must not be null");
+
+    Datasource outputDatasource = buildExcelDatasource(destinationExcelFile);
+    try {
+      // Create a DatasourceCopier that will copy only the metadata and export.
+      exportTablesToDatasource(sourceTableNames, outputDatasource.getName(), datasourceCopier, incremental);
+    } finally {
+      MagmaEngine.get().removeDatasource(outputDatasource);
+    }
+
+  }
+
+  private Datasource buildExcelDatasource(File destinationExcelFile) {
+    Datasource outputDatasource = new ExcelDatasource(destinationExcelFile.getName(), destinationExcelFile);
+    MagmaEngine.get().addDatasource(outputDatasource);
+
+    return outputDatasource;
   }
 
   private Datasource getDatasourceByName(String datasourceName) {
@@ -125,4 +146,9 @@ public class DefaultExportServiceImpl implements ExportService {
 
     return incrementalView;
   }
+
+  public Builder newCopier(Datasource destinationDatasource) {
+    return DatasourceCopier.Builder.newCopier().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, destinationDatasource);
+  }
+
 }
