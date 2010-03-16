@@ -71,14 +71,14 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
           }
 
         } catch(ExportException e) {
-          System.console().printf("%s\n", e.getMessage());
-          System.err.println(e);
-        } catch(UnsupportedOperationException e) {
-          System.console().printf("%s\n", e.getMessage());
+          getShell().printf("%s\n", e.getMessage());
+          e.printStackTrace(System.err);
+        } catch(Exception e) {
+          getShell().printf("%s\n", e.getMessage());
         }
       }
     } else {
-      System.console().printf("%s\n", "Neither source not table name(s) are specified.");
+      getShell().printf("%s\n", "Neither source not table name(s) are specified.");
     }
   }
 
@@ -109,18 +109,18 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   private boolean validateOptions() {
     boolean validated = true;
     if(!options.isDestination() && !options.isOut()) {
-      System.console().printf("Must provide either the 'destination' option or the 'out' option.\n");
+      getShell().printf("Must provide either the 'destination' option or the 'out' option.\n");
       validated = false;
     }
     if(options.isDestination() && options.isOut()) {
-      System.console().printf("The 'destination' option and the 'out' option are mutually exclusive.\n");
+      getShell().printf("The 'destination' option and the 'out' option are mutually exclusive.\n");
       validated = false;
     }
     if(options.isDestination()) {
       try {
         getDatasourceByName(options.getDestination());
       } catch(NoSuchDatasourceException e) {
-        System.console().printf("Destination datasource '%s' does not exist.\n", options.getDestination());
+        getShell().printf("Destination datasource '%s' does not exist.\n", options.getDestination());
         validated = false;
       }
     }
@@ -128,7 +128,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       try {
         getDatasourceByName(options.getSource());
       } catch(NoSuchDatasourceException e) {
-        System.console().printf("Destination datasource '%s' does not exist.\n", options.getDestination());
+        getShell().printf("Destination datasource '%s' does not exist.\n", options.getDestination());
         validated = false;
       }
     }
@@ -138,10 +138,10 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
         try {
           resolver.resolveTable();
         } catch(NoSuchDatasourceException e) {
-          System.console().printf("'%s' refers to an unknown datasource: '%s'.\n", tableName, resolver.getDatasourceName());
+          getShell().printf("'%s' refers to an unknown datasource: '%s'.\n", tableName, resolver.getDatasourceName());
           validated = false;
         } catch(NoSuchValueTableException e) {
-          System.console().printf("Table '%s' does not exist in datasource : '%s'.\n", resolver.getTableName(), resolver.getDatasourceName());
+          getShell().printf("Table '%s' does not exist in datasource : '%s'.\n", resolver.getTableName(), resolver.getDatasourceName());
           validated = false;
         }
       }
