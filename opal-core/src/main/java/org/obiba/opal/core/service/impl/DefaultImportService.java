@@ -24,7 +24,7 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
-import org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager;
+import org.obiba.magma.audit.VariableEntityAuditLogManager;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
@@ -68,7 +68,7 @@ public class DefaultImportService implements ImportService {
   /** Configured through org.obiba.opal.keys.entityType */
   private String keysTableEntityType;
 
-  private HibernateVariableEntityAuditLogManager auditLogManager;
+  private VariableEntityAuditLogManager auditLogManager;
 
   private IParticipantIdentifier participantIdentifier;
 
@@ -129,7 +129,7 @@ public class DefaultImportService implements ImportService {
     this.archiveDirectory = archiveDirectory;
   }
 
-  public void setAuditLogManager(HibernateVariableEntityAuditLogManager auditLogManager) {
+  public void setAuditLogManager(VariableEntityAuditLogManager auditLogManager) {
     this.auditLogManager = auditLogManager;
   }
 
