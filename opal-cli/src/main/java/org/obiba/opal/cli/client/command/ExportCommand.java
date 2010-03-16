@@ -17,7 +17,7 @@ import org.obiba.opal.core.service.ExportService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Provides ability to export Magma tables to an existing datasource or an Excel file.
+ * Provides ability to copy Magma tables to an existing datasource or an Excel file.
  */
 @CommandUsage(description = "Exports tables to an existing datasource or to the specified Excel file.", syntax = "Syntax: export (--destination NAME | --out FILE) TABLE_NAME...")
 public class ExportCommand extends AbstractOpalRuntimeDependentCommand<ExportCommandOptions> {

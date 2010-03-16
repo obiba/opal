@@ -20,7 +20,7 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager;
+import org.obiba.magma.audit.VariableEntityAuditLogManager;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineTableResolver;
@@ -38,9 +38,9 @@ import org.springframework.util.Assert;
 @Transactional
 public class DefaultExportServiceImpl implements ExportService {
 
-  private HibernateVariableEntityAuditLogManager auditLogManager;
+  private VariableEntityAuditLogManager auditLogManager;
 
-  public void setAuditLogManager(HibernateVariableEntityAuditLogManager auditLogManager) {
+  public void setAuditLogManager(VariableEntityAuditLogManager auditLogManager) {
     this.auditLogManager = auditLogManager;
   }
 
