@@ -13,10 +13,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
 
-import org.apache.commons.vfs.FileObject;
 import org.obiba.magma.support.MagmaEngineFactory;
 import org.obiba.opal.core.unit.FunctionalUnit;
-import org.obiba.opal.fs.OpalFileSystem;
 
 import com.google.common.collect.Sets;
 
@@ -26,8 +24,6 @@ public class OpalConfiguration {
   //
 
   private String fileSystemRoot;
-
-  private OpalFileSystem opalFileSystem;
 
   private MagmaEngineFactory magmaEngineFactory;
 
@@ -49,11 +45,8 @@ public class OpalConfiguration {
     this.fileSystemRoot = fileSystemRoot;
   }
 
-  public OpalFileSystem getFileSystem() {
-    if(opalFileSystem == null) {
-      opalFileSystem = new OpalFileSystem(fileSystemRoot);
-    }
-    return opalFileSystem;
+  public String getFileSystemRoot() {
+    return fileSystemRoot;
   }
 
   public MagmaEngineFactory getMagmaEngineFactory() {
@@ -85,16 +78,7 @@ public class OpalConfiguration {
   }
 
   public void init() throws IOException {
-    for(FunctionalUnit unit : functionalUnits) {
-      FileObject unitsDir = getFileSystem().getRoot().resolveFile("units");
-      if(!unitsDir.exists()) {
-        unitsDir.createFolder();
-      }
 
-      FileObject unitDir = unitsDir.resolveFile(unit.getName());
-      if(!unitDir.exists()) {
-        unitDir.createFolder();
-      }
-    }
   }
+
 }
