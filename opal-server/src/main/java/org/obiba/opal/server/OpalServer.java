@@ -55,6 +55,7 @@ public class OpalServer {
     // Make the securityManager accessible as a singleton.
     // This would be done by Spring when using the spring support packages.
     SecurityUtils.setSecurityManager(securityManager);
+    System.console().printf("Opal Server successfully started. Type the 'any key' to stop.\n");
   }
 
   final void startAndWait() throws IOException {
