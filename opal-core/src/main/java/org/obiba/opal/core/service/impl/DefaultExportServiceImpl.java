@@ -139,16 +139,16 @@ public class DefaultExportServiceImpl implements ExportService {
   }
 
   private View getIncrementalView(ValueTable valueTable, Datasource destination) {
-    View incrementalView = new View(valueTable.getName(), valueTable);
-    IncrementalWhereClause incrementalWhereClause = new IncrementalWhereClause(destination.getName() + "." + valueTable.getName());
-    incrementalWhereClause.setAuditLogManager(auditLogManager);
-    incrementalView.setWhereClause(incrementalWhereClause);
+    IncrementalWhereClause whereClause = new IncrementalWhereClause(destination.getName() + "." + valueTable.getName());
+    whereClause.setAuditLogManager(auditLogManager);
 
-    return incrementalView;
+    // Cache the where clause as it is quite expensive. This is ok since the incremental view is transient: used this
+    // time only then thrown away.
+    return View.Builder.newView(valueTable.getName(), valueTable).where(whereClause).cacheWhere().build();
   }
 
   public Builder newCopier(Datasource destinationDatasource) {
-    return DatasourceCopier.Builder.newCopier().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, destinationDatasource);
+    return DatasourceCopier.Builder.newCopier().withLoggingListener().withThroughtputListener().withVariableEntityCopyEventListener(auditLogManager, destinationDatasource);
   }
 
 }
