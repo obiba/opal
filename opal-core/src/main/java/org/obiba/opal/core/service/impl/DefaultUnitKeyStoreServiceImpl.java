@@ -89,15 +89,13 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
   }
 
   public boolean aliasExists(String unitName, String alias) {
-    Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
-    validateUnitExists(unitName);
 
     UnitKeyStore unitKeyStore = getUnitKeyStore(unitName);
-    if(unitKeyStore == null) {
-      throw new RuntimeException("The key store [" + unitName + "] does not exist.");
+    if(unitKeyStore != null) {
+      return unitKeyStore.aliasExists(alias);
     }
-    return unitKeyStore.aliasExists(alias);
+    return false;
   }
 
   public void deleteKey(String unitName, String alias) {
