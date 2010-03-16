@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.core.runtime;
 
+import java.util.Set;
+
 import org.apache.commons.vfs.FileObject;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.opal.core.cfg.OpalConfiguration;
@@ -57,16 +59,11 @@ public class OpalRuntime {
     // Create the folders for each FunctionalUnit
     for(FunctionalUnit unit : opalConfiguration.getFunctionalUnits()) {
       FileObject unitsDir = getFileSystem().getRoot().resolveFile("units");
-      if(!unitsDir.exists()) {
-        unitsDir.createFolder();
-      }
+      unitsDir.createFolder();
 
       FileObject unitDir = unitsDir.resolveFile(unit.getName());
-      if(!unitDir.exists()) {
-        unitDir.createFolder();
-      }
+      unitDir.createFolder();
     }
-
   }
 
   public void destroy() throws Exception {
@@ -86,4 +83,11 @@ public class OpalRuntime {
     return opalFileSystem;
   }
 
+  public Set<FunctionalUnit> getFunctionalUnits() {
+    return opalConfiguration.getFunctionalUnits();
+  }
+
+  public FunctionalUnit getFunctionalUnit(String unitName) {
+    return opalConfiguration.getFunctionalUnit(unitName);
+  }
 }

@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.opal.core.service.ImportService;
+import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -37,10 +38,11 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       if(!filesToImport.isEmpty()) {
         importFiles(filesToImport);
       } else {
-        getShell().printf("No files found. Import canceled.\n");
+        getShell().printf("No file found. Import canceled.\n");
       }
     } else {
-      getShell().printf("At least one file (or directory) to import must be specified. Use 'import --help' for more information.\n");
+      // TODO: When no file is specified, import all files in the specified unit's directory.
+      getShell().printf("No file found. Import canceled.\n");
     }
   }
 
@@ -56,7 +58,11 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       getShell().printf("  %s\n", file.getPath());
 
       try {
-        importService.importData(destination, options.getOwner(), file);
+        importService.importData(options.getUnit(), destination, file);
+      } catch(NoSuchFunctionalUnitException ex) {
+        // Fatal exception - break out of here.
+        getShell().printf("Functional unit '%s' does not exist. Cannot import.\n", ex.getUnitName());
+        break;
       } catch(NoSuchDatasourceException ex) {
         // Fatal exception - break out of here.
         getShell().printf("Destination datasource '%s' does not exist. Cannot import.\n", ex.getDatasourceName());

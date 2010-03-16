@@ -7,6 +7,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
   <import resource="hibernate-session.xml" />
 
   <bean id="importService" class="org.obiba.opal.core.service.impl.DefaultImportService" lazy-init="true">
+    <property name="opalRuntime" ref="opalRuntime" />
     <property name="participantIdentifier" ref="participantIdentifier" />
   	<property name="auditLogManager" ref="auditLogManager" />
     <property name="datasourceEncryptionStrategy">
@@ -15,9 +16,6 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <property name="archiveDirectory" value="${org.obiba.opal.import.archiveDirectory}" />
     <property name="keysTableReference" value="${org.obiba.opal.keys.tableReference}"/>
     <property name="keysTableEntityType" value="${org.obiba.opal.keys.entityType}"/>
-    
-    <!-- TO BE REMOVED -->
-    <property name="opalKeyProvider" ref="opalKeyProvider" />
   </bean>
   
   <bean id="exportService" class="org.obiba.opal.core.service.impl.DefaultExportServiceImpl" lazy-init="true">
@@ -26,12 +24,10 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
   
   <bean id="decryptService" class="org.obiba.opal.core.service.impl.DefaultDecryptService" lazy-init="true">
     <property name="auditLogManager" ref="auditLogManager" />
+    <property name="unitKeyStoreService" ref="unitKeyStoreService" />
     <property name="datasourceEncryptionStrategy">
       <bean class="org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy" />
     </property>
-    
-    <!-- TO BE REMOVED -->
-    <property name="opalKeyProvider" ref="opalKeyProvider" />
   </bean>
 
   <bean id="unitKeyStoreService" class="org.obiba.opal.core.service.impl.DefaultUnitKeyStoreServiceImpl">

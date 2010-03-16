@@ -25,7 +25,6 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.audit.VariableEntityAuditLogManager;
-import org.obiba.magma.crypt.KeyProvider;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
@@ -39,10 +38,14 @@ import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.magma.PrivateVariableEntityValueTable;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ImportService;
+import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.unit.FunctionalUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * Default implementation of {@link ImportService}.
@@ -59,6 +62,8 @@ public class DefaultImportService implements ImportService {
   // Instance Variables
   //
 
+  private OpalRuntime opalRuntime;
+
   private DatasourceEncryptionStrategy dsEncryptionStrategy;
 
   private String archiveDirectory;
@@ -73,53 +78,21 @@ public class DefaultImportService implements ImportService {
 
   private IParticipantIdentifier participantIdentifier;
 
-  /**
-   * TO BE REMOVED
-   */
-  private KeyProvider opalKeyProvider;
-
   //
   // ImportService Methods
   //
 
-  public void importData(String datasourceName, String owner, File file) throws NoSuchDatasourceException, IllegalArgumentException, IOException {
+  public void importData(String unitName, String datasourceName, File file) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
     // OPAL-170 Dispatch the variables in tables corresponding to Onyx stage attribute value.
-    importData(datasourceName, owner, file, "stage");
-  }
-
-  public void importData(String datasourceName, String owner, File file, String dispatchAttribute) throws NoSuchDatasourceException, IllegalArgumentException, IOException {
-    // Validate the file.
-    if(!file.isFile()) {
-      throw new IllegalArgumentException("No such file (" + file.getPath() + ")");
-    }
-
-    // Validate the datasource name.
-    Datasource destinationDatasource = MagmaEngine.get().getDatasource(datasourceName);
-
-    // Create an FsDatasource for the specified file.
-    FsDatasource sourceDatasource = new FsDatasource(file.getName(), file, dsEncryptionStrategy);
-
-    // Copy the FsDatasource to the destination datasource.
-    try {
-      MagmaEngine.get().addDatasource(sourceDatasource);
-      copyValueTables(sourceDatasource, destinationDatasource, owner, dispatchAttribute);
-    } finally {
-      MagmaEngine.get().removeDatasource(sourceDatasource);
-    }
-
-    // Archive the file.
-    archiveData(file);
+    importData(unitName, datasourceName, file, "stage");
   }
 
   //
   // Methods
   //
 
-  /**
-   * TO BE REMOVED
-   */
-  public void setOpalKeyProvider(KeyProvider opalKeyProvider) {
-    this.opalKeyProvider = opalKeyProvider;
+  public void setOpalRuntime(OpalRuntime opalRuntime) {
+    this.opalRuntime = opalRuntime;
   }
 
   public void setParticipantIdentifier(IParticipantIdentifier participantIdentifier) {
@@ -128,11 +101,6 @@ public class DefaultImportService implements ImportService {
 
   public void setDatasourceEncryptionStrategy(DatasourceEncryptionStrategy dsEncryptionStrategy) {
     this.dsEncryptionStrategy = dsEncryptionStrategy;
-
-    // Temporarily, for backward compatibility.
-    if(dsEncryptionStrategy != null) {
-      dsEncryptionStrategy.setKeyProvider(opalKeyProvider);
-    }
   }
 
   public void setKeysTableReference(String keysTableReference) {
@@ -151,10 +119,41 @@ public class DefaultImportService implements ImportService {
     this.auditLogManager = auditLogManager;
   }
 
-  private void copyValueTables(Datasource source, Datasource destination, String owner, String dispatchAttribute) throws IOException {
+  private void importData(String unitName, String datasourceName, File file, String dispatchAttribute) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
+    Assert.hasText(unitName, "unitName is null or empty");
+    Assert.isTrue(!unitName.equals(FunctionalUnit.OPAL_INSTANCE), "unitName cannot be " + FunctionalUnit.OPAL_INSTANCE);
+    Assert.hasText(datasourceName, "datasourceName is null or empty");
+    Assert.notNull(file, "file is null");
+    Assert.isTrue(file.isFile(), "No such file (" + file.getPath() + ")");
+
+    // Validate the datasource name.
+    Datasource destinationDatasource = MagmaEngine.get().getDatasource(datasourceName);
+
+    FunctionalUnit unit = opalRuntime.getFunctionalUnit(unitName);
+    if(unit == null) {
+      throw new NoSuchFunctionalUnitException(unitName);
+    }
+    dsEncryptionStrategy.setKeyProvider(unit.getKeyStore());
+
+    // Create an FsDatasource for the specified file.
+    FsDatasource sourceDatasource = new FsDatasource(file.getName(), file, dsEncryptionStrategy);
+
+    // Copy the FsDatasource to the destination datasource.
+    try {
+      MagmaEngine.get().addDatasource(sourceDatasource);
+      copyValueTables(sourceDatasource, destinationDatasource, unit.getKeyVariableName(), dispatchAttribute);
+    } finally {
+      MagmaEngine.get().removeDatasource(sourceDatasource);
+    }
+
+    // Archive the file.
+    archiveData(file);
+  }
+
+  private void copyValueTables(Datasource source, Datasource destination, String keyVariableName, String dispatchAttribute) throws IOException {
     for(ValueTable valueTable : source.getValueTables()) {
       if(valueTable.isForEntityType(keysTableEntityType)) {
-        copyParticipants(valueTable, source, destination, owner, dispatchAttribute);
+        copyParticipants(valueTable, source, destination, keyVariableName, dispatchAttribute);
       } else {
         DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, destination).build();
         copier.copy(valueTable, destination);
@@ -162,7 +161,7 @@ public class DefaultImportService implements ImportService {
     }
   }
 
-  private void copyParticipants(ValueTable participantTable, Datasource source, Datasource destination, String owner, final String dispatchAttribute) throws IOException {
+  private void copyParticipants(ValueTable participantTable, Datasource source, Datasource destination, String keyVariableName, final String dispatchAttribute) throws IOException {
     // Make a view of all private variables.
     final View privateView = View.Builder.newView(participantTable.getName(), participantTable).select(new SelectClause() {
       public boolean select(Variable variable) {
@@ -170,9 +169,9 @@ public class DefaultImportService implements ImportService {
       }
     }).build();
 
-    final Variable ownerVariable = prepareKeysTable(privateView, owner);
+    final Variable keyVariable = prepareKeysTable(privateView, keyVariableName);
 
-    final OpalPrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(lookupKeysTable(), ownerVariable, participantIdentifier);
+    final OpalPrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(lookupKeysTable(), keyVariable, participantIdentifier);
 
     // Wrap the participant table in a view that exposes public entities and non-identifiable variables
     PrivateVariableEntityValueTable publicTable = new PrivateVariableEntityValueTable(participantTable.getName(), participantTable, entityMap);
@@ -199,7 +198,7 @@ public class DefaultImportService implements ImportService {
         }
 
         public void onValueSetCopy(ValueTable source, ValueSet valueSet) {
-          copyParticipantIdentifiers(valueSet.getVariableEntity(), privateView, ownerVariable, keysTableWriter, entityMap);
+          copyParticipantIdentifiers(valueSet.getVariableEntity(), privateView, keyVariable, keysTableWriter, entityMap);
         }
 
       };
@@ -226,20 +225,20 @@ public class DefaultImportService implements ImportService {
   /**
    * Write the key variable.
    * @param privateView
-   * @param owner
+   * @param keyVariableName
    * @return
    * @throws IOException
    */
-  private Variable prepareKeysTable(ValueTable privateView, String owner) throws IOException {
+  private Variable prepareKeysTable(ValueTable privateView, String keyVariableName) throws IOException {
 
-    Variable ownerVariable = Variable.Builder.newVariable(owner, TextType.get(), privateView.getEntityType()).build();
+    Variable keyVariable = Variable.Builder.newVariable(keyVariableName, TextType.get(), privateView.getEntityType()).build();
 
     ValueTableWriter writer = writeToKeysTable();
     try {
       VariableWriter vw = writer.writeVariables();
       try {
         // Create private variables
-        vw.writeVariable(ownerVariable);
+        vw.writeVariable(keyVariable);
         DatasourceCopier.Builder.newCopier().dontCopyValues().build().copy(privateView, lookupKeysTable().getName(), vw);
       } finally {
         vw.close();
@@ -247,13 +246,13 @@ public class DefaultImportService implements ImportService {
     } finally {
       writer.close();
     }
-    return ownerVariable;
+    return keyVariable;
   }
 
   /**
    * Write the key variable and the identifier variables values; update the participant key private/public map.
    */
-  private VariableEntity copyParticipantIdentifiers(VariableEntity publicEntity, ValueTable privateView, Variable ownerVariable, ValueTableWriter writer, OpalPrivateVariableEntityMap entityMap) {
+  private VariableEntity copyParticipantIdentifiers(VariableEntity publicEntity, ValueTable privateView, Variable keyVariable, ValueTableWriter writer, OpalPrivateVariableEntityMap entityMap) {
     VariableEntity privateEntity = entityMap.privateEntity(publicEntity);
 
     ValueSetWriter vsw = writer.writeValueSet(publicEntity);

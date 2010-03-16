@@ -16,11 +16,14 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.audit.VariableEntityAuditLogManager;
-import org.obiba.magma.crypt.KeyProvider;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
+import org.obiba.opal.core.domain.unit.UnitKeyStore;
 import org.obiba.opal.core.service.DecryptService;
+import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.service.UnitKeyStoreService;
+import org.obiba.opal.core.unit.FunctionalUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,16 +44,17 @@ public class DefaultDecryptService implements DecryptService {
   // Instance Variables
   //
 
+  private UnitKeyStoreService unitKeyStoreService;
+
   private DatasourceEncryptionStrategy dsEncryptionStrategy;
 
   private VariableEntityAuditLogManager auditLogManager;
 
-  /**
-   * TO BE REMOVED
-   */
-  private KeyProvider opalKeyProvider;
+  //
+  // DecryptService Methods
+  //
 
-  public void decryptData(String datasourceName, File file) throws NoSuchDatasourceException, IllegalArgumentException, IOException {
+  public void decryptData(String unitName, String datasourceName, File file) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
     // Validate the file.
     if(!file.isFile()) {
       throw new IllegalArgumentException("No such file (" + file.getPath() + ")");
@@ -58,6 +62,9 @@ public class DefaultDecryptService implements DecryptService {
 
     // Validate the datasource name.
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(datasourceName);
+
+    UnitKeyStore unitKeyStore = unitKeyStoreService.getUnitKeyStore(unitName);
+    dsEncryptionStrategy.setKeyProvider(unitKeyStore);
 
     // Create an FsDatasource for the specified file.
     FsDatasource sourceDatasource = new FsDatasource(file.getName(), file, dsEncryptionStrategy);
@@ -71,24 +78,20 @@ public class DefaultDecryptService implements DecryptService {
     }
   }
 
+  public void decryptData(String datasourceName, File file) throws NoSuchDatasourceException, IllegalArgumentException, IOException {
+    decryptData(FunctionalUnit.OPAL_INSTANCE, datasourceName, file);
+  }
+
   //
   // Methods
   //
 
-  /**
-   * TO BE REMOVED
-   */
-  public void setOpalKeyProvider(KeyProvider opalKeyProvider) {
-    this.opalKeyProvider = opalKeyProvider;
+  public void setUnitKeyStoreService(UnitKeyStoreService unitKeyStoreService) {
+    this.unitKeyStoreService = unitKeyStoreService;
   }
 
   public void setDatasourceEncryptionStrategy(DatasourceEncryptionStrategy dsEncryptionStrategy) {
     this.dsEncryptionStrategy = dsEncryptionStrategy;
-
-    // Temporarily, for backward compatibility.
-    if(dsEncryptionStrategy != null) {
-      dsEncryptionStrategy.setKeyProvider(opalKeyProvider);
-    }
   }
 
   public void setAuditLogManager(VariableEntityAuditLogManager auditLogManager) {

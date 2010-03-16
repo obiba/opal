@@ -18,11 +18,16 @@ import uk.co.flamingpenguin.jewel.cli.Unparsed;
 @CommandLineInterface(application = "decrypt")
 public interface DecryptCommandOptions extends HelpOption {
 
-  @Unparsed(name = "FILE")
-  public List<File> getFiles();
+  @Option(shortName = "u", description = "The functional unit. Defaults to 'OpalInstance'.")
+  public String getUnit();
+
+  public boolean isUnit();
 
   @Option(shortName = "o", longName = "out", description = "The directory into which the decrypted files are written. Default is current directory.")
   public File getOutput();
 
   public boolean isOutput();
+
+  @Unparsed(name = "FILE")
+  public List<File> getFiles();
 }

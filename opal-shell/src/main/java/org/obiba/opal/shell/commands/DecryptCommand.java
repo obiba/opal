@@ -91,7 +91,11 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
 
     MagmaEngine.get().addDatasource(outputDatasource);
     try {
-      decryptService.decryptData(DECRYPT_DATASOURCE_NAME, inputFile);
+      if(options.isUnit()) {
+        decryptService.decryptData(options.getUnit(), DECRYPT_DATASOURCE_NAME, inputFile);
+      } else {
+        decryptService.decryptData(DECRYPT_DATASOURCE_NAME, inputFile);
+      }
     } catch(Exception e) {
       log.info("The following file either does not exist or could not be decrypted : {}", inputFile);
       System.err.printf("The following file either does not exist or could not be decrypted : %s\n", inputFile);

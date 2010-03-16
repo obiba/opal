@@ -18,8 +18,6 @@ import org.obiba.opal.core.unit.FunctionalUnit;
  */
 public interface UnitKeyStoreService {
 
-  public static final String OPAL_INSTANCE_KEYSTORE = "OpalInstance";
-
   /**
    * Gets the {@link UnitKeyStore} for the specified {@link FunctionalUnit}.
    * 

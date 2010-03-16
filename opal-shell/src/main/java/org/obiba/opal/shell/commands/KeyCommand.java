@@ -11,6 +11,7 @@ package org.obiba.opal.shell.commands;
 
 import org.apache.commons.vfs.FileSystemException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
+import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.shell.commands.options.CertificateInfo;
 import org.obiba.opal.shell.commands.options.KeyCommandOptions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,7 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   //
 
   private void deleteKey() {
-    String unit = options.isUnit() ? options.getUnit() : UnitKeyStoreService.OPAL_INSTANCE_KEYSTORE;
+    String unit = options.isUnit() ? options.getUnit() : FunctionalUnit.OPAL_INSTANCE;
 
     if(unitKeyStoreService.aliasExists(unit, options.getAlias())) {
       unitKeyStoreService.deleteKey(unit, options.getAlias());
@@ -63,7 +64,7 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   }
 
   private void createKey() {
-    String unit = options.isUnit() ? options.getUnit() : UnitKeyStoreService.OPAL_INSTANCE_KEYSTORE;
+    String unit = options.isUnit() ? options.getUnit() : FunctionalUnit.OPAL_INSTANCE;
 
     if(keyDoesNotExistOrOverwriteConfirmed(unit, options.getAlias())) {
       String certificateInfo = new CertificateInfo(getShell()).getCertificateInfoAsString();
@@ -73,7 +74,7 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   }
 
   private void importKey() throws FileSystemException {
-    String unit = options.isUnit() ? options.getUnit() : UnitKeyStoreService.OPAL_INSTANCE_KEYSTORE;
+    String unit = options.isUnit() ? options.getUnit() : FunctionalUnit.OPAL_INSTANCE;
 
     if(getFile(options.getPrivate()).exists() == false) {
       getShell().printf("Private key file '%s' does not exist. Cannot import key.\n", options.getPrivate());

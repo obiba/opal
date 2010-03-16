@@ -18,7 +18,14 @@ public class NoSuchFunctionalUnitException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
 
-  public NoSuchFunctionalUnitException(String message) {
-    super(message);
+  private String unitName;
+
+  public NoSuchFunctionalUnitException(String unitName) {
+    super("No such functional unit (" + unitName + ")");
+    this.unitName = unitName;
+  }
+
+  public String getUnitName() {
+    return unitName;
   }
 }

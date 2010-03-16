@@ -74,7 +74,7 @@ public class PublicCommand extends AbstractOpalRuntimeDependentCommand<PublicCom
       FunctionalUnit unit = getOpalConfiguration().getFunctionalUnit(options.getUnit());
       unitKeyStore = unit.getKeyStore();
     } else {
-      unitKeyStore = unitKeyStoreService.getUnitKeyStore(UnitKeyStoreService.OPAL_INSTANCE_KEYSTORE);
+      unitKeyStore = unitKeyStoreService.getUnitKeyStore(FunctionalUnit.OPAL_INSTANCE);
     }
     return unitKeyStore;
   }

@@ -18,6 +18,12 @@ import org.obiba.opal.core.service.UnitKeyStoreService;
  */
 public class FunctionalUnit {
   //
+  // Constants
+  //
+
+  public static final String OPAL_INSTANCE = "OpalInstance";
+
+  //
   // Instance Variables
   //
 
@@ -76,6 +82,6 @@ public class FunctionalUnit {
   }
 
   public UnitKeyStore getKeyStore() {
-    return unitKeyStoreService.getUnitKeyStore(getName());
+    return unitKeyStoreService.getOrCreateUnitKeyStore(getName());
   }
 }
