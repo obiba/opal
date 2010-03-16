@@ -41,12 +41,14 @@ public class ListCommand extends AbstractOpalRuntimeDependentCommand<ListCommand
 
     // Make sure that each table exist, before launching the export.
     if(validateTableNames(tableNames)) {
-      Datasource outputDatasource = new ExcelDatasource(getOuputFile().getName(), getOuputFile());
+      File outputFile = getOuputFile();
+      Datasource outputDatasource = new ExcelDatasource(outputFile.getName(), outputFile);
       MagmaEngine.get().addDatasource(outputDatasource);
       try {
         // Create a DatasourceCopier that will copy only the metadata and export.
         DatasourceCopier metaDataCopier = DatasourceCopier.Builder.newCopier().dontCopyValues().build();
         exportService.exportTablesToDatasource(tableNames, outputDatasource.getName(), metaDataCopier, false);
+        getShell().printf("Variables written to %s\n", outputFile.getName());
       } finally {
         try {
           MagmaEngine.get().removeDatasource(outputDatasource);
@@ -109,14 +111,15 @@ public class ListCommand extends AbstractOpalRuntimeDependentCommand<ListCommand
         directory.mkdirs();
       }
 
+      if(options.getOutputFile().getName().endsWith("xls")) {
+        System.console().printf("WARNING: Writing to an Excel 97 spreadsheet. These are limited to 256 columns which may not be sufficient for writing large tables.\nUse an 'xlsx' extension to use Excel 2007 format which supports 16K columns.\n");
+      }
       return options.getOutputFile();
-
-      // Generate the default file name if no file name was specified.
     } else {
 
       // Generate a file name automatically when not specified by user.
       SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
-      return new File("variables-" + dateFormatter.format(new Date()) + ".xls");
+      return new File("variables-" + dateFormatter.format(new Date()) + ".xlsx");
     }
 
   }
