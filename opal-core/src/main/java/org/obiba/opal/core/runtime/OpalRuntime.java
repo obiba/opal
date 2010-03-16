@@ -14,6 +14,7 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.fs.OpalFileSystem;
+import org.obiba.opal.fs.impl.OpalFileSystemImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -51,7 +52,7 @@ public class OpalRuntime {
     });
 
     // Initialize Opal file system
-    opalFileSystem = new OpalFileSystem(opalConfiguration.getFileSystemRoot());
+    opalFileSystem = new OpalFileSystemImpl(opalConfiguration.getFileSystemRoot());
 
     // Create the folders for each FunctionalUnit
     for(FunctionalUnit unit : opalConfiguration.getFunctionalUnits()) {

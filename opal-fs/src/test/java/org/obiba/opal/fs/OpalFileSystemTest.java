@@ -19,8 +19,6 @@ import junit.framework.Assert;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
-import org.apache.commons.vfs.FileSystemManager;
-import org.apache.commons.vfs.VFS;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,10 +29,15 @@ import org.mockftpserver.fake.filesystem.FileEntry;
 import org.mockftpserver.fake.filesystem.FileSystem;
 import org.mockftpserver.fake.filesystem.WindowsFakeFileSystem;
 import org.obiba.core.util.StreamUtil;
+import org.obiba.opal.fs.impl.OpalFileSystemImpl;
 
 public class OpalFileSystemTest {
 
+  private OpalFileSystem fsLocal;
+
   private FileObject fsLocalRoot;
+
+  private OpalFileSystem fsFtp;
 
   private FileObject fsFtpRoot;
 
@@ -43,9 +46,8 @@ public class OpalFileSystemTest {
   @Before
   public void setUp() throws FileSystemException {
 
-    FileSystemManager fsm = VFS.getManager();
-    FileObject vfsRoot = fsm.resolveFile("res:opal-file-system");
-    fsLocalRoot = fsm.createVirtualFileSystem(vfsRoot);
+    fsLocal = new OpalFileSystemImpl("res:opal-file-system");
+    fsLocalRoot = fsLocal.getRoot();
 
     mockFtpServer = new FakeFtpServer();
     mockFtpServer.addUserAccount(new UserAccount("user", "password", "c:/"));
@@ -58,27 +60,27 @@ public class OpalFileSystemTest {
 
     mockFtpServer.start();
 
-    vfsRoot = fsm.resolveFile("ftp://user:password@localhost:21/temp");
-    fsFtpRoot = fsm.createVirtualFileSystem(vfsRoot);
+    fsFtp = new OpalFileSystemImpl("ftp://user:password@localhost:21/temp");
+    fsFtpRoot = fsFtp.getRoot();
 
   }
 
   @Test
   public void testLocalFile() throws FileSystemException {
-    System.out.println(fsLocalRoot.resolveFile("temp.pem"));
-    OpalFileSystem.getLocaleFile(fsLocalRoot.resolveFile("temp.pem"));
-    Assert.assertTrue(OpalFileSystem.isLocalFile(fsLocalRoot.resolveFile("temp.pem")));
+    System.out.println(fsLocal.getRoot().resolveFile("temp.pem"));
+    fsLocal.getLocalFile(fsLocalRoot.resolveFile("temp.pem"));
+    Assert.assertTrue(fsLocal.isLocalFile(fsLocalRoot.resolveFile("temp.pem")));
   }
 
   @Test
   public void testFtpFileNotLocalFile() throws FileSystemException {
-    Assert.assertFalse(OpalFileSystem.isLocalFile(fsFtpRoot.resolveFile("file1.txt")));
+    Assert.assertFalse(fsFtp.isLocalFile(fsFtpRoot.resolveFile("file1.txt")));
   }
 
   @Test
   public void getLocalFileFromFtp() throws FileNotFoundException, IOException {
-    Assert.assertFalse(OpalFileSystem.isLocalFile(fsFtpRoot.resolveFile("file2.txt")));
-    File localFile = OpalFileSystem.getLocaleFile(fsFtpRoot.resolveFile("file2.txt"));
+    Assert.assertFalse(fsFtp.isLocalFile(fsFtpRoot.resolveFile("file2.txt")));
+    File localFile = fsFtp.getLocalFile(fsFtpRoot.resolveFile("file2.txt"));
     List<String> lines = StreamUtil.readLines(new FileInputStream(localFile));
     Assert.assertEquals("this is the file content", lines.get(0));
   }
