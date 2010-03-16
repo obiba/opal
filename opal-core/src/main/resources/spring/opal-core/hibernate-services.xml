@@ -41,6 +41,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
       </bean>
     </property>
     <property name="callbackHandler" ref="consoleCallbackHandler" />
+    <property name="opalRuntime" ref="opalRuntime" />
   </bean>
   
   <!--  TODO: Remove studyKeyStoreService bean -->

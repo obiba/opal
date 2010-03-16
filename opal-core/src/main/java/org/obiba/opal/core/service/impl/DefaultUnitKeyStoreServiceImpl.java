@@ -16,6 +16,8 @@ import javax.security.auth.callback.CallbackHandler;
 import org.apache.commons.vfs.FileObject;
 import org.obiba.core.service.impl.PersistenceManagerAwareService;
 import org.obiba.opal.core.domain.unit.UnitKeyStore;
+import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -28,12 +30,15 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
 
   protected CallbackHandler callbackHandler;
 
+  protected OpalRuntime opalRuntime;
+
   //
   // UnitKeyStore Methods
   //
 
   public UnitKeyStore getUnitKeyStore(String unitName) {
     Assert.hasText(unitName, "unitName must not be null or empty");
+    validateUnitExists(unitName);
 
     UnitKeyStore template = new UnitKeyStore();
     template.setUnit(unitName);
@@ -47,6 +52,9 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
   }
 
   public UnitKeyStore getOrCreateUnitKeyStore(String unitName) {
+    Assert.hasText(unitName, "unitName must not be null or empty");
+    validateUnitExists(unitName);
+
     UnitKeyStore unitKeyStore = getUnitKeyStore(unitName);
     if(unitKeyStore == null) {
       unitKeyStore = UnitKeyStore.Builder.newStore().unit(unitName).passwordPrompt(callbackHandler).build();
@@ -66,6 +74,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     Assert.hasText(algorithm, "algorithm must not be null or empty");
     Assert.notNull(size, "size must not be null");
     Assert.hasText(certificateInfo, "certificateInfo must not be null or empty");
+    validateUnitExists(unitName);
 
     UnitKeyStore unitKeyStore = getOrCreateUnitKeyStore(unitName);
     try {
@@ -82,6 +91,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
   public boolean aliasExists(String unitName, String alias) {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
+    validateUnitExists(unitName);
 
     UnitKeyStore unitKeyStore = getUnitKeyStore(unitName);
     if(unitKeyStore == null) {
@@ -93,6 +103,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
   public void deleteKey(String unitName, String alias) {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
+    validateUnitExists(unitName);
 
     UnitKeyStore unitKeyStore = getUnitKeyStore(unitName);
     if(unitKeyStore == null) {
@@ -106,6 +117,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(privateKey, "privateKey must not be null");
     Assert.notNull(certificate, "certificate must not be null");
+    validateUnitExists(unitName);
 
     UnitKeyStore unitKeyStore = getOrCreateUnitKeyStore(unitName);
     unitKeyStore.importKey(alias, privateKey, certificate);
@@ -116,6 +128,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(privateKey, "privateKey must not be null");
     Assert.hasText(certificateInfo, "certificateInfo must not be null or empty");
+    validateUnitExists(unitName);
 
     UnitKeyStore unitKeyStore = getOrCreateUnitKeyStore(unitName);
     unitKeyStore.importKey(alias, privateKey, certificateInfo);
@@ -129,4 +142,13 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     this.callbackHandler = callbackHandler;
   }
 
+  public void setOpalRuntime(OpalRuntime opalRuntime) {
+    this.opalRuntime = opalRuntime;
+  }
+
+  private void validateUnitExists(String unitName) throws NoSuchFunctionalUnitException {
+    if(opalRuntime.getOpalConfiguration().getFunctionalUnit(unitName) == null) {
+      throw new NoSuchFunctionalUnitException(unitName);
+    }
+  }
 }
