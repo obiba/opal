@@ -46,12 +46,12 @@ public interface CopyCommandOptions extends HelpOption {
   // Variable transformations
   //
 
-  @Option(shortName = "m", description = "Dispatch the variable into a value table that is identified by the provided rule.")
+  @Option(shortName = "m", description = "Dispatch the variable and data to a table which name is provided by the javascript.")
   public String getMultiplex();
 
   public boolean isMultiplex();
 
-  @Option(shortName = "t", description = "Transform the variable according to the provided rule.")
+  @Option(shortName = "t", description = "Rename each variable with the name provided by the javascript.")
   public String getTransform();
 
   public boolean isTransform();

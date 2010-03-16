@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Provides ability to export Magma tables to an existing datasource or an Excel file.
  */
-@CommandUsage(description = "Copy tables to an existing datasource or to the specified Excel file.", syntax = "Syntax: copy (--destination NAME | --out FILE) [--multiplex] [--transform] [--catalogue] [--source NAME | TABLE_NAME...]")
+@CommandUsage(description = "Copy tables to an existing datasource or to the specified Excel file.", syntax = "Syntax: copy [--source NAME] (--destination NAME | --out FILE) [--multiplex SCRIPT] [--transform SCRIPT] [--catalogue]  [TABLE_NAME...]")
 public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommandOptions> {
 
   @Autowired
