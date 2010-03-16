@@ -40,8 +40,8 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   public void execute() {
     if(options.getTables() != null && !options.isSource()) {
       if(validateOptions()) {
+        Datasource destinationDatasource = null;
         try {
-          Datasource destinationDatasource;
           if(options.isDestination()) {
             destinationDatasource = getDatasourceByName(options.getDestination());
           } else {
@@ -66,15 +66,16 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
           exportService.exportTablesToDatasource(getValueTables(), destinationDatasource, builder.build(), !options.getNonIncremental());
 
-          if(options.isOut()) {
-            MagmaEngine.get().removeDatasource(destinationDatasource);
-          }
-
         } catch(ExportException e) {
           getShell().printf("%s\n", e.getMessage());
           e.printStackTrace(System.err);
         } catch(Exception e) {
           getShell().printf("%s\n", e.getMessage());
+          e.printStackTrace(System.err);
+        } finally {
+          if(options.isOut() && destinationDatasource != null) {
+            MagmaEngine.get().removeDatasource(destinationDatasource);
+          }
         }
       }
     } else {
