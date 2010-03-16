@@ -10,6 +10,7 @@
 package org.obiba.opal.shell.commands;
 
 import org.apache.commons.vfs.FileSystemException;
+import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.shell.commands.options.CertificateInfo;
@@ -55,21 +56,29 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   private void deleteKey() {
     String unit = options.isUnit() ? options.getUnit() : FunctionalUnit.OPAL_INSTANCE;
 
-    if(unitKeyStoreService.aliasExists(unit, options.getAlias())) {
-      unitKeyStoreService.deleteKey(unit, options.getAlias());
-      getShell().printf("Deleted key with alias '%s' from keystore '%s'.\n", options.getAlias(), unit);
-    } else {
-      getShell().printf("The alias '%s' does not exist in keystore '%s'. No key deleted.\n", options.getAlias(), unit);
+    try {
+      if(unitKeyStoreService.aliasExists(unit, options.getAlias())) {
+        unitKeyStoreService.deleteKey(unit, options.getAlias());
+        getShell().printf("Deleted key with alias '%s' from keystore '%s'.\n", options.getAlias(), unit);
+      } else {
+        getShell().printf("The alias '%s' does not exist in keystore '%s'. No key deleted.\n", options.getAlias(), unit);
+      }
+    } catch(NoSuchFunctionalUnitException ex) {
+      getShell().printf("Functional unit '%s' does not exist. No key deleted.\n", ex.getUnitName());
     }
   }
 
   private void createKey() {
     String unit = options.isUnit() ? options.getUnit() : FunctionalUnit.OPAL_INSTANCE;
 
-    if(keyDoesNotExistOrOverwriteConfirmed(unit, options.getAlias())) {
-      String certificateInfo = new CertificateInfo(getShell()).getCertificateInfoAsString();
-      unitKeyStoreService.createOrUpdateKey(unit, options.getAlias(), options.getAlgorithm(), options.getSize(), certificateInfo);
-      getShell().printf("Key generated with alias '%s'.\n", options.getAlias());
+    try {
+      if(keyDoesNotExistOrOverwriteConfirmed(unit, options.getAlias())) {
+        String certificateInfo = new CertificateInfo(getShell()).getCertificateInfoAsString();
+        unitKeyStoreService.createOrUpdateKey(unit, options.getAlias(), options.getAlgorithm(), options.getSize(), certificateInfo);
+        getShell().printf("Key generated with alias '%s'.\n", options.getAlias());
+      }
+    } catch(NoSuchFunctionalUnitException ex) {
+      getShell().printf("Functional unit '%s' does not exist. Key not created.\n", ex.getUnitName());
     }
   }
 
@@ -84,19 +93,23 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
       getShell().printf("Certificate file '%s' does not exist. Cannot import key.\n", options.getCertificate());
       return;
     }
-    if(keyDoesNotExistOrOverwriteConfirmed(unit, options.getAlias())) {
-      if(options.isCertificate()) {
-        unitKeyStoreService.importKey(unit, options.getAlias(), getFile(options.getPrivate()), getFile(options.getCertificate()));
-      } else {
-        unitKeyStoreService.importKey(unit, options.getAlias(), getFile(options.getPrivate()), new CertificateInfo(getShell()).getCertificateInfoAsString());
+    try {
+      if(keyDoesNotExistOrOverwriteConfirmed(unit, options.getAlias())) {
+        if(options.isCertificate()) {
+          unitKeyStoreService.importKey(unit, options.getAlias(), getFile(options.getPrivate()), getFile(options.getCertificate()));
+        } else {
+          unitKeyStoreService.importKey(unit, options.getAlias(), getFile(options.getPrivate()), new CertificateInfo(getShell()).getCertificateInfoAsString());
+        }
+        getShell().printf("Key imported with alias '%s'.\n", options.getAlias());
       }
-      getShell().printf("Key imported with alias '%s'.\n", options.getAlias());
+    } catch(NoSuchFunctionalUnitException ex) {
+      getShell().printf("Functional unit '%s' does not exist. Key not imported.\n", ex.getUnitName());
     }
   }
 
   private boolean keyDoesNotExistOrOverwriteConfirmed(String unit, String alias) {
     boolean createKeyConfirmation = true;
-    if(unitKeyStoreService.getUnitKeyStore(unit) != null && unitKeyStoreService.aliasExists(unit, options.getAlias())) {
+    if(unitKeyStoreService.aliasExists(unit, options.getAlias())) {
       createKeyConfirmation = confirmKeyOverWrite();
     }
     return createKeyConfirmation;
