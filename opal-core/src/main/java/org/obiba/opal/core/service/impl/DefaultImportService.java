@@ -26,6 +26,7 @@ import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.audit.VariableEntityAuditLogManager;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
+import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineTableResolver;
@@ -64,8 +65,6 @@ public class DefaultImportService implements ImportService {
 
   private OpalRuntime opalRuntime;
 
-  private DatasourceEncryptionStrategy dsEncryptionStrategy;
-
   private String archiveDirectory;
 
   /** Configured through org.obiba.opal.keys.tableReference */
@@ -99,10 +98,6 @@ public class DefaultImportService implements ImportService {
     this.participantIdentifier = participantIdentifier;
   }
 
-  public void setDatasourceEncryptionStrategy(DatasourceEncryptionStrategy dsEncryptionStrategy) {
-    this.dsEncryptionStrategy = dsEncryptionStrategy;
-  }
-
   public void setKeysTableReference(String keysTableReference) {
     this.keysTableReference = keysTableReference;
   }
@@ -133,21 +128,21 @@ public class DefaultImportService implements ImportService {
     if(unit == null) {
       throw new NoSuchFunctionalUnitException(unitName);
     }
-    dsEncryptionStrategy.setKeyProvider(unit.getKeyStore());
 
-    // Create an FsDatasource for the specified file.
-    FsDatasource sourceDatasource = new FsDatasource(file.getName(), file, dsEncryptionStrategy);
+    copyToDestinationDatasource(file, dispatchAttribute, destinationDatasource, unit);
 
-    // Copy the FsDatasource to the destination datasource.
+    // Archive the file.
+    archiveData(file);
+  }
+
+  private void copyToDestinationDatasource(File file, String dispatchAttribute, Datasource destinationDatasource, FunctionalUnit unit) throws IOException {
+    FsDatasource sourceDatasource = new FsDatasource(file.getName(), file, getDatasourceEncryptionStrategy(unit));
     try {
       MagmaEngine.get().addDatasource(sourceDatasource);
       copyValueTables(sourceDatasource, destinationDatasource, unit.getKeyVariableName(), dispatchAttribute);
     } finally {
       MagmaEngine.get().removeDatasource(sourceDatasource);
     }
-
-    // Archive the file.
-    archiveData(file);
   }
 
   private void copyValueTables(Datasource source, Datasource destination, String keyVariableName, String dispatchAttribute) throws IOException {
@@ -162,27 +157,11 @@ public class DefaultImportService implements ImportService {
   }
 
   private void copyParticipants(ValueTable participantTable, Datasource source, Datasource destination, String keyVariableName, final String dispatchAttribute) throws IOException {
-    // Make a view of all private variables.
-    final View privateView = View.Builder.newView(participantTable.getName(), participantTable).select(new SelectClause() {
-      public boolean select(Variable variable) {
-        return isIdentifierVariable(variable);
-      }
-    }).build();
-
+    final View privateView = createPrivateView(participantTable);
     final Variable keyVariable = prepareKeysTable(privateView, keyVariableName);
-
     final OpalPrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(lookupKeysTable(), keyVariable, participantIdentifier);
 
-    // Wrap the participant table in a view that exposes public entities and non-identifiable variables
-    PrivateVariableEntityValueTable publicTable = new PrivateVariableEntityValueTable(participantTable.getName(), participantTable, entityMap);
-    publicTable.setSelectClause(new SelectClause() {
-
-      public boolean select(Variable variable) {
-        return isIdentifierVariable(variable) == false;
-      }
-
-    });
-    publicTable.initialise();
+    PrivateVariableEntityValueTable publicView = createPublicView(participantTable, entityMap);
 
     // prepare for copying participant data
     final ValueTableWriter keysTableWriter = writeToKeysTable();
@@ -203,23 +182,62 @@ public class DefaultImportService implements ImportService {
 
       };
 
-      DatasourceCopier dataCopier = DatasourceCopier.Builder.newCopier() //
-      .withLoggingListener().withThroughtputListener() //
-      .withListener(createKeysListener) //
-      .withVariableEntityCopyEventListener(auditLogManager, destination)//
-      .withMultiplexingStrategy(new VariableAttributeMutiplexingStrategy(dispatchAttribute, publicTable.getName()))//
-      .withVariableTransformer(new VariableTransformer() {
-        /** Remove the dispatch attribute from the variable name. This is onyx-specific. See OPAL-170 */
-        public Variable transform(Variable variable) {
-          return Variable.Builder.sameAs(variable).name(variable.hasAttribute(dispatchAttribute) ? variable.getName().replaceFirst("^.*\\.?" + variable.getAttributeStringValue(dispatchAttribute) + "\\.", "") : variable.getName()).build();
-        }
-      }).build();
-
-      // Copy participant's non-identifiable variables and data
-      dataCopier.copy(publicTable, destination);
+      copyPublicViewToDestinationDatasource(destination, dispatchAttribute, publicView, createKeysListener);
     } finally {
       keysTableWriter.close();
     }
+  }
+
+  private void copyPublicViewToDestinationDatasource(Datasource destination, final String dispatchAttribute, PrivateVariableEntityValueTable publicView, DatasourceCopyValueSetEventListener createKeysListener) throws IOException {
+    DatasourceCopier dataCopier = DatasourceCopier.Builder.newCopier() //
+    .withLoggingListener().withThroughtputListener() //
+    .withListener(createKeysListener) //
+    .withVariableEntityCopyEventListener(auditLogManager, destination)//
+    .withMultiplexingStrategy(new VariableAttributeMutiplexingStrategy(dispatchAttribute, publicView.getName()))//
+    .withVariableTransformer(new VariableTransformer() {
+      /** Remove the dispatch attribute from the variable name. This is onyx-specific. See OPAL-170 */
+      public Variable transform(Variable variable) {
+        return Variable.Builder.sameAs(variable).name(variable.hasAttribute(dispatchAttribute) ? variable.getName().replaceFirst("^.*\\.?" + variable.getAttributeStringValue(dispatchAttribute) + "\\.", "") : variable.getName()).build();
+      }
+    }).build();
+
+    // Copy participant's non-identifiable variables and data
+    dataCopier.copy(publicView, destination);
+  }
+
+  /**
+   * Creates a {@link View} of the participant table's "private" variables (i.e., identifiers).
+   * 
+   * @param participantTable
+   * @return
+   */
+  private View createPrivateView(ValueTable participantTable) {
+    final View privateView = View.Builder.newView(participantTable.getName(), participantTable).select(new SelectClause() {
+      public boolean select(Variable variable) {
+        return isIdentifierVariable(variable);
+      }
+    }).build();
+    return privateView;
+  }
+
+  /**
+   * Wraps the participant table in a {@link View} that exposes public entities and non-identifier variables.
+   * 
+   * @param participantTable
+   * @param entityMap
+   * @return
+   */
+  private PrivateVariableEntityValueTable createPublicView(ValueTable participantTable, final OpalPrivateVariableEntityMap entityMap) {
+    PrivateVariableEntityValueTable publicTable = new PrivateVariableEntityValueTable(participantTable.getName(), participantTable, entityMap);
+    publicTable.setSelectClause(new SelectClause() {
+
+      public boolean select(Variable variable) {
+        return isIdentifierVariable(variable) == false;
+      }
+
+    });
+    publicTable.initialise();
+    return publicTable;
   }
 
   /**
@@ -267,6 +285,17 @@ public class DefaultImportService implements ImportService {
       }
     }
     return publicEntity;
+  }
+
+  private DatasourceEncryptionStrategy getDatasourceEncryptionStrategy(FunctionalUnit unit) {
+    DatasourceEncryptionStrategy dsEncryptionStrategy = unit.getDatasourceEncryptionStrategy();
+    if(dsEncryptionStrategy == null) {
+      // Use default strategy.
+      dsEncryptionStrategy = new EncryptedSecretKeyDatasourceEncryptionStrategy();
+    }
+    dsEncryptionStrategy.setKeyProvider(unit.getKeyStore());
+
+    return dsEncryptionStrategy;
   }
 
   private void archiveData(File file) {
