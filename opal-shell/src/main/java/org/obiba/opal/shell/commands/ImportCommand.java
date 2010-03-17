@@ -51,24 +51,19 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   //
 
   private void importFiles(List<File> filesToImport) {
-    String destination = options.getDestination();
-
     getShell().printf("Importing %d file%s :\n", filesToImport.size(), (filesToImport.size() > 1 ? "s" : ""));
     for(File file : filesToImport) {
       getShell().printf("  %s\n", file.getPath());
-
       try {
-        importService.importData(options.getUnit(), destination, file);
+        importService.importData(options.getUnit(), options.getDestination(), file);
       } catch(NoSuchFunctionalUnitException ex) {
-        // Fatal exception - break out of here.
         getShell().printf("Functional unit '%s' does not exist. Cannot import.\n", ex.getUnitName());
         break;
       } catch(NoSuchDatasourceException ex) {
-        // Fatal exception - break out of here.
         getShell().printf("Destination datasource '%s' does not exist. Cannot import.\n", ex.getDatasourceName());
         break;
       } catch(IOException ex) {
-        // Possibly a non-fatal exception - report an error and continue with the next file.
+        // Report an error and continue with the next file.
         getShell().printf("Unrecoverable import exception: %s\n", ex.getMessage());
         ex.printStackTrace(System.err);
         continue;
@@ -78,7 +73,6 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
 
   private List<File> resolveFiles() {
     List<File> files = new ArrayList<File>();
-
     for(File file : options.getFiles()) {
       if(file.exists() == false) {
         getShell().printf("'%s' does not exist.\n", file.getPath());
@@ -95,7 +89,6 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
         files.add(file);
       }
     }
-
     return files;
   }
 }
