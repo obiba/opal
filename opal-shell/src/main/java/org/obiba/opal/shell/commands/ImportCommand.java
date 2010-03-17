@@ -9,17 +9,22 @@
  ******************************************************************************/
 package org.obiba.opal.shell.commands;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSelectInfo;
+import org.apache.commons.vfs.FileSelector;
+import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileType;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @CommandUsage(description = "Imports one or more Onyx data files into a datasource.", syntax = "Syntax: import --unit NAME --destination NAME --owner NAME [_FILE_...]")
@@ -29,12 +34,14 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   // AbstractContextLoadingCommand Methods
   //
 
+  private static final Logger log = LoggerFactory.getLogger(ImportCommand.class);
+
   @Autowired
   private ImportService importService;
 
   public void execute() {
     if(options.isFiles()) {
-      List<File> filesToImport = resolveFiles();
+      List<FileObject> filesToImport = resolveFiles();
       if(!filesToImport.isEmpty()) {
         importFiles(filesToImport);
       } else {
@@ -50,10 +57,10 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   // Methods
   //
 
-  private void importFiles(List<File> filesToImport) {
+  private void importFiles(List<FileObject> filesToImport) {
     getShell().printf("Importing %d file%s :\n", filesToImport.size(), (filesToImport.size() > 1 ? "s" : ""));
-    for(File file : filesToImport) {
-      getShell().printf("  %s\n", file.getPath());
+    for(FileObject file : filesToImport) {
+      getShell().printf("  %s\n", file.getName().getPath());
       try {
         importService.importData(options.getUnit(), options.getDestination(), file);
       } catch(NoSuchFunctionalUnitException ex) {
@@ -71,23 +78,41 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     }
   }
 
-  private List<File> resolveFiles() {
-    List<File> files = new ArrayList<File>();
-    for(File file : options.getFiles()) {
-      if(file.exists() == false) {
-        getShell().printf("'%s' does not exist.\n", file.getPath());
+  private List<FileObject> resolveFiles() {
+    List<FileObject> files = new ArrayList<FileObject>();
+    FileObject file;
+    FileType fileType;
+    for(String filePath : options.getFiles()) {
+
+      try {
+        file = getFile(filePath);
+        if(file.exists() == false) {
+          getShell().printf("'%s' does not exist\n", filePath);
+          continue;
+        }
+        fileType = file.getType();
+        if(fileType == FileType.FOLDER) {
+          FileObject[] filesInDir = file.findFiles(new FileSelector() {
+            @Override
+            public boolean traverseDescendents(FileSelectInfo file) throws Exception {
+              return true;
+            }
+
+            @Override
+            public boolean includeFile(FileSelectInfo file) throws Exception {
+              return file.getFile().getType() == FileType.FILE && file.getFile().getName().getExtension().toLowerCase().equals("zip");
+            }
+          });
+          files.addAll(Arrays.asList(filesInDir));
+        } else if(fileType == FileType.FILE) {
+          files.add(file);
+        }
+      } catch(FileSystemException e) {
+        getShell().printf("Cannot resolve the following path : %s, skipping import...");
+        log.warn("Cannot resolve the following path : {}, skipping import...", e);
         continue;
       }
-      if(file.isDirectory()) {
-        File[] filesInDir = file.listFiles(new FileFilter() {
-          public boolean accept(File dirFile) {
-            return dirFile.isFile() && dirFile.getName().toLowerCase().endsWith(".zip");
-          }
-        });
-        files.addAll(Arrays.asList(filesInDir));
-      } else if(file.isFile()) {
-        files.add(file);
-      }
+
     }
     return files;
   }

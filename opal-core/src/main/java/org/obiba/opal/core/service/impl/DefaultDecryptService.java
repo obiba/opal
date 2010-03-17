@@ -9,9 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.core.service.impl;
 
-import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileType;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
@@ -21,11 +22,13 @@ import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionSt
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.DecryptService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -45,19 +48,22 @@ public class DefaultDecryptService implements DecryptService {
   // Instance Variables
   //
 
+  @Autowired
   private OpalRuntime opalRuntime;
 
   // private DatasourceEncryptionStrategy dsEncryptionStrategy;
 
+  @Autowired
   private VariableEntityAuditLogManager auditLogManager;
 
   //
   // DecryptService Methods
   //
 
-  public void decryptData(String unitName, String datasourceName, File file) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
+  public void decryptData(String unitName, String datasourceName, FileObject file) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
+
     Assert.notNull(file, "file is null");
-    Assert.isTrue(file.isFile(), "No such file (" + file.getPath() + ")");
+    Assert.isTrue(file.getType() == FileType.FILE, "No such file (" + file.getName().getPath() + ")");
 
     // Validate the datasource name.
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(datasourceName);
@@ -67,7 +73,8 @@ public class DefaultDecryptService implements DecryptService {
       throw new NoSuchFunctionalUnitException(unitName);
     }
 
-    FsDatasource sourceDatasource = new FsDatasource(file.getName(), file, getDatasourceEncryptionStrategy(unit));
+    // Create an FsDatasource for the specified file.
+    FsDatasource sourceDatasource = new FsDatasource(file.getName().getBaseName(), opalRuntime.getFileSystem().getLocalFile(file), getDatasourceEncryptionStrategy(unit));
     try {
       MagmaEngine.get().addDatasource(sourceDatasource);
       copyValueTables(sourceDatasource, destinationDatasource);
@@ -76,22 +83,13 @@ public class DefaultDecryptService implements DecryptService {
     }
   }
 
-  public void decryptData(String datasourceName, File file) throws NoSuchDatasourceException, IllegalArgumentException, IOException {
+  public void decryptData(String datasourceName, FileObject file) throws NoSuchDatasourceException, IllegalArgumentException, IOException {
     decryptData(FunctionalUnit.OPAL_INSTANCE, datasourceName, file);
   }
 
   //
   // Methods
   //
-
-  public void setOpalRuntime(OpalRuntime opalRuntime) {
-    this.opalRuntime = opalRuntime;
-  }
-
-  public void setAuditLogManager(VariableEntityAuditLogManager auditLogManager) {
-    this.auditLogManager = auditLogManager;
-  }
-
   private DatasourceEncryptionStrategy getDatasourceEncryptionStrategy(FunctionalUnit unit) {
     DatasourceEncryptionStrategy dsEncryptionStrategy = unit.getDatasourceEncryptionStrategy();
     if(dsEncryptionStrategy == null) {

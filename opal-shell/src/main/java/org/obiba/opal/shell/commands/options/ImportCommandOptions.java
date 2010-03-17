@@ -1,6 +1,5 @@
 package org.obiba.opal.shell.commands.options;
 
-import java.io.File;
 import java.util.List;
 
 import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
@@ -29,7 +28,7 @@ public interface ImportCommandOptions extends HelpOption {
   public String getDestination();
 
   @Unparsed(name = "FILE")
-  public List<File> getFiles();
+  public List<String> getFiles();
 
   public boolean isFiles();
 }

@@ -1,6 +1,5 @@
 package org.obiba.opal.shell.commands.options;
 
-import java.io.File;
 import java.util.List;
 
 import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
@@ -24,10 +23,10 @@ public interface DecryptCommandOptions extends HelpOption {
   public boolean isUnit();
 
   @Option(shortName = "o", longName = "out", description = "The directory into which the decrypted files are written. Default is current directory.")
-  public File getOutput();
+  public String getOutput();
 
   public boolean isOutput();
 
   @Unparsed(name = "FILE")
-  public List<File> getFiles();
+  public List<String> getFiles();
 }

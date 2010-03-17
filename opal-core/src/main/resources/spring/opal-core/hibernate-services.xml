@@ -19,10 +19,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <property name="auditLogManager" ref="auditLogManager" />
   </bean>  
   
-  <bean id="decryptService" class="org.obiba.opal.core.service.impl.DefaultDecryptService" lazy-init="true">
-    <property name="opalRuntime" ref="opalRuntime" />
-    <property name="auditLogManager" ref="auditLogManager" />
-  </bean>
+  <bean id="decryptService" class="org.obiba.opal.core.service.impl.DefaultDecryptService" lazy-init="true"/>
 
   <bean id="unitKeyStoreService" class="org.obiba.opal.core.service.impl.DefaultUnitKeyStoreServiceImpl">
     <property name="persistenceManager">

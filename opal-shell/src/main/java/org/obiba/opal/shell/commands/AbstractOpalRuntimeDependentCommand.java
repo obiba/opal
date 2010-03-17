@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.shell.commands;
 
+import java.io.File;
+
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.obiba.opal.core.cfg.OpalConfiguration;
@@ -43,6 +45,14 @@ public abstract class AbstractOpalRuntimeDependentCommand<T> extends AbstractCom
 
   public FileObject getFile(String path) throws FileSystemException {
     return getFileSystemRoot().resolveFile(path);
+  }
+
+  public FileObject getFile(FileObject folder, String fileName) throws FileSystemException {
+    return folder.resolveFile(fileName);
+  }
+
+  public File getLocalFile(FileObject vsfFile) {
+    return opalRuntime.getFileSystem().getLocalFile(vsfFile);
   }
 
   protected OpalConfiguration getOpalConfiguration() {

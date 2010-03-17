@@ -9,10 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.core.service.impl;
 
-import java.io.File;
 import java.io.IOException;
 
-import org.obiba.core.util.FileUtil;
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileType;
+import org.apache.commons.vfs.FileUtil;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
@@ -81,7 +83,7 @@ public class DefaultImportService implements ImportService {
   // ImportService Methods
   //
 
-  public void importData(String unitName, String datasourceName, File file) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
+  public void importData(String unitName, String datasourceName, FileObject file) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
     // OPAL-170 Dispatch the variables in tables corresponding to Onyx stage attribute value.
     importData(unitName, datasourceName, file, "stage");
   }
@@ -114,12 +116,12 @@ public class DefaultImportService implements ImportService {
     this.auditLogManager = auditLogManager;
   }
 
-  private void importData(String unitName, String datasourceName, File file, String dispatchAttribute) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
+  private void importData(String unitName, String datasourceName, FileObject file, String dispatchAttribute) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
     Assert.hasText(unitName, "unitName is null or empty");
     Assert.isTrue(!unitName.equals(FunctionalUnit.OPAL_INSTANCE), "unitName cannot be " + FunctionalUnit.OPAL_INSTANCE);
     Assert.hasText(datasourceName, "datasourceName is null or empty");
     Assert.notNull(file, "file is null");
-    Assert.isTrue(file.isFile(), "No such file (" + file.getPath() + ")");
+    Assert.isTrue(file.getType() == FileType.FOLDER, "No such file (" + file.getName().getPath() + ")");
 
     // Validate the datasource name.
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(datasourceName);
@@ -132,11 +134,15 @@ public class DefaultImportService implements ImportService {
     copyToDestinationDatasource(file, dispatchAttribute, destinationDatasource, unit);
 
     // Archive the file.
-    archiveData(file);
+    try {
+      archiveData(file);
+    } catch(FileSystemException e) {
+      log.warn("The following imported file could not be archived : {}", file);
+    }
   }
 
-  private void copyToDestinationDatasource(File file, String dispatchAttribute, Datasource destinationDatasource, FunctionalUnit unit) throws IOException {
-    FsDatasource sourceDatasource = new FsDatasource(file.getName(), file, getDatasourceEncryptionStrategy(unit));
+  private void copyToDestinationDatasource(FileObject file, String dispatchAttribute, Datasource destinationDatasource, FunctionalUnit unit) throws IOException {
+    FsDatasource sourceDatasource = new FsDatasource(file.getName().getBaseName(), opalRuntime.getFileSystem().getLocalFile(file), getDatasourceEncryptionStrategy(unit));
     try {
       MagmaEngine.get().addDatasource(sourceDatasource);
       copyValueTables(sourceDatasource, destinationDatasource, unit.getKeyVariableName(), dispatchAttribute);
@@ -298,7 +304,7 @@ public class DefaultImportService implements ImportService {
     return dsEncryptionStrategy;
   }
 
-  private void archiveData(File file) {
+  private void archiveData(FileObject file) throws FileSystemException {
     // Was an archive directory configured? If not, do nothing.
     if(archiveDirectory == null || archiveDirectory.isEmpty()) {
       log.info("No archive directory configured");
@@ -306,12 +312,15 @@ public class DefaultImportService implements ImportService {
     }
 
     // Create the archive directory if necessary.
-    File archiveDir = new File(archiveDirectory);
-    archiveDir.mkdirs();
+    FileObject archiveDir = opalRuntime.getFileSystem().getRoot();
+    archiveDir.createFolder();
+    FileObject archiveFile = archiveDir.resolveFile(file.getName().getBaseName());
+    archiveFile.createFile();
 
     // Move the file there.
     try {
-      FileUtil.moveFile(file, archiveDir);
+      FileUtil.copyContent(file, archiveFile);
+
     } catch(IOException e) {
       log.error("Failed to archive file {} to dir {}. Error reported: {}", new Object[] { file, archiveDir, e.getMessage() });
     }

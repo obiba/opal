@@ -9,8 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.core.service;
 
-import java.io.File;
 import java.io.IOException;
+
+import org.apache.commons.vfs.FileObject;
 
 /**
  * Service for decrypt operations.
@@ -26,11 +27,11 @@ public interface DecryptService {
    * @throws IllegalArgumentException if the specified datasource does not exist
    * @throws IOException if the specified file does not exist or is not a normal file
    */
-  public void decryptData(String unitName, String datasourceName, File file) throws NoSuchFunctionalUnitException, IllegalArgumentException, IOException;
+  public void decryptData(String unitName, String datasourceName, FileObject file) throws NoSuchFunctionalUnitException, IllegalArgumentException, IOException;
 
   /**
    * Equivalent to <code>decryptData(FunctionalUnit.OPAL_INSTANCE, datasourceName, file)</code>.
    */
-  public void decryptData(String datasourceName, File file) throws NoSuchFunctionalUnitException, IllegalArgumentException, IOException;
+  public void decryptData(String datasourceName, FileObject file) throws NoSuchFunctionalUnitException, IllegalArgumentException, IOException;
 
 }
