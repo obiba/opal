@@ -10,6 +10,7 @@
 package org.obiba.opal.shell.commands;
 
 import java.io.File;
+import java.util.List;
 
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.datasource.fs.FsDatasource;
@@ -40,34 +41,31 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
   private DecryptService decryptService;
 
   public void execute() {
-    // Ensure that options have been set.
-    if(options == null) {
-      throw new IllegalStateException("Options not set (setOptions must be called before calling execute)");
-    }
-
     if(options.getFiles() == null) {
       getShell().printf("No input file(s) specified.\n");
       return;
     }
 
-    // Validate/initialize output directory.
     File outputDir = new File(".");
     if(options.isOutput()) {
       outputDir = getOutputDir(options.getOutput());
     }
 
     if(outputDir != null) {
-      // Now process each input file (Onyx data zip file) specified on the command line.
-      for(File inputFile : options.getFiles()) {
-        if(inputFile.exists() == false) {
-          getShell().printf("Skipping non-existant input file %s\n", inputFile.getName());
-        } else {
-          getShell().printf("Decrypting input file %s\n", inputFile.getName());
-          processFile(inputFile, outputDir, null);
-        }
-      }
+      decryptFiles(options.getFiles(), outputDir);
     } else {
       System.err.println("Invalid output directory");
+    }
+  }
+
+  private void decryptFiles(List<File> filesToDecrypt, File outputDir) {
+    for(File inputFile : filesToDecrypt) {
+      if(inputFile.exists() == false) {
+        getShell().printf("Skipping non-existent input file %s\n", inputFile.getName());
+      } else {
+        getShell().printf("Decrypting input file %s\n", inputFile.getName());
+        decryptFile(inputFile, outputDir);
+      }
     }
   }
 
@@ -75,20 +73,8 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
   // Methods
   //
 
-  private void processFile(File inputFile, File outputDir, String keystorePassword) {
-
-    String inputFilename = inputFile.getName();
-    String inputFilenameExt = "";
-    String inputFilenamePrefix = "";
-    int inputFilenameExtIndex = inputFilename.lastIndexOf(".");
-    if(inputFilenameExtIndex > 0) {
-      inputFilenamePrefix = inputFilename.substring(0, inputFilenameExtIndex);
-      inputFilenameExt = inputFilename.substring(inputFilenameExtIndex, inputFilename.length());
-    }
-
-    File outputFile = new File(outputDir, inputFilenamePrefix + "-plaintext" + inputFilenameExt);
-    FsDatasource outputDatasource = new FsDatasource(DECRYPT_DATASOURCE_NAME, outputFile);
-
+  private void decryptFile(File inputFile, File outputDir) {
+    FsDatasource outputDatasource = new FsDatasource(DECRYPT_DATASOURCE_NAME, new File(outputDir, getOutputFileName(inputFile)));
     MagmaEngine.get().addDatasource(outputDatasource);
     try {
       if(options.isUnit()) {
@@ -125,4 +111,16 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
     return outputDir;
   }
 
+  private String getOutputFileName(File inputFile) {
+    String inputFilename = inputFile.getName();
+    String inputFilenameExt = "";
+    String inputFilenamePrefix = "";
+    int inputFilenameExtIndex = inputFilename.lastIndexOf(".");
+    if(inputFilenameExtIndex > 0) {
+      inputFilenamePrefix = inputFilename.substring(0, inputFilenameExtIndex);
+      inputFilenameExt = inputFilename.substring(inputFilenameExtIndex, inputFilename.length());
+    }
+
+    return inputFilenamePrefix + "-plaintext" + inputFilenameExt;
+  }
 }
