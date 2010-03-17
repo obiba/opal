@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.shell.commands;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.vfs.FileObject;
@@ -47,16 +48,23 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
       return;
     }
 
+    if(options.isUnit()) {
+      if(getOpalRuntime().getFunctionalUnit(options.getUnit()) == null) {
+        getShell().printf("Functional unit '%s' does not exist. Cannot decrypt.\n", options.getUnit());
+        return;
+      }
+    }
+
     FileObject outputDir = getFileSystemRoot();
     if(options.isOutput()) {
       outputDir = getOutputDir(options.getOutput());
     }
-
-    if(outputDir != null) {
-      decryptFiles(options.getFiles(), outputDir);
-    } else {
-      System.err.println("Invalid output directory");
+    if(outputDir == null) {
+      getShell().printf("Invalid output directory");
+      return;
     }
+
+    decryptFiles(options.getFiles(), outputDir);
   }
 
   private void decryptFiles(List<String> encryptedFilePaths, FileObject outputDir) {
@@ -69,11 +77,17 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
           getShell().printf("Skipping non-existent input file %s\n", path);
         } else {
           getShell().printf("Decrypting input file %s\n", path);
-          decryptFile(encryptedFile, outputDir);
+          try {
+            decryptFile(encryptedFile, outputDir);
+          } catch(IOException ex) {
+            // Report an error and continue with the next file.
+            getShell().printf("Unexpected decrypt exception: %s\n", ex.getMessage());
+            ex.printStackTrace(System.err);
+          }
         }
-      } catch(FileSystemException e) {
-        getShell().printf("Cannot resolve the following path : %s, skipping file...");
-        log.warn("Cannot resolve the following path : {}, skipping file...", e);
+      } catch(FileSystemException ex) {
+        getShell().printf("Skipping non-existent input file %s\n", path);
+        log.warn("Cannot resolve the following file path : {}, skipping file...", ex);
       }
     }
   }
@@ -82,7 +96,7 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
   // Methods
   //
 
-  private void decryptFile(FileObject inputFile, FileObject outputDir) {
+  private void decryptFile(FileObject inputFile, FileObject outputDir) throws IOException {
     FileObject outputFile = null;
     try {
       outputFile = getFile(outputDir, getOutputFileName(inputFile));
@@ -99,9 +113,6 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
       } else {
         decryptService.decryptData(DECRYPT_DATASOURCE_NAME, inputFile);
       }
-    } catch(Exception e) {
-      log.info("The following file either does not exist or could not be decrypted : {}", inputFile);
-      System.err.printf("The following file either does not exist or could not be decrypted : %s\n", inputFile);
     } finally {
       try {
         MagmaEngine.get().removeDatasource(outputDatasource);

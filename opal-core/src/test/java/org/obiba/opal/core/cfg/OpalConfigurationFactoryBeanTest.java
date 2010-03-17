@@ -44,7 +44,7 @@ public class OpalConfigurationFactoryBeanTest {
 
   @Before
   public void setUp() throws Exception {
-    applicationContext = new ClassPathXmlApplicationContext("test-spring-context.xml");
+    applicationContext = new ClassPathXmlApplicationContext("classpath*:test-spring-context.xml");
   }
 
   //

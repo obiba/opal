@@ -17,7 +17,10 @@ import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -30,10 +33,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obiba.core.service.PersistenceManager;
 import org.obiba.opal.core.cfg.OpalConfiguration;
-import org.obiba.opal.core.domain.unit.UnitKeyStore;
+import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
+import org.obiba.opal.core.unit.UnitKeyStore;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -89,11 +93,13 @@ public class DefaultUnitKeyStoreServiceImplTest {
   }
 
   @Test
-  public void testGetUnitKeyStore() {
-    UnitKeyStore expectedUnitKeyStoreTemplate = new UnitKeyStore();
-    expectedUnitKeyStoreTemplate.setUnit("my-unit");
-    UnitKeyStore expectedUnitKeyStore = new UnitKeyStore();
-    expect(mockPersistenceManager.matchOne(eqUnitKeyStore(expectedUnitKeyStoreTemplate))).andReturn(expectedUnitKeyStore);
+  public void testGetUnitKeyStore() throws IOException {
+    UnitKeyStoreState expectedUnitKeyStoreStateTemplate = new UnitKeyStoreState();
+    expectedUnitKeyStoreStateTemplate.setUnit("my-unit");
+    UnitKeyStoreState matchedUnitKeyStoreState = new UnitKeyStoreState();
+    matchedUnitKeyStoreState.setUnit("my-unit");
+    matchedUnitKeyStoreState.setKeyStore(getTestKeyStoreByteArray());
+    expect(mockPersistenceManager.matchOne(eqUnitKeyStoreState(expectedUnitKeyStoreStateTemplate))).andReturn(matchedUnitKeyStoreState);
 
     replay(mockPersistenceManager);
 
@@ -101,15 +107,16 @@ public class DefaultUnitKeyStoreServiceImplTest {
 
     verify(mockPersistenceManager);
 
-    assertEquals(expectedUnitKeyStore, unitKeyStore);
+    UnitKeyStore expectedUnitKeyStore = new UnitKeyStore("my-unit", null);
+    assertEquals(expectedUnitKeyStore.getUnitName(), unitKeyStore.getUnitName());
   }
 
   @Test
   public void testGetOrCreateUnitKeyStoreCreatesTheKeyStoreIfItDoesNotExist() throws IOException, UnsupportedCallbackException {
-    UnitKeyStore expectedUnitKeyStoreTemplate = new UnitKeyStore();
-    expectedUnitKeyStoreTemplate.setUnit("my-unit");
-    expect(mockPersistenceManager.matchOne(eqUnitKeyStore(expectedUnitKeyStoreTemplate))).andReturn(null);
-    expect(mockPersistenceManager.save((UnitKeyStore) anyObject())).andReturn(new UnitKeyStore());
+    UnitKeyStoreState expectedUnitKeyStoreStateTemplate = new UnitKeyStoreState();
+    expectedUnitKeyStoreStateTemplate.setUnit("my-unit");
+    expect(mockPersistenceManager.matchOne(eqUnitKeyStoreState(expectedUnitKeyStoreStateTemplate))).andReturn(null).atLeastOnce();
+    expect(mockPersistenceManager.save((UnitKeyStoreState) anyObject())).andReturn(new UnitKeyStoreState());
 
     replay(mockPersistenceManager);
 
@@ -145,22 +152,35 @@ public class DefaultUnitKeyStoreServiceImplTest {
     };
   }
 
+  private byte[] getTestKeyStoreByteArray() throws IOException {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+    InputStream testKeyStoreStream = new FileInputStream("src/test/resources/DefaultUnitKeyStoreServiceImplTest/opal.jks");
+    while(testKeyStoreStream.available() != 0) {
+      byte[] buf = new byte[1024];
+      int bytesRead = testKeyStoreStream.read(buf);
+      baos.write(buf, 0, bytesRead);
+    }
+
+    return baos.toByteArray();
+  }
+
   //
   // Inner Classes
   //
 
-  static class UnitKeyStoreMatcher implements IArgumentMatcher {
+  static class UnitKeyStoreStateMatcher implements IArgumentMatcher {
 
-    private UnitKeyStore expected;
+    private UnitKeyStoreState expected;
 
-    public UnitKeyStoreMatcher(UnitKeyStore expected) {
+    public UnitKeyStoreStateMatcher(UnitKeyStoreState expected) {
       this.expected = expected;
     }
 
     @Override
     public boolean matches(Object actual) {
-      if(actual instanceof UnitKeyStore) {
-        return ((UnitKeyStore) actual).getUnit().equals(expected.getUnit());
+      if(actual instanceof UnitKeyStoreState) {
+        return ((UnitKeyStoreState) actual).getUnit().equals(expected.getUnit());
       } else {
         return false;
       }
@@ -168,7 +188,7 @@ public class DefaultUnitKeyStoreServiceImplTest {
 
     @Override
     public void appendTo(StringBuffer buffer) {
-      buffer.append("eqUnitKeyStore(");
+      buffer.append("eqUnitKeyStoreState(");
       buffer.append(expected.getClass().getName());
       buffer.append(" with unit \"");
       buffer.append(expected.getUnit());
@@ -177,8 +197,8 @@ public class DefaultUnitKeyStoreServiceImplTest {
 
   }
 
-  static UnitKeyStore eqUnitKeyStore(UnitKeyStore in) {
-    EasyMock.reportMatcher(new UnitKeyStoreMatcher(in));
+  static UnitKeyStoreState eqUnitKeyStoreState(UnitKeyStoreState in) {
+    EasyMock.reportMatcher(new UnitKeyStoreStateMatcher(in));
     return null;
   }
 
