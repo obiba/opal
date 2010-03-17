@@ -45,6 +45,10 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
           if(options.isDestination()) {
             destinationDatasource = getDatasourceByName(options.getDestination());
           } else {
+            if(options.getOut().canWrite() == false) {
+              getShell().printf("Cannot write to file %s\n", options.getOut().getName());
+              return;
+            }
             destinationDatasource = new ExcelDatasource(options.getOut().getName(), options.getOut());
             MagmaEngine.get().addDatasource(destinationDatasource);
           }
