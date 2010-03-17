@@ -45,7 +45,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
           if(options.isDestination()) {
             destinationDatasource = getDatasourceByName(options.getDestination());
           } else {
-            if(options.getOut().canWrite() == false) {
+            if(options.getOut().exists() && options.getOut().canWrite() == false) {
               getShell().printf("Cannot write to file %s\n", options.getOut().getName());
               return;
             }
