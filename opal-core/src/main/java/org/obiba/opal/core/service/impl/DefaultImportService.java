@@ -121,7 +121,7 @@ public class DefaultImportService implements ImportService {
     Assert.isTrue(!unitName.equals(FunctionalUnit.OPAL_INSTANCE), "unitName cannot be " + FunctionalUnit.OPAL_INSTANCE);
     Assert.hasText(datasourceName, "datasourceName is null or empty");
     Assert.notNull(file, "file is null");
-    Assert.isTrue(file.getType() == FileType.FOLDER, "No such file (" + file.getName().getPath() + ")");
+    Assert.isTrue(file.getType() == FileType.FILE, "No such file (" + file.getName().getPath() + ")");
 
     // Validate the datasource name.
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(datasourceName);
