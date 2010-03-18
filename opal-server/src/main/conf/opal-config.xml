@@ -1,6 +1,17 @@
 <org.obiba.opal.core.cfg.OpalConfiguration>
-  <magmaEngineFactory>
+  
+  <!-- Configure the path which will be the root of the Virtual File System used by Opal  -->
+  <fileSystemRoot>file://path/to/your/opal-filesystem</fileSystemRoot>
 
+  <functionalUnits>
+    <org.obiba.opal.core.unit.FunctionalUnit>
+	  <name>my-unit</name>
+	  <keyVariableName>my-key</keyVariableName>
+	</org.obiba.opal.core.unit.FunctionalUnit>
+  </functionalUnits>
+
+  <magmaEngineFactory>
+  
     <extensions>
       <org.obiba.magma.js.MagmaJsExtension />
       <org.obiba.magma.xstream.MagmaXStreamExtension />
