@@ -187,25 +187,27 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
   private UnitKeyStore loadUnitKeyStore(String unitName, UnitKeyStoreState unitKeyStoreState) {
     CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName).prompt(getPasswordFor(unitName)).build();
 
-    UnitKeyStore unitKeyStore = new UnitKeyStore(unitName, loadKeyStore(unitKeyStoreState.getKeyStore(), passwordCallback));
-    unitKeyStore.setCallbackHander(callbackHandler);
-    UnitKeyStore.loadBouncyCastle();
-
-    return unitKeyStore;
-  }
-
-  private KeyStore loadKeyStore(byte[] keyStoreBytes, CacheablePasswordCallback passwordCallback) {
-    KeyStore ks = null;
+    UnitKeyStore unitKeyStore = null;
     try {
-      ks = KeyStore.getInstance("JCEKS");
-      ks.load(new ByteArrayInputStream(keyStoreBytes), getKeyPassword(passwordCallback));
+      unitKeyStore = new UnitKeyStore(unitName, loadKeyStore(unitKeyStoreState.getKeyStore(), passwordCallback));
+      unitKeyStore.setCallbackHander(callbackHandler);
+      UnitKeyStore.loadBouncyCastle();
     } catch(GeneralSecurityException ex) {
       throw new RuntimeException(ex);
     } catch(UnsupportedCallbackException ex) {
       throw new RuntimeException(ex);
     } catch(IOException ex) {
-      throw new RuntimeException(ex);
+      clearPasswordCache(callbackHandler, unitName);
+      translateAndRethrowKeyStoreIOException(ex);
     }
+
+    return unitKeyStore;
+  }
+
+  private KeyStore loadKeyStore(byte[] keyStoreBytes, CacheablePasswordCallback passwordCallback) throws GeneralSecurityException, UnsupportedCallbackException, IOException {
+    KeyStore ks = KeyStore.getInstance("JCEKS");
+    ks.load(new ByteArrayInputStream(keyStoreBytes), getKeyPassword(passwordCallback));
+
     return ks;
   }
 
@@ -242,9 +244,9 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     return new StringBuilder().append(PASSWORD_FOR).append(" '").append(name).append("':  ").toString();
   }
 
-  private static void clearPasswordCache(CallbackHandler callbackHandler, String alias) {
+  private static void clearPasswordCache(CallbackHandler callbackHandler, String passwordKey) {
     if(callbackHandler instanceof CachingCallbackHandler) {
-      ((CachingCallbackHandler) callbackHandler).clearPasswordCache(alias);
+      ((CachingCallbackHandler) callbackHandler).clearPasswordCache(passwordKey);
     }
   }
 
