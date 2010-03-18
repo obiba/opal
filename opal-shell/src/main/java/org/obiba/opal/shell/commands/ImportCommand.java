@@ -40,15 +40,25 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   private ImportService importService;
 
   public void execute() {
+    if(getOpalRuntime().getFunctionalUnit(options.getUnit()) == null) {
+      getShell().printf("Functional unit '%s' does not exist. Cannot decrypt.\n", options.getUnit());
+      return;
+    }
+
+    List<FileObject> filesToImport = null;
     if(options.isFiles()) {
-      List<FileObject> filesToImport = resolveFiles();
-      if(!filesToImport.isEmpty()) {
-        importFiles(filesToImport);
-      } else {
-        getShell().printf("No file found. Import canceled.\n");
-      }
+      filesToImport = resolveFiles(options.getFiles());
     } else {
-      // TODO: When no file is specified, import all files in the specified unit's directory.
+      try {
+        filesToImport = getFilesInFolder(getOpalRuntime().getUnitDirectory(options.getUnit()));
+      } catch(IOException ex) {
+        throw new RuntimeException(ex);
+      }
+    }
+
+    if(!filesToImport.isEmpty()) {
+      importFiles(filesToImport);
+    } else {
       getShell().printf("No file found. Import canceled.\n");
     }
   }
@@ -78,11 +88,11 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     }
   }
 
-  private List<FileObject> resolveFiles() {
+  private List<FileObject> resolveFiles(List<String> filePaths) {
     List<FileObject> files = new ArrayList<FileObject>();
     FileObject file;
     FileType fileType;
-    for(String filePath : options.getFiles()) {
+    for(String filePath : filePaths) {
 
       try {
         file = getFile(filePath);
@@ -92,18 +102,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
         }
         fileType = file.getType();
         if(fileType == FileType.FOLDER) {
-          FileObject[] filesInDir = file.findFiles(new FileSelector() {
-            @Override
-            public boolean traverseDescendents(FileSelectInfo file) throws Exception {
-              return true;
-            }
-
-            @Override
-            public boolean includeFile(FileSelectInfo file) throws Exception {
-              return file.getFile().getType() == FileType.FILE && file.getFile().getName().getExtension().toLowerCase().equals("zip");
-            }
-          });
-          files.addAll(Arrays.asList(filesInDir));
+          files.addAll(getFilesInFolder(file));
         } else if(fileType == FileType.FILE) {
           files.add(file);
         }
@@ -115,5 +114,20 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
 
     }
     return files;
+  }
+
+  private List<FileObject> getFilesInFolder(FileObject file) throws FileSystemException {
+    FileObject[] filesInDir = file.findFiles(new FileSelector() {
+      @Override
+      public boolean traverseDescendents(FileSelectInfo file) throws Exception {
+        return true;
+      }
+
+      @Override
+      public boolean includeFile(FileSelectInfo file) throws Exception {
+        return file.getFile().getType() == FileType.FILE && file.getFile().getName().getExtension().toLowerCase().equals("zip");
+      }
+    });
+    return Arrays.asList(filesInDir);
   }
 }

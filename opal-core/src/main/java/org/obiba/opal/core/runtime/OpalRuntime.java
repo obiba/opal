@@ -12,8 +12,10 @@ package org.obiba.opal.core.runtime;
 import java.util.Set;
 
 import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.opal.core.cfg.OpalConfiguration;
+import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.fs.impl.OpalFileSystemImpl;
@@ -58,11 +60,7 @@ public class OpalRuntime {
 
     // Create the folders for each FunctionalUnit
     for(FunctionalUnit unit : opalConfiguration.getFunctionalUnits()) {
-      FileObject unitsDir = getFileSystem().getRoot().resolveFile("units");
-      unitsDir.createFolder();
-
-      FileObject unitDir = unitsDir.resolveFile(unit.getName());
-      unitDir.createFolder();
+      getUnitDirectory(unit.getName());
     }
   }
 
@@ -89,5 +87,19 @@ public class OpalRuntime {
 
   public FunctionalUnit getFunctionalUnit(String unitName) {
     return opalConfiguration.getFunctionalUnit(unitName);
+  }
+
+  public FileObject getUnitDirectory(String unitName) throws NoSuchFunctionalUnitException, FileSystemException {
+    if(getFunctionalUnit(unitName) == null) {
+      throw new NoSuchFunctionalUnitException(unitName);
+    }
+
+    FileObject unitsDir = getFileSystem().getRoot().resolveFile("units");
+    unitsDir.createFolder();
+
+    FileObject unitDir = unitsDir.resolveFile(unitName);
+    unitDir.createFolder();
+
+    return unitDir;
   }
 }
