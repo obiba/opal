@@ -26,6 +26,8 @@ public class OpalFileSystemImpl implements OpalFileSystem {
 
   private final FileObject root;
 
+  private final String nativeRootURL;
+
   public OpalFileSystemImpl(String root) {
 
     Assert.hasText(root, "You must specify a root directory for the Opal File System.");
@@ -33,6 +35,7 @@ public class OpalFileSystemImpl implements OpalFileSystem {
     try {
       FileSystemManager fsm = VFS.getManager();
       FileObject vfsRoot = fsm.resolveFile(root);
+      nativeRootURL = vfsRoot.getURL().toString() + "/";
 
       Assert.isTrue(vfsRoot.isWriteable(), "The root of the Opal File System is not writable.  Please reconfigure the Opal File System with a writable root.");
 
@@ -59,7 +62,14 @@ public class OpalFileSystemImpl implements OpalFileSystem {
 
     try {
       if(isLocalFile) {
-        return new File(virtualFile.getURL().toURI());
+        String virtualFileURL = virtualFile.getURL().toString();
+        String nativeFileURL = virtualFileURL.replace(root.getURL().toString(), nativeRootURL);
+        log.info("nativeRootURL: {}", nativeRootURL);
+        log.info("nativeFileURL: {}", nativeFileURL);
+
+        File file = new File(nativeFileURL.substring("file:///".length()));
+        log.info("nativeFile exists: {}", file.exists());
+        return file;
       } else {
         return convertVirtualFileToLocal(virtualFile);
       }
@@ -104,7 +114,7 @@ public class OpalFileSystemImpl implements OpalFileSystem {
 
     Assert.notNull(virtualFile, "A virtualFile is required.");
 
-    checkThatFileExist(virtualFile);
+    // checkThatFileExist(virtualFile);
 
     FileObject currentFile = virtualFile;
     while(true) {

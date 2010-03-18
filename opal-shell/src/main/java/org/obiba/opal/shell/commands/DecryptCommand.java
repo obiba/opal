@@ -97,13 +97,7 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
   //
 
   private void decryptFile(FileObject inputFile, FileObject outputDir) throws IOException {
-    FileObject outputFile = null;
-    try {
-      outputFile = getFile(outputDir, getOutputFileName(inputFile));
-      outputFile.createFile();
-    } catch(FileSystemException e) {
-      throw new RuntimeException("Could not create the output file for the decrypted data", e);
-    }
+    FileObject outputFile = getFile(outputDir, getOutputFileName(inputFile));
 
     FsDatasource outputDatasource = new FsDatasource(DECRYPT_DATASOURCE_NAME, getLocalFile(outputFile));
     MagmaEngine.get().addDatasource(outputDatasource);
