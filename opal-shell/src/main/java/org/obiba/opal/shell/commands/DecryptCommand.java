@@ -30,71 +30,76 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
 
   private static final Logger log = LoggerFactory.getLogger(DecryptCommand.class);
 
-  //
-  // Constants
-  //
-
   public static final String DECRYPT_DATASOURCE_NAME = "decrypt-datasource";
 
-  //
-  // Instance Variables
-  //
   @Autowired
   private DecryptService decryptService;
 
   public void execute() {
-    if(options.getFiles() == null) {
-      getShell().printf("No input file(s) specified.\n");
-      return;
-    }
-
-    if(options.isUnit()) {
-      if(getOpalRuntime().getFunctionalUnit(options.getUnit()) == null) {
-        getShell().printf("Functional unit '%s' does not exist. Cannot decrypt.\n", options.getUnit());
-        return;
-      }
-    }
 
     FileObject outputDir = getFileSystemRoot();
     if(options.isOutput()) {
       outputDir = getOutputDir(options.getOutput());
     }
-    if(outputDir == null) {
-      getShell().printf("Invalid output directory");
-      return;
+
+    if(validOutputDir(outputDir) && validInputFiles() && validUnit()) {
+      decryptFiles(options.getFiles(), outputDir);
     }
 
-    decryptFiles(options.getFiles(), outputDir);
+  }
+
+  private boolean validOutputDir(FileObject outputDir) {
+    if(outputDir == null) {
+      getShell().printf("Invalid output directory");
+      return false;
+    }
+    return true;
+  }
+
+  private boolean validUnit() {
+    if(options.isUnit()) {
+      if(getOpalRuntime().getFunctionalUnit(options.getUnit()) == null) {
+        getShell().printf("Functional unit '%s' does not exist. Cannot decrypt.\n", options.getUnit());
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private boolean validInputFiles() {
+    if(options.getFiles() == null) {
+      getShell().printf("No input file(s) specified.\n");
+      return false;
+    }
+    return true;
   }
 
   private void decryptFiles(List<String> encryptedFilePaths, FileObject outputDir) {
-    FileObject encryptedFile;
     for(String path : encryptedFilePaths) {
-      try {
-        encryptedFile = getFile(path);
-
-        if(encryptedFile.exists() == false) {
-          getShell().printf("Skipping non-existent input file %s\n", path);
-        } else {
-          getShell().printf("Decrypting input file %s\n", path);
-          try {
-            decryptFile(encryptedFile, outputDir);
-          } catch(IOException ex) {
-            // Report an error and continue with the next file.
-            getShell().printf("Unexpected decrypt exception: %s\n", ex.getMessage());
-            ex.printStackTrace(System.err);
-          }
-        }
-      } catch(FileSystemException ex) {
-        getShell().printf("Skipping non-existent input file %s\n", path);
-        log.warn("Cannot resolve the following file path : {}, skipping file...", ex);
-      }
+      decryptFileSkipFileIfDontExist(outputDir, path);
     }
   }
 
-  //
-  // Methods
-  //
+  private void decryptFileSkipFileIfDontExist(FileObject outputDir, String path) {
+    try {
+      FileObject encryptedFile = getFile(path);
+      if(encryptedFile.exists() == false) {
+        getShell().printf("Skipping non-existent input file %s\n", path);
+      } else {
+        getShell().printf("Decrypting input file %s\n", path);
+        try {
+          decryptFile(encryptedFile, outputDir);
+        } catch(IOException ex) {
+          // Report an error and continue with the next file.
+          getShell().printf("Unexpected decrypt exception: %s\n", ex.getMessage());
+          ex.printStackTrace(System.err);
+        }
+      }
+    } catch(FileSystemException ex) {
+      getShell().printf("Skipping non-existent input file %s\n", path);
+      log.warn("Cannot resolve the following file path : {}, skipping file...", ex);
+    }
+  }
 
   private void decryptFile(FileObject inputFile, FileObject outputDir) throws IOException {
     FileObject outputFile = getFile(outputDir, getOutputFileName(inputFile));
