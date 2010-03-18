@@ -19,6 +19,7 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
+import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.cli.client.command.options.ListCommandOptions;
@@ -42,7 +43,7 @@ public class ListCommand extends AbstractOpalRuntimeDependentCommand<ListCommand
     // Make sure that each table exist, before launching the export.
     if(validateTableNames(tableNames)) {
       File outputFile = getOuputFile();
-      Datasource outputDatasource = new ExcelDatasource(outputFile.getName(), outputFile);
+      Datasource outputDatasource = new FsDatasource(outputFile.getName(), outputFile);
       MagmaEngine.get().addDatasource(outputDatasource);
       try {
         // Create a DatasourceCopier that will copy only the metadata and export.
