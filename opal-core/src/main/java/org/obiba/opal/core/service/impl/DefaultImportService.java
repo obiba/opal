@@ -41,7 +41,7 @@ import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.magma.PrivateVariableEntityValueTable;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.IOpalRuntime;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
@@ -65,7 +65,7 @@ public class DefaultImportService implements ImportService {
   // Instance Variables
   //
 
-  private OpalRuntime opalRuntime;
+  private IOpalRuntime opalRuntime;
 
   private String archiveDirectory;
 
@@ -92,7 +92,7 @@ public class DefaultImportService implements ImportService {
   // Methods
   //
 
-  public void setOpalRuntime(OpalRuntime opalRuntime) {
+  public void setOpalRuntime(IOpalRuntime opalRuntime) {
     this.opalRuntime = opalRuntime;
   }
 

@@ -28,7 +28,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 /**
  *
  */
-public class OpalRuntime {
+public class OpalRuntime implements IOpalRuntime {
   //
   // Instance Variables
   //

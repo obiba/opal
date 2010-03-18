@@ -21,8 +21,7 @@ import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
-import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.IOpalRuntime;
 import org.obiba.opal.core.service.DecryptService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
@@ -49,9 +48,7 @@ public class DefaultDecryptService implements DecryptService {
   //
 
   @Autowired
-  private OpalRuntime opalRuntime;
-
-  // private DatasourceEncryptionStrategy dsEncryptionStrategy;
+  private IOpalRuntime opalRuntime;
 
   @Autowired
   private VariableEntityAuditLogManager auditLogManager;
