@@ -312,7 +312,7 @@ public class DefaultImportService implements ImportService {
     }
 
     // Create the archive directory if necessary.
-    FileObject archiveDir = opalRuntime.getFileSystem().getRoot();
+    FileObject archiveDir = opalRuntime.getFileSystem().getRoot().resolveFile(archiveDirectory);
     archiveDir.createFolder();
     FileObject archiveFile = archiveDir.resolveFile(file.getName().getBaseName());
     archiveFile.createFile();
@@ -320,6 +320,7 @@ public class DefaultImportService implements ImportService {
     // Move the file there.
     try {
       FileUtil.copyContent(file, archiveFile);
+      file.delete();
 
     } catch(IOException e) {
       log.error("Failed to archive file {} to dir {}. Error reported: {}", new Object[] { file, archiveDir, e.getMessage() });
