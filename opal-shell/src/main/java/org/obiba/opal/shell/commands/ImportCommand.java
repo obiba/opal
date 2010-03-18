@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.shell.commands;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,7 +96,12 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     for(String filePath : filePaths) {
 
       try {
-        file = getFile(filePath);
+        if(isRelativeFilePath(filePath)) {
+          file = getFileInUnitDirectory(filePath);
+        } else {
+          file = getFile(filePath);
+        }
+
         if(file.exists() == false) {
           getShell().printf("'%s' does not exist\n", filePath);
           continue;
@@ -129,5 +135,14 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       }
     });
     return Arrays.asList(filesInDir);
+  }
+
+  private boolean isRelativeFilePath(String filePath) {
+    return !(new File(filePath).isAbsolute());
+  }
+
+  private FileObject getFileInUnitDirectory(String filePath) throws FileSystemException {
+    FileObject unitDir = getOpalRuntime().getUnitDirectory(options.getUnit());
+    return unitDir.resolveFile(filePath);
   }
 }
