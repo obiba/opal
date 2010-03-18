@@ -31,15 +31,4 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <property name="opalRuntime" ref="opalRuntime" />
   </bean>
   
-  <!--  TODO: Remove studyKeyStoreService bean -->
-  <bean id="studyKeyStoreService" class="org.obiba.opal.core.service.impl.hibernate.StudyKeyStoreServiceHibernateImpl">
-    <property name="sessionFactory" ref="opalSessionFactory" />
-    <property name="persistenceManager">
-      <bean class="org.obiba.core.service.impl.hibernate.PersistenceManagerHibernateImpl">
-        <property name="sessionFactory" ref="opalSessionFactory" />
-      </bean>
-    </property>
-    <property name="callbackHandler" ref="consoleCallbackHandler" />
-  </bean>
-
 </beans>

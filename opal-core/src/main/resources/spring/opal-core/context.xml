@@ -7,7 +7,6 @@
   <context:annotation-config />
 
   <import resource="tx.xml" />
-  <import resource="crypt.xml" />
   <import resource="hibernate-services.xml" />
   <import resource="version.xml" />
 
