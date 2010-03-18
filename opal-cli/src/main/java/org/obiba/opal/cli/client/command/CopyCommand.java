@@ -11,7 +11,6 @@ package org.obiba.opal.cli.client.command;
 
 import java.util.HashMap;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
@@ -27,6 +26,8 @@ import org.obiba.opal.cli.client.command.options.CopyCommandOptions;
 import org.obiba.opal.core.service.ExportException;
 import org.obiba.opal.core.service.ExportService;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Provides ability to export Magma tables to an existing datasource or an Excel file.
@@ -100,7 +101,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       }
     }
 
-    return new TreeSet<ValueTable>(names.values());
+    return ImmutableSet.copyOf(names.values());
   }
 
   private Datasource getDatasourceByName(String datasourceName) {
