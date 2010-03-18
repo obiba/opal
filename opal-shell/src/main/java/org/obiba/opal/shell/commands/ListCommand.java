@@ -9,11 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.shell.commands;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
@@ -41,28 +42,35 @@ public class ListCommand extends AbstractOpalRuntimeDependentCommand<ListCommand
 
     // Make sure that each table exist, before launching the export.
     if(validateTableNames(tableNames)) {
-      File outputFile = getOuputFile();
-      Datasource outputDatasource = new ExcelDatasource(outputFile.getName(), outputFile);
-      MagmaEngine.get().addDatasource(outputDatasource);
-      try {
-        // Create a DatasourceCopier that will copy only the metadata and export.
-        DatasourceCopier metaDataCopier = DatasourceCopier.Builder.newCopier().dontCopyValues().build();
-        exportService.exportTablesToDatasource(tableNames, outputDatasource.getName(), metaDataCopier, false);
-        getShell().printf("Variables written to %s\n", outputFile.getName());
-      } finally {
-        try {
-          MagmaEngine.get().removeDatasource(outputDatasource);
-        } catch(Exception e) {
-          log.warn("Could not remove the following datasource : {}", outputDatasource.getName(), e);
-        }
-      }
-
+      exportMetadata(tableNames, getOuputFile());
     }
-
   }
 
   /**
-   * Validate that a corresponding table exist for each table name. Display feedback to the user for each invalid table
+   * Export the tables metadata to the specified output file.
+   * 
+   * @param tableNames A list of table names to be exported.
+   * @param outputFile The ouput file for the metadata.
+   */
+  private void exportMetadata(List<String> tableNames, FileObject outputFile) {
+    Datasource outputDatasource = new ExcelDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
+    MagmaEngine.get().addDatasource(outputDatasource);
+    try {
+      // Create a DatasourceCopier that will copy only the metadata and export.
+      DatasourceCopier metaDataCopier = DatasourceCopier.Builder.newCopier().dontCopyValues().build();
+      exportService.exportTablesToDatasource(tableNames, outputDatasource.getName(), metaDataCopier, false);
+      getShell().printf("Variables written to %s\n", outputFile.getName());
+    } finally {
+      try {
+        MagmaEngine.get().removeDatasource(outputDatasource);
+      } catch(Exception e) {
+        log.warn("Could not remove the following datasource : {}", outputDatasource.getName(), e);
+      }
+    }
+  }
+
+  /**
+   * Validates that a corresponding table exist for each table name. Display feedback to the user for each invalid table
    * name.
    * 
    * @param tableNames A list of table name to validate.
@@ -78,19 +86,30 @@ public class ListCommand extends AbstractOpalRuntimeDependentCommand<ListCommand
     } else {
       boolean isValid = true;
       for(String tableName : tableNames) {
-        MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
-        try {
-          resolver.resolveTable();
-        } catch(NoSuchDatasourceException e) {
-          getShell().printf("'%s' refers to an unknown datasource: '%s'.\n", tableName, resolver.getDatasourceName());
-          isValid = false;
-        } catch(NoSuchValueTableException e) {
-          getShell().printf("Table '%s' does not exist in datasource : '%s'.\n", resolver.getTableName(), resolver.getDatasourceName());
+        if(!validateTableName(tableName)) {
           isValid = false;
         }
       }
-
       return isValid;
+    }
+  }
+
+  /**
+   * Validates that a corresponding table exist for one specific table name.
+   * 
+   * @param tableName The table name to validate.
+   */
+  private boolean validateTableName(String tableName) {
+    MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
+    try {
+      resolver.resolveTable();
+      return true;
+    } catch(NoSuchDatasourceException e) {
+      getShell().printf("'%s' refers to an unknown datasource: '%s'.\n", tableName, resolver.getDatasourceName());
+      return false;
+    } catch(NoSuchValueTableException e) {
+      getShell().printf("Table '%s' does not exist in datasource : '%s'.\n", resolver.getTableName(), resolver.getDatasourceName());
+      return false;
     }
   }
 
@@ -98,29 +117,57 @@ public class ListCommand extends AbstractOpalRuntimeDependentCommand<ListCommand
    * Get the output file to which the metadata will be exported to.
    * 
    * @return The output file.
+   * @throws FileSystemException
    */
-  private File getOuputFile() {
+  private FileObject getOuputFile() {
 
-    // Get the file specified on the command line.
-    if(options.isOutputFile()) {
-      File outputFile = options.getOutputFile();
+    try {
 
-      // Create the parent directory, if it doesn't already exist.
-      File directory = outputFile.getParentFile();
-      if(directory != null && !directory.exists()) {
-        directory.mkdirs();
+      // Get the file specified on the command line.
+      if(options.isOutputFile()) {
+        return resolveOutputFileAndCreateParentFolders();
+
+        // Generate a file name automatically when not specified by user.
+      } else {
+        return generateOutputFile();
       }
 
-      if(options.getOutputFile().getName().endsWith("xls")) {
-        System.console().printf("WARNING: Writing to an Excel 97 spreadsheet. These are limited to 256 columns which may not be sufficient for writing large tables.\nUse an 'xlsx' extension to use Excel 2007 format which supports 16K columns.\n");
-      }
-      return options.getOutputFile();
-    } else {
-
-      // Generate a file name automatically when not specified by user.
-      SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
-      return new File("variables-" + dateFormatter.format(new Date()) + ".xlsx");
+    } catch(FileSystemException e) {
+      log.error("There was an error accessing the output file", e);
+      throw new RuntimeException("There was an error accessing the output file", e);
     }
 
+  }
+
+  /**
+   * Generates an output file based on the current system date an time.
+   * 
+   * @return A FileObject representing the ouput file.
+   * @throws FileSystemException
+   */
+  private FileObject generateOutputFile() throws FileSystemException {
+    SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
+    return getFileSystemRoot().resolveFile("variables-" + dateFormatter.format(new Date()) + ".xlsx");
+  }
+
+  /**
+   * Resolves the output file based on the command parameter. Creates the necessary parent folders (when required).
+   * 
+   * @return A FileObject representing the ouput file.
+   * @throws FileSystemException
+   */
+  private FileObject resolveOutputFileAndCreateParentFolders() throws FileSystemException {
+    FileObject outputFile = getFileSystemRoot().resolveFile(options.getOutputFile());
+
+    // Create the parent directory, if it doesn't already exist.
+    FileObject directory = outputFile.getParent();
+    if(directory != null) {
+      directory.createFolder();
+    }
+
+    if(outputFile.getName().getExtension().equals("xls")) {
+      System.console().printf("WARNING: Writing to an Excel 97 spreadsheet. These are limited to 256 columns which may not be sufficient for writing large tables.\nUse an 'xlsx' extension to use Excel 2007 format which supports 16K columns.\n");
+    }
+    return outputFile;
   }
 }
