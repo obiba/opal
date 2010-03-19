@@ -14,11 +14,19 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+
+import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.junit.Test;
+import org.obiba.magma.test.AbstractMagmaTest;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.runtime.IOpalRuntime;
+import org.obiba.opal.core.service.DecryptService;
+import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.shell.OpalShell;
 import org.obiba.opal.shell.commands.options.DecryptCommandOptions;
@@ -26,7 +34,7 @@ import org.obiba.opal.shell.commands.options.DecryptCommandOptions;
 /**
  * Unit tests for {@link DecryptCommand}.
  */
-public class DecryptCommandTest {
+public class DecryptCommandTest extends AbstractMagmaTest {
   //
   // Test Methods
   //
@@ -34,24 +42,29 @@ public class DecryptCommandTest {
   @Test
   public void testPrintsErrorOnInvalidOutputDirectory() throws FileSystemException {
     DecryptCommandOptions mockOptions = createMockOptionsForInvalidOutputDirectory("my-unit", "$%@%$@#");
-    OpalFileSystem mockFileSystem = createMockFileSystem("$%@%$@#");
+
+    FileObject mockFileSystemRoot = createMockFileSystemRoot();
+    expect(mockFileSystemRoot.resolveFile("$%@%$@#")).andThrow(new FileSystemException("cannot resolve"));
+
+    OpalFileSystem mockFileSystem = createMockFileSystem(mockFileSystemRoot);
     IOpalRuntime mockRuntime = createMockRuntime(mockFileSystem);
     OpalShell mockShell = createMockShellForInvalidOutputDirectory();
 
-    replay(mockOptions, mockFileSystem, mockRuntime, mockShell);
+    replay(mockOptions, mockFileSystemRoot, mockFileSystem, mockRuntime, mockShell);
 
     DecryptCommand decryptCommand = createDecryptCommand(mockRuntime);
     decryptCommand.setOptions(mockOptions);
     decryptCommand.setShell(mockShell);
     decryptCommand.execute();
 
-    verify(mockOptions, mockFileSystem, mockRuntime, mockShell);
+    verify(mockOptions, mockFileSystemRoot, mockFileSystem, mockRuntime, mockShell);
   }
 
   @Test
   public void testPrintsErrorIfNoFileSpecified() throws FileSystemException {
     DecryptCommandOptions mockOptions = createMockOptionsForNoFileSpecified();
-    OpalFileSystem mockFileSystem = createMockFileSystem("$%@%$@#");
+    FileObject mockFileSystemRoot = createMockFileSystemRoot();
+    OpalFileSystem mockFileSystem = createMockFileSystem(mockFileSystemRoot);
     IOpalRuntime mockRuntime = createMockRuntime(mockFileSystem);
     OpalShell mockShell = createMockShellForNoFileSpecified();
 
@@ -68,7 +81,8 @@ public class DecryptCommandTest {
   @Test
   public void testPrintsErrorOnInvalidFunctionalUnit() throws FileSystemException {
     DecryptCommandOptions mockOptions = createMockOptionsForInvalidFunctionalUnit("my-unit");
-    OpalFileSystem mockFileSystem = createMockFileSystem("root");
+    FileObject mockFileSystemRoot = createMockFileSystemRoot();
+    OpalFileSystem mockFileSystem = createMockFileSystem(mockFileSystemRoot);
     IOpalRuntime mockRuntime = createMockRuntimeForInvalidFunctionalUnit(mockFileSystem, "my-unit");
     OpalShell mockShell = createMockShellForInvalidFunctionalUnit("my-unit");
 
@@ -80,6 +94,37 @@ public class DecryptCommandTest {
     decryptCommand.execute();
 
     verify(mockOptions, mockFileSystem, mockRuntime, mockShell);
+  }
+
+  @Test
+  public void testOutputDirectoryDefaultsToOpalFileSystemRoot() throws IOException {
+    DecryptCommandOptions mockOptions = createMockOptionsForDefaultOutputDirectory("my-unit");
+
+    FileObject mockFileSystemRoot = createMockFileSystemRoot();
+
+    FileObject inputFile = createMockFile("encrypted.zip", true);
+    expect(mockFileSystemRoot.resolveFile("encrypted.zip")).andReturn(inputFile);
+    FileObject outputFile = createMockFile("encrypted-plaintext.zip", false);
+    expect(mockFileSystemRoot.resolveFile("encrypted-plaintext.zip")).andReturn(outputFile);
+
+    OpalFileSystem mockFileSystem = createMockFileSystem(mockFileSystemRoot);
+    expect(mockFileSystem.getLocalFile(outputFile)).andReturn(new File("encrypted.zip")).atLeastOnce();
+
+    IOpalRuntime mockRuntime = createMockRuntimeForDefaultOutputDirectory(mockFileSystem, "my-unit");
+    OpalShell mockShell = createMockShellForDefaultOutputDirectory("encrypted.zip");
+
+    DecryptService mockDecryptService = createMock(DecryptService.class);
+    mockDecryptService.decryptData("my-unit", DecryptCommand.DECRYPT_DATASOURCE_NAME, inputFile);
+
+    replay(mockOptions, mockFileSystemRoot, mockFileSystem, mockRuntime, mockShell, mockDecryptService);
+
+    DecryptCommand decryptCommand = createDecryptCommand(mockRuntime);
+    decryptCommand.setDecryptService(mockDecryptService);
+    decryptCommand.setOptions(mockOptions);
+    decryptCommand.setShell(mockShell);
+    decryptCommand.execute();
+
+    verify(mockOptions, mockFileSystemRoot, mockFileSystem, mockRuntime, mockShell, mockDecryptService);
   }
 
   //
@@ -108,20 +153,35 @@ public class DecryptCommandTest {
     return mockOptions;
   }
 
-  private OpalFileSystem createMockFileSystem(String rootPath) throws FileSystemException {
+  private OpalFileSystem createMockFileSystem(FileObject mockFileSystemRoot) throws FileSystemException {
     OpalFileSystem mockFileSystem = createMock(OpalFileSystem.class);
-    expect(mockFileSystem.getRoot()).andReturn(createMockFileSystemRoot(rootPath)).atLeastOnce();
+    expect(mockFileSystem.getRoot()).andReturn(mockFileSystemRoot).atLeastOnce();
 
     return mockFileSystem;
   }
 
-  private FileObject createMockFileSystemRoot(String invalidOutputDirPath) throws FileSystemException {
+  private FileObject createMockFileSystemRoot() {
     FileObject mockFileSystemRoot = createMock(FileObject.class);
-    expect(mockFileSystemRoot.resolveFile(invalidOutputDirPath)).andThrow(new FileSystemException(invalidOutputDirPath));
-
-    replay(mockFileSystemRoot);
-
     return mockFileSystemRoot;
+  }
+
+  private FileObject createMockFile(String baseName, boolean exists) throws FileSystemException {
+    FileObject mockFile = createMock(FileObject.class);
+    expect(mockFile.exists()).andReturn(exists).atLeastOnce();
+    expect(mockFile.getName()).andReturn(createMockFileName(baseName)).atLeastOnce();
+
+    replay(mockFile);
+
+    return mockFile;
+  }
+
+  private FileName createMockFileName(String baseName) {
+    FileName mockFileName = createMock(FileName.class);
+    expect(mockFileName.getBaseName()).andReturn(baseName).atLeastOnce();
+
+    replay(mockFileName);
+
+    return mockFileName;
   }
 
   private IOpalRuntime createMockRuntime(OpalFileSystem mockFileSystem) {
@@ -174,6 +234,32 @@ public class DecryptCommandTest {
   private OpalShell createMockShellForInvalidFunctionalUnit(String unitName) {
     OpalShell mockShell = createMock(OpalShell.class);
     mockShell.printf("Functional unit '%s' does not exist. Cannot decrypt.\n", unitName);
+
+    return mockShell;
+  }
+
+  private DecryptCommandOptions createMockOptionsForDefaultOutputDirectory(String unitName) {
+    DecryptCommandOptions mockOptions = createMock(DecryptCommandOptions.class);
+    expect(mockOptions.isUnit()).andReturn(true).atLeastOnce();
+    expect(mockOptions.getUnit()).andReturn(unitName).atLeastOnce();
+    expect(mockOptions.isOutput()).andReturn(false).atLeastOnce();
+    expect(mockOptions.isFiles()).andReturn(true).atLeastOnce();
+    expect(mockOptions.getFiles()).andReturn(Arrays.asList("encrypted.zip")).atLeastOnce();
+
+    return mockOptions;
+  }
+
+  private IOpalRuntime createMockRuntimeForDefaultOutputDirectory(OpalFileSystem mockFileSystem, String unitName) {
+    IOpalRuntime mockRuntime = createMock(IOpalRuntime.class);
+    expect(mockRuntime.getFileSystem()).andReturn(mockFileSystem).atLeastOnce();
+    expect(mockRuntime.getFunctionalUnit(unitName)).andReturn(new FunctionalUnit(unitName, null)).atLeastOnce();
+
+    return mockRuntime;
+  }
+
+  private OpalShell createMockShellForDefaultOutputDirectory(String filePath) {
+    OpalShell mockShell = createMock(OpalShell.class);
+    mockShell.printf("Decrypting input file %s\n", filePath);
 
     return mockShell;
   }

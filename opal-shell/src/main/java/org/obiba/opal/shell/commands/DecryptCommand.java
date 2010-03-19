@@ -49,6 +49,10 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
     decryptFiles(options.getFiles(), outputDir);
   }
 
+  public void setDecryptService(DecryptService decryptService) {
+    this.decryptService = decryptService;
+  }
+
   private boolean validOutputDir(FileObject outputDir) {
     if(outputDir == null) {
       getShell().printf("Invalid output directory");
