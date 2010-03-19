@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.shell.commands;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -27,13 +28,24 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @CommandUsage(description = "Decrypts one or more Onyx data files.", syntax = "Syntax: decrypt [--out FILE] _FILE_...")
 public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptCommandOptions> {
+  //
+  // Constants
+  //
 
   private static final Logger log = LoggerFactory.getLogger(DecryptCommand.class);
 
   public static final String DECRYPT_DATASOURCE_NAME = "decrypt-datasource";
 
+  //
+  // Instance Variables
+  //
+
   @Autowired
   private DecryptService decryptService;
+
+  //
+  // AbstractOpalRuntimeDependentCommand Methods
+  //
 
   public void execute() {
 
@@ -48,6 +60,10 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
 
     decryptFiles(options.getFiles(), outputDir);
   }
+
+  //
+  // Methods
+  //
 
   public void setDecryptService(DecryptService decryptService) {
     this.decryptService = decryptService;
@@ -87,7 +103,13 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
 
   private void processPathSkipIfFileDoesNotExist(FileObject outputDir, String path) {
     try {
-      FileObject encryptedFile = getFile(path);
+      FileObject encryptedFile = null;
+      if(isRelativeFilePath(path) && options.isUnit()) {
+        encryptedFile = getFileInUnitDirectory(path);
+      } else {
+        encryptedFile = getFile(path);
+      }
+
       if(encryptedFile.exists() == false) {
         getShell().printf("Skipping non-existent input file %s\n", path);
       } else {
@@ -134,8 +156,13 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
    * created.
    */
   private FileObject getOutputDir(String outputDirPath) {
-    FileObject outputDir;
+    FileObject outputDir = null;
     try {
+      if(isRelativeFilePath(outputDirPath) && options.isUnit()) {
+        outputDir = getFileInUnitDirectory(outputDirPath);
+      } else {
+        outputDir = getFile(outputDirPath);
+      }
       outputDir = getFile(outputDirPath);
       outputDir.createFolder();
     } catch(FileSystemException e) {
@@ -155,5 +182,14 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
     }
 
     return inputFilenamePrefix + "-plaintext" + inputFilenameExt;
+  }
+
+  private boolean isRelativeFilePath(String filePath) {
+    return !(new File(filePath).isAbsolute());
+  }
+
+  private FileObject getFileInUnitDirectory(String filePath) throws FileSystemException {
+    FileObject unitDir = getOpalRuntime().getUnitDirectory(options.getUnit());
+    return unitDir.resolveFile(filePath);
   }
 }

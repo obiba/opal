@@ -44,20 +44,24 @@ public class DecryptCommandTest extends AbstractMagmaTest {
     DecryptCommandOptions mockOptions = createMockOptionsForInvalidOutputDirectory("my-unit", "$%@%$@#");
 
     FileObject mockFileSystemRoot = createMockFileSystemRoot();
-    expect(mockFileSystemRoot.resolveFile("$%@%$@#")).andThrow(new FileSystemException("cannot resolve"));
-
     OpalFileSystem mockFileSystem = createMockFileSystem(mockFileSystemRoot);
+
+    FileObject mockUnitDir = createMockFile("my-unit", true, false);
+    expect(mockUnitDir.resolveFile("$%@%$@#")).andThrow(new FileSystemException("cannot resolve")).atLeastOnce();
+
     IOpalRuntime mockRuntime = createMockRuntime(mockFileSystem);
+    expect(mockRuntime.getUnitDirectory("my-unit")).andReturn(mockUnitDir).atLeastOnce();
+
     OpalShell mockShell = createMockShellForInvalidOutputDirectory();
 
-    replay(mockOptions, mockFileSystemRoot, mockFileSystem, mockRuntime, mockShell);
+    replay(mockOptions, mockFileSystemRoot, mockFileSystem, mockUnitDir, mockRuntime, mockShell);
 
     DecryptCommand decryptCommand = createDecryptCommand(mockRuntime);
     decryptCommand.setOptions(mockOptions);
     decryptCommand.setShell(mockShell);
     decryptCommand.execute();
 
-    verify(mockOptions, mockFileSystemRoot, mockFileSystem, mockRuntime, mockShell);
+    verify(mockOptions, mockFileSystemRoot, mockFileSystem, mockUnitDir, mockRuntime, mockShell);
   }
 
   @Test
@@ -80,11 +84,11 @@ public class DecryptCommandTest extends AbstractMagmaTest {
 
   @Test
   public void testPrintsErrorOnInvalidFunctionalUnit() throws FileSystemException {
-    DecryptCommandOptions mockOptions = createMockOptionsForInvalidFunctionalUnit("my-unit");
+    DecryptCommandOptions mockOptions = createMockOptionsForInvalidFunctionalUnit("bogus");
     FileObject mockFileSystemRoot = createMockFileSystemRoot();
     OpalFileSystem mockFileSystem = createMockFileSystem(mockFileSystemRoot);
-    IOpalRuntime mockRuntime = createMockRuntimeForInvalidFunctionalUnit(mockFileSystem, "my-unit");
-    OpalShell mockShell = createMockShellForInvalidFunctionalUnit("my-unit");
+    IOpalRuntime mockRuntime = createMockRuntimeForInvalidFunctionalUnit(mockFileSystem, "bogus");
+    OpalShell mockShell = createMockShellForInvalidFunctionalUnit("bogus");
 
     replay(mockOptions, mockFileSystem, mockRuntime, mockShell);
 
@@ -100,23 +104,27 @@ public class DecryptCommandTest extends AbstractMagmaTest {
   public void testOutputDirectoryDefaultsToOpalFileSystemRoot() throws IOException {
     DecryptCommandOptions mockOptions = createMockOptionsForDefaultOutputDirectory("my-unit");
 
-    FileObject mockFileSystemRoot = createMockFileSystemRoot();
+    FileObject inputFile = createMockFile("encrypted.zip", true, true);
+    FileObject outputFile = createMockFile("encrypted-plaintext.zip", false, true);
 
-    FileObject inputFile = createMockFile("encrypted.zip", true);
-    expect(mockFileSystemRoot.resolveFile("encrypted.zip")).andReturn(inputFile);
-    FileObject outputFile = createMockFile("encrypted-plaintext.zip", false);
-    expect(mockFileSystemRoot.resolveFile("encrypted-plaintext.zip")).andReturn(outputFile);
+    FileObject mockFileSystemRoot = createMockFileSystemRoot();
+    expect(mockFileSystemRoot.resolveFile("encrypted-plaintext.zip")).andReturn(outputFile).atLeastOnce();
+
+    FileObject mockUnitDir = createMockFile("my-unit", true, false);
+    expect(mockUnitDir.resolveFile("encrypted.zip")).andReturn(inputFile).atLeastOnce();
 
     OpalFileSystem mockFileSystem = createMockFileSystem(mockFileSystemRoot);
     expect(mockFileSystem.getLocalFile(outputFile)).andReturn(new File("encrypted.zip")).atLeastOnce();
 
     IOpalRuntime mockRuntime = createMockRuntimeForDefaultOutputDirectory(mockFileSystem, "my-unit");
+    expect(mockRuntime.getUnitDirectory("my-unit")).andReturn(mockUnitDir).atLeastOnce();
+
     OpalShell mockShell = createMockShellForDefaultOutputDirectory("encrypted.zip");
 
     DecryptService mockDecryptService = createMock(DecryptService.class);
     mockDecryptService.decryptData("my-unit", DecryptCommand.DECRYPT_DATASOURCE_NAME, inputFile);
 
-    replay(mockOptions, mockFileSystemRoot, mockFileSystem, mockRuntime, mockShell, mockDecryptService);
+    replay(mockOptions, mockFileSystemRoot, mockFileSystem, mockUnitDir, mockRuntime, mockShell, mockDecryptService);
 
     DecryptCommand decryptCommand = createDecryptCommand(mockRuntime);
     decryptCommand.setDecryptService(mockDecryptService);
@@ -124,7 +132,7 @@ public class DecryptCommandTest extends AbstractMagmaTest {
     decryptCommand.setShell(mockShell);
     decryptCommand.execute();
 
-    verify(mockOptions, mockFileSystemRoot, mockFileSystem, mockRuntime, mockShell, mockDecryptService);
+    verify(mockOptions, mockFileSystemRoot, mockFileSystem, mockUnitDir, mockRuntime, mockShell, mockDecryptService);
   }
 
   //
@@ -147,6 +155,8 @@ public class DecryptCommandTest extends AbstractMagmaTest {
 
   private DecryptCommandOptions createMockOptionsForInvalidOutputDirectory(String unitName, String invalidOutputDirPath) {
     DecryptCommandOptions mockOptions = createMock(DecryptCommandOptions.class);
+    expect(mockOptions.isUnit()).andReturn(true).atLeastOnce();
+    expect(mockOptions.getUnit()).andReturn(unitName).atLeastOnce();
     expect(mockOptions.isOutput()).andReturn(true).atLeastOnce();
     expect(mockOptions.getOutput()).andReturn(invalidOutputDirPath).atLeastOnce();
 
@@ -165,12 +175,14 @@ public class DecryptCommandTest extends AbstractMagmaTest {
     return mockFileSystemRoot;
   }
 
-  private FileObject createMockFile(String baseName, boolean exists) throws FileSystemException {
+  private FileObject createMockFile(String baseName, boolean exists, boolean withReplay) throws FileSystemException {
     FileObject mockFile = createMock(FileObject.class);
-    expect(mockFile.exists()).andReturn(exists).atLeastOnce();
-    expect(mockFile.getName()).andReturn(createMockFileName(baseName)).atLeastOnce();
+    expect(mockFile.exists()).andReturn(exists).anyTimes();
+    expect(mockFile.getName()).andReturn(createMockFileName(baseName)).anyTimes();
 
-    replay(mockFile);
+    if(withReplay) {
+      replay(mockFile);
+    }
 
     return mockFile;
   }
