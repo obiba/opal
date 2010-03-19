@@ -16,7 +16,6 @@ import org.obiba.opal.shell.commands.ExitCommand;
 import org.obiba.opal.shell.commands.HelpCommand;
 import org.obiba.opal.shell.commands.ImportCommand;
 import org.obiba.opal.shell.commands.KeyCommand;
-import org.obiba.opal.shell.commands.ListCommand;
 import org.obiba.opal.shell.commands.PublicCommand;
 import org.obiba.opal.shell.commands.QuitCommand;
 import org.obiba.opal.shell.commands.ShowCommand;
@@ -27,7 +26,6 @@ import org.obiba.opal.shell.commands.options.ExitCommandOptions;
 import org.obiba.opal.shell.commands.options.HelpCommandOptions;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
 import org.obiba.opal.shell.commands.options.KeyCommandOptions;
-import org.obiba.opal.shell.commands.options.ListCommandOptions;
 import org.obiba.opal.shell.commands.options.PublicCommandOptions;
 import org.obiba.opal.shell.commands.options.QuitCommandOptions;
 import org.obiba.opal.shell.commands.options.ShowCommandOptions;
@@ -50,7 +48,6 @@ public class SecureShellCommandRegistry extends AbstractCommandRegistry {
     addAvailableCommand(VersionCommand.class, VersionCommandOptions.class);
     addAvailableCommand(ShowCommand.class, ShowCommandOptions.class);
     addAvailableCommand(CopyCommand.class, CopyCommandOptions.class);
-    addAvailableCommand(ListCommand.class, ListCommandOptions.class);
   }
 
 }
