@@ -11,7 +11,6 @@ package org.obiba.opal.shell.commands;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Set;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -50,7 +49,7 @@ public class CopyCommandTest extends AbstractMagmaTest {
     EasyMock.expect(mockOptions.isOut()).andReturn(true).anyTimes();
     File out = File.createTempFile("test", ".xlsx");
     out.delete();
-    EasyMock.expect(mockOptions.getOut()).andReturn(out).anyTimes();
+    EasyMock.expect(mockOptions.getOut()).andReturn(out.getName()).anyTimes();
     EasyMock.expect(mockOptions.getTables()).andReturn(ImmutableList.of("ds.table1", "ds.table2")).anyTimes();
     EasyMock.expect(mockOptions.isMultiplex()).andReturn(false).anyTimes();
     EasyMock.expect(mockOptions.isTransform()).andReturn(false).anyTimes();
@@ -58,8 +57,6 @@ public class CopyCommandTest extends AbstractMagmaTest {
     EasyMock.expect(mockOptions.getNonIncremental()).andReturn(true).anyTimes();
 
     EasyMock.expect(mockService.newCopier((Datasource) EasyMock.anyObject())).andReturn(DatasourceCopier.Builder.newCopier()).anyTimes();
-    mockService.exportTablesToDatasource((Set<ValueTable>) EasyMock.anyObject(), (Datasource) EasyMock.anyObject(), (DatasourceCopier) EasyMock.anyObject(), EasyMock.anyBoolean());
-    EasyMock.expectLastCall().once();
 
     MagmaEngine.get().addDatasource(createMockDatasource("ds", "table1", "table2"));
 
