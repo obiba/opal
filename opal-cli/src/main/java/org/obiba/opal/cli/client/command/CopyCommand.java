@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.cli.client.command;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -32,7 +35,7 @@ import com.google.common.collect.ImmutableSet;
 /**
  * Provides ability to export Magma tables to an existing datasource or an Excel file.
  */
-@CommandUsage(description = "Copy tables to an existing datasource or to the specified Excel file.", syntax = "Syntax: copy [--source NAME] (--destination NAME | --out FILE) [--multiplex SCRIPT] [--transform SCRIPT] [--catalogue]  [TABLE_NAME...]")
+@CommandUsage(description = "Copy tables to an existing destination datasource or to a specified Excel file. The tables can be explicitly named and/or be the ones from a specified source datasource. The variables can be optionally processed: dispatched in another table and/or renamed.", syntax = "Syntax: copy [--source NAME] (--destination NAME | --out FILE) [--multiplex SCRIPT] [--transform SCRIPT] [--nonIncremental] [--catalogue] [TABLE_NAME...]")
 public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommandOptions> {
 
   @Autowired
@@ -46,12 +49,19 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
           if(options.isDestination()) {
             destinationDatasource = getDatasourceByName(options.getDestination());
           } else {
-            destinationDatasource = new ExcelDatasource(options.getOut().getName(), options.getOut());
+            File outputFile = getOuputFile();
+            destinationDatasource = new ExcelDatasource(outputFile.getName(), outputFile);
             MagmaEngine.get().addDatasource(destinationDatasource);
           }
 
           // build a datasource copier according to options
-          DatasourceCopier.Builder builder = exportService.newCopier(destinationDatasource);
+          DatasourceCopier.Builder builder;
+          if(options.getCatalogue()) {
+            builder = DatasourceCopier.Builder.newCopier().dontCopyValues();
+          } else {
+            // get a builder with logging facilities
+            builder = exportService.newCopier(destinationDatasource);
+          }
 
           if(options.isMultiplex()) {
             builder.withMultiplexingStrategy(new JavascriptMultiplexingStrategy(options.getMultiplex()));
@@ -59,10 +69,6 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
           if(options.isTransform()) {
             builder.withVariableTransformer(new JavascriptVariableTransformer(options.getTransform()));
-          }
-
-          if(options.getCatalogue()) {
-            builder.dontCopyValues();
           }
 
           exportService.exportTablesToDatasource(getValueTables(), destinationDatasource, builder.build(), !options.getNonIncremental());
@@ -150,6 +156,34 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     }
 
     return validated;
+  }
+
+  /**
+   * Get the output file to which the metadata will be exported to.
+   * 
+   * @return The output file.
+   */
+  private File getOuputFile() {
+
+    // Get the file specified on the command line.
+    if(options.isOut()) {
+      File outputFile = options.getOut();
+
+      // Create the parent directory, if it doesn't already exist.
+      File directory = outputFile.getParentFile();
+      if(directory != null && !directory.exists()) {
+        directory.mkdirs();
+      }
+      if(options.getOut().getName().endsWith("xls")) {
+        System.console().printf("WARNING: Writing to an Excel 97 spreadsheet. These are limited to 256 columns and 65536 rows which may not be sufficient for writing large tables.\nUse an 'xlsx' extension to use Excel 2007 format which supports 16K columns.\n");
+      }
+      return options.getOut();
+    } else {
+      // Generate a file name automatically when not specified by user.
+      SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
+      return new File("variables-" + dateFormatter.format(new Date()) + ".xlsx");
+    }
+
   }
 
 }
