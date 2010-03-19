@@ -23,7 +23,6 @@ import org.obiba.opal.cli.client.command.ExportCommand;
 import org.obiba.opal.cli.client.command.HelpCommand;
 import org.obiba.opal.cli.client.command.ImportCommand;
 import org.obiba.opal.cli.client.command.KeyCommand;
-import org.obiba.opal.cli.client.command.ListCommand;
 import org.obiba.opal.cli.client.command.PublicCommand;
 import org.obiba.opal.cli.client.command.QuitCommand;
 import org.obiba.opal.cli.client.command.ShowCommand;
@@ -39,7 +38,6 @@ import org.obiba.opal.cli.client.command.options.HelpCommandOptions;
 import org.obiba.opal.cli.client.command.options.HelpOption;
 import org.obiba.opal.cli.client.command.options.ImportCommandOptions;
 import org.obiba.opal.cli.client.command.options.KeyCommandOptions;
-import org.obiba.opal.cli.client.command.options.ListCommandOptions;
 import org.obiba.opal.cli.client.command.options.PublicCommandOptions;
 import org.obiba.opal.cli.client.command.options.QuitCommandOptions;
 import org.obiba.opal.cli.client.command.options.ShowCommandOptions;
@@ -88,7 +86,6 @@ public class OpalConsole extends AbstractCliClient {
     addAvailableCommand(ShowCommand.class, ShowCommandOptions.class);
     addAvailableCommand(ExportCommand.class, ExportCommandOptions.class);
     addAvailableCommand(CopyCommand.class, CopyCommandOptions.class);
-    addAvailableCommand(ListCommand.class, ListCommandOptions.class);
     addAvailableCommand(SplitCommand.class, SplitCommandOptions.class);
   }
 
@@ -200,12 +197,9 @@ public class OpalConsole extends AbstractCliClient {
 
   /**
    * Parses array of arguments using spaces as delimiters. Quoted strings (including spaces) are considered a single
-   * argument. For example the command line:<br> {@code export --destination=opal onyx.Participants "onyx.Instrument Logs"}<br/>
-   * would yield the array:<br/>
-   * a[0] = export<br/>
-   * a[1] = --destination=opal<br/>
-   * a[2] = onyx.Participants<br/>
-   * a[3] = onyx.Instrument Logs<br/>
+   * argument. For example the command line:<br>
+   * {@code export --destination=opal onyx.Participants "onyx.Instrument Logs"}<br/> would yield the array:<br/> a[0] =
+   * export<br/> a[1] = --destination=opal<br/> a[2] = onyx.Participants<br/> a[3] = onyx.Instrument Logs<br/>
    * @param string A command line of arguments to be parsed.
    * @return An array of arguments.
    */

@@ -39,7 +39,7 @@ public interface CopyCommandOptions extends HelpOption {
   @Option(shortName = "n", description = "Non-incremental copy (i.e., copy all data not just updates).")
   public boolean getNonIncremental();
 
-  @Option(shortName = "c", description = "Copy only the variable catalogue.")
+  @Option(shortName = "c", description = "Copy only the variable catalogue: tables, variables, categories and their attributes.")
   public boolean getCatalogue();
 
   //
