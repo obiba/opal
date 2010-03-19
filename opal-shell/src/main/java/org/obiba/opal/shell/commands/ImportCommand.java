@@ -68,6 +68,10 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   // Methods
   //
 
+  public void setImportService(ImportService importService) {
+    this.importService = importService;
+  }
+
   private void importFiles(List<FileObject> filesToImport) {
     getShell().printf("Importing %d file%s :\n", filesToImport.size(), (filesToImport.size() > 1 ? "s" : ""));
     for(FileObject file : filesToImport) {
