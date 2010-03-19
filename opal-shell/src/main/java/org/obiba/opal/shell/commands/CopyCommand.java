@@ -12,6 +12,8 @@ package org.obiba.opal.shell.commands;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
@@ -25,18 +27,22 @@ import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.core.service.ExportException;
 import org.obiba.opal.core.service.ExportService;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.ImmutableSet;
 
 /**
- * Provides ability to export Magma tables to an existing datasource or an Excel file.
+ * Provides ability to copy Magma tables to an existing datasource or an Excel file.
  */
-@CommandUsage(description = "Copy tables to an existing datasource or to the specified Excel file.", syntax = "Syntax: copy [--source NAME] (--destination NAME | --out FILE) [--multiplex SCRIPT] [--transform SCRIPT] [--catalogue]  [TABLE_NAME...]")
+@CommandUsage(description = "Copy tables to an existing destination datasource or to a specified Excel file. The tables can be explicitly named and/or be the ones from a specified source datasource. The variables can be optionally processed: dispatched in another table and/or renamed.", syntax = "Syntax: copy [--source NAME] (--destination NAME | --out FILE) [--multiplex SCRIPT] [--transform SCRIPT] [--nonIncremental] [--catalogue] [TABLE_NAME...]")
 public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommandOptions> {
 
   @Autowired
   private ExportService exportService;
+
+  private static final Logger log = LoggerFactory.getLogger(CopyCommand.class);
 
   public void setExportService(ExportService exportService) {
     this.exportService = exportService;
@@ -50,16 +56,19 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
           if(options.isDestination()) {
             destinationDatasource = getDatasourceByName(options.getDestination());
           } else {
-            if(options.getOut().exists() && options.getOut().canWrite() == false) {
-              getShell().printf("Cannot write to file %s\n", options.getOut().getName());
-              return;
-            }
-            destinationDatasource = new ExcelDatasource(options.getOut().getName(), options.getOut());
+            FileObject outputFile = getOuputFile();
+            destinationDatasource = new ExcelDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
             MagmaEngine.get().addDatasource(destinationDatasource);
           }
 
           // build a datasource copier according to options
-          DatasourceCopier.Builder builder = exportService.newCopier(destinationDatasource);
+          DatasourceCopier.Builder builder;
+          if(options.getCatalogue()) {
+            builder = DatasourceCopier.Builder.newCopier().dontCopyValues();
+          } else {
+            // get a builder with logging facilities
+            builder = exportService.newCopier(destinationDatasource);
+          }
 
           if(options.isMultiplex()) {
             builder.withMultiplexingStrategy(new JavascriptMultiplexingStrategy(options.getMultiplex()));
@@ -67,10 +76,6 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
           if(options.isTransform()) {
             builder.withVariableTransformer(new JavascriptVariableTransformer(options.getTransform()));
-          }
-
-          if(options.getCatalogue()) {
-            builder.dontCopyValues();
           }
 
           exportService.exportTablesToDatasource(getValueTables(), destinationDatasource, builder.build(), !options.getNonIncremental());
@@ -162,6 +167,43 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     }
 
     return validated;
+  }
+
+  /**
+   * Get the output file to which the metadata will be exported to.
+   * 
+   * @return The output file.
+   * @throws FileSystemException
+   */
+  private FileObject getOuputFile() {
+    try {
+      // Get the file specified on the command line.
+      return resolveOutputFileAndCreateParentFolders();
+    } catch(FileSystemException e) {
+      log.error("There was an error accessing the output file", e);
+      throw new RuntimeException("There was an error accessing the output file", e);
+    }
+  }
+
+  /**
+   * Resolves the output file based on the command parameter. Creates the necessary parent folders (when required).
+   * 
+   * @return A FileObject representing the ouput file.
+   * @throws FileSystemException
+   */
+  private FileObject resolveOutputFileAndCreateParentFolders() throws FileSystemException {
+    FileObject outputFile = getFileSystemRoot().resolveFile(options.getOut());
+
+    // Create the parent directory, if it doesn't already exist.
+    FileObject directory = outputFile.getParent();
+    if(directory != null) {
+      directory.createFolder();
+    }
+
+    if(outputFile.getName().getExtension().equals("xls")) {
+      System.console().printf("WARNING: Writing to an Excel 97 spreadsheet. These are limited to 256 columns and 65536 rows which may not be sufficient for writing large tables.\nUse an 'xlsx' extension to use Excel 2007 format which supports 16K columns.\n");
+    }
+    return outputFile;
   }
 
 }

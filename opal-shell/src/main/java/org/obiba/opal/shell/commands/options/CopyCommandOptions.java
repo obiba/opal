@@ -1,6 +1,5 @@
 package org.obiba.opal.shell.commands.options;
 
-import java.io.File;
 import java.util.List;
 
 import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
@@ -28,7 +27,7 @@ public interface CopyCommandOptions extends HelpOption {
   public boolean isDestination();
 
   @Option(shortName = "o", description = "Copy to this Excel file.")
-  public File getOut();
+  public String getOut();
 
   public boolean isOut();
 
