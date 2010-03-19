@@ -11,7 +11,6 @@ package org.obiba.opal.fs;
 
 import java.io.File;
 
-import org.apache.commons.vfs.FileNotFoundException;
 import org.apache.commons.vfs.FileObject;
 
 /**
@@ -49,9 +48,7 @@ public interface OpalFileSystem {
    * 
    * @param virtualFile The file to check.
    * @return True if a local file, false if not.
-   * 
-   * @throws FileNotFoundException An exception is thrown if the specified file does not exist.
    */
-  public boolean isLocalFile(FileObject virtualFile) throws FileNotFoundException;
+  public boolean isLocalFile(FileObject virtualFile);
 
 }
