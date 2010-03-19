@@ -42,10 +42,11 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
       outputDir = getOutputDir(options.getOutput());
     }
 
-    if(validOutputDir(outputDir) && validInputFiles() && validUnit()) {
-      decryptFiles(options.getFiles(), outputDir);
+    if(!validOutputDir(outputDir) || !validInputFiles() || !validUnit()) {
+      return;
     }
 
+    decryptFiles(options.getFiles(), outputDir);
   }
 
   private boolean validOutputDir(FileObject outputDir) {
@@ -76,11 +77,11 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
 
   private void decryptFiles(List<String> encryptedFilePaths, FileObject outputDir) {
     for(String path : encryptedFilePaths) {
-      decryptFileSkipFileIfDontExist(outputDir, path);
+      processPathSkipIfFileDoesNotExist(outputDir, path);
     }
   }
 
-  private void decryptFileSkipFileIfDontExist(FileObject outputDir, String path) {
+  private void processPathSkipIfFileDoesNotExist(FileObject outputDir, String path) {
     try {
       FileObject encryptedFile = getFile(path);
       if(encryptedFile.exists() == false) {
