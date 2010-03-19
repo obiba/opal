@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>magma</artifactId>
+    <groupId>org.obiba.magma</groupId>
+    <version>1.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>magma-r</artifactId>
+  <name>magma-r</name>
+  <dependencies>
+    <dependency>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.rosuda</groupId>
+      <artifactId>REngine</artifactId>
+      <version>0.5-1</version>
+    </dependency>
+    
+    <!-- REngine bindings -->
+    <dependency>
+      <groupId>org.rosuda</groupId>
+      <artifactId>Rserve</artifactId>
+      <version>0.5-1</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.rosuda</groupId>
+      <artifactId>JRI</artifactId>
+      <version>0.5-1</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.rosuda</groupId>
+      <artifactId>JRIEngine</artifactId>
+      <version>0.5-1</version>
+      <optional>true</optional>
+    </dependency>
+  </dependencies>
+</project>
