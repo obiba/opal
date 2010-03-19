@@ -9,8 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.shell.commands;
 
-import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.opal.core.service.DecryptService;
@@ -27,68 +30,81 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
 
   private static final Logger log = LoggerFactory.getLogger(DecryptCommand.class);
 
-  //
-  // Constants
-  //
-
   public static final String DECRYPT_DATASOURCE_NAME = "decrypt-datasource";
 
-  //
-  // Instance Variables
-  //
   @Autowired
   private DecryptService decryptService;
 
   public void execute() {
-    // Ensure that options have been set.
-    if(options == null) {
-      throw new IllegalStateException("Options not set (setOptions must be called before calling execute)");
-    }
 
-    if(options.getFiles() == null) {
-      getShell().printf("No input file(s) specified.\n");
-      return;
-    }
-
-    // Validate/initialize output directory.
-    File outputDir = new File(".");
+    FileObject outputDir = getFileSystemRoot();
     if(options.isOutput()) {
       outputDir = getOutputDir(options.getOutput());
     }
 
-    if(outputDir != null) {
-      // Now process each input file (Onyx data zip file) specified on the command line.
-      for(File inputFile : options.getFiles()) {
-        if(inputFile.exists() == false) {
-          getShell().printf("Skipping non-existant input file %s\n", inputFile.getName());
-        } else {
-          getShell().printf("Decrypting input file %s\n", inputFile.getName());
-          processFile(inputFile, outputDir, null);
-        }
+    if(validOutputDir(outputDir) && validInputFiles() && validUnit()) {
+      decryptFiles(options.getFiles(), outputDir);
+    }
+
+  }
+
+  private boolean validOutputDir(FileObject outputDir) {
+    if(outputDir == null) {
+      getShell().printf("Invalid output directory");
+      return false;
+    }
+    return true;
+  }
+
+  private boolean validUnit() {
+    if(options.isUnit()) {
+      if(getOpalRuntime().getFunctionalUnit(options.getUnit()) == null) {
+        getShell().printf("Functional unit '%s' does not exist. Cannot decrypt.\n", options.getUnit());
+        return false;
       }
-    } else {
-      System.err.println("Invalid output directory");
+    }
+    return true;
+  }
+
+  private boolean validInputFiles() {
+    if(options.getFiles() == null) {
+      getShell().printf("No input file(s) specified.\n");
+      return false;
+    }
+    return true;
+  }
+
+  private void decryptFiles(List<String> encryptedFilePaths, FileObject outputDir) {
+    for(String path : encryptedFilePaths) {
+      decryptFileSkipFileIfDontExist(outputDir, path);
     }
   }
 
-  //
-  // Methods
-  //
-
-  private void processFile(File inputFile, File outputDir, String keystorePassword) {
-
-    String inputFilename = inputFile.getName();
-    String inputFilenameExt = "";
-    String inputFilenamePrefix = "";
-    int inputFilenameExtIndex = inputFilename.lastIndexOf(".");
-    if(inputFilenameExtIndex > 0) {
-      inputFilenamePrefix = inputFilename.substring(0, inputFilenameExtIndex);
-      inputFilenameExt = inputFilename.substring(inputFilenameExtIndex, inputFilename.length());
+  private void decryptFileSkipFileIfDontExist(FileObject outputDir, String path) {
+    try {
+      FileObject encryptedFile = getFile(path);
+      if(encryptedFile.exists() == false) {
+        getShell().printf("Skipping non-existent input file %s\n", path);
+      } else {
+        getShell().printf("Decrypting input file %s\n", path);
+        try {
+          decryptFile(encryptedFile, outputDir);
+        } catch(IOException ex) {
+          // Report an error and continue with the next file.
+          getShell().printf("Unexpected decrypt exception: %s\n", ex.getMessage());
+          ex.printStackTrace(System.err);
+        }
+      }
+    } catch(FileSystemException ex) {
+      getShell().printf("Skipping non-existent input file %s\n", path);
+      log.warn("Cannot resolve the following file path : {}, skipping file...", ex);
     }
+  }
 
-    File outputFile = new File(outputDir, inputFilenamePrefix + "-plaintext" + inputFilenameExt);
-    FsDatasource outputDatasource = new FsDatasource(DECRYPT_DATASOURCE_NAME, outputFile);
+  private void decryptFile(FileObject inputFile, FileObject outputDir) throws IOException {
+    FileObject outputFile = getFile(outputDir, getOutputFileName(inputFile));
 
+    FsDatasource outputDatasource = new FsDatasource(DECRYPT_DATASOURCE_NAME, getLocalFile(outputFile));
     MagmaEngine.get().addDatasource(outputDatasource);
     try {
       if(options.isUnit()) {
@@ -96,9 +112,6 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
       } else {
         decryptService.decryptData(DECRYPT_DATASOURCE_NAME, inputFile);
       }
-    } catch(Exception e) {
-      log.info("The following file either does not exist or could not be decrypted : {}", inputFile);
-      System.err.printf("The following file either does not exist or could not be decrypted : %s\n", inputFile);
     } finally {
       try {
         MagmaEngine.get().removeDatasource(outputDatasource);
@@ -111,18 +124,31 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
   /**
    * Given the name/path of a directory, returns that directory (creating it if necessary).
    * 
-   * @param output the name/path of the directory
-   * @return the directory, as a <code>File</code> object (or <code>null</code> if the directory does not exist and
-   * could not be created
+   * @param outputDirPath the name/path of the directory.
+   * @return the directory, as a <code>FileObject</code> object (or <code>null</code> if the directory could not be
+   * created.
    */
-  private File getOutputDir(File outputDir) {
-    if(!outputDir.exists()) {
-      boolean dirCreated = outputDir.mkdirs();
-      if(!dirCreated) {
-        outputDir = null;
-      }
+  private FileObject getOutputDir(String outputDirPath) {
+    FileObject outputDir;
+    try {
+      outputDir = getFile(outputDirPath);
+      outputDir.createFolder();
+    } catch(FileSystemException e) {
+      outputDir = null;
     }
     return outputDir;
   }
 
+  private String getOutputFileName(FileObject inputFile) {
+    String inputFilename = inputFile.getName().getBaseName();
+    String inputFilenameExt = "";
+    String inputFilenamePrefix = "";
+    int inputFilenameExtIndex = inputFilename.lastIndexOf(".");
+    if(inputFilenameExtIndex > 0) {
+      inputFilenamePrefix = inputFilename.substring(0, inputFilenameExtIndex);
+      inputFilenameExt = inputFilename.substring(inputFilenameExtIndex, inputFilename.length());
+    }
+
+    return inputFilenamePrefix + "-plaintext" + inputFilenameExt;
+  }
 }

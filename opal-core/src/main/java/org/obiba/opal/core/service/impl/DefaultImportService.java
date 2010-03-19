@@ -9,10 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.core.service.impl;
 
-import java.io.File;
 import java.io.IOException;
 
-import org.obiba.core.util.FileUtil;
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileType;
+import org.apache.commons.vfs.FileUtil;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
@@ -26,6 +28,7 @@ import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.audit.VariableEntityAuditLogManager;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
+import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineTableResolver;
@@ -38,7 +41,7 @@ import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.magma.PrivateVariableEntityValueTable;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.IOpalRuntime;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
@@ -62,9 +65,7 @@ public class DefaultImportService implements ImportService {
   // Instance Variables
   //
 
-  private OpalRuntime opalRuntime;
-
-  private DatasourceEncryptionStrategy dsEncryptionStrategy;
+  private IOpalRuntime opalRuntime;
 
   private String archiveDirectory;
 
@@ -82,7 +83,7 @@ public class DefaultImportService implements ImportService {
   // ImportService Methods
   //
 
-  public void importData(String unitName, String datasourceName, File file) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
+  public void importData(String unitName, String datasourceName, FileObject file) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
     // OPAL-170 Dispatch the variables in tables corresponding to Onyx stage attribute value.
     importData(unitName, datasourceName, file, "stage");
   }
@@ -91,16 +92,12 @@ public class DefaultImportService implements ImportService {
   // Methods
   //
 
-  public void setOpalRuntime(OpalRuntime opalRuntime) {
+  public void setOpalRuntime(IOpalRuntime opalRuntime) {
     this.opalRuntime = opalRuntime;
   }
 
   public void setParticipantIdentifier(IParticipantIdentifier participantIdentifier) {
     this.participantIdentifier = participantIdentifier;
-  }
-
-  public void setDatasourceEncryptionStrategy(DatasourceEncryptionStrategy dsEncryptionStrategy) {
-    this.dsEncryptionStrategy = dsEncryptionStrategy;
   }
 
   public void setKeysTableReference(String keysTableReference) {
@@ -119,12 +116,12 @@ public class DefaultImportService implements ImportService {
     this.auditLogManager = auditLogManager;
   }
 
-  private void importData(String unitName, String datasourceName, File file, String dispatchAttribute) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
+  private void importData(String unitName, String datasourceName, FileObject file, String dispatchAttribute) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
     Assert.hasText(unitName, "unitName is null or empty");
     Assert.isTrue(!unitName.equals(FunctionalUnit.OPAL_INSTANCE), "unitName cannot be " + FunctionalUnit.OPAL_INSTANCE);
     Assert.hasText(datasourceName, "datasourceName is null or empty");
     Assert.notNull(file, "file is null");
-    Assert.isTrue(file.isFile(), "No such file (" + file.getPath() + ")");
+    Assert.isTrue(file.getType() == FileType.FILE, "No such file (" + file.getName().getPath() + ")");
 
     // Validate the datasource name.
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(datasourceName);
@@ -133,21 +130,25 @@ public class DefaultImportService implements ImportService {
     if(unit == null) {
       throw new NoSuchFunctionalUnitException(unitName);
     }
-    dsEncryptionStrategy.setKeyProvider(unit.getKeyStore());
 
-    // Create an FsDatasource for the specified file.
-    FsDatasource sourceDatasource = new FsDatasource(file.getName(), file, dsEncryptionStrategy);
+    copyToDestinationDatasource(file, dispatchAttribute, destinationDatasource, unit);
 
-    // Copy the FsDatasource to the destination datasource.
+    // Archive the file.
+    try {
+      archiveData(file);
+    } catch(FileSystemException e) {
+      log.warn("The following imported file could not be archived : {}", file);
+    }
+  }
+
+  private void copyToDestinationDatasource(FileObject file, String dispatchAttribute, Datasource destinationDatasource, FunctionalUnit unit) throws IOException {
+    FsDatasource sourceDatasource = new FsDatasource(file.getName().getBaseName(), opalRuntime.getFileSystem().getLocalFile(file), getDatasourceEncryptionStrategy(unit));
     try {
       MagmaEngine.get().addDatasource(sourceDatasource);
       copyValueTables(sourceDatasource, destinationDatasource, unit.getKeyVariableName(), dispatchAttribute);
     } finally {
       MagmaEngine.get().removeDatasource(sourceDatasource);
     }
-
-    // Archive the file.
-    archiveData(file);
   }
 
   private void copyValueTables(Datasource source, Datasource destination, String keyVariableName, String dispatchAttribute) throws IOException {
@@ -162,27 +163,11 @@ public class DefaultImportService implements ImportService {
   }
 
   private void copyParticipants(ValueTable participantTable, Datasource source, Datasource destination, String keyVariableName, final String dispatchAttribute) throws IOException {
-    // Make a view of all private variables.
-    final View privateView = View.Builder.newView(participantTable.getName(), participantTable).select(new SelectClause() {
-      public boolean select(Variable variable) {
-        return isIdentifierVariable(variable);
-      }
-    }).build();
-
+    final View privateView = createPrivateView(participantTable);
     final Variable keyVariable = prepareKeysTable(privateView, keyVariableName);
-
     final OpalPrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(lookupKeysTable(), keyVariable, participantIdentifier);
 
-    // Wrap the participant table in a view that exposes public entities and non-identifiable variables
-    PrivateVariableEntityValueTable publicTable = new PrivateVariableEntityValueTable(participantTable.getName(), participantTable, entityMap);
-    publicTable.setSelectClause(new SelectClause() {
-
-      public boolean select(Variable variable) {
-        return isIdentifierVariable(variable) == false;
-      }
-
-    });
-    publicTable.initialise();
+    PrivateVariableEntityValueTable publicView = createPublicView(participantTable, entityMap);
 
     // prepare for copying participant data
     final ValueTableWriter keysTableWriter = writeToKeysTable();
@@ -203,23 +188,62 @@ public class DefaultImportService implements ImportService {
 
       };
 
-      DatasourceCopier dataCopier = DatasourceCopier.Builder.newCopier() //
-      .withLoggingListener().withThroughtputListener() //
-      .withListener(createKeysListener) //
-      .withVariableEntityCopyEventListener(auditLogManager, destination)//
-      .withMultiplexingStrategy(new VariableAttributeMutiplexingStrategy(dispatchAttribute, publicTable.getName()))//
-      .withVariableTransformer(new VariableTransformer() {
-        /** Remove the dispatch attribute from the variable name. This is onyx-specific. See OPAL-170 */
-        public Variable transform(Variable variable) {
-          return Variable.Builder.sameAs(variable).name(variable.hasAttribute(dispatchAttribute) ? variable.getName().replaceFirst("^.*\\.?" + variable.getAttributeStringValue(dispatchAttribute) + "\\.", "") : variable.getName()).build();
-        }
-      }).build();
-
-      // Copy participant's non-identifiable variables and data
-      dataCopier.copy(publicTable, destination);
+      copyPublicViewToDestinationDatasource(destination, dispatchAttribute, publicView, createKeysListener);
     } finally {
       keysTableWriter.close();
     }
+  }
+
+  private void copyPublicViewToDestinationDatasource(Datasource destination, final String dispatchAttribute, PrivateVariableEntityValueTable publicView, DatasourceCopyValueSetEventListener createKeysListener) throws IOException {
+    DatasourceCopier dataCopier = DatasourceCopier.Builder.newCopier() //
+    .withLoggingListener().withThroughtputListener() //
+    .withListener(createKeysListener) //
+    .withVariableEntityCopyEventListener(auditLogManager, destination)//
+    .withMultiplexingStrategy(new VariableAttributeMutiplexingStrategy(dispatchAttribute, publicView.getName()))//
+    .withVariableTransformer(new VariableTransformer() {
+      /** Remove the dispatch attribute from the variable name. This is onyx-specific. See OPAL-170 */
+      public Variable transform(Variable variable) {
+        return Variable.Builder.sameAs(variable).name(variable.hasAttribute(dispatchAttribute) ? variable.getName().replaceFirst("^.*\\.?" + variable.getAttributeStringValue(dispatchAttribute) + "\\.", "") : variable.getName()).build();
+      }
+    }).build();
+
+    // Copy participant's non-identifiable variables and data
+    dataCopier.copy(publicView, destination);
+  }
+
+  /**
+   * Creates a {@link View} of the participant table's "private" variables (i.e., identifiers).
+   * 
+   * @param participantTable
+   * @return
+   */
+  private View createPrivateView(ValueTable participantTable) {
+    final View privateView = View.Builder.newView(participantTable.getName(), participantTable).select(new SelectClause() {
+      public boolean select(Variable variable) {
+        return isIdentifierVariable(variable);
+      }
+    }).build();
+    return privateView;
+  }
+
+  /**
+   * Wraps the participant table in a {@link View} that exposes public entities and non-identifier variables.
+   * 
+   * @param participantTable
+   * @param entityMap
+   * @return
+   */
+  private PrivateVariableEntityValueTable createPublicView(ValueTable participantTable, final OpalPrivateVariableEntityMap entityMap) {
+    PrivateVariableEntityValueTable publicTable = new PrivateVariableEntityValueTable(participantTable.getName(), participantTable, entityMap);
+    publicTable.setSelectClause(new SelectClause() {
+
+      public boolean select(Variable variable) {
+        return isIdentifierVariable(variable) == false;
+      }
+
+    });
+    publicTable.initialise();
+    return publicTable;
   }
 
   /**
@@ -269,7 +293,18 @@ public class DefaultImportService implements ImportService {
     return publicEntity;
   }
 
-  private void archiveData(File file) {
+  private DatasourceEncryptionStrategy getDatasourceEncryptionStrategy(FunctionalUnit unit) {
+    DatasourceEncryptionStrategy dsEncryptionStrategy = unit.getDatasourceEncryptionStrategy();
+    if(dsEncryptionStrategy == null) {
+      // Use default strategy.
+      dsEncryptionStrategy = new EncryptedSecretKeyDatasourceEncryptionStrategy();
+    }
+    dsEncryptionStrategy.setKeyProvider(unit.getKeyStore());
+
+    return dsEncryptionStrategy;
+  }
+
+  private void archiveData(FileObject file) throws FileSystemException {
     // Was an archive directory configured? If not, do nothing.
     if(archiveDirectory == null || archiveDirectory.isEmpty()) {
       log.info("No archive directory configured");
@@ -277,12 +312,16 @@ public class DefaultImportService implements ImportService {
     }
 
     // Create the archive directory if necessary.
-    File archiveDir = new File(archiveDirectory);
-    archiveDir.mkdirs();
+    FileObject archiveDir = opalRuntime.getFileSystem().getRoot().resolveFile(archiveDirectory);
+    archiveDir.createFolder();
+    FileObject archiveFile = archiveDir.resolveFile(file.getName().getBaseName());
+    archiveFile.createFile();
 
     // Move the file there.
     try {
-      FileUtil.moveFile(file, archiveDir);
+      FileUtil.copyContent(file, archiveFile);
+      file.delete();
+
     } catch(IOException e) {
       log.error("Failed to archive file {} to dir {}. Error reported: {}", new Object[] { file, archiveDir, e.getMessage() });
     }

@@ -9,24 +9,27 @@
  ******************************************************************************/
 package org.obiba.opal.core.service.impl;
 
-import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileType;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.audit.VariableEntityAuditLogManager;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
+import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
-import org.obiba.opal.core.domain.unit.UnitKeyStore;
+import org.obiba.opal.core.runtime.IOpalRuntime;
 import org.obiba.opal.core.service.DecryptService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
-import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * Default implementation of {@link DecryptService}.
@@ -44,32 +47,31 @@ public class DefaultDecryptService implements DecryptService {
   // Instance Variables
   //
 
-  private UnitKeyStoreService unitKeyStoreService;
+  @Autowired
+  private IOpalRuntime opalRuntime;
 
-  private DatasourceEncryptionStrategy dsEncryptionStrategy;
-
+  @Autowired
   private VariableEntityAuditLogManager auditLogManager;
 
   //
   // DecryptService Methods
   //
 
-  public void decryptData(String unitName, String datasourceName, File file) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
-    // Validate the file.
-    if(!file.isFile()) {
-      throw new IllegalArgumentException("No such file (" + file.getPath() + ")");
-    }
+  public void decryptData(String unitName, String datasourceName, FileObject file) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
+
+    Assert.notNull(file, "file is null");
+    Assert.isTrue(file.getType() == FileType.FILE, "No such file (" + file.getName().getPath() + ")");
 
     // Validate the datasource name.
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(datasourceName);
 
-    UnitKeyStore unitKeyStore = unitKeyStoreService.getUnitKeyStore(unitName);
-    dsEncryptionStrategy.setKeyProvider(unitKeyStore);
+    FunctionalUnit unit = opalRuntime.getFunctionalUnit(unitName);
+    if(unit == null) {
+      throw new NoSuchFunctionalUnitException(unitName);
+    }
 
     // Create an FsDatasource for the specified file.
-    FsDatasource sourceDatasource = new FsDatasource(file.getName(), file, dsEncryptionStrategy);
-
-    // Copy the FsDatasource to the destination datasource.
+    FsDatasource sourceDatasource = new FsDatasource(file.getName().getBaseName(), opalRuntime.getFileSystem().getLocalFile(file), getDatasourceEncryptionStrategy(unit));
     try {
       MagmaEngine.get().addDatasource(sourceDatasource);
       copyValueTables(sourceDatasource, destinationDatasource);
@@ -78,24 +80,22 @@ public class DefaultDecryptService implements DecryptService {
     }
   }
 
-  public void decryptData(String datasourceName, File file) throws NoSuchDatasourceException, IllegalArgumentException, IOException {
+  public void decryptData(String datasourceName, FileObject file) throws NoSuchDatasourceException, IllegalArgumentException, IOException {
     decryptData(FunctionalUnit.OPAL_INSTANCE, datasourceName, file);
   }
 
   //
   // Methods
   //
+  private DatasourceEncryptionStrategy getDatasourceEncryptionStrategy(FunctionalUnit unit) {
+    DatasourceEncryptionStrategy dsEncryptionStrategy = unit.getDatasourceEncryptionStrategy();
+    if(dsEncryptionStrategy == null) {
+      // Use default strategy.
+      dsEncryptionStrategy = new EncryptedSecretKeyDatasourceEncryptionStrategy();
+    }
+    dsEncryptionStrategy.setKeyProvider(unit.getKeyStore());
 
-  public void setUnitKeyStoreService(UnitKeyStoreService unitKeyStoreService) {
-    this.unitKeyStoreService = unitKeyStoreService;
-  }
-
-  public void setDatasourceEncryptionStrategy(DatasourceEncryptionStrategy dsEncryptionStrategy) {
-    this.dsEncryptionStrategy = dsEncryptionStrategy;
-  }
-
-  public void setAuditLogManager(VariableEntityAuditLogManager auditLogManager) {
-    this.auditLogManager = auditLogManager;
+    return dsEncryptionStrategy;
   }
 
   private void copyValueTables(Datasource source, Datasource destination) throws IOException {

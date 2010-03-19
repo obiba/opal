@@ -9,10 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.shell.commands;
 
+import java.io.File;
+
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.obiba.opal.core.cfg.OpalConfiguration;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.IOpalRuntime;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -24,16 +26,16 @@ public abstract class AbstractOpalRuntimeDependentCommand<T> extends AbstractCom
   //
 
   @Autowired
-  private OpalRuntime opalRuntime;
+  private IOpalRuntime opalRuntime;
 
   //
   // Methods
   //
 
   /**
-   * Initializes the {@link OpalRuntime} bean in the context.
+   * Initializes the {@link IOpalRuntime} bean in the context.
    */
-  protected OpalRuntime getOpalRuntime() {
+  protected IOpalRuntime getOpalRuntime() {
     return opalRuntime;
   }
 
@@ -43,6 +45,14 @@ public abstract class AbstractOpalRuntimeDependentCommand<T> extends AbstractCom
 
   public FileObject getFile(String path) throws FileSystemException {
     return getFileSystemRoot().resolveFile(path);
+  }
+
+  public FileObject getFile(FileObject folder, String fileName) throws FileSystemException {
+    return folder.resolveFile(fileName);
+  }
+
+  public File getLocalFile(FileObject vsfFile) {
+    return opalRuntime.getFileSystem().getLocalFile(vsfFile);
   }
 
   protected OpalConfiguration getOpalConfiguration() {

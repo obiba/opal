@@ -10,8 +10,8 @@
 package org.obiba.opal.core.service;
 
 import org.apache.commons.vfs.FileObject;
-import org.obiba.opal.core.domain.unit.UnitKeyStore;
 import org.obiba.opal.core.unit.FunctionalUnit;
+import org.obiba.opal.core.unit.UnitKeyStore;
 
 /**
  * Manage KeyStores.

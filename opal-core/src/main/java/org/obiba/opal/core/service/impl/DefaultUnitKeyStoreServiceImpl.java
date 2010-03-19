@@ -9,28 +9,45 @@
  ******************************************************************************/
 package org.obiba.opal.core.service.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.UnrecoverableKeyException;
 
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.commons.vfs.FileObject;
 import org.obiba.core.service.impl.PersistenceManagerAwareService;
-import org.obiba.opal.core.domain.unit.UnitKeyStore;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.crypt.CacheablePasswordCallback;
+import org.obiba.opal.core.crypt.CachingCallbackHandler;
+import org.obiba.opal.core.crypt.KeyProviderSecurityException;
+import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
+import org.obiba.opal.core.runtime.IOpalRuntime;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
+import org.obiba.opal.core.unit.UnitKeyStore;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 @Transactional
 public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareService implements UnitKeyStoreService {
   //
+  // Constants
+  //
+
+  private static final String PASSWORD_FOR = "Password for";
+
+  //
   // Instance Variables
   //
 
   protected CallbackHandler callbackHandler;
 
-  protected OpalRuntime opalRuntime;
+  protected IOpalRuntime opalRuntime;
 
   //
   // UnitKeyStore Methods
@@ -40,15 +57,15 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     Assert.hasText(unitName, "unitName must not be null or empty");
     validateUnitExists(unitName);
 
-    UnitKeyStore template = new UnitKeyStore();
+    UnitKeyStoreState template = new UnitKeyStoreState();
     template.setUnit(unitName);
 
-    UnitKeyStore unitKeyStore = getPersistenceManager().matchOne(template);
-    if(unitKeyStore != null) {
-      unitKeyStore.setCallbackHander(callbackHandler);
-      UnitKeyStore.loadBouncyCastle();
+    UnitKeyStoreState unitKeyStoreState = getPersistenceManager().matchOne(template);
+    if(unitKeyStoreState != null) {
+      return loadUnitKeyStore(unitName, unitKeyStoreState);
     }
-    return unitKeyStore;
+
+    return null;
   }
 
   public UnitKeyStore getOrCreateUnitKeyStore(String unitName) {
@@ -65,7 +82,17 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
 
   public void saveUnitKeyStore(UnitKeyStore unitKeyStore) {
     Assert.notNull(unitKeyStore, "unitKeyStore must not be null");
-    getPersistenceManager().save(unitKeyStore);
+
+    UnitKeyStoreState template = new UnitKeyStoreState();
+    template.setUnit(unitKeyStore.getUnitName());
+
+    UnitKeyStoreState unitKeyStoreState = getPersistenceManager().matchOne(template);
+    if(unitKeyStoreState == null) {
+      unitKeyStoreState = template;
+    }
+    unitKeyStoreState.setKeyStore(getKeyStoreByteArray(unitKeyStore));
+
+    getPersistenceManager().save(unitKeyStoreState);
   }
 
   public void createOrUpdateKey(String unitName, String alias, String algorithm, int size, String certificateInfo) {
@@ -85,6 +112,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
       throw new RuntimeException(e);
     }
     unitKeyStore.createOrUpdateKey(alias, algorithm, size, certificateInfo);
+
     saveUnitKeyStore(unitKeyStore);
   }
 
@@ -108,6 +136,8 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
       throw new RuntimeException("The key store [" + unitName + "] does not exist. Nothing to delete.");
     }
     unitKeyStore.deleteKey(alias);
+
+    saveUnitKeyStore(unitKeyStore);
   }
 
   public void importKey(String unitName, String alias, FileObject privateKey, FileObject certificate) {
@@ -119,6 +149,8 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
 
     UnitKeyStore unitKeyStore = getOrCreateUnitKeyStore(unitName);
     unitKeyStore.importKey(alias, privateKey, certificate);
+
+    saveUnitKeyStore(unitKeyStore);
   }
 
   public void importKey(String unitName, String alias, FileObject privateKey, String certificateInfo) {
@@ -130,6 +162,8 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
 
     UnitKeyStore unitKeyStore = getOrCreateUnitKeyStore(unitName);
     unitKeyStore.importKey(alias, privateKey, certificateInfo);
+
+    saveUnitKeyStore(unitKeyStore);
   }
 
   //
@@ -140,7 +174,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     this.callbackHandler = callbackHandler;
   }
 
-  public void setOpalRuntime(OpalRuntime opalRuntime) {
+  public void setOpalRuntime(IOpalRuntime opalRuntime) {
     this.opalRuntime = opalRuntime;
   }
 
@@ -148,5 +182,78 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     if(opalRuntime.getOpalConfiguration().getFunctionalUnit(unitName) == null) {
       throw new NoSuchFunctionalUnitException(unitName);
     }
+  }
+
+  private UnitKeyStore loadUnitKeyStore(String unitName, UnitKeyStoreState unitKeyStoreState) {
+    CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName).prompt(getPasswordFor(unitName)).build();
+
+    UnitKeyStore unitKeyStore = null;
+    try {
+      unitKeyStore = new UnitKeyStore(unitName, loadKeyStore(unitKeyStoreState.getKeyStore(), passwordCallback));
+      unitKeyStore.setCallbackHander(callbackHandler);
+      UnitKeyStore.loadBouncyCastle();
+    } catch(GeneralSecurityException ex) {
+      throw new RuntimeException(ex);
+    } catch(UnsupportedCallbackException ex) {
+      throw new RuntimeException(ex);
+    } catch(IOException ex) {
+      clearPasswordCache(callbackHandler, unitName);
+      translateAndRethrowKeyStoreIOException(ex);
+    }
+
+    return unitKeyStore;
+  }
+
+  private KeyStore loadKeyStore(byte[] keyStoreBytes, CacheablePasswordCallback passwordCallback) throws GeneralSecurityException, UnsupportedCallbackException, IOException {
+    KeyStore ks = KeyStore.getInstance("JCEKS");
+    ks.load(new ByteArrayInputStream(keyStoreBytes), getKeyPassword(passwordCallback));
+
+    return ks;
+  }
+
+  private byte[] getKeyStoreByteArray(UnitKeyStore unitKeyStore) {
+    String unitName = unitKeyStore.getUnitName();
+
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    try {
+      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName).prompt(getPasswordFor(unitName)).build();
+      unitKeyStore.getKeyStore().store(baos, getKeyPassword(passwordCallback));
+    } catch(KeyStoreException e) {
+      clearPasswordCache(callbackHandler, unitKeyStore.getUnitName());
+      throw new KeyProviderSecurityException("Wrong keystore password or keystore was tampered with");
+    } catch(GeneralSecurityException e) {
+      throw new RuntimeException(e);
+    } catch(IOException ex) {
+      clearPasswordCache(callbackHandler, unitName);
+      translateAndRethrowKeyStoreIOException(ex);
+    } catch(UnsupportedCallbackException e) {
+      throw new RuntimeException(e);
+    }
+    return baos.toByteArray();
+  }
+
+  private char[] getKeyPassword(CacheablePasswordCallback passwordCallback) throws UnsupportedCallbackException, IOException {
+    callbackHandler.handle(new CacheablePasswordCallback[] { passwordCallback });
+    return passwordCallback.getPassword();
+  }
+
+  /**
+   * Returns "Password for 'name':  ".
+   */
+  private String getPasswordFor(String name) {
+    return new StringBuilder().append(PASSWORD_FOR).append(" '").append(name).append("':  ").toString();
+  }
+
+  private static void clearPasswordCache(CallbackHandler callbackHandler, String passwordKey) {
+    if(callbackHandler instanceof CachingCallbackHandler) {
+      ((CachingCallbackHandler) callbackHandler).clearPasswordCache(passwordKey);
+    }
+  }
+
+  private static void translateAndRethrowKeyStoreIOException(IOException ex) {
+    if(ex.getCause() != null && ex.getCause() instanceof UnrecoverableKeyException) {
+      throw new KeyProviderSecurityException("Wrong keystore password");
+    }
+    throw new RuntimeException(ex);
   }
 }

@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.shell.commands.options;
 
-import java.io.File;
 import java.util.List;
 
 import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
@@ -23,7 +22,7 @@ public interface ListCommandOptions extends HelpOption {
   public List<String> getTables();
 
   @Option(shortName = "o", description = "The file to which the metadata will be written.  If not specified, a file will be created with the default name : 'variables-yyyyMMdd_HHmmss.xls'")
-  public File getOutputFile();
+  public String getOutputFile();
 
   public boolean isOutputFile();
 

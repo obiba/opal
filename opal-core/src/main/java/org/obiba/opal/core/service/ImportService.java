@@ -9,9 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.core.service;
 
-import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.vfs.FileObject;
 import org.obiba.magma.NoSuchDatasourceException;
 
 /**
@@ -29,5 +29,5 @@ public interface ImportService {
    * @throws IllegalArgumentException if the specified file does not exist or is not a normal file
    * @throws IOException on any I/O error
    */
-  public void importData(String unitName, String datasourceName, File file) throws NoSuchFunctionalUnitException, IllegalArgumentException, IOException;
+  public void importData(String unitName, String datasourceName, FileObject file) throws NoSuchFunctionalUnitException, IllegalArgumentException, IOException;
 }

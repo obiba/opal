@@ -10,38 +10,56 @@
 package org.obiba.opal.shell.commands;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSelectInfo;
+import org.apache.commons.vfs.FileSelector;
+import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileType;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@CommandUsage(description = "Imports one or more Onyx data files into a datasource.", syntax = "Syntax: import --unit NAME --destination NAME --owner NAME [_FILE_...]")
+@CommandUsage(description = "Imports one or more Onyx data files into a datasource.", syntax = "Syntax: import --unit NAME --destination NAME [_FILE_...]")
 public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCommandOptions> {
 
   //
   // AbstractContextLoadingCommand Methods
   //
 
+  private static final Logger log = LoggerFactory.getLogger(ImportCommand.class);
+
   @Autowired
   private ImportService importService;
 
   public void execute() {
+    if(getOpalRuntime().getFunctionalUnit(options.getUnit()) == null) {
+      getShell().printf("Functional unit '%s' does not exist. Cannot decrypt.\n", options.getUnit());
+      return;
+    }
+
+    List<FileObject> filesToImport = null;
     if(options.isFiles()) {
-      List<File> filesToImport = resolveFiles();
-      if(!filesToImport.isEmpty()) {
-        importFiles(filesToImport);
-      } else {
-        getShell().printf("No file found. Import canceled.\n");
-      }
+      filesToImport = resolveFiles(options.getFiles());
     } else {
-      // TODO: When no file is specified, import all files in the specified unit's directory.
+      try {
+        filesToImport = getFilesInFolder(getOpalRuntime().getUnitDirectory(options.getUnit()));
+      } catch(IOException ex) {
+        throw new RuntimeException(ex);
+      }
+    }
+
+    if(!filesToImport.isEmpty()) {
+      importFiles(filesToImport);
+    } else {
       getShell().printf("No file found. Import canceled.\n");
     }
   }
@@ -50,25 +68,24 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   // Methods
   //
 
-  private void importFiles(List<File> filesToImport) {
-    String destination = options.getDestination();
+  public void setImportService(ImportService importService) {
+    this.importService = importService;
+  }
 
+  private void importFiles(List<FileObject> filesToImport) {
     getShell().printf("Importing %d file%s :\n", filesToImport.size(), (filesToImport.size() > 1 ? "s" : ""));
-    for(File file : filesToImport) {
-      getShell().printf("  %s\n", file.getPath());
-
+    for(FileObject file : filesToImport) {
+      getShell().printf("  %s\n", file.getName().getPath());
       try {
-        importService.importData(options.getUnit(), destination, file);
+        importService.importData(options.getUnit(), options.getDestination(), file);
       } catch(NoSuchFunctionalUnitException ex) {
-        // Fatal exception - break out of here.
         getShell().printf("Functional unit '%s' does not exist. Cannot import.\n", ex.getUnitName());
         break;
       } catch(NoSuchDatasourceException ex) {
-        // Fatal exception - break out of here.
         getShell().printf("Destination datasource '%s' does not exist. Cannot import.\n", ex.getDatasourceName());
         break;
       } catch(IOException ex) {
-        // Possibly a non-fatal exception - report an error and continue with the next file.
+        // Report an error and continue with the next file.
         getShell().printf("Unrecoverable import exception: %s\n", ex.getMessage());
         ex.printStackTrace(System.err);
         continue;
@@ -76,26 +93,60 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     }
   }
 
-  private List<File> resolveFiles() {
-    List<File> files = new ArrayList<File>();
+  private List<FileObject> resolveFiles(List<String> filePaths) {
+    List<FileObject> files = new ArrayList<FileObject>();
+    FileObject file;
+    FileType fileType;
+    for(String filePath : filePaths) {
 
-    for(File file : options.getFiles()) {
-      if(file.exists() == false) {
-        getShell().printf("'%s' does not exist.\n", file.getPath());
+      try {
+        if(isRelativeFilePath(filePath)) {
+          file = getFileInUnitDirectory(filePath);
+        } else {
+          file = getFile(filePath);
+        }
+
+        if(file.exists() == false) {
+          getShell().printf("'%s' does not exist\n", filePath);
+          continue;
+        }
+        fileType = file.getType();
+        if(fileType == FileType.FOLDER) {
+          files.addAll(getFilesInFolder(file));
+        } else if(fileType == FileType.FILE) {
+          files.add(file);
+        }
+      } catch(FileSystemException e) {
+        getShell().printf("Cannot resolve the following path : %s, skipping import...");
+        log.warn("Cannot resolve the following path : {}, skipping import...", e);
         continue;
       }
-      if(file.isDirectory()) {
-        File[] filesInDir = file.listFiles(new FileFilter() {
-          public boolean accept(File dirFile) {
-            return dirFile.isFile() && dirFile.getName().toLowerCase().endsWith(".zip");
-          }
-        });
-        files.addAll(Arrays.asList(filesInDir));
-      } else if(file.isFile()) {
-        files.add(file);
-      }
-    }
 
+    }
     return files;
+  }
+
+  private List<FileObject> getFilesInFolder(FileObject file) throws FileSystemException {
+    FileObject[] filesInDir = file.findFiles(new FileSelector() {
+      @Override
+      public boolean traverseDescendents(FileSelectInfo file) throws Exception {
+        return true;
+      }
+
+      @Override
+      public boolean includeFile(FileSelectInfo file) throws Exception {
+        return file.getFile().getType() == FileType.FILE && file.getFile().getName().getExtension().toLowerCase().equals("zip");
+      }
+    });
+    return Arrays.asList(filesInDir);
+  }
+
+  private boolean isRelativeFilePath(String filePath) {
+    return !(new File(filePath).isAbsolute());
+  }
+
+  private FileObject getFileInUnitDirectory(String filePath) throws FileSystemException {
+    FileObject unitDir = getOpalRuntime().getUnitDirectory(options.getUnit());
+    return unitDir.resolveFile(filePath);
   }
 }

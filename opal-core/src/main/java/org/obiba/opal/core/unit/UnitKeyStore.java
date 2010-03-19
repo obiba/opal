@@ -7,10 +7,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.domain.unit;
+package org.obiba.opal.core.unit;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -28,18 +26,12 @@ import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.persistence.UniqueConstraint;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
@@ -47,7 +39,6 @@ import org.apache.commons.vfs.FileObject;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PasswordFinder;
-import org.obiba.core.domain.AbstractEntity;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.crypt.KeyProvider;
 import org.obiba.magma.crypt.MagmaCryptRuntimeException;
@@ -57,15 +48,12 @@ import org.obiba.opal.core.crypt.CachingCallbackHandler;
 import org.obiba.opal.core.crypt.KeyPairNotFoundException;
 import org.obiba.opal.core.crypt.KeyProviderException;
 import org.obiba.opal.core.crypt.KeyProviderSecurityException;
-import org.obiba.opal.core.unit.FunctionalUnit;
 import org.springframework.util.Assert;
 
 /**
  * A {@link FunctionalUnit}'s keystore.
  */
-@Entity
-@Table(name = "unit_key_store", uniqueConstraints = { @UniqueConstraint(columnNames = { "unit" }) })
-public class UnitKeyStore extends AbstractEntity implements KeyProvider {
+public class UnitKeyStore implements KeyProvider {
   //
   // Constants
   //
@@ -78,34 +66,35 @@ public class UnitKeyStore extends AbstractEntity implements KeyProvider {
   // Instance Variables
   //
 
-  @Column(nullable = false)
-  private String unit;
+  private String unitName;
 
-  @Column(nullable = false, length = 1048576)
-  private byte[] keyStore;
+  private KeyStore store;
 
-  @Transient
-  KeyStore store;
-
-  @Transient
   private CallbackHandler callbackHandler;
+
+  //
+  // Constructors
+  //
+
+  public UnitKeyStore(String unitName, KeyStore store) {
+    this.unitName = unitName;
+    this.store = store;
+  }
 
   //
   // KeyProvider Methods
   //
 
   public KeyPair getKeyPair(String alias) throws NoSuchKeyException, org.obiba.magma.crypt.KeyProviderSecurityException {
-    KeyStore ks = getKeyStore();
     KeyPair keyPair = null;
-
     try {
-      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unit).prompt("Password for '" + alias + "':  ").build();
-      keyPair = findKeyPairForPrivateKey(alias, ks, keyPair, passwordCallback);
+      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName).prompt("Password for '" + alias + "':  ").build();
+      keyPair = findKeyPairForPrivateKey(alias, store, keyPair, passwordCallback);
     } catch(KeyPairNotFoundException ex) {
       throw ex;
     } catch(UnrecoverableKeyException ex) {
       if(callbackHandler instanceof CachingCallbackHandler) {
-        ((CachingCallbackHandler) callbackHandler).clearPasswordCache(unit);
+        ((CachingCallbackHandler) callbackHandler).clearPasswordCache(unitName);
       }
       throw new KeyProviderSecurityException("Wrong key password");
     } catch(Exception ex) {
@@ -116,11 +105,9 @@ public class UnitKeyStore extends AbstractEntity implements KeyProvider {
   }
 
   public KeyPair getKeyPair(PublicKey publicKey) throws NoSuchKeyException, org.obiba.magma.crypt.KeyProviderSecurityException {
-    KeyStore ks = getKeyStore();
-
     Enumeration<String> aliases = null;
     try {
-      aliases = ks.aliases();
+      aliases = store.aliases();
     } catch(KeyStoreException ex) {
       throw new RuntimeException(ex);
     }
@@ -129,10 +116,8 @@ public class UnitKeyStore extends AbstractEntity implements KeyProvider {
   }
 
   public PublicKey getPublicKey(Datasource datasource) throws NoSuchKeyException {
-    KeyStore ks = getKeyStore();
-
     try {
-      Certificate cert = ks.getCertificate(datasource.getName());
+      Certificate cert = store.getCertificate(datasource.getName());
       if(cert != null) {
         return cert.getPublicKey();
       }
@@ -150,64 +135,17 @@ public class UnitKeyStore extends AbstractEntity implements KeyProvider {
     this.callbackHandler = callbackHander;
   }
 
-  public String getUnit() {
-    return unit;
-  }
-
-  public void setUnit(String unit) {
-    this.unit = unit;
+  public String getUnitName() {
+    return unitName;
   }
 
   public KeyStore getKeyStore() {
-    KeyStore ks = null;
-    try {
-      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unit).prompt(getPasswordFor(unit)).build();
-      ks = loadKeyStore(passwordCallback);
-    } catch(KeyStoreException e) {
-      clearPasswordCache(callbackHandler, unit);
-      throw new KeyProviderSecurityException("Wrong keystore password or keystore was tampered with");
-    } catch(GeneralSecurityException e) {
-      throw new RuntimeException(e);
-    } catch(IOException ex) {
-      clearPasswordCache(callbackHandler, unit);
-      translateAndRethrowKeyStoreIOException(ex);
-    } catch(UnsupportedCallbackException e) {
-      throw new RuntimeException(e);
-    }
-
-    return ks;
-  }
-
-  public void setKeyStore(KeyStore keyStore) {
-    ByteArrayOutputStream b = new ByteArrayOutputStream();
-
-    try {
-      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unit).prompt(getPasswordFor(unit)).build();
-      keyStore.store(b, getKeyPassword(passwordCallback));
-    } catch(KeyStoreException e) {
-      clearPasswordCache(callbackHandler, unit);
-      throw new KeyProviderSecurityException("Wrong keystore password or keystore was tampered with");
-    } catch(GeneralSecurityException e) {
-      throw new RuntimeException(e);
-    } catch(IOException ex) {
-      clearPasswordCache(callbackHandler, unit);
-      translateAndRethrowKeyStoreIOException(ex);
-    } catch(UnsupportedCallbackException e) {
-      throw new RuntimeException(e);
-    }
-    this.keyStore = b.toByteArray();
+    return store;
   }
 
   private char[] getKeyPassword(CacheablePasswordCallback passwordCallback) throws UnsupportedCallbackException, IOException {
     callbackHandler.handle(new CacheablePasswordCallback[] { passwordCallback });
     return passwordCallback.getPassword();
-  }
-
-  private KeyStore loadKeyStore(CacheablePasswordCallback passwordCallback) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException, UnsupportedCallbackException {
-    KeyStore ks;
-    ks = KeyStore.getInstance("JCEKS");
-    ks.load(new ByteArrayInputStream(keyStore), getKeyPassword(passwordCallback));
-    return ks;
   }
 
   private KeyPair findKeyPairForPrivateKey(String alias, KeyStore ks, KeyPair keyPair, CacheablePasswordCallback passwordCallback) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedCallbackException, IOException {
@@ -257,75 +195,6 @@ public class UnitKeyStore extends AbstractEntity implements KeyProvider {
     throw new RuntimeException(ex);
   }
 
-  //
-  // Inner Classes
-  //
-
-  public static class Builder {
-    private String unit;
-
-    private CallbackHandler callbackHandler;
-
-    public static Builder newStore() {
-      return new Builder();
-    }
-
-    public Builder unit(String unit) {
-      this.unit = unit;
-      return this;
-    }
-
-    public Builder passwordPrompt(CallbackHandler callbackHandler) {
-      this.callbackHandler = callbackHandler;
-      return this;
-    }
-
-    private char[] getKeyPassword(CacheablePasswordCallback passwordCallback) throws UnsupportedCallbackException, IOException {
-      callbackHandler.handle(new CacheablePasswordCallback[] { passwordCallback });
-      return passwordCallback.getPassword();
-    }
-
-    public UnitKeyStore build() {
-      Assert.hasText(unit, "unit must not be null or empty");
-      Assert.notNull(callbackHandler, "callbackHander must not be null");
-
-      UnitKeyStore.loadBouncyCastle();
-
-      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unit).prompt("Enter '" + unit + "' keystore password:  ").confirmation("Re-enter '" + unit + "' keystore password:  ").build();
-
-      KeyStore keyStore = createEmptyKeyStore(passwordCallback);
-
-      return createUnitKeyStore(keyStore);
-    }
-
-    private KeyStore createEmptyKeyStore(CacheablePasswordCallback passwordCallback) {
-      KeyStore keyStore = null;
-      try {
-        keyStore = KeyStore.getInstance("JCEKS");
-        keyStore.load(null, getKeyPassword(passwordCallback));
-      } catch(KeyStoreException e) {
-        clearPasswordCache(callbackHandler, unit);
-        throw new KeyProviderSecurityException("Wrong keystore password or keystore was tampered with");
-      } catch(GeneralSecurityException e) {
-        throw new RuntimeException(e);
-      } catch(IOException ex) {
-        clearPasswordCache(callbackHandler, unit);
-        translateAndRethrowKeyStoreIOException(ex);
-      } catch(UnsupportedCallbackException e) {
-        throw new RuntimeException(e);
-      }
-      return keyStore;
-    }
-
-    private UnitKeyStore createUnitKeyStore(KeyStore keyStore) {
-      UnitKeyStore unitKeyStore = new UnitKeyStore();
-      unitKeyStore.setUnit(unit);
-      unitKeyStore.setCallbackHander(callbackHandler);
-      unitKeyStore.setKeyStore(keyStore);
-      return unitKeyStore;
-    }
-  }
-
   public static X509Certificate makeCertificate(PrivateKey issuerPrivateKey, PublicKey subjectPublicKey, String certificateInfo, String signatureAlgorithm) throws SignatureException, InvalidKeyException, CertificateEncodingException, NoSuchAlgorithmException {
     final org.bouncycastle.x509.X509V3CertificateGenerator certificateGenerator = new org.bouncycastle.x509.X509V3CertificateGenerator();
     final org.bouncycastle.asn1.x509.X509Name issuerDN = new org.bouncycastle.asn1.x509.X509Name(certificateInfo);
@@ -350,12 +219,8 @@ public class UnitKeyStore extends AbstractEntity implements KeyProvider {
     try {
       KeyPair keyPair = generateKeyPair(algorithm, size);
       X509Certificate cert = makeCertificate(algorithm, certificateInfo, keyPair);
-
-      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unit).prompt(getPasswordFor(unit)).build();
-
-      KeyStore keyStore = getKeyStore();
-      keyStore.setKeyEntry(alias, keyPair.getPrivate(), getKeyPassword(passwordCallback), new X509Certificate[] { cert });
-      setKeyStore(keyStore);
+      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName).prompt(getPasswordFor(unitName)).build();
+      store.setKeyEntry(alias, keyPair.getPrivate(), getKeyPassword(passwordCallback), new X509Certificate[] { cert });
     } catch(GeneralSecurityException e) {
       throw new RuntimeException(e);
     } catch(UnsupportedCallbackException e) {
@@ -370,10 +235,8 @@ public class UnitKeyStore extends AbstractEntity implements KeyProvider {
    * @param alias key to delete
    */
   public void deleteKey(String alias) {
-    KeyStore keyStore = getKeyStore();
     try {
-      keyStore.deleteEntry(alias);
-      setKeyStore(keyStore);
+      store.deleteEntry(alias);
     } catch(KeyStoreException e) {
       throw new KeyProviderException(e);
     }
@@ -386,9 +249,8 @@ public class UnitKeyStore extends AbstractEntity implements KeyProvider {
    * @return true if the alias exists
    */
   public boolean aliasExists(String alias) {
-    KeyStore keyStore = getKeyStore();
     try {
-      return keyStore.containsAlias(alias);
+      return store.containsAlias(alias);
     } catch(KeyStoreException e) {
       throw new KeyProviderException(e);
     }
@@ -407,11 +269,9 @@ public class UnitKeyStore extends AbstractEntity implements KeyProvider {
   public void importKey(String alias, FileObject privateKey, FileObject certificate) {
     Key key = getPrivateKeyFile(privateKey);
     X509Certificate cert = getCertificateFromFile(certificate);
-    KeyStore keyStore = getKeyStore();
-    CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unit).prompt(getPasswordFor(alias)).build();
+    CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName).prompt(getPasswordFor(alias)).build();
     try {
-      keyStore.setKeyEntry(alias, key, getKeyPassword(passwordCallback), new X509Certificate[] { cert });
-      setKeyStore(keyStore);
+      store.setKeyEntry(alias, key, getKeyPassword(passwordCallback), new X509Certificate[] { cert });
     } catch(KeyStoreException e) {
       throw new RuntimeException(e);
     } catch(UnsupportedCallbackException e) {
@@ -434,11 +294,8 @@ public class UnitKeyStore extends AbstractEntity implements KeyProvider {
     X509Certificate cert;
     try {
       cert = UnitKeyStore.makeCertificate(keyPair.getPrivate(), keyPair.getPublic(), certificateInfo, chooseSignatureAlgorithm(keyPair.getPrivate().getAlgorithm()));
-      KeyStore keyStore = getKeyStore();
-      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unit).prompt(getPasswordFor(alias)).build();
-
-      keyStore.setKeyEntry(alias, keyPair.getPrivate(), getKeyPassword(passwordCallback), new X509Certificate[] { cert });
-      setKeyStore(keyStore);
+      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName).prompt(getPasswordFor(alias)).build();
+      store.setKeyEntry(alias, keyPair.getPrivate(), getKeyPassword(passwordCallback), new X509Certificate[] { cert });
     } catch(GeneralSecurityException e) {
       throw new RuntimeException(e);
     } catch(UnsupportedCallbackException e) {
@@ -549,5 +406,72 @@ public class UnitKeyStore extends AbstractEntity implements KeyProvider {
    */
   private String getPasswordFor(String name) {
     return new StringBuilder().append(PASSWORD_FOR).append(" '").append(name).append("':  ").toString();
+  }
+
+  //
+  // Inner Classes
+  //
+
+  public static class Builder {
+    private String unit;
+
+    private CallbackHandler callbackHandler;
+
+    public static Builder newStore() {
+      return new Builder();
+    }
+
+    public Builder unit(String unit) {
+      this.unit = unit;
+      return this;
+    }
+
+    public Builder passwordPrompt(CallbackHandler callbackHandler) {
+      this.callbackHandler = callbackHandler;
+      return this;
+    }
+
+    private char[] getKeyPassword(CacheablePasswordCallback passwordCallback) throws UnsupportedCallbackException, IOException {
+      callbackHandler.handle(new CacheablePasswordCallback[] { passwordCallback });
+      return passwordCallback.getPassword();
+    }
+
+    public UnitKeyStore build() {
+      Assert.hasText(unit, "unit must not be null or empty");
+      Assert.notNull(callbackHandler, "callbackHander must not be null");
+
+      UnitKeyStore.loadBouncyCastle();
+
+      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unit).prompt("Enter '" + unit + "' keystore password:  ").confirmation("Re-enter '" + unit + "' keystore password:  ").build();
+
+      KeyStore keyStore = createEmptyKeyStore(passwordCallback);
+
+      return createUnitKeyStore(keyStore);
+    }
+
+    private KeyStore createEmptyKeyStore(CacheablePasswordCallback passwordCallback) {
+      KeyStore keyStore = null;
+      try {
+        keyStore = KeyStore.getInstance("JCEKS");
+        keyStore.load(null, getKeyPassword(passwordCallback));
+      } catch(KeyStoreException e) {
+        clearPasswordCache(callbackHandler, unit);
+        throw new KeyProviderSecurityException("Wrong keystore password or keystore was tampered with");
+      } catch(GeneralSecurityException e) {
+        throw new RuntimeException(e);
+      } catch(IOException ex) {
+        clearPasswordCache(callbackHandler, unit);
+        translateAndRethrowKeyStoreIOException(ex);
+      } catch(UnsupportedCallbackException e) {
+        throw new RuntimeException(e);
+      }
+      return keyStore;
+    }
+
+    private UnitKeyStore createUnitKeyStore(KeyStore keyStore) {
+      UnitKeyStore unitKeyStore = new UnitKeyStore(unit, keyStore);
+      unitKeyStore.setCallbackHander(callbackHandler);
+      return unitKeyStore;
+    }
   }
 }

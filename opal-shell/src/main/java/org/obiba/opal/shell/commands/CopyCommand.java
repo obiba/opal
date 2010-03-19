@@ -11,7 +11,6 @@ package org.obiba.opal.shell.commands;
 
 import java.util.HashMap;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
@@ -28,6 +27,8 @@ import org.obiba.opal.core.service.ExportService;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
  * Provides ability to export Magma tables to an existing datasource or an Excel file.
  */
@@ -37,6 +38,10 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   @Autowired
   private ExportService exportService;
 
+  public void setExportService(ExportService exportService) {
+    this.exportService = exportService;
+  }
+
   public void execute() {
     if(options.getTables() != null && !options.isSource()) {
       if(validateOptions()) {
@@ -45,6 +50,10 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
           if(options.isDestination()) {
             destinationDatasource = getDatasourceByName(options.getDestination());
           } else {
+            if(options.getOut().exists() && options.getOut().canWrite() == false) {
+              getShell().printf("Cannot write to file %s\n", options.getOut().getName());
+              return;
+            }
             destinationDatasource = new ExcelDatasource(options.getOut().getName(), options.getOut());
             MagmaEngine.get().addDatasource(destinationDatasource);
           }
@@ -74,7 +83,11 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
           e.printStackTrace(System.err);
         } finally {
           if(options.isOut() && destinationDatasource != null) {
-            MagmaEngine.get().removeDatasource(destinationDatasource);
+            try {
+              MagmaEngine.get().removeDatasource(destinationDatasource);
+            } catch(RuntimeException e) {
+
+            }
           }
         }
       }
@@ -100,7 +113,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       }
     }
 
-    return new TreeSet<ValueTable>(names.values());
+    return ImmutableSet.copyOf(names.values());
   }
 
   private Datasource getDatasourceByName(String datasourceName) {

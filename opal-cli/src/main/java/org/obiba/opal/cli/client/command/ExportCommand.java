@@ -32,7 +32,11 @@ public class ExportCommand extends AbstractOpalRuntimeDependentCommand<ExportCom
           if(options.isDestination()) {
             exportService.exportTablesToDatasource(options.getTables(), options.getDestination(), !options.getNonIncremental());
           } else if(options.isOut()) {
-            exportService.exportTablesToExcelFile(options.getTables(), options.getOut(), !options.getNonIncremental());
+            if(options.getOut().exists() && options.getOut().canWrite() == false) {
+              System.console().printf("Cannot write to file %s %s %s\n", options.getOut().getName(), options.getOut().exists(), options.getOut().canWrite());
+            } else {
+              exportService.exportTablesToExcelFile(options.getTables(), options.getOut(), !options.getNonIncremental());
+            }
           }
         } catch(ExportException e) {
           System.console().printf("%s\n", e.getMessage());

@@ -4,8 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.obiba.opal.core.crypt.StudyKeyStore;
-import org.obiba.opal.core.domain.unit.UnitKeyStore;
+import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
 import org.springframework.beans.factory.FactoryBean;
 
 import com.google.common.collect.ImmutableSet;
@@ -13,8 +12,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 public class OpalAnnotationConfigurationHelper implements FactoryBean {
-  // TODO: Remove StudyKeyStore.class for annotatedClasses.
-  private final Set<Class<?>> annotatedClasses = new ImmutableSet.Builder<Class<?>>().add(StudyKeyStore.class).add(UnitKeyStore.class).build();
+  private final Set<Class<?>> annotatedClasses = new ImmutableSet.Builder<Class<?>>().add(UnitKeyStoreState.class).build();
 
   private final List<Class<?>> additionalClasses = Lists.newArrayList();
 

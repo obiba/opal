@@ -10,7 +10,6 @@
 package org.obiba.opal.core.unit;
 
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
-import org.obiba.opal.core.domain.unit.UnitKeyStore;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 
 /**
@@ -73,7 +72,6 @@ public class FunctionalUnit {
   }
 
   public DatasourceEncryptionStrategy getDatasourceEncryptionStrategy() {
-    datasourceEncryptionStrategy.setKeyProvider(getKeyStore());
     return datasourceEncryptionStrategy;
   }
 
