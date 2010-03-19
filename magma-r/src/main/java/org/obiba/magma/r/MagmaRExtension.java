@@ -3,6 +3,7 @@ package org.obiba.magma.r;
 import org.obiba.magma.Disposable;
 import org.obiba.magma.MagmaEngineExtension;
 import org.obiba.magma.MagmaRuntimeException;
+import org.obiba.magma.r.rserve.RserveEngineFactory;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngine;
@@ -12,7 +13,7 @@ import org.rosuda.REngine.REngineException;
  */
 public class MagmaRExtension implements MagmaEngineExtension, Disposable {
 
-  private REngineFactory engineFactory;
+  private REngineFactory engineFactory = new RserveEngineFactory();
 
   private REngine engine;
 

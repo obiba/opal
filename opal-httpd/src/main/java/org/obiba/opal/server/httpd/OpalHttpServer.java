@@ -4,11 +4,8 @@ import org.obiba.opal.server.httpd.security.ShiroVerifierAndEnroler;
 import org.obiba.opal.server.rest.TransactionFilter;
 import org.restlet.Application;
 import org.restlet.Component;
-import org.restlet.Server;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Protocol;
-import org.restlet.ext.jetty.HttpServerHelper;
-import org.restlet.ext.jetty.JettyServerHelper;
 import org.restlet.security.ChallengeAuthenticator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -19,15 +16,14 @@ public class OpalHttpServer {
 
   private Component component;
 
-  private JettyServerHelper jetty;
+  // private JettyServerHelper jetty;
 
   @Autowired
   private PlatformTransactionManager txManager;
 
   public OpalHttpServer() {
     component = new Component();
-    Server embeddedServer = new Server(component.getContext().createChildContext(), Protocol.HTTP, 8182, component);
-    jetty = new HttpServerHelper(embeddedServer);
+    component.getServers().add(Protocol.HTTP, 8182);
   }
 
   public Component getComponent() {
@@ -51,7 +47,7 @@ public class OpalHttpServer {
 
   public void start() {
     try {
-      jetty.start();
+      component.start();
     } catch(Exception e) {
       throw new RuntimeException(e);
     }
@@ -59,7 +55,7 @@ public class OpalHttpServer {
 
   public void stop() {
     try {
-      jetty.stop();
+      component.stop();
     } catch(Exception e) {
       throw new RuntimeException(e);
     }

@@ -22,6 +22,11 @@
       <artifactId>opal-shell</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-datashield</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
 </project>
