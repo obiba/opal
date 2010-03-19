@@ -68,8 +68,8 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
   }
 
   private boolean validInputFiles() {
-    if(options.getFiles() == null) {
-      getShell().printf("No input file(s) specified.\n");
+    if(!options.isFiles()) {
+      getShell().printf("No input file specified.\n");
       return false;
     }
     return true;

@@ -29,4 +29,6 @@ public interface DecryptCommandOptions extends HelpOption {
 
   @Unparsed(name = "FILE")
   public List<String> getFiles();
+
+  public boolean isFiles();
 }
