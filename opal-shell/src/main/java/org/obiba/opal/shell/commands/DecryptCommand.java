@@ -97,34 +97,18 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
 
   private void decryptFiles(List<String> encryptedFilePaths, FileObject outputDir) {
     for(String path : encryptedFilePaths) {
-      processPathSkipIfFileDoesNotExist(outputDir, path);
-    }
-  }
-
-  private void processPathSkipIfFileDoesNotExist(FileObject outputDir, String path) {
-    try {
-      FileObject encryptedFile = null;
-      if(isRelativeFilePath(path) && options.isUnit()) {
-        encryptedFile = getFileInUnitDirectory(path);
-      } else {
-        encryptedFile = getFile(path);
-      }
-
-      if(encryptedFile.exists() == false) {
-        getShell().printf("Skipping non-existent input file %s\n", path);
-      } else {
-        getShell().printf("Decrypting input file %s\n", path);
-        try {
+      try {
+        FileObject encryptedFile = getEncryptedFile(path);
+        if(encryptedFile.exists() == false) {
+          getShell().printf("Skipping non-existent input file %s\n", path);
+        } else {
+          getShell().printf("Decrypting input file %s\n", path);
           decryptFile(encryptedFile, outputDir);
-        } catch(IOException ex) {
-          // Report an error and continue with the next file.
-          getShell().printf("Unexpected decrypt exception: %s\n", ex.getMessage());
-          ex.printStackTrace(System.err);
         }
+      } catch(IOException ex) {
+        getShell().printf("Unexpected decrypt exception: %s, skipping\n", ex.getMessage());
+        ex.printStackTrace(System.err);
       }
-    } catch(FileSystemException ex) {
-      getShell().printf("Skipping non-existent input file %s\n", path);
-      log.warn("Cannot resolve the following file path : {}, skipping file...", ex);
     }
   }
 
@@ -184,12 +168,22 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
     return inputFilenamePrefix + "-plaintext" + inputFilenameExt;
   }
 
-  private boolean isRelativeFilePath(String filePath) {
-    return !(new File(filePath).isAbsolute());
+  private FileObject getEncryptedFile(String path) throws FileSystemException {
+    FileObject encryptedFile = null;
+    if(isRelativeFilePath(path) && options.isUnit()) {
+      encryptedFile = getFileInUnitDirectory(path);
+    } else {
+      encryptedFile = getFile(path);
+    }
+    return encryptedFile;
   }
 
   private FileObject getFileInUnitDirectory(String filePath) throws FileSystemException {
     FileObject unitDir = getOpalRuntime().getUnitDirectory(options.getUnit());
     return unitDir.resolveFile(filePath);
+  }
+
+  private boolean isRelativeFilePath(String filePath) {
+    return !(new File(filePath).isAbsolute());
   }
 }

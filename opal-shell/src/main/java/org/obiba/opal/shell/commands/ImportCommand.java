@@ -46,16 +46,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       return;
     }
 
-    List<FileObject> filesToImport = null;
-    if(options.isFiles()) {
-      filesToImport = resolveFiles(options.getFiles());
-    } else {
-      try {
-        filesToImport = getFilesInFolder(getOpalRuntime().getUnitDirectory(options.getUnit()));
-      } catch(IOException ex) {
-        throw new RuntimeException(ex);
-      }
-    }
+    List<FileObject> filesToImport = getFilesToImport();
 
     if(!filesToImport.isEmpty()) {
       importFiles(filesToImport);
@@ -93,37 +84,57 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     }
   }
 
+  private List<FileObject> getFilesToImport() {
+    List<FileObject> filesToImport = null;
+    if(options.isFiles()) {
+      filesToImport = resolveFiles(options.getFiles());
+    } else {
+      try {
+        filesToImport = getFilesInFolder(getOpalRuntime().getUnitDirectory(options.getUnit()));
+      } catch(IOException ex) {
+        throw new RuntimeException(ex);
+      }
+    }
+    return filesToImport;
+  }
+
   private List<FileObject> resolveFiles(List<String> filePaths) {
     List<FileObject> files = new ArrayList<FileObject>();
     FileObject file;
-    FileType fileType;
     for(String filePath : filePaths) {
-
       try {
-        if(isRelativeFilePath(filePath)) {
-          file = getFileInUnitDirectory(filePath);
-        } else {
-          file = getFile(filePath);
-        }
-
+        file = getFileToImport(filePath);
         if(file.exists() == false) {
           getShell().printf("'%s' does not exist\n", filePath);
           continue;
         }
-        fileType = file.getType();
-        if(fileType == FileType.FOLDER) {
-          files.addAll(getFilesInFolder(file));
-        } else if(fileType == FileType.FILE) {
-          files.add(file);
-        }
+        addFile(files, file);
       } catch(FileSystemException e) {
         getShell().printf("Cannot resolve the following path : %s, skipping import...");
         log.warn("Cannot resolve the following path : {}, skipping import...", e);
         continue;
       }
-
     }
     return files;
+  }
+
+  private FileObject getFileToImport(String filePath) throws FileSystemException {
+    FileObject file;
+    if(isRelativeFilePath(filePath)) {
+      file = getFileInUnitDirectory(filePath);
+    } else {
+      file = getFile(filePath);
+    }
+    return file;
+  }
+
+  private void addFile(List<FileObject> files, FileObject file) throws FileSystemException {
+    FileType fileType = file.getType();
+    if(fileType == FileType.FOLDER) {
+      files.addAll(getFilesInFolder(file));
+    } else if(fileType == FileType.FILE) {
+      files.add(file);
+    }
   }
 
   private List<FileObject> getFilesInFolder(FileObject file) throws FileSystemException {
@@ -141,12 +152,12 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     return Arrays.asList(filesInDir);
   }
 
-  private boolean isRelativeFilePath(String filePath) {
-    return !(new File(filePath).isAbsolute());
-  }
-
   private FileObject getFileInUnitDirectory(String filePath) throws FileSystemException {
     FileObject unitDir = getOpalRuntime().getUnitDirectory(options.getUnit());
     return unitDir.resolveFile(filePath);
+  }
+
+  private boolean isRelativeFilePath(String filePath) {
+    return !(new File(filePath).isAbsolute());
   }
 }
