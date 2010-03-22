@@ -562,7 +562,10 @@
             <linkXref>false</linkXref>
             <sourceEncoding>ISO-8859-1</sourceEncoding>
             <minimumTokens>30</minimumTokens>
-            <targetJdk>1.5</targetJdk>
+            <targetJdk>1.6</targetJdk>
+            <rulesets>
+              <ruleset>${pmd.ruleset.dir}/opal-pmd-ruleset.xml</ruleset>        
+            </rulesets>
           </configuration>
         </plugin>
 
@@ -668,6 +671,8 @@
   <properties>
     <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
 
+    <pmd.ruleset.dir>${basedir}</pmd.ruleset.dir>
+    
     <obiba.commons.version>1.1.1</obiba.commons.version>
     <magma.version>1.1-SNAPSHOT</magma.version>
     <spring.version>2.5.6</spring.version>

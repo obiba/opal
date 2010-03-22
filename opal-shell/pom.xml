@@ -28,4 +28,8 @@
       <version>0.6</version>
     </dependency>
   </dependencies>
+  
+  <properties>
+    <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
+  </properties>
 </project>
