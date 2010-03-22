@@ -562,10 +562,7 @@
             <linkXref>false</linkXref>
             <sourceEncoding>ISO-8859-1</sourceEncoding>
             <minimumTokens>30</minimumTokens>
-            <targetJdk>1.6</targetJdk>
-            <rulesets>
-              <ruleset>http://svn.obiba.org/opal/trunk/obiba-pmd-ruleset.xml</ruleset>
-            </rulesets>
+            <targetJdk>1.5</targetJdk>
           </configuration>
         </plugin>
 
