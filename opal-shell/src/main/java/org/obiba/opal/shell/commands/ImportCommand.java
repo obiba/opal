@@ -23,7 +23,6 @@ import org.apache.commons.vfs.FileType;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
-import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,13 +41,8 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   private ImportService importService;
 
   public void execute() {
-    if(!FunctionalUnit.OPAL_INSTANCE.equals(options.getUnit()) && getOpalRuntime().getFunctionalUnit(options.getUnit()) == null) {
-      getShell().printf("Functional unit '%s' does not exist. Cannot import.\n", options.getUnit());
-      return;
-    }
-
-    if(FunctionalUnit.OPAL_INSTANCE.equals(options.getUnit())) {
-      getShell().printf("Imports into '%s' not allowed.\n", FunctionalUnit.OPAL_INSTANCE);
+    if(getOpalRuntime().getFunctionalUnit(options.getUnit()) == null) {
+      getShell().printf("Functional unit '%s' does not exist.\n", options.getUnit());
       return;
     }
 

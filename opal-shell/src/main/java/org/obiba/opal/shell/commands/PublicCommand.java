@@ -44,16 +44,31 @@ public class PublicCommand extends AbstractOpalRuntimeDependentCommand<PublicCom
   //
 
   public void execute() {
+    if(options.isUnit()) {
+      if(FunctionalUnit.OPAL_INSTANCE.equals(options.getUnit())) {
+        getShell().printf("Functional unit '%s' does not exist.\n", options.getUnit());
+        return;
+      }
+    }
+
     UnitKeyStore unitKeyStore = getUnitKeyStore();
     if(unitKeyStore == null) {
       getShell().printf("Keystore doesn't exist\n");
       return;
     }
 
+    exportCertificate(unitKeyStore, options.getAlias());
+  }
+
+  //
+  // Methods
+  //
+
+  private void exportCertificate(UnitKeyStore unitKeyStore, String alias) {
     Writer certificateWriter = null;
     try {
       certificateWriter = getCertificateWriter();
-      writeCertificate(unitKeyStore, certificateWriter);
+      writeCertificate(unitKeyStore, alias, certificateWriter);
       printResult(certificateWriter);
     } catch(FileSystemException e) {
       getShell().printf("%s in an invalid output file.  Please make sure that you have specified a valid path.", options.getOut());
@@ -63,10 +78,6 @@ public class PublicCommand extends AbstractOpalRuntimeDependentCommand<PublicCom
       StreamUtil.silentSafeClose(certificateWriter);
     }
   }
-
-  //
-  // Methods
-  //
 
   private UnitKeyStore getUnitKeyStore() {
     UnitKeyStore unitKeyStore = null;
@@ -91,9 +102,8 @@ public class PublicCommand extends AbstractOpalRuntimeDependentCommand<PublicCom
     return certificateWriter;
   }
 
-  private void writeCertificate(UnitKeyStore unitKeyStore, Writer writer) throws IOException {
+  private void writeCertificate(UnitKeyStore unitKeyStore, String alias, Writer writer) throws IOException {
     Assert.notNull(unitKeyStore, "unitKeyStore can not be null");
-    String alias = options.getAlias();
 
     Certificate certificate;
     try {

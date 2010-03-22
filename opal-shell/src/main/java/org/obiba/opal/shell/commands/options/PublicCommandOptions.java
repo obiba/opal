@@ -9,7 +9,7 @@ import uk.co.flamingpenguin.jewel.cli.Option;
 @CommandLineInterface(application = "certificate")
 public interface PublicCommandOptions extends HelpOption {
 
-  @Option(shortName = "u", description = "The functional unit. Defaults to 'OpalInstance'.")
+  @Option(shortName = "u", description = "The functional unit.")
   public String getUnit();
 
   public boolean isUnit();

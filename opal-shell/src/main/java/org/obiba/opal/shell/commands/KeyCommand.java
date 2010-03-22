@@ -34,16 +34,19 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   //
 
   public void execute() {
+    if(options.isUnit()) {
+      if(FunctionalUnit.OPAL_INSTANCE.equals(options.getUnit())) {
+        getShell().printf("Functional unit '%s' does not exist.\n", options.getUnit());
+        return;
+      }
+    }
+
     if(options.isDelete()) {
       deleteKey();
     } else if(options.isAlgorithm() && options.isSize()) {
       createKey();
     } else if(options.isPrivate()) {
-      try {
-        importKey();
-      } catch(FileSystemException e) {
-        throw new RuntimeException("An error occured while reading the encryption key files.", e);
-      }
+      importKey();
     } else {
       unrecognizedOptionsHelp();
     }
@@ -82,29 +85,34 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
     }
   }
 
-  private void importKey() throws FileSystemException {
+  private void importKey() {
     String unit = options.isUnit() ? options.getUnit() : FunctionalUnit.OPAL_INSTANCE;
-
-    if(getFile(options.getPrivate()).exists() == false) {
-      getShell().printf("Private key file '%s' does not exist. Cannot import key.\n", options.getPrivate());
-      return;
-    }
-    if(options.isCertificate() && getFile(options.getCertificate()).exists() == false) {
-      getShell().printf("Certificate file '%s' does not exist. Cannot import key.\n", options.getCertificate());
-      return;
-    }
     try {
+      if(getFile(options.getPrivate()).exists() == false) {
+        getShell().printf("Private key file '%s' does not exist. Cannot import key.\n", options.getPrivate());
+        return;
+      }
+      if(options.isCertificate() && getFile(options.getCertificate()).exists() == false) {
+        getShell().printf("Certificate file '%s' does not exist. Cannot import key.\n", options.getCertificate());
+        return;
+      }
       if(keyDoesNotExistOrOverwriteConfirmed(unit, options.getAlias())) {
-        if(options.isCertificate()) {
-          unitKeyStoreService.importKey(unit, options.getAlias(), getFile(options.getPrivate()), getFile(options.getCertificate()));
-        } else {
-          unitKeyStoreService.importKey(unit, options.getAlias(), getFile(options.getPrivate()), new CertificateInfo(getShell()).getCertificateInfoAsString());
-        }
-        getShell().printf("Key imported with alias '%s'.\n", options.getAlias());
+        importKeyFromFileOrInteractively(unit, options.getAlias());
       }
     } catch(NoSuchFunctionalUnitException ex) {
       getShell().printf("Functional unit '%s' does not exist. Key not imported.\n", ex.getUnitName());
+    } catch(FileSystemException e) {
+      throw new RuntimeException("An error occured while reading the encryption key files.", e);
     }
+  }
+
+  private void importKeyFromFileOrInteractively(String unit, String alias) throws FileSystemException {
+    if(options.isCertificate()) {
+      unitKeyStoreService.importKey(unit, alias, getFile(options.getPrivate()), getFile(options.getCertificate()));
+    } else {
+      unitKeyStoreService.importKey(unit, alias, getFile(options.getPrivate()), new CertificateInfo(getShell()).getCertificateInfoAsString());
+    }
+    getShell().printf("Key imported with alias '%s'.\n", alias);
   }
 
   private boolean keyDoesNotExistOrOverwriteConfirmed(String unit, String alias) {
