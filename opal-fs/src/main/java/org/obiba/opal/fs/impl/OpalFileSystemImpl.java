@@ -36,6 +36,7 @@ public class OpalFileSystemImpl implements OpalFileSystem {
       FileObject vfsRoot = fsm.resolveFile(root);
       nativeRootURL = vfsRoot.getURL().toString() + "/";
 
+      Assert.isTrue(vfsRoot.isReadable(), "Opal File System is not readable.  Please check your Opal File System configuration.");
       Assert.isTrue(vfsRoot.isWriteable(), "The root of the Opal File System is not writable.  Please reconfigure the Opal File System with a writable root.");
 
       // This is similar to what chroot does. We obtain a "filesystem" that appears to be rooted at vfsRoot
@@ -55,11 +56,11 @@ public class OpalFileSystemImpl implements OpalFileSystem {
       if(isLocalFile(virtualFile)) {
         String virtualFileURL = virtualFile.getURL().toString();
         String nativeFileURL = virtualFileURL.replace(root.getURL().toString(), nativeRootURL);
+
         log.info("nativeRootURL: {}", nativeRootURL);
         log.info("nativeFileURL: {}", nativeFileURL);
 
-        File file = new File(nativeFileURL.substring("file://".length()));
-        log.info("nativeFile exists: {}", file.exists());
+        File file = new File(nativeFileURL.replaceFirst("[a-zA-Z]*[0-9]?://", ""));
         return file;
       } else {
         return convertVirtualFileToLocal(virtualFile);
