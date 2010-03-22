@@ -18,6 +18,7 @@ import org.apache.commons.vfs.FileSystemException;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.opal.core.service.DecryptService;
+import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.shell.commands.options.DecryptCommandOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,6 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
   //
 
   public void execute() {
-
     FileObject outputDir = getFileSystemRoot();
     if(options.isOutput()) {
       outputDir = getOutputDir(options.getOutput());
@@ -79,7 +79,7 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
 
   private boolean validUnit() {
     if(options.isUnit()) {
-      if(getOpalRuntime().getFunctionalUnit(options.getUnit()) == null) {
+      if(!FunctionalUnit.OPAL_INSTANCE.equals(options.getUnit()) && getOpalRuntime().getFunctionalUnit(options.getUnit()) == null) {
         getShell().printf("Functional unit '%s' does not exist. Cannot decrypt.\n", options.getUnit());
         return false;
       }

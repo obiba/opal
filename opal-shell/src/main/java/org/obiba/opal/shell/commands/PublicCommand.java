@@ -91,13 +91,13 @@ public class PublicCommand extends AbstractOpalRuntimeDependentCommand<PublicCom
     return certificateWriter;
   }
 
-  private void writeCertificate(UnitKeyStore studyKeyStore, Writer writer) throws IOException {
-    Assert.notNull(studyKeyStore, "studyKeyStore can not be null");
+  private void writeCertificate(UnitKeyStore unitKeyStore, Writer writer) throws IOException {
+    Assert.notNull(unitKeyStore, "unitKeyStore can not be null");
     String alias = options.getAlias();
 
     Certificate certificate;
     try {
-      certificate = studyKeyStore.getKeyStore().getCertificate(alias);
+      certificate = unitKeyStore.getKeyStore().getCertificate(alias);
       if(certificate == null) {
         getShell().printf("No certificate was found for alias '%s'.\n", alias);
       } else {

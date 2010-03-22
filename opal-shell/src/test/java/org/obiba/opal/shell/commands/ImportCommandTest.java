@@ -41,12 +41,41 @@ public class ImportCommandTest {
 
   @Test
   public void testImportIntoOpalInstanceNotAllowed() {
-    testImportIntoNonExistingUnit(FunctionalUnit.OPAL_INSTANCE);
+    ImportCommandOptions mockOptions = createMock(ImportCommandOptions.class);
+    expect(mockOptions.getUnit()).andReturn(FunctionalUnit.OPAL_INSTANCE).atLeastOnce();
+
+    OpalShell mockShell = createMockShellForOpalInstanceNotAllowed();
+
+    IOpalRuntime mockRuntime = createMock(IOpalRuntime.class);
+
+    replay(mockOptions, mockShell, mockRuntime);
+
+    ImportCommand importCommand = createImportCommand(mockRuntime);
+    importCommand.setOptions(mockOptions);
+    importCommand.setShell(mockShell);
+    importCommand.execute();
+
+    verify(mockOptions, mockShell, mockRuntime);
   }
 
   @Test
   public void testImportIntoBogusUnitNotAllowed() {
-    testImportIntoNonExistingUnit("bogus");
+    ImportCommandOptions mockOptions = createMock(ImportCommandOptions.class);
+    expect(mockOptions.getUnit()).andReturn("bogus").atLeastOnce();
+
+    OpalShell mockShell = createMockShellForBogusUnitNotAllowed("bogus");
+
+    IOpalRuntime mockRuntime = createMock(IOpalRuntime.class);
+    expect(mockRuntime.getFunctionalUnit("bogus")).andReturn(null).atLeastOnce();
+
+    replay(mockOptions, mockShell, mockRuntime);
+
+    ImportCommand importCommand = createImportCommand(mockRuntime);
+    importCommand.setOptions(mockOptions);
+    importCommand.setShell(mockShell);
+    importCommand.execute();
+
+    verify(mockOptions, mockShell, mockRuntime);
   }
 
   /**
@@ -106,26 +135,6 @@ public class ImportCommandTest {
   // Methods
   //
 
-  private void testImportIntoNonExistingUnit(String unitName) {
-    ImportCommandOptions mockOptions = createMock(ImportCommandOptions.class);
-    expect(mockOptions.getUnit()).andReturn(unitName).atLeastOnce();
-
-    OpalShell mockShell = createMock(OpalShell.class);
-    mockShell.printf("Functional unit '%s' does not exist. Cannot decrypt.\n", unitName);
-
-    IOpalRuntime mockRuntime = createMock(IOpalRuntime.class);
-    expect(mockRuntime.getFunctionalUnit(unitName)).andReturn(null).atLeastOnce();
-
-    replay(mockOptions, mockShell, mockRuntime);
-
-    ImportCommand importCommand = createImportCommand(mockRuntime);
-    importCommand.setOptions(mockOptions);
-    importCommand.setShell(mockShell);
-    importCommand.execute();
-
-    verify(mockOptions, mockShell, mockRuntime);
-  }
-
   private ImportCommand createImportCommand(final IOpalRuntime mockRuntime) {
     return new ImportCommand() {
       @Override
@@ -138,6 +147,20 @@ public class ImportCommandTest {
         return null;
       }
     };
+  }
+
+  private OpalShell createMockShellForOpalInstanceNotAllowed() {
+    OpalShell mockShell = createMock(OpalShell.class);
+    mockShell.printf("Imports into '%s' not allowed.\n", FunctionalUnit.OPAL_INSTANCE);
+
+    return mockShell;
+  }
+
+  private OpalShell createMockShellForBogusUnitNotAllowed(String unitName) {
+    OpalShell mockShell = createMock(OpalShell.class);
+    mockShell.printf("Functional unit '%s' does not exist. Cannot import.\n", unitName);
+
+    return mockShell;
   }
 
   private ImportCommandOptions createMockOptionsForRelativePathImport(String unitName, String destination, String relativeFilePath) {

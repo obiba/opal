@@ -24,6 +24,7 @@ import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.opal.core.runtime.IOpalRuntime;
 import org.obiba.opal.core.service.DecryptService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +52,9 @@ public class DefaultDecryptService implements DecryptService {
   private IOpalRuntime opalRuntime;
 
   @Autowired
+  private UnitKeyStoreService unitKeyStoreService;
+
+  @Autowired
   private VariableEntityAuditLogManager auditLogManager;
 
   //
@@ -58,7 +62,6 @@ public class DefaultDecryptService implements DecryptService {
   //
 
   public void decryptData(String unitName, String datasourceName, FileObject file) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
-
     Assert.notNull(file, "file is null");
     Assert.isTrue(file.getType() == FileType.FILE, "No such file (" + file.getName().getPath() + ")");
 
@@ -66,12 +69,12 @@ public class DefaultDecryptService implements DecryptService {
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(datasourceName);
 
     FunctionalUnit unit = opalRuntime.getFunctionalUnit(unitName);
-    if(unit == null) {
+    if(!FunctionalUnit.OPAL_INSTANCE.equals(unitName) && unit == null) {
       throw new NoSuchFunctionalUnitException(unitName);
     }
 
     // Create an FsDatasource for the specified file.
-    FsDatasource sourceDatasource = new FsDatasource(file.getName().getBaseName(), opalRuntime.getFileSystem().getLocalFile(file), getDatasourceEncryptionStrategy(unit));
+    FsDatasource sourceDatasource = new FsDatasource(file.getName().getBaseName(), opalRuntime.getFileSystem().getLocalFile(file), unit != null ? getDatasourceEncryptionStrategy(unit) : getOpalInstanceEncryptionStrategy());
     try {
       MagmaEngine.get().addDatasource(sourceDatasource);
       copyValueTables(sourceDatasource, destinationDatasource);
@@ -87,15 +90,26 @@ public class DefaultDecryptService implements DecryptService {
   //
   // Methods
   //
+
   private DatasourceEncryptionStrategy getDatasourceEncryptionStrategy(FunctionalUnit unit) {
     DatasourceEncryptionStrategy dsEncryptionStrategy = unit.getDatasourceEncryptionStrategy();
     if(dsEncryptionStrategy == null) {
-      // Use default strategy.
-      dsEncryptionStrategy = new EncryptedSecretKeyDatasourceEncryptionStrategy();
+      dsEncryptionStrategy = getDefaultEncryptionStrategy();
     }
     dsEncryptionStrategy.setKeyProvider(unit.getKeyStore());
 
     return dsEncryptionStrategy;
+  }
+
+  private DatasourceEncryptionStrategy getOpalInstanceEncryptionStrategy() {
+    DatasourceEncryptionStrategy dsEncryptionStrategy = getDefaultEncryptionStrategy();
+    dsEncryptionStrategy.setKeyProvider(unitKeyStoreService.getOrCreateUnitKeyStore(FunctionalUnit.OPAL_INSTANCE));
+
+    return dsEncryptionStrategy;
+  }
+
+  private DatasourceEncryptionStrategy getDefaultEncryptionStrategy() {
+    return new EncryptedSecretKeyDatasourceEncryptionStrategy();
   }
 
   private void copyValueTables(Datasource source, Datasource destination) throws IOException {
