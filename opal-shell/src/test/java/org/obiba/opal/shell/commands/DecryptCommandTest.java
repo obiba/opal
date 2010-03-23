@@ -114,7 +114,7 @@ public class DecryptCommandTest extends AbstractMagmaTest {
     expect(mockUnitDir.resolveFile("encrypted.zip")).andReturn(inputFile).atLeastOnce();
 
     OpalFileSystem mockFileSystem = createMockFileSystem(mockFileSystemRoot);
-    expect(mockFileSystem.getLocalFile(outputFile)).andReturn(new File(System.getProperty("java.io.tmpdir"), "encrypted.zip")).atLeastOnce();
+    expect(mockFileSystem.getLocalFile(outputFile)).andReturn(new File("target", "encrypted.zip")).atLeastOnce();
 
     IOpalRuntime mockRuntime = createMockRuntimeForDefaultOutputDirectory(mockFileSystem, "my-unit");
     expect(mockRuntime.getUnitDirectory("my-unit")).andReturn(mockUnitDir).atLeastOnce();
