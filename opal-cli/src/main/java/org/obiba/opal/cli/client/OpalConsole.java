@@ -19,7 +19,6 @@ import org.apache.shiro.util.LifecycleUtils;
 import org.obiba.opal.cli.client.command.Command;
 import org.obiba.opal.cli.client.command.CopyCommand;
 import org.obiba.opal.cli.client.command.DecryptCommand;
-import org.obiba.opal.cli.client.command.ExportCommand;
 import org.obiba.opal.cli.client.command.HelpCommand;
 import org.obiba.opal.cli.client.command.ImportCommand;
 import org.obiba.opal.cli.client.command.KeyCommand;
@@ -33,7 +32,6 @@ import org.obiba.opal.cli.client.command.VersionCommand;
 import org.obiba.opal.cli.client.command.options.AuthenticationOptions;
 import org.obiba.opal.cli.client.command.options.CopyCommandOptions;
 import org.obiba.opal.cli.client.command.options.DecryptCommandOptions;
-import org.obiba.opal.cli.client.command.options.ExportCommandOptions;
 import org.obiba.opal.cli.client.command.options.HelpCommandOptions;
 import org.obiba.opal.cli.client.command.options.HelpOption;
 import org.obiba.opal.cli.client.command.options.ImportCommandOptions;
@@ -84,7 +82,6 @@ public class OpalConsole extends AbstractCliClient {
     addAvailableCommand(DecryptCommand.class, DecryptCommandOptions.class);
     addAvailableCommand(VersionCommand.class, VersionCommandOptions.class);
     addAvailableCommand(ShowCommand.class, ShowCommandOptions.class);
-    addAvailableCommand(ExportCommand.class, ExportCommandOptions.class);
     addAvailableCommand(CopyCommand.class, CopyCommandOptions.class);
     addAvailableCommand(SplitCommand.class, SplitCommandOptions.class);
   }

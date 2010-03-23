@@ -21,7 +21,7 @@ public interface SplitCommandOptions extends HelpOption {
   @Unparsed(name = "FILE")
   public List<File> getFiles();
 
-  @Option(shortName = "o", longName = "out", description = "The directory into which the decrypted files are written. Default is current directory.")
+  @Option(shortName = "o", longName = "out", description = "The directory into which the decrypted files are written. Directory is created if it does not exist.")
   public File getOutput();
 
   @Option(shortName = "s", longName = "size", description = "Maximum number of entities to write per file. Default is 500.", defaultValue = "500")
