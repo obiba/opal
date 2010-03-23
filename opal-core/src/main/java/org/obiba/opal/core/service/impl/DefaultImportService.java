@@ -132,13 +132,7 @@ public class DefaultImportService implements ImportService {
     }
 
     copyToDestinationDatasource(file, dispatchAttribute, destinationDatasource, unit);
-
-    // Archive the file.
-    try {
-      archiveData(file);
-    } catch(FileSystemException e) {
-      log.warn("The following imported file could not be archived : {}", file);
-    }
+    archiveData(file);
   }
 
   private void copyToDestinationDatasource(FileObject file, String dispatchAttribute, Datasource destinationDatasource, FunctionalUnit unit) throws IOException {
@@ -173,25 +167,29 @@ public class DefaultImportService implements ImportService {
     final ValueTableWriter keysTableWriter = writeToKeysTable();
 
     try {
-      // This listener will insert all participant identifiers in the keys datasource prior to copying the valueset to
-      // the data datasource.
-      // It will also generate the public variable entity if it does not exist yet. As such, it must be executed before
-      // the ValueSet is copied to the data datasource otherwise, it will not have an associated entity.
-      DatasourceCopyValueSetEventListener createKeysListener = new DatasourceCopyValueSetEventListener() {
-
-        public void onValueSetCopied(ValueTable source, ValueSet valueSet, String... destination) {
-        }
-
-        public void onValueSetCopy(ValueTable source, ValueSet valueSet) {
-          copyParticipantIdentifiers(valueSet.getVariableEntity(), privateView, keyVariable, keysTableWriter, entityMap);
-        }
-
-      };
-
-      copyPublicViewToDestinationDatasource(destination, dispatchAttribute, publicView, createKeysListener);
+      copyPublicViewToDestinationDatasource(destination, dispatchAttribute, publicView, createKeysListener(privateView, keyVariable, entityMap, keysTableWriter));
     } finally {
       keysTableWriter.close();
     }
+  }
+
+  /**
+   * This listener will insert all participant identifiers in the keys datasource prior to copying the valueset to the
+   * data datasource. It will also generate the public variable entity if it does not exist yet. As such, it must be
+   * executed before the ValueSet is copied to the data datasource otherwise, it will not have an associated entity.
+   */
+  private DatasourceCopyValueSetEventListener createKeysListener(final View privateView, final Variable keyVariable, final OpalPrivateVariableEntityMap entityMap, final ValueTableWriter keysTableWriter) {
+    DatasourceCopyValueSetEventListener createKeysListener = new DatasourceCopyValueSetEventListener() {
+
+      public void onValueSetCopied(ValueTable source, ValueSet valueSet, String... destination) {
+      }
+
+      public void onValueSetCopy(ValueTable source, ValueSet valueSet) {
+        copyParticipantIdentifiers(valueSet.getVariableEntity(), privateView, keyVariable, keysTableWriter, entityMap);
+      }
+
+    };
+    return createKeysListener;
   }
 
   private void copyPublicViewToDestinationDatasource(Datasource destination, final String dispatchAttribute, PrivateVariableEntityValueTable publicView, DatasourceCopyValueSetEventListener createKeysListener) throws IOException {
@@ -305,25 +303,22 @@ public class DefaultImportService implements ImportService {
   }
 
   private void archiveData(FileObject file) throws FileSystemException {
-    // Was an archive directory configured? If not, do nothing.
     if(archiveDirectory == null || archiveDirectory.isEmpty()) {
       log.info("No archive directory configured");
       return;
     }
 
-    // Create the archive directory if necessary.
-    FileObject archiveDir = opalRuntime.getFileSystem().getRoot().resolveFile(archiveDirectory);
-    archiveDir.createFolder();
-    FileObject archiveFile = archiveDir.resolveFile(file.getName().getBaseName());
-    archiveFile.createFile();
-
-    // Move the file there.
     try {
+      FileObject archiveDir = opalRuntime.getFileSystem().getRoot().resolveFile(archiveDirectory);
+      archiveDir.createFolder();
+
+      FileObject archiveFile = archiveDir.resolveFile(file.getName().getBaseName());
+      archiveFile.createFile();
+
       FileUtil.copyContent(file, archiveFile);
       file.delete();
-
     } catch(IOException e) {
-      log.error("Failed to archive file {} to dir {}. Error reported: {}", new Object[] { file, archiveDir, e.getMessage() });
+      log.error("Failed to archive file {} to dir {}. Error reported: {}", new Object[] { file, archiveDirectory, e.getMessage() });
     }
   }
 
