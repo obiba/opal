@@ -72,7 +72,6 @@ public class DefaultDecryptService implements DecryptService {
     if(!FunctionalUnit.OPAL_INSTANCE.equals(unitName) && unit == null) {
       throw new NoSuchFunctionalUnitException(unitName);
     }
-
     // Create an FsDatasource for the specified file.
     FsDatasource sourceDatasource = new FsDatasource(file.getName().getBaseName(), opalRuntime.getFileSystem().getLocalFile(file), unit != null ? getDatasourceEncryptionStrategy(unit) : getOpalInstanceEncryptionStrategy());
     try {
