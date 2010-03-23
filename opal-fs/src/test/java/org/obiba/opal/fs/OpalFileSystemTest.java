@@ -50,10 +50,13 @@ public class OpalFileSystemTest {
     fsLocal = new OpalFileSystemImpl("res:opal-file-system");
     fsLocalRoot = fsLocal.getRoot();
 
-    mockFtpServer = new FakeFtpServer();
-    mockFtpServer.addUserAccount(new UserAccount("user", "password", "c:/"));
-
+    // MockFtpServer blocks the execution of this test under the unix environment, so this test
+    // will be run on Windows until we find a solution...
     if(runningOsIsWindows()) {
+
+      mockFtpServer = new FakeFtpServer();
+      mockFtpServer.addUserAccount(new UserAccount("user", "password", "c:/"));
+
       FileSystem fileSystem = new WindowsFakeFileSystem();
       fileSystem.add(new DirectoryEntry("c:/temp"));
       fileSystem.add(new FileEntry("c:/temp/file1.txt"));
@@ -97,7 +100,8 @@ public class OpalFileSystemTest {
 
   @After
   public void cleanUp() {
-    Assume.assumeTrue(runningOsIsWindows());
-    mockFtpServer.stop();
+    if(mockFtpServer != null) {
+      mockFtpServer.stop();
+    }
   }
 }
