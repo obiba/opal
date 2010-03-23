@@ -5,7 +5,7 @@
     Opal PMD ruleset.
   </description>
   
-  <rule ref="rulesets/codesize.xml/ExcessiveMethodLength">
+  <rule ref="rulesets/codesize.xml/NcssMethodCount">
     <properties>
       <property name="minimum" value="20" />
     </properties>
