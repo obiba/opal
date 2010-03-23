@@ -29,7 +29,6 @@ public class JOTMTransactionFactory extends JTATransactionFactory {
   @Override
   public void configure(Properties props) throws HibernateException {
     super.configure(props);
-
     TransactionManagerLookup lookup = TransactionManagerLookupFactory.getTransactionManagerLookup(props);
     if(lookup == null) {
       throw new HibernateException("Could not obtain an instance of TransactionManagerLookup. Make sure the property '" + Environment.TRANSACTION_MANAGER_STRATEGY + "' is set.");
@@ -41,7 +40,6 @@ public class JOTMTransactionFactory extends JTATransactionFactory {
     if(tm == null) {
       throw new HibernateException("Could not lookup JOTM TransactionManager");
     }
-
     if(tm instanceof UserTransaction) {
       ut = (UserTransaction) tm;
     } else {
