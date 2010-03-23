@@ -90,21 +90,21 @@ public class OpalFileSystemImpl implements OpalFileSystem {
     Assert.notNull(virtualFile, "A virtualFile is required.");
     makeSureThatFileCanBeConverted(virtualFile);
 
-    File localFile = null;
     InputStream virtualFileInputStream = null;
     FileOutputStream localFileOutputStream = null;
     try {
-      localFileOutputStream = new FileOutputStream(getLocalTempFile(virtualFile));
+      File localFile = getLocalTempFile(virtualFile);
+      localFileOutputStream = new FileOutputStream(localFile);
       virtualFileInputStream = virtualFile.getContent().getInputStream();
       StreamUtil.copy(virtualFileInputStream, localFileOutputStream);
-
+      return localFile;
     } catch(Exception couldNotConvertFileToLocal) {
       throw new RuntimeException("Failed to convert FileObject (VFS) to a local File", couldNotConvertFileToLocal);
     } finally {
       StreamUtil.silentSafeClose(virtualFileInputStream);
       StreamUtil.silentSafeClose(localFileOutputStream);
     }
-    return localFile;
+
   }
 
   private File getLocalTempFile(FileObject virtualFile) throws IOException {
