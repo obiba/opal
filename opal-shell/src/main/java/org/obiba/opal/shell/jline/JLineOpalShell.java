@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.Writer;
 
 import jline.ConsoleReader;
+import jline.Terminal;
+import jline.UnixTerminal;
 
 import org.obiba.opal.shell.AbstractOpalShell;
 import org.obiba.opal.shell.CommandRegistry;
@@ -19,7 +21,11 @@ public class JLineOpalShell extends AbstractOpalShell {
   public JLineOpalShell(CommandRegistry registry, InputStream in, Writer out) {
     super(registry);
     try {
-      consoleReader = new ConsoleReader(in, out);
+
+      // OPAL-222
+      // Forcing a Unix terminal to fix a Putty compatibility issue when connecting from Windows through SSH.
+      Terminal terminal = new UnixTerminal();
+      consoleReader = new ConsoleReader(in, out, null, terminal);
     } catch(IOException e) {
       throw new RuntimeException(e);
     }
