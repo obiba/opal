@@ -44,11 +44,8 @@ public class PublicCommand extends AbstractOpalRuntimeDependentCommand<PublicCom
   //
 
   public void execute() {
-    if(options.isUnit()) {
-      if(FunctionalUnit.OPAL_INSTANCE.equals(options.getUnit())) {
-        getShell().printf("Functional unit '%s' does not exist.\n", options.getUnit());
-        return;
-      }
+    if(!validUnit()) {
+      return;
     }
 
     UnitKeyStore unitKeyStore = getUnitKeyStore();
@@ -64,12 +61,25 @@ public class PublicCommand extends AbstractOpalRuntimeDependentCommand<PublicCom
   // Methods
   //
 
+  private boolean validUnit() {
+
+    if(options.isUnit()) {
+      if(FunctionalUnit.OPAL_INSTANCE.equals(options.getUnit())) {
+        getShell().printf("Functional unit '%s' does not exist.\n", options.getUnit());
+        return false;
+      } else if(getOpalRuntime().getFunctionalUnit(options.getUnit()) == null) {
+        getShell().printf("Functional unit '%s' does not exist. Cannot decrypt.\n", options.getUnit());
+        return false;
+      }
+    }
+    return true;
+  }
+
   private void exportCertificate(UnitKeyStore unitKeyStore, String alias) {
     Writer certificateWriter = null;
     try {
       certificateWriter = getCertificateWriter();
       writeCertificate(unitKeyStore, alias, certificateWriter);
-      printResult(certificateWriter);
     } catch(FileSystemException e) {
       getShell().printf("%s in an invalid output file.  Please make sure that you have specified a valid path.", options.getOut());
     } catch(IOException e) {
@@ -114,6 +124,7 @@ public class PublicCommand extends AbstractOpalRuntimeDependentCommand<PublicCom
         PEMWriter pemWriter = new PEMWriter(writer);
         pemWriter.writeObject(certificate);
         pemWriter.flush();
+        printResult(writer);
       }
     } catch(KeyStoreException e) {
       throw new RuntimeException(e);
