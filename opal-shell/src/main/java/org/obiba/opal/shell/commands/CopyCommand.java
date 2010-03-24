@@ -201,7 +201,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     }
 
     if(outputFile.getName().getExtension().equals("xls")) {
-      System.console().printf("WARNING: Writing to an Excel 97 spreadsheet. These are limited to 256 columns and 65536 rows which may not be sufficient for writing large tables.\nUse an 'xlsx' extension to use Excel 2007 format which supports 16K columns.\n");
+      getShell().printf("WARNING: Writing to an Excel 97 spreadsheet. These are limited to 256 columns and 65536 rows which may not be sufficient for writing large tables.\nUse an 'xlsx' extension to use Excel 2007 format which supports 16K columns.\n");
     }
     return outputFile;
   }
