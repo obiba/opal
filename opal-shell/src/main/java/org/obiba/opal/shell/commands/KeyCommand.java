@@ -72,6 +72,10 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   // Methods
   //
 
+  public void setUnitKeyStoreService(UnitKeyStoreService unitKeyStoreService) {
+    this.unitKeyStoreService = unitKeyStoreService;
+  }
+
   private void executeAction(String action) {
     if(action.equals(CREATE_ACTION)) {
       createKey();
@@ -246,7 +250,7 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   private UnitKeyStore getUnitKeyStore() {
     UnitKeyStore unitKeyStore = null;
     if(options.isUnit()) {
-      FunctionalUnit unit = getOpalConfiguration().getFunctionalUnit(options.getUnit());
+      FunctionalUnit unit = getOpalRuntime().getFunctionalUnit(options.getUnit());
       unitKeyStore = unit.getKeyStore();
     } else {
       unitKeyStore = unitKeyStoreService.getUnitKeyStore(FunctionalUnit.OPAL_INSTANCE);
