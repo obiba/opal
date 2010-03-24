@@ -80,6 +80,14 @@ public class FunctionalUnit {
   }
 
   public UnitKeyStore getKeyStore() {
-    return unitKeyStoreService.getOrCreateUnitKeyStore(getName());
+    return getKeyStore(true);
+  }
+
+  public UnitKeyStore getKeyStore(boolean create) {
+    if(create) {
+      return unitKeyStoreService.getOrCreateUnitKeyStore(getName());
+    } else {
+      return unitKeyStoreService.getUnitKeyStore(getName());
+    }
   }
 }

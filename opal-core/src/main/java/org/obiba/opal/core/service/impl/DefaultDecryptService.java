@@ -17,6 +17,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.audit.VariableEntityAuditLogManager;
+import org.obiba.magma.crypt.support.NullKeyProvider;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
@@ -26,6 +27,7 @@ import org.obiba.opal.core.service.DecryptService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
+import org.obiba.opal.core.unit.UnitKeyStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,7 +97,8 @@ public class DefaultDecryptService implements DecryptService {
     if(dsEncryptionStrategy == null) {
       dsEncryptionStrategy = getDefaultEncryptionStrategy();
     }
-    dsEncryptionStrategy.setKeyProvider(unit.getKeyStore());
+    UnitKeyStore unitKeyStore = unit.getKeyStore(false);
+    dsEncryptionStrategy.setKeyProvider(unitKeyStore != null ? unitKeyStore : new NullKeyProvider());
 
     return dsEncryptionStrategy;
   }

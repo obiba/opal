@@ -27,6 +27,7 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.audit.VariableEntityAuditLogManager;
+import org.obiba.magma.crypt.support.NullKeyProvider;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
@@ -45,6 +46,7 @@ import org.obiba.opal.core.runtime.IOpalRuntime;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
+import org.obiba.opal.core.unit.UnitKeyStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -297,7 +299,8 @@ public class DefaultImportService implements ImportService {
       // Use default strategy.
       dsEncryptionStrategy = new EncryptedSecretKeyDatasourceEncryptionStrategy();
     }
-    dsEncryptionStrategy.setKeyProvider(unit.getKeyStore());
+    UnitKeyStore unitKeyStore = unit.getKeyStore(false);
+    dsEncryptionStrategy.setKeyProvider(unitKeyStore != null ? unitKeyStore : new NullKeyProvider());
 
     return dsEncryptionStrategy;
   }
