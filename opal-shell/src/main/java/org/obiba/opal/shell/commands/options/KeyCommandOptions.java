@@ -16,8 +16,8 @@ public interface KeyCommandOptions extends HelpOption {
   @Option(shortName = "a", description = "The alias name of the encryption key pair.")
   public String getAlias();
 
-  @Option(shortName = "d", description = "Delete a key pair from the keystore.")
-  public boolean isDelete();
+  @Option(shortName = "x", description = "The action to perform: create, delete, import or export.")
+  public String getAction();
 
   @Option(shortName = "g", longName = "algo", description = "The algorithm for creating the key pair. RSA is recommended.")
   public String getAlgorithm();
@@ -34,7 +34,7 @@ public interface KeyCommandOptions extends HelpOption {
 
   public boolean isPrivate();
 
-  @Option(shortName = "c", description = "Provides the certified public key file that matches the private key file. If omitted the user is prompted to create one.")
+  @Option(shortName = "c", description = "When action is 'import', indicates the certificate file to import (if omitted, user is prompted to create one). When action is 'export', indicates the file to which the exported certficate will be saved.")
   public String getCertificate();
 
   public boolean isCertificate();
