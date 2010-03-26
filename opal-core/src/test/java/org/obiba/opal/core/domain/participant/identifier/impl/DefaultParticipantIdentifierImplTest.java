@@ -12,6 +12,7 @@ package org.obiba.opal.core.domain.participant.identifier.impl;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import junit.framework.Assert;
 
@@ -66,10 +67,10 @@ public class DefaultParticipantIdentifierImplTest {
         }
       }
     }
-    Set<Character> keys = distributionMap.keySet();
-    for(Character c : keys) {
+    Set<Entry<Character, Integer>> entries = distributionMap.entrySet();
+    for(Entry<Character, Integer> c : entries) {
       // All characters should be used roughly the same number of times
-      Assert.assertTrue("The distribution of [" + c + "] has the value [" + distributionMap.get(c) + "].", distributionMap.get(c) >= 9500 && distributionMap.get(c) <= 10500);
+      Assert.assertTrue("The distribution of [" + c.getKey() + "] has the value [" + c.getValue() + "].", c.getValue() >= 9500 && c.getValue() <= 10500);
     }
   }
 }

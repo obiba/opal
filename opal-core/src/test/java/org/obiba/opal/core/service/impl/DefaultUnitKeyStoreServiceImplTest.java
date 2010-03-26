@@ -153,16 +153,27 @@ public class DefaultUnitKeyStoreServiceImplTest {
   }
 
   private byte[] getTestKeyStoreByteArray() throws IOException {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-    InputStream testKeyStoreStream = new FileInputStream("src/test/resources/DefaultUnitKeyStoreServiceImplTest/opal.jks");
-    while(testKeyStoreStream.available() != 0) {
-      byte[] buf = new byte[1024];
-      int bytesRead = testKeyStoreStream.read(buf);
-      baos.write(buf, 0, bytesRead);
+    byte[] barray;
+    ByteArrayOutputStream baos = null;
+    InputStream testKeyStoreStream = null;
+    try {
+      baos = new ByteArrayOutputStream();
+
+      testKeyStoreStream = new FileInputStream("src/test/resources/DefaultUnitKeyStoreServiceImplTest/opal.jks");
+      while(testKeyStoreStream.available() != 0) {
+        byte[] buf = new byte[1024];
+        int bytesRead = testKeyStoreStream.read(buf);
+        baos.write(buf, 0, bytesRead);
+      }
+
+      barray = baos.toByteArray();
+    } finally {
+      baos.close();
+      testKeyStoreStream.close();
     }
+    return barray;
 
-    return baos.toByteArray();
   }
 
   //

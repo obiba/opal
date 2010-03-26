@@ -341,7 +341,7 @@ public class DefaultImportService implements ImportService {
   /**
    * A MultiplexingStrategy that uses a variable attribute as the destination table name
    */
-  private class VariableAttributeMutiplexingStrategy implements MultiplexingStrategy {
+  static private class VariableAttributeMutiplexingStrategy implements MultiplexingStrategy {
 
     private final String attributeName;
 
