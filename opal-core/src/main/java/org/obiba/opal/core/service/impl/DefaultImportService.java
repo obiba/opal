@@ -12,9 +12,7 @@ package org.obiba.opal.core.service.impl;
 import java.io.IOException;
 
 import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
-import org.apache.commons.vfs.FileUtil;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
@@ -69,8 +67,6 @@ public class DefaultImportService implements ImportService {
 
   private IOpalRuntime opalRuntime;
 
-  private String archiveDirectory;
-
   /** Configured through org.obiba.opal.keys.tableReference */
   private String keysTableReference;
 
@@ -110,10 +106,6 @@ public class DefaultImportService implements ImportService {
     this.keysTableEntityType = keysTableEntityType;
   }
 
-  public void setArchiveDirectory(String archiveDirectory) {
-    this.archiveDirectory = archiveDirectory;
-  }
-
   public void setAuditLogManager(VariableEntityAuditLogManager auditLogManager) {
     this.auditLogManager = auditLogManager;
   }
@@ -134,7 +126,6 @@ public class DefaultImportService implements ImportService {
     }
 
     copyToDestinationDatasource(file, dispatchAttribute, destinationDatasource, unit);
-    archiveData(file);
   }
 
   private void copyToDestinationDatasource(FileObject file, String dispatchAttribute, Datasource destinationDatasource, FunctionalUnit unit) throws IOException {
@@ -303,26 +294,6 @@ public class DefaultImportService implements ImportService {
     dsEncryptionStrategy.setKeyProvider(unitKeyStore != null ? unitKeyStore : new NullKeyProvider());
 
     return dsEncryptionStrategy;
-  }
-
-  private void archiveData(FileObject file) throws FileSystemException {
-    if(archiveDirectory == null || archiveDirectory.isEmpty()) {
-      log.info("No archive directory configured");
-      return;
-    }
-
-    try {
-      FileObject archiveDir = opalRuntime.getFileSystem().getRoot().resolveFile(archiveDirectory);
-      archiveDir.createFolder();
-
-      FileObject archiveFile = archiveDir.resolveFile(file.getName().getBaseName());
-      archiveFile.createFile();
-
-      FileUtil.copyContent(file, archiveFile);
-      file.delete();
-    } catch(IOException e) {
-      log.error("Failed to archive file {} to dir {}. Error reported: {}", new Object[] { file, archiveDirectory, e.getMessage() });
-    }
   }
 
   private ValueTable lookupKeysTable() {

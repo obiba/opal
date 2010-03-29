@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@CommandUsage(description = "Imports one or more Onyx data files into a datasource.", syntax = "Syntax: import --unit NAME --destination NAME [_FILE_...]")
+@CommandUsage(description = "Imports one or more Onyx data files into a datasource.", syntax = "Syntax: import --unit NAME --destination NAME [--archive FILE] [_FILE_...]")
 public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCommandOptions> {
 
   //
@@ -69,6 +69,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       getShell().printf("  %s\n", file.getName().getPath());
       try {
         importService.importData(options.getUnit(), options.getDestination(), file);
+        archive(file);
       } catch(NoSuchFunctionalUnitException ex) {
         getShell().printf("Functional unit '%s' does not exist. Cannot import.\n", ex.getUnitName());
         break;
@@ -81,6 +82,27 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
         ex.printStackTrace(System.err);
         continue;
       }
+    }
+  }
+
+  private void archive(FileObject file) throws IOException {
+    if(!options.isArchive()) {
+      return;
+    }
+
+    try {
+      FileObject archiveDir;
+      if(isRelativeFilePath(options.getArchive())) {
+        archiveDir = getFileInUnitDirectory(options.getArchive());
+      } else {
+        archiveDir = getFile(options.getArchive());
+      }
+      archiveDir.createFolder();
+
+      FileObject archiveFile = archiveDir.resolveFile(file.getName().getBaseName());
+      file.moveTo(archiveFile);
+    } catch(FileSystemException ex) {
+      throw new IOException("Failed to archive file " + file.getName().getPath());
     }
   }
 

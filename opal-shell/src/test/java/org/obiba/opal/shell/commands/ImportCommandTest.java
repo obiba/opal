@@ -171,6 +171,7 @@ public class ImportCommandTest {
     expect(mockOptions.getDestination()).andReturn(destination).atLeastOnce();
     expect(mockOptions.isFiles()).andReturn(true).atLeastOnce();
     expect(mockOptions.getFiles()).andReturn(Arrays.asList(relativeFilePath)).atLeastOnce();
+    expect(mockOptions.isArchive()).andReturn(false).atLeastOnce();
 
     return mockOptions;
   }
@@ -221,6 +222,7 @@ public class ImportCommandTest {
     expect(mockOptions.getUnit()).andReturn(unitName).atLeastOnce();
     expect(mockOptions.getDestination()).andReturn(destination).atLeastOnce();
     expect(mockOptions.isFiles()).andReturn(false).atLeastOnce();
+    expect(mockOptions.isArchive()).andReturn(false).atLeastOnce();
 
     return mockOptions;
   }

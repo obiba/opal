@@ -27,6 +27,11 @@ public interface ImportCommandOptions extends HelpOption {
   @Option(shortName = "d", description = "The destination datasource into which the variable catalogue and the participants data will be imported.")
   public String getDestination();
 
+  @Option(shortName = "a", description = "Archive directory. If a relative path is given, it is relative to the functional unit's directory.")
+  public String getArchive();
+
+  public boolean isArchive();
+
   @Unparsed(name = "FILE")
   public List<String> getFiles();
 
