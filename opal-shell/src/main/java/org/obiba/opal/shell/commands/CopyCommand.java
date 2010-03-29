@@ -74,7 +74,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
         }
       }
     } else {
-      getShell().printf("%s\n", "Neither source not table name(s) are specified.");
+      getShell().printf("%s\n", "Neither source nor table name(s) are specified.");
     }
   }
 
