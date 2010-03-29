@@ -16,6 +16,9 @@ import java.io.InputStream;
 
 import org.obiba.core.spring.xstream.InjectingReflectionProviderWrapper;
 import org.obiba.core.util.StreamUtil;
+import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.js.MagmaJsExtension;
+import org.obiba.magma.xstream.DefaultXStreamFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
@@ -81,7 +84,8 @@ public class OpalConfigurationFactoryBean implements FactoryBean, ApplicationCon
   }
 
   protected XStream doCreateXStreamInstance(ApplicationContext applicationContext) {
-    return new XStream(new InjectingReflectionProviderWrapper(new PureJavaReflectionProvider(), applicationContext));
+    new MagmaEngine().extend(new MagmaJsExtension());
+    return new DefaultXStreamFactory().createXStream(new InjectingReflectionProviderWrapper(new PureJavaReflectionProvider(), applicationContext));
   }
 
   private void initObject() throws IOException {
@@ -94,6 +98,7 @@ public class OpalConfigurationFactoryBean implements FactoryBean, ApplicationCon
       opalConfiguration = (OpalConfiguration) xstream.fromXML(serializedConfiguration);
     } finally {
       StreamUtil.silentSafeClose(serializedConfiguration);
+      MagmaEngine.get().shutdown();
     }
   }
 }

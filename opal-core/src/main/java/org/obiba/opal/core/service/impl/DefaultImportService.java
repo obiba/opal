@@ -17,6 +17,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.NoSuchDatasourceException;
+import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
@@ -132,16 +133,16 @@ public class DefaultImportService implements ImportService {
     FsDatasource sourceDatasource = new FsDatasource(file.getName().getBaseName(), opalRuntime.getFileSystem().getLocalFile(file), getDatasourceEncryptionStrategy(unit));
     try {
       MagmaEngine.get().addDatasource(sourceDatasource);
-      copyValueTables(sourceDatasource, destinationDatasource, unit.getKeyVariableName(), dispatchAttribute);
+      copyValueTables(sourceDatasource, destinationDatasource, unit, dispatchAttribute);
     } finally {
       MagmaEngine.get().removeDatasource(sourceDatasource);
     }
   }
 
-  private void copyValueTables(Datasource source, Datasource destination, String keyVariableName, String dispatchAttribute) throws IOException {
+  private void copyValueTables(Datasource source, Datasource destination, FunctionalUnit unit, String dispatchAttribute) throws IOException {
     for(ValueTable valueTable : source.getValueTables()) {
       if(valueTable.isForEntityType(keysTableEntityType)) {
-        copyParticipants(valueTable, source, destination, keyVariableName, dispatchAttribute);
+        copyParticipants(valueTable, source, destination, unit, dispatchAttribute);
       } else {
         DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, destination).build();
         copier.copy(valueTable, destination);
@@ -149,8 +150,9 @@ public class DefaultImportService implements ImportService {
     }
   }
 
-  private void copyParticipants(ValueTable participantTable, Datasource source, Datasource destination, String keyVariableName, final String dispatchAttribute) throws IOException {
-    final View privateView = createPrivateView(participantTable);
+  private void copyParticipants(ValueTable participantTable, Datasource source, Datasource destination, FunctionalUnit unit, final String dispatchAttribute) throws IOException {
+    final String keyVariableName = unit.getKeyVariableName();
+    final View privateView = createPrivateView(participantTable, unit);
     final Variable keyVariable = prepareKeysTable(privateView, keyVariableName);
     final OpalPrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(lookupKeysTable(), keyVariable, participantIdentifier);
 
@@ -208,13 +210,19 @@ public class DefaultImportService implements ImportService {
    * @param participantTable
    * @return
    */
-  private View createPrivateView(ValueTable participantTable) {
-    final View privateView = View.Builder.newView(participantTable.getName(), participantTable).select(new SelectClause() {
-      public boolean select(Variable variable) {
-        return isIdentifierVariable(variable);
-      }
-    }).build();
-    return privateView;
+  private View createPrivateView(ValueTable participantTable, FunctionalUnit unit) {
+    if(unit.getSelect() != null) {
+      final View privateView = View.Builder.newView(participantTable.getName(), participantTable).select(unit.getSelect()).build();
+      privateView.initialise();
+      return privateView;
+    } else {
+      final View privateView = View.Builder.newView(participantTable.getName(), participantTable).select(new SelectClause() {
+        public boolean select(Variable variable) {
+          return isIdentifierVariable(variable);
+        }
+      }).build();
+      return privateView;
+    }
   }
 
   /**

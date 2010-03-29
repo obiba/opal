@@ -7,6 +7,19 @@
     <org.obiba.opal.core.unit.FunctionalUnit>
 	  <name>my-unit</name>
 	  <keyVariableName>my-key</keyVariableName>
+      <!--
+        Unique identifier selection clause.
+        If not specified variables with an "identifier" attribute set to "true" will be chosen as unique identifiers. 
+        If a select clause is specified the default behaviour is overridden with the contents of the select clause.
+        In the example below the variable with the name "BoneDensity.InstrumentRun.Contraindication.code" will be
+        a unique identifier along will all the variables that contain an "identifier" attribute set to "true". Here
+        the select clause reproduces the default behaviour and marks one extra variable by name to be an identifier.
+      -->
+      <!--
+      <select class="org.obiba.magma.js.views.JavascriptClause">
+        <script>name().matches(/BoneDensity.InstrumentRun.Contraindication.code/).or(attribute('identifier').isNull().not().and(attribute('identifier').matches(/true/)))</script>
+      </select>
+      -->   
 	</org.obiba.opal.core.unit.FunctionalUnit>
   </functionalUnits>
 
