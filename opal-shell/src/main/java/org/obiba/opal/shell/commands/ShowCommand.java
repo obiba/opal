@@ -49,8 +49,12 @@ public class ShowCommand extends AbstractOpalRuntimeDependentCommand<ShowCommand
 
   private void showUnits(boolean displayUnits) {
     if(displayUnits) {
-      for(FunctionalUnit unit : getOpalConfiguration().getFunctionalUnits()) {
-        getShell().printf("functional unit [%s], with key variable [%s]\n", unit.getName(), unit.getKeyVariableName());
+      if(!getOpalRuntime().getFunctionalUnits().isEmpty()) {
+        for(FunctionalUnit unit : getOpalRuntime().getFunctionalUnits()) {
+          getShell().printf("functional unit [%s], with key variable [%s]\n", unit.getName(), unit.getKeyVariableName());
+        }
+      } else {
+        getShell().printf("No functional units");
       }
     }
   }

@@ -14,6 +14,9 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.magma.Datasource;
@@ -21,6 +24,7 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.test.AbstractMagmaTest;
 import org.obiba.opal.core.cfg.OpalConfiguration;
+import org.obiba.opal.core.runtime.IOpalRuntime;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.shell.OpalShell;
 import org.obiba.opal.shell.commands.options.ShowCommandOptions;
@@ -47,17 +51,43 @@ public class ShowCommandTest extends AbstractMagmaTest {
 
   @Test
   public void testShowUnits() {
+    testShowUnits("unit1", "unit2");
+  }
+
+  @Test
+  public void testShowUnitsDisplaysNoUnitsMessageWhenThereAreNone() {
+    testShowUnits(new String[] {});
+  }
+
+  @Test
+  public void testShowAll() {
+    testShowAll("unit1", "unit2");
+  }
+
+  @Test
+  public void testShowAllDisplaysNoUnitsMessageWhenThereAreNone() {
+    testShowAll(new String[] {});
+  }
+
+  //
+  // Methods
+  //
+
+  private void testShowUnits(String... units) {
     ShowCommandOptions mockOptions = createMock(ShowCommandOptions.class);
     expect(mockOptions.getDatasources()).andReturn(false).anyTimes();
     expect(mockOptions.getTables()).andReturn(false).anyTimes();
     expect(mockOptions.getUnits()).andReturn(true).anyTimes();
 
+    IOpalRuntime mockRuntime = createMock(IOpalRuntime.class);
+    recordExpectedOpalRuntimeExpectations(mockRuntime, units);
+
     OpalShell mockShell = createMock(OpalShell.class);
-    recordExpectedShellOutputForUnits(mockShell);
+    recordExpectedShellOutputForUnits(mockShell, units);
 
-    replay(mockOptions, mockShell);
+    replay(mockOptions, mockRuntime, mockShell);
 
-    ShowCommand showCommand = createShowCommand();
+    ShowCommand showCommand = createShowCommand(mockRuntime);
     showCommand.setOptions(mockOptions);
     showCommand.setShell(mockShell);
     showCommand.execute();
@@ -65,23 +95,39 @@ public class ShowCommandTest extends AbstractMagmaTest {
     verify(mockOptions, mockShell);
   }
 
-  @Test
-  public void testShowAll() {
+  private void testShowAll(String... units) {
     ShowCommandOptions mockOptions = createMock(ShowCommandOptions.class);
     recordExpectedOperationsOnOptions(mockOptions);
 
+    IOpalRuntime mockRuntime = createMock(IOpalRuntime.class);
+    recordExpectedOpalRuntimeExpectations(mockRuntime, units);
+
     OpalShell mockShell = createMock(OpalShell.class);
     recordExpectedShellOutputForDatasourcesAndTables(mockShell);
-    recordExpectedShellOutputForUnits(mockShell);
+    recordExpectedShellOutputForUnits(mockShell, units);
 
-    replay(mockOptions, mockShell);
+    replay(mockOptions, mockRuntime, mockShell);
 
-    ShowCommand showCommand = createShowCommand();
+    ShowCommand showCommand = createShowCommand(mockRuntime);
     showCommand.setOptions(mockOptions);
     showCommand.setShell(mockShell);
     showCommand.execute();
 
     verify(mockOptions, mockShell);
+  }
+
+  private ShowCommand createShowCommand(final IOpalRuntime mockRuntime) {
+    return new ShowCommand() {
+      @Override
+      protected IOpalRuntime getOpalRuntime() {
+        return mockRuntime;
+      }
+
+      @Override
+      protected OpalConfiguration getOpalConfiguration() {
+        return null;
+      }
+    };
   }
 
   private void recordExpectedOperationsOnOptions(ShowCommandOptions mockOptions) {
@@ -90,9 +136,25 @@ public class ShowCommandTest extends AbstractMagmaTest {
     expect(mockOptions.getUnits()).andReturn(false).anyTimes();
   }
 
-  private void recordExpectedShellOutputForUnits(OpalShell mockShell) {
-    mockShell.printf("functional unit [%s], with key variable [%s]\n", "unit1", "unit1KeyVariable");
-    mockShell.printf("functional unit [%s], with key variable [%s]\n", "unit2", "unit2KeyVariable");
+  private void recordExpectedOpalRuntimeExpectations(IOpalRuntime mockRuntime, String... units) {
+    Set<FunctionalUnit> functionalUnits = new LinkedHashSet<FunctionalUnit>();
+    if(units.length != 0) {
+      for(String unitName : units) {
+        functionalUnits.add(new FunctionalUnit(unitName, unitName + "KeyVariable"));
+      }
+    }
+
+    expect(mockRuntime.getFunctionalUnits()).andReturn(functionalUnits).atLeastOnce();
+  }
+
+  private void recordExpectedShellOutputForUnits(OpalShell mockShell, String... units) {
+    if(units.length != 0) {
+      for(String unitName : units) {
+        mockShell.printf("functional unit [%s], with key variable [%s]\n", unitName, unitName + "KeyVariable");
+      }
+    } else {
+      mockShell.printf("No functional units");
+    }
   }
 
   private void recordExpectedShellOutputForDatasourcesAndTables(OpalShell mockShell) {
@@ -102,31 +164,6 @@ public class ShowCommandTest extends AbstractMagmaTest {
     mockShell.printf("%s.%s\n", "ds1", "table2");
     mockShell.printf("%s.%s\n", "ds2", "tableA");
     mockShell.printf("%s.%s\n", "ds2", "tableB");
-  }
-
-  //
-  // Methods
-  //
-
-  private ShowCommand createShowCommand() {
-    return new ShowCommand() {
-      @Override
-      protected OpalConfiguration getOpalConfiguration() {
-        return createOpalConfiguration();
-      }
-    };
-  }
-
-  private OpalConfiguration createOpalConfiguration() {
-    OpalConfiguration opalConfiguration = new OpalConfiguration();
-
-    ImmutableSet.Builder<FunctionalUnit> builder = new ImmutableSet.Builder<FunctionalUnit>();
-    builder.add(new FunctionalUnit("unit1", "unit1KeyVariable"));
-    builder.add(new FunctionalUnit("unit2", "unit2KeyVariable"));
-
-    opalConfiguration.setFunctionalUnits(builder.build());
-
-    return opalConfiguration;
   }
 
   private Datasource createMockDatasource(String name, String... tables) {
