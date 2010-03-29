@@ -54,7 +54,7 @@ public class ShowCommand extends AbstractOpalRuntimeDependentCommand<ShowCommand
           getShell().printf("functional unit [%s], with key variable [%s]\n", unit.getName(), unit.getKeyVariableName());
         }
       } else {
-        getShell().printf("No functional units");
+        getShell().printf("No functional units\n");
       }
     }
   }

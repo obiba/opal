@@ -153,7 +153,7 @@ public class ShowCommandTest extends AbstractMagmaTest {
         mockShell.printf("functional unit [%s], with key variable [%s]\n", unitName, unitName + "KeyVariable");
       }
     } else {
-      mockShell.printf("No functional units");
+      mockShell.printf("No functional units\n");
     }
   }
 
