@@ -53,7 +53,7 @@ public class CopyCommandTest extends AbstractMagmaTest {
     EasyMock.expect(mockOptions.getTables()).andReturn(ImmutableList.of("ds.table1", "ds.table2")).anyTimes();
     EasyMock.expect(mockOptions.isMultiplex()).andReturn(false).anyTimes();
     EasyMock.expect(mockOptions.isTransform()).andReturn(false).anyTimes();
-    EasyMock.expect(mockOptions.getCatalogue()).andReturn(false).anyTimes();
+    EasyMock.expect(mockOptions.getNoValues()).andReturn(false).anyTimes();
     EasyMock.expect(mockOptions.getNonIncremental()).andReturn(true).anyTimes();
 
     EasyMock.expect(mockService.newCopier((Datasource) EasyMock.anyObject())).andReturn(DatasourceCopier.Builder.newCopier()).anyTimes();
