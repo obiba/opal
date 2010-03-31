@@ -49,7 +49,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   public void execute() {
-    if(options.getTables() != null && !options.isSource()) {
+    if(options.getTables() != null || options.isSource()) {
       if(validateOptions()) {
         Datasource destinationDatasource = null;
 
