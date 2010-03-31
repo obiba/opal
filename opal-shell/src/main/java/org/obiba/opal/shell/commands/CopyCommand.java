@@ -36,7 +36,7 @@ import com.google.common.collect.ImmutableSet;
 /**
  * Provides ability to copy Magma tables to an existing datasource or an Excel file.
  */
-@CommandUsage(description = "Copy tables to an existing destination datasource or to a specified Excel file. The tables can be explicitly named and/or be the ones from a specified source datasource. The variables can be optionally processed: dispatched in another table and/or renamed.", syntax = "Syntax: copy [--source NAME] (--destination NAME | --out FILE) [--multiplex SCRIPT] [--transform SCRIPT] [--nonIncremental] [--catalogue] [TABLE_NAME...]")
+@CommandUsage(description = "Copy tables to an existing destination datasource or to a specified Excel file. The tables can be explicitly named and/or be the ones from a specified source datasource. The variables can be optionally processed: dispatched in another table and/or renamed.", syntax = "Syntax: copy [--source NAME] (--destination NAME | --out FILE) [--multiplex SCRIPT] [--transform SCRIPT] [--non-incremental] [--no-values] [--no-variables] [TABLE_NAME...]")
 public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommandOptions> {
 
   @Autowired
@@ -81,11 +81,15 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   private DatasourceCopier buildDatasourceCopier(Datasource destinationDatasource) {
     // build a datasource copier according to options
     DatasourceCopier.Builder builder;
-    if(options.getCatalogue()) {
+    if(options.getNoValues()) {
       builder = DatasourceCopier.Builder.newCopier().dontCopyValues();
     } else {
       // get a builder with logging facilities
       builder = exportService.newCopier(destinationDatasource);
+    }
+
+    if(options.getNoVariables()) {
+      builder.dontCopyMetadata();
     }
 
     if(options.isMultiplex()) {
@@ -138,6 +142,15 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     boolean validated = validateDestination();
     validated = validateSource(validated);
     validated = validateTables(validated);
+    validated = validateSwitches(validated);
+    return validated;
+  }
+
+  private boolean validateSwitches(boolean validated) {
+    if(options.getNoValues() && options.getNoVariables()) {
+      getShell().printf("Must at least copy variables or values.\n");
+      validated = false;
+    }
     return validated;
   }
 

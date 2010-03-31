@@ -16,12 +16,12 @@ public interface CopyCommandOptions extends HelpOption {
   // In and out datasources
   // 
 
-  @Option(shortName = "s", description = "Copy from this datasource.")
+  @Option(shortName = "s", description = "Copy all tables from this datasource.")
   public String getSource();
 
   public boolean isSource();
 
-  @Option(shortName = "d", description = "Copy to this datasource.")
+  @Option(shortName = "d", description = "Copy to this existing datasource.")
   public String getDestination();
 
   public boolean isDestination();
@@ -35,17 +35,20 @@ public interface CopyCommandOptions extends HelpOption {
   // Values
   // 
 
-  @Option(shortName = "n", description = "Non-incremental copy (i.e., copy all data not just updates).")
+  @Option(longName = "non-incremental", shortName = "i", description = "Non-incremental copy (i.e., copy all data not just updates).")
   public boolean getNonIncremental();
 
-  @Option(shortName = "c", description = "Copy only the variable catalogue.")
-  public boolean getCatalogue();
+  @Option(longName = "no-values", shortName = "l", description = "Do not copy the values.")
+  public boolean getNoValues();
+
+  @Option(longName = "no-variables", shortName = "v", description = "Do not copy the variables.")
+  public boolean getNoVariables();
 
   //
   // Variable transformations
   //
 
-  @Option(shortName = "m", description = "Dispatch the variable and data to a table which name is provided by the javascript.")
+  @Option(shortName = "m", description = "Dispatch the variables and values to a table which name is provided by the javascript.")
   public String getMultiplex();
 
   public boolean isMultiplex();
