@@ -56,19 +56,15 @@ if $cygwin; then
   OPAL_HOME=`cygpath --absolute --windows "$OPAL_HOME"`
 fi
 
-# Are we under cygwin environment ?
-WINDOWS=`echo $OS | grep -ci windows`
-
 CLASSPATH=$OPAL_HOME/conf
 for f in $(ls "$OPAL_BIN/../lib" | grep jar$); do
-  if [ x"$WINDOWS" = x0 ]
-  then
-    CLASSPATH=$CLASSPATH:$OPAL_BIN/../lib/$f
-  else
+  if $cygwin; then
     CLASSPATH=$CLASSPATH\;$OPAL_BIN/../lib/$f
+  else
+    CLASSPATH=$CLASSPATH:$OPAL_BIN/../lib/$f
   fi
 done
 
-[ -e $OPAL_HOME/logs ] || mkdir $OPAL_HOME/logs
-echo $JAVA_OPTS -cp "$CLASSPATH" -DOPAL_HOME="${OPAL_HOME}" org.obiba.opal.server.OpalServer $@ 2> "${OPAL_HOME}"/logs/opal-session.log
+[ -e "$OPAL_HOME/logs" ] || mkdir "$OPAL_HOME/logs"
+#echo $JAVA_OPTS -cp "$CLASSPATH" -DOPAL_HOME="${OPAL_HOME}" org.obiba.opal.server.OpalServer $@ 2> "${OPAL_HOME}"/logs/opal-session.log
 java $JAVA_OPTS -cp "$CLASSPATH" -DOPAL_HOME="${OPAL_HOME}" org.obiba.opal.server.OpalServer $@ 2> "${OPAL_HOME}"/logs/opal-session.log
