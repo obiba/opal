@@ -12,6 +12,8 @@ import org.obiba.opal.shell.commands.CommandUsage;
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException;
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException.ValidationError;
 
+import com.google.common.collect.Sets;
+
 /**
  * Implements {@code OpalShell} but does not specify how user interactions are implemented. Extending classes must
  * implement three methods {@code printf(String, Object...)}, {@code passwordPrompt(String, Object...)} and {@code
@@ -73,7 +75,8 @@ public abstract class AbstractOpalShell implements OpalShell {
       maxSize = Math.max(maxSize, command.length() + 2);
     }
     printf("Usage:\n  <command> <options> <arguments>\n\nCommands:\n");
-    for(String command : this.commandRegistry.getAvailableCommands()) {
+    // Create a TreeSet so that the output is sorted on command name
+    for(String command : Sets.newTreeSet(this.commandRegistry.getAvailableCommands())) {
       // %-<maxSize>s: constantly print <maxSize> characters, left-justified
       printf("  %-" + maxSize + "s%s\n", command, this.commandRegistry.getCommandUsage(command).description());
     }
