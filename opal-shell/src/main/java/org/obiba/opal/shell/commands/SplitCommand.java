@@ -12,71 +12,97 @@ package org.obiba.opal.shell.commands;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileType;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
-import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
+import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.shell.commands.options.SplitCommandOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
  */
-@CommandUsage(description = "Splits one or more ZIP files into multiple pieces.", syntax = "Syntax: split --out DIR _FILE_...")
+@CommandUsage(description = "Splits one or more ZIP files into multiple pieces.", syntax = "Syntax: split --unit unit --out DIR _FILE_...")
 public class SplitCommand extends AbstractOpalRuntimeDependentCommand<SplitCommandOptions> {
 
   private static final Logger log = LoggerFactory.getLogger(SplitCommand.class);
 
-  //
-  // Constants
-  //
-
-  public static final String DECRYPT_DATASOURCE_NAME = "decrypt-datasource";
-
-  //
-  // Instance Variables
-  //
-  @Autowired
-  private DatasourceEncryptionStrategy dsEncryptionStrategy;
-
   public void execute() {
     // Ensure that options have been set.
     if(options.getFiles() == null) {
-      System.console().printf("No input file(s) specified.\n");
+      getShell().printf("No input file(s) specified.\n");
+      return;
+    }
+    try {
+      innerExecute();
+    } catch(FileSystemException e) {
+      // We can't handle it
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void innerExecute() throws FileSystemException {
+
+    FunctionalUnit unit = getOpalRuntime().getFunctionalUnit(options.getUnit());
+    if(unit == null) {
+      getShell().printf("Functional unit '%s' does not exist.\n", options.getUnit());
       return;
     }
 
-    File outputDir = options.getOutput();
+    FileObject unitDir = getOpalRuntime().getUnitDirectory(options.getUnit());
+
+    FileObject outputDir = resolveFile(options.getOutput(), unitDir);
     if(outputDir.exists() == false) {
-      if(outputDir.mkdirs() == false) {
-        System.console().printf("Could not create output directory: %s\n", outputDir.getPath());
+      try {
+        outputDir.createFolder();
+      } catch(FileSystemException e) {
+        getShell().printf("Could not create output directory: %s\n", outputDir.getName().getPath());
         return;
       }
-    } else if(outputDir.isDirectory() == false) {
-      System.console().printf("The output '%s' is not a directory.\n", outputDir.getPath());
+    } else if(outputDir.getType() != FileType.FOLDER) {
+      getShell().printf("Specified output '%s' is not a directory.\n", outputDir.getName().getPath());
       return;
     }
 
-    for(File inputFile : options.getFiles()) {
+    for(String inputName : options.getFiles()) {
+      FileObject inputFile = resolveFile(inputName, unitDir);
       if(inputFile.exists() == false) {
-        System.console().printf("Skipping non-existant input file %s\n", inputFile.getName());
+        getShell().printf("Skipping non-existant input file %s\n", inputFile.getName());
       } else {
-        System.console().printf("Splitting input file %s in chunks of %d entities\n", inputFile.getName(), options.getChunkSize());
-        processFile(inputFile, outputDir);
+        getShell().printf("Splitting input file %s in chunks of %d entities\n", inputFile.getName().getPath(), options.getChunkSize());
+        File localInputFile = getOpalRuntime().getFileSystem().getLocalFile(inputFile);
+        processFile(unit, localInputFile, outputDir);
       }
     }
   }
 
-  private void processFile(File inputFile, File outputDir) {
+  private FileObject resolveFile(String filename, FileObject unitDir) {
+    FileObject outputDir = null;
+    FileObject root = getOpalRuntime().getFileSystem().getRoot();
+    try {
+      if(filename.startsWith("/")) {
+        outputDir = root.resolveFile(filename);
+      } else {
+        outputDir = unitDir.resolveFile(filename);
+      }
+    } catch(FileSystemException e) {
+      outputDir = null;
+    }
+    return outputDir;
+  }
+
+  private void processFile(FunctionalUnit unit, File inputFile, FileObject outputDir) {
     String inputFilename = inputFile.getName();
-    FsDatasource inputDatasource = new FsDatasource(inputFilename, inputFile, dsEncryptionStrategy);
+    FsDatasource inputDatasource = new FsDatasource(inputFilename, inputFile, unit.getDatasourceEncryptionStrategy());
 
     DatasourceCopier dataCopier = DatasourceCopier.Builder.newCopier().dontCopyMetadata().dontCopyNullValues().withLoggingListener().withThroughtputListener().build();
 
@@ -98,6 +124,7 @@ public class SplitCommand extends AbstractOpalRuntimeDependentCommand<SplitComma
           // Increment the chunk counter and test boundary.
           // Split if we've written enough value sets.
           if(++currentChunk >= options.getChunkSize()) {
+            // Split boundary
             currentChunk = 0;
             close(writer);
 
@@ -117,10 +144,15 @@ public class SplitCommand extends AbstractOpalRuntimeDependentCommand<SplitComma
     }
   }
 
-  private Datasource createOutput(int i, String inputFilename, File outputDir) {
-    File newFile = new File(outputDir, inputFilename.replace(".zip", "-" + i + ".zip"));
-    System.console().printf("  Writing to %s\n", newFile.getPath());
-    return MagmaEngine.get().addDatasource(new FsDatasource(newFile.getName(), newFile));
+  private Datasource createOutput(int i, String inputFilename, FileObject outputDir) {
+    try {
+      FileObject newFile = outputDir.resolveFile(inputFilename.replace(".zip", "-" + i + ".zip"));
+      getShell().printf("  Writing to %s\n", newFile.getName().getPath());
+      File localOutputFile = getOpalRuntime().getFileSystem().getLocalFile(newFile);
+      return MagmaEngine.get().addDatasource(new FsDatasource(newFile.getName().getBaseName(), localOutputFile));
+    } catch(FileSystemException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private void close(ValueTableWriter vtw) {
