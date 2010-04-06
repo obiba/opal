@@ -170,7 +170,7 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
       certificateWriter = getCertificateWriter();
       writeCertificate(unitKeyStore, options.getAlias(), certificateWriter);
     } catch(FileSystemException e) {
-      getShell().printf("%s is an invalid output file.  Please make sure that you have specified a valid path.", options.getCertificate());
+      getShell().printf("%s is an invalid output file.  Please make sure that you have specified a valid path.\n", options.getCertificate());
     } catch(IOException e) {
       throw new RuntimeException(e);
     } finally {
