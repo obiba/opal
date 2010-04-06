@@ -34,6 +34,8 @@ public class JLineOpalShell extends AbstractOpalShell {
   public void printf(String format, Object... args) {
     try {
       consoleReader.printString(String.format(format, args));
+      // OPAL-267: need to flush the console to make sure the string is actually printed.
+      consoleReader.flushConsole();
     } catch(IOException e) {
       throw new RuntimeException(e);
     }
