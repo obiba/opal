@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.cli.client.command;
+package org.obiba.opal.shell.commands;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +21,7 @@ import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
-import org.obiba.opal.cli.client.command.options.SplitCommandOptions;
+import org.obiba.opal.shell.commands.options.SplitCommandOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

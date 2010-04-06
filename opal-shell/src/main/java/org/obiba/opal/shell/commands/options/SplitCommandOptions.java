@@ -1,4 +1,4 @@
-package org.obiba.opal.cli.client.command.options;
+package org.obiba.opal.shell.commands.options;
 
 import java.io.File;
 import java.util.List;
