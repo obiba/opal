@@ -16,7 +16,6 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.obiba.magma.Datasource;
-import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
@@ -25,16 +24,12 @@ import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.shell.commands.options.SplitCommandOptions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
  */
 @CommandUsage(description = "Splits one or more ZIP files into multiple pieces.", syntax = "Syntax: split --unit unit --out DIR _FILE_...")
 public class SplitCommand extends AbstractOpalRuntimeDependentCommand<SplitCommandOptions> {
-
-  private static final Logger log = LoggerFactory.getLogger(SplitCommand.class);
 
   public void execute() {
     // Ensure that options have been set.
@@ -59,17 +54,8 @@ public class SplitCommand extends AbstractOpalRuntimeDependentCommand<SplitComma
     }
 
     FileObject unitDir = getOpalRuntime().getUnitDirectory(options.getUnit());
-
-    FileObject outputDir = resolveFile(options.getOutput(), unitDir);
-    if(outputDir.exists() == false) {
-      try {
-        outputDir.createFolder();
-      } catch(FileSystemException e) {
-        getShell().printf("Could not create output directory: %s\n", outputDir.getName().getPath());
-        return;
-      }
-    } else if(outputDir.getType() != FileType.FOLDER) {
-      getShell().printf("Specified output '%s' is not a directory.\n", outputDir.getName().getPath());
+    FileObject outputDir = getOutputDir(unitDir);
+    if(outputDir == null) {
       return;
     }
 
@@ -79,95 +65,152 @@ public class SplitCommand extends AbstractOpalRuntimeDependentCommand<SplitComma
         getShell().printf("Skipping non-existant input file %s\n", inputFile.getName());
       } else {
         getShell().printf("Splitting input file %s in chunks of %d entities\n", inputFile.getName().getPath(), options.getChunkSize());
-        File localInputFile = getOpalRuntime().getFileSystem().getLocalFile(inputFile);
-        processFile(unit, localInputFile, outputDir);
+        processFile(unit, inputFile, outputDir);
       }
     }
   }
 
-  private FileObject resolveFile(String filename, FileObject unitDir) {
-    FileObject outputDir = null;
-    FileObject root = getOpalRuntime().getFileSystem().getRoot();
-    try {
-      if(filename.startsWith("/")) {
-        outputDir = root.resolveFile(filename);
-      } else {
-        outputDir = unitDir.resolveFile(filename);
+  private FileObject getOutputDir(FileObject unitDir) throws FileSystemException {
+    FileObject outputDir = resolveFile(options.getOutput(), unitDir);
+    if(outputDir.exists() == false) {
+      try {
+        outputDir.createFolder();
+      } catch(FileSystemException e) {
+        getShell().printf("Could not create output directory: %s\n", outputDir.getName().getPath());
+        return null;
       }
-    } catch(FileSystemException e) {
-      outputDir = null;
+    } else if(outputDir.getType() != FileType.FOLDER) {
+      getShell().printf("Specified output '%s' is not a directory.\n", outputDir.getName().getPath());
+      return null;
     }
     return outputDir;
   }
 
-  private void processFile(FunctionalUnit unit, File inputFile, FileObject outputDir) {
-    String inputFilename = inputFile.getName();
-    FsDatasource inputDatasource = new FsDatasource(inputFilename, inputFile, unit.getDatasourceEncryptionStrategy());
+  private FileObject resolveFile(String filename, FileObject unitDir) throws FileSystemException {
+    if(filename.startsWith("/")) {
+      return getFileSystemRoot().resolveFile(filename);
+    } else {
+      return unitDir.resolveFile(filename);
+    }
+  }
 
-    DatasourceCopier dataCopier = DatasourceCopier.Builder.newCopier().dontCopyMetadata().dontCopyNullValues().withLoggingListener().withThroughtputListener().build();
-
-    MagmaEngine.get().addDatasource(inputDatasource);
+  private void processFile(FunctionalUnit unit, FileObject inputFile, FileObject outputDir) {
+    DatasourceSplitter f = new DatasourceSplitter(unit, inputFile, outputDir);
     try {
-      int currentChunk = 0;
-      int i = 1;
-      Datasource destination = createOutput(i++, inputFilename, outputDir);
-      for(ValueTable source : inputDatasource.getValueTables()) {
-        ValueTableWriter writer = dataCopier.createValueTableWriter(source, source.getName(), destination);
+      f.split();
+    } catch(IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-        DatasourceCopier.Builder.newCopier().dontCopyValues().build().copy(source, source.getName(), writer);
+  private class DatasourceSplitter {
 
-        for(ValueSet vs : source.getValueSets()) {
-          ValueSetWriter vsw = writer.writeValueSet(vs.getVariableEntity());
-          dataCopier.copy(source, vs, source.getName(), vsw);
-          close(vsw);
+    private final FileObject outputDir;
 
-          // Increment the chunk counter and test boundary.
-          // Split if we've written enough value sets.
-          if(++currentChunk >= options.getChunkSize()) {
-            // Split boundary
-            currentChunk = 0;
-            close(writer);
+    private final String filenameFormat;
 
-            MagmaEngine.get().removeDatasource(destination);
-            destination = createOutput(i++, inputFilename, outputDir);
-            // Copy variables
-            writer = dataCopier.createValueTableWriter(source, source.getName(), destination);
-            DatasourceCopier.Builder.newCopier().dontCopyValues().build().copy(source, source.getName(), writer);
+    private final Datasource inputDatasource;
+
+    private final DatasourceCopier dataCopier;
+
+    private int currentChunk = 0;
+
+    private int index = 1;
+
+    private Datasource destination;
+
+    private ValueTableWriter writer;
+
+    private DatasourceSplitter(FunctionalUnit unit, FileObject bigFile, FileObject outputDir) {
+      this.outputDir = outputDir;
+      // /path/file.zip --> file.zip
+      final String basename = bigFile.getName().getBaseName();
+      // /path/file.zip --> zip
+      final String extension = bigFile.getName().getExtension();
+      // Output filename format is '{inputname}-{index}.zip' where {inputname} is '{basename}' without '.{extension}'
+      this.filenameFormat = basename.replaceAll("\\." + extension + "$", "") + "-%s.zip";
+
+      this.dataCopier = DatasourceCopier.Builder.newCopier().dontCopyMetadata().dontCopyNullValues().withLoggingListener().withThroughtputListener().build();
+      File localInputFile = getOpalRuntime().getFileSystem().getLocalFile(bigFile);
+      inputDatasource = new FsDatasource(bigFile.getName().getBaseName(), localInputFile, unit.getDatasourceEncryptionStrategy());
+    }
+
+    public void split() throws IOException {
+      inputDatasource.initialise();
+      try {
+        nextDestination();
+        for(ValueTable source : inputDatasource.getValueTables()) {
+          prepareDestination(source);
+          for(ValueSet vs : source.getValueSets()) {
+            ValueSetWriter vsw = writer.writeValueSet(vs.getVariableEntity());
+            dataCopier.copy(source, vs, source.getName(), vsw);
+            close(vsw);
+            checkSplitBoundary(source);
           }
         }
+        destination.dispose();
+      } finally {
+        inputDatasource.dispose();
       }
-      MagmaEngine.get().removeDatasource(destination);
-    } catch(Exception e) {
-      throw new RuntimeException(e);
-    } finally {
-      MagmaEngine.get().removeDatasource(inputDatasource);
     }
-  }
 
-  private Datasource createOutput(int i, String inputFilename, FileObject outputDir) {
-    try {
-      FileObject newFile = outputDir.resolveFile(inputFilename.replace(".zip", "-" + i + ".zip"));
-      getShell().printf("  Writing to %s\n", newFile.getName().getPath());
-      File localOutputFile = getOpalRuntime().getFileSystem().getLocalFile(newFile);
-      return MagmaEngine.get().addDatasource(new FsDatasource(newFile.getName().getBaseName(), localOutputFile));
-    } catch(FileSystemException e) {
-      throw new RuntimeException(e);
+    private void nextDestination() {
+      try {
+        FileObject newFile = outputDir.resolveFile(String.format(this.filenameFormat, index++));
+        File localOutputFile = getOpalRuntime().getFileSystem().getLocalFile(newFile);
+        destination = new FsDatasource(newFile.getName().getBaseName(), localOutputFile);
+        destination.initialise();
+        getShell().printf("  Writing to %s\n", newFile.getName().getPath());
+      } catch(FileSystemException e) {
+        throw new RuntimeException(e);
+      }
     }
-  }
 
-  private void close(ValueTableWriter vtw) {
-    try {
-      vtw.close();
-    } catch(IOException e) {
-      throw new RuntimeException(e);
+    /**
+     * Initializes the destination for the specified {@code ValueTable}. This will create a new instance of {@code
+     * ValueTableWriter} and copy the variables to this new writer.
+     * @param source
+     * @throws IOException
+     */
+    private void prepareDestination(ValueTable source) throws IOException {
+      writer = dataCopier.createValueTableWriter(source, source.getName(), destination);
+      DatasourceCopier.Builder.newCopier().dontCopyValues().build().copy(source, source.getName(), writer);
     }
-  }
 
-  private void close(ValueSetWriter vsw) {
-    try {
-      vsw.close();
-    } catch(IOException e) {
-      throw new RuntimeException(e);
+    /**
+     * Tests the split boundary. If we've hit the boundary, this method will close the current output datasource, create
+     * a new one and prepare it using the {@code #prepareDestination(ValueTable)} method.
+     * @param source
+     * @throws IOException
+     */
+    private void checkSplitBoundary(ValueTable source) throws IOException {
+      // Increment the chunk counter and test boundary.
+      // Split if we've written enough value sets.
+      if(++currentChunk >= options.getChunkSize()) {
+        // Split boundary
+        currentChunk = 0;
+        close(writer);
+        destination.dispose();
+
+        nextDestination();
+        prepareDestination(source);
+      }
+    }
+
+    private void close(ValueTableWriter vtw) {
+      try {
+        vtw.close();
+      } catch(IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    private void close(ValueSetWriter vsw) {
+      try {
+        vsw.close();
+      } catch(IOException e) {
+        throw new RuntimeException(e);
+      }
     }
   }
 
