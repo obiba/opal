@@ -287,6 +287,7 @@ public class KeyCommandTest {
     expect(mockOptions.getAlias()).andReturn(alias).atLeastOnce();
     expect(mockOptions.getAction()).andReturn("export").atLeastOnce();
     expect(mockOptions.isCertificate()).andReturn(true).atLeastOnce();
+    expect(mockOptions.isPrivate()).andReturn(false).atLeastOnce();
     expect(mockOptions.getCertificate()).andReturn(certificateFile).atLeastOnce();
 
     return mockOptions;

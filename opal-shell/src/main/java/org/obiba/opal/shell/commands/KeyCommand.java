@@ -34,9 +34,6 @@ import org.springframework.util.Assert;
  */
 @CommandUsage(description = "Creates, deletes, imports and exports keypairs/certificates.", syntax = "Syntax: keystore [--unit NAME] --alias NAME (--action create --algo NAME --size INT | --action delete | --action import --private FILE [--certificate FILE] | --action export [--certificate FILE])")
 public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOptions> {
-  //
-  // Constants
-  //
 
   private static final String CREATE_ACTION = "create";
 
@@ -163,6 +160,10 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
     if(unitKeyStore == null) {
       getShell().printf("Keystore doesn't exist\n");
       return;
+    }
+
+    if(options.isPrivate()) {
+      getShell().printf("WARNING: the export action only exports public certficates. Ignoring --private option.\n");
     }
 
     Writer certificateWriter = null;
