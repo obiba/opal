@@ -45,7 +45,14 @@ public class OpalServer {
       xmlReader.loadBeanDefinitions("classpath:/META-INF/spring/opal-server/context.xml");
       ctx.refresh();
     } catch(Exception e) {
-      System.err.println(e);
+      System.console().printf("Failed to start Opal Server. See log file for details.\nError message: %s\n", e.getMessage());
+      e.printStackTrace(System.err);
+      try {
+        ctx.destroy();
+      } catch(RuntimeException ignore) {
+        // ignore
+      }
+      return;
     }
 
     // Loads the ini file from OPAL_HOME.
@@ -59,12 +66,14 @@ public class OpalServer {
   }
 
   final void startAndWait() throws IOException {
-    try {
-      System.in.read();
-    } finally {
-      // Destroy the security manager.
-      LifecycleUtils.destroy(SecurityUtils.getSecurityManager());
-      ctx.destroy();
+    if(ctx.isActive()) {
+      try {
+        System.in.read();
+      } finally {
+        // Destroy the security manager.
+        LifecycleUtils.destroy(SecurityUtils.getSecurityManager());
+        ctx.destroy();
+      }
     }
   }
 
