@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# OS specific support.
+cygwin=false
+case "`uname`" in
+CYGWIN*) cygwin=true;;
+esac
+
 if [ -z "$JAVA_OPTS" ]
 then
   # Set default JAVA_OPTS
@@ -22,18 +28,43 @@ then
   exit 2;
 fi
 
-# Are we under cygwin environment ?
-WINDOWS=`echo $OS | grep -ci windows`
+# resolve links - $0 may be a softlink
+OPAL_BIN="$0"
 
-CLASSPATH=$OPAL_HOME/conf
-for f in $(ls "$OPAL_HOME/lib" | grep jar$); do
-  if [ x"$WINDOWS" = x0 ]
-  then
-    CLASSPATH=$CLASSPATH:$OPAL_HOME/lib/$f
+while [ -h "$OPAL_BIN" ]; do
+  ls=`ls -ld "$OPAL_BIN"`
+  link=`expr "$ls" : '.*-> \(.*\)$'`
+  if expr "$link" : '/.*' > /dev/null; then
+    OPAL_BIN="$link"
   else
-    CLASSPATH=$CLASSPATH\;$OPAL_HOME/lib/$f
+    OPAL_BIN=`dirname "$OPAL_BIN"`/"$link"
   fi
 done
 
-[ -e $OPAL_HOME/logs ] || mkdir $OPAL_HOME/logs
+# Get standard environment variables
+OPAL_BIN=`dirname "$OPAL_BIN"`
+
+if $cygwin; then
+  # For Cygwin, ensure paths are in UNIX format before anything is touched
+  [ -n "$JAVA_HOME" ] && JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
+  [ -n "$OPAL_BIN" ] && OPAL_BIN=`cygpath --unix "$OPAL_BIN"`
+  [ -n "$OPAL_HOME" ] && OPAL_HOME=`cygpath --unix "$OPAL_HOME"`
+  
+  # For Cygwin, switch paths to Windows format before running java  
+  JAVA_HOME=`cygpath --absolute --windows "$JAVA_HOME"`
+  OPAL_BIN=`cygpath --absolute --windows "$OPAL_BIN"`
+  OPAL_HOME=`cygpath --absolute --windows "$OPAL_HOME"`
+fi
+
+CLASSPATH=$OPAL_HOME/conf
+for f in $(ls "$OPAL_BIN/../lib" | grep jar$); do
+  if $cygwin; then
+    CLASSPATH=$CLASSPATH\;$OPAL_BIN/../lib/$f
+  else
+    CLASSPATH=$CLASSPATH:$OPAL_BIN/../lib/$f
+  fi
+done
+
+[ -e "$OPAL_HOME/logs" ] || mkdir "$OPAL_HOME/logs"
+#echo $JAVA_OPTS -cp "$CLASSPATH" -DOPAL_HOME="${OPAL_HOME}" org.obiba.opal.server.OpalServer $@ 2> "${OPAL_HOME}"/logs/opal-session.log
 java $JAVA_OPTS -cp "$CLASSPATH" -DOPAL_HOME="${OPAL_HOME}" org.obiba.opal.server.OpalServer $@ 2> "${OPAL_HOME}"/logs/opal-session.log

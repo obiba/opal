@@ -40,7 +40,7 @@ public abstract class AbstractOpalRuntimeDependentCommand<T> extends AbstractCom
   }
 
   public FileObject getFileSystemRoot() {
-    return opalRuntime.getFileSystem().getRoot();
+    return getOpalRuntime().getFileSystem().getRoot();
   }
 
   public FileObject getFile(String path) throws FileSystemException {
@@ -52,11 +52,11 @@ public abstract class AbstractOpalRuntimeDependentCommand<T> extends AbstractCom
   }
 
   public File getLocalFile(FileObject vsfFile) {
-    return opalRuntime.getFileSystem().getLocalFile(vsfFile);
+    return getOpalRuntime().getFileSystem().getLocalFile(vsfFile);
   }
 
   protected OpalConfiguration getOpalConfiguration() {
-    return opalRuntime.getOpalConfiguration();
+    return getOpalRuntime().getOpalConfiguration();
   }
 
 }

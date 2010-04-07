@@ -12,13 +12,12 @@ package org.obiba.opal.core.service.impl;
 import java.io.IOException;
 
 import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
-import org.apache.commons.vfs.FileUtil;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.NoSuchDatasourceException;
+import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
@@ -27,6 +26,7 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.audit.VariableEntityAuditLogManager;
+import org.obiba.magma.crypt.support.NullKeyProvider;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
@@ -45,6 +45,7 @@ import org.obiba.opal.core.runtime.IOpalRuntime;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
+import org.obiba.opal.core.unit.UnitKeyStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,8 +67,6 @@ public class DefaultImportService implements ImportService {
   //
 
   private IOpalRuntime opalRuntime;
-
-  private String archiveDirectory;
 
   /** Configured through org.obiba.opal.keys.tableReference */
   private String keysTableReference;
@@ -108,10 +107,6 @@ public class DefaultImportService implements ImportService {
     this.keysTableEntityType = keysTableEntityType;
   }
 
-  public void setArchiveDirectory(String archiveDirectory) {
-    this.archiveDirectory = archiveDirectory;
-  }
-
   public void setAuditLogManager(VariableEntityAuditLogManager auditLogManager) {
     this.auditLogManager = auditLogManager;
   }
@@ -132,29 +127,22 @@ public class DefaultImportService implements ImportService {
     }
 
     copyToDestinationDatasource(file, dispatchAttribute, destinationDatasource, unit);
-
-    // Archive the file.
-    try {
-      archiveData(file);
-    } catch(FileSystemException e) {
-      log.warn("The following imported file could not be archived : {}", file);
-    }
   }
 
   private void copyToDestinationDatasource(FileObject file, String dispatchAttribute, Datasource destinationDatasource, FunctionalUnit unit) throws IOException {
     FsDatasource sourceDatasource = new FsDatasource(file.getName().getBaseName(), opalRuntime.getFileSystem().getLocalFile(file), getDatasourceEncryptionStrategy(unit));
     try {
       MagmaEngine.get().addDatasource(sourceDatasource);
-      copyValueTables(sourceDatasource, destinationDatasource, unit.getKeyVariableName(), dispatchAttribute);
+      copyValueTables(sourceDatasource, destinationDatasource, unit, dispatchAttribute);
     } finally {
       MagmaEngine.get().removeDatasource(sourceDatasource);
     }
   }
 
-  private void copyValueTables(Datasource source, Datasource destination, String keyVariableName, String dispatchAttribute) throws IOException {
+  private void copyValueTables(Datasource source, Datasource destination, FunctionalUnit unit, String dispatchAttribute) throws IOException {
     for(ValueTable valueTable : source.getValueTables()) {
       if(valueTable.isForEntityType(keysTableEntityType)) {
-        copyParticipants(valueTable, source, destination, keyVariableName, dispatchAttribute);
+        copyParticipants(valueTable, source, destination, unit, dispatchAttribute);
       } else {
         DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, destination).build();
         copier.copy(valueTable, destination);
@@ -162,8 +150,9 @@ public class DefaultImportService implements ImportService {
     }
   }
 
-  private void copyParticipants(ValueTable participantTable, Datasource source, Datasource destination, String keyVariableName, final String dispatchAttribute) throws IOException {
-    final View privateView = createPrivateView(participantTable);
+  private void copyParticipants(ValueTable participantTable, Datasource source, Datasource destination, FunctionalUnit unit, final String dispatchAttribute) throws IOException {
+    final String keyVariableName = unit.getKeyVariableName();
+    final View privateView = createPrivateView(participantTable, unit);
     final Variable keyVariable = prepareKeysTable(privateView, keyVariableName);
     final OpalPrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(lookupKeysTable(), keyVariable, participantIdentifier);
 
@@ -173,25 +162,29 @@ public class DefaultImportService implements ImportService {
     final ValueTableWriter keysTableWriter = writeToKeysTable();
 
     try {
-      // This listener will insert all participant identifiers in the keys datasource prior to copying the valueset to
-      // the data datasource.
-      // It will also generate the public variable entity if it does not exist yet. As such, it must be executed before
-      // the ValueSet is copied to the data datasource otherwise, it will not have an associated entity.
-      DatasourceCopyValueSetEventListener createKeysListener = new DatasourceCopyValueSetEventListener() {
-
-        public void onValueSetCopied(ValueTable source, ValueSet valueSet, String... destination) {
-        }
-
-        public void onValueSetCopy(ValueTable source, ValueSet valueSet) {
-          copyParticipantIdentifiers(valueSet.getVariableEntity(), privateView, keyVariable, keysTableWriter, entityMap);
-        }
-
-      };
-
-      copyPublicViewToDestinationDatasource(destination, dispatchAttribute, publicView, createKeysListener);
+      copyPublicViewToDestinationDatasource(destination, dispatchAttribute, publicView, createKeysListener(privateView, keyVariable, entityMap, keysTableWriter));
     } finally {
       keysTableWriter.close();
     }
+  }
+
+  /**
+   * This listener will insert all participant identifiers in the keys datasource prior to copying the valueset to the
+   * data datasource. It will also generate the public variable entity if it does not exist yet. As such, it must be
+   * executed before the ValueSet is copied to the data datasource otherwise, it will not have an associated entity.
+   */
+  private DatasourceCopyValueSetEventListener createKeysListener(final View privateView, final Variable keyVariable, final OpalPrivateVariableEntityMap entityMap, final ValueTableWriter keysTableWriter) {
+    DatasourceCopyValueSetEventListener createKeysListener = new DatasourceCopyValueSetEventListener() {
+
+      public void onValueSetCopied(ValueTable source, ValueSet valueSet, String... destination) {
+      }
+
+      public void onValueSetCopy(ValueTable source, ValueSet valueSet) {
+        copyParticipantIdentifiers(valueSet.getVariableEntity(), privateView, keyVariable, keysTableWriter, entityMap);
+      }
+
+    };
+    return createKeysListener;
   }
 
   private void copyPublicViewToDestinationDatasource(Datasource destination, final String dispatchAttribute, PrivateVariableEntityValueTable publicView, DatasourceCopyValueSetEventListener createKeysListener) throws IOException {
@@ -217,13 +210,19 @@ public class DefaultImportService implements ImportService {
    * @param participantTable
    * @return
    */
-  private View createPrivateView(ValueTable participantTable) {
-    final View privateView = View.Builder.newView(participantTable.getName(), participantTable).select(new SelectClause() {
-      public boolean select(Variable variable) {
-        return isIdentifierVariable(variable);
-      }
-    }).build();
-    return privateView;
+  private View createPrivateView(ValueTable participantTable, FunctionalUnit unit) {
+    if(unit.getSelect() != null) {
+      final View privateView = View.Builder.newView(participantTable.getName(), participantTable).select(unit.getSelect()).build();
+      privateView.initialise();
+      return privateView;
+    } else {
+      final View privateView = View.Builder.newView(participantTable.getName(), participantTable).select(new SelectClause() {
+        public boolean select(Variable variable) {
+          return isIdentifierVariable(variable);
+        }
+      }).build();
+      return privateView;
+    }
   }
 
   /**
@@ -299,32 +298,10 @@ public class DefaultImportService implements ImportService {
       // Use default strategy.
       dsEncryptionStrategy = new EncryptedSecretKeyDatasourceEncryptionStrategy();
     }
-    dsEncryptionStrategy.setKeyProvider(unit.getKeyStore());
+    UnitKeyStore unitKeyStore = unit.getKeyStore(false);
+    dsEncryptionStrategy.setKeyProvider(unitKeyStore != null ? unitKeyStore : new NullKeyProvider());
 
     return dsEncryptionStrategy;
-  }
-
-  private void archiveData(FileObject file) throws FileSystemException {
-    // Was an archive directory configured? If not, do nothing.
-    if(archiveDirectory == null || archiveDirectory.isEmpty()) {
-      log.info("No archive directory configured");
-      return;
-    }
-
-    // Create the archive directory if necessary.
-    FileObject archiveDir = opalRuntime.getFileSystem().getRoot().resolveFile(archiveDirectory);
-    archiveDir.createFolder();
-    FileObject archiveFile = archiveDir.resolveFile(file.getName().getBaseName());
-    archiveFile.createFile();
-
-    // Move the file there.
-    try {
-      FileUtil.copyContent(file, archiveFile);
-      file.delete();
-
-    } catch(IOException e) {
-      log.error("Failed to archive file {} to dir {}. Error reported: {}", new Object[] { file, archiveDir, e.getMessage() });
-    }
   }
 
   private ValueTable lookupKeysTable() {
@@ -343,7 +320,7 @@ public class DefaultImportService implements ImportService {
   /**
    * A MultiplexingStrategy that uses a variable attribute as the destination table name
    */
-  private class VariableAttributeMutiplexingStrategy implements MultiplexingStrategy {
+  static private class VariableAttributeMutiplexingStrategy implements MultiplexingStrategy {
 
     private final String attributeName;
 

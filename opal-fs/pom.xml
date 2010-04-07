@@ -42,5 +42,8 @@
       </releases>
     </repository>
   </repositories>
-
+   
+  <properties>
+    <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
+  </properties>
 </project>

@@ -75,27 +75,29 @@ public class ShellCallbackHandler implements CachingCallbackHandler {
         textCallback.setText(shell.prompt(textCallback.getPrompt()));
       } else if(c instanceof PasswordCallback) {
         PasswordCallback passwordCallback = (PasswordCallback) c;
-
         if(passwordCallback instanceof CacheablePasswordCallback) {
-          String passwordKey = ((CacheablePasswordCallback) passwordCallback).getPasswordKey();
-
-          if(passwordCache.containsKey(passwordKey)) {
-            passwordCallback.setPassword(passwordCache.get(passwordKey));
-          } else {
-            CacheablePasswordCallback cachablePasswordCallback = (CacheablePasswordCallback) passwordCallback;
-            if(cachablePasswordCallback.isConfirmationPrompt()) {
-              passwordCallback.setPassword(promptAndConfirmPassword(cachablePasswordCallback));
-            } else {
-              passwordCallback.setPassword(shell.passwordPrompt(" %s", cachablePasswordCallback.getPrompt()));
-            }
-            passwordCache.put(passwordKey, passwordCallback.getPassword());
-          }
+          handleCacheablePasswordCallback(((CacheablePasswordCallback) passwordCallback));
         } else {
           passwordCallback.setPassword(shell.passwordPrompt(" %s", passwordCallback.getPrompt()));
         }
       } else {
         throw new UnsupportedCallbackException(c);
       }
+    }
+  }
+
+  private void handleCacheablePasswordCallback(CacheablePasswordCallback cacheablePasswordCallback) throws IOException {
+    String passwordKey = cacheablePasswordCallback.getPasswordKey();
+
+    if(passwordCache.containsKey(passwordKey)) {
+      cacheablePasswordCallback.setPassword(passwordCache.get(passwordKey));
+    } else {
+      if(cacheablePasswordCallback.isConfirmationPrompt()) {
+        cacheablePasswordCallback.setPassword(promptAndConfirmPassword(cacheablePasswordCallback));
+      } else {
+        cacheablePasswordCallback.setPassword(getCurrentShell().passwordPrompt(" %s", cacheablePasswordCallback.getPrompt()));
+      }
+      passwordCache.put(passwordKey, cacheablePasswordCallback.getPassword());
     }
   }
 

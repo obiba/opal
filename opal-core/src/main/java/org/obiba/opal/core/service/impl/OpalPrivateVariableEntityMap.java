@@ -101,9 +101,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
 
   public VariableEntity createPublicEntity(VariableEntity privateEntity) {
     if(privateEntity == null) throw new IllegalArgumentException("privateEntity cannot be null");
-
     ValueTable keyTable = getKeyValueTable();
-
     for(int i = 0; i < 100; i++) {
       VariableEntity publicEntity = new VariableEntityBean(privateEntity.getType(), participantIdentifier.generateParticipantIdentifier());
       if(!keyTable.hasValueSet(publicEntity)) {
@@ -119,7 +117,6 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
         return publicEntity;
       }
     }
-
     throw new IllegalStateException("Unable to generate a unique public entity for the owner [" + ownerVariable + "] and private entity [" + privateEntity.getIdentifier() + "]. " + "One hundred attempts made.");
   }
 

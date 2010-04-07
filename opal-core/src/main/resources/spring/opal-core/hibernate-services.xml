@@ -10,7 +10,6 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <property name="opalRuntime" ref="opalRuntime" />
   	<property name="auditLogManager" ref="auditLogManager" />
     <property name="participantIdentifier" ref="participantIdentifier" />
-    <property name="archiveDirectory" value="${org.obiba.opal.import.archiveDirectory}" />
     <property name="keysTableReference" value="${org.obiba.opal.keys.tableReference}"/>
     <property name="keysTableEntityType" value="${org.obiba.opal.keys.entityType}"/>
   </bean>

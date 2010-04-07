@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileNotFoundException;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileSystemManager;
@@ -37,6 +36,7 @@ public class OpalFileSystemImpl implements OpalFileSystem {
       FileObject vfsRoot = fsm.resolveFile(root);
       nativeRootURL = vfsRoot.getURL().toString() + "/";
 
+      Assert.isTrue(vfsRoot.isReadable(), "Opal File System is not readable.  Please check your Opal File System configuration.");
       Assert.isTrue(vfsRoot.isWriteable(), "The root of the Opal File System is not writable.  Please reconfigure the Opal File System with a writable root.");
 
       // This is similar to what chroot does. We obtain a "filesystem" that appears to be rooted at vfsRoot
@@ -52,23 +52,15 @@ public class OpalFileSystemImpl implements OpalFileSystem {
 
   public File getLocalFile(FileObject virtualFile) {
     Assert.notNull(virtualFile, "A virtualFile is required.");
-
-    boolean isLocalFile;
     try {
-      isLocalFile = isLocalFile(virtualFile);
-    } catch(FileNotFoundException e1) {
-      return null;
-    }
-
-    try {
-      if(isLocalFile) {
+      if(isLocalFile(virtualFile)) {
         String virtualFileURL = virtualFile.getURL().toString();
         String nativeFileURL = virtualFileURL.replace(root.getURL().toString(), nativeRootURL);
+
         log.info("nativeRootURL: {}", nativeRootURL);
         log.info("nativeFileURL: {}", nativeFileURL);
 
-        File file = new File(nativeFileURL.substring("file:///".length()));
-        log.info("nativeFile exists: {}", file.exists());
+        File file = new File(nativeFileURL.replaceFirst("[a-zA-Z]*[0-9]?://", ""));
         return file;
       } else {
         return convertVirtualFileToLocal(virtualFile);
@@ -78,31 +70,41 @@ public class OpalFileSystemImpl implements OpalFileSystem {
     }
   }
 
+  private void makeSureThatFileCanBeConverted(FileObject virtualFile) {
+    FileType virtualFileType;
+    try {
+      virtualFileType = virtualFile.getType();
+
+      if(virtualFileType == FileType.FOLDER) {
+        throw new RuntimeException("This FileObject cannot be converted to a local File because it represents a folder in the VFS.");
+      } else if(virtualFileType == FileType.IMAGINARY) {
+        virtualFile.createFile();
+      }
+
+    } catch(FileSystemException e) {
+      throw new RuntimeException("Unsuspected error : ", e);
+    }
+  }
+
   public File convertVirtualFileToLocal(FileObject virtualFile) {
     Assert.notNull(virtualFile, "A virtualFile is required.");
+    makeSureThatFileCanBeConverted(virtualFile);
 
-    File localFile = null;
     InputStream virtualFileInputStream = null;
     FileOutputStream localFileOutputStream = null;
     try {
-      makeSureThatFileCanBeConverted(virtualFile);
-      localFileOutputStream = new FileOutputStream(getLocalTempFile(virtualFile));
+      File localFile = getLocalTempFile(virtualFile);
+      localFileOutputStream = new FileOutputStream(localFile);
       virtualFileInputStream = virtualFile.getContent().getInputStream();
       StreamUtil.copy(virtualFileInputStream, localFileOutputStream);
-
+      return localFile;
     } catch(Exception couldNotConvertFileToLocal) {
       throw new RuntimeException("Failed to convert FileObject (VFS) to a local File", couldNotConvertFileToLocal);
     } finally {
       StreamUtil.silentSafeClose(virtualFileInputStream);
       StreamUtil.silentSafeClose(localFileOutputStream);
     }
-    return localFile;
-  }
 
-  private void makeSureThatFileCanBeConverted(FileObject virtualFile) throws FileSystemException {
-    if(virtualFile.getType() != FileType.FILE) {
-      throw new RuntimeException("This FileObject (VFS) cannot be converted to a local File, because it is either a folder or represents a file that does not exist.");
-    }
   }
 
   private File getLocalTempFile(FileObject virtualFile) throws IOException {
@@ -110,11 +112,9 @@ public class OpalFileSystemImpl implements OpalFileSystem {
     return File.createTempFile("temp_local_vfs_", "." + virtualFileName.getExtension());
   }
 
-  public boolean isLocalFile(FileObject virtualFile) throws FileNotFoundException {
+  public boolean isLocalFile(FileObject virtualFile) {
 
     Assert.notNull(virtualFile, "A virtualFile is required.");
-
-    // checkThatFileExist(virtualFile);
 
     FileObject currentFile = virtualFile;
     while(true) {
@@ -127,16 +127,6 @@ public class OpalFileSystemImpl implements OpalFileSystem {
       }
     }
 
-  }
-
-  private void checkThatFileExist(FileObject virtualFile) {
-    try {
-      if(!virtualFile.exists()) {
-        throw new FileNotFoundException("File not found : " + virtualFile);
-      }
-    } catch(FileSystemException e) {
-      throw new RuntimeException(e);
-    }
   }
 
 }

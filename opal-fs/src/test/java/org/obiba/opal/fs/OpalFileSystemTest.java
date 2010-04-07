@@ -20,8 +20,8 @@ import junit.framework.Assert;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockftpserver.fake.FakeFtpServer;
 import org.mockftpserver.fake.UserAccount;
@@ -50,19 +50,24 @@ public class OpalFileSystemTest {
     fsLocal = new OpalFileSystemImpl("res:opal-file-system");
     fsLocalRoot = fsLocal.getRoot();
 
-    mockFtpServer = new FakeFtpServer();
-    mockFtpServer.addUserAccount(new UserAccount("user", "password", "c:/"));
+    // MockFtpServer blocks the execution of this test under the unix environment, so this test
+    // will be run on Windows until we find a solution...
+    if(runningOsIsWindows()) {
 
-    FileSystem fileSystem = new WindowsFakeFileSystem();
-    fileSystem.add(new DirectoryEntry("c:/temp"));
-    fileSystem.add(new FileEntry("c:/temp/file1.txt"));
-    fileSystem.add(new FileEntry("c:/temp/file2.txt", "this is the file content"));
-    mockFtpServer.setFileSystem(fileSystem);
+      mockFtpServer = new FakeFtpServer();
+      mockFtpServer.addUserAccount(new UserAccount("user", "password", "c:/"));
 
-    // mockFtpServer.start();
+      FileSystem fileSystem = new WindowsFakeFileSystem();
+      fileSystem.add(new DirectoryEntry("c:/temp"));
+      fileSystem.add(new FileEntry("c:/temp/file1.txt"));
+      fileSystem.add(new FileEntry("c:/temp/file2.txt", "this is the file content"));
+      mockFtpServer.setFileSystem(fileSystem);
 
-    // fsFtp = new OpalFileSystemImpl("ftp://user:password@localhost:21/temp");
-    // fsFtpRoot = fsFtp.getRoot();
+      mockFtpServer.start();
+
+      fsFtp = new OpalFileSystemImpl("ftp://user:password@localhost:21");
+      fsFtpRoot = fsFtp.getRoot();
+    }
 
   }
 
@@ -74,22 +79,29 @@ public class OpalFileSystemTest {
   }
 
   @Test
-  @Ignore("Test freezes the compilation under Unix")
   public void testFtpFileNotLocalFile() throws FileSystemException {
-    Assert.assertFalse(fsFtp.isLocalFile(fsFtpRoot.resolveFile("file1.txt")));
+    Assume.assumeTrue(runningOsIsWindows());
+    Assert.assertFalse(fsFtp.isLocalFile(fsFtpRoot.resolveFile("/temp/file2.txt")));
   }
 
   @Test
-  @Ignore("Test freezes the compilation under Unix")
   public void getLocalFileFromFtp() throws FileNotFoundException, IOException {
-    Assert.assertFalse(fsFtp.isLocalFile(fsFtpRoot.resolveFile("file2.txt")));
-    File localFile = fsFtp.getLocalFile(fsFtpRoot.resolveFile("file2.txt"));
+    Assume.assumeTrue(runningOsIsWindows());
+    Assert.assertFalse(fsFtp.isLocalFile(fsFtpRoot.resolveFile("/temp/file2.txt")));
+    File localFile = fsFtp.getLocalFile(fsFtpRoot.resolveFile("/temp/file2.txt"));
     List<String> lines = StreamUtil.readLines(new FileInputStream(localFile));
     Assert.assertEquals("this is the file content", lines.get(0));
   }
 
+  private boolean runningOsIsWindows() {
+    String osName = System.getProperty("os.name");
+    return osName.toLowerCase().contains("windows");
+  }
+
   @After
   public void cleanUp() {
-    // mockFtpServer.stop();
+    if(mockFtpServer != null) {
+      mockFtpServer.stop();
+    }
   }
 }

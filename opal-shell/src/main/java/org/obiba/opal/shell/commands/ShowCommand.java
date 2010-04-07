@@ -20,7 +20,7 @@ import org.obiba.opal.shell.commands.options.ShowCommandOptions;
 /**
  * Displays on the standard output the fully qualified name of elements that are available in Opal.
  */
-@CommandUsage(description = "Displays the fully qualified name of each data element currently available in Opal.", syntax = "Syntax: show [--datasources] [--tables]")
+@CommandUsage(description = "Displays the fully qualified name of each data element currently available in Opal.", syntax = "Syntax: show [--datasources] [--tables] [--units]")
 public class ShowCommand extends AbstractOpalRuntimeDependentCommand<ShowCommandOptions> {
 
   public void execute() {
@@ -49,8 +49,12 @@ public class ShowCommand extends AbstractOpalRuntimeDependentCommand<ShowCommand
 
   private void showUnits(boolean displayUnits) {
     if(displayUnits) {
-      for(FunctionalUnit unit : getOpalConfiguration().getFunctionalUnits()) {
-        getShell().printf("functional unit [%s], with key variable [%s]\n", unit.getName(), unit.getKeyVariableName());
+      if(!getOpalRuntime().getFunctionalUnits().isEmpty()) {
+        for(FunctionalUnit unit : getOpalRuntime().getFunctionalUnits()) {
+          getShell().printf("functional unit [%s], with key variable [%s]\n", unit.getName(), unit.getKeyVariableName());
+        }
+      } else {
+        getShell().printf("No functional units\n");
       }
     }
   }

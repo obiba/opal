@@ -29,6 +29,7 @@ import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
 import org.obiba.opal.core.runtime.IOpalRuntime;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
+import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.UnitKeyStore;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -179,7 +180,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
   }
 
   private void validateUnitExists(String unitName) throws NoSuchFunctionalUnitException {
-    if(opalRuntime.getOpalConfiguration().getFunctionalUnit(unitName) == null) {
+    if(!FunctionalUnit.OPAL_INSTANCE.equals(unitName) && opalRuntime.getOpalConfiguration().getFunctionalUnit(unitName) == null) {
       throw new NoSuchFunctionalUnitException(unitName);
     }
   }

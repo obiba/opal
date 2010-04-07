@@ -90,10 +90,6 @@ public class PrivateVariableEntityValueTable extends View {
 
     return new Function<ValueSet, ValueSet>() {
       public ValueSet apply(ValueSet from) {
-        VariableEntity publicEntity = privateMap.publicEntity(from.getVariableEntity());
-        if(publicEntity == null) {
-          publicEntity = privateMap.createPublicEntity(from.getVariableEntity());
-        }
         return baseTransformer.apply(from);
       }
     };

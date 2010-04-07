@@ -12,6 +12,8 @@ import org.obiba.opal.shell.commands.CommandUsage;
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException;
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException.ValidationError;
 
+import com.google.common.collect.Sets;
+
 /**
  * Implements {@code OpalShell} but does not specify how user interactions are implemented. Extending classes must
  * implement three methods {@code printf(String, Object...)}, {@code passwordPrompt(String, Object...)} and {@code
@@ -46,21 +48,7 @@ public abstract class AbstractOpalShell implements OpalShell {
         String commandName = args[0];
 
         if(commandRegistry.hasCommand(commandName)) {
-          args = Arrays.copyOfRange(args, 1, args.length);
-          try {
-            Command<?> command = commandRegistry.newCommand(commandName, args);
-            command.setShell(this);
-            command.execute();
-          } catch(ArgumentValidationException e) {
-            // Print some help to the user then fallback to prompt.
-            printHelp(commandName, e);
-          } catch(RuntimeException e) {
-            printf("Error executing command '%s'.\n", commandName);
-            if(e.getMessage() != null) printf("Error message: %s.\n", e.getMessage());
-            printf("See log file for error details.\n");
-            // TODO: where to we output this?
-            e.printStackTrace(System.err);
-          }
+          executeCommand(commandName, args);
         } else {
           printf("Unknown command '%s'. Type help to get help.\n", commandName);
         }
@@ -87,7 +75,8 @@ public abstract class AbstractOpalShell implements OpalShell {
       maxSize = Math.max(maxSize, command.length() + 2);
     }
     printf("Usage:\n  <command> <options> <arguments>\n\nCommands:\n");
-    for(String command : this.commandRegistry.getAvailableCommands()) {
+    // Create a TreeSet so that the output is sorted on command name
+    for(String command : Sets.newTreeSet(this.commandRegistry.getAvailableCommands())) {
       // %-<maxSize>s: constantly print <maxSize> characters, left-justified
       printf("  %-" + maxSize + "s%s\n", command, this.commandRegistry.getCommandUsage(command).description());
     }
@@ -99,6 +88,24 @@ public abstract class AbstractOpalShell implements OpalShell {
   public abstract char[] passwordPrompt(String format, Object... args);
 
   public abstract String prompt(String format, Object... args);
+
+  private void executeCommand(String commandName, String[] args) {
+    args = Arrays.copyOfRange(args, 1, args.length);
+    try {
+      Command<?> command = commandRegistry.newCommand(commandName, args);
+      command.setShell(this);
+      command.execute();
+    } catch(ArgumentValidationException e) {
+      // Print some help to the user then fallback to prompt.
+      printHelp(commandName, e);
+    } catch(RuntimeException e) {
+      printf("Error executing command '%s'.\n", commandName);
+      if(e.getMessage() != null) printf("Error message: %s.\n", e.getMessage());
+      printf("See log file for error details.\n");
+      // TODO: where to we output this?
+      e.printStackTrace(System.err);
+    }
+  }
 
   private void printHelp(String commandName, ArgumentValidationException e) {
     boolean helpRequested = false;

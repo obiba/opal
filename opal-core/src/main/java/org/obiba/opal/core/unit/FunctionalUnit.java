@@ -10,6 +10,7 @@
 package org.obiba.opal.core.unit;
 
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
+import org.obiba.magma.views.SelectClause;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 
 /**
@@ -33,6 +34,8 @@ public class FunctionalUnit {
   private DatasourceEncryptionStrategy datasourceEncryptionStrategy;
 
   private UnitKeyStoreService unitKeyStoreService;
+
+  private SelectClause select;
 
   //
   // Constructors
@@ -80,6 +83,23 @@ public class FunctionalUnit {
   }
 
   public UnitKeyStore getKeyStore() {
-    return unitKeyStoreService.getOrCreateUnitKeyStore(getName());
+    return getKeyStore(true);
   }
+
+  public UnitKeyStore getKeyStore(boolean create) {
+    if(create) {
+      return unitKeyStoreService.getOrCreateUnitKeyStore(getName());
+    } else {
+      return unitKeyStoreService.getUnitKeyStore(getName());
+    }
+  }
+
+  public SelectClause getSelect() {
+    return select;
+  }
+
+  public void setSelect(SelectClause select) {
+    this.select = select;
+  }
+
 }

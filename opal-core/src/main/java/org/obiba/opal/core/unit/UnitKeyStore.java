@@ -39,6 +39,7 @@ import org.apache.commons.vfs.FileObject;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PasswordFinder;
+import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.crypt.KeyProvider;
 import org.obiba.magma.crypt.MagmaCryptRuntimeException;
@@ -328,8 +329,9 @@ public class UnitKeyStore implements KeyProvider {
   }
 
   private KeyPair getKeyPairFromFile(FileObject privateKey) {
+    PEMReader pemReader = null;
     try {
-      PEMReader pemReader = new PEMReader(new InputStreamReader(privateKey.getContent().getInputStream()), new PasswordFinder() {
+      pemReader = new PEMReader(new InputStreamReader(privateKey.getContent().getInputStream()), new PasswordFinder() {
         public char[] getPassword() {
           return System.console().readPassword("%s:  ", "Password for imported private key");
         }
@@ -345,12 +347,15 @@ public class UnitKeyStore implements KeyProvider {
       throw new RuntimeException(e);
     } catch(IOException e) {
       throw new RuntimeException(e);
+    } finally {
+      StreamUtil.silentSafeClose(pemReader);
     }
   }
 
   private Key getPrivateKeyFile(FileObject privateKey) {
+    PEMReader pemReader = null;
     try {
-      PEMReader pemReader = new PEMReader(new InputStreamReader(privateKey.getContent().getInputStream()), new PasswordFinder() {
+      pemReader = new PEMReader(new InputStreamReader(privateKey.getContent().getInputStream()), new PasswordFinder() {
         public char[] getPassword() {
           return System.console().readPassword("%s:  ", "Password for imported private key");
         }
@@ -362,6 +367,8 @@ public class UnitKeyStore implements KeyProvider {
       return toPrivateKey(pemObject);
     } catch(IOException e) {
       throw new RuntimeException(e);
+    } finally {
+      StreamUtil.silentSafeClose(pemReader);
     }
   }
 
@@ -376,8 +383,9 @@ public class UnitKeyStore implements KeyProvider {
   }
 
   private X509Certificate getCertificateFromFile(FileObject certificate) {
+    PEMReader pemReader = null;
     try {
-      PEMReader pemReader = new PEMReader(new InputStreamReader(certificate.getContent().getInputStream()), new PasswordFinder() {
+      pemReader = new PEMReader(new InputStreamReader(certificate.getContent().getInputStream()), new PasswordFinder() {
 
         public char[] getPassword() {
           return System.console().readPassword("%s:  ", "Password for imported certificate");
@@ -392,6 +400,8 @@ public class UnitKeyStore implements KeyProvider {
       throw new RuntimeException(e);
     } catch(IOException e) {
       throw new RuntimeException(e);
+    } finally {
+      StreamUtil.silentSafeClose(pemReader);
     }
   }
 

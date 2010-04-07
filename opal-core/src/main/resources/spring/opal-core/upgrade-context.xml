@@ -92,6 +92,10 @@
 
     <property name="upgradeSteps">
       <list>
+        <bean id="opal-schemaUpgrade-1.1" parent="updateOpalSchema">
+          <property name="appliesTo" value="1.1" />  
+        </bean>
+        <ref bean="opal-dataUpgrade-1.1" />
       </list>
     </property>
 
@@ -101,6 +105,19 @@
       </list>
     </property>
   </bean>
+    
+  <bean id="updateOpalSchema" class="org.obiba.runtime.upgrade.support.MethodInvokingUpgradeStep" abstract="true">
+    <property name="description" value="Update Opal Schema." />
+    <property name="methodOwner" ref="&amp;opalSessionFactory" />
+    <property name="methodName" value="updateDatabaseSchema" />
+  </bean>
   
-
+  <bean id="opal-dataUpgrade-1.1" class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
+    <property name="dataSource" ref="opalDataSource" />
+    <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/" />
+    <property name="scriptBasename" value="opal-dataUpgrade-1.1" />
+    <property name="description" value="Copy 'DEFAULT_STUDY_ID' keystore from study_key_store to unit_key_store, then drop study_key_store."/>
+    <property name="appliesTo" value="1.1" />     
+  </bean>
+  
 </beans>
