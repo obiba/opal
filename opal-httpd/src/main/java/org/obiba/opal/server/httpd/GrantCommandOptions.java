@@ -7,20 +7,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.datashield;
+package org.obiba.opal.server.httpd;
+
+import java.util.List;
 
 import org.obiba.opal.shell.commands.options.HelpOption;
 
 import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
 import uk.co.flamingpenguin.jewel.cli.Option;
+import uk.co.flamingpenguin.jewel.cli.Unparsed;
 
-@CommandLineInterface(application = "listen")
-public interface ListenCommandOptions extends HelpOption {
+/**
+ *
+ */
+@CommandLineInterface(application = "grant")
+public interface GrantCommandOptions extends HelpOption {
 
-  @Option(shortName = "u", longName = "unit")
-  public String getUnit();
+  @Option(shortName = "u")
+  String getUnit();
 
-  @Option(shortName = "r", longName = "root")
-  public String getRoot();
+  @Option(shortName = "p")
+  List<String> getPerm();
 
+  boolean isPerm();
+
+  @Unparsed(name = "tables")
+  List<String> getTables();
 }

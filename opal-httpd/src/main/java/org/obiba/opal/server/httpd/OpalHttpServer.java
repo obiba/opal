@@ -1,14 +1,13 @@
 package org.obiba.opal.server.httpd;
 
-import org.obiba.opal.server.httpd.security.ShiroVerifierAndEnroler;
-import org.obiba.opal.server.rest.TransactionFilter;
 import org.restlet.Application;
 import org.restlet.Component;
-import org.restlet.data.ChallengeScheme;
+import org.restlet.Context;
+import org.restlet.Restlet;
+import org.restlet.Server;
 import org.restlet.data.Protocol;
-import org.restlet.security.ChallengeAuthenticator;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.PlatformTransactionManager;
+import org.restlet.engine.security.SslContextFactory;
+import org.restlet.routing.VirtualHost;
 
 /**
  */
@@ -16,14 +15,9 @@ public class OpalHttpServer {
 
   private Component component;
 
-  // private JettyServerHelper jetty;
-
-  @Autowired
-  private PlatformTransactionManager txManager;
-
   public OpalHttpServer() {
+    System.setProperty("org.restlet.engine.loggerFacadeClass", "org.restlet.ext.slf4j.Slf4jLoggerFacade");
     component = new Component();
-    component.getServers().add(Protocol.HTTP, 8182);
   }
 
   public Component getComponent() {
@@ -31,18 +25,24 @@ public class OpalHttpServer {
   }
 
   public void addApplication(String root, Application app) {
-    // Executes the request within a transaction
-    TransactionFilter tx = new TransactionFilter(txManager);
-    tx.setNext(app);
 
-    // Authenticates / authorizes through Shiro
-    ChallengeAuthenticator guard = new ChallengeAuthenticator(component.getContext().createChildContext(), ChallengeScheme.HTTP_BASIC, "Opal");
-    ShiroVerifierAndEnroler shiro = new ShiroVerifierAndEnroler();
-    guard.setVerifier(shiro);
-    guard.setEnroler(shiro);
-    guard.setNext(tx);
+  }
 
-    component.getDefaultHost().attach(root, guard);
+  public void addApplication(SslContextFactory factory, int port, Application app) throws Exception {
+    Context httpsCtx = component.getContext().createChildContext();
+    httpsCtx.getAttributes().put("sslContextFactory", factory);
+    httpsCtx.getParameters().add("needClientAuthentication", "true");
+    httpsCtx.getParameters().add("wantClientAuthentication", "true");
+
+    Server https = new Server(httpsCtx, Protocol.HTTPS, port, (Restlet) null);
+    VirtualHost vhost = new VirtualHost(component.getContext().createChildContext());
+    vhost.setServerPort(Integer.toString(port));
+    vhost.attach(app);
+    component.getHosts().add(vhost);
+    component.updateHosts();
+
+    component.getServers().add(https);
+    https.start();
   }
 
   public void start() {

@@ -10,7 +10,7 @@ public class FederationApp extends Application {
 
   @Override
   public Set<Class<?>> getClasses() {
-    return ImmutableSet.<Class<?>> builder().add(RestDatasource.class).build();
+    return ImmutableSet.<Class<?>> builder().add(DatasourceResource.class).build();
   }
 
 }

@@ -24,6 +24,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -31,6 +32,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -50,6 +53,9 @@ import org.obiba.opal.core.crypt.KeyPairNotFoundException;
 import org.obiba.opal.core.crypt.KeyProviderException;
 import org.obiba.opal.core.crypt.KeyProviderSecurityException;
 import org.springframework.util.Assert;
+
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Sets;
 
 /**
  * A {@link FunctionalUnit}'s keystore.
@@ -85,6 +91,21 @@ public class UnitKeyStore implements KeyProvider {
   //
   // KeyProvider Methods
   //
+
+  public Set<String> listKeyPairs() {
+    Set<String> keyPairs = Sets.newLinkedHashSet();
+    try {
+      for(Iterator<String> iterator = Iterators.forEnumeration(this.store.aliases()); iterator.hasNext();) {
+        String alias = iterator.next();
+        if(this.store.entryInstanceOf(alias, PrivateKeyEntry.class)) {
+          keyPairs.add(alias);
+        }
+      }
+    } catch(KeyStoreException e) {
+      throw new RuntimeException(e);
+    }
+    return keyPairs;
+  }
 
   public KeyPair getKeyPair(String alias) throws NoSuchKeyException, org.obiba.magma.crypt.KeyProviderSecurityException {
     KeyPair keyPair = null;

@@ -27,6 +27,7 @@
     <module>opal-datashield</module>
     <module>opal-httpd</module>
     <module>magma-r</module>
+    <module>datasource-federation</module>
   </modules>
 
   <dependencyManagement>

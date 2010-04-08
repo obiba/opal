@@ -21,7 +21,7 @@ import com.google.common.collect.Iterables;
 import com.thoughtworks.xstream.XStream;
 
 @Path("/datasource")
-public class RestDatasource {
+public class DatasourceResource {
 
   private final XStream xstream = MagmaEngine.get().getExtension(MagmaXStreamExtension.class).getXStreamFactory().createXStream();
 

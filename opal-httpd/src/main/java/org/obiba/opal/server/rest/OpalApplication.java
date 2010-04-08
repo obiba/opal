@@ -9,22 +9,58 @@
  ******************************************************************************/
 package org.obiba.opal.server.rest;
 
-import java.util.Set;
+import java.util.Collections;
 
-import javax.ws.rs.core.Application;
-
-import com.google.common.collect.Sets;
+import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.restlet.Application;
+import org.restlet.Context;
+import org.restlet.Restlet;
+import org.restlet.routing.Router;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  *
  */
 public class OpalApplication extends Application {
 
-  private Set<Class<?>> classes = Sets.newHashSet();
+  @Autowired
+  private PlatformTransactionManager txManager;
 
-  @Override
-  public Set<Class<?>> getClasses() {
-    return classes;
+  public OpalApplication(Context context) {
+    super(context);
   }
 
+  @Override
+  public Restlet createInboundRoot() {
+    Router router = new Router();
+    router.attach("/tables", TablesResource.class);
+    router.attach("/table/{table}/variables", VariablesResource.class);
+    router.attach("/table/{table}/entities", EntitiesResource.class);
+    router.attach("/table/{table}/valueSet/{identifier}", ValueSetResource.class);
+
+    // Executes the request within a transaction
+    TransactionFilter tx = new TransactionFilter(txManager);
+    tx.setNext(router);
+
+    /*
+     * // Authenticates / authorizes through Shiro ChallengeAuthenticator guard = new
+     * ChallengeAuthenticator(application.getContext().createChildContext(), ChallengeScheme.HTTP_BASIC, "Opal");
+     * ShiroVerifierAndEnroler shiro = new ShiroVerifierAndEnroler(); guard.setVerifier(shiro); guard.setEnroler(shiro);
+     * guard.setNext(tx);
+     */
+
+    return tx;
+  }
+
+  public void addTable(String table) {
+    addTables(Collections.singleton(table));
+  }
+
+  public void addTables(Iterable<String> tables) {
+    for(String table : tables) {
+      MagmaEngineTableResolver.valueOf(table).resolveTable();
+      getContext().getParameters().add("table", table);
+    }
+  }
 }

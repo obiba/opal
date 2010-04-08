@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.server.sshd;
 
-import org.obiba.opal.datashield.ListenCommand;
-import org.obiba.opal.datashield.ListenCommandOptions;
+import org.obiba.opal.server.httpd.GrantCommand;
+import org.obiba.opal.server.httpd.GrantCommandOptions;
 import org.obiba.opal.shell.AbstractCommandRegistry;
 import org.obiba.opal.shell.commands.CopyCommand;
 import org.obiba.opal.shell.commands.DecryptCommand;
@@ -51,7 +51,7 @@ public class SecureShellCommandRegistry extends AbstractCommandRegistry {
     addAvailableCommand(CopyCommand.class, CopyCommandOptions.class);
     addAvailableCommand(SplitCommand.class, SplitCommandOptions.class);
 
-    addAvailableCommand(ListenCommand.class, ListenCommandOptions.class);
+    addAvailableCommand(GrantCommand.class, GrantCommandOptions.class);
   }
 
 }

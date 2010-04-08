@@ -21,5 +21,8 @@
     <constructor-arg value="${org.obiba.opal.ssh.port}" />
   </bean>
 
-  <bean class="org.obiba.opal.server.httpd.OpalHttpServer" init-method="start" destroy-method="stop"/>
+  <bean class="org.obiba.opal.server.httpd.OpalHttpServer" init-method="start" destroy-method="stop" />
+
+  <bean class="org.obiba.opal.server.resource.OpalApplicationFactory" />
+
 </beans>
