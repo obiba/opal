@@ -12,6 +12,7 @@ package org.obiba.opal.server.rest;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.restlet.Application;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
@@ -27,8 +28,9 @@ public class AbstractTableResource extends ServerResource {
   protected void doInit() throws ResourceException {
     super.doInit();
     String table = (String) getRequestAttributes().get("table");
+    String datasource = Application.getCurrent().getContext().getParameters().getFirstValue(table);
     try {
-      valueTable = MagmaEngineTableResolver.valueOf(table).resolveTable();
+      valueTable = MagmaEngineTableResolver.valueOf(datasource + "." + table).resolveTable();
     } catch(NoSuchValueTableException e) {
       setStatus(Status.CLIENT_ERROR_NOT_FOUND);
     } catch(IllegalArgumentException e) {

@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.server.sshd;
 
+import org.obiba.opal.server.httpd.ConnectCommand;
+import org.obiba.opal.server.httpd.ConnectCommandOptions;
 import org.obiba.opal.server.httpd.GrantCommand;
 import org.obiba.opal.server.httpd.GrantCommandOptions;
 import org.obiba.opal.shell.AbstractCommandRegistry;
@@ -52,6 +54,7 @@ public class SecureShellCommandRegistry extends AbstractCommandRegistry {
     addAvailableCommand(SplitCommand.class, SplitCommandOptions.class);
 
     addAvailableCommand(GrantCommand.class, GrantCommandOptions.class);
+    addAvailableCommand(ConnectCommand.class, ConnectCommandOptions.class);
   }
 
 }

@@ -23,6 +23,6 @@
 
   <bean class="org.obiba.opal.server.httpd.OpalHttpServer" init-method="start" destroy-method="stop" />
 
-  <bean class="org.obiba.opal.server.resource.OpalApplicationFactory" />
+  <bean class="org.obiba.opal.server.rest.OpalApplicationFactory" />
 
 </beans>

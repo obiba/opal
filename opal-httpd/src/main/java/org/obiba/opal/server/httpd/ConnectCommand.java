@@ -9,24 +9,28 @@
  ******************************************************************************/
 package org.obiba.opal.server.httpd;
 
+import java.util.Collections;
+
+import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
+import org.obiba.magma.MagmaEngine;
+import org.obiba.opal.client.rest.RestDatasource;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.UnitKeyStore;
 import org.obiba.opal.server.httpd.ssl.FunctionalUnitSslContextFactory;
-import org.obiba.opal.server.rest.OpalApplication;
-import org.obiba.opal.server.rest.OpalApplicationFactory;
 import org.obiba.opal.shell.commands.AbstractOpalRuntimeDependentCommand;
 import org.obiba.opal.shell.commands.CommandUsage;
+import org.restlet.Client;
+import org.restlet.Context;
+import org.restlet.data.Protocol;
+import org.restlet.data.Reference;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
  */
-@CommandUsage(description = "Grant permissions to functional units.", syntax = "Syntax: grant --unit NAME --perm PERM TABLES...")
-public class GrantCommand extends AbstractOpalRuntimeDependentCommand<GrantCommandOptions> {
-
-  @Autowired
-  private OpalApplicationFactory applicationFactory;
+@CommandUsage(description = "Connect to a functional unit's hosted tables.", syntax = "Syntax: connect --unit NAME --url url")
+public class ConnectCommand extends AbstractOpalRuntimeDependentCommand<ConnectCommandOptions> {
 
   @Autowired
   private OpalHttpServer httpServer;
@@ -36,20 +40,19 @@ public class GrantCommand extends AbstractOpalRuntimeDependentCommand<GrantComma
 
   @Override
   public void execute() {
-    OpalApplication application = applicationFactory.createApplication(httpServer.getComponent().getContext().createChildContext());
-    for(String table : options.getTables()) {
-      application.addTable(table);
-    }
-
     UnitKeyStore opalKeyStore = keystoreService.getUnitKeyStore(FunctionalUnit.OPAL_INSTANCE);
     UnitKeyStore unitKeyStore = keystoreService.getUnitKeyStore(options.getUnit());
 
     FunctionalUnitSslContextFactory fussl = new FunctionalUnitSslContextFactory(opalKeyStore, unitKeyStore);
     try {
-      httpServer.addApplication(fussl, 8443, application);
-      getShell().printf("HTTPS server started.\n");
+      Context httpsCtx = httpServer.getComponent().getContext().createChildContext();
+      httpsCtx.getAttributes().put("sslContextFactory", fussl);
+      httpsCtx.getParameters().add("hostnameVerifier", AllowAllHostnameVerifier.class.getName());
+
+      Client client = new Client(httpsCtx, Collections.singletonList(Protocol.HTTPS), ExtendedHttpClientHelper.class.getName());
+      RestDatasource ds = new RestDatasource(options.getUnit(), new Reference(options.getUrl()), client);
+      MagmaEngine.get().addDatasource(ds);
     } catch(Exception e) {
-      getShell().printf("Unable to start HTTPS server: %s\n", e.getMessage());
       throw new RuntimeException(e);
     }
   }

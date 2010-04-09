@@ -14,6 +14,10 @@ import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.security.KeyStoreException;
+import java.security.KeyStore.Entry;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStore.SecretKeyEntry;
+import java.security.KeyStore.TrustedCertificateEntry;
 import java.security.cert.Certificate;
 
 import org.apache.commons.vfs.FileObject;
@@ -42,6 +46,8 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   private static final String IMPORT_ACTION = "import";
 
   private static final String EXPORT_ACTION = "export";
+
+  private static final String LIST_ACTION = "list";
 
   //
   // Instance Variables
@@ -82,6 +88,8 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
       importKey();
     } else if(action.equals(EXPORT_ACTION)) {
       exportCertificate();
+    } else if(action.equals(LIST_ACTION)) {
+      listKeystore();
     } else {
       unrecognizedOptionsHelp();
     }
@@ -123,8 +131,8 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   private void importKey() {
     String unit = options.isUnit() ? options.getUnit() : FunctionalUnit.OPAL_INSTANCE;
 
-    if(options.isPrivate()) {
-      try {
+    try {
+      if(options.isPrivate()) {
         if(getFile(options.getPrivate()).exists() == false) {
           getShell().printf("Private key file '%s' does not exist. Cannot import key.\n", options.getPrivate());
           return;
@@ -136,13 +144,17 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
         if(keyDoesNotExistOrOverwriteConfirmed(unit, options.getAlias())) {
           importKeyFromFileOrInteractively(unit, options.getAlias());
         }
-      } catch(NoSuchFunctionalUnitException ex) {
-        getShell().printf("Functional unit '%s' does not exist. Key not imported.\n", ex.getUnitName());
-      } catch(FileSystemException e) {
-        throw new RuntimeException("An error occured while reading the encryption key files.", e);
+      } else if(options.isCertificate()) {
+        UnitKeyStore ks = unitKeyStoreService.getOrCreateUnitKeyStore(unit);
+        ks.importCertificate(options.getAlias(), getFile(options.getCertificate()));
+        unitKeyStoreService.saveUnitKeyStore(ks);
+      } else {
+        unrecognizedOptionsHelp();
       }
-    } else {
-      unrecognizedOptionsHelp();
+    } catch(NoSuchFunctionalUnitException ex) {
+      getShell().printf("Functional unit '%s' does not exist. Key not imported.\n", ex.getUnitName());
+    } catch(FileSystemException e) {
+      throw new RuntimeException("An error occured while reading the encryption key files.", e);
     }
   }
 
@@ -215,6 +227,25 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
       getShell().printf("Certificate written to the file [%s]\n", options.getCertificate());
     } else {
       getShell().printf(((StringWriter) certificateWriter).getBuffer().toString());
+    }
+  }
+
+  private void listKeystore() {
+    String unit = options.isUnit() ? options.getUnit() : FunctionalUnit.OPAL_INSTANCE;
+    UnitKeyStore uks = this.unitKeyStoreService.getUnitKeyStore(unit);
+    if(uks != null) {
+      for(String alias : uks.listAliases()) {
+        Entry e = uks.getEntry(alias);
+        String type = "<unknown>";
+        if(e instanceof TrustedCertificateEntry) {
+          type = "<trusted certificate>";
+        } else if(e instanceof PrivateKeyEntry) {
+          type = "<key pair>";
+        } else if(e instanceof SecretKeyEntry) {
+          type = "<secret key>";
+        }
+        getShell().printf("%s: %s\n", alias, type);
+      }
     }
   }
 

@@ -39,7 +39,13 @@ public class UnitKeyManager implements X509KeyManager {
   }
 
   @Override
-  public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket) {
+  public String chooseClientAlias(String[] keyTypes, Principal[] issuers, Socket socket) {
+    for(String keyType : keyTypes) {
+      String alias = chooseServerAlias(keyType, issuers, socket);
+      if(alias != null) {
+        return alias;
+      }
+    }
     return null;
   }
 

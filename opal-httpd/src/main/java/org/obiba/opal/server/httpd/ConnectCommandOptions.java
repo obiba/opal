@@ -7,19 +7,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.server.rest;
+package org.obiba.opal.server.httpd;
 
-import java.util.Arrays;
+import org.obiba.opal.shell.commands.options.HelpOption;
 
-import org.restlet.Application;
-import org.restlet.resource.Get;
-import org.restlet.resource.ServerResource;
+import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
+import uk.co.flamingpenguin.jewel.cli.Option;
 
-public class TablesResource extends ServerResource {
+/**
+ *
+ */
+@CommandLineInterface(application = "connect")
+public interface ConnectCommandOptions extends HelpOption {
 
-  @Get("xml")
-  public Iterable<String> getTables() {
-    return Arrays.asList(Application.getCurrent().getContext().getParameters().getValuesArray("table"));
-  }
+  @Option(shortName = "u")
+  String getUnit();
+
+  @Option(shortName = "l")
+  String getUrl();
 
 }

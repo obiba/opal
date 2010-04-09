@@ -11,6 +11,7 @@ package org.obiba.opal.server.rest;
 
 import java.util.Collections;
 
+import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.restlet.Application;
 import org.restlet.Context;
@@ -59,8 +60,9 @@ public class OpalApplication extends Application {
 
   public void addTables(Iterable<String> tables) {
     for(String table : tables) {
-      MagmaEngineTableResolver.valueOf(table).resolveTable();
-      getContext().getParameters().add("table", table);
+      ValueTable vt = MagmaEngineTableResolver.valueOf(table).resolveTable();
+      getContext().getParameters().add("table", vt.getName());
+      getContext().getParameters().add(vt.getName(), vt.getDatasource().getName());
     }
   }
 }
