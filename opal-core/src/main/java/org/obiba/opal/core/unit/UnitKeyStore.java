@@ -23,7 +23,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
+import java.security.UnrecoverableEntryException;
 import java.security.UnrecoverableKeyException;
+import java.security.KeyStore.Entry;
+import java.security.KeyStore.PasswordProtection;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -31,6 +35,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -50,6 +56,10 @@ import org.obiba.opal.core.crypt.KeyPairNotFoundException;
 import org.obiba.opal.core.crypt.KeyProviderException;
 import org.obiba.opal.core.crypt.KeyProviderSecurityException;
 import org.springframework.util.Assert;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Sets;
 
 /**
  * A {@link FunctionalUnit}'s keystore.
@@ -85,6 +95,52 @@ public class UnitKeyStore implements KeyProvider {
   //
   // KeyProvider Methods
   //
+
+  public Set<String> listAliases() {
+    try {
+      return ImmutableSet.copyOf(Iterators.forEnumeration(this.store.aliases()));
+    } catch(KeyStoreException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public Entry getEntry(String alias) {
+    try {
+      if(this.store.isKeyEntry(alias)) {
+        CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName).prompt("Password for '" + alias + "':  ").build();
+        return this.store.getEntry(alias, new PasswordProtection(getKeyPassword(passwordCallback)));
+      } else if(this.store.isCertificateEntry(alias)) {
+        return this.store.getEntry(alias, null);
+      } else {
+        throw new UnsupportedOperationException("unsupported key type");
+      }
+    } catch(KeyStoreException e) {
+      throw new RuntimeException(e);
+    } catch(NoSuchAlgorithmException e) {
+      throw new RuntimeException(e);
+    } catch(UnrecoverableEntryException e) {
+      throw new RuntimeException(e);
+    } catch(UnsupportedCallbackException e) {
+      throw new RuntimeException(e);
+    } catch(IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public Set<String> listKeyPairs() {
+    Set<String> keyPairs = Sets.newLinkedHashSet();
+    try {
+      for(Iterator<String> iterator = Iterators.forEnumeration(this.store.aliases()); iterator.hasNext();) {
+        String alias = iterator.next();
+        if(this.store.entryInstanceOf(alias, PrivateKeyEntry.class)) {
+          keyPairs.add(alias);
+        }
+      }
+    } catch(KeyStoreException e) {
+      throw new RuntimeException(e);
+    }
+    return keyPairs;
+  }
 
   public KeyPair getKeyPair(String alias) throws NoSuchKeyException, org.obiba.magma.crypt.KeyProviderSecurityException {
     KeyPair keyPair = null;
@@ -126,6 +182,16 @@ public class UnitKeyStore implements KeyProvider {
       throw new MagmaCryptRuntimeException(e);
     }
     throw new NoSuchKeyException(datasource.getName(), "No PublicKey for Datasource '" + datasource.getName() + "'");
+  }
+
+  public X509Certificate importCertificate(String alias, FileObject certFile) {
+    X509Certificate cert = getCertificateFromFile(certFile);
+    try {
+      this.store.setCertificateEntry(alias, cert);
+    } catch(KeyStoreException e) {
+      throw new MagmaCryptRuntimeException(e);
+    }
+    return cert;
   }
 
   //

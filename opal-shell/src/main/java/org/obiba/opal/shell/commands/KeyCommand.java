@@ -14,6 +14,10 @@ import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.security.KeyStoreException;
+import java.security.KeyStore.Entry;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStore.SecretKeyEntry;
+import java.security.KeyStore.TrustedCertificateEntry;
 import java.security.cert.Certificate;
 
 import org.apache.commons.vfs.FileObject;
@@ -32,7 +36,7 @@ import org.springframework.util.Assert;
 /**
  * Provides key management allowing for key creation, deletion, importing and exporting of keys.
  */
-@CommandUsage(description = "Creates, deletes, imports and exports keypairs/certificates.", syntax = "Syntax: keystore [--unit NAME] --alias NAME (--action create --algo NAME --size INT | --action delete | --action import --private FILE [--certificate FILE] | --action export [--certificate FILE])")
+@CommandUsage(description = "Creates, deletes, imports and exports keypairs/certificates.", syntax = "Syntax: keystore [--unit NAME] [--alias NAME] (--action create --algo NAME --size INT | --action list | --action delete | --action import [--private FILE] [--certificate FILE] | --action export [--private FILE] [--certificate FILE])")
 public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOptions> {
 
   private static final String CREATE_ACTION = "create";
@@ -42,6 +46,8 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   private static final String IMPORT_ACTION = "import";
 
   private static final String EXPORT_ACTION = "export";
+
+  private static final String LIST_ACTION = "list";
 
   //
   // Instance Variables
@@ -74,17 +80,23 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   }
 
   private void executeAction(String action) {
-    if(action.equals(CREATE_ACTION)) {
+    if(action.equals(CREATE_ACTION) && hasAlias()) {
       createKey();
-    } else if(action.equals(DELETE_ACTION)) {
+    } else if(action.equals(DELETE_ACTION) && hasAlias()) {
       deleteKey();
-    } else if(action.equals(IMPORT_ACTION)) {
+    } else if(action.equals(IMPORT_ACTION) && hasAlias()) {
       importKey();
-    } else if(action.equals(EXPORT_ACTION)) {
+    } else if(action.equals(EXPORT_ACTION) && hasAlias()) {
       exportCertificate();
+    } else if(action.equals(LIST_ACTION) && hasAlias() == false) {
+      listKeystore();
     } else {
       unrecognizedOptionsHelp();
     }
+  }
+
+  private boolean hasAlias() {
+    return options.isAlias() == true;
   }
 
   private void createKey() {
@@ -123,8 +135,8 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   private void importKey() {
     String unit = options.isUnit() ? options.getUnit() : FunctionalUnit.OPAL_INSTANCE;
 
-    if(options.isPrivate()) {
-      try {
+    try {
+      if(options.isPrivate()) {
         if(getFile(options.getPrivate()).exists() == false) {
           getShell().printf("Private key file '%s' does not exist. Cannot import key.\n", options.getPrivate());
           return;
@@ -136,13 +148,17 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
         if(keyDoesNotExistOrOverwriteConfirmed(unit, options.getAlias())) {
           importKeyFromFileOrInteractively(unit, options.getAlias());
         }
-      } catch(NoSuchFunctionalUnitException ex) {
-        getShell().printf("Functional unit '%s' does not exist. Key not imported.\n", ex.getUnitName());
-      } catch(FileSystemException e) {
-        throw new RuntimeException("An error occured while reading the encryption key files.", e);
+      } else if(options.isCertificate()) {
+        UnitKeyStore ks = unitKeyStoreService.getOrCreateUnitKeyStore(unit);
+        ks.importCertificate(options.getAlias(), getFile(options.getCertificate()));
+        unitKeyStoreService.saveUnitKeyStore(ks);
+      } else {
+        unrecognizedOptionsHelp();
       }
-    } else {
-      unrecognizedOptionsHelp();
+    } catch(NoSuchFunctionalUnitException ex) {
+      getShell().printf("Functional unit '%s' does not exist. Key not imported.\n", ex.getUnitName());
+    } catch(FileSystemException e) {
+      throw new RuntimeException("An error occured while reading the encryption key files.", e);
     }
   }
 
@@ -218,6 +234,26 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
     }
   }
 
+  private void listKeystore() {
+    String unit = options.isUnit() ? options.getUnit() : FunctionalUnit.OPAL_INSTANCE;
+    UnitKeyStore uks = this.unitKeyStoreService.getUnitKeyStore(unit);
+    if(uks != null) {
+      getShell().printf("Listing available keys (alias: <key type>) for '%s'\n", unit);
+      for(String alias : uks.listAliases()) {
+        Entry e = uks.getEntry(alias);
+        String type = "<unknown>";
+        if(e instanceof TrustedCertificateEntry) {
+          type = "<certificate>";
+        } else if(e instanceof PrivateKeyEntry) {
+          type = "<key pair>";
+        } else if(e instanceof SecretKeyEntry) {
+          type = "<secret key>";
+        }
+        getShell().printf("%s: %s\n", alias, type);
+      }
+    }
+  }
+
   private boolean keyDoesNotExistOrOverwriteConfirmed(String unit, String alias) {
     boolean createKeyConfirmation = true;
     if(unitKeyStoreService.aliasExists(unit, options.getAlias())) {
@@ -269,8 +305,9 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
 
   private void unrecognizedOptionsHelp() {
     getShell().printf("This combination of options was unrecognized." + "\nSyntax:" //
-        + "\n  keystore [--unit NAME] --alias NAME (--action create --algo NAME --size INT | --action delete | --action import --private FILE [--certificate FILE] | --action export [--certificate FILE])" //
+        + "\n  keystore [--unit NAME] [--alias NAME] (--action create --algo NAME --size INT | --action list | --action delete | --action import [--private FILE] [--certificate FILE] | --action export [--private FILE] [--certificate FILE])" //
         + "\nExamples:" //
+        + "\n  keystore --unit someUnit --action list" //
         + "\n  keystore --unit someUnit --alias someAlias --action create --algo RSA --size 2048" //
         + "\n  keystore --unit someUnit --alias someAlias --action delete" //
         + "\n  keystore --unit someUnit --alias someAlias --action import --private private_key.pem --certificate public_key.pem" //
