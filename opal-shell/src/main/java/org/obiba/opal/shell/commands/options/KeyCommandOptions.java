@@ -13,18 +13,20 @@ public interface KeyCommandOptions extends HelpOption {
 
   public boolean isUnit();
 
-  @Option(shortName = "a", description = "The alias name of the encryption key pair.")
+  @Option(shortName = "a", description = "The name of the key within the keystore.")
   public String getAlias();
 
-  @Option(shortName = "x", description = "The action to perform: create, delete, import or export.")
+  public boolean isAlias();
+
+  @Option(shortName = "x", description = "The action to perform: list, create, delete, import or export.")
   public String getAction();
 
-  @Option(shortName = "g", longName = "algo", description = "The algorithm for creating the key pair. RSA is recommended.")
+  @Option(shortName = "g", longName = "algo", description = "The algorithm for creating a key pair. RSA is recommended.")
   public String getAlgorithm();
 
   public boolean isAlgorithm();
 
-  @Option(shortName = "s", description = "The key size for creating the key pair.")
+  @Option(shortName = "s", description = "The key size for creating a key pair.")
   public int getSize();
 
   public boolean isSize();

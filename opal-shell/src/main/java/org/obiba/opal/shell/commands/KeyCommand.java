@@ -36,7 +36,7 @@ import org.springframework.util.Assert;
 /**
  * Provides key management allowing for key creation, deletion, importing and exporting of keys.
  */
-@CommandUsage(description = "Creates, deletes, imports and exports keypairs/certificates.", syntax = "Syntax: keystore [--unit NAME] --alias NAME (--action create --algo NAME --size INT | --action delete | --action import --private FILE [--certificate FILE] | --action export [--certificate FILE])")
+@CommandUsage(description = "Creates, deletes, imports and exports keypairs/certificates.", syntax = "Syntax: keystore [--unit NAME] [--alias NAME] (--action create --algo NAME --size INT | --action list | --action delete | --action import [--private FILE] [--certificate FILE] | --action export [--private FILE] [--certificate FILE])")
 public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOptions> {
 
   private static final String CREATE_ACTION = "create";
@@ -80,19 +80,23 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   }
 
   private void executeAction(String action) {
-    if(action.equals(CREATE_ACTION)) {
+    if(action.equals(CREATE_ACTION) && hasAlias()) {
       createKey();
-    } else if(action.equals(DELETE_ACTION)) {
+    } else if(action.equals(DELETE_ACTION) && hasAlias()) {
       deleteKey();
-    } else if(action.equals(IMPORT_ACTION)) {
+    } else if(action.equals(IMPORT_ACTION) && hasAlias()) {
       importKey();
-    } else if(action.equals(EXPORT_ACTION)) {
+    } else if(action.equals(EXPORT_ACTION) && hasAlias()) {
       exportCertificate();
-    } else if(action.equals(LIST_ACTION)) {
+    } else if(action.equals(LIST_ACTION) && hasAlias() == false) {
       listKeystore();
     } else {
       unrecognizedOptionsHelp();
     }
+  }
+
+  private boolean hasAlias() {
+    return options.isAlias() == true;
   }
 
   private void createKey() {
@@ -234,11 +238,12 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
     String unit = options.isUnit() ? options.getUnit() : FunctionalUnit.OPAL_INSTANCE;
     UnitKeyStore uks = this.unitKeyStoreService.getUnitKeyStore(unit);
     if(uks != null) {
+      getShell().printf("Listing available keys (alias: <key type>) for '%s'\n", unit);
       for(String alias : uks.listAliases()) {
         Entry e = uks.getEntry(alias);
         String type = "<unknown>";
         if(e instanceof TrustedCertificateEntry) {
-          type = "<trusted certificate>";
+          type = "<certificate>";
         } else if(e instanceof PrivateKeyEntry) {
           type = "<key pair>";
         } else if(e instanceof SecretKeyEntry) {
@@ -300,8 +305,9 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
 
   private void unrecognizedOptionsHelp() {
     getShell().printf("This combination of options was unrecognized." + "\nSyntax:" //
-        + "\n  keystore [--unit NAME] --alias NAME (--action create --algo NAME --size INT | --action delete | --action import --private FILE [--certificate FILE] | --action export [--certificate FILE])" //
+        + "\n  keystore [--unit NAME] [--alias NAME] (--action create --algo NAME --size INT | --action list | --action delete | --action import [--private FILE] [--certificate FILE] | --action export [--private FILE] [--certificate FILE])" //
         + "\nExamples:" //
+        + "\n  keystore --unit someUnit --action list" //
         + "\n  keystore --unit someUnit --alias someAlias --action create --algo RSA --size 2048" //
         + "\n  keystore --unit someUnit --alias someAlias --action delete" //
         + "\n  keystore --unit someUnit --alias someAlias --action import --private private_key.pem --certificate public_key.pem" //
