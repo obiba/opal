@@ -186,6 +186,7 @@ public class KeyCommandTest {
     KeyCommandOptions mockOptions = createMock(KeyCommandOptions.class);
     expect(mockOptions.isUnit()).andReturn(true).atLeastOnce();
     expect(mockOptions.getUnit()).andReturn(unitName).atLeastOnce();
+    expect(mockOptions.isAlias()).andReturn(true).atLeastOnce();
     expect(mockOptions.getAlias()).andReturn(alias).atLeastOnce();
     expect(mockOptions.getAction()).andReturn("create").atLeastOnce();
     expect(mockOptions.isAlgorithm()).andReturn(true).atLeastOnce();
@@ -247,6 +248,7 @@ public class KeyCommandTest {
     expect(mockOptions.isUnit()).andReturn(true).atLeastOnce();
     expect(mockOptions.getUnit()).andReturn(unitName).atLeastOnce();
     expect(mockOptions.getAlias()).andReturn(alias).atLeastOnce();
+    expect(mockOptions.isAlias()).andReturn(true).atLeastOnce();
     expect(mockOptions.getAction()).andReturn("delete").atLeastOnce();
 
     return mockOptions;
@@ -264,6 +266,7 @@ public class KeyCommandTest {
     expect(mockOptions.isUnit()).andReturn(true).atLeastOnce();
     expect(mockOptions.getUnit()).andReturn(unitName).atLeastOnce();
     expect(mockOptions.getAlias()).andReturn(alias).atLeastOnce();
+    expect(mockOptions.isAlias()).andReturn(true).atLeastOnce();
     expect(mockOptions.getAction()).andReturn("import").atLeastOnce();
     expect(mockOptions.isPrivate()).andReturn(true).atLeastOnce();
     expect(mockOptions.getPrivate()).andReturn(privateFile).atLeastOnce();
@@ -285,6 +288,7 @@ public class KeyCommandTest {
     expect(mockOptions.isUnit()).andReturn(true).atLeastOnce();
     expect(mockOptions.getUnit()).andReturn(unitName).atLeastOnce();
     expect(mockOptions.getAlias()).andReturn(alias).atLeastOnce();
+    expect(mockOptions.isAlias()).andReturn(true).atLeastOnce();
     expect(mockOptions.getAction()).andReturn("export").atLeastOnce();
     expect(mockOptions.isCertificate()).andReturn(true).atLeastOnce();
     expect(mockOptions.isPrivate()).andReturn(false).atLeastOnce();
