@@ -19,7 +19,10 @@ import org.restlet.engine.Engine;
 import org.restlet.ext.httpclient.HttpClientHelper;
 
 /**
- *
+ * Extends {@code HttpClientHelper} to allow configuring the {@code hostnameVerifier} property of the @
+ * SSLSocketFactory}
+ * @see <a href="http://hc.apache.org/httpcomponents-client/tutorial/html/connmgmt.html#d4e514">HTTP Client Hostname Verification</a>
+ * @see <a href="http://restlet.tigris.org/issues/show_bug.cgi?id=1078">Restlet Feature Request</a>
  */
 public class ExtendedHttpClientHelper extends HttpClientHelper {
 
