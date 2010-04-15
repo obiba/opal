@@ -16,6 +16,8 @@ import org.obiba.opal.server.httpd.OpalJettyServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
 
 @Configuration
@@ -26,7 +28,14 @@ public class OpalJerseyConfiguration {
 
   @PostConstruct
   public void addDispatcherServlet() {
-    jettyServer.getContext().addServlet(new ServletHolder(new SpringServlet()), "/jersey/*");
+    SpringServlet s = new SpringServlet() {
+      @Override
+      protected void initiate(ResourceConfig rc, WebApplication wa) {
+        rc.getClasses().add(TableResource.class);
+        rc.getClasses().add(VariableResource.class);
+        super.initiate(rc, wa);
+      }
+    };
+    jettyServer.getContext().addServlet(new ServletHolder(s), "/jersey/*");
   }
-
 }

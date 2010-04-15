@@ -56,6 +56,8 @@ public class OpalJettyServer implements org.obiba.opal.server.Server {
 
     context.addFilter(new FilterHolder(new TransactionFilter(txmgr)), "/*", FilterMapping.DEFAULT);
 
+    // TODO: Should be GenericWebApplicationContext, but cannot due to Jersey bug
+    // https://jersey.dev.java.net/issues/show_bug.cgi?id=222
     AnnotationConfigWebApplicationContext webAppCtx = new AnnotationConfigWebApplicationContext();
     webAppCtx.setServletContext(context.getServletContext());
     webAppCtx.setParent(ctx);

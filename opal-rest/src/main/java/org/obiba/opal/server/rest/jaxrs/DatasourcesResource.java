@@ -13,11 +13,10 @@ import java.util.Set;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.ValueTable;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
@@ -29,22 +28,11 @@ import com.google.common.collect.Iterables;
 public class DatasourcesResource {
 
   @GET
+  @Produces("application/xml")
   public Set<String> getDatasources() {
     Set<String> names = ImmutableSet.copyOf(Iterables.transform(MagmaEngine.get().getDatasources(), new Function<Datasource, String>() {
       @Override
       public String apply(Datasource from) {
-        return from.getName();
-      }
-    }));
-    return names;
-  }
-
-  @GET
-  @Path("/datasource/{name}/tables")
-  public Set<String> getDatasource(@PathParam("name") String name) {
-    Set<String> names = ImmutableSet.copyOf(Iterables.transform(MagmaEngine.get().getDatasource(name).getValueTables(), new Function<ValueTable, String>() {
-      @Override
-      public String apply(ValueTable from) {
         return from.getName();
       }
     }));
