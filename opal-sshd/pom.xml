@@ -23,7 +23,7 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-datashield</artifactId>
+      <artifactId>opal-httpd</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

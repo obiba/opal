@@ -28,7 +28,11 @@
       <artifactId>org.restlet</artifactId>
       <version>${restlet.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+      <version>3.0.2.RELEASE</version>
+    </dependency>
     <dependency>
       <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet.ext.jetty</artifactId>
@@ -46,11 +50,6 @@
     </dependency>
     <dependency>
       <groupId>org.restlet.jse</groupId>
-      <artifactId>org.restlet.ext.jaxrs</artifactId>
-      <version>${restlet.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet.ext.slf4j</artifactId>
       <version>${restlet.version}</version>
     </dependency>
@@ -59,10 +58,14 @@
       <artifactId>org.restlet.ext.httpclient</artifactId>
       <version>${restlet.version}</version>
     </dependency>
-    
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-util</artifactId>
+      <version>${jetty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlet</artifactId>
       <version>${jetty.version}</version>
     </dependency>
     <dependency>

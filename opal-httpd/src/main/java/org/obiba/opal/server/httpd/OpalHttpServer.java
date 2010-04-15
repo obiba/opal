@@ -11,7 +11,7 @@ import org.restlet.routing.VirtualHost;
 
 /**
  */
-public class OpalHttpServer {
+public class OpalHttpServer implements org.obiba.opal.server.Server {
 
   private Component component;
 
@@ -43,6 +43,11 @@ public class OpalHttpServer {
 
     component.getServers().add(https);
     https.start();
+  }
+
+  @Override
+  public boolean isRunning() {
+    return component.isStarted();
   }
 
   public void start() {
