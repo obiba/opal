@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.server.sshd;
+package org.obiba.opal.server;
 
 import org.obiba.opal.server.httpd.ConnectCommand;
 import org.obiba.opal.server.httpd.ConnectCommandOptions;

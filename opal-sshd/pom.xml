@@ -21,11 +21,6 @@
       <artifactId>opal-shell</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-httpd</artifactId>
-      <version>${project.version}</version>
-    </dependency>
   </dependencies>
 
   <properties>
