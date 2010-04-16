@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.server.rest.jaxrs;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +31,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -81,19 +82,15 @@ public class TableResource {
   @GET
   @Path("/values.json")
   @Produces("application/json")
-  public Response getValues(@QueryParam("v") List<String> variables) {
-    Map<String, List<Object>> response = new HashMap<String, List<Object>>();
-    for(String name : variables) {
-      response.put(name, new LinkedList<Object>());
-    }
+  public Response getValuesAsJson(@QueryParam("v") List<String> variables) {
+    return Response.ok(new JSONObject(readValues(variables)).toString()).build();
+  }
 
-    for(ValueSet vs : valueTable.getValueSets()) {
-      for(String name : variables) {
-        response.get(name).add(valueTable.getVariableValueSource(name).getValue(vs).getValue());
-      }
-    }
-
-    return Response.ok(new JSONObject(response).toString()).build();
+  @GET
+  @Path("/values.xml")
+  @Produces("application/xml")
+  public Map<String, List<Object>> getValuesAsXml(@QueryParam("v") List<String> variables) {
+    return readValues(variables);
   }
 
   @Path("/{variable}")
@@ -102,5 +99,29 @@ public class TableResource {
     resource.setValueTable(valueTable);
     resource.setVariableValueSource(valueTable.getVariableValueSource(name));
     return resource;
+  }
+
+  private Map<String, List<Object>> readValues(List<String> variables) {
+    Map<String, List<Object>> response = new LinkedHashMap<String, List<Object>>();
+
+    if(variables.size() == 0) {
+      variables = ImmutableList.copyOf(Iterables.transform(valueTable.getVariables(), new Function<Variable, String>() {
+        @Override
+        public String apply(Variable from) {
+          return from.getName();
+        }
+      }));
+    }
+
+    for(String name : variables) {
+      response.put(name, new LinkedList<Object>());
+    }
+
+    for(ValueSet vs : valueTable.getValueSets()) {
+      for(String name : response.keySet()) {
+        response.get(name).add(valueTable.getVariableValueSource(name).getValue(vs).getValue());
+      }
+    }
+    return response;
   }
 }
