@@ -1,0 +1,11 @@
+Package: Ropal
+Version: 0.1
+Date: 2010-04-19
+Title: Opal-R API and DataShield API
+Author: OBiBa Consortium <info@obiba.org>
+Maintainer: OBiBa Consortium <info@obiba.org>
+Depends: R (>= 2.9.0), RCurl, rjson
+Description: A short (one paragraph) description of what
+	the package does and why it may be useful.
+License: GPL (= 3)
+URL: http://www.r-project.org, http://www.obiba.org
