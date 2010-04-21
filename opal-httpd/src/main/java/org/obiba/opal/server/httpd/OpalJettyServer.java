@@ -29,6 +29,9 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.FilterMapping;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.resource.FileResource;
+import org.obiba.opal.core.runtime.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -42,7 +45,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 /**
  *
  */
-public class OpalJettyServer implements org.obiba.opal.server.Server {
+public class OpalJettyServer implements Service {
+
+  private static final Logger log = LoggerFactory.getLogger(OpalJettyServer.class);
 
   private final Server jettyServer;
 
@@ -77,6 +82,7 @@ public class OpalJettyServer implements org.obiba.opal.server.Server {
 
   public void start() {
     try {
+      log.info("Starting Opal HTTP/s Server on port {}", this.jettyServer.getConnectors()[0].getPort());
       this.jettyServer.start();
     } catch(Exception e) {
       throw new RuntimeException(e);

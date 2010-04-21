@@ -1,5 +1,6 @@
 package org.obiba.opal.server.httpd;
 
+import org.obiba.opal.core.runtime.Service;
 import org.restlet.Application;
 import org.restlet.Component;
 import org.restlet.Context;
@@ -11,7 +12,7 @@ import org.restlet.routing.VirtualHost;
 
 /**
  */
-public class OpalHttpServer implements org.obiba.opal.server.Server {
+public class OpalHttpServer implements Service {
 
   private Component component;
 
