@@ -12,8 +12,6 @@ package org.obiba.opal.server.httpd;
 import java.util.Collections;
 
 import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.opal.client.rest.RestDatasource;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.UnitKeyStore;
@@ -23,7 +21,6 @@ import org.obiba.opal.shell.commands.CommandUsage;
 import org.restlet.Client;
 import org.restlet.Context;
 import org.restlet.data.Protocol;
-import org.restlet.data.Reference;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -50,8 +47,10 @@ public class ConnectCommand extends AbstractOpalRuntimeDependentCommand<ConnectC
       httpsCtx.getParameters().add("hostnameVerifier", AllowAllHostnameVerifier.class.getName());
 
       Client client = new Client(httpsCtx, Collections.singletonList(Protocol.HTTPS), ExtendedHttpClientHelper.class.getName());
-      RestDatasource ds = new RestDatasource(options.getUnit(), new Reference(options.getUrl()), client);
-      MagmaEngine.get().addDatasource(ds);
+
+      // TODO: commented due to code refactoring. Uncomment and fix once package structure is stable.
+      // RestDatasource ds = new RestDatasource(options.getUnit(), new Reference(options.getUrl()), client);
+      // MagmaEngine.get().addDatasource(ds);
     } catch(Exception e) {
       throw new RuntimeException(e);
     }
