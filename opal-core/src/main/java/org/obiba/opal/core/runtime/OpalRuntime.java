@@ -13,93 +13,29 @@ import java.util.Set;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
-import org.obiba.magma.MagmaEngine;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.fs.OpalFileSystem;
-import org.obiba.opal.fs.impl.OpalFileSystemImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
-import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  *
  */
-public class OpalRuntime implements IOpalRuntime {
-  //
-  // Instance Variables
-  //
+public interface OpalRuntime {
 
-  @Autowired
-  private PlatformTransactionManager txManager;
+  public OpalConfiguration getOpalConfiguration();
 
-  private OpalConfiguration opalConfiguration;
+  public Set<Service> getServices();
 
-  private OpalFileSystem opalFileSystem;
+  public OpalFileSystem getFileSystem();
 
-  //
-  // InitializingBean Methods
-  //
+  public Set<FunctionalUnit> getFunctionalUnits();
 
-  public OpalRuntime(OpalConfiguration opalConfiguration) {
-    this.opalConfiguration = opalConfiguration;
-  }
+  public FunctionalUnit getFunctionalUnit(String unitName);
 
-  public void init() throws Exception {
-    new TransactionTemplate(txManager).execute(new TransactionCallback() {
-      public Object doInTransaction(TransactionStatus status) {
-        return opalConfiguration.getMagmaEngineFactory().create();
-      }
-    });
+  public FileObject getUnitDirectory(String unitName) throws NoSuchFunctionalUnitException, FileSystemException;
 
-    // Initialize Opal file system
-    opalFileSystem = new OpalFileSystemImpl(opalConfiguration.getFileSystemRoot());
+  public void start();
 
-    // Create the folders for each FunctionalUnit
-    for(FunctionalUnit unit : opalConfiguration.getFunctionalUnits()) {
-      getUnitDirectory(unit.getName());
-    }
-  }
-
-  public void destroy() throws Exception {
-    new TransactionTemplate(txManager).execute(new TransactionCallback() {
-      public Object doInTransaction(TransactionStatus status) {
-        MagmaEngine.get().shutdown();
-        return null;
-      }
-    });
-  }
-
-  public OpalConfiguration getOpalConfiguration() {
-    return opalConfiguration;
-  }
-
-  public OpalFileSystem getFileSystem() {
-    return opalFileSystem;
-  }
-
-  public Set<FunctionalUnit> getFunctionalUnits() {
-    return opalConfiguration.getFunctionalUnits();
-  }
-
-  public FunctionalUnit getFunctionalUnit(String unitName) {
-    return opalConfiguration.getFunctionalUnit(unitName);
-  }
-
-  public FileObject getUnitDirectory(String unitName) throws NoSuchFunctionalUnitException, FileSystemException {
-    if(getFunctionalUnit(unitName) == null) {
-      throw new NoSuchFunctionalUnitException(unitName);
-    }
-
-    FileObject unitsDir = getFileSystem().getRoot().resolveFile("units");
-    unitsDir.createFolder();
-
-    FileObject unitDir = unitsDir.resolveFile(unitName);
-    unitDir.createFolder();
-
-    return unitDir;
-  }
+  public void stop();
 }

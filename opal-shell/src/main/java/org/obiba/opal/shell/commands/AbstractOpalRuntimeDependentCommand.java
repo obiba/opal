@@ -14,7 +14,7 @@ import java.io.File;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.obiba.opal.core.cfg.OpalConfiguration;
-import org.obiba.opal.core.runtime.IOpalRuntime;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -26,16 +26,16 @@ public abstract class AbstractOpalRuntimeDependentCommand<T> extends AbstractCom
   //
 
   @Autowired
-  private IOpalRuntime opalRuntime;
+  private OpalRuntime opalRuntime;
 
   //
   // Methods
   //
 
   /**
-   * Initializes the {@link IOpalRuntime} bean in the context.
+   * Initializes the {@link OpalRuntime} bean in the context.
    */
-  protected IOpalRuntime getOpalRuntime() {
+  protected OpalRuntime getOpalRuntime() {
     return opalRuntime;
   }
 

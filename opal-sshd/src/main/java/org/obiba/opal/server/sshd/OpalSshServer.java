@@ -14,13 +14,18 @@ import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
 import org.apache.sshd.server.PasswordAuthenticator;
 import org.apache.sshd.server.session.ServerSession;
+import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.OpalShell;
 import org.obiba.opal.shell.OpalShellExitCallback;
 import org.obiba.opal.shell.OpalShellFactory;
 import org.obiba.opal.shell.OpalShellHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class OpalSshServer {
+public class OpalSshServer implements Service {
+
+  private static final Logger log = LoggerFactory.getLogger(OpalSshServer.class);
 
   private final SshServer sshd;
 
@@ -29,6 +34,8 @@ public class OpalSshServer {
   private final OpalShellHolder opalShellHolder;
 
   private final OpalShellFactory shellFactory;
+
+  private boolean isRunning = false;
 
   public OpalSshServer(CommandRegistry commandRegistry, OpalShellFactory shellFactory, OpalShellHolder opalShellHolder, Integer port) {
     this.commandRegistry = commandRegistry;
@@ -50,6 +57,8 @@ public class OpalSshServer {
       public boolean authenticate(String username, String password, ServerSession session) {
         try {
           SecurityUtils.getSubject().login(new UsernamePasswordToken(username, password.toCharArray(), session.getIoSession().getRemoteAddress().toString()));
+          // Sessions don't expire automatically
+          SecurityUtils.getSubject().getSession().setTimeout(-1);
         } catch(AuthenticationException ae) {
 
         }
@@ -58,16 +67,26 @@ public class OpalSshServer {
     });
   }
 
+  @Override
+  public boolean isRunning() {
+    return isRunning;
+  }
+
+  @Override
   public void start() {
     try {
+      log.info("Starting Opal SSH Server on port {}", sshd.getPort());
       sshd.start();
+      isRunning = true;
     } catch(IOException e) {
       throw new RuntimeException(e);
     }
   }
 
+  @Override
   public void stop() {
     try {
+      isRunning = false;
       sshd.stop(true);
     } catch(InterruptedException e) {
       throw new RuntimeException(e);
@@ -86,6 +105,7 @@ public class OpalSshServer {
 
     private OutputStream err;
 
+    @SuppressWarnings("deprecation")
     public void destroy() {
       thread.stop();
     }

@@ -7,6 +7,7 @@ import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.util.Factory;
 import org.apache.shiro.util.LifecycleUtils;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 
@@ -68,7 +69,9 @@ public class OpalServer {
   final void startAndWait() throws IOException {
     if(ctx.isActive()) {
       try {
+        ctx.getBean(OpalRuntime.class).start();
         System.in.read();
+        ctx.getBean(OpalRuntime.class).stop();
       } finally {
         // Destroy the security manager.
         LifecycleUtils.destroy(SecurityUtils.getSecurityManager());

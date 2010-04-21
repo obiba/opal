@@ -38,7 +38,7 @@ import org.springframework.util.Assert;
 /**
  * Provides key management allowing for key creation, deletion, importing and exporting of keys.
  */
-@CommandUsage(description = "Creates, deletes, imports and exports keypairs/certificates.", syntax = "Syntax: keystore [--unit NAME] [--alias NAME] (--action create --algo NAME --size INT | --action list | --action delete | --action import [--private FILE] [--certificate FILE] | --action export [--private FILE] [--certificate FILE])")
+@CommandUsage(description = "Creates, deletes, imports and exports keypairs/certificates.", syntax = "Syntax: keystore --unit NAME (--action list | --alias NAME (--action create --algo NAME --size INT | --action delete | --action import [--private FILE] [--certificate FILE] | --action export [--certificate FILE]))")
 public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOptions> {
 
   private static final String CREATE_ACTION = "create";
@@ -311,7 +311,7 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
 
   private void unrecognizedOptionsHelp() {
     getShell().printf("This combination of options was unrecognized." + "\nSyntax:" //
-        + "\n  keystore [--unit NAME] [--alias NAME] (--action create --algo NAME --size INT | --action list | --action delete | --action import [--private FILE] [--certificate FILE] | --action export [--private FILE] [--certificate FILE])" //
+        + "\n  keystore --unit NAME (--action list | --alias NAME (--action create --algo NAME --size INT | --action delete | --action import [--private FILE] [--certificate FILE] | --action export [--certificate FILE]))" //
         + "\nExamples:" //
         + "\n  keystore --unit someUnit --action list" //
         + "\n  keystore --unit someUnit --alias someAlias --action create --algo RSA --size 2048" //

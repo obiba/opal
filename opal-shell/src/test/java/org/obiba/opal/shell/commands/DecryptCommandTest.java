@@ -24,7 +24,7 @@ import org.apache.commons.vfs.FileSystemException;
 import org.junit.Test;
 import org.obiba.magma.test.AbstractMagmaTest;
 import org.obiba.opal.core.cfg.OpalConfiguration;
-import org.obiba.opal.core.runtime.IOpalRuntime;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.DecryptService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.fs.OpalFileSystem;
@@ -49,7 +49,7 @@ public class DecryptCommandTest extends AbstractMagmaTest {
     FileObject mockUnitDir = createMockFile("my-unit", true, false);
     expect(mockUnitDir.resolveFile("$%@%$@#")).andThrow(new FileSystemException("cannot resolve")).atLeastOnce();
 
-    IOpalRuntime mockRuntime = createMockRuntime(mockFileSystem);
+    OpalRuntime mockRuntime = createMockRuntime(mockFileSystem);
     expect(mockRuntime.getUnitDirectory("my-unit")).andReturn(mockUnitDir).atLeastOnce();
 
     OpalShell mockShell = createMockShellForInvalidOutputDirectory();
@@ -69,7 +69,7 @@ public class DecryptCommandTest extends AbstractMagmaTest {
     DecryptCommandOptions mockOptions = createMockOptionsForNoFileSpecified();
     FileObject mockFileSystemRoot = createMockFileSystemRoot();
     OpalFileSystem mockFileSystem = createMockFileSystem(mockFileSystemRoot);
-    IOpalRuntime mockRuntime = createMockRuntime(mockFileSystem);
+    OpalRuntime mockRuntime = createMockRuntime(mockFileSystem);
     OpalShell mockShell = createMockShellForNoFileSpecified();
 
     replay(mockOptions, mockFileSystem, mockRuntime, mockShell);
@@ -87,7 +87,7 @@ public class DecryptCommandTest extends AbstractMagmaTest {
     DecryptCommandOptions mockOptions = createMockOptionsForInvalidFunctionalUnit("bogus");
     FileObject mockFileSystemRoot = createMockFileSystemRoot();
     OpalFileSystem mockFileSystem = createMockFileSystem(mockFileSystemRoot);
-    IOpalRuntime mockRuntime = createMockRuntimeForInvalidFunctionalUnit(mockFileSystem, "bogus");
+    OpalRuntime mockRuntime = createMockRuntimeForInvalidFunctionalUnit(mockFileSystem, "bogus");
     OpalShell mockShell = createMockShellForInvalidFunctionalUnit("bogus");
 
     replay(mockOptions, mockFileSystem, mockRuntime, mockShell);
@@ -116,7 +116,7 @@ public class DecryptCommandTest extends AbstractMagmaTest {
     OpalFileSystem mockFileSystem = createMockFileSystem(mockFileSystemRoot);
     expect(mockFileSystem.getLocalFile(outputFile)).andReturn(new File("target", "encrypted.zip")).atLeastOnce();
 
-    IOpalRuntime mockRuntime = createMockRuntimeForDefaultOutputDirectory(mockFileSystem, "my-unit");
+    OpalRuntime mockRuntime = createMockRuntimeForDefaultOutputDirectory(mockFileSystem, "my-unit");
     expect(mockRuntime.getUnitDirectory("my-unit")).andReturn(mockUnitDir).atLeastOnce();
 
     OpalShell mockShell = createMockShellForDefaultOutputDirectory("encrypted.zip");
@@ -139,10 +139,10 @@ public class DecryptCommandTest extends AbstractMagmaTest {
   // Helper Methods
   //
 
-  private DecryptCommand createDecryptCommand(final IOpalRuntime mockRuntime) {
+  private DecryptCommand createDecryptCommand(final OpalRuntime mockRuntime) {
     return new DecryptCommand() {
       @Override
-      protected IOpalRuntime getOpalRuntime() {
+      protected OpalRuntime getOpalRuntime() {
         return mockRuntime;
       }
 
@@ -196,8 +196,8 @@ public class DecryptCommandTest extends AbstractMagmaTest {
     return mockFileName;
   }
 
-  private IOpalRuntime createMockRuntime(OpalFileSystem mockFileSystem) {
-    IOpalRuntime mockRuntime = createMock(IOpalRuntime.class);
+  private OpalRuntime createMockRuntime(OpalFileSystem mockFileSystem) {
+    OpalRuntime mockRuntime = createMock(OpalRuntime.class);
     expect(mockRuntime.getFileSystem()).andReturn(mockFileSystem).atLeastOnce();
 
     return mockRuntime;
@@ -235,8 +235,8 @@ public class DecryptCommandTest extends AbstractMagmaTest {
     return mockOptions;
   }
 
-  private IOpalRuntime createMockRuntimeForInvalidFunctionalUnit(OpalFileSystem mockFileSystem, String invalidUnitName) {
-    IOpalRuntime mockRuntime = createMock(IOpalRuntime.class);
+  private OpalRuntime createMockRuntimeForInvalidFunctionalUnit(OpalFileSystem mockFileSystem, String invalidUnitName) {
+    OpalRuntime mockRuntime = createMock(OpalRuntime.class);
     expect(mockRuntime.getFileSystem()).andReturn(mockFileSystem).atLeastOnce();
     expect(mockRuntime.getFunctionalUnit(invalidUnitName)).andReturn(null).atLeastOnce();
 
@@ -261,8 +261,8 @@ public class DecryptCommandTest extends AbstractMagmaTest {
     return mockOptions;
   }
 
-  private IOpalRuntime createMockRuntimeForDefaultOutputDirectory(OpalFileSystem mockFileSystem, String unitName) {
-    IOpalRuntime mockRuntime = createMock(IOpalRuntime.class);
+  private OpalRuntime createMockRuntimeForDefaultOutputDirectory(OpalFileSystem mockFileSystem, String unitName) {
+    OpalRuntime mockRuntime = createMock(OpalRuntime.class);
     expect(mockRuntime.getFileSystem()).andReturn(mockFileSystem).atLeastOnce();
     expect(mockRuntime.getFunctionalUnit(unitName)).andReturn(new FunctionalUnit(unitName, null)).atLeastOnce();
 

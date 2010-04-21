@@ -24,7 +24,7 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.test.AbstractMagmaTest;
 import org.obiba.opal.core.cfg.OpalConfiguration;
-import org.obiba.opal.core.runtime.IOpalRuntime;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.shell.OpalShell;
 import org.obiba.opal.shell.commands.options.ShowCommandOptions;
@@ -79,7 +79,7 @@ public class ShowCommandTest extends AbstractMagmaTest {
     expect(mockOptions.getTables()).andReturn(false).anyTimes();
     expect(mockOptions.getUnits()).andReturn(true).anyTimes();
 
-    IOpalRuntime mockRuntime = createMock(IOpalRuntime.class);
+    OpalRuntime mockRuntime = createMock(OpalRuntime.class);
     recordExpectedOpalRuntimeExpectations(mockRuntime, units);
 
     OpalShell mockShell = createMock(OpalShell.class);
@@ -99,7 +99,7 @@ public class ShowCommandTest extends AbstractMagmaTest {
     ShowCommandOptions mockOptions = createMock(ShowCommandOptions.class);
     recordExpectedOperationsOnOptions(mockOptions);
 
-    IOpalRuntime mockRuntime = createMock(IOpalRuntime.class);
+    OpalRuntime mockRuntime = createMock(OpalRuntime.class);
     recordExpectedOpalRuntimeExpectations(mockRuntime, units);
 
     OpalShell mockShell = createMock(OpalShell.class);
@@ -116,10 +116,10 @@ public class ShowCommandTest extends AbstractMagmaTest {
     verify(mockOptions, mockShell);
   }
 
-  private ShowCommand createShowCommand(final IOpalRuntime mockRuntime) {
+  private ShowCommand createShowCommand(final OpalRuntime mockRuntime) {
     return new ShowCommand() {
       @Override
-      protected IOpalRuntime getOpalRuntime() {
+      protected OpalRuntime getOpalRuntime() {
         return mockRuntime;
       }
 
@@ -136,7 +136,7 @@ public class ShowCommandTest extends AbstractMagmaTest {
     expect(mockOptions.getUnits()).andReturn(false).anyTimes();
   }
 
-  private void recordExpectedOpalRuntimeExpectations(IOpalRuntime mockRuntime, String... units) {
+  private void recordExpectedOpalRuntimeExpectations(OpalRuntime mockRuntime, String... units) {
     Set<FunctionalUnit> functionalUnits = new LinkedHashSet<FunctionalUnit>();
     if(units.length != 0) {
       for(String unitName : units) {
