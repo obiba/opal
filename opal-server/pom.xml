@@ -27,6 +27,12 @@
       <artifactId>opal-rest</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-datashield</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
 
     <dependency>
       <groupId>org.hibernate</groupId>

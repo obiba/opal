@@ -10,6 +10,9 @@
 package org.obiba.opal.server.httpd;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -17,11 +20,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.FilterMapping;
 import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.util.resource.FileResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -39,6 +46,8 @@ public class OpalJettyServer implements org.obiba.opal.server.Server {
 
   private final Server jettyServer;
 
+  private ServletContextHandler contextHandler;
+
   @Autowired
   public OpalJettyServer(ApplicationContext ctx, PlatformTransactionManager txmgr) {
     Server server = new Server();
@@ -49,26 +58,16 @@ public class OpalJettyServer implements org.obiba.opal.server.Server {
     connector0.setRequestHeaderSize(8192);
 
     server.setConnectors(new Connector[] { connector0 });
-
-    ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS | ServletContextHandler.NO_SECURITY);
-    context.setContextPath("/");
-    server.setHandler(context);
-
-    context.addFilter(new FilterHolder(new TransactionFilter(txmgr)), "/*", FilterMapping.DEFAULT);
-
-    // TODO: Should be GenericWebApplicationContext, but cannot due to Jersey bug
-    // https://jersey.dev.java.net/issues/show_bug.cgi?id=222
-    AnnotationConfigWebApplicationContext webAppCtx = new AnnotationConfigWebApplicationContext();
-    webAppCtx.setServletContext(context.getServletContext());
-    webAppCtx.setParent(ctx);
-    webAppCtx.refresh();
-    context.getServletContext().setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, webAppCtx);
+    HandlerList handlers = new HandlerList();
+    handlers.addHandler(createFileHandler());
+    handlers.addHandler(createServletHandler(ctx, txmgr));
+    server.setHandler(handlers);
 
     this.jettyServer = server;
   }
 
   public ServletContextHandler getContext() {
-    return (ServletContextHandler) this.jettyServer.getHandler();
+    return this.contextHandler;
   }
 
   @Override
@@ -91,6 +90,40 @@ public class OpalJettyServer implements org.obiba.opal.server.Server {
       // ignore
     }
 
+  }
+
+  private Handler createServletHandler(ApplicationContext ctx, PlatformTransactionManager txmgr) {
+    contextHandler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS | ServletContextHandler.NO_SECURITY);
+    contextHandler.setContextPath("/");
+    contextHandler.addFilter(new FilterHolder(new DevelopmentModeFilter()), "/*", FilterMapping.DEFAULT);
+    contextHandler.addFilter(new FilterHolder(new TransactionFilter(txmgr)), "/*", FilterMapping.DEFAULT);
+
+    // TODO: Should be GenericWebApplicationContext, but cannot due to Jersey bug
+    // https://jersey.dev.java.net/issues/show_bug.cgi?id=222
+    AnnotationConfigWebApplicationContext webAppCtx = new AnnotationConfigWebApplicationContext();
+    webAppCtx.setServletContext(contextHandler.getServletContext());
+    webAppCtx.setParent(ctx);
+    webAppCtx.refresh();
+    contextHandler.getServletContext().setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, webAppCtx);
+    return contextHandler;
+  }
+
+  /**
+   * @return
+   */
+  private Handler createFileHandler() {
+    ResourceHandler resourceHandler = new ResourceHandler();
+    try {
+      resourceHandler.setBaseResource(new FileResource(new URL("file:///home/plaflamm/opal-home/fs")));
+      resourceHandler.setAliases(true);
+    } catch(MalformedURLException e) {
+      throw new RuntimeException(e);
+    } catch(IOException e) {
+      throw new RuntimeException(e);
+    } catch(URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
+    return resourceHandler;
   }
 
   public static class TransactionFilter extends OncePerRequestFilter {
@@ -116,6 +149,29 @@ public class OpalJettyServer implements org.obiba.opal.server.Server {
         }
       });
 
+    }
+
+  }
+
+  /**
+   * Implements HTTP Access-Control to allow XDR requests. Should only be activated during development.
+   */
+  public static class DevelopmentModeFilter extends OncePerRequestFilter {
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+      if(request.getMethod().equalsIgnoreCase("OPTIONS")) {
+        response.addHeader("Access-Control-Allow-Origin", "*");
+        response.addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        response.addHeader("Access-Control-Allow-Headers", request.getHeader("Access-Control-Request-Headers"));
+        response.setStatus(200);
+        response.flushBuffer();
+      } else if(request.getHeader("Origin") != null) {
+        response.addHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+        filterChain.doFilter(request, response);
+      } else {
+        filterChain.doFilter(request, response);
+      }
     }
 
   }

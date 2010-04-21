@@ -12,8 +12,12 @@ package org.obiba.opal.server.rest.jaxrs;
 import java.util.Set;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
@@ -26,6 +30,12 @@ import com.google.common.collect.Iterables;
 @Component
 @Path("/datasources")
 public class DatasourcesResource {
+
+  @OPTIONS
+  public Response getOptions(@Context HttpHeaders requestHeaders) {
+    System.out.println("bonjour");
+    return Response.ok().header("Access-Control-Allow-Origin", "*").header("Access-Control-Allow-Methods", "GET").header("Access-Control-Allow-Headers", "user-agent").build();
+  }
 
   @GET
   @Produces("application/xml")

@@ -32,6 +32,6 @@
 
   <bean class="org.obiba.opal.server.rest.OpalApplicationFactory" />
 
-  <context:component-scan base-package="org.obiba.opal.server" />
+  <context:component-scan base-package="org.obiba.opal.server,org.obiba.opal.service" />
 
 </beans>

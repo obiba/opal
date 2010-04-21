@@ -27,6 +27,7 @@
     <module>opal-fs</module>
     <module>opal-httpd</module>
     <module>opal-rest</module>
+    <module>opal-datashield</module>
   </modules>
 
   <dependencyManagement>
