@@ -26,7 +26,7 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.junit.Test;
 import org.obiba.opal.core.cfg.OpalConfiguration;
-import org.obiba.opal.core.runtime.IOpalRuntime;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.UnitKeyStore;
@@ -52,7 +52,7 @@ public class KeyCommandTest {
   public void testCreateActionCreatesOrUpdatesKey() {
     KeyCommandOptions mockOptions = createMockOptionsForCreateAction("my-unit", "my-alias", "RSA", 2048);
 
-    IOpalRuntime mockRuntime = createMockRuntime();
+    OpalRuntime mockRuntime = createMockRuntime();
     expect(mockRuntime.getFunctionalUnit("my-unit")).andReturn(new FunctionalUnit("my-unit", null)).atLeastOnce();
 
     OpalShell mockShell = createMockShellForCreateAction("my-alias");
@@ -75,7 +75,7 @@ public class KeyCommandTest {
   public void testDeleteActionDeletesKey() {
     KeyCommandOptions mockOptions = createMockOptionsForDeleteAction("my-unit", "my-alias");
 
-    IOpalRuntime mockRuntime = createMockRuntime();
+    OpalRuntime mockRuntime = createMockRuntime();
     expect(mockRuntime.getFunctionalUnit("my-unit")).andReturn(new FunctionalUnit("my-unit", null)).atLeastOnce();
 
     OpalShell mockShell = createMockShellForDeleteAction("my-unit", "my-alias");
@@ -107,7 +107,7 @@ public class KeyCommandTest {
 
     OpalFileSystem mockFileSystem = createMockFileSystem(mockFileSystemRoot);
 
-    IOpalRuntime mockRuntime = createMockRuntime();
+    OpalRuntime mockRuntime = createMockRuntime();
     expect(mockRuntime.getFunctionalUnit("my-unit")).andReturn(new FunctionalUnit("my-unit", null)).atLeastOnce();
     expect(mockRuntime.getFileSystem()).andReturn(mockFileSystem).atLeastOnce();
 
@@ -151,7 +151,7 @@ public class KeyCommandTest {
     FunctionalUnit unit = new FunctionalUnit("my-unit", null);
     unit.setUnitKeyStoreService(mockUnitKeyStoreService);
 
-    IOpalRuntime mockRuntime = createMockRuntime();
+    OpalRuntime mockRuntime = createMockRuntime();
     expect(mockRuntime.getFunctionalUnit("my-unit")).andReturn(unit).atLeastOnce();
     expect(mockRuntime.getFileSystem()).andReturn(mockFileSystem).atLeastOnce();
 
@@ -168,10 +168,10 @@ public class KeyCommandTest {
   // Helper Methods
   //
 
-  private KeyCommand createKeyCommand(final IOpalRuntime mockRuntime) {
+  private KeyCommand createKeyCommand(final OpalRuntime mockRuntime) {
     return new KeyCommand() {
       @Override
-      protected IOpalRuntime getOpalRuntime() {
+      protected OpalRuntime getOpalRuntime() {
         return mockRuntime;
       }
 
@@ -197,8 +197,8 @@ public class KeyCommandTest {
     return mockOptions;
   }
 
-  private IOpalRuntime createMockRuntime() {
-    IOpalRuntime mockRuntime = createMock(IOpalRuntime.class);
+  private OpalRuntime createMockRuntime() {
+    OpalRuntime mockRuntime = createMock(OpalRuntime.class);
 
     return mockRuntime;
   }

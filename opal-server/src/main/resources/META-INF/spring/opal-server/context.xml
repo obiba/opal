@@ -10,7 +10,7 @@
     <constructor-arg ref="opalShellHolder" />
   </bean>
 
-  <bean class="org.obiba.opal.server.sshd.OpalSshServer" init-method="start" destroy-method="stop">
+  <bean class="org.obiba.opal.server.sshd.OpalSshServer">
     <constructor-arg>
       <bean class="org.obiba.opal.server.sshd.SecureShellCommandRegistry" />
     </constructor-arg>

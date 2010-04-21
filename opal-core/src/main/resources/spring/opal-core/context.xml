@@ -10,11 +10,7 @@
   <import resource="hibernate-services.xml" />
   <import resource="version.xml" />
 
-  <bean id="participantIdentifier" class="org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl">
-  </bean>
-
-  <bean id="opalRuntime" class="org.obiba.opal.core.runtime.OpalRuntime" init-method="init" destroy-method="destroy"
-    lazy-init="true">
+  <bean id="opalRuntime" class="org.obiba.opal.core.runtime.DefaultOpalRuntime" lazy-init="true">
     <constructor-arg>
       <bean class="org.obiba.opal.core.cfg.OpalConfigurationFactoryBean">
         <property name="configFile" value="${OPAL_HOME}/conf/opal-config.xml" />
@@ -22,12 +18,7 @@
     </constructor-arg>
   </bean>
 
-  <bean id="auditLogManager" class="org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager">
-    <property name="sessionFactory" ref="opalSessionFactory" />
-    <property name="userProvider">
-      <bean class="org.obiba.opal.audit.OpalUserProvider" />
-    </property>
+  <bean id="participantIdentifier" class="org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl">
   </bean>
-
 
 </beans>

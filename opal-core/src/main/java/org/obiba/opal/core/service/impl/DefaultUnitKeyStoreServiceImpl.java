@@ -26,7 +26,7 @@ import org.obiba.opal.core.crypt.CacheablePasswordCallback;
 import org.obiba.opal.core.crypt.CachingCallbackHandler;
 import org.obiba.opal.core.crypt.KeyProviderSecurityException;
 import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
-import org.obiba.opal.core.runtime.IOpalRuntime;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
@@ -48,7 +48,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
 
   protected CallbackHandler callbackHandler;
 
-  protected IOpalRuntime opalRuntime;
+  protected OpalRuntime opalRuntime;
 
   //
   // UnitKeyStore Methods
@@ -175,7 +175,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     this.callbackHandler = callbackHandler;
   }
 
-  public void setOpalRuntime(IOpalRuntime opalRuntime) {
+  public void setOpalRuntime(OpalRuntime opalRuntime) {
     this.opalRuntime = opalRuntime;
   }
 

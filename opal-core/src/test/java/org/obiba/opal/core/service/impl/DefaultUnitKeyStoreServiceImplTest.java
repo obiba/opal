@@ -34,7 +34,7 @@ import org.junit.Test;
 import org.obiba.core.service.PersistenceManager;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.DefaultOpalRuntime;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.UnitKeyStore;
@@ -131,13 +131,13 @@ public class DefaultUnitKeyStoreServiceImplTest {
   // Helper Methods
   //
 
-  private OpalRuntime createOpalRuntime() {
+  private DefaultOpalRuntime createOpalRuntime() {
     FunctionalUnit myUnit = new FunctionalUnit("my-unit", "my-keyVariable");
 
     OpalConfiguration opalConfiguration = new OpalConfiguration();
     opalConfiguration.setFunctionalUnits(ImmutableSet.of(myUnit));
 
-    return new OpalRuntime(opalConfiguration);
+    return new DefaultOpalRuntime(opalConfiguration);
   }
 
   private CallbackHandler createPasswordCallbackHandler() {

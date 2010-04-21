@@ -25,7 +25,7 @@ import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.junit.Test;
 import org.obiba.opal.core.cfg.OpalConfiguration;
-import org.obiba.opal.core.runtime.IOpalRuntime;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.shell.OpalShell;
@@ -46,7 +46,7 @@ public class ImportCommandTest {
 
     OpalShell mockShell = createMockShellForOpalInstanceNotAllowed();
 
-    IOpalRuntime mockRuntime = createMock(IOpalRuntime.class);
+    OpalRuntime mockRuntime = createMock(OpalRuntime.class);
     expect(mockRuntime.getFunctionalUnit(FunctionalUnit.OPAL_INSTANCE)).andReturn(null).atLeastOnce();
 
     replay(mockOptions, mockShell, mockRuntime);
@@ -66,7 +66,7 @@ public class ImportCommandTest {
 
     OpalShell mockShell = createMockShellForBogusUnitNotAllowed("bogus");
 
-    IOpalRuntime mockRuntime = createMock(IOpalRuntime.class);
+    OpalRuntime mockRuntime = createMock(OpalRuntime.class);
     expect(mockRuntime.getFunctionalUnit("bogus")).andReturn(null).atLeastOnce();
 
     replay(mockOptions, mockShell, mockRuntime);
@@ -88,7 +88,7 @@ public class ImportCommandTest {
     ImportCommandOptions mockOptions = createMockOptionsForRelativePathImport("my-unit", "opal-data", "test.zip");
     FileObject mockFile = createMockFileForRelativePathImport("my-unit", "test.zip");
     FileObject mockUnitDir = createMockUnitDirectoryForRelativePathImport(mockFile, "test.zip");
-    IOpalRuntime mockRuntime = createMockRuntime(mockUnitDir, "my-unit");
+    OpalRuntime mockRuntime = createMockRuntime(mockUnitDir, "my-unit");
     OpalShell mockShell = createMockShellForRelativePathImport("my-unit", "test.zip");
     ImportService mockImportService = createMock(ImportService.class);
     mockImportService.importData("my-unit", "opal-data", mockFile);
@@ -113,7 +113,7 @@ public class ImportCommandTest {
     ImportCommandOptions mockOptions = createMockOptionsForImportWithNoFile("my-unit", "opal-data");
     FileObject[] mockFilesInUnitDir = createMockFilesInUnitDirectory("my-unit", "test1.zip", "test2.zip");
     FileObject mockUnitDir = createMockUnitDirectoryForImportWithNoFile(mockFilesInUnitDir);
-    IOpalRuntime mockRuntime = createMockRuntime(mockUnitDir, "my-unit");
+    OpalRuntime mockRuntime = createMockRuntime(mockUnitDir, "my-unit");
     OpalShell mockShell = createMockShellForImportWithNoFile("my-unit", "test1.zip", "test2.zip");
 
     ImportService mockImportService = createMock(ImportService.class);
@@ -136,10 +136,10 @@ public class ImportCommandTest {
   // Methods
   //
 
-  private ImportCommand createImportCommand(final IOpalRuntime mockRuntime) {
+  private ImportCommand createImportCommand(final OpalRuntime mockRuntime) {
     return new ImportCommand() {
       @Override
-      protected IOpalRuntime getOpalRuntime() {
+      protected OpalRuntime getOpalRuntime() {
         return mockRuntime;
       }
 
@@ -176,8 +176,8 @@ public class ImportCommandTest {
     return mockOptions;
   }
 
-  private IOpalRuntime createMockRuntime(FileObject mockUnitDir, String unitName) throws FileSystemException {
-    IOpalRuntime mockRuntime = createMock(IOpalRuntime.class);
+  private OpalRuntime createMockRuntime(FileObject mockUnitDir, String unitName) throws FileSystemException {
+    OpalRuntime mockRuntime = createMock(OpalRuntime.class);
     expect(mockRuntime.getFunctionalUnit(unitName)).andReturn(new FunctionalUnit(unitName, null)).atLeastOnce();
     expect(mockRuntime.getUnitDirectory(unitName)).andReturn(mockUnitDir).atLeastOnce();
 

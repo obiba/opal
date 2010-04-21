@@ -41,7 +41,7 @@ import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.magma.PrivateVariableEntityValueTable;
-import org.obiba.opal.core.runtime.IOpalRuntime;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
@@ -66,7 +66,7 @@ public class DefaultImportService implements ImportService {
   // Instance Variables
   //
 
-  private IOpalRuntime opalRuntime;
+  private OpalRuntime opalRuntime;
 
   /** Configured through org.obiba.opal.keys.tableReference */
   private String keysTableReference;
@@ -91,7 +91,7 @@ public class DefaultImportService implements ImportService {
   // Methods
   //
 
-  public void setOpalRuntime(IOpalRuntime opalRuntime) {
+  public void setOpalRuntime(OpalRuntime opalRuntime) {
     this.opalRuntime = opalRuntime;
   }
 

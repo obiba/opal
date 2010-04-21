@@ -3,6 +3,7 @@
   xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+  
   <import resource="datasource.xml" />
   <import resource="hibernate-session.xml" />
 
@@ -28,6 +29,13 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     </property>
     <property name="callbackHandler" ref="consoleCallbackHandler" />
     <property name="opalRuntime" ref="opalRuntime" />
+  </bean>
+  
+  <bean id="auditLogManager" class="org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager">
+    <property name="sessionFactory" ref="opalSessionFactory" />
+    <property name="userProvider">
+      <bean class="org.obiba.opal.audit.OpalUserProvider" />
+    </property>
   </bean>
   
 </beans>
