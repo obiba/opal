@@ -13,11 +13,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
 import org.obiba.magma.r.REngineFactory;
 import org.obiba.magma.r.rserve.RserveEngineFactory;
+import org.obiba.opal.core.runtime.Service;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngine;
@@ -29,7 +27,7 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.MapMaker;
 
 @Component
-public class DatashieldService {
+public class DatashieldService implements Service {
 
   private static final Logger log = LoggerFactory.getLogger(DatashieldService.class);
 
@@ -58,7 +56,11 @@ public class DatashieldService {
     return new RTemplate(sessions.get(UUID.fromString(sessionId)));
   }
 
-  @PostConstruct
+  @Override
+  public boolean isRunning() {
+    return engine != null;
+  }
+
   public void start() {
     try {
       engine = engineFactory.createEngine();
@@ -67,9 +69,10 @@ public class DatashieldService {
     }
   }
 
-  @PreDestroy
   public void stop() {
-    engine.close();
+    if(engine != null) {
+      engine.close();
+    }
   }
 
   public class RTemplate {

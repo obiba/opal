@@ -14,6 +14,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import javax.net.ssl.SSLContext;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -25,15 +26,18 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.FilterMapping;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.resource.FileResource;
 import org.obiba.opal.core.runtime.Service;
+import org.obiba.opal.server.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
@@ -45,27 +49,40 @@ import org.springframework.web.filter.OncePerRequestFilter;
 /**
  *
  */
+@Component
 public class OpalJettyServer implements Service {
 
   private static final Logger log = LoggerFactory.getLogger(OpalJettyServer.class);
 
   private final Server jettyServer;
 
-  private ServletContextHandler contextHandler;
+  private final ServletContextHandler contextHandler;
 
   @Autowired
-  public OpalJettyServer(ApplicationContext ctx, PlatformTransactionManager txmgr) {
+  public OpalJettyServer(final ApplicationContext ctx, final SslContextFactory sslContextFactory, final PlatformTransactionManager txmgr) {
     Server server = new Server();
 
-    SelectChannelConnector connector0 = new SelectChannelConnector();
-    connector0.setPort(8080);
-    connector0.setMaxIdleTime(30000);
-    connector0.setRequestHeaderSize(8192);
+    SelectChannelConnector httpConnector = new SelectChannelConnector();
+    httpConnector.setPort(8080);
+    httpConnector.setMaxIdleTime(30000);
+    httpConnector.setRequestHeaderSize(8192);
 
-    server.setConnectors(new Connector[] { connector0 });
+    SslSelectChannelConnector sslConnector = new SslSelectChannelConnector() {
+      @Override
+      protected SSLContext createSSLContext() throws Exception {
+        return sslContextFactory.createSslContext();
+      }
+    };
+    sslConnector.setPort(8443);
+    sslConnector.setWantClientAuth(true);
+    sslConnector.setNeedClientAuth(false);
+    sslConnector.setMaxIdleTime(30000);
+    sslConnector.setRequestHeaderSize(8192);
+
+    server.setConnectors(new Connector[] { httpConnector, sslConnector });
     HandlerList handlers = new HandlerList();
     handlers.addHandler(createFileHandler());
-    handlers.addHandler(createServletHandler(ctx, txmgr));
+    handlers.addHandler(contextHandler = createServletHandler(ctx, txmgr));
     server.setHandler(handlers);
 
     this.jettyServer = server;
@@ -98,8 +115,8 @@ public class OpalJettyServer implements Service {
 
   }
 
-  private Handler createServletHandler(ApplicationContext ctx, PlatformTransactionManager txmgr) {
-    contextHandler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS | ServletContextHandler.NO_SECURITY);
+  private ServletContextHandler createServletHandler(ApplicationContext ctx, PlatformTransactionManager txmgr) {
+    ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS | ServletContextHandler.NO_SECURITY);
     contextHandler.setContextPath("/");
     contextHandler.addFilter(new FilterHolder(new DevelopmentModeFilter()), "/*", FilterMapping.DEFAULT);
     contextHandler.addFilter(new FilterHolder(new TransactionFilter(txmgr)), "/*", FilterMapping.DEFAULT);

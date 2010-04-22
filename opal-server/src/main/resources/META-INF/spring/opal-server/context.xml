@@ -11,8 +11,8 @@
 
   <bean id="opalShellHolder" class="org.obiba.opal.shell.security.ShiroSessionOpalShellHolder" />
 
-  <bean id="consoleCallbackHandler" class="org.obiba.opal.shell.security.ShellCallbackHandler">
-    <constructor-arg ref="opalShellHolder" />
+  <bean id="consoleCallbackHandler" class="org.obiba.opal.core.crypt.FixedPasswordCallbackHandler">
+    <constructor-arg value="pwel" />
   </bean>
 
   <bean class="org.obiba.opal.server.sshd.OpalSshServer">
@@ -25,12 +25,6 @@
     <constructor-arg ref="opalShellHolder" />
     <constructor-arg value="${org.obiba.opal.ssh.port}" />
   </bean>
-
-  <bean class="org.obiba.opal.server.httpd.OpalHttpServer" init-method="start" destroy-method="stop" />
-
-  <bean class="org.obiba.opal.server.httpd.OpalJettyServer" init-method="start" destroy-method="stop" />
-
-  <bean class="org.obiba.opal.server.rest.OpalApplicationFactory" />
 
   <context:component-scan base-package="org.obiba.opal.server,org.obiba.opal.service" />
 

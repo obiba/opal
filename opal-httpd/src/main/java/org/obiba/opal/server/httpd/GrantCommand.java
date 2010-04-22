@@ -12,7 +12,6 @@ package org.obiba.opal.server.httpd;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.UnitKeyStore;
-import org.obiba.opal.server.httpd.ssl.FunctionalUnitSslContextFactory;
 import org.obiba.opal.server.rest.OpalApplication;
 import org.obiba.opal.server.rest.OpalApplicationFactory;
 import org.obiba.opal.shell.commands.AbstractOpalRuntimeDependentCommand;
@@ -44,9 +43,9 @@ public class GrantCommand extends AbstractOpalRuntimeDependentCommand<GrantComma
     UnitKeyStore opalKeyStore = keystoreService.getUnitKeyStore(FunctionalUnit.OPAL_INSTANCE);
     UnitKeyStore unitKeyStore = keystoreService.getUnitKeyStore(options.getUnit());
 
-    FunctionalUnitSslContextFactory fussl = new FunctionalUnitSslContextFactory(opalKeyStore, unitKeyStore);
+    // FunctionalUnitSslContextFactory fussl = new FunctionalUnitSslContextFactory(opalKeyStore, unitKeyStore);
     try {
-      httpServer.addApplication(fussl, 8443, application);
+      httpServer.addApplication(null, 8443, application);
       getShell().printf("HTTPS server started.\n");
     } catch(Exception e) {
       getShell().printf("Unable to start HTTPS server: %s\n", e.getMessage());
