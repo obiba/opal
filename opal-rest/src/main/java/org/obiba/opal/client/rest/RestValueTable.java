@@ -80,6 +80,7 @@ class RestValueTable extends AbstractValueTable {
 
     @Override
     public String getEntityType() {
+      // TODO: fetch this from the service
       return "Participant";
     }
 
@@ -101,7 +102,7 @@ class RestValueTable extends AbstractValueTable {
 
     @Override
     public boolean isForEntityType(String entityType) {
-      return true;
+      return getEntityType().equals(entityType);
     }
 
   }

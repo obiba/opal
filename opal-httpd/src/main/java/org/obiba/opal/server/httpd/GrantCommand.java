@@ -9,11 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.server.httpd;
 
-import org.obiba.opal.core.service.UnitKeyStoreService;
-import org.obiba.opal.core.unit.FunctionalUnit;
-import org.obiba.opal.core.unit.UnitKeyStore;
-import org.obiba.opal.server.rest.OpalApplication;
-import org.obiba.opal.server.rest.OpalApplicationFactory;
+import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.unit.security.FunctionalUnitRealm;
 import org.obiba.opal.shell.commands.AbstractOpalRuntimeDependentCommand;
 import org.obiba.opal.shell.commands.CommandUsage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,31 +23,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class GrantCommand extends AbstractOpalRuntimeDependentCommand<GrantCommandOptions> {
 
   @Autowired
-  private OpalApplicationFactory applicationFactory;
+  private OpalRuntime opal;
 
   @Autowired
-  private OpalHttpServer httpServer;
-
-  @Autowired
-  private UnitKeyStoreService keystoreService;
+  private FunctionalUnitRealm realm;
 
   @Override
   public void execute() {
-    OpalApplication application = applicationFactory.createApplication(httpServer.getComponent().getContext().createChildContext());
     for(String table : options.getTables()) {
-      application.addTable(table);
-    }
-
-    UnitKeyStore opalKeyStore = keystoreService.getUnitKeyStore(FunctionalUnit.OPAL_INSTANCE);
-    UnitKeyStore unitKeyStore = keystoreService.getUnitKeyStore(options.getUnit());
-
-    // FunctionalUnitSslContextFactory fussl = new FunctionalUnitSslContextFactory(opalKeyStore, unitKeyStore);
-    try {
-      httpServer.addApplication(null, 8443, application);
-      getShell().printf("HTTPS server started.\n");
-    } catch(Exception e) {
-      getShell().printf("Unable to start HTTPS server: %s\n", e.getMessage());
-      throw new RuntimeException(e);
+      MagmaEngineTableResolver.valueOf(table).resolveTable();
+      realm.grant(opal.getFunctionalUnit(options.getUnit()), "tables:" + table + ":" + options.getPerm());
     }
   }
 }

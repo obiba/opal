@@ -24,9 +24,13 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import org.json.JSONObject;
+import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
+import org.obiba.magma.VariableEntity;
+import org.obiba.magma.support.VariableEntityBean;
+import org.obiba.magma.xstream.XStreamValueSet;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -80,6 +84,20 @@ public class TableResource {
   }
 
   @GET
+  @Path("/valueSet/{identifier}")
+  @Produces("application/xml")
+  public XStreamValueSet getValueSet(@PathParam("identifier") String identifier) {
+    VariableEntity entity = new VariableEntityBean(this.valueTable.getEntityType(), identifier);
+    ValueSet valueSet = this.valueTable.getValueSet(entity);
+    XStreamValueSet xvs = new XStreamValueSet(this.valueTable.getName(), entity);
+    for(Variable variable : this.valueTable.getVariables()) {
+      Value value = this.valueTable.getValue(variable, valueSet);
+      xvs.setValue(variable, value);
+    }
+    return xvs;
+  }
+
+  @GET
   @Path("/values.json")
   @Produces("application/json")
   public Response getValuesAsJson(@QueryParam("v") List<String> variables) {
@@ -93,7 +111,7 @@ public class TableResource {
     return readValues(variables);
   }
 
-  @Path("/{variable}")
+  @Path("/variable/{variable}")
   public VariableResource getVariable(@PathParam("variable") String name) {
     VariableResource resource = resourceContext.getResource(VariableResource.class);
     resource.setValueTable(valueTable);

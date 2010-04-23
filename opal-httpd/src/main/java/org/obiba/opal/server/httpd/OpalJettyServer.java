@@ -32,6 +32,7 @@ import org.eclipse.jetty.servlet.FilterMapping;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.resource.FileResource;
 import org.obiba.opal.core.runtime.Service;
+import org.obiba.opal.server.httpd.security.AuthenticationFilter;
 import org.obiba.opal.server.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,6 +119,7 @@ public class OpalJettyServer implements Service {
   private ServletContextHandler createServletHandler(ApplicationContext ctx, PlatformTransactionManager txmgr) {
     ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS | ServletContextHandler.NO_SECURITY);
     contextHandler.setContextPath("/");
+    contextHandler.addFilter(new FilterHolder(new AuthenticationFilter()), "/*", FilterMapping.DEFAULT);
     contextHandler.addFilter(new FilterHolder(new DevelopmentModeFilter()), "/*", FilterMapping.DEFAULT);
     contextHandler.addFilter(new FilterHolder(new TransactionFilter(txmgr)), "/*", FilterMapping.DEFAULT);
 

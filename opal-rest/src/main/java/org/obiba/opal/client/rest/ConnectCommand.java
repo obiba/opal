@@ -7,19 +7,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.server.httpd;
+package org.obiba.opal.client.rest;
 
 import java.util.Collections;
 
+import javax.net.ssl.SSLContext;
+
 import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
-import org.obiba.opal.core.service.UnitKeyStoreService;
-import org.obiba.opal.core.unit.FunctionalUnit;
-import org.obiba.opal.core.unit.UnitKeyStore;
+import org.obiba.magma.MagmaEngine;
+import org.obiba.opal.server.httpd.ExtendedHttpClientHelper;
+import org.obiba.opal.server.ssl.SslContextFactory;
 import org.obiba.opal.shell.commands.AbstractOpalRuntimeDependentCommand;
 import org.obiba.opal.shell.commands.CommandUsage;
 import org.restlet.Client;
 import org.restlet.Context;
+import org.restlet.data.Parameter;
 import org.restlet.data.Protocol;
+import org.restlet.data.Reference;
+import org.restlet.util.Series;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -29,27 +34,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ConnectCommand extends AbstractOpalRuntimeDependentCommand<ConnectCommandOptions> {
 
   @Autowired
-  private OpalHttpServer httpServer;
-
-  @Autowired
-  private UnitKeyStoreService keystoreService;
+  private SslContextFactory sslContextFactory;
 
   @Override
   public void execute() {
-    UnitKeyStore opalKeyStore = keystoreService.getUnitKeyStore(FunctionalUnit.OPAL_INSTANCE);
-    UnitKeyStore unitKeyStore = keystoreService.getUnitKeyStore(options.getUnit());
-
-    // FunctionalUnitSslContextFactory fussl = new FunctionalUnitSslContextFactory(opalKeyStore, unitKeyStore);
     try {
-      Context httpsCtx = httpServer.getComponent().getContext().createChildContext();
-      // httpsCtx.getAttributes().put("sslContextFactory", fussl);
+      Context httpsCtx = new Context();
+      httpsCtx.getAttributes().put("sslContextFactory", new org.restlet.engine.security.SslContextFactory() {
+
+        @Override
+        public void init(Series<Parameter> parameters) {
+        }
+
+        @Override
+        public SSLContext createSslContext() throws Exception {
+          return sslContextFactory.createSslContext();
+        }
+      });
       httpsCtx.getParameters().add("hostnameVerifier", AllowAllHostnameVerifier.class.getName());
 
       Client client = new Client(httpsCtx, Collections.singletonList(Protocol.HTTPS), ExtendedHttpClientHelper.class.getName());
 
-      // TODO: commented due to code refactoring. Uncomment and fix once package structure is stable.
-      // RestDatasource ds = new RestDatasource(options.getUnit(), new Reference(options.getUrl()), client);
-      // MagmaEngine.get().addDatasource(ds);
+      RestDatasource ds = new RestDatasource(options.getUnit(), new Reference(options.getUrl()), client);
+      MagmaEngine.get().addDatasource(ds);
     } catch(Exception e) {
       throw new RuntimeException(e);
     }

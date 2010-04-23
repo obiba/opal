@@ -26,10 +26,8 @@ public interface GrantCommandOptions extends HelpOption {
   @Option(shortName = "u")
   String getUnit();
 
-  @Option(shortName = "p")
-  List<String> getPerm();
-
-  boolean isPerm();
+  @Option(shortName = "p", defaultValue = "read")
+  String getPerm();
 
   @Unparsed(name = "tables")
   List<String> getTables();

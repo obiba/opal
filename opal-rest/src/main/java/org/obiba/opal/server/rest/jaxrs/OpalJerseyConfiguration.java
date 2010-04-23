@@ -26,6 +26,6 @@ public class OpalJerseyConfiguration {
 
   @PostConstruct
   public void addDispatcherServlet() {
-    jettyServer.getContext().addServlet(new ServletHolder(new SpringServlet()), "/jersey/*");
+    jettyServer.getContext().addServlet(new ServletHolder(new SpringServlet()), "/*");
   }
 }

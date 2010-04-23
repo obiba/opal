@@ -141,6 +141,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-spring</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.ow2.spec.ee</groupId>
       <artifactId>ow2-jta-1.1-spec</artifactId>
     </dependency>

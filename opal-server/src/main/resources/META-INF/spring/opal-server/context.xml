@@ -26,6 +26,6 @@
     <constructor-arg value="${org.obiba.opal.ssh.port}" />
   </bean>
 
-  <context:component-scan base-package="org.obiba.opal.server,org.obiba.opal.service" />
+  <context:component-scan base-package="org.obiba.opal.server,org.obiba.opal.service,org.obiba.opal.core" />
 
 </beans>

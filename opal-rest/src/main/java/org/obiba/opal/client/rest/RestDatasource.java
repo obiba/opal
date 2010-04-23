@@ -8,6 +8,7 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.AbstractDatasource;
+import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.restlet.Client;
 import org.restlet.Request;
@@ -17,6 +18,8 @@ import org.restlet.data.Reference;
 import org.restlet.resource.ResourceException;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import com.google.common.collect.Sets.SetView;
 import com.thoughtworks.xstream.XStream;
 
 public class RestDatasource extends AbstractDatasource {
@@ -27,10 +30,18 @@ public class RestDatasource extends AbstractDatasource {
 
   private final Client client;
 
+  private Set<String> cachedTableNames;
+
   public RestDatasource(String name, Reference datasourceReference, Client client) {
     super(name, "rest");
     this.client = client;
     this.datasourceReference = datasourceReference;
+  }
+
+  @Override
+  public Set<ValueTable> getValueTables() {
+    refresh();
+    return super.getValueTables();
   }
 
   @Override
@@ -41,6 +52,8 @@ public class RestDatasource extends AbstractDatasource {
       throw new MagmaRuntimeException(e);
     }
     super.onInitialise();
+
+    cachedTableNames = getValueTableNames();
   }
 
   @Override
@@ -62,6 +75,23 @@ public class RestDatasource extends AbstractDatasource {
   @Override
   protected ValueTable initialiseValueTable(final String tableName) {
     return new RestValueTable(this, tableName);
+  }
+
+  private void refresh() {
+    Set<String> currentTables = getValueTableNames();
+
+    SetView<String> tablesToRemove = Sets.difference(cachedTableNames, currentTables);
+    SetView<String> tablesToAdd = Sets.difference(currentTables, cachedTableNames);
+
+    for(String table : tablesToRemove) {
+      ValueTable v = super.getValueTable(table);
+      // remove table.
+    }
+    for(String table : tablesToAdd) {
+      ValueTable vt = initialiseValueTable(table);
+      Initialisables.initialise(vt);
+      super.addValueTable(vt);
+    }
   }
 
   Reference newReference() {

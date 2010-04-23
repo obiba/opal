@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.server;
 
-import org.obiba.opal.server.httpd.ConnectCommand;
-import org.obiba.opal.server.httpd.ConnectCommandOptions;
+import org.obiba.opal.client.rest.ConnectCommand;
+import org.obiba.opal.client.rest.ConnectCommandOptions;
 import org.obiba.opal.server.httpd.GrantCommand;
 import org.obiba.opal.server.httpd.GrantCommandOptions;
 import org.obiba.opal.shell.AbstractCommandRegistry;

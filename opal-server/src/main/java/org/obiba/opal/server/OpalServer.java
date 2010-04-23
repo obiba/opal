@@ -2,11 +2,6 @@ package org.obiba.opal.server;
 
 import java.io.IOException;
 
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.config.IniSecurityManagerFactory;
-import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.util.Factory;
-import org.apache.shiro.util.LifecycleUtils;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
@@ -55,26 +50,16 @@ public class OpalServer {
       }
       return;
     }
-
-    // Loads the ini file from OPAL_HOME.
-    Factory<SecurityManager> factory = new IniSecurityManagerFactory(System.getProperty("OPAL_HOME") + "/conf/shiro.ini");
-    SecurityManager securityManager = factory.getInstance();
-
-    // Make the securityManager accessible as a singleton.
-    // This would be done by Spring when using the spring support packages.
-    SecurityUtils.setSecurityManager(securityManager);
-    System.console().printf("Opal Server successfully started. Type the 'any key' to stop.\n");
   }
 
   final void startAndWait() throws IOException {
     if(ctx.isActive()) {
       try {
         ctx.getBean(OpalRuntime.class).start();
+        System.console().printf("Opal Server successfully started. Type the 'any key' to stop.\n");
         System.in.read();
         ctx.getBean(OpalRuntime.class).stop();
       } finally {
-        // Destroy the security manager.
-        LifecycleUtils.destroy(SecurityUtils.getSecurityManager());
         ctx.destroy();
       }
     }
