@@ -1,5 +1,0 @@
-export --destination=opal onyx.Participants
-export --destination=opal onyx.Participants "onyx.Instrument Logs"
-export --destination=opal onyx.Participants "onyx.Instrument Logs" "onyx.Participant Names"
-export --destination=opal onyx.Participants "onyx.Instrument Logs" "onyx.OrphanQuote
-export --destination=opal onyx.Participants "onyx.Instrument Logs" "
