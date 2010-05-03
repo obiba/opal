@@ -69,5 +69,13 @@
       <name>Public online Restlet repository</name>
       <url>http://maven.restlet.org</url>
     </repository>
+    <repository>
+      <id>jboss.org</id>
+      <url>http://repository.jboss.com/maven2</url>
+    </repository>
   </repositories>
+
+  <properties>
+    <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
+  </properties>
 </project>
