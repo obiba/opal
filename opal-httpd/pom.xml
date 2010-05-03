@@ -5,7 +5,7 @@
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
   </parent>
   <artifactId>opal-httpd</artifactId>
   <name>opal-httpd</name>
@@ -18,54 +18,70 @@
       <artifactId>opal-core</artifactId>
       <version>${project.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-shell</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet</artifactId>
-      <version>2.0-SNAPSHOT</version>
+      <version>${restlet.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+      <version>3.0.2.RELEASE</version>
+    </dependency>
     <dependency>
       <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet.ext.jetty</artifactId>
-      <version>2.0-SNAPSHOT</version>
+      <version>${restlet.version}</version>
     </dependency>
     <dependency>
       <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet.ext.xstream</artifactId>
-      <version>2.0-SNAPSHOT</version>
+      <version>${restlet.version}</version>
     </dependency>
-
     <dependency>
       <groupId>org.restlet.jse</groupId>
-      <artifactId>org.restlet.ext.jaxrs</artifactId>
-      <version>2.0-SNAPSHOT</version>
+      <artifactId>org.restlet.ext.slf4j</artifactId>
+      <version>${restlet.version}</version>
     </dependency>
-
+     <dependency>
+      <groupId>org.restlet.jse</groupId>
+      <artifactId>org.restlet.ext.httpclient</artifactId>
+      <version>${restlet.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-util</artifactId>
-      <version>7.0.2.RC0</version>
+      <version>${jetty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlet</artifactId>
+      <version>${jetty.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-continuation</artifactId>
-      <version>7.0.2.RC0</version>
+      <version>${jetty.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-io</artifactId>
-      <version>7.0.2.RC0</version>
+      <version>${jetty.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-http</artifactId>
-      <version>7.0.2.RC0</version>
+      <version>${jetty.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
-      <version>7.0.2.RC0</version>
+      <version>${jetty.version}</version>
     </dependency>
   </dependencies>
 
@@ -76,4 +92,9 @@
       <url>http://maven.restlet.org</url>
     </repository>
   </repositories>
+  
+  <properties>
+   <restlet.version>2.0-SNAPSHOT</restlet.version>
+   <jetty.version>7.0.2.v20100331</jetty.version>
+  </properties>
 </project>
