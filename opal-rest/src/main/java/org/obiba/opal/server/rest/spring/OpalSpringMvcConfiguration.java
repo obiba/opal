@@ -19,7 +19,6 @@ import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.server.httpd.OpalJettyServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
@@ -33,7 +32,7 @@ import org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMa
 
 import com.thoughtworks.xstream.XStream;
 
-@Configuration
+//@Configuration
 public class OpalSpringMvcConfiguration {
 
   @Autowired
