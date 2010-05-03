@@ -48,7 +48,7 @@
       <artifactId>org.restlet.ext.slf4j</artifactId>
       <version>${restlet.version}</version>
     </dependency>
-     <dependency>
+    <dependency>
       <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet.ext.httpclient</artifactId>
       <version>${restlet.version}</version>
@@ -92,9 +92,10 @@
       <url>http://maven.restlet.org</url>
     </repository>
   </repositories>
-  
+
   <properties>
-   <restlet.version>2.0-SNAPSHOT</restlet.version>
-   <jetty.version>7.0.2.v20100331</jetty.version>
+    <restlet.version>2.0-SNAPSHOT</restlet.version>
+    <jetty.version>7.0.2.v20100331</jetty.version>
+    <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
   </properties>
 </project>
