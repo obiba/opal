@@ -32,7 +32,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.sun.jersey.api.core.ResourceContext;
 
-@Component("jersey.datasourceResource")
+@Component
 @Path("/datasource")
 public class DatasourceResource {
 

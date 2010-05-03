@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 
 import com.sun.jersey.spi.resource.PerRequest;
 
-@Component("jersey.variableResource")
+@Component
 @Scope("prototype")
 @PerRequest
 public class VariableResource {

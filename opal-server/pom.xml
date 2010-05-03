@@ -22,13 +22,11 @@
       <artifactId>opal-httpd</artifactId>
       <version>${project.version}</version>
     </dependency>
-<!--
     <dependency>
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-rest</artifactId>
       <version>${project.version}</version>
     </dependency>
--->
 <!--
     <dependency>
       <groupId>org.obiba.opal</groupId>

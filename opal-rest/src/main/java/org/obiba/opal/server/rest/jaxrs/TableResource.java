@@ -42,7 +42,7 @@ import com.google.common.collect.Iterables;
 import com.sun.jersey.api.core.ResourceContext;
 import com.sun.jersey.spi.resource.PerRequest;
 
-@Component("jersey.tableResource")
+@Component
 @Scope("prototype")
 @PerRequest
 public class TableResource {
