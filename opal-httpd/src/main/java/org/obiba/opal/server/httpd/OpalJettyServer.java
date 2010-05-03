@@ -185,16 +185,21 @@ public class OpalJettyServer implements Service {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-      if(request.getMethod().equalsIgnoreCase("OPTIONS")) {
+      // Test whether this is an Access-Control request
+      if(request.getMethod().equalsIgnoreCase("OPTIONS") && request.getHeader("Access-Control-Request-Method") != null) {
+        // Yes, then respond
         response.addHeader("Access-Control-Allow-Origin", "*");
         response.addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         response.addHeader("Access-Control-Allow-Headers", request.getHeader("Access-Control-Request-Headers"));
         response.setStatus(200);
+        // Commits the response. No further writing is possible.
         response.flushBuffer();
-      } else if(request.getHeader("Origin") != null) {
-        response.addHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
-        filterChain.doFilter(request, response);
       } else {
+        // Test whether this is part of an Access-Control request that we've previously allowed
+        if(request.getHeader("Origin") != null) {
+          // Allow the requested Origin
+          response.addHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+        }
         filterChain.doFilter(request, response);
       }
     }
