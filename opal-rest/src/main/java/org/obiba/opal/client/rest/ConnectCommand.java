@@ -15,7 +15,6 @@ import javax.net.ssl.SSLContext;
 
 import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 import org.obiba.magma.MagmaEngine;
-import org.obiba.opal.server.httpd.ExtendedHttpClientHelper;
 import org.obiba.opal.server.ssl.SslContextFactory;
 import org.obiba.opal.shell.commands.AbstractOpalRuntimeDependentCommand;
 import org.obiba.opal.shell.commands.CommandUsage;
