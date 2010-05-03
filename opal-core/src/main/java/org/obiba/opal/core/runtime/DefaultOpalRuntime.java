@@ -15,6 +15,7 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.opal.core.cfg.OpalConfiguration;
+import org.obiba.opal.core.runtime.security.OpalSecurityManager;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.fs.OpalFileSystem;
@@ -44,6 +45,9 @@ public class DefaultOpalRuntime implements OpalRuntime {
   @Autowired
   private Set<Service> services;
 
+  @Autowired
+  private OpalSecurityManager opalSecurityManager;
+
   private OpalFileSystem opalFileSystem;
 
   public DefaultOpalRuntime(OpalConfiguration opalConfiguration) {
@@ -52,6 +56,8 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   @Override
   public void start() {
+    opalSecurityManager.start();
+
     try {
       new TransactionTemplate(txManager).execute(new TransactionCallbackWithoutResult() {
         @Override
@@ -102,6 +108,8 @@ public class DefaultOpalRuntime implements OpalRuntime {
         MagmaEngine.get().shutdown();
       }
     });
+
+    opalSecurityManager.stop();
   }
 
   @Override

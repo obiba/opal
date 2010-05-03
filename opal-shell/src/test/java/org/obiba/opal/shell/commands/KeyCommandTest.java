@@ -24,6 +24,7 @@ import org.apache.commons.vfs.FileContent;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
+import org.easymock.EasyMock;
 import org.junit.Test;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.runtime.OpalRuntime;
@@ -143,6 +144,8 @@ public class KeyCommandTest {
     OpalFileSystem mockFileSystem = createMockFileSystem(mockFileSystemRoot);
 
     OpalShell mockShell = createMockShellForExportAction("certificate.pem");
+    mockShell.printf((String) EasyMock.anyObject(), (String) EasyMock.anyObject());
+    EasyMock.expectLastCall().anyTimes();
 
     UnitKeyStoreService mockUnitKeyStoreService = createMock(UnitKeyStoreService.class);
     expect(mockUnitKeyStoreService.aliasExists("my-unit", "my-alias")).andReturn(false).atLeastOnce();

@@ -17,7 +17,26 @@
       <artifactId>opal-sshd</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-httpd</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+<!--
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-rest</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+-->
+<!--
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-datashield</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+-->
+
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-ehcache</artifactId>

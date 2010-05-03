@@ -7,11 +7,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.server.sshd;
+package org.obiba.opal.server;
 
+import org.obiba.opal.server.httpd.GrantCommand;
+import org.obiba.opal.server.httpd.GrantCommandOptions;
 import org.obiba.opal.shell.AbstractCommandRegistry;
 import org.obiba.opal.shell.commands.CopyCommand;
 import org.obiba.opal.shell.commands.DecryptCommand;
+import org.obiba.opal.shell.commands.EncryptCommand;
 import org.obiba.opal.shell.commands.ExitCommand;
 import org.obiba.opal.shell.commands.HelpCommand;
 import org.obiba.opal.shell.commands.ImportCommand;
@@ -22,6 +25,7 @@ import org.obiba.opal.shell.commands.SplitCommand;
 import org.obiba.opal.shell.commands.VersionCommand;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.obiba.opal.shell.commands.options.DecryptCommandOptions;
+import org.obiba.opal.shell.commands.options.EncryptCommandOptions;
 import org.obiba.opal.shell.commands.options.ExitCommandOptions;
 import org.obiba.opal.shell.commands.options.HelpCommandOptions;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
@@ -48,6 +52,9 @@ public class SecureShellCommandRegistry extends AbstractCommandRegistry {
     addAvailableCommand(ShowCommand.class, ShowCommandOptions.class);
     addAvailableCommand(CopyCommand.class, CopyCommandOptions.class);
     addAvailableCommand(SplitCommand.class, SplitCommandOptions.class);
+    addAvailableCommand(EncryptCommand.class, EncryptCommandOptions.class);
+
+    addAvailableCommand(GrantCommand.class, GrantCommandOptions.class);
   }
 
 }

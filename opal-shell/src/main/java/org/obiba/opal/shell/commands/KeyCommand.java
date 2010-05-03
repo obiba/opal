@@ -19,11 +19,13 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStore.SecretKeyEntry;
 import java.security.KeyStore.TrustedCertificateEntry;
 import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.bouncycastle.openssl.PEMWriter;
 import org.obiba.core.util.StreamUtil;
+import org.obiba.opal.core.crypt.x509.X509PrettyPrinter;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
@@ -200,7 +202,6 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
     if(options.isCertificate()) {
       FileObject outputFile = getFileSystemRoot().resolveFile(options.getCertificate());
       certificateWriter = new OutputStreamWriter(outputFile.getContent().getOutputStream());
-
     } else {
       certificateWriter = new StringWriter();
     }
@@ -209,6 +210,7 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
 
   private void writeCertificate(UnitKeyStore unitKeyStore, String alias, Writer writer) throws IOException {
     Assert.notNull(unitKeyStore, "unitKeyStore can not be null");
+    Assert.notNull(writer, "writer can not be null");
 
     Certificate certificate;
     try {
@@ -216,6 +218,9 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
       if(certificate == null) {
         getShell().printf("No certificate was found for alias '%s'.\n", alias);
       } else {
+        if(certificate instanceof X509Certificate) {
+          getShell().printf("%s\n", X509PrettyPrinter.prettyPrint((X509Certificate) certificate));
+        }
         PEMWriter pemWriter = new PEMWriter(writer);
         pemWriter.writeObject(certificate);
         pemWriter.flush();
@@ -228,8 +233,9 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
 
   private void printResult(Writer certificateWriter) {
     if(options.isCertificate()) {
-      getShell().printf("Certificate written to the file [%s]\n", options.getCertificate());
+      getShell().printf("Certificate written to file [%s]\n", options.getCertificate());
     } else {
+      getShell().printf("Certificate will be printed to console. You may then copy-paste it elsewhere:\n", options.getCertificate());
       getShell().printf(((StringWriter) certificateWriter).getBuffer().toString());
     }
   }
