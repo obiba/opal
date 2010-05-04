@@ -20,7 +20,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import org.json.JSONObject;
@@ -29,37 +28,28 @@ import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
+import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.xstream.XStreamValueSet;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.sun.jersey.api.core.ResourceContext;
-import com.sun.jersey.spi.resource.PerRequest;
 
-@Component
-@Scope("prototype")
-@PerRequest
 public class TableResource {
 
-  @Context
-  private ResourceContext resourceContext;
+  private final ValueTable valueTable;
 
-  private ValueTable valueTable;
-
-  public TableResource() {
-  }
-
-  public void setValueTable(ValueTable valueTable) {
+  public TableResource(ValueTable valueTable) {
     this.valueTable = valueTable;
   }
 
   @GET
+  @Produces("application/xml")
   public Map<String, String> details() {
     return ImmutableMap.of("name", valueTable.getName(), "entityType", valueTable.getEntityType());
   }
@@ -113,16 +103,19 @@ public class TableResource {
 
   @Path("/variable/{variable}")
   public VariableResource getVariable(@PathParam("variable") String name) {
-    VariableResource resource = resourceContext.getResource(VariableResource.class);
-    resource.setValueTable(valueTable);
-    resource.setVariableValueSource(valueTable.getVariableValueSource(name));
-    return resource;
+    return getVariableResource(valueTable.getVariableValueSource(name));
+  }
+
+  @Bean
+  @Scope("request")
+  public VariableResource getVariableResource(VariableValueSource source) {
+    return new VariableResource(this.valueTable, source);
   }
 
   private Map<String, List<Object>> readValues(List<String> variables) {
     Map<String, List<Object>> response = new LinkedHashMap<String, List<Object>>();
 
-    if(variables.size() == 0) {
+    if(variables == null || variables.size() == 0) {
       variables = ImmutableList.copyOf(Iterables.transform(valueTable.getVariables(), new Function<Variable, String>() {
         @Override
         public String apply(Variable from) {

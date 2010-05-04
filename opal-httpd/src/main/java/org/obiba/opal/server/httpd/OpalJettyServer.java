@@ -44,6 +44,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.AbstractRefreshableWebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -58,6 +59,8 @@ public class OpalJettyServer implements Service {
   private final Server jettyServer;
 
   private final ServletContextHandler contextHandler;
+
+  private AbstractRefreshableWebApplicationContext webAppCtx;
 
   @Autowired
   public OpalJettyServer(final ApplicationContext ctx, final SslContextFactory sslContextFactory, final PlatformTransactionManager txmgr) {
@@ -100,6 +103,7 @@ public class OpalJettyServer implements Service {
 
   public void start() {
     try {
+      webAppCtx.refresh();
       log.info("Starting Opal HTTP/s Server on port {}", this.jettyServer.getConnectors()[0].getPort());
       this.jettyServer.start();
     } catch(Exception e) {
@@ -125,10 +129,10 @@ public class OpalJettyServer implements Service {
 
     // TODO: Should be GenericWebApplicationContext, but cannot due to Jersey bug
     // https://jersey.dev.java.net/issues/show_bug.cgi?id=222
-    AnnotationConfigWebApplicationContext webAppCtx = new AnnotationConfigWebApplicationContext();
+    webAppCtx = new AnnotationConfigWebApplicationContext();
     webAppCtx.setServletContext(contextHandler.getServletContext());
     webAppCtx.setParent(ctx);
-    webAppCtx.refresh();
+    webAppCtx.setConfigLocation("org.obiba.opal.server.rest");
     contextHandler.getServletContext().setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, webAppCtx);
     return contextHandler;
   }

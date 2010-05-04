@@ -15,22 +15,20 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authz.AuthorizationException;
 import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.sun.jersey.api.core.ResourceContext;
 
 @Component
 @Path("/datasource")
@@ -38,8 +36,8 @@ public class DatasourceResource {
 
   private static final Logger log = LoggerFactory.getLogger(DatasourceResource.class);
 
-  @Context
-  private ResourceContext resourceContext;
+  // @Context
+  // private ResourceContext resourceContext;
 
   @GET
   @Path("/{name}/tables")
@@ -65,16 +63,18 @@ public class DatasourceResource {
 
   @Path("/{name}/table/{table}")
   public TableResource getTableResource(@PathParam("name") String name, @PathParam("table") String table) {
-
-    String tableFqn = name + "." + table;
-    try {
-      SecurityUtils.getSubject().checkPermission("tables:" + tableFqn + ":read");
-    } catch(AuthorizationException e) {
-      log.warn("Unauthorized access to table {}", tableFqn);
-      throw new NoSuchValueTableException("unauthorized: " + tableFqn);
-    }
-    TableResource resource = resourceContext.getResource(TableResource.class);
-    resource.setValueTable(MagmaEngine.get().getDatasource(name).getValueTable(table));
-    return resource;
+    /*
+     * String tableFqn = name + "." + table; try { SecurityUtils.getSubject().checkPermission("tables:" + tableFqn +
+     * ":read"); } catch(AuthorizationException e) { log.warn("Unauthorized access to table {}", tableFqn); throw new
+     * NoSuchValueTableException("unauthorized: " + tableFqn); }
+     */
+    return getTableResource(MagmaEngine.get().getDatasource(name).getValueTable(table));
   }
+
+  @Bean
+  @Scope("request")
+  public TableResource getTableResource(ValueTable table) {
+    return new TableResource(table);
+  }
+
 }

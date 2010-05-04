@@ -1,5 +1,5 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:context="http://www.springframework.org/schema/context"
   xsi:schemaLocation="
         http://www.springframework.org/schema/beans 
         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
@@ -26,6 +26,8 @@
     <constructor-arg value="${org.obiba.opal.ssh.port}" />
   </bean>
 
-  <context:component-scan base-package="org.obiba.opal.server,org.obiba.opal.service,org.obiba.opal.core" />
+  <context:component-scan base-package="org.obiba.opal.server,org.obiba.opal.service,org.obiba.opal.core">
+    <context:exclude-filter type="regex" expression="org.obiba.opal.server.rest.*"/>
+  </context:component-scan>
 
 </beans>

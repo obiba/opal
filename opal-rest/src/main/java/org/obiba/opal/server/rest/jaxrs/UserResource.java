@@ -27,7 +27,7 @@ public class UserResource {
   @GET
   @Path("/current")
   @Produces("application/xml")
-  public Object getDatasource() {
+  public Object getCurrentUser() {
     return SecurityUtils.getSubject().getPrincipals();
   }
 

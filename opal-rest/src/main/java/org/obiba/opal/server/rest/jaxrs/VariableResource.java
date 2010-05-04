@@ -22,30 +22,24 @@ import javax.ws.rs.core.Response;
 import org.json.JSONObject;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-import com.sun.jersey.spi.resource.PerRequest;
-
-@Component
-@Scope("prototype")
-@PerRequest
 public class VariableResource {
 
-  private ValueTable valueTable;
+  private final ValueTable valueTable;
 
-  private VariableValueSource vvs;
+  private final VariableValueSource vvs;
 
-  public VariableResource() {
-  }
-
-  public void setValueTable(ValueTable valueTable) {
+  public VariableResource(ValueTable valueTable, VariableValueSource vvs) {
     this.valueTable = valueTable;
+    this.vvs = vvs;
   }
 
-  public void setVariableValueSource(VariableValueSource vvs) {
-    this.vvs = vvs;
+  @GET
+  @Produces("application/xml")
+  public Variable get() {
+    return vvs.getVariable();
   }
 
   @GET
