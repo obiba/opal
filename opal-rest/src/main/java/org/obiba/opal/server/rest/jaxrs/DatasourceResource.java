@@ -19,6 +19,7 @@ import javax.ws.rs.Produces;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
+import org.obiba.opal.server.rest.model.Datasource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -36,13 +37,17 @@ public class DatasourceResource {
 
   private static final Logger log = LoggerFactory.getLogger(DatasourceResource.class);
 
-  // @Context
-  // private ResourceContext resourceContext;
+  @GET
+  @Path("/{name}")
+  @Produces( { "application/xml", "application/json" })
+  public Datasource get(@PathParam("name") String name) {
+    return new Datasource(null, MagmaEngine.get().getDatasource(name));
+  }
 
   @GET
   @Path("/{name}/tables")
   @Produces("application/xml")
-  public Set<String> getDatasource(@PathParam("name") String name) {
+  public Set<String> getTables(@PathParam("name") String name) {
     Iterable<ValueTable> filteredTables = Iterables.filter(MagmaEngine.get().getDatasource(name).getValueTables(), new Predicate<ValueTable>() {
 
       @Override
@@ -62,7 +67,7 @@ public class DatasourceResource {
   }
 
   @Path("/{name}/table/{table}")
-  public TableResource getTableResource(@PathParam("name") String name, @PathParam("table") String table) {
+  public TableResource getTable(@PathParam("name") String name, @PathParam("table") String table) {
     /*
      * String tableFqn = name + "." + table; try { SecurityUtils.getSubject().checkPermission("tables:" + tableFqn +
      * ":read"); } catch(AuthorizationException e) { log.warn("Unauthorized access to table {}", tableFqn); throw new
