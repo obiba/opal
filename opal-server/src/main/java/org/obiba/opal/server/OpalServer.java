@@ -35,17 +35,17 @@ public class OpalServer {
 
     if(options.isUpgrade()) {
       new UpgradeCommand().execute();
-      System.console().printf("Upgrade successful.\n");
+      System.out.println("Upgrade successful.");
     }
 
-    System.console().printf("Starting Opal.\n");
+    System.out.println("Starting Opal.\n");
     ctx = new GenericApplicationContext();
     try {
       XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(ctx);
       xmlReader.loadBeanDefinitions("classpath:/META-INF/spring/opal-server/context.xml");
       ctx.refresh();
     } catch(Exception e) {
-      System.console().printf("Failed to start Opal Server. See log file for details.\nError message: %s\n", e.getMessage());
+      System.out.println(String.format("Failed to start Opal Server. See log file for details.\nError message: %s", e.getMessage()));
       e.printStackTrace(System.err);
       try {
         ctx.destroy();
@@ -62,7 +62,7 @@ public class OpalServer {
     // Make the securityManager accessible as a singleton.
     // This would be done by Spring when using the spring support packages.
     SecurityUtils.setSecurityManager(securityManager);
-    System.console().printf("Opal Server successfully started. Type the 'any key' to stop.\n");
+    System.out.println("Opal Server successfully started. Type the 'any key' to stop.");
   }
 
   final void startAndWait() throws IOException {
@@ -81,7 +81,7 @@ public class OpalServer {
     try {
       new OpalServer(CliFactory.parseArguments(OpalServerOptions.class, args)).startAndWait();
     } catch(ArgumentValidationException e) {
-      System.console().printf("%s\n", e.getMessage());
+      System.out.println(String.format("%s", e.getMessage()));
     }
   }
 
