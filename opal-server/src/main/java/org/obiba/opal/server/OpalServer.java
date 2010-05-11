@@ -31,17 +31,17 @@ public class OpalServer {
 
     if(options.isUpgrade()) {
       new UpgradeCommand().execute();
-      System.console().printf("Upgrade successful.\n");
+      System.out.println("Upgrade successful.");
     }
 
-    System.console().printf("Starting Opal.\n");
+    System.out.println("Starting Opal.\n");
     ctx = new GenericApplicationContext();
     try {
       XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(ctx);
       xmlReader.loadBeanDefinitions("classpath:/META-INF/spring/opal-server/context.xml");
       ctx.refresh();
     } catch(Exception e) {
-      System.console().printf("Failed to start Opal Server. See log file for details.\nError message: %s\n", e.getMessage());
+      System.out.println(String.format("Failed to start Opal Server. See log file for details.\nError message: %s", e.getMessage()));
       e.printStackTrace(System.err);
       try {
         ctx.destroy();
@@ -56,7 +56,7 @@ public class OpalServer {
     if(ctx.isActive()) {
       try {
         ctx.getBean(OpalRuntime.class).start();
-        System.console().printf("Opal Server successfully started. Type the 'any key' to stop.\n");
+        System.out().println("Opal Server successfully started. Type the 'any key' to stop.");
         System.in.read();
         ctx.getBean(OpalRuntime.class).stop();
       } finally {
@@ -69,7 +69,7 @@ public class OpalServer {
     try {
       new OpalServer(CliFactory.parseArguments(OpalServerOptions.class, args)).startAndWait();
     } catch(ArgumentValidationException e) {
-      System.console().printf("%s\n", e.getMessage());
+      System.out.println(String.format("%s", e.getMessage()));
     }
   }
 
