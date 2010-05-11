@@ -56,7 +56,7 @@ public class OpalServer {
     if(ctx.isActive()) {
       try {
         ctx.getBean(OpalRuntime.class).start();
-        System.out().println("Opal Server successfully started. Type the 'any key' to stop.");
+        System.out.println("Opal Server successfully started. Type the 'any key' to stop.");
         System.in.read();
         ctx.getBean(OpalRuntime.class).stop();
       } finally {
