@@ -32,6 +32,26 @@
         <include>**/*.*</include>
       </includes>
     </fileSet>
+	
+    <fileSet>
+      <directory>src/main/yajsw</directory>
+      <outputDirectory>yajsw</outputDirectory>
+	  <excludes>
+	    <exclude>bat/*.*</exclude>
+	  </excludes>
+      <includes>
+        <include>**/*.*</include>
+      </includes>
+    </fileSet>
+	
+	<fileSet>
+      <directory>src/main/yajsw/bat</directory>
+      <outputDirectory>yajsw/bat</outputDirectory>
+	  <fileMode>0755</fileMode>
+      <includes>
+        <include>**/*.*</include>
+      </includes>
+    </fileSet>
   </fileSets>
   <dependencySets>
     <!-- Copy dependency jar files to 'lib' -->
