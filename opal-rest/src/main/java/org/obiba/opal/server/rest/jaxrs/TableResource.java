@@ -21,6 +21,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 
 import org.json.JSONObject;
 import org.obiba.magma.Value;
@@ -31,6 +32,7 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.xstream.XStreamValueSet;
+import org.obiba.opal.server.rest.model.RestVariable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 
@@ -49,21 +51,28 @@ public class TableResource {
   }
 
   @GET
-  @Produces("application/xml")
+  @Produces( { "application/xml", "application/json" })
   public Map<String, String> details() {
     return ImmutableMap.of("name", valueTable.getName(), "entityType", valueTable.getEntityType());
   }
 
   @GET
   @Path("/variables")
-  @Produces("application/xml")
-  public Iterable<Variable> getVariables() {
-    return valueTable.getVariables();
+  @Produces( { "application/xml", "application/json" })
+  public Set<RestVariable> getVariables() {
+    return ImmutableSet.copyOf(Iterables.transform(valueTable.getVariables(), new Function<Variable, RestVariable>() {
+
+      @Override
+      public RestVariable apply(Variable from) {
+        return new RestVariable(UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable").path(TableResource.class, "getVariable").build(valueTable.getDatasource().getName(), valueTable.getName(), from.getName()), from);
+      }
+
+    }));
   }
 
   @GET
   @Path("/entities")
-  @Produces("application/xml")
+  @Produces( { "application/xml", "application/json" })
   public Set<String> getEntities() {
     return ImmutableSet.copyOf(Iterables.transform(valueTable.getValueSets(), new Function<ValueSet, String>() {
       @Override

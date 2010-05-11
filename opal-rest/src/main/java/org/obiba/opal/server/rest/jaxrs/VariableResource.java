@@ -20,10 +20,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import org.json.JSONObject;
+import org.obiba.magma.Category;
+import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
+
+import com.google.common.collect.Maps;
 
 public class VariableResource {
 
@@ -57,4 +61,33 @@ public class VariableResource {
     return Response.ok(new JSONObject(response).toString()).build();
   }
 
+  @GET
+  @Path("/frequencies.json")
+  @Produces("application/json")
+  public Response getDataTable() {
+    Map<String, Integer> frequencies = Maps.newLinkedHashMap();
+    for(Category c : vvs.getVariable().getCategories()) {
+      frequencies.put(c.getName(), 0);
+    }
+
+    for(ValueSet vs : valueTable.getValueSets()) {
+      Value value = vvs.getValue(vs);
+      if(value.isNull()) {
+        count("N/A", frequencies);
+      } else {
+        count(value.toString(), frequencies);
+      }
+    }
+    return Response.ok(new JSONObject(frequencies).toString()).build();
+  }
+
+  private void count(String key, Map<String, Integer> frequencies) {
+    Integer value = frequencies.get(key);
+    if(value == null) {
+      frequencies.put(key, 1);
+    } else {
+      frequencies.put(key, ++value);
+    }
+
+  }
 }
