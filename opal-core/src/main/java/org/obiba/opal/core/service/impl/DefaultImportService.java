@@ -151,7 +151,7 @@ public class DefaultImportService implements ImportService {
     final Variable keyVariable = prepareKeysTable(privateView, keyVariableName);
     final OpalPrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(lookupKeysTable(), keyVariable, participantIdentifier);
 
-    PrivateVariableEntityValueTable publicView = createPublicView(participantTable, entityMap);
+    PrivateVariableEntityValueTable publicView = createPublicView(participantTable, unit, entityMap);
 
     // prepare for copying participant data
     final ValueTableWriter keysTableWriter = writeToKeysTable();
@@ -227,12 +227,12 @@ public class DefaultImportService implements ImportService {
    * @param entityMap
    * @return
    */
-  private PrivateVariableEntityValueTable createPublicView(ValueTable participantTable, final OpalPrivateVariableEntityMap entityMap) {
+  private PrivateVariableEntityValueTable createPublicView(ValueTable participantTable, final FunctionalUnit unit, final OpalPrivateVariableEntityMap entityMap) {
     PrivateVariableEntityValueTable publicTable = new PrivateVariableEntityValueTable(participantTable.getName(), participantTable, entityMap);
     publicTable.setSelectClause(new SelectClause() {
 
       public boolean select(Variable variable) {
-        return isIdentifierVariable(variable) == false;
+        return isIdentifierVariable(variable) == false && isIdentifierVariableForUnit(variable, unit) == false;
       }
 
     });
@@ -298,6 +298,10 @@ public class DefaultImportService implements ImportService {
 
   private boolean isIdentifierVariable(Variable variable) {
     return variable.hasAttribute("identifier") && (variable.getAttribute("identifier").getValue().equals(BooleanType.get().trueValue()) || variable.getAttribute("identifier").getValue().equals(TextType.get().valueOf("true")));
+  }
+
+  private boolean isIdentifierVariableForUnit(Variable variable, FunctionalUnit unit) {
+    return (unit.getSelect() != null && unit.getSelect().select(variable));
   }
 
   /**
