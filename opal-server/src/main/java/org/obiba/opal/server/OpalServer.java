@@ -62,6 +62,13 @@ public class OpalServer {
     // Make the securityManager accessible as a singleton.
     // This would be done by Spring when using the spring support packages.
     SecurityUtils.setSecurityManager(securityManager);
+	
+	Runtime.getRuntime().addShutdownHook(new Thread() {
+      public void run() {
+        shutdown();
+      }
+    });
+		
     System.out.println("Opal Server successfully started. Type the 'any key' to stop.");
   }
 
@@ -70,13 +77,17 @@ public class OpalServer {
       try {
         System.in.read();
       } finally {
-        // Destroy the security manager.
-        LifecycleUtils.destroy(SecurityUtils.getSecurityManager());
-        ctx.destroy();
+        shutdown();        
       }
     }
   }
 
+  final void shutdown() {
+    // Destroy the security manager.
+    LifecycleUtils.destroy(SecurityUtils.getSecurityManager());
+    ctx.destroy();
+  }
+  
   public static void main(String[] args) throws IOException {
     try {
       new OpalServer(CliFactory.parseArguments(OpalServerOptions.class, args)).startAndWait();
