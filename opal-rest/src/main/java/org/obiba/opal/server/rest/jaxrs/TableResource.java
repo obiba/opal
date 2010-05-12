@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.server.rest.jaxrs;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,10 +21,15 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONObject;
+import org.obiba.magma.Attribute;
+import org.obiba.magma.Category;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
@@ -32,7 +38,9 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.xstream.XStreamValueSet;
-import org.obiba.opal.server.rest.model.RestVariable;
+import org.obiba.opal.web.model.AttributeDTO;
+import org.obiba.opal.web.model.CategoryDTO;
+import org.obiba.opal.web.model.VariableDTO;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 
@@ -41,6 +49,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 public class TableResource {
 
@@ -58,15 +67,35 @@ public class TableResource {
 
   @GET
   @Path("/variables")
-  @Produces( { "application/xml", "application/json" })
-  public Set<RestVariable> getVariables() {
-    return ImmutableSet.copyOf(Iterables.transform(valueTable.getVariables(), new Function<Variable, RestVariable>() {
+  @Produces("application/json")
+  public Iterable<VariableDTO> getVariables(@Context final UriInfo uriInfo) {
+    ArrayList<PathSegment> segments = Lists.newArrayList(uriInfo.getPathSegments());
+    segments.remove(segments.size() - 1);
+    final UriBuilder ub = uriInfo.getBaseUriBuilder();
+    for(PathSegment segment : segments) {
+      ub.segment(segment.getPath());
+    }
+    ub.path(TableResource.class, "getVariable");
+
+    return ImmutableSet.copyOf(Iterables.transform(valueTable.getVariables(), new Function<Variable, VariableDTO>() {
 
       @Override
-      public RestVariable apply(Variable from) {
-        return new RestVariable(UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable").path(TableResource.class, "getVariable").build(valueTable.getDatasource().getName(), valueTable.getName(), from.getName()), from);
+      public VariableDTO apply(Variable from) {
+        VariableDTO var = new VariableDTO(from.getName(), from.getValueType().getName());
+        for(Attribute attribute : from.getAttributes()) {
+          AttributeDTO a = new AttributeDTO(attribute.getName(), attribute.getValue().toString());
+          if(attribute.isLocalised()) {
+            a.setLocale(attribute.getLocale().toString());
+          }
+          var.addAttributes(a);
+        }
+        for(Category category : from.getCategories()) {
+          CategoryDTO c = new CategoryDTO(category.getName(), category.isMissing());
+          var.addCategories(c);
+        }
+        var.setLink(ub.build(from.getName()).toString());
+        return var;
       }
-
     }));
   }
 

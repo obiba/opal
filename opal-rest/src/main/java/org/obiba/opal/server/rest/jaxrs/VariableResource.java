@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.server.rest.jaxrs;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
+import org.obiba.opal.web.model.FrequencyDTO;
 
 import com.google.common.collect.Maps;
 
@@ -64,12 +66,12 @@ public class VariableResource {
   @GET
   @Path("/frequencies.json")
   @Produces("application/json")
-  public Response getDataTable() {
-    Map<String, Integer> frequencies = Maps.newLinkedHashMap();
+  public Collection<FrequencyDTO> getDataTable() {
+    Map<String, FrequencyDTO> frequencies = Maps.newLinkedHashMap();
     for(Category c : vvs.getVariable().getCategories()) {
-      frequencies.put(c.getName(), 0);
+      frequencies.put(c.getName(), new FrequencyDTO(c.getName(), 0));
     }
-
+    frequencies.put("N/A", new FrequencyDTO("N/A", 0));
     for(ValueSet vs : valueTable.getValueSets()) {
       Value value = vvs.getValue(vs);
       if(value.isNull()) {
@@ -78,15 +80,15 @@ public class VariableResource {
         count(value.toString(), frequencies);
       }
     }
-    return Response.ok(new JSONObject(frequencies).toString()).build();
+    return frequencies.values();
   }
 
-  private void count(String key, Map<String, Integer> frequencies) {
-    Integer value = frequencies.get(key);
+  private void count(String key, Map<String, FrequencyDTO> frequencies) {
+    FrequencyDTO value = frequencies.get(key);
     if(value == null) {
-      frequencies.put(key, 1);
+      frequencies.put(key, new FrequencyDTO(key, 1));
     } else {
-      frequencies.put(key, ++value);
+      value.setValue(value.getValue() + 1);
     }
 
   }

@@ -17,9 +17,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.apache.shiro.SecurityUtils;
+import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.server.rest.model.Datasource;
+import org.obiba.opal.web.model.DatasourceDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -39,9 +40,14 @@ public class DatasourceResource {
 
   @GET
   @Path("/{name}")
-  @Produces( { "application/xml", "application/json" })
-  public Datasource get(@PathParam("name") String name) {
-    return new Datasource(null, MagmaEngine.get().getDatasource(name));
+  @Produces("application/json")
+  public DatasourceDTO get(@PathParam("name") String name) {
+    Datasource ds = MagmaEngine.get().getDatasource(name);
+    DatasourceDTO datasource = new DatasourceDTO(ds.getName());
+    for(ValueTable table : ds.getValueTables()) {
+      datasource.addTable(table.getName());
+    }
+    return datasource;
   }
 
   @GET

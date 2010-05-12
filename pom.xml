@@ -27,9 +27,8 @@
     <module>opal-fs</module>
     <module>opal-httpd</module>
     <module>opal-rest</module>
-<!--
-    <module>opal-datashield</module>
--->
+    <module>opal-web-model</module>
+    <module>opal-gwt-client</module>
   </modules>
 
   <dependencyManagement>
