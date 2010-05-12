@@ -56,13 +56,24 @@ public class OpalServer {
     if(ctx.isActive()) {
       try {
         ctx.getBean(OpalRuntime.class).start();
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+          public void run() {
+            shutdown();
+          }
+        });
+
         System.out.println("Opal Server successfully started. Type the 'any key' to stop.");
         System.in.read();
-        ctx.getBean(OpalRuntime.class).stop();
+        shutdown();
       } finally {
         ctx.destroy();
       }
     }
+  }
+
+  final void shutdown() {
+    ctx.getBean(OpalRuntime.class).stop();
   }
 
   public static void main(String[] args) throws IOException {
