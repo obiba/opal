@@ -1,0 +1,850 @@
+<com.google.common.collect.RegularImmutableSet resolves-to="com.google.common.collect.ImmutableSet$SerializedForm">
+  <elements>
+    <variable name="INPUT_BODY_TYPE" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Body type</attribute>
+        <attribute name="label" valueType="text" locale="fr">Type corporel</attribute>
+        <attribute name="source" valueType="text">Data[TEXT:STANDARD]</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">false</attribute>
+      </attributes>
+    </variable>
+    <variable name="INPUT_BODY_TYPE.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="INPUT_CLOTHES_WEIGHT" valueType="decimal" entityType="Participant" unit="kg">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Clothes Weight</attribute>
+        <attribute name="label" valueType="text" locale="fr">Poids des vêtements</attribute>
+        <attribute name="source" valueType="text">Data[DECIMAL:0.0]</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">false</attribute>
+      </attributes>
+    </variable>
+    <variable name="INPUT_CLOTHES_WEIGHT.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="INPUT_PARTICIPANT_AGE" valueType="integer" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Age</attribute>
+        <attribute name="label" valueType="text" locale="fr">Age</attribute>
+        <attribute name="source" valueType="text">ParticipantProperty[age]</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">false</attribute>
+      </attributes>
+    </variable>
+    <variable name="INPUT_PARTICIPANT_AGE.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="INPUT_PARTICIPANT_GENDER" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Gender</attribute>
+        <attribute name="label" valueType="text" locale="fr">Sexe</attribute>
+        <attribute name="source" valueType="text">ParticipantProperty[gender]</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">false</attribute>
+      </attributes>
+    </variable>
+    <variable name="INPUT_PARTICIPANT_GENDER.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="INPUT_PARTICIPANT_HEIGHT" valueType="integer" entityType="Participant" unit="cm">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Participant Height</attribute>
+        <attribute name="label" valueType="text" locale="fr">Hauteur debout du participant</attribute>
+        <attribute name="source" valueType="text">Instrument[StandingHeight, RES_FIRST_HEIGHT]</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">false</attribute>
+      </attributes>
+    </variable>
+    <variable name="INPUT_PARTICIPANT_HEIGHT.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="InstrumentRun.Contraindication.code" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+    </variable>
+    <variable name="InstrumentRun.Contraindication.type" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="ASKED"/>
+        <category name="OBSERVED"/>
+      </categories>
+    </variable>
+    <variable name="InstrumentRun.instrumentBarcode" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+    </variable>
+    <variable name="InstrumentRun.otherContraindication" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+    </variable>
+    <variable name="InstrumentRun.timeEnd" valueType="datetime" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+    </variable>
+    <variable name="InstrumentRun.timeStart" valueType="datetime" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+    </variable>
+    <variable name="InstrumentRun.user" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+    </variable>
+    <variable name="OUTPUT_BODY_TYPE" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Body type</attribute>
+        <attribute name="label" valueType="text" locale="fr">Type corporel</attribute>
+        <attribute name="validation" valueType="text">[IntegrityCheck-ERROR[x == INPUT_BODY_TYPE]]</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">false</attribute>
+      </attributes>
+    </variable>
+    <variable name="OUTPUT_BODY_TYPE.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="OUTPUT_PARTICIPANT_AGE" valueType="integer" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Age</attribute>
+        <attribute name="label" valueType="text" locale="fr">Age</attribute>
+        <attribute name="validation" valueType="text">[IntegrityCheck-ERROR[x == INPUT_PARTICIPANT_AGE]]</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">false</attribute>
+      </attributes>
+    </variable>
+    <variable name="OUTPUT_PARTICIPANT_AGE.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="OUTPUT_PARTICIPANT_GENDER" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Gender</attribute>
+        <attribute name="label" valueType="text" locale="fr">Sexe</attribute>
+        <attribute name="validation" valueType="text">[IntegrityCheck-ERROR[x == INPUT_PARTICIPANT_GENDER]]</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">false</attribute>
+      </attributes>
+    </variable>
+    <variable name="OUTPUT_PARTICIPANT_GENDER.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="OUTPUT_PARTICIPANT_HEIGHT" valueType="integer" entityType="Participant" unit="cm">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Participant Height</attribute>
+        <attribute name="label" valueType="text" locale="fr">Hauteur debout du participant</attribute>
+        <attribute name="validation" valueType="text">[IntegrityCheck-ERROR[x == INPUT_PARTICIPANT_HEIGHT]]</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">false</attribute>
+      </attributes>
+    </variable>
+    <variable name="OUTPUT_PARTICIPANT_HEIGHT.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_BASAL_METABOLIC_RATE" valueType="integer" entityType="Participant" unit="kJ">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Basal Metabolic Rate (BMR)</attribute>
+        <attribute name="label" valueType="text" locale="fr">Métabolisme de base (MB)</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_BASAL_METABOLIC_RATE.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_BODY_IMPEDANCE" valueType="integer" entityType="Participant" unit="ohm">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Whole body impedance</attribute>
+        <attribute name="label" valueType="text" locale="fr">Impédence du corps entier</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_BODY_IMPEDANCE.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_BODY_MASS_INDEX" valueType="decimal" entityType="Participant" unit="kg/m²">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Body Mass Index (BMI)</attribute>
+        <attribute name="label" valueType="text" locale="fr">Indice de masse corporelle (IMC)</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_BODY_MASS_INDEX.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_FAT_FREE_MASS" valueType="decimal" entityType="Participant" unit="kg">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Fat Free Mass</attribute>
+        <attribute name="label" valueType="text" locale="fr">Masse maigre</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_FAT_FREE_MASS.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_FAT_MASS" valueType="decimal" entityType="Participant" unit="kg">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Fat Mass</attribute>
+        <attribute name="label" valueType="text" locale="fr">Masse grasse</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_FAT_MASS.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_FAT_PERCENT" valueType="decimal" entityType="Participant" unit="%">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Fat Percentage</attribute>
+        <attribute name="label" valueType="text" locale="fr">Pourcentage de graisse</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_FAT_PERCENT.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_LEFT_ARM_FAT_FREE_MASS" valueType="decimal" entityType="Participant" unit="kg">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Left arm fat free mass</attribute>
+        <attribute name="label" valueType="text" locale="fr">Masse maigre du bras gauche</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_LEFT_ARM_FAT_FREE_MASS.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_LEFT_ARM_FAT_MASS" valueType="decimal" entityType="Participant" unit="kg">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Left arm fat mass</attribute>
+        <attribute name="label" valueType="text" locale="fr">Masse grasse du bras gauche</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_LEFT_ARM_FAT_MASS.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_LEFT_ARM_FAT_PERCENT" valueType="decimal" entityType="Participant" unit="%">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Left arm fat percentage</attribute>
+        <attribute name="label" valueType="text" locale="fr">Taux de gras du bras gauche</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_LEFT_ARM_FAT_PERCENT.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_LEFT_ARM_IMPEDANCE" valueType="integer" entityType="Participant" unit="ohm">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Left arm impedance</attribute>
+        <attribute name="label" valueType="text" locale="fr">Impédence du bras gauche</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_LEFT_ARM_IMPEDANCE.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_LEFT_ARM_PRED_MUSCLE_MASS" valueType="decimal" entityType="Participant" unit="kg">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Left arm predicted muscle mass</attribute>
+        <attribute name="label" valueType="text" locale="fr">Estimation masse musculaire du bras gauche</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_LEFT_ARM_PRED_MUSCLE_MASS.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_LEFT_LEG_FAT_FREE_MASS" valueType="decimal" entityType="Participant" unit="kg">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Left leg fat free mass</attribute>
+        <attribute name="label" valueType="text" locale="fr">Masse maigre de la jambe gauche</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_LEFT_LEG_FAT_FREE_MASS.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_LEFT_LEG_FAT_MASS" valueType="decimal" entityType="Participant" unit="kg">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Left leg fat mass</attribute>
+        <attribute name="label" valueType="text" locale="fr">Masse grasse de la jambe gauche</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_LEFT_LEG_FAT_MASS.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_LEFT_LEG_FAT_PERCENT" valueType="decimal" entityType="Participant" unit="%">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Left leg fat percentage</attribute>
+        <attribute name="label" valueType="text" locale="fr">Taux de gras de la jambe gauche</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_LEFT_LEG_FAT_PERCENT.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_LEFT_LEG_IMPEDANCE" valueType="integer" entityType="Participant" unit="ohm">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Left leg impedance</attribute>
+        <attribute name="label" valueType="text" locale="fr">Impédence de la jambe gauche</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_LEFT_LEG_IMPEDANCE.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_LEFT_LEG_PRED_MUSCLE_MASS" valueType="decimal" entityType="Participant" unit="kg">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Left leg predicted muscle mass</attribute>
+        <attribute name="label" valueType="text" locale="fr">Estimation masse musculaire de la jambe gauche</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_LEFT_LEG_PRED_MUSCLE_MASS.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_MEASUREMENT_TIMESTAMP" valueType="datetime" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Timestamp</attribute>
+        <attribute name="label" valueType="text" locale="fr">Date de la mesure</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">false</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_MEASUREMENT_TIMESTAMP.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_RIGHT_ARM_FAT_FREE_MASS" valueType="decimal" entityType="Participant" unit="kg">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Right arm fat free mass</attribute>
+        <attribute name="label" valueType="text" locale="fr">Masse maigre du bras droit</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_RIGHT_ARM_FAT_FREE_MASS.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_RIGHT_ARM_FAT_MASS" valueType="decimal" entityType="Participant" unit="kg">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Right arm fat mass</attribute>
+        <attribute name="label" valueType="text" locale="fr">Masse grasse du bras droit</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_RIGHT_ARM_FAT_MASS.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_RIGHT_ARM_FAT_PERCENT" valueType="decimal" entityType="Participant" unit="%">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Right arm fat percentage</attribute>
+        <attribute name="label" valueType="text" locale="fr">Taux de gras du bras droit</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_RIGHT_ARM_FAT_PERCENT.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_RIGHT_ARM_IMPEDANCE" valueType="integer" entityType="Participant" unit="ohm">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Right arm impedance</attribute>
+        <attribute name="label" valueType="text" locale="fr">Impédence du bras droit</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_RIGHT_ARM_IMPEDANCE.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_RIGHT_ARM_PRED_MUSCLE_MASS" valueType="decimal" entityType="Participant" unit="kg">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Right arm predicted muscle mass</attribute>
+        <attribute name="label" valueType="text" locale="fr">Estimation masse musculaire du bras droit</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_RIGHT_ARM_PRED_MUSCLE_MASS.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_RIGHT_LEG_FAT_FREE_MASS" valueType="decimal" entityType="Participant" unit="kg">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Right leg fat free mass</attribute>
+        <attribute name="label" valueType="text" locale="fr">Masse maigre de la jambe droite</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_RIGHT_LEG_FAT_FREE_MASS.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_RIGHT_LEG_FAT_MASS" valueType="decimal" entityType="Participant" unit="kg">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Right leg fat mass</attribute>
+        <attribute name="label" valueType="text" locale="fr">Masse grasse de la jambe droite</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_RIGHT_LEG_FAT_MASS.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_RIGHT_LEG_FAT_PERCENT" valueType="decimal" entityType="Participant" unit="%">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Right leg fat percentage</attribute>
+        <attribute name="label" valueType="text" locale="fr">Taux de gras de la jambe droite</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_RIGHT_LEG_FAT_PERCENT.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_RIGHT_LEG_IMPEDANCE" valueType="integer" entityType="Participant" unit="ohm">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Right leg impedance</attribute>
+        <attribute name="label" valueType="text" locale="fr">Impédence de la jambe droite</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_RIGHT_LEG_IMPEDANCE.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_RIGHT_LEG_PRED_MUSCLE_MASS" valueType="decimal" entityType="Participant" unit="kg">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Right leg predicted muscle mass</attribute>
+        <attribute name="label" valueType="text" locale="fr">Estimation masse musculaire de la jambe droite</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_RIGHT_LEG_PRED_MUSCLE_MASS.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_TOTAL_BODY_WATER_MASS" valueType="decimal" entityType="Participant" unit="kg">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Total Body Water</attribute>
+        <attribute name="label" valueType="text" locale="fr">Masse hydrique</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_TOTAL_BODY_WATER_MASS.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_TRUNK_FAT_FREE_MASS" valueType="decimal" entityType="Participant" unit="kg">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Trunk fat free mass</attribute>
+        <attribute name="label" valueType="text" locale="fr">Masse maigre du torse</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_TRUNK_FAT_FREE_MASS.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_TRUNK_FAT_MASS" valueType="decimal" entityType="Participant" unit="kg">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Trunk fat mass</attribute>
+        <attribute name="label" valueType="text" locale="fr">Masse grasse du torse</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_TRUNK_FAT_MASS.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_TRUNK_FAT_PERCENT" valueType="decimal" entityType="Participant" unit="%">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Trunk fat percentage</attribute>
+        <attribute name="label" valueType="text" locale="fr">Taux de gras du torse</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_TRUNK_FAT_PERCENT.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_TRUNK_PRED_MUSCLE_MASS" valueType="decimal" entityType="Participant" unit="kg">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Trunk predicted muscle mass</attribute>
+        <attribute name="label" valueType="text" locale="fr">Estimation masse musculaire du torse</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_TRUNK_PRED_MUSCLE_MASS.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+    <variable name="RES_WEIGHT" valueType="decimal" entityType="Participant" unit="kg">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+        <attribute name="label" valueType="text" locale="en">Weight</attribute>
+        <attribute name="label" valueType="text" locale="fr">Poids</attribute>
+        <attribute name="captureMethod" valueType="text">AUTOMATIC</attribute>
+        <attribute name="isManualCaptureAllowed" valueType="text">true</attribute>
+      </attributes>
+    </variable>
+    <variable name="RES_WEIGHT.captureMethod" valueType="text" entityType="Participant">
+      <attributes>
+        <attribute name="stage" valueType="text">Impedance418</attribute>
+      </attributes>
+      <categories>
+        <category name="MANUAL"/>
+        <category name="AUTOMATIC"/>
+        <category name="COMPUTED"/>
+      </categories>
+    </variable>
+  </elements>
+</com.google.common.collect.RegularImmutableSet>

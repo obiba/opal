@@ -1,0 +1,20 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:g2="urn:import:com.google.gwt.gen2.table.client">
+
+  <g:SplitLayoutPanel>
+    <g:north  size='200'>
+      <g:ScrollPanel ui:field="east"/>
+    </g:north>
+    <g:center>
+      <g:ScrollPanel>
+        <g2:SortableGrid ui:field="table" />
+      </g:ScrollPanel>
+    </g:center>
+    <g:west size='200'>
+      <g:ScrollPanel>
+        <g:Tree ui:field="tree" />
+      </g:ScrollPanel>
+    </g:west>
+  </g:SplitLayoutPanel>
+</ui:UiBinder>
