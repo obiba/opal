@@ -1,0 +1,35 @@
+package opal;
+
+option optimize_for = LITE_RUNTIME;
+option java_package = "org.obiba.opal.web.model";
+
+message DatasourceDTO {
+  required string name = 1;
+  optional string link = 2;
+  repeated string table = 3;
+}
+
+message VariableDTO {
+  required string name = 1;
+  required string valueType = 2;
+  optional string link = 3;
+  repeated AttributeDTO attributes = 4;
+  repeated CategoryDTO categories = 5;
+}
+
+message CategoryDTO {
+  required string name = 1;
+  required bool isMissing = 2;
+  repeated AttributeDTO attributes = 3;
+}
+
+message AttributeDTO {
+  required string name = 1;
+  required string value = 2;
+  optional string locale = 3;
+}
+
+message FrequencyDTO {
+  required string name = 1;
+  required int32 value = 2;
+}
