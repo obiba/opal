@@ -56,42 +56,13 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   @Override
   public void start() {
-    opalSecurityManager.start();
+    initSecurityManager();
 
-    try {
-      opalConfiguration.getMagmaEngineFactory().create();
+    initMagmaEngine();
 
-      Runnable magmaEngineInit = new Runnable() {
-        public void run() {
-          opalConfiguration.getMagmaEngineFactory().initialize(MagmaEngine.get());
-        }
-      };
-      new TransactionalThread(txManager, magmaEngineInit).start();
-    } catch(RuntimeException e) {
-      log.error("Could not create MagmaEngine.", e);
-    }
+    initServices();
 
-    for(Service service : services) {
-      try {
-        service.start();
-      } catch(RuntimeException e) {
-        log.warn("Error starting service " + service.getClass(), e);
-      }
-    }
-
-    // Initialize Opal file system
-    try {
-      opalFileSystem = new OpalFileSystemImpl(opalConfiguration.getFileSystemRoot());
-      // Create the folders for each FunctionalUnit
-      for(FunctionalUnit unit : opalConfiguration.getFunctionalUnits()) {
-        getUnitDirectory(unit.getName());
-      }
-    } catch(RuntimeException e) {
-      log.error("The opal filesystem cannot be started.", e);
-    } catch(FileSystemException e) {
-      log.error("Error creating functional unit's directory in the Opal File System.", e);
-    }
-
+    initFileSystem();
   }
 
   @Override
@@ -152,6 +123,49 @@ public class DefaultOpalRuntime implements OpalRuntime {
     unitDir.createFolder();
 
     return unitDir;
+  }
+
+  private void initSecurityManager() {
+    opalSecurityManager.start();
+  }
+
+  private void initMagmaEngine() {
+    try {
+      opalConfiguration.getMagmaEngineFactory().create();
+
+      Runnable magmaEngineInit = new Runnable() {
+        public void run() {
+          opalConfiguration.getMagmaEngineFactory().initialize(MagmaEngine.get());
+        }
+      };
+      new TransactionalThread(txManager, magmaEngineInit).start();
+    } catch(RuntimeException e) {
+      log.error("Could not create MagmaEngine.", e);
+    }
+  }
+
+  private void initServices() {
+    for(Service service : services) {
+      try {
+        service.start();
+      } catch(RuntimeException e) {
+        log.warn("Error starting service " + service.getClass(), e);
+      }
+    }
+  }
+
+  private void initFileSystem() {
+    try {
+      opalFileSystem = new OpalFileSystemImpl(opalConfiguration.getFileSystemRoot());
+      // Create the folders for each FunctionalUnit
+      for(FunctionalUnit unit : opalConfiguration.getFunctionalUnits()) {
+        getUnitDirectory(unit.getName());
+      }
+    } catch(RuntimeException e) {
+      log.error("The opal filesystem cannot be started.", e);
+    } catch(FileSystemException e) {
+      log.error("Error creating functional unit's directory in the Opal File System.", e);
+    }
   }
 
   //
