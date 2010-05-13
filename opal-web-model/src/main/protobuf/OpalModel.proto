@@ -1,6 +1,5 @@
 package opal;
 
-option optimize_for = LITE_RUNTIME;
 option java_package = "org.obiba.opal.web.model";
 
 message DatasourceDTO {
