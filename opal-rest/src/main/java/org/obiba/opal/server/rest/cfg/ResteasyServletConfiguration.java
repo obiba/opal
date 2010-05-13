@@ -19,7 +19,6 @@ import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 import org.jboss.resteasy.spi.Registry;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.obiba.opal.server.httpd.OpalJettyServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
@@ -27,19 +26,18 @@ import org.springframework.context.annotation.Configuration;
 public class ResteasyServletConfiguration {
 
   @Autowired
-  private OpalJettyServer jettyServer;
+  private ServletContextHandler servletContextHandler;
 
   @Autowired
   private ResteasyDeployment resteasyDeployment;
 
   @PostConstruct
   public void configureResteasyServlet() {
-    ServletContextHandler sch = jettyServer.getContext();
-    ServletContext servletContext = sch.getServletContext();
+    ServletContext servletContext = servletContextHandler.getServletContext();
     servletContext.setAttribute(ResteasyProviderFactory.class.getName(), resteasyDeployment.getProviderFactory());
     servletContext.setAttribute(Dispatcher.class.getName(), resteasyDeployment.getDispatcher());
     servletContext.setAttribute(Registry.class.getName(), resteasyDeployment.getRegistry());
-    sch.addServlet(new ServletHolder(new HttpServletDispatcher()), "/*");
+    servletContextHandler.addServlet(new ServletHolder(new HttpServletDispatcher()), "/*");
   }
 
 }

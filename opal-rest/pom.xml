@@ -67,9 +67,19 @@
       <artifactId>visualization-datasource</artifactId>
       <version>1.0.2</version>
     </dependency>
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java-format</artifactId>
+      <version>1.1</version>
+    </dependency>
+    
   </dependencies>
 
   <repositories>
+  <repository>
+    <id>protobuf-java-format</id>
+    <url>http://protobuf-java-format.googlecode.com/svn/trunk/repo</url>
+  </repository>
     <repository>
       <id>maven-restlet</id>
       <name>Public online Restlet repository</name>

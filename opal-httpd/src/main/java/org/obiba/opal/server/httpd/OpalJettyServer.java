@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -92,7 +93,8 @@ public class OpalJettyServer implements Service {
     this.jettyServer = server;
   }
 
-  public ServletContextHandler getContext() {
+  @Bean
+  public ServletContextHandler getServletContextHandler() {
     return this.contextHandler;
   }
 
@@ -132,6 +134,7 @@ public class OpalJettyServer implements Service {
     webAppCtx = new AnnotationConfigWebApplicationContext();
     webAppCtx.setServletContext(contextHandler.getServletContext());
     webAppCtx.setParent(ctx);
+    // This should be "org.obiba.opal.web"
     webAppCtx.setConfigLocation("org.obiba.opal.server.rest");
     contextHandler.getServletContext().setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, webAppCtx);
     return contextHandler;
