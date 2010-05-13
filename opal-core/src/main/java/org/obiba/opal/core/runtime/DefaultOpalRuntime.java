@@ -59,12 +59,14 @@ public class DefaultOpalRuntime implements OpalRuntime {
     opalSecurityManager.start();
 
     try {
-      new TransactionTemplate(txManager).execute(new TransactionCallbackWithoutResult() {
-        @Override
-        protected void doInTransactionWithoutResult(TransactionStatus status) {
-          opalConfiguration.getMagmaEngineFactory().create();
+      opalConfiguration.getMagmaEngineFactory().create();
+
+      Runnable magmaEngineInit = new Runnable() {
+        public void run() {
+          opalConfiguration.getMagmaEngineFactory().initialize(MagmaEngine.get());
         }
-      });
+      };
+      new TransactionalThread(txManager, magmaEngineInit).start();
     } catch(RuntimeException e) {
       log.error("Could not create MagmaEngine.", e);
     }
@@ -150,5 +152,29 @@ public class DefaultOpalRuntime implements OpalRuntime {
     unitDir.createFolder();
 
     return unitDir;
+  }
+
+  //
+  // Inner Classes
+  //
+
+  static class TransactionalThread extends Thread {
+    private PlatformTransactionManager txManager;
+
+    private Runnable runnable;
+
+    public TransactionalThread(PlatformTransactionManager txManager, Runnable runnable) {
+      this.txManager = txManager;
+      this.runnable = runnable;
+    }
+
+    public void run() {
+      new TransactionTemplate(txManager).execute(new TransactionCallbackWithoutResult() {
+        @Override
+        protected void doInTransactionWithoutResult(TransactionStatus status) {
+          runnable.run();
+        }
+      });
+    }
   }
 }
