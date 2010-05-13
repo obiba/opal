@@ -20,7 +20,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.web.model.OpalModel;
+import org.obiba.opal.web.model.DatasourceDTO;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
@@ -33,16 +33,18 @@ public class DatasourcesResource {
 
   @GET
   @Produces( { "application/json" })
-  public Set<OpalModel.DatasourceDTO> getDatasources() {
-    Set<OpalModel.DatasourceDTO> names = ImmutableSet.copyOf(Iterables.transform(MagmaEngine.get().getDatasources(), new Function<Datasource, OpalModel.DatasourceDTO>() {
+  public Set<DatasourceDTO> getDatasources() {
+    Set<DatasourceDTO> names = ImmutableSet.copyOf(Iterables.transform(MagmaEngine.get().getDatasources(), new Function<Datasource, DatasourceDTO>() {
       @Override
-      public OpalModel.DatasourceDTO apply(Datasource from) {
+      public DatasourceDTO apply(Datasource from) {
         URI dslink = UriBuilder.fromResource(DatasourceResource.class).path(DatasourceResource.class, "get").build(from.getName());
-        OpalModel.DatasourceDTO.Builder ds = OpalModel.DatasourceDTO.newBuilder().setName(from.getName()).setLink(dslink.toString());
+        DatasourceDTO ds = new DatasourceDTO();
+        ds.setName(from.getName());
+        ds.setLink(dslink.toString());
         for(ValueTable table : from.getValueTables()) {
           ds.addTable(table.getName());
         }
-        return ds.build();
+        return ds;
       }
     }));
 
