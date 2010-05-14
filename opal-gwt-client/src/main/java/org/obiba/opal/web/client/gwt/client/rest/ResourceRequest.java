@@ -113,7 +113,7 @@ public class ResourceRequest<T extends JavaScriptObject> {
     // TODO: populate the custom authentication header. This should be the contents of the Cookie set by the server
     // after authentication.
     builder.setHeader("X-Opal-Auth", /* SomeStaticCookie.get().getValue() */"someValue");
-    builder.setHeader("Accept", "application/json");
+    builder.setHeader("Accept", "application/x-protobuf+json");
     return builder;
   }
 
