@@ -28,7 +28,7 @@ import com.google.gwt.http.client.Response;
  */
 public class ResourceRequest<T extends JavaScriptObject> {
 
-  public static String OPAL_WS_ROOT = "http://localhost:8080";
+  public static String OPAL_WS_ROOT = "http://localhost:8080/ws";
 
   private final String uri;
 

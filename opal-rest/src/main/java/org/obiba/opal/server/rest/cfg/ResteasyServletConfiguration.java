@@ -37,7 +37,7 @@ public class ResteasyServletConfiguration {
     servletContext.setAttribute(ResteasyProviderFactory.class.getName(), resteasyDeployment.getProviderFactory());
     servletContext.setAttribute(Dispatcher.class.getName(), resteasyDeployment.getDispatcher());
     servletContext.setAttribute(Registry.class.getName(), resteasyDeployment.getRegistry());
-    servletContextHandler.addServlet(new ServletHolder(new HttpServletDispatcher()), "/*");
+    servletContextHandler.addServlet(new ServletHolder(new HttpServletDispatcher()), "/ws/*");
   }
 
 }
