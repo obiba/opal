@@ -2,9 +2,13 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.obiba.opal</groupId>
+  <parent>
+    <artifactId>opal</artifactId>
+    <groupId>org.obiba.opal</groupId>
+    <version>1.2-SNAPSHOT</version>
+  </parent>
+  
   <artifactId>opal-web-model</artifactId>
-  <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>opal-web-model</name>
@@ -104,16 +108,16 @@
                 <!-- Determine which protoc binary we can use -->
                 <condition property="os.protoc" value="${protobuf.version}-linux-x86_64">
                   <or>
-                    <os name="linux" arch="amd64"/>
-                    <os name="linux" arch="x86_64"/>
+                    <os name="linux" arch="amd64" />
+                    <os name="linux" arch="x86_64" />
                   </or>
                 </condition>
                 <condition property="os.protoc" value="${protobuf.version}-win32">
-                  <os family="windows"/>
+                  <os family="windows" />
                 </condition>
-                
-                <fail message="No protoc binary for your OS: ${os.name} ${os.arch}." unless="os.protoc"/>
-                
+
+                <fail message="No protoc binary for your OS: ${os.name} ${os.arch}." unless="os.protoc" />
+
                 <mkdir dir="target/generated-sources/protobuf-server" />
                 <!-- Compile our .proto file -->
                 <exec executable="tools/protoc-${os.protoc}" failonerror="true">
@@ -128,7 +132,7 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <!-- This will compile the .proto file and produce JavaScriptOverlay classes usable by a GWT client -->
       <plugin>
         <groupId>com.dyuproject.protostuff</groupId>
