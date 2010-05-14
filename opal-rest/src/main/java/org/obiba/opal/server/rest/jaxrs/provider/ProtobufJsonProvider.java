@@ -36,7 +36,8 @@ import com.google.protobuf.Message;
  */
 @Component
 @Provider
-@Produces("application/json")
+// TODO: should also provide "application/x-protobuf" for native protobuf encoding
+@Produces("application/x-protobuf+json")
 public class ProtobufJsonProvider implements MessageBodyWriter<Object> {
 
   @Override
