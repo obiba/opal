@@ -34,7 +34,7 @@ public class OpalServer {
       System.out.println("Upgrade successful.");
     }
 
-    System.out.println("Starting Opal.\n");
+    System.out.println("Starting Opal.");
     ctx = new GenericApplicationContext();
     try {
       XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(ctx);
