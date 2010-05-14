@@ -31,5 +31,5 @@ if [ ! -x "$PRGDIR"/"$EXECUTABLE" ]; then
   exit 1
 fi
 
-exec "$PRGDIR"/"$EXECUTABLE" -c "$conf_file.upgrade"
+exec "$PRGDIR"/"$EXECUTABLE" -c "$conf_file" "wrapper.app.parameter.1=--upgrade"
  
