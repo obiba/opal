@@ -22,13 +22,13 @@ import org.obiba.opal.web.client.gwt.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.client.gwt.client.event.NavigatorSelectionChangeEventHandler;
 import org.obiba.opal.web.client.gwt.client.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.client.gwt.client.js.JsArrays;
+import org.obiba.opal.web.client.gwt.client.rest.ResourceCallback;
+import org.obiba.opal.web.client.gwt.client.rest.ResourceRequest;
 import org.obiba.opal.web.model.client.DatasourceDTO;
 import org.obiba.opal.web.model.client.VariableDTO;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -36,11 +36,6 @@ import com.google.gwt.gen2.table.event.client.HasRowSelectionHandlers;
 import com.google.gwt.gen2.table.event.client.RowSelectionEvent;
 import com.google.gwt.gen2.table.event.client.RowSelectionHandler;
 import com.google.gwt.gen2.table.event.client.TableEvent.Row;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.TreeItem;
 
 /**
@@ -122,61 +117,37 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
   }
 
   private void updateTable(String datasource, String table) {
-    RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, "http://localhost:8080/datasource/" + datasource + "/table/" + table + "/variables");
-    builder.setHeader("Accept", "application/json");
-    try {
-      builder.sendRequest(null, new RequestCallback() {
+    ResourceRequest<JsArray<VariableDTO>> rr = new ResourceRequest<JsArray<VariableDTO>>("/datasource/" + datasource + "/table/" + table + "/variables");
+    rr.get(new ResourceCallback<JsArray<VariableDTO>>() {
+      @Override
+      public void onResource(JsArray<VariableDTO> resource) {
+        variables = resource;
+        getDisplay().renderRows(JsArrays.toIterable(variables));
+      }
 
-        @Override
-        public void onError(Request request, Throwable exception) {
-          GWT.log(exception.getMessage());
-        }
-
-        @Override
-        public void onResponseReceived(Request request, Response response) {
-          variables = JsonUtils.unsafeEval(response.getText());
-          getDisplay().renderRows(JsArrays.toIterable(variables));
-        }
-
-      });
-    } catch(RequestException e) {
-      GWT.log(e.getMessage());
-    }
+    });
   }
 
   private void updateTree() {
-    RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, "http://localhost:8080/datasources");
-    builder.setHeader("Accept", "application/json");
-    try {
-      builder.sendRequest(null, new RequestCallback() {
-
-        @Override
-        public void onResponseReceived(Request request, Response response) {
-          JsArray<DatasourceDTO> datasources = JsonUtils.unsafeEval(response.getText());
-          ArrayList<TreeItem> items = new ArrayList<TreeItem>(datasources.length());
-          for(int i = 0; i < datasources.length(); i++) {
-            DatasourceDTO ds = datasources.get(i);
-            TreeItem dsItem = new TreeItem(ds.getName());
-            dsItem.setUserObject(ds);
-            JsArrayString array = ds.getTableArray();
-            for(int j = 0; j < array.length(); j++) {
-              array.get(j);
-              dsItem.addItem(array.get(j));
-            }
-            items.add(dsItem);
+    ResourceRequest<JsArray<DatasourceDTO>> rr = new ResourceRequest<JsArray<DatasourceDTO>>("/datasources");
+    rr.get(new ResourceCallback<JsArray<DatasourceDTO>>() {
+      @Override
+      public void onResource(JsArray<DatasourceDTO> datasources) {
+        ArrayList<TreeItem> items = new ArrayList<TreeItem>(datasources.length());
+        for(int i = 0; i < datasources.length(); i++) {
+          DatasourceDTO ds = datasources.get(i);
+          TreeItem dsItem = new TreeItem(ds.getName());
+          dsItem.setUserObject(ds);
+          JsArrayString array = ds.getTableArray();
+          for(int j = 0; j < array.length(); j++) {
+            array.get(j);
+            dsItem.addItem(array.get(j));
           }
-          getDisplay().setItems(items);
+          items.add(dsItem);
         }
-
-        @Override
-        public void onError(Request request, Throwable exception) {
-          GWT.log(exception.getMessage());
-
-        }
-      });
-    } catch(RequestException e) {
-      GWT.log(e.getMessage());
-    }
+        getDisplay().setItems(items);
+      }
+    });
   }
 
 }

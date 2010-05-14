@@ -20,18 +20,13 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.client.gwt.client.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.client.gwt.client.event.VariableSelectionChangeEventHandler;
+import org.obiba.opal.web.client.gwt.client.rest.ResourceCallback;
+import org.obiba.opal.web.client.gwt.client.rest.ResourceRequest;
 import org.obiba.opal.web.model.client.CategoryDTO;
 import org.obiba.opal.web.model.client.FrequencyDTO;
 import org.obiba.opal.web.model.client.VariableDTO;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.Response;
 import com.google.gwt.visualization.client.AbstractDataTable;
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
@@ -91,46 +86,32 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
   private void updateFrequencies(final VariableDTO variable) {
     getDisplay().clearChart();
+    ResourceRequest<JsArray<FrequencyDTO>> rr = new ResourceRequest<JsArray<FrequencyDTO>>(variable.getLink() + "/frequencies.json");
 
-    RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, variable.getLink() + "/frequencies.json");
-    builder.setHeader("Accept", "application/json");
-    try {
-      builder.sendRequest(null, new RequestCallback() {
+    rr.get(new ResourceCallback<JsArray<FrequencyDTO>>() {
 
-        @Override
-        public void onError(Request request, Throwable exception) {
-          GWT.log(exception.getMessage());
+      @Override
+      public void onResource(JsArray<FrequencyDTO> frequencies) {
+        Map<String, FrequencyDTO> freqs = new HashMap<String, FrequencyDTO>();
+        for(int i = 0; i < frequencies.length(); i++) {
+          FrequencyDTO freq = frequencies.get(i);
+          freqs.put(freq.getName(), freq);
         }
-
-        @Override
-        public void onResponseReceived(Request request, Response response) {
-          if(response.getStatusCode() == 200) {
-            JsArray<FrequencyDTO> frequencies = JsonUtils.unsafeEval(response.getText());
-            Map<String, FrequencyDTO> freqs = new HashMap<String, FrequencyDTO>();
-            for(int i = 0; i < frequencies.length(); i++) {
-              FrequencyDTO freq = frequencies.get(i);
-              freqs.put(freq.getName(), freq);
-            }
-            DataTable table = DataTable.create();
-            table.addColumn(ColumnType.STRING, "Category");
-            table.addColumn(ColumnType.NUMBER, "Frequency");
-            JsArray<CategoryDTO> categories = variable.getCategoriesArray();
-            for(int i = 0; i < categories.length(); i++) {
-              CategoryDTO c = categories.get(i);
-              int row = table.addRow();
-              table.setValue(row, 0, c.getName());
-              table.setValue(row, 1, freqs.get(c.getName()).getValue());
-            }
-            int row = table.addRow();
-            table.setValue(row, 0, "N/A");
-            table.setValue(row, 1, freqs.get("N/A").getValue());
-            getDisplay().renderData(table);
-          }
+        DataTable table = DataTable.create();
+        table.addColumn(ColumnType.STRING, "Category");
+        table.addColumn(ColumnType.NUMBER, "Frequency");
+        JsArray<CategoryDTO> categories = variable.getCategoriesArray();
+        for(int i = 0; i < categories.length(); i++) {
+          CategoryDTO c = categories.get(i);
+          int row = table.addRow();
+          table.setValue(row, 0, c.getName());
+          table.setValue(row, 1, freqs.get(c.getName()).getValue());
         }
-
-      });
-    } catch(RequestException e) {
-      GWT.log(e.getMessage());
-    }
+        int row = table.addRow();
+        table.setValue(row, 0, "N/A");
+        table.setValue(row, 1, freqs.get("N/A").getValue());
+        getDisplay().renderData(table);
+      }
+    });
   }
 }
