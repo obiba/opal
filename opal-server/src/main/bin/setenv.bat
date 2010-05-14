@@ -2,7 +2,7 @@
 rem quotes are required for correct handling of path with spaces
 
 rem default java home
-set wrapper_home=%~dp0/..
+set wrapper_home=%~dp0..\bootstrap\yajsw
 
 rem default java exe for running the wrapper
 rem note this is not the java exe for running the application. the exe for running the application is defined in the wrapper configuration file
