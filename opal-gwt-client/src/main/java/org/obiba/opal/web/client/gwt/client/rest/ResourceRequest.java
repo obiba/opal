@@ -28,7 +28,7 @@ import com.google.gwt.http.client.Response;
  */
 public class ResourceRequest<T extends JavaScriptObject> {
 
-  public static String OPAL_WS_ROOT = "http://localhost:8080/ws";
+  public static String OPAL_WS_ROOT = GWT.isScript() ? GWT.getModuleBaseURL() + "ws" : "http://localhost:8080/ws";
 
   private final String uri;
 
@@ -48,7 +48,7 @@ public class ResourceRequest<T extends JavaScriptObject> {
         case Response.SC_OK:
           // Nominal case
           try {
-            final T result = JsonUtils.unsafeEval(response.getText()).cast();
+            final T result = JsonUtils.unsafeEval(response.getText());
             callback.onResource(result);
           } catch(Exception e) {
             GWT.log("Error processing request ", e);
