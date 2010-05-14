@@ -10,7 +10,7 @@
 package org.obiba.opal.server.rest.jaxrs;
 
 import java.net.URI;
-import java.util.Set;
+import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -20,12 +20,10 @@ import javax.ws.rs.core.UriBuilder;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.web.model.DatasourceDTO;
+import org.obiba.opal.web.model.OpalModel;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 @Component
 @Path("/datasources")
@@ -33,21 +31,18 @@ public class DatasourcesResource {
 
   @GET
   @Produces( { "application/json" })
-  public Set<DatasourceDTO> getDatasources() {
-    Set<DatasourceDTO> names = ImmutableSet.copyOf(Iterables.transform(MagmaEngine.get().getDatasources(), new Function<Datasource, DatasourceDTO>() {
-      @Override
-      public DatasourceDTO apply(Datasource from) {
-        URI dslink = UriBuilder.fromResource(DatasourceResource.class).path(DatasourceResource.class, "get").build(from.getName());
-        DatasourceDTO ds = new DatasourceDTO();
-        ds.setName(from.getName());
-        ds.setLink(dslink.toString());
-        for(ValueTable table : from.getValueTables()) {
-          ds.addTable(table.getName());
-        }
-        return ds;
+  public List<OpalModel.DatasourceDTO> getDatasources() {
+    final List<OpalModel.DatasourceDTO> datasources = Lists.newArrayList();
+    for(Datasource from : MagmaEngine.get().getDatasources()) {
+      URI dslink = UriBuilder.fromResource(DatasourceResource.class).path(DatasourceResource.class, "get").build(from.getName());
+      OpalModel.DatasourceDTO.Builder ds = OpalModel.DatasourceDTO.newBuilder() //
+      .setName(from.getName()) //
+      .setLink(dslink.toString());
+      for(ValueTable table : from.getValueTables()) {
+        ds.addTable(table.getName());
       }
-    }));
-
-    return names;
+      datasources.add(ds.build());
+    }
+    return datasources;
   }
 }

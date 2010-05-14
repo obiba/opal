@@ -14,6 +14,8 @@
     <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
     <maven.compiler.source>1.6</maven.compiler.source>
     <maven.compiler.target>1.6</maven.compiler.target>
+    <gwt.version>2.0.3</gwt.version>
+    <protobuf.version>2.3.0</protobuf.version>
     <protostuff.version>1.0-SNAPSHOT</protostuff.version>
   </properties>
 
@@ -21,13 +23,18 @@
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-user</artifactId>
-      <version>2.0.3</version>
+      <version>${gwt.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
-      <version>2.2.0</version>
+      <version>${protobuf.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java-format</artifactId>
+      <version>1.1</version>
     </dependency>
     <dependency>
       <groupId>com.dyuproject.protostuff</groupId>
@@ -43,7 +50,6 @@
   </dependencies>
 
   <build>
-
     <resources>
       <resource>
         <directory>src/main/resources</directory>
@@ -79,6 +85,7 @@
             </goals>
             <configuration>
               <sources>
+                <!-- This will add these directories to the build path -->
                 <source>target/generated-sources/protobuf-server</source>
                 <source>target/generated-sources/protobuf-gwt</source>
               </sources>
@@ -94,8 +101,22 @@
             <phase>generate-sources</phase>
             <configuration>
               <tasks>
+                <!-- Determine which protoc binary we can use -->
+                <condition property="os.protoc" value="${protobuf.version}-linux-x86_64">
+                  <or>
+                    <os name="linux" arch="amd64"/>
+                    <os name="linux" arch="x86_64"/>
+                  </or>
+                </condition>
+                <condition property="os.protoc" value="${protobuf.version}-win32">
+                  <os family="windows"/>
+                </condition>
+                
+                <fail message="No protoc binary for your OS: ${os.name} ${os.arch}." unless="os.protoc"/>
+                
                 <mkdir dir="target/generated-sources/protobuf-server" />
-                <exec executable="protoc">
+                <!-- Compile our .proto file -->
+                <exec executable="tools/protoc-${os.protoc}" failonerror="true">
                   <arg value="--java_out=target/generated-sources/protobuf-server" />
                   <arg value="src/main/protobuf/OpalModel.proto" />
                 </exec>
@@ -107,6 +128,8 @@
           </execution>
         </executions>
       </plugin>
+      
+      <!-- This will compile the .proto file and produce JavaScriptOverlay classes usable by a GWT client -->
       <plugin>
         <groupId>com.dyuproject.protostuff</groupId>
         <artifactId>protostuff-maven-plugin</artifactId>
@@ -115,23 +138,11 @@
           <protoModules>
             <protoModule>
               <source>src/main/protobuf/OpalModel.proto</source>
-              <output>java_bean</output>
-              <outputDir>target/generated-sources/protobuf-server</outputDir>
-              <options>
-                <property>
-                  <name>generate_helper_methods</name>
-                </property>
-              </options>
-            </protoModule>
-            <protoModule>
-              <source>src/main/protobuf/OpalModel.proto</source>
               <output>gwt_overlay</output>
               <outputDir>target/generated-sources/protobuf-gwt</outputDir>
               <options>
                 <property>
-                  <name>numeric</name>
-                </property>
-                <property>
+                  <!-- Override the package name -->
                   <name>org.obiba.opal.web.model</name>
                   <value>org.obiba.opal.web.model.client</value>
                 </property>

@@ -27,7 +27,7 @@ import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
-import org.obiba.opal.web.model.FrequencyDTO;
+import org.obiba.opal.web.model.OpalModel.FrequencyDTO;
 
 import com.google.common.collect.Maps;
 
@@ -69,9 +69,9 @@ public class VariableResource {
   public Collection<FrequencyDTO> getDataTable() {
     Map<String, FrequencyDTO> frequencies = Maps.newLinkedHashMap();
     for(Category c : vvs.getVariable().getCategories()) {
-      frequencies.put(c.getName(), new FrequencyDTO(c.getName(), 0));
+      frequencies.put(c.getName(), FrequencyDTO.newBuilder().setName(c.getName()).setValue(0).build());
     }
-    frequencies.put("N/A", new FrequencyDTO("N/A", 0));
+    frequencies.put("N/A", FrequencyDTO.newBuilder().setName("N/A").setValue(0).build());
     for(ValueSet vs : valueTable.getValueSets()) {
       Value value = vvs.getValue(vs);
       if(value.isNull()) {
@@ -86,10 +86,11 @@ public class VariableResource {
   private void count(String key, Map<String, FrequencyDTO> frequencies) {
     FrequencyDTO value = frequencies.get(key);
     if(value == null) {
-      frequencies.put(key, new FrequencyDTO(key, 1));
+      value = FrequencyDTO.newBuilder().setName(key).setValue(1).build();
     } else {
-      value.setValue(value.getValue() + 1);
+      // Need to derive a new FrequencyDTO because they are immutable
+      value = value.toBuilder().setValue(value.getValue() + 1).build();
     }
-
+    frequencies.put(key, value);
   }
 }

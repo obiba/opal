@@ -20,7 +20,7 @@ import org.apache.shiro.SecurityUtils;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.web.model.DatasourceDTO;
+import org.obiba.opal.web.model.OpalModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -41,18 +41,17 @@ public class DatasourceResource {
   @GET
   @Path("/{name}")
   @Produces("application/json")
-  public DatasourceDTO get(@PathParam("name") String name) {
+  public OpalModel.DatasourceDTO get(@PathParam("name") String name) {
     Datasource ds = MagmaEngine.get().getDatasource(name);
-    DatasourceDTO datasource = new DatasourceDTO(ds.getName());
+    OpalModel.DatasourceDTO.Builder datasource = OpalModel.DatasourceDTO.newBuilder().setName(ds.getName());
     for(ValueTable table : ds.getValueTables()) {
       datasource.addTable(table.getName());
     }
-    return datasource;
+    return datasource.build();
   }
 
   @GET
   @Path("/{name}/tables")
-  @Produces("application/xml")
   public Set<String> getTables(@PathParam("name") String name) {
     Iterable<ValueTable> filteredTables = Iterables.filter(MagmaEngine.get().getDatasource(name).getValueTables(), new Predicate<ValueTable>() {
 
@@ -74,11 +73,6 @@ public class DatasourceResource {
 
   @Path("/{name}/table/{table}")
   public TableResource getTable(@PathParam("name") String name, @PathParam("table") String table) {
-    /*
-     * String tableFqn = name + "." + table; try { SecurityUtils.getSubject().checkPermission("tables:" + tableFqn +
-     * ":read"); } catch(AuthorizationException e) { log.warn("Unauthorized access to table {}", tableFqn); throw new
-     * NoSuchValueTableException("unauthorized: " + tableFqn); }
-     */
     return getTableResource(MagmaEngine.get().getDatasource(name).getValueTable(table));
   }
 

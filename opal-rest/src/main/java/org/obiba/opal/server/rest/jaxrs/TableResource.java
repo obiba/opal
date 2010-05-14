@@ -38,9 +38,9 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.xstream.XStreamValueSet;
-import org.obiba.opal.web.model.AttributeDTO;
-import org.obiba.opal.web.model.CategoryDTO;
-import org.obiba.opal.web.model.VariableDTO;
+import org.obiba.opal.web.model.OpalModel.AttributeDTO;
+import org.obiba.opal.web.model.OpalModel.CategoryDTO;
+import org.obiba.opal.web.model.OpalModel.VariableDTO;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 
@@ -81,20 +81,20 @@ public class TableResource {
 
       @Override
       public VariableDTO apply(Variable from) {
-        VariableDTO var = new VariableDTO(from.getName(), from.getValueType().getName());
+        VariableDTO.Builder var = VariableDTO.newBuilder().setName(from.getName()).setValueType(from.getValueType().getName());
         for(Attribute attribute : from.getAttributes()) {
-          AttributeDTO a = new AttributeDTO(attribute.getName(), attribute.getValue().toString());
+          AttributeDTO.Builder a = AttributeDTO.newBuilder().setName(attribute.getName()).setValue(attribute.getValue().toString());
           if(attribute.isLocalised()) {
             a.setLocale(attribute.getLocale().toString());
           }
           var.addAttributes(a);
         }
         for(Category category : from.getCategories()) {
-          CategoryDTO c = new CategoryDTO(category.getName(), category.isMissing());
+          CategoryDTO.Builder c = CategoryDTO.newBuilder().setName(category.getName()).setIsMissing(category.isMissing());
           var.addCategories(c);
         }
         var.setLink(ub.build(from.getName()).toString());
-        return var;
+        return var.build();
       }
     }));
   }
