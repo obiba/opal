@@ -65,7 +65,6 @@ public class VariableResource {
 
   @GET
   @Path("/frequencies.json")
-  @Produces("application/json")
   public Collection<FrequencyDto> getDataTable() {
     Map<String, FrequencyDto> frequencies = Maps.newLinkedHashMap();
     for(Category c : vvs.getVariable().getCategories()) {

@@ -25,6 +25,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ResteasyServletConfiguration {
 
+  private static final String WS_ROOT = "/ws";
+
   @Autowired
   private ServletContextHandler servletContextHandler;
 
@@ -37,7 +39,10 @@ public class ResteasyServletConfiguration {
     servletContext.setAttribute(ResteasyProviderFactory.class.getName(), resteasyDeployment.getProviderFactory());
     servletContext.setAttribute(Dispatcher.class.getName(), resteasyDeployment.getDispatcher());
     servletContext.setAttribute(Registry.class.getName(), resteasyDeployment.getRegistry());
-    servletContextHandler.addServlet(new ServletHolder(new HttpServletDispatcher()), "/ws/*");
+
+    ServletHolder sh = new ServletHolder(new HttpServletDispatcher());
+    sh.setInitParameter("resteasy.servlet.mapping.prefix", WS_ROOT);
+    servletContextHandler.addServlet(sh, WS_ROOT + "/*");
   }
 
 }

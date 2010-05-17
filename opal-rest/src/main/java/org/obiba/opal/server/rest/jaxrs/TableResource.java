@@ -46,7 +46,6 @@ import org.springframework.context.annotation.Scope;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -60,14 +59,7 @@ public class TableResource {
   }
 
   @GET
-  @Produces( { "application/xml", "application/json" })
-  public Map<String, String> details() {
-    return ImmutableMap.of("name", valueTable.getName(), "entityType", valueTable.getEntityType());
-  }
-
-  @GET
   @Path("/variables")
-  @Produces("application/json")
   public Iterable<VariableDto> getVariables(@Context final UriInfo uriInfo) {
     ArrayList<PathSegment> segments = Lists.newArrayList(uriInfo.getPathSegments());
     segments.remove(segments.size() - 1);
@@ -101,7 +93,7 @@ public class TableResource {
 
   @GET
   @Path("/entities")
-  @Produces( { "application/xml", "application/json" })
+  @Produces("application/xml")
   public Set<String> getEntities() {
     return ImmutableSet.copyOf(Iterables.transform(valueTable.getValueSets(), new Function<ValueSet, String>() {
       @Override
