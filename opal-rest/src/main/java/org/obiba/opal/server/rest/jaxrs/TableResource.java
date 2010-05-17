@@ -38,9 +38,9 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.xstream.XStreamValueSet;
-import org.obiba.opal.web.model.OpalModel.AttributeDTO;
-import org.obiba.opal.web.model.OpalModel.CategoryDTO;
-import org.obiba.opal.web.model.OpalModel.VariableDTO;
+import org.obiba.opal.web.model.Magma.AttributeDto;
+import org.obiba.opal.web.model.Magma.CategoryDto;
+import org.obiba.opal.web.model.Magma.VariableDto;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 
@@ -68,7 +68,7 @@ public class TableResource {
   @GET
   @Path("/variables")
   @Produces("application/json")
-  public Iterable<VariableDTO> getVariables(@Context final UriInfo uriInfo) {
+  public Iterable<VariableDto> getVariables(@Context final UriInfo uriInfo) {
     ArrayList<PathSegment> segments = Lists.newArrayList(uriInfo.getPathSegments());
     segments.remove(segments.size() - 1);
     final UriBuilder ub = uriInfo.getBaseUriBuilder();
@@ -77,20 +77,20 @@ public class TableResource {
     }
     ub.path(TableResource.class, "getVariable");
 
-    return ImmutableSet.copyOf(Iterables.transform(valueTable.getVariables(), new Function<Variable, VariableDTO>() {
+    return ImmutableSet.copyOf(Iterables.transform(valueTable.getVariables(), new Function<Variable, VariableDto>() {
 
       @Override
-      public VariableDTO apply(Variable from) {
-        VariableDTO.Builder var = VariableDTO.newBuilder().setName(from.getName()).setValueType(from.getValueType().getName());
+      public VariableDto apply(Variable from) {
+        VariableDto.Builder var = VariableDto.newBuilder().setName(from.getName()).setValueType(from.getValueType().getName());
         for(Attribute attribute : from.getAttributes()) {
-          AttributeDTO.Builder a = AttributeDTO.newBuilder().setName(attribute.getName()).setValue(attribute.getValue().toString());
+          AttributeDto.Builder a = AttributeDto.newBuilder().setName(attribute.getName()).setValue(attribute.getValue().toString());
           if(attribute.isLocalised()) {
             a.setLocale(attribute.getLocale().toString());
           }
           var.addAttributes(a);
         }
         for(Category category : from.getCategories()) {
-          CategoryDTO.Builder c = CategoryDTO.newBuilder().setName(category.getName()).setIsMissing(category.isMissing());
+          CategoryDto.Builder c = CategoryDto.newBuilder().setName(category.getName()).setIsMissing(category.isMissing());
           var.addCategories(c);
         }
         var.setLink(ub.build(from.getName()).toString());

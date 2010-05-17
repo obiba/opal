@@ -12,8 +12,8 @@ package org.obiba.opal.web.client.gwt.client.view;
 import java.util.List;
 
 import org.obiba.opal.web.client.gwt.client.presenter.NavigatorPresenter.Display;
-import org.obiba.opal.web.model.client.AttributeDTO;
-import org.obiba.opal.web.model.client.VariableDTO;
+import org.obiba.opal.web.model.client.AttributeDto;
+import org.obiba.opal.web.model.client.VariableDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -53,22 +53,22 @@ public class NavigatorView extends Composite implements Display {
   @UiField
   Panel east;
 
-  SelectionGridBulkRenderer<VariableDTO> bulkRenderer;
+  SelectionGridBulkRenderer<VariableDto> bulkRenderer;
 
   public NavigatorView() {
     initWidget(uiBinder.createAndBindUi(this));
     tree.setAnimationEnabled(true);
 
-    DefaultTableDefinition<VariableDTO> tableDefinition = new DefaultTableDefinition<VariableDTO>();
-    AbstractColumnDefinition<VariableDTO, String> cd = new AbstractColumnDefinition<VariableDTO, String>() {
+    DefaultTableDefinition<VariableDto> tableDefinition = new DefaultTableDefinition<VariableDto>();
+    AbstractColumnDefinition<VariableDto, String> cd = new AbstractColumnDefinition<VariableDto, String>() {
 
       @Override
-      public String getCellValue(VariableDTO rowValue) {
+      public String getCellValue(VariableDto rowValue) {
         return rowValue.getName();
       }
 
       @Override
-      public void setCellValue(VariableDTO rowValue, String cellValue) {
+      public void setCellValue(VariableDto rowValue, String cellValue) {
 
       }
 
@@ -78,27 +78,27 @@ public class NavigatorView extends Composite implements Display {
     cd.setHeaderCount(1);
     tableDefinition.addColumnDefinition(cd);
 
-    tableDefinition.addColumnDefinition(new AbstractColumnDefinition<VariableDTO, String>() {
+    tableDefinition.addColumnDefinition(new AbstractColumnDefinition<VariableDto, String>() {
 
       @Override
-      public String getCellValue(VariableDTO rowValue) {
+      public String getCellValue(VariableDto rowValue) {
         return rowValue.getValueType();
       }
 
       @Override
-      public void setCellValue(VariableDTO rowValue, String cellValue) {
+      public void setCellValue(VariableDto rowValue, String cellValue) {
 
       }
 
     });
 
-    tableDefinition.addColumnDefinition(new AbstractColumnDefinition<VariableDTO, String>() {
+    tableDefinition.addColumnDefinition(new AbstractColumnDefinition<VariableDto, String>() {
 
       @Override
-      public String getCellValue(VariableDTO rowValue) {
-        JsArray<AttributeDTO> attributes = rowValue.getAttributesArray();
+      public String getCellValue(VariableDto rowValue) {
+        JsArray<AttributeDto> attributes = rowValue.getAttributesArray();
         for(int i = 0; i < attributes.length(); i++) {
-          AttributeDTO attribute = attributes.get(i);
+          AttributeDto attribute = attributes.get(i);
           if(attribute.getName().equals("label")) {
             return attribute.getValue();
           }
@@ -107,14 +107,14 @@ public class NavigatorView extends Composite implements Display {
       }
 
       @Override
-      public void setCellValue(VariableDTO rowValue, String cellValue) {
+      public void setCellValue(VariableDto rowValue, String cellValue) {
 
       }
 
     });
 
     table.setSelectionEnabled(true);
-    bulkRenderer = new SelectionGridBulkRenderer<VariableDTO>(table, tableDefinition);
+    bulkRenderer = new SelectionGridBulkRenderer<VariableDto>(table, tableDefinition);
   }
 
   public Panel getDetailsPanel() {
@@ -135,7 +135,7 @@ public class NavigatorView extends Composite implements Display {
   }
 
   @Override
-  public void renderRows(Iterable<VariableDTO> rows) {
+  public void renderRows(Iterable<VariableDto> rows) {
     bulkRenderer.renderRows(rows);
   }
 

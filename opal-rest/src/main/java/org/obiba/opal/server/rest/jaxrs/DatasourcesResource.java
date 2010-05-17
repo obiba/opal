@@ -20,7 +20,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.web.model.OpalModel;
+import org.obiba.opal.web.model.Magma;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
@@ -31,11 +31,11 @@ public class DatasourcesResource {
 
   @GET
   @Produces( { "application/json" })
-  public List<OpalModel.DatasourceDTO> getDatasources() {
-    final List<OpalModel.DatasourceDTO> datasources = Lists.newArrayList();
+  public List<Magma.DatasourceDto> getDatasources() {
+    final List<Magma.DatasourceDto> datasources = Lists.newArrayList();
     for(Datasource from : MagmaEngine.get().getDatasources()) {
       URI dslink = UriBuilder.fromResource(DatasourceResource.class).path(DatasourceResource.class, "get").build(from.getName());
-      OpalModel.DatasourceDTO.Builder ds = OpalModel.DatasourceDTO.newBuilder() //
+      Magma.DatasourceDto.Builder ds = Magma.DatasourceDto.newBuilder() //
       .setName(from.getName()) //
       .setLink(dslink.toString());
       for(ValueTable table : from.getValueTables()) {

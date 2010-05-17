@@ -48,7 +48,8 @@ public class ResourceRequest<T extends JavaScriptObject> {
         case Response.SC_OK:
           // Nominal case
           try {
-            final T result = JsonUtils.unsafeEval(response.getText());
+            // A compiler bug makes this static cast required.
+            final T result = (T) JsonUtils.unsafeEval(response.getText());
             callback.onResource(result);
           } catch(Exception e) {
             GWT.log("Error processing request ", e);

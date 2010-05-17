@@ -27,7 +27,7 @@ import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
-import org.obiba.opal.web.model.OpalModel.FrequencyDTO;
+import org.obiba.opal.web.model.Magma.FrequencyDto;
 
 import com.google.common.collect.Maps;
 
@@ -66,12 +66,12 @@ public class VariableResource {
   @GET
   @Path("/frequencies.json")
   @Produces("application/json")
-  public Collection<FrequencyDTO> getDataTable() {
-    Map<String, FrequencyDTO> frequencies = Maps.newLinkedHashMap();
+  public Collection<FrequencyDto> getDataTable() {
+    Map<String, FrequencyDto> frequencies = Maps.newLinkedHashMap();
     for(Category c : vvs.getVariable().getCategories()) {
-      frequencies.put(c.getName(), FrequencyDTO.newBuilder().setName(c.getName()).setValue(0).build());
+      frequencies.put(c.getName(), FrequencyDto.newBuilder().setName(c.getName()).setValue(0).build());
     }
-    frequencies.put("N/A", FrequencyDTO.newBuilder().setName("N/A").setValue(0).build());
+    frequencies.put("N/A", FrequencyDto.newBuilder().setName("N/A").setValue(0).build());
     for(ValueSet vs : valueTable.getValueSets()) {
       Value value = vvs.getValue(vs);
       if(value.isNull()) {
@@ -83,10 +83,10 @@ public class VariableResource {
     return frequencies.values();
   }
 
-  private void count(String key, Map<String, FrequencyDTO> frequencies) {
-    FrequencyDTO value = frequencies.get(key);
+  private void count(String key, Map<String, FrequencyDto> frequencies) {
+    FrequencyDto value = frequencies.get(key);
     if(value == null) {
-      value = FrequencyDTO.newBuilder().setName(key).setValue(1).build();
+      value = FrequencyDto.newBuilder().setName(key).setValue(1).build();
     } else {
       // Need to derive a new FrequencyDTO because they are immutable
       value = value.toBuilder().setValue(value.getValue() + 1).build();

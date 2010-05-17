@@ -9,28 +9,19 @@
  ******************************************************************************/
 package org.obiba.opal.server.rest.jaxrs;
 
-import java.util.Set;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 
-import org.apache.shiro.SecurityUtils;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.web.model.OpalModel;
+import org.obiba.opal.web.model.Magma;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 
 @Component
 @Path("/datasource")
@@ -40,35 +31,13 @@ public class DatasourceResource {
 
   @GET
   @Path("/{name}")
-  @Produces("application/json")
-  public OpalModel.DatasourceDTO get(@PathParam("name") String name) {
+  public Magma.DatasourceDto get(@PathParam("name") String name) {
     Datasource ds = MagmaEngine.get().getDatasource(name);
-    OpalModel.DatasourceDTO.Builder datasource = OpalModel.DatasourceDTO.newBuilder().setName(ds.getName());
+    Magma.DatasourceDto.Builder datasource = Magma.DatasourceDto.newBuilder().setName(ds.getName());
     for(ValueTable table : ds.getValueTables()) {
       datasource.addTable(table.getName());
     }
     return datasource.build();
-  }
-
-  @GET
-  @Path("/{name}/tables")
-  public Set<String> getTables(@PathParam("name") String name) {
-    Iterable<ValueTable> filteredTables = Iterables.filter(MagmaEngine.get().getDatasource(name).getValueTables(), new Predicate<ValueTable>() {
-
-      @Override
-      public boolean apply(ValueTable input) {
-        String tableFqn = input.getDatasource().getName() + '.' + input.getName();
-        return SecurityUtils.getSubject().isPermitted("tables:" + tableFqn + ":read");
-      }
-
-    });
-    Set<String> names = ImmutableSet.copyOf(Iterables.transform(filteredTables, new Function<ValueTable, String>() {
-      @Override
-      public String apply(ValueTable from) {
-        return from.getName();
-      }
-    }));
-    return names;
   }
 
   @Path("/{name}/table/{table}")

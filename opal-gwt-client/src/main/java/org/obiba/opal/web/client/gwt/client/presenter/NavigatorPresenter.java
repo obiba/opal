@@ -24,8 +24,8 @@ import org.obiba.opal.web.client.gwt.client.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.client.gwt.client.js.JsArrays;
 import org.obiba.opal.web.client.gwt.client.rest.ResourceCallback;
 import org.obiba.opal.web.client.gwt.client.rest.ResourceRequest;
-import org.obiba.opal.web.model.client.DatasourceDTO;
-import org.obiba.opal.web.model.client.VariableDTO;
+import org.obiba.opal.web.model.client.DatasourceDto;
+import org.obiba.opal.web.model.client.VariableDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -51,10 +51,10 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
 
     HasRowSelectionHandlers getTable();
 
-    void renderRows(Iterable<VariableDTO> rows);
+    void renderRows(Iterable<VariableDto> rows);
   }
 
-  private JsArray<VariableDTO> variables;
+  private JsArray<VariableDto> variables;
 
   /**
    * @param display
@@ -82,7 +82,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
       @Override
       public void onRowSelection(RowSelectionEvent event) {
         Row row = event.getSelectedRows().iterator().next();
-        VariableDTO variable = variables.get(row.getRowIndex());
+        VariableDto variable = variables.get(row.getRowIndex());
         eventBus.fireEvent(new VariableSelectionChangeEvent(variable));
       }
     });
@@ -117,10 +117,10 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
   }
 
   private void updateTable(String datasource, String table) {
-    ResourceRequest<JsArray<VariableDTO>> rr = new ResourceRequest<JsArray<VariableDTO>>("/datasource/" + datasource + "/table/" + table + "/variables");
-    rr.get(new ResourceCallback<JsArray<VariableDTO>>() {
+    ResourceRequest<JsArray<VariableDto>> rr = new ResourceRequest<JsArray<VariableDto>>("/datasource/" + datasource + "/table/" + table + "/variables");
+    rr.get(new ResourceCallback<JsArray<VariableDto>>() {
       @Override
-      public void onResource(JsArray<VariableDTO> resource) {
+      public void onResource(JsArray<VariableDto> resource) {
         variables = resource;
         getDisplay().renderRows(JsArrays.toIterable(variables));
       }
@@ -129,13 +129,13 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
   }
 
   private void updateTree() {
-    ResourceRequest<JsArray<DatasourceDTO>> rr = new ResourceRequest<JsArray<DatasourceDTO>>("/datasources");
-    rr.get(new ResourceCallback<JsArray<DatasourceDTO>>() {
+    ResourceRequest<JsArray<DatasourceDto>> rr = new ResourceRequest<JsArray<DatasourceDto>>("/datasources");
+    rr.get(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
-      public void onResource(JsArray<DatasourceDTO> datasources) {
+      public void onResource(JsArray<DatasourceDto> datasources) {
         ArrayList<TreeItem> items = new ArrayList<TreeItem>(datasources.length());
         for(int i = 0; i < datasources.length(); i++) {
-          DatasourceDTO ds = datasources.get(i);
+          DatasourceDto ds = datasources.get(i);
           TreeItem dsItem = new TreeItem(ds.getName());
           dsItem.setUserObject(ds);
           JsArrayString array = ds.getTableArray();

@@ -22,9 +22,9 @@ import org.obiba.opal.web.client.gwt.client.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.client.gwt.client.event.VariableSelectionChangeEventHandler;
 import org.obiba.opal.web.client.gwt.client.rest.ResourceCallback;
 import org.obiba.opal.web.client.gwt.client.rest.ResourceRequest;
-import org.obiba.opal.web.model.client.CategoryDTO;
-import org.obiba.opal.web.model.client.FrequencyDTO;
-import org.obiba.opal.web.model.client.VariableDTO;
+import org.obiba.opal.web.model.client.CategoryDto;
+import org.obiba.opal.web.model.client.FrequencyDto;
+import org.obiba.opal.web.model.client.VariableDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.visualization.client.AbstractDataTable;
@@ -62,7 +62,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     eventBus.addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionChangeEventHandler() {
       @Override
       public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-        VariableDTO variable = event.getSelection();
+        VariableDto variable = event.getSelection();
         updateFrequencies(variable);
       }
     });
@@ -84,25 +84,25 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   public void revealDisplay() {
   }
 
-  private void updateFrequencies(final VariableDTO variable) {
+  private void updateFrequencies(final VariableDto variable) {
     getDisplay().clearChart();
-    ResourceRequest<JsArray<FrequencyDTO>> rr = new ResourceRequest<JsArray<FrequencyDTO>>(variable.getLink() + "/frequencies.json");
+    ResourceRequest<JsArray<FrequencyDto>> rr = new ResourceRequest<JsArray<FrequencyDto>>(variable.getLink() + "/frequencies.json");
 
-    rr.get(new ResourceCallback<JsArray<FrequencyDTO>>() {
+    rr.get(new ResourceCallback<JsArray<FrequencyDto>>() {
 
       @Override
-      public void onResource(JsArray<FrequencyDTO> frequencies) {
-        Map<String, FrequencyDTO> freqs = new HashMap<String, FrequencyDTO>();
+      public void onResource(JsArray<FrequencyDto> frequencies) {
+        Map<String, FrequencyDto> freqs = new HashMap<String, FrequencyDto>();
         for(int i = 0; i < frequencies.length(); i++) {
-          FrequencyDTO freq = frequencies.get(i);
+          FrequencyDto freq = frequencies.get(i);
           freqs.put(freq.getName(), freq);
         }
         DataTable table = DataTable.create();
         table.addColumn(ColumnType.STRING, "Category");
         table.addColumn(ColumnType.NUMBER, "Frequency");
-        JsArray<CategoryDTO> categories = variable.getCategoriesArray();
+        JsArray<CategoryDto> categories = variable.getCategoriesArray();
         for(int i = 0; i < categories.length(); i++) {
-          CategoryDTO c = categories.get(i);
+          CategoryDto c = categories.get(i);
           int row = table.addRow();
           table.setValue(row, 0, c.getName());
           table.setValue(row, 1, freqs.get(c.getName()).getValue());

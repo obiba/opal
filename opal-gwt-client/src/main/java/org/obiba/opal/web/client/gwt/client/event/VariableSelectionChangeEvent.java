@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.client.gwt.client.event;
 
-import org.obiba.opal.web.model.client.VariableDTO;
+import org.obiba.opal.web.model.client.VariableDto;
 
 import com.google.gwt.event.shared.GwtEvent;
 
@@ -20,16 +20,16 @@ public class VariableSelectionChangeEvent extends GwtEvent<VariableSelectionChan
 
   private static Type<VariableSelectionChangeEventHandler> TYPE;
 
-  private final VariableDTO selection;
+  private final VariableDto selection;
 
   /**
    * @param selectedItem
    */
-  public VariableSelectionChangeEvent(VariableDTO selectedItem) {
+  public VariableSelectionChangeEvent(VariableDto selectedItem) {
     this.selection = selectedItem;
   }
 
-  public VariableDTO getSelection() {
+  public VariableDto getSelection() {
     return selection;
   }
 
