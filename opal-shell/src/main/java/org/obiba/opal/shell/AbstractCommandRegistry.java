@@ -19,8 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 
-import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException;
-import uk.co.flamingpenguin.jewel.cli.CliFactory;
 import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
 
 import com.google.common.collect.ImmutableSet;
@@ -78,31 +76,32 @@ public abstract class AbstractCommandRegistry implements CommandRegistry {
   }
 
   public CommandUsage getCommandUsage(String commandName) {
+    if(commandName == null) throw new IllegalArgumentException("commandName cannot be null");
     return commandMap.get(commandName).getAnnotation(CommandUsage.class);
   }
 
-  public Command<?> newCommand(String commandName, String[] arguments) throws ArgumentValidationException {
-    Command<Object> command = null;
-    Class<?> commandClass = commandMap.get(commandName);
+  @Override
+  public Class<?> getOptionsClass(String commandName) {
+    if(commandName == null) throw new IllegalArgumentException("commandName cannot be null");
+    if(hasCommand(commandName) == false) throw new IllegalArgumentException("no such command " + commandName);
+    return optionsMap.get(commandName);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T> Command<T> newCommand(String commandName) {
+    Class<T> commandClass = (Class<T>) commandMap.get(commandName);
     if(commandClass == null) {
       throw new IllegalArgumentException("Command not found (" + commandName + ")");
     }
 
     try {
       // Create the command object.
-      command = (Command<Object>) commandClass.newInstance();
+      Command<T> command = (Command<T>) commandClass.newInstance();
       ctx.getAutowireCapableBeanFactory().autowireBeanProperties(command, AutowireCapableBeanFactory.AUTOWIRE_NO, false);
-
-      // Create the options object.
-      Class<?> optionsClass = optionsMap.get(commandName);
-      // Set the command's options.
-      command.setOptions(CliFactory.parseArguments(optionsClass, arguments));
-    } catch(ArgumentValidationException e) {
-      throw e;
+      return command;
     } catch(Exception e) {
       throw new IllegalArgumentException(e);
     }
-
-    return command;
   }
 }
