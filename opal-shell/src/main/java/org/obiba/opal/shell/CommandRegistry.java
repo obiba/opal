@@ -5,8 +5,6 @@ import java.util.Set;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.CommandUsage;
 
-import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException;
-
 /**
  * A registry of commands made available to a {@code OpalShell}. Consider extending {@code AbstractCommandRegistry}
  * instead of implementing this interface directly.
@@ -31,7 +29,14 @@ public interface CommandRegistry {
    * 
    * @param commandName The command name.
    */
-  CommandUsage getCommandUsage(String name);
+  CommandUsage getCommandUsage(String commandName);
+
+  /**
+   * 
+   * @param commandName the name of the command
+   * @return the Class annotated with {@code CommandLineInterface} that defines the command's options
+   */
+  Class<?> getOptionsClass(String commandName);
 
   /**
    * Returns a new instance of the specified command using the specified arguments.
@@ -39,8 +44,7 @@ public interface CommandRegistry {
    * @param name
    * @param arguments
    * @return
-   * @throws ArgumentValidationException
    */
-  Command<?> newCommand(String name, String[] arguments) throws ArgumentValidationException;
+  <T> Command<T> newCommand(String name);
 
 }

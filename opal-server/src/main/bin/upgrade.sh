@@ -1,8 +1,9 @@
 #!/bin/bash
 # -----------------------------------------------------------------------------
-# run test.HelloWorld
+# run YAJSW as console
 #
 # -----------------------------------------------------------------------------
+
 # resolve links - $0 may be a softlink
 PRG="$0"
 
@@ -17,9 +18,18 @@ while [ -h "$PRG" ] ; do
 done
  
 PRGDIR=`dirname "$PRG"`
+EXECUTABLE=wrapper.sh
 
 # set java and conf file
 source "$PRGDIR"/setenv.sh
+export PRGDIR
 
-"$java_exe" "$yajsw_java_options" -cp "$yajsw_jar" test.HelloWorld 
+# Check that target executable exists
+if [ ! -x "$PRGDIR"/"$EXECUTABLE" ]; then
+  echo "Cannot find $PRGDIR/$EXECUTABLE"
+  echo "This file is needed to run this program"
+  exit 1
+fi
 
+exec "$PRGDIR"/"$EXECUTABLE" -c "$conf_file" "wrapper.app.parameter.1=--upgrade"
+ 

@@ -34,10 +34,10 @@
     </fileSet>
 	
     <fileSet>
-      <directory>src/main/yajsw</directory>
-      <outputDirectory>yajsw</outputDirectory>
+      <directory>src/main/bootstrap</directory>
+      <outputDirectory>bootstrap</outputDirectory>
 	  <excludes>
-	    <exclude>bat/*.*</exclude>
+	    <exclude>yajsw/bat/*.*</exclude>
 	  </excludes>
       <includes>
         <include>**/*.*</include>
@@ -45,8 +45,8 @@
     </fileSet>
 	
 	<fileSet>
-      <directory>src/main/yajsw/bat</directory>
-      <outputDirectory>yajsw/bat</outputDirectory>
+      <directory>src/main/bootstrap/yajsw/bat</directory>
+      <outputDirectory>bootstrap/yajsw/bat</outputDirectory>
 	  <fileMode>0755</fileMode>
       <includes>
         <include>**/*.*</include>

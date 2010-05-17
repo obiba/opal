@@ -10,6 +10,7 @@ import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.CommandUsage;
 
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException;
+import uk.co.flamingpenguin.jewel.cli.CliFactory;
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException.ValidationError;
 
 import com.google.common.collect.Sets;
@@ -92,7 +93,11 @@ public abstract class AbstractOpalShell implements OpalShell {
   private void executeCommand(String commandName, String[] args) {
     args = Arrays.copyOfRange(args, 1, args.length);
     try {
-      Command<?> command = commandRegistry.newCommand(commandName, args);
+      // Create the options object.
+      Class<?> optionsClass = commandRegistry.getOptionsClass(commandName);
+      Object options = CliFactory.parseArguments(optionsClass, args);
+      Command<Object> command = commandRegistry.newCommand(commandName);
+      command.setOptions(options);
       command.setShell(this);
       command.execute();
     } catch(ArgumentValidationException e) {
