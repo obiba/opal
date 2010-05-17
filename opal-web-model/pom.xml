@@ -7,7 +7,7 @@
     <groupId>org.obiba.opal</groupId>
     <version>1.2-SNAPSHOT</version>
   </parent>
-  
+
   <artifactId>opal-web-model</artifactId>
   <packaging>jar</packaging>
 
@@ -167,7 +167,6 @@
 
     </plugins>
   </build>
-
   <repositories>
     <repository>
       <id>obiba</id>
@@ -179,4 +178,10 @@
       <url>http://protostuff.googlecode.com/svn/repos/maven2</url>
     </repository>
   </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>obiba</id>
+      <url>http://maven.obiba.org/maven2</url>
+    </pluginRepository>
+  </pluginRepositories>
 </project>
