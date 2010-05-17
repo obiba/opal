@@ -12,7 +12,8 @@ PRGDIR=`pwd`
 cd "$current"
 
 yajsw_home="$PRGDIR"/../bootstrap/yajsw
-export yajsw_home
+export yajsw_home wrapper_home=${yajsw_home}
+PRGDIR=${yajsw_home}/bat
 
 yajsw_jar="$yajsw_home"/wrapper.jar
 export yajsw_jar
