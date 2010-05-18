@@ -28,8 +28,6 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONObject;
-import org.obiba.magma.Attribute;
-import org.obiba.magma.Category;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
@@ -38,8 +36,6 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.xstream.XStreamValueSet;
-import org.obiba.opal.web.model.Magma.AttributeDto;
-import org.obiba.opal.web.model.Magma.CategoryDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
@@ -69,26 +65,7 @@ public class TableResource {
     }
     ub.path(TableResource.class, "getVariable");
 
-    return ImmutableSet.copyOf(Iterables.transform(valueTable.getVariables(), new Function<Variable, VariableDto>() {
-
-      @Override
-      public VariableDto apply(Variable from) {
-        VariableDto.Builder var = VariableDto.newBuilder().setName(from.getName()).setValueType(from.getValueType().getName());
-        for(Attribute attribute : from.getAttributes()) {
-          AttributeDto.Builder a = AttributeDto.newBuilder().setName(attribute.getName()).setValue(attribute.getValue().toString());
-          if(attribute.isLocalised()) {
-            a.setLocale(attribute.getLocale().toString());
-          }
-          var.addAttributes(a);
-        }
-        for(Category category : from.getCategories()) {
-          CategoryDto.Builder c = CategoryDto.newBuilder().setName(category.getName()).setIsMissing(category.isMissing());
-          var.addCategories(c);
-        }
-        var.setLink(ub.build(from.getName()).toString());
-        return var.build();
-      }
-    }));
+    return ImmutableSet.copyOf(Iterables.transform(valueTable.getVariables(), Dtos.asDtoFunc(ub)));
   }
 
   @GET
