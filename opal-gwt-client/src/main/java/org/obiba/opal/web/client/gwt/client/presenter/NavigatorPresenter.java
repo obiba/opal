@@ -22,8 +22,8 @@ import org.obiba.opal.web.client.gwt.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.client.gwt.client.event.NavigatorSelectionChangeEventHandler;
 import org.obiba.opal.web.client.gwt.client.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.client.gwt.client.js.JsArrays;
-import org.obiba.opal.web.client.gwt.client.rest.ResourceCallback;
-import org.obiba.opal.web.client.gwt.client.rest.ResourceRequest;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.model.client.DatasourceDto;
 import org.obiba.opal.web.model.client.VariableDto;
 
@@ -36,6 +36,7 @@ import com.google.gwt.gen2.table.event.client.HasRowSelectionHandlers;
 import com.google.gwt.gen2.table.event.client.RowSelectionEvent;
 import com.google.gwt.gen2.table.event.client.RowSelectionHandler;
 import com.google.gwt.gen2.table.event.client.TableEvent.Row;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.inject.Inject;
 
@@ -120,22 +121,20 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
   }
 
   private void updateTable(String datasource, String table) {
-    ResourceRequest<JsArray<VariableDto>> rr = new ResourceRequest<JsArray<VariableDto>>("/datasource/" + datasource + "/table/" + table + "/variables");
-    rr.get(new ResourceCallback<JsArray<VariableDto>>() {
+    new ResourceRequestBuilder<JsArray<VariableDto>>(eventBus).forResource("/datasource/" + datasource + "/table/" + table + "/variables").get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
       @Override
-      public void onResource(JsArray<VariableDto> resource) {
+      public void onResource(Response response, JsArray<VariableDto> resource) {
         variables = resource;
         getDisplay().renderRows(JsArrays.toIterable(variables));
       }
 
-    });
+    }).send();
   }
 
   private void updateTree() {
-    ResourceRequest<JsArray<DatasourceDto>> rr = new ResourceRequest<JsArray<DatasourceDto>>("/datasources");
-    rr.get(new ResourceCallback<JsArray<DatasourceDto>>() {
+    new ResourceRequestBuilder<JsArray<DatasourceDto>>(eventBus).forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
-      public void onResource(JsArray<DatasourceDto> datasources) {
+      public void onResource(Response response, JsArray<DatasourceDto> datasources) {
         ArrayList<TreeItem> items = new ArrayList<TreeItem>(datasources.length());
         for(int i = 0; i < datasources.length(); i++) {
           DatasourceDto ds = datasources.get(i);
@@ -150,7 +149,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
         }
         getDisplay().setItems(items);
       }
-    });
+    }).send();
   }
 
 }

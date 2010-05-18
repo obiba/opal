@@ -13,6 +13,7 @@
 
   <!-- Opal's WS data models -->
   <inherits name='org.obiba.opal.web.gwt.inject.Inject' />
+  <inherits name='org.obiba.opal.web.gwt.rest.Rest' />
   <inherits name='org.obiba.opal.web.model.Model' />
 
   <!--  inherit css based theme-->

@@ -20,13 +20,14 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.client.gwt.client.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.client.gwt.client.event.VariableSelectionChangeEventHandler;
-import org.obiba.opal.web.client.gwt.client.rest.ResourceCallback;
-import org.obiba.opal.web.client.gwt.client.rest.ResourceRequest;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.model.client.CategoryDto;
 import org.obiba.opal.web.model.client.FrequencyDto;
 import org.obiba.opal.web.model.client.VariableDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.visualization.client.AbstractDataTable;
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
@@ -88,12 +89,11 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
   private void updateFrequencies(final VariableDto variable) {
     getDisplay().clearChart();
-    ResourceRequest<JsArray<FrequencyDto>> rr = new ResourceRequest<JsArray<FrequencyDto>>(variable.getLink() + "/frequencies.json");
 
-    rr.get(new ResourceCallback<JsArray<FrequencyDto>>() {
+    new ResourceRequestBuilder<JsArray<FrequencyDto>>(eventBus).forResource(variable.getLink() + "/frequencies.json").get().withCallback(new ResourceCallback<JsArray<FrequencyDto>>() {
 
       @Override
-      public void onResource(JsArray<FrequencyDto> frequencies) {
+      public void onResource(Response response, JsArray<FrequencyDto> frequencies) {
         Map<String, FrequencyDto> freqs = new HashMap<String, FrequencyDto>();
         for(int i = 0; i < frequencies.length(); i++) {
           FrequencyDto freq = frequencies.get(i);

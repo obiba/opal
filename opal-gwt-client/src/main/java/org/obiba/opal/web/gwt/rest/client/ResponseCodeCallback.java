@@ -7,15 +7,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.client.gwt.client.rest;
+package org.obiba.opal.web.gwt.rest.client;
 
-import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 
 /**
- *
+ * A response callback for handling HTTP status codes. These callbacks are added to a {@code ResourceRequestBuilder} and
+ * attached to a specific status code. If the response to the request is that specific code, then this handler is
+ * invoked.
  */
-public interface ResourceCallback<T extends JavaScriptObject> {
+public interface ResponseCodeCallback {
 
-  public void onResource(T resource);
+  public void onResponseCode(Request request, Response response);
 
 }
