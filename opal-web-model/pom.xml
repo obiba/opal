@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -66,6 +67,18 @@
       </resource>
     </resources>
     <plugins>
+
+      <plugin>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <configuration>
+          <excludeRoots>
+            <excludeRoot>target/generated-sources/protobuf-server</excludeRoot>
+            <excludeRoot>target/generated-sources/protobuf-gwt</excludeRoot>
+          </excludeRoots>
+        </configuration>
+      </plugin>
+
+
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
@@ -115,19 +128,19 @@
                 <fail message="No protoc binary for your OS: ${os.name} ${os.arch}." unless="os.protoc" />
 
                 <mkdir dir="target/generated-sources/protobuf-server" />
-                
+
                 <path id="protofiles">
-        			<fileset dir="src/main/protobuf">
-            			<include name="*.proto" />
-        			</fileset>
-    			</path>
-    			<pathconvert pathsep=" " property="protofilesList" refid="protofiles"/>
-    			                
+                  <fileset dir="src/main/protobuf">
+                    <include name="*.proto" />
+                  </fileset>
+                </path>
+                <pathconvert pathsep=" " property="protofilesList" refid="protofiles" />
+
                 <!-- Compile our .proto file -->
                 <exec executable="${basedir}/tools/protoc-${os.protoc}" failonerror="true">
                   <arg value="--java_out=target/generated-sources/protobuf-server" />
                   <arg line="${protofilesList}" />
-                  <arg line="-I${basedir}/src/main/protobuf"/>
+                  <arg line="-I${basedir}/src/main/protobuf" />
                 </exec>
               </tasks>
             </configuration>
@@ -168,7 +181,7 @@
                   <value>org.obiba.opal.web.model.client</value>
                 </property>
               </options>
-            </protoModule>            
+            </protoModule>
           </protoModules>
         </configuration>
         <executions>
