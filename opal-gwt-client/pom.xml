@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -11,18 +10,8 @@
   </parent>
 
   <artifactId>opal-gwt-client</artifactId>
+  <name>Opal GWT Client</name>
   <packaging>war</packaging>
-
-  <properties>
-    <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
-    <maven.compiler.source>1.6</maven.compiler.source>
-    <maven.compiler.target>1.6</maven.compiler.target>
-    
-    <gwt.version>2.0.3</gwt.version>
-    <gwt-incubator.version>2.0.1</gwt-incubator.version>
-    <gwt-visualization.version>1.0.2</gwt-visualization.version>
-    <gwt-presenter.version>1.0.0</gwt-presenter.version>
-  </properties>
 
   <dependencies>
     <dependency>
@@ -104,22 +93,18 @@
           <runTarget>org.obiba.opal.web.client.gwt.GwtApp/Application.html</runTarget>
         </configuration>
       </plugin>
-      <!--
-        If you want to use the target/web.xml file mergewebxml produces, tell the war plugin to use it. Also, exclude
-        what you want from the final artifact here. <plugin> <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId> <configuration> <webXml>target/web.xml</webXml>
-        <warSourceExcludes>.gwt-tmp/**</warSourceExcludes> </configuration> </plugin>
-      -->
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.0.2</version>
-        <configuration>
-          <source>${maven.compiler.source}</source>
-          <target>${maven.compiler.target}</target>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
+
+  <properties>
+    <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+    <maven.compiler.source>1.6</maven.compiler.source>
+    <maven.compiler.target>1.6</maven.compiler.target>
+
+    <gwt.version>2.0.3</gwt.version>
+    <gwt-incubator.version>2.0.1</gwt-incubator.version>
+    <gwt-visualization.version>1.0.2</gwt-visualization.version>
+    <gwt-presenter.version>1.0.0</gwt-presenter.version>
+  </properties>
+
 </project>
