@@ -21,6 +21,7 @@
 
   <modules>
     <module>opal-core</module>
+    <module>opal-core-ws</module>
     <module>opal-sshd</module>
     <module>opal-shell</module>
     <module>opal-server</module>
