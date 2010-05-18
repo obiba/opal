@@ -186,6 +186,7 @@
     <gwt.version>2.0.3</gwt.version>
     <protobuf.version>2.3.0</protobuf.version>
     <protostuff.version>r788</protostuff.version>
+    <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
   </properties>
 
 </project>
