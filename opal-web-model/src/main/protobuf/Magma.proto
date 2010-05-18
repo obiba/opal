@@ -1,0 +1,34 @@
+package opal;
+
+option java_package = "org.obiba.opal.web.model";
+
+message DatasourceDto {
+  required string name = 1;
+  optional string link = 2;
+  repeated string table = 3;
+}
+
+message VariableDto {
+  required string name = 1;
+  required string valueType = 2;
+  optional string link = 3;
+  repeated AttributeDto attributes = 4;
+  repeated CategoryDto categories = 5;
+}
+
+message CategoryDto {
+  required string name = 1;
+  required bool isMissing = 2;
+  repeated AttributeDto attributes = 3;
+}
+
+message AttributeDto {
+  required string name = 1;
+  required string value = 2;
+  optional string locale = 3;
+}
+
+message FrequencyDto {
+  required string name = 1;
+  required int32 value = 2;
+}

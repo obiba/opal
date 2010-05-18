@@ -129,13 +129,11 @@ public class OpalJettyServer implements Service {
     contextHandler.addFilter(new FilterHolder(new DevelopmentModeFilter()), "/*", FilterMapping.DEFAULT);
     contextHandler.addFilter(new FilterHolder(new TransactionFilter(txmgr)), "/*", FilterMapping.DEFAULT);
 
-    // TODO: Should be GenericWebApplicationContext, but cannot due to Jersey bug
-    // https://jersey.dev.java.net/issues/show_bug.cgi?id=222
     webAppCtx = new AnnotationConfigWebApplicationContext();
     webAppCtx.setServletContext(contextHandler.getServletContext());
     webAppCtx.setParent(ctx);
     // This should be "org.obiba.opal.web"
-    webAppCtx.setConfigLocation("org.obiba.opal.server.rest");
+    webAppCtx.setConfigLocation("org.obiba.opal.web");
     contextHandler.getServletContext().setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, webAppCtx);
     return contextHandler;
   }

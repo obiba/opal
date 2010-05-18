@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>opal</artifactId>
+    <groupId>org.obiba.opal</groupId>
+    <version>1.2-SNAPSHOT</version>
+  </parent>
+  <groupId>org.obiba.opal</groupId>
+  <artifactId>opal-ws</artifactId>
+  <name>Opal Web Services</name>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-spring</artifactId>
+      <version>2.0-beta-2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-simple</artifactId>
+        </exclusion>
+        <!-- Ideally we would exclude org.scannotation:scannotation, but that's not possible due to ConfigurationBootstrap -->
+        <exclusion>
+          <groupId>javassist</groupId>
+          <artifactId>javassist</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-beans</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlet</artifactId>
+      <version>${jetty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>2.3.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java-format</artifactId>
+      <version>1.1</version>
+    </dependency>
+    
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>protobuf-java-format</id>
+      <url>http://protobuf-java-format.googlecode.com/svn/trunk/repo/</url>
+    </repository>
+    <repository>
+      <id>maven-restlet</id>
+      <name>Public online Restlet repository</name>
+      <url>http://maven.restlet.org</url>
+    </repository>
+    <repository>
+      <id>jboss.org</id>
+      <url>http://repository.jboss.com/maven2</url>
+    </repository>
+  </repositories>
+
+  <properties>
+    <jetty.version>7.0.2.v20100331</jetty.version>
+    <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
+  </properties>
+</project>

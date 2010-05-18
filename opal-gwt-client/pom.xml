@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <artifactId>opal</artifactId>
+    <groupId>org.obiba.opal</groupId>
+    <version>1.2-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>opal-gwt-client</artifactId>
+  <name>Opal GWT Client</name>
+  <packaging>war</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-servlet</artifactId>
+      <version>${gwt.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-user</artifactId>
+      <version>${gwt.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-incubator</artifactId>
+      <version>${gwt-incubator.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.gwt.google-apis</groupId>
+      <artifactId>gwt-visualization</artifactId>
+      <version>${gwt-visualization.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.customware.gwt.presenter</groupId>
+      <artifactId>gwt-presenter</artifactId>
+      <version>${gwt-presenter.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-web-model</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- test -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.7</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <outputDirectory>war/WEB-INF/classes</outputDirectory>
+    <plugins>
+      <plugin>
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>7.1.0.RC0</version>
+        <executions>
+          <execution>
+            <configuration>
+              <startPort>8888</startPort>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>gwt-maven-plugin</artifactId>
+        <version>1.2</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+              <goal>generateAsync</goal>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
+          <runTarget>org.obiba.opal.web.client.gwt.GwtApp/Application.html</runTarget>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <properties>
+    <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+    <maven.compiler.source>1.6</maven.compiler.source>
+    <maven.compiler.target>1.6</maven.compiler.target>
+
+    <gwt.version>2.0.3</gwt.version>
+    <gwt-incubator.version>2.0.1</gwt-incubator.version>
+    <gwt-visualization.version>1.0.2</gwt-visualization.version>
+    <gwt-presenter.version>1.0.0</gwt-presenter.version>
+  </properties>
+
+</project>
