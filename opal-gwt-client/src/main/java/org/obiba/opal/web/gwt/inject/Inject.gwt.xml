@@ -1,0 +1,5 @@
+<!DOCTYPE module PUBLIC "//gwt-module/" "http://google-web-toolkit.googlecode.com/svn/tags/1.6.2/distro-source/core/src/gwt-module.dtd">
+<module>
+  <!-- Use dependency Injection -->
+  <inherits name='com.google.gwt.inject.Inject' />
+</module>

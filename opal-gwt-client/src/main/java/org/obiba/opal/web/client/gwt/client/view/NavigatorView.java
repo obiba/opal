@@ -11,7 +11,7 @@ package org.obiba.opal.web.client.gwt.client.view;
 
 import java.util.List;
 
-import org.obiba.opal.web.client.gwt.client.presenter.NavigatorPresenter.Display;
+import org.obiba.opal.web.client.gwt.client.presenter.NavigatorPresenter;
 import org.obiba.opal.web.model.client.AttributeDto;
 import org.obiba.opal.web.model.client.VariableDto;
 
@@ -36,7 +36,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  *
  */
-public class NavigatorView extends Composite implements Display {
+public class NavigatorView extends Composite implements NavigatorPresenter.Display {
 
   @UiTemplate("NavigatorView.ui.xml")
   interface NavigatorViewUiBinder extends UiBinder<DockLayoutPanel, NavigatorView> {

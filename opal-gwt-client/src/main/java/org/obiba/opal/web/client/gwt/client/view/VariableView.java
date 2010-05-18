@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.client.gwt.client.view;
 
-import org.obiba.opal.web.client.gwt.client.presenter.VariablePresenter.Display;
+import org.obiba.opal.web.client.gwt.client.presenter.VariablePresenter;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
@@ -20,7 +20,7 @@ import com.google.gwt.visualization.client.visualizations.ColumnChart;
 /**
  *
  */
-public class VariableView extends Composite implements Display {
+public class VariableView extends Composite implements VariablePresenter.Display {
 
   ColumnChart chart;
 

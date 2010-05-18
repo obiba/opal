@@ -37,6 +37,7 @@ import com.google.gwt.gen2.table.event.client.RowSelectionEvent;
 import com.google.gwt.gen2.table.event.client.RowSelectionHandler;
 import com.google.gwt.gen2.table.event.client.TableEvent.Row;
 import com.google.gwt.user.client.ui.TreeItem;
+import com.google.inject.Inject;
 
 /**
  *
@@ -60,7 +61,8 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
    * @param display
    * @param eventBus
    */
-  public NavigatorPresenter(Display display, EventBus eventBus) {
+  @Inject
+  public NavigatorPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
   }
 
@@ -114,6 +116,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
 
   @Override
   public void revealDisplay() {
+    updateTree();
   }
 
   private void updateTable(String datasource, String table) {

@@ -1,15 +1,10 @@
 package org.obiba.opal.web.client.gwt.client;
 
-import net.customware.gwt.presenter.client.DefaultEventBus;
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.client.gwt.client.presenter.NavigatorPresenter;
-import org.obiba.opal.web.client.gwt.client.presenter.VariablePresenter;
-import org.obiba.opal.web.client.gwt.client.view.NavigatorView;
-import org.obiba.opal.web.client.gwt.client.view.VariableView;
+import org.obiba.opal.web.gwt.inject.client.OpalGinjector;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.visualization.client.VisualizationUtils;
 import com.google.gwt.visualization.client.visualizations.ColumnChart;
@@ -19,26 +14,19 @@ import com.google.gwt.visualization.client.visualizations.ColumnChart;
  */
 public class GwtApp implements EntryPoint {
 
-  private final EventBus eventBus = new DefaultEventBus();
-
   @Override
   public void onModuleLoad() {
+    final OpalGinjector opalGinjector = GWT.create(OpalGinjector.class);
 
     Runnable onLoadCallback = new Runnable() {
       @Override
       public void run() {
-        NavigatorView navigator = new NavigatorView();
-        VariableView variableView = new VariableView();
-        navigator.getDetailsPanel().add(variableView);
 
-        WidgetPresenter presenter = new VariablePresenter(variableView, eventBus);
+        NavigatorPresenter presenter = opalGinjector.getNavigatorPresenter();
         presenter.bind();
+        presenter.revealDisplay();
 
-        presenter = new NavigatorPresenter(navigator, eventBus);
-        presenter.bind();
-        presenter.refreshDisplay();
-
-        RootLayoutPanel.get().add(navigator);
+        RootLayoutPanel.get().add(presenter.getDisplay().asWidget());
       }
     };
     VisualizationUtils.loadVisualizationApi(onLoadCallback, ColumnChart.PACKAGE);

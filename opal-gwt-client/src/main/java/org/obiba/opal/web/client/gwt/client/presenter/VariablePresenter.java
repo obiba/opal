@@ -30,6 +30,7 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.visualization.client.AbstractDataTable;
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
+import com.google.inject.Inject;
 
 /**
  *
@@ -48,6 +49,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
    * @param display
    * @param eventBus
    */
+  @Inject
   public VariablePresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
   }
