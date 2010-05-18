@@ -1,0 +1,8 @@
+package opal;
+
+option java_package = "org.obiba.opal.web.model";
+
+message FunctionalUnitDto {
+  required string name = 1;
+  required string keyVariableName = 2;
+}
