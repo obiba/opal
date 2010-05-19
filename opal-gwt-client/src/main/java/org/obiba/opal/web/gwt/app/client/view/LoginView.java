@@ -1,20 +1,21 @@
 package org.obiba.opal.web.gwt.app.client.view;
 
+import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
+
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
-public class LoginView extends Composite {
+public class LoginView extends PopupPanel implements LoginPresenter.Display {
   @UiTemplate("LoginView.ui.xml")
   interface LoginViewUiBinder extends UiBinder<Widget, LoginView> {
   }
@@ -37,12 +38,52 @@ public class LoginView extends Composite {
   Button login;
 
   public LoginView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    // Clicking outside of the popupPanel will dismiss the panel, panel is modal
+    super(true, true);
+    add(uiBinder.createAndBindUi(this));
     errorMessage.setVisible(false);
   }
 
-  @UiHandler("login")
-  void handleClick(ClickEvent e) {
-    Window.alert("Login not implement. Click outside Sign In popup to start.");
+  @Override
+  public HasClickHandlers getSignIn() {
+    return login;
   }
+
+  @Override
+  public Widget asWidget() {
+    return null;
+  }
+
+  @Override
+  public void startProcessing() {
+  }
+
+  @Override
+  public void stopProcessing() {
+  }
+
+  @Override
+  public HasValue<String> getPassword() {
+    return password;
+  }
+
+  @Override
+  public HasValue<String> getUserName() {
+    return userName;
+  }
+
+  @Override
+  public void showPopup() {
+    setGlassEnabled(false);
+    center();
+    show();
+  }
+
+  @Override
+  public void showPopupWithGlassPanel() {
+    setGlassEnabled(true);
+    center();
+    show();
+  }
+
 }
