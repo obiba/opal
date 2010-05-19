@@ -182,6 +182,18 @@
                 </property>
               </options>
             </protoModule>
+            <protoModule>
+              <source>src/main/protobuf/Commands.proto</source>
+              <output>gwt_overlay</output>
+              <outputDir>target/generated-sources/protobuf-gwt</outputDir>
+              <options>
+                <property>
+                  <!-- Override the package name -->
+                  <name>org.obiba.opal.web.model</name>
+                  <value>org.obiba.opal.web.model.client</value>
+                </property>
+              </options>
+            </protoModule>
           </protoModules>
         </configuration>
         <executions>
