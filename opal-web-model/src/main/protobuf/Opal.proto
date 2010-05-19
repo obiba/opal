@@ -6,3 +6,7 @@ message FunctionalUnitDto {
   required string name = 1;
   required string keyVariableName = 2;
 }
+
+message FileDto {
+  required string name = 1;
+}
