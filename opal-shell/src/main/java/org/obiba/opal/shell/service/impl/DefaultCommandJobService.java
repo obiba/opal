@@ -61,8 +61,12 @@ public class DefaultCommandJobService implements CommandJobService {
   //
 
   public void launchCommand(CommandJob commandJob) {
+    // TODO: Look up and set the actual owner.
+    commandJob.setOwner("Unknown");
     commandJob.setSubmitTime(getCurrentTime());
+
     executor.execute(commandJob);
+
     history.add(0, commandJob);
   }
 

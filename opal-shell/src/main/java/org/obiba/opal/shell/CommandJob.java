@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.shell;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -23,6 +24,12 @@ import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
  * Contains a command and the state of its execution.
  */
 public class CommandJob implements OpalShell, Runnable {
+  //
+  // Constants
+  //
+
+  public static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd'T'HH'h'mm";
+
   //
   // Instance Variables
   //
@@ -47,6 +54,7 @@ public class CommandJob implements OpalShell, Runnable {
 
   public CommandJob() {
     messages = new ArrayList<Message>();
+    status = Status.NOT_STARTED;
   }
 
   //
@@ -89,7 +97,15 @@ public class CommandJob implements OpalShell, Runnable {
 
   public void run() {
     startTime = getCurrentTime();
-    command.execute();
+
+    status = Status.IN_PROGRESS;
+    try {
+      command.execute();
+      status = Status.SUCCEEDED;
+    } catch(RuntimeException ex) {
+      status = Status.FAILED;
+    }
+
     endTime = getCurrentTime();
   }
 
@@ -154,6 +170,11 @@ public class CommandJob implements OpalShell, Runnable {
   }
 
   protected Message createMessage(String msg) {
-    return Message.newBuilder().setMsg(msg).build();
+    return Message.newBuilder().setMsg(msg).setTimestamp(formatTime(new Date())).build();
+  }
+
+  protected String formatTime(Date date) {
+    SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_PATTERN);
+    return dateFormat.format(date);
   }
 }

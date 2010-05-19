@@ -15,6 +15,8 @@
     <constructor-arg value="pwel" />
   </bean>
 
+  <bean id="commandJobService" class="org.obiba.opal.shell.service.impl.DefaultCommandJobService" />
+    
   <bean class="org.obiba.opal.server.sshd.OpalSshServer">
     <constructor-arg>
       <bean class="org.obiba.opal.server.SecureShellCommandRegistry" />

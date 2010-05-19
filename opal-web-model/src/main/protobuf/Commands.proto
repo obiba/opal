@@ -9,8 +9,7 @@ message Message {
 
 message CommandStateDto {
   required string command = 1;
-  required string link = 2;
-  required string owner = 3;
+  required string owner = 2;
 
   enum Status {
     NOT_STARTED = 0;
@@ -19,8 +18,8 @@ message CommandStateDto {
     FAILED = 3;
   }
 
-  required Status status = 4;
-  optional string startTime = 5;
-  optional string endTime = 6;
-  repeated Message messages = 7;
+  required Status status = 3;
+  optional string startTime = 4;
+  optional string endTime = 5;
+  repeated Message messages = 6;
 }
