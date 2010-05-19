@@ -1,0 +1,43 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.gen2.table.client">
+
+  <g:DockLayoutPanel unit="EM">
+    <g:north size="4">
+      <g:LayoutPanel ui:field="barPanel">
+        <g:layer top="0" height="2em" horizontalAlignment="ALIGN_RIGHT">
+            <g:HorizontalPanel ui:field="topBar">
+              <g:Hyperlink>Studies</g:Hyperlink>
+              <g:Hyperlink>Profile</g:Hyperlink>
+              <g:Hyperlink>Help</g:Hyperlink>
+              <g:Hyperlink>Quit</g:Hyperlink>
+            </g:HorizontalPanel>
+        </g:layer>
+
+        <g:layer bottom="0" height="2em" left="25%" right="25%">
+          <g:MenuBar ui:field="menuBar">
+            <g:MenuItem>
+              Variables
+              <g:MenuBar vertical="true">
+                <g:MenuItem>Explore</g:MenuItem>
+              </g:MenuBar>
+            </g:MenuItem>
+            <g:MenuItem>
+              Data
+              <g:MenuBar vertical="true">
+                <g:MenuItem>Import...</g:MenuItem>
+                <g:MenuItem>Export...</g:MenuItem>
+              </g:MenuBar>
+            </g:MenuItem>
+            <g:MenuItem>Jobs</g:MenuItem>
+            <g:MenuItem>Administration</g:MenuItem>
+          </g:MenuBar>
+
+        </g:layer>
+      </g:LayoutPanel>
+    </g:north>
+    <g:center>
+      <g:ScrollPanel>
+        <g:Label>The Workbench</g:Label>
+      </g:ScrollPanel>
+    </g:center>
+  </g:DockLayoutPanel>
+</ui:UiBinder>
