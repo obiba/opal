@@ -139,21 +139,9 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
 
     try {
       if(options.isPrivate()) {
-        if(getFile(options.getPrivate()).exists() == false) {
-          getShell().printf("Private key file '%s' does not exist. Cannot import key.\n", options.getPrivate());
-          return;
-        }
-        if(options.isCertificate() && getFile(options.getCertificate()).exists() == false) {
-          getShell().printf("Certificate file '%s' does not exist. Cannot import key.\n", options.getCertificate());
-          return;
-        }
-        if(keyDoesNotExistOrOverwriteConfirmed(unit, options.getAlias())) {
-          importKeyFromFileOrInteractively(unit, options.getAlias());
-        }
+        importPrivateKey(unit);
       } else if(options.isCertificate()) {
-        UnitKeyStore ks = unitKeyStoreService.getOrCreateUnitKeyStore(unit);
-        ks.importCertificate(options.getAlias(), getFile(options.getCertificate()));
-        unitKeyStoreService.saveUnitKeyStore(ks);
+        importCertificate(unit);
       } else {
         unrecognizedOptionsHelp();
       }
@@ -162,6 +150,30 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
     } catch(FileSystemException e) {
       throw new RuntimeException("An error occured while reading the encryption key files.", e);
     }
+  }
+
+  private void importPrivateKey(String unit) throws FileSystemException {
+    if(getFile(options.getPrivate()).exists() == false) {
+      getShell().printf("Private key file '%s' does not exist. Cannot import key.\n", options.getPrivate());
+      return;
+    }
+    if(options.isCertificate() && getFile(options.getCertificate()).exists() == false) {
+      getShell().printf("Certificate file '%s' does not exist. Cannot import key.\n", options.getCertificate());
+      return;
+    }
+    if(keyDoesNotExistOrOverwriteConfirmed(unit, options.getAlias())) {
+      importKeyFromFileOrInteractively(unit, options.getAlias());
+    }
+  }
+
+  private void importCertificate(String unit) throws FileSystemException {
+    if(options.isCertificate() && getFile(options.getCertificate()).exists() == false) {
+      getShell().printf("Certificate file '%s' does not exist. Cannot import certificate.\n", options.getCertificate());
+      return;
+    }
+    UnitKeyStore ks = unitKeyStoreService.getOrCreateUnitKeyStore(unit);
+    ks.importCertificate(options.getAlias(), getFile(options.getCertificate()));
+    unitKeyStoreService.saveUnitKeyStore(ks);
   }
 
   private void importKeyFromFileOrInteractively(String unit, String alias) throws FileSystemException {
