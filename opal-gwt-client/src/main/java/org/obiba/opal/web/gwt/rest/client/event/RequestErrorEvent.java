@@ -33,7 +33,7 @@ public class RequestErrorEvent extends GwtEvent<RequestErrorEvent.Handler> {
     this.exception = t;
   }
 
-  public Throwable getSelection() {
+  public Throwable getException() {
     return exception;
   }
 

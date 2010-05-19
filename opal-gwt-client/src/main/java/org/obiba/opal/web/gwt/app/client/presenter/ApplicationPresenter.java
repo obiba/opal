@@ -74,6 +74,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
           workbench.unbind();
         }
         workbench = event.getWorkbench();
+        workbench.bind();
         WidgetDisplay wd = (WidgetDisplay) workbench.getDisplay();
         getDisplay().updateWorkbench(wd.asWidget());
         workbench.revealDisplay();
