@@ -11,14 +11,21 @@ package org.obiba.opal.web.gwt.app.client.event;
 
 import org.obiba.opal.web.model.client.VariableDto;
 
+import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
 /**
  *
  */
-public class VariableSelectionChangeEvent extends GwtEvent<VariableSelectionChangeEventHandler> {
+public class VariableSelectionChangeEvent extends GwtEvent<VariableSelectionChangeEvent.Handler> {
 
-  private static Type<VariableSelectionChangeEventHandler> TYPE;
+  public interface Handler extends EventHandler {
+
+    void onVariableSelectionChanged(VariableSelectionChangeEvent event);
+
+  }
+
+  private static Type<Handler> TYPE;
 
   private final VariableDto selection;
 
@@ -33,17 +40,17 @@ public class VariableSelectionChangeEvent extends GwtEvent<VariableSelectionChan
     return selection;
   }
 
-  public static Type<VariableSelectionChangeEventHandler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<VariableSelectionChangeEventHandler>());
+  public static Type<Handler> getType() {
+    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
   }
 
   @Override
-  protected void dispatch(VariableSelectionChangeEventHandler handler) {
+  protected void dispatch(Handler handler) {
     handler.onVariableSelectionChanged(this);
   }
 
   @Override
-  public Type<VariableSelectionChangeEventHandler> getAssociatedType() {
+  public Type<Handler> getAssociatedType() {
     return TYPE;
   }
 }

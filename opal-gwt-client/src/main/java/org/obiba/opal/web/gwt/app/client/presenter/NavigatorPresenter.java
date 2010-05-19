@@ -19,7 +19,6 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEventHandler;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -90,7 +89,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
       }
     });
 
-    eventBus.addHandler(NavigatorSelectionChangeEvent.getType(), new NavigatorSelectionChangeEventHandler() {
+    eventBus.addHandler(NavigatorSelectionChangeEvent.getType(), new NavigatorSelectionChangeEvent.Handler() {
       @Override
       public void onNavigatorSelectionChanged(NavigatorSelectionChangeEvent event) {
         if(event.getSelection().getParentItem() != null) {

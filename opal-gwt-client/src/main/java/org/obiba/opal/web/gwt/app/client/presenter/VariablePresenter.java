@@ -19,7 +19,6 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEventHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.model.client.CategoryDto;
@@ -62,7 +61,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
   @Override
   protected void onBind() {
-    eventBus.addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionChangeEventHandler() {
+    eventBus.addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionChangeEvent.Handler() {
       @Override
       public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
         VariableDto variable = event.getSelection();

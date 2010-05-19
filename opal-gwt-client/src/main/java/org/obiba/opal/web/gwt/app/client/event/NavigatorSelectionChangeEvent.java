@@ -9,15 +9,22 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.event;
 
+import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.client.ui.TreeItem;
 
 /**
  *
  */
-public class NavigatorSelectionChangeEvent extends GwtEvent<NavigatorSelectionChangeEventHandler> {
+public class NavigatorSelectionChangeEvent extends GwtEvent<NavigatorSelectionChangeEvent.Handler> {
 
-  private static Type<NavigatorSelectionChangeEventHandler> TYPE;
+  public interface Handler extends EventHandler {
+
+    void onNavigatorSelectionChanged(NavigatorSelectionChangeEvent event);
+
+  }
+
+  private static Type<Handler> TYPE;
 
   private final TreeItem selection;
 
@@ -32,17 +39,17 @@ public class NavigatorSelectionChangeEvent extends GwtEvent<NavigatorSelectionCh
     return selection;
   }
 
-  public static Type<NavigatorSelectionChangeEventHandler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<NavigatorSelectionChangeEventHandler>());
+  public static Type<Handler> getType() {
+    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
   }
 
   @Override
-  protected void dispatch(NavigatorSelectionChangeEventHandler handler) {
+  protected void dispatch(Handler handler) {
     handler.onNavigatorSelectionChanged(this);
   }
 
   @Override
-  public Type<NavigatorSelectionChangeEventHandler> getAssociatedType() {
+  public Type<Handler> getAssociatedType() {
     return TYPE;
   }
 }
