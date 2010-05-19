@@ -1,0 +1,41 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder' xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+  <g:HTMLPanel>
+    <table>
+      <tr>
+        <td/>
+        <td>
+          <g:Label ui:field="applicationName" text="Opal" />
+        </td>
+      </tr>
+      <tr>
+        <td/>
+        <td>
+          <g:Label ui:field="errorMessage" text="Authentication Failed" />
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <g:Label>User Name</g:Label>
+        </td>
+        <td>
+          <g:TextBox ui:field="userName" width="15em"  />
+        </td>
+
+      </tr>
+      <tr>
+        <td>
+          <g:Label>Password</g:Label>
+        </td>
+        <td>
+          <g:PasswordTextBox ui:field="password" width="15em" />
+        </td>
+      </tr>
+      <tr>
+        <td/>
+        <td>
+          <g:Button ui:field="login" text="Sign In" />
+        </td>
+      </tr>
+    </table>
+  </g:HTMLPanel>
+</ui:UiBinder>
