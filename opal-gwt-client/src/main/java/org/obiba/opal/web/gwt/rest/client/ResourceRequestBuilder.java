@@ -32,6 +32,8 @@ public class ResourceRequestBuilder<T extends JavaScriptObject> {
 
   private String uri;
 
+  private String body;
+
   private ResourceCallback<T> resourceCallback;
 
   // An array of handlers for HTTP status codes: the index of the array is the HTTP code. This will be 99% empty. This
@@ -69,6 +71,7 @@ public class ResourceRequestBuilder<T extends JavaScriptObject> {
   }
 
   public ResourceRequestBuilder<T> withBody(String body) {
+    this.body = body;
     return this;
   }
 
@@ -103,6 +106,7 @@ public class ResourceRequestBuilder<T extends JavaScriptObject> {
     if(resourceCallback != null) {
       builder.setHeader("Accept", "application/x-protobuf+json");
     }
+    if(body != null) builder.setRequestData(body);
     return builder;
   }
 
