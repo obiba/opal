@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.inject.client;
 
 import net.customware.gwt.presenter.client.EventBus;
 
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.VariablePresenter;
 
@@ -21,6 +22,8 @@ import com.google.gwt.inject.client.Ginjector;
 public interface OpalGinjector extends Ginjector {
 
   EventBus getEventBus();
+
+  ApplicationPresenter getApplicationPresenter();
 
   NavigatorPresenter getNavigatorPresenter();
 

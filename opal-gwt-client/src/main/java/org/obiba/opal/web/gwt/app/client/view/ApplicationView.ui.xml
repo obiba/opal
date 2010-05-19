@@ -1,23 +1,32 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.gen2.table.client">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:g2="urn:import:com.google.gwt.gen2.table.client">
 
   <g:DockLayoutPanel unit="EM">
     <g:north size="4">
-      <g:LayoutPanel ui:field="barPanel">
-        <g:layer top="0" height="2em" horizontalAlignment="ALIGN_RIGHT">
-            <g:HorizontalPanel ui:field="topBar">
-              <g:Hyperlink>Studies</g:Hyperlink>
-              <g:Hyperlink>Profile</g:Hyperlink>
-              <g:Hyperlink>Help</g:Hyperlink>
-              <g:Hyperlink>Quit</g:Hyperlink>
-            </g:HorizontalPanel>
+      <g:LayoutPanel>
+        <g:layer top="0" height="2em">
+          <g:VerticalPanel width="100%">
+            <!--
+              Don't know why, but the ALIGN_RIGHT cannot be specified on the Panel itself, it has to be on this specific
+              cell...
+            -->
+            <g:Cell horizontalAlignment="ALIGN_RIGHT">
+              <g:HorizontalPanel spacing="10" ui:field="topBar">
+                <g:Anchor>Studies</g:Anchor>
+                <g:Anchor>Profile</g:Anchor>
+                <g:Anchor>Help</g:Anchor>
+                <g:Anchor>Quit</g:Anchor>
+              </g:HorizontalPanel>
+            </g:Cell>
+          </g:VerticalPanel>
         </g:layer>
 
-        <g:layer bottom="0" height="2em" left="25%" right="25%">
+        <g:layer bottom="0" height="2em">
           <g:MenuBar ui:field="menuBar">
             <g:MenuItem>
               Variables
               <g:MenuBar vertical="true">
-                <g:MenuItem>Explore</g:MenuItem>
+                <g:MenuItem ui:field="exploreVariablesItem">Explore</g:MenuItem>
               </g:MenuBar>
             </g:MenuItem>
             <g:MenuItem>
@@ -35,9 +44,11 @@
       </g:LayoutPanel>
     </g:north>
     <g:center>
-      <g:ScrollPanel>
-        <g:Label>The Workbench</g:Label>
-      </g:ScrollPanel>
+      <g:LayoutPanel ui:field="workbench">
+        <g:layer top="0" height="100%">
+          <g:Label>The Workbench</g:Label>
+        </g:layer>
+      </g:LayoutPanel>
     </g:center>
   </g:DockLayoutPanel>
 </ui:UiBinder>

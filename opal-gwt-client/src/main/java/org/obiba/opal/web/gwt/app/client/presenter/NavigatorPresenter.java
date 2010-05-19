@@ -89,7 +89,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
       }
     });
 
-    eventBus.addHandler(NavigatorSelectionChangeEvent.getType(), new NavigatorSelectionChangeEvent.Handler() {
+    super.registerHandler(eventBus.addHandler(NavigatorSelectionChangeEvent.getType(), new NavigatorSelectionChangeEvent.Handler() {
       @Override
       public void onNavigatorSelectionChanged(NavigatorSelectionChangeEvent event) {
         if(event.getSelection().getParentItem() != null) {
@@ -98,7 +98,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
           updateTable(datasource, table);
         }
       }
-    });
+    }));
   }
 
   @Override

@@ -61,13 +61,13 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
   @Override
   protected void onBind() {
-    eventBus.addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionChangeEvent.Handler() {
+    super.registerHandler(eventBus.addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionChangeEvent.Handler() {
       @Override
       public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
         VariableDto variable = event.getSelection();
         updateFrequencies(variable);
       }
-    });
+    }));
   }
 
   @Override

@@ -12,8 +12,10 @@ package org.obiba.opal.web.gwt.inject.client;
 import net.customware.gwt.presenter.client.DefaultEventBus;
 import net.customware.gwt.presenter.client.EventBus;
 
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.VariablePresenter;
+import org.obiba.opal.web.gwt.app.client.view.ApplicationView;
 import org.obiba.opal.web.gwt.app.client.view.NavigatorView;
 import org.obiba.opal.web.gwt.app.client.view.VariableView;
 
@@ -28,6 +30,7 @@ public class OpalGinModule extends AbstractGinModule {
   protected void configure() {
     // Bind concrete implementations to interfaces
     bind(EventBus.class).to(DefaultEventBus.class);
+    bind(ApplicationPresenter.Display.class).to(ApplicationView.class);
     bind(NavigatorPresenter.Display.class).to(NavigatorView.class);
     bind(VariablePresenter.Display.class).to(VariableView.class);
 
