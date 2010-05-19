@@ -28,6 +28,7 @@ import java.security.UnrecoverableKeyException;
 import java.security.KeyStore.Entry;
 import java.security.KeyStore.PasswordProtection;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStore.TrustedCertificateEntry;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -36,6 +37,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -59,6 +61,7 @@ import org.springframework.util.Assert;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 /**
@@ -192,6 +195,18 @@ public class UnitKeyStore implements KeyProvider {
       throw new MagmaCryptRuntimeException(e);
     }
     return cert;
+  }
+
+  public List<Certificate> getCertficateEntries() {
+    List<Certificate> certs = Lists.newArrayList();
+    for(String alias : listAliases()) {
+      Entry keyEntry = getEntry(alias);
+      if(keyEntry instanceof TrustedCertificateEntry) {
+        TrustedCertificateEntry tce = (TrustedCertificateEntry) keyEntry;
+        certs.add(tce.getTrustedCertificate());
+      }
+    }
+    return certs;
   }
 
   //

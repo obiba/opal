@@ -9,14 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.core.unit.security;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
-import java.security.KeyStore.Entry;
-import java.security.KeyStore.TrustedCertificateEntry;
+import java.security.GeneralSecurityException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
@@ -98,28 +92,21 @@ public class FunctionalUnitRealm extends AuthorizingRealm {
   @Override
   protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
     X509CertificateAuthenticationToken x509Token = (X509CertificateAuthenticationToken) token;
+    X509Certificate x509Cert = x509Token.getCredentials();
     for(FunctionalUnit unit : opalRuntime.getFunctionalUnits()) {
       UnitKeyStore keyStore = unit.getKeyStore();
-      for(String alias : keyStore.listAliases()) {
-        Entry keyEntry = keyStore.getEntry(alias);
-        if(keyEntry instanceof TrustedCertificateEntry) {
-          TrustedCertificateEntry tce = (TrustedCertificateEntry) keyEntry;
-          Certificate cert = tce.getTrustedCertificate();
-          try {
-            x509Token.getCredentials().verify(cert.getPublicKey());
-            log.info("Checking signature");
-            SimplePrincipalCollection principals = new SimplePrincipalCollection();
-            principals.add(x509Token.getPrincipal(), getName());
-            principals.add(unit.getName(), getName());
-            return new SimpleAuthenticationInfo(principals, x509Token.getCredentials());
-          } catch(InvalidKeyException e) {
-          } catch(CertificateException e) {
-          } catch(NoSuchAlgorithmException e) {
-          } catch(NoSuchProviderException e) {
-          } catch(SignatureException e) {
-          }
+      for(Certificate cert : keyStore.getCertficateEntries()) {
+        try {
+          x509Cert.verify(cert.getPublicKey());
+          SimplePrincipalCollection principals = new SimplePrincipalCollection();
+          principals.add(x509Token.getPrincipal(), getName());
+          principals.add(unit.getName(), getName());
+          return new SimpleAuthenticationInfo(principals, x509Token.getCredentials());
+        } catch(GeneralSecurityException e) {
+          // Ignore
         }
       }
+
     }
     throw new IncorrectCredentialsException();
   }
@@ -138,4 +125,5 @@ public class FunctionalUnitRealm extends AuthorizingRealm {
     }
     return null;
   }
+
 }
