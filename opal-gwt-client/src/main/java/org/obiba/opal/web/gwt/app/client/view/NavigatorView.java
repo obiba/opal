@@ -28,7 +28,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
@@ -49,9 +48,6 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
 
   @UiField
   SortableGrid table;
-
-  @UiField
-  Panel east;
 
   SelectionGridBulkRenderer<VariableDto> bulkRenderer;
 
@@ -115,10 +111,6 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
 
     table.setSelectionEnabled(true);
     bulkRenderer = new SelectionGridBulkRenderer<VariableDto>(table, tableDefinition);
-  }
-
-  public Panel getDetailsPanel() {
-    return east;
   }
 
   @Override
