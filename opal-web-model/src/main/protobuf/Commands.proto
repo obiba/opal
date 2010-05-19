@@ -23,3 +23,10 @@ message CommandStateDto {
   optional string endTime = 5;
   repeated Message messages = 6;
 }
+
+message ImportCommandOptionsDto {
+  required string unit = 1;
+  required string destination = 2;
+  optional string archive = 3;
+  repeated string files = 4;
+}

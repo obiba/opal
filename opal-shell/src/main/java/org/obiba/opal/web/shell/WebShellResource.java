@@ -15,10 +15,16 @@ import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 import org.obiba.opal.shell.CommandJob;
+import org.obiba.opal.shell.CommandRegistry;
+import org.obiba.opal.shell.commands.Command;
+import org.obiba.opal.shell.commands.options.ImportCommandOptions;
 import org.obiba.opal.shell.service.CommandJobService;
+import org.obiba.opal.shell.web.ImportCommandOptionsDtoImpl;
+import org.obiba.opal.web.model.Commands;
 import org.obiba.opal.web.model.Commands.CommandStateDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -35,6 +41,9 @@ public class WebShellResource {
 
   @Autowired
   private CommandJobService commandJobService;
+
+  @Autowired
+  private CommandRegistry commandRegistry;
 
   //
   // Web Service Methods
@@ -61,12 +70,29 @@ public class WebShellResource {
     return commandDtoList;
   }
 
+  @POST
+  @Path("/import")
+  public void importData(Commands.ImportCommandOptionsDto options) {
+    ImportCommandOptions importOptions = new ImportCommandOptionsDtoImpl(options);
+    Command<ImportCommandOptions> importCommand = commandRegistry.newCommand("import");
+    importCommand.setOptions(importOptions);
+
+    CommandJob commandJob = new CommandJob();
+    importCommand.setShell(commandJob);
+    commandJob.setCommand(importCommand);
+    commandJobService.launchCommand(commandJob);
+  }
+
   //
   // Methods
   //
 
   public void setCommandJobService(CommandJobService commandJobService) {
     this.commandJobService = commandJobService;
+  }
+
+  public void setCommandRegistry(CommandRegistry commandRegistry) {
+    this.commandRegistry = commandRegistry;
   }
 
   protected String formatTime(Date date) {

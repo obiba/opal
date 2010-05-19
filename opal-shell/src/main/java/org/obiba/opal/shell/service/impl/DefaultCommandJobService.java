@@ -13,7 +13,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.obiba.opal.audit.OpalUserProvider;
 import org.obiba.opal.shell.CommandJob;
@@ -27,9 +28,9 @@ public class DefaultCommandJobService implements CommandJobService {
   // Instance Variables
   //
 
-  private OpalUserProvider userProvider;
+  private ExecutorService executor;
 
-  private Executor executor;
+  private OpalUserProvider userProvider;
 
   private boolean isRunning;
 
@@ -41,6 +42,9 @@ public class DefaultCommandJobService implements CommandJobService {
 
   public DefaultCommandJobService() {
     history = new ArrayList<CommandJob>();
+
+    // TODO: Inject this dependency.
+    executor = Executors.newFixedThreadPool(10);
   }
 
   //
@@ -64,7 +68,7 @@ public class DefaultCommandJobService implements CommandJobService {
   //
 
   public void launchCommand(CommandJob commandJob) {
-    commandJob.setOwner(userProvider.getUsername());
+    commandJob.setOwner("none"); // userProvider.getUsername());
     commandJob.setSubmitTime(getCurrentTime());
 
     executor.execute(commandJob);
@@ -79,6 +83,10 @@ public class DefaultCommandJobService implements CommandJobService {
   //
   // Methods
   //
+
+  public void setExecutorService(ExecutorService executor) {
+    this.executor = executor;
+  }
 
   public void setUserProvider(OpalUserProvider userProvider) {
     this.userProvider = userProvider;
