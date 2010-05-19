@@ -60,11 +60,6 @@
       <url>http://protobuf-java-format.googlecode.com/svn/trunk/repo/</url>
     </repository>
     <repository>
-      <id>maven-restlet</id>
-      <name>Public online Restlet repository</name>
-      <url>http://maven.restlet.org</url>
-    </repository>
-    <repository>
       <id>jboss.org</id>
       <url>http://repository.jboss.com/maven2</url>
     </repository>

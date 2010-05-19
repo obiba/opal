@@ -51,7 +51,7 @@ public class ProtobufJsonWriterProvider implements MessageBodyWriter<Object> {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings( { "unchecked", "PMD.ExcessiveParameterList" })
   public void writeTo(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
     OutputStreamWriter output = new OutputStreamWriter(entityStream, "UTF-8");
     if(isWrapped(type, genericType, annotations, mediaType)) {

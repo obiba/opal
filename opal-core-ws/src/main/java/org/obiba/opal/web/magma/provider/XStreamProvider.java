@@ -44,6 +44,7 @@ public class XStreamProvider implements MessageBodyWriter<Object> {
   }
 
   @Override
+  @SuppressWarnings("PMD.ExcessiveParameterList")
   public void writeTo(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
     MagmaEngine.get().getExtension(MagmaXStreamExtension.class).getXStreamFactory().createXStream().toXML(t, entityStream);
   }

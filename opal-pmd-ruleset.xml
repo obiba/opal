@@ -10,4 +10,9 @@
       <property name="minimum" value="20" />
     </properties>
   </rule>
+  <rule ref="rulesets/codesize.xml/ExcessiveParameterList">
+    <properties>
+      <property name="minimum" value="7" />
+    </properties>
+  </rule>
 </ruleset>
