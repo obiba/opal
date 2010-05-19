@@ -48,7 +48,7 @@ public class WebShellResource {
     List<CommandJob> history = commandJobService.getHistory();
     for(CommandJob commandJob : history) {
       CommandStateDto dto = CommandStateDto.newBuilder() //
-      .setCommand("theCommand") // TODO: Set the command name (or command + args?)
+      .setCommand(commandJob.getCommand().toString()) //
       .setOwner(commandJob.getOwner()) //
       .setStatus(commandJob.getStatus()) //
       .setStartTime(formatTime(commandJob.getStartTime())) //

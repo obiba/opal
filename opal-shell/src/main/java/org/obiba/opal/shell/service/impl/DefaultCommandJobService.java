@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executor;
 
+import org.obiba.opal.audit.OpalUserProvider;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.service.CommandJobService;
 
@@ -25,6 +26,8 @@ public class DefaultCommandJobService implements CommandJobService {
   //
   // Instance Variables
   //
+
+  private OpalUserProvider userProvider;
 
   private Executor executor;
 
@@ -61,8 +64,7 @@ public class DefaultCommandJobService implements CommandJobService {
   //
 
   public void launchCommand(CommandJob commandJob) {
-    // TODO: Look up and set the actual owner.
-    commandJob.setOwner("Unknown");
+    commandJob.setOwner(userProvider.getUsername());
     commandJob.setSubmitTime(getCurrentTime());
 
     executor.execute(commandJob);
@@ -77,6 +79,10 @@ public class DefaultCommandJobService implements CommandJobService {
   //
   // Methods
   //
+
+  public void setUserProvider(OpalUserProvider userProvider) {
+    this.userProvider = userProvider;
+  }
 
   protected Date getCurrentTime() {
     return new Date();

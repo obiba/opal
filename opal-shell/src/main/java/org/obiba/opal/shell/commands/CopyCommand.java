@@ -10,6 +10,7 @@
 package org.obiba.opal.shell.commands;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.vfs.FileObject;
@@ -76,6 +77,40 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     } else {
       getShell().printf("%s\n", "Neither source nor table name(s) are specified.");
     }
+  }
+
+  public String toString() {
+    StringBuffer sb = new StringBuffer();
+
+    sb.append("copy");
+
+    if(options.isSource()) {
+      appendOption(sb, "source", options.getSource());
+    }
+
+    if(options.isDestination()) {
+      appendOption(sb, "destination", options.getDestination());
+    }
+
+    if(options.isOut()) {
+      appendOption(sb, "out", options.getOut());
+    }
+
+    if(options.isMultiplex()) {
+      appendOption(sb, "multiplex", options.getMultiplex());
+    }
+
+    if(options.isTransform()) {
+      appendOption(sb, "transform", options.getTransform());
+    }
+
+    appendFlag(sb, "non-incremental", options.getNonIncremental());
+    appendFlag(sb, "no-values", options.getNoValues());
+    appendFlag(sb, "no-variables", options.getNoVariables());
+
+    appendUnparsedList(sb, options.getTables());
+
+    return sb.toString();
   }
 
   private DatasourceCopier buildDatasourceCopier(Datasource destinationDatasource) {
@@ -242,4 +277,24 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     return outputFile;
   }
 
+  private void appendOption(StringBuffer sb, String option, String value) {
+    sb.append(" --");
+    sb.append(option);
+    sb.append(' ');
+    sb.append(value);
+  }
+
+  private void appendFlag(StringBuffer sb, String flag, boolean value) {
+    if(value) {
+      sb.append(" --");
+      sb.append(flag);
+    }
+  }
+
+  private void appendUnparsedList(StringBuffer sb, List<String> unparsedList) {
+    for(String unparsed : unparsedList) {
+      sb.append(' ');
+      sb.append(unparsed);
+    }
+  }
 }

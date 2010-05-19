@@ -33,9 +33,9 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
   
   <bean id="auditLogManager" class="org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager">
     <property name="sessionFactory" ref="opalSessionFactory" />
-    <property name="userProvider">
-      <bean class="org.obiba.opal.audit.OpalUserProvider" />
-    </property>
+    <property name="userProvider" ref="userProvider" />
   </bean>
+  
+  <bean id="userProvider" class="org.obiba.opal.audit.OpalUserProvider" />
   
 </beans>
