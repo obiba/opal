@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.Produces;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -44,7 +44,7 @@ import com.google.protobuf.Message.Builder;
 @Component
 @Provider
 // TODO: should also provide "application/x-protobuf" for native protobuf encoding
-@Produces("application/x-protobuf+json")
+@Consumes( { "application/x-protobuf+json", "application/json" })
 public class ProtobufJsonReaderProvider implements MessageBodyReader<Object> {
 
   private static final Logger log = LoggerFactory.getLogger(ProtobufJsonReaderProvider.class);
