@@ -90,7 +90,7 @@
         </executions>
         <configuration>
           <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
-          <runTarget>org.obiba.opal.web.client.gwt.GwtApp/Application.html</runTarget>
+          <runTarget>org.obiba.opal.web.gwt.app.GwtApp/Application.html</runTarget>
         </configuration>
       </plugin>
     </plugins>

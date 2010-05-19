@@ -7,9 +7,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.client.gwt.client.view;
+package org.obiba.opal.web.gwt.app.client.view;
 
-import org.obiba.opal.web.client.gwt.client.presenter.VariablePresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.VariablePresenter;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;

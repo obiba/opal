@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.client.gwt.client.js;
+package org.obiba.opal.web.gwt.app.client.js;
 
 import java.util.Iterator;
 

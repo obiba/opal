@@ -20,7 +20,7 @@
   <inherits name='com.google.gwt.user.theme.standard.Standard' />
 
   <!-- Specify the app entry point class.                         -->
-  <entry-point class='org.obiba.opal.web.client.gwt.client.GwtApp' />
+  <entry-point class='org.obiba.opal.web.gwt.app.client.GwtApp' />
 
   <!-- This will limit the compile to a single browser: Firefox 3.x -->
   <set-property name="user.agent" value="gecko1_8" />

@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.client.gwt.client.presenter;
+package org.obiba.opal.web.gwt.app.client.presenter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +18,8 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.client.gwt.client.event.VariableSelectionChangeEvent;
-import org.obiba.opal.web.client.gwt.client.event.VariableSelectionChangeEventHandler;
+import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEventHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.model.client.CategoryDto;

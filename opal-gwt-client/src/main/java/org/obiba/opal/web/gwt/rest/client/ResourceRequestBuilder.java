@@ -128,7 +128,7 @@ public class ResourceRequestBuilder<T extends JavaScriptObject> {
         codes[code].onResponseCode(request, response);
       } else {
         if(resourceCallback != null && code < 400) {
-          final T resource = JsonUtils.unsafeEval(response.getText());
+          final T resource = (T) JsonUtils.unsafeEval(response.getText());
           resourceCallback.onResource(response, resource);
         } else {
           eventBus.fireEvent(new UnhandledResponseEvent(request, response));

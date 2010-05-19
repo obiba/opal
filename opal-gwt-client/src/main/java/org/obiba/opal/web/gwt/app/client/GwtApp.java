@@ -1,6 +1,6 @@
-package org.obiba.opal.web.client.gwt.client;
+package org.obiba.opal.web.gwt.app.client;
 
-import org.obiba.opal.web.client.gwt.client.presenter.NavigatorPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.inject.client.OpalGinjector;
 
 import com.google.gwt.core.client.EntryPoint;
