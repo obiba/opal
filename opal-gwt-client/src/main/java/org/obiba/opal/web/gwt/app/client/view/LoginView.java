@@ -86,4 +86,9 @@ public class LoginView extends PopupPanel implements LoginPresenter.Display {
     show();
   }
 
+  @Override
+  public void showErrorMessage() {
+    errorMessage.setVisible(true);
+  }
+
 }

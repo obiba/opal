@@ -15,9 +15,15 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
@@ -29,6 +35,8 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
     public void showPopup();
 
     public void showPopupWithGlassPanel();
+
+    public void showErrorMessage();
 
     public HasValue<String> getUserName();
 
@@ -52,6 +60,7 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
     display.getSignIn().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
         Window.alert("Login not implement. Click outside Sign In popup to start.");
+        createSecurityResource(display.getUserName().getValue(), display.getPassword().getValue());
       }
     });
   }
@@ -73,8 +82,20 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
     display.showPopup();
   }
 
-  private void createSecurityResource(String datasource, String table) {
-    // new ResourceRequestBuilder<JsArray<?>>(eventBus).forResource("/auth/sessions").post()
-  }
+  private void createSecurityResource(String username, String password) {
+    new ResourceRequestBuilder<JsArray<?>>(eventBus).forResource("/auth/sessions").post().accept("application/xml").withCallback(403, new ResponseCodeCallback() {
 
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        display.showErrorMessage();
+      }
+    }).withCallback(201, new ResponseCodeCallback() {
+
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        // TODO Save token? Send event to display Variable Explorer.
+        Window.alert("Created");
+      }
+    }).withBody("username=" + username + "\npassword=" + password + "\n").send();
+  }
 }

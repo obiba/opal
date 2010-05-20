@@ -1,16 +1,21 @@
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder' xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+  <ui:style>
+    .error { color: red; }
+    .applicationTitle { font-weight: bold; font-size: x-large; }
+  </ui:style>
+
   <g:HTMLPanel>
     <table>
       <tr>
         <td/>
         <td>
-          <g:Label ui:field="applicationName" text="Opal" />
+          <span class='{style.applicationTitle}'><g:Label ui:field="applicationName" text="Opal" /></span>
         </td>
       </tr>
       <tr>
         <td/>
         <td>
-          <g:Label ui:field="errorMessage" text="Authentication Failed" />
+          <span class='{style.error}'><g:Label ui:field="errorMessage" text="Authentication Failed" /></span>          
         </td>
       </tr>
       <tr>
