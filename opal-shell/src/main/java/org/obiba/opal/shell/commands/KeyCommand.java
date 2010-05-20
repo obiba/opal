@@ -38,7 +38,7 @@ import org.springframework.util.Assert;
 /**
  * Provides key management allowing for key creation, deletion, importing and exporting of keys.
  */
-@CommandUsage(description = "Creates, deletes, imports and exports keypairs/certificates.", syntax = "Syntax: keystore --unit NAME (--action list | --alias NAME (--action create --algo NAME --size INT | --action delete | --action import [--private FILE] [--certificate FILE] | --action export [--certificate FILE]))")
+@CommandUsage(description = "Creates, deletes, imports and exports keypairs/certificates.", syntax = "Syntax: keystore [--unit NAME] (--action list | --alias NAME (--action create --algo NAME --size INT | --action delete | --action import --private FILE [--certificate FILE] | --action export --certificate FILE))")
 public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOptions> {
 
   private static final String CREATE_ACTION = "create";
