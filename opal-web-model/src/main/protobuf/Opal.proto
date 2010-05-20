@@ -9,4 +9,11 @@ message FunctionalUnitDto {
 
 message FileDto {
   required string name = 1;
+  required string path = 2;
+  enum fileType {
+    FILE = 0;
+    FOLDER = 1;
+  }
+  required fileType type = 3;
+  repeated FileDto children = 4;
 }
