@@ -10,12 +10,15 @@
 package org.obiba.opal.audit;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.obiba.magma.audit.UserProvider;
 
 public class OpalUserProvider implements UserProvider {
 
   public String getUsername() {
-    return SecurityUtils.getSubject().getPrincipal().toString();
+    // TODO: Defaulting to "Unknown" as a temporary patch.
+    Subject subject = SecurityUtils.getSubject();
+    return (subject != null && subject.getPrincipal() != null) ? subject.getPrincipal().toString() : "Unknown";
   }
 
 }

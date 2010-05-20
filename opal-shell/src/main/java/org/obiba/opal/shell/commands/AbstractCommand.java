@@ -11,6 +11,8 @@ package org.obiba.opal.shell.commands;
 
 import org.obiba.opal.shell.OpalShell;
 
+import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
+
 /**
  * Base class for commands.
  */
@@ -19,13 +21,23 @@ public abstract class AbstractCommand<T> implements Command<T> {
   // Instance Variables
   //
 
+  private String name;
+
   private OpalShell shell;
 
   protected T options;
 
   //
-  // Methods
+  // Command Methods
   //
+
+  public String getName() {
+    if(name == null) {
+      CommandLineInterface annotation = getCommandLineInterfaceAnnotation();
+      name = annotation.application();
+    }
+    return name;
+  }
 
   public void setOptions(T options) {
     this.options = options;
@@ -35,7 +47,22 @@ public abstract class AbstractCommand<T> implements Command<T> {
     this.shell = shell;
   }
 
+  //
+  // Methods
+  //
+
   public OpalShell getShell() {
     return shell;
+  }
+
+  private CommandLineInterface getCommandLineInterfaceAnnotation() {
+    CommandLineInterface annotation = options.getClass().getAnnotation(CommandLineInterface.class);
+    if(annotation == null) {
+      for(Class<?> optionsInterface : options.getClass().getInterfaces()) {
+        annotation = optionsInterface.getAnnotation(CommandLineInterface.class);
+        if(annotation != null) break;
+      }
+    }
+    return annotation;
   }
 }

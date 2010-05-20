@@ -68,7 +68,7 @@ public class DefaultCommandJobService implements CommandJobService {
   //
 
   public void launchCommand(CommandJob commandJob) {
-    commandJob.setOwner("none"); // userProvider.getUsername());
+    commandJob.setOwner(userProvider.getUsername());
     commandJob.setSubmitTime(getCurrentTime());
 
     executor.execute(commandJob);

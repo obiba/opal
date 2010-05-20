@@ -16,6 +16,8 @@ import org.obiba.opal.shell.OpalShell;
  */
 public interface Command<T> {
 
+  public String getName();
+
   public void setShell(OpalShell shell);
 
   /**
