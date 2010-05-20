@@ -31,3 +31,15 @@ message ImportCommandOptionsDto {
   optional string archive = 3;
   repeated string files = 4;
 }
+
+message CopyCommandOptionsDto {
+  optional string source = 1;
+  optional string destination = 2;
+  optional string out = 3;
+  optional bool nonIncremental = 4;
+  optional bool noValues = 5;
+  optional bool noVariables = 6;
+  optional string multiplex = 7;
+  optional string transform = 8;
+  repeated string tables = 9;
+}

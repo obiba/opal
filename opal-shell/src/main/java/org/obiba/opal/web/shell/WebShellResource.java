@@ -21,8 +21,10 @@ import javax.ws.rs.Path;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.commands.Command;
+import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
 import org.obiba.opal.shell.service.CommandJobService;
+import org.obiba.opal.shell.web.CopyCommandOptionsDtoImpl;
 import org.obiba.opal.shell.web.ImportCommandOptionsDtoImpl;
 import org.obiba.opal.web.model.Commands;
 import org.obiba.opal.web.model.Commands.CommandStateDto;
@@ -61,8 +63,8 @@ public class WebShellResource {
       .setCommandArgs(commandJob.getCommand().toString()) //
       .setOwner(commandJob.getOwner()) //
       .setStatus(commandJob.getStatus()) //
-      .setStartTime(formatTime(commandJob.getStartTime())) //
-      .setEndTime(formatTime(commandJob.getEndTime())) //
+      .setStartTime(commandJob.getStartTime() != null ? formatTime(commandJob.getStartTime()) : null) //
+      .setEndTime(commandJob.getEndTime() != null ? formatTime(commandJob.getEndTime()) : null) //
       .addAllMessages(commandJob.getMessages()).build();
 
       commandDtoList.add(dto);
@@ -78,10 +80,17 @@ public class WebShellResource {
     Command<ImportCommandOptions> importCommand = commandRegistry.newCommand("import");
     importCommand.setOptions(importOptions);
 
-    CommandJob commandJob = new CommandJob();
-    importCommand.setShell(commandJob);
-    commandJob.setCommand(importCommand);
-    commandJobService.launchCommand(commandJob);
+    launchCommand(importCommand);
+  }
+
+  @POST
+  @Path("/copy")
+  public void copyData(Commands.CopyCommandOptionsDto options) {
+    CopyCommandOptions copyOptions = new CopyCommandOptionsDtoImpl(options);
+    Command<CopyCommandOptions> copyCommand = commandRegistry.newCommand("copy");
+    copyCommand.setOptions(copyOptions);
+
+    launchCommand(copyCommand);
   }
 
   //
@@ -99,5 +108,12 @@ public class WebShellResource {
   protected String formatTime(Date date) {
     SimpleDateFormat dateFormat = new SimpleDateFormat(CommandJob.DATE_FORMAT_PATTERN);
     return dateFormat.format(date);
+  }
+
+  private void launchCommand(Command<?> command) {
+    CommandJob commandJob = new CommandJob();
+    command.setShell(commandJob);
+    commandJob.setCommand(command);
+    commandJobService.launchCommand(commandJob);
   }
 }
