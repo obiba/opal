@@ -34,6 +34,8 @@ public class ResourceRequestBuilder<T extends JavaScriptObject> {
 
   private String body;
 
+  private String acceptHeader;
+
   private ResourceCallback<T> resourceCallback;
 
   // An array of handlers for HTTP status codes: the index of the array is the HTTP code. This will be 99% empty. This
@@ -70,6 +72,11 @@ public class ResourceRequestBuilder<T extends JavaScriptObject> {
     return this;
   }
 
+  public ResourceRequestBuilder<T> accept(String acceptHeader) {
+    this.acceptHeader = acceptHeader;
+    return this;
+  }
+
   public ResourceRequestBuilder<T> withBody(String body) {
     this.body = body;
     return this;
@@ -103,9 +110,10 @@ public class ResourceRequestBuilder<T extends JavaScriptObject> {
   public RequestBuilder build() {
     builder = new RequestBuilder(method, uri);
     builder.setCallback(new InnerCallback());
-    if(resourceCallback != null) {
+    if(resourceCallback != null && acceptHeader == null) {
       builder.setHeader("Accept", "application/x-protobuf+json");
     }
+    if(acceptHeader != null) builder.setHeader("Accept", acceptHeader);
     if(body != null) builder.setRequestData(body);
     return builder;
   }
@@ -128,6 +136,10 @@ public class ResourceRequestBuilder<T extends JavaScriptObject> {
     @Override
     public void onResponseReceived(Request request, Response response) {
       int code = response.getStatusCode();
+
+      // Restore the 403 code when the request is 'forbidden'. This ensures the correct handler is called.
+      if(code == 0 && response.getStatusText().equalsIgnoreCase("Forbidden")) code = 403;
+
       if(codes != null && codes[code] != null) {
         codes[code].onResponseCode(request, response);
       } else {
