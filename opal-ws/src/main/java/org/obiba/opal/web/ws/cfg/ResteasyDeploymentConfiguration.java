@@ -12,14 +12,16 @@ package org.obiba.opal.web.ws.cfg;
 import java.net.URL;
 
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
+import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.plugins.server.servlet.ConfigurationBootstrap;
 import org.jboss.resteasy.plugins.spring.SpringBeanProcessor;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.jboss.resteasy.spi.interception.PostProcessInterceptor;
 import org.jboss.resteasy.spi.interception.PreProcessInterceptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -53,35 +55,50 @@ public class ResteasyDeploymentConfiguration {
 
   @Bean
   public SpringBeanProcessor resteasyPostProcessor() {
-    return new SpringBeanProcessor(resteasyDeployment().getDispatcher()) {
-      @Override
-      public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        super.postProcessBeanFactory(beanFactory);
+    return new SpringBeanProcessor(resteasyDeployment().getDispatcher());
+  }
 
-        for(String name : beanFactory.getBeanDefinitionNames()) {
-          BeanDefinition beanDef = beanFactory.getBeanDefinition(name);
-          if(beanDef.getBeanClassName() == null) continue;
-          if(beanDef.isAbstract()) continue;
+  @Bean
+  public ServerInterceptorSpringBeanProcessor resteasyInterceptorPostProcessor() {
+    return new ServerInterceptorSpringBeanProcessor(resteasyDeployment().getDispatcher());
+  }
 
-          Class<?> beanClass = null;
-          try {
-            beanClass = Thread.currentThread().getContextClassLoader().loadClass(beanDef.getBeanClassName());
-          } catch(ClassNotFoundException e) {
-            throw new RuntimeException(e);
-          }
-          if(beanClass.isAnnotationPresent(ServerInterceptor.class)) {
-            if(PreProcessInterceptor.class.isAssignableFrom(beanClass)) {
-              System.out.println("Registering " + beanDef.getBeanClassName() + "as preprocessor");
-              super.getProviderFactory().getServerPreProcessInterceptorRegistry().register((Class<PreProcessInterceptor>) beanClass);
-            }
-            if(PostProcessInterceptor.class.isAssignableFrom(beanClass)) {
-              System.out.println("Registering " + beanDef.getBeanClassName() + "as postprocessor");
-              super.getProviderFactory().getServerPostProcessInterceptorRegistry().register((Class<PostProcessInterceptor>) beanClass);
-            }
-          }
+  /**
+   * Required because the normal SpringBeanProcessor does not pickup classes annotated with {@code ServerInterceptor}.
+   * This
+   * 
+   * https://jira.jboss.org/browse/RESTEASY-394
+   */
+  private static class ServerInterceptorSpringBeanProcessor implements BeanPostProcessor {
+
+    private static final Logger log = LoggerFactory.getLogger(ServerInterceptorSpringBeanProcessor.class);
+
+    private final Dispatcher dispatcher;
+
+    public ServerInterceptorSpringBeanProcessor(final Dispatcher dispatcher) {
+      this.dispatcher = dispatcher;
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+      Class<?> beanClass = bean.getClass();
+      if(beanClass.isAnnotationPresent(ServerInterceptor.class)) {
+        if(PreProcessInterceptor.class.isAssignableFrom(beanClass)) {
+          log.info("Registring bean '{}' as pre-process interceptor.", beanName);
+          dispatcher.getProviderFactory().getServerPreProcessInterceptorRegistry().register((PreProcessInterceptor) bean);
         }
-
+        if(PostProcessInterceptor.class.isAssignableFrom(beanClass)) {
+          log.info("Registring bean '{}' as post-process interceptor.", beanName);
+          dispatcher.getProviderFactory().getServerPostProcessInterceptorRegistry().register((PostProcessInterceptor) bean);
+        }
       }
-    };
+      return bean;
+    }
+
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+      return bean;
+    }
+
   }
 }
