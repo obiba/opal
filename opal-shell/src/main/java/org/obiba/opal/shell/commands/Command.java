@@ -21,6 +21,13 @@ public interface Command<T> {
   public void setShell(OpalShell shell);
 
   /**
+   * Returns the command's options.
+   * 
+   * @return options
+   */
+  public T getOptions();
+
+  /**
    * Sets the command's options.
    * 
    * @param options options
