@@ -1,0 +1,18 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
+
+  <g:LayoutPanel>
+    <g:layer top="0" height="1em">
+      <g:Label>Data Import</g:Label>
+    </g:layer>
+    <g:layer top="1em" height="100%">
+      <g:Label>Content</g:Label>
+    </g:layer>
+    <g:layer bottom="0" height="3em">
+      <g:HorizontalPanel>
+        <g:Button>Import</g:Button>
+        <g:Button>Cancel</g:Button>
+      </g:HorizontalPanel>
+    </g:layer>
+  </g:LayoutPanel>
+
+</ui:UiBinder>
