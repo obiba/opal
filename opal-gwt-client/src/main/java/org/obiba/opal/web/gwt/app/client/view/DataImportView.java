@@ -16,7 +16,6 @@ import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -35,9 +34,6 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
 
   @UiField
   DialogBox dialog;
-
-  @UiField
-  Anchor close;
 
   public DataImportView() {
     uiBinder.createAndBindUi(this);
