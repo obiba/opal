@@ -15,7 +15,7 @@
                 <g:Anchor>Studies</g:Anchor>
                 <g:Anchor>Profile</g:Anchor>
                 <g:Anchor>Help</g:Anchor>
-                <g:Anchor>Quit</g:Anchor>
+                <g:Anchor ui:field="quit">Quit</g:Anchor>
               </g:HorizontalPanel>
             </g:Cell>
           </g:VerticalPanel>

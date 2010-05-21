@@ -2,6 +2,7 @@ package org.obiba.opal.web.gwt.app.client.view;
 
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 
+import com.google.gwt.animation.client.Animation;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -89,6 +90,20 @@ public class LoginView extends PopupPanel implements LoginPresenter.Display {
   @Override
   public void showErrorMessage() {
     errorMessage.setVisible(true);
+    new Animation() {
+
+      @Override
+      protected void onUpdate(double progress) {
+        errorMessage.getElement().setAttribute("style", "opacity:" + progress);
+      }
+
+    }.run(200);
   }
 
+  @Override
+  public void hidePopup() {
+    setGlassEnabled(false);
+    errorMessage.setVisible(false);
+    hide();
+  }
 }

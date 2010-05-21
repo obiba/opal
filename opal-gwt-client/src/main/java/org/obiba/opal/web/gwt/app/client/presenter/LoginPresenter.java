@@ -15,18 +15,17 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Cookies;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 
@@ -35,6 +34,8 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
   public interface Display extends WidgetDisplay {
 
     public void showPopup();
+
+    public void hidePopup();
 
     public void showPopupWithGlassPanel();
 
@@ -67,7 +68,6 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
   protected void onBind() {
     display.getSignIn().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
-        Window.alert("Login not implement. Click outside Sign In popup to start.");
         createSecurityResource(display.getUserName().getValue(), display.getPassword().getValue());
       }
     });
@@ -91,19 +91,21 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
   }
 
   private void createSecurityResource(String username, String password) {
-    factory.newBuilder().forResource("/auth/sessions").post().withCallback(403, new ResponseCodeCallback() {
+    ResponseCodeCallback authError = new ResponseCodeCallback() {
 
       @Override
       public void onResponseCode(Request request, Response response) {
         display.showErrorMessage();
       }
-    }).withCallback(201, new ResponseCodeCallback() {
+    };
+
+    factory.newBuilder().forResource("/auth/sessions").post().withCallback(403, authError).withCallback(401, authError).withCallback(201, new ResponseCodeCallback() {
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        String creds = Cookies.getCookie("opalsid");
-        GWT.log("Creds: " + creds);
-        credentials.setCredentials(creds);
+        display.hidePopup();
+        credentials.setCredentials(Cookies.getCookie("opalsid"));
+        eventBus.fireEvent(new SessionCreatedEvent(response.getHeader("Location")));
       }
     }).withFormBody("username", username, "password", password).send();
   }

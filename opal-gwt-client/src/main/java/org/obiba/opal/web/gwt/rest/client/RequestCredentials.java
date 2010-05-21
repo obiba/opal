@@ -25,6 +25,10 @@ public class RequestCredentials {
     return builder;
   }
 
+  public void invalidate() {
+    this.credentials = null;
+  }
+
   public void setCredentials(String credentials) {
     this.credentials = credentials;
   }

@@ -15,8 +15,13 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.SessionExpiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
+import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
@@ -30,11 +35,15 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
   public interface Display extends WidgetDisplay {
 
+    HasClickHandlers getQuit();
+
     MenuItem getExploreVariables();
 
     void updateWorkbench(Widget workbench);
 
   }
+
+  private final RequestCredentials credentials;
 
   private final Provider<NavigatorPresenter> navigationPresenter;
 
@@ -45,9 +54,10 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
    * @param eventBus
    */
   @Inject
-  public ApplicationPresenter(final Display display, final EventBus eventBus, Provider<NavigatorPresenter> navigationPresenter) {
+  public ApplicationPresenter(final Display display, final EventBus eventBus, Provider<NavigatorPresenter> navigationPresenter, RequestCredentials credentials) {
     super(display, eventBus);
     this.navigationPresenter = navigationPresenter;
+    this.credentials = credentials;
   }
 
   @Override
@@ -63,6 +73,18 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       @Override
       public void execute() {
         eventBus.fireEvent(new WorkbenchChangeEvent(navigationPresenter.get()));
+      }
+    });
+
+    getDisplay().getQuit().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        credentials.invalidate();
+        if(workbench != null) {
+          workbench.unbind();
+          // Need to send to some type of no-workbench place.
+        }
+        eventBus.fireEvent(new SessionExpiredEvent());
       }
     });
 

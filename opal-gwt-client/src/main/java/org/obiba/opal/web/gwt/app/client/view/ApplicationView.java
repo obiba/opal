@@ -12,9 +12,11 @@ package org.obiba.opal.web.gwt.app.client.view;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.MenuBar;
@@ -40,6 +42,9 @@ public class ApplicationView extends Composite implements ApplicationPresenter.D
   MenuBar menuBar;
 
   @UiField
+  Anchor quit;
+
+  @UiField
   MenuItem exploreVariablesItem;
 
   @UiField
@@ -58,6 +63,11 @@ public class ApplicationView extends Composite implements ApplicationPresenter.D
   public void updateWorkbench(Widget workbench) {
     this.workbench.clear();
     this.workbench.add(workbench);
+  }
+
+  @Override
+  public HasClickHandlers getQuit() {
+    return quit;
   }
 
   @Override
