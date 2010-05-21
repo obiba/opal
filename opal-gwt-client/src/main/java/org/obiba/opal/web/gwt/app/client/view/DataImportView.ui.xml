@@ -1,18 +1,22 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
 
-  <g:LayoutPanel>
-    <g:layer top="0" height="1em">
-      <g:Label>Data Import</g:Label>
-    </g:layer>
-    <g:layer top="1em" height="100%">
-      <g:Label>Content</g:Label>
-    </g:layer>
-    <g:layer bottom="0" height="3em">
-      <g:HorizontalPanel>
-        <g:Button>Import</g:Button>
-        <g:Button>Cancel</g:Button>
-      </g:HorizontalPanel>
-    </g:layer>
-  </g:LayoutPanel>
+  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" height="50em" width="50em">
+    <g:caption>Data Import</g:caption>
+    <!-- These sizes have to match EXACTLY the ones on DialogBox above -->
+    <g:LayoutPanel height="50em" width="50em">
+      <g:layer top="0em" bottom="5em">
+        <g:Label>Content</g:Label>
+      </g:layer>
+      <g:layer bottom="6em" height="1em">
+        <g:Label>-----------------------------------</g:Label>
+      </g:layer>
+      <g:layer bottom="0" height="5em">
+        <g:HorizontalPanel>
+          <g:Button>Import</g:Button>
+          <g:Button>Cancel</g:Button>
+        </g:HorizontalPanel>
+      </g:layer>
+    </g:LayoutPanel>
+  </g:DialogBox>
 
 </ui:UiBinder>

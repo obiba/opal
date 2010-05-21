@@ -41,11 +41,14 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
     void updateWorkbench(Widget workbench);
 
+    MenuItem getDataImportItem();
   }
 
   private final RequestCredentials credentials;
 
   private final Provider<NavigatorPresenter> navigationPresenter;
+
+  private final Provider<DataImportPresenter> dataImportPresenter;
 
   private WidgetPresenter<?> workbench;
 
@@ -54,10 +57,11 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
    * @param eventBus
    */
   @Inject
-  public ApplicationPresenter(final Display display, final EventBus eventBus, Provider<NavigatorPresenter> navigationPresenter, RequestCredentials credentials) {
+  public ApplicationPresenter(final Display display, final EventBus eventBus, Provider<NavigatorPresenter> navigationPresenter, Provider<DataImportPresenter> dataImportPresenter, RequestCredentials credentials) {
     super(display, eventBus);
     this.navigationPresenter = navigationPresenter;
     this.credentials = credentials;
+    this.dataImportPresenter = dataImportPresenter;
   }
 
   @Override
@@ -73,6 +77,16 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       @Override
       public void execute() {
         eventBus.fireEvent(new WorkbenchChangeEvent(navigationPresenter.get()));
+      }
+    });
+
+    getDisplay().getDataImportItem().setCommand(new Command() {
+
+      @Override
+      public void execute() {
+        DataImportPresenter presenter = dataImportPresenter.get();
+        presenter.bind();
+        presenter.revealDisplay();
       }
     });
 

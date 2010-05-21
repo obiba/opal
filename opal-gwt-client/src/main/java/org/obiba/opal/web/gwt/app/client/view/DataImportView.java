@@ -12,26 +12,51 @@ package org.obiba.opal.web.gwt.app.client.view;
 import org.obiba.opal.web.gwt.app.client.presenter.DataImportPresenter;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.LayoutPanel;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
  *
  */
-public class DataImportView extends PopupPanel implements DataImportPresenter.Display {
+public class DataImportView extends Composite implements DataImportPresenter.Display {
 
   @UiTemplate("DataImportView.ui.xml")
-  interface ViewUiBinder extends UiBinder<LayoutPanel, DataImportView> {
+  interface ViewUiBinder extends UiBinder<DialogBox, DataImportView> {
   }
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
+  @UiField
+  DialogBox dialog;
+
+  @UiField
+  Anchor close;
+
   public DataImportView() {
-    super(false, true);
-    add(uiBinder.createAndBindUi(this));
+    uiBinder.createAndBindUi(this);
+    getDialog().setGlassEnabled(true);
+  }
+
+  @Override
+  public HasCloseHandlers<PopupPanel> getDialogBox() {
+    return dialog;
+  }
+
+  @Override
+  public void showDialog() {
+    getDialog().center();
+    getDialog().show();
+  }
+
+  public DialogBox getDialog() {
+    return dialog;
   }
 
   @Override

@@ -13,11 +13,13 @@ import net.customware.gwt.presenter.client.DefaultEventBus;
 import net.customware.gwt.presenter.client.EventBus;
 
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.view.ApplicationView;
+import org.obiba.opal.web.gwt.app.client.view.DataImportView;
 import org.obiba.opal.web.gwt.app.client.view.LoginView;
 import org.obiba.opal.web.gwt.app.client.view.NavigatorView;
 import org.obiba.opal.web.gwt.app.client.view.UnhandledResponseNotificationView;
@@ -42,6 +44,7 @@ public class OpalGinModule extends AbstractGinModule {
     bind(VariablePresenter.Display.class).to(VariableView.class);
     bind(LoginPresenter.Display.class).to(LoginView.class);
     bind(UnhandledResponseNotificationPresenter.Display.class).to(UnhandledResponseNotificationView.class);
+    bind(DataImportPresenter.Display.class).to(DataImportView.class);
 
     // Concrete classes (such as NavigatorPresenter) don't need to be "bound". Simply define a getter in the
     // OpalGinjector interface and they'll "just work".

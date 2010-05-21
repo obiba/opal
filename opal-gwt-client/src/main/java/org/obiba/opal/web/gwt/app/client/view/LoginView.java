@@ -40,9 +40,10 @@ public class LoginView extends PopupPanel implements LoginPresenter.Display {
 
   public LoginView() {
     // Clicking outside of the popupPanel will dismiss the panel, panel is modal
-    super(true, true);
+    super(false, true);
     add(uiBinder.createAndBindUi(this));
     errorMessage.setVisible(false);
+    setGlassEnabled(true);
   }
 
   @Override
@@ -75,14 +76,14 @@ public class LoginView extends PopupPanel implements LoginPresenter.Display {
 
   @Override
   public void showPopup() {
-    setGlassEnabled(false);
+    // setGlassEnabled(false);
     center();
     show();
   }
 
   @Override
   public void showPopupWithGlassPanel() {
-    setGlassEnabled(true);
+    // setGlassEnabled(true);
     center();
     show();
   }

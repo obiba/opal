@@ -32,7 +32,7 @@
             <g:MenuItem>
               Data
               <g:MenuBar vertical="true">
-                <g:MenuItem>Import...</g:MenuItem>
+                <g:MenuItem ui:field="dataImportItem">Import...</g:MenuItem>
                 <g:MenuItem>Export...</g:MenuItem>
               </g:MenuBar>
             </g:MenuItem>

@@ -48,6 +48,9 @@ public class ApplicationView extends Composite implements ApplicationPresenter.D
   MenuItem exploreVariablesItem;
 
   @UiField
+  MenuItem dataImportItem;
+
+  @UiField
   Panel workbench;
 
   public ApplicationView() {
@@ -57,6 +60,11 @@ public class ApplicationView extends Composite implements ApplicationPresenter.D
   @Override
   public MenuItem getExploreVariables() {
     return exploreVariablesItem;
+  }
+
+  @Override
+  public MenuItem getDataImportItem() {
+    return dataImportItem;
   }
 
   @Override
