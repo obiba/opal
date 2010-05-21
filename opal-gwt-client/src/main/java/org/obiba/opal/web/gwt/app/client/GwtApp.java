@@ -1,5 +1,6 @@
 package org.obiba.opal.web.gwt.app.client;
 
+import org.obiba.opal.web.gwt.app.client.event.SessionExpiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
@@ -47,6 +48,12 @@ public class GwtApp implements EntryPoint {
         GWT.log("Request error: ", e.getException());
       }
     });
+    opalGinjector.getEventBus().addHandler(SessionExpiredEvent.getType(), new SessionExpiredEvent.Handler() {
+      @Override
+      public void onSessionExpired(SessionExpiredEvent event) {
+        GWT.log("Session expired");
+        opalGinjector.getLoginPresenter().revealDisplay();
+      }
+    });
   }
-
 }
