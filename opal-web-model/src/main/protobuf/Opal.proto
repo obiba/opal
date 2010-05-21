@@ -7,6 +7,35 @@ message FunctionalUnitDto {
   required string keyVariableName = 2;
 }
 
+message KeyPairDto {
+  required string alias = 1;
+  required string certificate = 2;
+}
+
+message KeyPairForm {
+  required string alias = 1;
+  
+  optional PrivateKeyForm privateForm = 2;
+  optional string privateImport = 3;
+  
+  optional PublicKeyForm publicForm = 4;
+  optional string publicImport = 5;
+}
+
+message PrivateKeyForm {
+  required string algo = 1;
+  required int32 size = 2; 
+}
+
+message PublicKeyForm {
+  required string name = 1;
+  required string organizationalUnit = 2;
+  required string organization = 3;
+  required string locality = 4;
+  required string state = 5;
+  required string country = 6;
+}
+
 message FileDto {
   required string name = 1;
   required string path = 2;
