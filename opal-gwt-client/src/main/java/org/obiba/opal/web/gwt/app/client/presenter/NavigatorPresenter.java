@@ -22,7 +22,7 @@ import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.DatasourceDto;
 import org.obiba.opal.web.model.client.VariableDto;
 
@@ -55,6 +55,8 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     void renderRows(Iterable<VariableDto> rows);
   }
 
+  final private ResourceRequestBuilderFactory factory;
+
   private JsArray<VariableDto> variables;
 
   /**
@@ -62,8 +64,9 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
    * @param eventBus
    */
   @Inject
-  public NavigatorPresenter(final Display display, final EventBus eventBus) {
+  public NavigatorPresenter(final Display display, final EventBus eventBus, final ResourceRequestBuilderFactory factory) {
     super(display, eventBus);
+    this.factory = factory;
   }
 
   @Override
@@ -120,7 +123,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
   }
 
   private void updateTable(String datasource, String table) {
-    new ResourceRequestBuilder<JsArray<VariableDto>>(eventBus).forResource("/datasource/" + datasource + "/table/" + table + "/variables").get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
+    factory.<JsArray<VariableDto>> newBuilder().forResource("/datasource/" + datasource + "/table/" + table + "/variables").get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
       @Override
       public void onResource(Response response, JsArray<VariableDto> resource) {
         variables = resource;
@@ -131,7 +134,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
   }
 
   private void updateTree() {
-    new ResourceRequestBuilder<JsArray<DatasourceDto>>(eventBus).forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+    factory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
       public void onResource(Response response, JsArray<DatasourceDto> datasources) {
         ArrayList<TreeItem> items = new ArrayList<TreeItem>(datasources.length());

@@ -126,7 +126,7 @@ public class OpalJettyServer implements Service {
     ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS | ServletContextHandler.NO_SECURITY);
     contextHandler.setContextPath("/");
     contextHandler.addFilter(new FilterHolder(new AuthenticationFilter()), "/*", FilterMapping.DEFAULT);
-    contextHandler.addFilter(new FilterHolder(new DevelopmentModeFilter()), "/*", FilterMapping.DEFAULT);
+    // contextHandler.addFilter(new FilterHolder(new CrossOriginFilter()), "/*", FilterMapping.DEFAULT);
     contextHandler.addFilter(new FilterHolder(new TransactionFilter(txmgr)), "/*", FilterMapping.DEFAULT);
 
     webAppCtx = new AnnotationConfigWebApplicationContext();
@@ -195,7 +195,12 @@ public class OpalJettyServer implements Service {
         // Yes, then allow
         response.addHeader("Access-Control-Allow-Origin", "*");
         response.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, HEAD, OPTIONS");
-        response.addHeader("Access-Control-Allow-Headers", request.getHeader("Access-Control-Request-Headers"));
+        response.addHeader("Access-Control-Allow-Credentials", "true");
+        if(request.getHeader("Access-Control-Request-Headers") != null) {
+          response.addHeader("Access-Control-Allow-Headers", request.getHeader("Access-Control-Request-Headers"));
+        } else {
+          response.addHeader("Access-Control-Allow-Headers", "Location, Set-Cookie, X-Opal-Auth, Cookie");
+        }
         response.setStatus(200);
         // Commits the response. No further writing is possible.
         response.flushBuffer();

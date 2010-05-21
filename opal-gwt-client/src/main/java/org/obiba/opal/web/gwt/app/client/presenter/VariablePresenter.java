@@ -20,7 +20,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.CategoryDto;
 import org.obiba.opal.web.model.client.FrequencyDto;
 import org.obiba.opal.web.model.client.VariableDto;
@@ -45,13 +45,16 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
   }
 
+  final private ResourceRequestBuilderFactory factory;
+
   /**
    * @param display
    * @param eventBus
    */
   @Inject
-  public VariablePresenter(Display display, EventBus eventBus) {
+  public VariablePresenter(Display display, EventBus eventBus, final ResourceRequestBuilderFactory factory) {
     super(display, eventBus);
+    this.factory = factory;
   }
 
   @Override
@@ -89,7 +92,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   private void updateFrequencies(final VariableDto variable) {
     getDisplay().clearChart();
 
-    new ResourceRequestBuilder<JsArray<FrequencyDto>>(eventBus).forResource(variable.getLink() + "/frequencies.json").get().withCallback(new ResourceCallback<JsArray<FrequencyDto>>() {
+    factory.<JsArray<FrequencyDto>> newBuilder().forResource(variable.getLink() + "/frequencies.json").get().withCallback(new ResourceCallback<JsArray<FrequencyDto>>() {
 
       @Override
       public void onResource(Response response, JsArray<FrequencyDto> frequencies) {

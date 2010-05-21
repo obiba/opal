@@ -15,15 +15,17 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
+import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 
-import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
@@ -45,9 +47,15 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
     public HasClickHandlers getSignIn();
   }
 
+  private final ResourceRequestBuilderFactory factory;
+
+  private final RequestCredentials credentials;
+
   @Inject
-  public LoginPresenter(Display display, EventBus eventBus) {
+  public LoginPresenter(Display display, EventBus eventBus, ResourceRequestBuilderFactory factory, RequestCredentials credentials) {
     super(display, eventBus);
+    this.factory = factory;
+    this.credentials = credentials;
   }
 
   @Override
@@ -83,7 +91,7 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
   }
 
   private void createSecurityResource(String username, String password) {
-    new ResourceRequestBuilder<JsArray<?>>(eventBus).forResource("/auth/sessions").post().accept("application/xml").withCallback(403, new ResponseCodeCallback() {
+    factory.newBuilder().forResource("/auth/sessions").post().withCallback(403, new ResponseCodeCallback() {
 
       @Override
       public void onResponseCode(Request request, Response response) {
@@ -93,9 +101,10 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        // TODO Save token? Send event to display Variable Explorer.
-        Window.alert("Created");
+        String creds = Cookies.getCookie("opalsid");
+        GWT.log("Creds: " + creds);
+        credentials.setCredentials(creds);
       }
-    }).withBody("username=" + username + "\npassword=" + password + "\n").send();
+    }).withFormBody("username", username, "password", password).send();
   }
 }

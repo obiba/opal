@@ -22,8 +22,10 @@ import org.obiba.opal.web.gwt.app.client.view.LoginView;
 import org.obiba.opal.web.gwt.app.client.view.NavigatorView;
 import org.obiba.opal.web.gwt.app.client.view.UnhandledResponseNotificationView;
 import org.obiba.opal.web.gwt.app.client.view.VariableView;
+import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 
 import com.google.gwt.inject.client.AbstractGinModule;
+import com.google.inject.Singleton;
 
 /**
  *
@@ -34,6 +36,7 @@ public class OpalGinModule extends AbstractGinModule {
   protected void configure() {
     // Bind concrete implementations to interfaces
     bind(EventBus.class).to(DefaultEventBus.class);
+    bind(RequestCredentials.class).in(Singleton.class);
     bind(ApplicationPresenter.Display.class).to(ApplicationView.class);
     bind(NavigatorPresenter.Display.class).to(NavigatorView.class);
     bind(VariablePresenter.Display.class).to(VariableView.class);

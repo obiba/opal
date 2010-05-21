@@ -9,12 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.rest.client;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import net.customware.gwt.presenter.client.EventBus;
 
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
 import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
@@ -22,19 +24,26 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
 
 public class ResourceRequestBuilder<T extends JavaScriptObject> {
 
-  private final static String OPAL_WS_ROOT = GWT.isScript() ? GWT.getModuleBaseURL() + "ws" : "http://localhost:8080/ws";
+  private final static String OPAL_WS_ROOT = "/ws";
+
+  // GWT.isScript() ? GWT.getModuleBaseURL() + "ws" : "http://localhost:8080/ws";
 
   private final EventBus eventBus;
+
+  private final RequestCredentials credentials;
 
   private String uri;
 
   private String body;
 
   private String acceptHeader;
+
+  private Map<String, String> form = new HashMap<String, String>();
 
   private ResourceCallback<T> resourceCallback;
 
@@ -48,9 +57,10 @@ public class ResourceRequestBuilder<T extends JavaScriptObject> {
   private RequestBuilder builder;
 
   @Inject
-  public ResourceRequestBuilder(EventBus eventBus) {
+  public ResourceRequestBuilder(EventBus eventBus, RequestCredentials credentials) {
     if(eventBus == null) throw new IllegalArgumentException("eventBus cannot be null");
     this.eventBus = eventBus;
+    this.credentials = credentials;
   }
 
   public ResourceRequestBuilder<T> forResource(String resource) {
@@ -79,6 +89,14 @@ public class ResourceRequestBuilder<T extends JavaScriptObject> {
 
   public ResourceRequestBuilder<T> withBody(String body) {
     this.body = body;
+    return this;
+  }
+
+  public ResourceRequestBuilder<T> withFormBody(String key1, String value1, String... keyValues) {
+    form.put(key1, com.google.gwt.http.client.URL.encodeComponent(value1));
+    for(int i = 0; i < keyValues.length; i += 2) {
+      form.put(keyValues[i], com.google.gwt.http.client.URL.encodeComponent(keyValues[i + 1]));
+    }
     return this;
   }
 
@@ -115,6 +133,8 @@ public class ResourceRequestBuilder<T extends JavaScriptObject> {
     }
     if(acceptHeader != null) builder.setHeader("Accept", acceptHeader);
     if(body != null) builder.setRequestData(body);
+    if(form != null && form.size() > 0) builder.setRequestData(encodeForm());
+    if(credentials != null) credentials.provideCredentials(builder);
     return builder;
   }
 
@@ -126,8 +146,20 @@ public class ResourceRequestBuilder<T extends JavaScriptObject> {
     }
   }
 
-  private class InnerCallback implements RequestCallback {
+  private String encodeForm() {
+    builder.setHeader("Content-Type", "application/x-www-form-urlencoded");
+    boolean needSeparator = false;
+    StringBuilder sb = new StringBuilder();
+    for(String key : this.form.keySet()) {
+      String value = this.form.get(key);
+      if(needSeparator) sb.append('&');
+      sb.append(key).append('=').append(URL.encode(value));
+      needSeparator = true;
+    }
+    return sb.toString();
+  }
 
+  private class InnerCallback implements RequestCallback {
     @Override
     public void onError(Request request, Throwable exception) {
       eventBus.fireEvent(new RequestErrorEvent(exception));
