@@ -39,7 +39,7 @@ public class OpalSslContextFactory implements SslContextFactory {
 
   @Override
   public SSLContext createSslContext() {
-    UnitKeyStore serverKeystore = keystoreService.getUnitKeyStore(FunctionalUnit.OPAL_INSTANCE);
+    UnitKeyStore serverKeystore = keystoreService.getOrCreateUnitKeyStore(FunctionalUnit.OPAL_INSTANCE);
 
     List<UnitKeyStore> trustedKeyStores = Lists.newArrayList();
     for(FunctionalUnit unit : opalRuntime.getFunctionalUnits()) {
