@@ -26,10 +26,15 @@ import org.springframework.stereotype.Component;
 @Path("/files")
 public class FilesResource {
 
-  @Autowired
+  private static final Logger log = LoggerFactory.getLogger(FilesResource.class);
+
   private OpalRuntime opalRuntime;
 
-  private static final Logger log = LoggerFactory.getLogger(FilesResource.class);
+  @Autowired
+  public FilesResource(OpalRuntime opalRuntime) {
+    super();
+    this.opalRuntime = opalRuntime;
+  }
 
   @GET
   public Opal.FileDto getFileSystem() throws FileSystemException {

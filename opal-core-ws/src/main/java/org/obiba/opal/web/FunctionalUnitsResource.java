@@ -28,10 +28,15 @@ import com.google.common.collect.Lists;
 @Path("/functional-units")
 public class FunctionalUnitsResource {
 
-  @Autowired
+  private static final Logger log = LoggerFactory.getLogger(FunctionalUnitsResource.class);
+
   private OpalRuntime opalRuntime;
 
-  private static final Logger log = LoggerFactory.getLogger(FunctionalUnitsResource.class);
+  @Autowired
+  public FunctionalUnitsResource(OpalRuntime opalRuntime) {
+    super();
+    this.opalRuntime = opalRuntime;
+  }
 
   @GET
   public List<Opal.FunctionalUnitDto> getFunctionalUnits() {
