@@ -2,6 +2,7 @@ package org.obiba.opal.web.gwt.app.client;
 
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
 import org.obiba.opal.web.gwt.inject.client.OpalGinjector;
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
 import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
@@ -29,10 +30,14 @@ public class GwtApp implements EntryPoint {
     loginPresenter.bind();
     loginPresenter.revealDisplay();
 
+    final UnhandledResponseNotificationPresenter unhandledResponseNotificationPresenter = opalGinjector.getUnhandledResponseNotificationPresenter();
+    unhandledResponseNotificationPresenter.bind();
+
     opalGinjector.getEventBus().addHandler(UnhandledResponseEvent.getType(), new UnhandledResponseEvent.Handler() {
 
       @Override
       public void onUnhandledResponse(UnhandledResponseEvent e) {
+        unhandledResponseNotificationPresenter.revealDisplay();
         GWT.log("Unhandled request response: " + e.getRequest().toString());
       }
     });
