@@ -104,7 +104,7 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
       @Override
       public void onResponseCode(Request request, Response response) {
         display.hidePopup();
-        credentials.setCredentials(Cookies.getCookie("opalsid"));
+        credentials.setCredentials(Cookies.getCookie(RequestCredentials.OPALSID));
         eventBus.fireEvent(new SessionCreatedEvent(response.getHeader("Location")));
       }
     }).withFormBody("username", username, "password", password).send();

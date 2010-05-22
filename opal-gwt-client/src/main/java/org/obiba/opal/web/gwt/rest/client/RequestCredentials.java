@@ -16,6 +16,9 @@ import com.google.gwt.http.client.RequestBuilder;
  */
 public class RequestCredentials {
 
+  /** Opal session id cookie name. */
+  public static final String OPALSID = "opalsid";
+
   private String credentials = null;
 
   public RequestBuilder provideCredentials(RequestBuilder builder) {

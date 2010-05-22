@@ -14,6 +14,7 @@ import java.util.Map;
 
 import net.customware.gwt.presenter.client.EventBus;
 
+import org.obiba.opal.web.gwt.app.client.event.SessionExpiredEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
 import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 
@@ -25,6 +26,7 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
+import com.google.gwt.user.client.Cookies;
 import com.google.inject.Inject;
 
 public class ResourceRequestBuilder<T extends JavaScriptObject> {
@@ -172,7 +174,9 @@ public class ResourceRequestBuilder<T extends JavaScriptObject> {
       // Restore the 403 code when the request is 'forbidden'. This ensures the correct handler is called.
       if(code == 0 && response.getStatusText().equalsIgnoreCase("Forbidden")) code = 403;
 
-      if(codes != null && codes[code] != null) {
+      if(sessionHasExpired(response)) {
+        eventBus.fireEvent(new SessionExpiredEvent());
+      } else if(codes != null && codes[code] != null) {
         codes[code].onResponseCode(request, response);
       } else {
         if(resourceCallback != null && code < 400) {
@@ -182,6 +186,12 @@ public class ResourceRequestBuilder<T extends JavaScriptObject> {
           eventBus.fireEvent(new UnhandledResponseEvent(request, response));
         }
       }
+    }
+
+    public boolean sessionHasExpired(Response response) {
+      if(response.getStatusCode() != 404) return false;
+      if(Cookies.getCookie(RequestCredentials.OPALSID) == null) return true;
+      return false;
     }
 
   }
