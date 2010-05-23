@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.VariablePresenter;
+import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 
 import com.google.gwt.inject.client.GinModules;
@@ -25,6 +26,8 @@ import com.google.gwt.inject.client.Ginjector;
 public interface OpalGinjector extends Ginjector {
 
   EventBus getEventBus();
+
+  RequestCredentials getRequestCredentials();
 
   ResourceRequestBuilderFactory getRequestFactory();
 

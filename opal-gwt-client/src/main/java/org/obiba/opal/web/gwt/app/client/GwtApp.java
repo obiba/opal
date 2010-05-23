@@ -29,7 +29,10 @@ public class GwtApp implements EntryPoint {
 
     LoginPresenter loginPresenter = opalGinjector.getLoginPresenter();
     loginPresenter.bind();
-    loginPresenter.revealDisplay();
+    // Only display login if we don't currently have any credentials.
+    if(opalGinjector.getRequestCredentials().hasCredentials() == false) {
+      loginPresenter.revealDisplay();
+    }
 
     final UnhandledResponseNotificationPresenter unhandledResponseNotificationPresenter = opalGinjector.getUnhandledResponseNotificationPresenter();
     unhandledResponseNotificationPresenter.bind();
