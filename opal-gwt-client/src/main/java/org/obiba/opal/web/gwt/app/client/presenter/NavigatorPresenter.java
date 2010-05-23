@@ -76,13 +76,14 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
 
   @Override
   protected void onBind() {
-    getDisplay().getTree().addSelectionHandler(new SelectionHandler<TreeItem>() {
+    super.registerHandler(getDisplay().getTree().addSelectionHandler(new SelectionHandler<TreeItem>() {
       @Override
       public void onSelection(SelectionEvent<TreeItem> event) {
         eventBus.fireEvent(new NavigatorSelectionChangeEvent(event.getSelectedItem()));
       }
-    });
+    }));
 
+    // FIXME: this HandlerRegistration is not of the same type, so we can't pass it to our parent for unbinding.
     getDisplay().getTable().addRowSelectionHandler(new RowSelectionHandler() {
       @Override
       public void onRowSelection(RowSelectionEvent event) {

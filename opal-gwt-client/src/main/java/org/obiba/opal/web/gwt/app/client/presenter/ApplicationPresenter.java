@@ -94,10 +94,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       @Override
       public void onClick(ClickEvent event) {
         credentials.invalidate();
-        if(workbench != null) {
-          workbench.unbind();
-          // Need to send to some type of no-workbench place.
-        }
+        // Need to send to some type of no-workbench place.
         eventBus.fireEvent(new SessionExpiredEvent());
       }
     });

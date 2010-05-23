@@ -25,7 +25,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 
@@ -103,9 +102,13 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        display.hidePopup();
-        credentials.setCredentials(Cookies.getCookie(RequestCredentials.OPALSID));
-        eventBus.fireEvent(new SessionCreatedEvent(response.getHeader("Location")));
+        // When a 201 happens, we should have credentials, but we'll test anyway.
+        if(credentials.hasCredentials()) {
+          display.hidePopup();
+          eventBus.fireEvent(new SessionCreatedEvent(response.getHeader("Location")));
+        } else {
+          display.showErrorMessage();
+        }
       }
     }).withFormBody("username", username, "password", password).send();
   }

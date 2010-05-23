@@ -37,14 +37,14 @@ public class OpalGinModule extends AbstractGinModule {
   @Override
   protected void configure() {
     // Bind concrete implementations to interfaces
-    bind(EventBus.class).to(DefaultEventBus.class);
+    bind(EventBus.class).to(DefaultEventBus.class).in(Singleton.class);
     bind(RequestCredentials.class).in(Singleton.class);
-    bind(ApplicationPresenter.Display.class).to(ApplicationView.class);
-    bind(NavigatorPresenter.Display.class).to(NavigatorView.class);
-    bind(VariablePresenter.Display.class).to(VariableView.class);
-    bind(LoginPresenter.Display.class).to(LoginView.class);
-    bind(UnhandledResponseNotificationPresenter.Display.class).to(UnhandledResponseNotificationView.class);
-    bind(DataImportPresenter.Display.class).to(DataImportView.class);
+    bind(ApplicationPresenter.Display.class).to(ApplicationView.class).in(Singleton.class);
+    bind(NavigatorPresenter.Display.class).to(NavigatorView.class).in(Singleton.class);
+    bind(VariablePresenter.Display.class).to(VariableView.class).in(Singleton.class);
+    bind(LoginPresenter.Display.class).to(LoginView.class).in(Singleton.class);
+    bind(UnhandledResponseNotificationPresenter.Display.class).to(UnhandledResponseNotificationView.class).in(Singleton.class);
+    bind(DataImportPresenter.Display.class).to(DataImportView.class).in(Singleton.class);
 
     // Concrete classes (such as NavigatorPresenter) don't need to be "bound". Simply define a getter in the
     // OpalGinjector interface and they'll "just work".

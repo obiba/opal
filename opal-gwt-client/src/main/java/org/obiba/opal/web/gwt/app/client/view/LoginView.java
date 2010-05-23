@@ -103,8 +103,8 @@ public class LoginView extends PopupPanel implements LoginPresenter.Display {
 
   @Override
   public void hidePopup() {
-    setGlassEnabled(false);
     errorMessage.setVisible(false);
+    getPassword().setValue("");
     hide();
   }
 }

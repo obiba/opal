@@ -27,7 +27,6 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
-import com.google.gwt.user.client.Cookies;
 import com.google.inject.Inject;
 
 public class ResourceRequestBuilder<T extends JavaScriptObject> {
@@ -176,7 +175,7 @@ public class ResourceRequestBuilder<T extends JavaScriptObject> {
         throw new IllegalStateException("Invalid status code.");
       }
 
-      if(sessionHasExpired(response)) {
+      if(credentials.hasExpired(builder)) {
         eventBus.fireEvent(new SessionExpiredEvent());
       } else if(codes != null && codes[code] != null) {
         codes[code].onResponseCode(request, response);
@@ -188,12 +187,6 @@ public class ResourceRequestBuilder<T extends JavaScriptObject> {
           eventBus.fireEvent(new UnhandledResponseEvent(request, response));
         }
       }
-    }
-
-    public boolean sessionHasExpired(Response response) {
-      if(response.getStatusCode() != 404) return false;
-      if(Cookies.getCookie(RequestCredentials.OPALSID) == null) return true;
-      return false;
     }
 
   }
