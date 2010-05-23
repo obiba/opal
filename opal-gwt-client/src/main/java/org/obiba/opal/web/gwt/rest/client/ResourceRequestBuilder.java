@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.event.SessionExpiredEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
 import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
@@ -170,9 +171,10 @@ public class ResourceRequestBuilder<T extends JavaScriptObject> {
     @Override
     public void onResponseReceived(Request request, Response response) {
       int code = response.getStatusCode();
-
-      // Restore the 403 code when the request is 'forbidden'. This ensures the correct handler is called.
-      if(code == 0 && response.getStatusText().equalsIgnoreCase("Forbidden")) code = 403;
+      if(code == 0) {
+        GWT.log("Invalid status code. Status text was '" + response.getStatusText() + "'. Interrupting response handling.");
+        throw new IllegalStateException("Invalid status code.");
+      }
 
       if(sessionHasExpired(response)) {
         eventBus.fireEvent(new SessionExpiredEvent());
