@@ -15,7 +15,6 @@ import javax.ws.rs.HEAD;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -68,6 +67,6 @@ public class SecurityResource {
     } catch(InvalidSessionException e) {
       // Ignore
     }
-    return Response.ok().cookie(new NewCookie(SecurityInterceptor.OPAL_SESSION_ID_COOKIE_NAME, null, "/", null, "Opal session deleted", 0, false)).build();
+    return Response.ok().build();
   }
 }

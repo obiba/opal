@@ -77,6 +77,8 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
         String sessionId = SecurityUtils.getSubject().getSession().getId().toString();
         int timeout = (int) (SecurityUtils.getSubject().getSession().getTimeout() / 1000);
         response.getMetadata().add(HttpHeaderNames.SET_COOKIE, new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, sessionId, "/", null, null, timeout, false));
+      } else {
+        response.getMetadata().add(HttpHeaderNames.SET_COOKIE, new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, null, "/", null, "Opal session deleted", 0, false));
       }
 
       if(log.isDebugEnabled()) {
