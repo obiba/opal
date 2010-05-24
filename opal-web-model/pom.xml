@@ -229,6 +229,11 @@
       <id>obiba</id>
       <url>http://maven.obiba.org/maven2</url>
     </pluginRepository>
+    <pluginRepository>
+      <id>protostuff-repo</id>
+      <name>protostuff-repo</name>
+      <url>http://protostuff.googlecode.com/svn/repos/maven2</url>
+    </pluginRepository>
   </pluginRepositories>
 
   <properties>
@@ -237,7 +242,7 @@
     <maven.compiler.target>1.6</maven.compiler.target>
     <gwt.version>2.0.3</gwt.version>
     <protobuf.version>2.3.0</protobuf.version>
-    <protostuff.version>r788</protostuff.version>
+    <protostuff.version>1.0.0.M1</protostuff.version>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
   </properties>
 
