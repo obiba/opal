@@ -16,6 +16,11 @@ public interface CopyCommandOptions extends HelpOption {
   // In and out datasources
   // 
 
+  @Option(shortName = "u", description = "The functional unit.")
+  public String getUnit();
+
+  public boolean isUnit();
+
   @Option(shortName = "s", description = "Copy all tables from this datasource.")
   public String getSource();
 

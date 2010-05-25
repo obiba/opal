@@ -44,6 +44,7 @@ public class CopyCommandTest extends AbstractMagmaTest {
 
     mockShell.printf((String) EasyMock.anyObject(), (String) EasyMock.anyObject());
     EasyMock.expectLastCall().anyTimes();
+    EasyMock.expect(mockOptions.isUnit()).andReturn(false).anyTimes();
     EasyMock.expect(mockOptions.isSource()).andReturn(false).anyTimes();
     EasyMock.expect(mockOptions.isDestination()).andReturn(false).anyTimes();
     EasyMock.expect(mockOptions.isOut()).andReturn(true).anyTimes();

@@ -40,6 +40,14 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
     return false;
   }
 
+  public boolean isUnit() {
+    return dto.hasUnit();
+  }
+
+  public String getUnit() {
+    return dto.getUnit();
+  }
+
   public boolean isSource() {
     return dto.hasSource();
   }

@@ -33,13 +33,14 @@ message ImportCommandOptionsDto {
 }
 
 message CopyCommandOptionsDto {
-  optional string source = 1;
-  optional string destination = 2;
-  optional string out = 3;
-  optional bool nonIncremental = 4;
-  optional bool noValues = 5;
-  optional bool noVariables = 6;
-  optional string multiplex = 7;
-  optional string transform = 8;
-  repeated string tables = 9;
+  optional string unit = 1;
+  optional string source = 2;
+  optional string destination = 3;
+  optional string out = 4;
+  optional bool nonIncremental = 5;
+  optional bool noValues = 6;
+  optional bool noVariables = 7;
+  optional string multiplex = 8;
+  optional string transform = 9;
+  repeated string tables = 10;
 }

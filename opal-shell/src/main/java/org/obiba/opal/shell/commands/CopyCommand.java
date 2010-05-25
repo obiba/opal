@@ -37,7 +37,7 @@ import com.google.common.collect.ImmutableSet;
 /**
  * Provides ability to copy Magma tables to an existing datasource or an Excel file.
  */
-@CommandUsage(description = "Copy tables to an existing destination datasource or to a specified Excel file. The tables can be explicitly named and/or be the ones from a specified source datasource. The variables can be optionally processed: dispatched in another table and/or renamed.", syntax = "Syntax: copy [--source NAME] (--destination NAME | --out FILE) [--multiplex SCRIPT] [--transform SCRIPT] [--non-incremental] [--no-values | --no-variables] [TABLE_NAME...]")
+@CommandUsage(description = "Copy tables to an existing destination datasource or to a specified Excel file. The tables can be explicitly named and/or be the ones from a specified source datasource. The variables can be optionally processed: dispatched in another table and/or renamed.", syntax = "Syntax: copy [--unit UNIT] [--source NAME] (--destination NAME | --out FILE) [--multiplex SCRIPT] [--transform SCRIPT] [--non-incremental] [--no-values | --no-variables] [TABLE_NAME...]")
 public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommandOptions> {
 
   @Autowired
@@ -50,32 +50,28 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   public void execute() {
-    if(options.getTables() != null || options.isSource()) {
-      if(validateOptions()) {
-        Datasource destinationDatasource = null;
+    if(validateOptions()) {
+      Datasource destinationDatasource = null;
 
-        try {
-          destinationDatasource = getDestinationDatasource();
-          exportService.exportTablesToDatasource(getValueTables(), destinationDatasource, buildDatasourceCopier(destinationDatasource), !options.getNonIncremental());
+      try {
+        destinationDatasource = getDestinationDatasource();
+        exportService.exportTablesToDatasource(getValueTables(), destinationDatasource, buildDatasourceCopier(destinationDatasource), !options.getNonIncremental());
 
-        } catch(ExportException e) {
-          getShell().printf("%s\n", e.getMessage());
-          e.printStackTrace(System.err);
-        } catch(Exception e) {
-          getShell().printf("%s\n", e.getMessage());
-          e.printStackTrace(System.err);
-        } finally {
-          if(options.isOut() && destinationDatasource != null) {
-            try {
-              MagmaEngine.get().removeDatasource(destinationDatasource);
-            } catch(RuntimeException e) {
+      } catch(ExportException e) {
+        getShell().printf("%s\n", e.getMessage());
+        e.printStackTrace(System.err);
+      } catch(Exception e) {
+        getShell().printf("%s\n", e.getMessage());
+        e.printStackTrace(System.err);
+      } finally {
+        if(options.isOut() && destinationDatasource != null) {
+          try {
+            MagmaEngine.get().removeDatasource(destinationDatasource);
+          } catch(RuntimeException e) {
 
-            }
           }
         }
       }
-    } else {
-      getShell().printf("%s\n", "Neither source nor table name(s) are specified.");
     }
   }
 
@@ -84,31 +80,18 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
     sb.append("copy");
 
-    if(options.isSource()) {
-      appendOption(sb, "source", options.getSource());
+    if(options != null) {
+      appendOption(sb, "unit", options.isUnit(), options.getUnit());
+      appendOption(sb, "source", options.isSource(), options.getSource());
+      appendOption(sb, "destination", options.isDestination(), options.getDestination());
+      appendOption(sb, "out", options.isOut(), options.getOut());
+      appendOption(sb, "multiplex", options.isMultiplex(), options.getMultiplex());
+      appendOption(sb, "transform", options.isTransform(), options.getTransform());
+      appendFlag(sb, "non-incremental", options.getNonIncremental());
+      appendFlag(sb, "no-values", options.getNoValues());
+      appendFlag(sb, "no-variables", options.getNoVariables());
+      appendUnparsedList(sb, options.getTables());
     }
-
-    if(options.isDestination()) {
-      appendOption(sb, "destination", options.getDestination());
-    }
-
-    if(options.isOut()) {
-      appendOption(sb, "out", options.getOut());
-    }
-
-    if(options.isMultiplex()) {
-      appendOption(sb, "multiplex", options.getMultiplex());
-    }
-
-    if(options.isTransform()) {
-      appendOption(sb, "transform", options.getTransform());
-    }
-
-    appendFlag(sb, "non-incremental", options.getNonIncremental());
-    appendFlag(sb, "no-values", options.getNoValues());
-    appendFlag(sb, "no-variables", options.getNoVariables());
-
-    appendUnparsedList(sb, options.getTables());
 
     return sb.toString();
   }
@@ -142,7 +125,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     if(options.isDestination()) {
       destinationDatasource = getDatasourceByName(options.getDestination());
     } else {
-      FileObject outputFile = getOuputFile();
+      FileObject outputFile = getOutputFile();
       destinationDatasource = new ExcelDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
       MagmaEngine.get().addDatasource(destinationDatasource);
     }
@@ -174,22 +157,34 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   private boolean validateOptions() {
-    boolean validated = validateDestination();
-    validated = validateSource(validated);
-    validated = validateTables(validated);
-    validated = validateSwitches(validated);
-    return validated;
+    return validateUnit() && validateSourceOrTables() && validateSource() && validateDestination() && validateTables() && validateSwitches();
   }
 
-  private boolean validateSwitches(boolean validated) {
+  private boolean validateUnit() {
+    if(options.isUnit() && getOpalRuntime().getFunctionalUnit(options.getUnit()) == null) {
+      getShell().printf("Functional unit '%s' does not exist.\n", options.getUnit());
+      return false;
+    }
+    return true;
+  }
+
+  private boolean validateSourceOrTables() {
+    if(!options.isSource() && options.getTables() == null) {
+      getShell().printf("%s\n", "Neither source nor table name(s) are specified.");
+      return false;
+    }
+    return true;
+  }
+
+  private boolean validateSwitches() {
     if(options.getNoValues() && options.getNoVariables()) {
       getShell().printf("Must at least copy variables or values.\n");
-      validated = false;
+      return false;
     }
-    return validated;
+    return true;
   }
 
-  private boolean validateTables(boolean validated) {
+  private boolean validateTables() {
     if(options.getTables() != null) {
       for(String tableName : options.getTables()) {
         MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
@@ -197,47 +192,46 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
           resolver.resolveTable();
         } catch(NoSuchDatasourceException e) {
           getShell().printf("'%s' refers to an unknown datasource: '%s'.\n", tableName, resolver.getDatasourceName());
-          validated = false;
+          return false;
         } catch(NoSuchValueTableException e) {
           getShell().printf("Table '%s' does not exist in datasource : '%s'.\n", resolver.getTableName(), resolver.getDatasourceName());
-          validated = false;
+          return false;
         }
       }
     }
-    return validated;
+    return true;
   }
 
-  private boolean validateSource(boolean validated) {
+  private boolean validateSource() {
     if(options.isSource()) {
       try {
         getDatasourceByName(options.getSource());
       } catch(NoSuchDatasourceException e) {
         getShell().printf("Destination datasource '%s' does not exist.\n", options.getDestination());
-        validated = false;
+        return false;
       }
     }
-    return validated;
+    return true;
   }
 
   private boolean validateDestination() {
-    boolean validated = true;
     if(!options.isDestination() && !options.isOut()) {
       getShell().printf("Must provide either the 'destination' option or the 'out' option.\n");
-      validated = false;
+      return false;
     }
     if(options.isDestination() && options.isOut()) {
       getShell().printf("The 'destination' option and the 'out' option are mutually exclusive.\n");
-      validated = false;
+      return false;
     }
     if(options.isDestination()) {
       try {
         getDatasourceByName(options.getDestination());
       } catch(NoSuchDatasourceException e) {
         getShell().printf("Destination datasource '%s' does not exist.\n", options.getDestination());
-        validated = false;
+        return false;
       }
     }
-    return validated;
+    return true;
   }
 
   /**
@@ -246,7 +240,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
    * @return The output file.
    * @throws FileSystemException
    */
-  private FileObject getOuputFile() {
+  private FileObject getOutputFile() {
     try {
       // Get the file specified on the command line.
       return resolveOutputFileAndCreateParentFolders();
@@ -277,11 +271,13 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     return outputFile;
   }
 
-  private void appendOption(StringBuffer sb, String option, String value) {
-    sb.append(" --");
-    sb.append(option);
-    sb.append(' ');
-    sb.append(value);
+  private void appendOption(StringBuffer sb, String option, boolean optionSpecified, String value) {
+    if(optionSpecified) {
+      sb.append(" --");
+      sb.append(option);
+      sb.append(' ');
+      sb.append(value);
+    }
   }
 
   private void appendFlag(StringBuffer sb, String flag, boolean value) {
