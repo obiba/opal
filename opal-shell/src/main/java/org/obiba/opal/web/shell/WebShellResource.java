@@ -17,6 +17,8 @@ import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.CommandRegistry;
@@ -75,22 +77,26 @@ public class WebShellResource {
 
   @POST
   @Path("/import")
-  public void importData(Commands.ImportCommandOptionsDto options) {
+  public Response importData(Commands.ImportCommandOptionsDto options) {
     ImportCommandOptions importOptions = new ImportCommandOptionsDtoImpl(options);
     Command<ImportCommandOptions> importCommand = commandRegistry.newCommand("import");
     importCommand.setOptions(importOptions);
 
     launchCommand(importCommand);
+
+    return Response.status(Status.ACCEPTED).build();
   }
 
   @POST
   @Path("/copy")
-  public void copyData(Commands.CopyCommandOptionsDto options) {
+  public Response copyData(Commands.CopyCommandOptionsDto options) {
     CopyCommandOptions copyOptions = new CopyCommandOptionsDtoImpl(options);
     Command<CopyCommandOptions> copyCommand = commandRegistry.newCommand("copy");
     copyCommand.setOptions(copyOptions);
 
     launchCommand(copyCommand);
+
+    return Response.status(Status.ACCEPTED).build();
   }
 
   //

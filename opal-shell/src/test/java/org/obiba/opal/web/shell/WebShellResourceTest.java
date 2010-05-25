@@ -23,6 +23,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import javax.ws.rs.core.Response;
+
 import org.easymock.EasyMock;
 import org.easymock.IArgumentMatcher;
 import org.junit.Test;
@@ -76,7 +78,7 @@ public class WebShellResourceTest {
 
     // Exercise
     ImportCommandOptionsDto optionsDto = createImportCommandOptionsDto("my-unit", "opal-data", null, "file1", "file2");
-    sut.importData(optionsDto);
+    Response response = sut.importData(optionsDto);
 
     // Verify mocks
     verify(mockCommandRegistry, mockCommandJobService);
@@ -89,6 +91,9 @@ public class WebShellResourceTest {
     for(int i = 0; i < optionsDto.getFilesCount(); i++) {
       assertEquals(optionsDto.getFiles(i), importOptions.getFiles().get(i));
     }
+
+    // Verify that the HTTP response code was ACCEPTED (202).
+    assertEquals(202, Response.Status.ACCEPTED.getStatusCode());
   }
 
   @Test
@@ -120,6 +125,9 @@ public class WebShellResourceTest {
     assertEquals(optionsDto.getSource(), copyOptions.getSource());
     assertEquals(optionsDto.getDestination(), copyOptions.getDestination());
     assertEquals(optionsDto.getTablesCount(), copyOptions.getTables().size());
+
+    // Verify that the HTTP response code was ACCEPTED (202).
+    assertEquals(202, Response.Status.ACCEPTED.getStatusCode());
   }
 
   //
