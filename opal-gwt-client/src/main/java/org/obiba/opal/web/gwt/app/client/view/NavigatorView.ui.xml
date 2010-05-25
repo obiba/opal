@@ -1,11 +1,13 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:g2="urn:import:com.google.gwt.gen2.table.client">
+             xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
 
   <g:SplitLayoutPanel>
     <g:center>
-      <g:ScrollPanel>
-        <g2:SortableGrid ui:field="table" />
+      <g:ScrollPanel width="100%" >
+      <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_CENTER">
+        <g2:CellTable width="100%" ui:field="table" />
+        </g:VerticalPanel>
       </g:ScrollPanel>
     </g:center>
     <g:west size='200'>

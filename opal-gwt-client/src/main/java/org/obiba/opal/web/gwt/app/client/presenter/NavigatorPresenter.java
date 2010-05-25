@@ -20,7 +20,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.DatasourceDto;
@@ -31,12 +30,11 @@ import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.gen2.table.event.client.HasRowSelectionHandlers;
-import com.google.gwt.gen2.table.event.client.RowSelectionEvent;
-import com.google.gwt.gen2.table.event.client.RowSelectionHandler;
-import com.google.gwt.gen2.table.event.client.TableEvent.Row;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.TreeItem;
+import com.google.gwt.view.client.SelectionModel;
+import com.google.gwt.view.client.SelectionModel.SelectionChangeEvent;
+import com.google.gwt.view.client.SelectionModel.SelectionChangeHandler;
 import com.google.inject.Inject;
 
 /**
@@ -50,9 +48,9 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
 
     void setItems(List<TreeItem> items);
 
-    HasRowSelectionHandlers getTable();
+    SelectionModel<VariableDto> getTableSelection();
 
-    void renderRows(Iterable<VariableDto> rows);
+    void renderRows(JsArray<VariableDto> rows);
   }
 
   final private ResourceRequestBuilderFactory factory;
@@ -84,12 +82,12 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     }));
 
     // FIXME: this HandlerRegistration is not of the same type, so we can't pass it to our parent for unbinding.
-    getDisplay().getTable().addRowSelectionHandler(new RowSelectionHandler() {
+    getDisplay().getTableSelection().addSelectionChangeHandler(new SelectionChangeHandler() {
+
       @Override
-      public void onRowSelection(RowSelectionEvent event) {
-        Row row = event.getSelectedRows().iterator().next();
-        VariableDto variable = variables.get(row.getRowIndex());
-        eventBus.fireEvent(new VariableSelectionChangeEvent(variable));
+      public void onSelectionChange(SelectionChangeEvent event) {
+        // VariableDto variable = getDisplay().getTableSelection();
+        eventBus.fireEvent(new VariableSelectionChangeEvent(null));
       }
     });
 
@@ -128,7 +126,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
       @Override
       public void onResource(Response response, JsArray<VariableDto> resource) {
         variables = resource;
-        getDisplay().renderRows(JsArrays.toIterable(variables));
+        getDisplay().renderRows(variables);
       }
 
     }).send();
