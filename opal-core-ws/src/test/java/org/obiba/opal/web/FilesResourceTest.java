@@ -52,7 +52,7 @@ public class FilesResourceTest {
     FileDto rootFileDto = filesResource.getFileSystem();
 
     Assert.assertEquals("root", rootFileDto.getName());
-    Assert.assertEquals(FileDto.fileType.FOLDER, rootFileDto.getType());
+    Assert.assertEquals(FileDto.FileType.FOLDER, rootFileDto.getType());
     Assert.assertEquals("/", rootFileDto.getPath());
 
   }
@@ -82,7 +82,7 @@ public class FilesResourceTest {
       correspondingFileObj = fileSystem.getRoot().resolveFile(child.getPath());
       System.out.println(correspondingFileObj.getName().getPath());
       Assert.assertTrue(correspondingFileObj.exists());
-      if(child.getType() == FileDto.fileType.FOLDER) {
+      if(child.getType() == FileDto.FileType.FOLDER) {
         childrenCounter = verifyThatChildrenExistInFileSystem(child, childrenCounter);
       }
     }

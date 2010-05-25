@@ -22,6 +22,8 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -79,6 +81,8 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
   @UiField
   Button cancel;
 
+  private JsArrayString selectedFiles = JavaScriptObject.createArray().cast();
+
   public DataImportView() {
     uiBinder.createAndBindUi(this);
     getDialog().setGlassEnabled(true);
@@ -86,7 +90,7 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
 
       @Override
       public void onClick(ClickEvent event) {
-        getDialog().hide();
+        hideDialog();
       }
 
     });
@@ -97,6 +101,17 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
       public void onClick(ClickEvent event) {
         archiveDirectory.setEnabled(shouldArchive.getValue());
       }
+    });
+    files.addSelectionHandler(new SelectionHandler<TreeItem>() {
+
+      @Override
+      public void onSelection(SelectionEvent<TreeItem> event) {
+        FileDto dto = (FileDto) event.getSelectedItem().getUserObject();
+
+        selectedFiles.shift();
+        selectedFiles.push(dto.getPath());
+      }
+
     });
   }
 
@@ -120,9 +135,8 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
   }
 
   @Override
-  public JsArrayString getFiles() {
-    // TODO: implement correctly
-    return JavaScriptObject.createArray().cast();
+  public JsArrayString getSelectedFiles() {
+    return selectedFiles;
   }
 
   @Override
@@ -168,6 +182,7 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
 
   @Override
   public void showDialog() {
+    selectedFiles = JavaScriptObject.createArray().cast();
     getDialog().center();
     getDialog().show();
   }
@@ -190,7 +205,8 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
   }
 
   private TreeItem createItem(FileDto fileItem) {
-    TreeItem item = new TreeItem(fileItem.getName());
+    final TreeItem item = new TreeItem(fileItem.getName());
+    item.setUserObject(fileItem);
     for(int i = 0; i < fileItem.getChildrenArray().length(); i++) {
       item.addItem(createItem(fileItem.getChildrenArray().get(i)));
     }

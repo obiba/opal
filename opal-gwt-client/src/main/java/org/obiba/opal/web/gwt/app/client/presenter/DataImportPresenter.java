@@ -42,53 +42,30 @@ import com.google.inject.Inject;
 public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Display> {
 
   public interface Display extends WidgetDisplay {
+
     HasCloseHandlers<PopupPanel> getDialogBox();
+
+    void showDialog();
+
+    void hideDialog();
 
     void setDatasources(JsArray<DatasourceDto> datasources);
 
     String getSelectedDatasource();
 
-    void showDialog();
-
-    /**
-     * @param root
-     */
     void setFiles(FileDto root);
 
-    /**
-     * @return
-     */
-    HasClickHandlers getImport();
+    JsArrayString getSelectedFiles();
 
-    /**
-     * @param units
-     */
     void setUnits(JsArray<FunctionalUnitDto> units);
 
-    /**
-     * @return
-     */
     String getArchiveDirectory();
 
-    /**
-     * @return
-     */
     String getSelectedUnit();
 
-    /**
-     * @return
-     */
-    JsArrayString getFiles();
+    HasClickHandlers getImport();
 
-    /**
-     * @param text
-     */
     void showErrors(String text);
-
-    /**
-     * 
-     */
-    void hideDialog();
   }
 
   private final ResourceRequestBuilderFactory factory;
@@ -146,7 +123,7 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
         ImportCommandOptionsDto dto = ImportCommandOptionsDto.create();
         dto.setDestination(getDisplay().getSelectedDatasource());
         dto.setArchive(getDisplay().getArchiveDirectory());
-        dto.setFilesArray(getDisplay().getFiles());
+        dto.setFilesArray(getDisplay().getSelectedFiles());
         dto.setUnit(getDisplay().getSelectedUnit());
         factory.newBuilder().forResource("/shell/import").post().withResourceBody(ImportCommandOptionsDto.stringify(dto)).withCallback(400, new ResponseCodeCallback() {
 
@@ -154,7 +131,7 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
           public void onResponseCode(Request request, Response response) {
             getDisplay().showErrors(response.getText());
           }
-        }).withCallback(204, new ResponseCodeCallback() {
+        }).withCallback(202, new ResponseCodeCallback() {
 
           @Override
           public void onResponseCode(Request request, Response response) {
