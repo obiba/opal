@@ -25,14 +25,13 @@ import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Tree;
@@ -54,7 +53,7 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
   DialogBox dialog;
 
   @UiField
-  Panel content;
+  LayoutPanel content;
 
   @UiField
   Label errors;
@@ -115,11 +114,14 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
   @Override
   public void setFiles(FileDto root) {
     this.files.clear();
-    this.files.addItem(createItem(root));
+    for(int i = 0; i < root.getChildrenArray().length(); i++) {
+      this.files.addItem(createItem(root.getChildrenArray().get(i)));
+    }
   }
 
   @Override
   public JsArrayString getFiles() {
+    // TODO: implement correctly
     return JavaScriptObject.createArray().cast();
   }
 
@@ -146,14 +148,6 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
     }
   }
 
-  public TreeItem createItem(FileDto fileItem) {
-    TreeItem item = new TreeItem(fileItem.getName());
-    for(int i = 0; i < fileItem.getChildrenArray().length(); i++) {
-      item.addItem(createItem(fileItem.getChildrenArray().get(i)));
-    }
-    return item;
-  }
-
   @Override
   public String getSelectedDatasource() {
     return this.datasources.getValue(this.datasources.getSelectedIndex());
@@ -174,10 +168,6 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
 
   @Override
   public void showDialog() {
-    int height = (int) (Window.getClientHeight() * 0.9d);
-    getDialog().setHeight(height + "px");
-    content.setHeight(height + "px");
-
     getDialog().center();
     getDialog().show();
   }
@@ -199,4 +189,11 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
   public void stopProcessing() {
   }
 
+  private TreeItem createItem(FileDto fileItem) {
+    TreeItem item = new TreeItem(fileItem.getName());
+    for(int i = 0; i < fileItem.getChildrenArray().length(); i++) {
+      item.addItem(createItem(fileItem.getChildrenArray().get(i)));
+    }
+    return item;
+  }
 }
