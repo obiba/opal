@@ -1,24 +1,53 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
 
-  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" height="100%" width="50em">
+  <ui:style>
+    .error { color: red; }
+    .separator { border-bottom: 2px solid black; }
+  </ui:style>
+
+  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" width="50em">
     <g:caption>Data Import</g:caption>
-    <g:ScrollPanel>
-    <!-- These sizes have to match EXACTLY the ones on DialogBox above -->
+    <!-- The width here  has to match EXACTLY the one on DialogBox above -->
     <g:LayoutPanel width="50em" ui:field="content">
       <g:layer top="0em" bottom="5em">
-        <g:Label>Content</g:Label>
+        <g:ScrollPanel>
+          <g:VerticalPanel>
+            <g:Label ui:field="errors" addStyleNames="{style.error}" visible="false">Errors will go here</g:Label>
+            <g:Label>File(s):</g:Label>
+            <g:ScrollPanel height="10em" width="100%">
+              <g:Tree ui:field="files"></g:Tree>
+            </g:ScrollPanel>
+            <g:Label>Destination:</g:Label>
+            <g:ListBox ui:field="datasources"></g:ListBox>
+            <g:Label>Archive:</g:Label>
+            <g:CheckBox ui:field="shouldArchive"></g:CheckBox>
+            <g:TextBox ui:field="archiveDirectory"></g:TextBox>
+            <g:Label>Unit:</g:Label>
+            <g:ListBox ui:field="units"></g:ListBox>
+          </g:VerticalPanel>
+        </g:ScrollPanel>
       </g:layer>
-      <g:layer bottom="6em" height="1em">
-        <g:Label>-----------------------------------</g:Label>
+      <g:layer bottom="4em" height="2px" left="1em" right="1em">
+        <g:HTMLPanel>
+          <div class="{style.separator}" />
+        </g:HTMLPanel>
       </g:layer>
-      <g:layer bottom="0" height="5em">
-        <g:HorizontalPanel>
-          <g:Button>Import</g:Button>
-          <g:Button ui:field="cancel">Cancel</g:Button>
-        </g:HorizontalPanel>
+      <g:layer bottom="0" height="4em">
+        <g:VerticalPanel height="100%" width="49em">
+          <!--
+            Don't know why, but the ALIGN_RIGHT cannot be specified on the Panel itself, it has to be on this specific
+            cell...
+          -->
+          <g:Cell horizontalAlignment="ALIGN_RIGHT" verticalAlignment="ALIGN_MIDDLE">
+            <g:HorizontalPanel>
+              <g:Button ui:field="start">Import</g:Button>
+              <g:Button ui:field="cancel">Cancel</g:Button>
+            </g:HorizontalPanel>
+          </g:Cell>
+        </g:VerticalPanel>
       </g:layer>
     </g:LayoutPanel>
-    </g:ScrollPanel>
   </g:DialogBox>
 
 </ui:UiBinder>

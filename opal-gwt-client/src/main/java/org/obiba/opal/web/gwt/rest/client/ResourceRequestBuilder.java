@@ -35,11 +35,15 @@ public class ResourceRequestBuilder<T extends JavaScriptObject> {
 
   // GWT.isScript() ? GWT.getModuleBaseURL() + "ws" : "http://localhost:8080/ws";
 
+  private final static String RESOURCE_MEDIA_TYPE = "application/x-protobuf+json";
+
   private final EventBus eventBus;
 
   private final RequestCredentials credentials;
 
   private String uri;
+
+  private String contentType;
 
   private String body;
 
@@ -89,9 +93,14 @@ public class ResourceRequestBuilder<T extends JavaScriptObject> {
     return this;
   }
 
-  public ResourceRequestBuilder<T> withBody(String body) {
+  public ResourceRequestBuilder<T> withBody(String contentType, String body) {
+    this.contentType = contentType;
     this.body = body;
     return this;
+  }
+
+  public ResourceRequestBuilder<T> withResourceBody(/* T.stringify() */String dto) {
+    return withBody(RESOURCE_MEDIA_TYPE, dto);
   }
 
   public ResourceRequestBuilder<T> withFormBody(String key1, String value1, String... keyValues) {
@@ -131,10 +140,13 @@ public class ResourceRequestBuilder<T extends JavaScriptObject> {
     builder = new RequestBuilder(method, uri);
     builder.setCallback(new InnerCallback());
     if(resourceCallback != null && acceptHeader == null) {
-      builder.setHeader("Accept", "application/x-protobuf+json");
+      builder.setHeader("Accept", RESOURCE_MEDIA_TYPE);
     }
     if(acceptHeader != null) builder.setHeader("Accept", acceptHeader);
-    if(body != null) builder.setRequestData(body);
+    if(body != null) {
+      builder.setHeader("Content-Type", contentType);
+      builder.setRequestData(body);
+    }
     if(form != null && form.size() > 0) builder.setRequestData(encodeForm());
     if(credentials != null) credentials.provideCredentials(builder);
     return builder;
