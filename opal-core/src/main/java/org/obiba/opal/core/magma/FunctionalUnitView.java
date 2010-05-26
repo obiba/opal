@@ -88,9 +88,24 @@ public class FunctionalUnitView extends View {
       public VariableEntity apply(VariableEntity from) {
         VariableEntity privateEntity = entityMap.privateEntity(from);
         if(privateEntity == null) {
-          throw new RuntimeException("no private entity corresponding to public entity " + from);
+          throw new RuntimeException("no private entity exists for public entity " + from);
         }
         return privateEntity;
+      }
+    };
+  }
+
+  /**
+   * Override <code>getVariableEntityTransformer</code> to transform "private" entities into "public" entities.
+   */
+  public Function<VariableEntity, VariableEntity> getVariableEntityReverseTransformer() {
+    return new Function<VariableEntity, VariableEntity>() {
+      public VariableEntity apply(VariableEntity from) {
+        VariableEntity publicEntity = entityMap.publicEntity(from);
+        if(publicEntity == null) {
+          throw new RuntimeException("no public entity exists for private entity " + from);
+        }
+        return publicEntity;
       }
     };
   }

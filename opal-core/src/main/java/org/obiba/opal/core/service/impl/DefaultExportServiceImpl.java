@@ -20,6 +20,7 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.VariableEntity;
 import org.obiba.magma.audit.VariableEntityAuditLogManager;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
@@ -35,6 +36,8 @@ import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+
+import com.google.common.base.Function;
 
 /**
  * Default implementation of {@link ExportService}.
@@ -99,13 +102,18 @@ public class DefaultExportServiceImpl implements ExportService {
 
     try {
       for(ValueTable table : sourceTables) {
-        // If the table contains an entity that requires key separation, create a "unit view" of the table (replace
-        // public identifiers with private, unit-specific identifiers).
-        table = (unit != null) && table.isForEntityType(keysTableEntityType) ? getUnitView(unit, table) : table;
-
         // If the incremental option was specified, create an incremental view of the table (leaving out what has
         // already been exported).
         table = incremental ? getIncrementalView(table, destinationDatasource) : table;
+
+        // If the table contains an entity that requires key separation, create a "unit view" of the table (replace
+        // public identifiers with private, unit-specific identifiers).
+        // Also, replace the copier with one that persists the "public" identifiers in the audit log.
+        if((unit != null) && table.isForEntityType(keysTableEntityType)) {
+          FunctionalUnitView unitView = getUnitView(unit, table);
+          table = unitView;
+          datasourceCopier = newCopier(destinationDatasource, unitView.getVariableEntityReverseTransformer()).build();
+        }
 
         // Go ahead and copy the result to the destination datasource.
         datasourceCopier.copy(table, destinationDatasource);
@@ -145,7 +153,7 @@ public class DefaultExportServiceImpl implements ExportService {
 
   }
 
-  private View getUnitView(FunctionalUnit unit, ValueTable valueTable) {
+  private FunctionalUnitView getUnitView(FunctionalUnit unit, ValueTable valueTable) {
     return new FunctionalUnitView(unit, valueTable, lookupKeysTable());
   }
 
@@ -203,8 +211,11 @@ public class DefaultExportServiceImpl implements ExportService {
     return View.Builder.newView(valueTable.getName(), valueTable).where(whereClause).cacheWhere().build();
   }
 
-  public Builder newCopier(Datasource destinationDatasource) {
-    return DatasourceCopier.Builder.newCopier().withLoggingListener().withThroughtputListener().withVariableEntityCopyEventListener(auditLogManager, destinationDatasource);
+  public Builder newCopier(Datasource destinationDatasource, Function<VariableEntity, VariableEntity> entityMapper) {
+    return DatasourceCopier.Builder.newCopier().withLoggingListener().withThroughtputListener().withVariableEntityCopyEventListener(auditLogManager, destinationDatasource, entityMapper);
   }
 
+  public Builder newCopier(Datasource destinationDatasource) {
+    return newCopier(destinationDatasource, null);
+  }
 }
