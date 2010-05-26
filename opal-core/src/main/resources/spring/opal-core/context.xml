@@ -10,7 +10,7 @@
   <import resource="hibernate-services.xml" />
   <import resource="version.xml" />
 
-  <bean id="opalRuntime" class="org.obiba.opal.core.runtime.DefaultOpalRuntime" lazy-init="true">
+  <bean id="opalRuntime" class="org.obiba.opal.core.runtime.DefaultOpalRuntime">
     <constructor-arg>
       <bean class="org.obiba.opal.core.cfg.OpalConfigurationFactoryBean">
         <property name="configFile" value="${OPAL_HOME}/conf/opal-config.xml" />

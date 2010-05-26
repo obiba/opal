@@ -3,26 +3,13 @@
   xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
-  
+
   <import resource="datasource.xml" />
   <import resource="hibernate-session.xml" />
 
-  <bean id="importService" class="org.obiba.opal.core.service.impl.DefaultImportService" lazy-init="true">
-    <property name="opalRuntime" ref="opalRuntime" />
-  	<property name="auditLogManager" ref="auditLogManager" />
-    <property name="participantIdentifier" ref="participantIdentifier" />
-    <property name="keysTableReference" value="${org.obiba.opal.keys.tableReference}"/>
-    <property name="keysTableEntityType" value="${org.obiba.opal.keys.entityType}"/>
-  </bean>
-  
-  <bean id="exportService" class="org.obiba.opal.core.service.impl.DefaultExportServiceImpl" lazy-init="true">
-    <property name="opalRuntime" ref="opalRuntime" />
-    <property name="auditLogManager" ref="auditLogManager" />
-    <property name="keysTableReference" value="${org.obiba.opal.keys.tableReference}"/>
-    <property name="keysTableEntityType" value="${org.obiba.opal.keys.entityType}"/>
-  </bean>  
-  
-  <bean id="decryptService" class="org.obiba.opal.core.service.impl.DefaultDecryptService" lazy-init="true"/>
+  <bean id="importService" class="org.obiba.opal.core.service.impl.DefaultImportService" />
+  <bean id="exportService" class="org.obiba.opal.core.service.impl.DefaultExportServiceImpl" />
+  <bean id="decryptService" class="org.obiba.opal.core.service.impl.DefaultDecryptService"/>
 
   <bean id="unitKeyStoreService" class="org.obiba.opal.core.service.impl.DefaultUnitKeyStoreServiceImpl">
     <property name="persistenceManager">
@@ -30,15 +17,13 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         <property name="sessionFactory" ref="opalSessionFactory" />
       </bean>
     </property>
-    <property name="callbackHandler" ref="consoleCallbackHandler" />
-    <property name="opalRuntime" ref="opalRuntime" />
   </bean>
-  
+
   <bean id="auditLogManager" class="org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager">
     <property name="sessionFactory" ref="opalSessionFactory" />
     <property name="userProvider" ref="userProvider" />
   </bean>
-  
+
   <bean id="userProvider" class="org.obiba.opal.audit.OpalUserProvider" />
-  
+
 </beans>

@@ -32,14 +32,8 @@ import org.easymock.IArgumentMatcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.core.service.PersistenceManager;
-import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
-import org.obiba.opal.core.runtime.DefaultOpalRuntime;
-import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
-import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.UnitKeyStore;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Unit tests for {@link DefaultUnitKeyStoreServiceImpl}.
@@ -61,10 +55,8 @@ public class DefaultUnitKeyStoreServiceImplTest {
   public void setUp() {
     mockPersistenceManager = createMock(PersistenceManager.class);
 
-    unitKeyStoreService = new DefaultUnitKeyStoreServiceImpl();
+    unitKeyStoreService = new DefaultUnitKeyStoreServiceImpl(createPasswordCallbackHandler());
     unitKeyStoreService.setPersistenceManager(mockPersistenceManager);
-    unitKeyStoreService.setOpalRuntime(createOpalRuntime());
-    unitKeyStoreService.setCallbackHandler(createPasswordCallbackHandler());
   }
 
   //
@@ -84,12 +76,6 @@ public class DefaultUnitKeyStoreServiceImplTest {
   @Test(expected = IllegalArgumentException.class)
   public void testGetUnitKeyStoreThrowsExceptionOnWhitespaceOnlyUnitName() {
     unitKeyStoreService.getUnitKeyStore(" \t \n \r\n");
-  }
-
-  @Test(expected = NoSuchFunctionalUnitException.class)
-  public void testGetUnitKeyStoreThrowsExceptionIfUnitDoesNotExist() {
-    unitKeyStoreService.setOpalRuntime(createOpalRuntime());
-    unitKeyStoreService.getUnitKeyStore("no-such-unit");
   }
 
   @Test
@@ -130,15 +116,6 @@ public class DefaultUnitKeyStoreServiceImplTest {
   //
   // Helper Methods
   //
-
-  private DefaultOpalRuntime createOpalRuntime() {
-    FunctionalUnit myUnit = new FunctionalUnit("my-unit", "my-keyVariable");
-
-    OpalConfiguration opalConfiguration = new OpalConfiguration();
-    opalConfiguration.setFunctionalUnits(ImmutableSet.of(myUnit));
-
-    return new DefaultOpalRuntime(opalConfiguration);
-  }
 
   private CallbackHandler createPasswordCallbackHandler() {
     return new CallbackHandler() {

@@ -43,6 +43,8 @@ import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -61,17 +63,32 @@ public class DefaultImportService implements ImportService {
   // Instance Variables
   //
 
-  private OpalRuntime opalRuntime;
+  private final OpalRuntime opalRuntime;
+
+  private final VariableEntityAuditLogManager auditLogManager;
+
+  private final IParticipantIdentifier participantIdentifier;
 
   /** Configured through org.obiba.opal.keys.tableReference */
-  private String keysTableReference;
+  private final String keysTableReference;
 
   /** Configured through org.obiba.opal.keys.entityType */
-  private String keysTableEntityType;
+  private final String keysTableEntityType;
 
-  private VariableEntityAuditLogManager auditLogManager;
+  @Autowired
+  public DefaultImportService(OpalRuntime opalRuntime, VariableEntityAuditLogManager auditLogManager, IParticipantIdentifier participantIdentifier, @Value("org.obiba.opal.keys.tableReference") String keysTableReference, @Value("org.obiba.opal.keys.entityType") String keysTableEntityType) {
+    if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
+    if(auditLogManager == null) throw new IllegalArgumentException("auditLogManager cannot be null");
+    if(participantIdentifier == null) throw new IllegalArgumentException("participantIdentifier cannot be null");
+    if(keysTableReference == null) throw new IllegalArgumentException("keysTableReference cannot be null");
+    if(keysTableEntityType == null) throw new IllegalArgumentException("keysTableEntityType cannot be null");
 
-  private IParticipantIdentifier participantIdentifier;
+    this.opalRuntime = opalRuntime;
+    this.auditLogManager = auditLogManager;
+    this.participantIdentifier = participantIdentifier;
+    this.keysTableReference = keysTableReference;
+    this.keysTableEntityType = keysTableEntityType;
+  }
 
   //
   // ImportService Methods
@@ -80,30 +97,6 @@ public class DefaultImportService implements ImportService {
   public void importData(String unitName, String datasourceName, FileObject file) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
     // OPAL-170 Dispatch the variables in tables corresponding to Onyx stage attribute value.
     importData(unitName, datasourceName, file, "stage");
-  }
-
-  //
-  // Methods
-  //
-
-  public void setOpalRuntime(OpalRuntime opalRuntime) {
-    this.opalRuntime = opalRuntime;
-  }
-
-  public void setParticipantIdentifier(IParticipantIdentifier participantIdentifier) {
-    this.participantIdentifier = participantIdentifier;
-  }
-
-  public void setKeysTableReference(String keysTableReference) {
-    this.keysTableReference = keysTableReference;
-  }
-
-  public void setKeysTableEntityType(String keysTableEntityType) {
-    this.keysTableEntityType = keysTableEntityType;
-  }
-
-  public void setAuditLogManager(VariableEntityAuditLogManager auditLogManager) {
-    this.auditLogManager = auditLogManager;
   }
 
   private void importData(String unitName, String datasourceName, FileObject file, String dispatchAttribute) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
@@ -127,10 +120,10 @@ public class DefaultImportService implements ImportService {
   private void copyToDestinationDatasource(FileObject file, String dispatchAttribute, Datasource destinationDatasource, FunctionalUnit unit) throws IOException {
     FsDatasource sourceDatasource = new FsDatasource(file.getName().getBaseName(), opalRuntime.getFileSystem().getLocalFile(file), unit.getDatasourceEncryptionStrategy());
     try {
-      MagmaEngine.get().addDatasource(sourceDatasource);
+      sourceDatasource.initialise();
       copyValueTables(sourceDatasource, destinationDatasource, unit, dispatchAttribute);
     } finally {
-      MagmaEngine.get().removeDatasource(sourceDatasource);
+      sourceDatasource.dispose();
     }
   }
 

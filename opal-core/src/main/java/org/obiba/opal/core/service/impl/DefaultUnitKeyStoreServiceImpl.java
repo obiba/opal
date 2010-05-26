@@ -26,11 +26,9 @@ import org.obiba.opal.core.crypt.CacheablePasswordCallback;
 import org.obiba.opal.core.crypt.CachingCallbackHandler;
 import org.obiba.opal.core.crypt.KeyProviderSecurityException;
 import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
-import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
-import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.UnitKeyStore;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -46,9 +44,13 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
   // Instance Variables
   //
 
-  protected CallbackHandler callbackHandler;
+  protected final CallbackHandler callbackHandler;
 
-  protected OpalRuntime opalRuntime;
+  @Autowired
+  public DefaultUnitKeyStoreServiceImpl(CallbackHandler callbackHandler) {
+    if(callbackHandler == null) throw new IllegalArgumentException("callbackHandler cannot be null");
+    this.callbackHandler = callbackHandler;
+  }
 
   //
   // UnitKeyStore Methods
@@ -56,7 +58,6 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
 
   public UnitKeyStore getUnitKeyStore(String unitName) {
     Assert.hasText(unitName, "unitName must not be null or empty");
-    validateUnitExists(unitName);
 
     UnitKeyStoreState template = new UnitKeyStoreState();
     template.setUnit(unitName);
@@ -71,7 +72,6 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
 
   public UnitKeyStore getOrCreateUnitKeyStore(String unitName) {
     Assert.hasText(unitName, "unitName must not be null or empty");
-    validateUnitExists(unitName);
 
     UnitKeyStore unitKeyStore = getUnitKeyStore(unitName);
     if(unitKeyStore == null) {
@@ -102,7 +102,6 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     Assert.hasText(algorithm, "algorithm must not be null or empty");
     Assert.notNull(size, "size must not be null");
     Assert.hasText(certificateInfo, "certificateInfo must not be null or empty");
-    validateUnitExists(unitName);
 
     UnitKeyStore unitKeyStore = getOrCreateUnitKeyStore(unitName);
     try {
@@ -130,7 +129,6 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
   public void deleteKey(String unitName, String alias) {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
-    validateUnitExists(unitName);
 
     UnitKeyStore unitKeyStore = getUnitKeyStore(unitName);
     if(unitKeyStore == null) {
@@ -146,7 +144,6 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(privateKey, "privateKey must not be null");
     Assert.notNull(certificate, "certificate must not be null");
-    validateUnitExists(unitName);
 
     UnitKeyStore unitKeyStore = getOrCreateUnitKeyStore(unitName);
     unitKeyStore.importKey(alias, privateKey, certificate);
@@ -159,30 +156,11 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(privateKey, "privateKey must not be null");
     Assert.hasText(certificateInfo, "certificateInfo must not be null or empty");
-    validateUnitExists(unitName);
 
     UnitKeyStore unitKeyStore = getOrCreateUnitKeyStore(unitName);
     unitKeyStore.importKey(alias, privateKey, certificateInfo);
 
     saveUnitKeyStore(unitKeyStore);
-  }
-
-  //
-  // Methods
-  //
-
-  public void setCallbackHandler(CallbackHandler callbackHandler) {
-    this.callbackHandler = callbackHandler;
-  }
-
-  public void setOpalRuntime(OpalRuntime opalRuntime) {
-    this.opalRuntime = opalRuntime;
-  }
-
-  private void validateUnitExists(String unitName) throws NoSuchFunctionalUnitException {
-    if(!FunctionalUnit.OPAL_INSTANCE.equals(unitName) && opalRuntime.getOpalConfiguration().getFunctionalUnit(unitName) == null) {
-      throw new NoSuchFunctionalUnitException(unitName);
-    }
   }
 
   private UnitKeyStore loadUnitKeyStore(String unitName, UnitKeyStoreState unitKeyStoreState) {
