@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.shell.commands;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -55,7 +56,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
       try {
         destinationDatasource = getDestinationDatasource();
-        exportService.exportTablesToDatasource(options.getUnit(), getValueTables(), destinationDatasource, buildDatasourceCopier(destinationDatasource), !options.getNonIncremental());
+        exportService.exportTablesToDatasource(options.isUnit() ? options.getUnit() : null, getValueTables(), destinationDatasource, buildDatasourceCopier(destinationDatasource), !options.getNonIncremental());
 
       } catch(ExportException e) {
         getShell().printf("%s\n", e.getMessage());
@@ -257,7 +258,12 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
    * @throws FileSystemException
    */
   private FileObject resolveOutputFileAndCreateParentFolders() throws FileSystemException {
-    FileObject outputFile = getFileSystemRoot().resolveFile(options.getOut());
+    FileObject outputFile;
+    if(options.isUnit() && isRelativeFilePath(options.getOut())) {
+      outputFile = getFileInUnitDirectory(options.getOut());
+    } else {
+      outputFile = getFile(options.getOut());
+    }
 
     // Create the parent directory, if it doesn't already exist.
     FileObject directory = outputFile.getParent();
@@ -269,6 +275,15 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       getShell().printf("WARNING: Writing to an Excel 97 spreadsheet. These are limited to 256 columns and 65536 rows which may not be sufficient for writing large tables.\nUse an 'xlsx' extension to use Excel 2007 format which supports 16K columns.\n");
     }
     return outputFile;
+  }
+
+  private FileObject getFileInUnitDirectory(String filePath) throws FileSystemException {
+    FileObject unitDir = getOpalRuntime().getUnitDirectory(options.getUnit());
+    return unitDir.resolveFile(filePath);
+  }
+
+  private boolean isRelativeFilePath(String filePath) {
+    return !(new File(filePath).isAbsolute());
   }
 
   private void appendOption(StringBuffer sb, String option, boolean optionSpecified, String value) {
