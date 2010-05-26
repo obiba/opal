@@ -13,12 +13,14 @@ import net.customware.gwt.presenter.client.DefaultEventBus;
 import net.customware.gwt.presenter.client.EventBus;
 
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.view.ApplicationView;
+import org.obiba.opal.web.gwt.app.client.view.DataExportView;
 import org.obiba.opal.web.gwt.app.client.view.DataImportView;
 import org.obiba.opal.web.gwt.app.client.view.LoginView;
 import org.obiba.opal.web.gwt.app.client.view.NavigatorView;
@@ -46,10 +48,11 @@ public class OpalGinModule extends AbstractGinModule {
     bind(LoginPresenter.Display.class).to(LoginView.class).in(Singleton.class);
     bind(UnhandledResponseNotificationPresenter.Display.class).to(UnhandledResponseNotificationView.class).in(Singleton.class);
 
-    // Don't bind as singleton because the ApplicationPresenter expects a new instance on every display
+     // Don't bind as singleton because the ApplicationPresenter expects a new instance on every display
     bind(DataImportPresenter.Display.class).to(DataImportView.class);// .in(Singleton.class);
+    bind(DataExportPresenter.Display.class).to(DataExportView.class);
 
-    // Concrete classes (such as NavigatorPresenter) don't need to be "bound". Simply define a getter in the
+   // Concrete classes (such as NavigatorPresenter) don't need to be "bound". Simply define a getter in the
     // OpalGinjector interface and they'll "just work".
   }
 

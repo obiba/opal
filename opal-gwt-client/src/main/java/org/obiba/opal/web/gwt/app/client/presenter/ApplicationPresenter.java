@@ -42,6 +42,8 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
     void updateWorkbench(Widget workbench);
 
     MenuItem getDataImportItem();
+
+    MenuItem getDataExportItem();
   }
 
   private final RequestCredentials credentials;
@@ -50,6 +52,8 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
   private final Provider<DataImportPresenter> dataImportPresenter;
 
+  private final Provider<DataExportPresenter> dataExportPresenter;
+
   private WidgetPresenter<?> workbench;
 
   /**
@@ -57,11 +61,12 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
    * @param eventBus
    */
   @Inject
-  public ApplicationPresenter(final Display display, final EventBus eventBus, Provider<NavigatorPresenter> navigationPresenter, Provider<DataImportPresenter> dataImportPresenter, RequestCredentials credentials) {
+  public ApplicationPresenter(final Display display, final EventBus eventBus, Provider<NavigatorPresenter> navigationPresenter, Provider<DataImportPresenter> dataImportPresenter, Provider<DataExportPresenter> dataExportPresenter, RequestCredentials credentials) {
     super(display, eventBus);
     this.navigationPresenter = navigationPresenter;
     this.credentials = credentials;
     this.dataImportPresenter = dataImportPresenter;
+    this.dataExportPresenter = dataExportPresenter;
   }
 
   @Override
@@ -85,6 +90,16 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       @Override
       public void execute() {
         DataImportPresenter presenter = dataImportPresenter.get();
+        presenter.bind();
+        presenter.revealDisplay();
+      }
+    });
+
+    getDisplay().getDataExportItem().setCommand(new Command() {
+
+      @Override
+      public void execute() {
+        DataExportPresenter presenter = dataExportPresenter.get();
         presenter.bind();
         presenter.revealDisplay();
       }

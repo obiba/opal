@@ -1,0 +1,112 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
+
+  <ui:style>
+    .error { color: red; }
+    .separator { border-bottom: 2px solid black; }
+    .applicationTitle { font-weight: bold; font-size: large; }
+    .instructions { font-weight: bold; }
+    .inset { border: 2px inset black; }
+  </ui:style>
+
+  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" >
+    <g:caption>Data Export</g:caption>
+    <g:LayoutPanel height="39em" width="40em" ui:field="content">
+      <g:layer top="0em" bottom="5em" left="1em" right="1em">
+        <g:HTMLPanel width="100%">
+          <table width="100%" class="gwt-KeyValue">
+            <tbody>
+              <tr>
+                <td colspan="2">
+                  <g:Label ui:field="errors" addStyleNames="{style.error}" visible="false">Errors will go here</g:Label>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <g:Label addStyleNames="{style.instructions}">Select the tables to be exported:</g:Label>
+                </td>
+              </tr>
+              <tr>
+                <td style="vertical-align:top">
+                  Tables:
+                </td>
+                <td>
+                  <g:ScrollPanel addStyleNames="{style.inset}" height="15em" width="100%">
+                    <g:Tree ui:field="tableTree" />
+                  </g:ScrollPanel>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Destination:
+                </td>
+                <td>
+                  <g:RadioButton name="b" /><g:ListBox ui:field="datasources" />
+                </td>
+              </tr>
+              <tr>
+                <td/>
+                <td>
+                  <g:RadioButton name="b"/> file name: <g:TextBox  ui:field="destinationFilename" />
+                </td>
+              </tr> 
+              <tr>
+                <td>
+                  Options:
+                </td>
+                <td>
+                  <g:CheckBox  /> incremental
+                </td>
+              </tr>              
+              <tr>
+                <td/>
+                <td>
+                  <g:CheckBox  /> with variables
+                </td>
+              </tr>              
+              <tr>
+                <td/>
+                <td>
+                  <g:CheckBox  /> use 'alias' attribute to rename variable
+                </td>
+              </tr>              
+              <tr>
+                <td colspan="2">
+                  Participant Identifier:
+                </td>
+              </tr>
+              <tr>
+                <td/>
+                <td>
+                  <g:RadioButton name="c"/> use Opal ID
+                </td>
+              </tr> 
+              <tr>
+                <td/>
+                <td>
+                  <g:RadioButton name="c"/> use Unit ID <g:ListBox ui:field="units" />
+                </td>
+              </tr> 
+            </tbody>
+          </table>
+        </g:HTMLPanel>
+      </g:layer>              
+      <g:layer bottom="4em" height="0.5em" left="1em" right="1em">
+        <g:HTMLPanel>
+          <div class="{style.separator}" />
+        </g:HTMLPanel>
+      </g:layer>
+      <g:layer bottom="0" height="4em" left="1em" right="1em">
+        <g:VerticalPanel height="100%" width="100%">
+          <g:cell horizontalAlignment="ALIGN_RIGHT" verticalAlignment="ALIGN_MIDDLE">
+            <g:HorizontalPanel>
+              <g:Button ui:field="start">Export</g:Button>
+              <g:Button ui:field="cancel">Cancel</g:Button>
+            </g:HorizontalPanel>
+          </g:cell>
+        </g:VerticalPanel>
+      </g:layer>
+    </g:LayoutPanel>  
+  </g:DialogBox>
+
+</ui:UiBinder>

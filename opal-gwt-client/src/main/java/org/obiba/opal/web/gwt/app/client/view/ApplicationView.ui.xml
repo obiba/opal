@@ -33,7 +33,7 @@
               Data
               <g:MenuBar vertical="true">
                 <g:MenuItem ui:field="dataImportItem">Import...</g:MenuItem>
-                <g:MenuItem>Export...</g:MenuItem>
+                <g:MenuItem ui:field="dataExportItem">Export...</g:MenuItem>
               </g:MenuBar>
             </g:MenuItem>
             <g:MenuItem>Jobs</g:MenuItem>

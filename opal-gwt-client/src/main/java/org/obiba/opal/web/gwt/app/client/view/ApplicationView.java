@@ -51,6 +51,9 @@ public class ApplicationView extends Composite implements ApplicationPresenter.D
   MenuItem dataImportItem;
 
   @UiField
+  MenuItem dataExportItem;
+
+  @UiField
   Panel workbench;
 
   public ApplicationView() {
@@ -89,5 +92,10 @@ public class ApplicationView extends Composite implements ApplicationPresenter.D
   @Override
   public Widget asWidget() {
     return this;
+  }
+
+  @Override
+  public MenuItem getDataExportItem() {
+    return dataExportItem;
   }
 }
