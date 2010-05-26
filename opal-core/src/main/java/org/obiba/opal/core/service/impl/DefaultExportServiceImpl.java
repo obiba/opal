@@ -27,8 +27,12 @@ import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.DatasourceCopier.Builder;
 import org.obiba.magma.views.IncrementalWhereClause;
 import org.obiba.magma.views.View;
+import org.obiba.opal.core.magma.FunctionalUnitView;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ExportException;
 import org.obiba.opal.core.service.ExportService;
+import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.unit.FunctionalUnit;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -38,37 +42,73 @@ import org.springframework.util.Assert;
 @Transactional
 public class DefaultExportServiceImpl implements ExportService {
 
+  private OpalRuntime opalRuntime;
+
   private VariableEntityAuditLogManager auditLogManager;
+
+  /** Configured through org.obiba.opal.keys.tableReference */
+  private String keysTableReference;
+
+  /** Configured through org.obiba.opal.keys.entityType */
+  private String keysTableEntityType;
+
+  public void setOpalRuntime(OpalRuntime opalRuntime) {
+    this.opalRuntime = opalRuntime;
+  }
 
   public void setAuditLogManager(VariableEntityAuditLogManager auditLogManager) {
     this.auditLogManager = auditLogManager;
   }
 
-  public void exportTablesToDatasource(List<String> sourceTableNames, String destinationDatasourceName, boolean incremental) {
+  public void setKeysTableReference(String keysTableReference) {
+    this.keysTableReference = keysTableReference;
+  }
+
+  public void setKeysTableEntityType(String keysTableEntityType) {
+    this.keysTableEntityType = keysTableEntityType;
+  }
+
+  public void exportTablesToDatasource(String unitName, List<String> sourceTableNames, String destinationDatasourceName, boolean incremental) {
     Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName must not be null or empty");
     Datasource destinationDatasource = getDatasourceByName(destinationDatasourceName);
     Set<ValueTable> sourceTables = getValueTablesByName(sourceTableNames);
     DatasourceCopier datasourceCopier = newCopier(destinationDatasource).build();
-    exportTablesToDatasource(sourceTables, destinationDatasource, datasourceCopier, incremental);
+    exportTablesToDatasource(unitName, sourceTables, destinationDatasource, datasourceCopier, incremental);
   }
 
-  public void exportTablesToDatasource(List<String> sourceTableNames, String destinationDatasourceName, DatasourceCopier datasourceCopier, boolean incremental) {
+  public void exportTablesToDatasource(String unitName, List<String> sourceTableNames, String destinationDatasourceName, DatasourceCopier datasourceCopier, boolean incremental) {
     Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName must not be null or empty");
     Datasource destinationDatasource = getDatasourceByName(destinationDatasourceName);
     Set<ValueTable> sourceTables = getValueTablesByName(sourceTableNames);
-    exportTablesToDatasource(sourceTables, destinationDatasource, datasourceCopier, incremental);
+    exportTablesToDatasource(unitName, sourceTables, destinationDatasource, datasourceCopier, incremental);
   }
 
-  public void exportTablesToDatasource(Set<ValueTable> sourceTables, Datasource destinationDatasource, DatasourceCopier datasourceCopier, boolean incremental) {
+  public void exportTablesToDatasource(String unitName, Set<ValueTable> sourceTables, Datasource destinationDatasource, DatasourceCopier datasourceCopier, boolean incremental) {
     Assert.notEmpty(sourceTables, "sourceTables must not be null or empty");
     Assert.notNull(destinationDatasource, "destinationDatasource must not be null");
     Assert.notNull(datasourceCopier, "datasourceCopier must not be null");
+
+    FunctionalUnit unit = null;
+    if(unitName != null) {
+      unit = validateFunctionalUnit(unitName);
+    }
+
     validateSourceDatasourceNotEqualDestinationDatasource(sourceTables, destinationDatasource);
+
     try {
       for(ValueTable table : sourceTables) {
-        datasourceCopier.copy(incremental ? getIncrementalView(table, destinationDatasource) : table, destinationDatasource);
+        // If the table contains an entity that requires key separation, create a "unit view" of the table (replace
+        // public identifiers with private, unit-specific identifiers).
+        table = (unit != null) && table.isForEntityType(keysTableEntityType) ? getUnitView(unit, table) : table;
+
+        // If the incremental option was specified, create an incremental view of the table (leaving out what has
+        // already been exported).
+        table = incremental ? getIncrementalView(table, destinationDatasource) : table;
+
+        // Go ahead and copy the result to the destination datasource.
+        datasourceCopier.copy(table, destinationDatasource);
       }
     } catch(IOException ex) {
       // When implementing the ExcelDatasource:
@@ -77,32 +117,40 @@ public class DefaultExportServiceImpl implements ExportService {
     }
   }
 
-  public void exportTablesToExcelFile(List<String> sourceTableNames, File destinationExcelFile, boolean incremental) {
+  public void exportTablesToExcelFile(String unitName, List<String> sourceTableNames, File destinationExcelFile, boolean incremental) {
     Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
     Assert.notNull(destinationExcelFile, "destinationExcelFile must not be null");
 
     Datasource outputDatasource = buildExcelDatasource(destinationExcelFile);
     try {
       // Create a DatasourceCopier that will copy only the metadata and export.
-      exportTablesToDatasource(sourceTableNames, outputDatasource.getName(), incremental);
+      exportTablesToDatasource(unitName, sourceTableNames, outputDatasource.getName(), incremental);
     } finally {
       MagmaEngine.get().removeDatasource(outputDatasource);
     }
 
   }
 
-  public void exportTablesToExcelFile(List<String> sourceTableNames, File destinationExcelFile, DatasourceCopier datasourceCopier, boolean incremental) {
+  public void exportTablesToExcelFile(String unitName, List<String> sourceTableNames, File destinationExcelFile, DatasourceCopier datasourceCopier, boolean incremental) {
     Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
     Assert.notNull(destinationExcelFile, "destinationExcelFile must not be null");
 
     Datasource outputDatasource = buildExcelDatasource(destinationExcelFile);
     try {
       // Create a DatasourceCopier that will copy only the metadata and export.
-      exportTablesToDatasource(sourceTableNames, outputDatasource.getName(), datasourceCopier, incremental);
+      exportTablesToDatasource(unitName, sourceTableNames, outputDatasource.getName(), datasourceCopier, incremental);
     } finally {
       MagmaEngine.get().removeDatasource(outputDatasource);
     }
 
+  }
+
+  private View getUnitView(FunctionalUnit unit, ValueTable valueTable) {
+    return new FunctionalUnitView(unit, valueTable, lookupKeysTable());
+  }
+
+  private ValueTable lookupKeysTable() {
+    return MagmaEngineTableResolver.valueOf(keysTableReference).resolveTable();
   }
 
   private Datasource buildExcelDatasource(File destinationExcelFile) {
@@ -128,6 +176,14 @@ public class DefaultExportServiceImpl implements ExportService {
       }
     }
     return tables;
+  }
+
+  private FunctionalUnit validateFunctionalUnit(String unitName) {
+    FunctionalUnit unit = opalRuntime.getFunctionalUnit(unitName);
+    if(unit == null) {
+      throw new NoSuchFunctionalUnitException(unitName);
+    }
+    return unit;
   }
 
   private void validateSourceDatasourceNotEqualDestinationDatasource(Set<ValueTable> sourceTables, Datasource destinationDatasource) {

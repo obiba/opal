@@ -16,7 +16,10 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
   </bean>
   
   <bean id="exportService" class="org.obiba.opal.core.service.impl.DefaultExportServiceImpl" lazy-init="true">
+    <property name="opalRuntime" ref="opalRuntime" />
     <property name="auditLogManager" ref="auditLogManager" />
+    <property name="keysTableReference" value="${org.obiba.opal.keys.tableReference}"/>
+    <property name="keysTableEntityType" value="${org.obiba.opal.keys.entityType}"/>
   </bean>  
   
   <bean id="decryptService" class="org.obiba.opal.core.service.impl.DefaultDecryptService" lazy-init="true"/>

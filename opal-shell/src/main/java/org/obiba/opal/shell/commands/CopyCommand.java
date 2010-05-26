@@ -55,7 +55,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
       try {
         destinationDatasource = getDestinationDatasource();
-        exportService.exportTablesToDatasource(getValueTables(), destinationDatasource, buildDatasourceCopier(destinationDatasource), !options.getNonIncremental());
+        exportService.exportTablesToDatasource(options.getUnit(), getValueTables(), destinationDatasource, buildDatasourceCopier(destinationDatasource), !options.getNonIncremental());
 
       } catch(ExportException e) {
         getShell().printf("%s\n", e.getMessage());

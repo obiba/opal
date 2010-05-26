@@ -80,18 +80,4 @@ public class PrivateVariableEntityValueTable extends View {
       }
     };
   }
-
-  /**
-   * Override <code>getValueSetTransformer</code> to create the "public" entity if necessary.
-   */
-  @Override
-  public Function<ValueSet, ValueSet> getValueSetTransformer() {
-    final Function<ValueSet, ValueSet> baseTransformer = super.getValueSetTransformer();
-
-    return new Function<ValueSet, ValueSet>() {
-      public ValueSet apply(ValueSet from) {
-        return baseTransformer.apply(from);
-      }
-    };
-  }
 }
