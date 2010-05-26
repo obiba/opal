@@ -41,13 +41,13 @@
                   Destination:
                 </td>
                 <td>
-                  <g:RadioButton name="b" /><g:ListBox ui:field="datasources" />
+                  <g:RadioButton name="destination" ui:field="destinationDataSource"/><g:ListBox ui:field="datasources" />
                 </td>
               </tr>
               <tr>
                 <td/>
                 <td>
-                  <g:RadioButton name="b"/> file name: <g:TextBox  ui:field="destinationFilename" />
+                  <g:RadioButton name="destination" ui:field="destinationFile"/> file name: <g:TextBox  ui:field="file" />
                 </td>
               </tr> 
               <tr>
@@ -55,19 +55,19 @@
                   Options:
                 </td>
                 <td>
-                  <g:CheckBox  /> incremental
+                  <g:CheckBox ui:field="incremental" /> incremental
                 </td>
               </tr>              
               <tr>
                 <td/>
                 <td>
-                  <g:CheckBox  /> with variables
+                  <g:CheckBox ui:field="withVariables" /> with variables
                 </td>
               </tr>              
               <tr>
                 <td/>
                 <td>
-                  <g:CheckBox  /> use 'alias' attribute to rename variable
+                  <g:CheckBox ui:field="useAlias" /> use 'alias' attribute to rename variable
                 </td>
               </tr>              
               <tr>
@@ -78,13 +78,13 @@
               <tr>
                 <td/>
                 <td>
-                  <g:RadioButton name="c"/> use Opal ID
+                  <g:RadioButton name="idGroup" ui:field="opalId"/> use Opal ID
                 </td>
               </tr> 
               <tr>
                 <td/>
                 <td>
-                  <g:RadioButton name="c"/> use Unit ID <g:ListBox ui:field="units" />
+                  <g:RadioButton name="idGroup" ui:field="unitId"/> use Unit ID <g:ListBox ui:field="units" />
                 </td>
               </tr> 
             </tbody>
@@ -100,7 +100,7 @@
         <g:VerticalPanel height="100%" width="100%">
           <g:cell horizontalAlignment="ALIGN_RIGHT" verticalAlignment="ALIGN_MIDDLE">
             <g:HorizontalPanel>
-              <g:Button ui:field="start">Export</g:Button>
+              <g:Button ui:field="exportButton">Export</g:Button>
               <g:Button ui:field="cancel">Cancel</g:Button>
             </g:HorizontalPanel>
           </g:cell>

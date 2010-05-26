@@ -22,22 +22,30 @@ import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.CopyCommandOptionsDto;
 import org.obiba.opal.web.model.client.DatasourceDto;
 import org.obiba.opal.web.model.client.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.VariableDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SelectionModel.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionModel.SelectionChangeHandler;
 import com.google.inject.Inject;
-
 
 public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Display> {
 
@@ -55,11 +63,36 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
     SelectionModel<VariableDto> getTableSelection();
 
-    void renderRows(JsArray<VariableDto> rows);
+    void addTable(String datasource, String table);
 
     String getSelectedUnit();
 
     void setUnits(JsArray<FunctionalUnitDto> units);
+
+    HasClickHandlers getExport();
+
+    HasValue<String> getFile();
+
+    RadioButton getDestinationFile();
+
+    void showErrors(List<String> errors);
+
+    void hideErrors();
+
+    void hideDialog();
+
+    JsArrayString getSelectedFiles();
+
+    HasValue<Boolean> isIncremental();
+
+    HasValue<Boolean> isWithVariables();
+
+    HasValue<Boolean> isUseAlias();
+
+    HasValue<Boolean> isUnitId();
+
+    HasValue<Boolean> isDestinationDataSource();
+
   }
 
   final private ResourceRequestBuilderFactory factory;
@@ -121,10 +154,68 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
         if(event.getSelection().getParentItem() != null) {
           String datasource = event.getSelection().getParentItem().getText();
           String table = event.getSelection().getText();
-          updateTable(datasource, table);
+          getDisplay().addTable(datasource, table);
         }
       }
     }));
+
+    getDisplay().getExport().addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        List<String> errors = formValidationErrors();
+        if(!errors.isEmpty()) {
+          getDisplay().showErrors(errors);
+        } else {
+          getDisplay().hideErrors();
+          CopyCommandOptionsDto dto = CopyCommandOptionsDto.create();
+          dto.setTablesArray(getDisplay().getSelectedFiles());
+          if(getDisplay().isDestinationDataSource().getValue()) {
+            dto.setDestination(getDisplay().getSelectedDatasource());
+          } else {
+            dto.setOut(getDisplay().getSelectedDatasource());
+          }
+          dto.setNonIncremental(!getDisplay().isIncremental().getValue());
+          dto.setNoVariables(!getDisplay().isWithVariables().getValue());
+          if(getDisplay().isUseAlias().getValue()) dto.setTransform("attribute('alias').isNull().value ? name() : attribute('alias')");
+          if(getDisplay().isUnitId().getValue()) dto.setUnit(getDisplay().getSelectedUnit());
+          factory.newBuilder().forResource("/shell/copy").post().withResourceBody(CopyCommandOptionsDto.stringify(dto)).withCallback(400, new ResponseCodeCallback() {
+
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              List<String> errors = new ArrayList<String>();
+              errors.add(response.getText());
+              getDisplay().showErrors(errors);
+            }
+          }).withCallback(202, new ResponseCodeCallback() {
+
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              getDisplay().hideDialog();
+            }
+          }).send();
+
+        }
+      }
+    });
+  }
+
+  private List<String> formValidationErrors() {
+    List<String> result = new ArrayList<String>();
+    if(getDisplay().getSelectedFiles().length() == 0) {
+      result.add("Must select at least one table for export");
+    }
+    if(getDisplay().getDestinationFile().getValue()) {
+      String filename = getDisplay().getFile().getValue();
+      if(filename == null || filename.equals("")) {
+        result.add("filename cannot be empty");
+      } else {
+        if(!(filename.endsWith(".xls") || filename.endsWith(".xlsx") || filename.endsWith(".xml"))) {
+          result.add("filename must end with .xls, .xlsx or .xml");
+        }
+      }
+    }
+    return result;
   }
 
   @Override
@@ -169,17 +260,6 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
         }
         getDisplay().setItems(items);
       }
-    }).send();
-  }
-
-  private void updateTable(String datasource, String table) {
-    factory.<JsArray<VariableDto>> newBuilder().forResource("/datasource/" + datasource + "/table/" + table + "/variables").get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<VariableDto> resource) {
-        variables = resource;
-        getDisplay().renderRows(variables);
-      }
-
     }).send();
   }
 
