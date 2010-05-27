@@ -60,16 +60,21 @@ public class WebShellResource {
 
     List<CommandJob> history = commandJobService.getHistory();
     for(CommandJob commandJob : history) {
-      CommandStateDto dto = CommandStateDto.newBuilder() //
+      CommandStateDto.Builder dtoBuilder = CommandStateDto.newBuilder() //
       .setCommand(commandJob.getCommand().getName()) //
       .setCommandArgs(commandJob.getCommand().toString()) //
       .setOwner(commandJob.getOwner()) //
       .setStatus(commandJob.getStatus()) //
-      .setStartTime(commandJob.getStartTime() != null ? formatTime(commandJob.getStartTime()) : null) //
-      .setEndTime(commandJob.getEndTime() != null ? formatTime(commandJob.getEndTime()) : null) //
-      .addAllMessages(commandJob.getMessages()).build();
+      .addAllMessages(commandJob.getMessages());
 
-      commandDtoList.add(dto);
+      if(commandJob.getStartTime() != null) {
+        dtoBuilder.setStartTime(formatTime(commandJob.getStartTime()));
+      }
+      if(commandJob.getEndTime() != null) {
+        dtoBuilder.setEndTime(formatTime(commandJob.getEndTime()));
+      }
+
+      commandDtoList.add(dtoBuilder.build());
     }
 
     return commandDtoList;
