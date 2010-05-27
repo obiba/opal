@@ -77,7 +77,7 @@
         <g:VerticalPanel height="100%" width="100%">
           <g:cell horizontalAlignment="ALIGN_RIGHT" verticalAlignment="ALIGN_MIDDLE">
             <g:HorizontalPanel>
-              <g:Button ui:field="start">Import</g:Button>
+              <g:Button ui:field="submit">Import</g:Button>
               <g:Button ui:field="cancel">Cancel</g:Button>
             </g:HorizontalPanel>
           </g:cell>

@@ -9,10 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.presenter;
 
+import java.util.Arrays;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -27,7 +28,6 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
@@ -36,22 +36,11 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.inject.Inject;
 
-/**
- *
- */
 public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Display> {
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends DataCommonPresenter.Display {
 
     HasCloseHandlers<PopupPanel> getDialogBox();
-
-    void showDialog();
-
-    void hideDialog();
-
-    void setDatasources(JsArray<DatasourceDto> datasources);
-
-    String getSelectedDatasource();
 
     void setFiles(FileDto root);
 
@@ -63,9 +52,6 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
 
     String getSelectedUnit();
 
-    HasClickHandlers getImport();
-
-    void showErrors(String text);
   }
 
   private final ResourceRequestBuilderFactory factory;
@@ -116,7 +102,7 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
       }
     });
 
-    getDisplay().getImport().addClickHandler(new ClickHandler() {
+    getDisplay().getSubmit().addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
@@ -129,7 +115,7 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
 
           @Override
           public void onResponseCode(Request request, Response response) {
-            getDisplay().showErrors(response.getText());
+            getDisplay().showErrors(Arrays.asList(new String[] { response.getText() }));
           }
         }).withCallback(202, new ResponseCodeCallback() {
 

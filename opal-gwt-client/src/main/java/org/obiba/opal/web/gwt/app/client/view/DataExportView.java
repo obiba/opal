@@ -12,28 +12,19 @@ package org.obiba.opal.web.gwt.app.client.view;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.presenter.DataExportPresenter;
-import org.obiba.opal.web.model.client.DatasourceDto;
-import org.obiba.opal.web.model.client.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.VariableDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Tree;
@@ -42,7 +33,10 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
 
-public class DataExportView extends Composite implements DataExportPresenter.Display {
+/**
+ * View of the dialog used to export data from Opal.
+ */
+public class DataExportView extends DataCommonView implements DataExportPresenter.Display {
 
   @UiTemplate("DataExportView.ui.xml")
   interface DataExportUiBinder extends UiBinder<Widget, DataExportView> {
@@ -51,16 +45,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   private static DataExportUiBinder uiBinder = GWT.create(DataExportUiBinder.class);
 
   @UiField
-  DialogBox dialog;
-
-  @UiField
-  Label errors;
-
-  @UiField
   Tree tableTree;
-
-  @UiField
-  ListBox datasources;
 
   @UiField
   TextBox file;
@@ -81,15 +66,6 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   CheckBox useAlias;
 
   @UiField
-  Button cancel;
-
-  @UiField
-  Button exportButton;
-
-  @UiField
-  ListBox units;
-
-  @UiField
   RadioButton opalId;
 
   @UiField
@@ -103,14 +79,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
     uiBinder.createAndBindUi(this);
     getDialog().setGlassEnabled(true);
     tableTree.setAnimationEnabled(true);
-    cancel.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        getDialog().hide();
-      }
-
-    });
+    addCommonHandlers();
     destinationDataSource.addClickHandler(new ClickHandler() {
 
       @Override
@@ -152,30 +121,15 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
 
   @Override
   public Widget asWidget() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public void startProcessing() {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
   public void stopProcessing() {
-    // TODO Auto-generated method stub
-
-  }
-
-  public DialogBox getDialog() {
-    return dialog;
-  }
-
-  @Override
-  public void showDialog() {
-    getDialog().center();
-    getDialog().show();
   }
 
   @Override
@@ -202,41 +156,6 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   }
 
   @Override
-  public String getSelectedDatasource() {
-    if(destinationDataSource.getValue()) {
-      return this.datasources.getValue(this.datasources.getSelectedIndex());
-    } else {
-      return this.file.getValue();
-    }
-  }
-
-  @Override
-  public void setDatasources(JsArray<DatasourceDto> datasources) {
-    this.datasources.clear();
-    for(int i = 0; i < datasources.length(); i++) {
-      this.datasources.addItem(datasources.get(i).getName(), datasources.get(i).getName());
-    }
-  }
-
-  @Override
-  public String getSelectedUnit() {
-    return this.units.getValue(this.units.getSelectedIndex());
-  }
-
-  @Override
-  public void setUnits(JsArray<FunctionalUnitDto> units) {
-    this.units.clear();
-    for(int i = 0; i < units.length(); i++) {
-      this.units.addItem(units.get(i).getName());
-    }
-  }
-
-  @Override
-  public HasClickHandlers getExport() {
-    return exportButton;
-  }
-
-  @Override
   public HasValue<String> getFile() {
     return file;
   }
@@ -244,22 +163,6 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   @Override
   public RadioButton getDestinationFile() {
     return destinationFile;
-  }
-
-  @Override
-  public void showErrors(List<String> errors) {
-    this.errors.setText(errors.get(0));
-    this.errors.setVisible(true);
-  }
-
-  @Override
-  public void hideErrors() {
-    errors.setVisible(false);
-  }
-
-  @Override
-  public void hideDialog() {
-    dialog.hide();
   }
 
   @Override
@@ -290,6 +193,11 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   @Override
   public HasValue<Boolean> isDestinationDataSource() {
     return destinationDataSource;
+  }
+
+  @Override
+  public String getOutFile() {
+    return file.getValue();
   }
 
 }

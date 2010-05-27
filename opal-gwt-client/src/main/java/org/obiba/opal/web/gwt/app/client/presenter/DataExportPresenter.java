@@ -15,7 +15,6 @@ import java.util.List;
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
@@ -28,12 +27,10 @@ import org.obiba.opal.web.model.client.DatasourceDto;
 import org.obiba.opal.web.model.client.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.VariableDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -49,13 +46,7 @@ import com.google.inject.Inject;
 
 public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Display> {
 
-  public interface Display extends WidgetDisplay {
-
-    void setDatasources(JsArray<DatasourceDto> datasources);
-
-    String getSelectedDatasource();
-
-    void showDialog();
+  public interface Display extends DataCommonPresenter.Display {
 
     HasSelectionHandlers<TreeItem> getTableTree();
 
@@ -65,23 +56,15 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
     void addTable(String datasource, String table);
 
-    String getSelectedUnit();
-
-    void setUnits(JsArray<FunctionalUnitDto> units);
-
-    HasClickHandlers getExport();
-
     HasValue<String> getFile();
 
     RadioButton getDestinationFile();
 
-    void showErrors(List<String> errors);
-
-    void hideErrors();
-
     void hideDialog();
 
     JsArrayString getSelectedFiles();
+
+    String getOutFile();
 
     HasValue<Boolean> isIncremental();
 
@@ -111,7 +94,6 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   @Override
   public Place getPlace() {
-    // TODO Auto-generated method stub
     return null;
   }
 
@@ -138,12 +120,10 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
         eventBus.fireEvent(new NavigatorSelectionChangeEvent(event.getSelectedItem()));
       }
     }));
-    // FIXME: this HandlerRegistration is not of the same type, so we can't pass it to our parent for unbinding.
     getDisplay().getTableSelection().addSelectionChangeHandler(new SelectionChangeHandler() {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
-        // VariableDto variable = getDisplay().getTableSelection();
         eventBus.fireEvent(new VariableSelectionChangeEvent(null));
       }
     });
@@ -159,7 +139,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
       }
     }));
 
-    getDisplay().getExport().addClickHandler(new ClickHandler() {
+    getDisplay().getSubmit().addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
@@ -173,7 +153,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
           if(getDisplay().isDestinationDataSource().getValue()) {
             dto.setDestination(getDisplay().getSelectedDatasource());
           } else {
-            dto.setOut(getDisplay().getSelectedDatasource());
+            dto.setOut(getDisplay().getOutFile());
           }
           dto.setNonIncremental(!getDisplay().isIncremental().getValue());
           dto.setNoVariables(!getDisplay().isWithVariables().getValue());
@@ -220,20 +200,14 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   @Override
   protected void onPlaceRequest(PlaceRequest request) {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
   protected void onUnbind() {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
   public void refreshDisplay() {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
