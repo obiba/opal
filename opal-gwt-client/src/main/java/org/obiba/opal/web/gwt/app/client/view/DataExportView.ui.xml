@@ -41,13 +41,13 @@
                   Destination:
                 </td>
                 <td>
-                  <g:RadioButton name="destination" ui:field="destinationDataSource"/><g:ListBox ui:field="datasources" />
+                  <g:RadioButton name="destination" ui:field="destinationDataSource"/> <g:ListBox ui:field="datasources" />
                 </td>
               </tr>
               <tr>
                 <td/>
                 <td>
-                  <g:RadioButton name="destination" ui:field="destinationFile"/> file name: <g:TextBox  ui:field="file" />
+                  <g:RadioButton name="destination" ui:field="destinationFile"> file name: </g:RadioButton> <g:TextBox  ui:field="file" />
                 </td>
               </tr> 
               <tr>
@@ -55,19 +55,19 @@
                   Options:
                 </td>
                 <td>
-                  <g:CheckBox ui:field="incremental" /> incremental
+                  <g:CheckBox ui:field="incremental"> incremental</g:CheckBox>
                 </td>
               </tr>              
               <tr>
                 <td/>
                 <td>
-                  <g:CheckBox ui:field="withVariables" /> with variables
+                  <g:CheckBox ui:field="withVariables"> with variables</g:CheckBox>
                 </td>
               </tr>              
               <tr>
                 <td/>
                 <td>
-                  <g:CheckBox ui:field="useAlias" /> use 'alias' attribute to rename variable
+                  <g:CheckBox ui:field="useAlias"> use 'alias' attribute to rename variable</g:CheckBox>
                 </td>
               </tr>              
               <tr>
@@ -78,13 +78,13 @@
               <tr>
                 <td/>
                 <td>
-                  <g:RadioButton name="idGroup" ui:field="opalId"/> use Opal ID
+                  <g:RadioButton name="idGroup" ui:field="opalId"> use Opal ID</g:RadioButton>
                 </td>
               </tr> 
               <tr>
                 <td/>
                 <td>
-                  <g:RadioButton name="idGroup" ui:field="unitId"/> use Unit ID <g:ListBox ui:field="units" />
+                  <g:RadioButton name="idGroup" ui:field="unitId"> use Unit ID </g:RadioButton> <g:ListBox ui:field="units" />
                 </td>
               </tr> 
             </tbody>
