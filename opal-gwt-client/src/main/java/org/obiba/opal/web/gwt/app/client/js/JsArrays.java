@@ -78,13 +78,16 @@ public class JsArrays {
    * @param array the array used to back the returned list
    * @param start the index within the array that will become the 0th element in the returned list
    * @param length the size of the returned list
-   * @return a view of the array as a {@code List} that contains elements array[start] to array[start + length]
+   * @return a view of the array as a {@code List} that contains elements array[start] to array[start + length] (or
+   * array[array.length] if start + lenght > array.length)
    */
   public static <T extends JavaScriptObject> List<T> toList(final JsArray<T> array, final int start, final int length) {
     if(array == null) throw new IllegalArgumentException("array cannot be null");
     if(start < 0 || start > array.length()) throw new IndexOutOfBoundsException("start index '" + start + "'is invalid");
-    if(length < 0 || length > array.length()) throw new IndexOutOfBoundsException("length '" + length + "'is invalid");
+    if(length < 0) throw new IndexOutOfBoundsException("length '" + length + "'is invalid");
     return new AbstractList<T>() {
+
+      transient int size = -1;
 
       @Override
       public T get(int index) {
@@ -93,9 +96,12 @@ public class JsArrays {
 
       @Override
       public int size() {
-        // size is either "length" or the number of elements that exist between "start" and the array's last item
-        // "array.lenght()" (array.length() - start)
-        return (start + length) > array.length() ? array.length() - start : length;
+        if(size == -1) {
+          // size is either "length" or the number of elements that exist between "start" and the array's last item
+          // "array.lenght()" (array.length() - start)
+          size = (start + length) > array.length() ? array.length() - start : length;
+        }
+        return size;
       }
 
     };
