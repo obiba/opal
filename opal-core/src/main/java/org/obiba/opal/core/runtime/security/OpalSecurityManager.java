@@ -28,6 +28,11 @@ public class OpalSecurityManager {
   @Autowired
   private Set<Realm> securityRealms;
 
+  public OpalSecurityManager(Set<Realm> securityRealms) {
+    super();
+    this.securityRealms = securityRealms;
+  }
+
   public void start() {
     RealmSecurityManager securityManager = new DefaultSecurityManager(ImmutableSet.<Realm> builder().add(new IniRealm(System.getProperty("OPAL_HOME") + "/conf/shiro.ini")).addAll(securityRealms).build());
     SecurityUtils.setSecurityManager(securityManager);
