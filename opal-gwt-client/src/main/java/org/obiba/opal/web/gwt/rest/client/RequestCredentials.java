@@ -49,10 +49,14 @@ public class RequestCredentials {
   }
 
   public void invalidate() {
-    Cookies.removeCookie(RequestCredentials.OPALSID);
+    Cookies.removeCookie(RequestCredentials.OPALSID, "/");
   }
 
-  private String extractCredentials() {
+  /**
+   * Returns the Opal session id.
+   * @return the opalsid.
+   */
+  public String extractCredentials() {
     return Cookies.getCookie(RequestCredentials.OPALSID);
   }
 }

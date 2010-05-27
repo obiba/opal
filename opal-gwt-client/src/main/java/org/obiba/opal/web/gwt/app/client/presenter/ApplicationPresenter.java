@@ -18,10 +18,14 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.SessionExpiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
@@ -56,17 +60,20 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
   private WidgetPresenter<?> workbench;
 
+  private final ResourceRequestBuilderFactory factory;
+
   /**
    * @param display
    * @param eventBus
    */
   @Inject
-  public ApplicationPresenter(final Display display, final EventBus eventBus, Provider<NavigatorPresenter> navigationPresenter, Provider<DataImportPresenter> dataImportPresenter, Provider<DataExportPresenter> dataExportPresenter, RequestCredentials credentials) {
+  public ApplicationPresenter(final Display display, final EventBus eventBus, Provider<NavigatorPresenter> navigationPresenter, Provider<DataImportPresenter> dataImportPresenter, Provider<DataExportPresenter> dataExportPresenter, RequestCredentials credentials, ResourceRequestBuilderFactory factory) {
     super(display, eventBus);
     this.navigationPresenter = navigationPresenter;
     this.credentials = credentials;
     this.dataImportPresenter = dataImportPresenter;
     this.dataExportPresenter = dataExportPresenter;
+    this.factory = factory;
   }
 
   @Override
@@ -108,9 +115,15 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
     getDisplay().getQuit().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
+        factory.newBuilder().forResource("/auth/session/" + credentials.extractCredentials()).delete().withCallback(201, new ResponseCodeCallback() {
+
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            eventBus.fireEvent(new SessionExpiredEvent());
+          }
+        }).send();
         credentials.invalidate();
         // Need to send to some type of no-workbench place.
-        eventBus.fireEvent(new SessionExpiredEvent());
       }
     });
 
