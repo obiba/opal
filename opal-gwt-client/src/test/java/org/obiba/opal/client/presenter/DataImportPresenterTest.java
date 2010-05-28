@@ -16,6 +16,7 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import net.customware.gwt.presenter.client.EventBus;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.web.gwt.app.client.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
@@ -29,19 +30,26 @@ import com.google.gwt.event.shared.HandlerRegistration;
 
 public class DataImportPresenterTest {
 
-  @Test
-  public void testThatEventHandlersAreAddedToComponents() {
+  private DataImportPresenter importPresenter;
 
-    DataImportPresenter.Display displayMock = createMock(DataImportPresenter.Display.class);
+  private DataImportPresenter.Display displayMock;
+
+  @Before
+  public void setUp() {
+    displayMock = createMock(DataImportPresenter.Display.class);
     EventBus eventBus = createMock(EventBus.class);
     RequestCredentials credentials = new RequestCredentials();
     ResourceRequestBuilderFactory factory = new ResourceRequestBuilderFactory(eventBus, credentials);
 
-    DataImportPresenter importPresenter = new DataImportPresenter(displayMock, eventBus, factory) {
+    importPresenter = new DataImportPresenter(displayMock, eventBus, factory) {
       @Override
       protected void initDisplayComponents() {
       }
     };
+  }
+
+  @Test
+  public void testThatEventHandlersAreAddedToUIComponents() {
 
     HasClickHandlers hasClickHandlerMock = createMock(HasClickHandlers.class);
     expect(displayMock.getSubmit()).andReturn(hasClickHandlerMock).atLeastOnce();

@@ -99,20 +99,11 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   @Override
   protected void onBind() {
+    initDisplayComponents();
+    addEventHandlers();
+  }
 
-    factory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<DatasourceDto> datasources) {
-        getDisplay().setDatasources(datasources);
-      }
-    }).send();
-
-    factory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
-        getDisplay().setUnits(units);
-      }
-    }).send();
+  protected void addEventHandlers() {
 
     super.registerHandler(getDisplay().getTableTree().addSelectionHandler(new SelectionHandler<TreeItem>() {
       @Override
@@ -120,6 +111,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
         eventBus.fireEvent(new NavigatorSelectionChangeEvent(event.getSelectedItem()));
       }
     }));
+
     getDisplay().getTableSelection().addSelectionChangeHandler(new SelectionChangeHandler() {
 
       @Override
@@ -178,6 +170,22 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
         }
       }
     });
+  }
+
+  protected void initDisplayComponents() {
+    factory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+      @Override
+      public void onResource(Response response, JsArray<DatasourceDto> datasources) {
+        getDisplay().setDatasources(datasources);
+      }
+    }).send();
+
+    factory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
+      @Override
+      public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
+        getDisplay().setUnits(units);
+      }
+    }).send();
   }
 
   private List<String> formValidationErrors() {

@@ -16,6 +16,7 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import net.customware.gwt.presenter.client.EventBus;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
@@ -27,15 +28,22 @@ import com.google.gwt.event.shared.HandlerRegistration;
 
 public class LoginPresenterTest {
 
-  @Test
-  public void testThatClickHandlerIsAddedToSignIn() {
+  private LoginPresenter loginPresenter;
 
-    LoginPresenter.Display displayMock = createMock(LoginPresenter.Display.class);
+  private LoginPresenter.Display displayMock;
+
+  @Before
+  public void setUp() {
+    displayMock = createMock(LoginPresenter.Display.class);
     EventBus eventBus = createMock(EventBus.class);
     RequestCredentials credentials = new RequestCredentials();
     ResourceRequestBuilderFactory factory = new ResourceRequestBuilderFactory(eventBus, credentials);
 
-    LoginPresenter loginPresenter = new LoginPresenter(displayMock, eventBus, factory, credentials);
+    loginPresenter = new LoginPresenter(displayMock, eventBus, factory, credentials);
+  }
+
+  @Test
+  public void testThatEventHandlersAreAddedToUIComponents() {
 
     HasClickHandlers hasClickHandlerMock = createMock(HasClickHandlers.class);
     expect(displayMock.getSignIn()).andReturn(hasClickHandlerMock).atLeastOnce();
