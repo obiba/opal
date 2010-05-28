@@ -17,6 +17,7 @@ import org.obiba.opal.web.model.client.AttributeDto;
 import org.obiba.opal.web.model.client.VariableDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -130,6 +131,13 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   @Override
   public SelectionModel<VariableDto> getTableSelection() {
     return selectionModel;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public void clear() {
+    this.tree.clear();
+    renderRows((JsArray<VariableDto>) JavaScriptObject.createArray());
   }
 
   @Override

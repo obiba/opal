@@ -19,6 +19,8 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.event.SessionExpiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -51,6 +53,8 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     SelectionModel<VariableDto> getTableSelection();
 
     void renderRows(JsArray<VariableDto> rows);
+
+    void clear();
   }
 
   final private ResourceRequestBuilderFactory factory;
@@ -81,15 +85,14 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
       }
     }));
 
-    // FIXME: this HandlerRegistration is not of the same type, so we can't pass it to our parent for unbinding.
-    getDisplay().getTableSelection().addSelectionChangeHandler(new SelectionChangeHandler() {
+    super.registerHandler(getDisplay().getTableSelection().addSelectionChangeHandler(new SelectionChangeHandler() {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
         // VariableDto variable = getDisplay().getTableSelection();
         eventBus.fireEvent(new VariableSelectionChangeEvent(null));
       }
-    });
+    }));
 
     super.registerHandler(eventBus.addHandler(NavigatorSelectionChangeEvent.getType(), new NavigatorSelectionChangeEvent.Handler() {
       @Override
@@ -99,6 +102,20 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
           String table = event.getSelection().getText();
           updateTable(datasource, table);
         }
+      }
+    }));
+
+    super.registerHandler(eventBus.addHandler(SessionCreatedEvent.getType(), new SessionCreatedEvent.Handler() {
+      @Override
+      public void onSessionCreated(SessionCreatedEvent event) {
+        refreshDisplay();
+      }
+    }));
+
+    super.registerHandler(eventBus.addHandler(SessionExpiredEvent.getType(), new SessionExpiredEvent.Handler() {
+      @Override
+      public void onSessionExpired(SessionExpiredEvent event) {
+        getDisplay().clear();
       }
     }));
   }

@@ -15,7 +15,7 @@ import com.google.gwt.event.shared.GwtEvent;
 public class SessionCreatedEvent extends GwtEvent<SessionCreatedEvent.Handler> {
 
   public interface Handler extends EventHandler {
-    void onSessionExpired(SessionCreatedEvent event);
+    void onSessionCreated(SessionCreatedEvent event);
   }
 
   private static Type<Handler> TYPE;
@@ -39,7 +39,7 @@ public class SessionCreatedEvent extends GwtEvent<SessionCreatedEvent.Handler> {
 
   @Override
   protected void dispatch(Handler handler) {
-    handler.onSessionExpired(this);
+    handler.onSessionCreated(this);
   }
 
   @Override
