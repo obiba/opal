@@ -24,6 +24,8 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.HasKeyUpHandlers;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 
 public class LoginPresenterTest {
@@ -48,8 +50,17 @@ public class LoginPresenterTest {
     HasClickHandlers hasClickHandlerMock = createMock(HasClickHandlers.class);
     expect(displayMock.getSignIn()).andReturn(hasClickHandlerMock).atLeastOnce();
 
+    HasKeyUpHandlers hasUserNameKeyUpHandlerMock = createMock(HasKeyUpHandlers.class);
+    expect(displayMock.getUserNameTextBox()).andReturn(hasUserNameKeyUpHandlerMock).atLeastOnce();
+
+    HasKeyUpHandlers hasPasswordKeyUpHandlerMock = createMock(HasKeyUpHandlers.class);
+    expect(displayMock.getPasswordTextBox()).andReturn(hasPasswordKeyUpHandlerMock).atLeastOnce();
+
     HandlerRegistration handlerRegistrationMock = createMock(HandlerRegistration.class);
+
     expect(hasClickHandlerMock.addClickHandler((ClickHandler) anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
+    expect(hasUserNameKeyUpHandlerMock.addKeyUpHandler((KeyUpHandler) anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
+    expect(hasPasswordKeyUpHandlerMock.addKeyUpHandler((KeyUpHandler) anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
 
     replay(displayMock, hasClickHandlerMock);
 
