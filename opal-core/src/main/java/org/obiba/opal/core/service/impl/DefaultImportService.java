@@ -76,7 +76,7 @@ public class DefaultImportService implements ImportService {
   private final String keysTableEntityType;
 
   @Autowired
-  public DefaultImportService(OpalRuntime opalRuntime, VariableEntityAuditLogManager auditLogManager, IParticipantIdentifier participantIdentifier, @Value("org.obiba.opal.keys.tableReference") String keysTableReference, @Value("org.obiba.opal.keys.entityType") String keysTableEntityType) {
+  public DefaultImportService(OpalRuntime opalRuntime, VariableEntityAuditLogManager auditLogManager, IParticipantIdentifier participantIdentifier, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference, @Value("${org.obiba.opal.keys.entityType}") String keysTableEntityType) {
     if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
     if(auditLogManager == null) throw new IllegalArgumentException("auditLogManager cannot be null");
     if(participantIdentifier == null) throw new IllegalArgumentException("participantIdentifier cannot be null");
