@@ -73,28 +73,11 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
 
   @Override
   protected void onBind() {
+    initDisplayComponents();
+    addEventHandlers();
+  }
 
-    factory.<FileDto> newBuilder().forResource("/files").get().withCallback(new ResourceCallback<FileDto>() {
-      @Override
-      public void onResource(Response response, FileDto root) {
-        getDisplay().setFiles(root);
-      }
-    }).send();
-
-    factory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<DatasourceDto> datasources) {
-        getDisplay().setDatasources(datasources);
-      }
-    }).send();
-
-    factory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
-        getDisplay().setUnits(units);
-      }
-    }).send();
-
+  protected void addEventHandlers() {
     getDisplay().getDialogBox().addCloseHandler(new CloseHandler<PopupPanel>() {
       @Override
       public void onClose(CloseEvent<PopupPanel> event) {
@@ -127,6 +110,31 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
       }
 
     });
+  }
+
+  protected void initDisplayComponents() {
+
+    factory.<FileDto> newBuilder().forResource("/files").get().withCallback(new ResourceCallback<FileDto>() {
+      @Override
+      public void onResource(Response response, FileDto root) {
+        getDisplay().setFiles(root);
+      }
+    }).send();
+
+    factory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+      @Override
+      public void onResource(Response response, JsArray<DatasourceDto> datasources) {
+        getDisplay().setDatasources(datasources);
+      }
+    }).send();
+
+    factory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
+      @Override
+      public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
+        getDisplay().setUnits(units);
+      }
+    }).send();
+
   }
 
   @Override
