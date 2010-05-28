@@ -20,9 +20,14 @@ import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.HasKeyUpHandlers;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasValue;
@@ -45,6 +50,11 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
     public HasValue<String> getPassword();
 
     public HasClickHandlers getSignIn();
+
+    public HasKeyUpHandlers getUserNameTextBox();
+
+    public HasKeyUpHandlers getPasswordTextBox();
+
   }
 
   private final ResourceRequestBuilderFactory factory;
@@ -67,9 +77,29 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
   protected void onBind() {
     display.getSignIn().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
-        createSecurityResource(display.getUserName().getValue(), display.getPassword().getValue());
+        createSecurityResource();
       }
     });
+    display.getUserNameTextBox().addKeyUpHandler(new KeyUpHandler() {
+      @Override
+      public void onKeyUp(KeyUpEvent event) {
+        if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+          createSecurityResource();
+        }
+      }
+    });
+    display.getPasswordTextBox().addKeyUpHandler(new KeyUpHandler() {
+      @Override
+      public void onKeyUp(KeyUpEvent event) {
+        if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+          createSecurityResource();
+        }
+      }
+    });
+  }
+
+  private void createSecurityResource() {
+    createSecurityResource(display.getUserName().getValue(), display.getPassword().getValue());
   }
 
   @Override

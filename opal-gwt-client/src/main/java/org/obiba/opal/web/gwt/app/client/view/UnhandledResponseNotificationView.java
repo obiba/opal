@@ -4,6 +4,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotification
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -62,6 +63,14 @@ public class UnhandledResponseNotificationView extends PopupPanel implements Unh
   @Override
   public void closePopup() {
     hide();
+  }
+
+  @Override
+  public boolean onKeyUpPreview(char key, int modifiers) {
+    if(key == KeyCodes.KEY_ESCAPE) {
+      hide();
+    }
+    return true;
   }
 
 }

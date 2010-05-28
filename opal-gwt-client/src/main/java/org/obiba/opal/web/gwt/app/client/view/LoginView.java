@@ -5,6 +5,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import com.google.gwt.animation.client.Animation;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.HasKeyUpHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -44,6 +45,7 @@ public class LoginView extends PopupPanel implements LoginPresenter.Display {
     add(uiBinder.createAndBindUi(this));
     errorMessage.setVisible(false);
     setGlassEnabled(true);
+    userName.setFocus(true);
   }
 
   @Override
@@ -76,14 +78,13 @@ public class LoginView extends PopupPanel implements LoginPresenter.Display {
 
   @Override
   public void showPopup() {
-    // setGlassEnabled(false);
     center();
+    userName.setFocus(true);
     show();
   }
 
   @Override
   public void showPopupWithGlassPanel() {
-    // setGlassEnabled(true);
     center();
     show();
   }
@@ -107,4 +108,15 @@ public class LoginView extends PopupPanel implements LoginPresenter.Display {
     getPassword().setValue("");
     hide();
   }
+
+  @Override
+  public HasKeyUpHandlers getPasswordTextBox() {
+    return password;
+  }
+
+  @Override
+  public HasKeyUpHandlers getUserNameTextBox() {
+    return userName;
+  }
+
 }
