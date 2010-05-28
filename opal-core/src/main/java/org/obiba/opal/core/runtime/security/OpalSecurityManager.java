@@ -25,9 +25,9 @@ import com.google.common.collect.ImmutableSet;
 @Component
 public class OpalSecurityManager {
 
-  @Autowired
   private Set<Realm> securityRealms;
 
+  @Autowired
   public OpalSecurityManager(Set<Realm> securityRealms) {
     super();
     this.securityRealms = securityRealms;
