@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ThreadFactory;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
@@ -25,6 +26,7 @@ import org.obiba.magma.audit.VariableEntityAuditLogManager;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.obiba.magma.support.MultithreadedDatasourceCopier;
 import org.obiba.magma.support.DatasourceCopier.Builder;
 import org.obiba.magma.views.IncrementalWhereClause;
 import org.obiba.magma.views.View;
@@ -36,7 +38,13 @@ import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
 import com.google.common.base.Function;
@@ -46,6 +54,8 @@ import com.google.common.base.Function;
  */
 @Transactional
 public class DefaultExportServiceImpl implements ExportService {
+
+  private final PlatformTransactionManager txManager;
 
   private final OpalRuntime opalRuntime;
 
@@ -58,12 +68,14 @@ public class DefaultExportServiceImpl implements ExportService {
   private final String keysTableEntityType;
 
   @Autowired
-  public DefaultExportServiceImpl(OpalRuntime opalRuntime, VariableEntityAuditLogManager auditLogManager, @Value("org.obiba.opal.keys.tableReference") String keysTableReference, @Value("org.obiba.opal.keys.entityType") String keysTableEntityType) {
+  public DefaultExportServiceImpl(PlatformTransactionManager txManager, OpalRuntime opalRuntime, VariableEntityAuditLogManager auditLogManager, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference, @Value("${org.obiba.opal.keys.entityType}") String keysTableEntityType) {
+    if(txManager == null) throw new IllegalArgumentException("txManager cannot be null");
     if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
     if(auditLogManager == null) throw new IllegalArgumentException("auditLogManager cannot be null");
     if(keysTableReference == null) throw new IllegalArgumentException("keysTableReference cannot be null");
     if(keysTableEntityType == null) throw new IllegalArgumentException("keysTableEntityType cannot be null");
 
+    this.txManager = txManager;
     this.opalRuntime = opalRuntime;
     this.auditLogManager = auditLogManager;
     this.keysTableReference = keysTableReference;
@@ -123,7 +135,13 @@ public class DefaultExportServiceImpl implements ExportService {
         }
 
         // Go ahead and copy the result to the destination datasource.
-        datasourceCopier.copy(table, destinationDatasource);
+        MultithreadedDatasourceCopier.Builder.newCopier().from(table).to(destinationDatasource).withCopier(DatasourceCopier.Builder.newCopier(datasourceCopier)).withReaders(4).withThreads(new ThreadFactory() {
+
+          @Override
+          public Thread newThread(Runnable r) {
+            return new TransactionalThread(txManager, r);
+          }
+        }).build().copy();
       }
     } catch(IOException ex) {
       // When implementing the ExcelDatasource:
@@ -213,4 +231,26 @@ public class DefaultExportServiceImpl implements ExportService {
     return View.Builder.newView(valueTable.getName(), valueTable).where(whereClause).cacheWhere().build();
   }
 
+  static class TransactionalThread extends Thread {
+
+    private PlatformTransactionManager txManager;
+
+    private Runnable runnable;
+
+    public TransactionalThread(PlatformTransactionManager txManager, Runnable runnable) {
+      this.txManager = txManager;
+      this.runnable = runnable;
+    }
+
+    public void run() {
+      DefaultTransactionDefinition txdef = new DefaultTransactionDefinition();
+      txdef.setIsolationLevel(TransactionDefinition.ISOLATION_READ_UNCOMMITTED);
+      new TransactionTemplate(txManager, txdef).execute(new TransactionCallbackWithoutResult() {
+        @Override
+        protected void doInTransactionWithoutResult(TransactionStatus status) {
+          runnable.run();
+        }
+      });
+    }
+  }
 }
