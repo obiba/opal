@@ -11,7 +11,7 @@
   </parent>
 
   <artifactId>opal-gwt-client</artifactId>
-  <name>opal-gwt--lient</name>
+  <name>opal-gwt-client</name>
   <packaging>war</packaging>
 
   <dependencies>
