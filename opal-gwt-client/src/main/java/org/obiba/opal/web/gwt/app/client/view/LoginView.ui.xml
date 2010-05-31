@@ -9,13 +9,13 @@
       <tr>
         <td/>
         <td>
-          <span class='{style.applicationTitle}'><g:Label ui:field="applicationName" text="Opal" /></span>
+          <g:Label ui:field="applicationName" addStyleNames="{style.applicationTitle}" text="Opal" />
         </td>
       </tr>
       <tr>
         <td/>
         <td>
-          <span class='{style.error}'><g:Label ui:field="errorMessage" text="Authentication Failed" /></span>          
+          <g:Label ui:field="errorMessage" addStyleNames="{style.error}" text="Authentication Failed" />          
         </td>
       </tr>
       <tr>
