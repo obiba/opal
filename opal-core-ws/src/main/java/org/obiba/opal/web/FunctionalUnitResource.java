@@ -34,21 +34,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import com.google.common.collect.Lists;
 
 @Component
 @Path("/functional-unit")
 public class FunctionalUnitResource {
 
+  private static final Logger log = LoggerFactory.getLogger(FunctionalUnitResource.class);
+
   @Autowired
   private OpalRuntime opalRuntime;
 
   @Autowired
   private UnitKeyStoreService unitKeyStoreService;
-
-  private static final Logger log = LoggerFactory.getLogger(FunctionalUnitResource.class);
 
   @GET
   @Path("/{unit}")
@@ -86,12 +84,12 @@ public class FunctionalUnitResource {
       unitKeyStoreService.createOrUpdateKey(unit, kpForm.getAlias(), kpForm.getPrivateForm().getAlgo(), kpForm.getPrivateForm().getSize(), getCertificateInfo(kpForm.getPublicForm()));
     } else if(kpForm.hasPrivateImport()) {
       if(kpForm.hasPublicForm()) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
         // TODO
         // unitKeyStoreService.importKey(unit, kpAdd.getAlias(), kpAdd.getPrivateImport(),
         // getCertificateInfo(kpAdd.getPublicForm()));
       } else if(kpForm.hasPublicImport()) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
         // TODO
         // unitKeyStoreService.importKey(unit, kpAdd.getAlias(), kpAdd.getPrivateImport(), kpAdd.getPublicImport());
       } else {
