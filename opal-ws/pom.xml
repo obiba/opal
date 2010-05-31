@@ -9,8 +9,7 @@
   </parent>
   <groupId>org.obiba.opal</groupId>
   <artifactId>opal-ws</artifactId>
-  <name>Opal Web Services</name>
-  <url>http://maven.apache.org</url>
+  <name>opal-ws</name>
   <dependencies>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>

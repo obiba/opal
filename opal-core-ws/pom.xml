@@ -9,6 +9,7 @@
   </parent>
   <groupId>org.obiba.opal</groupId>
   <artifactId>opal-core-ws</artifactId>
+  <name>opal-core-ws</name>
   <dependencies>
     <dependency>
       <groupId>org.obiba.opal</groupId>
