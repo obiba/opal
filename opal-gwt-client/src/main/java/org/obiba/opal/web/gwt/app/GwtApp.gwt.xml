@@ -4,22 +4,22 @@
   <!-- Third-party tools and libraries -->
   <!-- Inherit the core Web Toolkit stuff. -->
   <inherits name='com.google.gwt.user.User' />
-  <!-- Use the incubator's bulk rendered tables -->
-  <!-- inherits name='com.google.gwt.gen2.table.Table' /-->
   <!-- Sophisticated visualisations -->
   <inherits name='com.google.gwt.visualization.Visualization' />
-  <!-- Use an MVP pattern -->
+  <!-- Use an MVP pattern framework -->
   <inherits name='net.customware.gwt.presenter.Presenter' />
 
-  <!-- Opal's WS data models -->
+  <!-- Dependency Injection -->
   <inherits name='org.obiba.opal.web.gwt.inject.Inject' />
+  <!-- Client-side REST framework -->
   <inherits name='org.obiba.opal.web.gwt.rest.Rest' />
+  <!-- Opal's WS data models -->
   <inherits name='org.obiba.opal.web.model.Model' />
 
-  <!--  inherit css based theme-->
+  <!--  inherit css based theme -->
   <inherits name='com.google.gwt.user.theme.standard.Standard' />
 
-  <!-- Specify the app entry point class.                         -->
+  <!-- Specify the app entry point class. -->
   <entry-point class='org.obiba.opal.web.gwt.app.client.GwtApp' />
 
   <!-- This will limit the compile to a single browser: Firefox 3.x -->
