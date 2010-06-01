@@ -13,7 +13,6 @@ import java.net.URI;
 import java.util.List;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.UriBuilder;
 
@@ -31,13 +30,14 @@ import com.google.common.collect.Lists;
 @Path("/datasources")
 public class DatasourcesResource {
 
+  @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(DatasourcesResource.class);
 
   @GET
   public List<Magma.DatasourceDto> getDatasources() {
     final List<Magma.DatasourceDto> datasources = Lists.newArrayList();
     for(Datasource from : MagmaEngine.get().getDatasources()) {
-      URI dslink = UriBuilder.fromResource(DatasourceResource.class).path(DatasourceResource.class, "get").build(from.getName());
+      URI dslink = UriBuilder.fromPath("/").path(DatasourceResource.class).build(from.getName());
       Magma.DatasourceDto.Builder ds = Magma.DatasourceDto.newBuilder() //
       .setName(from.getName()) //
       .setLink(dslink.toString());
@@ -47,12 +47,6 @@ public class DatasourcesResource {
       datasources.add(ds.build());
     }
     return datasources;
-  }
-
-  @POST
-  // Bogus method to demonstrate reading the request body into a dto
-  public void create(Magma.DatasourceDto dto) {
-    log.info(dto.toString());
   }
 
 }

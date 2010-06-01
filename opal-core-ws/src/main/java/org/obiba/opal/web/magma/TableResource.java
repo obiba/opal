@@ -36,6 +36,7 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.xstream.XStreamValueSet;
+import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
@@ -52,6 +53,14 @@ public class TableResource {
 
   public TableResource(ValueTable valueTable) {
     this.valueTable = valueTable;
+  }
+
+  @GET
+  public TableDto get(@Context final UriInfo uriInfo) {
+    return TableDto.newBuilder()//
+    .setName(valueTable.getName())//
+    .setEntityType(valueTable.getEntityType())//
+    .setLink(uriInfo.getPath()).build();
   }
 
   @GET

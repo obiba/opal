@@ -24,14 +24,26 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component
-@Path("/datasource")
+@Scope("request")
+@Path("/datasource/{name}")
 public class DatasourceResource {
 
   private static final Logger log = LoggerFactory.getLogger(DatasourceResource.class);
 
+  @PathParam("name")
+  private String name;
+
+  // Used by Spring. JAX-RS, will inject the name attribute
+  public DatasourceResource() {
+  }
+
+  // Used for testing
+  public DatasourceResource(String name) {
+    this.name = name;
+  }
+
   @GET
-  @Path("/{name}")
-  public Magma.DatasourceDto get(@PathParam("name") String name) {
+  public Magma.DatasourceDto get() {
     Datasource ds = MagmaEngine.get().getDatasource(name);
     Magma.DatasourceDto.Builder datasource = Magma.DatasourceDto.newBuilder().setName(ds.getName());
     for(ValueTable table : ds.getValueTables()) {
@@ -40,8 +52,8 @@ public class DatasourceResource {
     return datasource.build();
   }
 
-  @Path("/{name}/table/{table}")
-  public TableResource getTable(@PathParam("name") String name, @PathParam("table") String table) {
+  @Path("/table/{table}")
+  public TableResource getTable(@PathParam("table") String table) {
     return getTableResource(MagmaEngine.get().getDatasource(name).getValueTable(table));
   }
 

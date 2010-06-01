@@ -8,6 +8,14 @@ message DatasourceDto {
   repeated string table = 3;
 }
 
+message TableDto {
+  required string name = 1;
+  required string entityType = 2;
+  optional string link = 3;
+  optional int32 variableCount = 4;
+  optional int32 valueSetCount = 5;
+}
+
 message VariableDto {
   required string name = 1;
   required string valueType = 2;
