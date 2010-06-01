@@ -56,6 +56,9 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
 
   private final ResourceRequestBuilderFactory factory;
 
+  @Inject
+  private ErrorDialogPresenter errorDialog;
+
   /**
    * @param display
    * @param eventBus
@@ -98,7 +101,9 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
 
           @Override
           public void onResponseCode(Request request, Response response) {
-            getDisplay().showErrors(Arrays.asList(new String[] { response.getText() }));
+            errorDialog.bind();
+            errorDialog.setErrors(Arrays.asList(new String[] { response.getText() }));
+            errorDialog.revealDisplay();
           }
         }).withCallback(202, new ResponseCodeCallback() {
 

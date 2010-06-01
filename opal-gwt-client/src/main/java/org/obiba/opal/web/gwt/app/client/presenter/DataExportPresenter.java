@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.presenter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.customware.gwt.presenter.client.EventBus;
@@ -80,7 +81,8 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   final private ResourceRequestBuilderFactory factory;
 
-  private JsArray<VariableDto> variables;
+  @Inject
+  private ErrorDialogPresenter errorDialog;
 
   /**
    * @param display
@@ -137,7 +139,9 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
       public void onClick(ClickEvent event) {
         List<String> errors = formValidationErrors();
         if(!errors.isEmpty()) {
-          getDisplay().showErrors(errors);
+          errorDialog.bind();
+          errorDialog.setErrors(errors);
+          errorDialog.revealDisplay();
         } else {
           getDisplay().hideErrors();
           CopyCommandOptionsDto dto = CopyCommandOptionsDto.create();
@@ -155,9 +159,9 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
             @Override
             public void onResponseCode(Request request, Response response) {
-              List<String> errors = new ArrayList<String>();
-              errors.add(response.getText());
-              getDisplay().showErrors(errors);
+              errorDialog.bind();
+              errorDialog.setErrors(Arrays.asList(new String[] { response.getText() }));
+              errorDialog.revealDisplay();
             }
           }).withCallback(202, new ResponseCodeCallback() {
 
