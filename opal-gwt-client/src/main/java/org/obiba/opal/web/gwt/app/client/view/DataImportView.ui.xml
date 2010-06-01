@@ -2,7 +2,6 @@
   xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
 
   <ui:style>
-    .error { color: red; }
     .separator { border-bottom: 2px solid black; }
     .instructions { font-weight: bold; }
     .inset { border: 2px inset black; }
@@ -16,11 +15,6 @@
         <g:HTMLPanel width="100%">
           <table width="100%" class="gwt-KeyValue">
             <tbody>
-              <tr>
-                <td colspan="2">
-                  <g:Label ui:field="errors" addStyleNames="{style.error}" visible="false">Errors will go here</g:Label>
-                </td>
-              </tr>
               <tr>
                 <td colspan="2">
                   <g:Label addStyleNames="{style.instructions}">Select the files to be imported:</g:Label>

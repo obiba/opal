@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.presenter;
 
-import java.util.List;
-
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.model.client.DatasourceDto;
@@ -29,12 +27,6 @@ public abstract class DataCommonPresenter {
     void showDialog();
 
     void hideDialog();
-
-    /** Display inline form errors. */
-    void showErrors(List<String> errors);
-
-    /** Hide inline form errors. */
-    void hideErrors();
 
     /** Set a collection of Opal datasources retrieved from Opal. */
     void setDatasources(JsArray<DatasourceDto> datasources);

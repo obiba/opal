@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.view;
 
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.presenter.DataCommonPresenter;
 import org.obiba.opal.web.model.client.DatasourceDto;
 import org.obiba.opal.web.model.client.FunctionalUnitDto;
@@ -23,7 +21,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 
 /**
@@ -33,9 +30,6 @@ public abstract class DataCommonView extends Composite implements DataCommonPres
 
   @UiField
   DialogBox dialog;
-
-  @UiField
-  Label errors;
 
   @UiField
   ListBox datasources;
@@ -62,17 +56,6 @@ public abstract class DataCommonView extends Composite implements DataCommonPres
   public void showDialog() {
     getDialog().center();
     getDialog().show();
-  }
-
-  @Override
-  public void showErrors(List<String> errors) {
-    this.errors.setText(errors.get(0));
-    this.errors.setVisible(true);
-  }
-
-  @Override
-  public void hideErrors() {
-    errors.setVisible(false);
   }
 
   @Override

@@ -143,7 +143,6 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
           errorDialog.setErrors(errors);
           errorDialog.revealDisplay();
         } else {
-          getDisplay().hideErrors();
           CopyCommandOptionsDto dto = CopyCommandOptionsDto.create();
           dto.setTablesArray(getDisplay().getSelectedFiles());
           if(getDisplay().isDestinationDataSource().getValue()) {
