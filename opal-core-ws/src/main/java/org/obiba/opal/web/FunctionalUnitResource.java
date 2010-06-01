@@ -32,25 +32,40 @@ import org.obiba.opal.web.model.Opal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
 
 @Component
-@Path("/functional-unit")
+@Scope("request")
+@Path("/functional-unit/{unit}")
 public class FunctionalUnitResource {
 
   private static final Logger log = LoggerFactory.getLogger(FunctionalUnitResource.class);
 
-  @Autowired
-  private OpalRuntime opalRuntime;
+  private final OpalRuntime opalRuntime;
+
+  private final UnitKeyStoreService unitKeyStoreService;
+
+  @PathParam("unit")
+  private String unit;
 
   @Autowired
-  private UnitKeyStoreService unitKeyStoreService;
+  public FunctionalUnitResource(OpalRuntime opalRuntime, UnitKeyStoreService unitKeyStoreService) {
+    this.opalRuntime = opalRuntime;
+    this.unitKeyStoreService = unitKeyStoreService;
+  }
+
+  // For testing
+  public FunctionalUnitResource(OpalRuntime opalRuntime, UnitKeyStoreService unitKeyStoreService, String unit) {
+    this.opalRuntime = opalRuntime;
+    this.unitKeyStoreService = unitKeyStoreService;
+    this.unit = unit;
+  }
 
   @GET
-  @Path("/{unit}")
-  public Opal.FunctionalUnitDto getFunctionalUnit(@PathParam("unit") String unit) {
+  public Opal.FunctionalUnitDto getFunctionalUnit() {
     FunctionalUnit functionalUnit = opalRuntime.getFunctionalUnit(unit);
     if(functionalUnit == null) throw new IllegalArgumentException("Cannot find a functionnal unit with name: " + unit);
 
@@ -62,8 +77,8 @@ public class FunctionalUnitResource {
   }
 
   @GET
-  @Path("/{unit}/keys")
-  public List<Opal.KeyPairDto> getFunctionalUnitKeyPairs(@PathParam("unit") String unit) throws KeyStoreException, IOException {
+  @Path("/keys")
+  public List<Opal.KeyPairDto> getFunctionalUnitKeyPairs() throws KeyStoreException, IOException {
     final List<Opal.KeyPairDto> keyPairs = Lists.newArrayList();
 
     UnitKeyStore keystore = unitKeyStoreService.getUnitKeyStore(unit);
@@ -78,8 +93,8 @@ public class FunctionalUnitResource {
   }
 
   @POST
-  @Path("/{unit}/key")
-  public Response createOrUpdateFunctionalUnitKeyPair(@PathParam("unit") String unit, Opal.KeyPairForm kpForm) {
+  @Path("/key")
+  public Response createOrUpdateFunctionalUnitKeyPair(Opal.KeyPairForm kpForm) {
     if(kpForm.hasPrivateForm() && kpForm.hasPublicForm()) {
       unitKeyStoreService.createOrUpdateKey(unit, kpForm.getAlias(), kpForm.getPrivateForm().getAlgo(), kpForm.getPrivateForm().getSize(), getCertificateInfo(kpForm.getPublicForm()));
     } else if(kpForm.hasPrivateImport()) {
@@ -103,16 +118,16 @@ public class FunctionalUnitResource {
   }
 
   @DELETE
-  @Path("/{unit}/key/{alias}")
-  public Response deleteFunctionalUnitKeyPair(@PathParam("unit") String unit, @PathParam("alias") String alias) {
+  @Path("/key/{alias}")
+  public Response deleteFunctionalUnitKeyPair(@PathParam("alias") String alias) {
     unitKeyStoreService.deleteKey(unit, alias);
 
     return Response.ok().build();
   }
 
   @GET
-  @Path("/{unit}/key/{alias}/certificate")
-  public Response getFunctionalUnitKeyPairCertificate(@PathParam("unit") String unit, @PathParam("alias") String alias) throws KeyStoreException, IOException {
+  @Path("/key/{alias}/certificate")
+  public Response getFunctionalUnitKeyPairCertificate(@PathParam("alias") String alias) throws KeyStoreException, IOException {
     UnitKeyStore keystore = unitKeyStoreService.getUnitKeyStore(unit);
 
     return Response.ok(getPEMCertificate(keystore, alias), MediaType.TEXT_PLAIN_TYPE).header("Content-disposition", "attachment; filename=\"" + unit + "-" + alias + "-certificate.pem\"").build();
