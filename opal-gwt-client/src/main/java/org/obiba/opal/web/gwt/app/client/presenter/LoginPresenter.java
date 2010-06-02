@@ -20,7 +20,6 @@ import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -57,14 +56,11 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
 
   }
 
-  private final ResourceRequestBuilderFactory factory;
-
   private final RequestCredentials credentials;
 
   @Inject
-  public LoginPresenter(Display display, EventBus eventBus, ResourceRequestBuilderFactory factory, RequestCredentials credentials) {
+  public LoginPresenter(Display display, EventBus eventBus, RequestCredentials credentials) {
     super(display, eventBus);
-    this.factory = factory;
     this.credentials = credentials;
   }
 
@@ -128,7 +124,7 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
       }
     };
 
-    factory.newBuilder().forResource("/auth/sessions").post().withCallback(403, authError).withCallback(401, authError).withCallback(201, new ResponseCodeCallback() {
+    ResourceRequestBuilderFactory.newBuilder().forResource("/auth/sessions").post().withCallback(403, authError).withCallback(401, authError).withCallback(201, new ResponseCodeCallback() {
 
       @Override
       public void onResponseCode(Request request, Response response) {

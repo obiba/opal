@@ -45,16 +45,13 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
   }
 
-  final private ResourceRequestBuilderFactory factory;
-
   /**
    * @param display
    * @param eventBus
    */
   @Inject
-  public VariablePresenter(Display display, EventBus eventBus, final ResourceRequestBuilderFactory factory) {
+  public VariablePresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
-    this.factory = factory;
   }
 
   @Override
@@ -92,7 +89,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   private void updateFrequencies(final VariableDto variable) {
     getDisplay().clearChart();
 
-    factory.<JsArray<FrequencyDto>> newBuilder().forResource(variable.getLink() + "/frequencies.json").get().withCallback(new ResourceCallback<JsArray<FrequencyDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<FrequencyDto>> newBuilder().forResource(variable.getLink() + "/frequencies.json").get().withCallback(new ResourceCallback<JsArray<FrequencyDto>>() {
 
       @Override
       public void onResource(Response response, JsArray<FrequencyDto> frequencies) {

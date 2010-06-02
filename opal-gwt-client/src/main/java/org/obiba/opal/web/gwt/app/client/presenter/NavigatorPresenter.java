@@ -57,8 +57,6 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     void clear();
   }
 
-  final private ResourceRequestBuilderFactory factory;
-
   private JsArray<VariableDto> variables;
 
   /**
@@ -66,9 +64,8 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
    * @param eventBus
    */
   @Inject
-  public NavigatorPresenter(final Display display, final EventBus eventBus, final ResourceRequestBuilderFactory factory) {
+  public NavigatorPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
-    this.factory = factory;
   }
 
   @Override
@@ -139,7 +136,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
   }
 
   private void updateTable(String datasource, String table) {
-    factory.<JsArray<VariableDto>> newBuilder().forResource("/datasource/" + datasource + "/table/" + table + "/variables").get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource("/datasource/" + datasource + "/table/" + table + "/variables").get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
       @Override
       public void onResource(Response response, JsArray<VariableDto> resource) {
         variables = resource;
@@ -150,7 +147,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
   }
 
   private void updateTree() {
-    factory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
       public void onResource(Response response, JsArray<DatasourceDto> datasources) {
         ArrayList<TreeItem> items = new ArrayList<TreeItem>(datasources.length());

@@ -16,11 +16,13 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import net.customware.gwt.presenter.client.EventBus;
 
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.web.gwt.app.client.presenter.DataImportPresenter;
-import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
+import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -28,7 +30,7 @@ import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.event.shared.HandlerRegistration;
 
-public class DataImportPresenterTest {
+public class DataImportPresenterTest extends AbstractGwtTestSetup {
 
   private DataImportPresenter importPresenter;
 
@@ -38,14 +40,7 @@ public class DataImportPresenterTest {
   public void setUp() {
     displayMock = createMock(DataImportPresenter.Display.class);
     EventBus eventBus = createMock(EventBus.class);
-    RequestCredentials credentials = new RequestCredentials();
-    ResourceRequestBuilderFactory factory = new ResourceRequestBuilderFactory(eventBus, credentials);
-
-    importPresenter = new DataImportPresenter(displayMock, eventBus, factory) {
-      @Override
-      protected void initDisplayComponents() {
-      }
-    };
+    importPresenter = new DataImportPresenter(displayMock, eventBus);
   }
 
   @Test
@@ -65,12 +60,21 @@ public class DataImportPresenterTest {
     // Make sure that a CloseHandler is added to the Import dialog
     expect(hasCloseHandlerMock.addCloseHandler((CloseHandler) anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
 
-    replay(displayMock, hasClickHandlerMock);
+    // Expect that the presenter makes these calls to the server when it binds itself.
+    ResourceRequestBuilder mockRequestBuilder = mockBridge.addMock(ResourceRequestBuilder.class);
+    expect(mockRequestBuilder.forResource("/files")).andReturn(mockRequestBuilder).once();
+    expect(mockRequestBuilder.get()).andReturn(mockRequestBuilder).anyTimes();
+    expect(mockRequestBuilder.withCallback((ResourceCallback) EasyMock.anyObject())).andReturn(mockRequestBuilder).anyTimes();
+    expect(mockRequestBuilder.forResource("/datasources")).andReturn(mockRequestBuilder).once();
+    expect(mockRequestBuilder.forResource("/functional-units")).andReturn(mockRequestBuilder).once();
+    mockRequestBuilder.send();
+    EasyMock.expectLastCall().anyTimes();
+
+    replay(displayMock, hasClickHandlerMock, mockRequestBuilder);
 
     importPresenter.bind();
 
-    verify(displayMock, hasClickHandlerMock);
+    verify(displayMock, hasClickHandlerMock, mockRequestBuilder);
 
   }
-
 }

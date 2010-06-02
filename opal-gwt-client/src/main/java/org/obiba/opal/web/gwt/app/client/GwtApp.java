@@ -5,6 +5,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
 import org.obiba.opal.web.gwt.inject.client.OpalGinjector;
+import org.obiba.opal.web.gwt.rest.client.DefaultResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
 import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 
@@ -17,9 +18,12 @@ import com.google.gwt.user.client.ui.RootLayoutPanel;
  */
 public class GwtApp implements EntryPoint {
 
+  private final OpalGinjector opalGinjector = GWT.create(OpalGinjector.class);
+
   @Override
   public void onModuleLoad() {
-    final OpalGinjector opalGinjector = GWT.create(OpalGinjector.class);
+    // TODO: is there a better way to provide the dependencies to instances created with GWT.create()?
+    DefaultResourceRequestBuilder.setup(opalGinjector);
 
     ApplicationPresenter presenter = opalGinjector.getApplicationPresenter();
     presenter.bind();

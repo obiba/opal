@@ -54,8 +54,6 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
 
   }
 
-  private final ResourceRequestBuilderFactory factory;
-
   @Inject
   private ErrorDialogPresenter errorDialog;
 
@@ -64,9 +62,8 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
    * @param eventBus
    */
   @Inject
-  public DataImportPresenter(final Display display, final EventBus eventBus, ResourceRequestBuilderFactory factory) {
+  public DataImportPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
-    this.factory = factory;
   }
 
   @Override
@@ -97,7 +94,7 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
         dto.setArchive(getDisplay().getArchiveDirectory());
         dto.setFilesArray(getDisplay().getSelectedFiles());
         dto.setUnit(getDisplay().getSelectedUnit());
-        factory.newBuilder().forResource("/shell/import").post().withResourceBody(ImportCommandOptionsDto.stringify(dto)).withCallback(400, new ResponseCodeCallback() {
+        ResourceRequestBuilderFactory.newBuilder().forResource("/shell/import").post().withResourceBody(ImportCommandOptionsDto.stringify(dto)).withCallback(400, new ResponseCodeCallback() {
 
           @Override
           public void onResponseCode(Request request, Response response) {
@@ -119,21 +116,21 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
 
   protected void initDisplayComponents() {
 
-    factory.<FileDto> newBuilder().forResource("/files").get().withCallback(new ResourceCallback<FileDto>() {
+    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files").get().withCallback(new ResourceCallback<FileDto>() {
       @Override
       public void onResource(Response response, FileDto root) {
         getDisplay().setFiles(root);
       }
     }).send();
 
-    factory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
       public void onResource(Response response, JsArray<DatasourceDto> datasources) {
         getDisplay().setDatasources(datasources);
       }
     }).send();
 
-    factory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
       @Override
       public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
         getDisplay().setUnits(units);

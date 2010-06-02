@@ -7,18 +7,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.rest.client;
+package org.obiba.opal.web.gwt.test;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JavaScriptObject;
+import org.junit.After;
+import org.junit.Before;
 
-/**
- *
- */
-public class ResourceRequestBuilderFactory {
+public abstract class AbstractGwtTestSetup {
 
-  public static <T extends JavaScriptObject> ResourceRequestBuilder<T> newBuilder() {
-    return GWT.create(ResourceRequestBuilder.class);
+  protected MockGWTBridge mockBridge;
+
+  @Before
+  public void createGwtMockBridge() {
+    mockBridge = GWTMockUtilities.disarm();
   }
 
+  @After
+  public void restoreNormalBridge() {
+    GWTMockUtilities.restore();
+  }
 }

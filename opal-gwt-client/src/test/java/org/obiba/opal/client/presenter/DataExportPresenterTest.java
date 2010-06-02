@@ -16,12 +16,14 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import net.customware.gwt.presenter.client.EventBus;
 
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.DataExportPresenter;
-import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
+import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -31,7 +33,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SelectionModel.SelectionChangeHandler;
 
-public class DataExportPresenterTest {
+public class DataExportPresenterTest extends AbstractGwtTestSetup {
 
   private EventBus eventBusMock;
 
@@ -43,14 +45,7 @@ public class DataExportPresenterTest {
   public void setUp() {
     displayMock = createMock(DataExportPresenter.Display.class);
     eventBusMock = createMock(EventBus.class);
-    RequestCredentials credentials = new RequestCredentials();
-    ResourceRequestBuilderFactory factory = new ResourceRequestBuilderFactory(eventBusMock, credentials);
-
-    exportPresenter = new DataExportPresenter(displayMock, eventBusMock, factory) {
-      @Override
-      protected void initDisplayComponents() {
-      }
-    };
+    exportPresenter = new DataExportPresenter(displayMock, eventBusMock);
   }
 
   @Test
@@ -80,11 +75,20 @@ public class DataExportPresenterTest {
     NavigatorSelectionChangeEvent.Handler selectionChangeEventMock = createMock(NavigatorSelectionChangeEvent.Handler.class);
     expect(eventBusMock.addHandler(NavigatorSelectionChangeEvent.getType(), selectionChangeEventMock)).andReturn(handlerRegistrationMock).atLeastOnce();
 
-    replay(displayMock, hasClickHandlerMock);
+    // Expects that the presenter makes these calls to the server when it binds itself
+    ResourceRequestBuilder mockRequestBuilder = mockBridge.addMock(ResourceRequestBuilder.class);
+    expect(mockRequestBuilder.forResource("/datasources")).andReturn(mockRequestBuilder).once();
+    expect(mockRequestBuilder.get()).andReturn(mockRequestBuilder).anyTimes();
+    expect(mockRequestBuilder.withCallback((ResourceCallback) EasyMock.anyObject())).andReturn(mockRequestBuilder).anyTimes();
+    expect(mockRequestBuilder.forResource("/functional-units")).andReturn(mockRequestBuilder).once();
+    mockRequestBuilder.send();
+    EasyMock.expectLastCall().anyTimes();
+
+    replay(displayMock, hasClickHandlerMock, mockRequestBuilder);
 
     exportPresenter.bind();
 
-    verify(displayMock, hasClickHandlerMock);
+    verify(displayMock, hasClickHandlerMock, mockRequestBuilder);
 
   }
 }

@@ -79,8 +79,6 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   }
 
-  final private ResourceRequestBuilderFactory factory;
-
   @Inject
   private ErrorDialogPresenter errorDialog;
 
@@ -89,9 +87,8 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
    * @param eventBus
    */
   @Inject
-  public DataExportPresenter(Display display, EventBus eventBus, final ResourceRequestBuilderFactory factory) {
+  public DataExportPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
-    this.factory = factory;
   }
 
   @Override
@@ -154,7 +151,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
           dto.setNoVariables(!getDisplay().isWithVariables().getValue());
           if(getDisplay().isUseAlias().getValue()) dto.setTransform("attribute('alias').isNull().value ? name() : attribute('alias')");
           if(getDisplay().isUnitId().getValue()) dto.setUnit(getDisplay().getSelectedUnit());
-          factory.newBuilder().forResource("/shell/copy").post().withResourceBody(CopyCommandOptionsDto.stringify(dto)).withCallback(400, new ResponseCodeCallback() {
+          ResourceRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().withResourceBody(CopyCommandOptionsDto.stringify(dto)).withCallback(400, new ResponseCodeCallback() {
 
             @Override
             public void onResponseCode(Request request, Response response) {
@@ -176,14 +173,14 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   }
 
   protected void initDisplayComponents() {
-    factory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
       public void onResource(Response response, JsArray<DatasourceDto> datasources) {
         getDisplay().setDatasources(datasources);
       }
     }).send();
 
-    factory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
       @Override
       public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
         getDisplay().setUnits(units);
@@ -228,7 +225,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   }
 
   private void updateTree() {
-    factory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
       public void onResource(Response response, JsArray<DatasourceDto> datasources) {
         ArrayList<TreeItem> items = new ArrayList<TreeItem>(datasources.length());
