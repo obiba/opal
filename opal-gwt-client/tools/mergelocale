@@ -1,0 +1,3 @@
+#!/bin/sh
+
+python ./mergelocales.py ../target/extra/org.obiba.opal.web.gwt.app.GwtApp/ ../src/main/java/com/google/gwt/i18n/client/
