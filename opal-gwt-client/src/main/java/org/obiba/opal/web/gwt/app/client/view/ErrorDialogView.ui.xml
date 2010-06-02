@@ -1,12 +1,12 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <ui:style>
     .separator { border-bottom: 2px solid black; }
   </ui:style>
 
   <g:DialogBox ui:field="dialog" autoHide="false" modal="true" height="17em" width="35em">
-    <g:caption >Errors</g:caption>
+    <g:caption><ui:msg description="Error dialog title">Errors</ui:msg></g:caption>
     <!-- The width here have to match EXACTLY the one on DialogBox above -->
     <g:LayoutPanel height="17em" width="35em">
       <g:layer top="0em" bottom="5em" left="1em" right="1em">
@@ -23,7 +23,7 @@
         <g:VerticalPanel height="100%" width="100%">
           <g:cell horizontalAlignment="ALIGN_RIGHT" verticalAlignment="ALIGN_MIDDLE">
             <g:HorizontalPanel>
-              <g:Button ui:field="okay">Okay</g:Button>
+              <g:Button ui:field="okay"><ui:msg description="Okay button label">Okay</ui:msg></g:Button>
             </g:HorizontalPanel>
           </g:cell>
         </g:VerticalPanel>
