@@ -7,77 +7,72 @@
     .inset { border: 2px inset black; }
   </ui:style>
 
-  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" height="32em" width="40em">
-    <g:caption>Data Import</g:caption>
-    <!-- The width here have to match EXACTLY the one on DialogBox above -->
-    <g:LayoutPanel height="32em" width="40em" ui:field="content">
-      <g:layer top="0em" bottom="5em" left="1em" right="1em">
-        <g:HTMLPanel width="100%">
-          <table width="100%" class="gwt-KeyValue">
-            <tbody>
-              <tr>
-                <td colspan="2">
-                  <g:Label addStyleNames="{style.instructions}">Select the files to be imported:</g:Label>
-                </td>
-              </tr>
-              <tr>
-                <td style="vertical-align:top">
-                  File(s):
-                </td>
-                <td>
-                  <g:ScrollPanel addStyleNames="{style.inset}" height="15em" width="100%">
-                    <g:Tree ui:field="files" />
-                  </g:ScrollPanel>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  Destination:
-                </td>
-                <td>
-                  <g:ListBox ui:field="datasources" />
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <g:CheckBox ui:field="shouldArchive">Archive:</g:CheckBox>
-                </td>
-                <td>
-                  <g:TextBox ui:field="archiveDirectory" title="An optional directory name where to archive the file after import" />
-                </td>
-              </tr>
-              <tr>
-                <td colspan="2">
-                  Participant Identifier:
-                </td>
-              </tr>
-              <tr>
-                <td></td>
-                <td>
-                  <g:RadioButton name="participantId" checked="true">use Unit ID:</g:RadioButton>
-                  <g:ListBox ui:field="units" />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </g:HTMLPanel>
-      </g:layer>
-      <g:layer bottom="4em" height="0.5em" left="1em" right="1em">
-        <g:HTMLPanel>
-          <div class="{style.separator}" />
-        </g:HTMLPanel>
-      </g:layer>
-      <g:layer bottom="0" height="4em" left="1em" right="1em">
-        <g:VerticalPanel height="100%" width="100%">
-          <g:cell horizontalAlignment="ALIGN_RIGHT" verticalAlignment="ALIGN_MIDDLE">
-            <g:HorizontalPanel>
-              <g:Button ui:field="submit">Import</g:Button>
-              <g:Button ui:field="cancel">Cancel</g:Button>
-            </g:HorizontalPanel>
-          </g:cell>
-        </g:VerticalPanel>
-      </g:layer>
-    </g:LayoutPanel>
-  </g:DialogBox>
+  <g:LayoutPanel height="32em" width="40em" ui:field="content">
+    <g:layer top="0em" bottom="5em" left="1em" right="1em">
+      <g:HTMLPanel width="100%">
+        <table width="100%" class="gwt-KeyValue">
+          <tbody>
+            <tr>
+              <td colspan="2">
+                <g:Label addStyleNames="{style.instructions}">Select the files to be imported:</g:Label>
+              </td>
+            </tr>
+            <tr>
+              <td style="vertical-align:top">
+                File(s):
+              </td>
+              <td>
+                <g:ScrollPanel addStyleNames="{style.inset}" height="15em" width="100%">
+                  <g:Tree ui:field="files" />
+                </g:ScrollPanel>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Destination:
+              </td>
+              <td>
+                <g:ListBox ui:field="datasources" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <g:CheckBox ui:field="shouldArchive">Archive:</g:CheckBox>
+              </td>
+              <td>
+                <g:TextBox ui:field="archiveDirectory" title="An optional directory name where to archive the file after import" />
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                Participant Identifier:
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>
+                <g:RadioButton name="participantId" checked="true">use Unit ID:</g:RadioButton>
+                <g:ListBox ui:field="units" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </g:HTMLPanel>
+    </g:layer>
+    <g:layer bottom="4em" height="0.5em" left="1em" right="1em">
+      <g:HTMLPanel>
+        <div class="{style.separator}" />
+      </g:HTMLPanel>
+    </g:layer>
+    <g:layer bottom="0" height="4em" left="1em" right="1em">
+      <g:VerticalPanel height="100%" width="100%">
+        <g:cell horizontalAlignment="ALIGN_RIGHT" verticalAlignment="ALIGN_MIDDLE">
+          <g:HorizontalPanel>
+            <g:Button ui:field="submit">Import</g:Button>
+          </g:HorizontalPanel>
+        </g:cell>
+      </g:VerticalPanel>
+    </g:layer>
+  </g:LayoutPanel>
 
 </ui:UiBinder>

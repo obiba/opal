@@ -61,8 +61,6 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
     RadioButton getDestinationFile();
 
-    void hideDialog();
-
     JsArrayString getSelectedFiles();
 
     String getOutFile();
@@ -163,7 +161,6 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
             @Override
             public void onResponseCode(Request request, Response response) {
-              getDisplay().hideDialog();
             }
           }).send();
 
@@ -220,7 +217,6 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   @Override
   public void revealDisplay() {
-    getDisplay().showDialog();
     updateTree();
   }
 

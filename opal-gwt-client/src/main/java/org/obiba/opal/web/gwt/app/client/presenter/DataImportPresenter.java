@@ -28,19 +28,13 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.CloseEvent;
-import com.google.gwt.event.logical.shared.CloseHandler;
-import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.inject.Inject;
 
 public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Display> {
 
   public interface Display extends DataCommonPresenter.Display {
-
-    HasCloseHandlers<PopupPanel> getDialogBox();
 
     void setFiles(FileDto root);
 
@@ -78,13 +72,6 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
   }
 
   protected void addEventHandlers() {
-    getDisplay().getDialogBox().addCloseHandler(new CloseHandler<PopupPanel>() {
-      @Override
-      public void onClose(CloseEvent<PopupPanel> event) {
-        unbind();
-      }
-    });
-
     getDisplay().getSubmit().addClickHandler(new ClickHandler() {
 
       @Override
@@ -99,14 +86,13 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
           @Override
           public void onResponseCode(Request request, Response response) {
             errorDialog.bind();
-            errorDialog.setErrors(Arrays.asList(new String[] { response.getText() }));
+            errorDialog.setErrors(Arrays.asList("Hello World!")); // new String[] { response.getText() }));
             errorDialog.revealDisplay();
           }
         }).withCallback(202, new ResponseCodeCallback() {
 
           @Override
           public void onResponseCode(Request request, Response response) {
-            getDisplay().hideDialog();
           }
         }).send();
       }
@@ -153,7 +139,6 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
 
   @Override
   public void revealDisplay() {
-    getDisplay().showDialog();
   }
 
 }

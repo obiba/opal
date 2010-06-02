@@ -26,8 +26,6 @@ import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.logical.shared.CloseHandler;
-import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.event.shared.HandlerRegistration;
 
 public class DataImportPresenterTest extends AbstractGwtTestSetup {
@@ -49,16 +47,10 @@ public class DataImportPresenterTest extends AbstractGwtTestSetup {
     HasClickHandlers hasClickHandlerMock = createMock(HasClickHandlers.class);
     expect(displayMock.getSubmit()).andReturn(hasClickHandlerMock).atLeastOnce();
 
-    HasCloseHandlers hasCloseHandlerMock = createMock(HasCloseHandlers.class);
-    expect(displayMock.getDialogBox()).andReturn(hasCloseHandlerMock).atLeastOnce();
-
     HandlerRegistration handlerRegistrationMock = createMock(HandlerRegistration.class);
 
     // Make sure that a ClickHandler is added to the Submit button
     expect(hasClickHandlerMock.addClickHandler((ClickHandler) anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
-
-    // Make sure that a CloseHandler is added to the Import dialog
-    expect(hasCloseHandlerMock.addCloseHandler((CloseHandler) anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
 
     // Expect that the presenter makes these calls to the server when it binds itself.
     ResourceRequestBuilder mockRequestBuilder = mockBridge.addMock(ResourceRequestBuilder.class);

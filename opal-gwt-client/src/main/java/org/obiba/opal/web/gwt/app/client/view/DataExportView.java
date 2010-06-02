@@ -76,10 +76,8 @@ public class DataExportView extends DataCommonView implements DataExportPresente
   SelectionModel<VariableDto> selectionModel = new SingleSelectionModel<VariableDto>();
 
   public DataExportView() {
-    uiBinder.createAndBindUi(this);
-    getDialog().setGlassEnabled(true);
+    initWidget(uiBinder.createAndBindUi(this));
     tableTree.setAnimationEnabled(true);
-    addCommonHandlers();
     destinationDataSource.addClickHandler(new ClickHandler() {
 
       @Override
@@ -121,7 +119,7 @@ public class DataExportView extends DataCommonView implements DataExportPresente
 
   @Override
   public Widget asWidget() {
-    return null;
+    return this;
   }
 
   @Override

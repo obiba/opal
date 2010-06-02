@@ -89,9 +89,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
       @Override
       public void execute() {
-        DataImportPresenter presenter = dataImportPresenter.get();
-        presenter.bind();
-        presenter.revealDisplay();
+        eventBus.fireEvent(new WorkbenchChangeEvent(dataImportPresenter.get()));
       }
     });
 
@@ -99,9 +97,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
       @Override
       public void execute() {
-        DataExportPresenter presenter = dataExportPresenter.get();
-        presenter.bind();
-        presenter.revealDisplay();
+        eventBus.fireEvent(new WorkbenchChangeEvent(dataExportPresenter.get()));
       }
     });
 

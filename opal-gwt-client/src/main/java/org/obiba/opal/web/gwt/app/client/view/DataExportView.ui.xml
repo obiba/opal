@@ -8,99 +8,95 @@
     .inset { border: 2px inset black; }
   </ui:style>
 
-  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" >
-    <g:caption>Data Export</g:caption>
-    <g:LayoutPanel height="39em" width="40em" ui:field="content">
-      <g:layer top="0em" bottom="5em" left="1em" right="1em">
-        <g:HTMLPanel width="100%">
-          <table width="100%" class="gwt-KeyValue">
-            <tbody>
-              <tr>
-                <td colspan="2">
-                  <g:Label addStyleNames="{style.instructions}">Select the tables to be exported:</g:Label>
-                </td>
-              </tr>
-              <tr>
-                <td style="vertical-align:top">
-                  Tables:
-                </td>
-                <td>
-                  <g:ScrollPanel addStyleNames="{style.inset}" height="15em" width="100%">
-                    <g:Tree ui:field="tableTree" />
-                  </g:ScrollPanel>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  Destination:
-                </td>
-                <td>
-                  <g:RadioButton name="destination" ui:field="destinationDataSource"/> <g:ListBox ui:field="datasources" />
-                </td>
-              </tr>
-              <tr>
-                <td/>
-                <td>
-                  <g:RadioButton name="destination" ui:field="destinationFile"> file name: </g:RadioButton> <g:TextBox  ui:field="file" />
-                </td>
-              </tr> 
-              <tr>
-                <td>
-                  Options:
-                </td>
-                <td>
-                  <g:CheckBox ui:field="incremental"> incremental</g:CheckBox>
-                </td>
-              </tr>              
-              <tr>
-                <td/>
-                <td>
-                  <g:CheckBox ui:field="withVariables"> with variables</g:CheckBox>
-                </td>
-              </tr>              
-              <tr>
-                <td/>
-                <td>
-                  <g:CheckBox ui:field="useAlias"> use 'alias' attribute to rename variable</g:CheckBox>
-                </td>
-              </tr>              
-              <tr>
-                <td colspan="2">
-                  Participant Identifier:
-                </td>
-              </tr>
-              <tr>
-                <td/>
-                <td>
-                  <g:RadioButton name="idGroup" ui:field="opalId"> use Opal ID</g:RadioButton>
-                </td>
-              </tr> 
-              <tr>
-                <td/>
-                <td>
-                  <g:RadioButton name="idGroup" ui:field="unitId"> use Unit ID </g:RadioButton> <g:ListBox ui:field="units" />
-                </td>
-              </tr> 
-            </tbody>
-          </table>
-        </g:HTMLPanel>
-      </g:layer>              
-      <g:layer bottom="4em" height="0.5em" left="1em" right="1em">
-        <g:HTMLPanel>
-          <div class="{style.separator}" />
-        </g:HTMLPanel>
-      </g:layer>
-      <g:layer bottom="0" height="4em" left="1em" right="1em">
-        <g:VerticalPanel height="100%" width="100%">
-          <g:cell horizontalAlignment="ALIGN_RIGHT" verticalAlignment="ALIGN_MIDDLE">
-            <g:HorizontalPanel>
-              <g:Button ui:field="submit">Export</g:Button>
-              <g:Button ui:field="cancel">Cancel</g:Button>
-            </g:HorizontalPanel>
-          </g:cell>
-        </g:VerticalPanel>
-      </g:layer>
-    </g:LayoutPanel>  
-  </g:DialogBox>
+  <g:LayoutPanel height="39em" width="40em" ui:field="content">
+    <g:layer top="0em" bottom="5em" left="1em" right="1em">
+      <g:HTMLPanel width="100%">
+        <table width="100%" class="gwt-KeyValue">
+          <tbody>
+            <tr>
+              <td colspan="2">
+                <g:Label addStyleNames="{style.instructions}">Select the tables to be exported:</g:Label>
+              </td>
+            </tr>
+            <tr>
+              <td style="vertical-align:top">
+                Tables:
+              </td>
+              <td>
+                <g:ScrollPanel addStyleNames="{style.inset}" height="15em" width="100%">
+                  <g:Tree ui:field="tableTree" />
+                </g:ScrollPanel>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Destination:
+              </td>
+              <td>
+                <g:RadioButton name="destination" ui:field="destinationDataSource"/> <g:ListBox ui:field="datasources" />
+              </td>
+            </tr>
+            <tr>
+              <td/>
+              <td>
+                <g:RadioButton name="destination" ui:field="destinationFile"> file name: </g:RadioButton> <g:TextBox  ui:field="file" />
+              </td>
+            </tr> 
+            <tr>
+              <td>
+                Options:
+              </td>
+              <td>
+                <g:CheckBox ui:field="incremental"> incremental</g:CheckBox>
+              </td>
+            </tr>              
+            <tr>
+              <td/>
+              <td>
+                <g:CheckBox ui:field="withVariables"> with variables</g:CheckBox>
+              </td>
+            </tr>              
+            <tr>
+              <td/>
+              <td>
+                <g:CheckBox ui:field="useAlias"> use 'alias' attribute to rename variable</g:CheckBox>
+              </td>
+            </tr>              
+            <tr>
+              <td colspan="2">
+                Participant Identifier:
+              </td>
+            </tr>
+            <tr>
+              <td/>
+              <td>
+                <g:RadioButton name="idGroup" ui:field="opalId"> use Opal ID</g:RadioButton>
+              </td>
+            </tr> 
+            <tr>
+              <td/>
+              <td>
+                <g:RadioButton name="idGroup" ui:field="unitId"> use Unit ID </g:RadioButton> <g:ListBox ui:field="units" />
+              </td>
+            </tr> 
+          </tbody>
+        </table>
+      </g:HTMLPanel>
+    </g:layer>              
+    <g:layer bottom="4em" height="0.5em" left="1em" right="1em">
+      <g:HTMLPanel>
+        <div class="{style.separator}" />
+      </g:HTMLPanel>
+    </g:layer>
+    <g:layer bottom="0" height="4em" left="1em" right="1em">
+      <g:VerticalPanel height="100%" width="100%">
+        <g:cell horizontalAlignment="ALIGN_RIGHT" verticalAlignment="ALIGN_MIDDLE">
+          <g:HorizontalPanel>
+            <g:Button ui:field="submit">Export</g:Button>
+          </g:HorizontalPanel>
+        </g:cell>
+      </g:VerticalPanel>
+    </g:layer>
+  </g:LayoutPanel>
 
 </ui:UiBinder>

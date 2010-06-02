@@ -17,16 +17,13 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.LayoutPanel;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
@@ -38,7 +35,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class DataImportView extends DataCommonView implements DataImportPresenter.Display {
 
   @UiTemplate("DataImportView.ui.xml")
-  interface ViewUiBinder extends UiBinder<DialogBox, DataImportView> {
+  interface ViewUiBinder extends UiBinder<Widget, DataImportView> {
   }
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
@@ -58,9 +55,7 @@ public class DataImportView extends DataCommonView implements DataImportPresente
   private JsArrayString selectedFiles = JavaScriptObject.createArray().cast();
 
   public DataImportView() {
-    uiBinder.createAndBindUi(this);
-    getDialog().setGlassEnabled(true);
-    addCommonHandlers();
+    initWidget(uiBinder.createAndBindUi(this));
     archiveDirectory.setEnabled(shouldArchive.getValue());
     shouldArchive.addClickHandler(new ClickHandler() {
 
@@ -80,11 +75,6 @@ public class DataImportView extends DataCommonView implements DataImportPresente
       }
 
     });
-  }
-
-  @Override
-  public HasCloseHandlers<PopupPanel> getDialogBox() {
-    return dialog;
   }
 
   @Override
@@ -125,11 +115,5 @@ public class DataImportView extends DataCommonView implements DataImportPresente
       item.addItem(createItem(fileItem.getChildrenArray().get(i)));
     }
     return item;
-  }
-
-  @Override
-  public void showDialog() {
-    selectedFiles = JavaScriptObject.createArray().cast();
-    super.showDialog();
   }
 }

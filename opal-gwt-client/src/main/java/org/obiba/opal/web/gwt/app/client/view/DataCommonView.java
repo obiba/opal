@@ -14,22 +14,16 @@ import org.obiba.opal.web.model.client.DatasourceDto;
 import org.obiba.opal.web.model.client.FunctionalUnitDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.ListBox;
 
 /**
  * View elements common between the export and import dialog.
  */
 public abstract class DataCommonView extends Composite implements DataCommonPresenter.Display {
-
-  @UiField
-  DialogBox dialog;
 
   @UiField
   ListBox datasources;
@@ -39,24 +33,6 @@ public abstract class DataCommonView extends Composite implements DataCommonPres
 
   @UiField
   Button submit;
-
-  @UiField
-  Button cancel;
-
-  public DialogBox getDialog() {
-    return dialog;
-  }
-
-  @Override
-  public void hideDialog() {
-    getDialog().hide();
-  }
-
-  @Override
-  public void showDialog() {
-    getDialog().center();
-    getDialog().show();
-  }
 
   @Override
   public String getSelectedDatasource() {
@@ -87,17 +63,6 @@ public abstract class DataCommonView extends Composite implements DataCommonPres
   @Override
   public HasClickHandlers getSubmit() {
     return submit;
-  }
-
-  public void addCommonHandlers() {
-    cancel.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        hideDialog();
-      }
-
-    });
   }
 
 }

@@ -24,10 +24,6 @@ public abstract class DataCommonPresenter {
 
   public interface Display extends WidgetDisplay {
 
-    void showDialog();
-
-    void hideDialog();
-
     /** Set a collection of Opal datasources retrieved from Opal. */
     void setDatasources(JsArray<DatasourceDto> datasources);
 
