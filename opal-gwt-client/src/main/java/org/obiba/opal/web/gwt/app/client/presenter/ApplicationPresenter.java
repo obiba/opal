@@ -46,13 +46,17 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
     MenuItem getDataExportItem();
   }
 
-  private final RequestCredentials credentials;
+  @Inject
+  private RequestCredentials credentials;
 
-  private final Provider<NavigatorPresenter> navigationPresenter;
+  @Inject
+  private Provider<NavigatorPresenter> navigationPresenter;
 
-  private final Provider<DataImportPresenter> dataImportPresenter;
+  @Inject
+  private Provider<DataImportPresenter> dataImportPresenter;
 
-  private final Provider<DataExportPresenter> dataExportPresenter;
+  @Inject
+  private Provider<DataExportPresenter> dataExportPresenter;
 
   private WidgetPresenter<?> workbench;
 
@@ -61,12 +65,8 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
    * @param eventBus
    */
   @Inject
-  public ApplicationPresenter(final Display display, final EventBus eventBus, Provider<NavigatorPresenter> navigationPresenter, Provider<DataImportPresenter> dataImportPresenter, Provider<DataExportPresenter> dataExportPresenter, RequestCredentials credentials) {
+  public ApplicationPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
-    this.navigationPresenter = navigationPresenter;
-    this.credentials = credentials;
-    this.dataImportPresenter = dataImportPresenter;
-    this.dataExportPresenter = dataExportPresenter;
   }
 
   @Override
