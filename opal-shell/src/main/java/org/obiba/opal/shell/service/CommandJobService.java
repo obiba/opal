@@ -20,11 +20,12 @@ import org.obiba.opal.shell.CommandJob;
 public interface CommandJobService extends Service {
 
   /**
-   * Submits a command for asynchronous execution.
+   * Assigns an id to a command job and submits it for asynchronous execution.
    * 
    * @param commandJob the submitted command job
+   * @return the command job's id
    */
-  public void launchCommand(CommandJob commandJob);
+  public Long launchCommand(CommandJob commandJob);
 
   /**
    * Returns the history of launched commands.
