@@ -2,13 +2,17 @@
   xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
 
   <ui:style>
+    .title { font-size: larger; font-weight: bold; }
     .separator { border-bottom: 2px solid black; }
     .instructions { font-weight: bold; }
     .inset { border: 2px inset black; }
   </ui:style>
 
-  <g:LayoutPanel height="32em" width="40em" ui:field="content">
-    <g:layer top="0em" bottom="5em" left="1em" right="1em">
+  <g:LayoutPanel height="35em" width="40em" ui:field="content">
+    <g:layer left="1em" right="1em">
+      <g:Label addStyleNames="{style.title}">Import Data</g:Label>
+    </g:layer>
+    <g:layer top="3em" bottom="6em" left="1em" right="1em">
       <g:HTMLPanel width="100%">
         <table width="100%" class="gwt-KeyValue">
           <tbody>
@@ -59,12 +63,12 @@
         </table>
       </g:HTMLPanel>
     </g:layer>
-    <g:layer bottom="4em" height="0.5em" left="1em" right="1em">
+    <g:layer bottom="5em" height="0.5em" left="1em" right="1em">
       <g:HTMLPanel>
         <div class="{style.separator}" />
       </g:HTMLPanel>
     </g:layer>
-    <g:layer bottom="0" height="4em" left="1em" right="1em">
+    <g:layer bottom="0em" height="6em" left="1em" right="1em">
       <g:VerticalPanel height="100%" width="100%">
         <g:cell horizontalAlignment="ALIGN_RIGHT" verticalAlignment="ALIGN_MIDDLE">
           <g:HorizontalPanel>
