@@ -11,6 +11,9 @@ package org.obiba.opal.web;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
@@ -67,6 +70,53 @@ public class FilesResource {
       if(children[i].getType() == FileType.FOLDER) {
         addFiles(fileBuilder, children[i]);
       }
+
+      // Add the current child to the parent FileDto (folder).
+      parentFolderBuilder.addChildren(fileBuilder.build());
+    }
+  }
+
+  @GET
+  @Path("/{path:.*}")
+  public Response getFolder(@PathParam("path") String path) throws FileSystemException {
+
+    // If path does not refer to a folder.
+    FileObject folder = opalRuntime.getFileSystem().getRoot().resolveFile(path);
+    if(!folder.exists() || folder.getType() != FileType.FOLDER) {
+      return Response.status(Status.NOT_FOUND).build();
+    } else {
+
+      // Create a FileDto representing the folder identified by the path.
+      Opal.FileDto.Builder fileBuilder = Opal.FileDto.newBuilder();
+      fileBuilder.setName(folder.getName().getBaseName()).setType(Opal.FileDto.FileType.FOLDER).setPath(folder.getName().getPath());
+
+      // Create FileDtos for each file & folder in the folder corresponding to the path.
+      addChildren(fileBuilder, opalRuntime.getFileSystem().getRoot().resolveFile(path));
+
+      return Response.ok(fileBuilder.build()).build();
+    }
+  }
+
+  private void addChildren(Opal.FileDto.Builder parentFolderBuilder, FileObject parentFolder) throws FileSystemException {
+    Opal.FileDto.Builder fileBuilder;
+
+    // Get the children for the current folder (list of files & folders).
+    FileObject[] children = parentFolder.getChildren();
+
+    // Loop through all children.
+    for(int i = 0; i < children.length; i++) {
+
+      // Build a FileDto representing the child.
+      fileBuilder = Opal.FileDto.newBuilder();
+      fileBuilder.setName(children[i].getName().getBaseName()).setPath(children[i].getName().getPath());
+      fileBuilder.setType(children[i].getType() == FileType.FILE ? Opal.FileDto.FileType.FILE : Opal.FileDto.FileType.FOLDER);
+
+      // Set size on files only, not folders.
+      if(children[i].getType() == FileType.FILE) {
+        fileBuilder.setSize(children[i].getContent().getSize());
+      }
+
+      fileBuilder.setLastModifiedTime(children[i].getContent().getLastModifiedTime());
 
       // Add the current child to the parent FileDto (folder).
       parentFolderBuilder.addChildren(fileBuilder.build());

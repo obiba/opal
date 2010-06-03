@@ -45,4 +45,6 @@ message FileDto {
   }
   required FileType type = 3;
   repeated FileDto children = 4;
+  optional int64 size = 5;
+  optional int64 lastModifiedTime = 6;
 }
