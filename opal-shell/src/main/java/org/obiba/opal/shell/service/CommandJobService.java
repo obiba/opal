@@ -41,4 +41,14 @@ public interface CommandJobService extends Service {
    * @return history of launched commands
    */
   public List<CommandJob> getHistory();
+
+  /**
+   * Deletes the specified command job.
+   * 
+   * @param id command job id
+   * @throws NoSuchCommandJobException if the specified command job does not exist
+   * @throws IllegalStateException if the command job is in a "running" state (IN_PROGRESS or CANCEL_PENDING) and
+   * therefore cannot be deleted
+   */
+  public void deleteCommand(Long id) throws NoSuchCommandJobException, IllegalStateException;
 }

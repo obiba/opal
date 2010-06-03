@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 import org.obiba.magma.audit.UserProvider;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.service.CommandJobService;
+import org.obiba.opal.shell.service.NoSuchCommandJobException;
 
 /**
  * Default implementation of {@link CommandJobService}.
@@ -43,7 +44,7 @@ public class DefaultCommandJobService implements CommandJobService {
   //
 
   public DefaultCommandJobService() {
-    history = new ArrayList<CommandJob>();
+    history = Collections.synchronizedList(new ArrayList<CommandJob>());
 
     // TODO: Inject this dependency.
     executor = Executors.newFixedThreadPool(10);
@@ -85,7 +86,6 @@ public class DefaultCommandJobService implements CommandJobService {
 
   public CommandJob getCommand(Long id) {
     for(CommandJob job : getHistory()) {
-      System.out.println("historyJobId = " + job.getId() + ", id = " + id);
       if(job.getId().equals(id)) {
         return job;
       }
@@ -95,6 +95,17 @@ public class DefaultCommandJobService implements CommandJobService {
 
   public List<CommandJob> getHistory() {
     return Collections.unmodifiableList(history);
+  }
+
+  public void deleteCommand(Long id) {
+    for(int i = 0; i < history.size(); i++) {
+      CommandJob job = history.get(i);
+      if(job.getId().equals(id)) {
+        history.remove(i);
+        return;
+      }
+    }
+    throw new NoSuchCommandJobException(id);
   }
 
   //

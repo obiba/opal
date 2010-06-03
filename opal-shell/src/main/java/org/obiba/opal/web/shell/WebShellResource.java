@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -28,6 +29,7 @@ import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
 import org.obiba.opal.shell.service.CommandJobService;
+import org.obiba.opal.shell.service.NoSuchCommandJobException;
 import org.obiba.opal.shell.web.CopyCommandOptionsDtoImpl;
 import org.obiba.opal.shell.web.ImportCommandOptionsDtoImpl;
 import org.obiba.opal.web.model.Commands;
@@ -89,6 +91,19 @@ public class WebShellResource {
       return Response.ok(toCommandStateDto(commandJob).getStatus().toString()).build();
     } else {
       return Response.status(Status.NOT_FOUND).build();
+    }
+  }
+
+  @DELETE
+  @Path("/command/{id}")
+  public Response deleteCommand(@PathParam("id") Long id) {
+    try {
+      commandJobService.deleteCommand(id);
+      return Response.ok().build();
+    } catch(NoSuchCommandJobException ex) {
+      return Response.status(Status.NOT_FOUND).build();
+    } catch(IllegalStateException ex) {
+      return Response.status(Status.BAD_REQUEST).build();
     }
   }
 
