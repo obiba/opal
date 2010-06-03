@@ -11,7 +11,6 @@ package org.obiba.opal.web.shell;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
@@ -55,20 +54,20 @@ public class WebShellResourceTest {
   }
 
   @Test
-  public void testGetCommands_ReturnsEmptyListThereIsNoHistory() {
+  public void testGetCommands_ReturnsEmptyListWhenThereIsNoHistory() {
     testGetCommands(createEmptyCommandJobList());
   }
 
   @Test
   public void testImportData() {
     // Setup
+    Long jobId = 1l;
     CommandRegistry mockCommandRegistry = createMockCommandRegistry();
     ImportCommand importCommand = createImportCommand();
     expect(mockCommandRegistry.<ImportCommandOptions> newCommand(importCommand.getName())).andReturn(importCommand).atLeastOnce();
 
     CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
-    mockCommandJobService.launchCommand(eqCommandJob(createCommandJob(importCommand, null)));
-    expectLastCall().atLeastOnce();
+    expect(mockCommandJobService.launchCommand(eqCommandJob(createCommandJob(importCommand, null)))).andReturn(jobId).atLeastOnce();
 
     WebShellResource sut = new WebShellResource();
     sut.setCommandRegistry(mockCommandRegistry);
@@ -92,20 +91,22 @@ public class WebShellResourceTest {
       assertEquals(optionsDto.getFiles(i), importOptions.getFiles().get(i));
     }
 
-    // Verify that the HTTP response code was ACCEPTED (202).
-    assertEquals(202, Response.Status.ACCEPTED.getStatusCode());
+    // Verify that the HTTP response code was CREATED (201) and that the "Location"
+    // header was set to '/shell/command/{jobId}'.
+    assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+    assertEquals("/shell/command/" + jobId, response.getMetadata().getFirst("Location").toString());
   }
 
   @Test
   public void testCopyData() {
     // Setup
+    Long jobId = 1l;
     CommandRegistry mockCommandRegistry = createMockCommandRegistry();
     CopyCommand copyCommand = createCopyCommand();
     expect(mockCommandRegistry.<CopyCommandOptions> newCommand(copyCommand.getName())).andReturn(copyCommand).atLeastOnce();
 
     CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
-    mockCommandJobService.launchCommand(eqCommandJob(createCommandJob(copyCommand, null)));
-    expectLastCall().atLeastOnce();
+    expect(mockCommandJobService.launchCommand(eqCommandJob(createCommandJob(copyCommand, null)))).andReturn(jobId).atLeastOnce();
 
     WebShellResource sut = new WebShellResource();
     sut.setCommandRegistry(mockCommandRegistry);
@@ -115,7 +116,7 @@ public class WebShellResourceTest {
 
     // Exercise
     CopyCommandOptionsDto optionsDto = createCopyCommandOptionsDto("opal-data", "jdbc", null, null, null);
-    sut.copyData(optionsDto);
+    Response response = sut.copyData(optionsDto);
 
     // Verify mocks
     verify(mockCommandRegistry, mockCommandJobService);
@@ -126,8 +127,10 @@ public class WebShellResourceTest {
     assertEquals(optionsDto.getDestination(), copyOptions.getDestination());
     assertEquals(optionsDto.getTablesCount(), copyOptions.getTables().size());
 
-    // Verify that the HTTP response code was ACCEPTED (202).
-    assertEquals(202, Response.Status.ACCEPTED.getStatusCode());
+    // Verify that the HTTP response code was CREATED (201) and that the "Location"
+    // header was set to '/shell/command/{jobId}'.
+    assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+    assertEquals("/shell/command/" + jobId, response.getMetadata().getFirst("Location").toString());
   }
 
   //

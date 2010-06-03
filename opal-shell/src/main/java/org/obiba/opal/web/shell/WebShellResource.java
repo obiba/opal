@@ -17,8 +17,9 @@ import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.CommandRegistry;
@@ -80,6 +81,12 @@ public class WebShellResource {
     return commandDtoList;
   }
 
+  @GET
+  @Path("/command/{id}")
+  public List<CommandStateDto> getCommand(@PathParam("id") String id) {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
   @POST
   @Path("/import")
   public Response importData(Commands.ImportCommandOptionsDto options) {
@@ -87,9 +94,9 @@ public class WebShellResource {
     Command<ImportCommandOptions> importCommand = commandRegistry.newCommand("import");
     importCommand.setOptions(importOptions);
 
-    launchCommand(importCommand);
+    Long jobId = launchCommand(importCommand);
 
-    return Response.status(Status.ACCEPTED).build();
+    return buildLaunchCommandResponse(jobId);
   }
 
   @POST
@@ -99,9 +106,9 @@ public class WebShellResource {
     Command<CopyCommandOptions> copyCommand = commandRegistry.newCommand("copy");
     copyCommand.setOptions(copyOptions);
 
-    launchCommand(copyCommand);
+    Long jobId = launchCommand(copyCommand);
 
-    return Response.status(Status.ACCEPTED).build();
+    return buildLaunchCommandResponse(jobId);
   }
 
   //
@@ -121,10 +128,15 @@ public class WebShellResource {
     return dateFormat.format(date);
   }
 
-  private void launchCommand(Command<?> command) {
+  private Long launchCommand(Command<?> command) {
     CommandJob commandJob = new CommandJob();
     command.setShell(commandJob);
     commandJob.setCommand(command);
-    commandJobService.launchCommand(commandJob);
+
+    return commandJobService.launchCommand(commandJob);
+  }
+
+  private Response buildLaunchCommandResponse(Long jobId) {
+    return Response.created(UriBuilder.fromPath("/").path(WebShellResource.class).path(WebShellResource.class, "getCommand").build(jobId)).build();
   }
 }
