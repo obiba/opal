@@ -23,4 +23,10 @@ public interface Translations extends Constants {
 
   String infoDialogTitle();
 
+  String nameLabel();
+
+  String valueTypeLabel();
+
+  String labelLabel();
+
 }

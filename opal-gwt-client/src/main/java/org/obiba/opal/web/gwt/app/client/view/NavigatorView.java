@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.view;
 
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.NavigatorPresenter;
 import org.obiba.opal.web.model.client.AttributeDto;
@@ -58,6 +59,8 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
 
   SimplePager<VariableDto> pager;
 
+  private Translations translations = GWT.create(Translations.class);
+
   public NavigatorView() {
     initWidget(uiBinder.createAndBindUi(this));
     tree.setAnimationEnabled(true);
@@ -67,14 +70,14 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
       public String getValue(VariableDto object) {
         return object.getName();
       }
-    }, "Name");
+    }, translations.nameLabel());
 
     table.addColumn(new TextColumn<VariableDto>() {
       @Override
       public String getValue(VariableDto object) {
         return object.getValueType();
       }
-    }, "Value Type");
+    }, translations.valueTypeLabel());
 
     table.addColumn(new TextColumn<VariableDto>() {
       @Override
@@ -88,7 +91,7 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
         }
         return null;
       }
-    }, "Label");
+    }, translations.labelLabel());
 
     table.setSelectionEnabled(true);
     table.setSelectionModel(selectionModel);
