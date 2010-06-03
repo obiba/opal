@@ -16,6 +16,7 @@ import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -86,13 +87,20 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
           @Override
           public void onResponseCode(Request request, Response response) {
             errorDialog.bind();
-            errorDialog.setErrors(Arrays.asList("Hello World!")); // new String[] { response.getText() }));
+            errorDialog.setErrors(Arrays.asList(new String[] { response.getText() }));
             errorDialog.revealDisplay();
           }
-        }).withCallback(202, new ResponseCodeCallback() {
+        }).withCallback(201, new ResponseCodeCallback() {
 
           @Override
           public void onResponseCode(Request request, Response response) {
+            String location = response.getHeader("Location");
+            String jobId = location.substring(location.lastIndexOf('/') + 1);
+
+            errorDialog.bind();
+            errorDialog.setMessageDialogType(MessageDialogType.INFO);
+            errorDialog.setErrors(Arrays.asList(new String[] { "The 'import' job has been launched with ID#" + jobId + "." }));
+            errorDialog.revealDisplay();
           }
         }).send();
       }
