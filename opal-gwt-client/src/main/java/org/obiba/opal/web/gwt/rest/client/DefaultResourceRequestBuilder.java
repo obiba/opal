@@ -188,23 +188,17 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
       if(code == 0) {
         GWT.log("Invalid status code. Status text was '" + response.getStatusText() + "'. Interrupting response handling.");
         throw new IllegalStateException("Invalid status code.");
-      } else {
-        GWT.log("Response code " + code);
       }
 
       if(credentials.hasExpired(builder)) {
-        GWT.log("Session expired");
         eventBus.fireEvent(new SessionExpiredEvent());
       } else if(codes != null && codes[code] != null) {
-        GWT.log("Using response code callback");
         codes[code].onResponseCode(request, response);
       } else {
         if(resourceCallback != null && code < 400) {
           final T resource = (T) JsonUtils.unsafeEval(response.getText());
-          GWT.log("Resource callback");
           resourceCallback.onResource(response, resource);
         } else {
-          GWT.log("Request was not handled");
           eventBus.fireEvent(new UnhandledResponseEvent(request, response));
         }
       }
