@@ -20,6 +20,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.Response.Status;
 
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.CommandRegistry;
@@ -61,21 +62,7 @@ public class WebShellResource {
 
     List<CommandJob> history = commandJobService.getHistory();
     for(CommandJob commandJob : history) {
-      CommandStateDto.Builder dtoBuilder = CommandStateDto.newBuilder() //
-      .setCommand(commandJob.getCommand().getName()) //
-      .setCommandArgs(commandJob.getCommand().toString()) //
-      .setOwner(commandJob.getOwner()) //
-      .setStatus(commandJob.getStatus()) //
-      .addAllMessages(commandJob.getMessages());
-
-      if(commandJob.getStartTime() != null) {
-        dtoBuilder.setStartTime(formatTime(commandJob.getStartTime()));
-      }
-      if(commandJob.getEndTime() != null) {
-        dtoBuilder.setEndTime(formatTime(commandJob.getEndTime()));
-      }
-
-      commandDtoList.add(dtoBuilder.build());
+      commandDtoList.add(toCommandStateDto(commandJob));
     }
 
     return commandDtoList;
@@ -83,8 +70,26 @@ public class WebShellResource {
 
   @GET
   @Path("/command/{id}")
-  public List<CommandStateDto> getCommand(@PathParam("id") String id) {
-    throw new UnsupportedOperationException("not implemented");
+  public Response getCommand(@PathParam("id") Long id) {
+    CommandJob commandJob = commandJobService.getCommand(id);
+
+    if(commandJob != null) {
+      return Response.ok(toCommandStateDto(commandJob)).build();
+    } else {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+  }
+
+  @GET
+  @Path("/command/{id}/status")
+  public Response getCommandStatus(@PathParam("id") Long id) {
+    CommandJob commandJob = commandJobService.getCommand(id);
+
+    if(commandJob != null) {
+      return Response.ok(toCommandStateDto(commandJob).getStatus().toString()).build();
+    } else {
+      return Response.status(Status.NOT_FOUND).build();
+    }
   }
 
   @POST
@@ -94,9 +99,7 @@ public class WebShellResource {
     Command<ImportCommandOptions> importCommand = commandRegistry.newCommand("import");
     importCommand.setOptions(importOptions);
 
-    Long jobId = launchCommand(importCommand);
-
-    return buildLaunchCommandResponse(jobId);
+    return launchCommand(importCommand);
   }
 
   @POST
@@ -106,9 +109,7 @@ public class WebShellResource {
     Command<CopyCommandOptions> copyCommand = commandRegistry.newCommand("copy");
     copyCommand.setOptions(copyOptions);
 
-    Long jobId = launchCommand(copyCommand);
-
-    return buildLaunchCommandResponse(jobId);
+    return launchCommand(copyCommand);
   }
 
   //
@@ -128,15 +129,34 @@ public class WebShellResource {
     return dateFormat.format(date);
   }
 
-  private Long launchCommand(Command<?> command) {
+  private Response launchCommand(Command<?> command) {
     CommandJob commandJob = new CommandJob();
     command.setShell(commandJob);
     commandJob.setCommand(command);
 
-    return commandJobService.launchCommand(commandJob);
+    return buildLaunchCommandResponse(commandJobService.launchCommand(commandJob));
   }
 
   private Response buildLaunchCommandResponse(Long jobId) {
     return Response.created(UriBuilder.fromPath("/").path(WebShellResource.class).path(WebShellResource.class, "getCommand").build(jobId)).build();
+  }
+
+  private CommandStateDto toCommandStateDto(CommandJob commandJob) {
+    CommandStateDto.Builder dtoBuilder = CommandStateDto.newBuilder() //
+    .setId(commandJob.getId()) //
+    .setCommand(commandJob.getCommand().getName()) //
+    .setCommandArgs(commandJob.getCommand().toString()) //
+    .setOwner(commandJob.getOwner()) //
+    .setStatus(commandJob.getStatus()) //
+    .addAllMessages(commandJob.getMessages());
+
+    if(commandJob.getStartTime() != null) {
+      dtoBuilder.setStartTime(formatTime(commandJob.getStartTime()));
+    }
+    if(commandJob.getEndTime() != null) {
+      dtoBuilder.setEndTime(formatTime(commandJob.getEndTime()));
+    }
+
+    return dtoBuilder.build();
   }
 }

@@ -28,6 +28,14 @@ public interface CommandJobService extends Service {
   public Long launchCommand(CommandJob commandJob);
 
   /**
+   * Returns the specified command job.
+   * 
+   * @param id command job id
+   * @return the command job (<code>null</code> if none)
+   */
+  public CommandJob getCommand(Long id);
+
+  /**
    * Returns the history of launched commands.
    * 
    * @return history of launched commands

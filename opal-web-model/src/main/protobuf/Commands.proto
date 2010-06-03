@@ -8,21 +8,23 @@ message Message {
 }
 
 message CommandStateDto {
-  required string command = 1;
-  required string commandArgs = 2;
-  required string owner = 3;
-
   enum Status {
     NOT_STARTED = 0;
     IN_PROGRESS = 1;
     SUCCEEDED = 2;
     FAILED = 3;
+    CANCEL_PENDING = 4;
+    CANCELED = 5;
   }
 
-  required Status status = 4;
-  optional string startTime = 5;
-  optional string endTime = 6;
-  repeated Message messages = 7;
+  required int64 id = 1;
+  required string command = 2;
+  required string commandArgs = 3;
+  required string owner = 4;
+  required Status status = 5;
+  optional string startTime = 6;
+  optional string endTime = 7;
+  repeated Message messages = 8;
 }
 
 message ImportCommandOptionsDto {

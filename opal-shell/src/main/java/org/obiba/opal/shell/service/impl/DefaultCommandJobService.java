@@ -83,6 +83,16 @@ public class DefaultCommandJobService implements CommandJobService {
     return id;
   }
 
+  public CommandJob getCommand(Long id) {
+    for(CommandJob job : getHistory()) {
+      System.out.println("historyJobId = " + job.getId() + ", id = " + id);
+      if(job.getId().equals(id)) {
+        return job;
+      }
+    }
+    return null;
+  }
+
   public List<CommandJob> getHistory() {
     return Collections.unmodifiableList(history);
   }
@@ -107,7 +117,7 @@ public class DefaultCommandJobService implements CommandJobService {
    * @return an id for a {@link CommandJob}
    */
   protected synchronized Long nextJobId() {
-    return lastJobId + 1;
+    return ++lastJobId;
   }
 
   protected Date getCurrentTime() {
