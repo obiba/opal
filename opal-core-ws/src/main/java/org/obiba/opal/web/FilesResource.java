@@ -78,23 +78,34 @@ public class FilesResource {
 
   @GET
   @Path("/{path:.*}")
-  public Response getFolder(@PathParam("path") String path) throws FileSystemException {
+  public Response getFileSystemEntry(@PathParam("path") String path) throws FileSystemException {
 
-    // If path does not refer to a folder.
-    FileObject folder = opalRuntime.getFileSystem().getRoot().resolveFile(path);
-    if(!folder.exists() || folder.getType() != FileType.FOLDER) {
+    FileObject file = opalRuntime.getFileSystem().getRoot().resolveFile(path);
+    if(!file.exists()) {
       return Response.status(Status.NOT_FOUND).build();
+    } else if(file.getType() == FileType.FILE) {
+      return getFile(file);
     } else {
-
-      // Create a FileDto representing the folder identified by the path.
-      Opal.FileDto.Builder fileBuilder = Opal.FileDto.newBuilder();
-      fileBuilder.setName(folder.getName().getBaseName()).setType(Opal.FileDto.FileType.FOLDER).setPath(folder.getName().getPath());
-
-      // Create FileDtos for each file & folder in the folder corresponding to the path.
-      addChildren(fileBuilder, opalRuntime.getFileSystem().getRoot().resolveFile(path));
-
-      return Response.ok(fileBuilder.build()).build();
+      return getFolder(file);
     }
+
+  }
+
+  private Response getFile(FileObject file) {
+    return Response.ok(opalRuntime.getFileSystem().getLocalFile(file)).build();
+  }
+
+  private Response getFolder(FileObject folder) throws FileSystemException {
+
+    // Create a FileDto representing the folder identified by the path.
+    Opal.FileDto.Builder fileBuilder = Opal.FileDto.newBuilder();
+    fileBuilder.setName(folder.getName().getBaseName()).setType(Opal.FileDto.FileType.FOLDER).setPath(folder.getName().getPath());
+
+    // Create FileDtos for each file & folder in the folder corresponding to the path.
+    addChildren(fileBuilder, folder);
+
+    return Response.ok(fileBuilder.build()).build();
+
   }
 
   private void addChildren(Opal.FileDto.Builder parentFolderBuilder, FileObject parentFolder) throws FileSystemException {
