@@ -20,16 +20,23 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.realm.Realm;
+import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.realm.SimpleAccountRealm;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.session.SessionException;
+import org.apache.shiro.session.mgt.SessionKey;
+import org.apache.shiro.session.mgt.SessionManager;
+import org.easymock.EasyMock;
+import org.easymock.IArgumentMatcher;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.obiba.opal.core.runtime.security.OpalSecurityManager;
-
-import com.google.common.collect.Sets;
 
 public class SecurityResourceTest {
+
+  private DefaultSecurityManager mockSecurityManager;
+
+  private SimpleAccountRealm mockRealm;
 
   private SecurityResource securityResource;
 
@@ -37,66 +44,99 @@ public class SecurityResourceTest {
 
   @Before
   public void setUp() throws URISyntaxException {
-    securityResource = new SecurityResource();
-  }
+    mockSecurityManager = new DefaultSecurityManager();
+    mockRealm = new SimpleAccountRealm();
+    mockSecurityManager.setRealm(mockRealm);
 
-  private void startTestOpalSecurityManager() {
-    OpalSecurityManager securityManager = new OpalSecurityManager(Sets.newHashSet((Realm) new SimpleAccountRealm()));
-    System.setProperty("OPAL_HOME", getClass().getResource("/").getPath().toString());
-    securityManager.start();
+    SecurityUtils.setSecurityManager(mockSecurityManager);
+
+    securityResource = new SecurityResource(mockSecurityManager);
   }
 
   @Test
   public void testLogin() {
-    startTestOpalSecurityManager();
+    mockRealm.addAccount("administrator", "password");
     Response response = securityResource.createSession("administrator", "password");
     Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
   }
 
   @Test
   public void testLoginBadCredentials() {
-    startTestOpalSecurityManager();
-    Response response = securityResource.createSession("user", "password");
+    Response response = securityResource.createSession("admninistrator", "password");
     Assert.assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-  }
-
-  private org.apache.shiro.mgt.SecurityManager mockSecurityManager() {
-    org.apache.shiro.mgt.SecurityManager securityManagerMock = createMock(org.apache.shiro.mgt.SecurityManager.class);
-    SecurityUtils.setSecurityManager(securityManagerMock);
-    return securityManagerMock;
   }
 
   @Test
   public void testCheckSession() {
+    Session mockSession = EasyMock.createMock(Session.class);
 
-    org.apache.shiro.mgt.SecurityManager securityManagerMock = mockSecurityManager();
-
-    expect(securityManagerMock.isValid(testSessionId)).andReturn(true).atLeastOnce();
-    replay(securityManagerMock);
+    SessionManager sessionManager = mockSessionManager();
+    expect(sessionManager.getSession(expectSession(testSessionId))).andReturn(mockSession).atLeastOnce();
+    replay(sessionManager);
 
     Response response = securityResource.checkSession(testSessionId);
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
-    verify(securityManagerMock);
+    verify(sessionManager);
   }
 
   @Test
-  public void testCheckSessionNotFound() {
-
-    org.apache.shiro.mgt.SecurityManager securityManagerMock = mockSecurityManager();
-
-    expect(securityManagerMock.isValid(testSessionId)).andReturn(false).atLeastOnce();
-    replay(securityManagerMock);
+  public void testCheckSessionThrowsSessionException() {
+    SessionManager sessionManager = mockSessionManager();
+    expect(sessionManager.getSession(expectSession(testSessionId))).andThrow(new SessionException()).atLeastOnce();
+    replay(sessionManager);
 
     Response response = securityResource.checkSession(testSessionId);
     Assert.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
 
-    verify(securityManagerMock);
+    verify(sessionManager);
+  }
+
+  @Test
+  public void testCheckSessionReturnsNull() {
+    SessionManager sessionManager = mockSessionManager();
+    expect(sessionManager.getSession(expectSession(testSessionId))).andReturn(null).atLeastOnce();
+    replay(sessionManager);
+
+    Response response = securityResource.checkSession(testSessionId);
+    Assert.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+
+    verify(sessionManager);
   }
 
   @Test
   public void testDeleteSession() {
     Response response = securityResource.deleteSession(testSessionId);
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  private SessionManager mockSessionManager() {
+    SessionManager mockSessionManager = createMock(SessionManager.class);
+    this.mockSecurityManager.setSessionManager(mockSessionManager);
+    return mockSessionManager;
+  }
+
+  private SessionKey expectSession(String sessionId) {
+    EasyMock.reportMatcher(new SessionKeyMatcher(sessionId));
+    return null;
+  }
+
+  private static class SessionKeyMatcher implements IArgumentMatcher {
+
+    private final String sessionId;
+
+    public SessionKeyMatcher(String sessionId) {
+      this.sessionId = sessionId;
+    }
+
+    @Override
+    public void appendTo(StringBuffer buffer) {
+
+    }
+
+    @Override
+    public boolean matches(Object argument) {
+      return ((SessionKey) argument).getSessionId().equals(this.sessionId);
+    }
   }
 }

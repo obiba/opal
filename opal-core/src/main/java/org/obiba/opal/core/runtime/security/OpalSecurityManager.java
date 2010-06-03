@@ -13,33 +13,28 @@ import java.util.Set;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.DefaultSecurityManager;
-import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.text.IniRealm;
-import org.apache.shiro.util.LifecycleUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.ImmutableSet;
 
 @Component
-public class OpalSecurityManager {
-
-  private Set<Realm> securityRealms;
+public class OpalSecurityManager extends DefaultSecurityManager {
 
   @Autowired
   public OpalSecurityManager(Set<Realm> securityRealms) {
-    super();
-    this.securityRealms = securityRealms;
+    super(ImmutableSet.<Realm> builder().add(new IniRealm(System.getProperty("OPAL_HOME") + "/conf/shiro.ini")).addAll(securityRealms).build());
   }
 
   public void start() {
-    RealmSecurityManager securityManager = new DefaultSecurityManager(ImmutableSet.<Realm> builder().add(new IniRealm(System.getProperty("OPAL_HOME") + "/conf/shiro.ini")).addAll(securityRealms).build());
-    SecurityUtils.setSecurityManager(securityManager);
+    SecurityUtils.setSecurityManager(this);
   }
 
   public void stop() {
     // Destroy the security manager.
-    LifecycleUtils.destroy(SecurityUtils.getSecurityManager());
+    SecurityUtils.setSecurityManager(null);
+    destroy();
   }
 }

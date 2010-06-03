@@ -16,7 +16,7 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
@@ -31,6 +31,7 @@ import org.jboss.resteasy.util.HttpHeaderNames;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -38,13 +39,18 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ServerInterceptor
-public class SecurityInterceptor implements PreProcessInterceptor, PostProcessInterceptor {
+public class SecurityInterceptor extends AbstractSecurityComponent implements PreProcessInterceptor, PostProcessInterceptor {
 
   private static final Logger log = LoggerFactory.getLogger(SecurityInterceptor.class);
 
-  public static final String X_OPAL_AUTH = "X-Opal-Auth";
+  private static final String X_OPAL_AUTH = "X-Opal-Auth";
 
-  public static final String OPAL_SESSION_ID_COOKIE_NAME = "opalsid";
+  private static final String OPAL_SESSION_ID_COOKIE_NAME = "opalsid";
+
+  @Autowired
+  public SecurityInterceptor(SessionsSecurityManager securityManager) {
+    super(securityManager);
+  }
 
   @Override
   public ServerResponse preProcess(HttpRequest request, ResourceMethod method) throws Failure, WebApplicationException {
@@ -58,10 +64,9 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
       return null;
     }
 
-    SecurityManager mgr = SecurityUtils.getSecurityManager();
     String sessionId = extractCookieValue(request);
-    if(sessionId != null && mgr.isValid(sessionId)) {
-      Subject s = new Subject.Builder(mgr).sessionId(sessionId).buildSubject();
+    if(isValidSessionId(sessionId)) {
+      Subject s = new Subject.Builder(getSecurityManager()).sessionId(sessionId).buildSubject();
       log.debug("Binding subject {} session {} to executring thread {}", new Object[] { s.getPrincipal(), sessionId, Thread.currentThread().getId() });
       ThreadContext.bind(s);
     } else {

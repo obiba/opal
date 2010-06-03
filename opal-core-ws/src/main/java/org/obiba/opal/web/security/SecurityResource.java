@@ -22,17 +22,24 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.session.InvalidSessionException;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 @Path("/auth")
-public class SecurityResource {
+public class SecurityResource extends AbstractSecurityComponent {
 
   private static final Logger log = LoggerFactory.getLogger(SecurityResource.class);
+
+  @Autowired
+  public SecurityResource(SessionsSecurityManager securityManager) {
+    super(securityManager);
+  }
 
   @POST
   @Path("/sessions")
@@ -45,6 +52,7 @@ public class SecurityResource {
       return Response.status(Status.UNAUTHORIZED).build();
     }
     String sessionId = SecurityUtils.getSubject().getSession().getId().toString();
+    log.info("Successfull session creation for user '{}' session ID is '{}'.", username, sessionId);
     return Response.created(UriBuilder.fromPath("/").path(SecurityResource.class).path(SecurityResource.class, "checkSession").build(sessionId)).build();
   }
 
@@ -52,7 +60,7 @@ public class SecurityResource {
   @Path("/session/{id}")
   public Response checkSession(@PathParam("id") String sessionId) {
     // Find the Shiro Session
-    if(SecurityUtils.getSecurityManager().isValid(sessionId) == false) {
+    if(isValidSessionId(sessionId) == false) {
       return Response.status(Status.NOT_FOUND).build();
     }
     return Response.ok().build();
