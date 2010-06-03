@@ -17,6 +17,8 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.inject.Inject;
@@ -37,6 +39,9 @@ public class ErrorDialogPresenter extends WidgetPresenter<ErrorDialogPresenter.D
     public void setCaption(String caption);
 
   }
+
+  @Inject
+  private Translations translations;
 
   @Inject
   public ErrorDialogPresenter(Display display, EventBus eventBus) {
@@ -76,13 +81,13 @@ public class ErrorDialogPresenter extends WidgetPresenter<ErrorDialogPresenter.D
   public void setMessageDialogType(MessageDialogType messageDialogType) {
     switch(messageDialogType) {
     case ERROR:
-      getDisplay().setCaption("Errors");
+      getDisplay().setCaption(translations.errorDialogTitle());
       break;
     case WARNING:
-      getDisplay().setCaption("Warnings");
+      getDisplay().setCaption(translations.warningDialogTitle());
       break;
     case INFO:
-      getDisplay().setCaption("Information");
+      getDisplay().setCaption(translations.infoDialogTitle());
       break;
     }
   }
