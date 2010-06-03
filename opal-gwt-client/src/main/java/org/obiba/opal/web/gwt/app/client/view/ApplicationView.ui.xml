@@ -1,5 +1,5 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:g2="urn:import:com.google.gwt.gen2.table.client">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <g:DockLayoutPanel unit="EM">
     <g:north size="4">
@@ -12,10 +12,10 @@
             -->
             <g:Cell horizontalAlignment="ALIGN_RIGHT">
               <g:HorizontalPanel spacing="10" ui:field="topBar">
-                <g:Anchor>Studies</g:Anchor>
-                <g:Anchor>Profile</g:Anchor>
-                <g:Anchor>Help</g:Anchor>
-                <g:Anchor ui:field="quit">Quit</g:Anchor>
+                <g:Anchor><ui:msg description="Studies link text">Studies</ui:msg></g:Anchor>
+                <g:Anchor><ui:msg description="Profile link text">Profile</ui:msg></g:Anchor>
+                <g:Anchor><ui:msg description="Help link text">Help</ui:msg></g:Anchor>
+                <g:Anchor ui:field="quit"><ui:msg description="Quit link text">Quit</ui:msg></g:Anchor>
               </g:HorizontalPanel>
             </g:Cell>
           </g:VerticalPanel>
@@ -24,20 +24,20 @@
         <g:layer bottom="0" height="2em">
           <g:MenuBar ui:field="menuBar">
             <g:MenuItem>
-              Variables
+              <ui:msg description="Variables menu item">Variables</ui:msg>              
               <g:MenuBar vertical="true">
-                <g:MenuItem ui:field="exploreVariablesItem">Explore</g:MenuItem>
+                <g:MenuItem ui:field="exploreVariablesItem"><ui:msg description="Explore menu item">Explore</ui:msg></g:MenuItem>
               </g:MenuBar>
             </g:MenuItem>
             <g:MenuItem>
-              Data
+              <ui:msg description="Data menu item">Data</ui:msg>              
               <g:MenuBar vertical="true">
-                <g:MenuItem ui:field="dataImportItem">Import...</g:MenuItem>
-                <g:MenuItem ui:field="dataExportItem">Export...</g:MenuItem>
+                <g:MenuItem ui:field="dataImportItem"><ui:msg description="Import menu item">Import...</ui:msg></g:MenuItem>
+                <g:MenuItem ui:field="dataExportItem"><ui:msg description="Export menu item">Export...</ui:msg></g:MenuItem>
               </g:MenuBar>
             </g:MenuItem>
-            <g:MenuItem>Jobs</g:MenuItem>
-            <g:MenuItem>Administration</g:MenuItem>
+            <g:MenuItem><ui:msg description="Jobs menu item">Jobs</ui:msg></g:MenuItem>
+            <g:MenuItem><ui:msg description="Administration menu item">Administration</ui:msg></g:MenuItem>
           </g:MenuBar>
 
         </g:layer>
@@ -46,7 +46,7 @@
     <g:center>
       <g:LayoutPanel ui:field="workbench">
         <g:layer top="0" height="100%">
-          <g:Label>The Workbench</g:Label>
+          <g:Label><ui:msg description="Workbench label">The Workbench</ui:msg></g:Label>
         </g:layer>
       </g:LayoutPanel>
     </g:center>

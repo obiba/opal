@@ -1,5 +1,5 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <ui:style>
     .title { font-size: larger; font-weight: bold; }
@@ -11,7 +11,7 @@
 
   <g:LayoutPanel height="40em" width="40em" ui:field="content">
     <g:layer left="1em" right="1em">
-      <g:Label addStyleNames="{style.title}">Export Data</g:Label>
+      <g:Label addStyleNames="{style.title}"><ui:msg description="Data export title">Export Data</ui:msg></g:Label>
     </g:layer>
     <g:layer top="3em" bottom="8em" left="1em" right="1em">
       <g:HTMLPanel width="100%">
@@ -19,12 +19,12 @@
           <tbody>
             <tr>
               <td colspan="2">
-                <g:Label addStyleNames="{style.instructions}">Select the tables to be exported:</g:Label>
+                <g:Label addStyleNames="{style.instructions}"><ui:msg description="Data export instructions">Select the tables to be exported:</ui:msg></g:Label>
               </td>
             </tr>
             <tr>
               <td style="vertical-align:top">
-                Tables:
+                <ui:msg description="Tables field label">Tables:</ui:msg>                
               </td>
               <td>
                 <g:ScrollPanel addStyleNames="{style.inset}" height="15em" width="100%">
@@ -34,7 +34,7 @@
             </tr>
             <tr>
               <td>
-                Destination:
+                <ui:msg description="Destination field label">Destination:</ui:msg>
               </td>
               <td>
                 <g:RadioButton name="destination" ui:field="destinationDataSource"/> <g:ListBox ui:field="datasources" />
@@ -43,44 +43,44 @@
             <tr>
               <td/>
               <td>
-                <g:RadioButton name="destination" ui:field="destinationFile"> file name: </g:RadioButton> <g:TextBox  ui:field="file" />
+                <g:RadioButton name="destination" ui:field="destinationFile"><ui:msg description="File name field label">file name:</ui:msg></g:RadioButton><g:TextBox ui:field="file"/>
               </td>
             </tr> 
             <tr>
               <td>
-                Options:
+                <ui:msg description="Options field label">Options:</ui:msg>                
               </td>
               <td>
-                <g:CheckBox ui:field="incremental"> incremental</g:CheckBox>
-              </td>
-            </tr>              
-            <tr>
-              <td/>
-              <td>
-                <g:CheckBox ui:field="withVariables"> with variables</g:CheckBox>
+                <g:CheckBox ui:field="incremental"><ui:msg description="Incremental checkbox label">incremental</ui:msg></g:CheckBox>
               </td>
             </tr>              
             <tr>
               <td/>
               <td>
-                <g:CheckBox ui:field="useAlias"> use 'alias' attribute to rename variable</g:CheckBox>
+                <g:CheckBox ui:field="withVariables"><ui:msg description="With variables checkbox label">with variables</ui:msg></g:CheckBox>
+              </td>
+            </tr>              
+            <tr>
+              <td/>
+              <td>
+                <g:CheckBox ui:field="useAlias"><ui:msg description="Use alias to rename variable checkbox label">use 'alias' attribute to rename variable</ui:msg></g:CheckBox>
               </td>
             </tr>              
             <tr>
               <td colspan="2">
-                Participant Identifier:
+                <ui:msg description="Participant identifier field label">Participant Identifier:</ui:msg>
               </td>
             </tr>
             <tr>
               <td/>
               <td>
-                <g:RadioButton name="idGroup" ui:field="opalId"> use Opal ID</g:RadioButton>
+                <g:RadioButton name="idGroup" ui:field="opalId"><ui:msg description="Use opal id radio button label">use Opal ID</ui:msg></g:RadioButton>
               </td>
             </tr> 
             <tr>
               <td/>
               <td>
-                <g:RadioButton name="idGroup" ui:field="unitId"> use Unit ID </g:RadioButton> <g:ListBox ui:field="units" />
+                <g:RadioButton name="idGroup" ui:field="unitId"><ui:msg description="Unit id dropdown label">use Unit ID:</ui:msg></g:RadioButton> <g:ListBox ui:field="units" />
               </td>
             </tr> 
           </tbody>
@@ -96,7 +96,7 @@
       <g:VerticalPanel height="100%" width="100%">
         <g:cell horizontalAlignment="ALIGN_RIGHT" verticalAlignment="ALIGN_MIDDLE">
           <g:HorizontalPanel>
-            <g:Button ui:field="submit">Export</g:Button>
+            <g:Button ui:field="submit"><ui:msg description="Export button label">Export</ui:msg></g:Button>
           </g:HorizontalPanel>
         </g:cell>
       </g:VerticalPanel>

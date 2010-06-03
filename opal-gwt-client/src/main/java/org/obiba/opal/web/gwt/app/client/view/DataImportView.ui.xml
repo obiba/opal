@@ -1,5 +1,5 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <ui:style>
     .title { font-size: larger; font-weight: bold; }
@@ -10,7 +10,7 @@
 
   <g:LayoutPanel height="35em" width="40em" ui:field="content">
     <g:layer left="1em" right="1em">
-      <g:Label addStyleNames="{style.title}">Import Data</g:Label>
+      <g:Label addStyleNames="{style.title}"><ui:msg description="Data import title">Import Data</ui:msg></g:Label>
     </g:layer>
     <g:layer top="3em" bottom="6em" left="1em" right="1em">
       <g:HTMLPanel width="100%">
@@ -18,12 +18,12 @@
           <tbody>
             <tr>
               <td colspan="2">
-                <g:Label addStyleNames="{style.instructions}">Select the files to be imported:</g:Label>
+                <g:Label addStyleNames="{style.instructions}"><ui:msg description="Data import instructions">Select the files to be imported:</ui:msg></g:Label>
               </td>
             </tr>
             <tr>
               <td style="vertical-align:top">
-                File(s):
+                <ui:msg description="Files field label">File(s):</ui:msg>                
               </td>
               <td>
                 <g:ScrollPanel addStyleNames="{style.inset}" height="15em" width="100%">
@@ -33,7 +33,7 @@
             </tr>
             <tr>
               <td>
-                Destination:
+                <ui:msg description="Destination field label">Destination:</ui:msg>                
               </td>
               <td>
                 <g:ListBox ui:field="datasources" />
@@ -41,21 +41,23 @@
             </tr>
             <tr>
               <td>
-                <g:CheckBox ui:field="shouldArchive">Archive:</g:CheckBox>
+                <g:CheckBox ui:field="shouldArchive"><ui:msg description="Archive field label">Archive:</ui:msg></g:CheckBox>
               </td>
               <td>
-                <g:TextBox ui:field="archiveDirectory" title="An optional directory name where to archive the file after import" />
+                <g:TextBox ui:field="archiveDirectory" title="An optional directory name where to archive the file after import" >
+                  <ui:attribute name='title' description='Tooltip text for archive directory name text field'/>                  
+                </g:TextBox>
               </td>
             </tr>
             <tr>
               <td colspan="2">
-                Participant Identifier:
+                <ui:msg description="Participant identifier field label">Participant Identifier:</ui:msg>                
               </td>
             </tr>
             <tr>
               <td></td>
               <td>
-                <g:RadioButton name="participantId" checked="true">use Unit ID:</g:RadioButton>
+                <g:RadioButton name="participantId" checked="true"><ui:msg description="Unit id dropdown label">use Unit ID:</ui:msg></g:RadioButton>
                 <g:ListBox ui:field="units" />
               </td>
             </tr>
@@ -72,7 +74,7 @@
       <g:VerticalPanel height="100%" width="100%">
         <g:cell horizontalAlignment="ALIGN_RIGHT" verticalAlignment="ALIGN_MIDDLE">
           <g:HorizontalPanel>
-            <g:Button ui:field="submit">Import</g:Button>
+            <g:Button ui:field="submit"><ui:msg description="Import button label">Import</ui:msg></g:Button>
           </g:HorizontalPanel>
         </g:cell>
       </g:VerticalPanel>
