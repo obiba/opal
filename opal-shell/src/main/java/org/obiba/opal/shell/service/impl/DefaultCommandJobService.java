@@ -20,6 +20,7 @@ import org.obiba.magma.audit.UserProvider;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.service.CommandJobService;
 import org.obiba.opal.shell.service.NoSuchCommandJobException;
+import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
 
 /**
  * Default implementation of {@link CommandJobService}.
@@ -101,6 +102,9 @@ public class DefaultCommandJobService implements CommandJobService {
     for(int i = 0; i < history.size(); i++) {
       CommandJob job = history.get(i);
       if(job.getId().equals(id)) {
+        if(isRunning(job)) {
+          throw new IllegalStateException("commandJob is running");
+        }
         history.remove(i);
         return;
       }
@@ -133,5 +137,9 @@ public class DefaultCommandJobService implements CommandJobService {
 
   protected Date getCurrentTime() {
     return new Date();
+  }
+
+  private boolean isRunning(CommandJob commandJob) {
+    return commandJob.getStatus().equals(Status.IN_PROGRESS) || commandJob.getStatus().equals(Status.CANCEL_PENDING);
   }
 }
