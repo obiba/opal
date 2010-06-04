@@ -107,9 +107,9 @@ public class CommandJob implements OpalShell, Runnable {
     } catch(RuntimeException ex) {
       status = Status.FAILED;
       ex.printStackTrace();
+    } finally {
+      endTime = getCurrentTime();
     }
-
-    endTime = getCurrentTime();
   }
 
   //
