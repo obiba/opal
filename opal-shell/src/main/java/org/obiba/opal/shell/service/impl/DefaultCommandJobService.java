@@ -179,7 +179,14 @@ public class DefaultCommandJobService implements CommandJobService {
   }
 
   private boolean isDeletable(CommandJob commandJob) {
-    return !commandJob.getStatus().equals(Status.IN_PROGRESS) && !commandJob.getStatus().equals(Status.CANCEL_PENDING);
+    switch(commandJob.getStatus()) {
+    case SUCCEEDED:
+    case FAILED:
+    case CANCELED:
+      return true;
+    default:
+      return false;
+    }
   }
 
   private boolean isCancellable(CommandJob commandJob) {
