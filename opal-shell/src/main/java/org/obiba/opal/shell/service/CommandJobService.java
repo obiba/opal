@@ -43,6 +43,16 @@ public interface CommandJobService extends Service {
   public List<CommandJob> getHistory();
 
   /**
+   * Cancels the specified command job.
+   * 
+   * @param id command job id
+   * @throws NoSuchCommandJobException if the specified command job does not exist
+   * @throws IllegalStateException if the command job is not in a "cancellable" state (either NOT_STARTED or
+   * IN_PROGRESS) and therefore cannot be cancelled
+   */
+  public void cancelCommand(Long id) throws NoSuchCommandJobException, IllegalStateException;
+
+  /**
    * Deletes the specified command job.
    * 
    * @param id command job id

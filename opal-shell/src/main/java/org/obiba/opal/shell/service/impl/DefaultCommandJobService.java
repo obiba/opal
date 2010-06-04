@@ -14,17 +14,26 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 
 import org.obiba.magma.audit.UserProvider;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.service.CommandJobService;
 import org.obiba.opal.shell.service.NoSuchCommandJobException;
 import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@link CommandJobService}.
  */
 public class DefaultCommandJobService implements CommandJobService {
+  //
+  // Constants
+  //
+
+  private static final Logger log = LoggerFactory.getLogger(DefaultCommandJobService.class);
+
   //
   // Instance Variables
   //
@@ -35,7 +44,7 @@ public class DefaultCommandJobService implements CommandJobService {
 
   private boolean isRunning;
 
-  private List<CommandJob> history;
+  private List<FutureCommandJob> history;
 
   private long lastJobId;
 
@@ -46,7 +55,7 @@ public class DefaultCommandJobService implements CommandJobService {
   //
 
   public DefaultCommandJobService() {
-    history = new ArrayList<CommandJob>();
+    history = new ArrayList<FutureCommandJob>();
 
     // TODO: Inject this dependency.
     executor = Executors.newFixedThreadPool(10);
@@ -81,9 +90,10 @@ public class DefaultCommandJobService implements CommandJobService {
     commandJob.setOwner(userProvider.getUsername());
     commandJob.setSubmitTime(getCurrentTime());
 
-    executor.execute(commandJob);
+    FutureCommandJob futureCommandJob = new FutureCommandJob(commandJob);
+    executor.execute(futureCommandJob);
 
-    history.add(0, commandJob);
+    history.add(0, futureCommandJob);
 
     return id;
   }
@@ -98,14 +108,38 @@ public class DefaultCommandJobService implements CommandJobService {
   }
 
   public synchronized List<CommandJob> getHistory() {
-    return new ArrayList<CommandJob>(history);
+    List<CommandJob> commandJobList = new ArrayList<CommandJob>();
+    for(FutureCommandJob futureCommandJob : history) {
+      commandJobList.add(futureCommandJob.getCommandJob());
+    }
+
+    return commandJobList;
+  }
+
+  public synchronized void cancelCommand(Long id) {
+    for(int i = 0; i < history.size(); i++) {
+      FutureCommandJob futureCommandJob = history.get(i);
+      CommandJob job = futureCommandJob.getCommandJob();
+      if(job.getId().equals(id)) {
+        if(!isCancellable(job)) {
+          log.info("CommandJob {} is not cancellable (current status: {})", id, job.getStatus());
+          throw new IllegalStateException("commandJob is finished");
+        }
+        job.setStatus(Status.CANCEL_PENDING);
+        futureCommandJob.cancel(true);
+        return;
+      }
+    }
+    throw new NoSuchCommandJobException(id);
+
   }
 
   public synchronized void deleteCommand(Long id) {
     for(int i = 0; i < history.size(); i++) {
-      CommandJob job = history.get(i);
+      CommandJob job = history.get(i).getCommandJob();
       if(job.getId().equals(id)) {
-        if(isRunning(job)) {
+        if(!isDeletable(job)) {
+          log.info("CommandJob {} is not deletable (current status: {})", id, job.getStatus());
           throw new IllegalStateException("commandJob is running");
         }
         history.remove(i);
@@ -144,7 +178,30 @@ public class DefaultCommandJobService implements CommandJobService {
     return new Date();
   }
 
-  private boolean isRunning(CommandJob commandJob) {
-    return commandJob.getStatus().equals(Status.IN_PROGRESS) || commandJob.getStatus().equals(Status.CANCEL_PENDING);
+  private boolean isDeletable(CommandJob commandJob) {
+    return !commandJob.getStatus().equals(Status.IN_PROGRESS) && !commandJob.getStatus().equals(Status.CANCEL_PENDING);
+  }
+
+  private boolean isCancellable(CommandJob commandJob) {
+    return commandJob.getStatus().equals(Status.NOT_STARTED) || commandJob.getStatus().equals(Status.IN_PROGRESS);
+  }
+
+  //
+  // Inner Classes
+  //
+
+  static class FutureCommandJob extends FutureTask<Object> {
+
+    private CommandJob commandJob;
+
+    public FutureCommandJob(CommandJob commandJob) {
+      super(commandJob, null);
+
+      this.commandJob = commandJob;
+    }
+
+    public CommandJob getCommandJob() {
+      return commandJob;
+    }
   }
 }

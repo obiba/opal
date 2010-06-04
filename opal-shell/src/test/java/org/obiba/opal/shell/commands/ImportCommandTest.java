@@ -84,7 +84,7 @@ public class ImportCommandTest {
    * functional unit's directory.
    */
   @Test
-  public void testRelativePathIsRelativeToUnitDirectory() throws IOException {
+  public void testRelativePathIsRelativeToUnitDirectory() throws IOException, InterruptedException {
     ImportCommandOptions mockOptions = createMockOptionsForRelativePathImport("my-unit", "opal-data", "test.zip");
     FileObject mockFile = createMockFileForRelativePathImport("my-unit", "test.zip");
     FileObject mockUnitDir = createMockUnitDirectoryForRelativePathImport(mockFile, "test.zip");
@@ -109,7 +109,7 @@ public class ImportCommandTest {
    * are imported.
    */
   @Test
-  public void testWhenNoFileIsSpecifiedAllFilesInUnitDirectoryAreImported() throws IOException {
+  public void testWhenNoFileIsSpecifiedAllFilesInUnitDirectoryAreImported() throws IOException, InterruptedException {
     ImportCommandOptions mockOptions = createMockOptionsForImportWithNoFile("my-unit", "opal-data");
     FileObject[] mockFilesInUnitDir = createMockFilesInUnitDirectory("my-unit", "test1.zip", "test2.zip");
     FileObject mockUnitDir = createMockUnitDirectoryForImportWithNoFile(mockFilesInUnitDir);

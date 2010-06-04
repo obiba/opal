@@ -51,12 +51,13 @@ import org.springframework.util.Assert;
 /**
  * Default implementation of {@link ImportService}.
  */
-@Transactional
+@Transactional(rollbackFor = { RuntimeException.class, InterruptedException.class })
 public class DefaultImportService implements ImportService {
   //
   // Constants
   //
 
+  @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(DefaultImportService.class);
 
   //
@@ -94,12 +95,12 @@ public class DefaultImportService implements ImportService {
   // ImportService Methods
   //
 
-  public void importData(String unitName, String datasourceName, FileObject file) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
+  public void importData(String unitName, String datasourceName, FileObject file) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException, InterruptedException {
     // OPAL-170 Dispatch the variables in tables corresponding to Onyx stage attribute value.
     importData(unitName, datasourceName, file, "stage");
   }
 
-  private void importData(String unitName, String datasourceName, FileObject file, String dispatchAttribute) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
+  private void importData(String unitName, String datasourceName, FileObject file, String dispatchAttribute) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException, InterruptedException {
     Assert.hasText(unitName, "unitName is null or empty");
     Assert.isTrue(!unitName.equals(FunctionalUnit.OPAL_INSTANCE), "unitName cannot be " + FunctionalUnit.OPAL_INSTANCE);
     Assert.hasText(datasourceName, "datasourceName is null or empty");
@@ -117,7 +118,7 @@ public class DefaultImportService implements ImportService {
     copyToDestinationDatasource(file, dispatchAttribute, destinationDatasource, unit);
   }
 
-  private void copyToDestinationDatasource(FileObject file, String dispatchAttribute, Datasource destinationDatasource, FunctionalUnit unit) throws IOException {
+  private void copyToDestinationDatasource(FileObject file, String dispatchAttribute, Datasource destinationDatasource, FunctionalUnit unit) throws IOException, InterruptedException {
     FsDatasource sourceDatasource = new FsDatasource(file.getName().getBaseName(), opalRuntime.getFileSystem().getLocalFile(file), unit.getDatasourceEncryptionStrategy());
     try {
       sourceDatasource.initialise();
@@ -127,8 +128,12 @@ public class DefaultImportService implements ImportService {
     }
   }
 
-  private void copyValueTables(Datasource source, Datasource destination, FunctionalUnit unit, String dispatchAttribute) throws IOException {
+  private void copyValueTables(Datasource source, Datasource destination, FunctionalUnit unit, String dispatchAttribute) throws IOException, InterruptedException {
     for(ValueTable valueTable : source.getValueTables()) {
+      if(Thread.interrupted()) {
+        throw new InterruptedException("Thread interrupted");
+      }
+
       if(valueTable.isForEntityType(keysTableEntityType)) {
         copyParticipants(valueTable, source, destination, unit, dispatchAttribute);
       } else {

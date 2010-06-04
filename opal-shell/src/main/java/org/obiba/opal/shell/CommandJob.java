@@ -103,7 +103,17 @@ public class CommandJob implements OpalShell, Runnable {
     status = Status.IN_PROGRESS;
     try {
       command.execute();
-      status = Status.SUCCEEDED;
+
+      // Update the status. Set to SUCCEEDED unless the status was changed to CANCEL_PENDING (i.e., job was
+      // interrupted); in that case set it to CANCELED.
+      if(status.equals(Status.IN_PROGRESS)) {
+        status = Status.SUCCEEDED;
+      } else if(status.equals(Status.CANCEL_PENDING)) {
+        status = Status.CANCELED;
+      } else {
+        // Should never get here!
+        throw new IllegalStateException("Unexpected CommandJob status: " + status);
+      }
     } catch(RuntimeException ex) {
       status = Status.FAILED;
       ex.printStackTrace();

@@ -18,10 +18,13 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.concurrent.ExecutorService;
 
+import org.easymock.EasyMock;
+import org.easymock.IArgumentMatcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.magma.audit.UserProvider;
 import org.obiba.opal.shell.CommandJob;
+import org.obiba.opal.shell.service.impl.DefaultCommandJobService.FutureCommandJob;
 
 /**
  * Unit tests for {@link DefaultCommandJobService}.
@@ -49,7 +52,7 @@ public class DefaultCommandJobServiceTest {
 
     // Expect commandJob executed once.
     mockExecutorService = createMock(ExecutorService.class);
-    mockExecutorService.execute(commandJob);
+    mockExecutorService.execute(eqFutureCommandJob(new FutureCommandJob(commandJob)));
     expectLastCall().once();
 
     // Expect current user is "testUser".
@@ -88,5 +91,42 @@ public class DefaultCommandJobServiceTest {
     sut.launchCommand(commandJob);
 
     verify(mockExecutorService);
+  }
+
+  //
+  // Inner Classes
+  //
+
+  static class FutureCommandJobMatcher implements IArgumentMatcher {
+
+    private FutureCommandJob expected;
+
+    public FutureCommandJobMatcher(FutureCommandJob expected) {
+      this.expected = expected;
+    }
+
+    @Override
+    public boolean matches(Object actual) {
+      if(actual instanceof FutureCommandJob) {
+        return ((FutureCommandJob) actual).getCommandJob().equals(expected.getCommandJob());
+      } else {
+        return false;
+      }
+    }
+
+    @Override
+    public void appendTo(StringBuffer buffer) {
+      buffer.append("eqFutureCommandJob(");
+      buffer.append(expected.getClass().getName());
+      buffer.append(" with commandJob \"");
+      buffer.append(expected.getCommandJob());
+      buffer.append("\")");
+    }
+
+  }
+
+  static FutureCommandJob eqFutureCommandJob(FutureCommandJob in) {
+    EasyMock.reportMatcher(new FutureCommandJobMatcher(in));
+    return null;
   }
 }

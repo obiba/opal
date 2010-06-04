@@ -90,6 +90,10 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   private void importFiles(List<FileObject> filesToImport) {
     getShell().printf("Importing %d file%s :\n", filesToImport.size(), (filesToImport.size() > 1 ? "s" : ""));
     for(FileObject file : filesToImport) {
+      if(Thread.interrupted()) {
+        break;
+      }
+
       getShell().printf("  %s\n", file.getName().getPath());
       try {
         importService.importData(options.getUnit(), options.getDestination(), file);
@@ -104,6 +108,11 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
         // Report an error and continue with the next file.
         getShell().printf("Unrecoverable import exception: %s\n", ex.getMessage());
         ex.printStackTrace(System.err);
+        continue;
+      } catch(InterruptedException ex) {
+        // Report the interrupted and continue; the test for interruption at the beginning of the loop
+        // will break out of here.
+        getShell().printf("Thread interrupted");
         continue;
       }
     }

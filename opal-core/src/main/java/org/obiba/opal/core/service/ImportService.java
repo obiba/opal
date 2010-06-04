@@ -28,6 +28,7 @@ public interface ImportService {
    * @throws NoSuchDatasourceException if the specified datasource does not exist
    * @throws IllegalArgumentException if the specified file does not exist or is not a normal file
    * @throws IOException on any I/O error
+   * @throws InterruptedException if the current thread was interrupted
    */
-  public void importData(String unitName, String datasourceName, FileObject file) throws NoSuchFunctionalUnitException, IllegalArgumentException, IOException;
+  public void importData(String unitName, String datasourceName, FileObject file) throws NoSuchFunctionalUnitException, IllegalArgumentException, IOException, InterruptedException;
 }

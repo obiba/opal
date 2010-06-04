@@ -42,8 +42,9 @@ public interface ExportService {
    * @throws NoSuchValueTableException if a sourceTableName does not exist.
    * @throws ExportException if the sourceTableNames are not unique or if the datasource of a sourceTableName matches
    * the destinationDatasource.
+   * @throws InterruptedException if the current thread was interrupted
    */
-  public void exportTablesToDatasource(String unit, List<String> sourceTableNames, String destinationDatasourceName, boolean incremental);
+  public void exportTablesToDatasource(String unit, List<String> sourceTableNames, String destinationDatasourceName, boolean incremental) throws InterruptedException;
 
   /**
    * Export tables to an existing Datasource using the provided {@link DatasourceCopier}. If logging is required ensure
@@ -58,8 +59,9 @@ public interface ExportService {
    * @throws NoSuchValueTableException if a sourceTableName does not exist.
    * @throws ExportException if the sourceTableNames are not unique or if the datasource of a sourceTableName matches
    * the destinationDatasource.
+   * @throws InterruptedException if the current thread was interrupted
    */
-  public void exportTablesToDatasource(String unit, List<String> sourceTableNames, String destinationDatasourceName, DatasourceCopier datasourceCopier, boolean incremental);
+  public void exportTablesToDatasource(String unit, List<String> sourceTableNames, String destinationDatasourceName, DatasourceCopier datasourceCopier, boolean incremental) throws InterruptedException;
 
   /**
    * Export tables to the provided {@link Datasource} using the provided {@link DatasourceCopier}. If logging is
@@ -72,8 +74,9 @@ public interface ExportService {
    * @param incremental if <code>true</code> the tables are exported incrementally (updates only)
    * @throws NoSuchFunctionalUnitException if a unit has been specified that does not exist
    * @throws ExportException if the datasource of a sourceTable matches the destinationDatasource.
+   * @throws InterruptedException if the current thread was interrupted
    */
-  public void exportTablesToDatasource(String unit, Set<ValueTable> sourceTables, Datasource destinationDatasource, DatasourceCopier datasourceCopier, boolean incremental);
+  public void exportTablesToDatasource(String unit, Set<ValueTable> sourceTables, Datasource destinationDatasource, DatasourceCopier datasourceCopier, boolean incremental) throws InterruptedException;
 
   /**
    * Export tables to an Excel file. This export operation will be logged.
@@ -83,8 +86,9 @@ public interface ExportService {
    * @param incremental if <code>true</code> the tables are exported incrementally (updates only)
    * @throws NoSuchFunctionalUnitException if a unit has been specified that does not exist
    * @throws UnsupportedOperationException Exporting to an Excel file is not currently implemented.
+   * @throws InterruptedException if the current thread was interrupted
    */
-  public void exportTablesToExcelFile(String unit, List<String> sourceTableNames, File destinationExcelFile, boolean incremental);
+  public void exportTablesToExcelFile(String unit, List<String> sourceTableNames, File destinationExcelFile, boolean incremental) throws InterruptedException;
 
   /**
    * Export tables to an Excel file. This export operation will be logged.
@@ -95,7 +99,8 @@ public interface ExportService {
    * @param incremental if <code>true</code> the tables are exported incrementally (updates only)
    * @throws NoSuchFunctionalUnitException if a unit has been specified that does not exist
    * @throws UnsupportedOperationException Exporting to an Excel file is not currently implemented.
+   * @throws InterruptedException if the current thread was interrupted
    */
-  public void exportTablesToExcelFile(String unit, List<String> sourceTableNames, File destinationExcelFile, DatasourceCopier datasourceCopier, boolean incremental);
+  public void exportTablesToExcelFile(String unit, List<String> sourceTableNames, File destinationExcelFile, DatasourceCopier datasourceCopier, boolean incremental) throws InterruptedException;
 
 }

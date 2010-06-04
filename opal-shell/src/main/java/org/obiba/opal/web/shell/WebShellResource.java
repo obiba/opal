@@ -17,6 +17,7 @@ import java.util.List;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
@@ -34,6 +35,8 @@ import org.obiba.opal.shell.web.CopyCommandOptionsDtoImpl;
 import org.obiba.opal.shell.web.ImportCommandOptionsDtoImpl;
 import org.obiba.opal.web.model.Commands;
 import org.obiba.opal.web.model.Commands.CommandStateDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -43,6 +46,12 @@ import org.springframework.stereotype.Component;
 @Component
 @Path("/shell")
 public class WebShellResource {
+  //
+  // Constants
+  //
+
+  private static final Logger log = LoggerFactory.getLogger(WebShellResource.class);
+
   //
   // Instance Variables
   //
@@ -82,6 +91,19 @@ public class WebShellResource {
     }
   }
 
+  @DELETE
+  @Path("/command/{id}")
+  public Response deleteCommand(@PathParam("id") Long id) {
+    try {
+      commandJobService.deleteCommand(id);
+      return Response.ok().build();
+    } catch(NoSuchCommandJobException ex) {
+      return Response.status(Status.NOT_FOUND).build();
+    } catch(IllegalStateException ex) {
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+  }
+
   @GET
   @Path("/command/{id}/status")
   public Response getCommandStatus(@PathParam("id") Long id) {
@@ -94,12 +116,18 @@ public class WebShellResource {
     }
   }
 
-  @DELETE
-  @Path("/command/{id}")
-  public Response deleteCommand(@PathParam("id") Long id) {
+  @PUT
+  @Path("/command/{id}/status")
+  public Response setCommandStatus(@PathParam("id") Long id, String newStatus) {
     try {
-      commandJobService.deleteCommand(id);
-      return Response.ok().build();
+      if(CommandStateDto.Status.CANCELED.toString().equals(newStatus)) {
+        commandJobService.cancelCommand(id);
+        return Response.ok().build();
+      } else {
+        // Status may only be updated to CANCELED.
+        log.info("setCommandStatus called with newStatus '{}' (only '{}' is allowed)", newStatus, CommandStateDto.Status.CANCELED);
+        return Response.status(Status.BAD_REQUEST).build();
+      }
     } catch(NoSuchCommandJobException ex) {
       return Response.status(Status.NOT_FOUND).build();
     } catch(IllegalStateException ex) {

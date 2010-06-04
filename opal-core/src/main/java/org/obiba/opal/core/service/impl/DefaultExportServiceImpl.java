@@ -88,7 +88,7 @@ public class DefaultExportServiceImpl implements ExportService {
     return newCopier(destinationDatasource, null);
   }
 
-  public void exportTablesToDatasource(String unitName, List<String> sourceTableNames, String destinationDatasourceName, boolean incremental) {
+  public void exportTablesToDatasource(String unitName, List<String> sourceTableNames, String destinationDatasourceName, boolean incremental) throws InterruptedException {
     Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName must not be null or empty");
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(destinationDatasourceName);
@@ -97,7 +97,7 @@ public class DefaultExportServiceImpl implements ExportService {
     exportTablesToDatasource(unitName, sourceTables, destinationDatasource, datasourceCopier, incremental);
   }
 
-  public void exportTablesToDatasource(String unitName, List<String> sourceTableNames, String destinationDatasourceName, DatasourceCopier datasourceCopier, boolean incremental) {
+  public void exportTablesToDatasource(String unitName, List<String> sourceTableNames, String destinationDatasourceName, DatasourceCopier datasourceCopier, boolean incremental) throws InterruptedException {
     Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName must not be null or empty");
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(destinationDatasourceName);
@@ -105,7 +105,7 @@ public class DefaultExportServiceImpl implements ExportService {
     exportTablesToDatasource(unitName, sourceTables, destinationDatasource, datasourceCopier, incremental);
   }
 
-  public void exportTablesToDatasource(String unitName, Set<ValueTable> sourceTables, Datasource destinationDatasource, DatasourceCopier datasourceCopier, boolean incremental) {
+  public void exportTablesToDatasource(String unitName, Set<ValueTable> sourceTables, Datasource destinationDatasource, DatasourceCopier datasourceCopier, boolean incremental) throws InterruptedException {
     Assert.notEmpty(sourceTables, "sourceTables must not be null or empty");
     Assert.notNull(destinationDatasource, "destinationDatasource must not be null");
     Assert.notNull(datasourceCopier, "datasourceCopier must not be null");
@@ -119,6 +119,10 @@ public class DefaultExportServiceImpl implements ExportService {
 
     try {
       for(ValueTable table : sourceTables) {
+        if(Thread.interrupted()) {
+          throw new InterruptedException("Thread interrupted");
+        }
+
         // If the incremental option was specified, create an incremental view of the table (leaving out what has
         // already been exported).
         table = incremental ? getIncrementalView(table, destinationDatasource) : table;
@@ -148,7 +152,7 @@ public class DefaultExportServiceImpl implements ExportService {
     }
   }
 
-  public void exportTablesToExcelFile(String unitName, List<String> sourceTableNames, File destinationExcelFile, boolean incremental) {
+  public void exportTablesToExcelFile(String unitName, List<String> sourceTableNames, File destinationExcelFile, boolean incremental) throws InterruptedException {
     Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
     Assert.notNull(destinationExcelFile, "destinationExcelFile must not be null");
 
@@ -162,7 +166,7 @@ public class DefaultExportServiceImpl implements ExportService {
 
   }
 
-  public void exportTablesToExcelFile(String unitName, List<String> sourceTableNames, File destinationExcelFile, DatasourceCopier datasourceCopier, boolean incremental) {
+  public void exportTablesToExcelFile(String unitName, List<String> sourceTableNames, File destinationExcelFile, DatasourceCopier datasourceCopier, boolean incremental) throws InterruptedException {
     Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
     Assert.notNull(destinationExcelFile, "destinationExcelFile must not be null");
 
