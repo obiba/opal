@@ -12,10 +12,10 @@ package org.obiba.opal.web;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -34,7 +34,6 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
-import org.eclipse.jetty.util.log.Log;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.web.model.Opal;
@@ -156,52 +155,45 @@ public class FilesResource {
   // The POST method is required here to be compatible with Html forms which do not support the PUT method.
   @POST
   @Path("/{path:.*}")
+  @Consumes("multipart/form-data")
   public Response uploadFile(@PathParam("path") String path, @Context HttpServletRequest request) throws FileSystemException, FileUploadException {
 
     FileObject fileToWriteTo = opalRuntime.getFileSystem().getRoot().resolveFile(path);
     FileObject folderOfFileToWriteTo = fileToWriteTo.getParent();
 
-    List<FileItem> uploadedFiles = getUploadedFiles(request, fileToWriteTo);
+    FileItem uploadedFile = getUploadedFile(request, fileToWriteTo);
 
-    // A folder exist with the same name at the specified path.
-    if(uploadedFiles.size() > 1) {
-      Log.warn("Multiple files upload is not supported by this service");
-      return Response.status(Status.BAD_REQUEST).build();
+    if(uploadedFile == null) {
+      return Response.status(Status.BAD_REQUEST).entity("No file has been submitted. Please make sure that you are submitting a file with your resquest.").build();
 
       // Multiple files were uploaded (not supported).
     } else if(fileToWriteTo.exists() && fileToWriteTo.getType() == FileType.FOLDER) {
-      Log.warn("Could not upload the file, a folder exist with that name at the specified path: {}", path);
-      return Response.status(Status.BAD_REQUEST).build();
+      return Response.status(Status.BAD_REQUEST).entity("Could not upload the file, a folder exist with that name at the specified path: " + path).build();
 
       // The parent folder does not exist (the specification says that we should not create folders)
     } else if(folderOfFileToWriteTo != null && !folderOfFileToWriteTo.exists()) {
-      return Response.status(Status.NOT_FOUND).build();
+      return Response.status(Status.NOT_FOUND).entity("The path specified does not exist: " + path).build();
     }
 
-    for(FileItem uploadedFile : uploadedFiles) {
-      writeUploadedFileToFileSystem(uploadedFile, fileToWriteTo);
-      break;
-    }
+    writeUploadedFileToFileSystem(uploadedFile, fileToWriteTo);
+
+    log.info("The following file was uploaded to Opal file system : {}", path);
 
     return Response.ok().build();
 
   }
 
   @SuppressWarnings("unchecked")
-  private List<FileItem> getUploadedFiles(HttpServletRequest request, FileObject fileToWriteTo) throws FileUploadException {
+  private FileItem getUploadedFile(HttpServletRequest request, FileObject fileToWriteTo) throws FileUploadException {
     FileItemFactory factory = new DiskFileItemFactory();
     ServletFileUpload upload = new ServletFileUpload(factory);
-    List<FileItem> uploadedFiles = new ArrayList<FileItem>();
     for(FileItem fileItem : (List<FileItem>) upload.parseRequest(request)) {
-
-      // Consider only uploaded files, ignore any other form fields.
-      if(!fileItem.isFormField()) {
-        writeUploadedFileToFileSystem(fileItem, fileToWriteTo);
-        uploadedFiles.add(fileItem);
+      if(!fileItem.isFormField() && fileItem.getFieldName().equals("fileToUpload")) {
+        return fileItem;
       }
-
     }
-    return uploadedFiles;
+
+    return null;
   }
 
   private void writeUploadedFileToFileSystem(FileItem uploadedFile, FileObject fileToWriteTo) {
