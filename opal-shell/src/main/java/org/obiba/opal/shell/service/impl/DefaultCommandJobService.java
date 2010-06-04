@@ -10,7 +10,6 @@
 package org.obiba.opal.shell.service.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -40,15 +39,19 @@ public class DefaultCommandJobService implements CommandJobService {
 
   private long lastJobId;
 
+  private Object jobIdLock;
+
   //
   // Constructors
   //
 
   public DefaultCommandJobService() {
-    history = Collections.synchronizedList(new ArrayList<CommandJob>());
+    history = new ArrayList<CommandJob>();
 
     // TODO: Inject this dependency.
     executor = Executors.newFixedThreadPool(10);
+
+    jobIdLock = new Object();
   }
 
   //
@@ -71,7 +74,7 @@ public class DefaultCommandJobService implements CommandJobService {
   // CommandJobService Methods
   //
 
-  public Long launchCommand(CommandJob commandJob) {
+  public synchronized Long launchCommand(CommandJob commandJob) {
     Long id = nextJobId();
 
     commandJob.setId(id);
@@ -94,11 +97,11 @@ public class DefaultCommandJobService implements CommandJobService {
     return null;
   }
 
-  public List<CommandJob> getHistory() {
-    return Collections.unmodifiableList(history);
+  public synchronized List<CommandJob> getHistory() {
+    return new ArrayList<CommandJob>(history);
   }
 
-  public void deleteCommand(Long id) {
+  public synchronized void deleteCommand(Long id) {
     for(int i = 0; i < history.size(); i++) {
       CommandJob job = history.get(i);
       if(job.getId().equals(id)) {
@@ -131,8 +134,10 @@ public class DefaultCommandJobService implements CommandJobService {
    * 
    * @return an id for a {@link CommandJob}
    */
-  protected synchronized Long nextJobId() {
-    return ++lastJobId;
+  protected Long nextJobId() {
+    synchronized(jobIdLock) {
+      return ++lastJobId;
+    }
   }
 
   protected Date getCurrentTime() {
