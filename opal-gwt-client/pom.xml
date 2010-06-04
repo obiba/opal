@@ -103,7 +103,9 @@
             <configuration>
               <tasks>
                 <!-- Run python mergelocales.py script. -->
-                <exec executable="python" failonerror="true" failifexecutionfails="false">
+                <exec executable="java" failonerror="true">
+                  <arg value="-jar" />
+                  <arg value="${basedir}/tools/jython-2.5.1-standalone.jar" />
                   <arg value="${basedir}/tools/mergelocales.py" />
                   <arg value="${basedir}/target/extra/org.obiba.opal.web.gwt.app.GwtApp/" />
                   <arg value="${basedir}/src/main/java/com/google/gwt/i18n/client/" />
