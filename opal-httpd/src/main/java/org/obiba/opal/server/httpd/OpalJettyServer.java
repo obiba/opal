@@ -67,6 +67,8 @@ public class OpalJettyServer implements Service {
   @Autowired
   public OpalJettyServer(final ApplicationContext ctx, final SslContextFactory sslContextFactory, final PlatformTransactionManager txmgr) {
     Server server = new Server();
+    // OPAL-342: We will manually stop the Jetty server instead of relying its shutdown hook
+    server.setStopAtShutdown(false);
 
     SelectChannelConnector httpConnector = new SelectChannelConnector();
     httpConnector.setPort(8080);
