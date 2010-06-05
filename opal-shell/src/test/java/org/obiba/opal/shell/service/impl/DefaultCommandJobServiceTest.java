@@ -15,6 +15,7 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -103,6 +104,25 @@ public class DefaultCommandJobServiceTest {
     verify(mockExecutor);
   }
 
+  @Test
+  public void testGetHistory_ReturnsAllJobsInReverseOrderOfSubmission() {
+    // Test-specific setup
+    futureCommandJobs = new ArrayList<FutureCommandJob>();
+    futureCommandJobs.add(new FutureCommandJob(createCommandJob(1l, new Date(1))));
+    futureCommandJobs.add(new FutureCommandJob(createCommandJob(2l, new Date(2))));
+    futureCommandJobs.add(new FutureCommandJob(createCommandJob(3l, new Date(3))));
+
+    // Exercise
+    List<CommandJob> history = sut.getHistory();
+
+    // Verify
+    assertNotNull(history);
+    assertEquals(3, history.size());
+    assertEquals((Long) 3l, history.get(0).getId()); // job 3 first, since it was submitted last
+    assertEquals((Long) 2l, history.get(1).getId()); // then job 2
+    assertEquals((Long) 1l, history.get(2).getId()); // then job 1
+  }
+
   @Test(expected = IllegalStateException.class)
   public void testCancelCommand_ThrowsIllegalStateExceptionIfCommandInSucceededState() {
     initCommandJob(Status.SUCCEEDED);
@@ -148,6 +168,14 @@ public class DefaultCommandJobServiceTest {
   //
   // Helper Methods
   //
+
+  private CommandJob createCommandJob(Long id, Date submitTime) {
+    CommandJob aCommandJob = new CommandJob();
+    aCommandJob.setId(id);
+    aCommandJob.setSubmitTime(submitTime);
+
+    return aCommandJob;
+  }
 
   private void initCommandJob(Status status) {
     commandJob.setId(1l);
