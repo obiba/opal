@@ -16,7 +16,10 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 
-import java.util.concurrent.ExecutorService;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.Executor;
 
 import org.easymock.EasyMock;
 import org.easymock.IArgumentMatcher;
@@ -25,6 +28,7 @@ import org.junit.Test;
 import org.obiba.magma.audit.UserProvider;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.service.impl.DefaultCommandJobService.FutureCommandJob;
+import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
 
 /**
  * Unit tests for {@link DefaultCommandJobService}.
@@ -36,11 +40,13 @@ public class DefaultCommandJobServiceTest {
 
   private DefaultCommandJobService sut;
 
-  private ExecutorService mockExecutorService;
+  private Executor mockExecutor;
 
   private UserProvider mockUserProvider;
 
   private CommandJob commandJob;
+
+  private List<FutureCommandJob> futureCommandJobs;
 
   //
   // Fixture Methods (setUp / tearDown)
@@ -51,19 +57,23 @@ public class DefaultCommandJobServiceTest {
     commandJob = new CommandJob();
 
     // Expect commandJob executed once.
-    mockExecutorService = createMock(ExecutorService.class);
-    mockExecutorService.execute(eqFutureCommandJob(new FutureCommandJob(commandJob)));
+    mockExecutor = createMock(Executor.class);
+    mockExecutor.execute(eqFutureCommandJob(new FutureCommandJob(commandJob)));
     expectLastCall().once();
 
     // Expect current user is "testUser".
     mockUserProvider = createMock(UserProvider.class);
     expect(mockUserProvider.getUsername()).andReturn("testUser").atLeastOnce();
 
-    sut = new DefaultCommandJobService();
-    sut.setExecutorService(mockExecutorService);
+    sut = new DefaultCommandJobService() {
+      protected List<FutureCommandJob> getFutureCommandJobs() {
+        return futureCommandJobs != null ? futureCommandJobs : super.getFutureCommandJobs();
+      }
+    };
+    sut.setExecutor(mockExecutor);
     sut.setUserProvider(mockUserProvider);
 
-    replay(mockExecutorService, mockUserProvider);
+    replay(mockExecutor, mockUserProvider);
   }
 
   //
@@ -81,7 +91,7 @@ public class DefaultCommandJobServiceTest {
   public void testLaunchCommand_MakesTheCurrentUserTheOwnerOfTheCommandJob() {
     sut.launchCommand(commandJob);
 
-    verify(mockExecutorService);
+    verify(mockExecutor);
 
     assertEquals("testUser", commandJob.getOwner());
   }
@@ -90,7 +100,65 @@ public class DefaultCommandJobServiceTest {
   public void testLaunchCommand_ExecutesCommandJob() {
     sut.launchCommand(commandJob);
 
-    verify(mockExecutorService);
+    verify(mockExecutor);
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testCancelCommand_ThrowsIllegalStateExceptionIfCommandInSucceededState() {
+    initCommandJob(Status.SUCCEEDED);
+
+    sut.cancelCommand(commandJob.getId());
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testCancelCommand_ThrowsIllegalStateExceptionIfCommandInFailedState() {
+    initCommandJob(Status.FAILED);
+
+    sut.cancelCommand(commandJob.getId());
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testCancelCommand_ThrowsIllegalStateExceptionIfCommandInCanceledState() {
+    initCommandJob(Status.CANCELED);
+
+    sut.cancelCommand(commandJob.getId());
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testDeleteCommand_ThrowsIllegalStateExceptionIfCommandInNotStartedState() {
+    initCommandJob(Status.NOT_STARTED);
+
+    sut.deleteCommand(commandJob.getId());
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testDeleteCommand_ThrowsIllegalStateExceptionIfCommandInInProgressState() {
+    initCommandJob(Status.IN_PROGRESS);
+
+    sut.deleteCommand(commandJob.getId());
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testDeleteCommand_ThrowsIllegalStateExceptionIfCommandInCancelPendingState() {
+    initCommandJob(Status.CANCEL_PENDING);
+
+    sut.deleteCommand(commandJob.getId());
+  }
+
+  //
+  // Helper Methods
+  //
+
+  private void initCommandJob(Status status) {
+    commandJob.setId(1l);
+    commandJob.setOwner("testUser");
+    commandJob.setSubmitTime(new Date());
+    commandJob.setStartTime(new Date());
+    commandJob.setEndTime(new Date());
+    commandJob.setStatus(status);
+
+    futureCommandJobs = new ArrayList<FutureCommandJob>();
+    futureCommandJobs.add(new FutureCommandJob(commandJob));
   }
 
   //

@@ -10,11 +10,16 @@
 package org.obiba.opal.shell.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executor;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.obiba.magma.audit.UserProvider;
 import org.obiba.opal.shell.CommandJob;
@@ -38,29 +43,49 @@ public class DefaultCommandJobService implements CommandJobService {
   // Instance Variables
   //
 
-  private ExecutorService executor;
+  private Executor executor;
 
   private UserProvider userProvider;
 
   private boolean isRunning;
 
-  private List<FutureCommandJob> history;
-
   private long lastJobId;
 
   private Object jobIdLock;
+
+  /**
+   * Jobs submitted for execution, but not yet executed.
+   */
+  private BlockingQueue<Runnable> jobsNotStarted;
+
+  /**
+   * Jobs in the process of being executed.
+   */
+  private List<FutureCommandJob> jobsStarted;
+
+  /**
+   * Jobs that have terminated.
+   */
+  private List<FutureCommandJob> jobsTerminated;
+
+  /**
+   * Comparator for sorting jobs in order of submit time, most recent first.
+   */
+  private Comparator<CommandJob> jobComparator;
 
   //
   // Constructors
   //
 
   public DefaultCommandJobService() {
-    history = new ArrayList<FutureCommandJob>();
-
-    // TODO: Inject this dependency.
-    executor = Executors.newFixedThreadPool(10);
-
     jobIdLock = new Object();
+    jobComparator = new CommandJobComparator();
+
+    jobsNotStarted = new LinkedBlockingQueue<Runnable>(); // thread-safe
+    jobsStarted = Collections.synchronizedList(new ArrayList<FutureCommandJob>());
+    jobsTerminated = Collections.synchronizedList(new ArrayList<FutureCommandJob>());
+
+    executor = createExecutor();
   }
 
   //
@@ -83,7 +108,7 @@ public class DefaultCommandJobService implements CommandJobService {
   // CommandJobService Methods
   //
 
-  public synchronized Long launchCommand(CommandJob commandJob) {
+  public Long launchCommand(CommandJob commandJob) {
     Long id = nextJobId();
 
     commandJob.setId(id);
@@ -92,8 +117,6 @@ public class DefaultCommandJobService implements CommandJobService {
 
     FutureCommandJob futureCommandJob = new FutureCommandJob(commandJob);
     executor.execute(futureCommandJob);
-
-    history.add(0, futureCommandJob);
 
     return id;
   }
@@ -107,23 +130,24 @@ public class DefaultCommandJobService implements CommandJobService {
     return null;
   }
 
-  public synchronized List<CommandJob> getHistory() {
-    List<CommandJob> commandJobList = new ArrayList<CommandJob>();
-    for(FutureCommandJob futureCommandJob : history) {
-      commandJobList.add(futureCommandJob.getCommandJob());
-    }
+  public List<CommandJob> getHistory() {
+    List<CommandJob> allJobs = new ArrayList<CommandJob>();
 
-    return commandJobList;
+    for(FutureCommandJob futureCommandJob : getFutureCommandJobs()) {
+      allJobs.add(futureCommandJob.getCommandJob());
+    }
+    Collections.sort(allJobs, jobComparator);
+
+    return allJobs;
   }
 
-  public synchronized void cancelCommand(Long id) {
-    for(int i = 0; i < history.size(); i++) {
-      FutureCommandJob futureCommandJob = history.get(i);
+  public void cancelCommand(Long id) {
+    for(FutureCommandJob futureCommandJob : getFutureCommandJobs()) {
       CommandJob job = futureCommandJob.getCommandJob();
       if(job.getId().equals(id)) {
         if(!isCancellable(job)) {
           log.info("CommandJob {} is not cancellable (current status: {})", id, job.getStatus());
-          throw new IllegalStateException("commandJob is finished");
+          throw new IllegalStateException("commandJob not cancellable");
         }
         job.setStatus(Status.CANCEL_PENDING);
         futureCommandJob.cancel(true);
@@ -131,18 +155,17 @@ public class DefaultCommandJobService implements CommandJobService {
       }
     }
     throw new NoSuchCommandJobException(id);
-
   }
 
-  public synchronized void deleteCommand(Long id) {
-    for(int i = 0; i < history.size(); i++) {
-      CommandJob job = history.get(i).getCommandJob();
+  public void deleteCommand(Long id) {
+    for(FutureCommandJob futureCommandJob : getFutureCommandJobs()) {
+      CommandJob job = futureCommandJob.getCommandJob();
       if(job.getId().equals(id)) {
         if(!isDeletable(job)) {
           log.info("CommandJob {} is not deletable (current status: {})", id, job.getStatus());
-          throw new IllegalStateException("commandJob is running");
+          throw new IllegalStateException("commandJob not deletable");
         }
-        history.remove(i);
+        jobsTerminated.remove(futureCommandJob);
         return;
       }
     }
@@ -153,12 +176,27 @@ public class DefaultCommandJobService implements CommandJobService {
   // Methods
   //
 
-  public void setExecutorService(ExecutorService executor) {
+  public void setExecutor(Executor executor) {
     this.executor = executor;
   }
 
   public void setUserProvider(UserProvider userProvider) {
     this.userProvider = userProvider;
+  }
+
+  protected Executor createExecutor() {
+    return new ThreadPoolExecutor(10, 10, 0, TimeUnit.MILLISECONDS, jobsNotStarted) {
+      @Override
+      protected void beforeExecute(Thread t, Runnable r) {
+        jobsStarted.add((FutureCommandJob) r);
+      }
+
+      @Override
+      protected void afterExecute(Runnable r, Throwable t) {
+        jobsStarted.remove(r);
+        jobsTerminated.add((FutureCommandJob) r);
+      }
+    };
   }
 
   /**
@@ -176,6 +214,26 @@ public class DefaultCommandJobService implements CommandJobService {
 
   protected Date getCurrentTime() {
     return new Date();
+  }
+
+  protected List<FutureCommandJob> getFutureCommandJobs() {
+    List<FutureCommandJob> allFutureCommandJobs = new ArrayList<FutureCommandJob>();
+
+    synchronized(this) {
+      for(Runnable runnable : jobsNotStarted) {
+        allFutureCommandJobs.add((FutureCommandJob) runnable);
+      }
+
+      for(FutureCommandJob futureCommandJob : jobsStarted) {
+        allFutureCommandJobs.add(futureCommandJob);
+      }
+
+      for(FutureCommandJob futureCommandJob : jobsTerminated) {
+        allFutureCommandJobs.add(futureCommandJob);
+      }
+    }
+
+    return allFutureCommandJobs;
   }
 
   private boolean isDeletable(CommandJob commandJob) {
@@ -209,6 +267,19 @@ public class DefaultCommandJobService implements CommandJobService {
 
     public CommandJob getCommandJob() {
       return commandJob;
+    }
+  }
+
+  static class CommandJobComparator implements Comparator<CommandJob> {
+
+    public int compare(CommandJob o1, CommandJob o2) {
+      if(o1.getSubmitTime().after(o2.getSubmitTime())) {
+        return -1;
+      } else if(o1.getSubmitTime().before(o2.getSubmitTime())) {
+        return 1;
+      } else {
+        return 0;
+      }
     }
   }
 }
