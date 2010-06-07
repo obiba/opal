@@ -36,7 +36,12 @@
                 <g:MenuItem ui:field="dataExportItem"><ui:msg description="Export menu item">Export...</ui:msg></g:MenuItem>
               </g:MenuBar>
             </g:MenuItem>
-            <g:MenuItem><ui:msg description="Jobs menu item">Jobs</ui:msg></g:MenuItem>
+            <g:MenuItem>
+              <ui:msg description="Jobs menu item">Jobs</ui:msg>
+              <g:MenuBar vertical="true">
+                <g:MenuItem ui:field="listJobsItem"><ui:msg description="List menu item">List</ui:msg></g:MenuItem>
+              </g:MenuBar>
+            </g:MenuItem>
             <g:MenuItem><ui:msg description="Administration menu item">Administration</ui:msg></g:MenuItem>
           </g:MenuBar>
 

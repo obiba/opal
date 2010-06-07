@@ -44,6 +44,8 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
     MenuItem getDataImportItem();
 
     MenuItem getDataExportItem();
+
+    MenuItem getListJobsItem();
   }
 
   @Inject
@@ -57,6 +59,9 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
   @Inject
   private Provider<DataExportPresenter> dataExportPresenter;
+
+  @Inject
+  private Provider<JobListPresenter> jobListPresenter;
 
   private WidgetPresenter<?> workbench;
 
@@ -98,6 +103,14 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       @Override
       public void execute() {
         eventBus.fireEvent(new WorkbenchChangeEvent(dataExportPresenter.get()));
+      }
+    });
+
+    getDisplay().getListJobsItem().setCommand(new Command() {
+
+      @Override
+      public void execute() {
+        eventBus.fireEvent(new WorkbenchChangeEvent(jobListPresenter.get()));
       }
     });
 
