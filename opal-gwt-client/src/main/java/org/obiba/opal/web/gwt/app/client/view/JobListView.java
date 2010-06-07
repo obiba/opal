@@ -14,6 +14,8 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.Display;
 import org.obiba.opal.web.model.client.CommandStateDto;
 
+import com.google.gwt.cell.client.ClickableTextCell;
+import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
@@ -21,6 +23,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Composite;
@@ -124,12 +127,7 @@ public class JobListView extends Composite implements Display {
   }
 
   private void addTableColumns() {
-    table.addColumn(new TextColumn<CommandStateDto>() {
-      @Override
-      public String getValue(CommandStateDto object) {
-        return String.valueOf(object.getId());
-      }
-    }, translations.idLabel());
+    table.addColumn(new StatusColumn(), translations.idLabel());
 
     table.addColumn(new TextColumn<CommandStateDto>() {
       @Override
@@ -180,5 +178,41 @@ public class JobListView extends Composite implements Display {
     pager = new SimplePager<CommandStateDto>(table);
     table.setPager(pager);
     ((VerticalPanel) table.getParent()).insert(pager, 0);
+  }
+
+  //
+  // Inner Classes
+  //
+
+  static class StatusColumn extends Column<CommandStateDto, String> {
+    //
+    // Constructors
+    //
+
+    StatusColumn() {
+      super(new ClickableTextCell());
+
+      setFieldUpdater(new FieldUpdater<CommandStateDto, String>() {
+        public void update(int index, CommandStateDto object, String value) {
+          showJobDetails(Integer.parseInt(value));
+        }
+      });
+    }
+
+    //
+    // Column Methods
+    //
+
+    public String getValue(CommandStateDto object) {
+      return String.valueOf(object.getId());
+    }
+
+    //
+    // Methods
+    //
+
+    void showJobDetails(Integer jobId) {
+      // TODO: Show the Job Details dialog box.
+    }
   }
 }
