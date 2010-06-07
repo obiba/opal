@@ -97,15 +97,19 @@ public class FilesResource {
   @Path("/{path:.*}")
   public Response getFileSystemEntry(@PathParam("path") String path) throws FileSystemException {
 
-    FileObject file = opalRuntime.getFileSystem().getRoot().resolveFile(path);
+    FileObject file = resolveFileInFileSystem(path);
     if(!file.exists()) {
-      return Response.status(Status.NOT_FOUND).build();
+      return getPathNotExistResponse(path);
     } else if(file.getType() == FileType.FILE) {
       return getFile(file);
     } else {
       return getFolder(file);
     }
 
+  }
+
+  protected FileObject resolveFileInFileSystem(String path) throws FileSystemException {
+    return opalRuntime.getFileSystem().getRoot().resolveFile(path);
   }
 
   private Response getFile(FileObject file) {
@@ -158,7 +162,7 @@ public class FilesResource {
   @Consumes("multipart/form-data")
   public Response uploadFile(@PathParam("path") String path, @Context HttpServletRequest request) throws FileSystemException, FileUploadException {
 
-    FileObject fileToWriteTo = opalRuntime.getFileSystem().getRoot().resolveFile(path);
+    FileObject fileToWriteTo = resolveFileInFileSystem(path);
     FileObject folderOfFileToWriteTo = fileToWriteTo.getParent();
 
     FileItem uploadedFile = getUploadedFile(request, fileToWriteTo);
@@ -166,13 +170,13 @@ public class FilesResource {
     if(uploadedFile == null) {
       return Response.status(Status.BAD_REQUEST).entity("No file has been submitted. Please make sure that you are submitting a file with your resquest.").build();
 
-      // Multiple files were uploaded (not supported).
+      // A folder exist with that name at the specified path
     } else if(fileToWriteTo.exists() && fileToWriteTo.getType() == FileType.FOLDER) {
       return Response.status(Status.BAD_REQUEST).entity("Could not upload the file, a folder exist with that name at the specified path: " + path).build();
 
       // The parent folder does not exist (the specification says that we should not create folders)
     } else if(folderOfFileToWriteTo != null && !folderOfFileToWriteTo.exists()) {
-      return Response.status(Status.NOT_FOUND).entity("The path specified does not exist: " + path).build();
+      return getPathNotExistResponse(path);
     }
 
     writeUploadedFileToFileSystem(uploadedFile, fileToWriteTo);
@@ -183,8 +187,12 @@ public class FilesResource {
 
   }
 
+  private Response getPathNotExistResponse(String path) {
+    return Response.status(Status.NOT_FOUND).entity("The path specified does not exist: " + path).build();
+  }
+
   @SuppressWarnings("unchecked")
-  private FileItem getUploadedFile(HttpServletRequest request, FileObject fileToWriteTo) throws FileUploadException {
+  protected FileItem getUploadedFile(HttpServletRequest request, FileObject fileToWriteTo) throws FileUploadException {
     FileItemFactory factory = new DiskFileItemFactory();
     ServletFileUpload upload = new ServletFileUpload(factory);
     for(FileItem fileItem : (List<FileItem>) upload.parseRequest(request)) {

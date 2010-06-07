@@ -64,6 +64,19 @@
     </dependency>
   </dependencies>
 
+  <build>
+    <plugins>
+      <plugin>
+	    <groupId>org.apache.maven.plugins</groupId>
+	    <artifactId>maven-resources-plugin</artifactId>
+		<configuration>
+		  <!-- Required for testing Opal file system (maven was not copying empty directories from test resources) -->
+		  <includeEmptyDirs>true</includeEmptyDirs>
+		</configuration>
+	  </plugin>  
+    </plugins>
+  </build>
+
   <repositories>
     <repository>
       <id>maven-restlet</id>
