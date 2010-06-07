@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.view;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.Display;
 import org.obiba.opal.web.model.client.CommandStateDto;
@@ -48,6 +49,8 @@ public class JobListView extends Composite implements Display {
   SelectionModel<CommandStateDto> selectionModel = new SingleSelectionModel<CommandStateDto>();
 
   SimplePager<CommandStateDto> pager;
+
+  private Translations translations = GWT.create(Translations.class);
 
   //
   // Constructors
@@ -126,35 +129,35 @@ public class JobListView extends Composite implements Display {
       public String getValue(CommandStateDto object) {
         return String.valueOf(object.getId());
       }
-    }, "ID");
+    }, translations.idLabel());
 
     table.addColumn(new TextColumn<CommandStateDto>() {
       @Override
       public String getValue(CommandStateDto object) {
         return object.getCommand();
       }
-    }, "Type");
+    }, translations.typeLabel());
 
     table.addColumn(new TextColumn<CommandStateDto>() {
       @Override
       public String getValue(CommandStateDto object) {
         return object.getOwner();
       }
-    }, "User");
+    }, translations.userLabel());
 
     table.addColumn(new TextColumn<CommandStateDto>() {
       @Override
       public String getValue(CommandStateDto object) {
         return object.getStartTime() != null ? object.getStartTime() : "";
       }
-    }, "Start");
+    }, translations.startLabel());
 
     table.addColumn(new TextColumn<CommandStateDto>() {
       @Override
       public String getValue(CommandStateDto object) {
         return object.getEndTime() != null ? object.getEndTime() : "";
       }
-    }, "End");
+    }, translations.endLabel());
 
     table.addColumn(new TextColumn<CommandStateDto>() {
       @Override
@@ -162,14 +165,14 @@ public class JobListView extends Composite implements Display {
         // TODO: Return String representation of object.getStatus().
         return "Not Implemented";
       }
-    }, "Status");
+    }, translations.statusLabel());
 
     table.addColumn(new TextColumn<CommandStateDto>() {
       @Override
       public String getValue(CommandStateDto object) {
         return "Not Implemented";
       }
-    }, "Actions");
+    }, translations.endLabel());
   }
 
   private void addTablePager() {

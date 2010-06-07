@@ -29,4 +29,17 @@ public interface Translations extends Constants {
 
   String labelLabel();
 
+  String idLabel();
+
+  String typeLabel();
+
+  String userLabel();
+
+  String startLabel();
+
+  String endLabel();
+
+  String statusLabel();
+
+  String actionsLabel();
 }
