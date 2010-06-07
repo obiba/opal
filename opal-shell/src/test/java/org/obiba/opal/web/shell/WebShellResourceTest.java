@@ -61,7 +61,7 @@ public class WebShellResourceTest {
   @Test
   public void testImportData() {
     // Setup
-    Long jobId = 1l;
+    Integer jobId = 1;
     CommandRegistry mockCommandRegistry = createMockCommandRegistry();
     ImportCommand importCommand = createImportCommand();
     expect(mockCommandRegistry.<ImportCommandOptions> newCommand(importCommand.getName())).andReturn(importCommand).atLeastOnce();
@@ -100,7 +100,7 @@ public class WebShellResourceTest {
   @Test
   public void testCopyData() {
     // Setup
-    Long jobId = 1l;
+    Integer jobId = 1;
     CommandRegistry mockCommandRegistry = createMockCommandRegistry();
     CopyCommand copyCommand = createCopyCommand();
     expect(mockCommandRegistry.<CopyCommandOptions> newCommand(copyCommand.getName())).andReturn(copyCommand).atLeastOnce();
@@ -188,8 +188,8 @@ public class WebShellResourceTest {
   private List<CommandJob> createNonEmptyCommandJobList() {
     List<CommandJob> history = new ArrayList<CommandJob>();
 
-    history.add(0, createCommandJob(1l, createImportCommand(), createTimestamp(2010, Calendar.JANUARY, 1, 12, 0)));
-    history.add(0, createCommandJob(2l, createCopyCommand(), createTimestamp(2010, Calendar.JANUARY, 1, 12, 10)));
+    history.add(0, createCommandJob(1, createImportCommand(), createTimestamp(2010, Calendar.JANUARY, 1, 12, 0)));
+    history.add(0, createCommandJob(2, createCopyCommand(), createTimestamp(2010, Calendar.JANUARY, 1, 12, 10)));
 
     return history;
   }
@@ -241,7 +241,7 @@ public class WebShellResourceTest {
     return dtoBuilder.build();
   }
 
-  private CommandJob createCommandJob(Long id, Command<?> command, Date submitTime) {
+  private CommandJob createCommandJob(Integer id, Command<?> command, Date submitTime) {
     CommandJob commandJob = new CommandJob();
 
     commandJob.setId(id);

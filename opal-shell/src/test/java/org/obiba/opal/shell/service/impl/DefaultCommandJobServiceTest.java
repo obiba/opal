@@ -85,7 +85,7 @@ public class DefaultCommandJobServiceTest {
   public void testLaunchCommand_AssignsIdToCommandJob() {
     sut.launchCommand(commandJob);
 
-    assertEquals((Long) 1l, commandJob.getId());
+    assertEquals((Integer) 1, commandJob.getId());
   }
 
   @Test
@@ -108,9 +108,9 @@ public class DefaultCommandJobServiceTest {
   public void testGetHistory_ReturnsAllJobsInReverseOrderOfSubmission() {
     // Test-specific setup
     futureCommandJobs = new ArrayList<FutureCommandJob>();
-    futureCommandJobs.add(new FutureCommandJob(createCommandJob(1l, new Date(1))));
-    futureCommandJobs.add(new FutureCommandJob(createCommandJob(2l, new Date(2))));
-    futureCommandJobs.add(new FutureCommandJob(createCommandJob(3l, new Date(3))));
+    futureCommandJobs.add(new FutureCommandJob(createCommandJob(1, new Date(1))));
+    futureCommandJobs.add(new FutureCommandJob(createCommandJob(2, new Date(2))));
+    futureCommandJobs.add(new FutureCommandJob(createCommandJob(3, new Date(3))));
 
     // Exercise
     List<CommandJob> history = sut.getHistory();
@@ -118,9 +118,9 @@ public class DefaultCommandJobServiceTest {
     // Verify
     assertNotNull(history);
     assertEquals(3, history.size());
-    assertEquals((Long) 3l, history.get(0).getId()); // job 3 first, since it was submitted last
-    assertEquals((Long) 2l, history.get(1).getId()); // then job 2
-    assertEquals((Long) 1l, history.get(2).getId()); // then job 1
+    assertEquals((Integer) 3, history.get(0).getId()); // job 3 first, since it was submitted last
+    assertEquals((Integer) 2, history.get(1).getId()); // then job 2
+    assertEquals((Integer) 1, history.get(2).getId()); // then job 1
   }
 
   @Test(expected = IllegalStateException.class)
@@ -169,7 +169,7 @@ public class DefaultCommandJobServiceTest {
   // Helper Methods
   //
 
-  private CommandJob createCommandJob(Long id, Date submitTime) {
+  private CommandJob createCommandJob(Integer id, Date submitTime) {
     CommandJob aCommandJob = new CommandJob();
     aCommandJob.setId(id);
     aCommandJob.setSubmitTime(submitTime);
@@ -178,7 +178,7 @@ public class DefaultCommandJobServiceTest {
   }
 
   private void initCommandJob(Status status) {
-    commandJob.setId(1l);
+    commandJob.setId(1);
     commandJob.setOwner("testUser");
     commandJob.setSubmitTime(new Date());
     commandJob.setStartTime(new Date());

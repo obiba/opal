@@ -25,7 +25,7 @@ public class NoSuchCommandJobException extends RuntimeException {
   // Constructors
   //
 
-  public NoSuchCommandJobException(Long jobId) {
+  public NoSuchCommandJobException(Integer jobId) {
     super(jobId.toString());
   }
 }

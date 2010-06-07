@@ -49,7 +49,7 @@ public class DefaultCommandJobService implements CommandJobService {
 
   private boolean isRunning;
 
-  private long lastJobId;
+  private int lastJobId;
 
   private Object jobIdLock;
 
@@ -108,8 +108,8 @@ public class DefaultCommandJobService implements CommandJobService {
   // CommandJobService Methods
   //
 
-  public Long launchCommand(CommandJob commandJob) {
-    Long id = nextJobId();
+  public Integer launchCommand(CommandJob commandJob) {
+    Integer id = nextJobId();
 
     commandJob.setId(id);
     commandJob.setOwner(userProvider.getUsername());
@@ -121,7 +121,7 @@ public class DefaultCommandJobService implements CommandJobService {
     return id;
   }
 
-  public CommandJob getCommand(Long id) {
+  public CommandJob getCommand(Integer id) {
     for(CommandJob job : getHistory()) {
       if(job.getId().equals(id)) {
         return job;
@@ -141,7 +141,7 @@ public class DefaultCommandJobService implements CommandJobService {
     return allJobs;
   }
 
-  public void cancelCommand(Long id) {
+  public void cancelCommand(Integer id) {
     for(FutureCommandJob futureCommandJob : getFutureCommandJobs()) {
       CommandJob job = futureCommandJob.getCommandJob();
       if(job.getId().equals(id)) {
@@ -157,7 +157,7 @@ public class DefaultCommandJobService implements CommandJobService {
     throw new NoSuchCommandJobException(id);
   }
 
-  public void deleteCommand(Long id) {
+  public void deleteCommand(Integer id) {
     for(FutureCommandJob futureCommandJob : getFutureCommandJobs()) {
       CommandJob job = futureCommandJob.getCommandJob();
       if(job.getId().equals(id)) {
@@ -206,7 +206,7 @@ public class DefaultCommandJobService implements CommandJobService {
    * 
    * @return an id for a {@link CommandJob}
    */
-  protected Long nextJobId() {
+  protected Integer nextJobId() {
     synchronized(jobIdLock) {
       return ++lastJobId;
     }

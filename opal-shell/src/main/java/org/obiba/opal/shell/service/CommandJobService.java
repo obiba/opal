@@ -25,7 +25,7 @@ public interface CommandJobService extends Service {
    * @param commandJob the submitted command job
    * @return the command job's id
    */
-  public Long launchCommand(CommandJob commandJob);
+  public Integer launchCommand(CommandJob commandJob);
 
   /**
    * Returns the specified command job.
@@ -33,7 +33,7 @@ public interface CommandJobService extends Service {
    * @param id command job id
    * @return the command job (<code>null</code> if none)
    */
-  public CommandJob getCommand(Long id);
+  public CommandJob getCommand(Integer id);
 
   /**
    * Returns the history of launched commands.
@@ -50,7 +50,7 @@ public interface CommandJobService extends Service {
    * @throws IllegalStateException if the command job is not in a "cancellable" state (either NOT_STARTED or
    * IN_PROGRESS) and therefore cannot be cancelled
    */
-  public void cancelCommand(Long id) throws NoSuchCommandJobException, IllegalStateException;
+  public void cancelCommand(Integer id) throws NoSuchCommandJobException, IllegalStateException;
 
   /**
    * Deletes the specified command job.
@@ -60,5 +60,5 @@ public interface CommandJobService extends Service {
    * @throws IllegalStateException if the command job is in a "running" state (IN_PROGRESS or CANCEL_PENDING) and
    * therefore cannot be deleted
    */
-  public void deleteCommand(Long id) throws NoSuchCommandJobException, IllegalStateException;
+  public void deleteCommand(Integer id) throws NoSuchCommandJobException, IllegalStateException;
 }

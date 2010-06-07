@@ -34,7 +34,7 @@ public class CommandJob implements OpalShell, Runnable {
   // Instance Variables
   //
 
-  private Long id;
+  private Integer id;
 
   private Command<?> command;
 
@@ -128,11 +128,11 @@ public class CommandJob implements OpalShell, Runnable {
   // Methods
   //
 
-  public Long getId() {
+  public Integer getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(Integer id) {
     this.id = id;
   }
 

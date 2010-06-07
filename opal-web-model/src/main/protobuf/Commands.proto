@@ -17,7 +17,7 @@ message CommandStateDto {
     CANCELED = 5;
   }
 
-  required int64 id = 1;
+  required uint32 id = 1;
   required string command = 2;
   required string commandArgs = 3;
   required string owner = 4;

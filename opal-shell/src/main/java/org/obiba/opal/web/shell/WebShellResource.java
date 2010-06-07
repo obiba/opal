@@ -81,7 +81,7 @@ public class WebShellResource {
 
   @GET
   @Path("/command/{id}")
-  public Response getCommand(@PathParam("id") Long id) {
+  public Response getCommand(@PathParam("id") Integer id) {
     CommandJob commandJob = commandJobService.getCommand(id);
 
     if(commandJob != null) {
@@ -93,7 +93,7 @@ public class WebShellResource {
 
   @DELETE
   @Path("/command/{id}")
-  public Response deleteCommand(@PathParam("id") Long id) {
+  public Response deleteCommand(@PathParam("id") Integer id) {
     try {
       commandJobService.deleteCommand(id);
       return Response.ok().build();
@@ -106,7 +106,7 @@ public class WebShellResource {
 
   @GET
   @Path("/command/{id}/status")
-  public Response getCommandStatus(@PathParam("id") Long id) {
+  public Response getCommandStatus(@PathParam("id") Integer id) {
     CommandJob commandJob = commandJobService.getCommand(id);
 
     if(commandJob != null) {
@@ -118,7 +118,7 @@ public class WebShellResource {
 
   @PUT
   @Path("/command/{id}/status")
-  public Response setCommandStatus(@PathParam("id") Long id, String newStatus) {
+  public Response setCommandStatus(@PathParam("id") Integer id, String newStatus) {
     try {
       if(CommandStateDto.Status.CANCELED.toString().equals(newStatus)) {
         commandJobService.cancelCommand(id);
@@ -180,7 +180,7 @@ public class WebShellResource {
     return buildLaunchCommandResponse(commandJobService.launchCommand(commandJob));
   }
 
-  private Response buildLaunchCommandResponse(Long jobId) {
+  private Response buildLaunchCommandResponse(Integer jobId) {
     return Response.created(UriBuilder.fromPath("/").path(WebShellResource.class).path(WebShellResource.class, "getCommand").build(jobId)).build();
   }
 
