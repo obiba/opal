@@ -15,35 +15,25 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.CommandStateDto;
 
-import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.view.client.SelectionModel;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
+import com.google.gwt.event.logical.shared.HasCloseHandlers;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.inject.Inject;
 
 /**
  *
  */
-public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> {
+public class JobDetailsPresenter extends WidgetPresenter<JobDetailsPresenter.Display> {
 
   public interface Display extends WidgetDisplay {
+    HasCloseHandlers<PopupPanel> getDialogBox();
 
-    SelectionModel<CommandStateDto> getTableSelection();
+    void showDialog(CommandStateDto commandStateDto);
 
-    void renderRows(JsArray<CommandStateDto> rows);
-
-    void clear();
-
-    HasFieldUpdater<CommandStateDto, String> getStatusColumn();
-  }
-
-  public interface HasFieldUpdater<T, C> {
-
-    public void setFieldUpdater(FieldUpdater<T, C> fieldUpdater);
+    void hideDialog();
   }
 
   //
@@ -51,14 +41,8 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
   //
 
   @Inject
-  public JobListPresenter(Display display, EventBus eventBus, final JobDetailsPresenter jobDetailsPresenter) {
+  public JobDetailsPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
-
-    getDisplay().getStatusColumn().setFieldUpdater(new FieldUpdater<CommandStateDto, String>() {
-      public void update(int index, CommandStateDto object, String value) {
-        jobDetailsPresenter.getDisplay().showDialog(object);
-      }
-    });
   }
 
   //
@@ -84,25 +68,24 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
 
   @Override
   public void refreshDisplay() {
-    updateTable();
+
   }
 
   @Override
   public void revealDisplay() {
-    updateTable();
+    // getDisplay().showDialog();
   }
 
   //
   // Methods
   //
 
-  private void updateTable() {
-    ResourceRequestBuilderFactory.<JsArray<CommandStateDto>> newBuilder().forResource("/shell/commands").get().withCallback(new ResourceCallback<JsArray<CommandStateDto>>() {
+  protected void addEventHandlers() {
+    getDisplay().getDialogBox().addCloseHandler(new CloseHandler<PopupPanel>() {
       @Override
-      public void onResource(Response response, JsArray<CommandStateDto> resource) {
-        getDisplay().renderRows(resource);
+      public void onClose(CloseEvent<PopupPanel> event) {
+        unbind();
       }
-
-    }).send();
+    });
   }
 }

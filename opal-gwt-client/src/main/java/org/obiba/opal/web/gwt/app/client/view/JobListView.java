@@ -12,10 +12,10 @@ package org.obiba.opal.web.gwt.app.client.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.HasFieldUpdater;
 import org.obiba.opal.web.model.client.CommandStateDto;
 
 import com.google.gwt.cell.client.ClickableTextCell;
-import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
@@ -54,6 +54,8 @@ public class JobListView extends Composite implements Display {
   SimplePager<CommandStateDto> pager;
 
   private Translations translations = GWT.create(Translations.class);
+
+  private HasFieldUpdater<CommandStateDto, String> statusColumn;
 
   //
   // Constructors
@@ -97,6 +99,10 @@ public class JobListView extends Composite implements Display {
     renderRows((JsArray<CommandStateDto>) JavaScriptObject.createArray());
   }
 
+  public HasFieldUpdater<CommandStateDto, String> getStatusColumn() {
+    return statusColumn;
+  }
+
   //
   // Composite Methods
   //
@@ -127,7 +133,8 @@ public class JobListView extends Composite implements Display {
   }
 
   private void addTableColumns() {
-    table.addColumn(new StatusColumn(), translations.idLabel());
+    statusColumn = new StatusColumn();
+    table.addColumn((StatusColumn) statusColumn, translations.idLabel());
 
     table.addColumn(new TextColumn<CommandStateDto>() {
       @Override
@@ -184,19 +191,13 @@ public class JobListView extends Composite implements Display {
   // Inner Classes
   //
 
-  static class StatusColumn extends Column<CommandStateDto, String> {
+  static class StatusColumn extends Column<CommandStateDto, String> implements HasFieldUpdater<CommandStateDto, String> {
     //
     // Constructors
     //
 
-    StatusColumn() {
+    public StatusColumn() {
       super(new ClickableTextCell());
-
-      setFieldUpdater(new FieldUpdater<CommandStateDto, String>() {
-        public void update(int index, CommandStateDto object, String value) {
-          showJobDetails(Integer.parseInt(value));
-        }
-      });
     }
 
     //
@@ -205,14 +206,6 @@ public class JobListView extends Composite implements Display {
 
     public String getValue(CommandStateDto object) {
       return String.valueOf(object.getId());
-    }
-
-    //
-    // Methods
-    //
-
-    void showJobDetails(Integer jobId) {
-      // TODO: Show the Job Details dialog box.
     }
   }
 }

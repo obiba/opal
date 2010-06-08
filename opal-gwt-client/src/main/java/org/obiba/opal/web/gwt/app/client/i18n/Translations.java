@@ -46,4 +46,8 @@ public interface Translations extends Constants {
   String sizeLabel();
 
   String lastModifiedLabel();
+
+  String dateLabel();
+
+  String messageLabel();
 }
