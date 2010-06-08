@@ -59,6 +59,28 @@ public class WebShellResourceTest {
   }
 
   @Test
+  public void testGetCommand_ReturnsNotFoundResponseIfJobDoesNotExist() {
+    // Setup
+    Integer bogusJobId = 1;
+    CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
+    expect(mockCommandJobService.getCommand(bogusJobId)).andReturn(null).atLeastOnce();
+
+    WebShellResource sut = new WebShellResource();
+    sut.setCommandJobService(mockCommandJobService);
+
+    replay(mockCommandJobService);
+
+    // Exercise
+    Response response = sut.getCommand(bogusJobId);
+
+    // Verify mocks
+    verify(mockCommandJobService);
+
+    // Verify that the HTTP response code was NOT FOUND (404).
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+  }
+
+  @Test
   public void testImportData() {
     // Setup
     Integer jobId = 1;
