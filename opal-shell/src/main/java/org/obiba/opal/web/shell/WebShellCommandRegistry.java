@@ -7,17 +7,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.shell.web;
+package org.obiba.opal.web.shell;
 
 import org.obiba.opal.shell.AbstractCommandRegistry;
 import org.obiba.opal.shell.commands.CopyCommand;
 import org.obiba.opal.shell.commands.ImportCommand;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 /**
  * Available commands for Opal Web Services Shell.
  */
+@Component
+@Qualifier("web")
 public class WebShellCommandRegistry extends AbstractCommandRegistry {
 
   public WebShellCommandRegistry() {

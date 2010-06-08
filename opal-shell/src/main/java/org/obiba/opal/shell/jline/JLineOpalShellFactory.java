@@ -18,10 +18,12 @@ import java.io.Writer;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.OpalShell;
 import org.obiba.opal.shell.OpalShellFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * A factory for {@code JLineOpalShell} instances
  */
+@Component
 public class JLineOpalShellFactory implements OpalShellFactory {
 
   public JLineOpalShellFactory() {

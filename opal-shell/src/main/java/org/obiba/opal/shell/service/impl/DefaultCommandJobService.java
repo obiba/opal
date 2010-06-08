@@ -28,10 +28,13 @@ import org.obiba.opal.shell.service.NoSuchCommandJobException;
 import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Default implementation of {@link CommandJobService}.
  */
+@Component
 public class DefaultCommandJobService implements CommandJobService {
   //
   // Constants
@@ -43,9 +46,10 @@ public class DefaultCommandJobService implements CommandJobService {
   // Instance Variables
   //
 
-  private Executor executor;
-
+  @Autowired
   private UserProvider userProvider;
+
+  private Executor executor;
 
   private boolean isRunning;
 

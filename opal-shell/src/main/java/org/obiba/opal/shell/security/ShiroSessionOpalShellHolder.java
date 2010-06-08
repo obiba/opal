@@ -12,10 +12,12 @@ package org.obiba.opal.shell.security;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.shell.OpalShell;
 import org.obiba.opal.shell.OpalShellHolder;
+import org.springframework.stereotype.Component;
 
 /**
  * Implements {@code OpalShellHolder} by storing the {@code OpalShell} in the current Shiro {@code Session}.
  */
+@Component
 public class ShiroSessionOpalShellHolder implements OpalShellHolder {
 
   public OpalShell getCurrentShell() {

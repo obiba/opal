@@ -9,31 +9,10 @@
   <import resource="config.xml" />
   <import resource="classpath:spring/opal-core/context.xml" />
 
-  <bean id="opalShellHolder" class="org.obiba.opal.shell.security.ShiroSessionOpalShellHolder" />
-
   <bean id="consoleCallbackHandler" class="org.obiba.opal.core.crypt.FixedPasswordCallbackHandler">
     <constructor-arg value="pwel" />
   </bean>
 
-  <bean id="commandRegistry" class="org.obiba.opal.shell.web.WebShellCommandRegistry" />
-  
-  <bean id="commandJobService" class="org.obiba.opal.shell.service.impl.DefaultCommandJobService">
-    <property name="userProvider" ref="userProvider" />
-  </bean>
-  
-  <bean class="org.obiba.opal.server.sshd.OpalSshServer">
-    <constructor-arg>
-      <bean class="org.obiba.opal.server.SecureShellCommandRegistry" />
-    </constructor-arg>
-    <constructor-arg>
-      <bean class="org.obiba.opal.shell.jline.JLineOpalShellFactory" />
-    </constructor-arg>
-    <constructor-arg ref="opalShellHolder" />
-    <constructor-arg value="${org.obiba.opal.ssh.port}" />
-  </bean>
-
-  <context:component-scan base-package="org.obiba.opal.server,org.obiba.opal.service,org.obiba.opal.core">
-    <context:exclude-filter type="regex" expression="org.obiba.opal.server.rest.*"/>
-  </context:component-scan>
+  <context:component-scan base-package="org.obiba.opal.server,org.obiba.opal.core,org.obiba.opal.service,org.obiba.opal.shell" />
 
 </beans>

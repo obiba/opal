@@ -22,7 +22,12 @@ import org.obiba.opal.shell.OpalShellFactory;
 import org.obiba.opal.shell.OpalShellHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@Component
 public class OpalSshServer implements Service {
 
   private static final Logger log = LoggerFactory.getLogger(OpalSshServer.class);
@@ -37,7 +42,8 @@ public class OpalSshServer implements Service {
 
   private boolean isRunning = false;
 
-  public OpalSshServer(CommandRegistry commandRegistry, OpalShellFactory shellFactory, OpalShellHolder opalShellHolder, Integer port) {
+  @Autowired
+  public OpalSshServer(@Qualifier("ssh") CommandRegistry commandRegistry, OpalShellFactory shellFactory, OpalShellHolder opalShellHolder, @Value("${org.obiba.opal.ssh.port}") Integer port) {
     this.commandRegistry = commandRegistry;
     this.shellFactory = shellFactory;
     this.opalShellHolder = opalShellHolder;

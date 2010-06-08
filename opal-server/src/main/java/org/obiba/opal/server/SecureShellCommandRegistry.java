@@ -34,10 +34,14 @@ import org.obiba.opal.shell.commands.options.QuitCommandOptions;
 import org.obiba.opal.shell.commands.options.ShowCommandOptions;
 import org.obiba.opal.shell.commands.options.SplitCommandOptions;
 import org.obiba.opal.shell.commands.options.VersionCommandOptions;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 /**
  * Available commands for a secure shell (ssh)
  */
+@Component
+@Qualifier("ssh")
 public class SecureShellCommandRegistry extends AbstractCommandRegistry {
 
   public SecureShellCommandRegistry() {
