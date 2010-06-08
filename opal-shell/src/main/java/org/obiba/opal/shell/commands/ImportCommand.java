@@ -94,28 +94,38 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
         break;
       }
 
-      getShell().printf("  %s\n", file.getName().getPath());
-      try {
-        importService.importData(options.getUnit(), options.getDestination(), file);
-        archive(file);
-      } catch(NoSuchFunctionalUnitException ex) {
-        getShell().printf("Functional unit '%s' does not exist. Cannot import.\n", ex.getUnitName());
+      if(importFile(file) == false) {
         break;
-      } catch(NoSuchDatasourceException ex) {
-        getShell().printf("Destination datasource '%s' does not exist. Cannot import.\n", ex.getDatasourceName());
-        break;
-      } catch(IOException ex) {
-        // Report an error and continue with the next file.
-        getShell().printf("Unrecoverable import exception: %s\n", ex.getMessage());
-        ex.printStackTrace(System.err);
-        continue;
-      } catch(InterruptedException ex) {
-        // Report the interrupted and continue; the test for interruption at the beginning of the loop
-        // will break out of here.
-        getShell().printf("Thread interrupted");
-        continue;
       }
     }
+  }
+
+  /**
+   * Imports the specified file. Called by <code>importFiles</code>.
+   * 
+   * @param file file to import
+   * @return <code>true</code> if <code>importFiles</code> should continue
+   */
+  private boolean importFile(FileObject file) {
+    getShell().printf("  %s\n", file.getName().getPath());
+    try {
+      importService.importData(options.getUnit(), options.getDestination(), file);
+      archive(file);
+    } catch(NoSuchFunctionalUnitException ex) {
+      getShell().printf("Functional unit '%s' does not exist. Cannot import.\n", ex.getUnitName());
+      return false;
+    } catch(NoSuchDatasourceException ex) {
+      getShell().printf("Destination datasource '%s' does not exist. Cannot import.\n", ex.getDatasourceName());
+      return false;
+    } catch(IOException ex) {
+      // Report an error and continue with the next file.
+      getShell().printf("Unrecoverable import exception: %s\n", ex.getMessage());
+      ex.printStackTrace(System.err);
+    } catch(InterruptedException ex) {
+      // Report the interrupted and continue; the test for interruption will detect this condition.
+      getShell().printf("Thread interrupted");
+    }
+    return true;
   }
 
   private void archive(FileObject file) throws IOException {
