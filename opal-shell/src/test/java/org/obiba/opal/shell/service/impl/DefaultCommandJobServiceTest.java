@@ -16,6 +16,7 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -82,6 +83,66 @@ public class DefaultCommandJobServiceTest {
   //
 
   @Test
+  public void testNotRunning() {
+    assertEquals(false, sut.isRunning());
+  }
+
+  @Test
+  public void testStart() {
+    // Exercise
+    sut.start();
+
+    // Verify
+    assertEquals(true, sut.isRunning());
+  }
+
+  @Test
+  public void testStop() {
+    // Exercise
+    sut.stop();
+
+    // Verify
+    assertEquals(false, sut.isRunning());
+  }
+
+  @Test
+  public void testGetCommand() {
+    // Test-specific setup
+    DefaultCommandJobService sut = new DefaultCommandJobService() {
+      @Override
+      public List<CommandJob> getHistory() {
+        return createJobHistory();
+      }
+    };
+
+    // Exercise
+    Integer jobId = 2;
+    CommandJob job = sut.getCommand(jobId);
+
+    // Verify
+    assertNotNull(job);
+    assertEquals(jobId, job.getId());
+  }
+
+  @Test
+  public void testGetCommand_ReturnsNullIfJobDoesNotExist() {
+    // Test-specific setup
+    DefaultCommandJobService sut = new DefaultCommandJobService() {
+      @Override
+      public List<CommandJob> getHistory() {
+        return createJobHistory();
+      }
+    };
+
+    // Exercise
+    Integer bogusJobId = 99;
+    CommandJob job = sut.getCommand(bogusJobId);
+
+    // Verify
+    assertNull(job);
+  }
+
+  @Test
   public void testLaunchCommand_AssignsIdToCommandJob() {
     sut.launchCommand(commandJob);
 
@@ -121,6 +182,18 @@ public class DefaultCommandJobServiceTest {
     assertEquals((Integer) 3, history.get(0).getId()); // job 3 first, since it was submitted last
     assertEquals((Integer) 2, history.get(1).getId()); // then job 2
     assertEquals((Integer) 1, history.get(2).getId()); // then job 1
+  }
+
+  @Test
+  public void testCancelCommand_ChangesJobStatusToCancelPending() {
+    // Test-specific setup
+    initCommandJob(Status.IN_PROGRESS);
+
+    // Exercise
+    sut.cancelCommand(commandJob.getId());
+
+    // Verify
+    assertEquals(Status.CANCEL_PENDING, commandJob.getStatus());
   }
 
   @Test(expected = IllegalStateException.class)
@@ -168,6 +241,16 @@ public class DefaultCommandJobServiceTest {
   //
   // Helper Methods
   //
+
+  private List<CommandJob> createJobHistory() {
+    List<CommandJob> jobHistory = new ArrayList<CommandJob>();
+
+    jobHistory.add(createCommandJob(1, new Date(1l)));
+    jobHistory.add(createCommandJob(2, new Date(2l)));
+    jobHistory.add(createCommandJob(3, new Date(3l)));
+
+    return jobHistory;
+  }
 
   private CommandJob createCommandJob(Integer id, Date submitTime) {
     CommandJob aCommandJob = new CommandJob();
