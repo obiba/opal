@@ -11,6 +11,7 @@ package org.obiba.opal.web.shell;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
@@ -36,6 +37,7 @@ import org.obiba.opal.shell.commands.ImportCommand;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
 import org.obiba.opal.shell.service.CommandJobService;
+import org.obiba.opal.shell.service.NoSuchCommandJobException;
 import org.obiba.opal.web.model.Commands.CommandStateDto;
 import org.obiba.opal.web.model.Commands.CopyCommandOptionsDto;
 import org.obiba.opal.web.model.Commands.ImportCommandOptionsDto;
@@ -106,6 +108,206 @@ public class WebShellResourceTest {
 
     // Verify that the HTTP response code was NOT FOUND (404).
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void testGetCommandStatus_ReturnsResponseContainingStatusSpecifiedJob() {
+    // Setup
+    Integer jobId = 1;
+    CommandJob job = createCommandJob(jobId, createImportCommand(), new Date(1l));
+    CommandJobService mockCommandJobService = createMock(CommandJobService.class);
+    expect(mockCommandJobService.getCommand(jobId)).andReturn(job).atLeastOnce();
+
+    WebShellResource sut = new WebShellResource();
+    sut.setCommandJobService(mockCommandJobService);
+
+    replay(mockCommandJobService);
+
+    // Exercise
+    Response response = sut.getCommandStatus(jobId);
+
+    // Verify mocks
+    verify(mockCommandJobService);
+
+    // Verify that the HTTP response code was OK (200) and that the body contains
+    // the status of the specified job.
+    assertNotNull(response);
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    assertNotNull(response.getEntity());
+    assertEquals(job.getStatus().toString(), response.getEntity());
+  }
+
+  @Test
+  public void testGetCommandStatus_ReturnsNotFoundResponseIfJobDoesNotExist() {
+    // Setup
+    Integer bogusJobId = 1;
+    CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
+    expect(mockCommandJobService.getCommand(bogusJobId)).andReturn(null).atLeastOnce();
+
+    WebShellResource sut = new WebShellResource();
+    sut.setCommandJobService(mockCommandJobService);
+
+    replay(mockCommandJobService);
+
+    // Exercise
+    Response response = sut.getCommandStatus(bogusJobId);
+
+    // Verify mocks
+    verify(mockCommandJobService);
+
+    // Verify that the HTTP response code was NOT FOUND (404).
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void testSetCommandStatus() {
+    // Setup
+    Integer jobId = 1;
+    CommandJobService mockCommandJobService = createMock(CommandJobService.class);
+    mockCommandJobService.cancelCommand(jobId);
+    expectLastCall().atLeastOnce();
+
+    WebShellResource sut = new WebShellResource();
+    sut.setCommandJobService(mockCommandJobService);
+
+    replay(mockCommandJobService);
+
+    // Exercise
+    Response response = sut.setCommandStatus(jobId, Status.CANCELED.toString());
+
+    // Verify mocks
+    verify(mockCommandJobService);
+
+    // Verify that the HTTP response code was OK (200).
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void testSetCommandStatus_ReturnsNotFoundResponseIfJobDoesNotExist() {
+    // Setup
+    Integer bogusJobId = 1;
+    CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
+    mockCommandJobService.cancelCommand(bogusJobId);
+    expectLastCall().andThrow(new NoSuchCommandJobException(bogusJobId));
+
+    WebShellResource sut = new WebShellResource();
+    sut.setCommandJobService(mockCommandJobService);
+
+    replay(mockCommandJobService);
+
+    // Exercise
+    Response response = sut.setCommandStatus(bogusJobId, Status.CANCELED.toString());
+
+    // Verify mocks
+    verify(mockCommandJobService);
+
+    // Verify that the HTTP response code was NOT FOUND (404).
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void testSetCommandStatus_ReturnsBadRequestResponseIfJobIsNotCancellable() {
+    // Setup
+    Integer bogusJobId = 1;
+    CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
+    mockCommandJobService.cancelCommand(bogusJobId);
+    expectLastCall().andThrow(new IllegalStateException());
+
+    WebShellResource sut = new WebShellResource();
+    sut.setCommandJobService(mockCommandJobService);
+
+    replay(mockCommandJobService);
+
+    // Exercise
+    Response response = sut.setCommandStatus(bogusJobId, Status.CANCELED.toString());
+
+    // Verify mocks
+    verify(mockCommandJobService);
+
+    // Verify that the HTTP response code was BAD REQUEST (400).
+    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void testSetCommandStatus_ReturnsBadRequestResponseForNewStatusOtherThanCanceled() {
+    // Setup
+    Integer jobId = 1;
+    WebShellResource sut = new WebShellResource();
+
+    // Exercise
+    Response response = sut.setCommandStatus(jobId, Status.SUCCEEDED.toString());
+
+    // Verify that the HTTP response code was BAD REQUEST (400).
+    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void testDeleteCommand() {
+    // Setup
+    Integer jobId = 1;
+    CommandJobService mockCommandJobService = createMock(CommandJobService.class);
+    mockCommandJobService.deleteCommand(jobId);
+    expectLastCall().atLeastOnce();
+
+    WebShellResource sut = new WebShellResource();
+    sut.setCommandJobService(mockCommandJobService);
+
+    replay(mockCommandJobService);
+
+    // Exercise
+    Response response = sut.deleteCommand(jobId);
+
+    // Verify mocks
+    verify(mockCommandJobService);
+
+    // Verify that the HTTP response code was OK (200).
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+  
+  @Test
+  public void testDeleteCommand_ReturnsNotFoundResponseIfJobDoesNotExist() {
+    // Setup
+    Integer bogusJobId = 1;
+    CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
+    mockCommandJobService.deleteCommand(bogusJobId);
+    expectLastCall().andThrow(new NoSuchCommandJobException(bogusJobId));
+
+    WebShellResource sut = new WebShellResource();
+    sut.setCommandJobService(mockCommandJobService);
+
+    replay(mockCommandJobService);
+
+    // Exercise
+    Response response = sut.deleteCommand(bogusJobId);
+
+    // Verify mocks
+    verify(mockCommandJobService);
+
+    // Verify that the HTTP response code was NOT FOUND (404).
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void testDeleteCommand_ReturnsBadRequestResponseIfJobIsNotDeletable() {
+    // Setup
+    Integer jobId = 1;
+    CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
+    mockCommandJobService.deleteCommand(jobId);
+    expectLastCall().andThrow(new IllegalStateException());
+
+    WebShellResource sut = new WebShellResource();
+    sut.setCommandJobService(mockCommandJobService);
+
+    replay(mockCommandJobService);
+
+    // Exercise
+    Response response = sut.deleteCommand(jobId);
+
+    // Verify mocks
+    verify(mockCommandJobService);
+
+    // Verify that the HTTP response code was BAD REQUEST (400).
+    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
   }
 
   @Test
