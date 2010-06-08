@@ -105,7 +105,6 @@ public class FilesResourceTest {
     for(FileDto child : folder.getChildrenList()) {
       childrenCounter++;
       correspondingFileObj = fileSystem.getRoot().resolveFile(child.getPath());
-      System.out.println(correspondingFileObj.getName().getPath());
       Assert.assertTrue(correspondingFileObj.exists());
       if(child.getType() == FileDto.FileType.FOLDER) {
         childrenCounter = verifyThatChildrenExistInFileSystem(child, childrenCounter);
