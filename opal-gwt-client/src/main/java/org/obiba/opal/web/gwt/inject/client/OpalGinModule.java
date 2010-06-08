@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.FolderDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NavigatorPresenter;
@@ -25,6 +26,7 @@ import org.obiba.opal.web.gwt.app.client.view.ApplicationView;
 import org.obiba.opal.web.gwt.app.client.view.DataExportView;
 import org.obiba.opal.web.gwt.app.client.view.DataImportView;
 import org.obiba.opal.web.gwt.app.client.view.ErrorDialogView;
+import org.obiba.opal.web.gwt.app.client.view.FolderDetailsView;
 import org.obiba.opal.web.gwt.app.client.view.JobListView;
 import org.obiba.opal.web.gwt.app.client.view.LoginView;
 import org.obiba.opal.web.gwt.app.client.view.NavigatorView;
@@ -52,6 +54,7 @@ public class OpalGinModule extends AbstractGinModule {
     bind(VariablePresenter.Display.class).to(VariableView.class).in(Singleton.class);
     bind(LoginPresenter.Display.class).to(LoginView.class).in(Singleton.class);
     bind(UnhandledResponseNotificationPresenter.Display.class).to(UnhandledResponseNotificationView.class).in(Singleton.class);
+    bind(FolderDetailsPresenter.Display.class).to(FolderDetailsView.class).in(Singleton.class);
 
     // Don't bind as singleton because the ApplicationPresenter expects a new instance on every display
     bind(DataImportPresenter.Display.class).to(DataImportView.class);// .in(Singleton.class);

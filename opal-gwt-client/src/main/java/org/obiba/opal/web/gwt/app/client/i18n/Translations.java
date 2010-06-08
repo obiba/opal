@@ -42,4 +42,8 @@ public interface Translations extends Constants {
   String statusLabel();
 
   String actionsLabel();
+
+  String sizeLabel();
+
+  String lastModifiedLabel();
 }
