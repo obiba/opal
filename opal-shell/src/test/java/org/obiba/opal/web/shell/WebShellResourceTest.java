@@ -15,6 +15,7 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,6 +57,33 @@ public class WebShellResourceTest {
   @Test
   public void testGetCommands_ReturnsEmptyListWhenThereIsNoHistory() {
     testGetCommands(createEmptyCommandJobList());
+  }
+
+  @Test
+  public void testGetCommand_ReturnsResponseContainingCommandStateDtoOfSpecifiedJob() {
+    // Setup
+    Integer jobId = 1;
+    CommandJob job = createCommandJob(jobId, createImportCommand(), new Date(1l));
+    CommandJobService mockCommandJobService = createMock(CommandJobService.class);
+    expect(mockCommandJobService.getCommand(jobId)).andReturn(job).atLeastOnce();
+
+    WebShellResource sut = new WebShellResource();
+    sut.setCommandJobService(mockCommandJobService);
+
+    replay(mockCommandJobService);
+
+    // Exercise
+    Response response = sut.getCommand(jobId);
+
+    // Verify mocks
+    verify(mockCommandJobService);
+
+    // Verify that the HTTP response code was OK (200) and that the body contains
+    // the CommandStateDto of the specified job.
+    assertNotNull(response);
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    assertNotNull(response.getEntity());
+    assertTrue(containsDtoForJob(response, job));
   }
 
   @Test
@@ -325,6 +353,21 @@ public class WebShellResourceTest {
     calendar.add(field, amount);
 
     return calendar.getTime();
+  }
+
+  private boolean containsDtoForJob(Response response, CommandJob job) {
+    Object entity = response.getEntity();
+
+    if(entity != null) {
+      if(entity instanceof CommandStateDto) {
+        CommandStateDto dto = (CommandStateDto) entity;
+        return (dto.getId() == job.getId() && dto.getCommand().equals(job.getCommand().getName()) && dto.getCommandArgs().equals(job.getCommand().toString()) && dto.getOwner().equals(job.getOwner()) && dto.getStatus().equals(job.getStatus()));
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
 
   //
