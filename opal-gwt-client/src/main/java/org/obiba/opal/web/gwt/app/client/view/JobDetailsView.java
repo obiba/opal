@@ -40,7 +40,7 @@ public class JobDetailsView extends DialogBox implements Display {
 
   private static final String DIALOG_HEIGHT = "30em";
 
-  private static final String DIALOG_WIDTH = "30em";
+  private static final String DIALOG_WIDTH = "40em";
 
   @UiTemplate("JobDetailsView.ui.xml")
   interface JobDetailsViewUiBinder extends UiBinder<LayoutPanel, JobDetailsView> {
