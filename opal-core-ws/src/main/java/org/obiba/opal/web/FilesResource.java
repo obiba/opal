@@ -122,6 +122,17 @@ public class FilesResource {
     Opal.FileDto.Builder fileBuilder = Opal.FileDto.newBuilder();
     fileBuilder.setName(folder.getName().getBaseName()).setType(Opal.FileDto.FileType.FOLDER).setPath(folder.getName().getPath());
 
+    // Add the parent folder as child of the current folder to allow going back to parent folder when navigating
+    // the file system.
+    FileObject parentFolder = folder.getParent();
+    if(parentFolder != null) {
+      Opal.FileDto.Builder parentFolderBuilder = Opal.FileDto.newBuilder();
+      parentFolderBuilder.setName("..").setPath(parentFolder.getName().getPath());
+      parentFolderBuilder.setType(Opal.FileDto.FileType.FOLDER);
+      parentFolderBuilder.setLastModifiedTime(parentFolder.getContent().getLastModifiedTime());
+      fileBuilder.addChildren(parentFolderBuilder.build());
+    }
+
     // Create FileDtos for each file & folder in the folder corresponding to the path.
     addChildren(fileBuilder, folder);
 
