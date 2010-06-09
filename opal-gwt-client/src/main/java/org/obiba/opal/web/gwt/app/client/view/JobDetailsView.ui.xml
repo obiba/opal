@@ -2,9 +2,7 @@
   xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
 
   <ui:style>
-    .separator { border-bottom: 2px solid black; }
-    .instructions { font-weight: bold; }
-    .inset { border: 2px inset black; }
+    .button { float: right; }
   </ui:style>
     
   <g:LayoutPanel>
@@ -14,7 +12,9 @@
       </g:ScrollPanel>
     </g:layer>
     <g:layer bottom="0" height="2em">
-      <g:Button ui:field="close">Close</g:Button>
+      <g:FlowPanel>
+        <g:Button ui:field="close" addStyleNames="{style.button}">Close</g:Button>
+      </g:FlowPanel>
     </g:layer>
   </g:LayoutPanel>
   
