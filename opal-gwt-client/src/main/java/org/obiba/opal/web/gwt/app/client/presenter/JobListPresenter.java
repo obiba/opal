@@ -38,7 +38,7 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
 
     void clear();
 
-    HasFieldUpdater<CommandStateDto, String> getStatusColumn();
+    HasFieldUpdater<CommandStateDto, String> getIdColumn();
   }
 
   public interface HasFieldUpdater<T, C> {
@@ -54,7 +54,7 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
   public JobListPresenter(Display display, EventBus eventBus, final JobDetailsPresenter jobDetailsPresenter) {
     super(display, eventBus);
 
-    getDisplay().getStatusColumn().setFieldUpdater(new FieldUpdater<CommandStateDto, String>() {
+    getDisplay().getIdColumn().setFieldUpdater(new FieldUpdater<CommandStateDto, String>() {
       public void update(int index, CommandStateDto object, String value) {
         jobDetailsPresenter.getDisplay().showDialog(object);
       }

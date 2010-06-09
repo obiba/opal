@@ -59,7 +59,7 @@ public class JobListView extends Composite implements Display {
 
   private Translations translations = GWT.create(Translations.class);
 
-  private HasFieldUpdater<CommandStateDto, String> statusColumn;
+  private HasFieldUpdater<CommandStateDto, String> idColumn;
 
   //
   // Constructors
@@ -105,8 +105,8 @@ public class JobListView extends Composite implements Display {
     renderRows((JsArray<CommandStateDto>) JavaScriptObject.createArray());
   }
 
-  public HasFieldUpdater<CommandStateDto, String> getStatusColumn() {
-    return statusColumn;
+  public HasFieldUpdater<CommandStateDto, String> getIdColumn() {
+    return idColumn;
   }
 
   //
@@ -139,8 +139,8 @@ public class JobListView extends Composite implements Display {
   }
 
   private void addTableColumns() {
-    statusColumn = new StatusColumn();
-    table.addColumn((StatusColumn) statusColumn, translations.idLabel());
+    idColumn = new IdColumn();
+    table.addColumn((IdColumn) idColumn, translations.idLabel());
 
     table.addColumn(new TextColumn<CommandStateDto>() {
       @Override
@@ -197,12 +197,12 @@ public class JobListView extends Composite implements Display {
   // Inner Classes
   //
 
-  static class StatusColumn extends Column<CommandStateDto, String> implements HasFieldUpdater<CommandStateDto, String> {
+  static class IdColumn extends Column<CommandStateDto, String> implements HasFieldUpdater<CommandStateDto, String> {
     //
     // Constructors
     //
 
-    public StatusColumn() {
+    public IdColumn() {
       super(new ClickableTextCell());
     }
 
