@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.app.client.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.HasFieldUpdater;
+import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.model.client.CommandStateDto;
 
 import com.google.gwt.cell.client.ClickableTextCell;

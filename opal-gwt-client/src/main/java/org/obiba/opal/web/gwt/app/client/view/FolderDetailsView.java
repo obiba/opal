@@ -14,7 +14,7 @@ import java.util.Date;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.FolderDetailsPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.presenter.FolderDetailsPresenter.HasFieldUpdater;
+import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.model.client.FileDto;
 
 import com.google.gwt.cell.client.ClickableTextCell;
@@ -74,7 +74,7 @@ public class FolderDetailsView extends Composite implements Display {
   }
 
   @Override
-  public HasFieldUpdater getFileNameColumn() {
+  public HasFieldUpdater<FileDto, String> getFileNameColumn() {
     return fileNameColumn;
   }
 
@@ -114,7 +114,7 @@ public class FolderDetailsView extends Composite implements Display {
 
   }
 
-  private abstract class FileNameColumn extends Column<FileDto, String> implements HasFieldUpdater {
+  private abstract class FileNameColumn extends Column<FileDto, String> implements HasFieldUpdater<FileDto, String> {
     public FileNameColumn() {
       super(new ClickableTextCell());
     }

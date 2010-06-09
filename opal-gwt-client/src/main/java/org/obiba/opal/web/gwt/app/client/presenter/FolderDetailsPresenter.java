@@ -15,6 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.FileDto;
@@ -32,14 +33,10 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
 
     void renderRows(FileDto rows);
 
-    HasFieldUpdater getFileNameColumn();
+    HasFieldUpdater<FileDto, String> getFileNameColumn();
 
     VerticalPanel getFileDetailsPanel();
 
-  }
-
-  public interface HasFieldUpdater {
-    public void setFieldUpdater(FieldUpdater<FileDto, String> fieldUpdater);
   }
 
   @Inject
