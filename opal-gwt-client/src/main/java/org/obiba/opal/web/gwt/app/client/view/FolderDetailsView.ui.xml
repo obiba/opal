@@ -4,8 +4,8 @@
 
   <g:DockLayoutPanel>
     <g:center>
-      <g:ScrollPanel width="100%" >
-        <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_CENTER">
+      <g:ScrollPanel width="100%">
+        <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_CENTER" ui:field="fileDetailsPanel">
           <g2:CellTable width="100%" ui:field="table" />
         </g:VerticalPanel>
       </g:ScrollPanel>

@@ -28,6 +28,7 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class FolderDetailsView extends Composite implements Display {
@@ -40,6 +41,9 @@ public class FolderDetailsView extends Composite implements Display {
 
   @UiField
   CellTable<FileDto> table;
+
+  @UiField
+  VerticalPanel fileDetailsPanel;
 
   private FileNameColumn fileNameColumn;
 
@@ -67,6 +71,16 @@ public class FolderDetailsView extends Composite implements Display {
 
   @Override
   public void stopProcessing() {
+  }
+
+  @Override
+  public HasFieldUpdater getFileNameColumn() {
+    return fileNameColumn;
+  }
+
+  @Override
+  public VerticalPanel getFileDetailsPanel() {
+    return fileDetailsPanel;
   }
 
   private void initTable() {
@@ -118,8 +132,4 @@ public class FolderDetailsView extends Composite implements Display {
     return file.getSize() > 0;
   }
 
-  @Override
-  public HasFieldUpdater getFileNameColumn() {
-    return fileNameColumn;
-  }
 }
