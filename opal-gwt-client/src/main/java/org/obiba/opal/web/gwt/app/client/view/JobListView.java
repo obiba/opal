@@ -28,6 +28,7 @@ import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
@@ -45,6 +46,9 @@ public class JobListView extends Composite implements Display {
   }
 
   private static JobListViewUiBinder uiBinder = GWT.create(JobListViewUiBinder.class);
+
+  @UiField
+  Label title;
 
   @UiField
   CellTable<CommandStateDto> table;
@@ -78,6 +82,8 @@ public class JobListView extends Composite implements Display {
 
   @Override
   public void renderRows(final JsArray<CommandStateDto> rows) {
+    title.setText(translations.jobsLabel() + " (" + rows.length() + ")");
+
     table.setDelegate(new Delegate<CommandStateDto>() {
 
       @Override

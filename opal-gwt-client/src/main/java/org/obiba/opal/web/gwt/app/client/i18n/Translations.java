@@ -50,4 +50,8 @@ public interface Translations extends Constants {
   String dateLabel();
 
   String messageLabel();
+
+  String jobLabel();
+
+  String jobsLabel();
 }

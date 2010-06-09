@@ -2,7 +2,18 @@
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
              xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
 
+  <ui:style>
+    .title { 
+      font-size: larger;
+      font-weight: bold;
+      margin: 0.5em 0 0 1em;
+    }
+  </ui:style>
+  
   <g:DockLayoutPanel>
+    <g:north size="30">
+      <g:Label ui:field="title" addStyleNames="{style.title}" />
+    </g:north>
     <g:center>
       <g:ScrollPanel width="100%" >
         <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_CENTER">

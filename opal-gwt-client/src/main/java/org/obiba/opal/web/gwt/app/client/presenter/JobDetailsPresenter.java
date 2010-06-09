@@ -68,12 +68,10 @@ public class JobDetailsPresenter extends WidgetPresenter<JobDetailsPresenter.Dis
 
   @Override
   public void refreshDisplay() {
-
   }
 
   @Override
   public void revealDisplay() {
-    // getDisplay().showDialog();
   }
 
   //

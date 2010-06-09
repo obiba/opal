@@ -63,7 +63,6 @@ public class JobDetailsView extends DialogBox implements Display {
   //
 
   public JobDetailsView() {
-    setText("Job Details");
     setHeight(DIALOG_HEIGHT);
     setWidth(DIALOG_WIDTH);
 
@@ -86,7 +85,7 @@ public class JobDetailsView extends DialogBox implements Display {
   }
 
   public void showDialog(CommandStateDto commandStateDto) {
-    setText("Job " + commandStateDto.getId());
+    setText("Job #" + commandStateDto.getId());
 
     JsArray<Message> jobMessages = commandStateDto.getMessagesArray();
     table.setData(0, jobMessages.length(), JsArrays.toList(jobMessages));
