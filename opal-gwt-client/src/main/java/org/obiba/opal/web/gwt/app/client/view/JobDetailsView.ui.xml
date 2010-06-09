@@ -2,7 +2,7 @@
   xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
 
   <ui:style>
-    .button { float: right; }
+    .right-aligned { float: right; }
   </ui:style>
     
   <g:LayoutPanel>
@@ -13,7 +13,7 @@
     </g:layer>
     <g:layer bottom="0" height="2em">
       <g:FlowPanel>
-        <g:Button ui:field="close" addStyleNames="{style.button}">Close</g:Button>
+        <g:Button ui:field="close" addStyleNames="{style.right-aligned}">Close</g:Button>
       </g:FlowPanel>
     </g:layer>
   </g:LayoutPanel>

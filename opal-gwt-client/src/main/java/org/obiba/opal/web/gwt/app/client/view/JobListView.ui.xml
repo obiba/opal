@@ -8,6 +8,20 @@
       font-weight: bold;
       margin: 0.5em 0 0 1em;
     }
+    .jobList td + td {
+      color: black;
+      text-decoration: none;
+    }
+    .jobList td {
+      color: blue;
+      text-decoration: underline;
+    }
+    .jobList td + td:hover {
+      cursor: default;
+    }
+    .jobList td:hover {
+      cursor: pointer;
+    }
   </ui:style>
   
   <g:DockLayoutPanel>
@@ -17,7 +31,7 @@
     <g:center>
       <g:ScrollPanel width="100%" >
         <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_CENTER">
-          <g2:CellTable width="100%" ui:field="table" />
+          <g2:CellTable width="100%" ui:field="table" addStyleNames="{style.jobList}"/>
         </g:VerticalPanel>
       </g:ScrollPanel>
     </g:center>
