@@ -9,26 +9,27 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.view;
 
+import java.util.Date;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.FolderDetailsPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.presenter.FolderDetailsPresenter.HasFieldUpdater;
 import org.obiba.opal.web.model.client.FileDto;
 
+import com.google.gwt.cell.client.ClickableTextCell;
+import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionModel;
-import com.google.gwt.view.client.SingleSelectionModel;
 
-/**
- *
- */
 public class FolderDetailsView extends Composite implements Display {
 
   @UiTemplate("FolderDetailsView.ui.xml")
@@ -40,42 +41,20 @@ public class FolderDetailsView extends Composite implements Display {
   @UiField
   CellTable<FileDto> table;
 
-  SelectionModel<FileDto> selectionModel = new SingleSelectionModel<FileDto>();
+  private FileNameColumn fileNameColumn;
 
   private Translations translations = GWT.create(Translations.class);
 
-  //
-  // Constructors
-  //
-
   public FolderDetailsView() {
     initWidget(uiBinder.createAndBindUi(this));
-
     initTable();
   }
 
-  //
-  // JobListPresenter.Display Methods
-  //
-
   @Override
-  public SelectionModel<FileDto> getTableSelection() {
-    return null;
+  public void renderRows(final FileDto folder) {
+    table.setData(0, table.getPageSize(), JsArrays.toList(folder.getChildrenArray()));
+    table.setDataSize(folder.getChildrenArray().length(), true);
   }
-
-  @Override
-  public void renderRows(final FileDto rows) {
-    table.setData(0, table.getPageSize(), JsArrays.toList(rows.getChildrenArray()));
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public void clear() {
-  }
-
-  //
-  // Composite Methods
-  //
 
   @Override
   public Widget asWidget() {
@@ -90,19 +69,12 @@ public class FolderDetailsView extends Composite implements Display {
   public void stopProcessing() {
   }
 
-  //
-  // Methods
-  //
-
   private void initTable() {
-    table.setSelectionEnabled(false);
-    table.setSelectionModel(selectionModel);
-
     addTableColumns();
   }
 
   private void addTableColumns() {
-    table.addColumn(new TextColumn<FileDto>() {
+    table.addColumn(fileNameColumn = new FileNameColumn() {
 
       @Override
       public String getValue(FileDto object) {
@@ -114,18 +86,40 @@ public class FolderDetailsView extends Composite implements Display {
 
       @Override
       public String getValue(FileDto object) {
-        return String.valueOf(object.getSize());
+        return isFolder(object) ? String.valueOf((long) object.getSize()) : "";
       }
     }, translations.sizeLabel());
 
-    table.addColumn(new TextColumn<FileDto>() {
+    table.addColumn(new LastModifiedTimeColumn() {
 
       @Override
-      public String getValue(FileDto object) {
-        return String.valueOf(object.getLastModifiedTime());
+      public Date getValue(FileDto object) {
+        return new Date((long) object.getLastModifiedTime());
       }
     }, translations.lastModifiedLabel());
 
   }
 
+  private abstract class FileNameColumn extends Column<FileDto, String> implements HasFieldUpdater {
+    public FileNameColumn() {
+      super(new ClickableTextCell());
+    }
+  }
+
+  private static abstract class LastModifiedTimeColumn extends Column<FileDto, Date> {
+    public LastModifiedTimeColumn() {
+      super(new DateCell());
+    }
+  }
+
+  private boolean isFolder(FileDto file) {
+    // TODO Replace the expression below by the text in comment if we find a solution to the enum bug in protobuf
+    /* file.getType() == FileDto.FileType.FILE */
+    return file.getSize() > 0;
+  }
+
+  @Override
+  public HasFieldUpdater getFileNameColumn() {
+    return fileNameColumn;
+  }
 }

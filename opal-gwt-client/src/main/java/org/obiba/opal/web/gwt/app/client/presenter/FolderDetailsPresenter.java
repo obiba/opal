@@ -19,19 +19,23 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.FileDto;
 
+import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.view.client.SelectionModel;
 import com.google.inject.Inject;
 
 public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresenter.Display> {
 
   public interface Display extends WidgetDisplay {
 
-    SelectionModel<FileDto> getTableSelection();
-
     void renderRows(FileDto rows);
 
-    void clear();
+    HasFieldUpdater getFileNameColumn();
+
+  }
+
+  public interface HasFieldUpdater {
+    public void setFieldUpdater(FieldUpdater<FileDto, String> fieldUpdater);
   }
 
   @Inject
@@ -47,6 +51,22 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
   @Override
   protected void onBind() {
 
+    super.getDisplay().getFileNameColumn().setFieldUpdater(new FieldUpdater<FileDto, String>() {
+
+      public void update(int index, FileDto file, String value) {
+        if(isFolder(file)) {
+          downloadFile(file.getPath());
+        } else {
+          updateTable(file.getPath());
+        }
+      }
+
+      private boolean isFolder(FileDto file) {
+        /* file.getType() == FileDto.FileType.FILE */
+        return file.getSize() > 0;
+      }
+
+    });
   }
 
   @Override
@@ -59,21 +79,24 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
 
   @Override
   public void refreshDisplay() {
-    updateTable();
+    updateTable("/");
   }
 
   @Override
   public void revealDisplay() {
-    updateTable();
+    updateTable("/");
   }
 
-  private void updateTable() {
-    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/archive").get().withCallback(new ResourceCallback<FileDto>() {
+  private void downloadFile(String path) {
+    GWT.log("Click to download file (" + path + ")");
+  }
+
+  private void updateTable(String path) {
+    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files" + path).get().withCallback(new ResourceCallback<FileDto>() {
       @Override
       public void onResource(Response response, FileDto resource) {
         getDisplay().renderRows(resource);
       }
-
     }).send();
   }
 
