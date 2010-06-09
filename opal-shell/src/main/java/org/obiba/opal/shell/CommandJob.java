@@ -68,7 +68,7 @@ public class CommandJob implements OpalShell, Runnable {
     Formatter formatter = new Formatter(sb);
     formatter.format(format, args);
 
-    messages.add(createMessage(sb.toString()));
+    messages.add(0, createMessage(sb.toString()));
   }
 
   public void printUsage() {
