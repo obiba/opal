@@ -12,14 +12,24 @@
       color: black;
       text-decoration: none;
     }
-    .jobList td {
-      color: blue;
-      text-decoration: underline;
-    }
     .jobList td + td:hover {
       cursor: default;
     }
+    .jobList td {
+      color: blue;
+      text-decoration: underline;
+    } 
     .jobList td:hover {
+      cursor: pointer;
+    } 
+    .jobList td + td + td + td + td + td + td + td span + span {
+      margin-left: 1em;	
+    }
+    .jobList td + td + td + td + td + td + td + td span {
+  	  color: blue;
+      text-decoration: underline;	
+    }
+    .jobList td + td + td + td + td + td + td + td span:hover {
       cursor: pointer;
     }
   </ui:style>

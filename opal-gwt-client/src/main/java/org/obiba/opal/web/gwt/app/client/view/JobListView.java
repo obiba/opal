@@ -15,7 +15,11 @@ import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.model.client.CommandStateDto;
 
+import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.ClickableTextCell;
+import com.google.gwt.cell.client.CompositeCell;
+import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.cell.client.HasCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
@@ -60,6 +64,8 @@ public class JobListView extends Composite implements Display {
   private Translations translations = GWT.create(Translations.class);
 
   private HasFieldUpdater<CommandStateDto, String> idColumn;
+
+  private HasFieldUpdater<CommandStateDto, String> actionsColumn;
 
   //
   // Constructors
@@ -107,6 +113,10 @@ public class JobListView extends Composite implements Display {
 
   public HasFieldUpdater<CommandStateDto, String> getIdColumn() {
     return idColumn;
+  }
+
+  public HasFieldUpdater<CommandStateDto, String> getActionsColumn() {
+    return actionsColumn;
   }
 
   //
@@ -184,6 +194,9 @@ public class JobListView extends Composite implements Display {
         return "Not Implemented";
       }
     }, translations.endLabel());
+
+    actionsColumn = new ActionsColumn();
+    table.addColumn((ActionsColumn) actionsColumn, "Actions");
   }
 
   private void addTablePager() {
@@ -212,6 +225,67 @@ public class JobListView extends Composite implements Display {
 
     public String getValue(CommandStateDto object) {
       return String.valueOf(object.getId());
+    }
+  }
+
+  static class ActionsColumn extends Column<CommandStateDto, String> implements HasFieldUpdater<CommandStateDto, String> {
+    //
+    // Instance Variables
+    //
+
+    private String lastActionName;
+
+    //
+    // Constructors
+    //
+
+    public ActionsColumn() {
+      super(new CompositeCell<String>());
+
+      addActionCell("Cancel");
+      addActionCell("Delete");
+    }
+
+    //
+    // Column Methods
+    //
+
+    public String getValue(CommandStateDto object) {
+      return lastActionName;
+    }
+
+    //
+    // Methods
+    //
+
+    private void addActionCell(final String actionName) {
+      final Cell<String> cell = new ClickableTextCell();
+
+      ((CompositeCell<String>) getCell()).addHasCell(new HasCell<String, String>() {
+
+        @Override
+        public Cell<String> getCell() {
+          return cell;
+        }
+
+        @Override
+        public FieldUpdater<String, String> getFieldUpdater() {
+          return new FieldUpdater<String, String>() {
+
+            @Override
+            public void update(int rowIndex, String object, String value) {
+              System.out.println("HasCell fieldUpdater.update = " + value);
+              lastActionName = actionName;
+            }
+
+          };
+        }
+
+        @Override
+        public String getValue(String object) {
+          return actionName;
+        }
+      });
     }
   }
 }
