@@ -62,4 +62,6 @@ public interface Translations extends Constants {
   Map<String, String> actionMap();
 
   String fileSystemLabel();
+
+  String unitLabel();
 }
