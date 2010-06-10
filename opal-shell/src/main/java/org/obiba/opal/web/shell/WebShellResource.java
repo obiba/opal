@@ -9,9 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.shell;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.DELETE;
@@ -169,16 +167,8 @@ public class WebShellResource {
     this.commandRegistry = commandRegistry;
   }
 
-  protected String formatTime(Date date) {
-    SimpleDateFormat dateFormat = new SimpleDateFormat(CommandJob.DATE_FORMAT_PATTERN);
-    return dateFormat.format(date);
-  }
-
   private Response launchCommand(Command<?> command) {
-    CommandJob commandJob = new CommandJob();
-    command.setShell(commandJob);
-    commandJob.setCommand(command);
-
+    CommandJob commandJob = new CommandJob(command);
     return buildLaunchCommandResponse(commandJobService.launchCommand(commandJob));
   }
 
@@ -196,10 +186,10 @@ public class WebShellResource {
     .addAllMessages(commandJob.getMessages());
 
     if(commandJob.getStartTime() != null) {
-      dtoBuilder.setStartTime(formatTime(commandJob.getStartTime()));
+      dtoBuilder.setStartTime(commandJob.getStartTimeAsString());
     }
     if(commandJob.getEndTime() != null) {
-      dtoBuilder.setEndTime(formatTime(commandJob.getEndTime()));
+      dtoBuilder.setEndTime(commandJob.getEndTimeAsString());
     }
 
     return dtoBuilder.build();

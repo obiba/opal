@@ -29,6 +29,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obiba.magma.audit.UserProvider;
 import org.obiba.opal.shell.CommandJob;
+import org.obiba.opal.shell.OpalShell;
+import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.service.impl.DefaultCommandJobService.FutureCommandJob;
 import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
 
@@ -56,7 +58,10 @@ public class DefaultCommandJobServiceTest {
 
   @Before
   public void setUp() {
-    commandJob = new CommandJob();
+    Command<?> cmd = createMock(Command.class);
+    cmd.setShell((OpalShell) EasyMock.anyObject());
+    expectLastCall().once();
+    commandJob = new CommandJob(cmd);
 
     // Expect commandJob executed once.
     mockExecutor = createMock(Executor.class);
@@ -75,7 +80,7 @@ public class DefaultCommandJobServiceTest {
     sut.setExecutor(mockExecutor);
     sut.setUserProvider(mockUserProvider);
 
-    replay(mockExecutor, mockUserProvider);
+    replay(cmd, mockExecutor, mockUserProvider);
   }
 
   //
@@ -146,7 +151,7 @@ public class DefaultCommandJobServiceTest {
   public void testLaunchCommand_AssignsIdToCommandJob() {
     sut.launchCommand(commandJob);
 
-    assertEquals((Integer) 1, commandJob.getId());
+    assertNotNull(commandJob.getId());
   }
 
   @Test
@@ -253,10 +258,15 @@ public class DefaultCommandJobServiceTest {
   }
 
   private CommandJob createCommandJob(Integer id, Date submitTime) {
-    CommandJob aCommandJob = new CommandJob();
+    Command<?> cmd = createMock(Command.class);
+    cmd.setShell((OpalShell) EasyMock.anyObject());
+    expectLastCall().once();
+
+    CommandJob aCommandJob = new CommandJob(cmd);
     aCommandJob.setId(id);
     aCommandJob.setSubmitTime(submitTime);
 
+    EasyMock.replay(cmd);
     return aCommandJob;
   }
 
@@ -264,8 +274,6 @@ public class DefaultCommandJobServiceTest {
     commandJob.setId(1);
     commandJob.setOwner("testUser");
     commandJob.setSubmitTime(new Date());
-    commandJob.setStartTime(new Date());
-    commandJob.setEndTime(new Date());
     commandJob.setStatus(status);
 
     futureCommandJobs = new ArrayList<FutureCommandJob>();

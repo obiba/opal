@@ -13,7 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Formatter;
 import java.util.List;
 
 import org.obiba.opal.shell.commands.Command;
@@ -28,35 +27,38 @@ public class CommandJob implements OpalShell, Runnable {
   // Constants
   //
 
-  public static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd'T'HH'h'mm";
+  private static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd'T'HH'h'mm";
 
   //
   // Instance Variables
   //
 
-  private Integer id;
+  private final Command<?> command;
 
-  private Command<?> command;
+  private final List<Message> messages;
+
+  private Integer id;
 
   private String owner;
 
   private Status status;
 
-  private Date submitTime;
+  private long submitTime;
 
-  private Date startTime;
+  private Long startTime;
 
-  private Date endTime;
-
-  private List<Message> messages;
+  private Long endTime;
 
   //
   // CommandJob
   //
 
-  public CommandJob() {
-    messages = new ArrayList<Message>();
-    status = Status.NOT_STARTED;
+  public CommandJob(Command<?> command) {
+    if(command == null) throw new IllegalArgumentException("command cannot be null");
+    this.command = command;
+    this.command.setShell(this);
+    this.messages = new ArrayList<Message>();
+    this.status = Status.NOT_STARTED;
   }
 
   //
@@ -64,11 +66,8 @@ public class CommandJob implements OpalShell, Runnable {
   //
 
   public void printf(String format, Object... args) {
-    StringBuffer sb = new StringBuffer();
-    Formatter formatter = new Formatter(sb);
-    formatter.format(format, args);
-
-    messages.add(0, createMessage(sb.toString()));
+    if(format == null) throw new IllegalArgumentException("format cannot be null");
+    messages.add(0, createMessage(String.format(format, args)));
   }
 
   public void printUsage() {
@@ -140,10 +139,6 @@ public class CommandJob implements OpalShell, Runnable {
     return command;
   }
 
-  public void setCommand(Command<?> command) {
-    this.command = command;
-  }
-
   public String getOwner() {
     return owner;
   }
@@ -161,35 +156,35 @@ public class CommandJob implements OpalShell, Runnable {
   }
 
   public Date getSubmitTime() {
-    return submitTime;
+    return new Date(submitTime);
   }
 
   public void setSubmitTime(Date submitTime) {
-    this.submitTime = submitTime;
+    this.submitTime = submitTime.getTime();
   }
 
   public Date getStartTime() {
-    return startTime;
+    return startTime != null ? new Date(startTime) : null;
   }
 
-  public void setStartTime(Date startTime) {
-    this.startTime = startTime;
+  public String getStartTimeAsString() {
+    return formatTime(getStartTime());
   }
 
   public Date getEndTime() {
-    return endTime;
+    return endTime != null ? new Date(endTime) : null;
   }
 
-  public void setEndTime(Date endTime) {
-    this.endTime = endTime;
+  public String getEndTimeAsString() {
+    return formatTime(getEndTime());
   }
 
   public List<Message> getMessages() {
     return Collections.unmodifiableList(messages);
   }
 
-  protected Date getCurrentTime() {
-    return new Date();
+  protected long getCurrentTime() {
+    return System.currentTimeMillis();
   }
 
   protected Message createMessage(String msg) {
@@ -197,6 +192,7 @@ public class CommandJob implements OpalShell, Runnable {
   }
 
   protected String formatTime(Date date) {
+    if(date == null) return null;
     SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_PATTERN);
     return dateFormat.format(date);
   }

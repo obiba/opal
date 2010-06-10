@@ -18,7 +18,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -411,8 +410,6 @@ public class WebShellResourceTest {
   }
 
   private void assertDtoListMatchesJobList(List<CommandStateDto> dtoList, List<CommandJob> jobList) {
-    SimpleDateFormat dateFormat = new SimpleDateFormat(CommandJob.DATE_FORMAT_PATTERN);
-
     assertEquals(jobList.size(), dtoList.size());
 
     for(int i = 0; i < dtoList.size(); i++) {
@@ -422,8 +419,8 @@ public class WebShellResourceTest {
       assertEquals(job.getCommand().getName(), dto.getCommand());
       assertEquals(job.getOwner(), dto.getOwner());
       assertEquals(job.getStatus().toString(), dto.getStatus());
-      assertEquals(dateFormat.format(job.getStartTime()), dto.getStartTime());
-      assertEquals(dateFormat.format(job.getEndTime()), dto.getEndTime());
+      assertEquals(job.getStartTimeAsString(), dto.getStartTime());
+      assertEquals(job.getEndTimeAsString(), dto.getEndTime());
     }
   }
 
@@ -494,17 +491,15 @@ public class WebShellResourceTest {
   }
 
   private CommandJob createCommandJob(Integer id, Command<?> command, Date submitTime) {
-    CommandJob commandJob = new CommandJob();
+    CommandJob commandJob = new CommandJob(command);
 
     commandJob.setId(id);
-    commandJob.setCommand(command);
     commandJob.setOwner("someUser");
     commandJob.setStatus(Status.SUCCEEDED);
 
     if(submitTime != null) {
       commandJob.setSubmitTime(submitTime);
-      commandJob.setStartTime(rollTimestamp(submitTime, Calendar.MINUTE, 1));
-      commandJob.setEndTime(rollTimestamp(commandJob.getStartTime(), Calendar.MINUTE, 5));
+      commandJob.run();
     }
 
     return commandJob;
@@ -520,6 +515,10 @@ public class WebShellResourceTest {
       @Override
       public String toString() {
         return "import args";
+      }
+
+      @Override
+      public void execute() {
       }
     };
 
@@ -537,6 +536,11 @@ public class WebShellResourceTest {
       public String toString() {
         return "copy args";
       }
+
+      @Override
+      public void execute() {
+      }
+
     };
 
     return command;
@@ -545,14 +549,6 @@ public class WebShellResourceTest {
   private Date createTimestamp(int year, int month, int date, int hour, int minute) {
     Calendar calendar = Calendar.getInstance();
     calendar.set(year, month, date, hour, minute);
-
-    return calendar.getTime();
-  }
-
-  private Date rollTimestamp(Date timestamp, int field, int amount) {
-    Calendar calendar = Calendar.getInstance();
-    calendar.setTime(timestamp);
-    calendar.add(field, amount);
 
     return calendar.getTime();
   }
