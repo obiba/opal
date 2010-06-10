@@ -151,6 +151,7 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
         } else {
           eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, response.getText(), null));
         }
+        refreshDisplay();
       }
     };
 
@@ -167,6 +168,7 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
         } else {
           eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, response.getText(), null));
         }
+        refreshDisplay();
       }
     };
 
