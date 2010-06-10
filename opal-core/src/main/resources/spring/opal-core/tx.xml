@@ -11,6 +11,7 @@
   <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
     <!-- Set a very high timeout (10 days) -->
     <property name="defaultTimeout" value="864000" />
+    <property name="allowCustomIsolationLevels" value="true"/>
     <property name="userTransaction">
       <ref local="jotm" />
     </property>
