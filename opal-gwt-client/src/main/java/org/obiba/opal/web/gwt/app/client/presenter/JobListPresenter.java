@@ -17,6 +17,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -58,13 +59,6 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
 
     void doAction(CommandStateDto dto, String actionName);
   }
-
-  //
-  // Instance Variables
-  //
-
-  @Inject
-  private ErrorDialogPresenter messageDialog;
 
   //
   // Constructors
@@ -148,17 +142,11 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        messageDialog.bind();
-
         if(response.getStatusCode() == 200) {
-          messageDialog.setMessageDialogType(MessageDialogType.INFO);
-          messageDialog.setErrors(Arrays.asList(new String[] { "Cancelling job #" + dto.getId() + "." }));
+          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.INFO, Arrays.asList(new String[] { "Job #" + dto.getId() + " cancelled." })));
         } else {
-          messageDialog.setMessageDialogType(MessageDialogType.ERROR);
-          messageDialog.setErrors(Arrays.asList(new String[] { "Job #" + dto.getId() + " could not be cancelled (code " + response.getStatusCode() + ")." }));
+          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, Arrays.asList(new String[] { "Job #" + dto.getId() + " could not be cancelled (code " + response.getStatusCode() + ")." })));
         }
-
-        messageDialog.revealDisplay();
       }
     };
 
@@ -171,15 +159,10 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
       @Override
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == 200) {
-          messageDialog.setMessageDialogType(MessageDialogType.INFO);
-          messageDialog.setErrors(Arrays.asList(new String[] { "Deleting job #" + dto.getId() + "." }));
+          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.INFO, Arrays.asList(new String[] { "Job #" + dto.getId() + " deleted." })));
         } else {
-          messageDialog.setMessageDialogType(MessageDialogType.ERROR);
-          messageDialog.setErrors(Arrays.asList(new String[] { "Job #" + dto.getId() + " could not be deleted (code " + response.getStatusCode() + ")." }));
+          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, Arrays.asList(new String[] { "Job #" + dto.getId() + " could not be deleted (code " + response.getStatusCode() + ")." })));
         }
-
-        // messageDialog.bind();
-        messageDialog.revealDisplay();
       }
     };
 

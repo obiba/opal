@@ -15,6 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -62,6 +63,9 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
   @Inject
   private Provider<JobListPresenter> jobListPresenter;
+
+  @Inject
+  private ErrorDialogPresenter messageDialog;
 
   private WidgetPresenter<?> workbench;
 
@@ -122,20 +126,9 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       }
     });
 
-    super.registerHandler(eventBus.addHandler(WorkbenchChangeEvent.getType(), new WorkbenchChangeEvent.Handler() {
+    registerWorkbenchChangeEventHandler();
 
-      @Override
-      public void onWorkbenchChanged(WorkbenchChangeEvent event) {
-        if(workbench != null) {
-          workbench.unbind();
-        }
-        workbench = event.getWorkbench();
-        workbench.bind();
-        WidgetDisplay wd = (WidgetDisplay) workbench.getDisplay();
-        getDisplay().updateWorkbench(wd.asWidget());
-        workbench.revealDisplay();
-      }
-    }));
+    registerUserMessageEventHandler();
   }
 
   @Override
@@ -154,4 +147,33 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
   public void revealDisplay() {
   }
 
+  private void registerWorkbenchChangeEventHandler() {
+    super.registerHandler(eventBus.addHandler(WorkbenchChangeEvent.getType(), new WorkbenchChangeEvent.Handler() {
+
+      @Override
+      public void onWorkbenchChanged(WorkbenchChangeEvent event) {
+        if(workbench != null) {
+          workbench.unbind();
+        }
+        workbench = event.getWorkbench();
+        workbench.bind();
+        WidgetDisplay wd = (WidgetDisplay) workbench.getDisplay();
+        getDisplay().updateWorkbench(wd.asWidget());
+        workbench.revealDisplay();
+      }
+    }));
+  }
+
+  private void registerUserMessageEventHandler() {
+    super.registerHandler(eventBus.addHandler(UserMessageEvent.getType(), new UserMessageEvent.Handler() {
+
+      @Override
+      public void onUserMessage(UserMessageEvent event) {
+        messageDialog.bind();
+        messageDialog.setMessageDialogType(event.getMessageType());
+        messageDialog.setErrors(event.getMessages());
+        messageDialog.revealDisplay();
+      }
+    }));
+  }
 }
