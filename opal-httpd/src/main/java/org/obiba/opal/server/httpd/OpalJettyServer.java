@@ -187,37 +187,4 @@ public class OpalJettyServer implements Service {
 
   }
 
-  /**
-   * Implements HTTP Access-Control to allow XDR requests. Should only be activated during development.
-   */
-  public static class DevelopmentModeFilter extends OncePerRequestFilter {
-
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-      // Test whether this is an Access-Control request
-      if(request.getMethod().equalsIgnoreCase("OPTIONS") && request.getHeader("Access-Control-Request-Method") != null) {
-        // Yes, then allow
-        response.addHeader("Access-Control-Allow-Origin", "*");
-        response.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, HEAD, OPTIONS");
-        response.addHeader("Access-Control-Allow-Credentials", "true");
-        if(request.getHeader("Access-Control-Request-Headers") != null) {
-          response.addHeader("Access-Control-Allow-Headers", request.getHeader("Access-Control-Request-Headers"));
-        } else {
-          response.addHeader("Access-Control-Allow-Headers", "Location, Set-Cookie, X-Opal-Auth, Cookie");
-        }
-        response.setStatus(200);
-        // Commits the response. No further writing is possible.
-        response.flushBuffer();
-      } else {
-        // Test whether this is part of an Access-Control request that we've previously allowed
-        if(request.getHeader("Origin") != null) {
-          // Allow the requested Origin
-          response.addHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
-        }
-        filterChain.doFilter(request, response);
-      }
-    }
-
-  }
-
 }
