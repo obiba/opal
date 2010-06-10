@@ -1,5 +1,6 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
+
  * 
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -7,13 +8,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.view;
+package org.obiba.opal.web.gwt.app.client.fs.view;
 
 import java.util.Date;
 
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.presenter.FolderDetailsPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.model.client.FileDto;
 
