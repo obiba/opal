@@ -130,6 +130,7 @@ public class FilesResource {
       parentFolderBuilder.setName("..").setPath(parentFolder.getName().getPath());
       parentFolderBuilder.setType(Opal.FileDto.FileType.FOLDER);
       parentFolderBuilder.setLastModifiedTime(parentFolder.getContent().getLastModifiedTime());
+      parentFolderBuilder.setSymbolicLink(true);
       fileBuilder.addChildren(parentFolderBuilder.build());
     }
 
