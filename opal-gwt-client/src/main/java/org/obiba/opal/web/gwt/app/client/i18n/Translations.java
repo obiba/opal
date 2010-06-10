@@ -60,4 +60,6 @@ public interface Translations extends Constants {
   String jobsLabel();
 
   Map<String, String> actionMap();
+
+  String fileSystemLabel();
 }
