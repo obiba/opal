@@ -89,7 +89,7 @@ public class ProtobufJsonReaderProvider implements MessageBodyReader<Object> {
     }
   }
 
-  private final class BuilderFactory {
+  private static final class BuilderFactory {
 
     private Map<Class<Message>, Method> methodCache = new HashMap<Class<Message>, Method>();
 
