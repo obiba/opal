@@ -10,6 +10,7 @@
 package org.obiba.opal.core.crypt;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -24,7 +25,7 @@ public class FixedPasswordCallbackHandler implements CallbackHandler {
   private final char[] password;
 
   public FixedPasswordCallbackHandler(char[] password) {
-    this.password = password;
+    this.password = Arrays.copyOf(password, password.length);
   }
 
   @Override
