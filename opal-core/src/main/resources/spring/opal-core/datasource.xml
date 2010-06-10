@@ -10,6 +10,8 @@
 
     <property name="maxIdle" value="10" />
     <property name="initialSize" value="2" />
+    <property name="validationQuery" value="SELECT 1"/>
+    <property name="testOnBorrow" value="true"/>
   </bean>
 
   <bean id="opalDataSource" class="org.apache.commons.dbcp.managed.BasicManagedDataSource" destroy-method="close">
@@ -21,6 +23,8 @@
 
     <property name="maxIdle" value="10" />
     <property name="initialSize" value="2" />
+    <property name="validationQuery" value="SELECT 1"/>
+    <property name="testOnBorrow" value="true"/>
   </bean>
 
 </beans>
