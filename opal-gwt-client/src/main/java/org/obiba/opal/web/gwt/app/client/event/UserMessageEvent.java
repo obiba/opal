@@ -33,19 +33,25 @@ public class UserMessageEvent extends GwtEvent<UserMessageEvent.Handler> {
 
   private MessageDialogType messageType;
 
-  private List<String> messages;
+  private String message;
+
+  private List<String> messageArgs;
 
   //
   // Constructors
   //
 
-  public UserMessageEvent(MessageDialogType messageType, List<String> messages) {
-    if(messages == null) {
-      throw new IllegalArgumentException("null messages");
+  public UserMessageEvent(MessageDialogType messageType, String message, List<String> messageArgs) {
+    if(message == null) {
+      throw new IllegalArgumentException("null message");
+    }
+    if(messageArgs == null) {
+      messageArgs = new ArrayList<String>();
     }
 
     this.messageType = messageType;
-    this.messages = new ArrayList<String>(messages);
+    this.message = message;
+    this.messageArgs = new ArrayList<String>(messageArgs);
   }
 
   //
@@ -74,7 +80,11 @@ public class UserMessageEvent extends GwtEvent<UserMessageEvent.Handler> {
     return messageType;
   }
 
-  public List<String> getMessages() {
-    return Collections.unmodifiableList(messages);
+  public String getMessage() {
+    return message;
+  }
+
+  public List<String> getMessageArgs() {
+    return Collections.unmodifiableList(messageArgs);
   }
 }

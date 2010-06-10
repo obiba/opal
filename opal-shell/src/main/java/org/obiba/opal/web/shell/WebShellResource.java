@@ -98,9 +98,9 @@ public class WebShellResource {
       commandJobService.deleteCommand(id);
       return Response.ok().build();
     } catch(NoSuchCommandJobException ex) {
-      return Response.status(Status.NOT_FOUND).build();
+      return Response.status(Status.NOT_FOUND).entity("DeleteCommand_NotFound").build();
     } catch(IllegalStateException ex) {
-      return Response.status(Status.BAD_REQUEST).build();
+      return Response.status(Status.BAD_REQUEST).entity("DeleteCommand_BadRequest_NotDeletable").build();
     }
   }
 
@@ -126,12 +126,12 @@ public class WebShellResource {
       } else {
         // Status may only be updated to CANCELED.
         log.info("setCommandStatus called with newStatus '{}' (only '{}' is allowed)", newStatus, CommandStateDto.Status.CANCELED);
-        return Response.status(Status.BAD_REQUEST).build();
+        return Response.status(Status.BAD_REQUEST).entity("SetCommandStatus_BadRequest_IllegalStatus").build();
       }
     } catch(NoSuchCommandJobException ex) {
-      return Response.status(Status.NOT_FOUND).build();
+      return Response.status(Status.NOT_FOUND).entity("SetCommandStatus_NotFound").build();
     } catch(IllegalStateException ex) {
-      return Response.status(Status.BAD_REQUEST).build();
+      return Response.status(Status.BAD_REQUEST).entity("SetCommandStatus_BadRequest_NotCancellable").build();
     }
   }
 

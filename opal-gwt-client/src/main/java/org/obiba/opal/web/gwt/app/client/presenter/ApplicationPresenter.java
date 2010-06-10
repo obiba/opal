@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.presenter;
 
+import java.util.Arrays;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -17,9 +19,11 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -68,6 +72,8 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
   private ErrorDialogPresenter messageDialog;
 
   private WidgetPresenter<?> workbench;
+
+  private static Translations translations = GWT.create(Translations.class);
 
   /**
    * @param display
@@ -171,7 +177,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       public void onUserMessage(UserMessageEvent event) {
         messageDialog.bind();
         messageDialog.setMessageDialogType(event.getMessageType());
-        messageDialog.setErrors(event.getMessages());
+        messageDialog.setErrors(Arrays.asList(translations.userMessageMap().get(event.getMessage())));
         messageDialog.revealDisplay();
       }
     }));

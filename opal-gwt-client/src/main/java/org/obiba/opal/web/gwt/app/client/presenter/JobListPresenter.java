@@ -37,9 +37,9 @@ import com.google.inject.Inject;
  */
 public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> {
 
-  private static final String CANCEL_ACTION = "Cancel";
+  public static final String CANCEL_ACTION = "Cancel";
 
-  private static final String DELETE_ACTION = "Delete";
+  public static final String DELETE_ACTION = "Delete";
 
   public interface Display extends WidgetDisplay {
 
@@ -147,9 +147,9 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
       @Override
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == 200) {
-          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.INFO, Arrays.asList(new String[] { "Job #" + dto.getId() + " cancelled." })));
+          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.INFO, "jobCancelled", Arrays.asList(new String[] { String.valueOf(dto.getId()) })));
         } else {
-          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, Arrays.asList(new String[] { "Job #" + dto.getId() + " could not be cancelled (code " + response.getStatusCode() + ")." })));
+          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, response.getText(), null));
         }
       }
     };
@@ -163,9 +163,9 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
       @Override
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == 200) {
-          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.INFO, Arrays.asList(new String[] { "Job #" + dto.getId() + " deleted." })));
+          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.INFO, "jobDeleted", Arrays.asList(new String[] { String.valueOf(dto.getId()) })));
         } else {
-          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, Arrays.asList(new String[] { "Job #" + dto.getId() + " could not be deleted (code " + response.getStatusCode() + ")." })));
+          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, response.getText(), null));
         }
       }
     };

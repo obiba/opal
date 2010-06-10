@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.view;
 
+import static org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.CANCEL_ACTION;
+import static org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.DELETE_ACTION;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -241,8 +244,8 @@ public class JobListView extends Composite implements Display {
     public ActionsColumn() {
       super(new ActionsCell());
 
-      addActionCell("Cancel");
-      addActionCell("Delete");
+      addActionCell(CANCEL_ACTION);
+      addActionCell(DELETE_ACTION);
 
       cellContainerFieldUpdater = new FieldUpdater<CommandStateDto, String>() {
         public void update(int rowIndex, CommandStateDto object, String value) {
