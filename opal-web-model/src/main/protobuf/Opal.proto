@@ -47,4 +47,5 @@ message FileDto {
   repeated FileDto children = 4;
   optional int64 size = 5;
   optional int64 lastModifiedTime = 6;
+  optional bool symbolicLink = 7;
 }
