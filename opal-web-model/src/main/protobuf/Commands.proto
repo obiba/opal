@@ -21,7 +21,7 @@ message CommandStateDto {
   required string command = 2;
   required string commandArgs = 3;
   required string owner = 4;
-  required Status status = 5;
+  required string status = 5;
   optional string startTime = 6;
   optional string endTime = 7;
   repeated Message messages = 8;

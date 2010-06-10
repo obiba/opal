@@ -46,7 +46,17 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
 
     HasFieldUpdater<CommandStateDto, String> getIdColumn();
 
-    HasFieldUpdater<CommandStateDto, String> getActionsColumn();
+    HasActionHandler getActionsColumn();
+  }
+
+  public interface HasActionHandler {
+
+    void setActionHandler(ActionHandler handler);
+  }
+
+  public interface ActionHandler {
+
+    void doAction(CommandStateDto dto, String actionName);
   }
 
   //
@@ -70,11 +80,11 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
       }
     });
 
-    getDisplay().getActionsColumn().setFieldUpdater(new FieldUpdater<CommandStateDto, String>() {
-      public void update(int rowIndex, CommandStateDto object, String value) {
-        System.out.println("Actions Column fieldUpdater.update = " + value);
-        if(value != null) {
-          doAction(object, value);
+    getDisplay().getActionsColumn().setActionHandler(new ActionHandler() {
+      public void doAction(CommandStateDto dto, String actionName) {
+        System.out.println("Actions Column fieldUpdater.update = " + actionName);
+        if(actionName != null) {
+          doActionImpl(dto, actionName);
         }
       }
     });
@@ -125,7 +135,7 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
     }).send();
   }
 
-  private void doAction(CommandStateDto dto, String actionName) {
+  private void doActionImpl(CommandStateDto dto, String actionName) {
     if("Cancel".equals(actionName)) {
       cancelJob(dto);
     } else if("Delete".equals(actionName)) {
@@ -145,7 +155,7 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
           messageDialog.setErrors(Arrays.asList(new String[] { "Cancelling job #" + dto.getId() + "." }));
         } else {
           messageDialog.setMessageDialogType(MessageDialogType.ERROR);
-          messageDialog.setErrors(Arrays.asList(new String[] { "Could not cancel job #" + dto.getId() + ".", "Action response: " + response.getStatusCode() }));
+          messageDialog.setErrors(Arrays.asList(new String[] { "Job #" + dto.getId() + " could not be cancelled (code " + response.getStatusCode() + ")." }));
         }
 
         messageDialog.revealDisplay();
@@ -165,7 +175,7 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
           messageDialog.setErrors(Arrays.asList(new String[] { "Deleting job #" + dto.getId() + "." }));
         } else {
           messageDialog.setMessageDialogType(MessageDialogType.ERROR);
-          messageDialog.setErrors(Arrays.asList(new String[] { "Could not delete job #" + dto.getId() + ".", "Action response: " + response.getStatusCode() }));
+          messageDialog.setErrors(Arrays.asList(new String[] { "Job #" + dto.getId() + " could not be deleted (code " + response.getStatusCode() + ")." }));
         }
 
         // messageDialog.bind();

@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.i18n;
 
+import java.util.Map;
+
 import com.google.gwt.i18n.client.Constants;
 
 /**
@@ -41,6 +43,8 @@ public interface Translations extends Constants {
 
   String statusLabel();
 
+  Map<String, String> statusMap();
+
   String actionsLabel();
 
   String sizeLabel();
@@ -54,4 +58,6 @@ public interface Translations extends Constants {
   String jobLabel();
 
   String jobsLabel();
+
+  Map<String, String> actionMap();
 }

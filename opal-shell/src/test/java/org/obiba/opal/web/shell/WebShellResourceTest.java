@@ -263,7 +263,7 @@ public class WebShellResourceTest {
     // Verify that the HTTP response code was OK (200).
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
   }
-  
+
   @Test
   public void testDeleteCommand_ReturnsNotFoundResponseIfJobDoesNotExist() {
     // Setup
@@ -421,7 +421,7 @@ public class WebShellResourceTest {
 
       assertEquals(job.getCommand().getName(), dto.getCommand());
       assertEquals(job.getOwner(), dto.getOwner());
-      assertEquals(job.getStatus(), dto.getStatus());
+      assertEquals(job.getStatus().toString(), dto.getStatus());
       assertEquals(dateFormat.format(job.getStartTime()), dto.getStartTime());
       assertEquals(dateFormat.format(job.getEndTime()), dto.getEndTime());
     }
@@ -563,7 +563,7 @@ public class WebShellResourceTest {
     if(entity != null) {
       if(entity instanceof CommandStateDto) {
         CommandStateDto dto = (CommandStateDto) entity;
-        return (dto.getId() == job.getId() && dto.getCommand().equals(job.getCommand().getName()) && dto.getCommandArgs().equals(job.getCommand().toString()) && dto.getOwner().equals(job.getOwner()) && dto.getStatus().equals(job.getStatus()));
+        return (dto.getId() == job.getId() && dto.getCommand().equals(job.getCommand().getName()) && dto.getCommandArgs().equals(job.getCommand().toString()) && dto.getOwner().equals(job.getOwner()) && dto.getStatus().equals(job.getStatus().toString()));
       } else {
         return false;
       }

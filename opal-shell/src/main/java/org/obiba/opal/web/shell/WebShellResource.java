@@ -192,7 +192,7 @@ public class WebShellResource {
     .setCommand(commandJob.getCommand().getName()) //
     .setCommandArgs(commandJob.getCommand().toString()) //
     .setOwner(commandJob.getOwner()) //
-    .setStatus(commandJob.getStatus()) //
+    .setStatus(commandJob.getStatus().toString()) //
     .addAllMessages(commandJob.getMessages());
 
     if(commandJob.getStartTime() != null) {

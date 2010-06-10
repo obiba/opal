@@ -11,7 +11,9 @@ package org.obiba.opal.web.gwt.app.client.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.model.client.CommandStateDto;
 
@@ -61,11 +63,11 @@ public class JobListView extends Composite implements Display {
 
   SimplePager<CommandStateDto> pager;
 
-  private Translations translations = GWT.create(Translations.class);
+  private static Translations translations = GWT.create(Translations.class);
 
   private HasFieldUpdater<CommandStateDto, String> idColumn;
 
-  private HasFieldUpdater<CommandStateDto, String> actionsColumn;
+  private HasActionHandler actionsColumn;
 
   //
   // Constructors
@@ -115,7 +117,7 @@ public class JobListView extends Composite implements Display {
     return idColumn;
   }
 
-  public HasFieldUpdater<CommandStateDto, String> getActionsColumn() {
+  public HasActionHandler getActionsColumn() {
     return actionsColumn;
   }
 
@@ -183,20 +185,12 @@ public class JobListView extends Composite implements Display {
     table.addColumn(new TextColumn<CommandStateDto>() {
       @Override
       public String getValue(CommandStateDto object) {
-        // TODO: Return String representation of object.getStatus().
-        return "Not Implemented";
+        return translations.statusMap().get(object.getStatus());
       }
     }, translations.statusLabel());
 
-    table.addColumn(new TextColumn<CommandStateDto>() {
-      @Override
-      public String getValue(CommandStateDto object) {
-        return "Not Implemented";
-      }
-    }, translations.endLabel());
-
     actionsColumn = new ActionsColumn();
-    table.addColumn((ActionsColumn) actionsColumn, "Actions");
+    table.addColumn((ActionsColumn) actionsColumn, translations.actionsLabel());
   }
 
   private void addTablePager() {
@@ -228,30 +222,48 @@ public class JobListView extends Composite implements Display {
     }
   }
 
-  static class ActionsColumn extends Column<CommandStateDto, String> implements HasFieldUpdater<CommandStateDto, String> {
+  static class ActionsColumn extends Column<CommandStateDto, CommandStateDto> implements HasActionHandler {
     //
     // Instance Variables
     //
 
-    private String lastActionName;
+    private ActionHandler actionHandler;
+
+    private FieldUpdater<CommandStateDto, String> cellContainerFieldUpdater;
 
     //
     // Constructors
     //
 
     public ActionsColumn() {
-      super(new CompositeCell<String>());
+      super(new CompositeCell<CommandStateDto>());
 
       addActionCell("Cancel");
       addActionCell("Delete");
+
+      cellContainerFieldUpdater = new FieldUpdater<CommandStateDto, String>() {
+        public void update(int rowIndex, CommandStateDto object, String value) {
+          if(actionHandler != null) {
+            actionHandler.doAction(object, value);
+          }
+        }
+      };
     }
 
     //
     // Column Methods
     //
 
-    public String getValue(CommandStateDto object) {
-      return lastActionName;
+    public CommandStateDto getValue(CommandStateDto object) {
+      return object;
+    }
+
+    //
+    // HasActionHandler Methods
+    //
+
+    public void setActionHandler(ActionHandler actionHandler) {
+      this.actionHandler = actionHandler;
     }
 
     //
@@ -259,9 +271,15 @@ public class JobListView extends Composite implements Display {
     //
 
     private void addActionCell(final String actionName) {
-      final Cell<String> cell = new ClickableTextCell();
+      final Cell<String> cell = new ClickableTextCell() {
 
-      ((CompositeCell<String>) getCell()).addHasCell(new HasCell<String, String>() {
+        @Override
+        public void render(String value, Object viewData, StringBuilder sb) {
+          super.render(translations.actionMap().get(value), viewData, sb);
+        }
+      };
+
+      ((CompositeCell<CommandStateDto>) getCell()).addHasCell(new HasCell<CommandStateDto, String>() {
 
         @Override
         public Cell<String> getCell() {
@@ -269,20 +287,12 @@ public class JobListView extends Composite implements Display {
         }
 
         @Override
-        public FieldUpdater<String, String> getFieldUpdater() {
-          return new FieldUpdater<String, String>() {
-
-            @Override
-            public void update(int rowIndex, String object, String value) {
-              System.out.println("HasCell fieldUpdater.update = " + value);
-              lastActionName = actionName;
-            }
-
-          };
+        public FieldUpdater<CommandStateDto, String> getFieldUpdater() {
+          return cellContainerFieldUpdater;
         }
 
         @Override
-        public String getValue(String object) {
+        public String getValue(CommandStateDto object) {
           return actionName;
         }
       });
