@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.view;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.ActionHandler;
@@ -236,7 +239,7 @@ public class JobListView extends Composite implements Display {
     //
 
     public ActionsColumn() {
-      super(new CompositeCell<CommandStateDto>());
+      super(new ActionsCell());
 
       addActionCell("Cancel");
       addActionCell("Delete");
@@ -279,7 +282,7 @@ public class JobListView extends Composite implements Display {
         }
       };
 
-      ((CompositeCell<CommandStateDto>) getCell()).addHasCell(new HasCell<CommandStateDto, String>() {
+      ((ActionsCell) getCell()).addHasCell(new HasCell<CommandStateDto, String>() {
 
         @Override
         public Cell<String> getCell() {
@@ -296,6 +299,50 @@ public class JobListView extends Composite implements Display {
           return actionName;
         }
       });
+    }
+  }
+
+  static class ActionsCell extends CompositeCell<CommandStateDto> {
+
+    private List<HasCell<CommandStateDto, ?>> hasCells;
+
+    public ActionsCell() {
+      hasCells = new ArrayList<HasCell<CommandStateDto, ?>>();
+    }
+
+    @Override
+    public void addHasCell(HasCell<CommandStateDto, ?> hasCell) {
+      hasCells.add(hasCell);
+
+      super.addHasCell(hasCell);
+    }
+
+    @Override
+    public void removeHasCell(HasCell<CommandStateDto, ?> hasCell) {
+      hasCells.remove(hasCell);
+
+      super.removeHasCell(hasCell);
+    }
+
+    @Override
+    public void render(CommandStateDto value, Object viewData, StringBuilder sb) {
+      // Remove all actions.
+      super.removeHasCell(getHasCell(0));
+      super.removeHasCell(getHasCell(1));
+
+      // Add back only valid actions (i.e., given the current job status).
+      if(value.getStatus().toString().equals("NOT_STARTED") || value.getStatus().toString().equals("IN_PROGRESS")) {
+        super.addHasCell(getHasCell(0));
+      }
+      if(value.getStatus().toString().equals("SUCCEEDED") || value.getStatus().toString().equals("FAILED") || value.getStatus().toString().equals("CANCELED")) {
+        super.addHasCell(getHasCell(1));
+      }
+
+      super.render(value, viewData, sb);
+    }
+
+    public HasCell<CommandStateDto, ?> getHasCell(int index) {
+      return hasCells.get(index);
     }
   }
 }

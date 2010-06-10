@@ -37,6 +37,10 @@ import com.google.inject.Inject;
  */
 public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> {
 
+  private static final String CANCEL_ACTION = "Cancel";
+
+  private static final String DELETE_ACTION = "Delete";
+
   public interface Display extends WidgetDisplay {
 
     SelectionModel<CommandStateDto> getTableSelection();
@@ -130,9 +134,9 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
   }
 
   private void doActionImpl(CommandStateDto dto, String actionName) {
-    if("Cancel".equals(actionName)) {
+    if(CANCEL_ACTION.equals(actionName)) {
       cancelJob(dto);
-    } else if("Delete".equals(actionName)) {
+    } else if(DELETE_ACTION.equals(actionName)) {
       deleteJob(dto);
     }
   }
