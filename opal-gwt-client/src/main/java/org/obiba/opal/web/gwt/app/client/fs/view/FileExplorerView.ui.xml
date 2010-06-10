@@ -1,0 +1,15 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
+
+  <g:DockLayoutPanel>
+    <g:west size="200">
+      <g:ScrollPanel ui:field="fileSystemTreePanel">
+      </g:ScrollPanel>
+    </g:west>
+    <g:center>
+      <g:ScrollPanel ui:field="folderDetailsPanel">
+      </g:ScrollPanel>
+    </g:center>
+  </g:DockLayoutPanel>
+</ui:UiBinder>

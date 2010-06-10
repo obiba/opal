@@ -29,7 +29,7 @@ import com.google.inject.Inject;
 public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePresenter.Display> {
 
   public interface Display extends WidgetDisplay {
-    void setFileSystemTree(FileDto root);
+    void initTree(FileDto root);
 
     void addBranch(TreeItem treeItem, FileDto folderToAdd);
 
@@ -77,7 +77,7 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
     ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files").get().withCallback(new ResourceCallback<FileDto>() {
       @Override
       public void onResource(Response response, FileDto root) {
-        getDisplay().setFileSystemTree(root);
+        getDisplay().initTree(root);
       }
     }).send();
 

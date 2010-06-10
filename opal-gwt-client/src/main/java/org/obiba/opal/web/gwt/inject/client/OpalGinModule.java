@@ -12,7 +12,11 @@ package org.obiba.opal.web.gwt.inject.client;
 import net.customware.gwt.presenter.client.DefaultEventBus;
 import net.customware.gwt.presenter.client.EventBus;
 
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.view.FileExplorerView;
+import org.obiba.opal.web.gwt.app.client.fs.view.FileSystemTreeView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FolderDetailsView;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.DataExportPresenter;
@@ -58,6 +62,8 @@ public class OpalGinModule extends AbstractGinModule {
     bind(LoginPresenter.Display.class).to(LoginView.class).in(Singleton.class);
     bind(UnhandledResponseNotificationPresenter.Display.class).to(UnhandledResponseNotificationView.class).in(Singleton.class);
     bind(FolderDetailsPresenter.Display.class).to(FolderDetailsView.class).in(Singleton.class);
+    bind(FileSystemTreePresenter.Display.class).to(FileSystemTreeView.class).in(Singleton.class);
+    bind(FileExplorerPresenter.Display.class).to(FileExplorerView.class).in(Singleton.class);
 
     // Don't bind as singleton because the ApplicationPresenter expects a new instance on every display
     bind(DataImportPresenter.Display.class).to(DataImportView.class);// .in(Singleton.class);

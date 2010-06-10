@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.inject.client;
 
 import net.customware.gwt.presenter.client.EventBus;
 
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
@@ -40,5 +42,9 @@ public interface OpalGinjector extends Ginjector {
   UnhandledResponseNotificationPresenter getUnhandledResponseNotificationPresenter();
 
   ErrorDialogPresenter getErrorDialogPresenter();
+
+  FileSystemTreePresenter getFileSystemTreePresenter();
+
+  FolderDetailsPresenter getFolderDetailsPresenter();
 
 }

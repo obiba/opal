@@ -28,14 +28,13 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class FolderDetailsView extends Composite implements Display {
 
   @UiTemplate("FolderDetailsView.ui.xml")
-  interface FolderDetailsUiBinder extends UiBinder<DockLayoutPanel, FolderDetailsView> {
+  interface FolderDetailsUiBinder extends UiBinder<Widget, FolderDetailsView> {
   }
 
   private static FolderDetailsUiBinder uiBinder = GWT.create(FolderDetailsUiBinder.class);

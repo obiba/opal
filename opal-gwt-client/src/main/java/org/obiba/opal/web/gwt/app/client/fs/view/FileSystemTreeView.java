@@ -15,36 +15,23 @@ import org.obiba.opal.web.model.client.FileDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
 
-public class FileSystemTreeView extends Composite implements Display {
-
-  @UiTemplate("FileSystemTreeView.ui.xml")
-  interface FileSystemTreeUiBinder extends UiBinder<DockLayoutPanel, FileSystemTreeView> {
-  }
-
-  private static FileSystemTreeUiBinder uiBinder = GWT.create(FileSystemTreeUiBinder.class);
+public class FileSystemTreeView implements Display {
 
   private Translations translations = GWT.create(Translations.class);
 
-  @UiField
   Tree fileSystemTree;
 
   public FileSystemTreeView() {
-    initWidget(uiBinder.createAndBindUi(this));
-    initTree();
+    fileSystemTree = new Tree();
   }
 
   @Override
   public Widget asWidget() {
-    return this;
+    return fileSystemTree;
   }
 
   @Override
@@ -55,11 +42,8 @@ public class FileSystemTreeView extends Composite implements Display {
   public void stopProcessing() {
   }
 
-  private void initTree() {
-  }
-
   @Override
-  public void setFileSystemTree(FileDto rootDto) {
+  public void initTree(FileDto rootDto) {
     fileSystemTree.clear();
     TreeItem treeRoot = createTreeItem(rootDto);
     treeRoot.setText(translations.fileSystemLabel());
