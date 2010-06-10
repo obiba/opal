@@ -1,0 +1,107 @@
+// This template overrides the normal gwt_overlay to handle enums differently (using their names as value)
+// See http://jira.obiba.org/jira/browse/OPAL-337 for more details
+// This template overrides 2 templates from the gwt_overlay file: enum_block (and related) and field_return_value
+//
+// Notes: in development mode, enums are internally represented as an array of one element (the enum's name) and in script mode, they are represented as a string.
+// This is done so that methods that return enum instances don't throw a ClassCastException in development mode (because String does not extend JavaScriptObject).  
+//
+// enum_block:
+//  Was overriden to use the enum name instead of its value (this is what java-format uses)
+//  Also added a isXXX() method to compare enum instances
+//
+// field_return_value:
+//   Was overriden to change the handling of the enum getter: it returns an array in development mode and a string in script mode.
+
+group custom_gwt_overlay : gwt_overlay;
+
+enum_block(eg, module, options, nested) ::= <<
+<if(!nested)>
+<eg:enum_header(eg=it, module=module, options=options)>
+
+<endif>
+public <if(nested)>static <endif>final class <eg.name> extends JavaScriptObject {
+
+    <eg.values:field_enum_value_declare(val=it, methodName="create"); separator="\n">
+
+    <eg:enum_static_method_create(eg=it, options=options)>
+
+    <eg:enum_constructor(eg=it, options=options)>
+
+    <eg:enum_method_get_name(eg=it, options=options)>
+
+    <eg:enum_method_is(eg=it, options=options)>
+
+}
+
+>>
+
+field_enum_value_declare(val, methodName) ::= <<
+public static final <val.enumGroup.name> <val.name> = <methodName>("<val.name>");
+>>
+
+enum_static_method_create(eg, options) ::= <<
+private static native <eg.name> create(String name) /*-{
+    if(! @com.google.gwt.core.client.GWT::isScript()()) {
+      return [name];
+    }
+    return name;
+}-*/;
+>>
+
+enum_method_get_name(eg, options) ::= <<
+public native String getName() /*-{
+    if(! @com.google.gwt.core.client.GWT::isScript()()) {
+      return this[0];
+    }
+    return this;
+}-*/;
+>>
+
+enum_method_is(eg, options) ::= <<
+public native boolean is<eg.name>(<eg.name> rhs) /*-{
+    if(! @com.google.gwt.core.client.GWT::isScript()()) {
+      return this[0] == rhs[0];
+    }
+    return this == rhs;
+}-*/;
+>>
+
+
+field_return_value(field, options) ::= <<
+<if(options.plain_overlay)>
+return this["<field:field_name_or_number(field=field,options=options)>"];
+<elseif(field.messageField)>
+return this["<field:field_name_or_number(field=field,options=options)>"];
+<elseif(field.bytesField)>
+return this["<field:field_name_or_number(field=field,options=options)>"];
+<elseif(field.stringField)>
+<if(field.defaultValue)>
+var v = this["<field:field_name_or_number(field=it,options=options)>"];
+return v == null ? "<field.defaultValueAsString>" : v;
+
+<else>
+return this["<field:field_name_or_number(field=field,options=options)>"] || "";
+
+<endif>
+<elseif(field.enumField)>
+var v = this["<field:field_name_or_number(field=it,options=options)>"];
+return @com.google.gwt.core.client.GWT::isScript()() ? v : (v == null ? null : [v]); 
+
+<elseif(field.numberField)>
+<if(field.defaultValue)>
+var v = this["<field:field_name_or_number(field=it,options=options)>"];
+return v == null ? <field.defaultValue> : v;
+
+<else>
+return this["<field:field_name_or_number(field=field,options=options)>"] || 0;
+
+<endif>
+<else>
+<if(field.defaultValue)>
+var v = this["<field:field_name_or_number(field=it,options=options)>"];
+return v == null ? <field.defaultValue> : v;
+<else>
+return this["<field:field_name_or_number(field=field,options=options)>"] || false;
+<endif>
+<endif>
+>>

@@ -159,7 +159,7 @@
           <protoModules>
             <protoModule>
               <source>src/main/protobuf/Magma.proto</source>
-              <output>gwt_overlay</output>
+              <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
               <outputDir>target/generated-sources/protobuf-gwt</outputDir>
               <options>
                 <property>
@@ -171,9 +171,14 @@
             </protoModule>
             <protoModule>
               <source>src/main/protobuf/Opal.proto</source>
-              <output>gwt_overlay</output>
+              <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
               <outputDir>target/generated-sources/protobuf-gwt</outputDir>
               <options>
+                <property>
+                  <!-- Override the package name -->
+                  <name>generate_helper_methods</name>
+                  <value>true</value>
+                </property>
                 <property>
                   <!-- Override the package name -->
                   <name>org.obiba.opal.web.model</name>
@@ -183,7 +188,7 @@
             </protoModule>
             <protoModule>
               <source>src/main/protobuf/Commands.proto</source>
-              <output>gwt_overlay</output>
+              <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
               <outputDir>target/generated-sources/protobuf-gwt</outputDir>
               <options>
                 <property>
@@ -241,7 +246,7 @@
     <maven.compiler.target>1.6</maven.compiler.target>
     <gwt.version>2.0.3</gwt.version>
     <protobuf.version>2.3.0</protobuf.version>
-    <protostuff.version>1.0.0.M1</protostuff.version>
+    <protostuff.version>r882</protostuff.version>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
   </properties>
 
