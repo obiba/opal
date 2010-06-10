@@ -15,6 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -59,6 +60,7 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
           downloadFile(file.getPath());
         } else {
           updateTable(file.getPath());
+          eventBus.fireEvent(new FolderSelectionChangeEvent(file));
         }
       }
 
@@ -68,6 +70,15 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
       }
 
     });
+
+    super.registerHandler(eventBus.addHandler(FolderSelectionChangeEvent.getType(), new FolderSelectionChangeEvent.Handler() {
+
+      @Override
+      public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
+        updateTable(event.getFolder().getPath());
+      }
+
+    }));
   }
 
   @Override

@@ -15,10 +15,12 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.FileDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -88,8 +90,12 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
 
       @Override
       public void onSelection(SelectionEvent<TreeItem> event) {
+
         final TreeItem selectedItem = event.getSelectedItem();
         FileDto selectedFile = ((FileDto) selectedItem.getUserObject());
+
+        eventBus.fireEvent(new FolderSelectionChangeEvent(selectedFile));
+
         if(selectedItem.getChildCount() == 0) {
           ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files" + selectedFile.getPath()).get().withCallback(new ResourceCallback<FileDto>() {
             @Override
@@ -101,5 +107,15 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
       }
 
     });
+
+    super.registerHandler(eventBus.addHandler(FolderSelectionChangeEvent.getType(), new FolderSelectionChangeEvent.Handler() {
+
+      @Override
+      public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
+        // TODO Select the right node in the tree
+        GWT.log("Folder selected details: " + event.getFolder().getPath());
+      }
+
+    }));
   }
 }
