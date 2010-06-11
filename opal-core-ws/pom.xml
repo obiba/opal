@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>opal</artifactId>
@@ -13,11 +14,6 @@
     <dependency>
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-httpd</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -43,6 +39,12 @@
       <groupId>com.google.visualization</groupId>
       <artifactId>visualization-datasource</artifactId>
       <version>1.0.2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.restlet.jse</groupId>
@@ -53,11 +55,17 @@
       <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet.ext.httpclient</artifactId>
       <version>${restlet.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>commons-fileupload</groupId>
-      <artifactId>commons-fileupload</artifactId>      
-    </dependency> 
+      <artifactId>commons-fileupload</artifactId>
+    </dependency>
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
@@ -67,13 +75,13 @@
   <build>
     <plugins>
       <plugin>
-	    <groupId>org.apache.maven.plugins</groupId>
-	    <artifactId>maven-resources-plugin</artifactId>
-		<configuration>
-		  <!-- Required for testing Opal file system (maven was not copying empty directories from test resources) -->
-		  <includeEmptyDirs>true</includeEmptyDirs>
-		</configuration>
-	  </plugin>  
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <configuration>
+          <!-- Required for testing Opal file system (maven was not copying empty directories from test resources) -->
+          <includeEmptyDirs>true</includeEmptyDirs>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
