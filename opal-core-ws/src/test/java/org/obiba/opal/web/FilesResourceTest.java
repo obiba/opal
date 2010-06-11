@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -35,6 +36,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.runtime.OpalRuntime;
@@ -54,6 +56,11 @@ public class FilesResourceTest {
 
   private FileItem fileItemMock;
 
+  /**
+   * Delete these files in tearDown().
+   */
+  private List<String> filesCreatedByTest = new ArrayList<String>();
+
   @Before
   public void setUp() throws URISyntaxException, FileSystemException {
     opalRuntimeMock = createMock(OpalRuntime.class);
@@ -64,6 +71,17 @@ public class FilesResourceTest {
 
     fileItemMock = createMock(FileItem.class);
     fileObjectMock = createMock(FileObject.class);
+  }
+
+  @After
+  public void tearDown() throws FileSystemException {
+    // Delete any files created by the test.
+    for(String filePath : filesCreatedByTest) {
+      FileObject file = fileSystem.getRoot().resolveFile(filePath);
+      if(file.exists()) {
+        file.delete();
+      }
+    }
   }
 
   @Test
@@ -206,7 +224,9 @@ public class FilesResourceTest {
     replay(opalRuntimeMock, fileItemMock);
 
     // Upload the file.
-    Response response = fileResource.uploadFile("/folder1/folder11/folder111/uploadedFile.txt", null);
+    String uploadedFilePath = "/folder1/folder11/folder111/uploadedFile.txt";
+    Response response = fileResource.uploadFile(uploadedFilePath, null);
+    filesCreatedByTest.add(uploadedFilePath);
 
     // Verify that the service response is OK.
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
