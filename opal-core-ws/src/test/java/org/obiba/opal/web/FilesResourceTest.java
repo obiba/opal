@@ -285,4 +285,34 @@ public class FilesResourceTest {
 
     verify(opalRuntimeMock, fileObjectMock);
   }
+
+  @Test
+  public void testUploadFile_ReturnsNotFoundResponseWhenUploadDestinationDoesNotExist() throws FileSystemException, FileUploadException {
+    expect(fileObjectMock.getType()).andReturn(FileType.FILE).atLeastOnce();
+    expect(fileObjectMock.exists()).andReturn(true).atLeastOnce();
+
+    FileObject parentFolderMock = createMock(FileObject.class);
+    expect(parentFolderMock.exists()).andReturn(false).atLeastOnce();
+
+    expect(fileObjectMock.getParent()).andReturn(parentFolderMock).atLeastOnce();
+
+    replay(opalRuntimeMock, fileObjectMock, parentFolderMock);
+
+    FilesResource fileResource = new FilesResource(opalRuntimeMock) {
+      @Override
+      protected FileItem getUploadedFile(HttpServletRequest request, FileObject fileToWriteTo) throws FileUploadException {
+        return fileItemMock;
+      }
+
+      @Override
+      protected FileObject resolveFileInFileSystem(String path) throws FileSystemException {
+        return fileObjectMock;
+      }
+    };
+
+    Response response = fileResource.uploadFile("/invalid/path/fileToUpload.txt", null);
+    Assert.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+
+    verify(opalRuntimeMock, fileObjectMock);
+  }
 }
