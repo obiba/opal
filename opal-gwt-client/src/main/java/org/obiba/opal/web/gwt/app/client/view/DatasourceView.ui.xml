@@ -1,0 +1,39 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+
+  <ui:style>
+    .separator { border-bottom: 2px solid black; }
+    .left-aligned { float : left; margin-right : 0.5em }
+    .left-aligned-no-space { float : left; }
+    .title-bold { font-weight: bold; font-size: medium; }
+    .title { font-size: medium; }    
+  </ui:style>
+ 
+  <g:LayoutPanel>
+    <g:layer left="1em" width="50%" top='0.5em' height="2em">
+      <g:FlowPanel>
+        <g:Label addStyleNames="{style.left-aligned},{style.title-bold}" ui:field="datasourceName">opal-data</g:Label>
+        <g:Label addStyleNames="{style.left-aligned},{style.title}"><ui:msg description="Dataset title in parentheses">(Dataset)</ui:msg></g:Label>
+      </g:FlowPanel>     
+    </g:layer>
+    <g:layer right="1em" width='50%' top='0.5em' height='2em'>
+     <g:Label horizontalAlignment="ALIGN_RIGHT">Download spreadsheet link</g:Label>
+    </g:layer>
+    <g:layer top="2.5em" height="0.5em" left="1em" right="1em">
+      <g:HTMLPanel>
+        <div class="{style.separator}" />
+      </g:HTMLPanel>
+    </g:layer>
+    <g:layer left="1em" width='50%' top='4em' height='2em'>
+      <g:FlowPanel>
+        <g:Label addStyleNames="{style.left-aligned},{style.title-bold}"><ui:msg description="Tables title">Tables</ui:msg></g:Label>
+        <g:Label addStyleNames="{style.left-aligned-no-space},{style.title}">(</g:Label>
+        <g:Label addStyleNames="{style.left-aligned-no-space},{style.title}" ui:field="variableCount">99</g:Label>
+        <g:Label addStyleNames="{style.left-aligned},{style.title}">)</g:Label>
+      </g:FlowPanel>     
+    </g:layer>    
+     <g:layer height="45em" top="5.5em">
+       <g2:CellTable width="100%"  ui:field="table" />
+     </g:layer>
+  </g:LayoutPanel> 
+</ui:UiBinder>
