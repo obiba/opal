@@ -25,6 +25,7 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.audit.VariableEntityAuditLogManager;
+import org.obiba.magma.audit.support.CopyAuditor;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineTableResolver;
@@ -138,8 +139,7 @@ public class DefaultImportService implements ImportService {
       if(valueTable.isForEntityType(keysTableEntityType)) {
         copyParticipants(valueTable, source, destination, unit, dispatchAttribute);
       } else {
-        DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, destination).build();
-        copier.copy(valueTable, destination);
+        DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(valueTable, destination);
       }
     }
   }
@@ -182,20 +182,21 @@ public class DefaultImportService implements ImportService {
   }
 
   private void copyPublicViewToDestinationDatasource(Datasource destination, final String dispatchAttribute, PrivateVariableEntityValueTable publicView, DatasourceCopyValueSetEventListener createKeysListener) throws IOException {
-    DatasourceCopier dataCopier = DatasourceCopier.Builder.newCopier() //
+    DatasourceCopier.Builder builder = DatasourceCopier.Builder.newCopier() //
     .withLoggingListener().withThroughtputListener() //
-    .withListener(createKeysListener) //
-    .withVariableEntityCopyEventListener(auditLogManager, destination)//
+    .withListener(createKeysListener)//
     .withMultiplexingStrategy(new VariableAttributeMutiplexingStrategy(dispatchAttribute, publicView.getName()))//
     .withVariableTransformer(new VariableTransformer() {
       /** Remove the dispatch attribute from the variable name. This is onyx-specific. See OPAL-170 */
       public Variable transform(Variable variable) {
         return Variable.Builder.sameAs(variable).name(variable.hasAttribute(dispatchAttribute) ? variable.getName().replaceFirst("^.*\\.?" + variable.getAttributeStringValue(dispatchAttribute) + "\\.", "") : variable.getName()).build();
       }
-    }).build();
-
+    });
+    CopyAuditor auditor = auditLogManager.createAuditor(builder, destination, null);
+    builder.build()
     // Copy participant's non-identifiable variables and data
-    dataCopier.copy(publicView, destination);
+    .copy(publicView, destination);
+    auditor.completeAuditing();
   }
 
   /**

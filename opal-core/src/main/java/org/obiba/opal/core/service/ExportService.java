@@ -61,7 +61,7 @@ public interface ExportService {
    * the destinationDatasource.
    * @throws InterruptedException if the current thread was interrupted
    */
-  public void exportTablesToDatasource(String unit, List<String> sourceTableNames, String destinationDatasourceName, DatasourceCopier datasourceCopier, boolean incremental) throws InterruptedException;
+  public void exportTablesToDatasource(String unit, List<String> sourceTableNames, String destinationDatasourceName, DatasourceCopier.Builder datasourceCopier, boolean incremental) throws InterruptedException;
 
   /**
    * Export tables to the provided {@link Datasource} using the provided {@link DatasourceCopier}. If logging is
@@ -76,7 +76,7 @@ public interface ExportService {
    * @throws ExportException if the datasource of a sourceTable matches the destinationDatasource.
    * @throws InterruptedException if the current thread was interrupted
    */
-  public void exportTablesToDatasource(String unit, Set<ValueTable> sourceTables, Datasource destinationDatasource, DatasourceCopier datasourceCopier, boolean incremental) throws InterruptedException;
+  public void exportTablesToDatasource(String unit, Set<ValueTable> sourceTables, Datasource destinationDatasource, DatasourceCopier.Builder datasourceCopier, boolean incremental) throws InterruptedException;
 
   /**
    * Export tables to an Excel file. This export operation will be logged.
@@ -101,6 +101,6 @@ public interface ExportService {
    * @throws UnsupportedOperationException Exporting to an Excel file is not currently implemented.
    * @throws InterruptedException if the current thread was interrupted
    */
-  public void exportTablesToExcelFile(String unit, List<String> sourceTableNames, File destinationExcelFile, DatasourceCopier datasourceCopier, boolean incremental) throws InterruptedException;
+  public void exportTablesToExcelFile(String unit, List<String> sourceTableNames, File destinationExcelFile, DatasourceCopier.Builder datasourceCopier, boolean incremental) throws InterruptedException;
 
 }

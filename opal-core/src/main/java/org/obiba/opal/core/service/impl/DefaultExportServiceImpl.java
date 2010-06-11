@@ -11,8 +11,10 @@ package org.obiba.opal.core.service.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 
@@ -20,14 +22,19 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
+import org.obiba.magma.Value;
+import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.audit.VariableEntityAuditLogManager;
+import org.obiba.magma.audit.support.CopyAuditor;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
 import org.obiba.magma.support.DatasourceCopier.Builder;
+import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListener;
+import org.obiba.magma.type.TextType;
 import org.obiba.magma.views.IncrementalWhereClause;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.magma.FunctionalUnitView;
@@ -37,7 +44,6 @@ import org.obiba.opal.core.service.ExportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,7 +72,7 @@ public class DefaultExportServiceImpl implements ExportService {
   private final String keysTableEntityType;
 
   @Autowired
-  public DefaultExportServiceImpl(PlatformTransactionManager txManager, OpalRuntime opalRuntime, VariableEntityAuditLogManager auditLogManager, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference, @Value("${org.obiba.opal.keys.entityType}") String keysTableEntityType) {
+  public DefaultExportServiceImpl(PlatformTransactionManager txManager, OpalRuntime opalRuntime, VariableEntityAuditLogManager auditLogManager, @org.springframework.beans.factory.annotation.Value("${org.obiba.opal.keys.tableReference}") String keysTableReference, @org.springframework.beans.factory.annotation.Value("${org.obiba.opal.keys.entityType}") String keysTableEntityType) {
     if(txManager == null) throw new IllegalArgumentException("txManager cannot be null");
     if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
     if(auditLogManager == null) throw new IllegalArgumentException("auditLogManager cannot be null");
@@ -81,7 +87,7 @@ public class DefaultExportServiceImpl implements ExportService {
   }
 
   public Builder newCopier(Datasource destinationDatasource, Function<VariableEntity, VariableEntity> entityMapper) {
-    return DatasourceCopier.Builder.newCopier().withLoggingListener().withThroughtputListener().withVariableEntityCopyEventListener(auditLogManager, destinationDatasource, entityMapper);
+    return DatasourceCopier.Builder.newCopier().withLoggingListener().withThroughtputListener();
   }
 
   public Builder newCopier(Datasource destinationDatasource) {
@@ -93,11 +99,10 @@ public class DefaultExportServiceImpl implements ExportService {
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName must not be null or empty");
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(destinationDatasourceName);
     Set<ValueTable> sourceTables = getValueTablesByName(sourceTableNames);
-    DatasourceCopier datasourceCopier = newCopier(destinationDatasource).build();
-    exportTablesToDatasource(unitName, sourceTables, destinationDatasource, datasourceCopier, incremental);
+    exportTablesToDatasource(unitName, sourceTables, destinationDatasource, newCopier(destinationDatasource), incremental);
   }
 
-  public void exportTablesToDatasource(String unitName, List<String> sourceTableNames, String destinationDatasourceName, DatasourceCopier datasourceCopier, boolean incremental) throws InterruptedException {
+  public void exportTablesToDatasource(String unitName, List<String> sourceTableNames, String destinationDatasourceName, DatasourceCopier.Builder datasourceCopier, boolean incremental) throws InterruptedException {
     Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName must not be null or empty");
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(destinationDatasourceName);
@@ -105,7 +110,7 @@ public class DefaultExportServiceImpl implements ExportService {
     exportTablesToDatasource(unitName, sourceTables, destinationDatasource, datasourceCopier, incremental);
   }
 
-  public void exportTablesToDatasource(String unitName, Set<ValueTable> sourceTables, Datasource destinationDatasource, DatasourceCopier datasourceCopier, boolean incremental) throws InterruptedException {
+  public void exportTablesToDatasource(String unitName, Set<ValueTable> sourceTables, Datasource destinationDatasource, DatasourceCopier.Builder datasourceCopier, boolean incremental) throws InterruptedException {
     Assert.notEmpty(sourceTables, "sourceTables must not be null or empty");
     Assert.notNull(destinationDatasource, "destinationDatasource must not be null");
     Assert.notNull(datasourceCopier, "datasourceCopier must not be null");
@@ -127,23 +132,27 @@ public class DefaultExportServiceImpl implements ExportService {
         // already been exported).
         table = incremental ? getIncrementalView(table, destinationDatasource) : table;
 
+        CopyAuditor auditor;
         // If the table contains an entity that requires key separation, create a "unit view" of the table (replace
         // public identifiers with private, unit-specific identifiers).
         // Also, replace the copier with one that persists the "public" identifiers in the audit log.
         if((unit != null) && table.isForEntityType(keysTableEntityType)) {
           FunctionalUnitView unitView = getUnitView(unit, table);
           table = unitView;
-          datasourceCopier = newCopier(destinationDatasource, unitView.getVariableEntityReverseTransformer()).build();
+          auditor = this.auditLogManager.createAuditor(datasourceCopier, destinationDatasource, unitView.getVariableEntityReverseTransformer());
+        } else {
+          auditor = this.auditLogManager.createAuditor(datasourceCopier, destinationDatasource, null);
         }
 
         // Go ahead and copy the result to the destination datasource.
-        MultithreadedDatasourceCopier.Builder.newCopier().from(table).to(destinationDatasource).withCopier(DatasourceCopier.Builder.newCopier(datasourceCopier)).withReaders(4).withThreads(new ThreadFactory() {
+        MultithreadedDatasourceCopier.Builder.newCopier().from(table).to(destinationDatasource).withCopier(datasourceCopier).withReaders(4).withThreads(new ThreadFactory() {
 
           @Override
           public Thread newThread(Runnable r) {
             return new TransactionalThread(txManager, r);
           }
         }).build().copy();
+        auditor.completeAuditing();
       }
     } catch(IOException ex) {
       // When implementing the ExcelDatasource:
@@ -166,7 +175,7 @@ public class DefaultExportServiceImpl implements ExportService {
 
   }
 
-  public void exportTablesToExcelFile(String unitName, List<String> sourceTableNames, File destinationExcelFile, DatasourceCopier datasourceCopier, boolean incremental) throws InterruptedException {
+  public void exportTablesToExcelFile(String unitName, List<String> sourceTableNames, File destinationExcelFile, DatasourceCopier.Builder datasourceCopier, boolean incremental) throws InterruptedException {
     Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
     Assert.notNull(destinationExcelFile, "destinationExcelFile must not be null");
 
@@ -252,5 +261,37 @@ public class DefaultExportServiceImpl implements ExportService {
         }
       });
     }
+  }
+
+  private class VariableEntityCopyEventListener implements DatasourceCopyValueSetEventListener {
+
+    private final Datasource destination;
+
+    private final Function<VariableEntity, VariableEntity> entityMapper;
+
+    public VariableEntityCopyEventListener(Datasource destination, Function<VariableEntity, VariableEntity> entityMapper) {
+      if(destination == null) throw new IllegalArgumentException("destination cannot be null");
+      this.destination = destination;
+      this.entityMapper = entityMapper;
+    }
+
+    @Override
+    public void onValueSetCopied(ValueTable source, ValueSet valueSet, String... tables) {
+      VariableEntity entity = entityMapper != null ? entityMapper.apply(valueSet.getVariableEntity()) : valueSet.getVariableEntity();
+      for(String tableName : tables) {
+        auditLogManager.createAuditEvent(auditLogManager.getAuditLog(entity), source, "COPY", createCopyDetails(entity, tableName));
+      }
+    }
+
+    @Override
+    public void onValueSetCopy(ValueTable source, ValueSet valueSet) {
+    }
+
+    private Map<String, Value> createCopyDetails(VariableEntity entity, String tableName) {
+      Map<String, Value> details = new HashMap<String, Value>();
+      details.put("destinationName", TextType.get().valueOf(destination.getName() + "." + tableName));
+      return details;
+    }
+
   }
 }

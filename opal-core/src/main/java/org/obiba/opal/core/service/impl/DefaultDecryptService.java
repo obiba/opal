@@ -16,7 +16,6 @@ import org.apache.commons.vfs.FileType;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
-import org.obiba.magma.audit.VariableEntityAuditLogManager;
 import org.obiba.magma.crypt.support.NullKeyProvider;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy;
@@ -55,9 +54,6 @@ public class DefaultDecryptService implements DecryptService {
 
   @Autowired
   private UnitKeyStoreService unitKeyStoreService;
-
-  @Autowired
-  private VariableEntityAuditLogManager auditLogManager;
 
   //
   // DecryptService Methods
@@ -115,7 +111,7 @@ public class DefaultDecryptService implements DecryptService {
   }
 
   private void copyValueTables(Datasource source, Datasource destination) throws IOException {
-    DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().withVariableEntityCopyEventListener(auditLogManager, destination).build();
+    DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build();
     copier.copy(source, destination);
   }
 

@@ -22,6 +22,8 @@ import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
+import org.obiba.magma.datasource.fs.FsDatasource;
+import org.obiba.magma.datasource.nul.NullDatasource;
 import org.obiba.magma.js.support.JavascriptMultiplexingStrategy;
 import org.obiba.magma.js.support.JavascriptVariableTransformer;
 import org.obiba.magma.support.DatasourceCopier;
@@ -97,7 +99,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     return sb.toString();
   }
 
-  private DatasourceCopier buildDatasourceCopier(Datasource destinationDatasource) {
+  private DatasourceCopier.Builder buildDatasourceCopier(Datasource destinationDatasource) {
     // build a datasource copier according to options
     DatasourceCopier.Builder builder;
     if(options.getNoValues()) {
@@ -118,7 +120,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     if(options.isTransform()) {
       builder.withVariableTransformer(new JavascriptVariableTransformer(options.getTransform()));
     }
-    return builder.build();
+    return builder;
   }
 
   private Datasource getDestinationDatasource() {
@@ -127,7 +129,15 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       destinationDatasource = getDatasourceByName(options.getDestination());
     } else {
       FileObject outputFile = getOutputFile();
-      destinationDatasource = new ExcelDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
+      if(outputFile.getName().getExtension().startsWith("xls")) {
+        destinationDatasource = new ExcelDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
+      } else if(outputFile.getName().getExtension().startsWith("zip")) {
+        destinationDatasource = new FsDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
+      } else if(outputFile.getName().getPath().equals("/dev/null")) {
+        destinationDatasource = new NullDatasource("/dev/null");
+      } else {
+        throw new IllegalArgumentException("unknown output datasource type");
+      }
       MagmaEngine.get().addDatasource(destinationDatasource);
     }
     return destinationDatasource;
