@@ -33,7 +33,7 @@
     </g:layer>       
     <g:layer left="1em" width='50%' top='6em' height='2em'>
       <g:FlowPanel>
-        <g:Label addStyleNames="{style.left-aligned},{style.title-bold}"><ui:msg description="Variables title">Variables</ui:msg></g:Label>
+        <g:Label addStyleNames="{style.left-aligned},{style.title-bold}"><ui:msg description="Variables menu item">Variables</ui:msg></g:Label>
         <g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="count">(0000)</g:Label>
       </g:FlowPanel>     
     </g:layer>
