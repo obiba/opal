@@ -57,6 +57,11 @@ public class DatasourceResource {
     return getTableResource(MagmaEngine.get().getDatasource(name).getValueTable(table));
   }
 
+  @Path("/tables")
+  public TablesResource getTables() {
+    return new TablesResource(name);
+  }
+
   @Bean
   @Scope("request")
   public TableResource getTableResource(ValueTable table) {
