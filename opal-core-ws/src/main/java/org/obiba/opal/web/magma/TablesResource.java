@@ -46,7 +46,7 @@ public class TablesResource {
       .setName(valueTable.getName()) //
       .setEntityType(valueTable.getEntityType()) //
       .setVariableCount(Iterables.size(valueTable.getVariables())) //
-      .setValueSetCount(Iterables.size(valueTable.getValueSets())) //
+      .setValueSetCount(valueTable.getVariableEntities().size()) //
       .setLink(tableLink.toString());
       tables.add(table.build());
     }

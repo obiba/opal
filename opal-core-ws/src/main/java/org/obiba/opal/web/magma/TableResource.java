@@ -57,9 +57,11 @@ public class TableResource {
 
   @GET
   public TableDto get(@Context final UriInfo uriInfo) {
-    return TableDto.newBuilder()//
-    .setName(valueTable.getName())//
-    .setEntityType(valueTable.getEntityType())//
+    return TableDto.newBuilder() //
+    .setName(valueTable.getName()) //
+    .setEntityType(valueTable.getEntityType()) //
+    .setVariableCount(Iterables.size(valueTable.getVariables())) //
+    .setValueSetCount(valueTable.getVariableEntities().size()) //
     .setLink(uriInfo.getPath()).build();
   }
 
