@@ -3,30 +3,40 @@
 
   <ui:style>
     .title {
-      font-size: 1.5em;
-      margin: 0.25em 0 0 0.5em;
+    font-size: 1.5em;
+    margin: 0.25em 0 0 0.5em;
     }
-    
+
     .topPanel {
-      border-bottom-style:solid;
-      border-bottom-width:0.2em;
-      border-bottom-color:black;
+    border-bottom-style:solid;
+    border-bottom-width:0.2em;
+    border-bottom-color:black;
     }
-    
+
+    .actionButton {
+    font-size: 1em;
+    margin: 0.5em 0.5em 0.5em 0.5em;
+    }
+
     .treePanel {
-      margin: 1.25em 0 0 0.5em;
+    margin: 1.25em 0 0 0.5em;
     }    
   </ui:style>
 
   <g:DockLayoutPanel>
     <g:north size="40">
-      <g:LayoutPanel addStyleNames="{style.topPanel}">
-        <g:layer top="0" height="100%">
+      <g:DockLayoutPanel addStyleNames="{style.topPanel}">
+        <g:center>
           <g:Label addStyleNames="{style.title}">
             <ui:msg description="File Explorer label">File Explorer</ui:msg>
           </g:Label>
-        </g:layer>
-      </g:LayoutPanel>
+        </g:center>
+        <g:east size="75" horizontalAlignment="ALIGN_RIGHT">
+          <g:Button addStyleNames="{style.actionButton}">
+            <ui:msg description="Upload File label">Upload</ui:msg>
+          </g:Button>
+        </g:east>
+      </g:DockLayoutPanel>
     </g:north>
     <g:center>
       <g:SplitLayoutPanel>
