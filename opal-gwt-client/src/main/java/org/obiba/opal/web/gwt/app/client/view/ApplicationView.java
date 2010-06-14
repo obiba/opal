@@ -57,6 +57,9 @@ public class ApplicationView extends Composite implements ApplicationPresenter.D
   MenuItem listJobsItem;
 
   @UiField
+  MenuItem fileExplorer;
+
+  @UiField
   Panel workbench;
 
   public ApplicationView() {
@@ -106,4 +109,10 @@ public class ApplicationView extends Composite implements ApplicationPresenter.D
   public MenuItem getDataExportItem() {
     return dataExportItem;
   }
+
+  @Override
+  public MenuItem getFileExplorer() {
+    return fileExplorer;
+  }
+
 }

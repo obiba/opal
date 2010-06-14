@@ -67,8 +67,8 @@ public class OpalGinModule extends AbstractGinModule {
     bind(VariablePresenter.Display.class).to(VariableView.class).in(Singleton.class);
     bind(LoginPresenter.Display.class).to(LoginView.class).in(Singleton.class);
     bind(UnhandledResponseNotificationPresenter.Display.class).to(UnhandledResponseNotificationView.class).in(Singleton.class);
-    bind(FolderDetailsPresenter.Display.class).to(FolderDetailsView.class).in(Singleton.class);
-    bind(FileSystemTreePresenter.Display.class).to(FileSystemTreeView.class).in(Singleton.class);
+    bind(FolderDetailsPresenter.Display.class).to(FolderDetailsView.class);
+    bind(FileSystemTreePresenter.Display.class).to(FileSystemTreeView.class);
     bind(FileExplorerPresenter.Display.class).to(FileExplorerView.class).in(Singleton.class);
 
     // Don't bind as singleton because the ApplicationPresenter expects a new instance on every display

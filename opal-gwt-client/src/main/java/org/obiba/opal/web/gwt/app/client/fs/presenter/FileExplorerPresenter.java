@@ -17,6 +17,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter.Display> {
 
@@ -27,9 +28,13 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   }
 
   @Inject
-  FileSystemTreePresenter fileSystemTreePresenter;
+  Provider<FileSystemTreePresenter> fileSystemTreePresenterProvider;
 
   @Inject
+  Provider<FolderDetailsPresenter> folderDetailsPresenterProvider;
+
+  FileSystemTreePresenter fileSystemTreePresenter;
+
   FolderDetailsPresenter folderDetailsPresenter;
 
   @Inject
@@ -46,8 +51,6 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   protected void onBind() {
     initDisplayComponents();
     addEventHandlers();
-    fileSystemTreePresenter.bind();
-    folderDetailsPresenter.bind();
   }
 
   @Override
@@ -56,6 +59,8 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
   @Override
   protected void onUnbind() {
+    getDisplay().getFileSystemTree().remove(fileSystemTreePresenter.getDisplay().asWidget());
+    getDisplay().getFolderDetailsPanel().remove(folderDetailsPresenter.getDisplay().asWidget());
   }
 
   @Override
@@ -69,8 +74,12 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   }
 
   protected void initDisplayComponents() {
+    fileSystemTreePresenter = fileSystemTreePresenterProvider.get();
+    folderDetailsPresenter = folderDetailsPresenterProvider.get();
     getDisplay().getFileSystemTree().add(fileSystemTreePresenter.getDisplay().asWidget());
     getDisplay().getFolderDetailsPanel().add(folderDetailsPresenter.getDisplay().asWidget());
+    fileSystemTreePresenter.bind();
+    folderDetailsPresenter.bind();
   }
 
   private void addEventHandlers() {

@@ -19,6 +19,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -51,6 +52,8 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
     MenuItem getDataExportItem();
 
     MenuItem getListJobsItem();
+
+    MenuItem getFileExplorer();
   }
 
   @Inject
@@ -70,6 +73,9 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
   @Inject
   private ErrorDialogPresenter messageDialog;
+
+  @Inject
+  private Provider<FileExplorerPresenter> fileExplorerPresenter;
 
   private WidgetPresenter<?> workbench;
 
@@ -121,6 +127,14 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       @Override
       public void execute() {
         eventBus.fireEvent(new WorkbenchChangeEvent(jobListPresenter.get()));
+      }
+    });
+
+    getDisplay().getFileExplorer().setCommand(new Command() {
+
+      @Override
+      public void execute() {
+        eventBus.fireEvent(new WorkbenchChangeEvent(fileExplorerPresenter.get()));
       }
     });
 

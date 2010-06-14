@@ -114,7 +114,6 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
 
       @Override
       public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
-        FileDto file = event.getFolder();
         getDisplay().selectTreeItem(event.getFolder());
       }
 

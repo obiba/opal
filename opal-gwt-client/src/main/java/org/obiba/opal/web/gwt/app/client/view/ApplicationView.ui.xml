@@ -41,8 +41,13 @@
               <g:MenuBar vertical="true">
                 <g:MenuItem ui:field="listJobsItem"><ui:msg description="List menu item">List</ui:msg></g:MenuItem>
               </g:MenuBar>
+            </g:MenuItem>           
+            <g:MenuItem>
+              <ui:msg description="Administration menu item">Administration</ui:msg>
+              <g:MenuBar vertical="true">
+                <g:MenuItem ui:field="fileExplorer"><ui:msg description="Explorer">File Explorer</ui:msg></g:MenuItem>                
+              </g:MenuBar>              
             </g:MenuItem>
-            <g:MenuItem><ui:msg description="Administration menu item">Administration</ui:msg></g:MenuItem>
           </g:MenuBar>
 
         </g:layer>
