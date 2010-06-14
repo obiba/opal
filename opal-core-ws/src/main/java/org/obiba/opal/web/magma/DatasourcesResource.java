@@ -22,6 +22,8 @@ import org.obiba.magma.ValueTable;
 import org.obiba.opal.web.model.Magma;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
@@ -33,10 +35,21 @@ public class DatasourcesResource {
   @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(DatasourcesResource.class);
 
+  private String keysDatasourceName;
+
+  @Autowired
+  public DatasourcesResource(@Value("${org.obiba.opal.keys.tableReference}") String keysTableReference) {
+    keysDatasourceName = extractKeysDatasourceName(keysTableReference);
+  }
+
   @GET
   public List<Magma.DatasourceDto> getDatasources() {
     final List<Magma.DatasourceDto> datasources = Lists.newArrayList();
+
     for(Datasource from : MagmaEngine.get().getDatasources()) {
+      // OPAL-365: Hide the keys datasource.
+      if(from.getName().equals(keysDatasourceName)) continue;
+
       URI dslink = UriBuilder.fromPath("/").path(DatasourceResource.class).build(from.getName());
       Magma.DatasourceDto.Builder ds = Magma.DatasourceDto.newBuilder() //
       .setName(from.getName()) //
@@ -49,4 +62,16 @@ public class DatasourcesResource {
     return datasources;
   }
 
+  private String extractKeysDatasourceName(String keysTableReference) {
+    if(keysTableReference == null) {
+      throw new IllegalArgumentException("null keysTableReference");
+    }
+
+    int separatorIndex = keysTableReference.indexOf('.');
+    if(separatorIndex == -1) {
+      throw new IllegalArgumentException("keysTableReference missing datasource");
+    }
+
+    return keysTableReference.substring(0, separatorIndex);
+  }
 }
