@@ -2,7 +2,7 @@
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
              xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
 
-  <g:DockLayoutPanel>
+  <g:SplitLayoutPanel>
     <g:west size="200">
       <g:ScrollPanel ui:field="fileSystemTreePanel">
       </g:ScrollPanel>
@@ -11,5 +11,5 @@
       <g:ScrollPanel ui:field="folderDetailsPanel">
       </g:ScrollPanel>
     </g:center>
-  </g:DockLayoutPanel>
+  </g:SplitLayoutPanel >
 </ui:UiBinder>

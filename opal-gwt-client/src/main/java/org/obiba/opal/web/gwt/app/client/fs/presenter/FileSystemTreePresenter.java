@@ -15,12 +15,12 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.FileDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -36,6 +36,8 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
     void addBranch(TreeItem treeItem, FileDto folderToAdd);
 
     HasSelectionHandlers<TreeItem> getFileSystemTree();
+
+    void selectTreeItem(FileDto folder);
 
   }
 
@@ -94,7 +96,7 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
         final TreeItem selectedItem = event.getSelectedItem();
         FileDto selectedFile = ((FileDto) selectedItem.getUserObject());
 
-        eventBus.fireEvent(new FolderSelectionChangeEvent(selectedFile));
+        eventBus.fireEvent(new FileSystemTreeFolderSelectionChangeEvent(selectedFile));
 
         if(selectedItem.getChildCount() == 0) {
           ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files" + selectedFile.getPath()).get().withCallback(new ResourceCallback<FileDto>() {
@@ -112,8 +114,8 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
 
       @Override
       public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
-        // TODO Select the right node in the tree
-        GWT.log("Folder selected details: " + event.getFolder().getPath());
+        FileDto file = event.getFolder();
+        getDisplay().selectTreeItem(event.getFolder());
       }
 
     }));

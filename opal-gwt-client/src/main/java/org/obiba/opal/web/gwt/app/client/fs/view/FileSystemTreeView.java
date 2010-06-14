@@ -74,4 +74,10 @@ public class FileSystemTreeView implements Display {
     return fileSystemTree;
   }
 
+  @Override
+  public void selectTreeItem(FileDto folder) {
+    // TODO Select the right node in the tree
+    GWT.log("Folder selected details: " + folder.getPath());
+  }
+
 }
