@@ -18,14 +18,14 @@
       </g:FlowPanel>     
     </g:layer>
     <g:layer right="1em" width='50%' top='0.5em' height='2em'>
-     <g:Label horizontalAlignment="ALIGN_RIGHT">Download spreadsheet link</g:Label>
+     <g:FlowPanel ui:field="spreadsheetDownloadPanel"/>
     </g:layer>
-    <g:layer top="2.5em" height="0.5em" left="1em" right="1em">
+    <g:layer top="2.7em" height="0.5em" left="1em" right="1em">
       <g:HTMLPanel>
         <div class="{style.separator}" />
       </g:HTMLPanel>
     </g:layer>
-    <g:layer left="1em" width='50%' top='3em' height='2em'>
+    <g:layer left="1em" width='50%' top='3.2em' height='2em'>
       <g:FlowPanel>
         <g:Label addStyleNames="{style.left-aligned},{style.title-light}">Entity Type:</g:Label>
         <g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="entityType">Entity Name</g:Label>

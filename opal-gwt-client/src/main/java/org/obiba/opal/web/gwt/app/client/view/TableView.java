@@ -19,6 +19,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -27,6 +28,8 @@ import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -53,16 +56,22 @@ public class TableView extends Composite implements TablePresenter.Display {
   Label entityType;
 
   @UiField
+  FlowPanel spreadsheetDownloadPanel;
+
+  @UiField
   CellTable<VariableDto> table;
 
   SelectionModel<VariableDto> selectionModel = new SingleSelectionModel<VariableDto>();
 
   SimplePager<VariableDto> pager;
 
+  private Image spreadsheetDownloadImage;
+
   private Translations translations = GWT.create(Translations.class);
 
   public TableView() {
     initWidget(uiBinder.createAndBindUi(this));
+    addSpreadsheetDownloadImage();
 
     table.addColumn(new TextColumn<VariableDto>() {
       @Override
@@ -111,6 +120,12 @@ public class TableView extends Composite implements TablePresenter.Display {
     p.setWidgetRightWidth(pager, 1, Unit.EM, 50, Unit.PCT);
     DOM.removeElementAttribute(pager.getElement(), "style");
     DOM.setStyleAttribute(pager.getElement(), "cssFloat", "right");
+  }
+
+  private void addSpreadsheetDownloadImage() {
+    spreadsheetDownloadImage = new Image("image/spreadsheet-download-icon.png");
+    spreadsheetDownloadPanel.add(spreadsheetDownloadImage);
+    DOM.setStyleAttribute(spreadsheetDownloadImage.getElement(), "cssFloat", "right");
   }
 
   @Override
@@ -167,6 +182,11 @@ public class TableView extends Composite implements TablePresenter.Display {
   @Override
   public Label getEntityTypeLabel() {
     return entityType;
+  }
+
+  @Override
+  public HasClickHandlers getSpreadsheetIcon() {
+    return spreadsheetDownloadImage;
   }
 
 }

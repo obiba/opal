@@ -17,6 +17,7 @@ import org.obiba.opal.web.model.client.TableDto;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -25,6 +26,8 @@ import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -47,17 +50,23 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   Label variableCount;
 
   @UiField
+  FlowPanel spreadsheetDownloadPanel;
+
+  @UiField
   CellTable<TableDto> table;
 
   SelectionModel<TableDto> selectionModel = new SingleSelectionModel<TableDto>();
 
   SimplePager<TableDto> pager;
 
+  private Image spreadsheetDownloadImage;
+
   private Translations translations = GWT.create(Translations.class);
 
   public DatasourceView() {
     initWidget(uiBinder.createAndBindUi(this));
     addTableColumns();
+    addSpreadsheetDownloadImage();
   }
 
   private void addTableColumns() {
@@ -98,6 +107,12 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
     DOM.setStyleAttribute(pager.getElement(), "cssFloat", "right");
   }
 
+  private void addSpreadsheetDownloadImage() {
+    spreadsheetDownloadImage = new Image("image/spreadsheet-download-icon.png");
+    spreadsheetDownloadPanel.add(spreadsheetDownloadImage);
+    DOM.setStyleAttribute(spreadsheetDownloadImage.getElement(), "cssFloat", "right");
+  }
+
   @Override
   public Widget asWidget() {
     return this;
@@ -136,6 +151,11 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   @Override
   public Label getVariableCountLabel() {
     return variableCount;
+  }
+
+  @Override
+  public HasClickHandlers getSpreadsheetIcon() {
+    return spreadsheetDownloadImage;
   }
 
 }
