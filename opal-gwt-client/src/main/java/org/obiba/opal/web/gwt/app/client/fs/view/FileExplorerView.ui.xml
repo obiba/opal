@@ -1,15 +1,45 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
 
-  <g:SplitLayoutPanel>
-    <g:west size="200">
-      <g:ScrollPanel ui:field="fileSystemTreePanel">
-      </g:ScrollPanel>
-    </g:west>
+  <ui:style>
+    .title {
+      font-size: 1.5em;
+      margin: 0.25em 0 0 0.5em;
+    }
+    
+    .topPanel {
+      border-bottom-style:solid;
+      border-bottom-width:0.2em;
+      border-bottom-color:black;
+    }
+    
+    .treePanel {
+      margin: 1.25em 0 0 0.5em;
+    }    
+  </ui:style>
+
+  <g:DockLayoutPanel>
+    <g:north size="40">
+      <g:LayoutPanel addStyleNames="{style.topPanel}">
+        <g:layer top="0" height="100%">
+          <g:Label addStyleNames="{style.title}">
+            <ui:msg description="File Explorer label">File Explorer</ui:msg>
+          </g:Label>
+        </g:layer>
+      </g:LayoutPanel>
+    </g:north>
     <g:center>
-      <g:ScrollPanel ui:field="folderDetailsPanel">
-      </g:ScrollPanel>
+      <g:SplitLayoutPanel>
+        <g:west size="200">
+          <g:ScrollPanel ui:field="fileSystemTreePanel" addStyleNames="{style.treePanel}">
+          </g:ScrollPanel>
+        </g:west>
+        <g:center>
+          <g:ScrollPanel ui:field="folderDetailsPanel">
+          </g:ScrollPanel>
+        </g:center>
+      </g:SplitLayoutPanel>
     </g:center>
-  </g:SplitLayoutPanel >
+  </g:DockLayoutPanel>
+
 </ui:UiBinder>

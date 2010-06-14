@@ -25,6 +25,8 @@ public class FileSystemTreeView implements Display {
 
   Tree fileSystemTree;
 
+  private TreeItem treeRoot;
+
   public FileSystemTreeView() {
     fileSystemTree = new Tree();
   }
@@ -45,11 +47,10 @@ public class FileSystemTreeView implements Display {
   @Override
   public void initTree(FileDto rootDto) {
     fileSystemTree.clear();
-    TreeItem treeRoot = createTreeItem(rootDto);
+    treeRoot = createTreeItem(rootDto);
     treeRoot.setText(translations.fileSystemLabel());
     fileSystemTree.addItem(treeRoot);
     addBranch(treeRoot, rootDto);
-    treeRoot.setSelected(true);
   }
 
   public void addBranch(TreeItem treeItem, FileDto folderToAdd) {
@@ -78,6 +79,11 @@ public class FileSystemTreeView implements Display {
   public void selectTreeItem(FileDto folder) {
     // TODO Select the right node in the tree
     GWT.log("Folder selected details: " + folder.getPath());
+  }
+
+  @Override
+  public void selectTreeRoot() {
+    treeRoot.setSelected(true);
   }
 
 }
