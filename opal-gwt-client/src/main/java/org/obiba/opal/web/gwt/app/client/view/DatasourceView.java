@@ -96,7 +96,7 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
     table.setSelectionEnabled(true);
     table.setSelectionModel(selectionModel);
-    table.setPageSize(20);
+    table.setPageSize(50);
     pager = new SimplePager<TableDto>(table);
     table.setPager(pager);
     LayoutPanel p = ((LayoutPanel) table.getParent());

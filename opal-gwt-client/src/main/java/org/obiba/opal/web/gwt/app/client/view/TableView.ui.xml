@@ -37,7 +37,7 @@
         <g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="count">(0000)</g:Label>
       </g:FlowPanel>     
     </g:layer>
-    <g:layer height="45em" top="7.5em">
+    <g:layer height="90em" top="7.5em">
         <g2:CellTable width="100%" ui:field="table" />
     </g:layer>
   </g:LayoutPanel>

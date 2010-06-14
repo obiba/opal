@@ -111,7 +111,7 @@ public class TableView extends Composite implements TablePresenter.Display {
 
     table.setSelectionEnabled(true);
     table.setSelectionModel(selectionModel);
-    table.setPageSize(20);
+    table.setPageSize(50);
     pager = new SimplePager<VariableDto>(table);
     table.setPager(pager);
     LayoutPanel p = ((LayoutPanel) table.getParent());
