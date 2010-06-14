@@ -1,8 +1,8 @@
 package org.obiba.opal.web.gwt.app.client;
 
 import org.obiba.opal.web.gwt.app.client.event.SessionExpiredEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
 import org.obiba.opal.web.gwt.inject.client.OpalGinjector;
 import org.obiba.opal.web.gwt.rest.client.DefaultResourceRequestBuilder;
@@ -25,8 +25,7 @@ public class GwtApp implements EntryPoint {
     // TODO: is there a better way to provide the dependencies to instances created with GWT.create()?
     DefaultResourceRequestBuilder.setup(opalGinjector);
 
-    NavigatorPresenter presenter = opalGinjector.getNavigatorPresenter();
-    // ApplicationPresenter presenter = opalGinjector.getApplicationPresenter();
+    ApplicationPresenter presenter = opalGinjector.getApplicationPresenter();
     presenter.bind();
     presenter.revealDisplay();
 
