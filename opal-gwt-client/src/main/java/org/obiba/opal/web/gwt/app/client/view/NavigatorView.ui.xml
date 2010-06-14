@@ -3,16 +3,11 @@
              xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
 
   <g:SplitLayoutPanel>
-    <g:center>
-      <g:ScrollPanel width="100%" >
-      <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_CENTER">
-        <g2:CellTable width="100%" ui:field="table" />
-        </g:VerticalPanel>
-      </g:ScrollPanel>
+    <g:center> 
+      <g:ScrollPanel width="100%" ui:field="navigatorDisplayPanel" />
     </g:center>
-    <g:west size='200'>
-      <g:ScrollPanel>
-        <g:Tree ui:field="tree" />
+    <g:west size='240'>
+      <g:ScrollPanel ui:field="treePanel">
       </g:ScrollPanel>
     </g:west>
   </g:SplitLayoutPanel>

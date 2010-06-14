@@ -9,9 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.presenter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -19,50 +16,30 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.event.SessionExpiredEvent;
-import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.model.client.DatasourceDto;
-import org.obiba.opal.web.model.client.VariableDto;
 
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.event.logical.shared.HasSelectionHandlers;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TreeItem;
-import com.google.gwt.view.client.SelectionModel;
-import com.google.gwt.view.client.SelectionModel.SelectionChangeEvent;
-import com.google.gwt.view.client.SelectionModel.SelectionChangeHandler;
 import com.google.inject.Inject;
 
-/**
- *
- */
 public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Display> {
 
   public interface Display extends WidgetDisplay {
 
-    HasSelectionHandlers<TreeItem> getTree();
+    ScrollPanel getTreePanel();
 
-    void setItems(List<TreeItem> items);
+    ScrollPanel getDetailsPanel();
 
-    SelectionModel<VariableDto> getTableSelection();
-
-    void renderRows(JsArray<VariableDto> rows);
-
-    void clear();
   }
 
-  private JsArray<VariableDto> variables;
+  @Inject
+  private NavigatorTreePresenter navigatorTreePresenter;
 
-  /**
-   * @param display
-   * @param eventBus
-   */
+  @Inject
+  private DatasourcePresenter datasourcePresenter;
+
+  @Inject
+  private TablePresenter tablePresenter;
+
   @Inject
   public NavigatorPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
@@ -75,44 +52,24 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
 
   @Override
   protected void onBind() {
-    super.registerHandler(getDisplay().getTree().addSelectionHandler(new SelectionHandler<TreeItem>() {
-      @Override
-      public void onSelection(SelectionEvent<TreeItem> event) {
-        eventBus.fireEvent(new NavigatorSelectionChangeEvent(event.getSelectedItem()));
-      }
-    }));
+    navigatorTreePresenter.bind();
+    datasourcePresenter.bind();
+    tablePresenter.bind();
 
-    super.registerHandler(getDisplay().getTableSelection().addSelectionChangeHandler(new SelectionChangeHandler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        // VariableDto variable = getDisplay().getTableSelection();
-        eventBus.fireEvent(new VariableSelectionChangeEvent(null));
-      }
-    }));
+    getDisplay().getTreePanel().add(navigatorTreePresenter.getDisplay().asWidget());
 
     super.registerHandler(eventBus.addHandler(NavigatorSelectionChangeEvent.getType(), new NavigatorSelectionChangeEvent.Handler() {
+
       @Override
       public void onNavigatorSelectionChanged(NavigatorSelectionChangeEvent event) {
-        if(event.getSelection().getParentItem() != null) {
-          String datasource = event.getSelection().getParentItem().getText();
-          String table = event.getSelection().getText();
-          updateTable(datasource, table);
+        TreeItem item = event.getSelection();
+        if(item.getParentItem() == null) {
+          getDisplay().getDetailsPanel().clear();
+          getDisplay().getDetailsPanel().add(datasourcePresenter.getDisplay().asWidget());
+        } else {
+          getDisplay().getDetailsPanel().clear();
+          getDisplay().getDetailsPanel().add(tablePresenter.getDisplay().asWidget());
         }
-      }
-    }));
-
-    super.registerHandler(eventBus.addHandler(SessionCreatedEvent.getType(), new SessionCreatedEvent.Handler() {
-      @Override
-      public void onSessionCreated(SessionCreatedEvent event) {
-        refreshDisplay();
-      }
-    }));
-
-    super.registerHandler(eventBus.addHandler(SessionExpiredEvent.getType(), new SessionExpiredEvent.Handler() {
-      @Override
-      public void onSessionExpired(SessionExpiredEvent event) {
-        getDisplay().clear();
       }
     }));
   }
@@ -123,48 +80,17 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
 
   @Override
   protected void onUnbind() {
+    navigatorTreePresenter.unbind();
   }
 
   @Override
   public void refreshDisplay() {
-    updateTree();
+    navigatorTreePresenter.refreshDisplay();
   }
 
   @Override
   public void revealDisplay() {
-    updateTree();
-  }
-
-  private void updateTable(String datasource, String table) {
-    ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource("/datasource/" + datasource + "/table/" + table + "/variables").get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<VariableDto> resource) {
-        variables = resource;
-        getDisplay().renderRows(variables);
-      }
-
-    }).send();
-  }
-
-  private void updateTree() {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<DatasourceDto> datasources) {
-        ArrayList<TreeItem> items = new ArrayList<TreeItem>(datasources.length());
-        for(int i = 0; i < datasources.length(); i++) {
-          DatasourceDto ds = datasources.get(i);
-          TreeItem dsItem = new TreeItem(ds.getName());
-          dsItem.setUserObject(ds);
-          JsArrayString array = ds.getTableArray();
-          for(int j = 0; j < array.length(); j++) {
-            array.get(j);
-            dsItem.addItem(array.get(j));
-          }
-          items.add(dsItem);
-        }
-        getDisplay().setItems(items);
-      }
-    }).send();
+    navigatorTreePresenter.revealDisplay();
   }
 
 }
