@@ -99,20 +99,13 @@ public class JobDetailsView extends DialogBox implements Display {
     hide();
   }
 
-  //
-  // Composite Methods
-  //
-
-  @Override
   public Widget asWidget() {
     return null;
   }
 
-  @Override
   public void startProcessing() {
   }
 
-  @Override
   public void stopProcessing() {
   }
 

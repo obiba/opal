@@ -66,7 +66,6 @@ public class OpalGinModule extends AbstractGinModule {
     bind(NavigatorPresenter.Display.class).to(NavigatorView.class).in(Singleton.class);
     bind(JobListPresenter.Display.class).to(JobListView.class).in(Singleton.class);
     bind(JobDetailsPresenter.Display.class).to(JobDetailsView.class).in(Singleton.class);
-    bind(VariablePresenter.Display.class).to(VariableView.class).in(Singleton.class);
     bind(LoginPresenter.Display.class).to(LoginView.class).in(Singleton.class);
     bind(UnhandledResponseNotificationPresenter.Display.class).to(UnhandledResponseNotificationView.class).in(Singleton.class);
     bind(FolderDetailsPresenter.Display.class).to(FolderDetailsView.class);
@@ -78,6 +77,7 @@ public class OpalGinModule extends AbstractGinModule {
     bind(NavigatorTreePresenter.Display.class).to(NavigatorTreeView.class);
     bind(DatasourcePresenter.Display.class).to(DatasourceView.class);
     bind(TablePresenter.Display.class).to(TableView.class);
+    bind(VariablePresenter.Display.class).to(VariableView.class).in(Singleton.class);
     bind(DataImportPresenter.Display.class).to(DataImportView.class);// .in(Singleton.class);
     bind(DataExportPresenter.Display.class).to(DataExportView.class);
     bind(ErrorDialogPresenter.Display.class).to(ErrorDialogView.class);

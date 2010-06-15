@@ -36,7 +36,13 @@ final class Dtos {
 
   public static VariableDto.Builder asDto(UriBuilder uriBuilder, Variable from) {
 
-    VariableDto.Builder var = VariableDto.newBuilder().setName(from.getName()).setValueType(from.getValueType().getName());
+    VariableDto.Builder var = VariableDto.newBuilder().setName(from.getName()).setValueType(from.getValueType().getName()).setIsRepeatable(from.isRepeatable());
+    if(from.getOccurrenceGroup() != null) {
+      var.setOccurrenceGroup(from.getOccurrenceGroup());
+    }
+    if(from.getMimeType() != null) {
+      var.setMimeType(from.getMimeType());
+    }
     if(from.getUnit() != null) {
       var.setUnit(from.getUnit());
     }

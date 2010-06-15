@@ -19,7 +19,6 @@ import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
 
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
@@ -45,6 +44,9 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
   private TablePresenter tablePresenter;
 
   @Inject
+  private VariablePresenter variablePresenter;
+
+  @Inject
   public NavigatorPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
   }
@@ -59,6 +61,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     navigatorTreePresenter.bind();
     datasourcePresenter.bind();
     tablePresenter.bind();
+    variablePresenter.bind();
 
     getDisplay().getTreePanel().add(navigatorTreePresenter.getDisplay().asWidget());
 
@@ -87,7 +90,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
 
       @Override
       public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-        Window.alert("Display the Variable View.");
+        displayTable(variablePresenter.getDisplay().asWidget());
       }
 
     }));

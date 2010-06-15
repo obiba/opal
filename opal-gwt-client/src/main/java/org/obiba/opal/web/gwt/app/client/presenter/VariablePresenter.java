@@ -9,27 +9,20 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.presenter;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.model.client.AttributeDto;
 import org.obiba.opal.web.model.client.CategoryDto;
-import org.obiba.opal.web.model.client.FrequencyDto;
 import org.obiba.opal.web.model.client.VariableDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.visualization.client.AbstractDataTable;
-import com.google.gwt.visualization.client.DataTable;
-import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 
 /**
@@ -39,10 +32,23 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
   public interface Display extends WidgetDisplay {
 
-    public void renderData(AbstractDataTable data);
+    HasText getVariableNameLabel();
 
-    public void clearChart();
+    HasText getEntityTypeLabel();
 
+    HasText getValueTypeLabel();
+
+    HasText getMimeTypeLabel();
+
+    HasText getUnitLabel();
+
+    HasText getRepeatableLabel();
+
+    HasText getOccurrenceGroupLabel();
+
+    void renderCategoryRows(JsArray<CategoryDto> rows);
+
+    void renderAttributeRows(JsArray<AttributeDto> rows);
   }
 
   /**
@@ -61,11 +67,19 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
   @Override
   protected void onBind() {
+    super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
+
+      @Override
+      public void onNavigatorSelectionChanged(TableSelectionChangeEvent event) {
+        getDisplay().getEntityTypeLabel().setText(event.getSelection().getEntityType());
+      }
+    }));
+
     super.registerHandler(eventBus.addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionChangeEvent.Handler() {
+
       @Override
       public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-        VariableDto variable = event.getSelection();
-        updateFrequencies(variable);
+        updateDisplay(event.getSelection());
       }
     }));
   }
@@ -86,33 +100,20 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   public void revealDisplay() {
   }
 
-  private void updateFrequencies(final VariableDto variable) {
-    getDisplay().clearChart();
+  //
+  // Methods
+  //
 
-    ResourceRequestBuilderFactory.<JsArray<FrequencyDto>> newBuilder().forResource(variable.getLink() + "/frequencies.json").get().withCallback(new ResourceCallback<JsArray<FrequencyDto>>() {
+  private void updateDisplay(VariableDto variableDto) {
+    getDisplay().getVariableNameLabel().setText(variableDto.getName());
+    // getDisplay().getEntityTypeLabel().setText(variableDto.getEntityType());
+    getDisplay().getValueTypeLabel().setText(variableDto.getValueType());
+    getDisplay().getMimeTypeLabel().setText(variableDto.hasMimeType() ? variableDto.getMimeType() : "");
+    // getDisplay().getUnitLabel().setText(variableDto.getUnit());
+    getDisplay().getRepeatableLabel().setText(variableDto.getIsRepeatable() ? "Yes" : "No");
+    getDisplay().getOccurrenceGroupLabel().setText(variableDto.getIsRepeatable() ? variableDto.getOccurrenceGroup() : "");
 
-      @Override
-      public void onResource(Response response, JsArray<FrequencyDto> frequencies) {
-        Map<String, FrequencyDto> freqs = new HashMap<String, FrequencyDto>();
-        for(int i = 0; i < frequencies.length(); i++) {
-          FrequencyDto freq = frequencies.get(i);
-          freqs.put(freq.getName(), freq);
-        }
-        DataTable table = DataTable.create();
-        table.addColumn(ColumnType.STRING, "Category");
-        table.addColumn(ColumnType.NUMBER, "Frequency");
-        JsArray<CategoryDto> categories = variable.getCategoriesArray();
-        for(int i = 0; i < categories.length(); i++) {
-          CategoryDto c = categories.get(i);
-          int row = table.addRow();
-          table.setValue(row, 0, c.getName());
-          table.setValue(row, 1, freqs.get(c.getName()).getValue());
-        }
-        int row = table.addRow();
-        table.setValue(row, 0, "N/A");
-        table.setValue(row, 1, freqs.get("N/A").getValue());
-        getDisplay().renderData(table);
-      }
-    });
+    getDisplay().renderCategoryRows(variableDto.getCategoriesArray());
+    getDisplay().renderAttributeRows(variableDto.getAttributesArray());
   }
 }
