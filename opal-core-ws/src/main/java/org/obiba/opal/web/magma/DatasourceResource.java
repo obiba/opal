@@ -9,13 +9,20 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.datasource.excel.ExcelDatasource;
+import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.opal.web.model.Magma;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +57,21 @@ public class DatasourceResource {
       datasource.addTable(table.getName());
     }
     return datasource.build();
+  }
+
+  @GET
+  @Path("/dictionary/excel")
+  public Response getExcelDictionary() throws MagmaRuntimeException, IOException {
+    String destinationName = name + "-dictionary";
+    ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
+    ExcelDatasource destinationDatasource = new ExcelDatasource(destinationName, excelOutput);
+
+    MagmaEngine.get().addDatasource(destinationDatasource);
+    DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyValues().build();
+    copier.copy(MagmaEngine.get().getDatasource(name), destinationDatasource);
+    MagmaEngine.get().removeDatasource(destinationDatasource);
+
+    return Response.ok(excelOutput.toByteArray(), "application/vnd.ms-excel").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".xlsx\"").build();
   }
 
   @Path("/table/{table}")
