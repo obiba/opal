@@ -24,6 +24,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.fileupload.FileItem;
@@ -140,7 +141,7 @@ public class FilesResource {
   @POST
   @Path("/{path:.*}")
   @Consumes("multipart/form-data")
-  public Response uploadFile(@PathParam("path") String path, @Context HttpServletRequest request) throws FileSystemException, FileUploadException {
+  public Response uploadFile(@PathParam("path") String path, @Context UriInfo uriInfo, @Context HttpServletRequest request) throws FileSystemException, FileUploadException {
 
     FileObject fileToWriteTo = resolveFileInFileSystem(path);
     FileObject folderOfFileToWriteTo = fileToWriteTo.getParent();
@@ -163,7 +164,7 @@ public class FilesResource {
 
     log.info("The following file was uploaded to Opal file system : {}", path);
 
-    return Response.ok().build();
+    return Response.created(uriInfo.getAbsolutePath()).build();
 
   }
 

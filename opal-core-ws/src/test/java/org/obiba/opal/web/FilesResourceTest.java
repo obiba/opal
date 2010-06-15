@@ -18,6 +18,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +28,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
 import junit.framework.Assert;
@@ -56,6 +58,8 @@ public class FilesResourceTest {
 
   private FileItem fileItemMock;
 
+  private UriInfo uriInfoMock;
+
   /**
    * Delete these files in tearDown().
    */
@@ -71,6 +75,8 @@ public class FilesResourceTest {
 
     fileItemMock = createMock(FileItem.class);
     fileObjectMock = createMock(FileObject.class);
+
+    uriInfoMock = createMock(UriInfo.class);
   }
 
   @After
@@ -210,9 +216,10 @@ public class FilesResourceTest {
   }
 
   @Test
-  public void testUploadFileToFileSystem() throws FileUploadException, IOException {
+  public void testUploadFileToFileSystem() throws FileUploadException, IOException, URISyntaxException {
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
     expect(fileItemMock.getInputStream()).andReturn(getClass().getResourceAsStream("/files-to-upload/fileToUpload.txt")).once();
+    expect(uriInfoMock.getAbsolutePath()).andReturn(new URI("test")).once();
 
     FilesResource fileResource = new FilesResource(opalRuntimeMock) {
       @Override
@@ -221,25 +228,25 @@ public class FilesResourceTest {
       }
     };
 
-    replay(opalRuntimeMock, fileItemMock);
+    replay(opalRuntimeMock, fileItemMock, uriInfoMock);
 
     // Upload the file.
     String uploadedFilePath = "/folder1/folder11/folder111/uploadedFile.txt";
-    Response response = fileResource.uploadFile(uploadedFilePath, null);
+    Response response = fileResource.uploadFile(uploadedFilePath, uriInfoMock, null);
     filesCreatedByTest.add(uploadedFilePath);
 
     // Verify that the service response is OK.
-    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
     // Verify that the file was uploaded at the right path in the file system.
     Assert.assertTrue(fileSystem.getRoot().resolveFile("/folder1/folder11/folder111/uploadedFile.txt").exists());
 
-    verify(opalRuntimeMock, fileItemMock);
+    verify(opalRuntimeMock, fileItemMock, uriInfoMock);
 
   }
 
   @Test
-  public void testUploadFileNoContentSubmitted() throws FileSystemException, FileUploadException {
+  public void testUploadFileNoContentSubmitted() throws FileSystemException, FileUploadException, URISyntaxException {
 
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
 
@@ -252,7 +259,7 @@ public class FilesResourceTest {
       }
     };
 
-    Response response = fileResource.uploadFile("/", null);
+    Response response = fileResource.uploadFile("/", uriInfoMock, null);
     Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
     verify(opalRuntimeMock);
@@ -260,7 +267,7 @@ public class FilesResourceTest {
   }
 
   @Test
-  public void testUploadFileWhenFolderExistWithThatNameAtSpecifiedPath() throws FileSystemException, FileUploadException {
+  public void testUploadFileWhenFolderExistWithThatNameAtSpecifiedPath() throws FileSystemException, FileUploadException, URISyntaxException {
 
     expect(fileObjectMock.getType()).andReturn(FileType.FOLDER).once();
     expect(fileObjectMock.exists()).andReturn(true).once();
@@ -280,14 +287,14 @@ public class FilesResourceTest {
       }
     };
 
-    Response response = fileResource.uploadFile("/", null);
+    Response response = fileResource.uploadFile("/", uriInfoMock, null);
     Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
     verify(opalRuntimeMock, fileObjectMock);
   }
 
   @Test
-  public void testUploadFile_ReturnsNotFoundResponseWhenUploadDestinationDoesNotExist() throws FileSystemException, FileUploadException {
+  public void testUploadFile_ReturnsNotFoundResponseWhenUploadDestinationDoesNotExist() throws FileSystemException, FileUploadException, URISyntaxException {
     expect(fileObjectMock.getType()).andReturn(FileType.FILE).atLeastOnce();
     expect(fileObjectMock.exists()).andReturn(true).atLeastOnce();
 
@@ -310,7 +317,7 @@ public class FilesResourceTest {
       }
     };
 
-    Response response = fileResource.uploadFile("/invalid/path/fileToUpload.txt", null);
+    Response response = fileResource.uploadFile("/invalid/path/fileToUpload.txt", uriInfoMock, null);
     Assert.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
 
     verify(opalRuntimeMock, fileObjectMock);
