@@ -16,6 +16,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.event.TableSelectionEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.TableDto;
@@ -75,9 +76,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
         if(event.getSelection().getParentItem() != null) {
           String datasource = event.getSelection().getParentItem().getText();
           String table = event.getSelection().getText();
-          getDisplay().getTableName().setText(table);
-          updateEntityType(datasource, table);
-          updateTable(datasource, table);
+          displayTable(datasource, table);
         }
       }
     }));
@@ -89,6 +88,22 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
         Window.alert("Metadata download (OPAL-390) is currently not implemented.");
       }
     }));
+
+    super.registerHandler(eventBus.addHandler(TableSelectionEvent.getType(), new TableSelectionEvent.Handler() {
+
+      @Override
+      public void onNavigatorSelectionChanged(TableSelectionEvent event) {
+        String datasource = event.getSelection().getDatasourceName();
+        String table = event.getSelection().getName();
+        displayTable(datasource, table);
+      }
+    }));
+  }
+
+  private void displayTable(String datasource, String table) {
+    getDisplay().getTableName().setText(table);
+    updateEntityType(datasource, table);
+    updateTable(datasource, table);
   }
 
   @Override
