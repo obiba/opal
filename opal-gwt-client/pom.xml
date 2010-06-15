@@ -99,24 +99,24 @@
         <executions>
           <execution>
             <id>mergelocales.py</id>
-            <phase>package</phase>
-            <configuration>
-              <tasks>
-                <!-- Run python mergelocales.py script. -->
-                <exec executable="java" failonerror="true">
-                  <arg value="-jar" />
-                  <arg value="${basedir}/tools/jython-2.5.1-standalone.jar" />
-                  <arg value="${basedir}/tools/mergelocales.py" />
-                  <arg value="${basedir}/target/extra/org.obiba.opal.web.gwt.app.GwtApp/" />
-                  <arg value="${basedir}/src/main/java/com/google/gwt/i18n/client/" />
-                </exec>
-              </tasks>
-            </configuration>
+            <!-- <phase>package</phase> -->
             <goals>
               <goal>run</goal>
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <tasks>
+            <!-- Run python mergelocales.py script using "mvn antrun:run" -->
+            <exec executable="java" failonerror="true">
+              <arg value="-jar" />
+              <arg value="${basedir}/tools/jython-2.5.1-standalone.jar" />
+              <arg value="${basedir}/tools/mergelocales.py" />
+              <arg value="${basedir}/target/extra/org.obiba.opal.web.gwt.app.GwtApp/" />
+              <arg value="${basedir}/src/main/java/com/google/gwt/i18n/client/" />
+            </exec>
+          </tasks>
+        </configuration>
       </plugin>
     </plugins>    
   </build>
