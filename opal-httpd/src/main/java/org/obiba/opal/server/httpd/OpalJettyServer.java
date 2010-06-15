@@ -37,20 +37,16 @@ import org.obiba.opal.server.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.AbstractRefreshableWebApplicationContext;
-import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.context.support.XmlWebApplicationContext;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.filter.RequestContextFilter;
 
@@ -62,19 +58,11 @@ public class OpalJettyServer implements Service {
 
   private static final Logger log = LoggerFactory.getLogger(OpalJettyServer.class);
 
-  private static final String DEFAULT_CONFIG_PROPERTIES_CLASSPATH = "/META-INF/defaults.properties";
-
-  private static final String OPAL_HOME_ENV_VAR = "OPAL_HOME";
-
-  private static final String OPAL_CONFIG_DIRECTORY = "conf";
-
-  private static final String OPAL_CONFIG_PROPERTIES = "opal-config.properties";
-
   private final Server jettyServer;
 
   private final ServletContextHandler contextHandler;
 
-  private AbstractRefreshableWebApplicationContext webAppCtx;
+  private ConfigurableApplicationContext webApplicationContext;
 
   @Autowired
   public OpalJettyServer(final ApplicationContext ctx, final SslContextFactory sslContextFactory, final PlatformTransactionManager txmgr) {
@@ -120,7 +108,7 @@ public class OpalJettyServer implements Service {
 
   public void start() {
     try {
-      webAppCtx.refresh();
+      webApplicationContext.refresh();
       log.info("Starting Opal HTTP/s Server on port {}", this.jettyServer.getConnectors()[0].getPort());
       this.jettyServer.start();
     } catch(Exception e) {
@@ -130,9 +118,19 @@ public class OpalJettyServer implements Service {
 
   public void stop() {
     try {
+      if(webApplicationContext.isActive()) {
+        webApplicationContext.close();
+      }
+    } catch(RuntimeException e) {
+      // log and ignore
+      log.warn("Exception during web application context shutdown", e);
+    }
+
+    try {
       this.jettyServer.stop();
     } catch(Exception e) {
-      // ignore
+      // log and ignore
+      log.warn("Exception during HTTPd server shutdown", e);
     }
 
   }
@@ -145,16 +143,12 @@ public class OpalJettyServer implements Service {
     contextHandler.addFilter(new FilterHolder(new RequestContextFilter()), "/*", FilterMapping.DEFAULT);
     contextHandler.addFilter(new FilterHolder(new TransactionFilter(txmgr)), "/*", FilterMapping.DEFAULT);
 
-    webAppCtx = new AnnotationConfigWebApplicationContext();
-    webAppCtx.setServletContext(contextHandler.getServletContext());
+    XmlWebApplicationContext webAppCtx = new XmlWebApplicationContext();
     webAppCtx.setParent(ctx);
-    // This should be "org.obiba.opal.web"
-    webAppCtx.setConfigLocation("org.obiba.opal.web");
+    webAppCtx.setServletContext(contextHandler.getServletContext());
+    webAppCtx.setConfigLocation("classpath:/META-INF/spring/opal-httpd/context.xml");
     contextHandler.getServletContext().setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, webAppCtx);
-
-    PropertyPlaceholderConfigurer propertyConfigurer = new PropertyPlaceholderConfigurer();
-    propertyConfigurer.setLocations(new Resource[] { new ClassPathResource(DEFAULT_CONFIG_PROPERTIES_CLASSPATH), new FileSystemResource(System.getenv(OPAL_HOME_ENV_VAR) + "/" + OPAL_CONFIG_DIRECTORY + "/" + OPAL_CONFIG_PROPERTIES) });
-    webAppCtx.addBeanFactoryPostProcessor(propertyConfigurer);
+    this.webApplicationContext = webAppCtx;
 
     return contextHandler;
   }
