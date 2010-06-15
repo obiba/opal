@@ -24,7 +24,6 @@ import org.obiba.opal.web.model.client.DatasourceDto;
 import org.obiba.opal.web.model.client.TableDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
