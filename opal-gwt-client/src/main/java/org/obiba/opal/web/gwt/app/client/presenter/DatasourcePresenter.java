@@ -24,12 +24,14 @@ import org.obiba.opal.web.model.client.DatasourceDto;
 import org.obiba.opal.web.model.client.TableDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.Label;
 import com.google.inject.Inject;
 
@@ -47,17 +49,15 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
     HasFieldUpdater<TableDto, String> getTableNameColumn();
 
+    FlowPanel getSpreadsheetDownloadPanel();
+
   }
 
-  private DatasourceDto datasource;
+  private String datasource;
 
   @Inject
   public DatasourcePresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
-  }
-
-  public void setDatasource(DatasourceDto datasource) {
-    this.datasource = datasource;
   }
 
   @Override
@@ -72,10 +72,9 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
       public void onNavigatorSelectionChanged(NavigatorSelectionChangeEvent event) {
         event.getSelection().getUserObject();
         if(event.getSelection().getParentItem() == null) {
-          datasource = (DatasourceDto) event.getSelection().getUserObject();
-          String datasourceName = datasource.getName();
-          getDisplay().getDatasourceNameLabel().setText(datasourceName);
-          updateTable(datasourceName);
+          datasource = ((DatasourceDto) event.getSelection().getUserObject()).getName();
+          getDisplay().getDatasourceNameLabel().setText(datasource);
+          updateTable(datasource);
         }
       }
     }));
@@ -84,7 +83,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
       @Override
       public void onClick(ClickEvent event) {
-        Window.alert("Metadata download (OPAL-390) is currently not implemented.");
+        downloadMetadata(datasource);
       }
     }));
 
@@ -125,6 +124,13 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
       }
 
     }).send();
+  }
+
+  private void downloadMetadata(String datasource) {
+    String downloadUrl = GWT.getHostPageBaseURL().replace("org.obiba.opal.web.gwt.app.GwtApp/", "") + "ws/datasource/" + datasource + "/dictionary/excel";
+    Frame frame = new Frame(downloadUrl);
+    frame.setVisible(false);
+    getDisplay().getSpreadsheetDownloadPanel().add(frame);
   }
 
 }

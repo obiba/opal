@@ -175,4 +175,9 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
     return tableNameColumn;
   }
 
+  @Override
+  public FlowPanel getSpreadsheetDownloadPanel() {
+    return spreadsheetDownloadPanel;
+  }
+
 }

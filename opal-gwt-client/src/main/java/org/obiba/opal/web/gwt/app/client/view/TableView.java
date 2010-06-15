@@ -204,4 +204,9 @@ public class TableView extends Composite implements TablePresenter.Display {
   public HasFieldUpdater<VariableDto, String> getVariableNameColumn() {
     return variableNameColumn;
   }
+
+  @Override
+  public FlowPanel getSpreadsheetDownloadPanel() {
+    return spreadsheetDownloadPanel;
+  }
 }
