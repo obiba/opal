@@ -110,7 +110,7 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
 
   protected void initDisplayComponents() {
 
-    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files").get().withCallback(new ResourceCallback<FileDto>() {
+    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/filesystem").get().withCallback(new ResourceCallback<FileDto>() {
       @Override
       public void onResource(Response response, FileDto root) {
         getDisplay().setFiles(root);

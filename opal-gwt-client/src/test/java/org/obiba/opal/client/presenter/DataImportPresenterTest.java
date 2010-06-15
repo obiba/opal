@@ -54,7 +54,7 @@ public class DataImportPresenterTest extends AbstractGwtTestSetup {
 
     // Expect that the presenter makes these calls to the server when it binds itself.
     ResourceRequestBuilder mockRequestBuilder = mockBridge.addMock(ResourceRequestBuilder.class);
-    expect(mockRequestBuilder.forResource("/files")).andReturn(mockRequestBuilder).once();
+    expect(mockRequestBuilder.forResource("/filesystem")).andReturn(mockRequestBuilder).once();
     expect(mockRequestBuilder.get()).andReturn(mockRequestBuilder).anyTimes();
     expect(mockRequestBuilder.withCallback((ResourceCallback) EasyMock.anyObject())).andReturn(mockRequestBuilder).anyTimes();
     expect(mockRequestBuilder.forResource("/datasources")).andReturn(mockRequestBuilder).once();

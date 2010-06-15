@@ -91,7 +91,7 @@ public class FilesResourceTest {
 
     replay(opalRuntimeMock);
 
-    FilesResource filesResource = new FilesResource(opalRuntimeMock);
+    FileSystemResource filesResource = new FileSystemResource(opalRuntimeMock);
     FileDto rootFileDto = filesResource.getFileSystem();
 
     Assert.assertEquals("root", rootFileDto.getName());
@@ -106,7 +106,7 @@ public class FilesResourceTest {
 
     replay(opalRuntimeMock);
 
-    FilesResource filesResource = new FilesResource(opalRuntimeMock);
+    FileSystemResource filesResource = new FileSystemResource(opalRuntimeMock);
     FileDto rootFileDto = filesResource.getFileSystem();
 
     int childrenCounter = 0;
