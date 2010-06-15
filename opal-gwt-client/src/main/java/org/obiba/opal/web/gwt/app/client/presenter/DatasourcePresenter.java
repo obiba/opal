@@ -16,11 +16,15 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.event.TableSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.DatasourceDto;
 import org.obiba.opal.web.model.client.TableDto;
 
+import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -41,6 +45,8 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     Label getVariableCountLabel();
 
     HasClickHandlers getSpreadsheetIcon();
+
+    HasFieldUpdater<TableDto, String> getTableNameColumn();
 
   }
 
@@ -82,6 +88,17 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
         Window.alert("Metadata download (OPAL-390) is currently not implemented.");
       }
     }));
+
+    super.getDisplay().getTableNameColumn().setFieldUpdater(new FieldUpdater<TableDto, String>() {
+
+      @Override
+      public void update(int index, TableDto tableDto, String value) {
+
+        eventBus.fireEvent(new TableSelectionEvent(tableDto));
+
+      }
+
+    });
   }
 
   @Override

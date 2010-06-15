@@ -12,8 +12,10 @@ package org.obiba.opal.web.gwt.app.client.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.DatasourcePresenter;
+import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.model.client.TableDto;
 
+import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style.Unit;
@@ -22,6 +24,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.DOM;
@@ -61,6 +64,8 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
   private Image spreadsheetDownloadImage;
 
+  private TableNameColumn tableNameColumn;
+
   private Translations translations = GWT.create(Translations.class);
 
   public DatasourceView() {
@@ -70,7 +75,8 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   }
 
   private void addTableColumns() {
-    table.addColumn(new TextColumn<TableDto>() {
+
+    table.addColumn(tableNameColumn = new TableNameColumn() {
 
       @Override
       public String getValue(TableDto object) {
@@ -156,6 +162,17 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   @Override
   public HasClickHandlers getSpreadsheetIcon() {
     return spreadsheetDownloadImage;
+  }
+
+  private abstract class TableNameColumn extends Column<TableDto, String> implements HasFieldUpdater<TableDto, String> {
+    public TableNameColumn() {
+      super(new ClickableTextCell());
+    }
+  }
+
+  @Override
+  public HasFieldUpdater<TableDto, String> getTableNameColumn() {
+    return tableNameColumn;
   }
 
 }
