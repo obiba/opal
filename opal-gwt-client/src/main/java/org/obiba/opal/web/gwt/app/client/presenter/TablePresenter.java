@@ -16,7 +16,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.event.TableSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -94,10 +94,10 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       }
     }));
 
-    super.registerHandler(eventBus.addHandler(TableSelectionEvent.getType(), new TableSelectionEvent.Handler() {
+    super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
 
       @Override
-      public void onNavigatorSelectionChanged(TableSelectionEvent event) {
+      public void onNavigatorSelectionChanged(TableSelectionChangeEvent event) {
         String datasource = event.getSelection().getDatasourceName();
         String table = event.getSelection().getName();
         displayTable(datasource, table);

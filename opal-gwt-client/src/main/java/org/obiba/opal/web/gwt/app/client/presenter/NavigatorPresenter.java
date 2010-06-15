@@ -16,7 +16,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.event.TableSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
 
 import com.google.gwt.user.client.Window;
@@ -75,10 +75,10 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
       }
     }));
 
-    super.registerHandler(eventBus.addHandler(TableSelectionEvent.getType(), new TableSelectionEvent.Handler() {
+    super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
 
       @Override
-      public void onNavigatorSelectionChanged(TableSelectionEvent event) {
+      public void onNavigatorSelectionChanged(TableSelectionChangeEvent event) {
         displayTable(tablePresenter.getDisplay().asWidget());
       }
     }));

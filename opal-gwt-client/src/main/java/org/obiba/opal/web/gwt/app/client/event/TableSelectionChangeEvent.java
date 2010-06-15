@@ -17,11 +17,11 @@ import com.google.gwt.event.shared.GwtEvent;
 /**
  * Event to indicate that a Magma Table has been selected.
  */
-public class TableSelectionEvent extends GwtEvent<TableSelectionEvent.Handler> {
+public class TableSelectionChangeEvent extends GwtEvent<TableSelectionChangeEvent.Handler> {
 
   public interface Handler extends EventHandler {
 
-    void onNavigatorSelectionChanged(TableSelectionEvent event);
+    void onNavigatorSelectionChanged(TableSelectionChangeEvent event);
 
   }
 
@@ -32,7 +32,7 @@ public class TableSelectionEvent extends GwtEvent<TableSelectionEvent.Handler> {
   /**
    * @param selectedItem
    */
-  public TableSelectionEvent(TableDto tableDto) {
+  public TableSelectionChangeEvent(TableDto tableDto) {
     this.tableDto = tableDto;
   }
 

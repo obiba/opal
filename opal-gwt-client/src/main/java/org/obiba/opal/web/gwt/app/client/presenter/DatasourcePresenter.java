@@ -16,7 +16,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.event.TableSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -93,7 +93,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
       @Override
       public void update(int index, TableDto tableDto, String value) {
 
-        eventBus.fireEvent(new TableSelectionEvent(tableDto));
+        eventBus.fireEvent(new TableSelectionChangeEvent(tableDto));
 
       }
 
