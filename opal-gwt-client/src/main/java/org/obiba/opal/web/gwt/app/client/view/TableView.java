@@ -110,7 +110,7 @@ public class TableView extends Composite implements TablePresenter.Display {
 
       @Override
       public String getValue(VariableDto object) {
-        return "";
+        return object.getUnit();
       }
     }, translations.unitLabel());
 

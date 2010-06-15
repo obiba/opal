@@ -37,6 +37,9 @@ final class Dtos {
   public static VariableDto.Builder asDto(UriBuilder uriBuilder, Variable from) {
 
     VariableDto.Builder var = VariableDto.newBuilder().setName(from.getName()).setValueType(from.getValueType().getName());
+    if(from.getUnit() != null) {
+      var.setUnit(from.getUnit());
+    }
     if(uriBuilder != null) {
       var.setLink(uriBuilder.build(from.getName()).toString());
     }

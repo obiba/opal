@@ -23,6 +23,7 @@ message VariableDto {
   optional string link = 3;
   repeated AttributeDto attributes = 4;
   repeated CategoryDto categories = 5;
+  optional string unit = 6;
 }
 
 message CategoryDto {
