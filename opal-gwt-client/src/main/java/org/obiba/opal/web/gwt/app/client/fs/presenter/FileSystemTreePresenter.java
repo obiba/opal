@@ -39,8 +39,6 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
 
     void selectTreeItem(FileDto folder);
 
-    void selectTreeRoot();
-
   }
 
   @Inject
@@ -75,7 +73,6 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
 
   @Override
   public void revealDisplay() {
-    getDisplay().selectTreeRoot();
   }
 
   protected void initDisplayComponents() {
@@ -84,6 +81,8 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
       @Override
       public void onResource(Response response, FileDto root) {
         getDisplay().initTree(root);
+        getDisplay().selectTreeItem(root);
+        eventBus.fireEvent(new FileSystemTreeFolderSelectionChangeEvent(root));
       }
     }).send();
 

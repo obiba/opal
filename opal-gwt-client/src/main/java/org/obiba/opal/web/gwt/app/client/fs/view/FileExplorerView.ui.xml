@@ -32,7 +32,7 @@
           </g:Label>
         </g:center>
         <g:east size="75" horizontalAlignment="ALIGN_RIGHT">
-          <g:Button addStyleNames="{style.actionButton}">
+          <g:Button addStyleNames="{style.actionButton}" ui:field="fileUploadButton">
             <ui:msg description="Upload File label">Upload</ui:msg>
           </g:Button>
         </g:east>

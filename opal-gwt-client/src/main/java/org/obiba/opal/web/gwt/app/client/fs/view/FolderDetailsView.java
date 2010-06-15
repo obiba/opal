@@ -21,6 +21,7 @@ import org.obiba.opal.web.model.client.FileDto;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -56,8 +57,10 @@ public class FolderDetailsView extends Composite implements Display {
 
   @Override
   public void renderRows(final FileDto folder) {
-    table.setData(0, table.getPageSize(), JsArrays.toList(folder.getChildrenArray()));
-    table.setDataSize(folder.getChildrenArray().length(), true);
+    int fileCount = folder.getChildrenArray().length();
+    table.setPageSize(fileCount);
+    table.setDataSize(fileCount, true);
+    table.setData(0, fileCount, JsArrays.toList(folder.getChildrenArray(), 0, fileCount));
   }
 
   @Override
@@ -100,7 +103,7 @@ public class FolderDetailsView extends Composite implements Display {
 
       @Override
       public String getValue(FileDto object) {
-        return isFolder(object) ? String.valueOf((long) object.getSize()) : "";
+        return object.getType().isFileType(FileDto.FileType.FILE) ? String.valueOf((long) object.getSize()) : "";
       }
     }, translations.sizeLabel());
 
@@ -122,14 +125,8 @@ public class FolderDetailsView extends Composite implements Display {
 
   private static abstract class LastModifiedTimeColumn extends Column<FileDto, Date> {
     public LastModifiedTimeColumn() {
-      super(new DateCell());
+      super(new DateCell(DateTimeFormat.getShortDateTimeFormat()));
     }
-  }
-
-  private boolean isFolder(FileDto file) {
-    // TODO Replace the expression below by the text in comment if we find a solution to the enum bug in protobuf
-    /* file.getType() == FileDto.FileType.FILE */
-    return file.getSize() > 0;
   }
 
 }

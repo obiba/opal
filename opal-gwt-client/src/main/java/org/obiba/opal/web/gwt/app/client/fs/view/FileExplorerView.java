@@ -16,6 +16,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
@@ -32,6 +33,9 @@ public class FileExplorerView extends Composite implements Display {
 
   @UiField
   ScrollPanel folderDetailsPanel;
+
+  @UiField
+  Button fileUploadButton;
 
   private static FileExplorerUiBinder uiBinder = GWT.create(FileExplorerUiBinder.class);
 
@@ -62,6 +66,11 @@ public class FileExplorerView extends Composite implements Display {
   @Override
   public ScrollPanel getFolderDetailsPanel() {
     return folderDetailsPanel;
+  }
+
+  @Override
+  public Button getFileUploadButton() {
+    return fileUploadButton;
   }
 
 }

@@ -16,6 +16,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -41,6 +42,8 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
 
   }
 
+  private FileDto currentFolder;
+
   @Inject
   public FolderDetailsPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
@@ -57,19 +60,13 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
     super.getDisplay().getFileNameColumn().setFieldUpdater(new FieldUpdater<FileDto, String>() {
 
       public void update(int index, FileDto file, String value) {
-        if(isFolder(file)) {
+        if(file.getType().isFileType(FileDto.FileType.FILE)) {
           downloadFile(file.getPath());
         } else {
           updateTable(file.getPath());
           eventBus.fireEvent(new FolderSelectionChangeEvent(file));
         }
       }
-
-      private boolean isFolder(FileDto file) {
-        /* file.getType() == FileDto.FileType.FILE */
-        return file.getSize() > 0;
-      }
-
     });
 
     super.registerHandler(eventBus.addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(), new FileSystemTreeFolderSelectionChangeEvent.Handler() {
@@ -77,6 +74,15 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
       @Override
       public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
         updateTable(event.getFolder().getPath());
+      }
+
+    }));
+
+    super.registerHandler(eventBus.addHandler(FileUploadedEvent.getType(), new FileUploadedEvent.Handler() {
+
+      @Override
+      public void onFileUploaded(FileUploadedEvent event) {
+        refreshDisplay();
       }
 
     }));
@@ -92,7 +98,7 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
 
   @Override
   public void refreshDisplay() {
-    updateTable("/");
+    updateTable(currentFolder.getPath());
   }
 
   @Override
@@ -113,6 +119,7 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
       @Override
       public void onResource(Response response, FileDto resource) {
         getDisplay().renderRows(resource);
+        currentFolder = resource;
       }
     }).send();
   }

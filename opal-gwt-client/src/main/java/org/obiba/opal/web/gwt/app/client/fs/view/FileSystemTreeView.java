@@ -57,7 +57,7 @@ public class FileSystemTreeView implements Display {
     FileDto file;
     for(int i = 0; i < folderToAdd.getChildrenArray().length(); i++) {
       file = folderToAdd.getChildrenArray().get(i);
-      if(file.getSize() == 0 && !file.getSymbolicLink()) {
+      if(file.getType().isFileType(FileDto.FileType.FOLDER) && !file.getSymbolicLink()) {
         treeItem.addItem(createTreeItem(file));
       }
     }
@@ -79,11 +79,6 @@ public class FileSystemTreeView implements Display {
   public void selectTreeItem(FileDto folder) {
     // TODO Select the right node in the tree
     GWT.log("Folder selected details: " + folder.getPath());
-  }
-
-  @Override
-  public void selectTreeRoot() {
-    treeRoot.setSelected(true);
   }
 
 }

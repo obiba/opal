@@ -15,6 +15,9 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -25,6 +28,8 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
     ScrollPanel getFileSystemTree();
 
     ScrollPanel getFolderDetailsPanel();
+
+    public Button getFileUploadButton();
   }
 
   @Inject
@@ -33,9 +38,14 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   @Inject
   Provider<FolderDetailsPresenter> folderDetailsPresenterProvider;
 
+  @Inject
+  Provider<FileUploadDialogPresenter> fileUploadDialogPresenterProvider;
+
   FileSystemTreePresenter fileSystemTreePresenter;
 
   FolderDetailsPresenter folderDetailsPresenter;
+
+  FileUploadDialogPresenter fileUploadDialogPresenter;
 
   @Inject
   public FileExplorerPresenter(Display display, EventBus eventBus) {
@@ -76,13 +86,22 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   protected void initDisplayComponents() {
     fileSystemTreePresenter = fileSystemTreePresenterProvider.get();
     folderDetailsPresenter = folderDetailsPresenterProvider.get();
+    fileUploadDialogPresenter = fileUploadDialogPresenterProvider.get();
     getDisplay().getFileSystemTree().add(fileSystemTreePresenter.getDisplay().asWidget());
     getDisplay().getFolderDetailsPanel().add(folderDetailsPresenter.getDisplay().asWidget());
     fileSystemTreePresenter.bind();
     folderDetailsPresenter.bind();
+    fileUploadDialogPresenter.bind();
   }
 
   private void addEventHandlers() {
+    super.registerHandler(getDisplay().getFileUploadButton().addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        fileUploadDialogPresenter.revealDisplay();
+      }
+    }));
 
   }
 }
