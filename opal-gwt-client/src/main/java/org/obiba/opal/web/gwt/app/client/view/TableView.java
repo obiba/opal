@@ -12,9 +12,11 @@ package org.obiba.opal.web.gwt.app.client.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.TablePresenter;
+import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.model.client.AttributeDto;
 import org.obiba.opal.web.model.client.VariableDto;
 
+import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
@@ -24,6 +26,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.DOM;
@@ -67,13 +70,15 @@ public class TableView extends Composite implements TablePresenter.Display {
 
   private Image spreadsheetDownloadImage;
 
+  private VariableNameColumn variableNameColumn;
+
   private Translations translations = GWT.create(Translations.class);
 
   public TableView() {
     initWidget(uiBinder.createAndBindUi(this));
     addSpreadsheetDownloadImage();
 
-    table.addColumn(new TextColumn<VariableDto>() {
+    table.addColumn(variableNameColumn = new VariableNameColumn() {
       @Override
       public String getValue(VariableDto object) {
         return object.getName();
@@ -189,4 +194,14 @@ public class TableView extends Composite implements TablePresenter.Display {
     return spreadsheetDownloadImage;
   }
 
+  private abstract class VariableNameColumn extends Column<VariableDto, String> implements HasFieldUpdater<VariableDto, String> {
+    public VariableNameColumn() {
+      super(new ClickableTextCell());
+    }
+  }
+
+  @Override
+  public HasFieldUpdater<VariableDto, String> getVariableNameColumn() {
+    return variableNameColumn;
+  }
 }
