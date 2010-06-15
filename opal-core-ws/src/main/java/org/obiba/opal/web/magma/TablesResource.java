@@ -45,6 +45,7 @@ public class TablesResource {
       Magma.TableDto.Builder table = Magma.TableDto.newBuilder() //
       .setName(valueTable.getName()) //
       .setEntityType(valueTable.getEntityType()) //
+      .setDatasourceName(datasource) //
       .setVariableCount(Iterables.size(valueTable.getVariables())) //
       .setValueSetCount(valueTable.getVariableEntities().size()) //
       .setLink(tableLink.toString());

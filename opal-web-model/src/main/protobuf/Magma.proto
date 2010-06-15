@@ -14,6 +14,7 @@ message TableDto {
   optional string link = 3;
   optional int32 variableCount = 4;
   optional int32 valueSetCount = 5;
+  optional string datasourceName = 6;
 }
 
 message VariableDto {
