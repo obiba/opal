@@ -17,9 +17,12 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
 
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TreeItem;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Display> {
@@ -65,10 +68,9 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
       public void onNavigatorSelectionChanged(NavigatorSelectionChangeEvent event) {
         TreeItem item = event.getSelection();
         if(item.getParentItem() == null) {
-          getDisplay().getDetailsPanel().clear();
-          getDisplay().getDetailsPanel().add(datasourcePresenter.getDisplay().asWidget());
+          displayTable(datasourcePresenter.getDisplay().asWidget());
         } else {
-          displayTable();
+          displayTable(tablePresenter.getDisplay().asWidget());
         }
       }
     }));
@@ -77,14 +79,23 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
 
       @Override
       public void onNavigatorSelectionChanged(TableSelectionEvent event) {
-        displayTable();
+        displayTable(tablePresenter.getDisplay().asWidget());
       }
+    }));
+
+    super.registerHandler(eventBus.addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionChangeEvent.Handler() {
+
+      @Override
+      public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
+        Window.alert("Display the Variable View.");
+      }
+
     }));
   }
 
-  private void displayTable() {
+  private void displayTable(Widget widget) {
     getDisplay().getDetailsPanel().clear();
-    getDisplay().getDetailsPanel().add(tablePresenter.getDisplay().asWidget());
+    getDisplay().getDetailsPanel().add(widget);
   }
 
   @Override
