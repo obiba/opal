@@ -17,11 +17,14 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.TableDto;
 import org.obiba.opal.web.model.client.VariableDto;
 
+import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -49,6 +52,8 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     Label getEntityTypeLabel();
 
     HasClickHandlers getSpreadsheetIcon();
+
+    HasFieldUpdater<VariableDto, String> getVariableNameColumn();
   }
 
   private JsArray<VariableDto> variables;
@@ -98,6 +103,15 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
         displayTable(datasource, table);
       }
     }));
+
+    super.getDisplay().getVariableNameColumn().setFieldUpdater(new FieldUpdater<VariableDto, String>() {
+
+      @Override
+      public void update(int index, VariableDto variableDto, String value) {
+        eventBus.fireEvent(new VariableSelectionChangeEvent(variableDto));
+      }
+
+    });
   }
 
   private void displayTable(String datasource, String table) {
