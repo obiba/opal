@@ -8,6 +8,10 @@
     .title-bold { font-weight: bold; font-size: medium; }
     .title { font-size: medium; }
     .title-light { color: gray; font-size: medium; }
+    .tableList td:first-child  {
+      color: blue;
+      text-decoration: underline;
+    }    
   </ui:style>
 
   <g:LayoutPanel>
@@ -38,7 +42,7 @@
       </g:FlowPanel>     
     </g:layer>
     <g:layer height="90em" top="7.5em">
-        <g2:CellTable width="100%" ui:field="table" />
+        <g2:CellTable width="100%" ui:field="table" addStyleNames="{style.tableList}" />
     </g:layer>
   </g:LayoutPanel>
 </ui:UiBinder>
