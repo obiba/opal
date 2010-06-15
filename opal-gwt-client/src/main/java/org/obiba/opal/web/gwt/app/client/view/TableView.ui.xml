@@ -11,7 +11,10 @@
     .tableList td:first-child  {
       color: blue;
       text-decoration: underline;
-    }    
+    }
+    .tableList td:first-child:hover {
+      cursor: pointer;
+    } 
   </ui:style>
 
   <g:LayoutPanel>
