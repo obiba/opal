@@ -21,6 +21,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionExpiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.DatasourceDto;
@@ -48,6 +49,8 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
     void clear();
 
     void selectFirstDatasource();
+
+    void selectTable(String tableName);
 
   }
 
@@ -82,6 +85,15 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
       public void onSessionExpired(SessionExpiredEvent event) {
         getDisplay().clear();
       }
+    }));
+
+    super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
+
+      @Override
+      public void onNavigatorSelectionChanged(TableSelectionChangeEvent event) {
+        getDisplay().selectTable(event.getSelection().getName());
+      }
+
     }));
   }
 
