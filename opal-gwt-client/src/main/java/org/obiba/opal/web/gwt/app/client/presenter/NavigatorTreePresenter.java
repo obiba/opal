@@ -47,6 +47,8 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
 
     void clear();
 
+    void selectFirstDatasource();
+
   }
 
   @Inject
@@ -117,11 +119,9 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
           }
           items.add(dsItem);
         }
-        items.get(0).setSelected(true);
         getDisplay().setItems(items);
-        eventBus.fireEvent(new NavigatorSelectionChangeEvent(items.get(0)));
+        getDisplay().selectFirstDatasource();
       }
     }).send();
   }
-
 }

@@ -61,4 +61,9 @@ public class NavigatorTreeView implements NavigatorTreePresenter.Display {
   public void stopProcessing() {
   }
 
+  @Override
+  public void selectFirstDatasource() {
+    tree.setSelectedItem(tree.getItem(0), true);
+  }
+
 }
