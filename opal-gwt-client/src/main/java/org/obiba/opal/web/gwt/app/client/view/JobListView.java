@@ -200,7 +200,7 @@ public class JobListView extends Composite implements Display {
   }
 
   private void addTablePager() {
-    table.setPageSize(20);
+    table.setPageSize(50);
     pager = new SimplePager<CommandStateDto>(table);
     table.setPager(pager);
     ((VerticalPanel) table.getParent()).insert(pager, 0);
