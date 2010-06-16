@@ -124,41 +124,45 @@ public class DefaultExportServiceImpl implements ExportService {
 
     try {
       for(ValueTable table : sourceTables) {
-        if(Thread.interrupted()) {
-          throw new InterruptedException("Thread interrupted");
-        }
-
-        // If the incremental option was specified, create an incremental view of the table (leaving out what has
-        // already been exported).
-        table = incremental ? getIncrementalView(table, destinationDatasource) : table;
-
-        CopyAuditor auditor;
-        // If the table contains an entity that requires key separation, create a "unit view" of the table (replace
-        // public identifiers with private, unit-specific identifiers).
-        // Also, replace the copier with one that persists the "public" identifiers in the audit log.
-        if((unit != null) && table.isForEntityType(keysTableEntityType)) {
-          FunctionalUnitView unitView = getUnitView(unit, table);
-          table = unitView;
-          auditor = this.auditLogManager.createAuditor(datasourceCopier, destinationDatasource, unitView.getVariableEntityReverseTransformer());
-        } else {
-          auditor = this.auditLogManager.createAuditor(datasourceCopier, destinationDatasource, null);
-        }
-
-        // Go ahead and copy the result to the destination datasource.
-        MultithreadedDatasourceCopier.Builder.newCopier().from(table).to(destinationDatasource).withCopier(datasourceCopier).withReaders(4).withThreads(new ThreadFactory() {
-
-          @Override
-          public Thread newThread(Runnable r) {
-            return new TransactionalThread(txManager, r);
-          }
-        }).build().copy();
-        auditor.completeAuditing();
+        exportTableToDatasource(destinationDatasource, datasourceCopier, incremental, unit, table);
       }
     } catch(IOException ex) {
       // When implementing the ExcelDatasource:
       // Determine if this the ExcelDatasource. If yes then display the filename.
       throw new ExportException("An error was encountered while exporting to datasource '" + destinationDatasource + "'.", ex);
     }
+  }
+
+  private void exportTableToDatasource(Datasource destinationDatasource, DatasourceCopier.Builder datasourceCopier, boolean incremental, FunctionalUnit unit, ValueTable table) throws InterruptedException, IOException {
+    if(Thread.interrupted()) {
+      throw new InterruptedException("Thread interrupted");
+    }
+
+    // If the incremental option was specified, create an incremental view of the table (leaving out what has
+    // already been exported).
+    table = incremental ? getIncrementalView(table, destinationDatasource) : table;
+
+    CopyAuditor auditor;
+    // If the table contains an entity that requires key separation, create a "unit view" of the table (replace
+    // public identifiers with private, unit-specific identifiers).
+    // Also, replace the copier with one that persists the "public" identifiers in the audit log.
+    if((unit != null) && table.isForEntityType(keysTableEntityType)) {
+      FunctionalUnitView unitView = getUnitView(unit, table);
+      table = unitView;
+      auditor = this.auditLogManager.createAuditor(datasourceCopier, destinationDatasource, unitView.getVariableEntityReverseTransformer());
+    } else {
+      auditor = this.auditLogManager.createAuditor(datasourceCopier, destinationDatasource, null);
+    }
+
+    // Go ahead and copy the result to the destination datasource.
+    MultithreadedDatasourceCopier.Builder.newCopier().from(table).to(destinationDatasource).withCopier(datasourceCopier).withReaders(4).withThreads(new ThreadFactory() {
+
+      @Override
+      public Thread newThread(Runnable r) {
+        return new TransactionalThread(txManager, r);
+      }
+    }).build().copy();
+    auditor.completeAuditing();
   }
 
   public void exportTablesToExcelFile(String unitName, List<String> sourceTableNames, File destinationExcelFile, boolean incremental) throws InterruptedException {
