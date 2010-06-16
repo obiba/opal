@@ -88,4 +88,10 @@ public interface Translations extends Constants {
   String valueLabel();
 
   String codeLabel();
+
+  String mimeTypeLabel();
+
+  String repeatableLabel();
+
+  String occurrenceGroupLabel();
 }
