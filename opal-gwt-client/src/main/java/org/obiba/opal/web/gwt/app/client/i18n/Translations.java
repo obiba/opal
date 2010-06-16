@@ -84,4 +84,6 @@ public interface Translations extends Constants {
   String languageLabel();
 
   String valueLabel();
+
+  String codeLabel();
 }

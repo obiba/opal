@@ -58,6 +58,9 @@ final class Dtos {
     }
     for(Category category : from.getCategories()) {
       CategoryDto.Builder c = CategoryDto.newBuilder().setName(category.getName()).setIsMissing(category.isMissing());
+      if(category.getCode() != null) {
+        c.setCode(category.getCode());
+      }
       var.addCategories(c);
     }
 

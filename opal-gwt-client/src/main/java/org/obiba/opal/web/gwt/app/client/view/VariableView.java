@@ -189,6 +189,13 @@ public class VariableView extends Composite implements VariablePresenter.Display
     categoryTable.addColumn(new TextColumn<CategoryDto>() {
       @Override
       public String getValue(CategoryDto object) {
+        return object.hasCode() ? object.getCode() : "";
+      }
+    }, translations.codeLabel());
+
+    categoryTable.addColumn(new TextColumn<CategoryDto>() {
+      @Override
+      public String getValue(CategoryDto object) {
         return object.getName();
       }
     }, translations.nameLabel());
@@ -220,7 +227,7 @@ public class VariableView extends Composite implements VariablePresenter.Display
     attributeTable.addColumn(new TextColumn<AttributeDto>() {
       @Override
       public String getValue(AttributeDto object) {
-        return object.getLocale();
+        return object.hasLocale() ? object.getLocale() : "";
       }
     }, translations.languageLabel());
 

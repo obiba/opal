@@ -31,9 +31,10 @@ message VariableDto {
 }
 
 message CategoryDto {
-  required string name = 1;
-  required bool isMissing = 2;
-  repeated AttributeDto attributes = 3;
+  optional string code = 1;
+  required string name = 2;
+  required bool isMissing = 3;
+  repeated AttributeDto attributes = 4;
 }
 
 message AttributeDto {
