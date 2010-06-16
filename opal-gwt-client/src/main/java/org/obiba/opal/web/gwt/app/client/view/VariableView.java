@@ -203,9 +203,31 @@ public class VariableView extends Composite implements VariablePresenter.Display
     categoryTable.addColumn(new TextColumn<CategoryDto>() {
       @Override
       public String getValue(CategoryDto object) {
+        return getCategoryLabel(object);
+      }
+    }, translations.labelLabel());
+
+    categoryTable.addColumn(new TextColumn<CategoryDto>() {
+      @Override
+      public String getValue(CategoryDto object) {
         return object.getIsMissing() ? translations.yesLabel() : translations.noLabel();
       }
     }, translations.missingLabel());
+  }
+
+  private String getCategoryLabel(CategoryDto categoryDto) {
+    String categoryLabel = "";
+
+    JsArray<AttributeDto> attributes = categoryDto.getAttributesArray();
+    for(int i = 0; i < attributes.length(); i++) {
+      AttributeDto attribute = attributes.get(i);
+      // TODO: Select the 'label' attribute with the current locale.
+      if(attribute.getName().equals("label")) {
+        return attribute.getValue();
+      }
+    }
+
+    return categoryLabel;
   }
 
   private void initAttributeTable() {

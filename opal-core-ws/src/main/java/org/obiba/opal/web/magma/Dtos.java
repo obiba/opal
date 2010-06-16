@@ -50,17 +50,17 @@ final class Dtos {
       var.setLink(uriBuilder.build(from.getName()).toString());
     }
     for(Attribute attribute : from.getAttributes()) {
-      AttributeDto.Builder a = AttributeDto.newBuilder().setName(attribute.getName()).setValue(attribute.getValue().toString());
-      if(attribute.isLocalised()) {
-        a.setLocale(attribute.getLocale().toString());
-      }
-      var.addAttributes(a);
+      var.addAttributes(asDto(attribute));
     }
     for(Category category : from.getCategories()) {
       CategoryDto.Builder c = CategoryDto.newBuilder().setName(category.getName()).setIsMissing(category.isMissing());
       if(category.getCode() != null) {
         c.setCode(category.getCode());
       }
+      for(Attribute attribute : category.getAttributes()) {
+        c.addAttributes(asDto(attribute));
+      }
+
       var.addCategories(c);
     }
 
@@ -70,5 +70,13 @@ final class Dtos {
 
   public static VariableDto.Builder asDto(Variable from) {
     return asDto(null, from);
+  }
+
+  public static AttributeDto.Builder asDto(Attribute from) {
+    AttributeDto.Builder a = AttributeDto.newBuilder().setName(from.getName()).setValue(from.getValue().toString());
+    if(from.isLocalised()) {
+      a.setLocale(from.getLocale().toString());
+    }
+    return a;
   }
 }
