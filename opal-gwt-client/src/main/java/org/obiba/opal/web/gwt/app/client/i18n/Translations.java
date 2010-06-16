@@ -71,6 +71,8 @@ public interface Translations extends Constants {
 
   Map<String, String> userMessageMap();
 
+  String fileMustBeSelected();
+
   String yesLabel();
 
   String noLabel();

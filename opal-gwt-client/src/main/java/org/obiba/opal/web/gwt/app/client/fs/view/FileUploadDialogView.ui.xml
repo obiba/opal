@@ -4,10 +4,12 @@
 
   <ui:style>
     .separator { border-bottom: .2em solid black; }
-    
+
     .optionsPanelMsg td { font-size:1.25em; margin: 0.5em 0.5em 0.5em 0.5em; }
-    
+
     .remoteFolderName{ font-weight:bold; }
+    
+    .errorMsg{color:red;}
   </ui:style>
 
   <g:DialogBox ui:field="dialog" autoHide="false" modal="true" height="10em" width="35em">
@@ -15,8 +17,11 @@
       <ui:msg description="Upload file dialog title">File Upload</ui:msg>
     </g:caption>
     <!-- The width here have to match EXACTLY the one on DialogBox above -->
-    <g:LayoutPanel height="10em" width="35em">
-      <g:layer top="0.75em" bottom="5em" left="1em" right="1em">
+    <g:LayoutPanel height="12em" width="35em">
+      <g:layer bottom="9.5em" height="2em" left="1em" right="1em">
+        <g:Label ui:field="errorMsg" addStyleNames="{style.errorMsg}"/>
+      </g:layer>
+      <g:layer height="6em" bottom="3.5em" left="1em" right="1em">
         <g:ScrollPanel>
           <g:FormPanel encoding="multipart/form-data" method="POST" ui:field="form">
             <g:VerticalPanel ui:field="inputFieldPanel">
@@ -24,8 +29,8 @@
                 <g:Label>
                   <ui:msg description="Select file to upload label">Select the file to be uploaded in directory:</ui:msg>
                 </g:Label>
-                <g:Label ui:field="remoteFolderName" addStyleNames="{style.remoteFolderName}"/>              
-                <g:Hidden name="remoteFolder" ui:field="remoteFolder"/>
+                <g:Label ui:field="remoteFolderName" addStyleNames="{style.remoteFolderName}" />
+                <g:Hidden name="remoteFolder" ui:field="remoteFolder" />
               </g:HorizontalPanel>
               <g:FileUpload name="fileToUpload" ui:field="fileToUpload" />
             </g:VerticalPanel>

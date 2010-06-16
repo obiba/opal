@@ -79,6 +79,20 @@ public class FileSystemTreeView implements Display {
   public void selectTreeItem(FileDto folder) {
     // TODO Select the right node in the tree
     GWT.log("Folder selected details: " + folder.getPath());
+    // TreeItem itemToSelect = searchChildren(treeRoot, folder);
+    // itemToSelect.setSelected(true);
+  }
+
+  private TreeItem searchChildren(TreeItem parent, FileDto folder) {
+    TreeItem child;
+    for(int i = 0; i < parent.getChildCount(); i++) {
+      child = parent.getChild(i);
+      if(((FileDto) child.getUserObject()).getPath().equals(folder.getPath())) return child;
+      if(child.getChildCount() > 0) {
+        return searchChildren(child, folder);
+      }
+    }
+    return null;
   }
 
 }

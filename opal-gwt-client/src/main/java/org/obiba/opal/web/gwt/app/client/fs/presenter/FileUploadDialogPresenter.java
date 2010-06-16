@@ -16,6 +16,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -28,6 +29,7 @@ import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
+import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.inject.Inject;
 
 public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogPresenter.Display> {
@@ -48,7 +50,11 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
     Label getRemoteFolderName();
 
     VerticalPanel getInputFieldPanel();
+
+    Label getErrorMsg();
   }
+
+  private Translations translations = GWT.create(Translations.class);
 
   @Inject
   public FileUploadDialogPresenter(Display display, EventBus eventBus) {
@@ -96,6 +102,16 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
     super.registerHandler(getDisplay().getCancelButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
         getDisplay().getDialog().hide();
+      }
+    }));
+
+    super.registerHandler(getDisplay().getUploadForm().addSubmitHandler(new FormPanel.SubmitHandler() {
+      @Override
+      public void onSubmit(SubmitEvent event) {
+        if(getDisplay().getFileToUpload().getFilename().equals("")) {
+          getDisplay().getErrorMsg().setText(translations.fileMustBeSelected());
+          event.cancel();
+        }
       }
     }));
 
