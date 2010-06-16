@@ -203,7 +203,7 @@ public class VariableView extends Composite implements VariablePresenter.Display
     categoryTable.addColumn(new TextColumn<CategoryDto>() {
       @Override
       public String getValue(CategoryDto object) {
-        return Boolean.toString(object.getIsMissing());
+        return object.getIsMissing() ? translations.yesLabel() : translations.noLabel();
       }
     }, translations.missingLabel());
   }
