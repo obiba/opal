@@ -15,10 +15,9 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
@@ -100,25 +99,6 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
       }
     }));
 
-    super.registerHandler(eventBus.addHandler(FolderSelectionChangeEvent.getType(), new FolderSelectionChangeEvent.Handler() {
-
-      @Override
-      public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
-        getDisplay().getRemoteFolder().setValue(event.getFolder().getPath());
-      }
-
-    }));
-
-    super.registerHandler(eventBus.addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(), new FileSystemTreeFolderSelectionChangeEvent.Handler() {
-
-      @Override
-      public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
-        getDisplay().getRemoteFolder().setValue(event.getFolder().getPath());
-        getDisplay().getRemoteFolderName().setText(event.getFolder().getName());
-      }
-
-    }));
-
     super.registerHandler(getDisplay().getUploadForm().addSubmitCompleteHandler(new FormPanel.SubmitCompleteHandler() {
       public void onSubmitComplete(SubmitCompleteEvent event) {
         getDisplay().getDialog().hide();
@@ -130,7 +110,7 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
 
   private void uploadFile() {
     FormPanel form = getDisplay().getUploadForm();
-    String url = "/ws/files" + getDisplay().getRemoteFolder().getValue() + "/" + getDisplay().getFileToUpload().getFilename();
+    String url = "/ws/files" + getDisplay().getRemoteFolder().getValue() + getDisplay().getFileToUpload().getFilename();
     form.setAction(url);
     form.submit();
   }

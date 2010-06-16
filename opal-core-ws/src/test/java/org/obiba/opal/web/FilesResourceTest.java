@@ -144,13 +144,13 @@ public class FilesResourceTest {
     replay(opalRuntimeMock);
 
     checkGetFolderResponse("/", new String[] { "..", "folder1", "folder2", "folder3", "folder4", "folder5", "file2.txt" });
-    checkGetFolderResponse("/folder1/folder11", new String[] { "..", "folder111", "file111.txt" });
-    checkGetFolderResponse("/folder1/folder11/folder111", new String[] { "..", "file1111.txt", "file1112.txt" });
-    checkGetFolderResponse("/folder2", new String[] { "..", "file21.txt" });
-    checkGetFolderResponse("/folder3", new String[] { "..", "folder31" });
-    checkGetFolderResponse("/folder4", new String[] { "..", "folder41", "file41.txt", "file42.txt", "file43.txt" });
-    checkGetFolderResponse("/folder4/folder41", new String[] { ".." });
-    checkGetFolderResponse("/folder5", new String[] { "..", "file51.txt" });
+    checkGetFolderResponse("/folder1/folder11", new String[] { "folder1", "folder111", "file111.txt" });
+    checkGetFolderResponse("/folder1/folder11/folder111", new String[] { "folder11", "file1111.txt", "file1112.txt" });
+    checkGetFolderResponse("/folder2", new String[] { "root", "file21.txt" });
+    checkGetFolderResponse("/folder3", new String[] { "root", "folder31" });
+    checkGetFolderResponse("/folder4", new String[] { "root", "folder41", "file41.txt", "file42.txt", "file43.txt" });
+    checkGetFolderResponse("/folder4/folder41", new String[] { "folder4" });
+    checkGetFolderResponse("/folder5", new String[] { "root", "file51.txt" });
 
     verify(opalRuntimeMock);
 

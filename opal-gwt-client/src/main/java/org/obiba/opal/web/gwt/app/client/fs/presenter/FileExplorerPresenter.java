@@ -15,6 +15,10 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
+import org.obiba.opal.web.model.client.FileDto;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
@@ -46,6 +50,8 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   FolderDetailsPresenter folderDetailsPresenter;
 
   FileUploadDialogPresenter fileUploadDialogPresenter;
+
+  FileDto currentFolder;
 
   @Inject
   public FileExplorerPresenter(Display display, EventBus eventBus) {
@@ -86,12 +92,10 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   protected void initDisplayComponents() {
     fileSystemTreePresenter = fileSystemTreePresenterProvider.get();
     folderDetailsPresenter = folderDetailsPresenterProvider.get();
-    fileUploadDialogPresenter = fileUploadDialogPresenterProvider.get();
     getDisplay().getFileSystemTree().add(fileSystemTreePresenter.getDisplay().asWidget());
     getDisplay().getFolderDetailsPanel().add(folderDetailsPresenter.getDisplay().asWidget());
     fileSystemTreePresenter.bind();
     folderDetailsPresenter.bind();
-    fileUploadDialogPresenter.bind();
   }
 
   private void addEventHandlers() {
@@ -99,8 +103,30 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
       @Override
       public void onClick(ClickEvent event) {
+        fileUploadDialogPresenter = fileUploadDialogPresenterProvider.get();
+        fileUploadDialogPresenter.getDisplay().getRemoteFolderName().setText(currentFolder.getName());
+        fileUploadDialogPresenter.getDisplay().getRemoteFolder().setValue(currentFolder.getPath());
+        fileUploadDialogPresenter.bind();
         fileUploadDialogPresenter.revealDisplay();
       }
+    }));
+
+    super.registerHandler(eventBus.addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(), new FileSystemTreeFolderSelectionChangeEvent.Handler() {
+
+      @Override
+      public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
+        currentFolder = event.getFolder();
+      }
+
+    }));
+
+    super.registerHandler(eventBus.addHandler(FolderSelectionChangeEvent.getType(), new FolderSelectionChangeEvent.Handler() {
+
+      @Override
+      public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
+        currentFolder = event.getFolder();
+      }
+
     }));
 
   }

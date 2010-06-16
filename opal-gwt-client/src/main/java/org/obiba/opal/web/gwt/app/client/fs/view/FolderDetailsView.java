@@ -21,6 +21,7 @@ import org.obiba.opal.web.model.client.FileDto;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -57,10 +58,11 @@ public class FolderDetailsView extends Composite implements Display {
 
   @Override
   public void renderRows(final FileDto folder) {
-    int fileCount = folder.getChildrenArray().length();
+    JsArray<FileDto> children = folder.getChildrenArray();
+    int fileCount = children.length();
     table.setPageSize(fileCount);
     table.setDataSize(fileCount, true);
-    table.setData(0, fileCount, JsArrays.toList(folder.getChildrenArray(), 0, fileCount));
+    table.setData(0, fileCount, JsArrays.toList(children, 0, fileCount));
   }
 
   @Override
@@ -95,6 +97,9 @@ public class FolderDetailsView extends Composite implements Display {
 
       @Override
       public String getValue(FileDto object) {
+        if(object.getSymbolicLink()) {
+          return "..";
+        }
         return object.getName();
       }
     }, translations.nameLabel());
