@@ -99,7 +99,7 @@ public class VariableView extends Composite implements VariablePresenter.Display
   public void renderCategoryRows(JsArray<CategoryDto> rows) {
     final JsArray<CategoryDto> categoryRows = (rows != null) ? rows : (JsArray<CategoryDto>) JsArray.createArray();
 
-    categoryTableTitle.setText("Categories" + " (" + categoryRows.length() + ")");
+    categoryTableTitle.setText(translations.categoriesLabel() + " (" + categoryRows.length() + ")");
 
     categoryTable.setDelegate(new Delegate<CategoryDto>() {
 
@@ -119,7 +119,7 @@ public class VariableView extends Composite implements VariablePresenter.Display
   public void renderAttributeRows(final JsArray<AttributeDto> rows) {
     final JsArray<AttributeDto> attributeRows = (rows != null) ? rows : (JsArray<AttributeDto>) JsArray.createArray();
 
-    attributeTableTitle.setText("Attributes" + " (" + attributeRows.length() + ")");
+    attributeTableTitle.setText(translations.attributesLabel() + " (" + attributeRows.length() + ")");
 
     attributeTable.setDelegate(new Delegate<AttributeDto>() {
 
@@ -178,7 +178,7 @@ public class VariableView extends Composite implements VariablePresenter.Display
   }
 
   private void initCategoryTable() {
-    categoryTableTitle.setText("Categories");
+    categoryTableTitle.setText(translations.categoriesLabel());
     categoryTable.setSelectionEnabled(false);
     categoryTable.setSelectionModel(new SingleSelectionModel<CategoryDto>());
 
@@ -198,11 +198,11 @@ public class VariableView extends Composite implements VariablePresenter.Display
       public String getValue(CategoryDto object) {
         return Boolean.toString(object.getIsMissing());
       }
-    }, "Missing"); // translations.nameLabel());
+    }, translations.missingLabel());
   }
 
   private void initAttributeTable() {
-    attributeTableTitle.setText("Attributes");
+    attributeTableTitle.setText(translations.attributesLabel());
     attributeTable.setSelectionEnabled(false);
     attributeTable.setSelectionModel(new SingleSelectionModel<AttributeDto>());
 
@@ -222,7 +222,7 @@ public class VariableView extends Composite implements VariablePresenter.Display
       public String getValue(AttributeDto object) {
         return object.getLocale();
       }
-    }, "Language"); // translations.languageLabel());
+    }, translations.languageLabel());
 
     attributeTable.addColumn(new TextColumn<AttributeDto>() {
       @Override

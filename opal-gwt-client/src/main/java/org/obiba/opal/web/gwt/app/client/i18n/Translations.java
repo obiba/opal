@@ -70,4 +70,18 @@ public interface Translations extends Constants {
   String unitLabel();
 
   Map<String, String> userMessageMap();
+
+  String yesLabel();
+
+  String noLabel();
+
+  String missingLabel();
+
+  String categoriesLabel();
+
+  String attributesLabel();
+
+  String languageLabel();
+
+  String valueLabel();
 }

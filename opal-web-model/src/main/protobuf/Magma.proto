@@ -19,14 +19,15 @@ message TableDto {
 
 message VariableDto {
   required string name = 1;
-  required string valueType = 2;
-  optional string mimeType = 3;
-  required bool isRepeatable = 4;
-  optional string occurrenceGroup = 5;  
-  optional string link = 6;
-  repeated AttributeDto attributes = 7;
-  repeated CategoryDto categories = 8;
-  optional string unit = 9;
+  required string entityType = 2;
+  required string valueType = 3;
+  optional string mimeType = 4;
+  required bool isRepeatable = 5;
+  optional string occurrenceGroup = 6;  
+  optional string link = 7;
+  repeated AttributeDto attributes = 8;
+  repeated CategoryDto categories = 9;
+  optional string unit = 10;
 }
 
 message CategoryDto {

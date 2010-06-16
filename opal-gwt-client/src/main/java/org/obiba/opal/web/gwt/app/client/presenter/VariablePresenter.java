@@ -15,12 +15,13 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.AttributeDto;
 import org.obiba.opal.web.model.client.CategoryDto;
 import org.obiba.opal.web.model.client.VariableDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
@@ -51,6 +52,8 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     void renderAttributeRows(JsArray<AttributeDto> rows);
   }
 
+  private static Translations translations = GWT.create(Translations.class);
+
   /**
    * @param display
    * @param eventBus
@@ -67,21 +70,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
   @Override
   protected void onBind() {
-    super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
-
-      @Override
-      public void onNavigatorSelectionChanged(TableSelectionChangeEvent event) {
-        getDisplay().getEntityTypeLabel().setText(event.getSelection().getEntityType());
-      }
-    }));
-
-    super.registerHandler(eventBus.addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionChangeEvent.Handler() {
-
-      @Override
-      public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-        updateDisplay(event.getSelection());
-      }
-    }));
+    registerVariableSelectionChangeHandler();
   }
 
   @Override
@@ -104,13 +93,23 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   // Methods
   //
 
+  private void registerVariableSelectionChangeHandler() {
+    super.registerHandler(eventBus.addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionChangeEvent.Handler() {
+
+      @Override
+      public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
+        updateDisplay(event.getSelection());
+      }
+    }));
+  }
+
   private void updateDisplay(VariableDto variableDto) {
     getDisplay().getVariableNameLabel().setText(variableDto.getName());
-    // getDisplay().getEntityTypeLabel().setText(variableDto.getEntityType());
+    getDisplay().getEntityTypeLabel().setText(variableDto.getEntityType());
     getDisplay().getValueTypeLabel().setText(variableDto.getValueType());
     getDisplay().getMimeTypeLabel().setText(variableDto.hasMimeType() ? variableDto.getMimeType() : "");
-    // getDisplay().getUnitLabel().setText(variableDto.getUnit());
-    getDisplay().getRepeatableLabel().setText(variableDto.getIsRepeatable() ? "Yes" : "No");
+    getDisplay().getUnitLabel().setText(variableDto.hasUnit() ? variableDto.getUnit() : "");
+    getDisplay().getRepeatableLabel().setText(variableDto.getIsRepeatable() ? translations.yesLabel() : translations.noLabel());
     getDisplay().getOccurrenceGroupLabel().setText(variableDto.getIsRepeatable() ? variableDto.getOccurrenceGroup() : "");
 
     getDisplay().renderCategoryRows(variableDto.getCategoriesArray());
