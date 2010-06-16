@@ -77,7 +77,7 @@ public class OpalGinModule extends AbstractGinModule {
     bind(NavigatorTreePresenter.Display.class).to(NavigatorTreeView.class);
     bind(DatasourcePresenter.Display.class).to(DatasourceView.class);
     bind(TablePresenter.Display.class).to(TableView.class);
-    bind(VariablePresenter.Display.class).to(VariableView.class).in(Singleton.class);
+    bind(VariablePresenter.Display.class).to(VariableView.class);
     bind(DataImportPresenter.Display.class).to(DataImportView.class);// .in(Singleton.class);
     bind(DataExportPresenter.Display.class).to(DataExportView.class);
     bind(ErrorDialogPresenter.Display.class).to(ErrorDialogView.class);
