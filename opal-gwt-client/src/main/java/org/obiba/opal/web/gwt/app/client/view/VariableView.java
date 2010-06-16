@@ -229,6 +229,6 @@ public class VariableView extends Composite implements VariablePresenter.Display
       public String getValue(AttributeDto object) {
         return object.getValue();
       }
-    }, "Value"); // translations.valueLabel());
+    }, translations.valueLabel());
   }
 }
