@@ -41,6 +41,10 @@ public class VariableView extends Composite implements VariablePresenter.Display
   interface VariableViewUiBinder extends UiBinder<Widget, VariableView> {
   }
 
+  private static final String DEFAULT_LOCALE_NAME = "default";
+
+  private static final String LABEL_ATTRIBUTE_NAME = "label";
+
   private static VariableViewUiBinder uiBinder = GWT.create(VariableViewUiBinder.class);
 
   private static Translations translations = GWT.create(Translations.class);
@@ -235,13 +239,23 @@ public class VariableView extends Composite implements VariablePresenter.Display
     JsArray<AttributeDto> attributes = categoryDto.getAttributesArray();
     for(int i = 0; i < attributes.length(); i++) {
       AttributeDto attribute = attributes.get(i);
-      // TODO: Select the 'label' attribute with the current locale.
-      if(attribute.getName().equals("label")) {
+      if(attribute.getName().equals(LABEL_ATTRIBUTE_NAME) && attribute.getLocale() != null && attribute.getLocale().equals(getCurrentLanguage())) {
         return attribute.getValue();
       }
     }
 
     return categoryLabel;
+  }
+
+  private String getCurrentLanguage() {
+    String currentLocaleName = com.google.gwt.i18n.client.LocaleInfo.getCurrentLocale().getLocaleName();
+    if(currentLocaleName.equals(DEFAULT_LOCALE_NAME)) {
+      // No locale has been specified so the current locale is "default". Return English as the current language.
+      return "en";
+    }
+    int separatorIndex = currentLocaleName.indexOf('_');
+
+    return (separatorIndex != -1) ? currentLocaleName.substring(0, separatorIndex) : currentLocaleName;
   }
 
   private void initAttributeTable() {
