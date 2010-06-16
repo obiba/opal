@@ -21,10 +21,12 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -74,11 +76,15 @@ public class VariableView extends Composite implements VariablePresenter.Display
   @UiField
   CellTable<CategoryDto> categoryTable;
 
+  SimplePager<CategoryDto> categoryTablePager;
+
   @UiField
   Label attributeTableTitle;
 
   @UiField
   CellTable<AttributeDto> attributeTable;
+
+  SimplePager<AttributeDto> attributeTablePager;
 
   //
   // Constructors
@@ -111,7 +117,8 @@ public class VariableView extends Composite implements VariablePresenter.Display
       }
     });
 
-    categoryTable.setData(0, categoryRows.length(), JsArrays.toList(categoryRows, 0, categoryRows.length()));
+    categoryTablePager.firstPage();
+    categoryTable.setData(0, categoryTable.getPageSize(), JsArrays.toList(categoryRows, 0, categoryTable.getPageSize()));
     categoryTable.setDataSize(categoryRows.length(), true);
   }
 
@@ -131,7 +138,8 @@ public class VariableView extends Composite implements VariablePresenter.Display
       }
     });
 
-    attributeTable.setData(0, attributeRows.length(), JsArrays.toList(attributeRows, 0, attributeRows.length()));
+    attributeTablePager.firstPage();
+    attributeTable.setData(0, attributeTable.getPageSize(), JsArrays.toList(attributeRows, 0, attributeTable.getPageSize()));
     attributeTable.setDataSize(attributeRows.length(), true);
   }
 
@@ -183,6 +191,12 @@ public class VariableView extends Composite implements VariablePresenter.Display
     categoryTable.setSelectionModel(new SingleSelectionModel<CategoryDto>());
 
     addCategoryTableColumns();
+
+    // Add a pager.
+    categoryTable.setPageSize(50);
+    categoryTablePager = new SimplePager<CategoryDto>(categoryTable);
+    categoryTable.setPager(categoryTablePager);
+    ((VerticalPanel) categoryTable.getParent()).insert(categoryTablePager, 0);
   }
 
   private void addCategoryTableColumns() {
@@ -236,6 +250,12 @@ public class VariableView extends Composite implements VariablePresenter.Display
     attributeTable.setSelectionModel(new SingleSelectionModel<AttributeDto>());
 
     addAttributeTableColumns();
+
+    // Add a pager.
+    attributeTable.setPageSize(50);
+    attributeTablePager = new SimplePager<AttributeDto>(attributeTable);
+    attributeTable.setPager(attributeTablePager);
+    ((VerticalPanel) attributeTable.getParent()).insert(attributeTablePager, 0);
   }
 
   private void addAttributeTableColumns() {
