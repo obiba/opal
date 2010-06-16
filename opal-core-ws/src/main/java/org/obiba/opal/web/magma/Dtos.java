@@ -53,15 +53,7 @@ final class Dtos {
       var.addAttributes(asDto(attribute));
     }
     for(Category category : from.getCategories()) {
-      CategoryDto.Builder c = CategoryDto.newBuilder().setName(category.getName()).setIsMissing(category.isMissing());
-      if(category.getCode() != null) {
-        c.setCode(category.getCode());
-      }
-      for(Attribute attribute : category.getAttributes()) {
-        c.addAttributes(asDto(attribute));
-      }
-
-      var.addCategories(c);
+      var.addCategories(asDto(category));
     }
 
     return var;
@@ -70,6 +62,17 @@ final class Dtos {
 
   public static VariableDto.Builder asDto(Variable from) {
     return asDto(null, from);
+  }
+
+  public static CategoryDto.Builder asDto(Category from) {
+    CategoryDto.Builder c = CategoryDto.newBuilder().setName(from.getName()).setIsMissing(from.isMissing());
+    if(from.getCode() != null) {
+      c.setCode(from.getCode());
+    }
+    for(Attribute attribute : from.getAttributes()) {
+      c.addAttributes(asDto(attribute));
+    }
+    return c;
   }
 
   public static AttributeDto.Builder asDto(Attribute from) {
