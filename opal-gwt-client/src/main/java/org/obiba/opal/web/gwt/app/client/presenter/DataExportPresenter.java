@@ -18,8 +18,6 @@ import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -42,8 +40,6 @@ import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.view.client.SelectionModel;
-import com.google.gwt.view.client.SelectionModel.SelectionChangeEvent;
-import com.google.gwt.view.client.SelectionModel.SelectionChangeHandler;
 import com.google.inject.Inject;
 
 public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Display> {
@@ -106,30 +102,16 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     super.registerHandler(getDisplay().getTableTree().addSelectionHandler(new SelectionHandler<TreeItem>() {
       @Override
       public void onSelection(SelectionEvent<TreeItem> event) {
-        eventBus.fireEvent(new NavigatorSelectionChangeEvent(event.getSelectedItem()));
-      }
-    }));
-
-    getDisplay().getTableSelection().addSelectionChangeHandler(new SelectionChangeHandler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        eventBus.fireEvent(new VariableSelectionChangeEvent(null));
-      }
-    });
-
-    super.registerHandler(eventBus.addHandler(NavigatorSelectionChangeEvent.getType(), new NavigatorSelectionChangeEvent.Handler() {
-      @Override
-      public void onNavigatorSelectionChanged(NavigatorSelectionChangeEvent event) {
-        if(event.getSelection().getParentItem() != null) {
-          String datasource = event.getSelection().getParentItem().getText();
-          String table = event.getSelection().getText();
+        TreeItem selection = event.getSelectedItem();
+        if(selection.getParentItem() != null) {
+          String datasource = selection.getParentItem().getText();
+          String table = selection.getText();
           getDisplay().addTable(datasource, table);
         }
       }
     }));
 
-    getDisplay().getSubmit().addClickHandler(new ClickHandler() {
+    super.registerHandler(getDisplay().getSubmit().addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
@@ -174,7 +156,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
         }
       }
-    });
+    }));
   }
 
   protected void initDisplayComponents() {
@@ -202,10 +184,6 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
       String filename = getDisplay().getFile().getValue();
       if(filename == null || filename.equals("")) {
         result.add("filename cannot be empty");
-      } else {
-        if(!(filename.endsWith(".xls") || filename.endsWith(".xlsx") || filename.endsWith(".xml"))) {
-          result.add("filename must end with .xls, .xlsx or .xml");
-        }
       }
     }
     return result;

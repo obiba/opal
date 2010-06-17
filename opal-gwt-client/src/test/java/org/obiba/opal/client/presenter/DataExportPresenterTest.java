@@ -30,8 +30,6 @@ import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.view.client.SelectionModel;
-import com.google.gwt.view.client.SelectionModel.SelectionChangeHandler;
 
 public class DataExportPresenterTest extends AbstractGwtTestSetup {
 
@@ -54,9 +52,6 @@ public class DataExportPresenterTest extends AbstractGwtTestSetup {
     HasSelectionHandlers hasSelectionHandlerMock = createMock(HasSelectionHandlers.class);
     expect(displayMock.getTableTree()).andReturn(hasSelectionHandlerMock).atLeastOnce();
 
-    SelectionModel selectionModelMock = createMock(SelectionModel.class);
-    expect(displayMock.getTableSelection()).andReturn(selectionModelMock).atLeastOnce();
-
     HasClickHandlers hasClickHandlerMock = createMock(HasClickHandlers.class);
     expect(displayMock.getSubmit()).andReturn(hasClickHandlerMock).atLeastOnce();
 
@@ -64,9 +59,6 @@ public class DataExportPresenterTest extends AbstractGwtTestSetup {
 
     // Make sure that a SelectionHandler is added to the browsing tree
     expect(hasSelectionHandlerMock.addSelectionHandler((SelectionHandler) anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
-
-    // Make sure that a SelectionChangeHandler is added to the table
-    expect(selectionModelMock.addSelectionChangeHandler((SelectionChangeHandler) anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
 
     // Make sure that a ClickHandler is added to the Submit button
     expect(hasClickHandlerMock.addClickHandler((ClickHandler) anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
