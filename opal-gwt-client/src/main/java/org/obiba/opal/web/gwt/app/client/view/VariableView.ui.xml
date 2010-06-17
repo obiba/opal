@@ -25,26 +25,26 @@
     <g:layer top="5em" height="6em" left="1em" width="47%">
       <g:VerticalPanel>
         <g:FlowPanel>
-          <g:Label addStyleNames="{style.left-aligned},{style.title-light}"><ui:msg key="entityTypeLabel">Entity Type</ui:msg></g:Label><g:Label addStyleNames="{style.left-aligned},{style.title-light}">:</g:Label><g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="entityType">Entity Name</g:Label>
+          <g:Label addStyleNames="{style.left-aligned},{style.title-light}"><ui:msg description="Entity type label">Entity Type</ui:msg></g:Label><g:Label addStyleNames="{style.left-aligned},{style.title-light}">:</g:Label><g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="entityType">Entity Name</g:Label>
         </g:FlowPanel>
         <g:FlowPanel>
-          <g:Label addStyleNames="{style.left-aligned},{style.title-light}"><ui:msg key="valueTypeLabel">Value Type</ui:msg></g:Label><g:Label addStyleNames="{style.left-aligned},{style.title-light}">:</g:Label><g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="valueType">Value Type Name</g:Label>
+          <g:Label addStyleNames="{style.left-aligned},{style.title-light}"><ui:msg description="Variable Explorer column title">Value Type</ui:msg></g:Label><g:Label addStyleNames="{style.left-aligned},{style.title-light}">:</g:Label><g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="valueType">Value Type Name</g:Label>
         </g:FlowPanel>            
         <g:FlowPanel>
-          <g:Label addStyleNames="{style.left-aligned},{style.title-light}"><ui:msg key="mimeTypeLabel">Mime Type</ui:msg></g:Label><g:Label addStyleNames="{style.left-aligned},{style.title-light}">:</g:Label><g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="mimeType">Mime Type Name</g:Label>
+          <g:Label addStyleNames="{style.left-aligned},{style.title-light}"><ui:msg description="Mime Type label">Mime Type</ui:msg></g:Label><g:Label addStyleNames="{style.left-aligned},{style.title-light}">:</g:Label><g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="mimeType">Mime Type Name</g:Label>
         </g:FlowPanel>
       </g:VerticalPanel>     
     </g:layer>     
     <g:layer top="5em" height="6em" left="50%" width="50%">
       <g:VerticalPanel>
         <g:FlowPanel>
-          <g:Label addStyleNames="{style.left-aligned},{style.title-light}"><ui:msg key="unitLabel">Unit</ui:msg></g:Label><g:Label addStyleNames="{style.left-aligned},{style.title-light}">:</g:Label><g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="unit">Unit Name</g:Label>
+          <g:Label addStyleNames="{style.left-aligned},{style.title-light}"><ui:msg description="Unit label">Unit</ui:msg></g:Label><g:Label addStyleNames="{style.left-aligned},{style.title-light}">:</g:Label><g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="unit">Unit Name</g:Label>
         </g:FlowPanel>
         <g:FlowPanel>
-          <g:Label addStyleNames="{style.left-aligned},{style.title-light}"><ui:msg key="repeatableLabel">Repeatable</ui:msg></g:Label><g:Label addStyleNames="{style.left-aligned},{style.title-light}">:</g:Label><g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="repeatable">Yes/No</g:Label>
+          <g:Label addStyleNames="{style.left-aligned},{style.title-light}"><ui:msg description="Repeatable label">Repeatable</ui:msg></g:Label><g:Label addStyleNames="{style.left-aligned},{style.title-light}">:</g:Label><g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="repeatable">Yes/No</g:Label>
         </g:FlowPanel>
         <g:FlowPanel>
-          <g:Label addStyleNames="{style.left-aligned},{style.title-light}"><ui:msg key="occurrenceGroupLabel">Occurrence Group</ui:msg></g:Label><g:Label addStyleNames="{style.left-aligned},{style.title-light}">:</g:Label><g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="occurrenceGroup">Occurrence Group Name</g:Label>
+          <g:Label addStyleNames="{style.left-aligned},{style.title-light}"><ui:msg description="Occurrence Group label">Occurrence Group</ui:msg></g:Label><g:Label addStyleNames="{style.left-aligned},{style.title-light}">:</g:Label><g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="occurrenceGroup">Occurrence Group Name</g:Label>
         </g:FlowPanel>
       </g:VerticalPanel>     
     </g:layer>
