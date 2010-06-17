@@ -24,6 +24,7 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.opal.web.model.Magma;
+import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -61,6 +62,7 @@ public class DatasourceResource {
 
   @GET
   @Path("/dictionary/excel")
+  @NotAuthenticated
   public Response getExcelDictionary() throws MagmaRuntimeException, IOException {
     String destinationName = name + "-dictionary";
     ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();

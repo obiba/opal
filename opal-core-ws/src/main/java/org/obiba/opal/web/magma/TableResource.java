@@ -44,6 +44,7 @@ import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.xstream.XStreamValueSet;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
+import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 
@@ -73,6 +74,7 @@ public class TableResource {
 
   @GET
   @Path("/dictionary/excel")
+  @NotAuthenticated
   public Response getExcelDictionary() throws MagmaRuntimeException, IOException {
     String destinationName = valueTable.getDatasource().getName() + "." + valueTable.getName() + "-dictionary";
     ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
