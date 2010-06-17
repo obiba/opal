@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.view;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -62,7 +64,7 @@ public class FolderDetailsView extends Composite implements Display {
     int fileCount = children.length();
     table.setPageSize(fileCount);
     table.setDataSize(fileCount, true);
-    table.setData(0, fileCount, JsArrays.toList(children, 0, fileCount));
+    table.setData(0, fileCount, sortFileList(JsArrays.toList(children, 0, fileCount)));
   }
 
   @Override
@@ -120,6 +122,33 @@ public class FolderDetailsView extends Composite implements Display {
       }
     }, translations.lastModifiedLabel());
 
+  }
+
+  /**
+   * Returns a sorted copy of the specified file list.
+   * 
+   * This method simply puts folders ahead of regular files; no additional sorting is performed.
+   * 
+   * @param fileList the list to be sorted
+   * @return the sorted list
+   */
+  private List<FileDto> sortFileList(List<FileDto> fileList) {
+    List<FileDto> sortedList = new ArrayList<FileDto>();
+
+    List<FileDto> folderList = new ArrayList<FileDto>();
+    List<FileDto> regularList = new ArrayList<FileDto>();
+    for(FileDto file : fileList) {
+      if(file.getType().isFileType(FileDto.FileType.FOLDER)) {
+        folderList.add(file);
+      } else {
+        regularList.add(file);
+      }
+    }
+
+    sortedList.addAll(folderList);
+    sortedList.addAll(regularList);
+
+    return sortedList;
   }
 
   private abstract class FileNameColumn extends Column<FileDto, String> implements HasFieldUpdater<FileDto, String> {
