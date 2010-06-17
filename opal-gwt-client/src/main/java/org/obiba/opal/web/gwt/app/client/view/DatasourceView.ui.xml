@@ -42,8 +42,12 @@
         <g:Label addStyleNames="{style.left-aligned},{style.title}">)</g:Label>
       </g:FlowPanel>     
     </g:layer>    
-     <g:layer height="90em" top="5.5em">
-       <g2:CellTable width="100%"  ui:field="table" addStyleNames="{style.tableList}" />
+     <g:layer width="97%" left="1em" height="90em" top="5.5em">
+       <g:ScrollPanel width="100%" >
+         <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_CENTER">
+           <g2:CellTable width="100%"  ui:field="table" addStyleNames="{style.tableList}" />
+         </g:VerticalPanel>
+       </g:ScrollPanel>
      </g:layer>
   </g:LayoutPanel> 
 </ui:UiBinder>
