@@ -21,7 +21,7 @@ import org.obiba.opal.web.model.client.FileDto;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -29,11 +29,11 @@ import com.google.inject.Provider;
 public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter.Display> {
 
   public interface Display extends WidgetDisplay {
-    ScrollPanel getFileSystemTree();
+    public ScrollPanel getFileSystemTree();
 
-    ScrollPanel getFolderDetailsPanel();
+    public ScrollPanel getFolderDetailsPanel();
 
-    public Button getFileUploadButton();
+    public HasClickHandlers getFileUploadButton();
   }
 
   @Inject
@@ -104,8 +104,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
       @Override
       public void onClick(ClickEvent event) {
         fileUploadDialogPresenter = fileUploadDialogPresenterProvider.get();
-        fileUploadDialogPresenter.getDisplay().getRemoteFolderName().setText(currentFolder.getName());
-        fileUploadDialogPresenter.getDisplay().getRemoteFolder().setValue(currentFolder.getPath());
+        fileUploadDialogPresenter.setCurrentFolder(currentFolder);
         fileUploadDialogPresenter.bind();
         fileUploadDialogPresenter.revealDisplay();
       }

@@ -10,9 +10,9 @@
 package org.obiba.opal.web.gwt.app.client.fs.view;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -38,8 +38,6 @@ public class FileExplorerView extends Composite implements Display {
   Button fileUploadButton;
 
   private static FileExplorerUiBinder uiBinder = GWT.create(FileExplorerUiBinder.class);
-
-  private Translations translations = GWT.create(Translations.class);
 
   public FileExplorerView() {
     initWidget(uiBinder.createAndBindUi(this));
@@ -69,7 +67,7 @@ public class FileExplorerView extends Composite implements Display {
   }
 
   @Override
-  public Button getFileUploadButton() {
+  public HasClickHandlers getFileUploadButton() {
     return fileUploadButton;
   }
 

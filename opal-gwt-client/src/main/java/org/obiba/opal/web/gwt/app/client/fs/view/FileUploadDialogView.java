@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.fs.view;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadDialogPresenter.Display;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -20,10 +21,12 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.Hidden;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
+import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 
 public class FileUploadDialogView extends Composite implements Display {
 
@@ -46,9 +49,6 @@ public class FileUploadDialogView extends Composite implements Display {
   FileUpload fileToUpload;
 
   @UiField
-  Hidden remoteFolder;
-
-  @UiField
   Label remoteFolderName;
 
   @UiField
@@ -64,7 +64,6 @@ public class FileUploadDialogView extends Composite implements Display {
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
     dialog.setGlassEnabled(false);
-    dialog.center();
     dialog.hide();
   }
 
@@ -82,8 +81,14 @@ public class FileUploadDialogView extends Composite implements Display {
   }
 
   @Override
-  public DialogBox getDialog() {
-    return dialog;
+  public void showDialog() {
+    dialog.center();
+    dialog.show();
+  }
+
+  @Override
+  public void hideDialog() {
+    dialog.hide();
   }
 
   @Override
@@ -97,32 +102,33 @@ public class FileUploadDialogView extends Composite implements Display {
   }
 
   @Override
-  public FileUpload getFileToUpload() {
-    return fileToUpload;
+  public String getFilename() {
+    return fileToUpload.getFilename();
   }
 
   @Override
-  public FormPanel getUploadForm() {
-    return form;
+  public HandlerRegistration addSubmitCompleteHandler(SubmitCompleteHandler handler) {
+    return this.form.addSubmitCompleteHandler(handler);
   }
 
   @Override
-  public Hidden getRemoteFolder() {
-    return remoteFolder;
+  public HandlerRegistration addSubmitHandler(SubmitHandler handler) {
+    return this.form.addSubmitHandler(handler);
   }
 
   @Override
-  public VerticalPanel getInputFieldPanel() {
-    return inputFieldPanel;
+  public void submit(String url) {
+    this.form.setAction(url);
+    this.form.submit();
   }
 
   @Override
-  public Label getRemoteFolderName() {
+  public HasText getRemoteFolderName() {
     return remoteFolderName;
   }
 
   @Override
-  public Label getErrorMsg() {
+  public HasText getErrorMsg() {
     return errorMsg;
   }
 

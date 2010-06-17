@@ -30,7 +30,6 @@
                   <ui:msg description="Select file to upload label">Select the file to be uploaded in directory:</ui:msg>
                 </g:Label>
                 <g:Label ui:field="remoteFolderName" addStyleNames="{style.remoteFolderName}" />
-                <g:Hidden name="remoteFolder" ui:field="remoteFolder" />
               </g:HorizontalPanel>
               <g:FileUpload name="fileToUpload" ui:field="fileToUpload" />
             </g:VerticalPanel>

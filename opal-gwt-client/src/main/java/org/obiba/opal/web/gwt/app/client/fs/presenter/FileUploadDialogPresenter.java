@@ -17,17 +17,15 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.model.client.FileDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.FileUpload;
+import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.Hidden;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.inject.Inject;
@@ -35,26 +33,30 @@ import com.google.inject.Inject;
 public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogPresenter.Display> {
 
   public interface Display extends WidgetDisplay {
-    DialogBox getDialog();
+    void showDialog();
 
-    Button getUploadButton();
+    void hideDialog();
 
-    Button getCancelButton();
+    HasClickHandlers getUploadButton();
 
-    FileUpload getFileToUpload();
+    HasClickHandlers getCancelButton();
 
-    FormPanel getUploadForm();
+    String getFilename();
 
-    Hidden getRemoteFolder();
+    HandlerRegistration addSubmitHandler(FormPanel.SubmitHandler handler);
 
-    Label getRemoteFolderName();
+    HandlerRegistration addSubmitCompleteHandler(FormPanel.SubmitCompleteHandler handler);
 
-    VerticalPanel getInputFieldPanel();
+    void submit(String url);
 
-    Label getErrorMsg();
+    HasText getRemoteFolderName();
+
+    HasText getErrorMsg();
   }
 
   private Translations translations = GWT.create(Translations.class);
+
+  private FileDto currentFolder;
 
   @Inject
   public FileUploadDialogPresenter(Display display, EventBus eventBus) {
@@ -86,7 +88,8 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
 
   @Override
   public void revealDisplay() {
-    getDisplay().getDialog().show();
+    getDisplay().getRemoteFolderName().setText(currentFolder.getName());
+    getDisplay().showDialog();
   }
 
   protected void initDisplayComponents() {
@@ -101,23 +104,23 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
 
     super.registerHandler(getDisplay().getCancelButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
-        getDisplay().getDialog().hide();
+        getDisplay().hideDialog();
       }
     }));
 
-    super.registerHandler(getDisplay().getUploadForm().addSubmitHandler(new FormPanel.SubmitHandler() {
+    super.registerHandler(getDisplay().addSubmitHandler(new FormPanel.SubmitHandler() {
       @Override
       public void onSubmit(SubmitEvent event) {
-        if(getDisplay().getFileToUpload().getFilename().equals("")) {
+        if(getDisplay().getFilename().equals("")) {
           getDisplay().getErrorMsg().setText(translations.fileMustBeSelected());
           event.cancel();
         }
       }
     }));
 
-    super.registerHandler(getDisplay().getUploadForm().addSubmitCompleteHandler(new FormPanel.SubmitCompleteHandler() {
+    super.registerHandler(getDisplay().addSubmitCompleteHandler(new FormPanel.SubmitCompleteHandler() {
       public void onSubmitComplete(SubmitCompleteEvent event) {
-        getDisplay().getDialog().hide();
+        getDisplay().hideDialog();
         eventBus.fireEvent(new FileUploadedEvent());
       }
     }));
@@ -125,9 +128,14 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
   }
 
   private void uploadFile() {
-    FormPanel form = getDisplay().getUploadForm();
-    String url = "/ws/files" + getDisplay().getRemoteFolder().getValue() + getDisplay().getFileToUpload().getFilename();
-    form.setAction(url);
-    form.submit();
+    String url = "/ws/files" + currentFolder.getPath() + '/' + getDisplay().getFilename();
+    getDisplay().submit(url);
+  }
+
+  /**
+   * @param currentFolder
+   */
+  public void setCurrentFolder(FileDto currentFolder) {
+    this.currentFolder = currentFolder;
   }
 }
