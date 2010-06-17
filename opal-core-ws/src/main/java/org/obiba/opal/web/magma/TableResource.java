@@ -170,8 +170,8 @@ public class TableResource {
     }
 
     for(ValueSet vs : valueTable.getValueSets()) {
-      for(String name : response.keySet()) {
-        response.get(name).add(valueTable.getVariableValueSource(name).getValue(vs).getValue());
+      for(Map.Entry<String, List<Object>> entry : response.entrySet()) {
+        entry.getValue().add(valueTable.getVariableValueSource(entry.getKey()).getValue(vs).getValue());
       }
     }
     return response;
