@@ -5,10 +5,11 @@
   <ui:style>
     .separator { border-bottom: .2em solid black; }
 
-    .optionsPanelMsg td { font-size:1.25em; margin: 0.5em 0.5em 0.5em 0.5em; }
+    .optionsPanelMsg td { font-size:1.25em; margin: 0.5em 0.5em
+    0.5em 0.5em; }
 
     .remoteFolderName{ font-weight:bold; }
-    
+
     .errorMsg{color:red;}
   </ui:style>
 
@@ -19,24 +20,22 @@
     <!-- The width here have to match EXACTLY the one on DialogBox above -->
     <g:LayoutPanel height="12em" width="35em">
       <g:layer bottom="9.5em" height="2em" left="1em" right="1em">
-        <g:Label ui:field="errorMsg" addStyleNames="{style.errorMsg}"/>
+        <g:Label ui:field="errorMsg" addStyleNames="{style.errorMsg}" />
       </g:layer>
-      <g:layer height="6em" bottom="3.5em" left="1em" right="1em">
-        <g:ScrollPanel>
-          <g:FormPanel encoding="multipart/form-data" method="POST" ui:field="form">
-            <g:VerticalPanel ui:field="inputFieldPanel">
-              <g:HorizontalPanel addStyleNames="{style.optionsPanelMsg}">
-                <g:Label>
-                  <ui:msg description="Select file to upload label">Select the file to be uploaded in directory:</ui:msg>
-                </g:Label>
-                <g:Label ui:field="remoteFolderName" addStyleNames="{style.remoteFolderName}" />
-              </g:HorizontalPanel>
-              <g:FileUpload name="fileToUpload" ui:field="fileToUpload" />
-            </g:VerticalPanel>
-          </g:FormPanel>
-        </g:ScrollPanel>
+      <g:layer bottom="7.5em" height="3.5em" left="1em" right="1em">
+        <g:VerticalPanel ui:field="inputFieldPanel" addStyleNames="{style.optionsPanelMsg}">
+          <g:Label>
+            <ui:msg description="Select file to upload label">Select the file to be uploaded in directory:</ui:msg>
+          </g:Label>
+          <g:Label ui:field="remoteFolderName" addStyleNames="{style.remoteFolderName}" />
+        </g:VerticalPanel>
       </g:layer>
-      <g:layer bottom="4em" height="0.5em" left="1em" right="1em">
+      <g:layer height="3em" bottom="3.5em" left="1em" right="1em">
+        <g:FormPanel encoding="multipart/form-data" method="POST" ui:field="form">
+          <g:FileUpload name="fileToUpload" ui:field="fileToUpload" />
+        </g:FormPanel>
+      </g:layer>
+      <g:layer bottom="3.5em" height="0.5em" left="1em" right="1em">
         <g:HTMLPanel>
           <div class="{style.separator}" />
         </g:HTMLPanel>

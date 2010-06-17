@@ -88,7 +88,8 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
 
   @Override
   public void revealDisplay() {
-    getDisplay().getRemoteFolderName().setText(currentFolder.getName());
+    String folderName = currentFolder.getName();
+    getDisplay().getRemoteFolderName().setText(folderName.equals("root") ? translations.fileSystemLabel() : folderName);
     getDisplay().showDialog();
   }
 
