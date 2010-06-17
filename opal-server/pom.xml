@@ -27,6 +27,12 @@
       <artifactId>opal-core-ws</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-gwt-client</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>    
 <!--
     <dependency>
       <groupId>org.obiba.opal</groupId>

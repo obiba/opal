@@ -89,7 +89,11 @@ public class OpalJettyServer implements Service {
 
     server.setConnectors(new Connector[] { httpConnector, sslConnector });
     HandlerList handlers = new HandlerList();
-    handlers.addHandler(createFileHandler());
+
+    // Add a file handler that points to the Opal GWT client directory
+    String url = "file://" + System.getProperty("OPAL_WRAPPER_DIR") + "/webapp";
+    handlers.addHandler(createFileHandler(url));
+
     handlers.addHandler(contextHandler = createServletHandler(ctx, txmgr));
     server.setHandler(handlers);
 
@@ -153,13 +157,12 @@ public class OpalJettyServer implements Service {
     return contextHandler;
   }
 
-  /**
-   * @return
-   */
-  private Handler createFileHandler() {
+  private Handler createFileHandler(String fileUrl) {
+    log.info("Created a file handler for the following URL : {}", fileUrl);
+
     ResourceHandler resourceHandler = new ResourceHandler();
     try {
-      resourceHandler.setBaseResource(new FileResource(new URL("file:///home/plaflamm/opal-home/fs")));
+      resourceHandler.setBaseResource(new FileResource(new URL(fileUrl)));
       resourceHandler.setAliases(true);
     } catch(MalformedURLException e) {
       throw new RuntimeException(e);

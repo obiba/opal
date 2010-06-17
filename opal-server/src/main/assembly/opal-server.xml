@@ -57,7 +57,20 @@
     <!-- Copy dependency jar files to 'lib' -->
     <dependencySet>
       <outputDirectory>lib</outputDirectory>
+      <excludes>
+        <exclude>org.obiba.opal:opal-gwt-client:*</exclude>
+      </excludes>      
       <scope>runtime</scope>
     </dependencySet>
+    
+    <dependencySet>
+      <outputDirectory>webapp</outputDirectory>
+      <includes>
+        <include>org.obiba.opal:opal-gwt-client:war</include>
+      </includes>      
+      <scope>runtime</scope>
+      <unpack>true</unpack>      
+    </dependencySet>    
+    
   </dependencySets>
 </assembly>
