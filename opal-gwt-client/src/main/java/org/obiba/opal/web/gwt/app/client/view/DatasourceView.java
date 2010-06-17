@@ -31,7 +31,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
 import com.google.gwt.view.client.SelectionModel;
@@ -104,7 +103,7 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
     table.setPageSize(50);
     pager = new SimplePager<TableDto>(table);
     table.setPager(pager);
-    VerticalPanel p = ((VerticalPanel) table.getParent());
+    FlowPanel p = ((FlowPanel) table.getParent());
     p.insert(pager, 0);
     DOM.removeElementAttribute(pager.getElement(), "style");
     DOM.setStyleAttribute(pager.getElement(), "cssFloat", "right");

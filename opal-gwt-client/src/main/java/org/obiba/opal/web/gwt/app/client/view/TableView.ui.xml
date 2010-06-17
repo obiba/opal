@@ -48,9 +48,9 @@
       </g:FlowPanel>     
     </g:layer>
     <g:layer width="97%" left="1em" height="120em" top="7.5em">
-      <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_CENTER">
+      <g:FlowPanel>
         <g2:CellTable width="100%" ui:field="table" addStyleNames="{style.tableList}" />
-      </g:VerticalPanel>
+      </g:FlowPanel>
     </g:layer>
   </g:LayoutPanel>
 </ui:UiBinder>
