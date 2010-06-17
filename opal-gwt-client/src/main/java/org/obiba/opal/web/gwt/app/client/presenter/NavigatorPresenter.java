@@ -19,19 +19,17 @@ import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
 
-import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.TreeItem;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Display> {
 
   public interface Display extends WidgetDisplay {
 
-    ScrollPanel getTreePanel();
+    void setTreeDisplay(NavigatorTreePresenter.Display treeDisplay);
 
-    ScrollPanel getDetailsPanel();
-
+    HasWidgets getDetailsPanel();
   }
 
   @Inject
@@ -63,7 +61,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     tablePresenter.bind();
     variablePresenter.bind();
 
-    getDisplay().getTreePanel().add(navigatorTreePresenter.getDisplay().asWidget());
+    getDisplay().setTreeDisplay(navigatorTreePresenter.getDisplay());
 
     super.registerHandler(eventBus.addHandler(NavigatorSelectionChangeEvent.getType(), new NavigatorSelectionChangeEvent.Handler() {
 
@@ -71,9 +69,9 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
       public void onNavigatorSelectionChanged(NavigatorSelectionChangeEvent event) {
         TreeItem item = event.getSelection();
         if(item.getParentItem() == null) {
-          displayTable(datasourcePresenter.getDisplay().asWidget());
+          displayDetails(datasourcePresenter.getDisplay());
         } else {
-          displayTable(tablePresenter.getDisplay().asWidget());
+          displayDetails(tablePresenter.getDisplay());
         }
       }
     }));
@@ -82,7 +80,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
 
       @Override
       public void onNavigatorSelectionChanged(TableSelectionChangeEvent event) {
-        displayTable(tablePresenter.getDisplay().asWidget());
+        displayDetails(tablePresenter.getDisplay());
       }
     }));
 
@@ -90,15 +88,15 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
 
       @Override
       public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-        displayTable(variablePresenter.getDisplay().asWidget());
+        displayDetails(variablePresenter.getDisplay());
       }
 
     }));
   }
 
-  private void displayTable(Widget widget) {
+  private void displayDetails(WidgetDisplay detailsDisplay) {
     getDisplay().getDetailsPanel().clear();
-    getDisplay().getDetailsPanel().add(widget);
+    getDisplay().getDetailsPanel().add(detailsDisplay.asWidget());
   }
 
   @Override

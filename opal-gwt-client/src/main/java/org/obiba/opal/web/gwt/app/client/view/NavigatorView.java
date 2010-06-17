@@ -10,12 +10,14 @@
 package org.obiba.opal.web.gwt.app.client.view;
 
 import org.obiba.opal.web.gwt.app.client.presenter.NavigatorPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.NavigatorTreePresenter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -51,12 +53,15 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   }
 
   @Override
-  public ScrollPanel getTreePanel() {
-    return treePanel;
+  public void setTreeDisplay(NavigatorTreePresenter.Display treeDisplay) {
+    if(treePanel.getWidget() != null) {
+      treePanel.remove(treePanel.getWidget());
+    }
+    treePanel.add(treeDisplay.asWidget());
   }
 
   @Override
-  public ScrollPanel getDetailsPanel() {
+  public HasWidgets getDetailsPanel() {
     return navigatorDisplayPanel;
   }
 
