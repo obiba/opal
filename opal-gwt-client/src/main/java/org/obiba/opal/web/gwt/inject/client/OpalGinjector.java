@@ -28,7 +28,7 @@ import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
 
-@GinModules(OpalGinModule.class)
+@GinModules( { OpalGinModule.class, NavigatorModule.class, FileSystemModule.class, JobModule.class })
 public interface OpalGinjector extends Ginjector {
 
   EventBus getEventBus();
