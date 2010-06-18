@@ -1,7 +1,17 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
 
+  <ui:style>
+    .folderDetailsTable td:first-child {
+  	  color: blue;
+      text-decoration: underline;	
+    }
+    .folderDetailsTable td:first-child:hover {
+      cursor: pointer;
+    }
+  </ui:style>
+  
   <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_CENTER" ui:field="fileDetailsPanel">
-    <g2:CellTable width="100%" ui:field="table" />
+    <g2:CellTable width="100%" ui:field="table" addStyleNames="{style.folderDetailsTable}" />
   </g:VerticalPanel>
 </ui:UiBinder>
