@@ -152,6 +152,7 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
     pager.firstPage();
     table.setData(0, table.getPageSize(), JsArrays.toList(rows, 0, table.getPageSize()));
     table.setDataSize(rows.length(), true);
+    table.redraw();
   }
 
   @Override
