@@ -21,9 +21,9 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class FileSystemTreeView implements Display {
 
-  private Translations translations = GWT.create(Translations.class);
+  private final Translations translations = GWT.create(Translations.class);
 
-  Tree fileSystemTree;
+  private final Tree fileSystemTree;
 
   private TreeItem treeRoot;
 
