@@ -51,6 +51,7 @@ public class FileSystemTreeView implements Display {
     treeRoot.setText(translations.fileSystemLabel());
     fileSystemTree.addItem(treeRoot);
     addBranch(treeRoot, rootDto);
+    fileSystemTree.setSelectedItem(treeRoot, true);
   }
 
   public void addBranch(TreeItem treeItem, FileDto folderToAdd) {
@@ -77,22 +78,26 @@ public class FileSystemTreeView implements Display {
 
   @Override
   public void selectTreeItem(FileDto folder) {
-    // TODO Select the right node in the tree
-    GWT.log("Folder selected details: " + folder.getPath());
-    // TreeItem itemToSelect = searchChildren(treeRoot, folder);
-    // itemToSelect.setSelected(true);
-  }
+    String folderName = folder.getName();
+    Boolean parentFolderSelected = Boolean.TRUE;
 
-  private TreeItem searchChildren(TreeItem parent, FileDto folder) {
-    TreeItem child;
-    for(int i = 0; i < parent.getChildCount(); i++) {
-      child = parent.getChild(i);
-      if(((FileDto) child.getUserObject()).getPath().equals(folder.getPath())) return child;
-      if(child.getChildCount() > 0) {
-        return searchChildren(child, folder);
+    TreeItem root = fileSystemTree.getSelectedItem();
+    for(int i = 0; i < root.getChildCount(); i++) {
+      if(folderName.equals(root.getChild(i).getText())) {
+        root.setState(true);
+        fileSystemTree.setSelectedItem(root.getChild(i));
+        parentFolderSelected = Boolean.FALSE;
+        break;
       }
     }
-    return null;
+
+    if(parentFolderSelected) {
+      if(root.getParentItem() != null) {
+        fileSystemTree.setSelectedItem(root.getParentItem());
+        root.getParentItem().setState(true);
+      }
+    }
+
   }
 
 }
