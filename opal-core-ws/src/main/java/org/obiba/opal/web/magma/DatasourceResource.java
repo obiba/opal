@@ -11,17 +11,24 @@ package org.obiba.opal.web.magma;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableWriter;
+import org.obiba.magma.Variable;
+import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
@@ -84,6 +91,27 @@ public class DatasourceResource {
   @Path("/table/{table}")
   public TableResource getTable(@PathParam("table") String table) {
     return getTableResource(MagmaEngine.get().getDatasource(name).getValueTable(table));
+  }
+
+  @PUT
+  @Path("/table/{table}")
+  public Response createTable(@Context UriInfo uri, @PathParam("table") String table, List<Variable> variables) throws IOException {
+    Datasource ds = MagmaEngine.get().getDatasource(name);
+    if(ds.hasValueTable(table)) {
+      throw new IllegalStateException("");
+    }
+
+    ValueTableWriter writer = ds.createWriter(table, variables.iterator().next().getEntityType());
+    try {
+      VariableWriter vw = writer.writeVariables();
+      for(Variable v : variables) {
+        vw.writeVariable(v);
+      }
+      vw.close();
+    } finally {
+      writer.close();
+    }
+    return Response.created(uri.getAbsolutePath()).build();
   }
 
   @Path("/tables")
