@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.HasUrl;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
@@ -32,7 +33,7 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.Widget;
 
 public class FolderDetailsView extends Composite implements Display {
@@ -47,15 +48,36 @@ public class FolderDetailsView extends Composite implements Display {
   CellTable<FileDto> table;
 
   @UiField
-  VerticalPanel fileDetailsPanel;
+  Frame downloader;
 
   private FileNameColumn fileNameColumn;
+
+  // Adaptor for Frame
+  private final HasUrl hasUrlImpl;
 
   private Translations translations = GWT.create(Translations.class);
 
   public FolderDetailsView() {
     initWidget(uiBinder.createAndBindUi(this));
     initTable();
+    // This iFrame is used to download files in the background. Its URL is meant to be changed to that of the file's
+    // location, the browser will then take care of downloading it.
+    downloader.setVisible(false);
+
+    // Adapt Frame to HasUrl
+    hasUrlImpl = new HasUrl() {
+
+      @Override
+      public String getUrl() {
+        return downloader.getUrl();
+      }
+
+      @Override
+      public void setUrl(String url) {
+        downloader.setUrl(url);
+      }
+
+    };
   }
 
   @Override
@@ -86,8 +108,8 @@ public class FolderDetailsView extends Composite implements Display {
   }
 
   @Override
-  public VerticalPanel getFileDetailsPanel() {
-    return fileDetailsPanel;
+  public HasUrl getFileDownloader() {
+    return hasUrlImpl;
   }
 
   private void initTable() {

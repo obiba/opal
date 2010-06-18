@@ -10,8 +10,9 @@
       cursor: pointer;
     }
   </ui:style>
-  
-  <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_CENTER" ui:field="fileDetailsPanel">
+
+  <g:FlowPanel>
     <g2:CellTable width="100%" ui:field="table" addStyleNames="{style.folderDetailsTable}" />
-  </g:VerticalPanel>
+    <g:Frame ui:field="downloader"/>
+  </g:FlowPanel>
 </ui:UiBinder>
