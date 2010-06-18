@@ -38,6 +38,12 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class FolderDetailsView extends Composite implements Display {
 
+  private static final long KB = 1024l;
+
+  private static final long MB = KB * KB;
+
+  private static final long GB = MB * KB;
+
   @UiTemplate("FolderDetailsView.ui.xml")
   interface FolderDetailsUiBinder extends UiBinder<Widget, FolderDetailsView> {
   }
@@ -132,7 +138,29 @@ public class FolderDetailsView extends Composite implements Display {
 
       @Override
       public String getValue(FileDto object) {
-        return object.getType().isFileType(FileDto.FileType.FILE) ? String.valueOf((long) object.getSize()) : "";
+        return object.getType().isFileType(FileDto.FileType.FILE) ? getFileSizeWithUnit(object) : "";
+      }
+
+      private String getFileSizeWithUnit(FileDto object) {
+        double fileSize = object.getSize();
+        if(fileSize < KB) {
+          return ((long) fileSize) + " B";
+        } else if(fileSize < MB) {
+          double fileSizeInKB = fileSize / KB;
+          long iPart = (long) fileSizeInKB;
+          long fPart = Math.round((fileSizeInKB - iPart) * 10);
+          return iPart + "." + fPart + " KB";
+        } else if(fileSize < GB) {
+          double fileSizeInMB = fileSize / MB;
+          long iPart = (long) fileSizeInMB;
+          long fPart = Math.round((fileSizeInMB - iPart) * 10);
+          return iPart + "." + fPart + " MB";
+        } else {
+          double fileSizeInGB = fileSize / GB;
+          long iPart = (long) fileSizeInGB;
+          long fPart = Math.round((fileSizeInGB - iPart) * 10);
+          return iPart + "." + fPart + " GB";
+        }
       }
     }, translations.sizeLabel());
 
