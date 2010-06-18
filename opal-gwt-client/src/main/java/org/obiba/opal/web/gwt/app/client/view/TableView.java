@@ -31,6 +31,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -62,6 +63,8 @@ public class TableView extends Composite implements TablePresenter.Display {
   @UiField
   CellTable<VariableDto> table;
 
+  private FlowPanel spreadSheetIframePanel;
+
   SelectionModel<VariableDto> selectionModel = new SingleSelectionModel<VariableDto>();
 
   SimplePager<VariableDto> pager;
@@ -74,8 +77,12 @@ public class TableView extends Composite implements TablePresenter.Display {
 
   public TableView() {
     initWidget(uiBinder.createAndBindUi(this));
-    addSpreadsheetDownloadImage();
+    addTableColumns();
+    addSpreadsheetImage();
+    addSpreadsheetDownloadPanel();
+  }
 
+  private void addTableColumns() {
     table.addColumn(variableNameColumn = new VariableNameColumn() {
       @Override
       public String getValue(VariableDto object) {
@@ -123,10 +130,15 @@ public class TableView extends Composite implements TablePresenter.Display {
     DOM.setStyleAttribute(pager.getElement(), "cssFloat", "right");
   }
 
-  private void addSpreadsheetDownloadImage() {
+  private void addSpreadsheetImage() {
     spreadsheetDownloadImage = new Image("image/spreadsheet-download-icon.png");
     spreadsheetDownloadPanel.add(spreadsheetDownloadImage);
     DOM.setStyleAttribute(spreadsheetDownloadImage.getElement(), "cssFloat", "right");
+  }
+
+  private void addSpreadsheetDownloadPanel() {
+    spreadSheetIframePanel = new FlowPanel();
+    spreadsheetDownloadPanel.add(spreadSheetIframePanel);
   }
 
   @Override
@@ -202,7 +214,13 @@ public class TableView extends Composite implements TablePresenter.Display {
   }
 
   @Override
-  public FlowPanel getSpreadsheetDownloadPanel() {
-    return spreadsheetDownloadPanel;
+  public void clearSpreadsheetDownload() {
+    spreadSheetIframePanel.clear();
   }
+
+  @Override
+  public void setSpreadsheetDownload(Frame iFrame) {
+    spreadSheetIframePanel.add(iFrame);
+  }
+
 }

@@ -29,6 +29,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -60,6 +61,8 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
   SimplePager<TableDto> pager;
 
+  private FlowPanel spreadSheetIframePanel;
+
   private Image spreadsheetDownloadImage;
 
   private TableNameColumn tableNameColumn;
@@ -69,7 +72,8 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   public DatasourceView() {
     initWidget(uiBinder.createAndBindUi(this));
     addTableColumns();
-    addSpreadsheetDownloadImage();
+    addSpreadsheetImage();
+    addSpreadsheetDownloadPanel();
   }
 
   private void addTableColumns() {
@@ -109,10 +113,15 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
     DOM.setStyleAttribute(pager.getElement(), "cssFloat", "right");
   }
 
-  private void addSpreadsheetDownloadImage() {
+  private void addSpreadsheetImage() {
     spreadsheetDownloadImage = new Image("image/spreadsheet-download-icon.png");
     spreadsheetDownloadPanel.add(spreadsheetDownloadImage);
     DOM.setStyleAttribute(spreadsheetDownloadImage.getElement(), "cssFloat", "right");
+  }
+
+  private void addSpreadsheetDownloadPanel() {
+    spreadSheetIframePanel = new FlowPanel();
+    spreadsheetDownloadPanel.add(spreadSheetIframePanel);
   }
 
   @Override
@@ -172,8 +181,13 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   }
 
   @Override
-  public FlowPanel getSpreadsheetDownloadPanel() {
-    return spreadsheetDownloadPanel;
+  public void clearSpreadsheetDownload() {
+    spreadSheetIframePanel.clear();
+  }
+
+  @Override
+  public void setSpreadsheetDownload(Frame iFrame) {
+    spreadSheetIframePanel.add(iFrame);
   }
 
 }

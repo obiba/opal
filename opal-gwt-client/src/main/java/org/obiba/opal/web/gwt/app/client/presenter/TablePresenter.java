@@ -31,7 +31,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.SelectionModel;
@@ -57,7 +56,9 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
     HasFieldUpdater<VariableDto, String> getVariableNameColumn();
 
-    FlowPanel getSpreadsheetDownloadPanel();
+    void clearSpreadsheetDownload();
+
+    void setSpreadsheetDownload(Frame iFrame);
   }
 
   private JsArray<VariableDto> variables;
@@ -125,6 +126,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   private void displayTable(String datasource, String table) {
     this.datasource = datasource;
     this.table = table;
+    getDisplay().clearSpreadsheetDownload();
     getDisplay().getTableName().setText(table);
     updateEntityType(datasource, table);
     updateTable(datasource, table);
@@ -172,7 +174,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     String downloadUrl = GWT.getHostPageBaseURL().replace("org.obiba.opal.web.gwt.app.GwtApp/", "") + "ws/datasource/" + datasource + "/table/" + table + "/dictionary/excel";
     Frame frame = new Frame(downloadUrl);
     frame.setVisible(false);
-    getDisplay().getSpreadsheetDownloadPanel().add(frame);
+    getDisplay().setSpreadsheetDownload(frame);
   }
 
 }
