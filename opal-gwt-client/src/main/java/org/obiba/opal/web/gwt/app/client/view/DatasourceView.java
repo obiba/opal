@@ -61,9 +61,9 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
   SimplePager<TableDto> pager;
 
-  private FlowPanel spreadSheetIframePanel;
-
   private Image spreadsheetDownloadImage;
+
+  private Frame downloadFrame;
 
   private TableNameColumn tableNameColumn;
 
@@ -120,8 +120,9 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   }
 
   private void addSpreadsheetDownloadPanel() {
-    spreadSheetIframePanel = new FlowPanel();
-    spreadsheetDownloadPanel.add(spreadSheetIframePanel);
+    downloadFrame = new Frame();
+    downloadFrame.setVisible(false);
+    spreadsheetDownloadPanel.add(downloadFrame);
   }
 
   @Override
@@ -183,12 +184,12 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
   @Override
   public void clearSpreadsheetDownload() {
-    spreadSheetIframePanel.clear();
+    downloadFrame.setUrl("");
   }
 
   @Override
-  public void setSpreadsheetDownload(Frame iFrame) {
-    spreadSheetIframePanel.add(iFrame);
+  public void setSpreadsheetDownload(String url) {
+    downloadFrame.setUrl(url);
   }
 
 }

@@ -31,8 +31,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.Frame;
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.inject.Inject;
 
@@ -46,26 +45,22 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
     void clear();
 
-    Label getTableName();
+    HasText getTableName();
 
-    Label getVariableCountLabel();
+    HasText getVariableCountLabel();
 
-    Label getEntityTypeLabel();
+    HasText getEntityTypeLabel();
 
     HasClickHandlers getSpreadsheetIcon();
 
     HasFieldUpdater<VariableDto, String> getVariableNameColumn();
 
-    void clearSpreadsheetDownload();
-
-    void setSpreadsheetDownload(Frame iFrame);
+    void setSpreadsheetDownload(String url);
   }
 
   private JsArray<VariableDto> variables;
 
-  private String datasource;
-
-  private String table;
+  private TableDto table;
 
   /**
    * @param display
@@ -99,7 +94,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
       @Override
       public void onClick(ClickEvent event) {
-        downloadMetadata(datasource, table);
+        downloadMetadata();
       }
     }));
 
@@ -123,15 +118,6 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     });
   }
 
-  private void displayTable(String datasource, String table) {
-    this.datasource = datasource;
-    this.table = table;
-    getDisplay().clearSpreadsheetDownload();
-    getDisplay().getTableName().setText(table);
-    updateEntityType(datasource, table);
-    updateTable(datasource, table);
-  }
-
   @Override
   protected void onPlaceRequest(PlaceRequest request) {
   }
@@ -148,8 +134,24 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   public void revealDisplay() {
   }
 
-  private void updateTable(String datasource, String table) {
-    ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource("/datasource/" + datasource + "/table/" + table + "/variables").get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
+  private void displayTable(String datasource, String tableName) {
+    getDisplay().clear();
+    getDisplay().getTableName().setText(tableName);
+
+    ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/datasource/" + datasource + "/table/" + tableName).get().withCallback(new ResourceCallback<TableDto>() {
+      @Override
+      public void onResource(Response response, TableDto resource) {
+        table = resource;
+        getDisplay().getEntityTypeLabel().setText(resource.getEntityType());
+        updateVariables();
+      }
+
+    }).send();
+
+  }
+
+  private void updateVariables() {
+    ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(table.getLink() + "/variables").get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
       @Override
       public void onResource(Response response, JsArray<VariableDto> resource) {
         variables = resource;
@@ -160,21 +162,9 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     }).send();
   }
 
-  private void updateEntityType(String datasource, String table) {
-    ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/datasource/" + datasource + "/table/" + table).get().withCallback(new ResourceCallback<TableDto>() {
-      @Override
-      public void onResource(Response response, TableDto resource) {
-        getDisplay().getEntityTypeLabel().setText(resource.getEntityType());
-      }
-
-    }).send();
-  }
-
-  private void downloadMetadata(String datasource, String table) {
-    String downloadUrl = GWT.getHostPageBaseURL().replace("org.obiba.opal.web.gwt.app.GwtApp/", "") + "ws/datasource/" + datasource + "/table/" + table + "/dictionary/excel";
-    Frame frame = new Frame(downloadUrl);
-    frame.setVisible(false);
-    getDisplay().setSpreadsheetDownload(frame);
+  private void downloadMetadata() {
+    String downloadUrl = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "ws")).append(this.table.getLink()).append("/variables/xlsx").toString();
+    getDisplay().setSpreadsheetDownload(downloadUrl);
   }
 
 }

@@ -30,8 +30,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.Frame;
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 
 public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Display> {
@@ -40,9 +39,9 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
     void renderRows(JsArray<TableDto> rows);
 
-    Label getDatasourceNameLabel();
+    HasText getDatasourceNameLabel();
 
-    Label getVariableCountLabel();
+    HasText getVariableCountLabel();
 
     HasClickHandlers getSpreadsheetIcon();
 
@@ -50,7 +49,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
     void clearSpreadsheetDownload();
 
-    void setSpreadsheetDownload(Frame iFrame);
+    void setSpreadsheetDownload(String iFrame);
 
   }
 
@@ -129,10 +128,8 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   }
 
   private void downloadMetadata(String datasource) {
-    String downloadUrl = GWT.getHostPageBaseURL().replace("org.obiba.opal.web.gwt.app.GwtApp/", "") + "ws/datasource/" + datasource + "/dictionary/excel";
-    Frame frame = new Frame(downloadUrl);
-    frame.setVisible(false);
-    getDisplay().setSpreadsheetDownload(frame);
+    String downloadUrl = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "ws")).append("/datasource/").append(datasource).append("/variables/excel").toString();
+    getDisplay().setSpreadsheetDownload(downloadUrl);
   }
 
 }

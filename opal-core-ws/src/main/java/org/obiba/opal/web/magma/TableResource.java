@@ -30,7 +30,6 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONObject;
-import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
@@ -40,6 +39,7 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
+import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.xstream.XStreamValueSet;
 import org.obiba.opal.web.model.Magma.TableDto;
@@ -73,17 +73,21 @@ public class TableResource {
   }
 
   @GET
-  @Path("/dictionary/excel")
+  @Path("/variables/xlsx")
+  @Produces("application/vnd.ms-excel")
   @NotAuthenticated
   public Response getExcelDictionary() throws MagmaRuntimeException, IOException {
     String destinationName = valueTable.getDatasource().getName() + "." + valueTable.getName() + "-dictionary";
     ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
     ExcelDatasource destinationDatasource = new ExcelDatasource(destinationName, excelOutput);
 
-    MagmaEngine.get().addDatasource(destinationDatasource);
-    DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyValues().build();
-    copier.copy(valueTable, destinationDatasource);
-    MagmaEngine.get().removeDatasource(destinationDatasource);
+    destinationDatasource.initialise();
+    try {
+      DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyValues().build();
+      copier.copy(valueTable, destinationDatasource);
+    } finally {
+      Disposables.silentlyDispose(destinationDatasource);
+    }
 
     return Response.ok(excelOutput.toByteArray(), "application/vnd.ms-excel").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".xlsx\"").build();
   }

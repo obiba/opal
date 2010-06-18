@@ -32,6 +32,7 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Frame;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -63,7 +64,7 @@ public class TableView extends Composite implements TablePresenter.Display {
   @UiField
   CellTable<VariableDto> table;
 
-  private FlowPanel spreadSheetIframePanel;
+  private Frame downloadFrame;
 
   SelectionModel<VariableDto> selectionModel = new SingleSelectionModel<VariableDto>();
 
@@ -79,7 +80,7 @@ public class TableView extends Composite implements TablePresenter.Display {
     initWidget(uiBinder.createAndBindUi(this));
     addTableColumns();
     addSpreadsheetImage();
-    addSpreadsheetDownloadPanel();
+    addSpreadsheetDownloadFrame();
   }
 
   private void addTableColumns() {
@@ -136,9 +137,10 @@ public class TableView extends Composite implements TablePresenter.Display {
     DOM.setStyleAttribute(spreadsheetDownloadImage.getElement(), "cssFloat", "right");
   }
 
-  private void addSpreadsheetDownloadPanel() {
-    spreadSheetIframePanel = new FlowPanel();
-    spreadsheetDownloadPanel.add(spreadSheetIframePanel);
+  private void addSpreadsheetDownloadFrame() {
+    downloadFrame = new Frame();
+    downloadFrame.setVisible(false);
+    spreadsheetDownloadPanel.add(downloadFrame);
   }
 
   @Override
@@ -167,6 +169,7 @@ public class TableView extends Composite implements TablePresenter.Display {
   @Override
   @SuppressWarnings("unchecked")
   public void clear() {
+    downloadFrame.setUrl("");
     renderRows((JsArray<VariableDto>) JavaScriptObject.createArray());
   }
 
@@ -184,17 +187,17 @@ public class TableView extends Composite implements TablePresenter.Display {
   }
 
   @Override
-  public Label getTableName() {
+  public HasText getTableName() {
     return tableName;
   }
 
   @Override
-  public Label getVariableCountLabel() {
+  public HasText getVariableCountLabel() {
     return count;
   }
 
   @Override
-  public Label getEntityTypeLabel() {
+  public HasText getEntityTypeLabel() {
     return entityType;
   }
 
@@ -215,13 +218,8 @@ public class TableView extends Composite implements TablePresenter.Display {
   }
 
   @Override
-  public void clearSpreadsheetDownload() {
-    spreadSheetIframePanel.clear();
-  }
-
-  @Override
-  public void setSpreadsheetDownload(Frame iFrame) {
-    spreadSheetIframePanel.add(iFrame);
+  public void setSpreadsheetDownload(String url) {
+    downloadFrame.setUrl(url);
   }
 
 }
