@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.Dis
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.HasUrl;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.resources.OpalResources;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.model.client.FileDto;
 
@@ -120,6 +121,9 @@ public class FolderDetailsView extends Composite implements Display {
 
   private void initTable() {
     addTableColumns();
+
+    table.addStyleName("folder-details");
+    OpalResources.INSTANCE.css().ensureInjected();
   }
 
   private void addTableColumns() {
@@ -127,10 +131,24 @@ public class FolderDetailsView extends Composite implements Display {
 
       @Override
       public String getValue(FileDto object) {
-        if(object.getSymbolicLink()) {
-          return "..";
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("<span class=\"");
+        if(object.getType().isFileType(FileDto.FileType.FILE)) {
+          sb.append("file\">");
+        } else {
+          sb.append("folder\">");
         }
-        return object.getName();
+
+        if(object.getSymbolicLink()) {
+          sb.append("..");
+        } else {
+          sb.append(object.getName());
+        }
+
+        sb.append("</span>");
+
+        return sb.toString();
       }
     }, translations.nameLabel());
 

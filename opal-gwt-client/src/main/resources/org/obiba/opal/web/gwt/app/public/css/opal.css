@@ -1,0 +1,9 @@
+/* File Explorer Styles */ 
+ 
+table.folder-details td:first-child span.file {
+  color: blue;
+  text-decoration: underline;	
+}
+table.folder-details td:first-child span.file:hover {
+  cursor: pointer;
+}

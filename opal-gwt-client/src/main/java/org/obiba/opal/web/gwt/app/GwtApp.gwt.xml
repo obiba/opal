@@ -19,6 +19,9 @@
   <!--  inherit css based theme -->
   <inherits name='com.google.gwt.user.theme.standard.Standard' />
 
+  <!--  for ClientBundle -->
+  <inherits name="com.google.gwt.resources.Resources" />
+
   <!-- Specify the app entry point class. -->
   <entry-point class='org.obiba.opal.web.gwt.app.client.GwtApp' />
   
