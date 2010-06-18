@@ -111,6 +111,7 @@ public class JobListView extends Composite implements Display {
     pager.firstPage();
     table.setData(0, table.getPageSize(), JsArrays.toList(rows, 0, table.getPageSize()));
     table.setDataSize(rows.length(), true);
+    table.redraw();
   }
 
   @SuppressWarnings("unchecked")
