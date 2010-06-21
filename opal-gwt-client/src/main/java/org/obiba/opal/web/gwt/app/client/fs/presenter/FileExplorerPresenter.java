@@ -113,7 +113,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
     super.registerHandler(eventBus.addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(), new FileSystemTreeFolderSelectionChangeEvent.Handler() {
 
       @Override
-      public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
+      public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
         currentFolder = event.getFolder();
       }
 

@@ -11,10 +11,39 @@ package org.obiba.opal.web.gwt.app.client.fs.event;
 
 import org.obiba.opal.web.model.client.FileDto;
 
-public class FileSystemTreeFolderSelectionChangeEvent extends FolderSelectionChangeEvent {
+import com.google.gwt.event.shared.EventHandler;
+import com.google.gwt.event.shared.GwtEvent;
+
+public class FileSystemTreeFolderSelectionChangeEvent extends GwtEvent<FileSystemTreeFolderSelectionChangeEvent.Handler> {
+
+  public interface Handler extends EventHandler {
+    void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event);
+  }
+
+  private static Type<Handler> TYPE;
+
+  private final FileDto folder;
 
   public FileSystemTreeFolderSelectionChangeEvent(FileDto folder) {
-    super(folder);
+    this.folder = folder;
+  }
+
+  public FileDto getFolder() {
+    return folder;
+  }
+
+  public static Type<Handler> getType() {
+    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
+  }
+
+  @Override
+  protected void dispatch(Handler handler) {
+    handler.onFolderSelectionChange(this);
+  }
+
+  @Override
+  public com.google.gwt.event.shared.GwtEvent.Type<Handler> getAssociatedType() {
+    return TYPE;
   }
 
 }

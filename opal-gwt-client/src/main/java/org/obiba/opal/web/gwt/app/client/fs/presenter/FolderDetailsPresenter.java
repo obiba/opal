@@ -81,7 +81,7 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
     super.registerHandler(eventBus.addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(), new FileSystemTreeFolderSelectionChangeEvent.Handler() {
 
       @Override
-      public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
+      public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
         updateTable(event.getFolder().getPath());
       }
 
