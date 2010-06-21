@@ -29,7 +29,7 @@
   <extend-property name='locale' values='en'/>
 
   <!-- This will limit the compile to a single browser: Firefox 3.x -->
-  <set-property name="user.agent" value="gecko1_8" />
+  <!--set-property name="user.agent" value="gecko1_8" /-->
 
   <!--
     This tells GWT to use this concrete implementation whenever a call to GWT.create() is made for the interface type.
