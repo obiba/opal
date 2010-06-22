@@ -21,6 +21,7 @@ import org.apache.commons.vfs.FileSelector;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.obiba.magma.NoSuchDatasourceException;
+import org.obiba.opal.core.crypt.KeyProviderException;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
@@ -116,6 +117,9 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       return false;
     } catch(NoSuchDatasourceException ex) {
       getShell().printf("Destination datasource '%s' does not exist. Cannot import.\n", ex.getDatasourceName());
+      return false;
+    } catch(KeyProviderException ex) {
+      getShell().printf("Decryption exception: %s\n", ex.getMessage());
       return false;
     } catch(IOException ex) {
       // Report an error and continue with the next file.
