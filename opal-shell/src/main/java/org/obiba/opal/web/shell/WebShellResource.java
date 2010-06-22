@@ -186,10 +186,10 @@ public class WebShellResource {
     .addAllMessages(commandJob.getMessages());
 
     if(commandJob.getStartTime() != null) {
-      dtoBuilder.setStartTime(commandJob.getStartTimeAsString());
+      dtoBuilder.setStartTime(commandJob.getStartTime().getTime());
     }
     if(commandJob.getEndTime() != null) {
-      dtoBuilder.setEndTime(commandJob.getEndTimeAsString());
+      dtoBuilder.setEndTime(commandJob.getEndTime().getTime());
     }
 
     return dtoBuilder.build();
