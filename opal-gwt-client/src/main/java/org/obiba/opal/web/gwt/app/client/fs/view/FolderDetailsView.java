@@ -20,13 +20,12 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.resources.OpalResources;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
+import org.obiba.opal.web.gwt.user.cellview.client.DateTimeColumn;
 import org.obiba.opal.web.model.client.FileDto;
 
 import com.google.gwt.cell.client.ClickableTextCell;
-import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -182,7 +181,7 @@ public class FolderDetailsView extends Composite implements Display {
       }
     }, translations.sizeLabel());
 
-    table.addColumn(new LastModifiedTimeColumn() {
+    table.addColumn(new DateTimeColumn<FileDto>() {
 
       @Override
       public Date getValue(FileDto object) {
@@ -222,12 +221,6 @@ public class FolderDetailsView extends Composite implements Display {
   private abstract class FileNameColumn extends Column<FileDto, String> implements HasFieldUpdater<FileDto, String> {
     public FileNameColumn() {
       super(new ClickableTextCell());
-    }
-  }
-
-  private static abstract class LastModifiedTimeColumn extends Column<FileDto, Date> {
-    public LastModifiedTimeColumn() {
-      super(new DateCell(DateTimeFormat.getShortDateTimeFormat()));
     }
   }
 

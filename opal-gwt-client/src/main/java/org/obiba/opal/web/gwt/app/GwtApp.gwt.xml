@@ -21,6 +21,9 @@
 
   <!--  for ClientBundle -->
   <inherits name="com.google.gwt.resources.Resources" />
+  
+  <!-- Opal CellView Module -->
+  <inherits name='org.obiba.opal.web.gwt.user.cellview.CellView' />
 
   <!-- Specify the app entry point class. -->
   <entry-point class='org.obiba.opal.web.gwt.app.client.GwtApp' />

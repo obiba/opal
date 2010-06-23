@@ -188,7 +188,7 @@ public class CommandJob implements OpalShell, Runnable {
   }
 
   protected Message createMessage(String msg) {
-    return Message.newBuilder().setMsg(msg).setTimestamp(formatTime(new Date())).build();
+    return Message.newBuilder().setMsg(msg).setTimestamp(System.currentTimeMillis()).build();
   }
 
   protected String formatTime(Date date) {

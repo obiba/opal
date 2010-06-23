@@ -4,7 +4,7 @@ option java_package = "org.obiba.opal.web.model";
 
 message Message {
   required string msg = 1;
-  required string timestamp = 2;
+  required int64 timestamp = 2;
 }
 
 message CommandStateDto {

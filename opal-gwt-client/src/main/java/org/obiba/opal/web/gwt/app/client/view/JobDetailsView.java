@@ -9,9 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.view;
 
+import java.util.Date;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.JobDetailsPresenter.Display;
+import org.obiba.opal.web.gwt.user.cellview.client.DateTimeColumn;
 import org.obiba.opal.web.model.client.CommandStateDto;
 import org.obiba.opal.web.model.client.Message;
 
@@ -121,10 +124,10 @@ public class JobDetailsView extends DialogBox implements Display {
   }
 
   private void addTableColumns() {
-    table.addColumn(new TextColumn<Message>() {
+    table.addColumn(new DateTimeColumn<Message>() {
       @Override
-      public String getValue(Message object) {
-        return object.getTimestamp();
+      public Date getValue(Message object) {
+        return new Date((long) object.getTimestamp());
       }
     }, translations.dateLabel());
 
