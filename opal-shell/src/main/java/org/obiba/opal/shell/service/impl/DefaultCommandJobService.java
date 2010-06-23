@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.shell.service.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -274,7 +275,9 @@ public class DefaultCommandJobService implements CommandJobService {
     }
   }
 
-  static class CommandJobComparator implements Comparator<CommandJob> {
+  static class CommandJobComparator implements Comparator<CommandJob>, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public int compare(CommandJob o1, CommandJob o2) {
       if(o1.getSubmitTime().after(o2.getSubmitTime())) {
