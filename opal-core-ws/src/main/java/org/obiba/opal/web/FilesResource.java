@@ -39,7 +39,7 @@ import org.apache.commons.vfs.FileType;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.web.model.Opal;
-import org.obiba.opal.web.ws.security.NotAuthenticated;
+import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +66,7 @@ public class FilesResource {
 
   @GET
   @Path("/{path:.*}")
-  @NotAuthenticated
+  @AuthenticatedByCookie
   public Response getFileSystemEntry(@PathParam("path") String path) throws FileSystemException {
 
     FileObject file = resolveFileInFileSystem(path);
@@ -149,7 +149,7 @@ public class FilesResource {
   @Path("/{path:.*}")
   @Consumes("multipart/form-data")
   @Produces("text/html")
-  @NotAuthenticated
+  @AuthenticatedByCookie
   public Response uploadFile(@PathParam("path") String path, @Context UriInfo uriInfo, @Context HttpServletRequest request) throws FileSystemException, FileUploadException {
 
     FileObject fileToWriteTo = resolveFileInFileSystem(path);

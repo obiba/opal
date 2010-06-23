@@ -13,6 +13,7 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response.Status;
 
@@ -29,6 +30,7 @@ import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.resteasy.spi.interception.PostProcessInterceptor;
 import org.jboss.resteasy.spi.interception.PreProcessInterceptor;
 import org.jboss.resteasy.util.HttpHeaderNames;
+import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +67,7 @@ public class SecurityInterceptor extends AbstractSecurityComponent implements Pr
       return null;
     }
 
-    String sessionId = extractCookieValue(request);
+    String sessionId = extractCookieValue(request, method);
     if(isValidSessionId(sessionId)) {
       Subject s = new Subject.Builder(getSecurityManager()).sessionId(sessionId).buildSubject();
       log.debug("Binding subject {} session {} to executring thread {}", new Object[] { s.getPrincipal(), sessionId, Thread.currentThread().getId() });
@@ -110,12 +112,20 @@ public class SecurityInterceptor extends AbstractSecurityComponent implements Pr
     return true;
   }
 
-  protected String extractCookieValue(HttpRequest request) {
-    List<String> values = request.getHttpHeaders().getRequestHeader(X_OPAL_AUTH);
-    if(values != null && values.size() == 1) {
-      return values.get(0);
+  protected String extractCookieValue(HttpRequest request, ResourceMethod method) {
+
+    if(method.getMethod().isAnnotationPresent(AuthenticatedByCookie.class) || method.getResourceClass().isAnnotationPresent(AuthenticatedByCookie.class)) {
+      Cookie cookie = request.getHttpHeaders().getCookies().get(OPAL_SESSION_ID_COOKIE_NAME);
+      if(cookie != null) {
+        return cookie.getValue();
+      }
+
+    } else {
+      List<String> values = request.getHttpHeaders().getRequestHeader(X_OPAL_AUTH);
+      if(values != null && values.size() == 1) {
+        return values.get(0);
+      }
     }
     return null;
   }
-
 }
