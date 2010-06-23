@@ -30,9 +30,12 @@ import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.CompositeCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.HasCell;
+import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -331,7 +334,24 @@ public class JobListView extends Composite implements Display {
     }
 
     @Override
+    public Object onBrowserEvent(Element parent, CommandStateDto value, Object viewData, NativeEvent event, ValueUpdater<CommandStateDto> valueUpdater) {
+      refreshActions(value);
+
+      return super.onBrowserEvent(parent, value, viewData, event, valueUpdater);
+    }
+
+    @Override
     public void render(CommandStateDto value, Object viewData, StringBuilder sb) {
+      refreshActions(value);
+
+      super.render(value, viewData, sb);
+    }
+
+    public HasCell<CommandStateDto, ?> getHasCell(int index) {
+      return hasCells.get(index);
+    }
+
+    private void refreshActions(CommandStateDto value) {
       // Remove all actions.
       super.removeHasCell(getHasCell(0));
       super.removeHasCell(getHasCell(1));
@@ -343,12 +363,6 @@ public class JobListView extends Composite implements Display {
       if(value.getStatus().toString().equals("SUCCEEDED") || value.getStatus().toString().equals("FAILED") || value.getStatus().toString().equals("CANCELED")) {
         super.addHasCell(getHasCell(1));
       }
-
-      super.render(value, viewData, sb);
-    }
-
-    public HasCell<CommandStateDto, ?> getHasCell(int index) {
-      return hasCells.get(index);
     }
   }
 }
