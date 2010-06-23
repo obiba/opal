@@ -22,18 +22,17 @@ import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.ActionHandle
 import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
+import org.obiba.opal.web.gwt.user.cellview.client.DateTimeColumn;
 import org.obiba.opal.web.model.client.CommandStateDto;
 
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.CompositeCell;
-import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.HasCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -213,12 +212,6 @@ public class JobListView extends Composite implements Display {
   //
   // Inner Classes
   //
-
-  public abstract class DateTimeColumn<T> extends Column<T, Date> {
-    public DateTimeColumn() {
-      super(new DateCell(DateTimeFormat.getShortDateTimeFormat()));
-    }
-  }
 
   static class IdColumn extends Column<CommandStateDto, String> implements HasFieldUpdater<CommandStateDto, String> {
     //
