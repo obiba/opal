@@ -9,7 +9,7 @@
     .inset { border: 2px inset black; }
   </ui:style>
 
-  <g:LayoutPanel height="40em" width="40em" ui:field="content">
+  <g:LayoutPanel height="43em" width="40em" ui:field="content">
     <g:layer left="1em" right="1em">
       <g:Label addStyleNames="{style.title}"><ui:msg description="Data export title">Export Data</ui:msg></g:Label>
     </g:layer>
