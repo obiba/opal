@@ -191,7 +191,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
       }
 
       if(credentials.hasExpired(builder)) {
-        eventBus.fireEvent(new SessionExpiredEvent());
+        eventBus.fireEvent(new SessionExpiredEvent(DefaultResourceRequestBuilder.this));
       } else if(codes != null && codes[code] != null) {
         codes[code].onResponseCode(request, response);
       } else {

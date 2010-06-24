@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.event;
 
+import org.obiba.opal.web.gwt.rest.client.DefaultResourceRequestBuilder;
+
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
@@ -18,6 +21,12 @@ public class SessionExpiredEvent extends GwtEvent<SessionExpiredEvent.Handler> {
   }
 
   private static Type<Handler> TYPE;
+
+  private final DefaultResourceRequestBuilder<? extends JavaScriptObject> failedRequest;
+
+  public SessionExpiredEvent(DefaultResourceRequestBuilder<? extends JavaScriptObject> resourceRequestBuilder) {
+    this.failedRequest = resourceRequestBuilder;
+  }
 
   public static Type<Handler> getType() {
     return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
@@ -31,5 +40,9 @@ public class SessionExpiredEvent extends GwtEvent<SessionExpiredEvent.Handler> {
   @Override
   public com.google.gwt.event.shared.GwtEvent.Type<Handler> getAssociatedType() {
     return TYPE;
+  }
+
+  public DefaultResourceRequestBuilder<? extends JavaScriptObject> getFailedRequest() {
+    return failedRequest;
   }
 }
