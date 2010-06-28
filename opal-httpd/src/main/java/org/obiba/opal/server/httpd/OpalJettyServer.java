@@ -37,6 +37,7 @@ import org.obiba.opal.server.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -65,13 +66,13 @@ public class OpalJettyServer implements Service {
   private ConfigurableApplicationContext webApplicationContext;
 
   @Autowired
-  public OpalJettyServer(final ApplicationContext ctx, final SslContextFactory sslContextFactory, final PlatformTransactionManager txmgr) {
+  public OpalJettyServer(final ApplicationContext ctx, final SslContextFactory sslContextFactory, final PlatformTransactionManager txmgr, final @Value("${org.obiba.opal.http.port}") Integer httpPort, final @Value("${org.obiba.opal.https.port}") Integer httpsPort) {
     Server server = new Server();
     // OPAL-342: We will manually stop the Jetty server instead of relying its shutdown hook
     server.setStopAtShutdown(false);
 
     SelectChannelConnector httpConnector = new SelectChannelConnector();
-    httpConnector.setPort(8080);
+    httpConnector.setPort(httpPort);
     httpConnector.setMaxIdleTime(30000);
     httpConnector.setRequestHeaderSize(8192);
 
@@ -81,7 +82,7 @@ public class OpalJettyServer implements Service {
         return sslContextFactory.createSslContext();
       }
     };
-    sslConnector.setPort(8443);
+    sslConnector.setPort(httpsPort);
     sslConnector.setWantClientAuth(true);
     sslConnector.setNeedClientAuth(false);
     sslConnector.setMaxIdleTime(30000);
@@ -91,7 +92,7 @@ public class OpalJettyServer implements Service {
     HandlerList handlers = new HandlerList();
 
     // Add a file handler that points to the Opal GWT client directory
-    String url = "file://" + System.getProperty("OPAL_WRAPPER_DIR") + "/webapp";
+    String url = "file://" + System.getProperty("OPAL_DIST_DIR") + "/webapp";
     handlers.addHandler(createFileHandler(url));
 
     handlers.addHandler(contextHandler = createServletHandler(ctx, txmgr));
