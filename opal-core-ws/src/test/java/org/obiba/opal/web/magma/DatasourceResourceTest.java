@@ -13,7 +13,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.web.model.Magma;
 import org.slf4j.Logger;
@@ -26,9 +26,9 @@ public class DatasourceResourceTest extends MagmaResourceTest {
 
   private static final Logger log = LoggerFactory.getLogger(DatasourceResourceTest.class);
 
-  @BeforeClass
-  public static void before() {
-    MagmaResourceTest.before();
+  @Before
+  public void before() {
+    super.before();
     addAllDatasources();
   }
 

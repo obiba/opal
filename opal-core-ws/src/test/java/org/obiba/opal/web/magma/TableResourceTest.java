@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
@@ -23,9 +23,9 @@ public class TableResourceTest extends MagmaResourceTest {
 
   private static final Logger log = LoggerFactory.getLogger(TableResourceTest.class);
 
-  @BeforeClass
-  public static void before() {
-    MagmaResourceTest.before();
+  @Before
+  public void before() {
+    super.before();
     addDatasource(DATASOURCE1);
   }
 

@@ -12,8 +12,8 @@ package org.obiba.opal.web.magma;
 import java.io.File;
 import java.io.FileFilter;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 
@@ -28,17 +28,17 @@ public abstract class MagmaResourceTest {
 
   public static final String DATASOURCE2 = "datasource2-novalues.xlsx";
 
-  @BeforeClass
-  public static void before() {
+  @Before
+  public void before() {
     new MagmaEngine();
   }
 
-  @AfterClass
-  public static void after() {
+  @After
+  public void after() {
     MagmaEngine.get().shutdown();
   }
 
-  protected static void addAllDatasources() {
+  protected void addAllDatasources() {
     File folder = new File(DATASOURCES_FOLDER);
     for(File file : folder.listFiles(new FileFilter() {
 
@@ -47,16 +47,29 @@ public abstract class MagmaResourceTest {
         return pathname.getName().endsWith("xlsx");
       }
     })) {
-      MagmaEngine.get().addDatasource(new ExcelDatasource(file.getName(), file));
+      MagmaEngine.get().addDatasource(new TestExcelDatasource(file.getName(), file));
     }
   }
 
-  protected static void addDatasource(String name) {
-    MagmaEngine.get().addDatasource(new ExcelDatasource(name, new File(DATASOURCES_FOLDER, name)));
+  protected void addDatasource(String name) {
+    MagmaEngine.get().addDatasource(new TestExcelDatasource(name, new File(DATASOURCES_FOLDER, name)));
   }
 
-  protected static void removeDatasource(String name) {
+  protected void removeDatasource(String name) {
     MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource(name));
+  }
+
+  private class TestExcelDatasource extends ExcelDatasource {
+
+    public TestExcelDatasource(String name, File excelFile) {
+      super(name, excelFile);
+    }
+
+    @Override
+    protected void onDispose() {
+      // do not write workbook
+    }
+
   }
 
 }
