@@ -11,6 +11,7 @@ package org.obiba.opal.web.magma;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -40,6 +41,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.Lists;
+
 @Component
 @Scope("request")
 @Path("/datasource/{name}")
@@ -63,9 +66,14 @@ public class DatasourceResource {
   public Magma.DatasourceDto get() {
     Datasource ds = MagmaEngine.get().getDatasource(name);
     Magma.DatasourceDto.Builder datasource = Magma.DatasourceDto.newBuilder().setName(ds.getName());
+
+    final List<String> tableNames = Lists.newArrayList();
     for(ValueTable table : ds.getValueTables()) {
-      datasource.addTable(table.getName());
+      tableNames.add(table.getName());
     }
+    Collections.sort(tableNames);
+    datasource.addAllTable(tableNames);
+
     return datasource.build();
   }
 

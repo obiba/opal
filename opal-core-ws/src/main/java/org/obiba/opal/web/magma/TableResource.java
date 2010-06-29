@@ -12,6 +12,8 @@ package org.obiba.opal.web.magma;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,6 +44,7 @@ import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.xstream.XStreamValueSet;
+import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
@@ -103,7 +106,10 @@ public class TableResource {
     }
     ub.path(TableResource.class, "getVariable");
 
-    return ImmutableSet.copyOf(Iterables.transform(valueTable.getVariables(), Dtos.asDtoFunc(ub)));
+    ArrayList<VariableDto> variables = Lists.newArrayList(Iterables.transform(valueTable.getVariables(), Dtos.asDtoFunc(ub)));
+    sortByName(variables);
+
+    return variables;
   }
 
   @GET
@@ -179,5 +185,17 @@ public class TableResource {
       }
     }
     return response;
+  }
+
+  private void sortByName(List<Magma.VariableDto> variables) {
+    // sort alphabetically
+    Collections.sort(variables, new Comparator<Magma.VariableDto>() {
+
+      @Override
+      public int compare(VariableDto v1, VariableDto v2) {
+        return v1.getName().compareTo(v2.getName());
+      }
+
+    });
   }
 }

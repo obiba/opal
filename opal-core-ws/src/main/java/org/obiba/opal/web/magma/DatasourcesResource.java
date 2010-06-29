@@ -10,6 +10,8 @@
 package org.obiba.opal.web.magma;
 
 import java.net.URI;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -20,6 +22,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.web.model.Magma;
+import org.obiba.opal.web.model.Magma.DatasourceDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,11 +57,18 @@ public class DatasourcesResource {
       Magma.DatasourceDto.Builder ds = Magma.DatasourceDto.newBuilder() //
       .setName(from.getName()) //
       .setLink(dslink.toString());
+
+      final List<String> tableNames = Lists.newArrayList();
       for(ValueTable table : from.getValueTables()) {
-        ds.addTable(table.getName());
+        tableNames.add(table.getName());
       }
+      Collections.sort(tableNames);
+      ds.addAllTable(tableNames);
+
       datasources.add(ds.build());
     }
+    sortByName(datasources);
+
     return datasources;
   }
 
@@ -74,4 +84,17 @@ public class DatasourcesResource {
 
     return keysTableReference.substring(0, separatorIndex);
   }
+
+  private void sortByName(List<Magma.DatasourceDto> datasources) {
+    // sort alphabetically
+    Collections.sort(datasources, new Comparator<Magma.DatasourceDto>() {
+
+      @Override
+      public int compare(DatasourceDto d1, DatasourceDto d2) {
+        return d1.getName().compareTo(d2.getName());
+      }
+
+    });
+  }
+
 }

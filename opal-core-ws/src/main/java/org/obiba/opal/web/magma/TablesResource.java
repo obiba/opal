@@ -10,6 +10,8 @@
 package org.obiba.opal.web.magma;
 
 import java.net.URI;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -19,6 +21,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.web.model.Magma;
+import org.obiba.opal.web.model.Magma.TableDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +54,20 @@ public class TablesResource {
       .setLink(tableLink.toString());
       tables.add(table.build());
     }
+    sortByName(tables);
+
     return tables;
+  }
+
+  private void sortByName(List<Magma.TableDto> tables) {
+    // sort alphabetically
+    Collections.sort(tables, new Comparator<Magma.TableDto>() {
+
+      @Override
+      public int compare(TableDto t1, TableDto t2) {
+        return t1.getName().compareTo(t2.getName());
+      }
+
+    });
   }
 }
