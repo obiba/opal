@@ -15,11 +15,14 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.fs.FileDownloadSelectionHandler;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.FileSelectionHandler;
 import org.obiba.opal.web.model.client.FileDto;
+import org.obiba.opal.web.model.client.FileDto.FileType;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -99,14 +102,17 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
     fileSystemTreePresenter = fileSystemTreePresenterProvider.get();
 
-    fileDownloadPresenter = fileDownloadPresenterProvider.get();
     folderDetailsPresenter = folderDetailsPresenterProvider.get();
-    folderDetailsPresenter.getDisplay().getFileNameColumn().addFileSelectionHandler(new FileDownloadSelectionHandler(fileDownloadPresenter));
+    folderDetailsPresenter.getDisplay().getFileNameColumn().addFileSelectionHandler(createFileSelectionHandler());
+
+    fileDownloadPresenter = fileDownloadPresenterProvider.get();
 
     getDisplay().getFileSystemTree().add(fileSystemTreePresenter.getDisplay().asWidget());
     getDisplay().getFolderDetailsPanel().add(folderDetailsPresenter.getDisplay().asWidget());
+
     fileSystemTreePresenter.bind();
     folderDetailsPresenter.bind();
+    fileDownloadPresenter.bind();
   }
 
   private void addEventHandlers() {
@@ -139,5 +145,17 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
     }));
 
+  }
+
+  private FileSelectionHandler createFileSelectionHandler() {
+    return new FileSelectionHandler() {
+
+      public void onFileSelection(FileDto fileDto) {
+        if(fileDto.getType().isFileType(FileType.FILE)) {
+          String url = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")).append("ws/files").append(fileDto.getPath()).toString();
+          eventBus.fireEvent(new FileDownloadEvent(url));
+        }
+      }
+    };
   }
 }
