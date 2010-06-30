@@ -18,6 +18,8 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileDownloadPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -34,6 +36,7 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
@@ -54,13 +57,16 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     HasClickHandlers getSpreadsheetIcon();
 
     HasFieldUpdater<VariableDto, String> getVariableNameColumn();
-
-    void setSpreadsheetDownload(String url);
   }
 
   private JsArray<VariableDto> variables;
 
   private TableDto table;
+
+  @Inject
+  Provider<FileDownloadPresenter> fileDownloadPresenterProvider;
+
+  FileDownloadPresenter fileDownloadPresenter;
 
   /**
    * @param display
@@ -78,6 +84,8 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
   @Override
   protected void onBind() {
+    fileDownloadPresenter = fileDownloadPresenterProvider.get();
+    fileDownloadPresenter.bind();
 
     super.registerHandler(eventBus.addHandler(NavigatorSelectionChangeEvent.getType(), new NavigatorSelectionChangeEvent.Handler() {
       @Override
@@ -164,7 +172,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
   private void downloadMetadata() {
     String downloadUrl = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "ws")).append(this.table.getLink()).append("/variables/xlsx").toString();
-    getDisplay().setSpreadsheetDownload(downloadUrl);
+    eventBus.fireEvent(new FileDownloadEvent(downloadUrl));
   }
 
 }

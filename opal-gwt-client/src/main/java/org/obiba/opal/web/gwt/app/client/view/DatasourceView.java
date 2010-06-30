@@ -29,7 +29,6 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -63,8 +62,6 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
   private Image spreadsheetDownloadImage;
 
-  private Frame downloadFrame;
-
   private TableNameColumn tableNameColumn;
 
   private Translations translations = GWT.create(Translations.class);
@@ -73,7 +70,6 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
     initWidget(uiBinder.createAndBindUi(this));
     addTableColumns();
     addSpreadsheetImage();
-    addSpreadsheetDownloadPanel();
   }
 
   private void addTableColumns() {
@@ -117,12 +113,6 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
     spreadsheetDownloadImage = new Image("image/spreadsheet-download-icon.png");
     spreadsheetDownloadPanel.add(spreadsheetDownloadImage);
     DOM.setStyleAttribute(spreadsheetDownloadImage.getElement(), "cssFloat", "right");
-  }
-
-  private void addSpreadsheetDownloadPanel() {
-    downloadFrame = new Frame();
-    downloadFrame.setVisible(false);
-    spreadsheetDownloadPanel.add(downloadFrame);
   }
 
   @Override
@@ -181,15 +171,4 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   public HasFieldUpdater<TableDto, String> getTableNameColumn() {
     return tableNameColumn;
   }
-
-  @Override
-  public void clearSpreadsheetDownload() {
-    downloadFrame.setUrl("");
-  }
-
-  @Override
-  public void setSpreadsheetDownload(String url) {
-    downloadFrame.setUrl(url);
-  }
-
 }

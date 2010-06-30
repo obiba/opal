@@ -17,6 +17,8 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileDownloadPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -32,6 +34,7 @@ import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Display> {
 
@@ -46,14 +49,14 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     HasClickHandlers getSpreadsheetIcon();
 
     HasFieldUpdater<TableDto, String> getTableNameColumn();
-
-    void clearSpreadsheetDownload();
-
-    void setSpreadsheetDownload(String iFrame);
-
   }
 
   private String datasource;
+
+  @Inject
+  Provider<FileDownloadPresenter> fileDownloadPresenterProvider;
+
+  FileDownloadPresenter fileDownloadPresenter;
 
   @Inject
   public DatasourcePresenter(Display display, EventBus eventBus) {
@@ -67,6 +70,9 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
   @Override
   protected void onBind() {
+    fileDownloadPresenter = fileDownloadPresenterProvider.get();
+    fileDownloadPresenter.bind();
+
     super.registerHandler(eventBus.addHandler(NavigatorSelectionChangeEvent.getType(), new NavigatorSelectionChangeEvent.Handler() {
       @Override
       public void onNavigatorSelectionChanged(NavigatorSelectionChangeEvent event) {
@@ -74,7 +80,6 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
         if(event.getSelection().getParentItem() == null) {
           datasource = ((DatasourceDto) event.getSelection().getUserObject()).getName();
           getDisplay().getDatasourceNameLabel().setText(datasource);
-          getDisplay().clearSpreadsheetDownload();
           updateTable(datasource);
         }
       }
@@ -129,7 +134,6 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
   private void downloadMetadata(String datasource) {
     String downloadUrl = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "ws")).append("/datasource/").append(datasource).append("/variables/excel").toString();
-    getDisplay().setSpreadsheetDownload(downloadUrl);
+    eventBus.fireEvent(new FileDownloadEvent(downloadUrl));
   }
-
 }

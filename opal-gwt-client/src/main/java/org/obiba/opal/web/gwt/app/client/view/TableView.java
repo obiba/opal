@@ -31,7 +31,6 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -64,8 +63,6 @@ public class TableView extends Composite implements TablePresenter.Display {
   @UiField
   CellTable<VariableDto> table;
 
-  private Frame downloadFrame;
-
   SelectionModel<VariableDto> selectionModel = new SingleSelectionModel<VariableDto>();
 
   SimplePager<VariableDto> pager;
@@ -80,7 +77,6 @@ public class TableView extends Composite implements TablePresenter.Display {
     initWidget(uiBinder.createAndBindUi(this));
     addTableColumns();
     addSpreadsheetImage();
-    addSpreadsheetDownloadFrame();
   }
 
   private void addTableColumns() {
@@ -137,12 +133,6 @@ public class TableView extends Composite implements TablePresenter.Display {
     DOM.setStyleAttribute(spreadsheetDownloadImage.getElement(), "cssFloat", "right");
   }
 
-  private void addSpreadsheetDownloadFrame() {
-    downloadFrame = new Frame();
-    downloadFrame.setVisible(false);
-    spreadsheetDownloadPanel.add(downloadFrame);
-  }
-
   @Override
   public void renderRows(final JsArray<VariableDto> rows) {
     table.setDelegate(new Delegate<VariableDto>() {
@@ -169,7 +159,6 @@ public class TableView extends Composite implements TablePresenter.Display {
   @Override
   @SuppressWarnings("unchecked")
   public void clear() {
-    downloadFrame.setUrl("");
     renderRows((JsArray<VariableDto>) JavaScriptObject.createArray());
   }
 
@@ -216,10 +205,4 @@ public class TableView extends Composite implements TablePresenter.Display {
   public HasFieldUpdater<VariableDto, String> getVariableNameColumn() {
     return variableNameColumn;
   }
-
-  @Override
-  public void setSpreadsheetDownload(String url) {
-    downloadFrame.setUrl(url);
-  }
-
 }
