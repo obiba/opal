@@ -26,16 +26,16 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter.Display> {
 
   public interface Display extends WidgetDisplay {
-    public ScrollPanel getFileSystemTree();
+    public HasWidgets getFileSystemTree();
 
-    public ScrollPanel getFolderDetailsPanel();
+    public HasWidgets getFolderDetailsPanel();
 
     public HasClickHandlers getFileUploadButton();
   }
@@ -49,16 +49,11 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   @Inject
   Provider<FileUploadDialogPresenter> fileUploadDialogPresenterProvider;
 
-  @Inject
-  Provider<FileDownloadPresenter> fileDownloadPresenterProvider;
-
   FileSystemTreePresenter fileSystemTreePresenter;
 
   FolderDetailsPresenter folderDetailsPresenter;
 
   FileUploadDialogPresenter fileUploadDialogPresenter;
-
-  FileDownloadPresenter fileDownloadPresenter;
 
   FileDto currentFolder;
 
@@ -105,14 +100,11 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
     folderDetailsPresenter = folderDetailsPresenterProvider.get();
     folderDetailsPresenter.getDisplay().getFileNameColumn().addFileSelectionHandler(createFileSelectionHandler());
 
-    fileDownloadPresenter = fileDownloadPresenterProvider.get();
-
     getDisplay().getFileSystemTree().add(fileSystemTreePresenter.getDisplay().asWidget());
     getDisplay().getFolderDetailsPanel().add(folderDetailsPresenter.getDisplay().asWidget());
 
     fileSystemTreePresenter.bind();
     folderDetailsPresenter.bind();
-    fileDownloadPresenter.bind();
   }
 
   private void addEventHandlers() {

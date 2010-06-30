@@ -1,6 +1,7 @@
 package org.obiba.opal.web.gwt.app.client;
 
 import org.obiba.opal.web.gwt.app.client.event.SessionExpiredEvent;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileDownloadPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
@@ -25,12 +26,21 @@ public class GwtApp implements EntryPoint {
     // TODO: is there a better way to provide the dependencies to instances created with GWT.create()?
     DefaultResourceRequestBuilder.setup(opalGinjector);
 
+    initFileDownloadPresenter();
+    initApplicationPresenter();
+    initLoginPresenter();
+
+    registerHandlers();
+  }
+
+  private void initApplicationPresenter() {
     ApplicationPresenter presenter = opalGinjector.getApplicationPresenter();
     presenter.bind();
     presenter.revealDisplay();
-
     RootLayoutPanel.get().add(presenter.getDisplay().asWidget());
+  }
 
+  private void initLoginPresenter() {
     LoginPresenter loginPresenter = opalGinjector.getLoginPresenter();
     loginPresenter.bind();
     // Only display login if we don't currently have any credentials.
@@ -38,12 +48,19 @@ public class GwtApp implements EntryPoint {
 
       loginPresenter.revealDisplay();
     }
+  }
 
+  private void initFileDownloadPresenter() {
+    FileDownloadPresenter fileDownloadPresenter = opalGinjector.getFileDownloadPresenter();
+    fileDownloadPresenter.bind();
+    RootLayoutPanel.get().add(fileDownloadPresenter.getDisplay().asWidget());
+  }
+
+  private void registerHandlers() {
     final UnhandledResponseNotificationPresenter unhandledResponseNotificationPresenter = opalGinjector.getUnhandledResponseNotificationPresenter();
     unhandledResponseNotificationPresenter.bind();
 
     opalGinjector.getEventBus().addHandler(UnhandledResponseEvent.getType(), new UnhandledResponseEvent.Handler() {
-
       @Override
       public void onUnhandledResponse(UnhandledResponseEvent e) {
         unhandledResponseNotificationPresenter.revealDisplay();

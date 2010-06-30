@@ -13,7 +13,6 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FileDownloadPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileDownloadPresenter.HasUrl;
 
 import com.google.gwt.user.client.ui.Frame;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -43,8 +42,6 @@ public class FileDownloadView implements FileDownloadPresenter.Display {
         downloader.setUrl(url);
       }
     };
-
-    RootPanel.get().add(asWidget());
   }
 
   //
