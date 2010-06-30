@@ -15,6 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
@@ -73,6 +74,14 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
         } else {
           displayDetails(tablePresenter.getDisplay());
         }
+      }
+    }));
+
+    super.registerHandler(eventBus.addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionChangeEvent.Handler() {
+
+      @Override
+      public void onNavigatorSelectionChanged(DatasourceSelectionChangeEvent event) {
+        displayDetails(datasourcePresenter.getDisplay());
       }
     }));
 

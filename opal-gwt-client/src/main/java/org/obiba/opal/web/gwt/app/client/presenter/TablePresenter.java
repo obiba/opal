@@ -15,6 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
@@ -22,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.model.client.DatasourceDto;
 import org.obiba.opal.web.model.client.TableDto;
 import org.obiba.opal.web.model.client.VariableDto;
 
@@ -53,6 +55,8 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     HasText getEntityTypeLabel();
 
     HasClickHandlers getSpreadsheetIcon();
+
+    HasClickHandlers getParentIcon();
 
     HasFieldUpdater<VariableDto, String> getVariableNameColumn();
   }
@@ -96,13 +100,25 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       }
     }));
 
+    super.registerHandler(getDisplay().getParentIcon().addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasource/" + table.getDatasourceName()).get().withCallback(new ResourceCallback<DatasourceDto>() {
+          @Override
+          public void onResource(Response response, DatasourceDto resource) {
+            eventBus.fireEvent(new DatasourceSelectionChangeEvent(resource));
+          }
+
+        }).send();
+      }
+    }));
+
     super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
 
       @Override
       public void onNavigatorSelectionChanged(TableSelectionChangeEvent event) {
-        String datasource = event.getSelection().getDatasourceName();
-        String table = event.getSelection().getName();
-        displayTable(datasource, table);
+        displayTable(event.getSelection());
       }
     }));
 
@@ -132,20 +148,30 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   public void revealDisplay() {
   }
 
-  private void displayTable(String datasource, String tableName) {
-    getDisplay().clear();
-    getDisplay().getTableName().setText(tableName);
+  private void displayTable(TableDto tableDto) {
+    if(!table.getDatasourceName().equals(tableDto.getDatasourceName()) || !table.getName().equals(tableDto.getName())) {
+      getDisplay().clear();
+      getDisplay().getTableName().setText(tableDto.getName());
+      table = tableDto;
+      updateVariables();
+    }
+  }
 
-    ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/datasource/" + datasource + "/table/" + tableName).get().withCallback(new ResourceCallback<TableDto>() {
-      @Override
-      public void onResource(Response response, TableDto resource) {
-        table = resource;
-        getDisplay().getEntityTypeLabel().setText(resource.getEntityType());
-        updateVariables();
-      }
+  private void displayTable(String datasourceName, String tableName) {
+    if(!table.getDatasourceName().equals(datasourceName) || !table.getName().equals(tableName)) {
+      getDisplay().clear();
+      getDisplay().getTableName().setText(tableName);
 
-    }).send();
+      ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/datasource/" + datasourceName + "/table/" + tableName).get().withCallback(new ResourceCallback<TableDto>() {
+        @Override
+        public void onResource(Response response, TableDto resource) {
+          table = resource;
+          getDisplay().getEntityTypeLabel().setText(resource.getEntityType());
+          updateVariables();
+        }
 
+      }).send();
+    }
   }
 
   private void updateVariables() {

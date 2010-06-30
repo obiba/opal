@@ -69,6 +69,8 @@ public class TableView extends Composite implements TablePresenter.Display {
 
   private Image spreadsheetDownloadImage;
 
+  private Image parentImage;
+
   private VariableNameColumn variableNameColumn;
 
   private Translations translations = GWT.create(Translations.class);
@@ -128,6 +130,10 @@ public class TableView extends Composite implements TablePresenter.Display {
   }
 
   private void addSpreadsheetImage() {
+    parentImage = new Image("image/up-icon.png");
+    spreadsheetDownloadPanel.add(parentImage);
+    DOM.setStyleAttribute(parentImage.getElement(), "cssFloat", "right");
+
     spreadsheetDownloadImage = new Image("image/spreadsheet-download-icon.png");
     spreadsheetDownloadPanel.add(spreadsheetDownloadImage);
     DOM.setStyleAttribute(spreadsheetDownloadImage.getElement(), "cssFloat", "right");
@@ -193,6 +199,11 @@ public class TableView extends Composite implements TablePresenter.Display {
   @Override
   public HasClickHandlers getSpreadsheetIcon() {
     return spreadsheetDownloadImage;
+  }
+
+  @Override
+  public HasClickHandlers getParentIcon() {
+    return parentImage;
   }
 
   private abstract class VariableNameColumn extends Column<VariableDto, String> implements HasFieldUpdater<VariableDto, String> {

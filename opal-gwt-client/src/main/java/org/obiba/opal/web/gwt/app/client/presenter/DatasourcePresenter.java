@@ -15,6 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
@@ -68,10 +69,16 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
       public void onNavigatorSelectionChanged(NavigatorSelectionChangeEvent event) {
         event.getSelection().getUserObject();
         if(event.getSelection().getParentItem() == null) {
-          datasource = ((DatasourceDto) event.getSelection().getUserObject()).getName();
-          getDisplay().getDatasourceNameLabel().setText(datasource);
-          updateTable(datasource);
+          displayDatasource((DatasourceDto) event.getSelection().getUserObject());
         }
+      }
+    }));
+
+    super.registerHandler(eventBus.addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionChangeEvent.Handler() {
+
+      @Override
+      public void onNavigatorSelectionChanged(DatasourceSelectionChangeEvent event) {
+        displayDatasource(event.getSelection());
       }
     }));
 
@@ -109,6 +116,14 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
   @Override
   public void revealDisplay() {
+  }
+
+  private void displayDatasource(DatasourceDto datasourceDto) {
+    if(!datasourceDto.getName().equals(datasource)) {
+      datasource = datasourceDto.getName();
+      getDisplay().getDatasourceNameLabel().setText(datasource);
+      updateTable(datasource);
+    }
   }
 
   private void updateTable(final String datasource) {

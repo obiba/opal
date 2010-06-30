@@ -16,8 +16,10 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import net.customware.gwt.presenter.client.EventBus;
 
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+import org.obiba.opal.web.gwt.app.client.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
@@ -27,6 +29,7 @@ import org.obiba.opal.web.model.client.TableDto;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.event.shared.GwtEvent.Type;
 
 public class DatasourcePresenterTest extends AbstractGwtTestSetup {
 
@@ -43,25 +46,24 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
     datasourcePresenter = new DatasourcePresenter(displayMock, eventBusMock);
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void testThatEventHandlersAreAddedToUIComponents() throws Exception {
     HandlerRegistration handlerRegistrationMock = createMock(HandlerRegistration.class);
-    NavigatorSelectionChangeEvent.Handler selectionChangeEventMock = createMock(NavigatorSelectionChangeEvent.Handler.class);
-    expect(eventBusMock.addHandler(NavigatorSelectionChangeEvent.getType(), selectionChangeEventMock)).andReturn(handlerRegistrationMock).anyTimes();
+    expect(eventBusMock.addHandler((Type<NavigatorSelectionChangeEvent.Handler>) EasyMock.anyObject(), (NavigatorSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
+    expect(eventBusMock.addHandler((Type<DatasourceSelectionChangeEvent.Handler>) EasyMock.anyObject(), (DatasourceSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
 
     HasClickHandlers hasClickHandlerMock = createMock(HasClickHandlers.class);
     expect(displayMock.getSpreadsheetIcon()).andReturn(hasClickHandlerMock);
 
-    @SuppressWarnings("unchecked")
     HasFieldUpdater<TableDto, String> hasFieldUpdater = createMock(HasFieldUpdater.class);
     expect(displayMock.getTableNameColumn()).andReturn(hasFieldUpdater);
 
     expect(hasClickHandlerMock.addClickHandler((ClickHandler) anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
 
-    replay(displayMock, hasClickHandlerMock);
+    replay(displayMock, eventBusMock, hasClickHandlerMock);
     datasourcePresenter.bind();
 
     verify(displayMock, hasClickHandlerMock);
   }
-
 }
