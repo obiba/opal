@@ -3,6 +3,5 @@
 
   <g:FlowPanel>
     <g2:CellTable width="100%" ui:field="table" />
-    <g:Frame ui:field="downloader"/>
   </g:FlowPanel>
 </ui:UiBinder>

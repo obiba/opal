@@ -15,15 +15,16 @@ import java.util.Date;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.HasUrl;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.FileSelectionHandler;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.HasFileSelectionHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.resources.OpalResources;
-import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.gwt.user.cellview.client.DateTimeColumn;
 import org.obiba.opal.web.model.client.FileDto;
 
 import com.google.gwt.cell.client.ClickableTextCell;
+import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -33,7 +34,6 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.Widget;
 
 public class FolderDetailsView extends Composite implements Display {
@@ -53,37 +53,13 @@ public class FolderDetailsView extends Composite implements Display {
   @UiField
   CellTable<FileDto> table;
 
-  @UiField
-  Frame downloader;
-
   private FileNameColumn fileNameColumn;
-
-  // Adaptor for Frame
-  private final HasUrl hasUrlImpl;
 
   private Translations translations = GWT.create(Translations.class);
 
   public FolderDetailsView() {
     initWidget(uiBinder.createAndBindUi(this));
     initTable();
-    // This iFrame is used to download files in the background. Its URL is meant to be changed to that of the file's
-    // location, the browser will then take care of downloading it.
-    downloader.setVisible(false);
-
-    // Adapt Frame to HasUrl
-    hasUrlImpl = new HasUrl() {
-
-      @Override
-      public String getUrl() {
-        return downloader.getUrl();
-      }
-
-      @Override
-      public void setUrl(String url) {
-        downloader.setUrl(url);
-      }
-
-    };
   }
 
   @Override
@@ -109,13 +85,8 @@ public class FolderDetailsView extends Composite implements Display {
   }
 
   @Override
-  public HasFieldUpdater<FileDto, String> getFileNameColumn() {
+  public HasFileSelectionHandlers getFileNameColumn() {
     return fileNameColumn;
-  }
-
-  @Override
-  public HasUrl getFileDownloader() {
-    return hasUrlImpl;
   }
 
   private void initTable() {
@@ -218,9 +189,30 @@ public class FolderDetailsView extends Composite implements Display {
     return sortedList;
   }
 
-  private abstract class FileNameColumn extends Column<FileDto, String> implements HasFieldUpdater<FileDto, String> {
+  private abstract class FileNameColumn extends Column<FileDto, String> implements HasFileSelectionHandlers {
+
+    private List<FileSelectionHandler> fileSelectionHandlers;
+
     public FileNameColumn() {
       super(new ClickableTextCell());
+
+      fileSelectionHandlers = new ArrayList<FileSelectionHandler>();
+
+      setFieldUpdater(new FieldUpdater<FileDto, String>() {
+        public void update(int rowIndex, FileDto dto, String value) {
+          for(FileSelectionHandler handler : fileSelectionHandlers) {
+            handler.onFileSelection(dto);
+          }
+        }
+      });
+    }
+
+    //
+    // HasFileSelectionHandler Methods
+    //
+
+    public void addFileSelectionHandler(final FileSelectionHandler handler) {
+      fileSelectionHandlers.add(handler);
     }
   }
 

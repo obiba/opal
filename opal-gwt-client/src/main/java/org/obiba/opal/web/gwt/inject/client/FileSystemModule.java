@@ -9,10 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.inject.client;
 
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileDownloadPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.view.FileDownloadView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FileExplorerView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FileSystemTreeView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FileUploadDialogView;
@@ -33,6 +35,7 @@ public class FileSystemModule extends AbstractGinModule {
     bind(FileSystemTreePresenter.Display.class).to(FileSystemTreeView.class);
     bind(FileExplorerPresenter.Display.class).to(FileExplorerView.class).in(Singleton.class);
     bind(FileUploadDialogPresenter.Display.class).to(FileUploadDialogView.class);
+    bind(FileDownloadPresenter.Display.class).to(FileDownloadView.class).in(Singleton.class);
   }
 
 }

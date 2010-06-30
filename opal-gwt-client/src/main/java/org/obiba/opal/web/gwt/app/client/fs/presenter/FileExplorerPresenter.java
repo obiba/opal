@@ -15,6 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.fs.FileDownloadSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.model.client.FileDto;
@@ -45,11 +46,16 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   @Inject
   Provider<FileUploadDialogPresenter> fileUploadDialogPresenterProvider;
 
+  @Inject
+  Provider<FileDownloadPresenter> fileDownloadPresenterProvider;
+
   FileSystemTreePresenter fileSystemTreePresenter;
 
   FolderDetailsPresenter folderDetailsPresenter;
 
   FileUploadDialogPresenter fileUploadDialogPresenter;
+
+  FileDownloadPresenter fileDownloadPresenter;
 
   FileDto currentFolder;
 
@@ -90,8 +96,13 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   }
 
   protected void initDisplayComponents() {
+
     fileSystemTreePresenter = fileSystemTreePresenterProvider.get();
+
+    fileDownloadPresenter = fileDownloadPresenterProvider.get();
     folderDetailsPresenter = folderDetailsPresenterProvider.get();
+    folderDetailsPresenter.getDisplay().getFileNameColumn().addFileSelectionHandler(new FileDownloadSelectionHandler(fileDownloadPresenter));
+
     getDisplay().getFileSystemTree().add(fileSystemTreePresenter.getDisplay().asWidget());
     getDisplay().getFolderDetailsPanel().add(folderDetailsPresenter.getDisplay().asWidget());
     fileSystemTreePresenter.bind();
