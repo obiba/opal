@@ -70,6 +70,7 @@ public class TableResource {
     TableDto.Builder builder = TableDto.newBuilder() //
     .setName(valueTable.getName()) //
     .setEntityType(valueTable.getEntityType()) //
+    .setDatasourceName(valueTable.getDatasource().getName()) //
     .setVariableCount(Iterables.size(valueTable.getVariables())) //
     .setValueSetCount(valueTable.getVariableEntities().size());
 
