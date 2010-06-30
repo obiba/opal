@@ -23,6 +23,9 @@ import org.obiba.opal.web.model.client.VariableDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 
@@ -47,12 +50,16 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
     HasText getOccurrenceGroupLabel();
 
+    HasClickHandlers getParentIcon();
+
     void renderCategoryRows(JsArray<CategoryDto> rows);
 
     void renderAttributeRows(JsArray<AttributeDto> rows);
   }
 
   private static Translations translations = GWT.create(Translations.class);
+
+  private VariableDto variable;
 
   /**
    * @param display
@@ -71,6 +78,22 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   @Override
   protected void onBind() {
     registerVariableSelectionChangeHandler();
+
+    super.registerHandler(getDisplay().getParentIcon().addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+
+        // ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/datasource/" + ).get().withCallback(new
+        // ResourceCallback<TableDto>() {
+        // @Override
+        // public void onResource(Response response, TableDto resource) {
+        // eventBus.fireEvent(new TableSelectionChangeEvent(resource));
+        // }
+        //
+        // }).send();
+      }
+    }));
   }
 
   @Override
@@ -104,6 +127,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   }
 
   private void updateDisplay(VariableDto variableDto) {
+    variable = variableDto;
     getDisplay().getVariableNameLabel().setText(variableDto.getName());
     getDisplay().getEntityTypeLabel().setText(variableDto.getEntityType());
     getDisplay().getValueTypeLabel().setText(variableDto.getValueType());

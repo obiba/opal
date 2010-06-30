@@ -17,14 +17,18 @@ import org.obiba.opal.web.model.client.CategoryDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -52,6 +56,9 @@ public class VariableView extends Composite implements VariablePresenter.Display
   //
   // Instance Variables
   //
+
+  @UiField
+  FlowPanel toolbarPanel;
 
   @UiField
   Label variableName;
@@ -90,13 +97,15 @@ public class VariableView extends Composite implements VariablePresenter.Display
 
   SimplePager<AttributeDto> attributeTablePager;
 
+  private Image parentImage;
+
   //
   // Constructors
   //
 
   public VariableView() {
     initWidget(uiBinder.createAndBindUi(this));
-
+    initToolbar();
     initCategoryTable();
     initAttributeTable();
   }
@@ -187,6 +196,17 @@ public class VariableView extends Composite implements VariablePresenter.Display
 
   public HasText getOccurrenceGroupLabel() {
     return occurrenceGroup;
+  }
+
+  @Override
+  public HasClickHandlers getParentIcon() {
+    return parentImage;
+  }
+
+  private void initToolbar() {
+    parentImage = new Image("image/up-icon.png");
+    toolbarPanel.add(parentImage);
+    DOM.setStyleAttribute(parentImage.getElement(), "cssFloat", "right");
   }
 
   private void initCategoryTable() {

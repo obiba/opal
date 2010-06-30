@@ -58,7 +58,7 @@ public class TableView extends Composite implements TablePresenter.Display {
   Label entityType;
 
   @UiField
-  FlowPanel spreadsheetDownloadPanel;
+  FlowPanel toolbarPanel;
 
   @UiField
   CellTable<VariableDto> table;
@@ -78,7 +78,7 @@ public class TableView extends Composite implements TablePresenter.Display {
   public TableView() {
     initWidget(uiBinder.createAndBindUi(this));
     addTableColumns();
-    addSpreadsheetImage();
+    initToolbar();
   }
 
   private void addTableColumns() {
@@ -129,13 +129,13 @@ public class TableView extends Composite implements TablePresenter.Display {
     DOM.setStyleAttribute(pager.getElement(), "cssFloat", "right");
   }
 
-  private void addSpreadsheetImage() {
+  private void initToolbar() {
     parentImage = new Image("image/up-icon.png");
-    spreadsheetDownloadPanel.add(parentImage);
+    toolbarPanel.add(parentImage);
     DOM.setStyleAttribute(parentImage.getElement(), "cssFloat", "right");
 
     spreadsheetDownloadImage = new Image("image/spreadsheet-download-icon.png");
-    spreadsheetDownloadPanel.add(spreadsheetDownloadImage);
+    toolbarPanel.add(spreadsheetDownloadImage);
     DOM.setStyleAttribute(spreadsheetDownloadImage.getElement(), "cssFloat", "right");
   }
 

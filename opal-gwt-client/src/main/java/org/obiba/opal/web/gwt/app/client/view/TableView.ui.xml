@@ -15,9 +15,12 @@
     .tableList td:first-child:hover {
       cursor: pointer;
     }
-    .spreadsheet img:hover {
+    .toolbar img {
+      margin-left: 5px;
+    }
+    .toolbar img:hover {
       cursor: pointer;
-    }    
+    }
   </ui:style>
 
   <g:LayoutPanel>
@@ -28,7 +31,7 @@
       </g:FlowPanel>     
     </g:layer>
     <g:layer right="1em" width='50%' top='0.5em' height='2em'>
-     <g:FlowPanel ui:field="spreadsheetDownloadPanel"  addStyleNames="{style.spreadsheet}"/>
+     <g:FlowPanel ui:field="toolbarPanel"  addStyleNames="{style.toolbar}"/>
     </g:layer>
     <g:layer top="2.7em" height="0.5em" left="1em" right="1em">
       <g:HTMLPanel>
