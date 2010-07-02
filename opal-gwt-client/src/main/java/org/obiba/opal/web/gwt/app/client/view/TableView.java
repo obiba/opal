@@ -34,6 +34,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.InsertPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
@@ -56,7 +57,7 @@ public class TableView extends Composite implements TablePresenter.Display {
   Label tableName;
 
   @UiField
-  Label count;
+  Label variablesTableTitle;
 
   @UiField
   Label entityType;
@@ -125,8 +126,7 @@ public class TableView extends Composite implements TablePresenter.Display {
     table.setPageSize(50);
     pager = new SimplePager<VariableDto>(table);
     table.setPager(pager);
-    FlowPanel p = ((FlowPanel) table.getParent());
-    p.insert(pager, 0);
+    ((InsertPanel) table.getParent()).insert(pager, 0);
     DOM.removeElementAttribute(pager.getElement(), "style");
     DOM.setStyleAttribute(pager.getElement(), "cssFloat", "right");
   }
@@ -139,18 +139,22 @@ public class TableView extends Composite implements TablePresenter.Display {
 
   @Override
   public void renderRows(final JsArray<VariableDto> rows) {
+    final JsArray<VariableDto> variableRows = (rows != null) ? rows : (JsArray<VariableDto>) JsArray.createArray();
+
+    variablesTableTitle.setText(translations.variablesLabel() + " (" + variableRows.length() + ")");
+
     table.setDelegate(new Delegate<VariableDto>() {
 
       @Override
       public void onRangeChanged(ListView<VariableDto> listView) {
         int start = listView.getRange().getStart();
         int length = listView.getRange().getLength();
-        listView.setData(start, length, JsArrays.toList(rows, start, length));
+        listView.setData(start, length, JsArrays.toList(variableRows, start, length));
       }
 
     });
     pager.firstPage();
-    table.setData(0, table.getPageSize(), JsArrays.toList(rows, 0, table.getPageSize()));
+    table.setData(0, table.getPageSize(), JsArrays.toList(variableRows, 0, table.getPageSize()));
     table.setDataSize(rows.length(), true);
     table.redraw();
   }
@@ -182,11 +186,6 @@ public class TableView extends Composite implements TablePresenter.Display {
   @Override
   public HasText getTableName() {
     return tableName;
-  }
-
-  @Override
-  public HasText getVariableCountLabel() {
-    return count;
   }
 
   @Override

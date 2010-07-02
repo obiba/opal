@@ -115,6 +115,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Entity Type")
   String entityTypeLabel();
 
+  @Description("Tables label")
+  @DefaultStringValue("Tables")
+  String tablesLabel();
+
   @Description("Variables menu item")
   @DefaultStringValue("Variables")
   String variablesLabel();

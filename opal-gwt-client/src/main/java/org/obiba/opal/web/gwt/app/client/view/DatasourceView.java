@@ -48,7 +48,7 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   Label datasourceName;
 
   @UiField
-  Label variableCount;
+  Label tablesTableTitle;
 
   @UiField
   FlowPanel toolbarPanel;
@@ -130,30 +130,29 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
   @Override
   public void renderRows(final JsArray<TableDto> rows) {
+    final JsArray<TableDto> tableRows = (rows != null) ? rows : (JsArray<TableDto>) JsArray.createArray();
+
+    tablesTableTitle.setText(translations.tablesLabel() + " (" + tableRows.length() + ")");
+
     table.setDelegate(new Delegate<TableDto>() {
 
       @Override
       public void onRangeChanged(ListView<TableDto> listView) {
         int start = listView.getRange().getStart();
         int length = listView.getRange().getLength();
-        listView.setData(start, length, JsArrays.toList(rows, start, length));
+        listView.setData(start, length, JsArrays.toList(tableRows, start, length));
       }
 
     });
     pager.firstPage();
-    table.setData(0, table.getPageSize(), JsArrays.toList(rows, 0, table.getPageSize()));
-    table.setDataSize(rows.length(), true);
+    table.setData(0, table.getPageSize(), JsArrays.toList(tableRows, 0, table.getPageSize()));
+    table.setDataSize(tableRows.length(), true);
     table.redraw();
   }
 
   @Override
   public Label getDatasourceNameLabel() {
     return datasourceName;
-  }
-
-  @Override
-  public Label getVariableCountLabel() {
-    return variableCount;
   }
 
   @Override

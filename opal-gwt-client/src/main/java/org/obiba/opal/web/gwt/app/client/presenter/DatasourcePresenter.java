@@ -43,8 +43,6 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
     HasText getDatasourceNameLabel();
 
-    HasText getVariableCountLabel();
-
     HasClickHandlers getSpreadsheetIcon();
 
     HasFieldUpdater<TableDto, String> getTableNameColumn();
@@ -130,7 +128,6 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     ResourceRequestBuilderFactory.<JsArray<TableDto>> newBuilder().forResource("/datasource/" + datasource + "/tables").get().withCallback(new ResourceCallback<JsArray<TableDto>>() {
       @Override
       public void onResource(Response response, JsArray<TableDto> resource) {
-        getDisplay().getVariableCountLabel().setText(Integer.toString(resource.length()));
         getDisplay().renderRows(resource);
       }
 

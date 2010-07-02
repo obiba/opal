@@ -17,7 +17,7 @@
   </ui:style>
 
   <g:LayoutPanel>
-    <g:layer top="0.5em" left="1em" height="2em" width="100%">
+    <g:layer top="0.5em" left="1em" height="2em" width="97%">
       <g:FlowPanel>
         <g:Label ui:field="variableName" addStyleNames="{style.left-aligned},{style.title-bold}">Variable Name</g:Label>
         <g:Label addStyleNames="{style.left-aligned},{style.title}">(Variable)</g:Label>
@@ -34,7 +34,7 @@
         <div class="{style.separator}" />
       </g:HTMLPanel>
     </g:layer>
-    <g:layer top="6em" height="6em" left="1em" width="47%">
+    <g:layer top="6em" height="6em" left="1em" width="48%">
       <g:VerticalPanel>
         <g:FlowPanel>
           <g:Label addStyleNames="{style.left-aligned},{style.title-light}"><ui:msg description="Entity type label">Entity Type</ui:msg></g:Label><g:Label addStyleNames="{style.left-aligned},{style.title-light}">:</g:Label><g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="entityType">Entity Name</g:Label>
@@ -47,7 +47,7 @@
         </g:FlowPanel>
       </g:VerticalPanel>     
     </g:layer>     
-    <g:layer top="6em" height="6em" left="50%" width="50%">
+    <g:layer top="6em" height="6em" left="50%" width="48%">
       <g:VerticalPanel>
         <g:FlowPanel>
           <g:Label addStyleNames="{style.left-aligned},{style.title-light}"><ui:msg description="Unit label">Unit</ui:msg></g:Label><g:Label addStyleNames="{style.left-aligned},{style.title-light}">:</g:Label><g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="unit">Unit Name</g:Label>
@@ -61,7 +61,7 @@
       </g:VerticalPanel>     
     </g:layer>
     <g:layer top="10em" height="30em" left="1em" width="97%">
-      <g:TabLayoutPanel barHeight="2" barUnit="EM">
+      <g:TabLayoutPanel barHeight="2" barUnit="EM" width="100%">
         <g:tab>
 		  <g:customHeader>
 		    <g:Label ui:field="categoryTableTitle" />
@@ -84,7 +84,7 @@
 	        <g:center>
               <g:ScrollPanel width="100%" >
                 <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_RIGHT">
-	              <g2:CellTable width="97%" ui:field="attributeTable" />
+	              <g2:CellTable width="100%" ui:field="attributeTable" />
 	            </g:VerticalPanel>
 	          </g:ScrollPanel>
 	        </g:center>

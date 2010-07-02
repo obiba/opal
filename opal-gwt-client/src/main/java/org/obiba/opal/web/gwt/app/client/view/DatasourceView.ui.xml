@@ -6,7 +6,7 @@
     .left-aligned { float : left; margin-right : 0.5em }
     .left-aligned-no-space { float : left; }
     .title-bold { font-weight: bold; font-size: medium; }
-    .title { font-size: medium; }
+    .title { font-size: small; }
     .tableList td:first-child  {
       color: blue;
       text-decoration: underline;
@@ -23,7 +23,7 @@
     </ui:style>
  
   <g:LayoutPanel>
-    <g:layer left="1em" width="50%" top='0.5em' height="2em">
+    <g:layer left="1em" width="97%" top='0.5em' height="2em">
       <g:FlowPanel>
         <g:Label addStyleNames="{style.left-aligned},{style.title-bold}" ui:field="datasourceName">opal-data</g:Label>
         <g:Label addStyleNames="{style.left-aligned},{style.title}"><ui:msg description="Dataset title in parentheses">(Dataset)</ui:msg></g:Label>
@@ -38,12 +38,7 @@
       </g:HTMLPanel>
     </g:layer>
     <g:layer top='6em' left="1em" width='50%' height='2em'>
-      <g:FlowPanel>
-        <g:Label addStyleNames="{style.left-aligned},{style.title-bold}"><ui:msg description="Tables title">Tables</ui:msg></g:Label>
-        <g:Label addStyleNames="{style.left-aligned-no-space},{style.title}">(</g:Label>
-        <g:Label addStyleNames="{style.left-aligned-no-space},{style.title}" ui:field="variableCount">99</g:Label>
-        <g:Label addStyleNames="{style.left-aligned},{style.title}">)</g:Label>
-      </g:FlowPanel>     
+      <g:Label ui:field="tablesTableTitle" addStyleNames="{style.left-aligned},{style.title-bold}" />    
     </g:layer>    
      <g:layer top="5.5em" width="97%" left="1em" height="60em">
        <g:FlowPanel>

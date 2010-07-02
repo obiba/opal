@@ -50,8 +50,6 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
     HasText getTableName();
 
-    HasText getVariableCountLabel();
-
     HasText getEntityTypeLabel();
 
     HasClickHandlers getSpreadsheetIcon();
@@ -183,7 +181,6 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       public void onResource(Response response, JsArray<VariableDto> resource) {
         variables = resource;
         getDisplay().renderRows(variables);
-        getDisplay().getVariableCountLabel().setText(Integer.toString(variables.length()));
       }
 
     }).send();
