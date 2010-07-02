@@ -212,6 +212,7 @@ public class VariableView extends Composite implements VariablePresenter.Display
   }
 
   private void initCategoryTable() {
+
     categoryTableTitle.setText(translations.categoriesLabel());
     categoryTable.setSelectionEnabled(false);
     categoryTable.setSelectionModel(new SingleSelectionModel<CategoryDto>());
@@ -229,16 +230,16 @@ public class VariableView extends Composite implements VariablePresenter.Display
     categoryTable.addColumn(new TextColumn<CategoryDto>() {
       @Override
       public String getValue(CategoryDto object) {
-        return object.hasCode() ? object.getCode() : "";
+        return object.getName();
       }
-    }, translations.codeLabel());
+    }, translations.nameLabel());
 
     categoryTable.addColumn(new TextColumn<CategoryDto>() {
       @Override
       public String getValue(CategoryDto object) {
-        return object.getName();
+        return object.hasCode() ? object.getCode() : "";
       }
-    }, translations.nameLabel());
+    }, translations.codeLabel());
 
     categoryTable.addColumn(new TextColumn<CategoryDto>() {
       @Override
