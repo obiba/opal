@@ -26,27 +26,35 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   @BeforeClass
   public static void before() {
     AbstractMagmaResourceTest.before();
-    addDatasource(DATASOURCE1);
+    addDatasource(DATASOURCE2);
   }
 
   @Test
   public void testTablesGET() {
-    TablesResource resource = new TablesResource(DATASOURCE1);
+    TablesResource resource = new TablesResource(DATASOURCE2);
 
     // bug with excel datasource
     // List<Magma.TableDto> dtos = resource.getTables();
     // Assert.assertEquals(2, dtos.size());
-    // Assert.assertEquals("CIPreliminaryQuestionnaire", dtos.get(0).getName());
-    // Assert.assertEquals("StandingHeight", dtos.get(1).getName());
+    // Assert.assertEquals("Impedance418", dtos.get(0).getName());
+    // Assert.assertEquals("Weight", dtos.get(1).getName());
   }
 
   @Test
   public void testTableGET() {
-    Datasource datasource = MagmaEngine.get().getDatasource(DATASOURCE1);
-    TableResource resource = new TableResource(datasource.getValueTable("CIPreliminaryQuestionnaire"));
+    Datasource datasource = MagmaEngine.get().getDatasource(DATASOURCE2);
+    TableResource resource = new TableResource(datasource.getValueTable("Weight"));
 
     // bug with excel datasource
     // Magma.TableDto dto = resource.get(null);
     // Assert.assertNotNull(dto);
+  }
+
+  @Test
+  public void testTableGETVariables() {
+    Datasource datasource = MagmaEngine.get().getDatasource(DATASOURCE2);
+    TableResource resource = new TableResource(datasource.getValueTable("Weight"));
+
+    // resource.getVariables();
   }
 }

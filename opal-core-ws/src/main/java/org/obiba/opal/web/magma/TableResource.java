@@ -45,6 +45,7 @@ import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.xstream.XStreamValueSet;
 import org.obiba.opal.web.model.Magma;
+import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
@@ -107,12 +108,16 @@ public class TableResource {
     ArrayList<PathSegment> segments = Lists.newArrayList(uriInfo.getPathSegments());
     segments.remove(segments.size() - 1);
     final UriBuilder ub = uriInfo.getBaseUriBuilder();
+    final UriBuilder tableub = uriInfo.getBaseUriBuilder();
     for(PathSegment segment : segments) {
       ub.segment(segment.getPath());
+      tableub.segment(segment.getPath());
     }
     ub.path(TableResource.class, "getVariable");
+    String tableUri = tableub.build().toString();
+    LinkDto.Builder tableLinkBuilder = LinkDto.newBuilder().setLink(tableUri).setRel(valueTable.getName());
 
-    ArrayList<VariableDto> variables = Lists.newArrayList(Iterables.transform(valueTable.getVariables(), Dtos.asDtoFunc(ub)));
+    ArrayList<VariableDto> variables = Lists.newArrayList(Iterables.transform(valueTable.getVariables(), Dtos.asDtoFunc(tableLinkBuilder.build(), ub)));
     sortByName(variables);
 
     return variables;

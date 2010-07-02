@@ -16,6 +16,7 @@ import org.obiba.magma.Category;
 import org.obiba.magma.Variable;
 import org.obiba.opal.web.model.Magma.AttributeDto;
 import org.obiba.opal.web.model.Magma.CategoryDto;
+import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 
 import com.google.common.base.Function;
@@ -25,16 +26,16 @@ import com.google.common.base.Function;
  */
 final class Dtos {
 
-  public static Function<Variable, VariableDto> asDtoFunc(final UriBuilder uriBuilder) {
+  public static Function<Variable, VariableDto> asDtoFunc(final LinkDto tableLink, final UriBuilder uriBuilder) {
     return new Function<Variable, VariableDto>() {
       @Override
       public VariableDto apply(Variable from) {
-        return asDto(uriBuilder, from).build();
+        return asDto(tableLink, uriBuilder, from).build();
       }
     };
   }
 
-  public static VariableDto.Builder asDto(UriBuilder uriBuilder, Variable from) {
+  public static VariableDto.Builder asDto(final LinkDto tableLink, UriBuilder uriBuilder, Variable from) {
 
     VariableDto.Builder var = VariableDto.newBuilder().setName(from.getName()).setEntityType(from.getEntityType()).setValueType(from.getValueType().getName()).setIsRepeatable(from.isRepeatable());
     if(from.getOccurrenceGroup() != null) {
@@ -56,12 +57,16 @@ final class Dtos {
       var.addCategories(asDto(category));
     }
 
+    if(tableLink != null) {
+      var.setParentLink(tableLink);
+    }
+
     return var;
 
   }
 
   public static VariableDto.Builder asDto(Variable from) {
-    return asDto(null, from);
+    return asDto(null, null, from);
   }
 
   public static CategoryDto.Builder asDto(Category from) {

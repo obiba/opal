@@ -28,6 +28,7 @@ message VariableDto {
   repeated AttributeDto attributes = 8;
   repeated CategoryDto categories = 9;
   optional string unit = 10;
+  optional LinkDto parentLink = 11;
 }
 
 message CategoryDto {
@@ -46,4 +47,9 @@ message AttributeDto {
 message FrequencyDto {
   required string name = 1;
   required int32 value = 2;
+}
+
+message LinkDto {
+  required string rel = 1;
+  required string link = 2;
 }
