@@ -56,7 +56,9 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
     HasClickHandlers getSpreadsheetIcon();
 
-    HasClickHandlers getParentIcon();
+    HasText getParentName();
+
+    HasClickHandlers getParentLink();
 
     HasFieldUpdater<VariableDto, String> getVariableNameColumn();
   }
@@ -100,7 +102,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       }
     }));
 
-    super.registerHandler(getDisplay().getParentIcon().addClickHandler(new ClickHandler() {
+    super.registerHandler(getDisplay().getParentLink().addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
@@ -152,6 +154,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     if(!table.getDatasourceName().equals(tableDto.getDatasourceName()) || !table.getName().equals(tableDto.getName())) {
       getDisplay().clear();
       getDisplay().getTableName().setText(tableDto.getName());
+      getDisplay().getParentName().setText("<< " + tableDto.getDatasourceName());
       table = tableDto;
       updateVariables();
     }

@@ -32,6 +32,7 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -47,6 +48,9 @@ public class TableView extends Composite implements TablePresenter.Display {
   }
 
   private static TableViewUiBinder uiBinder = GWT.create(TableViewUiBinder.class);
+
+  @UiField
+  Hyperlink parentLink;
 
   @UiField
   Label tableName;
@@ -68,8 +72,6 @@ public class TableView extends Composite implements TablePresenter.Display {
   SimplePager<VariableDto> pager;
 
   private Image spreadsheetDownloadImage;
-
-  private Image parentImage;
 
   private VariableNameColumn variableNameColumn;
 
@@ -130,10 +132,6 @@ public class TableView extends Composite implements TablePresenter.Display {
   }
 
   private void initToolbar() {
-    parentImage = new Image("image/up-icon.png");
-    toolbarPanel.add(parentImage);
-    DOM.setStyleAttribute(parentImage.getElement(), "cssFloat", "right");
-
     spreadsheetDownloadImage = new Image("image/spreadsheet-download-icon.png");
     toolbarPanel.add(spreadsheetDownloadImage);
     DOM.setStyleAttribute(spreadsheetDownloadImage.getElement(), "cssFloat", "right");
@@ -202,8 +200,13 @@ public class TableView extends Composite implements TablePresenter.Display {
   }
 
   @Override
-  public HasClickHandlers getParentIcon() {
-    return parentImage;
+  public HasText getParentName() {
+    return parentLink;
+  }
+
+  @Override
+  public HasClickHandlers getParentLink() {
+    return parentLink;
   }
 
   private abstract class VariableNameColumn extends Column<VariableDto, String> implements HasFieldUpdater<VariableDto, String> {

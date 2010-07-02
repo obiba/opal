@@ -13,8 +13,11 @@
     }
     .tableList td:first-child:hover {
       cursor: pointer;
-    }    
-    .spreadsheet img:hover {
+    }
+    .toolbar img {
+      margin-left: 5px;
+    }
+    .toolbar img:hover {
       cursor: pointer;
     }
     </ui:style>
@@ -26,15 +29,15 @@
         <g:Label addStyleNames="{style.left-aligned},{style.title}"><ui:msg description="Dataset title in parentheses">(Dataset)</ui:msg></g:Label>
       </g:FlowPanel>     
     </g:layer>
-    <g:layer right="1em" width='50%' top='0.5em' height='2em'>
-      <g:FlowPanel ui:field="spreadsheetDownloadPanel" addStyleNames="{style.spreadsheet}" />
+    <g:layer top='2.5em' right="1em" width='50%' height='2em'>
+      <g:FlowPanel ui:field="toolbarPanel" addStyleNames="{style.toolbar}" />
     </g:layer>
-    <g:layer top="2.7em" height="0.5em" left="1em" right="1em">
+    <g:layer top="4.7em" height="0.5em" left="1em" right="1em">
       <g:HTMLPanel>
         <div class="{style.separator}" />
       </g:HTMLPanel>
     </g:layer>
-    <g:layer left="1em" width='50%' top='4em' height='2em'>
+    <g:layer top='6em' left="1em" width='50%' height='2em'>
       <g:FlowPanel>
         <g:Label addStyleNames="{style.left-aligned},{style.title-bold}"><ui:msg description="Tables title">Tables</ui:msg></g:Label>
         <g:Label addStyleNames="{style.left-aligned-no-space},{style.title}">(</g:Label>
@@ -42,7 +45,7 @@
         <g:Label addStyleNames="{style.left-aligned},{style.title}">)</g:Label>
       </g:FlowPanel>     
     </g:layer>    
-     <g:layer width="97%" left="1em" height="60em" top="5.5em">
+     <g:layer top="5.5em" width="97%" left="1em" height="60em">
        <g:FlowPanel>
          <g2:CellTable width="100%"  ui:field="table" addStyleNames="{style.tableList}" />
        </g:FlowPanel>

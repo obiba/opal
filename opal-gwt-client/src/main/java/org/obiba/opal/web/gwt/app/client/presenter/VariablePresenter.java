@@ -15,10 +15,14 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.AttributeDto;
 import org.obiba.opal.web.model.client.CategoryDto;
+import org.obiba.opal.web.model.client.TableDto;
 import org.obiba.opal.web.model.client.VariableDto;
 
 import com.google.gwt.core.client.GWT;
@@ -26,6 +30,7 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 
@@ -50,7 +55,9 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
     HasText getOccurrenceGroupLabel();
 
-    HasClickHandlers getParentIcon();
+    HasText getParentName();
+
+    HasClickHandlers getParentLink();
 
     void renderCategoryRows(JsArray<CategoryDto> rows);
 
@@ -79,19 +86,17 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   protected void onBind() {
     registerVariableSelectionChangeHandler();
 
-    super.registerHandler(getDisplay().getParentIcon().addClickHandler(new ClickHandler() {
+    super.registerHandler(getDisplay().getParentLink().addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
+        ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource(variable.getParentLink().getLink()).get().withCallback(new ResourceCallback<TableDto>() {
+          @Override
+          public void onResource(Response response, TableDto resource) {
+            eventBus.fireEvent(new TableSelectionChangeEvent(resource));
+          }
 
-        // ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/datasource/" + ).get().withCallback(new
-        // ResourceCallback<TableDto>() {
-        // @Override
-        // public void onResource(Response response, TableDto resource) {
-        // eventBus.fireEvent(new TableSelectionChangeEvent(resource));
-        // }
-        //
-        // }).send();
+        }).send();
       }
     }));
   }
@@ -135,6 +140,8 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     getDisplay().getUnitLabel().setText(variableDto.hasUnit() ? variableDto.getUnit() : "");
     getDisplay().getRepeatableLabel().setText(variableDto.getIsRepeatable() ? translations.yesLabel() : translations.noLabel());
     getDisplay().getOccurrenceGroupLabel().setText(variableDto.getIsRepeatable() ? variableDto.getOccurrenceGroup() : "");
+
+    getDisplay().getParentName().setText("<< " + variableDto.getParentLink().getRel());
 
     getDisplay().renderCategoryRows(variableDto.getCategoriesArray());
     getDisplay().renderAttributeRows(variableDto.getAttributesArray());

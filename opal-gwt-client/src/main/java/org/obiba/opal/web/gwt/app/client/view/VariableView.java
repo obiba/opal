@@ -24,11 +24,10 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -56,6 +55,9 @@ public class VariableView extends Composite implements VariablePresenter.Display
   //
   // Instance Variables
   //
+
+  @UiField
+  Hyperlink parentLink;
 
   @UiField
   FlowPanel toolbarPanel;
@@ -96,8 +98,6 @@ public class VariableView extends Composite implements VariablePresenter.Display
   CellTable<AttributeDto> attributeTable;
 
   SimplePager<AttributeDto> attributeTablePager;
-
-  private Image parentImage;
 
   //
   // Constructors
@@ -199,14 +199,16 @@ public class VariableView extends Composite implements VariablePresenter.Display
   }
 
   @Override
-  public HasClickHandlers getParentIcon() {
-    return parentImage;
+  public HasClickHandlers getParentLink() {
+    return parentLink;
+  }
+
+  @Override
+  public HasText getParentName() {
+    return parentLink;
   }
 
   private void initToolbar() {
-    parentImage = new Image("image/up-icon.png");
-    toolbarPanel.add(parentImage);
-    DOM.setStyleAttribute(parentImage.getElement(), "cssFloat", "right");
   }
 
   private void initCategoryTable() {
@@ -314,4 +316,5 @@ public class VariableView extends Composite implements VariablePresenter.Display
       }
     }, translations.valueLabel());
   }
+
 }

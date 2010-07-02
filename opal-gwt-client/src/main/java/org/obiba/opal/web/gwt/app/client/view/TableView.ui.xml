@@ -24,27 +24,30 @@
   </ui:style>
 
   <g:LayoutPanel>
-    <g:layer left="1em" width="50%" top='0.5em' height="2em">
+    <g:layer left="1em" width="100%" top='0.5em' height="2em">
       <g:FlowPanel>
         <g:Label addStyleNames="{style.left-aligned},{style.title-bold}" ui:field="tableName">SwimmingHeight</g:Label>
         <g:Label addStyleNames="{style.left-aligned},{style.title}">(Table)</g:Label>
       </g:FlowPanel>     
     </g:layer>
-    <g:layer right="1em" width='50%' top='0.5em' height='2em'>
+    <g:layer top="2.9em" left="1em" height="2em" width="50%">
+        <g:Hyperlink ui:field="parentLink">..</g:Hyperlink>
+    </g:layer>
+    <g:layer top='2.5em' right="1em" width='50%' height='2em'>
      <g:FlowPanel ui:field="toolbarPanel"  addStyleNames="{style.toolbar}"/>
     </g:layer>
-    <g:layer top="2.7em" height="0.5em" left="1em" right="1em">
+    <g:layer top="4.7em" height="0.5em" left="1em" right="1em">
       <g:HTMLPanel>
         <div class="{style.separator}" />
       </g:HTMLPanel>
     </g:layer>
-    <g:layer left="1em" width='50%' top='3.2em' height='2em'>
+    <g:layer top='6em' left="1em" width='50%' height='2em'>
       <g:FlowPanel>
         <g:Label addStyleNames="{style.left-aligned},{style.title-light}">Entity Type:</g:Label>
         <g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="entityType">Entity Name</g:Label>
       </g:FlowPanel>     
     </g:layer>       
-    <g:layer left="1em" width='50%' top='6em' height='2em'>
+    <g:layer top='8em' left="1em" width='50%' height='2em'>
       <g:FlowPanel>
         <g:Label addStyleNames="{style.left-aligned},{style.title-bold}"><ui:msg description="Variables menu item">Variables</ui:msg></g:Label>
         <g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="count">(0000)</g:Label>

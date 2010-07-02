@@ -51,7 +51,7 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   Label variableCount;
 
   @UiField
-  FlowPanel spreadsheetDownloadPanel;
+  FlowPanel toolbarPanel;
 
   @UiField
   CellTable<TableDto> table;
@@ -69,7 +69,7 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   public DatasourceView() {
     initWidget(uiBinder.createAndBindUi(this));
     addTableColumns();
-    addSpreadsheetImage();
+    initToolbar();
   }
 
   private void addTableColumns() {
@@ -109,9 +109,9 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
     DOM.setStyleAttribute(pager.getElement(), "cssFloat", "right");
   }
 
-  private void addSpreadsheetImage() {
+  private void initToolbar() {
     spreadsheetDownloadImage = new Image("image/spreadsheet-download-icon.png");
-    spreadsheetDownloadPanel.add(spreadsheetDownloadImage);
+    toolbarPanel.add(spreadsheetDownloadImage);
     DOM.setStyleAttribute(spreadsheetDownloadImage.getElement(), "cssFloat", "right");
   }
 

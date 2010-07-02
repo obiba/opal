@@ -17,21 +17,24 @@
   </ui:style>
 
   <g:LayoutPanel>
-    <g:layer top="0.5em" left="1em" height="2em" width="50%">
+    <g:layer top="0.5em" left="1em" height="2em" width="100%">
       <g:FlowPanel>
         <g:Label ui:field="variableName" addStyleNames="{style.left-aligned},{style.title-bold}">Variable Name</g:Label>
         <g:Label addStyleNames="{style.left-aligned},{style.title}">(Variable)</g:Label>
       </g:FlowPanel>     
     </g:layer>
-    <g:layer right="1em" width='50%' top='0.5em' height='2em'>
-     <g:FlowPanel ui:field="toolbarPanel"  addStyleNames="{style.toolbar}"/>
+    <g:layer top="2.9em" left="1em" height="2em" width="50%">
+        <g:Hyperlink ui:field="parentLink">..</g:Hyperlink>
     </g:layer>
-    <g:layer top="2.7em" height="0.5em" left="1em" right="1em">
+    <g:layer top='2.5em' right="1em" width='50%' height='2em'>
+      <g:FlowPanel ui:field="toolbarPanel"  addStyleNames="{style.toolbar}"/>
+    </g:layer>
+    <g:layer top="4.7em" height="0.5em" left="1em" right="1em">
       <g:HTMLPanel>
         <div class="{style.separator}" />
       </g:HTMLPanel>
     </g:layer>
-    <g:layer top="5em" height="6em" left="1em" width="47%">
+    <g:layer top="6em" height="6em" left="1em" width="47%">
       <g:VerticalPanel>
         <g:FlowPanel>
           <g:Label addStyleNames="{style.left-aligned},{style.title-light}"><ui:msg description="Entity type label">Entity Type</ui:msg></g:Label><g:Label addStyleNames="{style.left-aligned},{style.title-light}">:</g:Label><g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="entityType">Entity Name</g:Label>
@@ -44,7 +47,7 @@
         </g:FlowPanel>
       </g:VerticalPanel>     
     </g:layer>     
-    <g:layer top="5em" height="6em" left="50%" width="50%">
+    <g:layer top="6em" height="6em" left="50%" width="50%">
       <g:VerticalPanel>
         <g:FlowPanel>
           <g:Label addStyleNames="{style.left-aligned},{style.title-light}"><ui:msg description="Unit label">Unit</ui:msg></g:Label><g:Label addStyleNames="{style.left-aligned},{style.title-light}">:</g:Label><g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="unit">Unit Name</g:Label>
