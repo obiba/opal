@@ -110,7 +110,7 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   }
 
   private void initToolbar() {
-    spreadsheetDownloadImage = new Image("image/spreadsheet-download-icon.png");
+    spreadsheetDownloadImage = new Image("image/document-export.png");
     toolbarPanel.add(spreadsheetDownloadImage);
     DOM.setStyleAttribute(spreadsheetDownloadImage.getElement(), "cssFloat", "right");
   }
@@ -126,6 +126,15 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
   @Override
   public void stopProcessing() {
+  }
+
+  @Override
+  public void setTableSelection(TableDto variable, int index) {
+    int pageIndex = (int) (index / table.getPageSize());
+    if(pageIndex != pager.getPage()) {
+      pager.setPage(pageIndex);
+    }
+    selectionModel.setSelected(variable, true);
   }
 
   @Override

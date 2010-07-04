@@ -15,8 +15,10 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.event.SiblingVariableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -55,9 +57,13 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
     HasText getOccurrenceGroupLabel();
 
-    HasText getParentName();
+    void setParentName(String name);
 
     HasClickHandlers getParentLink();
+
+    HasClickHandlers getPreviousLink();
+
+    HasClickHandlers getNextLink();
 
     void renderCategoryRows(JsArray<CategoryDto> rows);
 
@@ -99,6 +105,23 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
         }).send();
       }
     }));
+
+    super.registerHandler(getDisplay().getNextLink().addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        eventBus.fireEvent(new SiblingVariableSelectionEvent(variable, Direction.NEXT));
+      }
+    }));
+
+    super.registerHandler(getDisplay().getPreviousLink().addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        eventBus.fireEvent(new SiblingVariableSelectionEvent(variable, Direction.PREVIOUS));
+      }
+    }));
+
   }
 
   @Override
@@ -141,7 +164,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     getDisplay().getRepeatableLabel().setText(variableDto.getIsRepeatable() ? translations.yesLabel() : translations.noLabel());
     getDisplay().getOccurrenceGroupLabel().setText(variableDto.getIsRepeatable() ? variableDto.getOccurrenceGroup() : "");
 
-    getDisplay().getParentName().setText("<< " + variableDto.getParentLink().getRel());
+    getDisplay().setParentName(variableDto.getParentLink().getRel());
 
     getDisplay().renderCategoryRows(variableDto.getCategoriesArray());
     getDisplay().renderAttributeRows(variableDto.getAttributesArray());

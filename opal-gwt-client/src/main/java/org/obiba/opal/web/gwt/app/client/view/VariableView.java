@@ -28,6 +28,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -98,6 +99,10 @@ public class VariableView extends Composite implements VariablePresenter.Display
   CellTable<AttributeDto> attributeTable;
 
   SimplePager<AttributeDto> attributeTablePager;
+
+  private Image previousImage;
+
+  private Image nextImage;
 
   //
   // Constructors
@@ -204,11 +209,25 @@ public class VariableView extends Composite implements VariablePresenter.Display
   }
 
   @Override
-  public HasText getParentName() {
-    return parentLink;
+  public void setParentName(String name) {
+    parentLink.setText("<< " + name);
+  }
+
+  @Override
+  public HasClickHandlers getPreviousLink() {
+    return previousImage;
+  }
+
+  @Override
+  public HasClickHandlers getNextLink() {
+    return nextImage;
   }
 
   private void initToolbar() {
+    nextImage = new Image("image/next.png");
+    toolbarPanel.add(nextImage);
+    previousImage = new Image("image/previous.png");
+    toolbarPanel.add(previousImage);
   }
 
   private void initCategoryTable() {

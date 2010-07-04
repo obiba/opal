@@ -74,6 +74,10 @@ public class TableView extends Composite implements TablePresenter.Display {
 
   private Image spreadsheetDownloadImage;
 
+  private Image previousImage;
+
+  private Image nextImage;
+
   private VariableNameColumn variableNameColumn;
 
   private Translations translations = GWT.create(Translations.class);
@@ -126,15 +130,19 @@ public class TableView extends Composite implements TablePresenter.Display {
     table.setPageSize(50);
     pager = new SimplePager<VariableDto>(table);
     table.setPager(pager);
+
     ((InsertPanel) table.getParent()).insert(pager, 0);
     DOM.removeElementAttribute(pager.getElement(), "style");
     DOM.setStyleAttribute(pager.getElement(), "cssFloat", "right");
   }
 
   private void initToolbar() {
-    spreadsheetDownloadImage = new Image("image/spreadsheet-download-icon.png");
+    nextImage = new Image("image/next.png");
+    toolbarPanel.add(nextImage);
+    previousImage = new Image("image/previous.png");
+    toolbarPanel.add(previousImage);
+    spreadsheetDownloadImage = new Image("image/document-export.png");
     toolbarPanel.add(spreadsheetDownloadImage);
-    DOM.setStyleAttribute(spreadsheetDownloadImage.getElement(), "cssFloat", "right");
   }
 
   @Override
@@ -160,8 +168,12 @@ public class TableView extends Composite implements TablePresenter.Display {
   }
 
   @Override
-  public SelectionModel<VariableDto> getTableSelection() {
-    return selectionModel;
+  public void setVariableSelection(VariableDto variable, int index) {
+    int pageIndex = (int) (index / table.getPageSize());
+    if(pageIndex != pager.getPage()) {
+      pager.setPage(pageIndex);
+    }
+    selectionModel.setSelected(variable, true);
   }
 
   @Override
@@ -199,13 +211,23 @@ public class TableView extends Composite implements TablePresenter.Display {
   }
 
   @Override
-  public HasText getParentName() {
-    return parentLink;
+  public void setParentName(String name) {
+    parentLink.setText("<< " + name);
   }
 
   @Override
   public HasClickHandlers getParentLink() {
     return parentLink;
+  }
+
+  @Override
+  public HasClickHandlers getNextLink() {
+    return nextImage;
+  }
+
+  @Override
+  public HasClickHandlers getPreviousLink() {
+    return previousImage;
   }
 
   private abstract class VariableNameColumn extends Column<VariableDto, String> implements HasFieldUpdater<VariableDto, String> {

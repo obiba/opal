@@ -17,8 +17,12 @@
     }
     .toolbar img {
       margin-left: 5px;
+      float:right;
     }
     .toolbar img:hover {
+      cursor: pointer;
+    }
+    .toolbar a:hover {
       cursor: pointer;
     }
   </ui:style>
@@ -31,7 +35,9 @@
       </g:FlowPanel>     
     </g:layer>
     <g:layer top="2.9em" left="1em" height="2em" width="50%">
-        <g:Hyperlink ui:field="parentLink">..</g:Hyperlink>
+      <g:FlowPanel addStyleNames="{style.toolbar}">
+        <g:Hyperlink ui:field="parentLink" addStyleNames="{style.left-aligned}">..</g:Hyperlink>
+      </g:FlowPanel>
     </g:layer>
     <g:layer top='2.5em' right="1em" width='50%' height='2em'>
      <g:FlowPanel ui:field="toolbarPanel"  addStyleNames="{style.toolbar}"/>

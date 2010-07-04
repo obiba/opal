@@ -17,8 +17,11 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -35,14 +38,13 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.view.client.SelectionModel;
 import com.google.inject.Inject;
 
 public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
   public interface Display extends WidgetDisplay {
 
-    SelectionModel<VariableDto> getTableSelection();
+    void setVariableSelection(VariableDto variable, int index);
 
     void renderRows(JsArray<VariableDto> rows);
 
@@ -54,9 +56,13 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
     HasClickHandlers getSpreadsheetIcon();
 
-    HasText getParentName();
+    void setParentName(String name);
 
     HasClickHandlers getParentLink();
+
+    HasClickHandlers getNextLink();
+
+    HasClickHandlers getPreviousLink();
 
     HasFieldUpdater<VariableDto, String> getVariableNameColumn();
   }
@@ -114,6 +120,22 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       }
     }));
 
+    super.registerHandler(getDisplay().getNextLink().addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        eventBus.fireEvent(new SiblingTableSelectionEvent(table, Direction.NEXT));
+      }
+    }));
+
+    super.registerHandler(getDisplay().getPreviousLink().addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        eventBus.fireEvent(new SiblingTableSelectionEvent(table, Direction.PREVIOUS));
+      }
+    }));
+
     super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
 
       @Override
@@ -130,6 +152,34 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       }
 
     });
+
+    super.registerHandler(eventBus.addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionEvent.Handler() {
+
+      @Override
+      public void onSiblingVariableSelection(SiblingVariableSelectionEvent event) {
+        VariableDto siblingSelection = event.getCurrentSelection();
+
+        // Look for the variable and its position in the list by its name.
+        // Having an position of the current variable would be more efficient.
+        int siblingIndex = 0;
+        for(int i = 0; i < variables.length(); i++) {
+          if(variables.get(i).getName().equals(event.getCurrentSelection().getName())) {
+            if(event.getDirection().equals(SiblingVariableSelectionEvent.Direction.NEXT) && i < variables.length() - 1) {
+              siblingIndex = i + 1;
+            } else if(event.getDirection().equals(SiblingVariableSelectionEvent.Direction.PREVIOUS) && i != 0) {
+              siblingIndex = i - 1;
+            } else {
+              siblingIndex = i;
+            }
+            break;
+          }
+        }
+        siblingSelection = variables.get(siblingIndex);
+
+        getDisplay().setVariableSelection(siblingSelection, siblingIndex);
+        eventBus.fireEvent(new VariableSelectionChangeEvent(siblingSelection));
+      }
+    }));
   }
 
   @Override
@@ -152,7 +202,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     if(!table.getDatasourceName().equals(tableDto.getDatasourceName()) || !table.getName().equals(tableDto.getName())) {
       getDisplay().clear();
       getDisplay().getTableName().setText(tableDto.getName());
-      getDisplay().getParentName().setText("<< " + tableDto.getDatasourceName());
+      getDisplay().setParentName(tableDto.getDatasourceName());
       table = tableDto;
       updateVariables();
     }
