@@ -35,7 +35,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
   FolderDetailsPresenter folderDetailsPresenter;
 
-  private FileSelectorMode mode = FileSelectorMode.FILE;
+  private FileSelectionType fileSelectionType = FileSelectionType.FILE;
 
   //
   // Constructors
@@ -70,7 +70,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
   @Override
   public void revealDisplay() {
-    getDisplay().setMode(mode);
+    getDisplay().setFileSelectionType(fileSelectionType);
     getDisplay().showDialog();
   }
 
@@ -92,8 +92,8 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   // Methods
   //
 
-  public void setMode(FileSelectorMode mode) {
-    this.mode = mode;
+  public void setFileSelectionType(FileSelectionType fileSelectionType) {
+    this.fileSelectionType = fileSelectionType;
   }
 
   private void addEventHandlers() {
@@ -110,7 +110,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   // Inner Classes / Interfaces
   //
 
-  public enum FileSelectorMode {
+  public enum FileSelectionType {
     FILE, EXISTING_FILE, FOLDER, EXISTING_FOLDER
   }
 
@@ -120,7 +120,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
     void hideDialog();
 
-    void setMode(FileSelectorMode mode);
+    void setFileSelectionType(FileSelectionType mode);
 
     HasWidgets getFileSystemTreePanel();
 

@@ -11,7 +11,7 @@ package org.obiba.opal.web.gwt.app.client.widgets.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectorMode;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -83,7 +83,7 @@ public class FileSelectorView extends DialogBox implements Display {
   @UiField
   Button cancelButton;
 
-  private FileSelectorMode mode = FileSelectorMode.FILE;
+  private FileSelectionType fileSelectionType = FileSelectionType.FILE;
 
   //
   // Constructors
@@ -113,8 +113,8 @@ public class FileSelectorView extends DialogBox implements Display {
 
   @Override
   public void showDialog() {
-    namePanel.setVisible(mode.equals(FileSelectorMode.FILE));
-    createFolderPanel.setVisible(mode.equals(FileSelectorMode.FILE) || mode.equals(FileSelectorMode.FOLDER));
+    namePanel.setVisible(fileSelectionType.equals(FileSelectionType.FILE));
+    createFolderPanel.setVisible(fileSelectionType.equals(FileSelectionType.FILE) || fileSelectionType.equals(FileSelectionType.FOLDER));
 
     center();
     show();
@@ -124,8 +124,8 @@ public class FileSelectorView extends DialogBox implements Display {
     hide();
   }
 
-  public void setMode(FileSelectorMode mode) {
-    this.mode = mode;
+  public void setFileSelectionType(FileSelectionType fileSelectionType) {
+    this.fileSelectionType = fileSelectionType;
   }
 
   public HasWidgets getFileSystemTreePanel() {
