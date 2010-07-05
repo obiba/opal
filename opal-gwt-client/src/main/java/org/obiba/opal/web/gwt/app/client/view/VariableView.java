@@ -107,6 +107,8 @@ public class VariableView extends Composite implements VariablePresenter.Display
 
   SimplePager<AttributeDto> attributeTablePager;
 
+  private Image parentImage;
+
   private Image previousImage;
 
   private Image nextImage;
@@ -218,8 +220,8 @@ public class VariableView extends Composite implements VariablePresenter.Display
   }
 
   @Override
-  public void setParentName(String name) {
-    parentLink.setText("<< " + name);
+  public HasText getParentName() {
+    return parentLink;
   }
 
   @Override

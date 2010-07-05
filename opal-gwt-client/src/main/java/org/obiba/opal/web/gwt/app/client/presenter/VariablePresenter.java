@@ -57,7 +57,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
     HasText getOccurrenceGroupLabel();
 
-    void setParentName(String name);
+    HasText getParentName();
 
     HasClickHandlers getParentLink();
 
@@ -165,7 +165,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
       getDisplay().getRepeatableLabel().setText(variableDto.getIsRepeatable() ? translations.yesLabel() : translations.noLabel());
       getDisplay().getOccurrenceGroupLabel().setText(variableDto.getIsRepeatable() ? variableDto.getOccurrenceGroup() : "");
 
-      getDisplay().setParentName(variableDto.getParentLink().getRel());
+      getDisplay().getParentName().setText(variableDto.getParentLink().getRel());
 
       getDisplay().renderCategoryRows(variableDto.getCategoriesArray());
       getDisplay().renderAttributeRows(variableDto.getAttributesArray());

@@ -15,9 +15,13 @@
     .tableList td:first-child:hover {
       cursor: pointer;
     }
-    .toolbar img {
+    .toolbar-right img {
       margin-left: 5px;
-      float:right;
+      float: right;
+    }
+    .toolbar-left img {
+      margin-right: 5px;
+      float: left;
     }
     .toolbar img:hover {
       cursor: pointer;
@@ -35,12 +39,13 @@
       </g:FlowPanel>     
     </g:layer>
     <g:layer top="2.9em" left="1em" height="2em" width="50%">
-      <g:FlowPanel addStyleNames="{style.toolbar}">
+      <g:FlowPanel addStyleNames="{style.toolbar},{style.toolbar-left}">
+        <g:Image ui:field="parentImage" url="image/up.png"></g:Image>
         <g:Hyperlink ui:field="parentLink" addStyleNames="{style.left-aligned}">..</g:Hyperlink>
       </g:FlowPanel>
     </g:layer>
     <g:layer top='2.5em' right="1em" width='50%' height='2em'>
-     <g:FlowPanel ui:field="toolbarPanel"  addStyleNames="{style.toolbar}"/>
+     <g:FlowPanel ui:field="toolbarPanel"  addStyleNames="{style.toolbar},{style.toolbar-right}"/>
     </g:layer>
     <g:layer top="4.7em" height="0.5em" left="1em" right="1em">
       <g:HTMLPanel>

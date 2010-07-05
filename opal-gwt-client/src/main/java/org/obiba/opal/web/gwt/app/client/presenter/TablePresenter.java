@@ -55,7 +55,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
     HasClickHandlers getSpreadsheetIcon();
 
-    void setParentName(String name);
+    HasText getParentName();
 
     HasClickHandlers getParentLink();
 
@@ -189,22 +189,11 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   public void revealDisplay() {
   }
 
-  private void displayTable(TableDto tableDto) {
-    if(!table.getDatasourceName().equals(tableDto.getDatasourceName()) || !table.getName().equals(tableDto.getName())) {
-      table = tableDto;
-      getDisplay().clear();
-      getDisplay().getTableName().setText(tableDto.getName());
-      getDisplay().setParentName(tableDto.getDatasourceName());
-      getDisplay().getEntityTypeLabel().setText(tableDto.getEntityType());
-      updateVariables();
-    }
-  }
-
   private void displayTable(String datasourceName, String tableName) {
     if(!table.getDatasourceName().equals(datasourceName) || !table.getName().equals(tableName)) {
       getDisplay().clear();
       getDisplay().getTableName().setText(tableName);
-      getDisplay().setParentName(datasourceName);
+      getDisplay().getParentName().setText(datasourceName);
 
       ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/datasource/" + datasourceName + "/table/" + tableName).get().withCallback(new ResourceCallback<TableDto>() {
         @Override

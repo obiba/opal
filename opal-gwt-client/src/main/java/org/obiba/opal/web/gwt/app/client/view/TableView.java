@@ -211,8 +211,8 @@ public class TableView extends Composite implements TablePresenter.Display {
   }
 
   @Override
-  public void setParentName(String name) {
-    parentLink.setText("<< " + name);
+  public HasText getParentName() {
+    return parentLink;
   }
 
   @Override
