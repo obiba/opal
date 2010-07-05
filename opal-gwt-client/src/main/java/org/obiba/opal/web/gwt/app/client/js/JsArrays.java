@@ -16,10 +16,6 @@ import java.util.List;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsArrayBoolean;
-import com.google.gwt.core.client.JsArrayInteger;
-import com.google.gwt.core.client.JsArrayNumber;
-import com.google.gwt.core.client.JsArrayString;
 
 /**
  *
@@ -106,24 +102,6 @@ public class JsArrays {
 
     };
   }
-
-  private static native JsArrayString reinterpretCast(String[] value) /*-{ return value; }-*/;
-
-  private static native String[] reinterpretCast(JsArrayString value) /*-{ return value; }-*/;
-
-  private static native JsArrayBoolean reinterpretCast(boolean[] value) /*-{ return value; }-*/;
-
-  private static native boolean[] reinterpretCast(JsArrayBoolean value) /*-{ return value; }-*/;
-
-  private static native JsArrayInteger reinterpretCast(int[] value) /*-{ return value; }-*/;
-
-  private static native int[] reinterpretCast(JsArrayInteger value) /*-{ return value; }-*/;
-
-  private static native JsArrayNumber reinterpretCast(double[] value) /*-{ return value; }-*/;
-
-  private static native double[] reinterpretCast(JsArrayNumber value) /*-{ return value; }-*/;
-
-  private static native <T extends JavaScriptObject> JsArray<T> reinterpretCast(T[] value) /*-{ return value; }-*/;
 
   private static native <T extends JavaScriptObject> T[] reinterpretCast(JsArray<T> value) /*-{ return value; }-*/;
 
