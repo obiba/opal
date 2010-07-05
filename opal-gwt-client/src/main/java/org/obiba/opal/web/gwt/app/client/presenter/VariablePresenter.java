@@ -155,18 +155,20 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   }
 
   private void updateDisplay(VariableDto variableDto) {
-    variable = variableDto;
-    getDisplay().getVariableNameLabel().setText(variableDto.getName());
-    getDisplay().getEntityTypeLabel().setText(variableDto.getEntityType());
-    getDisplay().getValueTypeLabel().setText(variableDto.getValueType());
-    getDisplay().getMimeTypeLabel().setText(variableDto.hasMimeType() ? variableDto.getMimeType() : "");
-    getDisplay().getUnitLabel().setText(variableDto.hasUnit() ? variableDto.getUnit() : "");
-    getDisplay().getRepeatableLabel().setText(variableDto.getIsRepeatable() ? translations.yesLabel() : translations.noLabel());
-    getDisplay().getOccurrenceGroupLabel().setText(variableDto.getIsRepeatable() ? variableDto.getOccurrenceGroup() : "");
+    if(!variableDto.getName().equals(variable.getName()) || !variableDto.getParentLink().getRel().equals(variable.getParentLink().getRel())) {
+      variable = variableDto;
+      getDisplay().getVariableNameLabel().setText(variableDto.getName());
+      getDisplay().getEntityTypeLabel().setText(variableDto.getEntityType());
+      getDisplay().getValueTypeLabel().setText(variableDto.getValueType());
+      getDisplay().getMimeTypeLabel().setText(variableDto.hasMimeType() ? variableDto.getMimeType() : "");
+      getDisplay().getUnitLabel().setText(variableDto.hasUnit() ? variableDto.getUnit() : "");
+      getDisplay().getRepeatableLabel().setText(variableDto.getIsRepeatable() ? translations.yesLabel() : translations.noLabel());
+      getDisplay().getOccurrenceGroupLabel().setText(variableDto.getIsRepeatable() ? variableDto.getOccurrenceGroup() : "");
 
-    getDisplay().setParentName(variableDto.getParentLink().getRel());
+      getDisplay().setParentName(variableDto.getParentLink().getRel());
 
-    getDisplay().renderCategoryRows(variableDto.getCategoriesArray());
-    getDisplay().renderAttributeRows(variableDto.getAttributesArray());
+      getDisplay().renderCategoryRows(variableDto.getCategoriesArray());
+      getDisplay().renderAttributeRows(variableDto.getAttributesArray());
+    }
   }
 }

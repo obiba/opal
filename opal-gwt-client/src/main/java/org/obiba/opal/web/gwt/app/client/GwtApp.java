@@ -46,7 +46,7 @@ public class GwtApp implements EntryPoint {
     // Only display login if we don't currently have any credentials.
     if(opalGinjector.getRequestCredentials().hasCredentials() == false) {
 
-      loginPresenter.revealDisplay();
+      // loginPresenter.revealDisplay();
     }
   }
 
