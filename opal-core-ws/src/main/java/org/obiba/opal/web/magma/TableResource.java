@@ -124,6 +124,35 @@ public class TableResource {
   }
 
   @GET
+  @Path("/variables/occurrenceGroup/{occurrenceGroup}")
+  public Iterable<VariableDto> getOccurrenceGroupVariables(@Context final UriInfo uriInfo, @PathParam("occurrenceGroup") String occurrenceGroup) {
+    ArrayList<PathSegment> segments = Lists.newArrayList(uriInfo.getPathSegments());
+    final UriBuilder ub = uriInfo.getBaseUriBuilder();
+    final UriBuilder tableub = uriInfo.getBaseUriBuilder();
+    for(int i = 0; i < segments.size() - 3; i++) {
+      PathSegment segment = segments.get(i);
+      ub.segment(segment.getPath());
+      tableub.segment(segment.getPath());
+    }
+    ub.path(TableResource.class, "getVariable");
+    String tableUri = tableub.build().toString();
+    LinkDto.Builder tableLinkBuilder = LinkDto.newBuilder().setLink(tableUri).setRel(valueTable.getName());
+
+    List<Variable> group = Lists.newArrayList();
+    for(Variable var : valueTable.getVariables()) {
+      String gp = var.getOccurrenceGroup();
+      if(gp != null && gp.equals(occurrenceGroup)) {
+        group.add(var);
+      }
+    }
+
+    ArrayList<VariableDto> variables = Lists.newArrayList(Iterables.transform(group, Dtos.asDtoFunc(tableLinkBuilder.build(), ub)));
+    sortByName(variables);
+
+    return variables;
+  }
+
+  @GET
   @Path("/entities")
   @Produces("application/xml")
   public Set<String> getEntities() {
