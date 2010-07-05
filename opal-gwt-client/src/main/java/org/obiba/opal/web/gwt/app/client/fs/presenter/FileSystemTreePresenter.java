@@ -68,7 +68,14 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
 
   @Override
   public void refreshDisplay() {
-
+    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files").get().withCallback(new ResourceCallback<FileDto>() {
+      @Override
+      public void onResource(Response response, FileDto root) {
+        getDisplay().initTree(root);
+        getDisplay().selectTreeItem(root);
+        eventBus.fireEvent(new FileSystemTreeFolderSelectionChangeEvent(root));
+      }
+    }).send();
   }
 
   @Override

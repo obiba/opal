@@ -24,6 +24,8 @@ import org.obiba.opal.web.gwt.app.client.view.DataImportView;
 import org.obiba.opal.web.gwt.app.client.view.ErrorDialogView;
 import org.obiba.opal.web.gwt.app.client.view.LoginView;
 import org.obiba.opal.web.gwt.app.client.view.UnhandledResponseNotificationView;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.view.FileSelectorView;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 
 import com.google.gwt.inject.client.AbstractGinModule;
@@ -48,6 +50,8 @@ public class OpalGinModule extends AbstractGinModule {
     bind(DataImportPresenter.Display.class).to(DataImportView.class);// .in(Singleton.class);
     bind(DataExportPresenter.Display.class).to(DataExportView.class);
     bind(ErrorDialogPresenter.Display.class).to(ErrorDialogView.class);
+
+    bind(FileSelectorPresenter.Display.class).to(FileSelectorView.class);
 
     // Concrete classes (such as NavigatorPresenter) don't need to be "bound". Simply define a getter in the
     // OpalGinjector interface and they'll "just work".
