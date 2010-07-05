@@ -9,16 +9,20 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.view;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.Display;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -39,15 +43,35 @@ public class FileSelectorView extends DialogBox implements Display {
 
   private static FileSelectorViewUiBinder uiBinder = GWT.create(FileSelectorViewUiBinder.class);
 
+  private static Translations translations = GWT.create(Translations.class);
+
   //
   // Instance Variables
   //
+
+  @UiField
+  Label nameLabel;
+
+  @UiField
+  TextBox name;
 
   @UiField
   ScrollPanel fileSystemTreePanel;
 
   @UiField
   ScrollPanel folderDetailsPanel;
+
+  @UiField
+  TextBox createFolderName;
+
+  @UiField
+  Button createFolderButton;
+
+  @UiField
+  Button selectButton;
+
+  @UiField
+  Button cancelButton;
 
   //
   // Constructors
@@ -62,6 +86,11 @@ public class FileSelectorView extends DialogBox implements Display {
     content.setHeight(DIALOG_HEIGHT);
     content.setWidth(DIALOG_WIDTH);
     add(content);
+
+    nameLabel.setText(translations.nameLabel() + ":");
+    createFolderButton.setText("Create Folder");
+    selectButton.setText("Select");
+    cancelButton.setText("Cancel");
   }
 
   //
