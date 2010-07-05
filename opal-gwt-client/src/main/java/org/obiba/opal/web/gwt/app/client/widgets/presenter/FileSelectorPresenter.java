@@ -17,6 +17,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionRequiredEvent;
 
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
@@ -59,6 +60,8 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
     fileSystemTreePresenter.bind();
     folderDetailsPresenter.bind();
+
+    addEventHandlers();
   }
 
   @Override
@@ -91,6 +94,16 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
   public void setMode(FileSelectorMode mode) {
     this.mode = mode;
+  }
+
+  private void addEventHandlers() {
+    super.registerHandler(eventBus.addHandler(FileSelectionRequiredEvent.getType(), new FileSelectionRequiredEvent.Handler() {
+
+      public void onFileSelectionRequired(FileSelectionRequiredEvent event) {
+        refreshDisplay();
+        revealDisplay();
+      }
+    }));
   }
 
   //
