@@ -57,6 +57,8 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
 
     HasClickHandlers hasClickHandlerMock = createMock(HasClickHandlers.class);
     expect(displayMock.getSpreadsheetIcon()).andReturn(hasClickHandlerMock);
+    expect(displayMock.getNextLink()).andReturn(hasClickHandlerMock);
+    expect(displayMock.getPreviousLink()).andReturn(hasClickHandlerMock);
 
     HasFieldUpdater<TableDto, String> hasFieldUpdater = createMock(HasFieldUpdater.class);
     expect(displayMock.getTableNameColumn()).andReturn(hasFieldUpdater);

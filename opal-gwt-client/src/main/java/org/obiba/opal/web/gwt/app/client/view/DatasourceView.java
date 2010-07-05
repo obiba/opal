@@ -62,6 +62,10 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
   private Image spreadsheetDownloadImage;
 
+  private Image previousImage;
+
+  private Image nextImage;
+
   private TableNameColumn tableNameColumn;
 
   private Translations translations = GWT.create(Translations.class);
@@ -110,6 +114,10 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   }
 
   private void initToolbar() {
+    nextImage = new Image("image/next.png");
+    toolbarPanel.add(nextImage);
+    previousImage = new Image("image/previous.png");
+    toolbarPanel.add(previousImage);
     spreadsheetDownloadImage = new Image("image/document-export.png");
     toolbarPanel.add(spreadsheetDownloadImage);
     DOM.setStyleAttribute(spreadsheetDownloadImage.getElement(), "cssFloat", "right");
@@ -129,12 +137,12 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   }
 
   @Override
-  public void setTableSelection(TableDto variable, int index) {
+  public void setTableSelection(TableDto tableDto, int index) {
     int pageIndex = (int) (index / table.getPageSize());
     if(pageIndex != pager.getPage()) {
       pager.setPage(pageIndex);
     }
-    selectionModel.setSelected(variable, true);
+    selectionModel.setSelected(tableDto, true);
   }
 
   @Override
@@ -162,6 +170,16 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   @Override
   public Label getDatasourceNameLabel() {
     return datasourceName;
+  }
+
+  @Override
+  public HasClickHandlers getNextLink() {
+    return nextImage;
+  }
+
+  @Override
+  public HasClickHandlers getPreviousLink() {
+    return previousImage;
   }
 
   @Override

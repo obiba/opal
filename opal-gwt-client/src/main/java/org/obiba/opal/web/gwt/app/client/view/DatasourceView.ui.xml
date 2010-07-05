@@ -16,8 +16,12 @@
     }
     .toolbar img {
       margin-left: 5px;
+      float:right;
     }
     .toolbar img:hover {
+      cursor: pointer;
+    }
+    .toolbar a:hover {
       cursor: pointer;
     }
     </ui:style>

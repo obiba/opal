@@ -19,7 +19,6 @@ import org.obiba.opal.web.gwt.app.client.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.event.SiblingVariableSelectionEvent;
-import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
@@ -136,14 +135,6 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       }
     }));
 
-    super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
-
-      @Override
-      public void onNavigatorSelectionChanged(TableSelectionChangeEvent event) {
-        displayTable(event.getSelection());
-      }
-    }));
-
     super.getDisplay().getVariableNameColumn().setFieldUpdater(new FieldUpdater<VariableDto, String>() {
 
       @Override
@@ -200,10 +191,11 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
   private void displayTable(TableDto tableDto) {
     if(!table.getDatasourceName().equals(tableDto.getDatasourceName()) || !table.getName().equals(tableDto.getName())) {
+      table = tableDto;
       getDisplay().clear();
       getDisplay().getTableName().setText(tableDto.getName());
       getDisplay().setParentName(tableDto.getDatasourceName());
-      table = tableDto;
+      getDisplay().getEntityTypeLabel().setText(tableDto.getEntityType());
       updateVariables();
     }
   }
@@ -212,6 +204,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     if(!table.getDatasourceName().equals(datasourceName) || !table.getName().equals(tableName)) {
       getDisplay().clear();
       getDisplay().getTableName().setText(tableName);
+      getDisplay().setParentName(datasourceName);
 
       ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/datasource/" + datasourceName + "/table/" + tableName).get().withCallback(new ResourceCallback<TableDto>() {
         @Override

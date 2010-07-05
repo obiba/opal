@@ -46,12 +46,16 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
     HasText getDatasourceNameLabel();
 
+    HasClickHandlers getNextLink();
+
+    HasClickHandlers getPreviousLink();
+
     HasClickHandlers getSpreadsheetIcon();
 
     HasFieldUpdater<TableDto, String> getTableNameColumn();
   }
 
-  private String datasource;
+  private String datasourceName;
 
   private JsArray<TableDto> tables;
 
@@ -70,9 +74,11 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     super.registerHandler(eventBus.addHandler(NavigatorSelectionChangeEvent.getType(), new NavigatorSelectionChangeEvent.Handler() {
       @Override
       public void onNavigatorSelectionChanged(NavigatorSelectionChangeEvent event) {
-        event.getSelection().getUserObject();
         if(event.getSelection().getParentItem() == null) {
           displayDatasource((DatasourceDto) event.getSelection().getUserObject());
+        } else {
+          // sync the table selection in the tree with the table selection in the tables list
+          displayDatasource((DatasourceDto) event.getSelection().getParentItem().getUserObject(), (TableDto) event.getSelection().getUserObject());
         }
       }
     }));
@@ -89,7 +95,49 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
       @Override
       public void onClick(ClickEvent event) {
-        downloadMetadata(datasource);
+        downloadMetadata(datasourceName);
+      }
+    }));
+
+    super.registerHandler(getDisplay().getNextLink().addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<DatasourceDto> resource) {
+            for(int i = 0; i < resource.length(); i++) {
+              if(resource.get(i).getName().equals(datasourceName)) {
+                if(i < resource.length() - 1) {
+                  displayDatasource(resource.get(i + 1));
+                }
+                break;
+              }
+            }
+          }
+
+        }).send();
+      }
+    }));
+
+    super.registerHandler(getDisplay().getPreviousLink().addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<DatasourceDto> resource) {
+            for(int i = 0; i < resource.length(); i++) {
+              if(resource.get(i).getName().equals(datasourceName)) {
+                if(i != 0) {
+                  displayDatasource(resource.get(i - 1));
+                }
+                break;
+              }
+            }
+          }
+
+        }).send();
       }
     }));
 
@@ -113,17 +161,13 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
         // Look for the table and its position in the list by its name.
         // Having an position of the current variable would be more efficient.
         int siblingIndex = 0;
-        for(int i = 0; i < tables.length(); i++) {
-          if(tables.get(i).getName().equals(event.getCurrentSelection().getName())) {
-            if(event.getDirection().equals(SiblingTableSelectionEvent.Direction.NEXT) && i < tables.length() - 1) {
-              siblingIndex = i + 1;
-            } else if(event.getDirection().equals(SiblingTableSelectionEvent.Direction.PREVIOUS) && i != 0) {
-              siblingIndex = i - 1;
-            } else {
-              siblingIndex = i;
-            }
-            break;
-          }
+        int currentTableIndex = getTableIndex(event.getCurrentSelection().getName());
+        if(event.getDirection().equals(SiblingTableSelectionEvent.Direction.NEXT) && currentTableIndex < tables.length() - 1) {
+          siblingIndex = currentTableIndex + 1;
+        } else if(event.getDirection().equals(SiblingTableSelectionEvent.Direction.PREVIOUS) && currentTableIndex != 0) {
+          siblingIndex = currentTableIndex - 1;
+        } else {
+          siblingIndex = currentTableIndex;
         }
         siblingSelection = tables.get(siblingIndex);
 
@@ -131,6 +175,17 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
         eventBus.fireEvent(new TableSelectionChangeEvent(siblingSelection));
       }
     }));
+  }
+
+  private int getTableIndex(String tableName) {
+    int tableIndex = 0;
+    for(int i = 0; i < tables.length(); i++) {
+      if(tables.get(i).getName().equals(tableName)) {
+        tableIndex = i;
+        break;
+      }
+    }
+    return tableIndex;
   }
 
   @Override
@@ -150,19 +205,31 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   }
 
   private void displayDatasource(DatasourceDto datasourceDto) {
-    if(!datasourceDto.getName().equals(datasource)) {
-      datasource = datasourceDto.getName();
-      getDisplay().getDatasourceNameLabel().setText(datasource);
-      updateTable(datasource);
+    displayDatasource(datasourceDto, null);
+  }
+
+  private void displayDatasource(DatasourceDto datasourceDto, TableDto tableDto) {
+    if(!datasourceDto.getName().equals(datasourceName)) {
+      datasourceName = datasourceDto.getName();
+      getDisplay().getDatasourceNameLabel().setText(datasourceName);
+      updateTable(tableDto != null ? tableDto.getName() : null);
+    } else if(tableDto != null) {
+      selectTable(tableDto.getName());
     }
   }
 
-  private void updateTable(final String datasource) {
-    ResourceRequestBuilderFactory.<JsArray<TableDto>> newBuilder().forResource("/datasource/" + datasource + "/tables").get().withCallback(new ResourceCallback<JsArray<TableDto>>() {
+  private void selectTable(String tableName) {
+    int index = getTableIndex(tableName);
+    getDisplay().setTableSelection(tables.get(index), index);
+  }
+
+  private void updateTable(final String tableName) {
+    ResourceRequestBuilderFactory.<JsArray<TableDto>> newBuilder().forResource("/datasource/" + datasourceName + "/tables").get().withCallback(new ResourceCallback<JsArray<TableDto>>() {
       @Override
       public void onResource(Response response, JsArray<TableDto> resource) {
         tables = resource;
         getDisplay().renderRows(resource);
+        selectTable(tableName);
       }
 
     }).send();
