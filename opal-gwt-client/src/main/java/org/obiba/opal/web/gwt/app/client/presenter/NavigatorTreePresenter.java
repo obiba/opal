@@ -50,7 +50,7 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
 
     void selectFirstDatasource();
 
-    void selectTable(String tableName);
+    void selectTable(String datasourceName, String tableName);
 
   }
 
@@ -91,7 +91,7 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
 
       @Override
       public void onNavigatorSelectionChanged(TableSelectionChangeEvent event) {
-        getDisplay().selectTable(event.getSelection().getName());
+        getDisplay().selectTable(event.getSelection().getDatasourceName(), event.getSelection().getName());
       }
 
     }));
@@ -126,7 +126,6 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
           dsItem.setUserObject(ds);
           JsArrayString array = ds.getTableArray();
           for(int j = 0; j < array.length(); j++) {
-            array.get(j);
             dsItem.addItem(array.get(j));
           }
           items.add(dsItem);

@@ -67,12 +67,19 @@ public class NavigatorTreeView implements NavigatorTreePresenter.Display {
   }
 
   @Override
-  public void selectTable(String tableName) {
-    TreeItem root = tree.getSelectedItem();
-    root.setState(true);
-    for(int i = 0; i < root.getChildCount(); i++) {
-      if(tableName.equals(root.getChild(i).getText())) {
-        tree.setSelectedItem(root.getChild(i));
+  public void selectTable(String datasourceName, String tableName) {
+    for(int i = 0; i < tree.getItemCount(); i++) {
+      TreeItem dsItem = tree.getItem(i);
+      if(dsItem.getText().equals(datasourceName)) {
+        dsItem.setState(true);
+        for(int j = 0; j < dsItem.getChildCount(); j++) {
+          TreeItem tableItem = dsItem.getChild(j);
+          if(tableName.equals(tableItem.getText())) {
+            tree.setSelectedItem(tableItem);
+            break;
+          }
+        }
+        break;
       }
     }
   }
