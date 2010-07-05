@@ -16,6 +16,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -206,6 +207,35 @@ public class FilesResource {
     } finally {
       StreamUtil.silentSafeClose(localFileStream);
       StreamUtil.silentSafeClose(uploadedFileStream);
+    }
+
+  }
+
+  @DELETE
+  @Path("/{path:.*}")
+  public Response deleteFile(@PathParam("path") String path) throws FileSystemException {
+    FileObject file = resolveFileInFileSystem(path);
+
+    // File or folder does not exist.
+    if(!file.exists()) {
+      return getPathNotExistResponse(path);
+    }
+
+    // The path refers to a folder that contains one or many files.
+    if(file.getType() == FileType.FOLDER && file.getChildren().length > 0) {
+      return Response.status(Status.FORBIDDEN).entity("This folder contains one or many file(s) and as a result cannot be deleted: " + path).build();
+    }
+
+    // Read-only file or folder.
+    if(!file.isWriteable()) {
+      return Response.status(Status.FORBIDDEN).entity("Could delete the following file or folder because it is read-only: " + path).build();
+    }
+
+    try {
+      file.delete();
+      return Response.ok("The following file or folder has been deleted : " + path).build();
+    } catch(FileSystemException couldNotDeleteFile) {
+      return Response.status(Status.INTERNAL_SERVER_ERROR).entity("There was an error while deleting the following file or folder: " + path).build();
     }
 
   }
