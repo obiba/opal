@@ -44,7 +44,7 @@
     <g:layer top='6em' left="1em" width='50%' height='2em'>
       <g:Label ui:field="tablesTableTitle" addStyleNames="{style.left-aligned},{style.title-bold}" />    
     </g:layer>    
-     <g:layer top="5.5em" width="97%" left="1em" height="60em">
+     <g:layer top="5.5em" width="97%" left="1em" height="100em">
        <g:FlowPanel>
          <g2:CellTable width="100%"  ui:field="table" addStyleNames="{style.tableList}" />
        </g:FlowPanel>
