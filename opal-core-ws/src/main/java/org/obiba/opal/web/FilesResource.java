@@ -163,7 +163,7 @@ public class FilesResource {
 
       // A folder exist with that name at the specified path
     } else if(fileToWriteTo.exists() && fileToWriteTo.getType() == FileType.FOLDER) {
-      return Response.status(Status.BAD_REQUEST).entity("Could not upload the file, a folder exist with that name at the specified path: " + path).build();
+      return Response.status(Status.FORBIDDEN).entity("Could not upload the file, a folder exist with that name at the specified path: " + path).build();
 
       // The parent folder does not exist (the specification says that we should not create folders)
     } else if(folderOfFileToWriteTo != null && !folderOfFileToWriteTo.exists()) {
@@ -237,6 +237,29 @@ public class FilesResource {
     } catch(FileSystemException couldNotDeleteFile) {
       return Response.status(Status.INTERNAL_SERVER_ERROR).entity("There was an error while deleting the following file or folder: " + path).build();
     }
-
   }
+
+  @PUT
+  @Path("/{path:.*}")
+  public Response createFolder(@PathParam("path") String path, @Context UriInfo uriInfo) throws FileSystemException {
+    FileObject file = resolveFileInFileSystem(path);
+
+    // Folder or file already exist at specified path.
+    if(file.exists()) {
+      return Response.status(Status.FORBIDDEN).entity("Cannot create the folder, a folder or a file exist with that name at the specified path: " + path).build();
+    }
+
+    // Parent folder is read-only.
+    if(!file.getParent().isWriteable()) {
+      return Response.status(Status.FORBIDDEN).entity("Could create the following folder because the parent folder is read-only: " + path).build();
+    }
+
+    try {
+      file.createFolder();
+      return Response.created(uriInfo.getAbsolutePath()).entity("Created the following folder: " + path).build();
+    } catch(FileSystemException couldNotCreateTheFolder) {
+      return Response.status(Status.INTERNAL_SERVER_ERROR).entity("There was an error while creating the following folder: " + path).build();
+    }
+  }
+
 }

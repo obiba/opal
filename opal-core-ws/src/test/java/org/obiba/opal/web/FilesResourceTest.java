@@ -288,7 +288,7 @@ public class FilesResourceTest {
     };
 
     Response response = fileResource.uploadFile("/", uriInfoMock, null);
-    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    Assert.assertEquals(Status.FORBIDDEN.getStatusCode(), response.getStatus());
 
     verify(opalRuntimeMock, fileObjectMock);
   }
