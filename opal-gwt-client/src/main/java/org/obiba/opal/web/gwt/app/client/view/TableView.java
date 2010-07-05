@@ -163,7 +163,7 @@ public class TableView extends Composite implements TablePresenter.Display {
     });
     pager.firstPage();
     table.setData(0, table.getPageSize(), JsArrays.toList(variableRows, 0, table.getPageSize()));
-    table.setDataSize(rows.length(), true);
+    table.setDataSize(variableRows.length(), true);
     table.redraw();
   }
 
