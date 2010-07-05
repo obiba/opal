@@ -84,4 +84,15 @@ public class NavigatorTreeView implements NavigatorTreePresenter.Display {
     }
   }
 
+  @Override
+  public void selectDatasource(String datasourceName) {
+    for(int i = 0; i < tree.getItemCount(); i++) {
+      TreeItem dsItem = tree.getItem(i);
+      if(dsItem.getText().equals(datasourceName)) {
+        tree.setSelectedItem(dsItem);
+        break;
+      }
+    }
+  }
+
 }

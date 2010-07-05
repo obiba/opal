@@ -109,7 +109,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
             for(int i = 0; i < resource.length(); i++) {
               if(resource.get(i).getName().equals(datasourceName)) {
                 if(i < resource.length() - 1) {
-                  displayDatasource(resource.get(i + 1));
+                  eventBus.fireEvent(new DatasourceSelectionChangeEvent(resource.get(i + 1)));
                 }
                 break;
               }
@@ -130,7 +130,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
             for(int i = 0; i < resource.length(); i++) {
               if(resource.get(i).getName().equals(datasourceName)) {
                 if(i != 0) {
-                  displayDatasource(resource.get(i - 1));
+                  eventBus.fireEvent(new DatasourceSelectionChangeEvent(resource.get(i - 1)));
                 }
                 break;
               }

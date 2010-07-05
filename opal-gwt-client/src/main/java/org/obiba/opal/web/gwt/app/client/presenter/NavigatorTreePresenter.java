@@ -18,6 +18,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionExpiredEvent;
@@ -51,6 +52,8 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
     void selectFirstDatasource();
 
     void selectTable(String datasourceName, String tableName);
+
+    void selectDatasource(String datasourceName);
 
   }
 
@@ -92,6 +95,15 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
       @Override
       public void onNavigatorSelectionChanged(TableSelectionChangeEvent event) {
         getDisplay().selectTable(event.getSelection().getDatasourceName(), event.getSelection().getName());
+      }
+
+    }));
+
+    super.registerHandler(eventBus.addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionChangeEvent.Handler() {
+
+      @Override
+      public void onNavigatorSelectionChanged(DatasourceSelectionChangeEvent event) {
+        getDisplay().selectDatasource(event.getSelection().getName());
       }
 
     }));
