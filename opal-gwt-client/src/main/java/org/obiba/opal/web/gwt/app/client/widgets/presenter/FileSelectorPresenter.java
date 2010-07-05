@@ -100,6 +100,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     super.registerHandler(eventBus.addHandler(FileSelectionRequiredEvent.getType(), new FileSelectionRequiredEvent.Handler() {
 
       public void onFileSelectionRequired(FileSelectionRequiredEvent event) {
+        setFileSelectionType(event.getFileSelectionType());
         refreshDisplay();
         revealDisplay();
       }

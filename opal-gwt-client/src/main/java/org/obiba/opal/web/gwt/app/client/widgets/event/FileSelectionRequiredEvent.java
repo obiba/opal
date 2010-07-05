@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.event;
 
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
+
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
@@ -28,12 +30,15 @@ public class FileSelectionRequiredEvent extends GwtEvent<FileSelectionRequiredEv
 
   private Object source;
 
+  private FileSelectionType fileSelectionType;
+
   //
   // Constructors
   //
 
-  public FileSelectionRequiredEvent(Object source) {
+  public FileSelectionRequiredEvent(Object source, FileSelectionType fileSelectionType) {
     this.source = source;
+    this.fileSelectionType = fileSelectionType;
   }
 
   //
@@ -61,6 +66,10 @@ public class FileSelectionRequiredEvent extends GwtEvent<FileSelectionRequiredEv
   @Override
   public Object getSource() {
     return source;
+  }
+
+  public FileSelectionType getFileSelectionType() {
+    return fileSelectionType;
   }
 
   //
