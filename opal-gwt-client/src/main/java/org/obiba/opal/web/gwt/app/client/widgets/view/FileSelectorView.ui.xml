@@ -14,7 +14,7 @@
   
   <g:DockLayoutPanel unit="EM">
     <g:north size="4">
-      <g:HTMLPanel addStyleNames="{style.top-margin} {style.bottom-margin}">
+      <g:HTMLPanel ui:field="namePanel" addStyleNames="{style.top-margin} {style.bottom-margin}">
         <g:Label ui:field="nameLabel" addStyleNames="{style.inline}" />
         <g:TextBox ui:field="name" addStyleNames="{style.name-input}" />
       </g:HTMLPanel>
@@ -34,8 +34,10 @@
     <g:south size="5">
       <g:HTMLPanel addStyleNames="{style.top-border} {style.top-margin}">
         <span class="{style.left-aligned} {style.top-margin}">
-          <g:TextBox ui:field="createFolderName" />
-          <g:Button ui:field="createFolderButton" />
+          <g:HTMLPanel ui:field="createFolderPanel">
+            <g:TextBox ui:field="createFolderName" />
+            <g:Button ui:field="createFolderButton" />
+          </g:HTMLPanel>
         </span>
         <span class="{style.right-aligned} {style.top-margin}">
           <g:Button ui:field="selectButton" />

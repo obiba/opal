@@ -11,14 +11,18 @@ package org.obiba.opal.web.gwt.app.client.widgets.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectorMode;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
@@ -50,6 +54,9 @@ public class FileSelectorView extends DialogBox implements Display {
   //
 
   @UiField
+  HTMLPanel namePanel;
+
+  @UiField
   Label nameLabel;
 
   @UiField
@@ -62,6 +69,9 @@ public class FileSelectorView extends DialogBox implements Display {
   ScrollPanel folderDetailsPanel;
 
   @UiField
+  HTMLPanel createFolderPanel;
+
+  @UiField
   TextBox createFolderName;
 
   @UiField
@@ -72,6 +82,8 @@ public class FileSelectorView extends DialogBox implements Display {
 
   @UiField
   Button cancelButton;
+
+  private FileSelectorMode mode = FileSelectorMode.FILE;
 
   //
   // Constructors
@@ -91,6 +103,8 @@ public class FileSelectorView extends DialogBox implements Display {
     createFolderButton.setText("Create Folder");
     selectButton.setText("Select");
     cancelButton.setText("Cancel");
+
+    addCancelHandler();
   }
 
   //
@@ -99,12 +113,19 @@ public class FileSelectorView extends DialogBox implements Display {
 
   @Override
   public void showDialog() {
+    namePanel.setVisible(mode.equals(FileSelectorMode.FILE));
+    createFolderPanel.setVisible(mode.equals(FileSelectorMode.FILE) || mode.equals(FileSelectorMode.FOLDER));
+
     center();
     show();
   }
 
   public void hideDialog() {
     hide();
+  }
+
+  public void setMode(FileSelectorMode mode) {
+    this.mode = mode;
   }
 
   public HasWidgets getFileSystemTreePanel() {
@@ -123,6 +144,20 @@ public class FileSelectorView extends DialogBox implements Display {
 
   public Widget asWidget() {
     return this;
+  }
+
+  //
+  // Methods
+  //
+
+  private void addCancelHandler() {
+    cancelButton.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        hideDialog();
+      }
+    });
   }
 
   //

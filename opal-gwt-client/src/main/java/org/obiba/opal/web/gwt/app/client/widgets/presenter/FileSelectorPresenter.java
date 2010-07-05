@@ -34,6 +34,8 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
   FolderDetailsPresenter folderDetailsPresenter;
 
+  private FileSelectorMode mode = FileSelectorMode.FILE;
+
   //
   // Constructors
   //
@@ -65,6 +67,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
   @Override
   public void revealDisplay() {
+    getDisplay().setMode(mode);
     getDisplay().showDialog();
   }
 
@@ -83,14 +86,28 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   }
 
   //
+  // Methods
+  //
+
+  public void setMode(FileSelectorMode mode) {
+    this.mode = mode;
+  }
+
+  //
   // Inner Classes / Interfaces
   //
+
+  public enum FileSelectorMode {
+    FILE, EXISTING_FILE, FOLDER, EXISTING_FOLDER
+  }
 
   public interface Display extends WidgetDisplay {
 
     void showDialog();
 
     void hideDialog();
+
+    void setMode(FileSelectorMode mode);
 
     HasWidgets getFileSystemTreePanel();
 
