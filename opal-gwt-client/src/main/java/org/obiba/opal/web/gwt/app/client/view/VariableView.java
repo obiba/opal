@@ -49,6 +49,10 @@ public class VariableView extends Composite implements VariablePresenter.Display
 
   private static final String LABEL_ATTRIBUTE_NAME = "label";
 
+  private static final String ALIAS_ATTRIBUTE_NAME = "alias";
+
+  private static final String SCRIPT_ATTRIBUTE_NAME = "script";
+
   private static VariableViewUiBinder uiBinder = GWT.create(VariableViewUiBinder.class);
 
   private static Translations translations = GWT.create(Translations.class);
@@ -83,6 +87,9 @@ public class VariableView extends Composite implements VariablePresenter.Display
 
   @UiField
   Label occurrenceGroup;
+
+  @UiField
+  Label label;
 
   @UiField
   Label categoryTableTitle;
@@ -159,6 +166,8 @@ public class VariableView extends Composite implements VariablePresenter.Display
     attributeTablePager.firstPage();
     attributeTable.setData(0, attributeTable.getPageSize(), JsArrays.toList(attributeRows, 0, attributeTable.getPageSize()));
     attributeTable.setDataSize(attributeRows.length(), true);
+
+    label.setText(getAttributeValue(attributeRows, LABEL_ATTRIBUTE_NAME));
   }
 
   public Widget asWidget() {
@@ -276,17 +285,25 @@ public class VariableView extends Composite implements VariablePresenter.Display
   }
 
   private String getCategoryLabel(CategoryDto categoryDto) {
-    String categoryLabel = "";
+    return getAttributeValue(categoryDto.getAttributesArray(), LABEL_ATTRIBUTE_NAME);
+  }
 
-    JsArray<AttributeDto> attributes = categoryDto.getAttributesArray();
+  private String getAttributeValue(JsArray<AttributeDto> attributes, String name) {
+    AttributeDto attribute = null;
+
     for(int i = 0; i < attributes.length(); i++) {
-      AttributeDto attribute = attributes.get(i);
-      if(attribute.getName().equals(LABEL_ATTRIBUTE_NAME) && attribute.getLocale() != null && attribute.getLocale().equals(getCurrentLanguage())) {
-        return attribute.getValue();
+      AttributeDto att = attributes.get(i);
+      if(att.getName().equals(name)) {
+        if(!att.hasLocale()) {
+          attribute = att;
+        } else if(att.getLocale().equals(getCurrentLanguage())) {
+          attribute = att;
+          break;
+        }
       }
     }
 
-    return categoryLabel;
+    return attribute != null ? attribute.getValue() : "";
   }
 
   private String getCurrentLanguage() {

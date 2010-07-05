@@ -66,7 +66,14 @@
         </g:FlowPanel>
       </g:VerticalPanel>     
     </g:layer>
-    <g:layer top="10em" height="30em" left="1em" width="97%">
+    <g:layer top="11em" height="4em" left="1em" width="97%">
+      <g:VerticalPanel>
+        <g:FlowPanel>
+          <g:Label addStyleNames="{style.left-aligned},{style.title-light}"><ui:msg description="Label label">Label</ui:msg></g:Label><g:Label addStyleNames="{style.left-aligned},{style.title-light}">:</g:Label><g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="label"></g:Label>
+        </g:FlowPanel>
+      </g:VerticalPanel>     
+    </g:layer>
+    <g:layer top="14em" height="30em" left="1em" width="97%">
       <g:TabLayoutPanel barHeight="2" barUnit="EM" width="100%">
         <g:tab>
 		  <g:customHeader>
