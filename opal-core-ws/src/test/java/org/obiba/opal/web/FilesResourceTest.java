@@ -143,23 +143,23 @@ public class FilesResourceTest {
 
     replay(opalRuntimeMock);
 
-    checkGetFolderResponse("/", new String[] { "..", "folder1", "folder2", "folder3", "folder4", "folder5", "file2.txt" });
-    checkGetFolderResponse("/folder1/folder11", new String[] { "folder1", "folder111", "file111.txt" });
-    checkGetFolderResponse("/folder1/folder11/folder111", new String[] { "folder11", "file1111.txt", "file1112.txt" });
-    checkGetFolderResponse("/folder2", new String[] { "root", "file21.txt" });
-    checkGetFolderResponse("/folder3", new String[] { "root", "folder31" });
-    checkGetFolderResponse("/folder4", new String[] { "root", "folder41", "file41.txt", "file42.txt", "file43.txt" });
-    checkGetFolderResponse("/folder4/folder41", new String[] { "folder4" });
-    checkGetFolderResponse("/folder5", new String[] { "root", "file51.txt" });
+    checkGetFileDetailsResponse("/", new String[] { "..", "folder1", "folder2", "folder3", "folder4", "folder5", "file2.txt" });
+    checkGetFileDetailsResponse("/folder1/folder11", new String[] { "folder1", "folder111", "file111.txt" });
+    checkGetFileDetailsResponse("/folder1/folder11/folder111", new String[] { "folder11", "file1111.txt", "file1112.txt" });
+    checkGetFileDetailsResponse("/folder2", new String[] { "root", "file21.txt" });
+    checkGetFileDetailsResponse("/folder3", new String[] { "root", "folder31" });
+    checkGetFileDetailsResponse("/folder4", new String[] { "root", "folder41", "file41.txt", "file42.txt", "file43.txt" });
+    checkGetFileDetailsResponse("/folder4/folder41", new String[] { "folder4" });
+    checkGetFileDetailsResponse("/folder5", new String[] { "root", "file51.txt" });
 
     verify(opalRuntimeMock);
 
   }
 
-  private void checkGetFolderResponse(String path, String[] expectedFolderContentArray) throws FileSystemException {
+  private void checkGetFileDetailsResponse(String path, String[] expectedFolderContentArray) throws FileSystemException {
 
     Set<String> expectedFolderContent = new HashSet<String>(Arrays.asList(expectedFolderContentArray));
-    Response response = filesResource.getFileSystemEntry(path);
+    Response response = filesResource.getFileDetails(path);
 
     // Make sure response is OK
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -179,16 +179,16 @@ public class FilesResourceTest {
 
     replay(opalRuntimeMock);
 
-    checkGetFileResponse("/file2.txt", "testing file2.txt content");
-    checkGetFileResponse("/folder1/folder11/folder111/file1112.txt", "testing file1112.txt content");
-    checkGetFileResponse("/folder4/file41.txt", "testing file41.txt content");
+    checkGetFileDetailsResponse("/file2.txt", "testing file2.txt content");
+    checkGetFileDetailsResponse("/folder1/folder11/folder111/file1112.txt", "testing file1112.txt content");
+    checkGetFileDetailsResponse("/folder4/file41.txt", "testing file41.txt content");
 
     verify(opalRuntimeMock);
 
   }
 
-  private void checkGetFileResponse(String path, String expectedFileContent) throws IOException {
-    Response response = filesResource.getFileSystemEntry(path);
+  private void checkGetFileDetailsResponse(String path, String expectedFileContent) throws IOException {
+    Response response = filesResource.getFile(path);
 
     // Make sure response is OK
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -208,7 +208,7 @@ public class FilesResourceTest {
 
     replay(opalRuntimeMock);
 
-    Response response = filesResource.getFileSystemEntry("/folder1/folder2");
+    Response response = filesResource.getFileDetails("/folder1/folder2");
     Assert.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
 
     verify(opalRuntimeMock);

@@ -117,7 +117,7 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
   }
 
   private void updateTable(String path) {
-    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files" + path).get().withCallback(new ResourceCallback<FileDto>() {
+    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta" + path).get().withCallback(new ResourceCallback<FileDto>() {
       @Override
       public void onResource(Response response, FileDto resource) {
         currentFolder = resource;

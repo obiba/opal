@@ -9,10 +9,16 @@
  ******************************************************************************/
 package org.obiba.opal.web;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -52,6 +58,8 @@ public class FilesResource {
 
   private static final Logger log = LoggerFactory.getLogger(FilesResource.class);
 
+  private static final int NOT_IMPLEMENTED = 501;
+
   private OpalRuntime opalRuntime;
 
   @Autowired
@@ -61,15 +69,34 @@ public class FilesResource {
   }
 
   @GET
-  public Response getFileSystemRoot() throws FileSystemException {
-    return getFileSystemEntry("/");
+  @Path("/meta")
+  public Response getFileSystemRootDetails() throws FileSystemException {
+    return getFileDetails("/");
+  }
+
+  @GET
+  @Path("/meta/{path:.*}")
+  public Response getFileDetails(@PathParam("path") String path) throws FileSystemException {
+    FileObject file = resolveFileInFileSystem(path);
+    if(!file.exists()) {
+      return getPathNotExistResponse(path);
+    } else if(file.getType() == FileType.FILE) {
+      return Response.status(NOT_IMPLEMENTED).entity("Details are only available for folder content.  The specified path points to a file : " + path).build();
+    } else {
+      return getFolderDetails(file);
+    }
+  }
+
+  @GET
+  @Path("/")
+  public Response getFileSystemRoot() throws IOException {
+    return getFile("/");
   }
 
   @GET
   @Path("/{path:.*}")
   @AuthenticatedByCookie
-  public Response getFileSystemEntry(@PathParam("path") String path) throws FileSystemException {
-
+  public Response getFile(@PathParam("path") String path) throws IOException {
     FileObject file = resolveFileInFileSystem(path);
     if(!file.exists()) {
       return getPathNotExistResponse(path);
@@ -78,7 +105,6 @@ public class FilesResource {
     } else {
       return getFolder(file);
     }
-
   }
 
   protected FileObject resolveFileInFileSystem(String path) throws FileSystemException {
@@ -89,7 +115,23 @@ public class FilesResource {
     return Response.ok(opalRuntime.getFileSystem().getLocalFile(file), MediaType.APPLICATION_OCTET_STREAM_TYPE).build();
   }
 
-  private Response getFolder(FileObject folder) throws FileSystemException {
+  private Response getFolder(FileObject folder) throws IOException {
+    FileObject[] files = folder.getChildren();
+    if(files.length == 0) {
+      return Response.status(Status.NO_CONTENT).entity("Cannot download the following folder content, because the folder contains no file : " + folder.getName().getPath()).build();
+    }
+
+    SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
+    String folderName = folder.getName().getBaseName();
+    File compressedFolder = new File(System.getProperty("java.io.tmpdir"), (folderName.equals("") ? "filesystem" : folderName) + "_" + dateTimeFormatter.format(System.currentTimeMillis()) + ".zip");
+    compressedFolder.deleteOnExit();
+
+    compressFolder(compressedFolder, folder);
+
+    return Response.ok(compressedFolder, MediaType.APPLICATION_OCTET_STREAM_TYPE).header("Content-Disposition", "attachment; filename=" + compressedFolder.getName()).build();
+  }
+
+  private Response getFolderDetails(FileObject folder) throws FileSystemException {
 
     // Create a FileDto representing the folder identified by the path.
     Opal.FileDto.Builder fileBuilder = getBaseFolderBuilder(folder, false);
@@ -144,7 +186,8 @@ public class FilesResource {
     }
   }
 
-  @PUT
+  // TODO Refactoring required to merge uploadFile() with createFolder()
+  // @PUT
   // The POST method is required here to be compatible with Html forms which do not support the PUT method.
   @POST
   @Path("/{path:.*}")
@@ -262,4 +305,29 @@ public class FilesResource {
     }
   }
 
+  private void compressFolder(File compressedFile, FileObject folder) throws IOException {
+    ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(compressedFile));
+    addFolder(folder, outputStream);
+    outputStream.close();
+  }
+
+  private void addFolder(FileObject folder, ZipOutputStream outputStream) throws IOException {
+    FileObject[] files = folder.getChildren();
+
+    for(int i = 0; i < files.length; i++) {
+      if(files[i].getType() == FileType.FOLDER) {
+        addFolder(files[i], outputStream);
+        continue;
+      }
+
+      outputStream.putNextEntry(new ZipEntry(files[i].getName().getPath().substring(1)));
+
+      FileInputStream inputStream = new FileInputStream(opalRuntime.getFileSystem().getLocalFile(files[i]));
+      StreamUtil.copy(inputStream, outputStream);
+
+      outputStream.closeEntry();
+      StreamUtil.silentSafeClose(inputStream);
+
+    }
+  }
 }

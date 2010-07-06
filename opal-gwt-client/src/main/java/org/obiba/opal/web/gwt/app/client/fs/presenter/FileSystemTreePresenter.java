@@ -72,7 +72,7 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
 
   @Override
   public void refreshDisplay() {
-    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files").get().withCallback(new ResourceCallback<FileDto>() {
+    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta").get().withCallback(new ResourceCallback<FileDto>() {
       @Override
       public void onResource(Response response, FileDto root) {
         getDisplay().initTree(root);
@@ -88,7 +88,7 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
 
   protected void initDisplayComponents() {
 
-    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files").get().withCallback(new ResourceCallback<FileDto>() {
+    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta").get().withCallback(new ResourceCallback<FileDto>() {
       @Override
       public void onResource(Response response, FileDto root) {
         getDisplay().initTree(root);
@@ -111,7 +111,7 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
         eventBus.fireEvent(new FileSystemTreeFolderSelectionChangeEvent(selectedFile));
 
         if(selectedItem.getChildCount() == 0) {
-          ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files" + selectedFile.getPath()).get().withCallback(new ResourceCallback<FileDto>() {
+          ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta" + selectedFile.getPath()).get().withCallback(new ResourceCallback<FileDto>() {
             @Override
             public void onResource(Response response, FileDto file) {
               getDisplay().addBranch(selectedItem, file);
