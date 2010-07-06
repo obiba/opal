@@ -72,11 +72,14 @@ public class TableView extends Composite implements TablePresenter.Display {
 
   SimplePager<VariableDto> pager;
 
-  private Image spreadsheetDownloadImage;
+  @UiField
+  Image spreadsheetDownloadImage;
 
-  private Image previousImage;
+  @UiField
+  Image previousImage;
 
-  private Image nextImage;
+  @UiField
+  Image nextImage;
 
   private VariableNameColumn variableNameColumn;
 
@@ -85,7 +88,6 @@ public class TableView extends Composite implements TablePresenter.Display {
   public TableView() {
     initWidget(uiBinder.createAndBindUi(this));
     addTableColumns();
-    initToolbar();
   }
 
   private void addTableColumns() {
@@ -134,15 +136,6 @@ public class TableView extends Composite implements TablePresenter.Display {
     ((InsertPanel) table.getParent()).insert(pager, 0);
     DOM.removeElementAttribute(pager.getElement(), "style");
     DOM.setStyleAttribute(pager.getElement(), "cssFloat", "right");
-  }
-
-  private void initToolbar() {
-    nextImage = new Image("image/next.png");
-    toolbarPanel.add(nextImage);
-    previousImage = new Image("image/previous.png");
-    toolbarPanel.add(previousImage);
-    spreadsheetDownloadImage = new Image("image/document-export.png");
-    toolbarPanel.add(spreadsheetDownloadImage);
   }
 
   @Override

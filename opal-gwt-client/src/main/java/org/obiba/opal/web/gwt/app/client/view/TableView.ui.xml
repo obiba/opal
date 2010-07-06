@@ -45,7 +45,11 @@
       </g:FlowPanel>
     </g:layer>
     <g:layer top='2.5em' right="1em" width='50%' height='2em'>
-     <g:FlowPanel ui:field="toolbarPanel"  addStyleNames="{style.toolbar},{style.toolbar-right}"/>
+     <g:FlowPanel ui:field="toolbarPanel"  addStyleNames="{style.toolbar},{style.toolbar-right}">
+        <g:Image ui:field="nextImage" url="image/next.png"></g:Image>
+        <g:Image ui:field="previousImage" url="image/previous.png"></g:Image>
+        <g:Image ui:field="spreadsheetDownloadImage" url="image/document-export.png"></g:Image>
+     </g:FlowPanel>
     </g:layer>
     <g:layer top="4.7em" height="0.5em" left="1em" right="1em">
       <g:HTMLPanel>

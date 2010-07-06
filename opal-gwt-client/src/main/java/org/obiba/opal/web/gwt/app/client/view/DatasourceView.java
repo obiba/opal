@@ -60,11 +60,14 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
   SimplePager<TableDto> pager;
 
-  private Image spreadsheetDownloadImage;
+  @UiField
+  Image spreadsheetDownloadImage;
 
-  private Image previousImage;
+  @UiField
+  Image previousImage;
 
-  private Image nextImage;
+  @UiField
+  Image nextImage;
 
   private TableNameColumn tableNameColumn;
 
@@ -73,7 +76,6 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   public DatasourceView() {
     initWidget(uiBinder.createAndBindUi(this));
     addTableColumns();
-    initToolbar();
   }
 
   private void addTableColumns() {
@@ -111,16 +113,6 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
     p.insert(pager, 0);
     DOM.removeElementAttribute(pager.getElement(), "style");
     DOM.setStyleAttribute(pager.getElement(), "cssFloat", "right");
-  }
-
-  private void initToolbar() {
-    nextImage = new Image("image/next.png");
-    toolbarPanel.add(nextImage);
-    previousImage = new Image("image/previous.png");
-    toolbarPanel.add(previousImage);
-    spreadsheetDownloadImage = new Image("image/document-export.png");
-    toolbarPanel.add(spreadsheetDownloadImage);
-    DOM.setStyleAttribute(spreadsheetDownloadImage.getElement(), "cssFloat", "right");
   }
 
   @Override

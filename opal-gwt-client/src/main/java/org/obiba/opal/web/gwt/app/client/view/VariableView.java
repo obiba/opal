@@ -107,11 +107,14 @@ public class VariableView extends Composite implements VariablePresenter.Display
 
   SimplePager<AttributeDto> attributeTablePager;
 
-  private Image parentImage;
+  @UiField
+  Image parentImage;
 
-  private Image previousImage;
+  @UiField
+  Image previousImage;
 
-  private Image nextImage;
+  @UiField
+  Image nextImage;
 
   //
   // Constructors
@@ -119,7 +122,6 @@ public class VariableView extends Composite implements VariablePresenter.Display
 
   public VariableView() {
     initWidget(uiBinder.createAndBindUi(this));
-    initToolbar();
     initCategoryTable();
     initAttributeTable();
   }
@@ -232,13 +234,6 @@ public class VariableView extends Composite implements VariablePresenter.Display
   @Override
   public HasClickHandlers getNextLink() {
     return nextImage;
-  }
-
-  private void initToolbar() {
-    nextImage = new Image("image/next.png");
-    toolbarPanel.add(nextImage);
-    previousImage = new Image("image/previous.png");
-    toolbarPanel.add(previousImage);
   }
 
   private void initCategoryTable() {
