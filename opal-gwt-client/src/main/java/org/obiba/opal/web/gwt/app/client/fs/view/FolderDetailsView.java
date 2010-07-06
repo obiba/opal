@@ -35,6 +35,7 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.SingleSelectionModel;
 
 public class FolderDetailsView extends Composite implements Display {
 
@@ -53,6 +54,8 @@ public class FolderDetailsView extends Composite implements Display {
   @UiField
   CellTable<FileDto> table;
 
+  private SingleSelectionModel<FileDto> tableSelectionModel;
+
   private FileNameColumn fileNameColumn;
 
   private Translations translations = GWT.create(Translations.class);
@@ -62,7 +65,18 @@ public class FolderDetailsView extends Composite implements Display {
     initTable();
   }
 
-  @Override
+  public void setSelectionEnabled(boolean enabled) {
+    table.setSelectionEnabled(enabled);
+  }
+
+  public void clearSelection() {
+    if(table.isSelectionEnabled()) {
+      for(FileDto file : table.getDisplayedItems()) {
+        tableSelectionModel.setSelected(file, false);
+      }
+    }
+  }
+
   public void renderRows(final FileDto folder) {
     JsArray<FileDto> children = folder.getChildrenArray();
     int fileCount = children.length();
@@ -94,6 +108,9 @@ public class FolderDetailsView extends Composite implements Display {
 
     table.addStyleName("folder-details");
     OpalResources.INSTANCE.css().ensureInjected();
+
+    tableSelectionModel = new SingleSelectionModel<FileDto>();
+    table.setSelectionModel(tableSelectionModel);
   }
 
   private void addTableColumns() {

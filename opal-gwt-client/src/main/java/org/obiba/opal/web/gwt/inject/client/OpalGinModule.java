@@ -51,7 +51,7 @@ public class OpalGinModule extends AbstractGinModule {
     bind(DataExportPresenter.Display.class).to(DataExportView.class);
     bind(ErrorDialogPresenter.Display.class).to(ErrorDialogView.class);
 
-    bind(FileSelectorPresenter.Display.class).to(FileSelectorView.class);
+    bind(FileSelectorPresenter.Display.class).to(FileSelectorView.class).in(Singleton.class);
 
     // Concrete classes (such as NavigatorPresenter) don't need to be "bound". Simply define a getter in the
     // OpalGinjector interface and they'll "just work".

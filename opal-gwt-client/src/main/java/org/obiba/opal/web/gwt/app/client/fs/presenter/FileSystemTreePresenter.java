@@ -44,6 +44,11 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
   @Inject
   public FileSystemTreePresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
+
+    // Do NOT add this handler in onBind(). This handler will NOT be removed when
+    // FileSystemTreePresenter's unbind() method is called, causing multiple instances
+    // of this handler.
+    addTreeItemSelectionHandler(eventBus);
   }
 
   @Override
@@ -63,7 +68,6 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
 
   @Override
   protected void onUnbind() {
-
   }
 
   @Override
@@ -95,7 +99,7 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
 
   }
 
-  private void addEventHandlers() {
+  private void addTreeItemSelectionHandler(final EventBus eventBus) {
     getDisplay().getFileSystemTree().addSelectionHandler(new SelectionHandler<TreeItem>() {
 
       @Override
@@ -117,7 +121,9 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
       }
 
     });
+  }
 
+  private void addEventHandlers() {
     super.registerHandler(eventBus.addHandler(FolderSelectionChangeEvent.getType(), new FolderSelectionChangeEvent.Handler() {
 
       @Override

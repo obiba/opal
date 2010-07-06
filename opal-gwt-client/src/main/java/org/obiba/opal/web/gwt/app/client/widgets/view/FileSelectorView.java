@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -134,6 +135,10 @@ public class FileSelectorView extends DialogBox implements Display {
 
   public HasWidgets getFolderDetailsPanel() {
     return folderDetailsPanel;
+  }
+
+  public HasClickHandlers getSelectButton() {
+    return selectButton;
   }
 
   public void startProcessing() {

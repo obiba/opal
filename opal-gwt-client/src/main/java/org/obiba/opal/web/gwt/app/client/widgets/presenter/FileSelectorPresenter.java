@@ -15,10 +15,18 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.FileSelectionHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionRequiredEvent;
+import org.obiba.opal.web.model.client.FileDto;
+import org.obiba.opal.web.model.client.FileDto.FileType;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
 
@@ -35,7 +43,13 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
   FolderDetailsPresenter folderDetailsPresenter;
 
+  private Object fileSelectionSource;
+
   private FileSelectionType fileSelectionType = FileSelectionType.FILE;
+
+  private String selectedFile;
+
+  private String selectedFolder;
 
   //
   // Constructors
@@ -47,6 +61,22 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
     this.fileSystemTreePresenter = fileSystemTreePresenter;
     this.folderDetailsPresenter = folderDetailsPresenter;
+    this.folderDetailsPresenter.getDisplay().setSelectionEnabled(true);
+
+    getDisplay().getFileSystemTreePanel().clear();
+    getDisplay().getFileSystemTreePanel().add(fileSystemTreePresenter.getDisplay().asWidget());
+
+    getDisplay().getFolderDetailsPanel().clear();
+    getDisplay().getFolderDetailsPanel().add(folderDetailsPresenter.getDisplay().asWidget());
+
+    folderDetailsPresenter.getDisplay().getFileNameColumn().addFileSelectionHandler(new FileSelectionHandler() {
+
+      public void onFileSelection(FileDto fileDto) {
+        if(fileDto.getType().isFileType(FileType.FILE)) {
+          selectedFile = fileDto.getPath();
+        }
+      }
+    });
   }
 
   //
@@ -55,9 +85,6 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
   @Override
   protected void onBind() {
-    getDisplay().getFileSystemTreePanel().add(fileSystemTreePresenter.getDisplay().asWidget());
-    getDisplay().getFolderDetailsPanel().add(folderDetailsPresenter.getDisplay().asWidget());
-
     fileSystemTreePresenter.bind();
     folderDetailsPresenter.bind();
 
@@ -70,6 +97,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
   @Override
   public void revealDisplay() {
+    folderDetailsPresenter.getDisplay().clearSelection(); // clear previous selection (highlighted row)
     getDisplay().setFileSelectionType(fileSelectionType);
     getDisplay().showDialog();
   }
@@ -92,6 +120,10 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   // Methods
   //
 
+  public void setFileSelectionSource(Object fileSelectionSource) {
+    this.fileSelectionSource = fileSelectionSource;
+  }
+
   public void setFileSelectionType(FileSelectionType fileSelectionType) {
     this.fileSelectionType = fileSelectionType;
   }
@@ -100,11 +132,48 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     super.registerHandler(eventBus.addHandler(FileSelectionRequiredEvent.getType(), new FileSelectionRequiredEvent.Handler() {
 
       public void onFileSelectionRequired(FileSelectionRequiredEvent event) {
+        selectedFile = selectedFolder = null; // clear previous selection
+        setFileSelectionSource(event.getSource());
         setFileSelectionType(event.getFileSelectionType());
         refreshDisplay();
         revealDisplay();
       }
     }));
+
+    super.registerHandler(getDisplay().getSelectButton().addClickHandler(new ClickHandler() {
+
+      public void onClick(ClickEvent event) {
+        String selection = getSelection();
+        if(selection != null) {
+          eventBus.fireEvent(new FileSelectionEvent(FileSelectorPresenter.this.fileSelectionSource, selection));
+        }
+        getDisplay().hideDialog();
+      }
+    }));
+
+    super.registerHandler(eventBus.addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(), new FileSystemTreeFolderSelectionChangeEvent.Handler() {
+
+      public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
+        selectedFolder = event.getFolder().getPath();
+      }
+    }));
+  }
+
+  private String getSelection() {
+    String selection = null;
+
+    switch(fileSelectionType) {
+    case FILE:
+    case EXISTING_FILE:
+      selection = selectedFile;
+      break;
+    case FOLDER:
+    case EXISTING_FOLDER:
+      selection = selectedFolder;
+      break;
+    }
+
+    return selection;
   }
 
   //
@@ -126,5 +195,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     HasWidgets getFileSystemTreePanel();
 
     HasWidgets getFolderDetailsPanel();
+
+    HasClickHandlers getSelectButton();
   }
 }
