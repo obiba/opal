@@ -1,0 +1,38 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
+  
+  <ui:style>
+    .full-border { border: 1px solid; }
+    .top-border { border-top: 1px solid; }
+    .inline { display: inline; }
+    .left-aligned { float: left; }
+    .right-aligned { float: right; }
+    .top-margin { margin-top: 1em; }
+    .bottom-margin { margin-bottom: 1em; }
+    .name-input { width: 90%; }
+  </ui:style>
+  
+  <g:DockLayoutPanel unit="EM">
+    <g:center>
+      <g:VerticalPanel spacing="10">
+        <g:HorizontalPanel spacing="10">
+          <g:Label><ui:msg description="Dataset field label">Dataset:</ui:msg></g:Label>
+          <g:ListBox ui:field="datasourceList" />  
+        </g:HorizontalPanel>
+        <g:HorizontalPanel spacing="10">
+          <g:Label><ui:msg description="Tables field label">Tables:</ui:msg></g:Label>
+          <g:ListBox ui:field="tableList" multipleSelect="true" width="20em"/>
+        </g:HorizontalPanel>
+      </g:VerticalPanel>
+    </g:center>
+    <g:south size="5">
+      <g:HTMLPanel addStyleNames="{style.top-border} {style.top-margin}">
+        <span class="{style.right-aligned} {style.top-margin}">
+          <g:Button ui:field="selectButton" />
+          <g:Button ui:field="cancelButton" />
+        </span>
+      </g:HTMLPanel>
+    </g:south> 
+  </g:DockLayoutPanel>
+  
+</ui:UiBinder>
