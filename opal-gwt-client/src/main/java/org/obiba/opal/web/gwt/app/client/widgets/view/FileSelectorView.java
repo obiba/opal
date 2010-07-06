@@ -24,6 +24,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
@@ -139,6 +140,14 @@ public class FileSelectorView extends DialogBox implements Display {
 
   public HasClickHandlers getSelectButton() {
     return selectButton;
+  }
+
+  public HasClickHandlers getCreateFolderButton() {
+    return createFolderButton;
+  }
+
+  public HasText getCreateFolderName() {
+    return createFolderName;
   }
 
   public void startProcessing() {

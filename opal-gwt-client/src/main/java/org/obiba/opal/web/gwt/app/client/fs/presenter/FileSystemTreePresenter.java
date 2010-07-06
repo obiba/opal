@@ -17,6 +17,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.FolderCreationEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.FileDto;
@@ -34,6 +35,8 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
     void initTree(FileDto root);
 
     void addBranch(TreeItem treeItem, FileDto folderToAdd);
+
+    void addBranch(FileDto folderToAdd);
 
     HasSelectionHandlers<TreeItem> getFileSystemTree();
 
@@ -110,7 +113,7 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
 
         eventBus.fireEvent(new FileSystemTreeFolderSelectionChangeEvent(selectedFile));
 
-        if(selectedItem.getChildCount() == 0) {
+        if(childrenNotAdded(selectedItem)) {
           ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta" + selectedFile.getPath()).get().withCallback(new ResourceCallback<FileDto>() {
             @Override
             public void onResource(Response response, FileDto file) {
@@ -120,17 +123,28 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
         }
       }
 
+      private boolean childrenNotAdded(final TreeItem selectedItem) {
+        return selectedItem.getChildCount() == 0;
+      }
+
     });
   }
 
   private void addEventHandlers() {
     super.registerHandler(eventBus.addHandler(FolderSelectionChangeEvent.getType(), new FolderSelectionChangeEvent.Handler() {
 
-      @Override
       public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
         getDisplay().selectTreeItem(event.getFolder());
       }
 
+    }));
+
+    super.registerHandler(eventBus.addHandler(FolderCreationEvent.getType(), new FolderCreationEvent.Handler() {
+
+      public void onFolderCreation(FolderCreationEvent event) {
+        // Refresh the file system since a new folder was added.
+        getDisplay().addBranch(event.getFolder());
+      }
     }));
   }
 }

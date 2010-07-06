@@ -18,6 +18,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.FolderCreationEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.FileDto;
@@ -84,6 +85,14 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
 
       public void onFileUploaded(FileUploadedEvent event) {
         // Refresh the current folder since a new file was probably added to it.
+        refreshDisplay();
+      }
+    }));
+
+    super.registerHandler(eventBus.addHandler(FolderCreationEvent.getType(), new FolderCreationEvent.Handler() {
+
+      public void onFolderCreation(FolderCreationEvent event) {
+        // Refresh the current folder since a new folder was added.
         refreshDisplay();
       }
     }));

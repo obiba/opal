@@ -21,12 +21,18 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.FileSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.FolderCreationEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.FileDto;
 import org.obiba.opal.web.model.client.FileDto.FileType;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
 
@@ -98,6 +104,8 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   @Override
   public void revealDisplay() {
     folderDetailsPresenter.getDisplay().clearSelection(); // clear previous selection (highlighted row)
+    getDisplay().getCreateFolderName().setText(""); // clear previous folder name
+
     getDisplay().setFileSelectionType(fileSelectionType);
     getDisplay().showDialog();
   }
@@ -129,6 +137,13 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   }
 
   private void addEventHandlers() {
+    addFileSelectionHandler(); // handler for file selected in FolderDetails
+    addFolderSelectionHandler(); // handler for folder selected in FileSystemTree
+    addSelectButtonHandler();
+    addCreateFolderButtonHandler();
+  }
+
+  private void addFileSelectionHandler() {
     super.registerHandler(eventBus.addHandler(FileSelectionRequiredEvent.getType(), new FileSelectionRequiredEvent.Handler() {
 
       public void onFileSelectionRequired(FileSelectionRequiredEvent event) {
@@ -139,7 +154,30 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
         revealDisplay();
       }
     }));
+  }
 
+  private void addFolderSelectionHandler() {
+    super.registerHandler(eventBus.addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(), new FileSystemTreeFolderSelectionChangeEvent.Handler() {
+
+      public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
+        selectedFolder = event.getFolder().getPath();
+      }
+    }));
+  }
+
+  private void addCreateFolderButtonHandler() {
+    super.registerHandler(getDisplay().getCreateFolderButton().addClickHandler(new ClickHandler() {
+
+      public void onClick(ClickEvent event) {
+        String newFolder = getDisplay().getCreateFolderName().getText();
+        if(selectedFolder != null && newFolder.trim().length() != 0) {
+          createFolder(selectedFolder + "/" + newFolder);
+        }
+      }
+    }));
+  }
+
+  private void addSelectButtonHandler() {
     super.registerHandler(getDisplay().getSelectButton().addClickHandler(new ClickHandler() {
 
       public void onClick(ClickEvent event) {
@@ -150,13 +188,24 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
         getDisplay().hideDialog();
       }
     }));
+  }
 
-    super.registerHandler(eventBus.addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(), new FileSystemTreeFolderSelectionChangeEvent.Handler() {
+  private void createFolder(final String folder) {
+    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
-      public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
-        selectedFolder = event.getFolder().getPath();
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        if(response.getStatusCode() == 201) {
+          eventBus.fireEvent(new FolderCreationEvent(folder));
+        } else if(response.getStatusCode() == 403) {
+          System.out.println("Folder creation failure (403)");
+        } else if(response.getStatusCode() == 500) {
+          System.out.println("Folder creation failure (500)");
+        }
       }
-    }));
+    };
+
+    ResourceRequestBuilderFactory.newBuilder().forResource("/files" + folder).put().withCallback(201, callbackHandler).withCallback(403, callbackHandler).withCallback(500, callbackHandler).send();
   }
 
   private String getSelection() {
@@ -197,5 +246,9 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     HasWidgets getFolderDetailsPanel();
 
     HasClickHandlers getSelectButton();
+
+    HasClickHandlers getCreateFolderButton();
+
+    HasText getCreateFolderName();
   }
 }

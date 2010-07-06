@@ -9,9 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.view;
 
+import java.util.Iterator;
+
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter.Display;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.FileDto;
+import org.obiba.opal.web.model.client.FileDto.FileType;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
@@ -65,6 +68,25 @@ public class FileSystemTreeView implements Display {
     treeItem.setState(true);
   }
 
+  public void addBranch(FileDto folderToAdd) {
+    FileDto parentDto = FileDto.create();
+    parentDto.setType(FileType.FOLDER);
+
+    int lastPathSeparatorIndex = folderToAdd.getPath().lastIndexOf('/');
+    if(lastPathSeparatorIndex != -1) {
+      parentDto.setPath(folderToAdd.getPath().substring(0, lastPathSeparatorIndex));
+      parentDto.setName(folderToAdd.getPath().substring(lastPathSeparatorIndex + 1));
+    } else {
+      parentDto.setPath(folderToAdd.getPath());
+      parentDto.setName(folderToAdd.getPath());
+    }
+
+    TreeItem parentItem = findTreeItem(parentDto);
+    if(parentItem != null) {
+      parentItem.addItem(createTreeItem(folderToAdd));
+    }
+  }
+
   private TreeItem createTreeItem(FileDto fileItem) {
     final TreeItem item = new TreeItem(fileItem.getName());
     item.setUserObject(fileItem);
@@ -97,7 +119,17 @@ public class FileSystemTreeView implements Display {
         root.getParentItem().setState(true);
       }
     }
-
   }
 
+  private TreeItem findTreeItem(FileDto dto) {
+    Iterator<TreeItem> treeIter = fileSystemTree.treeItemIterator();
+    while(treeIter.hasNext()) {
+      TreeItem item = treeIter.next();
+      if(((FileDto) item.getUserObject()).getPath().equals(dto.getPath())) {
+        return item;
+      }
+    }
+
+    return null;
+  }
 }
