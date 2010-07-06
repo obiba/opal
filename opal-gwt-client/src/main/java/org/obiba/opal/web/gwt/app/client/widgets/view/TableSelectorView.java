@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.view;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter.TableSelectionType;
@@ -20,6 +23,7 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasChangeHandlers;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -184,13 +188,21 @@ public class TableSelectorView extends DialogBox implements TableSelectorPresent
   }
 
   @Override
-  public int getSelectedTableIndex() {
+  public List<Integer> getSelectedTableIndices() {
+    List<Integer> selections = new ArrayList<Integer>();
+
     for(int i = 0; i < tableList.getItemCount(); i++) {
       if(tableList.isItemSelected(i)) {
-        ;
+        selections.add(i);
       }
     }
-    return tableList.getSelectedIndex();
+
+    return selections;
+  }
+
+  @Override
+  public HasClickHandlers getSelectButton() {
+    return selectButton;
   }
 
 }

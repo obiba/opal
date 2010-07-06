@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 
+import java.util.List;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -24,7 +26,10 @@ import org.obiba.opal.web.model.client.TableDto;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasChangeHandlers;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
@@ -140,6 +145,15 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
       }
 
     }));
+
+    super.registerHandler(getDisplay().getSelectButton().addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        // System.out.println(getDisplay().getSelectedDatasourceIndex());
+        // System.out.println(getDisplay().getSelectedTableIndices());
+      }
+    }));
   }
 
   //
@@ -158,9 +172,11 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
 
     HasChangeHandlers getDatasourceList();
 
+    HasClickHandlers getSelectButton();
+
     int getSelectedDatasourceIndex();
 
-    int getSelectedTableIndex();
+    List<Integer> getSelectedTableIndices();
 
     void setTableSelectionType(TableSelectionType mode);
 
