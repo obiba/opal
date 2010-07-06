@@ -45,6 +45,15 @@ public class ApplicationView extends Composite implements ApplicationPresenter.D
   Anchor quit;
 
   @UiField
+  Anchor help;
+
+  @UiField
+  Anchor profile;
+
+  @UiField
+  Anchor studies;
+
+  @UiField
   MenuItem exploreVariablesItem;
 
   @UiField
@@ -113,6 +122,21 @@ public class ApplicationView extends Composite implements ApplicationPresenter.D
   @Override
   public MenuItem getFileExplorer() {
     return fileExplorer;
+  }
+
+  @Override
+  public HasClickHandlers getHelp() {
+    return help;
+  }
+
+  @Override
+  public HasClickHandlers getProfile() {
+    return profile;
+  }
+
+  @Override
+  public HasClickHandlers getStudies() {
+    return studies;
   }
 
 }

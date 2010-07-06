@@ -1,6 +1,12 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
+  <ui:style>
+    .topbar a:hover {
+      cursor: pointer;
+    }
+  </ui:style>
+
   <g:DockLayoutPanel unit="EM">
     <g:north size="4">
       <g:LayoutPanel>
@@ -11,10 +17,10 @@
               cell...
             -->
             <g:Cell horizontalAlignment="ALIGN_RIGHT">
-              <g:HorizontalPanel spacing="10" ui:field="topBar">
-                <g:Anchor><ui:msg description="Studies link text">Studies</ui:msg></g:Anchor>
-                <g:Anchor><ui:msg description="Profile link text">Profile</ui:msg></g:Anchor>
-                <g:Anchor><ui:msg description="Help link text">Help</ui:msg></g:Anchor>
+              <g:HorizontalPanel spacing="10" ui:field="topBar" addStyleNames="{style.topbar}">
+                <g:Anchor ui:field="studies"><ui:msg description="Studies link text">Studies</ui:msg></g:Anchor>
+                <g:Anchor ui:field="profile"><ui:msg description="Profile link text">Profile</ui:msg></g:Anchor>
+                <g:Anchor ui:field="help"><ui:msg description="Help link text">Help</ui:msg></g:Anchor>
                 <g:Anchor ui:field="quit"><ui:msg description="Quit link text">Quit</ui:msg></g:Anchor>
               </g:HorizontalPanel>
             </g:Cell>

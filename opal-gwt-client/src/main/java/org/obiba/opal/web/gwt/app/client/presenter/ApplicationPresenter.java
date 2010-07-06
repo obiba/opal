@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 
@@ -42,6 +43,12 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
   public interface Display extends WidgetDisplay {
 
     HasClickHandlers getQuit();
+
+    HasClickHandlers getHelp();
+
+    HasClickHandlers getProfile();
+
+    HasClickHandlers getStudies();
 
     MenuItem getExploreVariables();
 
@@ -70,6 +77,9 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
   @Inject
   private JobListPresenter jobListPresenter;
+
+  @Inject
+  private TableSelectorPresenter tableSelectorPresenter;
 
   @Inject
   private ErrorDialogPresenter messageDialog;
@@ -143,6 +153,27 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       public void onClick(ClickEvent event) {
         ResourceRequestBuilderFactory.newBuilder().forResource("/auth/session/" + credentials.extractCredentials()).delete().send();
         // Need to send to some type of no-workbench place.
+      }
+    });
+
+    getDisplay().getHelp().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+
+      }
+    });
+
+    getDisplay().getProfile().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+
+      }
+    });
+
+    getDisplay().getStudies().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+
       }
     });
 
