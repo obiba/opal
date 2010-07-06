@@ -66,6 +66,6 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     replay(displayMock, eventBusMock, hasClickHandlerMock);
     presenter.bind();
 
-    verify(displayMock);
+    verify(displayMock, eventBusMock, hasClickHandlerMock);
   }
 }

@@ -58,7 +58,7 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
     replay(displayMock, eventBusMock, hasClickHandlerMock);
     variablePresenter.bind();
 
-    verify(displayMock);
+    verify(displayMock, eventBusMock, hasClickHandlerMock);
   }
 
 }

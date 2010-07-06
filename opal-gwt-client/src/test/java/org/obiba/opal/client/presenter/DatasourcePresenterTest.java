@@ -68,6 +68,6 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
     replay(displayMock, eventBusMock, hasClickHandlerMock);
     datasourcePresenter.bind();
 
-    verify(displayMock, hasClickHandlerMock);
+    verify(displayMock, eventBusMock, hasClickHandlerMock);
   }
 }
