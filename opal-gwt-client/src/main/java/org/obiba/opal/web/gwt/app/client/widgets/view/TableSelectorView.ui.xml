@@ -10,20 +10,40 @@
     .top-margin { margin-top: 1em; }
     .bottom-margin { margin-bottom: 1em; }
     .name-input { width: 90%; }
+    .instructions { font-weight: bold; margin-bottom: 1em; }
   </ui:style>
   
   <g:DockLayoutPanel unit="EM">
     <g:center>
-      <g:VerticalPanel spacing="10">
-        <g:HorizontalPanel spacing="10">
-          <g:Label><ui:msg description="Dataset field label">Dataset:</ui:msg></g:Label>
-          <g:ListBox ui:field="datasourceList" />  
-        </g:HorizontalPanel>
-        <g:HorizontalPanel spacing="10">
-          <g:Label><ui:msg description="Tables field label">Tables:</ui:msg></g:Label>
-          <g:ListBox ui:field="tableList" multipleSelect="true" width="20em"/>
-        </g:HorizontalPanel>
-      </g:VerticalPanel>
+      <g:HTMLPanel width="100%">
+        <table width="100%" class="gwt-KeyValue">
+          <tbody>
+            <tr>
+              <td colspan="2">
+                <g:Label ui:field="instructionsLabel" addStyleNames="{style.instructions}" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <g:Label><ui:msg description="Dataset field label">Dataset:</ui:msg></g:Label>                
+              </td>
+              <td>
+                <g:ListBox ui:field="datasourceList" />
+              </td>
+            </tr>
+            <tr>
+              <td style="vertical-align:top">
+                <g:Label ui:field="tableLabel"/>                
+              </td>
+              <td>
+                <g:SimplePanel ui:field="tablePanel">
+                  <g:ListBox ui:field="tableList" multipleSelect="true" width="20em"/>
+                </g:SimplePanel>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </g:HTMLPanel>
     </g:center>
     <g:south size="5">
       <g:HTMLPanel addStyleNames="{style.top-border} {style.top-margin}">

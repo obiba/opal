@@ -9,16 +9,18 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.event;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter.TableSelectionType;
+import org.obiba.opal.web.model.client.TableDto;
 
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
 /**
- * Event that will be handled by {@link TableSelectorPresenter}.
+ * Event that will be fired by {@link TableSelectorPresenter}.
  */
-public class TableSelectionRequiredEvent extends GwtEvent<TableSelectionRequiredEvent.Handler> {
+public class TableSelectionEvent extends GwtEvent<TableSelectionEvent.Handler> {
   //
   // Static Variables
   //
@@ -29,22 +31,17 @@ public class TableSelectionRequiredEvent extends GwtEvent<TableSelectionRequired
   // Instance Variables
   //
 
-  private Object source;
+  private Object callSource;
 
-  private TableSelectionType tableSelectionType;
+  private List<TableDto> selectedTables;
 
   //
   // Constructors
   //
-
-  public TableSelectionRequiredEvent(Object source) {
-    this(source, TableSelectionType.MULTIPLE);
-  }
-
-  public TableSelectionRequiredEvent(Object source, TableSelectionType tableSelectionType) {
+  public TableSelectionEvent(Object callSource, List<TableDto> selectedTables) {
     super();
-    this.source = source;
-    this.tableSelectionType = tableSelectionType;
+    this.callSource = callSource;
+    this.selectedTables = selectedTables;
   }
 
   //
@@ -53,7 +50,7 @@ public class TableSelectionRequiredEvent extends GwtEvent<TableSelectionRequired
 
   @Override
   protected void dispatch(Handler handler) {
-    handler.onTableSelectionRequired(this);
+    handler.onTableSelection(this);
   }
 
   @Override
@@ -69,13 +66,12 @@ public class TableSelectionRequiredEvent extends GwtEvent<TableSelectionRequired
     return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
   }
 
-  @Override
-  public Object getSource() {
-    return source;
+  public Object getCallSource() {
+    return callSource;
   }
 
-  public TableSelectionType getTableSelectionType() {
-    return tableSelectionType;
+  public List<TableDto> getSelectedTables() {
+    return selectedTables;
   }
 
   //
@@ -84,6 +80,6 @@ public class TableSelectionRequiredEvent extends GwtEvent<TableSelectionRequired
 
   public interface Handler extends EventHandler {
 
-    public void onTableSelectionRequired(TableSelectionRequiredEvent event);
+    public void onTableSelection(TableSelectionEvent event);
   }
 }

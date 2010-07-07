@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.customware.gwt.presenter.client.EventBus;
@@ -17,6 +18,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -46,7 +48,7 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
 
   private JsArray<DatasourceDto> datasources;
 
-  private JsArray<TableDto> tables;
+  private Object callSource;
 
   //
   // Constructors
@@ -72,32 +74,26 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
 
   @Override
   public void revealDisplay() {
-    getDisplay().showDialog();
-  }
-
-  @Override
-  public void refreshDisplay() {
-    refreshDatasources();
-  }
-
-  private void refreshDatasources() {
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
       public void onResource(Response response, JsArray<DatasourceDto> resource) {
         datasources = resource;
-        getDisplay().setDatasources(resource);
-        refreshTables(resource.get(0).getName());
+        getDisplay().setTableSelectionType(tableSelectionType);
+        getDisplay().renderDatasources(resource);
+        getDisplay().showDialog();
       }
 
     }).send();
   }
 
-  private void refreshTables(String datasourceName) {
-    ResourceRequestBuilderFactory.<JsArray<TableDto>> newBuilder().forResource("/datasource/" + datasourceName + "/tables").get().withCallback(new ResourceCallback<JsArray<TableDto>>() {
+  @Override
+  public void refreshDisplay() {
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
-      public void onResource(Response response, JsArray<TableDto> resource) {
-        tables = resource;
-        getDisplay().setTables(resource);
+      public void onResource(Response response, JsArray<DatasourceDto> resource) {
+        datasources = resource;
+        getDisplay().setTableSelectionType(tableSelectionType);
+        getDisplay().renderDatasources(resource);
       }
 
     }).send();
@@ -124,8 +120,8 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
     super.registerHandler(eventBus.addHandler(TableSelectionRequiredEvent.getType(), new TableSelectionRequiredEvent.Handler() {
 
       public void onTableSelectionRequired(TableSelectionRequiredEvent event) {
+        callSource = event.getSource();
         setTableSelectionType(event.getTableSelectionType());
-        refreshDisplay();
         revealDisplay();
       }
     }));
@@ -135,13 +131,7 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
       @Override
       public void onChange(ChangeEvent event) {
         // get selected datasource name
-        int datasourceIndex = getDisplay().getSelectedDatasourceIndex();
-        if(datasourceIndex == -1) {
-          // TODO
-        } else {
-          DatasourceDto selection = datasources.get(datasourceIndex);
-          refreshTables(selection.getName());
-        }
+        getDisplay().renderTables(datasources.get(getDisplay().getSelectedDatasourceIndex()));
       }
 
     }));
@@ -150,8 +140,19 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
 
       @Override
       public void onClick(ClickEvent event) {
-        // System.out.println(getDisplay().getSelectedDatasourceIndex());
-        // System.out.println(getDisplay().getSelectedTableIndices());
+        DatasourceDto selectedDatasource = datasources.get(getDisplay().getSelectedDatasourceIndex());
+        ResourceRequestBuilderFactory.<JsArray<TableDto>> newBuilder().forResource("/datasource/" + selectedDatasource.getName() + "/tables").get().withCallback(new ResourceCallback<JsArray<TableDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<TableDto> resource) {
+            List<TableDto> selectedTables = new ArrayList<TableDto>();
+            // table names and table dtos are both in alphabetical order
+            for(Integer idx : getDisplay().getSelectedTableIndices()) {
+              selectedTables.add(resource.get(idx));
+            }
+            eventBus.fireEvent(new TableSelectionEvent(callSource, selectedTables));
+          }
+
+        }).send();
       }
     }));
   }
@@ -180,9 +181,9 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
 
     void setTableSelectionType(TableSelectionType mode);
 
-    void setDatasources(JsArray<DatasourceDto> datasources);
+    void renderDatasources(JsArray<DatasourceDto> datasources);
 
-    void setTables(JsArray<TableDto> tables);
+    void renderTables(DatasourceDto datasource);
 
   }
 }

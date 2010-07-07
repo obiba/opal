@@ -5,6 +5,7 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FileDownloadPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
 import org.obiba.opal.web.gwt.inject.client.OpalGinjector;
 import org.obiba.opal.web.gwt.rest.client.DefaultResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
@@ -29,6 +30,7 @@ public class GwtApp implements EntryPoint {
     initFileDownloadPresenter();
     initApplicationPresenter();
     initLoginPresenter();
+    initTableSelectorPresenter();
 
     registerHandlers();
   }
@@ -46,7 +48,7 @@ public class GwtApp implements EntryPoint {
     // Only display login if we don't currently have any credentials.
     if(opalGinjector.getRequestCredentials().hasCredentials() == false) {
 
-      loginPresenter.revealDisplay();
+      // loginPresenter.revealDisplay();
     }
   }
 
@@ -54,6 +56,11 @@ public class GwtApp implements EntryPoint {
     FileDownloadPresenter fileDownloadPresenter = opalGinjector.getFileDownloadPresenter();
     fileDownloadPresenter.bind();
     RootLayoutPanel.get().add(fileDownloadPresenter.getDisplay().asWidget());
+  }
+
+  private void initTableSelectorPresenter() {
+    TableSelectorPresenter tableSelectorPresenter = opalGinjector.getTableSelectorPresenter();
+    tableSelectorPresenter.bind();
   }
 
   private void registerHandlers() {

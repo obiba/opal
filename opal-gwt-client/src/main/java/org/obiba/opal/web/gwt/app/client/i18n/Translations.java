@@ -119,6 +119,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Tables")
   String tablesLabel();
 
+  @Description("Table label")
+  @DefaultStringValue("Table")
+  String tableLabel();
+
   @Description("Variables menu item")
   @DefaultStringValue("Variables")
   String variablesLabel();
@@ -178,4 +182,12 @@ public interface Translations extends Constants {
   @Description("Occurrence Group label")
   @DefaultStringValue("Occurrence Group")
   String occurrenceGroupLabel();
+
+  @Description("Multiple table selection instructions")
+  @DefaultStringValue("Select one or more tables:")
+  String multipleTableSelectionInstructionsLabel();
+
+  @Description("Single table selection instructions")
+  @DefaultStringValue("Select one table:")
+  String singleTableSelectionInstructionsLabel();
 }

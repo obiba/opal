@@ -16,7 +16,6 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter.TableSelectionType;
 import org.obiba.opal.web.model.client.DatasourceDto;
-import org.obiba.opal.web.model.client.TableDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -30,7 +29,9 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -41,9 +42,13 @@ public class TableSelectorView extends DialogBox implements TableSelectorPresent
   // Constants
   //
 
-  private static final String DIALOG_HEIGHT = "30em";
+  private static final String DIALOG_HEIGHT_MULTIPLE = "28em";
+
+  private static final String DIALOG_HEIGHT_SINGLE = "12em";
 
   private static final String DIALOG_WIDTH = "30em";
+
+  private static final String TABLE_LIST_WIDTH = "25em";
 
   private static final int VISIBLE_COUNT = 15;
 
@@ -71,7 +76,16 @@ public class TableSelectorView extends DialogBox implements TableSelectorPresent
   @UiField
   Button cancelButton;
 
-  private TableSelectionType tableSelectionType = TableSelectionType.MULTIPLE;
+  @UiField
+  SimplePanel tablePanel;
+
+  @UiField
+  Label instructionsLabel;
+
+  @UiField
+  Label tableLabel;
+
+  private DockLayoutPanel content;
 
   //
   // Constructors
@@ -79,16 +93,14 @@ public class TableSelectorView extends DialogBox implements TableSelectorPresent
 
   public TableSelectorView() {
     setText("Table Selector");
-    setHeight(DIALOG_HEIGHT);
     setWidth(DIALOG_WIDTH);
 
-    DockLayoutPanel content = uiBinder.createAndBindUi(this);
-    content.setHeight(DIALOG_HEIGHT);
+    content = uiBinder.createAndBindUi(this);
     content.setWidth(DIALOG_WIDTH);
     add(content);
 
     datasourceList.setVisibleItemCount(1);
-    tableList.setVisibleItemCount(VISIBLE_COUNT);
+    initContent();
 
     selectButton.setText("Select");
     cancelButton.setText("Cancel");
@@ -113,27 +125,31 @@ public class TableSelectorView extends DialogBox implements TableSelectorPresent
 
   @Override
   public void setTableSelectionType(TableSelectionType mode) {
-    this.tableSelectionType = mode;
-    if(mode.equals(TableSelectionType.SINGLE)) {
-      tableList.setVisibleItemCount(1);
-    } else {
-      tableList.setVisibleItemCount(VISIBLE_COUNT);
+    // tableList.setVisibleItemCount(1) does not work as supposed to
+    if(mode.equals(TableSelectionType.MULTIPLE) != tableList.isMultipleSelect()) {
+      ListBox newTableList = new ListBox(mode.equals(TableSelectionType.MULTIPLE));
+      tablePanel.setWidget(newTableList);
+      tableList = newTableList;
+      initContent();
     }
   }
 
   @Override
-  public void setDatasources(JsArray<DatasourceDto> datasources) {
+  public void renderDatasources(JsArray<DatasourceDto> datasources) {
     datasourceList.clear();
     for(int i = 0; i < datasources.length(); i++) {
       datasourceList.addItem(datasources.get(i).getName());
     }
+    if(datasources.length() > 0) {
+      renderTables(datasources.get(0));
+    }
   }
 
   @Override
-  public void setTables(JsArray<TableDto> tables) {
+  public void renderTables(DatasourceDto datasource) {
     tableList.clear();
-    for(int i = 0; i < tables.length(); i++) {
-      tableList.addItem(tables.get(i).getName());
+    for(int i = 0; i < datasource.getTableArray().length(); i++) {
+      tableList.addItem(datasource.getTableArray().get(i));
     }
   }
 
@@ -150,6 +166,20 @@ public class TableSelectorView extends DialogBox implements TableSelectorPresent
   //
   // Methods
   //
+
+  private void initContent() {
+    if(tableList.isMultipleSelect()) {
+      tableList.setVisibleItemCount(VISIBLE_COUNT);
+      tableList.setWidth(TABLE_LIST_WIDTH);
+      instructionsLabel.setText(translations.multipleTableSelectionInstructionsLabel());
+      tableLabel.setText(translations.tablesLabel() + ":");
+    } else {
+      instructionsLabel.setText(translations.singleTableSelectionInstructionsLabel());
+      tableLabel.setText(translations.tableLabel() + ":");
+    }
+    setHeight(tableList.isMultipleSelect() ? DIALOG_HEIGHT_MULTIPLE : DIALOG_HEIGHT_SINGLE);
+    content.setHeight(tableList.isMultipleSelect() ? DIALOG_HEIGHT_MULTIPLE : DIALOG_HEIGHT_SINGLE);
+  }
 
   private void addCancelHandler() {
     selectButton.addClickHandler(new ClickHandler() {
