@@ -17,11 +17,12 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.resources.OpalResources;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 
@@ -61,10 +62,15 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
     MenuItem getListJobsItem();
 
     MenuItem getFileExplorer();
+
+    MenuItem getDashboardItem();
   }
 
   @Inject
   private RequestCredentials credentials;
+
+  @Inject
+  private Provider<DashboardPresenter> dashboardPresenter;
 
   @Inject
   private Provider<NavigatorPresenter> navigationPresenter;
@@ -77,9 +83,6 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
   @Inject
   private JobListPresenter jobListPresenter;
-
-  @Inject
-  private TableSelectorPresenter tableSelectorPresenter;
 
   @Inject
   private ErrorDialogPresenter messageDialog;
@@ -98,6 +101,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
   @Inject
   public ApplicationPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
+    OpalResources.INSTANCE.css().ensureInjected();
   }
 
   @Override
@@ -107,6 +111,14 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
   @Override
   protected void onBind() {
+
+    getDisplay().getDashboardItem().setCommand(new Command() {
+
+      @Override
+      public void execute() {
+        eventBus.fireEvent(new WorkbenchChangeEvent(dashboardPresenter.get()));
+      }
+    });
 
     getDisplay().getExploreVariables().setCommand(new Command() {
 
@@ -180,6 +192,8 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
     registerWorkbenchChangeEventHandler();
 
     registerUserMessageEventHandler();
+
+    updateWorkbench(dashboardPresenter.get());
   }
 
   @Override
@@ -203,16 +217,20 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
       @Override
       public void onWorkbenchChanged(WorkbenchChangeEvent event) {
-        if(workbench != null) {
-          workbench.unbind();
-        }
-        workbench = event.getWorkbench();
-        workbench.bind();
-        WidgetDisplay wd = (WidgetDisplay) workbench.getDisplay();
-        getDisplay().updateWorkbench(wd.asWidget());
-        workbench.revealDisplay();
+        updateWorkbench(event.getWorkbench());
       }
     }));
+  }
+
+  private void updateWorkbench(WidgetPresenter<?> newWorkbench) {
+    if(workbench != null) {
+      workbench.unbind();
+    }
+    workbench = newWorkbench;
+    workbench.bind();
+    WidgetDisplay wd = (WidgetDisplay) workbench.getDisplay();
+    getDisplay().updateWorkbench(wd.asWidget());
+    workbench.revealDisplay();
   }
 
   private void registerUserMessageEventHandler() {

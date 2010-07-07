@@ -54,6 +54,9 @@ public class ApplicationView extends Composite implements ApplicationPresenter.D
   Anchor studies;
 
   @UiField
+  MenuItem dashboardItem;
+
+  @UiField
   MenuItem exploreVariablesItem;
 
   @UiField
@@ -73,6 +76,11 @@ public class ApplicationView extends Composite implements ApplicationPresenter.D
 
   public ApplicationView() {
     initWidget(uiBinder.createAndBindUi(this));
+  }
+
+  @Override
+  public MenuItem getDashboardItem() {
+    return dashboardItem;
   }
 
   @Override

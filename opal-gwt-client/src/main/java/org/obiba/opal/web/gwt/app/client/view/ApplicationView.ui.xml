@@ -29,6 +29,9 @@
 
         <g:layer bottom="0" height="2em">
           <g:MenuBar ui:field="menuBar">
+            <g:MenuItem  ui:field="dashboardItem">
+              <ui:msg description="Dashboard menu item">Dashboard</ui:msg>              
+            </g:MenuItem>
             <g:MenuItem>
               <ui:msg description="Variables menu item">Variables</ui:msg>              
               <g:MenuBar vertical="true">

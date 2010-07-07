@@ -7,3 +7,7 @@ table.folder-details td:first-child span.file {
 table.folder-details td:first-child span.file:hover {
   cursor: pointer;
 }
+
+.gwt-MenuBar .gwt-MenuItem {
+  cursor:pointer;
+}
