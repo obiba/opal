@@ -32,10 +32,21 @@
             <ui:msg description="File Explorer label">File Explorer</ui:msg>
           </g:Label>
         </g:center>
-        <g:east size="75" horizontalAlignment="ALIGN_RIGHT">
-          <g:Button addStyleNames="{style.actionButton}" ui:field="fileUploadButton">
-            <ui:msg description="Upload File label">Upload</ui:msg>
-          </g:Button>
+        <g:east size="360" horizontalAlignment="ALIGN_RIGHT">
+          <g:FlowPanel>
+            <g:Button addStyleNames="{style.actionButton}" ui:field="createFolderButton">
+              <ui:msg description="Create Folder label">Create Folder</ui:msg>
+            </g:Button>          
+            <g:Button addStyleNames="{style.actionButton}" ui:field="fileUploadButton">
+              <ui:msg description="Upload File label">Upload</ui:msg>
+            </g:Button>
+            <g:Button addStyleNames="{style.actionButton}" ui:field="fileDownloadButton">
+              <ui:msg description="Download File label">Download</ui:msg>
+            </g:Button>
+            <g:Button addStyleNames="{style.actionButton}" ui:field="fileDeleteButton">
+              <ui:msg description="Delete File label">Delete</ui:msg>
+            </g:Button>
+          </g:FlowPanel>
         </g:east>
       </g:DockLayoutPanel>
     </g:north>

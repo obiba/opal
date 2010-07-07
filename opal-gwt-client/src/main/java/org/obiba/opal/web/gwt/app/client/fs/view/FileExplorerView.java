@@ -24,6 +24,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class FileExplorerView extends Composite implements Display {
 
+  private static FileExplorerUiBinder uiBinder = GWT.create(FileExplorerUiBinder.class);
+
   @UiTemplate("FileExplorerView.ui.xml")
   interface FileExplorerUiBinder extends UiBinder<DockLayoutPanel, FileExplorerView> {
   }
@@ -37,23 +39,29 @@ public class FileExplorerView extends Composite implements Display {
   @UiField
   Button fileUploadButton;
 
-  private static FileExplorerUiBinder uiBinder = GWT.create(FileExplorerUiBinder.class);
+  @UiField
+  Button fileDeleteButton;
+
+  @UiField
+  Button fileDownloadButton;
+
+  @UiField
+  Button createFolderButton;
 
   public FileExplorerView() {
     initWidget(uiBinder.createAndBindUi(this));
   }
 
-  @Override
-  public Widget asWidget() {
-    return this;
+  public Button getFileDeleteButton() {
+    return fileDeleteButton;
   }
 
-  @Override
-  public void startProcessing() {
+  public Button getFileDownloadButton() {
+    return fileDownloadButton;
   }
 
-  @Override
-  public void stopProcessing() {
+  public Button getCreateFolderButton() {
+    return createFolderButton;
   }
 
   @Override
@@ -69,6 +77,19 @@ public class FileExplorerView extends Composite implements Display {
   @Override
   public HasClickHandlers getFileUploadButton() {
     return fileUploadButton;
+  }
+
+  @Override
+  public Widget asWidget() {
+    return this;
+  }
+
+  @Override
+  public void startProcessing() {
+  }
+
+  @Override
+  public void stopProcessing() {
   }
 
 }
