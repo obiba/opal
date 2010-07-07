@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.FileSelectionHandler;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.HasFileSelectionHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.resources.OpalResources;
@@ -85,6 +84,10 @@ public class FolderDetailsView extends Composite implements Display {
     table.setData(0, fileCount, sortFileList(JsArrays.toList(children, 0, fileCount)));
   }
 
+  public void addFileSelectionHandler(FileSelectionHandler fileSelectionHandler) {
+    fileNameColumn.addFileSelectionHandler(fileSelectionHandler);
+  }
+
   @Override
   public Widget asWidget() {
     return this;
@@ -96,11 +99,6 @@ public class FolderDetailsView extends Composite implements Display {
 
   @Override
   public void stopProcessing() {
-  }
-
-  @Override
-  public HasFileSelectionHandlers getFileNameColumn() {
-    return fileNameColumn;
   }
 
   private void initTable() {
@@ -206,7 +204,7 @@ public class FolderDetailsView extends Composite implements Display {
     return sortedList;
   }
 
-  private abstract class FileNameColumn extends Column<FileDto, String> implements HasFileSelectionHandlers {
+  private abstract class FileNameColumn extends Column<FileDto, String> {
 
     private List<FileSelectionHandler> fileSelectionHandlers;
 
@@ -223,10 +221,6 @@ public class FolderDetailsView extends Composite implements Display {
         }
       });
     }
-
-    //
-    // HasFileSelectionHandler Methods
-    //
 
     public void addFileSelectionHandler(final FileSelectionHandler handler) {
       fileSelectionHandlers.add(handler);

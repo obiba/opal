@@ -37,12 +37,7 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
 
     void renderRows(FileDto rows);
 
-    HasFileSelectionHandlers getFileNameColumn();
-  }
-
-  public interface HasFileSelectionHandlers {
-
-    public void addFileSelectionHandler(FileSelectionHandler selectionHandler);
+    void addFileSelectionHandler(FileSelectionHandler fileSelectionHandler);
   }
 
   public interface FileSelectionHandler {
@@ -64,7 +59,7 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
   @Override
   protected void onBind() {
 
-    super.getDisplay().getFileNameColumn().addFileSelectionHandler(new FileSelectionHandler() {
+    super.getDisplay().addFileSelectionHandler(new FileSelectionHandler() {
 
       public void onFileSelection(FileDto fileDto) {
         if(!fileDto.getType().isFileType(FileType.FILE)) {

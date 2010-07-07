@@ -29,7 +29,7 @@ import org.obiba.opal.web.model.client.FileDto.FileType;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -69,13 +69,10 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     this.folderDetailsPresenter = folderDetailsPresenter;
     this.folderDetailsPresenter.getDisplay().setSelectionEnabled(true);
 
-    getDisplay().getFileSystemTreePanel().clear();
-    getDisplay().getFileSystemTreePanel().add(fileSystemTreePresenter.getDisplay().asWidget());
+    getDisplay().setTreeDisplay(fileSystemTreePresenter.getDisplay());
+    getDisplay().setDetailsDisplay(folderDetailsPresenter.getDisplay());
 
-    getDisplay().getFolderDetailsPanel().clear();
-    getDisplay().getFolderDetailsPanel().add(folderDetailsPresenter.getDisplay().asWidget());
-
-    folderDetailsPresenter.getDisplay().getFileNameColumn().addFileSelectionHandler(new FileSelectionHandler() {
+    folderDetailsPresenter.getDisplay().addFileSelectionHandler(new FileSelectionHandler() {
 
       public void onFileSelection(FileDto fileDto) {
         if(fileDto.getType().isFileType(FileType.FILE)) {
@@ -103,10 +100,14 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
   @Override
   public void revealDisplay() {
+    // Clear previous state.
     folderDetailsPresenter.getDisplay().clearSelection(); // clear previous selection (highlighted row)
-    getDisplay().getCreateFolderName().setText(""); // clear previous folder name
+    getDisplay().clearNewFolderName(); // clear previous new folder name
 
-    getDisplay().setFileSelectionType(fileSelectionType);
+    // Adjust display based on file selection type.
+    getDisplay().setNewFilePanelVisible(allowsFileCreation());
+    getDisplay().setNewFolderPanelVisible(allowsFolderCreation());
+
     getDisplay().showDialog();
   }
 
@@ -134,6 +135,14 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
   public void setFileSelectionType(FileSelectionType fileSelectionType) {
     this.fileSelectionType = fileSelectionType;
+  }
+
+  public boolean allowsFileCreation() {
+    return fileSelectionType.equals(FileSelectionType.FILE);
+  }
+
+  public boolean allowsFolderCreation() {
+    return fileSelectionType.equals(FileSelectionType.FILE) || fileSelectionType.equals(FileSelectionType.FOLDER);
   }
 
   private void addEventHandlers() {
@@ -166,7 +175,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   }
 
   private void addCreateFolderButtonHandler() {
-    super.registerHandler(getDisplay().getCreateFolderButton().addClickHandler(new ClickHandler() {
+    super.registerHandler(getDisplay().addCreateFolderButtonHandler(new ClickHandler() {
 
       public void onClick(ClickEvent event) {
         String newFolder = getDisplay().getCreateFolderName().getText();
@@ -178,7 +187,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   }
 
   private void addSelectButtonHandler() {
-    super.registerHandler(getDisplay().getSelectButton().addClickHandler(new ClickHandler() {
+    super.registerHandler(getDisplay().addSelectButtonHandler(new ClickHandler() {
 
       public void onClick(ClickEvent event) {
         String selection = getSelection();
@@ -239,15 +248,23 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
     void hideDialog();
 
-    void setFileSelectionType(FileSelectionType mode);
+    void setTreeDisplay(FileSystemTreePresenter.Display treeDisplay);
+
+    void setDetailsDisplay(FolderDetailsPresenter.Display detailsDisplay);
+
+    void setNewFilePanelVisible(boolean visible);
+
+    void setNewFolderPanelVisible(boolean visible);
+
+    void clearNewFolderName();
 
     HasWidgets getFileSystemTreePanel();
 
     HasWidgets getFolderDetailsPanel();
 
-    HasClickHandlers getSelectButton();
+    HandlerRegistration addSelectButtonHandler(ClickHandler handler);
 
-    HasClickHandlers getCreateFolderButton();
+    HandlerRegistration addCreateFolderButtonHandler(ClickHandler handler);
 
     HasText getCreateFolderName();
   }

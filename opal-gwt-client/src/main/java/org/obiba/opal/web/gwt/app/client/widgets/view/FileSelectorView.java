@@ -9,14 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.view;
 
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -85,8 +86,6 @@ public class FileSelectorView extends DialogBox implements Display {
   @UiField
   Button cancelButton;
 
-  private FileSelectionType fileSelectionType = FileSelectionType.FILE;
-
   //
   // Constructors
   //
@@ -115,9 +114,6 @@ public class FileSelectorView extends DialogBox implements Display {
 
   @Override
   public void showDialog() {
-    namePanel.setVisible(fileSelectionType.equals(FileSelectionType.FILE));
-    createFolderPanel.setVisible(fileSelectionType.equals(FileSelectionType.FILE) || fileSelectionType.equals(FileSelectionType.FOLDER));
-
     center();
     show();
   }
@@ -126,8 +122,26 @@ public class FileSelectorView extends DialogBox implements Display {
     hide();
   }
 
-  public void setFileSelectionType(FileSelectionType fileSelectionType) {
-    this.fileSelectionType = fileSelectionType;
+  public void setTreeDisplay(FileSystemTreePresenter.Display treeDisplay) {
+    getFileSystemTreePanel().clear();
+    getFileSystemTreePanel().add(treeDisplay.asWidget());
+  }
+
+  public void setDetailsDisplay(FolderDetailsPresenter.Display detailsDisplay) {
+    getFolderDetailsPanel().clear();
+    getFolderDetailsPanel().add(detailsDisplay.asWidget());
+  }
+
+  public void setNewFilePanelVisible(boolean visible) {
+    namePanel.setVisible(visible);
+  }
+
+  public void setNewFolderPanelVisible(boolean visible) {
+    createFolderPanel.setVisible(visible);
+  }
+
+  public void clearNewFolderName() {
+    createFolderName.setText("");
   }
 
   public HasWidgets getFileSystemTreePanel() {
@@ -138,12 +152,12 @@ public class FileSelectorView extends DialogBox implements Display {
     return folderDetailsPanel;
   }
 
-  public HasClickHandlers getSelectButton() {
-    return selectButton;
+  public HandlerRegistration addSelectButtonHandler(ClickHandler handler) {
+    return selectButton.addClickHandler(handler);
   }
 
-  public HasClickHandlers getCreateFolderButton() {
-    return createFolderButton;
+  public HandlerRegistration addCreateFolderButtonHandler(ClickHandler handler) {
+    return createFolderButton.addClickHandler(handler);
   }
 
   public HasText getCreateFolderName() {
