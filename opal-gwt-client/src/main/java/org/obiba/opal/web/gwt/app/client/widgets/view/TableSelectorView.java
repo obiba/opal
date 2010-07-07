@@ -48,7 +48,7 @@ public class TableSelectorView extends DialogBox implements TableSelectorPresent
 
   private static final String DIALOG_WIDTH = "30em";
 
-  private static final String TABLE_LIST_WIDTH = "25em";
+  private static final String TABLE_LIST_WIDTH = "20em";
 
   private static final int VISIBLE_COUNT = 15;
 
@@ -92,7 +92,7 @@ public class TableSelectorView extends DialogBox implements TableSelectorPresent
   //
 
   public TableSelectorView() {
-    setText("Table Selector");
+    setText(translations.tableSelectorTitle());
     setWidth(DIALOG_WIDTH);
 
     content = uiBinder.createAndBindUi(this);
@@ -101,9 +101,6 @@ public class TableSelectorView extends DialogBox implements TableSelectorPresent
 
     datasourceList.setVisibleItemCount(1);
     initContent();
-
-    selectButton.setText("Select");
-    cancelButton.setText("Cancel");
 
     addCancelHandler();
   }

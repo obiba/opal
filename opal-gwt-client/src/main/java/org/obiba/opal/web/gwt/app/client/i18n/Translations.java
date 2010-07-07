@@ -190,4 +190,12 @@ public interface Translations extends Constants {
   @Description("Single table selection instructions")
   @DefaultStringValue("Select one table:")
   String singleTableSelectionInstructionsLabel();
+
+  @Description("Datasource label")
+  @DefaultStringValue("Dataset")
+  String datasourceLabel();
+
+  @Description("Table selector title")
+  @DefaultStringValue("Table selector")
+  String tableSelectorTitle();
 }

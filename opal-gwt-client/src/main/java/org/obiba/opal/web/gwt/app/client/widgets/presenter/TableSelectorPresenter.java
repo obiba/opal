@@ -141,18 +141,20 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
       @Override
       public void onClick(ClickEvent event) {
         DatasourceDto selectedDatasource = datasources.get(getDisplay().getSelectedDatasourceIndex());
-        ResourceRequestBuilderFactory.<JsArray<TableDto>> newBuilder().forResource("/datasource/" + selectedDatasource.getName() + "/tables").get().withCallback(new ResourceCallback<JsArray<TableDto>>() {
-          @Override
-          public void onResource(Response response, JsArray<TableDto> resource) {
-            List<TableDto> selectedTables = new ArrayList<TableDto>();
-            // table names and table dtos are both in alphabetical order
-            for(Integer idx : getDisplay().getSelectedTableIndices()) {
-              selectedTables.add(resource.get(idx));
+        if(getDisplay().getSelectedTableIndices().size() > 0) {
+          ResourceRequestBuilderFactory.<JsArray<TableDto>> newBuilder().forResource("/datasource/" + selectedDatasource.getName() + "/tables").get().withCallback(new ResourceCallback<JsArray<TableDto>>() {
+            @Override
+            public void onResource(Response response, JsArray<TableDto> resource) {
+              List<TableDto> selectedTables = new ArrayList<TableDto>();
+              // table names and table dtos are both in alphabetical order
+              for(Integer idx : getDisplay().getSelectedTableIndices()) {
+                selectedTables.add(resource.get(idx));
+              }
+              eventBus.fireEvent(new TableSelectionEvent(callSource, selectedTables));
             }
-            eventBus.fireEvent(new TableSelectionEvent(callSource, selectedTables));
-          }
 
-        }).send();
+          }).send();
+        }
       }
     }));
   }
