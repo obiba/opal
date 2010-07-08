@@ -43,6 +43,14 @@
                 </g:SimplePanel>
               </td>
             </tr>
+            <tr>
+              <td>
+                                
+              </td>
+              <td>
+                <g:CheckBox ui:field="selectAllCheckbox"/>
+              </td>
+            </tr>
           </tbody>
         </table>
       </g:HTMLPanel>

@@ -18,7 +18,8 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresente
 import org.obiba.opal.web.model.client.DatasourceDto;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasChangeHandlers;
@@ -27,6 +28,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -42,7 +44,7 @@ public class TableSelectorView extends DialogBox implements TableSelectorPresent
   // Constants
   //
 
-  private static final String DIALOG_HEIGHT_MULTIPLE = "25em";
+  private static final String DIALOG_HEIGHT_MULTIPLE = "26em";
 
   private static final String DIALOG_HEIGHT_SINGLE = "12em";
 
@@ -85,6 +87,9 @@ public class TableSelectorView extends DialogBox implements TableSelectorPresent
   @UiField
   Label tableLabel;
 
+  @UiField
+  CheckBox selectAllCheckbox;
+
   private DockLayoutPanel content;
 
   //
@@ -99,10 +104,11 @@ public class TableSelectorView extends DialogBox implements TableSelectorPresent
     content.setWidth(DIALOG_WIDTH);
     add(content);
 
+    selectAllCheckbox.setText(translations.selectAllLabel());
     datasourceList.setVisibleItemCount(1);
     initContent();
 
-    addCancelHandler();
+    addHandlers();
   }
 
   //
@@ -132,12 +138,12 @@ public class TableSelectorView extends DialogBox implements TableSelectorPresent
   }
 
   @Override
-  public void renderDatasources(JsArray<DatasourceDto> datasources) {
+  public void renderDatasources(List<DatasourceDto> datasources) {
     datasourceList.clear();
-    for(int i = 0; i < datasources.length(); i++) {
-      datasourceList.addItem(datasources.get(i).getName());
+    for(DatasourceDto d : datasources) {
+      datasourceList.addItem(d.getName());
     }
-    if(datasources.length() > 0) {
+    if(datasources.size() > 0) {
       renderTables(datasources.get(0));
     }
   }
@@ -145,6 +151,7 @@ public class TableSelectorView extends DialogBox implements TableSelectorPresent
   @Override
   public void renderTables(DatasourceDto datasource) {
     tableList.clear();
+    selectAllCheckbox.setValue(false);
     for(int i = 0; i < datasource.getTableArray().length(); i++) {
       tableList.addItem(datasource.getTableArray().get(i));
     }
@@ -170,15 +177,41 @@ public class TableSelectorView extends DialogBox implements TableSelectorPresent
       tableList.setWidth(TABLE_LIST_WIDTH);
       instructionsLabel.setText(translations.multipleTableSelectionInstructionsLabel());
       tableLabel.setText(translations.tablesLabel() + ":");
+      selectAllCheckbox.setVisible(true);
     } else {
       instructionsLabel.setText(translations.singleTableSelectionInstructionsLabel());
       tableLabel.setText(translations.tableLabel() + ":");
+      selectAllCheckbox.setVisible(false);
     }
     setHeight(tableList.isMultipleSelect() ? DIALOG_HEIGHT_MULTIPLE : DIALOG_HEIGHT_SINGLE);
     content.setHeight(tableList.isMultipleSelect() ? DIALOG_HEIGHT_MULTIPLE : DIALOG_HEIGHT_SINGLE);
   }
 
-  private void addCancelHandler() {
+  private void addHandlers() {
+    selectAllCheckbox.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        if(selectAllCheckbox.getValue()) {
+          for(int i = 0; i < tableList.getItemCount(); i++) {
+            tableList.setItemSelected(i, true);
+          }
+        } else {
+          for(int i = 0; i < tableList.getItemCount(); i++) {
+            tableList.setItemSelected(i, false);
+          }
+        }
+      }
+    });
+
+    tableList.addChangeHandler(new ChangeHandler() {
+
+      @Override
+      public void onChange(ChangeEvent event) {
+        selectAllCheckbox.setValue(false);
+      }
+    });
+
     selectButton.addClickHandler(new ClickHandler() {
 
       @Override

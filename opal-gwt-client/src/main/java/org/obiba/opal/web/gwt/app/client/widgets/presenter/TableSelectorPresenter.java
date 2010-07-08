@@ -46,7 +46,7 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
 
   private TableSelectionType tableSelectionType = TableSelectionType.MULTIPLE;
 
-  private JsArray<DatasourceDto> datasources;
+  private List<DatasourceDto> datasources;
 
   private Object callSource;
 
@@ -77,9 +77,10 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
       public void onResource(Response response, JsArray<DatasourceDto> resource) {
-        datasources = resource;
+        initDatasource(resource);
+
         getDisplay().setTableSelectionType(tableSelectionType);
-        getDisplay().renderDatasources(resource);
+        getDisplay().renderDatasources(datasources);
         getDisplay().showDialog();
       }
 
@@ -91,9 +92,10 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
       public void onResource(Response response, JsArray<DatasourceDto> resource) {
-        datasources = resource;
+        initDatasource(resource);
+
         getDisplay().setTableSelectionType(tableSelectionType);
-        getDisplay().renderDatasources(resource);
+        getDisplay().renderDatasources(datasources);
       }
 
     }).send();
@@ -114,6 +116,16 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
 
   public void setTableSelectionType(TableSelectionType tableSelectionType) {
     this.tableSelectionType = tableSelectionType;
+  }
+
+  private void initDatasource(JsArray<DatasourceDto> resource) {
+    datasources = new ArrayList<DatasourceDto>();
+    for(int i = 0; i < resource.length(); i++) {
+      DatasourceDto d = resource.get(i);
+      if(d.getTableArray().length() > 0) {
+        datasources.add(d);
+      }
+    }
   }
 
   private void addEventHandlers() {
@@ -183,7 +195,7 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
 
     void setTableSelectionType(TableSelectionType mode);
 
-    void renderDatasources(JsArray<DatasourceDto> datasources);
+    void renderDatasources(List<DatasourceDto> datasources);
 
     void renderTables(DatasourceDto datasource);
 

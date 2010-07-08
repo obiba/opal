@@ -198,4 +198,8 @@ public interface Translations extends Constants {
   @Description("Table selector title")
   @DefaultStringValue("Table selector")
   String tableSelectorTitle();
+
+  @Description("Select all label")
+  @DefaultStringValue("select all")
+  String selectAllLabel();
 }
