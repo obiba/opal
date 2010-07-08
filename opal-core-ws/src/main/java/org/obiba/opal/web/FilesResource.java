@@ -116,11 +116,6 @@ public class FilesResource {
   }
 
   private Response getFolder(FileObject folder) throws IOException {
-    FileObject[] files = folder.getChildren();
-    if(files.length == 0) {
-      return Response.status(Status.NO_CONTENT).entity("Cannot download the following folder content, because the folder contains no file : " + folder.getName().getPath()).build();
-    }
-
     SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
     String folderName = folder.getName().getBaseName();
     File compressedFolder = new File(System.getProperty("java.io.tmpdir"), (folderName.equals("") ? "filesystem" : folderName) + "_" + dateTimeFormatter.format(System.currentTimeMillis()) + ".zip");
@@ -264,21 +259,31 @@ public class FilesResource {
       return getPathNotExistResponse(path);
     }
 
-    // The path refers to a folder that contains one or many files.
+    // The path refers to a folder that contains one or many files or subfolders.
     if(file.getType() == FileType.FOLDER && file.getChildren().length > 0) {
-      return Response.status(Status.FORBIDDEN).entity("This folder contains one or many file(s) and as a result cannot be deleted: " + path).build();
+      return Response.status(Status.FORBIDDEN).entity("cannotDeleteNotEmptyFolder").build();
+      // return
+      // Response.status(Status.FORBIDDEN).entity("This folder contains one or many file(s) and as a result cannot be deleted: "
+      // + path).build();
     }
 
     // Read-only file or folder.
     if(!file.isWriteable()) {
-      return Response.status(Status.FORBIDDEN).entity("Could delete the following file or folder because it is read-only: " + path).build();
+      // return
+      // Response.status(Status.FORBIDDEN).entity("Could delete the following file or folder because it is read-only: "
+      // + path).build();
+      return Response.status(Status.FORBIDDEN).entity("cannotDeleteReadOnlyFile").build();
     }
 
     try {
       file.delete();
-      return Response.ok("The following file or folder has been deleted : " + path).build();
+      return Response.ok("fileSuccessfullyDeleted").build();
+      // return Response.ok("The following file or folder has been deleted : " + path).build();
     } catch(FileSystemException couldNotDeleteFile) {
-      return Response.status(Status.INTERNAL_SERVER_ERROR).entity("There was an error while deleting the following file or folder: " + path).build();
+      return Response.status(Status.INTERNAL_SERVER_ERROR).entity("couldNotDeleteFileError").build();
+      // return
+      // Response.status(Status.INTERNAL_SERVER_ERROR).entity("There was an error while deleting the following file or folder: "
+      // + path).build();
     }
   }
 
@@ -312,8 +317,12 @@ public class FilesResource {
   }
 
   private void addFolder(FileObject folder, ZipOutputStream outputStream) throws IOException {
-    FileObject[] files = folder.getChildren();
 
+    // Add the folder.
+    outputStream.putNextEntry(new ZipEntry(folder.getName().getPath().substring(1) + "/"));
+
+    // Add its children files and subfolders.
+    FileObject[] files = folder.getChildren();
     for(int i = 0; i < files.length; i++) {
       if(files[i].getType() == FileType.FOLDER) {
         addFolder(files[i], outputStream);
