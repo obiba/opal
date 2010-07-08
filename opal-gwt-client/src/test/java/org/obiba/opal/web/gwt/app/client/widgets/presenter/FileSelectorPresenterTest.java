@@ -28,10 +28,13 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionC
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.FileSelectionHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.SelectButtonHandler;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.user.client.ui.HasText;
@@ -233,6 +236,29 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     assertEquals(null, place);
   }
 
+  @Test
+  public void testOnSelectButtonClicked_FiresFileSelectionEvent() {
+    // Setup
+    eventBusMock.fireEvent(isA(FileSelectionEvent.class));
+    expectLastCall().once();
+
+    displayMock.hideDialog();
+    expectLastCall().once();
+
+    replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
+
+    FileSelectorPresenter presenter = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter);
+    presenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
+    presenter.selectedFile = "someFile.txt";
+
+    // Exercise
+    SelectButtonHandler sut = presenter.new SelectButtonHandler();
+    sut.onClick(new TestClickEvent());
+
+    // Verify
+    verify(eventBusMock, displayMock);
+  }
+
   //
   // Helper Methods
   //
@@ -355,5 +381,8 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     public int getBindCount() {
       return bindCount;
     }
+  }
+
+  private static class TestClickEvent extends ClickEvent {
   }
 }

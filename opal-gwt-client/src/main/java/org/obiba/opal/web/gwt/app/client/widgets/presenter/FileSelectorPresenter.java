@@ -53,9 +53,9 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
   private FileSelectionType fileSelectionType = FileSelectionType.FILE;
 
-  private String selectedFile;
+  String selectedFile;
 
-  private String selectedFolder;
+  String selectedFolder;
 
   //
   // Constructors
@@ -72,14 +72,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     getDisplay().setTreeDisplay(fileSystemTreePresenter.getDisplay());
     getDisplay().setDetailsDisplay(folderDetailsPresenter.getDisplay());
 
-    folderDetailsPresenter.getDisplay().addFileSelectionHandler(new FileSelectionHandler() {
-
-      public void onFileSelection(FileDto fileDto) {
-        if(fileDto.getType().isFileType(FileType.FILE)) {
-          selectedFile = fileDto.getPath();
-        }
-      }
-    });
+    folderDetailsPresenter.getDisplay().addFileSelectionHandler(new InternalFileSelectionHandler());
   }
 
   //
@@ -159,50 +152,19 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   }
 
   private void addFileSelectionRequiredHandler() {
-    super.registerHandler(eventBus.addHandler(FileSelectionRequiredEvent.getType(), new FileSelectionRequiredEvent.Handler() {
-
-      public void onFileSelectionRequired(FileSelectionRequiredEvent event) {
-        selectedFile = selectedFolder = null; // clear previous selection
-        setFileSelectionSource(event.getSource());
-        setFileSelectionType(event.getFileSelectionType());
-        refreshDisplay();
-        revealDisplay();
-      }
-    }));
+    super.registerHandler(eventBus.addHandler(FileSelectionRequiredEvent.getType(), new FileSelectionRequiredHandler()));
   }
 
   private void addFolderSelectionHandler() {
-    super.registerHandler(eventBus.addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(), new FileSystemTreeFolderSelectionChangeEvent.Handler() {
-
-      public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
-        selectedFolder = event.getFolder().getPath();
-      }
-    }));
+    super.registerHandler(eventBus.addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(), new FolderSelectionHandler()));
   }
 
   private void addCreateFolderButtonHandler() {
-    super.registerHandler(getDisplay().addCreateFolderButtonHandler(new ClickHandler() {
-
-      public void onClick(ClickEvent event) {
-        String newFolder = getDisplay().getCreateFolderName().getText();
-        if(selectedFolder != null && newFolder.trim().length() != 0) {
-          createFolder(selectedFolder + "/" + newFolder);
-        }
-      }
-    }));
+    super.registerHandler(getDisplay().addCreateFolderButtonHandler(new CreateFolderButtonHandler()));
   }
 
   private void addSelectButtonHandler() {
-    super.registerHandler(getDisplay().addSelectButtonHandler(new ClickHandler() {
-
-      public void onClick(ClickEvent event) {
-        String selection = getSelection();
-        if(selection != null) {
-          eventBus.fireEvent(new FileSelectionEvent(FileSelectorPresenter.this.fileSelectionSource, selection));
-        }
-        getDisplay().hideDialog();
-      }
-    }));
+    super.registerHandler(getDisplay().addSelectButtonHandler(new SelectButtonHandler()));
   }
 
   private void createFolder(final String folder) {
@@ -284,5 +246,53 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     HasText getCreateFolderName();
 
     void clearNewFolderName();
+  }
+
+  class InternalFileSelectionHandler implements FileSelectionHandler {
+
+    public void onFileSelection(FileDto fileDto) {
+      if(fileDto.getType().isFileType(FileType.FILE)) {
+        selectedFile = fileDto.getPath();
+      }
+    }
+  }
+
+  class FileSelectionRequiredHandler implements FileSelectionRequiredEvent.Handler {
+
+    public void onFileSelectionRequired(FileSelectionRequiredEvent event) {
+      selectedFile = selectedFolder = null; // clear previous selection
+      setFileSelectionSource(event.getSource());
+      setFileSelectionType(event.getFileSelectionType());
+      refreshDisplay();
+      revealDisplay();
+    }
+  }
+
+  class FolderSelectionHandler implements FileSystemTreeFolderSelectionChangeEvent.Handler {
+
+    public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
+      selectedFolder = event.getFolder().getPath();
+    }
+  }
+
+  class CreateFolderButtonHandler implements ClickHandler {
+
+    public void onClick(ClickEvent event) {
+      String newFolder = getDisplay().getCreateFolderName().getText();
+      if(selectedFolder != null && newFolder.trim().length() != 0) {
+        createFolder(selectedFolder + "/" + newFolder);
+      }
+    }
+  }
+
+  class SelectButtonHandler implements ClickHandler {
+
+    public void onClick(ClickEvent event) {
+      String selection = getSelection();
+      if(selection != null) {
+        eventBus.fireEvent(new FileSelectionEvent(FileSelectorPresenter.this.fileSelectionSource, selection));
+      }
+      getDisplay().hideDialog();
+    }
   }
 }
