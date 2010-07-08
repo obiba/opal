@@ -146,13 +146,13 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   }
 
   private void addEventHandlers() {
-    addFileSelectionHandler(); // handler for file selected in FolderDetails
+    addFileSelectionRequiredHandler(); // handler for file selection required
     addFolderSelectionHandler(); // handler for folder selected in FileSystemTree
     addSelectButtonHandler();
     addCreateFolderButtonHandler();
   }
 
-  private void addFileSelectionHandler() {
+  private void addFileSelectionRequiredHandler() {
     super.registerHandler(eventBus.addHandler(FileSelectionRequiredEvent.getType(), new FileSelectionRequiredEvent.Handler() {
 
       public void onFileSelectionRequired(FileSelectionRequiredEvent event) {
@@ -192,6 +192,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
       public void onClick(ClickEvent event) {
         String selection = getSelection();
         if(selection != null) {
+          System.out.println("DSPATHIS selection: [" + selection + "]");
           eventBus.fireEvent(new FileSelectionEvent(FileSelectorPresenter.this.fileSelectionSource, selection));
         }
         getDisplay().hideDialog();
@@ -222,6 +223,13 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
     switch(fileSelectionType) {
     case FILE:
+      String newFileName = getDisplay().getNewFileName().getText();
+      if(newFileName != null && newFileName.trim().length() != 0) {
+        selection = (!selectedFolder.equals("/") ? selectedFolder + "/" : selectedFolder) + newFileName;
+      } else {
+        selection = selectedFile;
+      }
+      break;
     case EXISTING_FILE:
       selection = selectedFile;
       break;
@@ -265,6 +273,8 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     HandlerRegistration addSelectButtonHandler(ClickHandler handler);
 
     HandlerRegistration addCreateFolderButtonHandler(ClickHandler handler);
+
+    HasText getNewFileName();
 
     HasText getCreateFolderName();
   }

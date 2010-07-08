@@ -59,6 +59,9 @@ public class FileSelectorView extends DialogBox implements Display {
   HTMLPanel namePanel;
 
   @UiField
+  TextBox newFileName;
+
+  @UiField
   ScrollPanel fileSystemTreePanel;
 
   @UiField
@@ -146,6 +149,10 @@ public class FileSelectorView extends DialogBox implements Display {
 
   public HandlerRegistration addCreateFolderButtonHandler(ClickHandler handler) {
     return createFolderButton.addClickHandler(handler);
+  }
+
+  public HasText getNewFileName() {
+    return newFileName;
   }
 
   public HasText getCreateFolderName() {
