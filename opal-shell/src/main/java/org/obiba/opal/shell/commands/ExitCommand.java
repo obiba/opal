@@ -14,8 +14,9 @@ import org.obiba.opal.shell.commands.options.ExitCommandOptions;
 @CommandUsage(description = "Exit the shell.")
 public class ExitCommand extends AbstractCommand<ExitCommandOptions> {
 
-  public void execute() {
+  public int execute() {
     getShell().exit();
+    return 0; // success!
   }
 
 }

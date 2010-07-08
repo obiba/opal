@@ -29,7 +29,8 @@ public class VersionCommand extends AbstractCommand<VersionCommandOptions> {
   // AbstractContextLoadingCommand Methods
   //
 
-  public void execute() {
+  public int execute() {
     getShell().printf("Opal %s\n", opalVersion);
+    return 0; // success!
   }
 }

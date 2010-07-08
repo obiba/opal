@@ -29,10 +29,12 @@ public class GrantCommand extends AbstractOpalRuntimeDependentCommand<GrantComma
   private FunctionalUnitRealm realm;
 
   @Override
-  public void execute() {
+  public int execute() {
     for(String table : options.getTables()) {
       MagmaEngineTableResolver.valueOf(table).resolveTable();
       realm.grant(opal.getFunctionalUnit(options.getUnit()), "tables:" + table + ":" + options.getPerm());
     }
+
+    return 0; // success!
   }
 }

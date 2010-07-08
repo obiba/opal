@@ -31,14 +31,15 @@ import org.obiba.opal.shell.commands.options.SplitCommandOptions;
 @CommandUsage(description = "Splits one or more ZIP files into multiple pieces.", syntax = "Syntax: split --unit unit --out DIR _FILE_...")
 public class SplitCommand extends AbstractOpalRuntimeDependentCommand<SplitCommandOptions> {
 
-  public void execute() {
+  public int execute() {
     // Ensure that options have been set.
     if(options.getFiles() == null) {
       getShell().printf("No input file(s) specified.\n");
-      return;
+      return 1; // error!
     }
     try {
       innerExecute();
+      return 0; // success!
     } catch(FileSystemException e) {
       // We can't handle it
       throw new RuntimeException(e);

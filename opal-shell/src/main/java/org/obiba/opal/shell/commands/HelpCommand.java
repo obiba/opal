@@ -23,7 +23,8 @@ public class HelpCommand extends AbstractCommand<HelpCommandOptions> {
   // AbstractCommand Methods
   //
 
-  public void execute() {
+  public int execute() {
     getShell().printUsage();
+    return 0; // success;
   }
 }

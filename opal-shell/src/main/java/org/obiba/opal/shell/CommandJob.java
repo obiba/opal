@@ -98,17 +98,20 @@ public class CommandJob implements OpalShell, Runnable {
 
   public void run() {
     try {
+      int errorCode = 0;
+
       // Don't execute the command if the job has been cancelled.
       if(!status.equals(Status.CANCEL_PENDING)) {
         status = Status.IN_PROGRESS;
         startTime = getCurrentTime();
-        command.execute();
+        errorCode = command.execute();
       }
 
-      // Update the status. Set to SUCCEEDED unless the status was changed to CANCEL_PENDING (i.e., job was
+      // Update the status. Set to SUCCEEDED/FAILED, based on the error code, unless the status was changed to
+      // CANCEL_PENDING (i.e., job was
       // interrupted); in that case set it to CANCELED.
       if(status.equals(Status.IN_PROGRESS)) {
-        status = Status.SUCCEEDED;
+        status = (errorCode == 0) ? Status.SUCCEEDED : Status.FAILED;
       } else if(status.equals(Status.CANCEL_PENDING)) {
         status = Status.CANCELED;
       } else {

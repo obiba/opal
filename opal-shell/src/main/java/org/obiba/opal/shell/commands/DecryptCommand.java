@@ -47,17 +47,19 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
   // AbstractOpalRuntimeDependentCommand Methods
   //
 
-  public void execute() {
+  public int execute() {
     FileObject outputDir = getFileSystemRoot();
     if(options.isOutput()) {
       outputDir = getOutputDir(options.getOutput());
     }
 
     if(!validOutputDir(outputDir) || !validInputFiles() || !validUnit()) {
-      return;
+      return 1; // error!
     }
 
     decryptFiles(options.getFiles(), outputDir);
+
+    return 0; // success!
   }
 
   //

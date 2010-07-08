@@ -52,14 +52,16 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     this.exportService = exportService;
   }
 
-  public void execute() {
+  public int execute() {
+    int errorCode = 1; // initialize as non-zero (error)
+
     if(validateOptions()) {
       Datasource destinationDatasource = null;
 
       try {
         destinationDatasource = getDestinationDatasource();
         exportService.exportTablesToDatasource(options.isUnit() ? options.getUnit() : null, getValueTables(), destinationDatasource, buildDatasourceCopier(destinationDatasource), !options.getNonIncremental());
-
+        errorCode = 0; // success!
       } catch(ExportException e) {
         getShell().printf("%s\n", e.getMessage());
         e.printStackTrace(System.err);
@@ -76,6 +78,8 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
         }
       }
     }
+
+    return errorCode;
   }
 
   public String toString() {

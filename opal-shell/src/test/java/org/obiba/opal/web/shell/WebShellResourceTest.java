@@ -518,7 +518,8 @@ public class WebShellResourceTest {
       }
 
       @Override
-      public void execute() {
+      public int execute() {
+        return 0;
       }
     };
 
@@ -538,7 +539,8 @@ public class WebShellResourceTest {
       }
 
       @Override
-      public void execute() {
+      public int execute() {
+        return 0;
       }
 
     };

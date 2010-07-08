@@ -29,13 +29,14 @@ public class UpgradeCommand extends AbstractCommand<UpgradeCommandOptions> {
   // AbstractContextLoadingCommand Methods
   //
 
-  public void execute() {
+  public int execute() {
     ConfigurableApplicationContext ctx = loadContext();
 
     try {
       UpgradeManager upgradeManager = (UpgradeManager) ctx.getBean("upgradeManager");
       try {
         upgradeManager.executeUpgrade();
+        return 0; // success!
       } catch(UpgradeException upgradeFailed) {
         throw new RuntimeException("An error occurred while running the upgrade manager", upgradeFailed);
       }

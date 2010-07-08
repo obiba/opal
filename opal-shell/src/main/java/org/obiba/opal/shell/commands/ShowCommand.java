@@ -23,12 +23,14 @@ import org.obiba.opal.shell.commands.options.ShowCommandOptions;
 @CommandUsage(description = "Displays the fully qualified name of each data element currently available in Opal.", syntax = "Syntax: show [--datasources] [--tables] [--units]")
 public class ShowCommand extends AbstractOpalRuntimeDependentCommand<ShowCommandOptions> {
 
-  public void execute() {
+  public int execute() {
     // If no options specified, show everything (datasources, tables and units).
     boolean showAll = !options.getDatasources() && !options.getTables() && !options.getUnits();
 
     showDatasourcesAndTables(options.getDatasources() || showAll, options.getTables() || showAll);
     showUnits(options.getUnits() || showAll);
+
+    return 0; // success!
   }
 
   private void showDatasourcesAndTables(boolean displayDatasources, boolean displayTables) {

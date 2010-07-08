@@ -40,9 +40,10 @@ public interface Command<T> {
    * Note that commands must not contain any business logic. All business logic should reside in a service method called
    * by the command to perform its work.
    * 
+   * @return error code (<code>0</code> on success, non-zero on any type of error)
    * @throws IllegalStateException if options are required but have not been set
    * @throws IllegalArgumentException if options invalid (mutually inconsistent)
    */
-  public void execute();
+  public int execute();
 
 }

@@ -41,10 +41,10 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   @Autowired
   private ImportService importService;
 
-  public void execute() {
+  public int execute() {
     if(getOpalRuntime().getFunctionalUnit(options.getUnit()) == null) {
       getShell().printf("Functional unit '%s' does not exist.\n", options.getUnit());
-      return;
+      return 1; // error!
     }
 
     List<FileObject> filesToImport = getFilesToImport();
@@ -52,8 +52,11 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     if(!filesToImport.isEmpty()) {
       importFiles(filesToImport);
     } else {
+      // TODO: Should this be considered success or an error?
       getShell().printf("No file found. Import canceled.\n");
     }
+
+    return 0; // success!
   }
 
   //

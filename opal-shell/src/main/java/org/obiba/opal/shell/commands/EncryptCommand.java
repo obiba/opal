@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.shell.commands;
 
-import java.io.File;
 import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyStoreException;
@@ -44,17 +43,19 @@ public class EncryptCommand extends AbstractOpalRuntimeDependentCommand<EncryptC
   @Autowired
   private UnitKeyStoreService keystoreService;
 
-  public void execute() {
+  public int execute() {
     FileObject outputDir = getFileSystemRoot();
     if(options.isOutput()) {
       outputDir = getOutputDir(options.getOutput());
     }
 
     if(!validOutputDir(outputDir) || !validUnit()) {
-      return;
+      return 1; // error!
     }
 
     encryptFiles(options.getFiles(), outputDir);
+
+    return 0; // success!
   }
 
   private boolean validOutputDir(FileObject outputDir) {
@@ -162,9 +163,5 @@ public class EncryptCommand extends AbstractOpalRuntimeDependentCommand<EncryptC
   private FileObject getFileInUnitDirectory(String filePath) throws FileSystemException {
     FileObject unitDir = getOpalRuntime().getUnitDirectory(options.getUnit());
     return unitDir.resolveFile(filePath);
-  }
-
-  private boolean isRelativeFilePath(String filePath) {
-    return !(new File(filePath).isAbsolute());
   }
 }
