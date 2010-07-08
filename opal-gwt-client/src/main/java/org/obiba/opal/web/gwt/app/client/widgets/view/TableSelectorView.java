@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.widgets.event.SelectionType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter.TableSelectionType;
 import org.obiba.opal.web.model.client.DatasourceDto;
 
 import com.google.gwt.core.client.GWT;
@@ -127,10 +127,10 @@ public class TableSelectorView extends DialogBox implements TableSelectorPresent
   }
 
   @Override
-  public void setTableSelectionType(TableSelectionType mode) {
+  public void setSelectionType(SelectionType mode) {
     // tableList.setVisibleItemCount(1) does not work as supposed to
-    if(mode.equals(TableSelectionType.MULTIPLE) != tableList.isMultipleSelect()) {
-      ListBox newTableList = new ListBox(mode.equals(TableSelectionType.MULTIPLE));
+    if(mode.equals(SelectionType.MULTIPLE) != tableList.isMultipleSelect()) {
+      ListBox newTableList = new ListBox(mode.equals(SelectionType.MULTIPLE));
       tablePanel.setWidget(newTableList);
       tableList = newTableList;
       initContent();

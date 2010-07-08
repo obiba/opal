@@ -20,6 +20,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.SelectionType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.DatasourceDto;
@@ -44,7 +45,7 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
   // Instance Variables
   //
 
-  private TableSelectionType tableSelectionType = TableSelectionType.MULTIPLE;
+  private SelectionType selectionType = SelectionType.MULTIPLE;
 
   private List<DatasourceDto> datasources;
 
@@ -79,7 +80,7 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
       public void onResource(Response response, JsArray<DatasourceDto> resource) {
         initDatasource(resource);
 
-        getDisplay().setTableSelectionType(tableSelectionType);
+        getDisplay().setSelectionType(selectionType);
         getDisplay().renderDatasources(datasources);
         getDisplay().showDialog();
       }
@@ -94,7 +95,7 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
       public void onResource(Response response, JsArray<DatasourceDto> resource) {
         initDatasource(resource);
 
-        getDisplay().setTableSelectionType(tableSelectionType);
+        getDisplay().setSelectionType(selectionType);
         getDisplay().renderDatasources(datasources);
       }
 
@@ -114,8 +115,8 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
   // Methods
   //
 
-  public void setTableSelectionType(TableSelectionType tableSelectionType) {
-    this.tableSelectionType = tableSelectionType;
+  public void setSelectionType(SelectionType tableSelectionType) {
+    this.selectionType = tableSelectionType;
   }
 
   private void initDatasource(JsArray<DatasourceDto> resource) {
@@ -133,7 +134,7 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
 
       public void onTableSelectionRequired(TableSelectionRequiredEvent event) {
         callSource = event.getSource();
-        setTableSelectionType(event.getTableSelectionType());
+        setSelectionType(event.getSelectionType());
         revealDisplay();
       }
     }));
@@ -175,10 +176,6 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
   // Inner Classes / Interfaces
   //
 
-  public enum TableSelectionType {
-    SINGLE, MULTIPLE
-  }
-
   public interface Display extends WidgetDisplay {
 
     void showDialog();
@@ -193,7 +190,7 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
 
     List<Integer> getSelectedTableIndices();
 
-    void setTableSelectionType(TableSelectionType mode);
+    void setSelectionType(SelectionType mode);
 
     void renderDatasources(List<DatasourceDto> datasources);
 

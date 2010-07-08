@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.widgets.event;
 
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter.TableSelectionType;
 
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
@@ -31,20 +30,20 @@ public class TableSelectionRequiredEvent extends GwtEvent<TableSelectionRequired
 
   private Object source;
 
-  private TableSelectionType tableSelectionType;
+  private SelectionType selectionType;
 
   //
   // Constructors
   //
 
   public TableSelectionRequiredEvent(Object source) {
-    this(source, TableSelectionType.MULTIPLE);
+    this(source, SelectionType.MULTIPLE);
   }
 
-  public TableSelectionRequiredEvent(Object source, TableSelectionType tableSelectionType) {
+  public TableSelectionRequiredEvent(Object source, SelectionType tableSelectionType) {
     super();
     this.source = source;
-    this.tableSelectionType = tableSelectionType;
+    this.selectionType = tableSelectionType;
   }
 
   //
@@ -74,8 +73,8 @@ public class TableSelectionRequiredEvent extends GwtEvent<TableSelectionRequired
     return source;
   }
 
-  public TableSelectionType getTableSelectionType() {
-    return tableSelectionType;
+  public SelectionType getSelectionType() {
+    return selectionType;
   }
 
   //
