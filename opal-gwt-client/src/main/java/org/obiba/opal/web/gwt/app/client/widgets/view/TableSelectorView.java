@@ -42,7 +42,7 @@ public class TableSelectorView extends DialogBox implements TableSelectorPresent
   // Constants
   //
 
-  private static final String DIALOG_HEIGHT_MULTIPLE = "28em";
+  private static final String DIALOG_HEIGHT_MULTIPLE = "25em";
 
   private static final String DIALOG_HEIGHT_SINGLE = "12em";
 
@@ -50,7 +50,7 @@ public class TableSelectorView extends DialogBox implements TableSelectorPresent
 
   private static final String TABLE_LIST_WIDTH = "20em";
 
-  private static final int VISIBLE_COUNT = 15;
+  private static final int VISIBLE_COUNT = 10;
 
   //
   // Static Variables

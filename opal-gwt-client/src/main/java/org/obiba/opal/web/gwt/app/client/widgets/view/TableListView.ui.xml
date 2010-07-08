@@ -1,0 +1,29 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
+
+  <ui:style>
+    .left-aligned { float : left; margin-right : 0.5em }
+    .toolbar-left img {
+      margin-right: 5px;
+      float: left;
+    }
+    .toolbar img:hover {
+      cursor: pointer;
+    }
+  </ui:style>
+
+  <g:HTMLPanel>
+    <g:FlowPanel addStyleNames="{style.toolbar},{style.toolbar-left}">
+   	  <g:ListBox ui:field="tableList" multipleSelect="true" addStyleNames="{style.left-aligned}"></g:ListBox>
+   	  <g:VerticalPanel>
+        <g:Image ui:field="addImage" url="image/list-add.png"></g:Image>
+        <g:Image ui:field="removeImage" url="image/list-remove.png"></g:Image>
+   	  </g:VerticalPanel>	
+    </g:FlowPanel>
+    
+  </g:HTMLPanel>
+</ui:UiBinder>
