@@ -93,14 +93,14 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
         if(TableListPresenter.this.equals(event.getCallSource())) {
           for(TableDto selectedTable : event.getSelectedTables()) {
             boolean found = false;
-            for(TableDto table : tables) {
+            for(TableDto table : getTables()) {
               if(table.getName().equals(selectedTable.getName()) && table.getDatasourceName().equals(selectedTable.getDatasourceName())) {
                 found = true;
                 break;
               }
             }
             if(!found) {
-              tables.add(selectedTable);
+              getTables().add(selectedTable);
               getDisplay().addTable(selectedTable);
             }
           }
@@ -112,9 +112,12 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
 
       @Override
       public void onClick(ClickEvent event) {
-        for(Integer index : getDisplay().getSelectedIndices()) {
-          tables.remove(index);
-          getDisplay().removeTable(index);
+        List<Integer> selectedIndices = getDisplay().getSelectedIndices();
+        int i = selectedIndices.size() - 1;
+        while(i >= 0) {
+          getTables().remove(selectedIndices.get(i).intValue());
+          getDisplay().removeTable(selectedIndices.get(i));
+          i--;
         }
         getDisplay().unselectAll();
       }
