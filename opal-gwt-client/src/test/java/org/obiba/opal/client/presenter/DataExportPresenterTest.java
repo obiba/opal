@@ -21,14 +21,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.DataExportPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.logical.shared.HasSelectionHandlers;
-import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 
 public class DataExportPresenterTest extends AbstractGwtTestSetup {
@@ -39,26 +38,29 @@ public class DataExportPresenterTest extends AbstractGwtTestSetup {
 
   private DataExportPresenter exportPresenter;
 
+  private TableListPresenter.Display tableListDisplayMock;
+
+  private TableListPresenter tableListPresenter;
+
   @Before
   public void setUp() {
     displayMock = createMock(DataExportPresenter.Display.class);
     eventBusMock = createMock(EventBus.class);
-    exportPresenter = new DataExportPresenter(displayMock, eventBusMock);
+    tableListDisplayMock = createMock(TableListPresenter.Display.class);
+    tableListPresenter = new TableListPresenter(tableListDisplayMock, eventBusMock);
+    exportPresenter = new DataExportPresenter(displayMock, eventBusMock, tableListPresenter);
   }
 
   @Test
   public void testThatEventHandlersAreAddedToUIComponents() {
 
-    HasSelectionHandlers hasSelectionHandlerMock = createMock(HasSelectionHandlers.class);
-    expect(displayMock.getTableTree()).andReturn(hasSelectionHandlerMock).atLeastOnce();
-
     HasClickHandlers hasClickHandlerMock = createMock(HasClickHandlers.class);
     expect(displayMock.getSubmit()).andReturn(hasClickHandlerMock).atLeastOnce();
+    expect(tableListDisplayMock.getRemoveWidget()).andReturn(hasClickHandlerMock);
+    expect(tableListDisplayMock.getAddWidget()).andReturn(hasClickHandlerMock);
+    displayMock.setTableWidgetDisplay(tableListDisplayMock);
 
     HandlerRegistration handlerRegistrationMock = createMock(HandlerRegistration.class);
-
-    // Make sure that a SelectionHandler is added to the browsing tree
-    expect(hasSelectionHandlerMock.addSelectionHandler((SelectionHandler) anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
 
     // Make sure that a ClickHandler is added to the Submit button
     expect(hasClickHandlerMock.addClickHandler((ClickHandler) anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
@@ -76,11 +78,11 @@ public class DataExportPresenterTest extends AbstractGwtTestSetup {
     mockRequestBuilder.send();
     EasyMock.expectLastCall().anyTimes();
 
-    replay(displayMock, hasClickHandlerMock, mockRequestBuilder);
+    replay(tableListDisplayMock, displayMock, hasClickHandlerMock, mockRequestBuilder);
 
     exportPresenter.bind();
 
-    verify(displayMock, hasClickHandlerMock, mockRequestBuilder);
+    verify(tableListDisplayMock, displayMock, hasClickHandlerMock, mockRequestBuilder);
 
   }
 }

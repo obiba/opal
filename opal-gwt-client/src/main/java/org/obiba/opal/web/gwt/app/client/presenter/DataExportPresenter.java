@@ -28,7 +28,6 @@ import org.obiba.opal.web.model.client.CopyCommandOptionsDto;
 import org.obiba.opal.web.model.client.DatasourceDto;
 import org.obiba.opal.web.model.client.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.TableDto;
-import org.obiba.opal.web.model.client.VariableDto;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
@@ -39,14 +38,11 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.RadioButton;
-import com.google.gwt.view.client.SelectionModel;
 import com.google.inject.Inject;
 
 public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Display> {
 
   public interface Display extends DataCommonPresenter.Display {
-
-    SelectionModel<VariableDto> getTableSelection();
 
     HasValue<String> getFile();
 
@@ -80,6 +76,11 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   @Inject
   public DataExportPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
+  }
+
+  public DataExportPresenter(Display display, EventBus eventBus, TableListPresenter tableListPresenter) {
+    this(display, eventBus);
+    this.tableListPresenter = tableListPresenter;
   }
 
   @Override
