@@ -50,6 +50,9 @@ public class FileExplorerView extends Composite implements Display {
 
   public FileExplorerView() {
     initWidget(uiBinder.createAndBindUi(this));
+
+    // TODO Delete function is not completed yet.
+    fileDeleteButton.setEnabled(false);
   }
 
   public Button getFileDeleteButton() {

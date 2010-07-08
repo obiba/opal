@@ -70,9 +70,7 @@ public class FolderDetailsView extends Composite implements Display {
 
   public void clearSelection() {
     if(table.isSelectionEnabled()) {
-      for(FileDto file : table.getDisplayedItems()) {
-        tableSelectionModel.setSelected(file, false);
-      }
+      getTableSelectionModel().setSelected(getTableSelectionModel().getSelectedObject(), false);
     }
   }
 
@@ -225,6 +223,10 @@ public class FolderDetailsView extends Composite implements Display {
     public void addFileSelectionHandler(final FileSelectionHandler handler) {
       fileSelectionHandlers.add(handler);
     }
+  }
+
+  public SingleSelectionModel<FileDto> getTableSelectionModel() {
+    return tableSelectionModel;
   }
 
 }

@@ -15,6 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FolderCreationEvent;
@@ -75,22 +76,12 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
 
   @Override
   public void refreshDisplay() {
-    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta").get().withCallback(new ResourceCallback<FileDto>() {
-      @Override
-      public void onResource(Response response, FileDto root) {
-        getDisplay().initTree(root);
-        getDisplay().selectTreeItem(root);
-        eventBus.fireEvent(new FileSystemTreeFolderSelectionChangeEvent(root));
-      }
-    }).send();
+    // TODO Reveal display should refresh the tree content, not completely resets its content
+    revealDisplay();
   }
 
   @Override
   public void revealDisplay() {
-  }
-
-  protected void initDisplayComponents() {
-
     ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta").get().withCallback(new ResourceCallback<FileDto>() {
       @Override
       public void onResource(Response response, FileDto root) {
@@ -99,7 +90,10 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
         eventBus.fireEvent(new FileSystemTreeFolderSelectionChangeEvent(root));
       }
     }).send();
+  }
 
+  protected void initDisplayComponents() {
+    revealDisplay();
   }
 
   private void addTreeItemSelectionHandler(final EventBus eventBus) {
@@ -112,6 +106,7 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
         FileDto selectedFile = ((FileDto) selectedItem.getUserObject());
 
         eventBus.fireEvent(new FileSystemTreeFolderSelectionChangeEvent(selectedFile));
+        eventBus.fireEvent(new FileSelectionChangeEvent(selectedFile));
 
         if(childrenNotAdded(selectedItem)) {
           ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta" + selectedFile.getPath()).get().withCallback(new ResourceCallback<FileDto>() {

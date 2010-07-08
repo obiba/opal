@@ -15,6 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
@@ -24,7 +25,11 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.FileDto;
 import org.obiba.opal.web.model.client.FileDto.FileType;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.view.client.SelectionModel;
+import com.google.gwt.view.client.SingleSelectionModel;
+import com.google.gwt.view.client.SelectionModel.SelectionChangeEvent;
 import com.google.inject.Inject;
 
 public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresenter.Display> {
@@ -38,6 +43,9 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
     void renderRows(FileDto rows);
 
     void addFileSelectionHandler(FileSelectionHandler fileSelectionHandler);
+
+    SingleSelectionModel<FileDto> getTableSelectionModel();
+
   }
 
   public interface FileSelectionHandler {
@@ -63,10 +71,23 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
 
       public void onFileSelection(FileDto fileDto) {
         if(!fileDto.getType().isFileType(FileType.FILE)) {
-          updateTable(fileDto.getPath());
           eventBus.fireEvent(new FolderSelectionChangeEvent(fileDto));
+          updateTable(fileDto.getPath());
         }
       }
+    });
+
+    getDisplay().getTableSelectionModel().addSelectionChangeHandler(new SelectionModel.SelectionChangeHandler() {
+
+      @Override
+      public void onSelectionChange(SelectionChangeEvent event) {
+        FileDto selectedFile = getDisplay().getTableSelectionModel().getSelectedObject();
+        if(selectedFile != null) {
+          GWT.log("firing event details file =" + selectedFile.getPath());
+          eventBus.fireEvent(new FileSelectionChangeEvent(selectedFile));
+        }
+      }
+
     });
 
     super.registerHandler(eventBus.addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(), new FileSystemTreeFolderSelectionChangeEvent.Handler() {
@@ -121,6 +142,7 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
   }
 
   private void updateTable(String path) {
+    getDisplay().clearSelection();
     ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta" + path).get().withCallback(new ResourceCallback<FileDto>() {
       @Override
       public void onResource(Response response, FileDto resource) {
@@ -129,5 +151,4 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
       }
     }).send();
   }
-
 }

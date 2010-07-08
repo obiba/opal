@@ -9,16 +9,23 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
+import java.util.Arrays;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.FileSelectionHandler;
+import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.FileDto;
 import org.obiba.opal.web.model.client.FileDto.FileType;
 
@@ -26,6 +33,9 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -38,6 +48,13 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
     public HasWidgets getFolderDetailsPanel();
 
     public HasClickHandlers getFileUploadButton();
+
+    public HasClickHandlers getFileDeleteButton();
+
+    public HasClickHandlers getFileDownloadButton();
+
+    public HasClickHandlers getCreateFolderButton();
+
   }
 
   @Inject
@@ -56,6 +73,8 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   FileUploadDialogPresenter fileUploadDialogPresenter;
 
   FileDto currentFolder;
+
+  private FileDto selectedFile;
 
   @Inject
   public FileExplorerPresenter(Display display, EventBus eventBus) {
@@ -85,7 +104,8 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
   @Override
   public void refreshDisplay() {
-
+    // fileSystemTreePresenter.refreshDisplay();
+    folderDetailsPresenter.refreshDisplay();
   }
 
   @Override
@@ -99,6 +119,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
     folderDetailsPresenter = folderDetailsPresenterProvider.get();
     folderDetailsPresenter.getDisplay().addFileSelectionHandler(createFileSelectionHandler());
+    folderDetailsPresenter.getDisplay().setSelectionEnabled(true);
 
     getDisplay().getFileSystemTree().add(fileSystemTreePresenter.getDisplay().asWidget());
     getDisplay().getFolderDetailsPanel().add(folderDetailsPresenter.getDisplay().asWidget());
@@ -108,6 +129,35 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   }
 
   private void addEventHandlers() {
+
+    super.registerHandler(getDisplay().getFileDeleteButton().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        if(selectedFile == null) {
+          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "fileMustBeSelected", null));
+        } else {
+          boolean confirm = Window.confirm("Confirm deletion of " + selectedFile.getPath() + " ?");
+          if(confirm) {
+            deleteFile(selectedFile);
+          }
+        }
+      }
+    }));
+
+    super.registerHandler(getDisplay().getFileDownloadButton().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        downloadFile(selectedFile);
+      }
+    }));
+
+    super.registerHandler(getDisplay().getCreateFolderButton().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        GWT.log("Clicked Create Folder!");
+      }
+    }));
+
     super.registerHandler(getDisplay().getFileUploadButton().addClickHandler(new ClickHandler() {
 
       @Override
@@ -116,6 +166,15 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
         fileUploadDialogPresenter.setCurrentFolder(currentFolder);
         fileUploadDialogPresenter.bind();
         fileUploadDialogPresenter.revealDisplay();
+      }
+    }));
+
+    super.registerHandler(eventBus.addHandler(FileSelectionChangeEvent.getType(), new FileSelectionChangeEvent.Handler() {
+
+      @Override
+      public void onFileSelectionChange(FileSelectionChangeEvent event) {
+        selectedFile = event.getFile();
+        GWT.log("selected file is " + selectedFile.getPath());
       }
     }));
 
@@ -144,10 +203,33 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
       public void onFileSelection(FileDto fileDto) {
         if(fileDto.getType().isFileType(FileType.FILE)) {
-          String url = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")).append("ws/files").append(fileDto.getPath()).toString();
-          eventBus.fireEvent(new FileDownloadEvent(url));
+          downloadFile(fileDto);
         }
       }
     };
+  }
+
+  private void deleteFile(final FileDto file) {
+    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        GWT.log("Deleting " + file.getPath());
+        if(response.getStatusCode() != Response.SC_OK) {
+          GWT.log("Error code= " + response.getStatusCode() + " " + response.getText());
+          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, response.getText(), Arrays.asList(new String[] { String.valueOf(file.getPath()) })));
+        } else {
+          selectedFile = null;
+          refreshDisplay();
+        }
+      }
+    };
+
+    ResourceRequestBuilderFactory.newBuilder().forResource("/files" + file.getPath()).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler).withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+  }
+
+  private void downloadFile(final FileDto file) {
+    String url = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")).append("ws/files").append(file.getPath()).toString();
+    eventBus.fireEvent(new FileDownloadEvent(url));
   }
 }
