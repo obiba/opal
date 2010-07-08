@@ -53,7 +53,8 @@
     <g:center>
       <g:SplitLayoutPanel>
         <g:center>
-          <g:HTMLPanel addStyleNames="{style.wb-form}">
+          <g:ScrollPanel width="100%" addStyleNames="{style.wb-form}">
+          <g:HTMLPanel>
             <table width="100%" class="gwt-KeyValue">
           <tbody>
             <tr>
@@ -96,8 +97,9 @@
           </tbody>
         </table>
           </g:HTMLPanel>
+          </g:ScrollPanel>
         </g:center>
-        <g:east size="300" horizontalAlignment="ALIGN_RIGHT">
+        <g:east size="300">
           <g:FlowPanel addStyleNames="{style.wb-information}">
             
           </g:FlowPanel>

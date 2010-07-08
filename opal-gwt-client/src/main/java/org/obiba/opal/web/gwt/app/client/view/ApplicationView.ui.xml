@@ -32,11 +32,8 @@
             <g:MenuItem  ui:field="dashboardItem">
               <ui:msg description="Dashboard menu item">Dashboard</ui:msg>              
             </g:MenuItem>
-            <g:MenuItem>
-              <ui:msg description="Variables menu item">Variables</ui:msg>              
-              <g:MenuBar vertical="true">
-                <g:MenuItem ui:field="exploreVariablesItem"><ui:msg description="Explore menu item">Explore</ui:msg></g:MenuItem>
-              </g:MenuBar>
+            <g:MenuItem ui:field="exploreVariablesItem">
+              <ui:msg description="Variables menu item">Variables</ui:msg>
             </g:MenuItem>
             <g:MenuItem>
               <ui:msg description="Data menu item">Data</ui:msg>              
@@ -45,18 +42,15 @@
                 <g:MenuItem ui:field="dataExportItem"><ui:msg description="Export menu item">Export...</ui:msg></g:MenuItem>
               </g:MenuBar>
             </g:MenuItem>
-            <g:MenuItem>
-              <ui:msg description="Jobs menu item">Jobs</ui:msg>
-              <g:MenuBar vertical="true">
-                <g:MenuItem ui:field="listJobsItem"><ui:msg description="List menu item">List</ui:msg></g:MenuItem>
-              </g:MenuBar>
-            </g:MenuItem>           
-            <g:MenuItem>
-              <ui:msg description="Administration menu item">Administration</ui:msg>
-              <g:MenuBar vertical="true">
-                <g:MenuItem ui:field="fileExplorer"><ui:msg description="Explorer">File Explorer</ui:msg></g:MenuItem>                
-              </g:MenuBar>              
+            <g:MenuItem ui:field="fileExplorer">
+              <ui:msg description="Files menu item">Files</ui:msg>
             </g:MenuItem>
+            <g:MenuItem ui:field="listJobsItem">
+              <ui:msg description="Jobs menu item">Jobs</ui:msg>
+            </g:MenuItem>           
+            <!-- g:MenuItem>
+              <ui:msg description="Administration menu item">Administration</ui:msg>
+            </g:MenuItem-->
           </g:MenuBar>
 
         </g:layer>
