@@ -27,9 +27,7 @@
                 <ui:msg description="Tables field label">Tables:</ui:msg>                
               </td>
               <td>
-                <g:ScrollPanel addStyleNames="{style.inset}" height="15em" width="100%">
-                  <g:Tree ui:field="tableTree" />
-                </g:ScrollPanel>
+                <g:SimplePanel ui:field="tablesPanel" />
               </td>
             </tr>
             <tr>

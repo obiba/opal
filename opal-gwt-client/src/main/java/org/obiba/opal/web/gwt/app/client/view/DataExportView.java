@@ -9,26 +9,22 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.view;
 
-import java.util.List;
+import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.presenter.DataExportPresenter;
 import org.obiba.opal.web.model.client.VariableDto;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.RadioButton;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Tree;
-import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -45,7 +41,7 @@ public class DataExportView extends DataCommonView implements DataExportPresente
   private static DataExportUiBinder uiBinder = GWT.create(DataExportUiBinder.class);
 
   @UiField
-  Tree tableTree;
+  SimplePanel tablesPanel;
 
   @UiField
   TextBox file;
@@ -71,13 +67,10 @@ public class DataExportView extends DataCommonView implements DataExportPresente
   @UiField
   RadioButton unitId;
 
-  private JsArrayString selectedFiles = JavaScriptObject.createArray().cast();
-
   SelectionModel<VariableDto> selectionModel = new SingleSelectionModel<VariableDto>();
 
   public DataExportView() {
     initWidget(uiBinder.createAndBindUi(this));
-    tableTree.setAnimationEnabled(true);
     destinationDataSource.addClickHandler(new ClickHandler() {
 
       @Override
@@ -131,26 +124,8 @@ public class DataExportView extends DataCommonView implements DataExportPresente
   }
 
   @Override
-  public void setItems(List<TreeItem> items) {
-    tableTree.clear();
-    for(TreeItem item : items) {
-      tableTree.addItem(item);
-    }
-  }
-
-  @Override
-  public HasSelectionHandlers<TreeItem> getTableTree() {
-    return tableTree;
-  }
-
-  @Override
   public SelectionModel<VariableDto> getTableSelection() {
     return selectionModel;
-  }
-
-  @Override
-  public void addTable(String datasource, String table) {
-    selectedFiles.push(datasource + "." + table);
   }
 
   @Override
@@ -161,11 +136,6 @@ public class DataExportView extends DataCommonView implements DataExportPresente
   @Override
   public RadioButton getDestinationFile() {
     return destinationFile;
-  }
-
-  @Override
-  public JsArrayString getSelectedFiles() {
-    return selectedFiles;
   }
 
   @Override
@@ -196,6 +166,11 @@ public class DataExportView extends DataCommonView implements DataExportPresente
   @Override
   public String getOutFile() {
     return file.getValue();
+  }
+
+  @Override
+  public void setTableWidgetDisplay(WidgetDisplay display) {
+    tablesPanel.setWidget(display.asWidget());
   }
 
 }

@@ -16,29 +16,29 @@ import java.util.List;
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
+import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.CopyCommandOptionsDto;
 import org.obiba.opal.web.model.client.DatasourceDto;
 import org.obiba.opal.web.model.client.FunctionalUnitDto;
+import org.obiba.opal.web.model.client.TableDto;
 import org.obiba.opal.web.model.client.VariableDto;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.HasSelectionHandlers;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.RadioButton;
-import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.inject.Inject;
 
@@ -46,19 +46,11 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   public interface Display extends DataCommonPresenter.Display {
 
-    HasSelectionHandlers<TreeItem> getTableTree();
-
-    void setItems(List<TreeItem> items);
-
     SelectionModel<VariableDto> getTableSelection();
-
-    void addTable(String datasource, String table);
 
     HasValue<String> getFile();
 
     RadioButton getDestinationFile();
-
-    JsArrayString getSelectedFiles();
 
     String getOutFile();
 
@@ -72,10 +64,14 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
     HasValue<Boolean> isDestinationDataSource();
 
+    void setTableWidgetDisplay(WidgetDisplay display);
   }
 
   @Inject
   private ErrorDialogPresenter errorDialog;
+
+  @Inject
+  private TableListPresenter tableListPresenter;
 
   /**
    * @param display
@@ -99,18 +95,6 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   protected void addEventHandlers() {
 
-    super.registerHandler(getDisplay().getTableTree().addSelectionHandler(new SelectionHandler<TreeItem>() {
-      @Override
-      public void onSelection(SelectionEvent<TreeItem> event) {
-        TreeItem selection = event.getSelectedItem();
-        if(selection.getParentItem() != null) {
-          String datasource = selection.getParentItem().getText();
-          String table = selection.getText();
-          getDisplay().addTable(datasource, table);
-        }
-      }
-    }));
-
     super.registerHandler(getDisplay().getSubmit().addClickHandler(new ClickHandler() {
 
       @Override
@@ -122,7 +106,13 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
           errorDialog.revealDisplay();
         } else {
           CopyCommandOptionsDto dto = CopyCommandOptionsDto.create();
-          dto.setTablesArray(getDisplay().getSelectedFiles());
+
+          JsArrayString selectedTables = JavaScriptObject.createArray().cast();
+          for(TableDto table : tableListPresenter.getTables()) {
+            selectedTables.push(table.getDatasourceName() + "." + table.getName());
+          }
+
+          dto.setTablesArray(selectedTables);
           if(getDisplay().isDestinationDataSource().getValue()) {
             dto.setDestination(getDisplay().getSelectedDatasource());
           } else {
@@ -160,6 +150,10 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   }
 
   protected void initDisplayComponents() {
+    tableListPresenter.bind();
+
+    getDisplay().setTableWidgetDisplay(tableListPresenter.getDisplay());
+
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
       public void onResource(Response response, JsArray<DatasourceDto> datasources) {
@@ -177,7 +171,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   private List<String> formValidationErrors() {
     List<String> result = new ArrayList<String>();
-    if(getDisplay().getSelectedFiles().length() == 0) {
+    if(tableListPresenter.getTables().size() == 0) {
       result.add("Must select at least one table for export");
     }
     if(getDisplay().getDestinationFile().getValue()) {
@@ -203,28 +197,6 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   @Override
   public void revealDisplay() {
-    updateTree();
-  }
-
-  private void updateTree() {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<DatasourceDto> datasources) {
-        ArrayList<TreeItem> items = new ArrayList<TreeItem>(datasources.length());
-        for(int i = 0; i < datasources.length(); i++) {
-          DatasourceDto ds = datasources.get(i);
-          TreeItem dsItem = new TreeItem(ds.getName());
-          dsItem.setUserObject(ds);
-          JsArrayString array = ds.getTableArray();
-          for(int j = 0; j < array.length(); j++) {
-            array.get(j);
-            dsItem.addItem(array.get(j));
-          }
-          items.add(dsItem);
-        }
-        getDisplay().setItems(items);
-      }
-    }).send();
   }
 
 }
