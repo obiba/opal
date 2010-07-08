@@ -92,7 +92,6 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     verify(eventBusMock, displayMock, folderDetailsPresenter.getDisplay(), folderDetailsPresenter.getDisplay());
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void testOnBind() {
     // Setup
@@ -117,6 +116,12 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
   public void testRevealDisplay() {
     // Setup
     folderDetailsPresenter.getDisplay().clearSelection();
+    expectLastCall().once();
+
+    folderDetailsPresenter.getDisplay().setDisplaysFiles(true);
+    expectLastCall().once();
+
+    displayMock.clearNewFileName();
     expectLastCall().once();
 
     displayMock.clearNewFolderName();
@@ -157,122 +162,42 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
 
   @Test
   public void testAllowsFileCreation_ReturnsTrueWhenSelectingFile() {
-    // Setup
-    replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
-
-    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter);
-    sut.setFileSelectionType(FileSelectionType.FILE);
-
-    // Exercise
-    boolean allowsFileCreation = sut.allowsFileCreation();
-
-    // Verify
-    assertEquals(true, allowsFileCreation);
+    testAllowsFileCreation(FileSelectionType.FILE, true);
   }
 
   @Test
   public void testAllowsFileCreation_ReturnsFalseWhenSelectingExistingFile() {
-    // Setup
-    replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
-
-    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter);
-    sut.setFileSelectionType(FileSelectionType.EXISTING_FILE);
-
-    // Exercise
-    boolean allowsFileCreation = sut.allowsFileCreation();
-
-    // Verify
-    assertEquals(false, allowsFileCreation);
+    testAllowsFileCreation(FileSelectionType.EXISTING_FILE, false);
   }
 
   @Test
   public void testAllowsFileCreation_ReturnsFalseWhenSelectingFolder() {
-    // Setup
-    replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
-
-    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter);
-    sut.setFileSelectionType(FileSelectionType.FOLDER);
-
-    // Exercise
-    boolean allowsFileCreation = sut.allowsFileCreation();
-
-    // Verify
-    assertEquals(false, allowsFileCreation);
+    testAllowsFileCreation(FileSelectionType.FOLDER, false);
   }
 
   @Test
   public void testAllowsFileCreation_ReturnsFalseWhenSelectingExistingFolder() {
-    // Setup
-    replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
-
-    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter);
-    sut.setFileSelectionType(FileSelectionType.EXISTING_FOLDER);
-
-    // Exercise
-    boolean allowsFileCreation = sut.allowsFileCreation();
-
-    // Verify
-    assertEquals(false, allowsFileCreation);
+    testAllowsFileCreation(FileSelectionType.EXISTING_FOLDER, false);
   }
 
   @Test
-  public void testAllowsFolderCreation_ReturnsFalseWhenSelectingFile() {
-    // Setup
-    replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
-
-    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter);
-    sut.setFileSelectionType(FileSelectionType.FILE);
-
-    // Exercise
-    boolean allowsFolderCreation = sut.allowsFolderCreation();
-
-    // Verify
-    assertEquals(true, allowsFolderCreation);
+  public void testAllowsFolderCreation_ReturnsTrueWhenSelectingFile() {
+    testAllowsFolderCreation(FileSelectionType.FILE, true);
   }
 
   @Test
   public void testAllowsFolderCreation_ReturnsFalseWhenSelectingExistingFile() {
-    // Setup
-    replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
-
-    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter);
-    sut.setFileSelectionType(FileSelectionType.EXISTING_FILE);
-
-    // Exercise
-    boolean allowsFolderCreation = sut.allowsFolderCreation();
-
-    // Verify
-    assertEquals(false, allowsFolderCreation);
+    testAllowsFolderCreation(FileSelectionType.EXISTING_FILE, false);
   }
 
   @Test
   public void testAllowsFolderCreation_ReturnsTrueWhenSelectingFolder() {
-    // Setup
-    replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
-
-    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter);
-    sut.setFileSelectionType(FileSelectionType.FOLDER);
-
-    // Exercise
-    boolean allowsFolderCreation = sut.allowsFolderCreation();
-
-    // Verify
-    assertEquals(true, allowsFolderCreation);
+    testAllowsFolderCreation(FileSelectionType.FOLDER, true);
   }
 
   @Test
   public void testAllowsFolderCreation_ReturnsFalseWhenSelectingExistingFolder() {
-    // Setup
-    replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
-
-    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter);
-    sut.setFileSelectionType(FileSelectionType.EXISTING_FOLDER);
-
-    // Exercise
-    boolean allowsFolderCreation = sut.allowsFolderCreation();
-
-    // Verify
-    assertEquals(false, allowsFolderCreation);
+    testAllowsFolderCreation(FileSelectionType.EXISTING_FOLDER, false);
   }
 
   @Test
@@ -320,6 +245,34 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     FolderDetailsPresenter.Display detailsDisplayMock = createMock(FolderDetailsPresenter.Display.class);
 
     return new FolderDetailsPresenterSpy(detailsDisplayMock, eventBus);
+  }
+
+  private void testAllowsFileCreation(FileSelectionType fileSelectionType, boolean shouldAllowFileCreation) {
+    // Setup
+    replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
+
+    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter);
+    sut.setFileSelectionType(fileSelectionType);
+
+    // Exercise
+    boolean allowsFileCreation = sut.allowsFileCreation();
+
+    // Verify
+    assertEquals(shouldAllowFileCreation, allowsFileCreation);
+  }
+
+  private void testAllowsFolderCreation(FileSelectionType fileSelectionType, boolean shouldAllowFolderCreation) {
+    // Setup
+    replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
+
+    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter);
+    sut.setFileSelectionType(fileSelectionType);
+
+    // Exercise
+    boolean allowsFolderCreation = sut.allowsFolderCreation();
+
+    // Verify
+    assertEquals(shouldAllowFolderCreation, allowsFolderCreation);
   }
 
   //

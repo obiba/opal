@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.resources.OpalResources;
 import org.obiba.opal.web.gwt.user.cellview.client.DateTimeColumn;
 import org.obiba.opal.web.model.client.FileDto;
+import org.obiba.opal.web.model.client.FileDto.FileType;
 
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
@@ -59,9 +60,15 @@ public class FolderDetailsView extends Composite implements Display {
 
   private Translations translations = GWT.create(Translations.class);
 
+  private boolean displaysFiles = true;
+
   public FolderDetailsView() {
     initWidget(uiBinder.createAndBindUi(this));
     initTable();
+  }
+
+  public void setDisplaysFiles(boolean display) {
+    displaysFiles = display;
   }
 
   public void setSelectionEnabled(boolean enabled) {
@@ -75,11 +82,29 @@ public class FolderDetailsView extends Composite implements Display {
   }
 
   public void renderRows(final FileDto folder) {
-    JsArray<FileDto> children = folder.getChildrenArray();
+    JsArray<FileDto> children = filterChildren(folder.getChildrenArray());
+
     int fileCount = children.length();
     table.setPageSize(fileCount);
     table.setDataSize(fileCount, true);
     table.setData(0, fileCount, sortFileList(JsArrays.toList(children, 0, fileCount)));
+  }
+
+  @SuppressWarnings("unchecked")
+  private JsArray<FileDto> filterChildren(JsArray<FileDto> children) {
+    if(displaysFiles) {
+      return children;
+    }
+
+    JsArray<FileDto> foldersOnly = (JsArray<FileDto>) JsArray.createArray();
+    for(int i = 0; i < children.length(); i++) {
+      FileDto child = children.get(i);
+      if(child.getType().isFileType(FileType.FOLDER)) {
+        foldersOnly.push(child);
+      }
+    }
+
+    return foldersOnly;
   }
 
   public void addFileSelectionHandler(FileSelectionHandler fileSelectionHandler) {

@@ -36,6 +36,8 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
 
   public interface Display extends WidgetDisplay {
 
+    void setDisplaysFiles(boolean include);
+
     void setSelectionEnabled(boolean enabled);
 
     void clearSelection();

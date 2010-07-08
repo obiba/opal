@@ -131,10 +131,6 @@ public class FileSelectorView extends DialogBox implements Display {
     createFolderPanel.setVisible(visible);
   }
 
-  public void clearNewFolderName() {
-    createFolderName.setText("");
-  }
-
   public HasWidgets getFileSystemTreePanel() {
     return fileSystemTreePanel;
   }
@@ -151,12 +147,20 @@ public class FileSelectorView extends DialogBox implements Display {
     return createFolderButton.addClickHandler(handler);
   }
 
-  public HasText getNewFileName() {
-    return newFileName;
+  public String getNewFileName() {
+    return newFileName.getText();
+  }
+
+  public void clearNewFileName() {
+    newFileName.setText("");
   }
 
   public HasText getCreateFolderName() {
     return createFolderName;
+  }
+
+  public void clearNewFolderName() {
+    createFolderName.setText("");
   }
 
   public void startProcessing() {

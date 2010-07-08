@@ -102,9 +102,11 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   public void revealDisplay() {
     // Clear previous state.
     folderDetailsPresenter.getDisplay().clearSelection(); // clear previous selection (highlighted row)
+    getDisplay().clearNewFileName(); // clear previous new file name
     getDisplay().clearNewFolderName(); // clear previous new folder name
 
     // Adjust display based on file selection type.
+    folderDetailsPresenter.getDisplay().setDisplaysFiles(displaysFiles());
     getDisplay().setNewFilePanelVisible(allowsFileCreation());
     getDisplay().setNewFolderPanelVisible(allowsFolderCreation());
 
@@ -135,6 +137,10 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
   public void setFileSelectionType(FileSelectionType fileSelectionType) {
     this.fileSelectionType = fileSelectionType;
+  }
+
+  public boolean displaysFiles() {
+    return fileSelectionType.equals(FileSelectionType.FILE) || fileSelectionType.equals(FileSelectionType.EXISTING_FILE);
   }
 
   public boolean allowsFileCreation() {
@@ -192,7 +198,6 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
       public void onClick(ClickEvent event) {
         String selection = getSelection();
         if(selection != null) {
-          System.out.println("DSPATHIS selection: [" + selection + "]");
           eventBus.fireEvent(new FileSelectionEvent(FileSelectorPresenter.this.fileSelectionSource, selection));
         }
         getDisplay().hideDialog();
@@ -223,7 +228,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
     switch(fileSelectionType) {
     case FILE:
-      String newFileName = getDisplay().getNewFileName().getText();
+      String newFileName = getDisplay().getNewFileName();
       if(newFileName != null && newFileName.trim().length() != 0) {
         selection = (!selectedFolder.equals("/") ? selectedFolder + "/" : selectedFolder) + newFileName;
       } else {
@@ -264,8 +269,6 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
     void setNewFolderPanelVisible(boolean visible);
 
-    void clearNewFolderName();
-
     HasWidgets getFileSystemTreePanel();
 
     HasWidgets getFolderDetailsPanel();
@@ -274,8 +277,12 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
     HandlerRegistration addCreateFolderButtonHandler(ClickHandler handler);
 
-    HasText getNewFileName();
+    String getNewFileName();
+
+    void clearNewFileName();
 
     HasText getCreateFolderName();
+
+    void clearNewFolderName();
   }
 }
