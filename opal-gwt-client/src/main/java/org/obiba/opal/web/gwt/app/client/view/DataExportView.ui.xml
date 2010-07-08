@@ -2,24 +2,60 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <ui:style>
-    .title { font-size: larger; font-weight: bold; }
-    .separator { border-bottom: 2px solid black; }
-    .applicationTitle { font-weight: bold; font-size: large; }
-    .instructions { font-weight: bold; }
-    .inset { border: 2px inset black; }
+    .topPanel {
+    border-bottom:1px solid #BBBBBB;
+    }
+    
+    .informationPanel {
+    border:1px solid #BBBBBB;
+    }
+    
+    .formPanel {
+    padding: 0.25em 0.5em 0 0.5em;
+    }
+    
+    .title {
+    font-size: 1.3em;
+    padding: 0.25em 0 0 0.5em;
+    }
+    
+    .actionButton {
+    font-size: 1em;
+    padding: 0.5em 0.5em 0.5em 0.5em;
+    float: right;
+    }
+  
+    .summary { 
+    margin: 0.25em 0 0 0.5em; 
+    }
   </ui:style>
-
-  <g:LayoutPanel height="45em" width="40em" ui:field="content">
-    <g:layer left="1em" right="1em">
-      <g:Label addStyleNames="{style.title}"><ui:msg description="Data export title">Export Data</ui:msg></g:Label>
-    </g:layer>
-    <g:layer top="3em" bottom="8em" left="1em" right="1em">
-      <g:HTMLPanel width="100%">
-        <table width="100%" class="gwt-KeyValue">
-          <tbody>
+  
+  
+  <g:DockLayoutPanel>
+    <g:north size="52">
+      <g:DockLayoutPanel addStyleNames="{style.topPanel}">
+        <g:center>
+          <g:FlowPanel>
+          <g:Label addStyleNames="{style.title}"><ui:msg description="Data export title">Export Data</ui:msg></g:Label>
+          <g:Label addStyleNames="{style.summary}"><ui:msg description="Data export instructions">Select the tables to be exported:</ui:msg></g:Label>	
+          </g:FlowPanel>
+        </g:center>
+        <g:east size="360" horizontalAlignment="ALIGN_RIGHT">
+          <g:FlowPanel>
+            <g:Button ui:field="submit" addStyleNames="{style.actionButton}"><ui:msg description="Export button label">Export</ui:msg></g:Button>
+          </g:FlowPanel>
+        </g:east>
+      </g:DockLayoutPanel>
+    </g:north>
+    <g:center>
+      <g:DockLayoutPanel>
+        <g:center>
+          <g:HTMLPanel addStyleNames="{style.formPanel}">
+            <table width="100%" class="gwt-KeyValue">
+            <tbody>
             <tr>
               <td colspan="2">
-                <g:Label addStyleNames="{style.instructions}"><ui:msg description="Data export instructions">Select the tables to be exported:</ui:msg></g:Label>
+                
               </td>
             </tr>
             <tr>
@@ -65,12 +101,9 @@
               </td>
             </tr>              
             <tr>
-              <td colspan="2">
+              <td>
                 <ui:msg description="Participant identifier field label">Participant Identifier:</ui:msg>
               </td>
-            </tr>
-            <tr>
-              <td/>
               <td>
                 <g:RadioButton name="idGroup" ui:field="opalId"><ui:msg description="Use opal id radio button label">use Opal ID</ui:msg></g:RadioButton>
               </td>
@@ -81,24 +114,17 @@
                 <g:RadioButton name="idGroup" ui:field="unitId"><ui:msg description="Unit id dropdown label">use Unit ID:</ui:msg></g:RadioButton> <g:ListBox ui:field="units" />
               </td>
             </tr> 
-          </tbody>
-        </table>
-      </g:HTMLPanel>
-    </g:layer>              
-    <g:layer bottom="6em" height="0.5em" left="1em" right="1em">
-      <g:HTMLPanel>
-        <div class="{style.separator}" />
-      </g:HTMLPanel>
-    </g:layer>
-    <g:layer bottom="0em" height="8em" left="1em" right="1em">
-      <g:VerticalPanel height="100%" width="100%">
-        <g:cell horizontalAlignment="ALIGN_RIGHT" verticalAlignment="ALIGN_MIDDLE">
-          <g:HorizontalPanel>
-            <g:Button ui:field="submit"><ui:msg description="Export button label">Export</ui:msg></g:Button>
-          </g:HorizontalPanel>
-        </g:cell>
-      </g:VerticalPanel>
-    </g:layer>
-  </g:LayoutPanel>
+            </tbody>
+            </table>
+          </g:HTMLPanel>
+        </g:center>
+        <g:east size="300" horizontalAlignment="ALIGN_RIGHT">
+          <g:FlowPanel addStyleNames="{style.informationPanel}">
+            
+          </g:FlowPanel>
+        </g:east>
+      </g:DockLayoutPanel>
+    </g:center>
+  </g:DockLayoutPanel>
 
 </ui:UiBinder>
