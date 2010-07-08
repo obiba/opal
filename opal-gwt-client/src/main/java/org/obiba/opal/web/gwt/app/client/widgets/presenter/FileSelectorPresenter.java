@@ -217,7 +217,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     ResourceRequestBuilderFactory.newBuilder().forResource("/files" + folder).put().withCallback(201, callbackHandler).withCallback(403, callbackHandler).withCallback(500, callbackHandler).send();
   }
 
-  private String getSelection() {
+  public String getSelection() {
     String selection = null;
 
     switch(fileSelectionType) {
