@@ -19,7 +19,7 @@
         <g:Label addStyleNames="{style.inline}">
           <ui:msg description="Name label">Name</ui:msg>
         </g:Label>
-        <g:Label>:</g:Label> 
+        <g:Label addStyleNames="{style.inline}">:</g:Label> 
         <g:TextBox addStyleNames="{style.name-input}" />
       </g:HTMLPanel>
     </g:north>
