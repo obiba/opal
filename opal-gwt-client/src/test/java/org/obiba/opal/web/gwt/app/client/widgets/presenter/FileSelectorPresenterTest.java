@@ -161,6 +161,26 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
   }
 
   @Test
+  public void testDisplaysFiles_ReturnsTrueWhenSelectingFile() {
+    testDisplaysFiles(FileSelectionType.FILE, true);
+  }
+
+  @Test
+  public void testDisplaysFiles_ReturnsTrueWhenSelectingExistingFile() {
+    testDisplaysFiles(FileSelectionType.EXISTING_FILE, true);
+  }
+
+  @Test
+  public void testDisplaysFiles_ReturnsFalseWhenSelectingFolder() {
+    testDisplaysFiles(FileSelectionType.FOLDER, false);
+  }
+
+  @Test
+  public void testDisplaysFiles_ReturnsTrueWhenSelectingExistingFolder() {
+    testDisplaysFiles(FileSelectionType.EXISTING_FOLDER, false);
+  }
+
+  @Test
   public void testAllowsFileCreation_ReturnsTrueWhenSelectingFile() {
     testAllowsFileCreation(FileSelectionType.FILE, true);
   }
@@ -245,6 +265,20 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     FolderDetailsPresenter.Display detailsDisplayMock = createMock(FolderDetailsPresenter.Display.class);
 
     return new FolderDetailsPresenterSpy(detailsDisplayMock, eventBus);
+  }
+
+  private void testDisplaysFiles(FileSelectionType fileSelectionType, boolean shouldDisplayFiles) {
+    // Setup
+    replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
+
+    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter);
+    sut.setFileSelectionType(fileSelectionType);
+
+    // Exercise
+    boolean displaysFiles = sut.displaysFiles();
+
+    // Verify
+    assertEquals(shouldDisplayFiles, displaysFiles);
   }
 
   private void testAllowsFileCreation(FileSelectionType fileSelectionType, boolean shouldAllowFileCreation) {
