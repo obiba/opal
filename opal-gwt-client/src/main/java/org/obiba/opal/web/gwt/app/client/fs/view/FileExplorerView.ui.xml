@@ -29,7 +29,7 @@
       <g:DockLayoutPanel addStyleNames="{style.topPanel}">
         <g:center>
           <g:Label addStyleNames="{style.title}">
-            <ui:msg description="File Explorer label">File Explorer</ui:msg>
+            <ui:msg description="Explorer">File Explorer</ui:msg>
           </g:Label>
         </g:center>
         <g:east size="360" horizontalAlignment="ALIGN_RIGHT">

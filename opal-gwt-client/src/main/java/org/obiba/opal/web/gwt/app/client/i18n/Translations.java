@@ -202,4 +202,8 @@ public interface Translations extends Constants {
   @Description("Select all label")
   @DefaultStringValue("select all")
   String selectAllLabel();
+
+  @Description("File Selector title")
+  @DefaultStringValue("File Selector")
+  String fileSelectorTitle();
 }

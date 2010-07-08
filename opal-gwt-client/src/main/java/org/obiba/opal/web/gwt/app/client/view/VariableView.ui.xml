@@ -54,7 +54,7 @@
           <g:Label addStyleNames="{style.left-aligned},{style.title-light}"><ui:msg description="Entity type label">Entity Type</ui:msg></g:Label><g:Label addStyleNames="{style.left-aligned},{style.title-light}">:</g:Label><g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="entityType">Entity Name</g:Label>
         </g:FlowPanel>
         <g:FlowPanel>
-          <g:Label addStyleNames="{style.left-aligned},{style.title-light}"><ui:msg description="Variable Explorer column title">Value Type</ui:msg></g:Label><g:Label addStyleNames="{style.left-aligned},{style.title-light}">:</g:Label><g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="valueType">Value Type Name</g:Label>
+          <g:Label addStyleNames="{style.left-aligned},{style.title-light}"><ui:msg description="Value Type label">Value Type</ui:msg></g:Label><g:Label addStyleNames="{style.left-aligned},{style.title-light}">:</g:Label><g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="valueType">Value Type Name</g:Label>
         </g:FlowPanel>            
         <g:FlowPanel>
           <g:Label addStyleNames="{style.left-aligned},{style.title-light}"><ui:msg description="Unit label">Unit</ui:msg></g:Label><g:Label addStyleNames="{style.left-aligned},{style.title-light}">:</g:Label><g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="unit">Unit Name</g:Label>

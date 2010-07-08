@@ -27,7 +27,6 @@ import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasWidgets;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -60,12 +59,6 @@ public class FileSelectorView extends DialogBox implements Display {
   HTMLPanel namePanel;
 
   @UiField
-  Label nameLabel;
-
-  @UiField
-  TextBox name;
-
-  @UiField
   ScrollPanel fileSystemTreePanel;
 
   @UiField
@@ -91,7 +84,7 @@ public class FileSelectorView extends DialogBox implements Display {
   //
 
   public FileSelectorView() {
-    setText("File Selector");
+    setText(translations.fileSelectorTitle());
     setHeight(DIALOG_HEIGHT);
     setWidth(DIALOG_WIDTH);
 
@@ -99,11 +92,6 @@ public class FileSelectorView extends DialogBox implements Display {
     content.setHeight(DIALOG_HEIGHT);
     content.setWidth(DIALOG_WIDTH);
     add(content);
-
-    nameLabel.setText(translations.nameLabel() + ":");
-    createFolderButton.setText("Create Folder");
-    selectButton.setText("Select");
-    cancelButton.setText("Cancel");
 
     addCancelHandler();
   }
