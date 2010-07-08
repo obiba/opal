@@ -12,8 +12,10 @@ package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
@@ -32,7 +34,6 @@ import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
-import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.TreeItem;
@@ -95,8 +96,8 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
   @Test
   public void testOnBind() {
     // Setup
-    expect(eventBusMock.addHandler((Type<FileSelectionRequiredEvent.Handler>) anyObject(), (FileSelectionRequiredEvent.Handler) anyObject())).andReturn(null).once();
-    expect(eventBusMock.addHandler((Type<FileSystemTreeFolderSelectionChangeEvent.Handler>) anyObject(), (FileSystemTreeFolderSelectionChangeEvent.Handler) anyObject())).andReturn(null).once();
+    expect(eventBusMock.addHandler(eq(FileSelectionRequiredEvent.getType()), isA(FileSelectionRequiredEvent.Handler.class))).andReturn(null).once();
+    expect(eventBusMock.addHandler(eq(FileSystemTreeFolderSelectionChangeEvent.getType()), isA(FileSystemTreeFolderSelectionChangeEvent.Handler.class))).andReturn(null).once();
     expect(displayMock.addSelectButtonHandler((ClickHandler) anyObject())).andReturn(null).once();
     expect(displayMock.addCreateFolderButtonHandler((ClickHandler) anyObject())).andReturn(null).once();
 
