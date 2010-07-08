@@ -23,7 +23,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
@@ -39,9 +38,6 @@ public class DataImportView extends DataCommonView implements DataImportPresente
   }
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  @UiField
-  LayoutPanel content;
 
   @UiField
   Tree files;

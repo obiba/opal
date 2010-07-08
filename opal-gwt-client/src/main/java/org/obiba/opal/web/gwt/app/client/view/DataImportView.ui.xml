@@ -1,32 +1,67 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <ui:style>
-    .title { font-size: larger; font-weight: bold; }
-    .separator { border-bottom: 2px solid black; }
-    .instructions { font-weight: bold; }
-    .inset { border: 2px inset black; }
+   <ui:style>
+    .wb-top {
+    border-bottom:1px solid #BBBBBB;
+    }
+    
+    .wb-head {
+    padding: 0.25em 0 0 0.5em;
+            float: left;
+    }
+    
+    .wb-head .title {
+    font-size: 1.3em;
+    }
+  
+    .wb-head .summary { 
+     
+    }
+    
+    .wb-control {
+    padding: 1em 0.5em 0.5em 0.5em;
+    float: left;
+    }
+    
+    .wb-control .button {
+    margin-left: 10px;
+    }
+    
+    .wb-information {
+    border:1px solid #BBBBBB;
+    }
+    
+    .wb-form {
+    padding: 0.25em 0.5em 0 0.5em;
+    }
+      
   </ui:style>
-
-  <g:LayoutPanel height="35em" width="40em" ui:field="content">
-    <g:layer left="1em" right="1em">
-      <g:Label addStyleNames="{style.title}"><ui:msg description="Data import title">Import Data</ui:msg></g:Label>
-    </g:layer>
-    <g:layer top="3em" bottom="6em" left="1em" right="1em">
-      <g:HTMLPanel width="100%">
-        <table width="100%" class="gwt-KeyValue">
+  
+  <g:DockLayoutPanel>
+    <g:north size="52">
+      <g:FlowPanel addStyleNames="{style.wb-top}">
+        <g:FlowPanel addStyleNames="{style.wb-head}">
+          <g:Label addStyleNames="{style.title}"><ui:msg description="Data import title">Import Data</ui:msg></g:Label>
+          <g:Label addStyleNames="{style.summary}"><ui:msg description="Data import instructions">Select the files to be imported:</ui:msg></g:Label>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="{style.wb-control}">
+          <g:Button ui:field="submit" addStyleNames="{style.button}"><ui:msg description="Import button label">Import</ui:msg></g:Button>  
+        </g:FlowPanel>
+      </g:FlowPanel>
+    </g:north>
+    <g:center>
+      <g:SplitLayoutPanel>
+        <g:center>
+          <g:HTMLPanel addStyleNames="{style.wb-form}">
+            <table width="100%" class="gwt-KeyValue">
           <tbody>
-            <tr>
-              <td colspan="2">
-                <g:Label addStyleNames="{style.instructions}"><ui:msg description="Data import instructions">Select the files to be imported:</ui:msg></g:Label>
-              </td>
-            </tr>
             <tr>
               <td style="vertical-align:top">
                 <ui:msg description="Files field label">File(s):</ui:msg>                
               </td>
               <td>
-                <g:ScrollPanel addStyleNames="{style.inset}" height="15em" width="100%">
+                <g:ScrollPanel height="15em" width="100%">
                   <g:Tree ui:field="files" />
                 </g:ScrollPanel>
               </td>
@@ -50,12 +85,9 @@
               </td>
             </tr>
             <tr>
-              <td colspan="2">
+              <td>
                 <ui:msg description="Participant identifier field label">Participant Identifier:</ui:msg>                
               </td>
-            </tr>
-            <tr>
-              <td></td>
               <td>
                 <g:RadioButton name="participantId" checked="true"><ui:msg description="Unit id dropdown label">use Unit ID:</ui:msg></g:RadioButton>
                 <g:ListBox ui:field="units" />
@@ -63,22 +95,15 @@
             </tr>
           </tbody>
         </table>
-      </g:HTMLPanel>
-    </g:layer>
-    <g:layer bottom="5em" height="0.5em" left="1em" right="1em">
-      <g:HTMLPanel>
-        <div class="{style.separator}" />
-      </g:HTMLPanel>
-    </g:layer>
-    <g:layer bottom="0em" height="6em" left="1em" right="1em">
-      <g:VerticalPanel height="100%" width="100%">
-        <g:cell horizontalAlignment="ALIGN_RIGHT" verticalAlignment="ALIGN_MIDDLE">
-          <g:HorizontalPanel>
-            <g:Button ui:field="submit"><ui:msg description="Import button label">Import</ui:msg></g:Button>
-          </g:HorizontalPanel>
-        </g:cell>
-      </g:VerticalPanel>
-    </g:layer>
-  </g:LayoutPanel>
+          </g:HTMLPanel>
+        </g:center>
+        <g:east size="300" horizontalAlignment="ALIGN_RIGHT">
+          <g:FlowPanel addStyleNames="{style.wb-information}">
+            
+          </g:FlowPanel>
+        </g:east>
+      </g:SplitLayoutPanel>
+    </g:center>
+  </g:DockLayoutPanel>
 
 </ui:UiBinder>

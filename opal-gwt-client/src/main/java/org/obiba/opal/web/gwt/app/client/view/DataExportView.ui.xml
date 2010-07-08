@@ -2,55 +2,58 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <ui:style>
-    .topPanel {
+    .wb-top {
     border-bottom:1px solid #BBBBBB;
     }
     
-    .informationPanel {
+    .wb-head {
+    padding: 0.25em 0 0 0.5em;
+            float: left;
+    }
+    
+    .wb-head .title {
+    font-size: 1.3em;
+    }
+  
+    .wb-head .summary { 
+     
+    }
+    
+    .wb-control {
+    padding: 1em 0.5em 0.5em 0.5em;
+    float: left;
+    }
+    
+    .wb-control .button {
+    margin-left: 10px;
+    }
+    
+    .wb-information {
     border:1px solid #BBBBBB;
     }
     
-    .formPanel {
+    .wb-form {
     padding: 0.25em 0.5em 0 0.5em;
     }
-    
-    .title {
-    font-size: 1.3em;
-    padding: 0.25em 0 0 0.5em;
-    }
-    
-    .actionButton {
-    font-size: 1em;
-    padding: 0.5em 0.5em 0.5em 0.5em;
-    float: right;
-    }
-  
-    .summary { 
-    margin: 0.25em 0 0 0.5em; 
-    }
+      
   </ui:style>
-  
   
   <g:DockLayoutPanel>
     <g:north size="52">
-      <g:DockLayoutPanel addStyleNames="{style.topPanel}">
-        <g:center>
-          <g:FlowPanel>
+      <g:FlowPanel addStyleNames="{style.wb-top}">
+        <g:FlowPanel addStyleNames="{style.wb-head}">
           <g:Label addStyleNames="{style.title}"><ui:msg description="Data export title">Export Data</ui:msg></g:Label>
-          <g:Label addStyleNames="{style.summary}"><ui:msg description="Data export instructions">Select the tables to be exported:</ui:msg></g:Label>	
-          </g:FlowPanel>
-        </g:center>
-        <g:east size="360" horizontalAlignment="ALIGN_RIGHT">
-          <g:FlowPanel>
-            <g:Button ui:field="submit" addStyleNames="{style.actionButton}"><ui:msg description="Export button label">Export</ui:msg></g:Button>
-          </g:FlowPanel>
-        </g:east>
-      </g:DockLayoutPanel>
+          <g:Label addStyleNames="{style.summary}"><ui:msg description="Data export instructions">Select the tables to be exported:</ui:msg></g:Label>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="{style.wb-control}">
+          <g:Button ui:field="submit" addStyleNames="{style.button}"><ui:msg description="Export button label">Export</ui:msg></g:Button>  
+        </g:FlowPanel>
+      </g:FlowPanel>
     </g:north>
     <g:center>
-      <g:DockLayoutPanel>
+      <g:SplitLayoutPanel>
         <g:center>
-          <g:HTMLPanel addStyleNames="{style.formPanel}">
+          <g:HTMLPanel addStyleNames="{style.wb-form}">
             <table width="100%" class="gwt-KeyValue">
             <tbody>
             <tr>
@@ -119,11 +122,11 @@
           </g:HTMLPanel>
         </g:center>
         <g:east size="300" horizontalAlignment="ALIGN_RIGHT">
-          <g:FlowPanel addStyleNames="{style.informationPanel}">
+          <g:FlowPanel addStyleNames="{style.wb-information}">
             
           </g:FlowPanel>
         </g:east>
-      </g:DockLayoutPanel>
+      </g:SplitLayoutPanel>
     </g:center>
   </g:DockLayoutPanel>
 
