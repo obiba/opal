@@ -102,10 +102,12 @@ public class TableView extends Composite implements TablePresenter.Display {
       @Override
       public String getValue(VariableDto object) {
         JsArray<AttributeDto> attributes = object.getAttributesArray();
-        for(int i = 0; i < attributes.length(); i++) {
-          AttributeDto attribute = attributes.get(i);
-          if(attribute.getName().equals("label")) {
-            return attribute.getValue();
+        if(attributes != null) {
+          for(int i = 0; i < attributes.length(); i++) {
+            AttributeDto attribute = attributes.get(i);
+            if(attribute.getName().equals("label")) {
+              return attribute.getValue();
+            }
           }
         }
         return null;
