@@ -118,10 +118,11 @@ public class TableListView extends Composite implements TableListPresenter.Displ
   }
 
   @Override
-  public void unselectAll() {
+  public void unselectAll(int first) {
     for(int i = 0; i < tableList.getItemCount(); i++) {
-      tableList.setItemSelected(i, false);
+      tableList.setItemSelected(i, i == first ? true : false);
     }
+
   }
 
   //

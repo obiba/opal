@@ -55,7 +55,7 @@
         <g:center>
           <g:ScrollPanel width="100%" addStyleNames="{style.wb-form}">
           <g:HTMLPanel>
-            <table width="100%" class="gwt-KeyValue">
+            <table class="gwt-KeyValue">
             <tbody>
             <tr>
               <td colspan="2">

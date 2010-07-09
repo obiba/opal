@@ -113,13 +113,13 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
       @Override
       public void onClick(ClickEvent event) {
         List<Integer> selectedIndices = getDisplay().getSelectedIndices();
-        int i = selectedIndices.size() - 1;
-        while(i >= 0) {
+        for(int i = selectedIndices.size() - 1; i >= 0; i--) {
           getTables().remove(selectedIndices.get(i).intValue());
           getDisplay().removeTable(selectedIndices.get(i));
-          i--;
         }
-        getDisplay().unselectAll();
+        if(selectedIndices.size() > 0) {
+          getDisplay().unselectAll(selectedIndices.get(0));
+        }
       }
     }));
 
@@ -153,7 +153,7 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
 
     List<Integer> getSelectedIndices();
 
-    public void unselectAll();
+    public void unselectAll(int first);
 
   }
 }
