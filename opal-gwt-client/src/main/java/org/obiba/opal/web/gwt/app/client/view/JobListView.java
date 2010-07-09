@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.gwt.user.cellview.client.DateTimeColumn;
 import org.obiba.opal.web.model.client.CommandStateDto;
 
+import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.CompositeCell;
@@ -233,30 +234,11 @@ public class JobListView extends Composite implements Display {
 
   static class ActionsColumn extends Column<CommandStateDto, CommandStateDto> implements HasActionHandler {
     //
-    // Instance Variables
-    //
-
-    private ActionHandler actionHandler;
-
-    private FieldUpdater<CommandStateDto, String> cellContainerFieldUpdater;
-
-    //
     // Constructors
     //
 
     public ActionsColumn() {
       super(new ActionsCell());
-
-      addActionCell(CANCEL_ACTION);
-      addActionCell(DELETE_ACTION);
-
-      cellContainerFieldUpdater = new FieldUpdater<CommandStateDto, String>() {
-        public void update(int rowIndex, CommandStateDto object, String value) {
-          if(actionHandler != null) {
-            actionHandler.doAction(object, value);
-          }
-        }
-      };
     }
 
     //
@@ -272,14 +254,74 @@ public class JobListView extends Composite implements Display {
     //
 
     public void setActionHandler(ActionHandler actionHandler) {
-      this.actionHandler = actionHandler;
+      ((ActionsCell) getCell()).setActionHandler(actionHandler);
+    }
+  }
+
+  static class ActionsCell extends AbstractCell<CommandStateDto> {
+    //
+    // Instance Variables
+    //
+
+    private CompositeCell<CommandStateDto> delegateCell;
+
+    private FieldUpdater<CommandStateDto, String> hasCellFieldUpdater;
+
+    private ActionHandler actionHandler;
+
+    //
+    // Constructors
+    //
+
+    public ActionsCell() {
+      hasCellFieldUpdater = new FieldUpdater<CommandStateDto, String>() {
+        public void update(int rowIndex, CommandStateDto object, String value) {
+          if(actionHandler != null) {
+            actionHandler.doAction(object, value);
+          }
+        }
+      };
+    }
+
+    //
+    // AbstractCell Methods
+    //
+
+    @Override
+    public Object onBrowserEvent(Element parent, CommandStateDto value, Object viewData, NativeEvent event, ValueUpdater<CommandStateDto> valueUpdater) {
+      refreshActions(value);
+
+      return delegateCell.onBrowserEvent(parent, value, viewData, event, valueUpdater);
+    }
+
+    @Override
+    public void render(CommandStateDto value, Object viewData, StringBuilder sb) {
+      refreshActions(value);
+
+      delegateCell.render(value, viewData, sb);
     }
 
     //
     // Methods
     //
 
-    private void addActionCell(final String actionName) {
+    public void setActionHandler(ActionHandler actionHandler) {
+      this.actionHandler = actionHandler;
+    }
+
+    private void refreshActions(CommandStateDto value) {
+      if(value.getStatus().toString().equals("NOT_STARTED") || value.getStatus().toString().equals("IN_PROGRESS")) {
+        delegateCell = createCompositeCell(CANCEL_ACTION);
+      } else if(value.getStatus().toString().equals("SUCCEEDED") || value.getStatus().toString().equals("FAILED") || value.getStatus().toString().equals("CANCELED")) {
+        delegateCell = createCompositeCell(DELETE_ACTION);
+      } else {
+        delegateCell = createCompositeCell(""); // no action
+      }
+    }
+
+    private CompositeCell<CommandStateDto> createCompositeCell(String... actionNames) {
+      List<HasCell<CommandStateDto, ?>> hasCells = new ArrayList<HasCell<CommandStateDto, ?>>();
+
       final Cell<String> cell = new ClickableTextCell() {
 
         @Override
@@ -288,78 +330,27 @@ public class JobListView extends Composite implements Display {
         }
       };
 
-      ((ActionsCell) getCell()).addHasCell(new HasCell<CommandStateDto, String>() {
+      for(final String actionName : actionNames) {
+        hasCells.add(new HasCell<CommandStateDto, String>() {
 
-        @Override
-        public Cell<String> getCell() {
-          return cell;
-        }
+          @Override
+          public Cell<String> getCell() {
+            return cell;
+          }
 
-        @Override
-        public FieldUpdater<CommandStateDto, String> getFieldUpdater() {
-          return cellContainerFieldUpdater;
-        }
+          @Override
+          public FieldUpdater<CommandStateDto, String> getFieldUpdater() {
+            return hasCellFieldUpdater;
+          }
 
-        @Override
-        public String getValue(CommandStateDto object) {
-          return actionName;
-        }
-      });
-    }
-  }
-
-  static class ActionsCell extends CompositeCell<CommandStateDto> {
-
-    private List<HasCell<CommandStateDto, ?>> hasCells;
-
-    public ActionsCell() {
-      hasCells = new ArrayList<HasCell<CommandStateDto, ?>>();
-    }
-
-    @Override
-    public void addHasCell(HasCell<CommandStateDto, ?> hasCell) {
-      hasCells.add(hasCell);
-
-      super.addHasCell(hasCell);
-    }
-
-    @Override
-    public void removeHasCell(HasCell<CommandStateDto, ?> hasCell) {
-      hasCells.remove(hasCell);
-
-      super.removeHasCell(hasCell);
-    }
-
-    @Override
-    public Object onBrowserEvent(Element parent, CommandStateDto value, Object viewData, NativeEvent event, ValueUpdater<CommandStateDto> valueUpdater) {
-      refreshActions(value);
-
-      return super.onBrowserEvent(parent, value, viewData, event, valueUpdater);
-    }
-
-    @Override
-    public void render(CommandStateDto value, Object viewData, StringBuilder sb) {
-      refreshActions(value);
-
-      super.render(value, viewData, sb);
-    }
-
-    public HasCell<CommandStateDto, ?> getHasCell(int index) {
-      return hasCells.get(index);
-    }
-
-    private void refreshActions(CommandStateDto value) {
-      // Remove all actions.
-      super.removeHasCell(getHasCell(0));
-      super.removeHasCell(getHasCell(1));
-
-      // Add back only valid actions (i.e., given the current job status).
-      if(value.getStatus().toString().equals("NOT_STARTED") || value.getStatus().toString().equals("IN_PROGRESS")) {
-        super.addHasCell(getHasCell(0));
+          @Override
+          public String getValue(CommandStateDto object) {
+            return actionName;
+          }
+        });
       }
-      if(value.getStatus().toString().equals("SUCCEEDED") || value.getStatus().toString().equals("FAILED") || value.getStatus().toString().equals("CANCELED")) {
-        super.addHasCell(getHasCell(1));
-      }
+
+      return new CompositeCell<CommandStateDto>(hasCells);
     }
   }
 }
