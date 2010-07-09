@@ -18,9 +18,9 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.widgets.event.SelectionType;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.widgets.event.SelectionType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.DatasourceDto;
@@ -121,10 +121,12 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
 
   private void initDatasource(JsArray<DatasourceDto> resource) {
     datasources = new ArrayList<DatasourceDto>();
-    for(int i = 0; i < resource.length(); i++) {
-      DatasourceDto d = resource.get(i);
-      if(d.getTableArray().length() > 0) {
-        datasources.add(d);
+    if(resource != null) {
+      for(int i = 0; i < resource.length(); i++) {
+        DatasourceDto d = resource.get(i);
+        if(d.getTableArray() != null && d.getTableArray().length() > 0) {
+          datasources.add(d);
+        }
       }
     }
   }
