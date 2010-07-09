@@ -66,7 +66,7 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
   //
 
   public interface Display extends WidgetDisplay {
-    void addTestWidget(WidgetDisplay display);
+
   }
 
 }
