@@ -132,7 +132,7 @@ public interface Translations extends Constants {
   String unitLabel();
 
   @Description("User message map")
-  @DefaultStringMapValue( { "jobCancelled", "Job cancelled.", "jobDeleted", "Job deleted.", "SetCommandStatus_NotFound", "Job could not be cancelled (not found).", "SetCommandStatus_BadRequest_IllegalStatus", "Job status cannot be set to the specified value.", "SetCommandStatus_BadRequest_NotCancellable", "Job has completed and has already been cancelled.", "DeleteCommand_NotFound", "Job could not be deleted (not found).", "DeleteCommand_BadRequest_NotDeletable", "Job is currently running and therefore cannot be deleted at this time." })
+  @DefaultStringMapValue( { "jobCancelled", "Job cancelled.", "jobDeleted", "Job deleted.", "completedJobsDeleted", "All completed jobs deleted.", "SetCommandStatus_NotFound", "Job could not be cancelled (not found).", "SetCommandStatus_BadRequest_IllegalStatus", "Job status cannot be set to the specified value.", "SetCommandStatus_BadRequest_NotCancellable", "Job has completed and has already been cancelled.", "DeleteCommand_NotFound", "Job could not be deleted (not found).", "DeleteCommand_BadRequest_NotDeletable", "Job is currently running and therefore cannot be deleted at this time." })
   Map<String, String> userMessageMap();
 
   @Description("You must select a file message")

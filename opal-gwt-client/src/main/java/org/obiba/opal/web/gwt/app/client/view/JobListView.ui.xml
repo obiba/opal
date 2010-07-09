@@ -30,6 +30,15 @@
     .jobList td + td + td + td + td + td + td span:hover {
       cursor: pointer;
     }
+    .jobList.center {
+      margin-top: 1em;
+    }
+    .jobList.clear-image {
+      float: right;	
+    }
+    .jobList.clear-image:hover {
+      cursor: pointer;
+    }
   </ui:style>
   
   <g:DockLayoutPanel>
@@ -40,9 +49,10 @@
     </g:north>
     <g:center>
       <g:ScrollPanel width="100%" >
-        <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_CENTER">
-          <g2:CellTable width="100%" ui:field="table" addStyleNames="{style.jobList}"/>
-        </g:VerticalPanel>
+        <g:FlowPanel addStyleNames="{style.jobList} {style.center}">
+          <g:Image ui:field="clearImage" url="image/garbage.png" addStyleNames="{style.jobList} {style.clear-image}" />
+          <g2:CellTable width="100%" ui:field="table" addStyleNames="{style.jobList} {style.clear-image}" />
+        </g:FlowPanel>
       </g:ScrollPanel>
     </g:center>
   </g:DockLayoutPanel>

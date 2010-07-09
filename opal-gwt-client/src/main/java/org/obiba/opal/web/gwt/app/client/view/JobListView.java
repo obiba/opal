@@ -22,7 +22,6 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.HasActionHandler;
-import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.gwt.user.cellview.client.DateTimeColumn;
 import org.obiba.opal.web.model.client.CommandStateDto;
 
@@ -38,6 +37,8 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -48,7 +49,8 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
 import com.google.gwt.view.client.SelectionModel;
@@ -69,13 +71,14 @@ public class JobListView extends Composite implements Display {
   @UiField
   CellTable<CommandStateDto> table;
 
+  @UiField
+  Image clearImage;
+
   SelectionModel<CommandStateDto> selectionModel = new SingleSelectionModel<CommandStateDto>();
 
   SimplePager<CommandStateDto> pager;
 
   private static Translations translations = GWT.create(Translations.class);
-
-  private HasFieldUpdater<CommandStateDto, String> idColumn;
 
   private HasActionHandler actionsColumn;
 
@@ -124,6 +127,10 @@ public class JobListView extends Composite implements Display {
 
   public HasActionHandler getActionsColumn() {
     return actionsColumn;
+  }
+
+  public HandlerRegistration addClearButtonHandler(ClickHandler handler) {
+    return clearImage.addClickHandler(handler);
   }
 
   //
@@ -206,7 +213,7 @@ public class JobListView extends Composite implements Display {
     table.setPageSize(50);
     pager = new SimplePager<CommandStateDto>(table);
     table.setPager(pager);
-    ((VerticalPanel) table.getParent()).insert(pager, 0);
+    ((FlowPanel) table.getParent()).insert(pager, 0);
     DOM.removeElementAttribute(pager.getElement(), "style");
     DOM.setStyleAttribute(pager.getElement(), "cssFloat", "right");
   }

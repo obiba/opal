@@ -25,6 +25,9 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.CommandStateDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.view.client.SelectionModel;
@@ -81,6 +84,7 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
 
   @Override
   protected void onBind() {
+    super.registerHandler(getDisplay().addClearButtonHandler(new ClearButtonHandler()));
   }
 
   @Override
@@ -159,6 +163,21 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
     ResourceRequestBuilderFactory.<JsArray<CommandStateDto>> newBuilder().forResource("/shell/command/" + dto.getId()).delete().withCallback(400, callbackHandler).withCallback(404, callbackHandler).withCallback(200, callbackHandler).send();
   }
 
+  private void deleteCompletedJobs() {
+    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        if(response.getStatusCode() == 200) {
+          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.INFO, "completedJobsDeleted", null));
+        }
+        refreshDisplay();
+      }
+    };
+
+    ResourceRequestBuilderFactory.<JsArray<CommandStateDto>> newBuilder().forResource("/shell/commands/completed").delete().withCallback(400, callbackHandler).withCallback(200, callbackHandler).send();
+  }
+
   //
   // Inner Classes / Interfaces
   //
@@ -172,6 +191,8 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
     void clear();
 
     HasActionHandler getActionsColumn();
+
+    HandlerRegistration addClearButtonHandler(ClickHandler handler);
   }
 
   public interface HasActionHandler {
@@ -182,5 +203,12 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
   public interface ActionHandler {
 
     void doAction(CommandStateDto dto, String actionName);
+  }
+
+  class ClearButtonHandler implements ClickHandler {
+
+    public void onClick(ClickEvent event) {
+      deleteCompletedJobs();
+    }
   }
 }
