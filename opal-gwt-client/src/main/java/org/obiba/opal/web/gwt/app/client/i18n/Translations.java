@@ -35,15 +35,15 @@ public interface Translations extends Constants {
   @DefaultStringValue("Information")
   String infoDialogTitle();
 
-  @Description("Variable Explorer column title")
+  @Description("Name label")
   @DefaultStringValue("Name")
   String nameLabel();
 
-  @Description("Variable Explorer column title")
+  @Description("Value Type label")
   @DefaultStringValue("Value Type")
   String valueTypeLabel();
 
-  @Description("Variable Explorer column title")
+  @Description("Label label")
   @DefaultStringValue("Label")
   String labelLabel();
 
@@ -206,4 +206,8 @@ public interface Translations extends Constants {
   @Description("File Selector title")
   @DefaultStringValue("File Selector")
   String fileSelectorTitle();
+
+  @Description("Log label")
+  @DefaultStringValue("Log")
+  String logLabel();
 }
