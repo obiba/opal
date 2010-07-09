@@ -67,7 +67,7 @@ public class CommandJob implements OpalShell, Runnable {
 
   public void printf(String format, Object... args) {
     if(format == null) throw new IllegalArgumentException("format cannot be null");
-    messages.add(0, createMessage(String.format(format, args)));
+    messages.add(createMessage(String.format(format, args)));
   }
 
   public void printUsage() {
