@@ -9,10 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.view;
 
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-
 import org.obiba.opal.web.gwt.app.client.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -155,7 +154,8 @@ public class DataExportView extends DataCommonView implements DataExportPresente
   }
 
   @Override
-  public void setTableWidgetDisplay(WidgetDisplay display) {
+  public void setTableWidgetDisplay(TableListPresenter.Display display) {
+    display.setListWidth("28em");
     tablesPanel.setWidget(display.asWidget());
   }
 

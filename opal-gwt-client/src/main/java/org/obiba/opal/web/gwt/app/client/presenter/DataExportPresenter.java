@@ -16,7 +16,6 @@ import java.util.List;
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
@@ -60,7 +59,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
     HasValue<Boolean> isDestinationDataSource();
 
-    void setTableWidgetDisplay(WidgetDisplay display);
+    void setTableWidgetDisplay(TableListPresenter.Display display);
 
     void setFileWidgetDisplay(FileSelectionPresenter.Display display);
   }

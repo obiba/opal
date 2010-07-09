@@ -4,19 +4,16 @@
    <ui:style>
     .wb-top {
     border-bottom:1px solid #BBBBBB;
+    padding: 0.25em 0 0 1em;
+    float: left;
     }
     
-    .wb-head {
-    padding: 0.25em 0 0 0.5em;
-            float: left;
-    }
-    
-    .wb-head .title {
+    .wb-top .title {
     font-size: 1.3em;
     }
   
-    .wb-head .summary { 
-     
+    .wb-top .summary { 
+    margin-top:0.25em;
     }
     
     .wb-control {
@@ -33,31 +30,37 @@
     }
     
     .wb-form {
-    padding: 0.25em 0.5em 0 0.5em;
+    padding: 1em 0.5em 0 1em;
     }
-      
+    
+    .wb-form .button {
+    margin-top: 10px;
+    }
+    
+    .right-aligned {
+    	float: right;
+    	margin-left: 5px;
+    }
+    
   </ui:style>
   
   <g:DockLayoutPanel>
     <g:north size="52">
       <g:FlowPanel addStyleNames="{style.wb-top}">
-        <g:FlowPanel addStyleNames="{style.wb-head}">
-          <g:Label addStyleNames="{style.title}"><ui:msg description="Data import title">Import Data</ui:msg></g:Label>
-          <g:Label addStyleNames="{style.summary}"><ui:msg description="Data import instructions">Select the files to be imported:</ui:msg></g:Label>
-        </g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.wb-control}">
-          <g:Button ui:field="submit" addStyleNames="{style.button}"><ui:msg description="Import button label">Import</ui:msg></g:Button>  
-        </g:FlowPanel>
+        <g:Label addStyleNames="{style.title}"><ui:msg description="Data import title">Import Data</ui:msg></g:Label>
+        <g:Label addStyleNames="{style.summary}"><ui:msg description="Data import instructions">Select the files to be imported:</ui:msg></g:Label>
       </g:FlowPanel>
     </g:north>
     <g:center>
       <g:ScrollPanel width="100%" addStyleNames="{style.wb-form}">
-      <g:HTMLPanel>
-        <table class="gwt-KeyValue">
+        <g:HTMLPanel>
+        <g:DecoratorPanel>
+        <g:HTMLPanel>
+        <table class="gwt-KeyValue" cellspacing="10">
           <tbody>
             <tr>
               <td style="vertical-align:top">
-                <ui:msg description="Files field label">File(s):</ui:msg>                
+                <ui:msg description="File field label">File:</ui:msg>                
               </td>
               <td>
                 <g:SimplePanel ui:field="filePanel" />
@@ -90,7 +93,10 @@
             </tr>
           </tbody>
         </table>
-      </g:HTMLPanel>
+        </g:HTMLPanel>
+        </g:DecoratorPanel>
+        <g:Button ui:field="submit" addStyleNames="{style.button}"><ui:msg description="Import button label">Import</ui:msg></g:Button>
+        </g:HTMLPanel>
       </g:ScrollPanel>
     </g:center>
   </g:DockLayoutPanel>
