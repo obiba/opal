@@ -96,7 +96,9 @@ public class FileSelectionPresenter extends WidgetPresenter<FileSelectionPresent
 
       @Override
       public void onFileSelection(FileSelectionEvent event) {
-        getDisplay().getFileField().setText(event.getSelectedFile());
+        if(FileSelectionPresenter.this.equals(event.getSource())) {
+          getDisplay().getFileField().setText(event.getSelectedFile());
+        }
       }
 
     }));

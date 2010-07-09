@@ -10,22 +10,17 @@
 package org.obiba.opal.web.gwt.app.client.view;
 
 import org.obiba.opal.web.gwt.app.client.presenter.DataImportPresenter;
-import org.obiba.opal.web.model.client.FileDto;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter.Display;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Tree;
-import com.google.gwt.user.client.ui.TreeItem;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -40,55 +35,33 @@ public class DataImportView extends DataCommonView implements DataImportPresente
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   @UiField
-  Tree files;
+  SimplePanel filePanel;
+
+  @UiField
+  SimplePanel archivePanel;
 
   @UiField
   CheckBox shouldArchive;
 
-  @UiField
-  TextBox archiveDirectory;
+  private FileSelectionPresenter.Display fileSelection;
 
-  private JsArrayString selectedFiles = JavaScriptObject.createArray().cast();
+  private FileSelectionPresenter.Display archiveSelection;
 
   public DataImportView() {
     initWidget(uiBinder.createAndBindUi(this));
-    archiveDirectory.setEnabled(shouldArchive.getValue());
     shouldArchive.addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
-        archiveDirectory.setEnabled(shouldArchive.getValue());
+        archiveSelection.setEnabled(shouldArchive.getValue());
       }
     });
-    files.addSelectionHandler(new SelectionHandler<TreeItem>() {
 
-      @Override
-      public void onSelection(SelectionEvent<TreeItem> event) {
-        FileDto dto = (FileDto) event.getSelectedItem().getUserObject();
-
-        selectedFiles.shift();
-        selectedFiles.push(dto.getPath());
-      }
-
-    });
-  }
-
-  @Override
-  public void setFiles(FileDto root) {
-    this.files.clear();
-    for(int i = 0; i < root.getChildrenArray().length(); i++) {
-      this.files.addItem(createItem(root.getChildrenArray().get(i)));
-    }
-  }
-
-  @Override
-  public JsArrayString getSelectedFiles() {
-    return selectedFiles;
   }
 
   @Override
   public String getArchiveDirectory() {
-    return this.shouldArchive.getValue() ? this.archiveDirectory.getValue() : null;
+    return this.shouldArchive.getValue() ? this.archiveSelection.getFileField().getText() : null;
   }
 
   @Override
@@ -104,12 +77,23 @@ public class DataImportView extends DataCommonView implements DataImportPresente
   public void stopProcessing() {
   }
 
-  private TreeItem createItem(FileDto fileItem) {
-    final TreeItem item = new TreeItem(fileItem.getName());
-    item.setUserObject(fileItem);
-    for(int i = 0; i < fileItem.getChildrenArray().length(); i++) {
-      item.addItem(createItem(fileItem.getChildrenArray().get(i)));
-    }
-    return item;
+  @Override
+  public void setFileWidgetDisplay(Display display) {
+    filePanel.setWidget(display.asWidget());
+    fileSelection = display;
+    fileSelection.setWidth("20em");
+  }
+
+  @Override
+  public String getSelectedFile() {
+    return fileSelection.getFileField().getText();
+  }
+
+  @Override
+  public void setArchiveWidgetDisplay(Display display) {
+    archivePanel.setWidget(display.asWidget());
+    archiveSelection = display;
+    archiveSelection.setEnabled(shouldArchive.getValue());
+    archiveSelection.setWidth("20em");
   }
 }

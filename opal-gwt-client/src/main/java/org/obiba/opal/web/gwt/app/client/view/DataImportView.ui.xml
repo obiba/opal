@@ -60,9 +60,7 @@
                 <ui:msg description="Files field label">File(s):</ui:msg>                
               </td>
               <td>
-                <g:ScrollPanel height="15em" width="100%">
-                  <g:Tree ui:field="files" />
-                </g:ScrollPanel>
+                <g:SimplePanel ui:field="filePanel" />
               </td>
             </tr>
             <tr>
@@ -78,9 +76,7 @@
                 <g:CheckBox ui:field="shouldArchive"><ui:msg description="Archive field label">Archive:</ui:msg></g:CheckBox>
               </td>
               <td>
-                <g:TextBox ui:field="archiveDirectory" title="An optional directory name where to archive the file after import" >
-                  <ui:attribute name='title' description='Tooltip text for archive directory name text field'/>                  
-                </g:TextBox>
+                <g:SimplePanel ui:field="archivePanel" />
               </td>
             </tr>
             <tr>

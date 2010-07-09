@@ -17,14 +17,16 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.DatasourceDto;
-import org.obiba.opal.web.model.client.FileDto;
 import org.obiba.opal.web.model.client.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.ImportCommandOptionsDto;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -37,9 +39,7 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
 
   public interface Display extends DataCommonPresenter.Display {
 
-    void setFiles(FileDto root);
-
-    JsArrayString getSelectedFiles();
+    String getSelectedFile();
 
     void setUnits(JsArray<FunctionalUnitDto> units);
 
@@ -47,10 +47,19 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
 
     String getSelectedUnit();
 
+    void setFileWidgetDisplay(FileSelectionPresenter.Display display);
+
+    void setArchiveWidgetDisplay(FileSelectionPresenter.Display display);
   }
 
   @Inject
   private ErrorDialogPresenter errorDialog;
+
+  @Inject
+  private FileSelectionPresenter fileSelectionPresenter;
+
+  @Inject
+  private FileSelectionPresenter archiveSelectionPresenter;
 
   /**
    * @param display
@@ -59,6 +68,12 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
   @Inject
   public DataImportPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
+  }
+
+  public DataImportPresenter(final Display display, final EventBus eventBus, FileSelectionPresenter fileSelectionPresenter, FileSelectionPresenter archiveSelectionPresenter) {
+    this(display, eventBus);
+    this.fileSelectionPresenter = fileSelectionPresenter;
+    this.archiveSelectionPresenter = archiveSelectionPresenter;
   }
 
   @Override
@@ -80,7 +95,9 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
         ImportCommandOptionsDto dto = ImportCommandOptionsDto.create();
         dto.setDestination(getDisplay().getSelectedDatasource());
         dto.setArchive(getDisplay().getArchiveDirectory());
-        dto.setFilesArray(getDisplay().getSelectedFiles());
+        JsArrayString selectedFiles = JavaScriptObject.createArray().cast();
+        selectedFiles.push(getDisplay().getSelectedFile());
+        dto.setFilesArray(selectedFiles);
         dto.setUnit(getDisplay().getSelectedUnit());
         ResourceRequestBuilderFactory.newBuilder().forResource("/shell/import").post().withResourceBody(ImportCommandOptionsDto.stringify(dto)).withCallback(400, new ResponseCodeCallback() {
 
@@ -109,13 +126,13 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
   }
 
   protected void initDisplayComponents() {
+    fileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
+    fileSelectionPresenter.bind();
+    getDisplay().setFileWidgetDisplay(fileSelectionPresenter.getDisplay());
 
-    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/filesystem").get().withCallback(new ResourceCallback<FileDto>() {
-      @Override
-      public void onResource(Response response, FileDto root) {
-        getDisplay().setFiles(root);
-      }
-    }).send();
+    archiveSelectionPresenter.setFileSelectionType(FileSelectionType.FOLDER);
+    archiveSelectionPresenter.bind();
+    getDisplay().setArchiveWidgetDisplay(archiveSelectionPresenter.getDisplay());
 
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
