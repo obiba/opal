@@ -253,7 +253,7 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
 
     // Exercise
     SelectButtonHandler sut = presenter.new SelectButtonHandler();
-    sut.onClick(new TestClickEvent());
+    sut.onClick(new DummyClickEvent());
 
     // Verify
     verify(eventBusMock, displayMock);
@@ -383,6 +383,6 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     }
   }
 
-  private static class TestClickEvent extends ClickEvent {
+  private static class DummyClickEvent extends ClickEvent {
   }
 }
