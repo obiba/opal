@@ -42,6 +42,8 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   private ImportService importService;
 
   public int execute() {
+    int errorCode = 0;
+
     if(getOpalRuntime().getFunctionalUnit(options.getUnit()) == null) {
       getShell().printf("Functional unit '%s' does not exist.\n", options.getUnit());
       return 1; // error!
@@ -50,13 +52,14 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     List<FileObject> filesToImport = getFilesToImport();
 
     if(!filesToImport.isEmpty()) {
-      importFiles(filesToImport);
+      errorCode = importFiles(filesToImport);
     } else {
-      // TODO: Should this be considered success or an error?
+      // TODO: Should this be considered success or an error? Will treat as an error for now.
       getShell().printf("No file found. Import canceled.\n");
+      errorCode = 1;
     }
 
-    return 0; // success!
+    return errorCode;
   }
 
   //
@@ -91,48 +94,61 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     return sb.toString();
   }
 
-  private void importFiles(List<FileObject> filesToImport) {
+  private int importFiles(List<FileObject> filesToImport) {
+    int errorCode = 0;
+
     getShell().printf("Importing %d file%s :\n", filesToImport.size(), (filesToImport.size() > 1 ? "s" : ""));
     for(FileObject file : filesToImport) {
       if(Thread.interrupted()) {
+        errorCode = 1;
         break;
       }
 
-      if(importFile(file) == false) {
+      // If lastErrorCode == 0 (success), do NOT update errorCode since it might have
+      // been equal to 2 (non-critical error). We want to remember that there was an earlier error.
+      int lastErrorCode = importFile(file);
+      if(lastErrorCode == 1) {
+        errorCode = lastErrorCode;
         break;
+      } else if(lastErrorCode == 2) {
+        errorCode = lastErrorCode;
       }
     }
+
+    return errorCode;
   }
 
   /**
    * Imports the specified file. Called by <code>importFiles</code>.
    * 
    * @param file file to import
-   * @return <code>true</code> if <code>importFiles</code> should continue
+   * @return error code (<code>0</code> on success, <code>1</code> on critical errors, <code>2</code> on errors handled
+   * by continuing with the next file)
    */
-  private boolean importFile(FileObject file) {
+  private int importFile(FileObject file) {
+    int errorCode = 1; // critical error (or interruption)!
+
     getShell().printf("  %s\n", file.getName().getPath());
     try {
       importService.importData(options.getUnit(), options.getDestination(), file);
       archive(file);
+      errorCode = 0; // success!
     } catch(NoSuchFunctionalUnitException ex) {
       getShell().printf("Functional unit '%s' does not exist. Cannot import.\n", ex.getUnitName());
-      return false;
     } catch(NoSuchDatasourceException ex) {
       getShell().printf("Destination datasource '%s' does not exist. Cannot import.\n", ex.getDatasourceName());
-      return false;
     } catch(KeyProviderException ex) {
       getShell().printf("Decryption exception: %s\n", ex.getMessage());
-      return false;
     } catch(IOException ex) {
       // Report an error and continue with the next file.
       getShell().printf("Unrecoverable import exception: %s\n", ex.getMessage());
-      ex.printStackTrace(System.err);
+      errorCode = 2; // non-critical error!
     } catch(InterruptedException ex) {
       // Report the interrupted and continue; the test for interruption will detect this condition.
       getShell().printf("Thread interrupted");
     }
-    return true;
+
+    return errorCode;
   }
 
   private void archive(FileObject file) throws IOException {
