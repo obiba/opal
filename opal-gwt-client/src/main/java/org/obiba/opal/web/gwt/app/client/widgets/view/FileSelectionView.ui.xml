@@ -1,0 +1,25 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
+
+  <ui:style>
+    .left-aligned { 
+    float : left; 
+    margin-right : 2px; 
+    }
+    
+    .button {
+    cursor: pointer;
+    }
+  </ui:style>
+
+  <g:HTMLPanel>
+    <g:FlowPanel addStyleNames="{style.left-aligned}">
+   	  <g:TextBox ui:field="fileField" addStyleNames="{style.left-aligned}"/>
+   	  <g:Button ui:field="browseButton" addStyleNames="{style.button}"><ui:msg description="Browse button label">...</ui:msg></g:Button>	
+    </g:FlowPanel>
+  </g:HTMLPanel>
+</ui:UiBinder>

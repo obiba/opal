@@ -74,6 +74,17 @@ public class TableSelectionEvent extends GwtEvent<TableSelectionEvent.Handler> {
     return selectedTables;
   }
 
+  /**
+   * Get the first selected table.
+   * @return null if none
+   */
+  public TableDto getSelectedTable() {
+    if(selectedTables != null && selectedTables.size() > 0) {
+      return selectedTables.get(0);
+    } else
+      return null;
+  }
+
   //
   // Inner Classes / Interfaces
   //

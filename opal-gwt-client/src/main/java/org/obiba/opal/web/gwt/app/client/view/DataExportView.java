@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.view;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.presenter.DataExportPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -23,7 +24,6 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -41,7 +41,7 @@ public class DataExportView extends DataCommonView implements DataExportPresente
   SimplePanel tablesPanel;
 
   @UiField
-  TextBox file;
+  SimplePanel filePanel;
 
   @UiField
   RadioButton destinationDataSource;
@@ -64,6 +64,8 @@ public class DataExportView extends DataCommonView implements DataExportPresente
   @UiField
   RadioButton unitId;
 
+  private FileSelectionPresenter.Display fileSelection;
+
   public DataExportView() {
     initWidget(uiBinder.createAndBindUi(this));
     destinationDataSource.addClickHandler(new ClickHandler() {
@@ -71,7 +73,7 @@ public class DataExportView extends DataCommonView implements DataExportPresente
       @Override
       public void onClick(ClickEvent event) {
         datasources.setEnabled(true);
-        file.setEnabled(false);
+        fileSelection.setEnabled(false);
       }
     });
     destinationFile.addClickHandler(new ClickHandler() {
@@ -79,11 +81,10 @@ public class DataExportView extends DataCommonView implements DataExportPresente
       @Override
       public void onClick(ClickEvent event) {
         datasources.setEnabled(false);
-        file.setEnabled(true);
+        fileSelection.setEnabled(true);
       }
     });
     destinationDataSource.setValue(true);
-    file.setEnabled(false);
 
     opalId.addClickHandler(new ClickHandler() {
 
@@ -119,11 +120,6 @@ public class DataExportView extends DataCommonView implements DataExportPresente
   }
 
   @Override
-  public HasValue<String> getFile() {
-    return file;
-  }
-
-  @Override
   public RadioButton getDestinationFile() {
     return destinationFile;
   }
@@ -155,12 +151,20 @@ public class DataExportView extends DataCommonView implements DataExportPresente
 
   @Override
   public String getOutFile() {
-    return file.getValue();
+    return fileSelection.getFileField().getText();
   }
 
   @Override
   public void setTableWidgetDisplay(WidgetDisplay display) {
     tablesPanel.setWidget(display.asWidget());
+  }
+
+  @Override
+  public void setFileWidgetDisplay(FileSelectionPresenter.Display display) {
+    filePanel.setWidget(display.asWidget());
+    fileSelection = display;
+    fileSelection.setEnabled(false);
+    fileSelection.setWidth("20em");
   }
 
 }

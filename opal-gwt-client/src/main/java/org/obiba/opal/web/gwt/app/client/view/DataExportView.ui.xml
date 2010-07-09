@@ -35,7 +35,11 @@
     .wb-form {
     padding: 0.25em 0.5em 0 0.5em;
     }
-      
+    
+    .right-aligned {
+    	float: right;
+    	margin-left: 5px;
+    }
   </ui:style>
   
   <g:DockLayoutPanel>
@@ -79,7 +83,8 @@
             <tr>
               <td/>
               <td>
-                <g:RadioButton name="destination" ui:field="destinationFile"><ui:msg description="File name field label">file name:</ui:msg></g:RadioButton><g:TextBox ui:field="file"/>
+                <g:RadioButton name="destination" ui:field="destinationFile"><ui:msg description="File name field label">file name:</ui:msg></g:RadioButton>
+                <g:SimplePanel ui:field="filePanel" addStyleNames="{style.right-aligned}" />
               </td>
             </tr> 
             <tr>

@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.NavigatorTreePresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.VariablePresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
@@ -73,4 +74,6 @@ public interface OpalGinjector extends Ginjector {
   TableSelectorPresenter getTableSelectorPresenter();
 
   TableListPresenter getTableListPresenter();
+
+  FileSelectionPresenter getFileSectionPresenter();
 }

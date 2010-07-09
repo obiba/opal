@@ -24,9 +24,11 @@ import org.obiba.opal.web.gwt.app.client.view.DataImportView;
 import org.obiba.opal.web.gwt.app.client.view.ErrorDialogView;
 import org.obiba.opal.web.gwt.app.client.view.LoginView;
 import org.obiba.opal.web.gwt.app.client.view.UnhandledResponseNotificationView;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.view.FileSelectionView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.FileSelectorView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.TableListView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.TableSelectorView;
@@ -58,6 +60,7 @@ public class OpalGinModule extends AbstractGinModule {
     bind(FileSelectorPresenter.Display.class).to(FileSelectorView.class).in(Singleton.class);
     bind(TableSelectorPresenter.Display.class).to(TableSelectorView.class).in(Singleton.class);
     bind(TableListPresenter.Display.class).to(TableListView.class);
+    bind(FileSelectionPresenter.Display.class).to(FileSelectionView.class);
 
     // Concrete classes (such as NavigatorPresenter) don't need to be "bound". Simply define a getter in the
     // OpalGinjector interface and they'll "just work".

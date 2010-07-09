@@ -20,7 +20,9 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -44,8 +46,6 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   public interface Display extends DataCommonPresenter.Display {
 
-    HasValue<String> getFile();
-
     RadioButton getDestinationFile();
 
     String getOutFile();
@@ -61,6 +61,8 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     HasValue<Boolean> isDestinationDataSource();
 
     void setTableWidgetDisplay(WidgetDisplay display);
+
+    void setFileWidgetDisplay(FileSelectionPresenter.Display display);
   }
 
   @Inject
@@ -68,6 +70,9 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   @Inject
   private TableListPresenter tableListPresenter;
+
+  @Inject
+  private FileSelectionPresenter fileSelectionPresenter;
 
   /**
    * @param display
@@ -78,9 +83,10 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     super(display, eventBus);
   }
 
-  public DataExportPresenter(Display display, EventBus eventBus, TableListPresenter tableListPresenter) {
+  public DataExportPresenter(Display display, EventBus eventBus, TableListPresenter tableListPresenter, FileSelectionPresenter fileSelectionPresenter) {
     this(display, eventBus);
     this.tableListPresenter = tableListPresenter;
+    this.fileSelectionPresenter = fileSelectionPresenter;
   }
 
   @Override
@@ -152,8 +158,11 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   protected void initDisplayComponents() {
     tableListPresenter.bind();
-
     getDisplay().setTableWidgetDisplay(tableListPresenter.getDisplay());
+
+    fileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE);
+    fileSelectionPresenter.bind();
+    getDisplay().setFileWidgetDisplay(fileSelectionPresenter.getDisplay());
 
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
@@ -176,7 +185,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
       result.add("Must select at least one table for export");
     }
     if(getDisplay().getDestinationFile().getValue()) {
-      String filename = getDisplay().getFile().getValue();
+      String filename = getDisplay().getOutFile();
       if(filename == null || filename.equals("")) {
         result.add("filename cannot be empty");
       }

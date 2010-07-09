@@ -15,18 +15,31 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
+
 import com.google.inject.Inject;
 
 public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Display> {
 
-  public interface Display extends WidgetDisplay {
+  //
+  // Instance Variables
+  //
 
-  }
+  @Inject
+  TableListPresenter tableListPresenter;
+
+  //
+  // Constructors
+  //
 
   @Inject
   public DashboardPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
   }
+
+  //
+  // WidgetPresenter Methods
+  //
 
   @Override
   public Place getPlace() {
@@ -35,7 +48,8 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
 
   @Override
   protected void onBind() {
-
+    tableListPresenter.bind();
+    getDisplay().addTestWidget(tableListPresenter.getDisplay());
   }
 
   @Override
@@ -52,6 +66,14 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
 
   @Override
   public void revealDisplay() {
+  }
+
+  //
+  // Inner Classes / Interfaces
+  //
+
+  public interface Display extends WidgetDisplay {
+    void addTestWidget(WidgetDisplay display);
   }
 
 }
