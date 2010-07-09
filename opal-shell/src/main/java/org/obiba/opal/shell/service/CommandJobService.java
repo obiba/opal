@@ -61,4 +61,9 @@ public interface CommandJobService extends Service {
    * therefore cannot be deleted
    */
   public void deleteCommand(Integer id) throws NoSuchCommandJobException, IllegalStateException;
+
+  /**
+   * Deletes all completed commands (i.e., commands in the SUCCEEDED, FAILED or CANCELED state).
+   */
+  public void deleteCompletedCommands();
 }

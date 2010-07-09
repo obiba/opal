@@ -104,6 +104,13 @@ public class WebShellResource {
     }
   }
 
+  @DELETE
+  @Path("/commands/completed")
+  public Response deleteCompletedCommands() {
+    commandJobService.deleteCompletedCommands();
+    return Response.ok().build();
+  }
+
   @GET
   @Path("/command/{id}/status")
   public Response getCommandStatus(@PathParam("id") Integer id) {

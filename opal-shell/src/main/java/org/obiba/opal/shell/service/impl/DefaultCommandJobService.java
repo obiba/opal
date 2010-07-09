@@ -177,6 +177,15 @@ public class DefaultCommandJobService implements CommandJobService {
     throw new NoSuchCommandJobException(id);
   }
 
+  public void deleteCompletedCommands() {
+    for(FutureCommandJob futureCommandJob : getFutureCommandJobs()) {
+      CommandJob job = futureCommandJob.getCommandJob();
+      if(isDeletable(job)) {
+        jobsTerminated.remove(futureCommandJob);
+      }
+    }
+  }
+
   //
   // Methods
   //
