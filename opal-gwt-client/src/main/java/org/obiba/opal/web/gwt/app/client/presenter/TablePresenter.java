@@ -190,7 +190,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   }
 
   private void displayTable(String datasourceName, String tableName) {
-    if(!table.getDatasourceName().equals(datasourceName) || !table.getName().equals(tableName)) {
+    if(table == null || (!table.getDatasourceName().equals(datasourceName) || !table.getName().equals(tableName))) {
       getDisplay().clear();
       getDisplay().getTableName().setText(tableName);
       getDisplay().getParentName().setText(datasourceName);

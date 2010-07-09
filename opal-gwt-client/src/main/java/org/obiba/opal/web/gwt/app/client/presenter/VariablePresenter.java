@@ -155,7 +155,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   }
 
   private void updateDisplay(VariableDto variableDto) {
-    if(!variableDto.getName().equals(variable.getName()) || !variableDto.getParentLink().getRel().equals(variable.getParentLink().getRel())) {
+    if(variable == null || (!variableDto.getName().equals(variable.getName()) || !variableDto.getParentLink().getRel().equals(variable.getParentLink().getRel()))) {
       variable = variableDto;
       getDisplay().getVariableNameLabel().setText(variableDto.getName());
       getDisplay().getEntityTypeLabel().setText(variableDto.getEntityType());
