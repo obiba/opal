@@ -51,11 +51,9 @@
       </g:FlowPanel>
     </g:north>
     <g:center>
-      <g:SplitLayoutPanel>
-        <g:center>
-          <g:ScrollPanel width="100%" addStyleNames="{style.wb-form}">
-          <g:HTMLPanel>
-            <table class="gwt-KeyValue">
+      <g:ScrollPanel width="100%" addStyleNames="{style.wb-form}">
+        <g:HTMLPanel>
+          <table class="gwt-KeyValue">
             <tbody>
             <tr>
               <td colspan="2">
@@ -119,16 +117,9 @@
               </td>
             </tr> 
             </tbody>
-            </table>
-          </g:HTMLPanel>
-          </g:ScrollPanel>
-        </g:center>
-        <g:east size="300">
-          <g:FlowPanel addStyleNames="{style.wb-information}">
-            
-          </g:FlowPanel>
-        </g:east>
-      </g:SplitLayoutPanel>
+          </table>
+        </g:HTMLPanel>
+      </g:ScrollPanel>
     </g:center>
   </g:DockLayoutPanel>
 

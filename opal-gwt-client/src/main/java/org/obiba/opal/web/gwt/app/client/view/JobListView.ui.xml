@@ -72,20 +72,11 @@
       </g:FlowPanel>
     </g:north>
     <g:center>
-      <g:SplitLayoutPanel>
-        <g:center>
-          <g:ScrollPanel width="100%" >
-            <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_CENTER">
-              <g2:CellTable width="100%" ui:field="table" addStyleNames="{style.jobList}"/>
-            </g:VerticalPanel>
-          </g:ScrollPanel>
-        </g:center>
-        <g:east size="300">
-          <g:FlowPanel addStyleNames="{style.wb-information}">
-            
-          </g:FlowPanel>
-        </g:east>
-      </g:SplitLayoutPanel>
+      <g:ScrollPanel width="100%" >
+        <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_CENTER">
+          <g2:CellTable width="100%" ui:field="table" addStyleNames="{style.jobList}"/>
+        </g:VerticalPanel>
+      </g:ScrollPanel>
     </g:center>
   </g:DockLayoutPanel>
 </ui:UiBinder>
