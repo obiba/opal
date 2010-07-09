@@ -80,7 +80,7 @@ public interface Translations extends Constants {
   String actionsLabel();
 
   @Description("Action map")
-  @DefaultStringMapValue( { "Cancel", "Cancel", "Delete", "Delete" })
+  @DefaultStringMapValue( { "Log", "Log", "Cancel", "Cancel", "Delete", "Delete" })
   Map<String, String> actionMap();
 
   @Description("Size label")
