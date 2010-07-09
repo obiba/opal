@@ -20,13 +20,6 @@
     .jobList td + td:hover {
       cursor: default;
     }
-    .jobList td {
-      color: blue;
-      text-decoration: underline;
-    } 
-    .jobList td:hover {
-      cursor: pointer;
-    } 
     .jobList td + td + td + td + td + td + td span + span {
       margin-left: 1em;	
     }

@@ -19,13 +19,11 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
-import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.CommandStateDto;
 
-import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -36,47 +34,31 @@ import com.google.inject.Inject;
  *
  */
 public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> {
+  //
+  // Constants
+  //
+
+  public static final String LOG_ACTION = "Log";
 
   public static final String CANCEL_ACTION = "Cancel";
 
   public static final String DELETE_ACTION = "Delete";
 
-  public interface Display extends WidgetDisplay {
+  //
+  // Instance Variables
+  //
 
-    SelectionModel<CommandStateDto> getTableSelection();
-
-    void renderRows(JsArray<CommandStateDto> rows);
-
-    void clear();
-
-    HasFieldUpdater<CommandStateDto, String> getIdColumn();
-
-    HasActionHandler getActionsColumn();
-  }
-
-  public interface HasActionHandler {
-
-    void setActionHandler(ActionHandler handler);
-  }
-
-  public interface ActionHandler {
-
-    void doAction(CommandStateDto dto, String actionName);
-  }
+  private JobDetailsPresenter jobDetailsPresenter;
 
   //
   // Constructors
   //
 
   @Inject
-  public JobListPresenter(Display display, EventBus eventBus, final JobDetailsPresenter jobDetailsPresenter) {
+  public JobListPresenter(Display display, EventBus eventBus, JobDetailsPresenter jobDetailsPresenter) {
     super(display, eventBus);
 
-    getDisplay().getIdColumn().setFieldUpdater(new FieldUpdater<CommandStateDto, String>() {
-      public void update(int rowIndex, CommandStateDto object, String value) {
-        jobDetailsPresenter.getDisplay().showDialog(object);
-      }
-    });
+    this.jobDetailsPresenter = jobDetailsPresenter;
 
     getDisplay().getActionsColumn().setActionHandler(new ActionHandler() {
       public void doAction(CommandStateDto dto, String actionName) {
@@ -134,7 +116,9 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
   }
 
   private void doActionImpl(CommandStateDto dto, String actionName) {
-    if(CANCEL_ACTION.equals(actionName)) {
+    if(LOG_ACTION.equals(actionName)) {
+      jobDetailsPresenter.getDisplay().showDialog(dto);
+    } else if(CANCEL_ACTION.equals(actionName)) {
       cancelJob(dto);
     } else if(DELETE_ACTION.equals(actionName)) {
       deleteJob(dto);
@@ -173,5 +157,30 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
     };
 
     ResourceRequestBuilderFactory.<JsArray<CommandStateDto>> newBuilder().forResource("/shell/command/" + dto.getId()).delete().withCallback(400, callbackHandler).withCallback(404, callbackHandler).withCallback(200, callbackHandler).send();
+  }
+
+  //
+  // Inner Classes / Interfaces
+  //
+
+  public interface Display extends WidgetDisplay {
+
+    SelectionModel<CommandStateDto> getTableSelection();
+
+    void renderRows(JsArray<CommandStateDto> rows);
+
+    void clear();
+
+    HasActionHandler getActionsColumn();
+  }
+
+  public interface HasActionHandler {
+
+    void setActionHandler(ActionHandler handler);
+  }
+
+  public interface ActionHandler {
+
+    void doAction(CommandStateDto dto, String actionName);
   }
 }

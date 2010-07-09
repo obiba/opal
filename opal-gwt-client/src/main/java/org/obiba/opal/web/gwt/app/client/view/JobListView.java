@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.view;
 
 import static org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.CANCEL_ACTION;
 import static org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.DELETE_ACTION;
+import static org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.LOG_ACTION;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -121,10 +122,6 @@ public class JobListView extends Composite implements Display {
     renderRows((JsArray<CommandStateDto>) JavaScriptObject.createArray());
   }
 
-  public HasFieldUpdater<CommandStateDto, String> getIdColumn() {
-    return idColumn;
-  }
-
   public HasActionHandler getActionsColumn() {
     return actionsColumn;
   }
@@ -159,8 +156,12 @@ public class JobListView extends Composite implements Display {
   }
 
   private void addTableColumns() {
-    idColumn = new IdColumn();
-    table.addColumn((IdColumn) idColumn, translations.idLabel());
+    table.addColumn(new TextColumn<CommandStateDto>() {
+      @Override
+      public String getValue(CommandStateDto object) {
+        return String.valueOf(object.getId());
+      }
+    }, translations.idLabel());
 
     table.addColumn(new TextColumn<CommandStateDto>() {
       @Override
@@ -213,24 +214,6 @@ public class JobListView extends Composite implements Display {
   //
   // Inner Classes
   //
-
-  static class IdColumn extends Column<CommandStateDto, String> implements HasFieldUpdater<CommandStateDto, String> {
-    //
-    // Constructors
-    //
-
-    public IdColumn() {
-      super(new ClickableTextCell());
-    }
-
-    //
-    // Column Methods
-    //
-
-    public String getValue(CommandStateDto object) {
-      return String.valueOf(object.getId());
-    }
-  }
 
   static class ActionsColumn extends Column<CommandStateDto, CommandStateDto> implements HasActionHandler {
     //
@@ -311,11 +294,11 @@ public class JobListView extends Composite implements Display {
 
     private void refreshActions(CommandStateDto value) {
       if(value.getStatus().toString().equals("NOT_STARTED") || value.getStatus().toString().equals("IN_PROGRESS")) {
-        delegateCell = createCompositeCell(CANCEL_ACTION);
+        delegateCell = createCompositeCell(LOG_ACTION, CANCEL_ACTION);
       } else if(value.getStatus().toString().equals("SUCCEEDED") || value.getStatus().toString().equals("FAILED") || value.getStatus().toString().equals("CANCELED")) {
-        delegateCell = createCompositeCell(DELETE_ACTION);
+        delegateCell = createCompositeCell(LOG_ACTION, DELETE_ACTION);
       } else {
-        delegateCell = createCompositeCell(""); // no action
+        delegateCell = createCompositeCell(LOG_ACTION);
       }
     }
 
