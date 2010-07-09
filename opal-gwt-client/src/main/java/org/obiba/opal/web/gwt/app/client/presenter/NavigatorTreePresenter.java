@@ -131,19 +131,23 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
       public void onResource(Response response, JsArray<DatasourceDto> datasources) {
-        ArrayList<TreeItem> items = new ArrayList<TreeItem>(datasources.length());
-        for(int i = 0; i < datasources.length(); i++) {
-          DatasourceDto ds = datasources.get(i);
-          TreeItem dsItem = new TreeItem(ds.getName());
-          dsItem.setUserObject(ds);
-          JsArrayString array = ds.getTableArray();
-          for(int j = 0; j < array.length(); j++) {
-            dsItem.addItem(array.get(j));
+        if(datasources != null) {
+          ArrayList<TreeItem> items = new ArrayList<TreeItem>(datasources.length());
+          for(int i = 0; i < datasources.length(); i++) {
+            DatasourceDto ds = datasources.get(i);
+            TreeItem dsItem = new TreeItem(ds.getName());
+            dsItem.setUserObject(ds);
+            JsArrayString array = ds.getTableArray();
+            if(array != null) {
+              for(int j = 0; j < array.length(); j++) {
+                dsItem.addItem(array.get(j));
+              }
+            }
+            items.add(dsItem);
           }
-          items.add(dsItem);
+          getDisplay().setItems(items);
+          getDisplay().selectFirstDatasource();
         }
-        getDisplay().setItems(items);
-        getDisplay().selectFirstDatasource();
       }
     }).send();
   }

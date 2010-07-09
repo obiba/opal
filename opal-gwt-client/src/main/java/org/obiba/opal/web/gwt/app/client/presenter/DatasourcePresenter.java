@@ -106,12 +106,14 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
         ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
           @Override
           public void onResource(Response response, JsArray<DatasourceDto> resource) {
-            for(int i = 0; i < resource.length(); i++) {
-              if(resource.get(i).getName().equals(datasourceName)) {
-                if(i < resource.length() - 1) {
-                  eventBus.fireEvent(new DatasourceSelectionChangeEvent(resource.get(i + 1)));
+            if(resource != null) {
+              for(int i = 0; i < resource.length(); i++) {
+                if(resource.get(i).getName().equals(datasourceName)) {
+                  if(i < resource.length() - 1) {
+                    eventBus.fireEvent(new DatasourceSelectionChangeEvent(resource.get(i + 1)));
+                  }
+                  break;
                 }
-                break;
               }
             }
           }
@@ -127,12 +129,14 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
         ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
           @Override
           public void onResource(Response response, JsArray<DatasourceDto> resource) {
-            for(int i = 0; i < resource.length(); i++) {
-              if(resource.get(i).getName().equals(datasourceName)) {
-                if(i != 0) {
-                  eventBus.fireEvent(new DatasourceSelectionChangeEvent(resource.get(i - 1)));
+            if(resource != null) {
+              for(int i = 0; i < resource.length(); i++) {
+                if(resource.get(i).getName().equals(datasourceName)) {
+                  if(i != 0) {
+                    eventBus.fireEvent(new DatasourceSelectionChangeEvent(resource.get(i - 1)));
+                  }
+                  break;
                 }
-                break;
               }
             }
           }
