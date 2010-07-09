@@ -2,6 +2,27 @@
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
              xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
 
+  <ui:style>
+    .wb-top {
+    border-bottom:1px solid #BBBBBB;
+    padding: 0.25em 0 0 1em;
+    float: left;
+    }
+    
+    .wb-top .title {
+    font-size: 1.3em;
+    }
+    
+  </ui:style>
+  
+  <g:DockLayoutPanel>
+    <g:north size="30">
+      <g:FlowPanel addStyleNames="{style.wb-top}">
+        <g:Label addStyleNames="{style.title}"><ui:msg description="Variable explorer title">Variable Explorer</ui:msg></g:Label>
+      </g:FlowPanel>
+    </g:north>
+    <g:center>
+    
   <g:SplitLayoutPanel>
     <g:center> 
       <g:ScrollPanel width="100%" ui:field="navigatorDisplayPanel" />
@@ -11,4 +32,6 @@
       </g:ScrollPanel>
     </g:west>
   </g:SplitLayoutPanel>
+  </g:center>
+  </g:DockLayoutPanel>
 </ui:UiBinder>

@@ -5,36 +5,12 @@
   <ui:style>
     .wb-top {
     border-bottom:1px solid #BBBBBB;
-    }
-    
-    .wb-head {
-    padding: 0.25em 0 0 0.5em;
-            float: left;
-    }
-    
-    .wb-head .title {
-    font-size: 1.3em;
-    }
-  
-    .wb-head .summary { 
-     
-    }
-    
-    .wb-control {
-    padding: 1em 0.5em 0.5em 0.5em;
+    padding: 0.25em 0 0 1em;
     float: left;
     }
     
-    .wb-control .button {
-    margin-left: 10px;
-    }
-    
-    .wb-information {
-    border:1px solid #BBBBBB;
-    }
-    
-    .wb-form {
-    padding: 0.25em 0.5em 0 0.5em;
+    .wb-top .title {
+    font-size: 1.3em;
     }
     
     .jobList td + td {
@@ -66,9 +42,7 @@
   <g:DockLayoutPanel>
     <g:north size="30">
       <g:FlowPanel addStyleNames="{style.wb-top}">
-        <g:FlowPanel addStyleNames="{style.wb-head}">
-          <g:Label addStyleNames="{style.title}"><ui:msg description="Jobs menu item">Jobs</ui:msg></g:Label>
-        </g:FlowPanel>
+        <g:Label addStyleNames="{style.title}"><ui:msg description="Jobs list title">Jobs List</ui:msg></g:Label>
       </g:FlowPanel>
     </g:north>
     <g:center>

@@ -3,57 +3,60 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <ui:style>
-    .title {
-    font-size: 1.5em;
-    margin: 0.25em 0 0 0.5em;
+    .wb-top {
+    border-bottom:1px solid #BBBBBB;
+    padding: 0.25em 0 0 1em;
+    float: left;
     }
-
-    .topPanel {
-    border-bottom-style:solid;
-    border-bottom-width:0.2em;
-    border-bottom-color:black;
+    
+    .wb-head {
+    float: left;
+    margin-right:20px;
     }
-
-    .actionButton {
-    font-size: 1em;
-    margin: 0.5em 0.5em 0.5em 0.5em;
+    
+    .wb-top .title {
+    font-size: 1.3em;
+    padding-top: 0.3em;
     }
-
-    .treePanel {
-    margin: 1.25em 0 0 0.5em;
-    }    
+    
+    .wb-control {
+    	padding-top: 0.25em;
+    }
+    
+    .wb-control button {
+    margin-left: 10px;
+    }
+           
   </ui:style>
 
   <g:DockLayoutPanel>
     <g:north size="40">
-      <g:DockLayoutPanel addStyleNames="{style.topPanel}">
-        <g:center>
-          <g:Label addStyleNames="{style.title}">
-            <ui:msg description="Explorer">File Explorer</ui:msg>
-          </g:Label>
-        </g:center>
-        <g:east size="360" horizontalAlignment="ALIGN_RIGHT">
-          <g:FlowPanel>
-            <g:Button addStyleNames="{style.actionButton}" ui:field="createFolderButton">
+      <g:FlowPanel addStyleNames="{style.wb-top}">
+        <g:FlowPanel addStyleNames="{style.wb-head}">
+          <g:Label addStyleNames="{style.title}"><ui:msg description="Explorer">File Explorer</ui:msg></g:Label>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="{style.wb-control}">
+            <g:Button ui:field="createFolderButton">
               <ui:msg description="Create Folder label">Create Folder</ui:msg>
             </g:Button>          
-            <g:Button addStyleNames="{style.actionButton}" ui:field="fileUploadButton">
+            <g:Button ui:field="fileUploadButton">
               <ui:msg description="Upload File label">Upload</ui:msg>
             </g:Button>
-            <g:Button addStyleNames="{style.actionButton}" ui:field="fileDownloadButton">
+            <g:Button ui:field="fileDownloadButton">
               <ui:msg description="Download File label">Download</ui:msg>
             </g:Button>
-            <g:Button addStyleNames="{style.actionButton}" ui:field="fileDeleteButton">
+            <g:Button ui:field="fileDeleteButton">
               <ui:msg description="Delete File label">Delete</ui:msg>
             </g:Button>
           </g:FlowPanel>
-        </g:east>
-      </g:DockLayoutPanel>
-    </g:north>
+        </g:FlowPanel>
+      
+   </g:north>       
+      
     <g:center>
       <g:SplitLayoutPanel>
         <g:west size="200">
-          <g:ScrollPanel ui:field="fileSystemTreePanel" addStyleNames="{style.treePanel}">
+          <g:ScrollPanel ui:field="fileSystemTreePanel">
           </g:ScrollPanel>
         </g:west>
         <g:center>
