@@ -15,8 +15,6 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
-
 import com.google.inject.Inject;
 
 public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Display> {
@@ -24,9 +22,6 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
   //
   // Instance Variables
   //
-
-  @Inject
-  TableListPresenter tableListPresenter;
 
   //
   // Constructors
@@ -48,8 +43,6 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
 
   @Override
   protected void onBind() {
-    tableListPresenter.bind();
-    getDisplay().addTestWidget(tableListPresenter.getDisplay());
   }
 
   @Override
