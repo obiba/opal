@@ -21,8 +21,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.inject.Inject;
 
 /**
@@ -76,11 +75,11 @@ public class FileSelectionPresenter extends WidgetPresenter<FileSelectionPresent
   // 
 
   public String getSelectedFile() {
-    return getDisplay().getFileField().getText();
+    return getDisplay().getFile();
   }
 
   public void setSelectedFile(String selectedFile) {
-    getDisplay().getFileField().setText(selectedFile);
+    getDisplay().setFile(selectedFile);
   }
 
   public FileSelectionType getFileSelectionType() {
@@ -97,13 +96,13 @@ public class FileSelectionPresenter extends WidgetPresenter<FileSelectionPresent
       @Override
       public void onFileSelection(FileSelectionEvent event) {
         if(FileSelectionPresenter.this.equals(event.getSource())) {
-          getDisplay().getFileField().setText(event.getSelectedFile());
+          getDisplay().setFile(event.getSelectedFile());
         }
       }
 
     }));
 
-    super.registerHandler(getDisplay().getBrowseWidget().addClickHandler(new ClickHandler() {
+    super.registerHandler(getDisplay().addBrowseClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
@@ -119,13 +118,17 @@ public class FileSelectionPresenter extends WidgetPresenter<FileSelectionPresent
 
   public interface Display extends WidgetDisplay {
 
-    HasClickHandlers getBrowseWidget();
+    HandlerRegistration addBrowseClickHandler(ClickHandler handler);
 
-    HasText getFileField();
+    String getFile();
+
+    void setFile(String text);
+
+    void clearFile();
 
     void setEnabled(boolean enabled);
 
-    void setWidth(String width);
+    void setFieldWidth(String width);
 
   }
 

@@ -61,7 +61,7 @@ public class DataImportView extends DataCommonView implements DataImportPresente
 
   @Override
   public String getArchiveDirectory() {
-    return this.shouldArchive.getValue() ? this.archiveSelection.getFileField().getText() : null;
+    return this.shouldArchive.getValue() ? this.archiveSelection.getFile() : null;
   }
 
   @Override
@@ -81,12 +81,12 @@ public class DataImportView extends DataCommonView implements DataImportPresente
   public void setFileWidgetDisplay(Display display) {
     filePanel.setWidget(display.asWidget());
     fileSelection = display;
-    fileSelection.setWidth("20em");
+    fileSelection.setFieldWidth("20em");
   }
 
   @Override
   public String getSelectedFile() {
-    return fileSelection.getFileField().getText();
+    return fileSelection.getFile();
   }
 
   @Override
@@ -94,6 +94,6 @@ public class DataImportView extends DataCommonView implements DataImportPresente
     archivePanel.setWidget(display.asWidget());
     archiveSelection = display;
     archiveSelection.setEnabled(shouldArchive.getValue());
-    archiveSelection.setWidth("20em");
+    archiveSelection.setFieldWidth("20em");
   }
 }

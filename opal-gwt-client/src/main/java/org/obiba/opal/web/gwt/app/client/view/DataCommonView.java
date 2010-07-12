@@ -14,7 +14,8 @@ import org.obiba.opal.web.model.client.DatasourceDto;
 import org.obiba.opal.web.model.client.FunctionalUnitDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -61,8 +62,8 @@ public abstract class DataCommonView extends Composite implements DataCommonPres
   }
 
   @Override
-  public HasClickHandlers getSubmit() {
-    return submit;
+  public HandlerRegistration addSubmitClickHandler(ClickHandler handler) {
+    return submit.addClickHandler(handler);
   }
 
 }

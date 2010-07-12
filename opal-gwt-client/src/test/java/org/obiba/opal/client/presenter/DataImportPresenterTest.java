@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.client.presenter;
 
-import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -27,7 +26,6 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.GwtEvent.Type;
 
@@ -69,19 +67,14 @@ public class DataImportPresenterTest extends AbstractGwtTestSetup {
     // Make sure that handlers are added to the event bus
     expect(eventBusMock.addHandler((Type<FileSelectionEvent.Handler>) EasyMock.anyObject(), (FileSelectionEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
 
-    HasClickHandlers hasClickHandlerMock = createMock(HasClickHandlers.class);
-    expect(displayMock.getSubmit()).andReturn(hasClickHandlerMock).atLeastOnce();
+    // Make sure that a ClickHandler is added to the Submit button
+    expect(displayMock.addSubmitClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
 
-    HasClickHandlers hasClickHandlerBrowseMock = createMock(HasClickHandlers.class);
-    expect(fileSelectionDisplayMock.getBrowseWidget()).andReturn(hasClickHandlerBrowseMock).atLeastOnce();
-    expect(archiveSelectionDisplayMock.getBrowseWidget()).andReturn(hasClickHandlerBrowseMock).atLeastOnce();
-    expect(hasClickHandlerBrowseMock.addClickHandler((ClickHandler) anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
+    expect(fileSelectionDisplayMock.addBrowseClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
+    expect(archiveSelectionDisplayMock.addBrowseClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
 
     displayMock.setFileWidgetDisplay(fileSelectionDisplayMock);
     displayMock.setArchiveWidgetDisplay(archiveSelectionDisplayMock);
-
-    // Make sure that a ClickHandler is added to the Submit button
-    expect(hasClickHandlerMock.addClickHandler((ClickHandler) anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
 
     // Expect that the presenter makes these calls to the server when it binds itself.
     ResourceRequestBuilder mockRequestBuilder = mockBridge.addMock(ResourceRequestBuilder.class);
@@ -92,11 +85,11 @@ public class DataImportPresenterTest extends AbstractGwtTestSetup {
     mockRequestBuilder.send();
     EasyMock.expectLastCall().anyTimes();
 
-    replay(eventBusMock, displayMock, fileSelectionDisplayMock, archiveSelectionDisplayMock, hasClickHandlerMock, hasClickHandlerBrowseMock, mockRequestBuilder);
+    replay(eventBusMock, displayMock, fileSelectionDisplayMock, archiveSelectionDisplayMock, mockRequestBuilder);
 
     importPresenter.bind();
 
-    verify(eventBusMock, displayMock, fileSelectionDisplayMock, archiveSelectionDisplayMock, hasClickHandlerMock, hasClickHandlerBrowseMock, mockRequestBuilder);
+    verify(eventBusMock, displayMock, fileSelectionDisplayMock, archiveSelectionDisplayMock, mockRequestBuilder);
 
   }
 }

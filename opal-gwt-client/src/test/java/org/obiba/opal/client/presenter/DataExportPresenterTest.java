@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.client.presenter;
 
-import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -28,8 +27,8 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.GwtEvent.Type;
 
@@ -73,25 +72,16 @@ public class DataExportPresenterTest extends AbstractGwtTestSetup {
     expect(eventBusMock.addHandler((Type<FileSelectionEvent.Handler>) EasyMock.anyObject(), (FileSelectionEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
 
     // Make sure that a ClickHandler is added to the Submit button
-    HasClickHandlers hasClickHandlerSubmitMock = createMock(HasClickHandlers.class);
-    expect(displayMock.getSubmit()).andReturn(hasClickHandlerSubmitMock).atLeastOnce();
-    expect(hasClickHandlerSubmitMock.addClickHandler((ClickHandler) anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
+    expect(displayMock.addSubmitClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
+    expect(tableListDisplayMock.addRemoveClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
+    expect(tableListDisplayMock.addAddClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
 
-    HasClickHandlers hasClickHandlerRemoveMock = createMock(HasClickHandlers.class);
-    expect(tableListDisplayMock.getRemoveWidget()).andReturn(hasClickHandlerRemoveMock);
-    expect(hasClickHandlerRemoveMock.addClickHandler((ClickHandler) anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
-
-    HasClickHandlers hasClickHandlerAddMock = createMock(HasClickHandlers.class);
-    expect(tableListDisplayMock.getAddWidget()).andReturn(hasClickHandlerAddMock);
-    expect(hasClickHandlerAddMock.addClickHandler((ClickHandler) anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
+    expect(fileSelectionDisplayMock.addBrowseClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
 
     displayMock.setTableWidgetDisplay(tableListDisplayMock);
-
-    HasClickHandlers hasClickHandlerBrowseMock = createMock(HasClickHandlers.class);
-    expect(fileSelectionDisplayMock.getBrowseWidget()).andReturn(hasClickHandlerBrowseMock).atLeastOnce();
-    expect(hasClickHandlerBrowseMock.addClickHandler((ClickHandler) anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
-
+    expect(displayMock.getFileFormat()).andReturn("csv");
     displayMock.setFileWidgetDisplay(fileSelectionDisplayMock);
+    expect(displayMock.addFileFormatChangeHandler((ChangeHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
 
     // Expects that the presenter makes these calls to the server when it binds itself
     ResourceRequestBuilder mockRequestBuilder = mockBridge.addMock(ResourceRequestBuilder.class);
@@ -102,11 +92,11 @@ public class DataExportPresenterTest extends AbstractGwtTestSetup {
     mockRequestBuilder.send();
     EasyMock.expectLastCall().anyTimes();
 
-    replay(eventBusMock, tableListDisplayMock, fileSelectionDisplayMock, displayMock, hasClickHandlerSubmitMock, hasClickHandlerRemoveMock, hasClickHandlerAddMock, hasClickHandlerBrowseMock, mockRequestBuilder);
+    replay(eventBusMock, tableListDisplayMock, fileSelectionDisplayMock, displayMock, mockRequestBuilder);
 
     exportPresenter.bind();
 
-    verify(eventBusMock, tableListDisplayMock, fileSelectionDisplayMock, displayMock, hasClickHandlerSubmitMock, hasClickHandlerRemoveMock, hasClickHandlerAddMock, hasClickHandlerBrowseMock, mockRequestBuilder);
+    verify(eventBusMock, tableListDisplayMock, fileSelectionDisplayMock, displayMock, mockRequestBuilder);
 
   }
 }

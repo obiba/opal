@@ -37,21 +37,6 @@ import com.google.inject.Inject;
 
 public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Display> {
 
-  public interface Display extends DataCommonPresenter.Display {
-
-    String getSelectedFile();
-
-    void setUnits(JsArray<FunctionalUnitDto> units);
-
-    String getArchiveDirectory();
-
-    String getSelectedUnit();
-
-    void setFileWidgetDisplay(FileSelectionPresenter.Display display);
-
-    void setArchiveWidgetDisplay(FileSelectionPresenter.Display display);
-  }
-
   @Inject
   private ErrorDialogPresenter errorDialog;
 
@@ -88,41 +73,7 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
   }
 
   protected void addEventHandlers() {
-    getDisplay().getSubmit().addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        ImportCommandOptionsDto dto = ImportCommandOptionsDto.create();
-        dto.setDestination(getDisplay().getSelectedDatasource());
-        dto.setArchive(getDisplay().getArchiveDirectory());
-        JsArrayString selectedFiles = JavaScriptObject.createArray().cast();
-        selectedFiles.push(getDisplay().getSelectedFile());
-        dto.setFilesArray(selectedFiles);
-        dto.setUnit(getDisplay().getSelectedUnit());
-        ResourceRequestBuilderFactory.newBuilder().forResource("/shell/import").post().withResourceBody(ImportCommandOptionsDto.stringify(dto)).withCallback(400, new ResponseCodeCallback() {
-
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            errorDialog.bind();
-            errorDialog.setErrors(Arrays.asList(new String[] { response.getText() }));
-            errorDialog.revealDisplay();
-          }
-        }).withCallback(201, new ResponseCodeCallback() {
-
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            String location = response.getHeader("Location");
-            String jobId = location.substring(location.lastIndexOf('/') + 1);
-
-            errorDialog.bind();
-            errorDialog.setMessageDialogType(MessageDialogType.INFO);
-            errorDialog.setErrors(Arrays.asList(new String[] { "The 'import' job has been launched with ID#" + jobId + "." }));
-            errorDialog.revealDisplay();
-          }
-        }).send();
-      }
-
-    });
+    getDisplay().addSubmitClickHandler(new SubmitClickHandler());
   }
 
   protected void initDisplayComponents() {
@@ -164,6 +115,59 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
 
   @Override
   public void revealDisplay() {
+  }
+
+  //
+  // Interfaces and classes
+  //
+
+  class SubmitClickHandler implements ClickHandler {
+    @Override
+    public void onClick(ClickEvent event) {
+      ImportCommandOptionsDto dto = ImportCommandOptionsDto.create();
+      dto.setDestination(getDisplay().getSelectedDatasource());
+      dto.setArchive(getDisplay().getArchiveDirectory());
+      JsArrayString selectedFiles = JavaScriptObject.createArray().cast();
+      selectedFiles.push(getDisplay().getSelectedFile());
+      dto.setFilesArray(selectedFiles);
+      dto.setUnit(getDisplay().getSelectedUnit());
+      ResourceRequestBuilderFactory.newBuilder().forResource("/shell/import").post().withResourceBody(ImportCommandOptionsDto.stringify(dto)).withCallback(400, new ResponseCodeCallback() {
+
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          errorDialog.bind();
+          errorDialog.setErrors(Arrays.asList(new String[] { response.getText() }));
+          errorDialog.revealDisplay();
+        }
+      }).withCallback(201, new ResponseCodeCallback() {
+
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          String location = response.getHeader("Location");
+          String jobId = location.substring(location.lastIndexOf('/') + 1);
+
+          errorDialog.bind();
+          errorDialog.setMessageDialogType(MessageDialogType.INFO);
+          errorDialog.setErrors(Arrays.asList(new String[] { "The 'import' job has been launched with ID#" + jobId + "." }));
+          errorDialog.revealDisplay();
+        }
+      }).send();
+    }
+  }
+
+  public interface Display extends DataCommonPresenter.Display {
+
+    String getSelectedFile();
+
+    void setUnits(JsArray<FunctionalUnitDto> units);
+
+    String getArchiveDirectory();
+
+    String getSelectedUnit();
+
+    void setFileWidgetDisplay(FileSelectionPresenter.Display display);
+
+    void setArchiveWidgetDisplay(FileSelectionPresenter.Display display);
   }
 
 }

@@ -16,7 +16,8 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.model.client.TableDto;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -85,13 +86,13 @@ public class TableListView extends Composite implements TableListPresenter.Displ
   }
 
   @Override
-  public HasClickHandlers getAddWidget() {
-    return addImage;
+  public HandlerRegistration addAddClickHandler(ClickHandler handler) {
+    return addImage.addClickHandler(handler);
   }
 
   @Override
-  public HasClickHandlers getRemoveWidget() {
-    return removeImage;
+  public HandlerRegistration addRemoveClickHandler(ClickHandler handler) {
+    return removeImage.addClickHandler(handler);
   }
 
   @Override

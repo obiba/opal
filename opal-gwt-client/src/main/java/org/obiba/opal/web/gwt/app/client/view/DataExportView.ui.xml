@@ -41,6 +41,15 @@
     	float: right;
     	margin-left: 5px;
     }
+    
+    .left-aligned {
+    	float: left;
+    	margin-right: 5px;
+    }
+    
+   .indent {
+    	margin-left: 20px;
+    }
   </ui:style>
   
   <g:DockLayoutPanel>
@@ -66,18 +75,37 @@
               </td>
             </tr>
             <tr>
-              <td>
+              <td style="vertical-align:top">
                 <ui:msg description="Destination field label">Destination:</ui:msg>
               </td>
               <td>
-                <g:RadioButton name="destination" ui:field="destinationDataSource"/> <g:ListBox ui:field="datasources" />
+                <g:RadioButton name="destination" ui:field="destinationFile"><ui:msg description="File destination label">Copy data to file:</ui:msg></g:RadioButton>
+                
+                <g:HTMLPanel  addStyleNames="{style.indent}">
+                
+                <table>
+                  <tbody>
+                    <tr>
+                      <td><g:Label><ui:msg description="File format field">Format:</ui:msg></g:Label></td>
+                      <td><g:ListBox ui:field="fileFormat">
+                        <g:item value="csv">CSV</g:item>
+                        <g:item value="excel">Excel</g:item>
+                      </g:ListBox></td>
+                    </tr>
+                    <tr>
+                      <td><g:Label><ui:msg description="File field">File:</ui:msg></g:Label></td>
+                      <td><g:SimplePanel ui:field="filePanel"/></td>
+                    </tr>
+                  </tbody>
+				</table>
+                </g:HTMLPanel>   
               </td>
             </tr>
             <tr>
               <td/>
               <td>
-                <g:RadioButton name="destination" ui:field="destinationFile"><ui:msg description="File name field label">file name:</ui:msg></g:RadioButton>
-                <g:SimplePanel ui:field="filePanel" addStyleNames="{style.right-aligned}" />
+                <g:RadioButton name="destination" ui:field="destinationDataSource"><ui:msg description="Datasource destination label">Copy data to dataset:</ui:msg></g:RadioButton> 
+                <g:ListBox ui:field="datasources" />
               </td>
             </tr> 
             <tr>

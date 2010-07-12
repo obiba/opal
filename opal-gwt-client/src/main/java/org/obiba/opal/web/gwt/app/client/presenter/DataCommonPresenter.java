@@ -15,7 +15,8 @@ import org.obiba.opal.web.model.client.DatasourceDto;
 import org.obiba.opal.web.model.client.FunctionalUnitDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 
 /**
  * Presenter elements common between the export and import dialog.
@@ -37,7 +38,7 @@ public abstract class DataCommonPresenter {
     String getSelectedUnit();
 
     /** Get the form submit button. */
-    HasClickHandlers getSubmit();
+    HandlerRegistration addSubmitClickHandler(ClickHandler handler);
   }
 
 }

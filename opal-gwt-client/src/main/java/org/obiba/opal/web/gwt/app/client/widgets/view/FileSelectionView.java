@@ -12,13 +12,13 @@ package org.obiba.opal.web.gwt.app.client.widgets.view;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -64,17 +64,17 @@ public class FileSelectionView extends Composite implements FileSelectionPresent
   //
 
   @Override
-  public HasClickHandlers getBrowseWidget() {
-    return browseButton;
+  public HandlerRegistration addBrowseClickHandler(ClickHandler handler) {
+    return browseButton.addClickHandler(handler);
   }
 
   @Override
-  public HasText getFileField() {
-    return fileField;
+  public String getFile() {
+    return fileField.getText();
   }
 
   @Override
-  public void setWidth(String width) {
+  public void setFieldWidth(String width) {
     fileField.setWidth(width);
   }
 
@@ -94,6 +94,16 @@ public class FileSelectionView extends Composite implements FileSelectionPresent
   @Override
   public void setEnabled(boolean enabled) {
     browseButton.setEnabled(enabled);
+  }
+
+  @Override
+  public void clearFile() {
+    fileField.setText("");
+  }
+
+  @Override
+  public void setFile(String text) {
+    fileField.setText(text);
   }
 
 }

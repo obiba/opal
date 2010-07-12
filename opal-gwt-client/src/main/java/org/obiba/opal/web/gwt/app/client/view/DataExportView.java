@@ -14,13 +14,15 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresente
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -41,6 +43,9 @@ public class DataExportView extends DataCommonView implements DataExportPresente
 
   @UiField
   SimplePanel filePanel;
+
+  @UiField
+  ListBox fileFormat;
 
   @UiField
   RadioButton destinationDataSource;
@@ -73,6 +78,7 @@ public class DataExportView extends DataCommonView implements DataExportPresente
       public void onClick(ClickEvent event) {
         datasources.setEnabled(true);
         fileSelection.setEnabled(false);
+        fileFormat.setEnabled(false);
       }
     });
     destinationFile.addClickHandler(new ClickHandler() {
@@ -81,9 +87,12 @@ public class DataExportView extends DataCommonView implements DataExportPresente
       public void onClick(ClickEvent event) {
         datasources.setEnabled(false);
         fileSelection.setEnabled(true);
+        fileFormat.setEnabled(true);
       }
     });
-    destinationDataSource.setValue(true);
+
+    destinationFile.setValue(true);
+    datasources.setEnabled(false);
 
     opalId.addClickHandler(new ClickHandler() {
 
@@ -119,38 +128,43 @@ public class DataExportView extends DataCommonView implements DataExportPresente
   }
 
   @Override
-  public RadioButton getDestinationFile() {
-    return destinationFile;
+  public boolean isDestinationFile() {
+    return destinationFile.getValue();
   }
 
   @Override
-  public HasValue<Boolean> isIncremental() {
-    return incremental;
+  public boolean isIncremental() {
+    return incremental.getValue();
   }
 
   @Override
-  public HasValue<Boolean> isUseAlias() {
-    return useAlias;
+  public boolean isUseAlias() {
+    return useAlias.getValue();
   }
 
   @Override
-  public HasValue<Boolean> isWithVariables() {
-    return withVariables;
+  public boolean isWithVariables() {
+    return withVariables.getValue();
   }
 
   @Override
-  public HasValue<Boolean> isUnitId() {
-    return unitId;
+  public boolean isUnitId() {
+    return unitId.getValue();
   }
 
   @Override
-  public HasValue<Boolean> isDestinationDataSource() {
-    return destinationDataSource;
+  public boolean isDestinationDataSource() {
+    return destinationDataSource.getValue();
   }
 
   @Override
   public String getOutFile() {
-    return fileSelection.getFileField().getText();
+    return fileSelection.getFile();
+  }
+
+  @Override
+  public String getFileFormat() {
+    return fileFormat.getValue(fileFormat.getSelectedIndex());
   }
 
   @Override
@@ -163,8 +177,14 @@ public class DataExportView extends DataCommonView implements DataExportPresente
   public void setFileWidgetDisplay(FileSelectionPresenter.Display display) {
     filePanel.setWidget(display.asWidget());
     fileSelection = display;
-    fileSelection.setEnabled(false);
-    fileSelection.setWidth("20em");
+    fileSelection.setEnabled(true);
+    fileSelection.setFieldWidth("20em");
+    fileFormat.setEnabled(true);
+  }
+
+  @Override
+  public HandlerRegistration addFileFormatChangeHandler(ChangeHandler handler) {
+    return fileFormat.addChangeHandler(handler);
   }
 
 }
