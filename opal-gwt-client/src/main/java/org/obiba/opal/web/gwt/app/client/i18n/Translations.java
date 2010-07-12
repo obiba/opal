@@ -210,4 +210,12 @@ public interface Translations extends Constants {
   @Description("Log label")
   @DefaultStringValue("Log")
   String logLabel();
+
+  @Description("Confirmation title map")
+  @DefaultStringMapValue( { "clearJobsList", "Clear Jobs List", "cancelJob", "Cancel Job" })
+  Map<String, String> confirmationTitleMap();
+
+  @Description("Confirmation message map")
+  @DefaultStringMapValue( { "confirmClearJobsList", "All the completed jobs (succeeded, failed or cancelled) will be removed from the jobs list. Currently running jobs will be unaffected.<br /><br />Please confirm that you want to clear the jobs list.", "confirmCancelJob", "The job will be cancelled. Changes will be rolled back as much as possible: although cancelled, a job might be partially completed.<br /><br />Please confirm that you want cancel this job." })
+  Map<String, String> confirmationMessageMap();
 }
