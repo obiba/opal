@@ -17,7 +17,8 @@ import org.obiba.opal.web.model.client.CategoryDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -26,7 +27,6 @@ import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -48,10 +48,6 @@ public class VariableView extends Composite implements VariablePresenter.Display
   private static final String DEFAULT_LOCALE_NAME = "default";
 
   private static final String LABEL_ATTRIBUTE_NAME = "label";
-
-  private static final String ALIAS_ATTRIBUTE_NAME = "alias";
-
-  private static final String SCRIPT_ATTRIBUTE_NAME = "script";
 
   private static VariableViewUiBinder uiBinder = GWT.create(VariableViewUiBinder.class);
 
@@ -188,52 +184,59 @@ public class VariableView extends Composite implements VariablePresenter.Display
   // Methods
   //
 
-  public HasText getVariableNameLabel() {
-    return variableName;
-  }
-
-  public HasText getEntityTypeLabel() {
-    return entityType;
-  }
-
-  public HasText getValueTypeLabel() {
-    return valueType;
-  }
-
-  public HasText getMimeTypeLabel() {
-    return mimeType;
-  }
-
-  public HasText getUnitLabel() {
-    return unit;
-  }
-
-  public HasText getRepeatableLabel() {
-    return repeatable;
-  }
-
-  public HasText getOccurrenceGroupLabel() {
-    return occurrenceGroup;
+  @Override
+  public void setVariableName(String name) {
+    variableName.setText(name);
   }
 
   @Override
-  public HasClickHandlers getParentLink() {
-    return parentLink;
+  public void setEntityType(String text) {
+    entityType.setText(text);
   }
 
   @Override
-  public HasText getParentName() {
-    return parentLink;
+  public void setValueType(String text) {
+    valueType.setText(text);
   }
 
   @Override
-  public HasClickHandlers getPreviousLink() {
-    return previousImage;
+  public void setMimeType(String text) {
+    mimeType.setText(text);
   }
 
   @Override
-  public HasClickHandlers getNextLink() {
-    return nextImage;
+  public void setUnit(String text) {
+    unit.setText(text);
+  }
+
+  @Override
+  public void setRepeatable(String text) {
+    repeatable.setText(text);
+  }
+
+  @Override
+  public void setOccurrenceGroup(String text) {
+    occurrenceGroup.setText(text);
+  }
+
+  @Override
+  public HandlerRegistration addParentClickHandler(ClickHandler handler) {
+    return parentLink.addClickHandler(handler);
+  }
+
+  @Override
+  public void setParentName(String name) {
+    parentLink.setText(name);
+  }
+
+  @Override
+  public HandlerRegistration addPreviousClickHandler(ClickHandler handler) {
+    return previousImage.addClickHandler(handler);
+  }
+
+  @Override
+  public HandlerRegistration addNextClickHandler(ClickHandler handler) {
+    return nextImage.addClickHandler(handler);
   }
 
   private void initCategoryTable() {

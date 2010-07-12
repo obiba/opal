@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.client.presenter;
 
-import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -23,12 +22,11 @@ import org.obiba.opal.web.gwt.app.client.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.DatasourcePresenter;
-import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 import org.obiba.opal.web.model.client.TableDto;
 
+import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.GwtEvent.Type;
 
@@ -55,19 +53,14 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
     expect(eventBusMock.addHandler((Type<DatasourceSelectionChangeEvent.Handler>) EasyMock.anyObject(), (DatasourceSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
     expect(eventBusMock.addHandler((Type<SiblingTableSelectionEvent.Handler>) EasyMock.anyObject(), (SiblingTableSelectionEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
 
-    HasClickHandlers hasClickHandlerMock = createMock(HasClickHandlers.class);
-    expect(displayMock.getSpreadsheetIcon()).andReturn(hasClickHandlerMock);
-    expect(displayMock.getNextLink()).andReturn(hasClickHandlerMock);
-    expect(displayMock.getPreviousLink()).andReturn(hasClickHandlerMock);
+    expect(displayMock.addNextClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
+    expect(displayMock.addPreviousClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
+    expect(displayMock.addSpreadSheetClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
+    displayMock.setTableNameFieldUpdater((FieldUpdater<TableDto, String>) EasyMock.anyObject());
 
-    HasFieldUpdater<TableDto, String> hasFieldUpdater = createMock(HasFieldUpdater.class);
-    expect(displayMock.getTableNameColumn()).andReturn(hasFieldUpdater);
-
-    expect(hasClickHandlerMock.addClickHandler((ClickHandler) anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
-
-    replay(displayMock, eventBusMock, hasClickHandlerMock);
+    replay(displayMock, eventBusMock);
     datasourcePresenter.bind();
 
-    verify(displayMock, eventBusMock, hasClickHandlerMock);
+    verify(displayMock, eventBusMock);
   }
 }

@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.client.presenter;
 
-import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -24,7 +23,6 @@ import org.obiba.opal.web.gwt.app.client.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.GwtEvent.Type;
 
@@ -49,16 +47,14 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
     HandlerRegistration handlerRegistrationMock = createMock(HandlerRegistration.class);
     expect(eventBusMock.addHandler((Type<VariableSelectionChangeEvent.Handler>) EasyMock.anyObject(), (VariableSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
 
-    HasClickHandlers hasClickHandlerMock = createMock(HasClickHandlers.class);
-    expect(displayMock.getParentLink()).andReturn(hasClickHandlerMock);
-    expect(displayMock.getNextLink()).andReturn(hasClickHandlerMock);
-    expect(displayMock.getPreviousLink()).andReturn(hasClickHandlerMock);
-    expect(hasClickHandlerMock.addClickHandler((ClickHandler) anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
+    expect(displayMock.addParentClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
+    expect(displayMock.addPreviousClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
+    expect(displayMock.addNextClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
 
-    replay(displayMock, eventBusMock, hasClickHandlerMock);
+    replay(displayMock, eventBusMock);
     variablePresenter.bind();
 
-    verify(displayMock, eventBusMock, hasClickHandlerMock);
+    verify(displayMock, eventBusMock);
   }
 
 }

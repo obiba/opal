@@ -17,10 +17,12 @@ import org.obiba.opal.web.model.client.AttributeDto;
 import org.obiba.opal.web.model.client.VariableDto;
 
 import com.google.gwt.cell.client.ClickableTextCell;
+import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -31,7 +33,6 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InsertPanel;
@@ -190,38 +191,38 @@ public class TableView extends Composite implements TablePresenter.Display {
   }
 
   @Override
-  public HasText getTableName() {
-    return tableName;
+  public void setTableName(String name) {
+    tableName.setText(name);
   }
 
   @Override
-  public HasText getEntityTypeLabel() {
-    return entityType;
+  public void setEntityType(String text) {
+    entityType.setText(text);
   }
 
   @Override
-  public HasClickHandlers getSpreadsheetIcon() {
-    return spreadsheetDownloadImage;
+  public HandlerRegistration addSpreadSheetClickHandler(ClickHandler handler) {
+    return spreadsheetDownloadImage.addClickHandler(handler);
   }
 
   @Override
-  public HasText getParentName() {
-    return parentLink;
+  public void setParentName(String name) {
+    parentLink.setText(name);
   }
 
   @Override
-  public HasClickHandlers getParentLink() {
-    return parentLink;
+  public HandlerRegistration addParentClickHandler(ClickHandler handler) {
+    return parentLink.addClickHandler(handler);
   }
 
   @Override
-  public HasClickHandlers getNextLink() {
-    return nextImage;
+  public HandlerRegistration addNextClickHandler(ClickHandler handler) {
+    return nextImage.addClickHandler(handler);
   }
 
   @Override
-  public HasClickHandlers getPreviousLink() {
-    return previousImage;
+  public HandlerRegistration addPreviousClickHandler(ClickHandler handler) {
+    return previousImage.addClickHandler(handler);
   }
 
   private abstract class VariableNameColumn extends Column<VariableDto, String> implements HasFieldUpdater<VariableDto, String> {
@@ -231,7 +232,7 @@ public class TableView extends Composite implements TablePresenter.Display {
   }
 
   @Override
-  public HasFieldUpdater<VariableDto, String> getVariableNameColumn() {
-    return variableNameColumn;
+  public void setVariableNameFieldUpdater(FieldUpdater<VariableDto, String> updater) {
+    variableNameColumn.setFieldUpdater(updater);
   }
 }

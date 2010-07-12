@@ -31,9 +31,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 
 /**
@@ -41,38 +40,13 @@ import com.google.inject.Inject;
  */
 public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display> {
 
-  public interface Display extends WidgetDisplay {
-
-    HasText getVariableNameLabel();
-
-    HasText getEntityTypeLabel();
-
-    HasText getValueTypeLabel();
-
-    HasText getMimeTypeLabel();
-
-    HasText getUnitLabel();
-
-    HasText getRepeatableLabel();
-
-    HasText getOccurrenceGroupLabel();
-
-    HasText getParentName();
-
-    HasClickHandlers getParentLink();
-
-    HasClickHandlers getPreviousLink();
-
-    HasClickHandlers getNextLink();
-
-    void renderCategoryRows(JsArray<CategoryDto> rows);
-
-    void renderAttributeRows(JsArray<AttributeDto> rows);
-  }
-
   private static Translations translations = GWT.create(Translations.class);
 
   private VariableDto variable;
+
+  //
+  // Constructors
+  //
 
   /**
    * @param display
@@ -90,38 +64,10 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
   @Override
   protected void onBind() {
-    registerVariableSelectionChangeHandler();
-
-    super.registerHandler(getDisplay().getParentLink().addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource(variable.getParentLink().getLink()).get().withCallback(new ResourceCallback<TableDto>() {
-          @Override
-          public void onResource(Response response, TableDto resource) {
-            eventBus.fireEvent(new TableSelectionChangeEvent(resource));
-          }
-
-        }).send();
-      }
-    }));
-
-    super.registerHandler(getDisplay().getNextLink().addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        eventBus.fireEvent(new SiblingVariableSelectionEvent(variable, Direction.NEXT));
-      }
-    }));
-
-    super.registerHandler(getDisplay().getPreviousLink().addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        eventBus.fireEvent(new SiblingVariableSelectionEvent(variable, Direction.PREVIOUS));
-      }
-    }));
-
+    super.registerHandler(eventBus.addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionHandler()));
+    super.registerHandler(getDisplay().addParentClickHandler(new ParentClickHandler()));
+    super.registerHandler(getDisplay().addNextClickHandler(new NextClickHandler()));
+    super.registerHandler(getDisplay().addPreviousClickHandler(new PreviousClickHandler()));
   }
 
   @Override
@@ -144,31 +90,92 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   // Methods
   //
 
-  private void registerVariableSelectionChangeHandler() {
-    super.registerHandler(eventBus.addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionChangeEvent.Handler() {
-
-      @Override
-      public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-        updateDisplay(event.getSelection());
-      }
-    }));
-  }
-
   private void updateDisplay(VariableDto variableDto) {
-    if(variable == null || (!variableDto.getName().equals(variable.getName()) || !variableDto.getParentLink().getRel().equals(variable.getParentLink().getRel()))) {
+    if(variable == null || !isCurrentVariable(variableDto)) {
       variable = variableDto;
-      getDisplay().getVariableNameLabel().setText(variableDto.getName());
-      getDisplay().getEntityTypeLabel().setText(variableDto.getEntityType());
-      getDisplay().getValueTypeLabel().setText(variableDto.getValueType());
-      getDisplay().getMimeTypeLabel().setText(variableDto.hasMimeType() ? variableDto.getMimeType() : "");
-      getDisplay().getUnitLabel().setText(variableDto.hasUnit() ? variableDto.getUnit() : "");
-      getDisplay().getRepeatableLabel().setText(variableDto.getIsRepeatable() ? translations.yesLabel() : translations.noLabel());
-      getDisplay().getOccurrenceGroupLabel().setText(variableDto.getIsRepeatable() ? variableDto.getOccurrenceGroup() : "");
+      getDisplay().setVariableName(variableDto.getName());
+      getDisplay().setEntityType(variableDto.getEntityType());
+      getDisplay().setValueType(variableDto.getValueType());
+      getDisplay().setMimeType(variableDto.hasMimeType() ? variableDto.getMimeType() : "");
+      getDisplay().setUnit(variableDto.hasUnit() ? variableDto.getUnit() : "");
+      getDisplay().setRepeatable(variableDto.getIsRepeatable() ? translations.yesLabel() : translations.noLabel());
+      getDisplay().setOccurrenceGroup(variableDto.getIsRepeatable() ? variableDto.getOccurrenceGroup() : "");
 
-      getDisplay().getParentName().setText(variableDto.getParentLink().getRel());
+      getDisplay().setParentName(variableDto.getParentLink().getRel());
 
       getDisplay().renderCategoryRows(variableDto.getCategoriesArray());
       getDisplay().renderAttributeRows(variableDto.getAttributesArray());
     }
+  }
+
+  private boolean isCurrentVariable(VariableDto variableDto) {
+    return variableDto.getName().equals(variable.getName()) && variableDto.getParentLink().getRel().equals(variable.getParentLink().getRel());
+  }
+
+  //
+  // Interfaces and classes
+  //
+
+  class VariableSelectionHandler implements VariableSelectionChangeEvent.Handler {
+    @Override
+    public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
+      updateDisplay(event.getSelection());
+    }
+  }
+
+  class PreviousClickHandler implements ClickHandler {
+    @Override
+    public void onClick(ClickEvent event) {
+      eventBus.fireEvent(new SiblingVariableSelectionEvent(variable, Direction.PREVIOUS));
+    }
+  }
+
+  class NextClickHandler implements ClickHandler {
+    @Override
+    public void onClick(ClickEvent event) {
+      eventBus.fireEvent(new SiblingVariableSelectionEvent(variable, Direction.NEXT));
+    }
+  }
+
+  class ParentClickHandler implements ClickHandler {
+    @Override
+    public void onClick(ClickEvent event) {
+      ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource(variable.getParentLink().getLink()).get().withCallback(new ResourceCallback<TableDto>() {
+        @Override
+        public void onResource(Response response, TableDto resource) {
+          eventBus.fireEvent(new TableSelectionChangeEvent(resource));
+        }
+
+      }).send();
+    }
+  }
+
+  public interface Display extends WidgetDisplay {
+
+    void setVariableName(String name);
+
+    void setEntityType(String text);
+
+    void setValueType(String text);
+
+    void setMimeType(String text);
+
+    void setUnit(String text);
+
+    void setRepeatable(String text);
+
+    void setOccurrenceGroup(String text);
+
+    void setParentName(String name);
+
+    HandlerRegistration addParentClickHandler(ClickHandler handler);
+
+    HandlerRegistration addNextClickHandler(ClickHandler handler);
+
+    HandlerRegistration addPreviousClickHandler(ClickHandler handler);
+
+    void renderCategoryRows(JsArray<CategoryDto> rows);
+
+    void renderAttributeRows(JsArray<AttributeDto> rows);
   }
 }

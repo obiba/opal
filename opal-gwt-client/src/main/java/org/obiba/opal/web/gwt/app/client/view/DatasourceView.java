@@ -16,9 +16,11 @@ import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.model.client.TableDto;
 
 import com.google.gwt.cell.client.ClickableTextCell;
+import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -159,23 +161,23 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   }
 
   @Override
-  public Label getDatasourceNameLabel() {
-    return datasourceName;
+  public void setDatasourceName(String name) {
+    datasourceName.setText(name);
   }
 
   @Override
-  public HasClickHandlers getNextLink() {
-    return nextImage;
+  public HandlerRegistration addNextClickHandler(ClickHandler handler) {
+    return nextImage.addClickHandler(handler);
   }
 
   @Override
-  public HasClickHandlers getPreviousLink() {
-    return previousImage;
+  public HandlerRegistration addPreviousClickHandler(ClickHandler handler) {
+    return previousImage.addClickHandler(handler);
   }
 
   @Override
-  public HasClickHandlers getSpreadsheetIcon() {
-    return spreadsheetDownloadImage;
+  public HandlerRegistration addSpreadSheetClickHandler(ClickHandler handler) {
+    return spreadsheetDownloadImage.addClickHandler(handler);
   }
 
   private abstract class TableNameColumn extends Column<TableDto, String> implements HasFieldUpdater<TableDto, String> {
@@ -185,7 +187,7 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   }
 
   @Override
-  public HasFieldUpdater<TableDto, String> getTableNameColumn() {
-    return tableNameColumn;
+  public void setTableNameFieldUpdater(FieldUpdater<TableDto, String> updater) {
+    tableNameColumn.setFieldUpdater(updater);
   }
 }
