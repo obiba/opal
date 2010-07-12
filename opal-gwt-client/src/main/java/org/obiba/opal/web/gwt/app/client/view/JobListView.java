@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.view;
 
 import static org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.CANCEL_ACTION;
-import static org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.LOG_ACTION;
 
 import java.util.ArrayList;
@@ -302,8 +301,6 @@ public class JobListView extends Composite implements Display {
     private void refreshActions(CommandStateDto value) {
       if(value.getStatus().toString().equals("NOT_STARTED") || value.getStatus().toString().equals("IN_PROGRESS")) {
         delegateCell = createCompositeCell(LOG_ACTION, CANCEL_ACTION);
-      } else if(value.getStatus().toString().equals("SUCCEEDED") || value.getStatus().toString().equals("FAILED") || value.getStatus().toString().equals("CANCELED")) {
-        delegateCell = createCompositeCell(LOG_ACTION, DELETE_ACTION);
       } else {
         delegateCell = createCompositeCell(LOG_ACTION);
       }

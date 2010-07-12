@@ -19,6 +19,8 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -45,13 +47,13 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
 
   public static final String CANCEL_ACTION = "Cancel";
 
-  public static final String DELETE_ACTION = "Delete";
-
   //
   // Instance Variables
   //
 
   private JobDetailsPresenter jobDetailsPresenter;
+
+  private Runnable actionRequiringConfirmation;
 
   //
   // Constructors
@@ -85,6 +87,7 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
   @Override
   protected void onBind() {
     super.registerHandler(getDisplay().addClearButtonHandler(new ClearButtonHandler()));
+    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
   }
 
   @Override
@@ -124,58 +127,51 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
       jobDetailsPresenter.getDisplay().showDialog(dto);
     } else if(CANCEL_ACTION.equals(actionName)) {
       cancelJob(dto);
-    } else if(DELETE_ACTION.equals(actionName)) {
-      deleteJob(dto);
     }
   }
 
   private void cancelJob(final CommandStateDto dto) {
-    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+    actionRequiringConfirmation = new Runnable() {
+      public void run() {
+        ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == 200) {
-          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.INFO, "jobCancelled", Arrays.asList(new String[] { String.valueOf(dto.getId()) })));
-        } else {
-          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, response.getText(), null));
-        }
-        refreshDisplay();
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if(response.getStatusCode() == 200) {
+              eventBus.fireEvent(new UserMessageEvent(MessageDialogType.INFO, "jobCancelled", Arrays.asList(new String[] { String.valueOf(dto.getId()) })));
+            } else {
+              eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, response.getText(), null));
+            }
+            refreshDisplay();
+          }
+        };
+
+        ResourceRequestBuilderFactory.<JsArray<CommandStateDto>> newBuilder().forResource("/shell/command/" + dto.getId() + "/status").put().withBody("text/plain", "CANCELED").withCallback(400, callbackHandler).withCallback(404, callbackHandler).withCallback(200, callbackHandler).send();
       }
     };
 
-    ResourceRequestBuilderFactory.<JsArray<CommandStateDto>> newBuilder().forResource("/shell/command/" + dto.getId() + "/status").put().withBody("text/plain", "CANCELED").withCallback(400, callbackHandler).withCallback(404, callbackHandler).withCallback(200, callbackHandler).send();
-  }
-
-  private void deleteJob(final CommandStateDto dto) {
-    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
-
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == 200) {
-          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.INFO, "jobDeleted", Arrays.asList(new String[] { String.valueOf(dto.getId()) })));
-        } else {
-          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, response.getText(), null));
-        }
-        refreshDisplay();
-      }
-    };
-
-    ResourceRequestBuilderFactory.<JsArray<CommandStateDto>> newBuilder().forResource("/shell/command/" + dto.getId()).delete().withCallback(400, callbackHandler).withCallback(404, callbackHandler).withCallback(200, callbackHandler).send();
+    eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "cancelJob", "confirmCancelJob"));
   }
 
   private void deleteCompletedJobs() {
-    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+    actionRequiringConfirmation = new Runnable() {
+      public void run() {
+        ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == 200) {
-          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.INFO, "completedJobsDeleted", null));
-        }
-        refreshDisplay();
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if(response.getStatusCode() == 200) {
+              eventBus.fireEvent(new UserMessageEvent(MessageDialogType.INFO, "completedJobsDeleted", null));
+            }
+            refreshDisplay();
+          }
+        };
+
+        ResourceRequestBuilderFactory.<JsArray<CommandStateDto>> newBuilder().forResource("/shell/commands/completed").delete().withCallback(400, callbackHandler).withCallback(200, callbackHandler).send();
       }
     };
 
-    ResourceRequestBuilderFactory.<JsArray<CommandStateDto>> newBuilder().forResource("/shell/commands/completed").delete().withCallback(400, callbackHandler).withCallback(200, callbackHandler).send();
+    eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "clearJobsList", "confirmClearJobsList"));
   }
 
   //
@@ -209,6 +205,16 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
 
     public void onClick(ClickEvent event) {
       deleteCompletedJobs();
+    }
+  }
+
+  class ConfirmationEventHandler implements ConfirmationEvent.Handler {
+
+    public void onConfirmation(ConfirmationEvent event) {
+      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event.isConfirmed()) {
+        actionRequiringConfirmation.run();
+        actionRequiringConfirmation = null;
+      }
     }
   }
 }
