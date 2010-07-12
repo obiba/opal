@@ -137,11 +137,10 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
     selectionModel.setSelected(tableDto, true);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void renderRows(final JsArray<TableDto> rows) {
     final JsArray<TableDto> tableRows = (rows != null) ? rows : (JsArray<TableDto>) JsArray.createArray();
-
-    tablesTableTitle.setText(translations.tablesLabel() + " (" + tableRows.length() + ")");
 
     table.setDelegate(new Delegate<TableDto>() {
 

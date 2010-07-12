@@ -140,11 +140,10 @@ public class TableView extends Composite implements TablePresenter.Display {
     DOM.setStyleAttribute(pager.getElement(), "cssFloat", "right");
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void renderRows(final JsArray<VariableDto> rows) {
     final JsArray<VariableDto> variableRows = (rows != null) ? rows : (JsArray<VariableDto>) JsArray.createArray();
-
-    variablesTableTitle.setText(translations.variablesLabel() + " (" + variableRows.length() + ")");
 
     table.setDelegate(new Delegate<VariableDto>() {
 

@@ -33,7 +33,7 @@
               <ui:msg description="Dashboard menu item">Dashboard</ui:msg>              
             </g:MenuItem>
             <g:MenuItem ui:field="exploreVariablesItem">
-              <ui:msg description="Variables menu item">Variables</ui:msg>
+              <ui:msg description="Variables label">Variables</ui:msg>
             </g:MenuItem>
             <g:MenuItem>
               <ui:msg description="Data menu item">Data</ui:msg>              

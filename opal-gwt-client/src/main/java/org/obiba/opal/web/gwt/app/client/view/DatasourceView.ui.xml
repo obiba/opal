@@ -50,7 +50,7 @@
       </g:HTMLPanel>
     </g:layer>
     <g:layer top='6em' left="1em" width='50%' height='2em'>
-      <g:Label ui:field="tablesTableTitle" addStyleNames="{style.left-aligned},{style.title-bold}" />    
+      <g:Label ui:field="tablesTableTitle" addStyleNames="{style.left-aligned},{style.title-bold}"><ui:msg description="Tables label">Tables</ui:msg></g:Label>    
     </g:layer>    
      <g:layer top="5.5em" width="97%" left="1em" height="100em">
        <g:FlowPanel>

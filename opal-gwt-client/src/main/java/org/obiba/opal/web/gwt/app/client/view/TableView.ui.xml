@@ -63,7 +63,7 @@
       </g:FlowPanel>     
     </g:layer>     
     <g:layer top='8em' left="1em" width='50%' height='2em'>
-      <g:Label ui:field="variablesTableTitle" addStyleNames="{style.left-aligned},{style.title-bold}" />     
+      <g:Label ui:field="variablesTableTitle" addStyleNames="{style.left-aligned},{style.title-bold}"><ui:msg description="Variables label">Variables</ui:msg></g:Label>     
     </g:layer>    
      <g:layer top="7.5em" width="97%" left="1em" height="100em">
        <g:FlowPanel>

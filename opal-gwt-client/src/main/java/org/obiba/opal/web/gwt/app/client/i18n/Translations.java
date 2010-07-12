@@ -123,7 +123,7 @@ public interface Translations extends Constants {
   @DefaultStringValue("Table")
   String tableLabel();
 
-  @Description("Variables menu item")
+  @Description("Variables label")
   @DefaultStringValue("Variables")
   String variablesLabel();
 
