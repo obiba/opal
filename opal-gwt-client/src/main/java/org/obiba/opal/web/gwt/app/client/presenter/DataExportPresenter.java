@@ -115,6 +115,13 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     }
   }
 
+  private void displayMessages(MessageDialogType type, List<String> messages) {
+    errorDialog.bind();
+    errorDialog.setMessageDialogType(type);
+    errorDialog.setErrors(messages);
+    errorDialog.revealDisplay();
+  }
+
   private List<String> formValidationErrors() {
     List<String> result = new ArrayList<String>();
     if(tableListPresenter.getTables().size() == 0) {
@@ -159,58 +166,60 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   class SubmitClickHandler implements ClickHandler {
 
-    class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        errorDialog.bind();
-        errorDialog.setErrors(Arrays.asList(new String[] { response.getText() }));
-        errorDialog.revealDisplay();
-      }
-    }
-
-    class SuccessResponseCodeCallBack implements ResponseCodeCallback {
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        String location = response.getHeader("Location");
-        String jobId = location.substring(location.lastIndexOf('/') + 1);
-
-        displayMessages(MessageDialogType.INFO, Arrays.asList(new String[] { "The 'export' job has been launched with ID#" + jobId + "." }));
-      }
-    }
-
-    private void displayMessages(MessageDialogType type, List<String> messages) {
-      errorDialog.bind();
-      errorDialog.setMessageDialogType(type);
-      errorDialog.setErrors(messages);
-      errorDialog.revealDisplay();
-    }
-
     @Override
     public void onClick(ClickEvent event) {
       List<String> errors = formValidationErrors();
       if(!errors.isEmpty()) {
         displayMessages(MessageDialogType.ERROR, errors);
       } else {
-        CopyCommandOptionsDto dto = CopyCommandOptionsDto.create();
-
-        JsArrayString selectedTables = JavaScriptObject.createArray().cast();
-        for(TableDto table : tableListPresenter.getTables()) {
-          selectedTables.push(table.getDatasourceName() + "." + table.getName());
-        }
-
-        dto.setTablesArray(selectedTables);
-        if(getDisplay().isDestinationDataSource()) {
-          dto.setDestination(getDisplay().getSelectedDatasource());
-        } else {
-          dto.setOut(getDisplay().getOutFile());
-        }
-        dto.setNonIncremental(!getDisplay().isIncremental());
-        dto.setNoVariables(!getDisplay().isWithVariables());
-        if(getDisplay().isUseAlias()) dto.setTransform("attribute('alias').isNull().value ? name() : attribute('alias')");
-        if(getDisplay().isUnitId()) dto.setUnit(getDisplay().getSelectedUnit());
-        ResourceRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().withResourceBody(CopyCommandOptionsDto.stringify(dto)).withCallback(400, new ClientFailureResponseCodeCallBack()).withCallback(201, new SuccessResponseCodeCallBack()).send();
-
+        ResourceRequestBuilderFactory.newBuilder().forResource("/shell/copy").post() //
+        .withResourceBody(CopyCommandOptionsDto.stringify(createCopycommandOptions())) //
+        .withCallback(400, new ClientFailureResponseCodeCallBack()) //
+        .withCallback(201, new SuccessResponseCodeCallBack()).send();
       }
+    }
+
+    private CopyCommandOptionsDto createCopycommandOptions() {
+      CopyCommandOptionsDto dto = CopyCommandOptionsDto.create();
+
+      JsArrayString selectedTables = JavaScriptObject.createArray().cast();
+      for(TableDto table : tableListPresenter.getTables()) {
+        selectedTables.push(table.getDatasourceName() + "." + table.getName());
+      }
+
+      dto.setTablesArray(selectedTables);
+      if(getDisplay().isDestinationDataSource()) {
+        dto.setDestination(getDisplay().getSelectedDatasource());
+      } else {
+        dto.setOut(getDisplay().getOutFile());
+        dto.setFormat(getDisplay().getFileFormat());
+      }
+      dto.setNonIncremental(!getDisplay().isIncremental());
+      dto.setNoVariables(!getDisplay().isWithVariables());
+      if(getDisplay().isUseAlias()) dto.setTransform("attribute('alias').isNull().value ? name() : attribute('alias')");
+      if(getDisplay().isUnitId()) dto.setUnit(getDisplay().getSelectedUnit());
+
+      return dto;
+    }
+
+  }
+
+  class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      errorDialog.bind();
+      errorDialog.setErrors(Arrays.asList(new String[] { response.getText() }));
+      errorDialog.revealDisplay();
+    }
+  }
+
+  class SuccessResponseCodeCallBack implements ResponseCodeCallback {
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      String location = response.getHeader("Location");
+      String jobId = location.substring(location.lastIndexOf('/') + 1);
+
+      displayMessages(MessageDialogType.INFO, Arrays.asList(new String[] { "The 'export' job has been launched with ID#" + jobId + "." }));
     }
   }
 
