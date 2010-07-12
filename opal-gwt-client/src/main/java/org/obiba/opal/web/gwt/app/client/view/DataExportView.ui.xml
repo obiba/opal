@@ -90,6 +90,7 @@
                       <td><g:ListBox ui:field="fileFormat">
                         <g:item value="csv">CSV</g:item>
                         <g:item value="excel">Excel</g:item>
+                        <g:item value="xml">XML (zip)</g:item>
                       </g:ListBox></td>
                     </tr>
                     <tr>

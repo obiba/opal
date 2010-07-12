@@ -31,10 +31,15 @@ public interface CopyCommandOptions extends HelpOption {
 
   public boolean isDestination();
 
-  @Option(shortName = "o", description = "Copy to this Excel file.")
+  @Option(shortName = "o", description = "Copy to a file.")
   public String getOut();
 
   public boolean isOut();
+
+  @Option(shortName = "o", description = "Format of the output file.")
+  public String getOutFormat();
+
+  public boolean isFormat();
 
   //
   // Values

@@ -45,4 +45,5 @@ message CopyCommandOptionsDto {
   optional string multiplex = 8;
   optional string transform = 9;
   repeated string tables = 10;
+  optional string format = 11;
 }
