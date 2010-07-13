@@ -11,3 +11,38 @@ table.folder-details td:first-child span.file:hover {
 .gwt-MenuBar .gwt-MenuItem {
   cursor:pointer;
 }
+
+.information {
+    	
+}
+
+.information .header {
+	height: 2em;
+}
+	
+.information .header img {
+  cursor:pointer;
+  padding-top: 5px;
+  margin-right: 5px;
+}
+
+.information .header .gwt-MenuItem {
+  cursor:default;
+  padding-top: 5px;
+}
+
+.information .content {
+  margin: 5px;
+}
+
+.information .title {
+  font-weight: bold;
+}
+
+.right-aligned {
+  float: right;
+}
+
+.left-aligned {
+  float: left;
+}
