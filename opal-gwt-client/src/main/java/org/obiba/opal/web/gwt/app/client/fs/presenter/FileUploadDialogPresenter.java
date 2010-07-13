@@ -157,7 +157,7 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
     if(fileName.equals("")) {
       getDisplay().getErrorMsg().setText(translations.fileMustBeSelected());
     } else if(fileExist(fileName)) {
-      eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "uploadFile", "confirmReplaceExistingFile"));
+      eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "replaceExistingFile", "confirmReplaceExistingFile"));
     } else {
       submitFile(path);
     }
