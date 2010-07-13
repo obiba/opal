@@ -1,104 +1,66 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
+   
+  <o:WorkbenchLayout>
+    <g:Label><ui:msg description="Data import title">Import Data</ui:msg></g:Label>
+    <g:Label><ui:msg description="Data import instructions">Select the file to be imported and the destination dataset.</ui:msg></g:Label>
+    <g:Button ui:field="submit"><ui:msg description="Import button label">Import</ui:msg></g:Button>
+    <g:HTMLPanel>
+      <table class="gwt-KeyValue" cellspacing="10">
+        <tbody>
+          <tr>
+            <td style="vertical-align:top">
+              <ui:msg description="File field label">File:</ui:msg>                
+            </td>
+            <td>
+              <g:SimplePanel ui:field="filePanel" />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <ui:msg description="Destination field label">Destination:</ui:msg>                
+            </td>
+            <td>
+              <g:ListBox ui:field="datasources" />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <g:CheckBox ui:field="shouldArchive"><ui:msg description="Archive field label">Archive:</ui:msg></g:CheckBox>
+            </td>
+            <td>
+              <g:SimplePanel ui:field="archivePanel" />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <ui:msg description="Participant identifier field label">Participant Identifier:</ui:msg>                
+            </td>
+            <td>
+              <g:RadioButton name="participantId" checked="true"><ui:msg description="Unit id dropdown label">use Unit ID:</ui:msg></g:RadioButton>
+              <g:ListBox ui:field="units" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </g:HTMLPanel>
+    <g:HTMLPanel>
+      <g:Label addStyleNames="title"><ui:msg description="Data File label">Data File</ui:msg></g:Label>
+      <p>The data file is to be selected on the server side. To upload a data file, go to [File Explorer]. Currently only Onyx exportation files can be imported.</p>
 
-   <ui:style>
-    .wb-top {
-    border-bottom:1px solid #BBBBBB;
-    padding: 0.25em 0 0 1em;
-    float: left;
-    }
-    
-    .wb-top .title {
-    font-size: 1.3em;
-    }
-  
-    .wb-top .summary { 
-    margin-top:0.25em;
-    }
-    
-    .wb-control {
-    padding: 1em 0.5em 0.5em 0.5em;
-    float: left;
-    }
-    
-    .wb-control .button {
-    margin-left: 10px;
-    }
-    
-    .wb-information {
-    border:1px solid #BBBBBB;
-    }
-    
-    .wb-form {
-    padding: 1em 0.5em 0 1em;
-    }
-    
-    .wb-form .button {
-    margin-top: 10px;
-    }
-    
-    .right-aligned {
-    	float: right;
-    	margin-left: 5px;
-    }
-    
-  </ui:style>
-  
-  <g:DockLayoutPanel>
-    <g:north size="52">
-      <g:FlowPanel addStyleNames="{style.wb-top}">
-        <g:Label addStyleNames="{style.title}"><ui:msg description="Data import title">Import Data</ui:msg></g:Label>
-        <g:Label addStyleNames="{style.summary}"><ui:msg description="Data import instructions">Select the files to be imported:</ui:msg></g:Label>
-      </g:FlowPanel>
-    </g:north>
-    <g:center>
-      <g:ScrollPanel width="100%" addStyleNames="{style.wb-form}">
-        <g:HTMLPanel>
-        <g:DecoratorPanel>
-        <g:HTMLPanel>
-        <table class="gwt-KeyValue" cellspacing="10">
-          <tbody>
-            <tr>
-              <td style="vertical-align:top">
-                <ui:msg description="File field label">File:</ui:msg>                
-              </td>
-              <td>
-                <g:SimplePanel ui:field="filePanel" />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <ui:msg description="Destination field label">Destination:</ui:msg>                
-              </td>
-              <td>
-                <g:ListBox ui:field="datasources" />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <g:CheckBox ui:field="shouldArchive"><ui:msg description="Archive field label">Archive:</ui:msg></g:CheckBox>
-              </td>
-              <td>
-                <g:SimplePanel ui:field="archivePanel" />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <ui:msg description="Participant identifier field label">Participant Identifier:</ui:msg>                
-              </td>
-              <td>
-                <g:RadioButton name="participantId" checked="true"><ui:msg description="Unit id dropdown label">use Unit ID:</ui:msg></g:RadioButton>
-                <g:ListBox ui:field="units" />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        </g:HTMLPanel>
-        </g:DecoratorPanel>
-        <g:Button ui:field="submit" addStyleNames="{style.button}"><ui:msg description="Import button label">Import</ui:msg></g:Button>
-        </g:HTMLPanel>
-      </g:ScrollPanel>
-    </g:center>
-  </g:DockLayoutPanel>
+      <g:Label addStyleNames="title"><ui:msg description="Destination Dataset label">Destination Dataset</ui:msg></g:Label>
+      <p>Tables and variables will be created in the selected dataset prior to the importation of data.</p>
 
+      <g:Label addStyleNames="title"><ui:msg description="Archive label">Archive</ui:msg></g:Label>
+      <p>Select a directory on the server side where the data file will be stored once successfully imported.</p>
+
+      <g:Label addStyleNames="title"><ui:msg description="Participant Identifier label">Participant Identifier</ui:msg></g:Label>
+      <p>Store the provided participant identifier in the participant key database. An Opal internal identifier will be affected to each of the new participants. To achieve that, select a 'unit' that has been predefined in your Opal system.</p>
+    </g:HTMLPanel>
+  </o:WorkbenchLayout>
+  
 </ui:UiBinder>

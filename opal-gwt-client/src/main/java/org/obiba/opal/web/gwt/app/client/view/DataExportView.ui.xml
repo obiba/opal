@@ -1,220 +1,128 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
 
-  <ui:style>
-    .wb-top {
-    border-bottom:1px solid #BBBBBB;
-    padding: 0.25em 0 0 1em;
-    float: left;
-    }
-    .wb-head {
-    float: left;
-    margin-right:20px;
-    }
-    .wb-top .title {
-    font-size: 1.3em;
-    }
-  
-    .wb-top .summary { 
-    margin-top:0.25em;
-    }
+  <o:WorkbenchLayout>
+    <g:Label><ui:msg description="Data export title">Export Data</ui:msg></g:Label>
+    <g:Label><ui:msg description="Data export instructions">Select the tables and the export destination.</ui:msg></g:Label>
+    <g:Button ui:field="submit"><ui:msg description="Export button label">Export</ui:msg></g:Button>
+ 	<g:HTMLPanel>
+       <table class="gwt-KeyValue" cellspacing="10">
+         <tbody>
+         <tr>
+           <td style="vertical-align:top">
+             <ui:msg description="Tables field label">Tables:</ui:msg>                
+           </td>
+           <td>
+             <g:SimplePanel ui:field="tablesPanel" />
+           </td>
+         </tr>
+         <tr>
+           <td style="vertical-align:top">
+             <ui:msg description="Destination field label">Destination:</ui:msg>
+           </td>
+           <td>
+             <g:RadioButton name="destination" ui:field="destinationFile"><ui:msg description="File destination label">Copy data to file:</ui:msg></g:RadioButton>
+             <g:HTMLPanel addStyleNames="indent">
+               <table>
+	             <tbody>
+	               <tr>
+	                 <td><g:Label><ui:msg description="File format field">Format:</ui:msg></g:Label></td>
+	                 <td><g:ListBox ui:field="fileFormat">
+	                   <g:item value="csv">CSV</g:item>
+	                   <g:item value="excel">Excel (xls,xlsx)</g:item>
+	                   <g:item value="xml">XML (zip)</g:item>
+	                 </g:ListBox></td>
+	               </tr>
+	               <tr>
+	                 <td><g:Label><ui:msg description="File field">File:</ui:msg></g:Label></td>
+	                 <td><g:SimplePanel ui:field="filePanel"/></td>
+	               </tr>
+	             </tbody>
+	           </table>
+             </g:HTMLPanel>   
+           </td>
+         </tr>
+         <tr>
+           <td/>
+           <td>
+             <g:RadioButton name="destination" ui:field="destinationDataSource"><ui:msg description="Datasource destination label">Copy data to dataset:</ui:msg></g:RadioButton>
+             <g:HTMLPanel addStyleNames="indent">
+               <g:ListBox ui:field="datasources" />
+             </g:HTMLPanel>
+           </td>
+         </tr> 
+         <tr>
+           <td>
+             <ui:msg description="Options field label">Options:</ui:msg>                
+           </td>
+           <td>
+             <g:CheckBox ui:field="incremental"><ui:msg description="Incremental checkbox label">incremental</ui:msg></g:CheckBox>
+           </td>
+         </tr>              
+         <tr>
+           <td/>
+           <td>
+             <g:CheckBox ui:field="withVariables"><ui:msg description="With variables checkbox label">with variables</ui:msg></g:CheckBox>
+           </td>
+         </tr>              
+         <tr>
+           <td/>
+           <td>
+             <g:CheckBox ui:field="useAlias"><ui:msg description="Use alias to rename variable checkbox label">use 'alias' attribute to rename variable</ui:msg></g:CheckBox>
+           </td>
+         </tr>              
+         <tr>
+           <td>
+             <ui:msg description="Participant identifier field label">Participant Identifier:</ui:msg>
+           </td>
+           <td>
+             <g:RadioButton name="idGroup" ui:field="opalId"><ui:msg description="Use opal id radio button label">use Opal ID</ui:msg></g:RadioButton>
+           </td>
+         </tr> 
+         <tr>
+           <td/>
+           <td>
+             <g:RadioButton name="idGroup" ui:field="unitId"><ui:msg description="Unit id dropdown label">use Unit ID:</ui:msg></g:RadioButton> <g:ListBox ui:field="units" />
+           </td>
+         </tr> 
+         </tbody>
+       </table>
+     </g:HTMLPanel>
+     
+     <g:HTMLPanel>
+       <g:Label addStyleNames="title"><ui:msg description="File destination label">File Destination</ui:msg></g:Label> 
+       <p>The data can be exported in file. The file will be outputed on the server side in a directory you will have selected. Once successfully exported, you will download the resulting output from the [Opal file system]. Depending on the file format selected, some limits applies:</p>
+       <ul>
+         <li>CSV
+           <br/>
+           Zip is not supported yet.
+         </li>
+         <li>Excel
+           <br/>
+             Use respectively .xls/.xlsx file suffix to distinguish Excel formats 97/2007.
+           <ul>
+             <li>Maximum length of table name: 30</li>
+             <li>Maximum number of variables: 256/16K</li>
+             <li>Maximum number of participants: 16K/1M</li>
+             <li>Binary data are not suported</li>    
+           </ul>
+         </li>
+         <li>XML
+           <br/>
+           Resulting file will be zipped.
+         </li>  
+       </ul>
+       <g:Label addStyleNames="title"><ui:msg description="Participant Identifier label">Participant Identifier</ui:msg></g:Label>
+       <p>Different strategies can be applied with the exported participant identifiers:</p>
+       <ul>
+         <li>Use Opal participant identifier.</li>
+         <li>Switch the participant identifier to one that is specific to destination unit. To achieve that, select a 'unit' that has been predefined in your Opal system.</li>
+       </ul>
+     </g:HTMLPanel>
+  </o:WorkbenchLayout>
     
-    .wb-control {
-    padding: 1em 0.5em 0.5em 0.5em;
-    float: left;
-    }
-    
-    .wb-control .button {
-    margin-left: 10px;
-    }
-    
-    .wb-information {
-    border:1px solid #BBBBBB;
-    }
-    
-    .wb-form {
-    padding: 1em 0.5em 0 1em;
-    }
-    
-    .wb-form .button {
-    margin-top: 10px;
-    }
-    
-    .right-aligned {
-    	float: right;
-    	margin-left: 5px;
-    }
-    
-    .left-aligned {
-    	float: left;
-    	margin-right: 5px;
-    }
-    
-   .indent {
-    	margin-left: 20px;
-    }
-    
-  </ui:style>
-  
-  <g:DockLayoutPanel>
-    <g:north size="52">
-      <g:FlowPanel addStyleNames="{style.wb-top}">
-        <g:FlowPanel addStyleNames="{style.wb-head}">
-          <g:Label addStyleNames="{style.title}"><ui:msg description="Data export title">Export Data</ui:msg></g:Label>
-        <g:Label addStyleNames="{style.summary}"><ui:msg description="Data export instructions">Select the tables and the export destination.</ui:msg></g:Label>  
-        </g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.wb-control}">
-          <g:Button ui:field="submit" addStyleNames="{style.button}"><ui:msg description="Export button label">Export</ui:msg></g:Button>
-        </g:FlowPanel>
-        
-      </g:FlowPanel>
-    </g:north>
-    <g:center>
-      <g:SplitLayoutPanel>
-        <g:center>  
-          <g:ScrollPanel addStyleNames="{style.wb-form}">
-        
-        <g:HTMLPanel>
-          <table class="gwt-KeyValue" cellspacing="10">
-            <tbody>
-            <tr>
-              <td style="vertical-align:top">
-                <ui:msg description="Tables field label">Tables:</ui:msg>                
-              </td>
-              <td>
-                <g:SimplePanel ui:field="tablesPanel" />
-              </td>
-            </tr>
-            <tr>
-              <td style="vertical-align:top">
-                <ui:msg description="Destination field label">Destination:</ui:msg>
-              </td>
-              <td>
-                <g:RadioButton name="destination" ui:field="destinationFile"><ui:msg description="File destination label">Copy data to file:</ui:msg></g:RadioButton>
-                
-                <g:HTMLPanel  addStyleNames="{style.indent}">
-                
-                <table>
-                  <tbody>
-                    <tr>
-                      <td><g:Label><ui:msg description="File format field">Format:</ui:msg></g:Label></td>
-                      <td><g:ListBox ui:field="fileFormat">
-                        <g:item value="csv">CSV</g:item>
-                        <g:item value="excel">Excel (xls,xlsx)</g:item>
-                        <g:item value="xml">XML (zip)</g:item>
-                      </g:ListBox></td>
-                    </tr>
-                    <tr>
-                      <td><g:Label><ui:msg description="File field">File:</ui:msg></g:Label></td>
-                      <td><g:SimplePanel ui:field="filePanel"/></td>
-                    </tr>
-                  </tbody>
-				</table>
-                </g:HTMLPanel>   
-              </td>
-            </tr>
-            <tr>
-              <td/>
-              <td>
-                <g:RadioButton name="destination" ui:field="destinationDataSource"><ui:msg description="Datasource destination label">Copy data to dataset:</ui:msg></g:RadioButton>
-                <g:HTMLPanel  addStyleNames="{style.indent}">
-                  <g:ListBox ui:field="datasources" />
-                </g:HTMLPanel>
-              </td>
-            </tr> 
-            <tr>
-              <td>
-                <ui:msg description="Options field label">Options:</ui:msg>                
-              </td>
-              <td>
-                <g:CheckBox ui:field="incremental"><ui:msg description="Incremental checkbox label">incremental</ui:msg></g:CheckBox>
-              </td>
-            </tr>              
-            <tr>
-              <td/>
-              <td>
-                <g:CheckBox ui:field="withVariables"><ui:msg description="With variables checkbox label">with variables</ui:msg></g:CheckBox>
-              </td>
-            </tr>              
-            <tr>
-              <td/>
-              <td>
-                <g:CheckBox ui:field="useAlias"><ui:msg description="Use alias to rename variable checkbox label">use 'alias' attribute to rename variable</ui:msg></g:CheckBox>
-              </td>
-            </tr>              
-            <tr>
-              <td>
-                <ui:msg description="Participant identifier field label">Participant Identifier:</ui:msg>
-              </td>
-              <td>
-                <g:RadioButton name="idGroup" ui:field="opalId"><ui:msg description="Use opal id radio button label">use Opal ID</ui:msg></g:RadioButton>
-              </td>
-            </tr> 
-            <tr>
-              <td/>
-              <td>
-                <g:RadioButton name="idGroup" ui:field="unitId"><ui:msg description="Unit id dropdown label">use Unit ID:</ui:msg></g:RadioButton> <g:ListBox ui:field="units" />
-              </td>
-            </tr> 
-            </tbody>
-          </table>
-        </g:HTMLPanel>
-                
-          </g:ScrollPanel>
-        </g:center>
-        
-        <g:east size="500">
-          <g:DockLayoutPanel addStyleNames="information" unit="EM">
-            <g:north size="2.3">
-              <g:FlowPanel addStyleNames="header gwt-MenuBar-horizontal">
-              <g:Label addStyleNames="left-aligned gwt-MenuItem"><ui:msg description="Information label">Information</ui:msg></g:Label>
-              <g:Image url="image/close.png" addStyleNames="right-aligned"></g:Image>
-            </g:FlowPanel>
-            </g:north>
-            <g:center>
-            
-            <g:ScrollPanel addStyleNames="content">
-              
-              <g:HTMLPanel>
-                <g:Label addStyleNames="title"><ui:msg description="File destination label">File Destination</ui:msg></g:Label> 
-                <p>The data can be exported in file. The file will be outputed on the server side in a directory you will have selected. Once successfully exported, you will download the resulting output from the [Opal file system]. Depending on the file format selected, some limits applies:</p>
-                <ul>
-                  <li>CSV
-                    <br/>
-                    Zip is not supported yet.
-                  </li>
-                  <li>Excel
-                    <br/>
-                      Use respectively .xls/.xlsx file suffix to distinguish Excel formats 97/2007.
-                    <ul>
-                      <li>Maximum length of table name: 30</li>
-                      <li>Maximum number of variables: 256/16K</li>
-                      <li>Maximum number of participants: 16K/1M</li>
-                      <li>Binary data are not suported</li>    
-                    </ul>
-                  </li>
-                  <li>XML
-                    <br/>
-                    Resulting file will be zipped.
-                  </li>
-                  
-                </ul>
-                <g:Label addStyleNames="title"><ui:msg description="Participant Identifier label">Participant Identifier</ui:msg></g:Label>
-                <p>Different strategies can be applied with the exported participant identifiers:</p>
-                <ul>
-                  <li>Use Opal participant identifier.</li>
-                  <li>Switch the participant identifier to one that is specific to destination unit. To achieve that, select a 'unit' that has been predefined in your Opal system.</li>
-                </ul>
-              </g:HTMLPanel>
-              
-            </g:ScrollPanel>
-            
-            </g:center>
-          </g:DockLayoutPanel>
-          
-        </g:east>
-        </g:SplitLayoutPanel>
-    </g:center>
-  </g:DockLayoutPanel>
-
 </ui:UiBinder>

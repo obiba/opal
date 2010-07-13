@@ -1,0 +1,33 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+
+  <g:DockLayoutPanel ui:field="workbench" addStyleNames="workbench">
+    <g:north size="50">
+      <g:FlowPanel addStyleNames="top">
+        <g:FlowPanel ui:field="topHeader" addStyleNames="header"/>
+        <g:SimplePanel ui:field="controlContent" addStyleNames="control" />
+      </g:FlowPanel>
+    </g:north>
+    <g:center>
+      <g:SplitLayoutPanel ui:field="content">
+        <g:center>  
+          <g:ScrollPanel ui:field="mainContent" addStyleNames="main" />
+        </g:center>  
+        <g:east size="400">
+          <g:DockLayoutPanel addStyleNames="information" unit="EM">
+            <g:north size="2.3">
+              <g:FlowPanel addStyleNames="header gwt-MenuBar-horizontal">
+                <g:Label addStyleNames="left-aligned gwt-MenuItem"><ui:msg description="Information label">Information</ui:msg></g:Label>
+                <g:Image ui:field="closeInfo" url="image/close.png" addStyleNames="right-aligned"></g:Image>
+              </g:FlowPanel>
+            </g:north>
+            <g:center>
+              <g:ScrollPanel ui:field="informationContent" addStyleNames="content" />
+            </g:center>
+          </g:DockLayoutPanel>
+        </g:east>
+      </g:SplitLayoutPanel>
+    </g:center>
+  </g:DockLayoutPanel>
+
+</ui:UiBinder>

@@ -1,18 +1,12 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" 
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
 
   <ui:style>
-    .wb-top {
-    border-bottom:1px solid #BBBBBB;
-    padding: 0.25em 0 0 1em;
-    float: left;
-    }
-    
-    .wb-top .title {
-    font-size: 1.3em;
-    }
-    
     .jobList td + td {
       color: black;
       text-decoration: none;
@@ -41,19 +35,17 @@
     }
   </ui:style>
   
-  <g:DockLayoutPanel>
-    <g:north size="30">
-      <g:FlowPanel addStyleNames="{style.wb-top}">
-        <g:Label addStyleNames="{style.title}"><ui:msg description="Jobs list title">Jobs List</ui:msg></g:Label>
-      </g:FlowPanel>
-    </g:north>
-    <g:center>
-      <g:ScrollPanel width="100%" >
-        <g:FlowPanel addStyleNames="{style.jobList} {style.center}">
-          <g:Image ui:field="clearImage" url="image/garbage.png" addStyleNames="{style.jobList} {style.clear-image}" />
-          <g2:CellTable width="100%" ui:field="table" addStyleNames="{style.jobList} {style.clear-image}" />
-        </g:FlowPanel>
-      </g:ScrollPanel>
-    </g:center>
-  </g:DockLayoutPanel>
+  <o:WorkbenchLayout withInfo="false">
+    <g:Label><ui:msg description="Jobs list title">Jobs List</ui:msg></g:Label>
+    <g:Label><ui:msg description="Jobs list instructions">Check the status of the jobs that are currently running or that were completed.</ui:msg></g:Label>
+    <g:FlowPanel>
+      <!-- g:Button>Clear</g:Button>
+      <g:Button>Refresh</g:Button-->
+    </g:FlowPanel>
+    <g:FlowPanel addStyleNames="{style.jobList} {style.center}">
+      <g:Image ui:field="clearImage" url="image/garbage.png" addStyleNames="{style.jobList} {style.clear-image}" />
+      <g2:CellTable width="100%" ui:field="table" addStyleNames="{style.jobList} {style.clear-image}" />
+    </g:FlowPanel>
+  </o:WorkbenchLayout>  
+  
 </ui:UiBinder>

@@ -1,3 +1,74 @@
+/* General */
+
+.right-aligned {
+  float: right;
+}
+
+.left-aligned {
+  float: left;
+}
+
+.indent {
+	margin-left: 20px;
+}
+
+/* Workbench */
+
+.workbench .top {
+	border-bottom:1px solid #BBBBBB;
+    padding: 0.5em 0 0 1em;
+    float: left;
+}
+
+.workbench .top .header {
+    float: left;
+    margin-right:20px;
+}
+
+.workbench .top .title {
+    font-size: 1.3em;
+}
+  
+.workbench .top .summary { 
+    margin-top:0.25em;
+}
+    
+.workbench .top .control {
+    padding: 0.5em;
+    float: left;
+}
+    
+.workbench .top .control button {
+    margin-left: 10px;
+}
+
+.workbench .main {
+	margin: 10px;
+}
+
+.workbench .information .header {
+	height: 2em;
+}
+	
+.workbench .information .header img {
+  cursor:pointer;
+  padding-top: 5px;
+  margin-right: 5px;
+}
+
+.workbench .information .header .gwt-MenuItem {
+  cursor:default;
+  padding-top: 5px;
+}
+
+.workbench .information .content {
+  margin: 5px;
+}
+
+.workbench .information .title {
+  font-weight: bold;
+}
+
 /* File Explorer Styles */ 
  
 table.folder-details td:first-child span.file {
@@ -12,37 +83,3 @@ table.folder-details td:first-child span.file:hover {
   cursor:pointer;
 }
 
-.information {
-    	
-}
-
-.information .header {
-	height: 2em;
-}
-	
-.information .header img {
-  cursor:pointer;
-  padding-top: 5px;
-  margin-right: 5px;
-}
-
-.information .header .gwt-MenuItem {
-  cursor:default;
-  padding-top: 5px;
-}
-
-.information .content {
-  margin: 5px;
-}
-
-.information .title {
-  font-weight: bold;
-}
-
-.right-aligned {
-  float: right;
-}
-
-.left-aligned {
-  float: left;
-}

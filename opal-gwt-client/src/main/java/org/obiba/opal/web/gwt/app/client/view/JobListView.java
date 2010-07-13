@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.workbench.view.WorkbenchLayout;
 import org.obiba.opal.web.gwt.user.cellview.client.DateTimeColumn;
 import org.obiba.opal.web.model.client.CommandStateDto;
 
@@ -47,7 +48,6 @@ import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
@@ -62,7 +62,7 @@ import com.google.gwt.view.client.ListView.Delegate;
 public class JobListView extends Composite implements Display {
 
   @UiTemplate("JobListView.ui.xml")
-  interface JobListViewUiBinder extends UiBinder<DockLayoutPanel, JobListView> {
+  interface JobListViewUiBinder extends UiBinder<WorkbenchLayout, JobListView> {
   }
 
   private static JobListViewUiBinder uiBinder = GWT.create(JobListViewUiBinder.class);
