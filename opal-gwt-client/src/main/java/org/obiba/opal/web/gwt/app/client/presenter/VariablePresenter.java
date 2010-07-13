@@ -65,7 +65,8 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   @Override
   protected void onBind() {
     super.registerHandler(eventBus.addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionHandler()));
-    super.registerHandler(getDisplay().addParentClickHandler(new ParentClickHandler()));
+    super.registerHandler(getDisplay().addParentLinkClickHandler(new ParentClickHandler()));
+    super.registerHandler(getDisplay().addParentImageClickHandler(new ParentClickHandler()));
     super.registerHandler(getDisplay().addNextClickHandler(new NextClickHandler()));
     super.registerHandler(getDisplay().addPreviousClickHandler(new PreviousClickHandler()));
   }
@@ -168,7 +169,9 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
     void setParentName(String name);
 
-    HandlerRegistration addParentClickHandler(ClickHandler handler);
+    HandlerRegistration addParentLinkClickHandler(ClickHandler handler);
+
+    HandlerRegistration addParentImageClickHandler(ClickHandler handler);
 
     HandlerRegistration addNextClickHandler(ClickHandler handler);
 

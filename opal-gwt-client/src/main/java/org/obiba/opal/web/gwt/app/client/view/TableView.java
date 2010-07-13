@@ -31,9 +31,9 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InsertPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -52,7 +52,10 @@ public class TableView extends Composite implements TablePresenter.Display {
   private static TableViewUiBinder uiBinder = GWT.create(TableViewUiBinder.class);
 
   @UiField
-  Hyperlink parentLink;
+  Image parentImage;
+
+  @UiField
+  Anchor parentLink;
 
   @UiField
   Label tableName;
@@ -208,11 +211,17 @@ public class TableView extends Composite implements TablePresenter.Display {
   @Override
   public void setParentName(String name) {
     parentLink.setText(name);
+    parentImage.setTitle(name);
   }
 
   @Override
-  public HandlerRegistration addParentClickHandler(ClickHandler handler) {
+  public HandlerRegistration addParentLinkClickHandler(ClickHandler handler) {
     return parentLink.addClickHandler(handler);
+  }
+
+  @Override
+  public HandlerRegistration addParentImageClickHandler(ClickHandler handler) {
+    return parentImage.addClickHandler(handler);
   }
 
   @Override

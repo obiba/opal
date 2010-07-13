@@ -52,7 +52,8 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     expect(eventBusMock.addHandler((Type<SiblingVariableSelectionEvent.Handler>) EasyMock.anyObject(), (SiblingVariableSelectionEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
 
     expect(displayMock.addSpreadSheetClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
-    expect(displayMock.addParentClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
+    expect(displayMock.addParentLinkClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
+    expect(displayMock.addParentImageClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
     expect(displayMock.addNextClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
     expect(displayMock.addPreviousClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
     displayMock.setVariableNameFieldUpdater((FieldUpdater<VariableDto, String>) EasyMock.anyObject());

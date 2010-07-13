@@ -47,7 +47,8 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
     HandlerRegistration handlerRegistrationMock = createMock(HandlerRegistration.class);
     expect(eventBusMock.addHandler((Type<VariableSelectionChangeEvent.Handler>) EasyMock.anyObject(), (VariableSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
 
-    expect(displayMock.addParentClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
+    expect(displayMock.addParentLinkClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
+    expect(displayMock.addParentImageClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
     expect(displayMock.addPreviousClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
     expect(displayMock.addNextClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
 

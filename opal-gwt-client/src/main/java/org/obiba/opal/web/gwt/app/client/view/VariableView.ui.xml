@@ -34,7 +34,7 @@
     <g:layer top="2.9em" left="1em" height="2em" width="50%">
       <g:FlowPanel addStyleNames="{style.toolbar},{style.toolbar-left}">
         <g:Image ui:field="parentImage" url="image/up.png"></g:Image>
-        <g:Hyperlink ui:field="parentLink" addStyleNames="{style.left-aligned}">..</g:Hyperlink>
+        <g:Anchor ui:field="parentLink" addStyleNames="{style.left-aligned}">..</g:Anchor>
       </g:FlowPanel>
     </g:layer>
     <g:layer top='2.5em' right="1em" width='50%' height='2em'>

@@ -66,7 +66,8 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     super.registerHandler(eventBus.addHandler(NavigatorSelectionChangeEvent.getType(), new NavigatorSelectionHandler()));
     super.registerHandler(eventBus.addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
     super.registerHandler(getDisplay().addSpreadSheetClickHandler(new SpreadSheetClickHandler()));
-    super.registerHandler(getDisplay().addParentClickHandler(new ParentClickHandler()));
+    super.registerHandler(getDisplay().addParentLinkClickHandler(new ParentClickHandler()));
+    super.registerHandler(getDisplay().addParentImageClickHandler(new ParentClickHandler()));
     super.registerHandler(getDisplay().addNextClickHandler(new NextClickHandler()));
     super.registerHandler(getDisplay().addPreviousClickHandler(new PreviousClickHandler()));
     super.getDisplay().setVariableNameFieldUpdater(new VariableNameFieldUpdater());
@@ -222,7 +223,9 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
     void setEntityType(String text);
 
-    HandlerRegistration addParentClickHandler(ClickHandler handler);
+    HandlerRegistration addParentLinkClickHandler(ClickHandler handler);
+
+    HandlerRegistration addParentImageClickHandler(ClickHandler handler);
 
     HandlerRegistration addSpreadSheetClickHandler(ClickHandler handler);
 

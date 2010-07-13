@@ -25,9 +25,9 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -58,7 +58,7 @@ public class VariableView extends Composite implements VariablePresenter.Display
   //
 
   @UiField
-  Hyperlink parentLink;
+  Anchor parentLink;
 
   @UiField
   FlowPanel toolbarPanel;
@@ -220,13 +220,19 @@ public class VariableView extends Composite implements VariablePresenter.Display
   }
 
   @Override
-  public HandlerRegistration addParentClickHandler(ClickHandler handler) {
+  public HandlerRegistration addParentLinkClickHandler(ClickHandler handler) {
     return parentLink.addClickHandler(handler);
+  }
+
+  @Override
+  public HandlerRegistration addParentImageClickHandler(ClickHandler handler) {
+    return parentImage.addClickHandler(handler);
   }
 
   @Override
   public void setParentName(String name) {
     parentLink.setText(name);
+    parentImage.setTitle(name);
   }
 
   @Override
