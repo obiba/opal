@@ -7,7 +7,10 @@
     padding: 0.25em 0 0 1em;
     float: left;
     }
-    
+    .wb-head {
+    float: left;
+    margin-right:20px;
+    }
     .wb-top .title {
     font-size: 1.3em;
     }
@@ -50,19 +53,27 @@
    .indent {
     	margin-left: 20px;
     }
+    
   </ui:style>
   
   <g:DockLayoutPanel>
     <g:north size="52">
       <g:FlowPanel addStyleNames="{style.wb-top}">
-        <g:Label addStyleNames="{style.title}"><ui:msg description="Data export title">Export Data</ui:msg></g:Label>
-        <g:Label addStyleNames="{style.summary}"><ui:msg description="Data export instructions">Select the tables to be exported:</ui:msg></g:Label>
+        <g:FlowPanel addStyleNames="{style.wb-head}">
+          <g:Label addStyleNames="{style.title}"><ui:msg description="Data export title">Export Data</ui:msg></g:Label>
+        <g:Label addStyleNames="{style.summary}"><ui:msg description="Data export instructions">Select the tables and the export destination.</ui:msg></g:Label>  
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="{style.wb-control}">
+          <g:Button ui:field="submit" addStyleNames="{style.button}"><ui:msg description="Export button label">Export</ui:msg></g:Button>
+        </g:FlowPanel>
+        
       </g:FlowPanel>
     </g:north>
     <g:center>
-      <g:ScrollPanel width="100%" addStyleNames="{style.wb-form}">
-        <g:HTMLPanel>
-        <g:DecoratorPanel>
+      <g:SplitLayoutPanel>
+        <g:center>  
+          <g:ScrollPanel addStyleNames="{style.wb-form}">
+        
         <g:HTMLPanel>
           <table class="gwt-KeyValue" cellspacing="10">
             <tbody>
@@ -89,7 +100,7 @@
                       <td><g:Label><ui:msg description="File format field">Format:</ui:msg></g:Label></td>
                       <td><g:ListBox ui:field="fileFormat">
                         <g:item value="csv">CSV</g:item>
-                        <g:item value="excel">Excel</g:item>
+                        <g:item value="excel">Excel (xls,xlsx)</g:item>
                         <g:item value="xml">XML (zip)</g:item>
                       </g:ListBox></td>
                     </tr>
@@ -105,8 +116,10 @@
             <tr>
               <td/>
               <td>
-                <g:RadioButton name="destination" ui:field="destinationDataSource"><ui:msg description="Datasource destination label">Copy data to dataset:</ui:msg></g:RadioButton> 
-                <g:ListBox ui:field="datasources" />
+                <g:RadioButton name="destination" ui:field="destinationDataSource"><ui:msg description="Datasource destination label">Copy data to dataset:</ui:msg></g:RadioButton>
+                <g:HTMLPanel  addStyleNames="{style.indent}">
+                  <g:ListBox ui:field="datasources" />
+                </g:HTMLPanel>
               </td>
             </tr> 
             <tr>
@@ -145,12 +158,62 @@
             </tr> 
             </tbody>
           </table>
+        </g:HTMLPanel>
+                
+          </g:ScrollPanel>
+        </g:center>
+        
+        <g:east size="500">
+          <g:DockLayoutPanel addStyleNames="information" unit="EM">
+            <g:north size="2.3">
+              <g:FlowPanel addStyleNames="header gwt-MenuBar-horizontal">
+              <g:Label addStyleNames="left-aligned gwt-MenuItem"><ui:msg description="Information label">Information</ui:msg></g:Label>
+              <g:Image url="image/close.png" addStyleNames="right-aligned"></g:Image>
+            </g:FlowPanel>
+            </g:north>
+            <g:center>
             
-        </g:HTMLPanel>
-        </g:DecoratorPanel>
-        <g:Button ui:field="submit" addStyleNames="{style.button}"><ui:msg description="Export button label">Export</ui:msg></g:Button>
-        </g:HTMLPanel>
-      </g:ScrollPanel>
+            <g:ScrollPanel addStyleNames="content">
+              
+              <g:HTMLPanel>
+                <g:Label addStyleNames="title"><ui:msg description="File destination label">File Destination</ui:msg></g:Label> 
+                <p>The data can be exported in file. The file will be outputed on the server side in a directory you will have selected. Once successfully exported, you will download the resulting output from the [Opal file system]. Depending on the file format selected, some limits applies:</p>
+                <ul>
+                  <li>CSV
+                    <br/>
+                    Zip is not supported yet.
+                  </li>
+                  <li>Excel
+                    <br/>
+                      Use respectively .xls/.xlsx file suffix to distinguish Excel formats 97/2007.
+                    <ul>
+                      <li>Maximum length of table name: 30</li>
+                      <li>Maximum number of variables: 256/16K</li>
+                      <li>Maximum number of participants: 16K/1M</li>
+                      <li>Binary data are not suported</li>    
+                    </ul>
+                  </li>
+                  <li>XML
+                    <br/>
+                    Resulting file will be zipped.
+                  </li>
+                  
+                </ul>
+                <g:Label addStyleNames="title"><ui:msg description="Participant Identifier label">Participant Identifier</ui:msg></g:Label>
+                <p>Different strategies can be applied with the exported participant identifiers:</p>
+                <ul>
+                  <li>Use Opal participant identifier.</li>
+                  <li>Switch the participant identifier to one that is specific to destination unit. To achieve that, select a 'unit' that has been predefined in your Opal system.</li>
+                </ul>
+              </g:HTMLPanel>
+              
+            </g:ScrollPanel>
+            
+            </g:center>
+          </g:DockLayoutPanel>
+          
+        </g:east>
+        </g:SplitLayoutPanel>
     </g:center>
   </g:DockLayoutPanel>
 
