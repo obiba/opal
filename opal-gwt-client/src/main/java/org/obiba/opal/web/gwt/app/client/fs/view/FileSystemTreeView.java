@@ -71,20 +71,39 @@ public class FileSystemTreeView implements Display {
   public void addBranch(FileDto folderToAdd) {
     FileDto parentDto = FileDto.create();
     parentDto.setType(FileType.FOLDER);
-
-    int lastPathSeparatorIndex = folderToAdd.getPath().lastIndexOf('/');
-    if(lastPathSeparatorIndex != -1) {
-      parentDto.setPath(folderToAdd.getPath().substring(0, lastPathSeparatorIndex));
-      parentDto.setName(folderToAdd.getPath().substring(lastPathSeparatorIndex + 1));
-    } else {
-      parentDto.setPath(folderToAdd.getPath());
-      parentDto.setName(folderToAdd.getPath());
-    }
+    parentDto.setPath(getParentFolderPath(folderToAdd.getPath()));
+    parentDto.setName(getFolderName(parentDto.getPath()));
 
     TreeItem parentItem = findTreeItem(parentDto);
     if(parentItem != null) {
       parentItem.addItem(createTreeItem(folderToAdd));
+    } else {
+      addBranch(parentDto);
     }
+  }
+
+  private String getParentFolderPath(String childPath) {
+    String parentPath = null;
+
+    int lastSeparatorIndex = childPath.lastIndexOf('/');
+
+    if(lastSeparatorIndex != -1) {
+      parentPath = lastSeparatorIndex != 0 ? childPath.substring(0, lastSeparatorIndex) : "/";
+    }
+
+    return parentPath;
+  }
+
+  private String getFolderName(String folderPath) {
+    String folderName = folderPath;
+
+    int lastSeparatorIndex = folderPath.lastIndexOf('/');
+
+    if(lastSeparatorIndex != -1) {
+      folderName = folderPath.substring(lastSeparatorIndex + 1);
+    }
+
+    return folderName;
   }
 
   private TreeItem createTreeItem(FileDto fileItem) {
