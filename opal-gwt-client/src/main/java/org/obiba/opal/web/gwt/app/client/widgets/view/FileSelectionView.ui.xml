@@ -6,20 +6,15 @@
   ui:generateLocales="default">
 
   <ui:style>
-    .left-aligned { 
-    float : left; 
-    margin-right : 2px; 
-    }
-    
     .button {
     cursor: pointer;
     }
   </ui:style>
 
   <g:HTMLPanel>
-    <g:FlowPanel addStyleNames="{style.left-aligned}">
-   	  <g:TextBox ui:field="fileField" addStyleNames="{style.left-aligned}"/>
+    <g:HorizontalPanel>
+   	  <g:TextBox ui:field="fileField"/>
    	  <g:Button ui:field="browseButton" addStyleNames="{style.button}"><ui:msg description="Browse button label">...</ui:msg></g:Button>	
-    </g:FlowPanel>
+    </g:HorizontalPanel>
   </g:HTMLPanel>
 </ui:UiBinder>
