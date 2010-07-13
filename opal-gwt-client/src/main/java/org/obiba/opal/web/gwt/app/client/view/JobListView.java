@@ -33,7 +33,6 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.HasCell;
 import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
@@ -95,12 +94,10 @@ public class JobListView extends Composite implements Display {
   // JobListPresenter.Display Methods
   //
 
-  @Override
   public SelectionModel<CommandStateDto> getTableSelection() {
     return null;
   }
 
-  @Override
   public void renderRows(final JsArray<CommandStateDto> rows) {
     table.setDelegate(new Delegate<CommandStateDto>() {
 
@@ -118,10 +115,8 @@ public class JobListView extends Composite implements Display {
     table.redraw();
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public void clear() {
-    renderRows((JsArray<CommandStateDto>) JavaScriptObject.createArray());
+  public void showClearJobsButton(boolean show) {
+    clearImage.setVisible(show);
   }
 
   public HasActionHandler getActionsColumn() {

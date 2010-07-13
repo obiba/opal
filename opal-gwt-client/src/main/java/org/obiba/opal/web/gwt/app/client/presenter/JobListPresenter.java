@@ -112,11 +112,22 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
   // Methods
   //
 
+  public boolean containsClearableJobs(JsArray<CommandStateDto> jobs) {
+    for(int i = 0; i < jobs.length(); i++) {
+      CommandStateDto job = jobs.get(i);
+      if(job.getStatus().toString().equals("SUCCEEDED") || job.getStatus().toString().equals("FAILED") || job.getStatus().toString().equals("CANCELED")) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private void updateTable() {
     ResourceRequestBuilderFactory.<JsArray<CommandStateDto>> newBuilder().forResource("/shell/commands").get().withCallback(new ResourceCallback<JsArray<CommandStateDto>>() {
       @Override
       public void onResource(Response response, JsArray<CommandStateDto> resource) {
         getDisplay().renderRows(resource);
+        getDisplay().showClearJobsButton(containsClearableJobs(resource));
       }
 
     }).send();
@@ -184,7 +195,7 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
 
     void renderRows(JsArray<CommandStateDto> rows);
 
-    void clear();
+    void showClearJobsButton(boolean show);
 
     HasActionHandler getActionsColumn();
 
