@@ -165,7 +165,6 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
       public void onResource(Response response, FileDto file) {
         treeItem.removeItems();
         getDisplay().addBranch(treeItem, file, 0);
-        getDisplay().selectTreeItem((FileDto) treeItem.getUserObject());
       }
     }).send();
   }
