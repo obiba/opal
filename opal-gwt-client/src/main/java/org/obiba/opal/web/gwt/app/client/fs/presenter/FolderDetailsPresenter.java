@@ -18,6 +18,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderRefreshedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FolderCreationEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -25,7 +26,6 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.FileDto;
 import org.obiba.opal.web.model.client.FileDto.FileType;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -85,7 +85,6 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
       public void onSelectionChange(SelectionChangeEvent event) {
         FileDto selectedFile = getDisplay().getTableSelectionModel().getSelectedObject();
         if(selectedFile != null) {
-          GWT.log("firing event details file =" + selectedFile.getPath());
           eventBus.fireEvent(new FileSelectionChangeEvent(selectedFile));
         }
       }
@@ -150,6 +149,7 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
       public void onResource(Response response, FileDto resource) {
         currentFolder = resource;
         getDisplay().renderRows(resource);
+        eventBus.fireEvent(new FolderRefreshedEvent(currentFolder));
       }
     }).send();
   }

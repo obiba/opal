@@ -18,8 +18,8 @@
       <ui:msg description="Upload file dialog title">File Upload</ui:msg>
     </g:caption>
     <!-- The width here have to match EXACTLY the one on DialogBox above -->
-    <g:LayoutPanel height="12em" width="35em">
-      <g:layer bottom="9.5em" height="2em" left="1em" right="1em">
+    <g:LayoutPanel height="13em" width="35em">
+      <g:layer bottom="9.5em" height="3em" left="1em" right="1em">
         <g:Label ui:field="errorMsg" addStyleNames="{style.errorMsg}" />
       </g:layer>
       <g:layer bottom="7.5em" height="3.5em" left="1em" right="1em">

@@ -21,7 +21,7 @@ import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderRefreshedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.FileSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -187,10 +187,10 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
     }));
 
-    super.registerHandler(eventBus.addHandler(FolderSelectionChangeEvent.getType(), new FolderSelectionChangeEvent.Handler() {
+    super.registerHandler(eventBus.addHandler(FolderRefreshedEvent.getType(), new FolderRefreshedEvent.Handler() {
 
       @Override
-      public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
+      public void onFolderRefreshed(FolderRefreshedEvent event) {
         currentFolder = event.getFolder();
       }
 

@@ -17,9 +17,12 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.model.client.FileDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -27,7 +30,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
-import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.inject.Inject;
 
 public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogPresenter.Display> {
@@ -57,6 +59,8 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
   private Translations translations = GWT.create(Translations.class);
 
   private FileDto currentFolder;
+
+  private Runnable actionRequiringConfirmation;
 
   @Inject
   public FileUploadDialogPresenter(Display display, EventBus eventBus) {
@@ -99,7 +103,8 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
   private void addEventHandlers() {
     super.registerHandler(getDisplay().getUploadButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
-        uploadFile();
+        String filePath = currentFolder.getPath() + '/' + getDisplay().getFilename();
+        uploadFile(filePath);
       }
     }));
 
@@ -109,15 +114,7 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
       }
     }));
 
-    super.registerHandler(getDisplay().addSubmitHandler(new FormPanel.SubmitHandler() {
-      @Override
-      public void onSubmit(SubmitEvent event) {
-        if(getDisplay().getFilename().equals("")) {
-          getDisplay().getErrorMsg().setText(translations.fileMustBeSelected());
-          event.cancel();
-        }
-      }
-    }));
+    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
 
     super.registerHandler(getDisplay().addSubmitCompleteHandler(new FormPanel.SubmitCompleteHandler() {
       public void onSubmitComplete(SubmitCompleteEvent event) {
@@ -128,14 +125,50 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
 
   }
 
-  private void uploadFile() {
-    String url = "/ws/files" + currentFolder.getPath() + '/' + getDisplay().getFilename();
+  class ConfirmationEventHandler implements ConfirmationEvent.Handler {
+
+    public void onConfirmation(ConfirmationEvent event) {
+      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event.isConfirmed()) {
+        actionRequiringConfirmation.run();
+        actionRequiringConfirmation = null;
+      }
+    }
+  }
+
+  private boolean fileExist(String fileName) {
+    JsArray<FileDto> filesInCurrentDirectory = currentFolder.getChildrenArray();
+    for(int i = 0; i < filesInCurrentDirectory.length(); i++) {
+      if(fileName.equals(filesInCurrentDirectory.get(i).getName())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private void uploadFile(final String path) {
+
+    actionRequiringConfirmation = new Runnable() {
+      public void run() {
+        submitFile(path);
+      }
+    };
+
+    String fileName = getDisplay().getFilename();
+    if(fileName.equals("")) {
+      getDisplay().getErrorMsg().setText(translations.fileMustBeSelected());
+    } else if(fileExist(fileName)) {
+      eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "uploadFile", "confirmReplaceExistingFile"));
+    } else {
+      submitFile(path);
+    }
+
+  }
+
+  private void submitFile(final String path) {
+    String url = "/ws/files" + path;
     getDisplay().submit(url);
   }
 
-  /**
-   * @param currentFolder
-   */
   public void setCurrentFolder(FileDto currentFolder) {
     this.currentFolder = currentFolder;
   }
