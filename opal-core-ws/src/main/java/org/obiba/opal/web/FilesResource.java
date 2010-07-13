@@ -129,20 +129,20 @@ public class FilesResource {
   private Response getFolderDetails(FileObject folder) throws FileSystemException {
 
     // Create a FileDto representing the folder identified by the path.
-    Opal.FileDto.Builder fileBuilder = getBaseFolderBuilder(folder, false);
+    Opal.FileDto.Builder folderBuilder = getBaseFolderBuilder(folder, false);
 
     // Add the parent folder as child of the current folder to allow going back to parent folder when navigating
     // the file system.
     FileObject parentFolder = folder.getParent();
     if(parentFolder != null) {
       Opal.FileDto.Builder parentFolderBuilder = getBaseFolderBuilder(parentFolder, true);
-      fileBuilder.addChildren(parentFolderBuilder.build());
+      folderBuilder.addChildren(parentFolderBuilder.build());
     }
 
     // Create FileDtos for each file & folder in the folder corresponding to the path.
-    addChildren(fileBuilder, folder);
+    addChildren(folderBuilder, folder, 2);
 
-    return Response.ok(fileBuilder.build()).build();
+    return Response.ok(folderBuilder.build()).build();
 
   }
 
@@ -155,11 +155,13 @@ public class FilesResource {
     return fileBuilder;
   }
 
-  private void addChildren(Opal.FileDto.Builder parentFolderBuilder, FileObject parentFolder) throws FileSystemException {
+  private void addChildren(Opal.FileDto.Builder folderBuilder, FileObject parentFolder, int level) throws FileSystemException {
     Opal.FileDto.Builder fileBuilder;
 
     // Get the children for the current folder (list of files & folders).
     FileObject[] children = parentFolder.getChildren();
+
+    level--;
 
     // Loop through all children.
     for(int i = 0; i < children.length; i++) {
@@ -176,8 +178,12 @@ public class FilesResource {
 
       fileBuilder.setLastModifiedTime(children[i].getContent().getLastModifiedTime());
 
+      if(children[i].getType().hasChildren() && children[i].getChildren().length > 0 && level > 0) {
+        addChildren(fileBuilder, children[i], level);
+      }
+
       // Add the current child to the parent FileDto (folder).
-      parentFolderBuilder.addChildren(fileBuilder.build());
+      folderBuilder.addChildren(fileBuilder.build());
     }
   }
 

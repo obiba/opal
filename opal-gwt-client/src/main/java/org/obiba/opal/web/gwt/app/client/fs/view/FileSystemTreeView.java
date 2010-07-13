@@ -18,6 +18,8 @@ import org.obiba.opal.web.model.client.FileDto.FileType;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
+import com.google.gwt.event.logical.shared.OpenHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
@@ -53,19 +55,33 @@ public class FileSystemTreeView implements Display {
     treeRoot = createTreeItem(rootDto);
     treeRoot.setText(translations.fileSystemLabel());
     fileSystemTree.addItem(treeRoot);
-    addBranch(treeRoot, rootDto);
+    addBranch(treeRoot, rootDto, 0);
     fileSystemTree.setSelectedItem(treeRoot, true);
   }
 
-  public void addBranch(TreeItem treeItem, FileDto folderToAdd) {
+  public HandlerRegistration addFileSystemTreeOpenHandler(OpenHandler<TreeItem> openHandler) {
+    return fileSystemTree.addOpenHandler(openHandler);
+  }
+
+  public void addBranch(TreeItem treeItem, FileDto folderToAdd, int level) {
+    ++level;
     FileDto file;
     for(int i = 0; i < folderToAdd.getChildrenArray().length(); i++) {
       file = folderToAdd.getChildrenArray().get(i);
+
       if(file.getType().isFileType(FileDto.FileType.FOLDER) && !file.getSymbolicLink()) {
-        treeItem.addItem(createTreeItem(file));
+        TreeItem childItem = createTreeItem(file);
+        if(file.getChildrenCount() > 0) {
+          addBranch(childItem, file, level);
+        }
+        treeItem.addItem(childItem);
+
+        if(level == 1) {
+          treeItem.setState(true);
+        }
       }
+
     }
-    treeItem.setState(true);
   }
 
   public void addBranch(FileDto folderToAdd) {
@@ -119,25 +135,9 @@ public class FileSystemTreeView implements Display {
 
   @Override
   public void selectTreeItem(FileDto folder) {
-    String folderName = folder.getName();
-    Boolean parentFolderSelected = Boolean.TRUE;
-
-    TreeItem root = fileSystemTree.getSelectedItem();
-    for(int i = 0; i < root.getChildCount(); i++) {
-      if(folderName.equals(root.getChild(i).getText())) {
-        root.setState(true);
-        fileSystemTree.setSelectedItem(root.getChild(i));
-        parentFolderSelected = Boolean.FALSE;
-        break;
-      }
-    }
-
-    if(parentFolderSelected) {
-      if(root.getParentItem() != null) {
-        fileSystemTree.setSelectedItem(root.getParentItem());
-        root.getParentItem().setState(true);
-      }
-    }
+    TreeItem item = findTreeItem(folder);
+    fileSystemTree.setSelectedItem(item);
+    item.setState(true);
   }
 
   private TreeItem findTreeItem(FileDto dto) {

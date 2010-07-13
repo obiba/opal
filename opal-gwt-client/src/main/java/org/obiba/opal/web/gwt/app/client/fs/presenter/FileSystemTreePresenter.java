@@ -24,8 +24,11 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.FileDto;
 
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
+import com.google.gwt.event.logical.shared.OpenEvent;
+import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.inject.Inject;
@@ -35,11 +38,13 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
   public interface Display extends WidgetDisplay {
     void initTree(FileDto root);
 
-    void addBranch(TreeItem treeItem, FileDto folderToAdd);
+    void addBranch(TreeItem treeItem, FileDto folderToAdd, int level);
 
     void addBranch(FileDto folderToAdd);
 
     HasSelectionHandlers<TreeItem> getFileSystemTree();
+
+    HandlerRegistration addFileSystemTreeOpenHandler(OpenHandler<TreeItem> openHandler);
 
     void selectTreeItem(FileDto folder);
 
@@ -112,7 +117,7 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
           ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta" + selectedFile.getPath()).get().withCallback(new ResourceCallback<FileDto>() {
             @Override
             public void onResource(Response response, FileDto file) {
-              getDisplay().addBranch(selectedItem, file);
+              getDisplay().addBranch(selectedItem, file, 0);
             }
           }).send();
         }
@@ -141,5 +146,27 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
         getDisplay().addBranch(event.getFolder());
       }
     }));
+
+    super.registerHandler(getDisplay().addFileSystemTreeOpenHandler(new OpenHandler<TreeItem>() {
+
+      @Override
+      public void onOpen(final OpenEvent<TreeItem> event) {
+        refreshTreeNode(event.getTarget());
+      }
+
+    }));
+
+  }
+
+  private void refreshTreeNode(final TreeItem treeItem) {
+    FileDto folder = (FileDto) treeItem.getUserObject();
+    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta" + folder.getPath()).get().withCallback(new ResourceCallback<FileDto>() {
+      @Override
+      public void onResource(Response response, FileDto file) {
+        treeItem.removeItems();
+        getDisplay().addBranch(treeItem, file, 0);
+        getDisplay().selectTreeItem((FileDto) treeItem.getUserObject());
+      }
+    }).send();
   }
 }
