@@ -70,6 +70,7 @@ public class SecurityInterceptor extends AbstractSecurityComponent implements Pr
     String sessionId = extractCookieValue(request, method);
     if(isValidSessionId(sessionId)) {
       Subject s = new Subject.Builder(getSecurityManager()).sessionId(sessionId).buildSubject();
+      s.getSession().touch();
       log.debug("Binding subject {} session {} to executring thread {}", new Object[] { s.getPrincipal(), sessionId, Thread.currentThread().getId() });
       ThreadContext.bind(s);
     } else {
@@ -82,9 +83,10 @@ public class SecurityInterceptor extends AbstractSecurityComponent implements Pr
   public void postProcess(ServerResponse response) {
     try {
       if(SecurityUtils.getSubject().isAuthenticated()) {
-        String sessionId = SecurityUtils.getSubject().getSession().getId().toString();
-        int timeout = (int) (SecurityUtils.getSubject().getSession().getTimeout() / 1000);
-        response.getMetadata().add(HttpHeaderNames.SET_COOKIE, new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, sessionId, "/", null, null, timeout, false));
+        Session session = SecurityUtils.getSubject().getSession();
+        session.touch();
+        int timeout = (int) (session.getTimeout() / 1000);
+        response.getMetadata().add(HttpHeaderNames.SET_COOKIE, new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, session.getId().toString(), "/", null, null, timeout, false));
       } else {
         if(isWebServiceAuthenticated(response.getAnnotations())) {
           // Only web service calls that require authentication will lose their opalsid cookie
