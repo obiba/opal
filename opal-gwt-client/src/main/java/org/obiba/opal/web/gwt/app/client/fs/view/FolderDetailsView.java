@@ -91,7 +91,7 @@ public class FolderDetailsView extends Composite implements Display {
     if(!folder.getName().equals("root")) {
       FileDto parent = FileDtos.getParent(folder);
       parent.setName("..");
-      children.set(0, parent);
+      children.unshift(parent);
     }
 
     int fileCount = children.length();
