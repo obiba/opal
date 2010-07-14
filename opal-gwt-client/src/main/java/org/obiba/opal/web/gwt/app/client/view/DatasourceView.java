@@ -166,6 +166,26 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   }
 
   @Override
+  public void setNextName(String name) {
+    nextImage.setTitle(name);
+    if(name != null && name.length() > 0) {
+      nextImage.setUrl("image/next.png");
+    } else {
+      nextImage.setUrl("image/next-disabled.png");
+    }
+  }
+
+  @Override
+  public void setPreviousName(String name) {
+    previousImage.setTitle(name);
+    if(name != null && name.length() > 0) {
+      previousImage.setUrl("image/previous.png");
+    } else {
+      previousImage.setUrl("image/previous-disabled.png");
+    }
+  }
+
+  @Override
   public HandlerRegistration addNextClickHandler(ClickHandler handler) {
     return nextImage.addClickHandler(handler);
   }
@@ -190,4 +210,5 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   public void setTableNameFieldUpdater(FieldUpdater<TableDto, String> updater) {
     tableNameColumn.setFieldUpdater(updater);
   }
+
 }

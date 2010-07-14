@@ -16,12 +16,10 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.DatasourceSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
 
 import com.google.gwt.user.client.ui.HasWidgets;
-import com.google.gwt.user.client.ui.TreeItem;
 import com.google.inject.Inject;
 
 public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Display> {
@@ -64,23 +62,10 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
 
     getDisplay().setTreeDisplay(navigatorTreePresenter.getDisplay());
 
-    super.registerHandler(eventBus.addHandler(NavigatorSelectionChangeEvent.getType(), new NavigatorSelectionChangeEvent.Handler() {
-
-      @Override
-      public void onNavigatorSelectionChanged(NavigatorSelectionChangeEvent event) {
-        TreeItem item = event.getSelection();
-        if(item.getParentItem() == null) {
-          displayDetails(datasourcePresenter.getDisplay());
-        } else {
-          displayDetails(tablePresenter.getDisplay());
-        }
-      }
-    }));
-
     super.registerHandler(eventBus.addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionChangeEvent.Handler() {
 
       @Override
-      public void onNavigatorSelectionChanged(DatasourceSelectionChangeEvent event) {
+      public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
         displayDetails(datasourcePresenter.getDisplay());
       }
     }));
@@ -88,7 +73,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
 
       @Override
-      public void onNavigatorSelectionChanged(TableSelectionChangeEvent event) {
+      public void onTableSelectionChanged(TableSelectionChangeEvent event) {
         displayDetails(tablePresenter.getDisplay());
       }
     }));

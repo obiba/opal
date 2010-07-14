@@ -21,7 +21,7 @@ public class DatasourceSelectionChangeEvent extends GwtEvent<DatasourceSelection
 
   public interface Handler extends EventHandler {
 
-    void onNavigatorSelectionChanged(DatasourceSelectionChangeEvent event);
+    void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event);
 
   }
 
@@ -46,7 +46,7 @@ public class DatasourceSelectionChangeEvent extends GwtEvent<DatasourceSelection
 
   @Override
   protected void dispatch(Handler handler) {
-    handler.onNavigatorSelectionChanged(this);
+    handler.onDatasourceSelectionChanged(this);
   }
 
   @Override

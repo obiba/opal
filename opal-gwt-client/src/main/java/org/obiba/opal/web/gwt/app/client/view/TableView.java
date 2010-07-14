@@ -215,6 +215,26 @@ public class TableView extends Composite implements TablePresenter.Display {
   }
 
   @Override
+  public void setNextName(String name) {
+    nextImage.setTitle(name);
+    if(name != null && name.length() > 0) {
+      nextImage.setUrl("image/next.png");
+    } else {
+      nextImage.setUrl("image/next-disabled.png");
+    }
+  }
+
+  @Override
+  public void setPreviousName(String name) {
+    previousImage.setTitle(name);
+    if(name != null && name.length() > 0) {
+      previousImage.setUrl("image/previous.png");
+    } else {
+      previousImage.setUrl("image/previous-disabled.png");
+    }
+  }
+
+  @Override
   public HandlerRegistration addParentLinkClickHandler(ClickHandler handler) {
     return parentLink.addClickHandler(handler);
   }

@@ -16,7 +16,6 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.DatasourceSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.event.NavigatorSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
@@ -40,6 +39,8 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
   private JsArray<TableDto> tables;
 
+  private JsArray<DatasourceDto> datasources;
+
   //
   // Constructors
   //
@@ -56,13 +57,14 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
   @Override
   protected void onBind() {
-    super.registerHandler(eventBus.addHandler(NavigatorSelectionChangeEvent.getType(), new NavigatorSelectionHandler()));
+    super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionHandler()));
     super.registerHandler(eventBus.addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionHandler()));
     super.registerHandler(getDisplay().addSpreadSheetClickHandler(new SpreadSheetClickHandler()));
     super.registerHandler(getDisplay().addNextClickHandler(new NextClickHandler()));
     super.registerHandler(getDisplay().addPreviousClickHandler(new PreviousClickHandler()));
     super.registerHandler(eventBus.addHandler(SiblingTableSelectionEvent.getType(), new SiblingTableSelectionHandler()));
     super.getDisplay().setTableNameFieldUpdater(new TableNameFieldUpdater());
+
   }
 
   private int getTableIndex(String tableName) {
@@ -86,6 +88,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
   @Override
   public void refreshDisplay() {
+    initDatasources();
   }
 
   @Override
@@ -96,14 +99,46 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     displayDatasource(datasourceDto, null);
   }
 
-  private void displayDatasource(DatasourceDto datasourceDto, TableDto tableDto) {
+  private void displayDatasource(final DatasourceDto datasourceDto, final TableDto tableDto) {
     if(datasourceName == null || !isCurrentDatasource(datasourceDto)) {
       datasourceName = datasourceDto.getName();
       getDisplay().setDatasourceName(datasourceName);
       updateTable(tableDto != null ? tableDto.getName() : null);
+
+      // make sure the list of datasources is initialized before looking for siblings
+      if(datasources == null || datasources.length() == 0) {
+        ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<DatasourceDto> resource) {
+            datasources = (resource != null) ? resource : (JsArray<DatasourceDto>) JsArray.createArray();
+            displayDatasourceSiblings(datasourceDto);
+          }
+
+        }).send();
+      } else {
+        displayDatasourceSiblings(datasourceDto);
+      }
+
     } else if(tableDto != null) {
       selectTable(tableDto.getName());
     }
+  }
+
+  private void displayDatasourceSiblings(DatasourceDto datasourceDto) {
+    int index = getDatasourceIndex(datasourceDto);
+    getDisplay().setPreviousName(index > 0 ? datasources.get(index - 1).getName() : null);
+    getDisplay().setNextName(index < datasources.length() - 1 ? datasources.get(index + 1).getName() : null);
+  }
+
+  private int getDatasourceIndex(DatasourceDto datasourceDto) {
+    int index = -1;
+    for(int i = 0; i < datasources.length(); i++) {
+      if(datasources.get(i).getName().equals(datasourceDto.getName())) {
+        index = i;
+        break;
+      }
+    }
+    return index;
   }
 
   private boolean isCurrentDatasource(DatasourceDto datasourceDto) {
@@ -132,35 +167,67 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     eventBus.fireEvent(new FileDownloadEvent(downloadUrl));
   }
 
+  private TableDto getPreviousTable(int index) {
+    TableDto previous = null;
+    if(index > 0) {
+      previous = tables.get(index - 1);
+    }
+    return previous;
+  }
+
+  private TableDto getNextTable(int index) {
+    TableDto next = null;
+    if(index < tables.length() - 1) {
+      next = tables.get(index + 1);
+    }
+    return next;
+  }
+
+  private void initDatasources() {
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+      @Override
+      public void onResource(Response response, JsArray<DatasourceDto> resource) {
+        datasources = (resource != null) ? resource : (JsArray<DatasourceDto>) JsArray.createArray();
+      }
+
+    }).send();
+  }
+
   //
   // Interfaces and classes
   //
 
-  /**
-   *
-   */
   class TableNameFieldUpdater implements FieldUpdater<TableDto, String> {
     @Override
     public void update(int index, TableDto tableDto, String value) {
-      eventBus.fireEvent(new TableSelectionChangeEvent(tableDto));
+      TableDto previous = getPreviousTable(index);
+      TableDto next = getNextTable(index);
+      String previousName = previous != null ? previous.getName() : null;
+      String nextName = next != null ? next.getName() : null;
+      eventBus.fireEvent(new TableSelectionChangeEvent(DatasourcePresenter.this, tableDto, previousName, nextName));
     }
   }
 
-  private final class DatasourceSelectionHandler implements DatasourceSelectionChangeEvent.Handler {
+  class DatasourceSelectionHandler implements DatasourceSelectionChangeEvent.Handler {
     @Override
-    public void onNavigatorSelectionChanged(DatasourceSelectionChangeEvent event) {
+    public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
       displayDatasource(event.getSelection());
     }
   }
 
-  class NavigatorSelectionHandler implements NavigatorSelectionChangeEvent.Handler {
+  class TableSelectionHandler implements TableSelectionChangeEvent.Handler {
+
     @Override
-    public void onNavigatorSelectionChanged(NavigatorSelectionChangeEvent event) {
-      if(event.getSelection().getParentItem() == null) {
-        displayDatasource((DatasourceDto) event.getSelection().getUserObject());
+    public void onTableSelectionChanged(final TableSelectionChangeEvent event) {
+      if(!event.getSelection().getDatasourceName().equals(datasourceName)) {
+        ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasource/" + event.getSelection().getDatasourceName()).get().withCallback(new ResourceCallback<DatasourceDto>() {
+          @Override
+          public void onResource(Response response, DatasourceDto resource) {
+            displayDatasource(resource, event.getSelection());
+          }
+        }).send();
       } else {
-        // sync the table selection in the tree with the table selection in the tables list
-        displayDatasource((DatasourceDto) event.getSelection().getParentItem().getUserObject(), (TableDto) event.getSelection().getUserObject());
+        selectTable(event.getSelection().getName());
       }
     }
   }
@@ -184,7 +251,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
       siblingSelection = tables.get(siblingIndex);
 
       getDisplay().setTableSelection(siblingSelection, siblingIndex);
-      eventBus.fireEvent(new TableSelectionChangeEvent(siblingSelection));
+      eventBus.fireEvent(new TableSelectionChangeEvent(DatasourcePresenter.this, siblingSelection, getPreviousTable(siblingIndex).getName(), getNextTable(siblingIndex).getName()));
     }
   }
 
@@ -198,44 +265,28 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   class PreviousClickHandler implements ClickHandler {
     @Override
     public void onClick(ClickEvent event) {
-      ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-        @Override
-        public void onResource(Response response, JsArray<DatasourceDto> resource) {
-          if(resource != null) {
-            for(int i = 0; i < resource.length(); i++) {
-              if(resource.get(i).getName().equals(datasourceName)) {
-                if(i != 0) {
-                  eventBus.fireEvent(new DatasourceSelectionChangeEvent(resource.get(i - 1)));
-                }
-                break;
-              }
-            }
+      for(int i = 0; i < datasources.length(); i++) {
+        if(datasources.get(i).getName().equals(datasourceName)) {
+          if(i != 0) {
+            eventBus.fireEvent(new DatasourceSelectionChangeEvent(datasources.get(i - 1)));
           }
+          break;
         }
-
-      }).send();
+      }
     }
   }
 
   class NextClickHandler implements ClickHandler {
     @Override
     public void onClick(ClickEvent event) {
-      ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-        @Override
-        public void onResource(Response response, JsArray<DatasourceDto> resource) {
-          if(resource != null) {
-            for(int i = 0; i < resource.length(); i++) {
-              if(resource.get(i).getName().equals(datasourceName)) {
-                if(i < resource.length() - 1) {
-                  eventBus.fireEvent(new DatasourceSelectionChangeEvent(resource.get(i + 1)));
-                }
-                break;
-              }
-            }
+      for(int i = 0; i < datasources.length(); i++) {
+        if(datasources.get(i).getName().equals(datasourceName)) {
+          if(i < datasources.length() - 1) {
+            eventBus.fireEvent(new DatasourceSelectionChangeEvent(datasources.get(i + 1)));
           }
+          break;
         }
-
-      }).send();
+      }
     }
   }
 
@@ -246,6 +297,10 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     void renderRows(JsArray<TableDto> rows);
 
     void setDatasourceName(String name);
+
+    void setPreviousName(String name);
+
+    void setNextName(String name);
 
     HandlerRegistration addNextClickHandler(ClickHandler handler);
 

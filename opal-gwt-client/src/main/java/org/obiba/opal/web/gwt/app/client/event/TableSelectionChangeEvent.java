@@ -21,7 +21,7 @@ public class TableSelectionChangeEvent extends GwtEvent<TableSelectionChangeEven
 
   public interface Handler extends EventHandler {
 
-    void onNavigatorSelectionChanged(TableSelectionChangeEvent event);
+    void onTableSelectionChanged(TableSelectionChangeEvent event);
 
   }
 
@@ -29,15 +29,41 @@ public class TableSelectionChangeEvent extends GwtEvent<TableSelectionChangeEven
 
   private final TableDto tableDto;
 
+  private final String previous;
+
+  private final String next;
+
+  private final Object source;
+
   /**
    * @param selectedItem
    */
-  public TableSelectionChangeEvent(TableDto tableDto) {
+  public TableSelectionChangeEvent(Object source, TableDto tableDto) {
+    this(source, tableDto, null, null);
+  }
+
+  public TableSelectionChangeEvent(Object source, TableDto tableDto, String previous, String next) {
+    super();
+    this.source = source;
     this.tableDto = tableDto;
+    this.previous = previous;
+    this.next = next;
+  }
+
+  public Object getSource() {
+    return source;
   }
 
   public TableDto getSelection() {
     return tableDto;
+  }
+
+  public String getPrevious() {
+    return previous;
+  }
+
+  public String getNext() {
+    return next;
   }
 
   public static Type<Handler> getType() {
@@ -46,7 +72,7 @@ public class TableSelectionChangeEvent extends GwtEvent<TableSelectionChangeEven
 
   @Override
   protected void dispatch(Handler handler) {
-    handler.onNavigatorSelectionChanged(this);
+    handler.onTableSelectionChanged(this);
   }
 
   @Override

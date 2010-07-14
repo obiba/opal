@@ -91,7 +91,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   // Methods
   //
 
-  private void updateDisplay(VariableDto variableDto) {
+  private void updateDisplay(VariableDto variableDto, VariableDto previous, VariableDto next) {
     if(variable == null || !isCurrentVariable(variableDto)) {
       variable = variableDto;
       getDisplay().setVariableName(variableDto.getName());
@@ -103,6 +103,8 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
       getDisplay().setOccurrenceGroup(variableDto.getIsRepeatable() ? variableDto.getOccurrenceGroup() : "");
 
       getDisplay().setParentName(variableDto.getParentLink().getRel());
+      getDisplay().setPreviousName(previous != null ? previous.getName() : "");
+      getDisplay().setNextName(next != null ? next.getName() : "");
 
       getDisplay().renderCategoryRows(variableDto.getCategoriesArray());
       getDisplay().renderAttributeRows(variableDto.getAttributesArray());
@@ -120,7 +122,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   class VariableSelectionHandler implements VariableSelectionChangeEvent.Handler {
     @Override
     public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-      updateDisplay(event.getSelection());
+      updateDisplay(event.getSelection(), event.getPrevious(), event.getNext());
     }
   }
 
@@ -144,7 +146,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
       ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource(variable.getParentLink().getLink()).get().withCallback(new ResourceCallback<TableDto>() {
         @Override
         public void onResource(Response response, TableDto resource) {
-          eventBus.fireEvent(new TableSelectionChangeEvent(resource));
+          eventBus.fireEvent(new TableSelectionChangeEvent(VariablePresenter.this, resource));
         }
 
       }).send();
@@ -168,6 +170,10 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     void setOccurrenceGroup(String text);
 
     void setParentName(String name);
+
+    void setPreviousName(String name);
+
+    void setNextName(String name);
 
     HandlerRegistration addParentLinkClickHandler(ClickHandler handler);
 

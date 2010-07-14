@@ -68,31 +68,49 @@ public class NavigatorTreeView implements NavigatorTreePresenter.Display {
 
   @Override
   public void selectTable(String datasourceName, String tableName) {
-    for(int i = 0; i < tree.getItemCount(); i++) {
-      TreeItem dsItem = tree.getItem(i);
-      if(dsItem.getText().equals(datasourceName)) {
-        dsItem.setState(true);
-        for(int j = 0; j < dsItem.getChildCount(); j++) {
-          TreeItem tableItem = dsItem.getChild(j);
-          if(tableName.equals(tableItem.getText())) {
-            tree.setSelectedItem(tableItem);
-            break;
+    if(!isTableSelected(datasourceName, tableName)) {
+      for(int i = 0; i < tree.getItemCount(); i++) {
+        TreeItem dsItem = tree.getItem(i);
+        if(dsItem.getText().equals(datasourceName)) {
+          dsItem.setState(true);
+          for(int j = 0; j < dsItem.getChildCount(); j++) {
+            TreeItem tableItem = dsItem.getChild(j);
+            if(tableName.equals(tableItem.getText())) {
+              tree.setSelectedItem(tableItem);
+              break;
+            }
           }
+          break;
         }
-        break;
       }
     }
   }
 
   @Override
   public void selectDatasource(String datasourceName) {
-    for(int i = 0; i < tree.getItemCount(); i++) {
-      TreeItem dsItem = tree.getItem(i);
-      if(dsItem.getText().equals(datasourceName)) {
-        tree.setSelectedItem(dsItem);
-        break;
+    if(!isDatasourceSelected(datasourceName)) {
+      for(int i = 0; i < tree.getItemCount(); i++) {
+        TreeItem dsItem = tree.getItem(i);
+        if(dsItem.getText().equals(datasourceName)) {
+          tree.setSelectedItem(dsItem);
+          break;
+        }
       }
     }
+  }
+
+  private boolean isDatasourceSelected(String datasourceName) {
+    TreeItem selected = tree.getSelectedItem();
+    if(selected == null) return false;
+    if(selected.getParentItem() != null) return false;
+    return selected.getText().equals(datasourceName);
+  }
+
+  private boolean isTableSelected(String datasourceName, String tableName) {
+    TreeItem selected = tree.getSelectedItem();
+    if(selected == null) return false;
+    if(selected.getParentItem() == null) return false;
+    return selected.getParentItem().getText().equals(datasourceName) && selected.getText().equals(tableName);
   }
 
 }

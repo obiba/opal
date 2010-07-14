@@ -29,15 +29,34 @@ public class VariableSelectionChangeEvent extends GwtEvent<VariableSelectionChan
 
   private final VariableDto selection;
 
+  private final VariableDto previous;
+
+  private final VariableDto next;
+
   /**
    * @param selectedItem
    */
   public VariableSelectionChangeEvent(VariableDto selectedItem) {
+    this(selectedItem, null, null);
+
+  }
+
+  public VariableSelectionChangeEvent(VariableDto selectedItem, VariableDto previous, VariableDto next) {
     this.selection = selectedItem;
+    this.previous = previous;
+    this.next = next;
   }
 
   public VariableDto getSelection() {
     return selection;
+  }
+
+  public VariableDto getPrevious() {
+    return previous;
+  }
+
+  public VariableDto getNext() {
+    return next;
   }
 
   public static Type<Handler> getType() {
