@@ -178,7 +178,7 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
           }
         };
 
-        ResourceRequestBuilderFactory.<JsArray<CommandStateDto>> newBuilder().forResource("/shell/commands/completed").delete().withCallback(400, callbackHandler).withCallback(200, callbackHandler).send();
+        ResourceRequestBuilderFactory.<JsArray<CommandStateDto>> newBuilder().forResource("/shell/commands/completed").delete().withCallback(200, callbackHandler).send();
       }
     };
 
