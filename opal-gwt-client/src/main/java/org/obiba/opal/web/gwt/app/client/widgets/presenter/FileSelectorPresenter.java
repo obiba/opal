@@ -89,6 +89,8 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
   @Override
   protected void onUnbind() {
+    fileSystemTreePresenter.unbind();
+    folderDetailsPresenter.unbind();
   }
 
   @Override
