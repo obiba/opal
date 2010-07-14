@@ -179,8 +179,13 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
   }
 
   @Test
-  public void testDisplaysFiles_ReturnsTrueWhenSelectingExistingFolder() {
+  public void testDisplaysFiles_ReturnsFalseWhenSelectingExistingFolder() {
     testDisplaysFiles(FileSelectionType.EXISTING_FOLDER, false);
+  }
+
+  @Test
+  public void testDisplaysFiles_ReturnsTrueWhenSelectingExistingFileOrFolder() {
+    testDisplaysFiles(FileSelectionType.EXISTING_FILE_OR_FOLDER, true);
   }
 
   @Test
@@ -204,6 +209,11 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
   }
 
   @Test
+  public void testAllowsFileCreation_ReturnsFalseWhenSelectingExistingFileOrFolder() {
+    testAllowsFileCreation(FileSelectionType.EXISTING_FILE_OR_FOLDER, false);
+  }
+
+  @Test
   public void testAllowsFolderCreation_ReturnsTrueWhenSelectingFile() {
     testAllowsFolderCreation(FileSelectionType.FILE, true);
   }
@@ -221,6 +231,11 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
   @Test
   public void testAllowsFolderCreation_ReturnsFalseWhenSelectingExistingFolder() {
     testAllowsFolderCreation(FileSelectionType.EXISTING_FOLDER, false);
+  }
+
+  @Test
+  public void testAllowsFolderCreation_ReturnsFalseWhenSelectingExistingFileOrFolder() {
+    testAllowsFolderCreation(FileSelectionType.EXISTING_FILE_OR_FOLDER, false);
   }
 
   @Test

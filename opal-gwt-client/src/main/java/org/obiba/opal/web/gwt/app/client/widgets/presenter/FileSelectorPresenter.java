@@ -135,7 +135,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   }
 
   public boolean displaysFiles() {
-    return fileSelectionType.equals(FileSelectionType.FILE) || fileSelectionType.equals(FileSelectionType.EXISTING_FILE);
+    return fileSelectionType.equals(FileSelectionType.FILE) || fileSelectionType.equals(FileSelectionType.EXISTING_FILE) || fileSelectionType.equals(FileSelectionType.EXISTING_FILE_OR_FOLDER);
   }
 
   public boolean allowsFileCreation() {
@@ -206,6 +206,9 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     case EXISTING_FOLDER:
       selection = selectedFolder;
       break;
+    case EXISTING_FILE_OR_FOLDER:
+      selection = (selectedFile != null) ? selectedFile : selectedFolder;
+      break;
     }
 
     return selection;
@@ -216,7 +219,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   //
 
   public enum FileSelectionType {
-    FILE, EXISTING_FILE, FOLDER, EXISTING_FOLDER
+    FILE, EXISTING_FILE, FOLDER, EXISTING_FOLDER, EXISTING_FILE_OR_FOLDER
   }
 
   public interface Display extends WidgetDisplay {
@@ -274,6 +277,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
     public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
       selectedFolder = event.getFolder().getPath();
+      selectedFile = null;
     }
   }
 
