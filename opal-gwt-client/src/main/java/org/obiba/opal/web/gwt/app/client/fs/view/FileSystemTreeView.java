@@ -69,7 +69,7 @@ public class FileSystemTreeView implements Display {
     for(int i = 0; i < folderToAdd.getChildrenArray().length(); i++) {
       file = folderToAdd.getChildrenArray().get(i);
 
-      if(file.getType().isFileType(FileDto.FileType.FOLDER) && !file.getSymbolicLink()) {
+      if(file.getType().isFileType(FileDto.FileType.FOLDER)) {
         TreeItem childItem = createTreeItem(file);
         if(file.getChildrenCount() > 0) {
           addBranch(childItem, file, level);

@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.fs;
 
 import org.obiba.opal.web.model.client.FileDto;
+import org.obiba.opal.web.model.client.FileDto.FileType;
 
 /**
  *
@@ -26,4 +27,39 @@ public class FileDtos {
     return FileDto.FileType.FILE.isFileType(dto.getType());
   }
 
+  public static FileDto getParent(FileDto dto) {
+    FileDto parentDto = FileDto.create();
+    parentDto.setType(FileType.FOLDER);
+    parentDto.setPath(getParentFolderPath(dto.getPath()));
+    parentDto.setName(getFolderName(parentDto.getPath()));
+    return parentDto;
+  }
+
+  private static String getParentFolderPath(String childPath) {
+    String parentPath = null;
+
+    int lastSeparatorIndex = childPath.lastIndexOf('/');
+
+    if(lastSeparatorIndex != -1) {
+      parentPath = lastSeparatorIndex != 0 ? childPath.substring(0, lastSeparatorIndex) : "/";
+    }
+
+    return parentPath;
+  }
+
+  private static String getFolderName(String folderPath) {
+    String folderName = folderPath;
+
+    if(!folderPath.equals("/")) {
+      int lastSeparatorIndex = folderPath.lastIndexOf('/');
+
+      if(lastSeparatorIndex != -1) {
+        folderName = folderPath.substring(lastSeparatorIndex + 1);
+      }
+    } else {
+      folderName = "root";
+    }
+
+    return folderName;
+  }
 }

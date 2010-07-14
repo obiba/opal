@@ -135,17 +135,8 @@ public class FilesResource {
   }
 
   private Response getFolderDetails(FileObject folder) throws FileSystemException {
-
     // Create a FileDto representing the folder identified by the path.
-    Opal.FileDto.Builder folderBuilder = getBaseFolderBuilder(folder, false);
-
-    // Add the parent folder as child of the current folder to allow going back to parent folder when navigating
-    // the file system.
-    FileObject parentFolder = folder.getParent();
-    if(parentFolder != null) {
-      Opal.FileDto.Builder parentFolderBuilder = getBaseFolderBuilder(parentFolder, true);
-      folderBuilder.addChildren(parentFolderBuilder.build());
-    }
+    Opal.FileDto.Builder folderBuilder = getBaseFolderBuilder(folder);
 
     // Create FileDtos for each file & folder in the folder corresponding to the path.
     addChildren(folderBuilder, folder, 2);
@@ -154,11 +145,10 @@ public class FilesResource {
 
   }
 
-  private Opal.FileDto.Builder getBaseFolderBuilder(FileObject folder, boolean symbolicLink) throws FileSystemException {
+  private Opal.FileDto.Builder getBaseFolderBuilder(FileObject folder) throws FileSystemException {
     Opal.FileDto.Builder fileBuilder = Opal.FileDto.newBuilder();
     String folderName = folder.getName().getBaseName();
     fileBuilder.setName(folderName.equals("") ? "root" : folderName).setType(Opal.FileDto.FileType.FOLDER).setPath(folder.getName().getPath());
-    fileBuilder.setSymbolicLink(symbolicLink);
     fileBuilder.setLastModifiedTime(folder.getContent().getLastModifiedTime());
     return fileBuilder;
   }

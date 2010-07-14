@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.FileSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -81,8 +82,15 @@ public class FolderDetailsView extends Composite implements Display {
     }
   }
 
+  @SuppressWarnings("unchecked")
   public void renderRows(final FileDto folder) {
-    JsArray<FileDto> children = filterChildren(folder.getChildrenArray());
+    JsArray<FileDto> children = (folder.getChildrenCount() != 0) ? filterChildren(folder.getChildrenArray()) : (JsArray<FileDto>) JsArray.createArray();
+
+    if(!folder.getName().equals("root")) {
+      FileDto parent = FileDtos.getParent(folder);
+      parent.setName("..");
+      children.set(0, parent);
+    }
 
     int fileCount = children.length();
     table.setPageSize(fileCount);
@@ -148,11 +156,7 @@ public class FolderDetailsView extends Composite implements Display {
           sb.append("folder\">");
         }
 
-        if(object.getSymbolicLink()) {
-          sb.append("..");
-        } else {
-          sb.append(object.getName());
-        }
+        sb.append(object.getName());
 
         sb.append("</span>");
 
