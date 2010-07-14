@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.fs.view;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.workbench.view.WorkbenchLayout;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -18,7 +19,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -27,7 +27,7 @@ public class FileExplorerView extends Composite implements Display {
   private static FileExplorerUiBinder uiBinder = GWT.create(FileExplorerUiBinder.class);
 
   @UiTemplate("FileExplorerView.ui.xml")
-  interface FileExplorerUiBinder extends UiBinder<DockLayoutPanel, FileExplorerView> {
+  interface FileExplorerUiBinder extends UiBinder<WorkbenchLayout, FileExplorerView> {
   }
 
   @UiField

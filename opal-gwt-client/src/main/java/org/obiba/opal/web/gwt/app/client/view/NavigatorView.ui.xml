@@ -1,37 +1,24 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
+  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
 
-  <ui:style>
-    .wb-top {
-    border-bottom:1px solid #BBBBBB;
-    padding: 0.25em 0 0 1em;
-    float: left;
-    }
-    
-    .wb-top .title {
-    font-size: 1.3em;
-    }
-    
-  </ui:style>
   
-  <g:DockLayoutPanel>
-    <g:north size="30">
-      <g:FlowPanel addStyleNames="{style.wb-top}">
-        <g:Label addStyleNames="{style.title}"><ui:msg description="Variable explorer title">Variable Explorer</ui:msg></g:Label>
-      </g:FlowPanel>
-    </g:north>
-    <g:center>
-    
-  <g:SplitLayoutPanel>
-    <g:center> 
-      <g:ScrollPanel width="100%" ui:field="navigatorDisplayPanel" />
-    </g:center>
-    <g:west size='240'>
-      <g:ScrollPanel ui:field="treePanel">
-      </g:ScrollPanel>
-    </g:west>
-  </g:SplitLayoutPanel>
-  </g:center>
-  </g:DockLayoutPanel>
+  <o:WorkbenchLayout withInfo="false">
+    <g:Label><ui:msg description="Variable explorer title">Variable Explorer</ui:msg></g:Label>
+    <g:Label></g:Label>
+    <g:FlowPanel></g:FlowPanel>
+    <g:SplitLayoutPanel>
+      <g:center> 
+        <g:ScrollPanel width="100%" ui:field="navigatorDisplayPanel" />
+      </g:center>
+      <g:west size='240'>
+        <g:ScrollPanel ui:field="treePanel">
+        </g:ScrollPanel>
+      </g:west>
+    </g:SplitLayoutPanel>  
+  </o:WorkbenchLayout>
+  
 </ui:UiBinder>

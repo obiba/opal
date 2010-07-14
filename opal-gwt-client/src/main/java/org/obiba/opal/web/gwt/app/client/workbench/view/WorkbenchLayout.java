@@ -67,63 +67,88 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
 
   private WidgetCollection children = new WidgetCollection(this);
 
-  private boolean withInfo;
+  private Label titleLabel;
+
+  private Label summaryLabel;
+
+  private Widget controlWidget;
+
+  private Widget mainWidget;
+
+  private Widget informationWidget;
 
   //
   // Constructors
   //
 
   public WorkbenchLayout() {
-    this(true);
-  }
-
-  public WorkbenchLayout(boolean withInfo) {
     super();
     initWidget(uiBinder.createAndBindUi(this));
-    setWithInfo(withInfo);
+    addHandlers();
+  }
+
+  private void addHandlers() {
+    closeInfo.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent arg0) {
+        // TODO set slider position
+      }
+    });
+    // http://code.google.com/p/google-web-toolkit/issues/detail?id=4489
+    closeInfo.setVisible(false);
   }
 
   public void setWithInfo(boolean withInfo) {
-    this.withInfo = withInfo;
     if(!withInfo) {
-      mainContent.removeFromParent();
-      workbench.remove(content);
-      mainContent.setStyleName("content", true);
-      workbench.add(mainContent);
-    } else {
-      closeInfo.addClickHandler(new ClickHandler() {
-
-        @Override
-        public void onClick(ClickEvent arg0) {
-          // TODO set slider position
-        }
-      });
-      // http://code.google.com/p/google-web-toolkit/issues/detail?id=4489
-      closeInfo.setVisible(false);
+      if(mainWidget instanceof DockLayoutPanel) {
+        mainWidget.removeFromParent();
+        workbench.remove(content);
+        workbench.add(mainWidget);
+      } else {
+        mainContent.removeFromParent();
+        workbench.remove(content);
+        mainContent.setStyleName("content", true);
+        workbench.add(mainContent);
+      }
     }
   }
 
   public void setTitle(Label label) {
-    label.setStyleName("title", true);
-    topHeader.add(label);
+    children.add(label);
+    titleLabel = label;
+    titleLabel.setStyleName("title", true);
+    topHeader.add(titleLabel);
   }
 
   public void setSummary(Label label) {
-    topHeader.add(label);
+    children.add(label);
+    summaryLabel = label;
+    topHeader.add(summaryLabel);
   }
 
   public void setControl(Widget w) {
-    controlContent.setWidget(w);
+    children.add(w);
+    controlWidget = w;
+    controlContent.setWidget(controlWidget);
   }
 
   public void setMain(Widget w) {
-    mainContent.setWidget(w);
+    children.add(w);
+    mainWidget = w;
+    if(mainWidget instanceof DockLayoutPanel) {
+      mainWidget.removeFromParent();
+      content.remove(mainContent);
+      content.add(mainWidget);
+    } else {
+      mainContent.setWidget(mainWidget);
+    }
   }
 
   public void setInformation(Widget w) {
-    if(withInfo) {
-      informationContent.setWidget(w);
-    }
+    children.add(w);
+    informationWidget = w;
+    informationContent.setWidget(informationWidget);
   }
 
   //
@@ -132,17 +157,26 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
 
   @Override
   public void add(Widget w) {
-    children.add(w);
-    if(children.size() == 1) {
+    if(w == null) return;
+
+    if(titleLabel == null) {
+      if(!(w instanceof Label)) {
+        throw new IllegalArgumentException("First widget must be the title label.");
+      }
       setTitle((Label) w);
-    } else if(children.size() == 2) {
+    } else if(summaryLabel == null) {
+      if(!(w instanceof Label)) {
+        throw new IllegalArgumentException("Second widget must be the summary label.");
+      }
       setSummary((Label) w);
-    } else if(children.size() == 3) {
+    } else if(controlWidget == null) {
       setControl(w);
-    } else if(children.size() == 4) {
+    } else if(mainWidget == null) {
       setMain(w);
-    } else if(children.size() == 5) {
+    } else if(informationWidget == null) {
       setInformation(w);
+    } else {
+      throw new IllegalArgumentException("Unexpected widget added.");
     }
   }
 
