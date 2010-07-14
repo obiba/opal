@@ -282,7 +282,11 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     public void onClick(ClickEvent event) {
       String newFolder = getDisplay().getCreateFolderName().getText();
       if(selectedFolder != null && newFolder.trim().length() != 0) {
-        createFolder(selectedFolder + "/" + newFolder);
+        if(selectedFolder.equals("/")) { // create under root
+          createFolder("/" + newFolder);
+        } else {
+          createFolder(selectedFolder + "/" + newFolder);
+        }
       }
     }
   }
