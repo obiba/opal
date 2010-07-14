@@ -72,6 +72,9 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
   FileUploadDialogPresenter fileUploadDialogPresenter;
 
+  @Inject
+  CreateFolderDialogPresenter createFolderDialogPresenter;
+
   FileDto currentFolder;
 
   private FileDto selectedFile;
@@ -154,7 +157,9 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
     super.registerHandler(getDisplay().getCreateFolderButton().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        GWT.log("Clicked Create Folder!");
+        createFolderDialogPresenter.setCurrentFolder(currentFolder);
+        createFolderDialogPresenter.bind();
+        createFolderDialogPresenter.revealDisplay();
       }
     }));
 
@@ -174,7 +179,6 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
       @Override
       public void onFileSelectionChange(FileSelectionChangeEvent event) {
         selectedFile = event.getFile();
-        GWT.log("selected file is " + selectedFile.getPath());
       }
     }));
 

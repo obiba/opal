@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.inject.client;
 import net.customware.gwt.presenter.client.EventBus;
 
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileDownloadPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadDialogPresenter;
@@ -79,4 +80,7 @@ public interface OpalGinjector extends Ginjector {
   FileSelectionPresenter getFileSectionPresenter();
 
   ConfirmationPresenter getConfirmationPresenter();
+
+  CreateFolderDialogPresenter getCreateFolderDialogPresenter();
+
 }

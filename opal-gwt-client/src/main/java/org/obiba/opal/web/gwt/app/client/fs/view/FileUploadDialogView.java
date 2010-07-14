@@ -26,7 +26,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
-import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 
 public class FileUploadDialogView extends Composite implements Display {
 
@@ -109,11 +108,6 @@ public class FileUploadDialogView extends Composite implements Display {
   @Override
   public HandlerRegistration addSubmitCompleteHandler(SubmitCompleteHandler handler) {
     return this.form.addSubmitCompleteHandler(handler);
-  }
-
-  @Override
-  public HandlerRegistration addSubmitHandler(SubmitHandler handler) {
-    return this.form.addSubmitHandler(handler);
   }
 
   @Override

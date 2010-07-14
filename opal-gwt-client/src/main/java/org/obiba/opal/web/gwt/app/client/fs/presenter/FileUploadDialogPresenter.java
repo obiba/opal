@@ -45,8 +45,6 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
 
     String getFilename();
 
-    HandlerRegistration addSubmitHandler(FormPanel.SubmitHandler handler);
-
     HandlerRegistration addSubmitCompleteHandler(FormPanel.SubmitCompleteHandler handler);
 
     void submit(String url);
