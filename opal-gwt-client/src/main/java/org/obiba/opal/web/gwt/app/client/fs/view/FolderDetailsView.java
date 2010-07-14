@@ -46,6 +46,8 @@ public class FolderDetailsView extends Composite implements Display {
 
   private static final long GB = MB * KB;
 
+  private static final String FOLDER_UP_HTML = "<img src=\"image/folder-up.png\" />";
+
   @UiTemplate("FolderDetailsView.ui.xml")
   interface FolderDetailsUiBinder extends UiBinder<Widget, FolderDetailsView> {
   }
@@ -146,18 +148,24 @@ public class FolderDetailsView extends Composite implements Display {
     table.addColumn(fileNameColumn = new FileNameColumn() {
 
       @Override
-      public String getValue(FileDto object) {
+      public String getValue(FileDto dto) {
+        if(dto.getName().equals("..")) {
+          return FOLDER_UP_HTML;
+        } else {
+          return createFolderChildHtml(dto);
+        }
+      }
+
+      private String createFolderChildHtml(FileDto dto) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("<span class=\"");
-        if(object.getType().isFileType(FileDto.FileType.FILE)) {
+        if(dto.getType().isFileType(FileDto.FileType.FILE)) {
           sb.append("file\">");
         } else {
           sb.append("folder\">");
         }
-
-        sb.append(object.getName());
-
+        sb.append(dto.getName());
         sb.append("</span>");
 
         return sb.toString();
