@@ -1,0 +1,5 @@
+# comments begin with a '#'
+# the format is <mime type> <space separated file extensions>
+application/zip zip
+application/vnd.ms-excel xls
+application/vnd.openxmlformats-officedocument.spreadsheetml.sheet xlsx

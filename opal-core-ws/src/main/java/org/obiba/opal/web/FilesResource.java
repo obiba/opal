@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -62,10 +63,14 @@ public class FilesResource {
 
   private OpalRuntime opalRuntime;
 
+  private MimetypesFileTypeMap mimeTypes;
+
   @Autowired
   public FilesResource(OpalRuntime opalRuntime) {
     super();
+
     this.opalRuntime = opalRuntime;
+    this.mimeTypes = new MimetypesFileTypeMap();
   }
 
   @GET
@@ -112,7 +117,10 @@ public class FilesResource {
   }
 
   private Response getFile(FileObject file) {
-    return Response.ok(opalRuntime.getFileSystem().getLocalFile(file), MediaType.APPLICATION_OCTET_STREAM_TYPE).build();
+    File localFile = opalRuntime.getFileSystem().getLocalFile(file);
+    String mimeType = mimeTypes.getContentType(localFile);
+
+    return Response.ok(localFile, MediaType.valueOf(mimeType)).build();
   }
 
   private Response getFolder(FileObject folder) throws IOException {
