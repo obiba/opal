@@ -10,7 +10,7 @@
   <import resource="classpath:spring/opal-core/context.xml" />
 
   <bean id="consoleCallbackHandler" class="org.obiba.opal.core.crypt.FixedPasswordCallbackHandler">
-    <constructor-arg value="pwel" />
+    <constructor-arg value="${org.obiba.opal.keystore.password}" />
   </bean>
 
   <context:component-scan base-package="org.obiba.opal.server,org.obiba.opal.core,org.obiba.opal.service,org.obiba.opal.shell" />
