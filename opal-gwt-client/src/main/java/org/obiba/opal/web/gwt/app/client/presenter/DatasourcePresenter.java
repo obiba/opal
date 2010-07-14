@@ -167,20 +167,20 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     eventBus.fireEvent(new FileDownloadEvent(downloadUrl));
   }
 
-  private TableDto getPreviousTable(int index) {
+  private String getPreviousTableName(int index) {
     TableDto previous = null;
     if(index > 0) {
       previous = tables.get(index - 1);
     }
-    return previous;
+    return previous != null ? previous.getName() : null;
   }
 
-  private TableDto getNextTable(int index) {
+  private String getNextTableName(int index) {
     TableDto next = null;
     if(index < tables.length() - 1) {
       next = tables.get(index + 1);
     }
-    return next;
+    return next != null ? next.getName() : null;
   }
 
   private void initDatasources() {
@@ -200,11 +200,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   class TableNameFieldUpdater implements FieldUpdater<TableDto, String> {
     @Override
     public void update(int index, TableDto tableDto, String value) {
-      TableDto previous = getPreviousTable(index);
-      TableDto next = getNextTable(index);
-      String previousName = previous != null ? previous.getName() : null;
-      String nextName = next != null ? next.getName() : null;
-      eventBus.fireEvent(new TableSelectionChangeEvent(DatasourcePresenter.this, tableDto, previousName, nextName));
+      eventBus.fireEvent(new TableSelectionChangeEvent(DatasourcePresenter.this, tableDto, getPreviousTableName(index), getNextTableName(index)));
     }
   }
 
@@ -251,7 +247,8 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
       siblingSelection = tables.get(siblingIndex);
 
       getDisplay().setTableSelection(siblingSelection, siblingIndex);
-      eventBus.fireEvent(new TableSelectionChangeEvent(DatasourcePresenter.this, siblingSelection, getPreviousTable(siblingIndex).getName(), getNextTable(siblingIndex).getName()));
+
+      eventBus.fireEvent(new TableSelectionChangeEvent(DatasourcePresenter.this, siblingSelection, getPreviousTableName(siblingIndex), getNextTableName(siblingIndex)));
     }
   }
 
