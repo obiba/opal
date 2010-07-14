@@ -46,9 +46,9 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
 import com.google.gwt.view.client.SelectionModel;
@@ -70,7 +70,7 @@ public class JobListView extends Composite implements Display {
   CellTable<CommandStateDto> table;
 
   @UiField
-  Image clearImage;
+  Button clearButton;
 
   SelectionModel<CommandStateDto> selectionModel = new SingleSelectionModel<CommandStateDto>();
 
@@ -116,7 +116,7 @@ public class JobListView extends Composite implements Display {
   }
 
   public void showClearJobsButton(boolean show) {
-    clearImage.setVisible(show);
+    clearButton.setEnabled(show);
   }
 
   public HasActionHandler getActionsColumn() {
@@ -124,7 +124,7 @@ public class JobListView extends Composite implements Display {
   }
 
   public HandlerRegistration addClearButtonHandler(ClickHandler handler) {
-    return clearImage.addClickHandler(handler);
+    return clearButton.addClickHandler(handler);
   }
 
   //
