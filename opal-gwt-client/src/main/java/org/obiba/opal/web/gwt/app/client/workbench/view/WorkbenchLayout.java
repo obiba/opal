@@ -160,14 +160,10 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
     if(w == null) return;
 
     if(titleLabel == null) {
-      if(!(w instanceof Label)) {
-        throw new IllegalArgumentException("First widget must be the title label.");
-      }
+      checkIsLabel(w, "First widget must be the title label.");
       setTitle((Label) w);
     } else if(summaryLabel == null) {
-      if(!(w instanceof Label)) {
-        throw new IllegalArgumentException("Second widget must be the summary label.");
-      }
+      checkIsLabel(w, "Second widget must be the summary label.");
       setSummary((Label) w);
     } else if(controlWidget == null) {
       setControl(w);
@@ -177,6 +173,12 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
       setInformation(w);
     } else {
       throw new IllegalArgumentException("Unexpected widget added.");
+    }
+  }
+
+  private void checkIsLabel(Widget w, String msg) {
+    if(!(w instanceof Label)) {
+      throw new IllegalArgumentException(msg);
     }
   }
 
