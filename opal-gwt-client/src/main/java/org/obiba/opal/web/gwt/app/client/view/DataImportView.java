@@ -49,6 +49,12 @@ public class DataImportView extends DataCommonView implements DataImportPresente
 
   public DataImportView() {
     initWidget(uiBinder.createAndBindUi(this));
+    initWidgets();
+  }
+
+  @Override
+  protected void initWidgets() {
+    super.initWidgets();
     shouldArchive.addClickHandler(new ClickHandler() {
 
       @Override
@@ -56,7 +62,6 @@ public class DataImportView extends DataCommonView implements DataImportPresente
         archiveSelection.setEnabled(shouldArchive.getValue());
       }
     });
-
   }
 
   @Override
@@ -95,5 +100,17 @@ public class DataImportView extends DataCommonView implements DataImportPresente
     archiveSelection = display;
     archiveSelection.setEnabled(shouldArchive.getValue());
     archiveSelection.setFieldWidth("20em");
+  }
+
+  @Override
+  public void renderConclusionStep(String jobId) {
+    super.renderConclusionStep(jobId);
+    instructionsLabel.setText(translations.dataImportInstructionsConclusion());
+  }
+
+  @Override
+  public void renderFormStep() {
+    super.renderFormStep();
+    instructionsLabel.setText(translations.dataImportInstructions());
   }
 }

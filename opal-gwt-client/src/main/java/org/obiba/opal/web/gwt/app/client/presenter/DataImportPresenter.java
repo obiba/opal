@@ -16,7 +16,6 @@ import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -77,7 +76,7 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
   }
 
   protected void initDisplayComponents() {
-    fileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE_OR_FOLDER);
+    fileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
     fileSelectionPresenter.bind();
     getDisplay().setFileWidgetDisplay(fileSelectionPresenter.getDisplay());
 
@@ -122,6 +121,7 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
   //
 
   class SubmitClickHandler implements ClickHandler {
+
     @Override
     public void onClick(ClickEvent event) {
       ImportCommandOptionsDto dto = ImportCommandOptionsDto.create();
@@ -131,27 +131,29 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
       selectedFiles.push(getDisplay().getSelectedFile());
       dto.setFilesArray(selectedFiles);
       dto.setUnit(getDisplay().getSelectedUnit());
-      ResourceRequestBuilderFactory.newBuilder().forResource("/shell/import").post().withResourceBody(ImportCommandOptionsDto.stringify(dto)).withCallback(400, new ResponseCodeCallback() {
+      ResourceRequestBuilderFactory.newBuilder().forResource("/shell/import").post() //
+      .withResourceBody(ImportCommandOptionsDto.stringify(dto)) //
+      .withCallback(400, new ClientFailureResponseCodeCallBack()) //
+      .withCallback(201, new SuccessResponseCodeCallBack()).send();
+    }
+  }
 
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          errorDialog.bind();
-          errorDialog.setErrors(Arrays.asList(new String[] { response.getText() }));
-          errorDialog.revealDisplay();
-        }
-      }).withCallback(201, new ResponseCodeCallback() {
+  class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      errorDialog.bind();
+      errorDialog.setErrors(Arrays.asList(new String[] { response.getText() }));
+      errorDialog.revealDisplay();
+    }
+  }
 
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          String location = response.getHeader("Location");
-          String jobId = location.substring(location.lastIndexOf('/') + 1);
+  class SuccessResponseCodeCallBack implements ResponseCodeCallback {
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      String location = response.getHeader("Location");
+      String jobId = location.substring(location.lastIndexOf('/') + 1);
 
-          errorDialog.bind();
-          errorDialog.setMessageDialogType(MessageDialogType.INFO);
-          errorDialog.setErrors(Arrays.asList(new String[] { "The 'import' job has been launched with ID#" + jobId + "." }));
-          errorDialog.revealDisplay();
-        }
-      }).send();
+      getDisplay().renderConclusionStep(jobId);
     }
   }
 

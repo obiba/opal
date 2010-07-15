@@ -222,4 +222,20 @@ public interface Translations extends Constants {
   @Description("A name is required when creating a new folder")
   @DefaultStringValue("You must specify a folder name")
   String folderNameIsRequired();
+
+  @Description("Data export instructions")
+  @DefaultStringValue("Select the tables and the export destination.")
+  String dataExportInstructions();
+
+  @Description("Data export instructions conclusion")
+  @DefaultStringValue("Data export job is launched.")
+  String dataExportInstructionsConclusion();
+
+  @Description("Data import instructions")
+  @DefaultStringValue("Select the file to be imported and the destination dataset.")
+  String dataImportInstructions();
+
+  @Description("Data import instructions conclusion")
+  @DefaultStringValue("Data import job is launched.")
+  String dataImportInstructionsConclusion();
 }

@@ -158,6 +158,7 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
     if(mainWidget instanceof DockLayoutPanel) {
       mainWidget.removeFromParent();
       content.remove(mainContent);
+      mainWidget.setStyleName("main", true);
       content.add(mainWidget);
     } else {
       mainContent.setWidget(mainWidget);
@@ -212,7 +213,8 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
       return false;
     }
     if(children.contains(w)) {
-      children.get(children.indexOf(w)).removeFromParent();
+      int index = children.indexOf(w);
+      children.get(index).removeFromParent();
       children.remove(w);
       return true;
     }

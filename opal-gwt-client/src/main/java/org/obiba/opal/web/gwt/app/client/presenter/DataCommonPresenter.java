@@ -39,6 +39,10 @@ public abstract class DataCommonPresenter {
 
     /** Get the form submit button. */
     HandlerRegistration addSubmitClickHandler(ClickHandler handler);
+
+    void renderConclusionStep(String jobId);
+
+    void renderFormStep();
   }
 
 }

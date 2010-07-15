@@ -7,47 +7,57 @@
    
   <o:WorkbenchLayout>
     <g:Label><ui:msg description="Data import title">Import Data</ui:msg></g:Label>
-    <g:Label><ui:msg description="Data import instructions">Select the file to be imported and the destination dataset.</ui:msg></g:Label>
+    <g:Label ui:field="instructionsLabel" />
     <g:Button ui:field="submit"><ui:msg description="Import button label">Import</ui:msg></g:Button>
-    <g:HTMLPanel>
-      <table class="gwt-KeyValue" cellspacing="10">
-        <tbody>
-          <tr>
-            <td style="vertical-align:top">
-              <ui:msg description="File field label">File:</ui:msg>                
-            </td>
-            <td>
-              <g:SimplePanel ui:field="filePanel" />
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <ui:msg description="Destination field label">Destination:</ui:msg>                
-            </td>
-            <td>
-              <g:ListBox ui:field="datasources" />
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <g:CheckBox ui:field="shouldArchive"><ui:msg description="Archive field label">Archive:</ui:msg></g:CheckBox>
-            </td>
-            <td>
-              <g:SimplePanel ui:field="archivePanel" />
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <ui:msg description="Participant identifier field label">Participant Identifier:</ui:msg>                
-            </td>
-            <td>
-              <g:RadioButton name="participantId" checked="true"><ui:msg description="Unit id dropdown label">use Unit ID:</ui:msg></g:RadioButton>
-              <g:ListBox ui:field="units" />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </g:HTMLPanel>
+    
+    <g:FlowPanel>
+	    <g:HTMLPanel ui:field="formStep">
+	      <table class="gwt-KeyValue" cellspacing="10">
+	        <tbody>
+	          <tr>
+	            <td style="vertical-align:top">
+	              <ui:msg description="File field label">File:</ui:msg>                
+	            </td>
+	            <td>
+	              <g:SimplePanel ui:field="filePanel" />
+	            </td>
+	          </tr>
+	          <tr>
+	            <td>
+	              <ui:msg description="Destination field label">Destination:</ui:msg>                
+	            </td>
+	            <td>
+	              <g:ListBox ui:field="datasources" />
+	            </td>
+	          </tr>
+	          <tr>
+	            <td>
+	              <g:CheckBox ui:field="shouldArchive"><ui:msg description="Archive field label">Archive:</ui:msg></g:CheckBox>
+	            </td>
+	            <td>
+	              <g:SimplePanel ui:field="archivePanel" />
+	            </td>
+	          </tr>
+	          <tr>
+	            <td>
+	              <ui:msg description="Participant identifier field label">Participant Identifier:</ui:msg>                
+	            </td>
+	            <td>
+	              <g:RadioButton name="participantId" checked="true"><ui:msg description="Unit id dropdown label">use Unit ID:</ui:msg></g:RadioButton>
+	              <g:ListBox ui:field="units" />
+	            </td>
+	          </tr>
+	        </tbody>
+	      </table>
+	    </g:HTMLPanel>
+	    <g:FlowPanel ui:field="conclusionStep">
+	       <g:Label addStyleNames="title p"><ui:msg description="Data import job">The data importation process can be followed using the Job ID:</ui:msg></g:Label>
+	       <g:Anchor ui:field="jobLink" addStyleNames="large-indent">Job ID</g:Anchor>
+	       <g:Label addStyleNames="p"><ui:msg description="Data import new">You may now import more data:</ui:msg></g:Label>
+	       <g:Button ui:field="returnButton" addStyleNames="large-indent"><ui:msg description="Return Data Import button">Return to Data Import</ui:msg></g:Button>
+	     </g:FlowPanel>
+     </g:FlowPanel>
+     
     <g:HTMLPanel>
       <g:Label addStyleNames="title"><ui:msg description="Data File label">Data File</ui:msg></g:Label>
       <p>The data file is to be selected on the server side. To upload a data file, go to [File Explorer]. Currently only Onyx exportation files can be imported.</p>

@@ -72,6 +72,12 @@ public class DataExportView extends DataCommonView implements DataExportPresente
 
   public DataExportView() {
     initWidget(uiBinder.createAndBindUi(this));
+    initWidgets();
+  }
+
+  @Override
+  protected void initWidgets() {
+    super.initWidgets();
     destinationDataSource.addClickHandler(new ClickHandler() {
 
       @Override
@@ -185,6 +191,18 @@ public class DataExportView extends DataCommonView implements DataExportPresente
   @Override
   public HandlerRegistration addFileFormatChangeHandler(ChangeHandler handler) {
     return fileFormat.addChangeHandler(handler);
+  }
+
+  @Override
+  public void renderConclusionStep(String jobId) {
+    super.renderConclusionStep(jobId);
+    instructionsLabel.setText(translations.dataExportInstructionsConclusion());
+  }
+
+  @Override
+  public void renderFormStep() {
+    super.renderFormStep();
+    instructionsLabel.setText(translations.dataExportInstructions());
   }
 
 }

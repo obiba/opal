@@ -219,7 +219,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
       String location = response.getHeader("Location");
       String jobId = location.substring(location.lastIndexOf('/') + 1);
 
-      displayMessages(MessageDialogType.INFO, Arrays.asList(new String[] { "The 'export' job has been launched with ID#" + jobId + "." }));
+      getDisplay().renderConclusionStep(jobId);
     }
   }
 
@@ -246,6 +246,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     void setTableWidgetDisplay(TableListPresenter.Display display);
 
     void setFileWidgetDisplay(FileSelectionPresenter.Display display);
+
   }
 
 }
