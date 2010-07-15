@@ -66,13 +66,6 @@ public abstract class DataCommonView extends Composite implements DataCommonPres
         renderFormStep();
       }
     });
-    jobLink.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent arg0) {
-
-      }
-    });
     renderFormStep();
   }
 
@@ -112,7 +105,7 @@ public abstract class DataCommonView extends Composite implements DataCommonPres
     formStep.setVisible(false);
     submit.setVisible(false);
 
-    jobLink.setText(jobId);
+    jobLink.setText(translations.jobLabel() + " #" + jobId);
     conclusionStep.setVisible(true);
   }
 
@@ -122,6 +115,11 @@ public abstract class DataCommonView extends Composite implements DataCommonPres
     submit.setVisible(true);
 
     conclusionStep.setVisible(false);
+  }
+
+  @Override
+  public HandlerRegistration addJobLinkClickHandler(ClickHandler handler) {
+    return jobLink.addClickHandler(handler);
   }
 
 }

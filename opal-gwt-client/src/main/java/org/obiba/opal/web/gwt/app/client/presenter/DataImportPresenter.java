@@ -45,6 +45,9 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
   @Inject
   private FileSelectionPresenter archiveSelectionPresenter;
 
+  @Inject
+  private JobListPresenter jobListPresenter;
+
   /**
    * @param display
    * @param eventBus
@@ -72,7 +75,8 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
   }
 
   protected void addEventHandlers() {
-    getDisplay().addSubmitClickHandler(new SubmitClickHandler());
+    super.registerHandler(getDisplay().addSubmitClickHandler(new SubmitClickHandler()));
+    super.registerHandler(getDisplay().addJobLinkClickHandler(new DataCommonPresenter.JobLinkClickHandler(eventBus, jobListPresenter)));
   }
 
   protected void initDisplayComponents() {
