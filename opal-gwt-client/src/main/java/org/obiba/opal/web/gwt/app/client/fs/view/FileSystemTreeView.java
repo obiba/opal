@@ -11,10 +11,10 @@ package org.obiba.opal.web.gwt.app.client.fs.view;
 
 import java.util.Iterator;
 
+import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter.Display;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.opal.FileDto;
-import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
@@ -83,10 +83,7 @@ public class FileSystemTreeView implements Display {
   }
 
   public void addBranch(FileDto folderToAdd) {
-    FileDto parentDto = FileDto.create();
-    parentDto.setType(FileType.FOLDER);
-    parentDto.setPath(getParentFolderPath(folderToAdd.getPath()));
-    parentDto.setName(getFolderName(parentDto.getPath()));
+    FileDto parentDto = FileDtos.getParent(folderToAdd);
 
     TreeItem parentItem = findTreeItem(parentDto);
     if(parentItem != null) {
@@ -94,30 +91,6 @@ public class FileSystemTreeView implements Display {
     } else {
       addBranch(parentDto);
     }
-  }
-
-  private String getParentFolderPath(String childPath) {
-    String parentPath = null;
-
-    int lastSeparatorIndex = childPath.lastIndexOf('/');
-
-    if(lastSeparatorIndex != -1) {
-      parentPath = lastSeparatorIndex != 0 ? childPath.substring(0, lastSeparatorIndex) : "/";
-    }
-
-    return parentPath;
-  }
-
-  private String getFolderName(String folderPath) {
-    String folderName = folderPath;
-
-    int lastSeparatorIndex = folderPath.lastIndexOf('/');
-
-    if(lastSeparatorIndex != -1) {
-      folderName = folderPath.substring(lastSeparatorIndex + 1);
-    }
-
-    return folderName;
   }
 
   private TreeItem createTreeItem(FileDto fileItem) {
