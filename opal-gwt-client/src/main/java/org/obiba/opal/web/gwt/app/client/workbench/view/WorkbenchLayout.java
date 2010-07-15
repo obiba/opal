@@ -22,7 +22,6 @@ import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
@@ -67,9 +66,9 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
 
   private WidgetCollection children = new WidgetCollection(this);
 
-  private Label titleLabel;
+  private Widget titleWidget;
 
-  private Label summaryLabel;
+  private Widget summaryWidget;
 
   private Widget controlWidget;
 
@@ -114,26 +113,46 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
     }
   }
 
-  public void setTitle(Label label) {
-    children.add(label);
-    titleLabel = label;
-    titleLabel.setStyleName("title", true);
-    topHeader.add(titleLabel);
+  public Widget getTitleWidget() {
+    return titleWidget;
   }
 
-  public void setSummary(Label label) {
-    children.add(label);
-    summaryLabel = label;
-    topHeader.add(summaryLabel);
+  public Widget getSummaryWidget() {
+    return summaryWidget;
   }
 
-  public void setControl(Widget w) {
+  public Widget getControlWidget() {
+    return controlWidget;
+  }
+
+  public Widget getMainWidget() {
+    return mainWidget;
+  }
+
+  public Widget getInformationWidget() {
+    return informationWidget;
+  }
+
+  public void setTitleWidget(Widget w) {
+    children.add(w);
+    titleWidget = w;
+    titleWidget.setStyleName("title", true);
+    topHeader.add(titleWidget);
+  }
+
+  public void setSummaryWidget(Widget w) {
+    children.add(w);
+    summaryWidget = w;
+    topHeader.add(summaryWidget);
+  }
+
+  public void setControlWidget(Widget w) {
     children.add(w);
     controlWidget = w;
     controlContent.setWidget(controlWidget);
   }
 
-  public void setMain(Widget w) {
+  public void setMainWidget(Widget w) {
     children.add(w);
     mainWidget = w;
     if(mainWidget instanceof DockLayoutPanel) {
@@ -145,7 +164,7 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
     }
   }
 
-  public void setInformation(Widget w) {
+  public void setInformationWidget(Widget w) {
     children.add(w);
     informationWidget = w;
     informationContent.setWidget(informationWidget);
@@ -159,26 +178,18 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
   public void add(Widget w) {
     if(w == null) return;
 
-    if(titleLabel == null) {
-      checkIsLabel(w, "First widget must be the title label.");
-      setTitle((Label) w);
-    } else if(summaryLabel == null) {
-      checkIsLabel(w, "Second widget must be the summary label.");
-      setSummary((Label) w);
+    if(titleWidget == null) {
+      setTitleWidget(w);
+    } else if(summaryWidget == null) {
+      setSummaryWidget(w);
     } else if(controlWidget == null) {
-      setControl(w);
+      setControlWidget(w);
     } else if(mainWidget == null) {
-      setMain(w);
+      setMainWidget(w);
     } else if(informationWidget == null) {
-      setInformation(w);
+      setInformationWidget(w);
     } else {
       throw new IllegalArgumentException("Unexpected widget added.");
-    }
-  }
-
-  private void checkIsLabel(Widget w, String msg) {
-    if(!(w instanceof Label)) {
-      throw new IllegalArgumentException(msg);
     }
   }
 
