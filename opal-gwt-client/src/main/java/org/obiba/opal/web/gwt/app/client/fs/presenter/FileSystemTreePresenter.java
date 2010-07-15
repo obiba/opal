@@ -15,6 +15,8 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
@@ -41,6 +43,8 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
     void addBranch(TreeItem treeItem, FileDto folderToAdd);
 
     void addBranch(FileDto folderToAdd);
+
+    void removeBranch(FileDto folderToRemove);
 
     HasSelectionHandlers<TreeItem> getFileSystemTree();
 
@@ -142,6 +146,16 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
         // Refresh the file system since a new folder was added.
         getDisplay().addBranch(event.getFolder());
       }
+    }));
+
+    super.registerHandler(eventBus.addHandler(FileDeletedEvent.getType(), new FileDeletedEvent.Handler() {
+
+      @Override
+      public void onFileDeleted(FileDeletedEvent event) {
+        getDisplay().selectFile(FileDtos.getParent(event.getFile()));
+        getDisplay().removeBranch(event.getFile());
+      }
+
     }));
 
     super.registerHandler(getDisplay().addFileSystemTreeOpenHandler(new OpenHandler<TreeItem>() {

@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
-import java.util.Arrays;
-
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -18,12 +16,15 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRefreshedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.FileSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FileDto;
@@ -35,7 +36,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -54,6 +54,8 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
     public HasClickHandlers getFileDownloadButton();
 
     public HasClickHandlers getCreateFolderButton();
+
+    public void setEnabledFileDeleteButton(boolean enabled);
 
   }
 
@@ -74,6 +76,8 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
   @Inject
   CreateFolderDialogPresenter createFolderDialogPresenter;
+
+  private Runnable actionRequiringConfirmation;
 
   FileDto currentFolder;
 
@@ -139,10 +143,13 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
         if(selectedFile == null) {
           eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "fileMustBeSelected", null));
         } else {
-          boolean confirm = Window.confirm("Confirm deletion of " + selectedFile.getPath() + " ?");
-          if(confirm) {
-            deleteFile(selectedFile);
-          }
+          actionRequiringConfirmation = new Runnable() {
+            public void run() {
+              deleteFile(selectedFile);
+            }
+          };
+
+          eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "deleteFile", "confirmDeleteFile"));
         }
       }
     }));
@@ -187,6 +194,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
       @Override
       public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
         currentFolder = event.getFolder();
+        setEnableFileDeleteButton(currentFolder);
       }
 
     }));
@@ -196,10 +204,26 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
       @Override
       public void onFolderRefreshed(FolderRefreshedEvent event) {
         currentFolder = event.getFolder();
+        setEnableFileDeleteButton(currentFolder);
       }
-
     }));
 
+    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+
+  }
+
+  private void setEnableFileDeleteButton(FileDto folder) {
+    getDisplay().setEnabledFileDeleteButton(folder.getPath().equals("/") ? false : true);
+  }
+
+  class ConfirmationEventHandler implements ConfirmationEvent.Handler {
+
+    public void onConfirmation(ConfirmationEvent event) {
+      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event.isConfirmed()) {
+        actionRequiringConfirmation.run();
+        actionRequiringConfirmation = null;
+      }
+    }
   }
 
   private FileSelectionHandler createFileSelectionHandler() {
@@ -218,12 +242,11 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        GWT.log("Deleting " + file.getPath());
         if(response.getStatusCode() != Response.SC_OK) {
-          GWT.log("Error code= " + response.getStatusCode() + " " + response.getText());
-          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, response.getText(), Arrays.asList(new String[] { String.valueOf(file.getPath()) })));
+          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, response.getText(), null));
         } else {
           selectedFile = null;
+          eventBus.fireEvent(new FileDeletedEvent(file));
           refreshDisplay();
         }
       }

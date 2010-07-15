@@ -106,6 +106,7 @@ public class FileSystemTreeView implements Display {
 
   @Override
   public void selectFile(FileDto folder) {
+    GWT.log("selecting " + folder.getPath());
     TreeItem item = findTreeItem(folder);
     fileSystemTree.setSelectedItem(item);
     fileSystemTree.ensureSelectedItemVisible();
@@ -125,5 +126,11 @@ public class FileSystemTreeView implements Display {
       }
     }
     return null;
+  }
+
+  @Override
+  public void removeBranch(FileDto folderToRemove) {
+    TreeItem itemToRemove = findTreeItem(folderToRemove);
+    itemToRemove.remove();
   }
 }

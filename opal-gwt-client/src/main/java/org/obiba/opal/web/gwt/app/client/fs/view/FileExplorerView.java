@@ -50,9 +50,6 @@ public class FileExplorerView extends Composite implements Display {
 
   public FileExplorerView() {
     initWidget(uiBinder.createAndBindUi(this));
-
-    // TODO Delete function is not completed yet.
-    fileDeleteButton.setEnabled(false);
   }
 
   public Button getFileDeleteButton() {
@@ -93,6 +90,11 @@ public class FileExplorerView extends Composite implements Display {
 
   @Override
   public void stopProcessing() {
+  }
+
+  @Override
+  public void setEnabledFileDeleteButton(boolean enabled) {
+    fileDeleteButton.setEnabled(enabled);
   }
 
 }

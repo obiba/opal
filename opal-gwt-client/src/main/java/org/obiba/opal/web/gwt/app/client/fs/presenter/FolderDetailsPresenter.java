@@ -79,7 +79,7 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
       }
     });
 
-    getDisplay().getTableSelectionModel().addSelectionChangeHandler(new SelectionModel.SelectionChangeHandler() {
+    super.registerHandler(getDisplay().getTableSelectionModel().addSelectionChangeHandler(new SelectionModel.SelectionChangeHandler() {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
@@ -89,7 +89,7 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
         }
       }
 
-    });
+    }));
 
     super.registerHandler(eventBus.addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(), new FileSystemTreeFolderSelectionChangeEvent.Handler() {
 

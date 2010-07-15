@@ -266,28 +266,18 @@ public class FilesResource {
     // The path refers to a folder that contains one or many files or subfolders.
     if(file.getType() == FileType.FOLDER && file.getChildren().length > 0) {
       return Response.status(Status.FORBIDDEN).entity("cannotDeleteNotEmptyFolder").build();
-      // return
-      // Response.status(Status.FORBIDDEN).entity("This folder contains one or many file(s) and as a result cannot be deleted: "
-      // + path).build();
     }
 
     // Read-only file or folder.
     if(!file.isWriteable()) {
-      // return
-      // Response.status(Status.FORBIDDEN).entity("Could delete the following file or folder because it is read-only: "
-      // + path).build();
       return Response.status(Status.FORBIDDEN).entity("cannotDeleteReadOnlyFile").build();
     }
 
     try {
       file.delete();
-      return Response.ok("fileSuccessfullyDeleted").build();
-      // return Response.ok("The following file or folder has been deleted : " + path).build();
+      return Response.ok("The following file or folder has been deleted : " + path).build();
     } catch(FileSystemException couldNotDeleteFile) {
       return Response.status(Status.INTERNAL_SERVER_ERROR).entity("couldNotDeleteFileError").build();
-      // return
-      // Response.status(Status.INTERNAL_SERVER_ERROR).entity("There was an error while deleting the following file or folder: "
-      // + path).build();
     }
   }
 
