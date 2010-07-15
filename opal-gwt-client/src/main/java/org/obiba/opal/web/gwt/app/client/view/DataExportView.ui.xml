@@ -27,7 +27,7 @@
 	             <ui:msg description="Destination field label">Destination:</ui:msg>
 	           </td>
 	           <td>
-	             <g:RadioButton name="destination" ui:field="destinationFile"><ui:msg description="File destination label">Copy data to file:</ui:msg></g:RadioButton>
+	             <g:RadioButton name="destination" ui:field="destinationFile"><ui:msg description="Copy data to file">Copy data to file:</ui:msg></g:RadioButton>
 	             <g:HTMLPanel addStyleNames="indent">
 	               <table>
 		             <tbody>
@@ -51,7 +51,7 @@
 	         <tr>
 	           <td/>
 	           <td>
-	             <g:RadioButton name="destination" ui:field="destinationDataSource"><ui:msg description="Datasource destination label">Copy data to dataset:</ui:msg></g:RadioButton>
+	             <g:RadioButton name="destination" ui:field="destinationDataSource"><ui:msg description="Copy data to dataset">Copy data to dataset:</ui:msg></g:RadioButton>
 	             <g:HTMLPanel addStyleNames="indent">
 	               <g:ListBox ui:field="datasources" />
 	             </g:HTMLPanel>
@@ -104,33 +104,34 @@
     
     <g:FlowPanel>
 	    <g:HTMLPanel ui:field="formInfo">
-	       <g:Label addStyleNames="title"><ui:msg description="File destination label">File Destination</ui:msg></g:Label> 
-	       <p>The data can be exported in file. The file will be outputed on the server side in a directory you will have selected. Once successfully exported, you will download the resulting output from the [Opal file system]. Depending on the file format selected, some limits applies:</p>
+	       <g:Label addStyleNames="title"><ui:msg description="File destination label">File Destination</ui:msg></g:Label>
+	        
+	       <p><ui:msg description="File destination information">The data can be exported in file. The file will be outputed on the server side in a directory you will have selected. Once successfully exported, you will download the resulting output from the [Opal file system]. Depending on the file format selected, some limits applies:</ui:msg></p>
 	       <ul>
 	         <li>CSV
 	           <br/>
-	           Zip is not supported yet.
+	           <ui:msg description="File destination information csv">Resulting file set is in a directory (Zip not supported yet)</ui:msg>
 	         </li>
 	         <li>Excel
 	           <br/>
-	             Use respectively .xls/.xlsx file suffix to distinguish Excel formats 97/2007.
+	           <ui:msg description="File destination information excel">Use respectively .xls/.xlsx file suffix to distinguish Excel formats 97/2007.</ui:msg>
 	           <ul>
-	             <li>Maximum length of table name: 30</li>
-	             <li>Maximum number of variables: 256/16K</li>
-	             <li>Maximum number of participants: 16K/1M</li>
-	             <li>Binary data are not suported</li>    
+	             <li><ui:msg description="File destination information excel max table name length">Maximum length of table name: 30</ui:msg></li>
+	             <li><ui:msg description="File destination information excel max number of variables">Maximum number of variables: 256/16K</ui:msg></li>
+	             <li><ui:msg description="File destination information excel max number of participants">Maximum number of participants: 16K/1M</ui:msg></li>
+	             <li><ui:msg description="File destination information excel binary data">Binary data are not suported</ui:msg></li>    
 	           </ul>
 	         </li>
 	         <li>XML
 	           <br/>
-	           Resulting file will be zipped.
-	         </li>  
+	           <ui:msg description="File destination information xml">This format does not lost information. Resulting file set is available as a Zip file.</ui:msg>
+	         </li>
 	       </ul>
 	       <g:Label addStyleNames="title"><ui:msg description="Participant Identifier label">Participant Identifier</ui:msg></g:Label>
-	       <p>Different strategies can be applied with the exported participant identifiers:</p>
+	       <p><ui:msg description="Participant Identifier information">Different strategies can be applied with the exported participant identifiers:</ui:msg></p>
 	       <ul>
-	         <li>Use Opal participant identifier.</li>
-	         <li>Switch the participant identifier to one that is specific to destination unit. To achieve that, select a 'unit' that has been predefined in your Opal system.</li>
+	         <li><ui:msg description="Participant Identifier information opal">Use Opal participant identifier.</ui:msg></li>
+	         <li><ui:msg description="Participant Identifier information unit">Switch the participant identifier to one that is specific to destination unit. To achieve that, select a 'unit' that has been predefined in your Opal system.</ui:msg></li>
 	       </ul>
 	     </g:HTMLPanel>
 	     <g:HTMLPanel ui:field="conclusionInfo">

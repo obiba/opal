@@ -61,16 +61,16 @@
      <g:FlowPanel>
 	    <g:HTMLPanel ui:field="formInfo">
 	      <g:Label addStyleNames="title"><ui:msg description="Data File label">Data File</ui:msg></g:Label>
-	      <p>The data file is to be selected on the server side. To upload a data file, go to [File Explorer]. Currently only Onyx exportation files can be imported.</p>
+	      <p><ui:msg description="Data File information">The data file is to be selected on the server side.Use the file explorer to upload a data file. Currently only Onyx exportation files can be imported.</ui:msg></p>
 	
 	      <g:Label addStyleNames="title"><ui:msg description="Destination Dataset label">Destination Dataset</ui:msg></g:Label>
-	      <p>Tables and variables will be created in the selected dataset prior to the importation of data.</p>
+	      <p><ui:msg description="Destination Dataset information">Tables and variables will be created in the selected dataset prior to the importation of data.</ui:msg></p>
 	
 	      <g:Label addStyleNames="title"><ui:msg description="Archive label">Archive</ui:msg></g:Label>
-	      <p>Select a directory on the server side where the data file will be stored once successfully imported.</p>
+	      <p><ui:msg description="Archive information">Select a directory on the server side where the data file will be stored once successfully imported.</ui:msg></p>
 	
 	      <g:Label addStyleNames="title"><ui:msg description="Participant Identifier label">Participant Identifier</ui:msg></g:Label>
-	      <p>Store the provided participant identifier in the participant key database. An Opal internal identifier will be affected to each of the new participants. To achieve that, select a 'unit' that has been predefined in your Opal system.</p>
+	      <p><ui:msg description="Participant Identifier information">Store the provided participant identifier in the participant key database. An Opal internal identifier will be affected to each of the new participants. To achieve that, select a 'unit' that has been predefined in your Opal system.</ui:msg></p>
 	    </g:HTMLPanel>
 	     <g:HTMLPanel ui:field="conclusionInfo">
 	       <g:Label><ui:msg description="No information">No information.</ui:msg></g:Label>
