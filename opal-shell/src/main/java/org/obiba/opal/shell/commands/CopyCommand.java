@@ -23,7 +23,7 @@ import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.datasource.fs.FsDatasource;
-import org.obiba.magma.datasource.nul.NullDatasource;
+import org.obiba.magma.datasource.nil.NullDatasource;
 import org.obiba.magma.js.support.JavascriptMultiplexingStrategy;
 import org.obiba.magma.js.support.JavascriptVariableTransformer;
 import org.obiba.magma.support.DatasourceCopier;
