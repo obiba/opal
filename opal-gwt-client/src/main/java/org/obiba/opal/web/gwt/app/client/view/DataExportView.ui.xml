@@ -101,37 +101,43 @@
 	       <g:Button ui:field="returnButton" addStyleNames="large-indent"><ui:msg description="Return Data Export button">Return to Data Export</ui:msg></g:Button>
 	     </g:FlowPanel>
     </g:FlowPanel>
+    
+    <g:FlowPanel>
+	    <g:HTMLPanel ui:field="formInfo">
+	       <g:Label addStyleNames="title"><ui:msg description="File destination label">File Destination</ui:msg></g:Label> 
+	       <p>The data can be exported in file. The file will be outputed on the server side in a directory you will have selected. Once successfully exported, you will download the resulting output from the [Opal file system]. Depending on the file format selected, some limits applies:</p>
+	       <ul>
+	         <li>CSV
+	           <br/>
+	           Zip is not supported yet.
+	         </li>
+	         <li>Excel
+	           <br/>
+	             Use respectively .xls/.xlsx file suffix to distinguish Excel formats 97/2007.
+	           <ul>
+	             <li>Maximum length of table name: 30</li>
+	             <li>Maximum number of variables: 256/16K</li>
+	             <li>Maximum number of participants: 16K/1M</li>
+	             <li>Binary data are not suported</li>    
+	           </ul>
+	         </li>
+	         <li>XML
+	           <br/>
+	           Resulting file will be zipped.
+	         </li>  
+	       </ul>
+	       <g:Label addStyleNames="title"><ui:msg description="Participant Identifier label">Participant Identifier</ui:msg></g:Label>
+	       <p>Different strategies can be applied with the exported participant identifiers:</p>
+	       <ul>
+	         <li>Use Opal participant identifier.</li>
+	         <li>Switch the participant identifier to one that is specific to destination unit. To achieve that, select a 'unit' that has been predefined in your Opal system.</li>
+	       </ul>
+	     </g:HTMLPanel>
+	     <g:HTMLPanel ui:field="conclusionInfo">
+	       <g:Label><ui:msg description="No information">No information.</ui:msg></g:Label>
+	     </g:HTMLPanel>
+     </g:FlowPanel>
      
-     <g:HTMLPanel>
-       <g:Label addStyleNames="title"><ui:msg description="File destination label">File Destination</ui:msg></g:Label> 
-       <p>The data can be exported in file. The file will be outputed on the server side in a directory you will have selected. Once successfully exported, you will download the resulting output from the [Opal file system]. Depending on the file format selected, some limits applies:</p>
-       <ul>
-         <li>CSV
-           <br/>
-           Zip is not supported yet.
-         </li>
-         <li>Excel
-           <br/>
-             Use respectively .xls/.xlsx file suffix to distinguish Excel formats 97/2007.
-           <ul>
-             <li>Maximum length of table name: 30</li>
-             <li>Maximum number of variables: 256/16K</li>
-             <li>Maximum number of participants: 16K/1M</li>
-             <li>Binary data are not suported</li>    
-           </ul>
-         </li>
-         <li>XML
-           <br/>
-           Resulting file will be zipped.
-         </li>  
-       </ul>
-       <g:Label addStyleNames="title"><ui:msg description="Participant Identifier label">Participant Identifier</ui:msg></g:Label>
-       <p>Different strategies can be applied with the exported participant identifiers:</p>
-       <ul>
-         <li>Use Opal participant identifier.</li>
-         <li>Switch the participant identifier to one that is specific to destination unit. To achieve that, select a 'unit' that has been predefined in your Opal system.</li>
-       </ul>
-     </g:HTMLPanel>
   </o:WorkbenchLayout>
     
 </ui:UiBinder>

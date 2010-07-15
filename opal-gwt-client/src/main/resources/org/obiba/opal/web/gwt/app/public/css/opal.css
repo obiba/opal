@@ -2,6 +2,7 @@
 
 a:hover {
 	cursor: pointer;
+	text-decoration:underline;
 }
 
 .right-aligned {

@@ -32,10 +32,13 @@ import com.google.gwt.user.client.ui.Panel;
  */
 public abstract class DataCommonView extends Composite implements DataCommonPresenter.Display {
 
-  protected static Translations translations = GWT.create(Translations.class);
+  protected static final Translations translations = GWT.create(Translations.class);
 
   @UiField
   Panel formStep;
+
+  @UiField
+  Panel formInfo;
 
   @UiField
   ListBox datasources;
@@ -51,6 +54,9 @@ public abstract class DataCommonView extends Composite implements DataCommonPres
 
   @UiField
   Panel conclusionStep;
+
+  @UiField
+  Panel conclusionInfo;
 
   @UiField
   Anchor jobLink;
@@ -103,18 +109,22 @@ public abstract class DataCommonView extends Composite implements DataCommonPres
   @Override
   public void renderConclusionStep(String jobId) {
     formStep.setVisible(false);
+    formInfo.setVisible(false);
     submit.setVisible(false);
 
     jobLink.setText(translations.jobLabel() + " #" + jobId);
     conclusionStep.setVisible(true);
+    conclusionInfo.setVisible(true);
   }
 
   @Override
   public void renderFormStep() {
     formStep.setVisible(true);
+    formInfo.setVisible(true);
     submit.setVisible(true);
 
     conclusionStep.setVisible(false);
+    conclusionInfo.setVisible(false);
   }
 
   @Override
