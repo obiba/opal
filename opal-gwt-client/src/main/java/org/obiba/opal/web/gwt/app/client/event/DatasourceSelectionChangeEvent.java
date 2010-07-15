@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.event;
 
-import org.obiba.opal.web.model.client.DatasourceDto;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
 
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;

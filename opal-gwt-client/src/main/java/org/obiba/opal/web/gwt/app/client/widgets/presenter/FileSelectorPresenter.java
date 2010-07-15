@@ -24,8 +24,8 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionRequiredEven
 import org.obiba.opal.web.gwt.app.client.widgets.event.FolderCreationEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.FileDto;
-import org.obiba.opal.web.model.client.FileDto.FileType;
+import org.obiba.opal.web.model.client.opal.FileDto;
+import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;

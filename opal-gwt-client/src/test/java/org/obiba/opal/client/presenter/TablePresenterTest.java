@@ -22,7 +22,7 @@ import org.obiba.opal.web.gwt.app.client.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
-import org.obiba.opal.web.model.client.VariableDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.event.dom.client.ClickHandler;

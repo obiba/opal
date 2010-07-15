@@ -21,8 +21,8 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.resources.OpalResources;
 import org.obiba.opal.web.gwt.user.cellview.client.DateTimeColumn;
-import org.obiba.opal.web.model.client.FileDto;
-import org.obiba.opal.web.model.client.FileDto.FileType;
+import org.obiba.opal.web.model.client.opal.FileDto;
+import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;

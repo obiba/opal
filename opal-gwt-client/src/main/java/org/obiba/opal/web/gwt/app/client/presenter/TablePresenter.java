@@ -24,9 +24,9 @@ import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent.Direct
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.model.client.DatasourceDto;
-import org.obiba.opal.web.model.client.TableDto;
-import org.obiba.opal.web.model.client.VariableDto;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
+import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;

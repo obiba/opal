@@ -24,7 +24,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.CommandStateDto;
+import org.obiba.opal.web.model.client.opal.CommandStateDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;

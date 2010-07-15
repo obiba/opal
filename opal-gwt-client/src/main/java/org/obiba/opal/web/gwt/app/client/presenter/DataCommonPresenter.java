@@ -11,8 +11,8 @@ package org.obiba.opal.web.gwt.app.client.presenter;
 
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
-import org.obiba.opal.web.model.client.DatasourceDto;
-import org.obiba.opal.web.model.client.FunctionalUnitDto;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
+import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;

@@ -13,8 +13,8 @@ import java.util.Iterator;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter.Display;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.model.client.FileDto;
-import org.obiba.opal.web.model.client.FileDto.FileType;
+import org.obiba.opal.web.model.client.opal.FileDto;
+import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;

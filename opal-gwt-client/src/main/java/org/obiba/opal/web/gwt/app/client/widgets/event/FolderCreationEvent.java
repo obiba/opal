@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.event;
 
-import org.obiba.opal.web.model.client.FileDto;
-import org.obiba.opal.web.model.client.FileDto.FileType;
+import org.obiba.opal.web.model.client.opal.FileDto;
+import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;

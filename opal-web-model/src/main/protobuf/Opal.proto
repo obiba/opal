@@ -1,4 +1,5 @@
-package opal;
+import "Ws.proto";
+package Opal;
 
 option java_package = "org.obiba.opal.web.model";
 

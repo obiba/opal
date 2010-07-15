@@ -13,7 +13,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
-import org.obiba.opal.web.model.client.TableDto;
+import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;

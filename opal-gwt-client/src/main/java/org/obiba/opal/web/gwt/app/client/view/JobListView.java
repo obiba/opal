@@ -23,7 +23,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WorkbenchLayout;
 import org.obiba.opal.web.gwt.user.cellview.client.DateTimeColumn;
-import org.obiba.opal.web.model.client.CommandStateDto;
+import org.obiba.opal.web.model.client.opal.CommandStateDto;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.Cell;

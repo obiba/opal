@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
-import org.obiba.opal.web.model.client.TableDto;
+import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;

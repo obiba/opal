@@ -22,9 +22,9 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.DatasourceDto;
-import org.obiba.opal.web.model.client.FunctionalUnitDto;
-import org.obiba.opal.web.model.client.ImportCommandOptionsDto;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
+import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
+import org.obiba.opal.web.model.client.opal.ImportCommandOptionsDto;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;

@@ -1,0 +1,17 @@
+package Ws;
+
+option java_package = "org.obiba.opal.web.model";
+
+message ClientErrorDto {
+  required int32 code = 1; // Holds the HTTP status code (4xx)
+  required string status = 2; // Holds a one-word error descritor. This should be usable as a key in localisation bundles.
+  repeated string arguments = 3; // Arguments to be passed during localisation
+  extensions 1000 to max; // Extensions can be registered to provide additional error data on a case-by-case basis
+}
+
+message ServerErrorDto {
+  required int32 code = 1; // Holds the HTTP status code (5xx)
+  required string status = 2; // Holds a one-word error descritor. This should be usable as a key in localisation bundles.
+  repeated string arguments = 3; // Arguments to be passed during localisation
+  extensions 1000 to max; // Extensions can be registered to provide additional error data on a case-by-case basis
+}

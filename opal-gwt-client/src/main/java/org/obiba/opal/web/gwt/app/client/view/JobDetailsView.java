@@ -15,8 +15,8 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.JobDetailsPresenter.Display;
 import org.obiba.opal.web.gwt.user.cellview.client.DateTimeColumn;
-import org.obiba.opal.web.model.client.CommandStateDto;
-import org.obiba.opal.web.model.client.Message;
+import org.obiba.opal.web.model.client.opal.CommandStateDto;
+import org.obiba.opal.web.model.client.opal.Message;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;

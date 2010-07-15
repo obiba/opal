@@ -158,6 +158,18 @@
         <configuration>
           <protoModules>
             <protoModule>
+              <source>src/main/protobuf/Ws.proto</source>
+              <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
+              <outputDir>target/generated-sources/protobuf-gwt</outputDir>
+              <options>
+                <property>
+                  <!-- Override the package name -->
+                  <name>org.obiba.opal.web.model</name>
+                  <value>org.obiba.opal.web.model.client.ws</value>
+                </property>
+              </options>
+            </protoModule>
+            <protoModule>
               <source>src/main/protobuf/Magma.proto</source>
               <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
               <outputDir>target/generated-sources/protobuf-gwt</outputDir>
@@ -165,7 +177,7 @@
                 <property>
                   <!-- Override the package name -->
                   <name>org.obiba.opal.web.model</name>
-                  <value>org.obiba.opal.web.model.client</value>
+                  <value>org.obiba.opal.web.model.client.magma</value>
                 </property>
               </options>
             </protoModule>
@@ -182,7 +194,7 @@
                 <property>
                   <!-- Override the package name -->
                   <name>org.obiba.opal.web.model</name>
-                  <value>org.obiba.opal.web.model.client</value>
+                  <value>org.obiba.opal.web.model.client.opal</value>
                 </property>
               </options>
             </protoModule>
@@ -194,7 +206,7 @@
                 <property>
                   <!-- Override the package name -->
                   <name>org.obiba.opal.web.model</name>
-                  <value>org.obiba.opal.web.model.client</value>
+                  <value>org.obiba.opal.web.model.client.opal</value>
                 </property>
               </options>
             </protoModule>
@@ -246,7 +258,7 @@
     <maven.compiler.target>1.6</maven.compiler.target>
     <gwt.version>2.0.3</gwt.version>
     <protobuf.version>2.3.0</protobuf.version>
-    <protostuff.version>1.0.0.M2</protostuff.version>
+    <protostuff.version>r1001.p01</protostuff.version>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
   </properties>
 

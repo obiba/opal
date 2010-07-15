@@ -14,6 +14,40 @@
 
 group custom_gwt_overlay : gwt_overlay;
 
+message_getters_and_setters(message, options) ::= <<
+<message.nestedExtensions:extensions_static_definintion(extension=it, options=options)>
+<if(message.extensible)>
+<message:extension_getters_and_setters(message=message, options=options)>
+
+<endif>
+// getters and setters
+<message.fields:field_getters_and_setters(field=it, options=options)>
+>>
+
+extensions_static_definintion(extension, options) ::= <<
+
+public static final class <extension.extendedMessage.name>Extensions {
+  <extension.fields:extension_field_static_definition(extension=extension, field=it, options=options)>
+}
+
+>>
+
+extension_field_static_definition(extension, field, options) ::= <<
+
+public static final int <field.name; format="UUC">_FIELD_NUMBER = <field.number>;
+public static final String <field.name> = "<extension.parentMessage.proto.packageName>.<extension.parentMessage.name>.<field.name>";
+
+>>
+
+extension_getters_and_setters(message, options) ::= <<
+public native final void setExtension(String name, JavaScriptObject ext) /*-{
+  this[name] = ext;
+}-*/;
+public native final JavaScriptObject getExtension(String name) /*-{
+  return this[name];
+}-*/;
+>>
+
 enum_block(eg, module, options, nested) ::= <<
 <if(!nested)>
 <eg:enum_header(eg=it, module=module, options=options)>

@@ -22,10 +22,10 @@ import org.obiba.opal.web.gwt.app.client.event.SiblingVariableSelectionEvent.Dir
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.model.client.AttributeDto;
-import org.obiba.opal.web.model.client.CategoryDto;
-import org.obiba.opal.web.model.client.TableDto;
-import org.obiba.opal.web.model.client.VariableDto;
+import org.obiba.opal.web.model.client.magma.AttributeDto;
+import org.obiba.opal.web.model.client.magma.CategoryDto;
+import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;

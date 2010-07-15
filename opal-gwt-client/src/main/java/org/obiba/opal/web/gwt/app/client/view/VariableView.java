@@ -12,8 +12,8 @@ package org.obiba.opal.web.gwt.app.client.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.VariablePresenter;
-import org.obiba.opal.web.model.client.AttributeDto;
-import org.obiba.opal.web.model.client.CategoryDto;
+import org.obiba.opal.web.model.client.magma.AttributeDto;
+import org.obiba.opal.web.model.client.magma.CategoryDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;

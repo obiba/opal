@@ -1,4 +1,5 @@
-package opal;
+import "Ws.proto";
+package Magma;
 
 option java_package = "org.obiba.opal.web.model";
 

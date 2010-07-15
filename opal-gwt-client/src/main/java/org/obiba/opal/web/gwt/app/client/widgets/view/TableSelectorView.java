@@ -15,7 +15,7 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.event.SelectionType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
-import org.obiba.opal.web.model.client.DatasourceDto;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
