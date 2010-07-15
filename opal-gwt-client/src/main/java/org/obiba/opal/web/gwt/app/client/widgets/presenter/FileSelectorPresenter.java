@@ -192,12 +192,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
     switch(fileSelectionType) {
     case FILE:
-      String newFileName = getDisplay().getNewFileName();
-      if(newFileName != null && newFileName.trim().length() != 0) {
-        selection = (!selectedFolder.equals("/") ? selectedFolder + "/" : selectedFolder) + newFileName;
-      } else {
-        selection = selectedFile;
-      }
+      selection = getFileSelection();
       break;
     case EXISTING_FILE:
       selection = selectedFile;
@@ -212,6 +207,19 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     }
 
     return selection;
+  }
+
+  private String getFileSelection() {
+    String fileSelection = null;
+
+    String newFileName = getDisplay().getNewFileName();
+    if(newFileName != null && newFileName.trim().length() != 0) {
+      fileSelection = (!selectedFolder.equals("/") ? selectedFolder + "/" : selectedFolder) + newFileName;
+    } else {
+      fileSelection = selectedFile;
+    }
+
+    return fileSelection;
   }
 
   //
