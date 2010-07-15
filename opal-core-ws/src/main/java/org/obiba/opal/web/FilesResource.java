@@ -120,7 +120,7 @@ public class FilesResource {
     File localFile = opalRuntime.getFileSystem().getLocalFile(file);
     String mimeType = mimeTypes.getContentType(localFile);
 
-    return Response.ok(localFile, MediaType.valueOf(mimeType)).build();
+    return Response.ok(localFile, MediaType.valueOf(mimeType)).header("Content-Disposition", "attachment; filename=" + localFile.getName()).build();
   }
 
   private Response getFolder(FileObject folder) throws IOException {
