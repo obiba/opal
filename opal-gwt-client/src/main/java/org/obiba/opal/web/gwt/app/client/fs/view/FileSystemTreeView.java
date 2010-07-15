@@ -32,6 +32,8 @@ public class FileSystemTreeView implements Display {
 
   private TreeItem treeRoot;
 
+  private FileDto selectedFile;
+
   public FileSystemTreeView() {
     fileSystemTree = new Tree();
   }
@@ -55,7 +57,9 @@ public class FileSystemTreeView implements Display {
     treeRoot = createTreeItem(rootDto);
     treeRoot.setText(translations.fileSystemLabel());
     fileSystemTree.addItem(treeRoot);
-    addBranch(treeRoot, rootDto, 0);
+    addBranch(treeRoot, rootDto);
+    treeRoot.setState(true);
+    selectedFile = (FileDto) treeRoot.getUserObject();
     fileSystemTree.setSelectedItem(treeRoot, true);
   }
 
@@ -63,8 +67,7 @@ public class FileSystemTreeView implements Display {
     return fileSystemTree.addOpenHandler(openHandler);
   }
 
-  public void addBranch(TreeItem treeItem, FileDto folderToAdd, int level) {
-    ++level;
+  public void addBranch(TreeItem treeItem, FileDto folderToAdd) {
     FileDto file;
     for(int i = 0; i < folderToAdd.getChildrenArray().length(); i++) {
       file = folderToAdd.getChildrenArray().get(i);
@@ -72,15 +75,10 @@ public class FileSystemTreeView implements Display {
       if(file.getType().isFileType(FileDto.FileType.FOLDER)) {
         TreeItem childItem = createTreeItem(file);
         if(file.getChildrenCount() > 0) {
-          addBranch(childItem, file, level);
+          addBranch(childItem, file);
         }
         treeItem.addItem(childItem);
-
-        if(level == 1) {
-          treeItem.setState(true);
-        }
       }
-
     }
   }
 
@@ -134,10 +132,15 @@ public class FileSystemTreeView implements Display {
   }
 
   @Override
-  public void selectTreeItem(FileDto folder) {
+  public void selectFile(FileDto folder) {
     TreeItem item = findTreeItem(folder);
     fileSystemTree.setSelectedItem(item);
-    item.setState(true);
+    fileSystemTree.ensureSelectedItemVisible();
+    selectedFile = (FileDto) item.getUserObject();
+  }
+
+  public FileDto getSelectedFile() {
+    return selectedFile;
   }
 
   private TreeItem findTreeItem(FileDto dto) {
@@ -148,7 +151,6 @@ public class FileSystemTreeView implements Display {
         return item;
       }
     }
-
     return null;
   }
 }

@@ -38,7 +38,7 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
   public interface Display extends WidgetDisplay {
     void initTree(FileDto root);
 
-    void addBranch(TreeItem treeItem, FileDto folderToAdd, int level);
+    void addBranch(TreeItem treeItem, FileDto folderToAdd);
 
     void addBranch(FileDto folderToAdd);
 
@@ -46,7 +46,9 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
 
     HandlerRegistration addFileSystemTreeOpenHandler(OpenHandler<TreeItem> openHandler);
 
-    void selectTreeItem(FileDto folder);
+    void selectFile(FileDto folder);
+
+    FileDto getSelectedFile();
 
   }
 
@@ -91,7 +93,7 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
       @Override
       public void onResource(Response response, FileDto root) {
         getDisplay().initTree(root);
-        getDisplay().selectTreeItem(root);
+        getDisplay().selectFile(root);
         eventBus.fireEvent(new FileSystemTreeFolderSelectionChangeEvent(root));
       }
     }).send();
@@ -117,7 +119,7 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
           ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta" + selectedFile.getPath()).get().withCallback(new ResourceCallback<FileDto>() {
             @Override
             public void onResource(Response response, FileDto file) {
-              getDisplay().addBranch(selectedItem, file, 0);
+              getDisplay().addBranch(selectedItem, file);
             }
           }).send();
         }
@@ -134,7 +136,7 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
     super.registerHandler(eventBus.addHandler(FolderSelectionChangeEvent.getType(), new FolderSelectionChangeEvent.Handler() {
 
       public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
-        getDisplay().selectTreeItem(event.getFolder());
+        getDisplay().selectFile(event.getFolder());
       }
 
     }));
@@ -164,7 +166,8 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
       @Override
       public void onResource(Response response, FileDto file) {
         treeItem.removeItems();
-        getDisplay().addBranch(treeItem, file, 0);
+        getDisplay().addBranch(treeItem, file);
+        getDisplay().selectFile(getDisplay().getSelectedFile());
       }
     }).send();
   }
