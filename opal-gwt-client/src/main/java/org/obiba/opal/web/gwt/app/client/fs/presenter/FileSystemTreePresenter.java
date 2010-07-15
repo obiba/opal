@@ -69,7 +69,6 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
 
   @Override
   protected void onBind() {
-    initDisplayComponents();
     addEventHandlers();
   }
 
@@ -97,10 +96,6 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
         eventBus.fireEvent(new FileSystemTreeFolderSelectionChangeEvent(root));
       }
     }).send();
-  }
-
-  protected void initDisplayComponents() {
-    revealDisplay();
   }
 
   private void addTreeItemSelectionHandler(final EventBus eventBus) {

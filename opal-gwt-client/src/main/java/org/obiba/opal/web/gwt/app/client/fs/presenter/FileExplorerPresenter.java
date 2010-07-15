@@ -113,7 +113,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
   @Override
   public void revealDisplay() {
-
+    fileSystemTreePresenter.revealDisplay();
   }
 
   protected void initDisplayComponents() {
