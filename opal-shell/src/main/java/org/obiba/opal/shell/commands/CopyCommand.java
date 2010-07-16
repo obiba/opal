@@ -40,9 +40,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.google.common.collect.ImmutableSet;
 
 /**
- * Provides ability to copy Magma tables to an existing datasource or an Excel file.
+ * Provides ability to copy Magma tables to an existing datasource or a file based datasource.
  */
-@CommandUsage(description = "Copy tables to an existing destination datasource or to a specified Excel file. The tables can be explicitly named and/or be the ones from a specified source datasource. The variables can be optionally processed: dispatched in another table and/or renamed.", syntax = "Syntax: copy [--unit UNIT] [--source NAME] (--destination NAME | --out FILE) [--multiplex SCRIPT] [--transform SCRIPT] [--non-incremental] [--no-values | --no-variables] [TABLE_NAME...]")
+@CommandUsage(description = "Copy tables to an existing destination datasource or to a specified file. The tables can be explicitly named and/or be the ones from a specified source datasource. The variables can be optionally processed: dispatched in another table and/or renamed.", syntax = "Syntax: copy [--unit UNIT] [--source NAME] (--destination NAME | --out FILE) [--multiplex SCRIPT] [--transform SCRIPT] [--non-incremental] [--no-values | --no-variables] [TABLE_NAME...]")
 public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommandOptions> {
 
   @Autowired

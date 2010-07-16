@@ -31,7 +31,7 @@ public interface CopyCommandOptions extends HelpOption {
 
   public boolean isDestination();
 
-  @Option(shortName = "o", description = "Copy to a file.")
+  @Option(shortName = "o", description = "Copy to file: CSV if file is a directory, Excel if file has suffix xls or xlsx, XML if file has suffix zip.")
   public String getOut();
 
   public boolean isOut();
