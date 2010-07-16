@@ -143,15 +143,13 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   private Datasource getFileBasedDatasource() throws IOException {
     Datasource destinationDatasource;
     FileObject outputFile = getOutputFile();
-    File localFile = getLocalFile(outputFile);
-    String datasourceName = outputFile.getName().getBaseName();
-    if(localFile.isDirectory()) {
-      setUpCsvDatasourceFiles(localFile);
-      destinationDatasource = new CsvDatasource(datasourceName, localFile);
+    if(getLocalFile(outputFile).isDirectory()) {
+      setUpCsvDatasourceFiles(getLocalFile(outputFile));
+      destinationDatasource = new CsvDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
     } else if(outputFile.getName().getExtension().startsWith("xls")) {
-      destinationDatasource = new ExcelDatasource(datasourceName, localFile);
+      destinationDatasource = new ExcelDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
     } else if(outputFile.getName().getExtension().startsWith("zip")) {
-      destinationDatasource = new FsDatasource(datasourceName, localFile);
+      destinationDatasource = new FsDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
     } else if(outputFile.getName().getPath().equals("/dev/null")) {
       destinationDatasource = new NullDatasource("/dev/null");
     } else {
