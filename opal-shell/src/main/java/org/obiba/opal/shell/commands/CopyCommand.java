@@ -134,23 +134,28 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     if(options.isDestination()) {
       destinationDatasource = getDatasourceByName(options.getDestination());
     } else {
-      FileObject outputFile = getOutputFile();
-      File localFile = getLocalFile(outputFile);
-      String datasourceName = outputFile.getName().getBaseName();
-
-      if(localFile.isDirectory()) {
-        setUpCsvDatasourceFiles(localFile);
-        destinationDatasource = new CsvDatasource(datasourceName, localFile);
-      } else if(outputFile.getName().getExtension().startsWith("xls")) {
-        destinationDatasource = new ExcelDatasource(datasourceName, localFile);
-      } else if(outputFile.getName().getExtension().startsWith("zip")) {
-        destinationDatasource = new FsDatasource(datasourceName, localFile);
-      } else if(outputFile.getName().getPath().equals("/dev/null")) {
-        destinationDatasource = new NullDatasource("/dev/null");
-      } else {
-        throw new IllegalArgumentException("unknown output datasource type");
-      }
+      destinationDatasource = getFileBasedDatasource();
       MagmaEngine.get().addDatasource(destinationDatasource);
+    }
+    return destinationDatasource;
+  }
+
+  private Datasource getFileBasedDatasource() throws IOException {
+    Datasource destinationDatasource;
+    FileObject outputFile = getOutputFile();
+    File localFile = getLocalFile(outputFile);
+    String datasourceName = outputFile.getName().getBaseName();
+    if(localFile.isDirectory()) {
+      setUpCsvDatasourceFiles(localFile);
+      destinationDatasource = new CsvDatasource(datasourceName, localFile);
+    } else if(outputFile.getName().getExtension().startsWith("xls")) {
+      destinationDatasource = new ExcelDatasource(datasourceName, localFile);
+    } else if(outputFile.getName().getExtension().startsWith("zip")) {
+      destinationDatasource = new FsDatasource(datasourceName, localFile);
+    } else if(outputFile.getName().getPath().equals("/dev/null")) {
+      destinationDatasource = new NullDatasource("/dev/null");
+    } else {
+      throw new IllegalArgumentException("unknown output datasource type");
     }
     return destinationDatasource;
   }
@@ -158,20 +163,22 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   private void setUpCsvDatasourceFiles(File directory) throws IOException {
     for(ValueTable table : getValueTables()) {
       File tableDir = new File(directory, table.getName());
-      tableDir.mkdir();
+      if(tableDir.exists() || tableDir.mkdir()) {
+        if(!options.getNoVariables()) {
+          createFileIfNotExists(new File(tableDir, CsvDatasource.VARIABLES_FILE));
+        }
+        if(!options.getNoValues()) {
+          createFileIfNotExists(new File(tableDir, CsvDatasource.DATA_FILE));
+        }
+      } else {
+        throw new IllegalArgumentException("Unable to create the directory: " + tableDir);
+      }
+    }
+  }
 
-      if(!options.getNoVariables()) {
-        File f = new File(tableDir, CsvDatasource.VARIABLES_FILE);
-        if(!f.exists()) {
-          f.createNewFile();
-        }
-      }
-      if(!options.getNoValues()) {
-        File f = new File(tableDir, CsvDatasource.DATA_FILE);
-        if(!f.exists()) {
-          f.createNewFile();
-        }
-      }
+  private void createFileIfNotExists(File f) throws IOException {
+    if(!f.exists() && !f.createNewFile()) {
+      throw new IllegalArgumentException("Unable to create the file: " + f);
     }
   }
 
