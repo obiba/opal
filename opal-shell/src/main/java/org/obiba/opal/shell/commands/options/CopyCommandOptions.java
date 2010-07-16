@@ -36,11 +36,6 @@ public interface CopyCommandOptions extends HelpOption {
 
   public boolean isOut();
 
-  @Option(shortName = "o", description = "Format of the output file.")
-  public String getOutFormat();
-
-  public boolean isFormat();
-
   //
   // Values
   // 

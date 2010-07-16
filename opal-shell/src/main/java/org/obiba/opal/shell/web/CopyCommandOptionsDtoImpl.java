@@ -104,13 +104,4 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
     return dto.getTablesList();
   }
 
-  @Override
-  public String getOutFormat() {
-    return dto.getFormat();
-  }
-
-  @Override
-  public boolean isFormat() {
-    return dto.hasFormat();
-  }
 }

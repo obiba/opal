@@ -70,6 +70,12 @@
         <artifactId>magma-datasource-excel</artifactId>
         <version>${magma.version}</version>
       </dependency>
+      
+      <dependency>
+        <groupId>org.obiba.magma</groupId>
+        <artifactId>magma-datasource-csv</artifactId>
+        <version>${magma.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>org.obiba.magma</groupId>

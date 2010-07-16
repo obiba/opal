@@ -41,6 +41,10 @@
       <artifactId>magma-datasource-null</artifactId>
       <version>1.2-SNAPSHOT</version>
     </dependency>
+    <dependency>
+        <groupId>org.obiba.magma</groupId>
+        <artifactId>magma-datasource-csv</artifactId>
+    </dependency>
   </dependencies>
   
   <properties>

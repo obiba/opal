@@ -10,6 +10,7 @@
 package org.obiba.opal.shell.commands;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -21,6 +22,7 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.datasource.csv.CsvDatasource;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.datasource.nil.NullDatasource;
@@ -127,16 +129,22 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     return builder;
   }
 
-  private Datasource getDestinationDatasource() {
+  private Datasource getDestinationDatasource() throws IOException {
     Datasource destinationDatasource;
     if(options.isDestination()) {
       destinationDatasource = getDatasourceByName(options.getDestination());
     } else {
       FileObject outputFile = getOutputFile();
-      if(outputFile.getName().getExtension().startsWith("xls")) {
-        destinationDatasource = new ExcelDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
+      File localFile = getLocalFile(outputFile);
+      String datasourceName = outputFile.getName().getBaseName();
+
+      if(localFile.isDirectory()) {
+        setUpCsvDatasourceFiles(localFile);
+        destinationDatasource = new CsvDatasource(datasourceName, localFile);
+      } else if(outputFile.getName().getExtension().startsWith("xls")) {
+        destinationDatasource = new ExcelDatasource(datasourceName, localFile);
       } else if(outputFile.getName().getExtension().startsWith("zip")) {
-        destinationDatasource = new FsDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
+        destinationDatasource = new FsDatasource(datasourceName, localFile);
       } else if(outputFile.getName().getPath().equals("/dev/null")) {
         destinationDatasource = new NullDatasource("/dev/null");
       } else {
@@ -145,6 +153,26 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       MagmaEngine.get().addDatasource(destinationDatasource);
     }
     return destinationDatasource;
+  }
+
+  private void setUpCsvDatasourceFiles(File directory) throws IOException {
+    for(ValueTable table : getValueTables()) {
+      File tableDir = new File(directory, table.getName());
+      tableDir.mkdir();
+
+      if(!options.getNoVariables()) {
+        File f = new File(tableDir, CsvDatasource.VARIABLES_FILE);
+        if(!f.exists()) {
+          f.createNewFile();
+        }
+      }
+      if(!options.getNoValues()) {
+        File f = new File(tableDir, CsvDatasource.DATA_FILE);
+        if(!f.exists()) {
+          f.createNewFile();
+        }
+      }
+    }
   }
 
   private Set<ValueTable> getValueTables() {
