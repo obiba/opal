@@ -5,7 +5,7 @@
   <ui:style>
     .separator { border-bottom: .2em solid black; }
 
-    .optionsPanelMsg td { font-size:1.25em; margin: 0.5em 0.5em 0.5em 0.5em; }
+    .optionsPanelMsg td { margin: 0.5em 0.5em 0.5em 0.5em; }
 
     .errorMsg{color:red;}
   </ui:style>
@@ -26,7 +26,7 @@
         </g:VerticalPanel>
       </g:layer>
       <g:layer height="3em" bottom="3.5em" left="1em" right="1em">
-        <g:TextBox name="folderToCreate" ui:field="folderToCreate" visibleLength="60"/>
+        <g:TextBox name="folderToCreate" ui:field="folderToCreate" visibleLength="40"/>
       </g:layer>
       <g:layer bottom="3.5em" height="0.5em" left="1em" right="1em">
         <g:HTMLPanel>
