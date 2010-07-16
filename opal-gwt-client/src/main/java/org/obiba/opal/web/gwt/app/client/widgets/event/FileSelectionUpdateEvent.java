@@ -9,10 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.event;
 
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
-import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
@@ -20,7 +17,7 @@ import com.google.gwt.event.shared.GwtEvent;
 /**
  * Event that will be fired by {@link TableSelectorPresenter}.
  */
-public class TableSelectionEvent extends GwtEvent<TableSelectionEvent.Handler> {
+public class FileSelectionUpdateEvent extends GwtEvent<FileSelectionUpdateEvent.Handler> {
   //
   // Static Variables
   //
@@ -33,15 +30,12 @@ public class TableSelectionEvent extends GwtEvent<TableSelectionEvent.Handler> {
 
   private Object source;
 
-  private List<TableDto> selectedTables;
-
   //
   // Constructors
   //
-  public TableSelectionEvent(Object source, List<TableDto> selectedTables) {
+  public FileSelectionUpdateEvent(Object source) {
     super();
     this.source = source;
-    this.selectedTables = selectedTables;
   }
 
   //
@@ -50,7 +44,7 @@ public class TableSelectionEvent extends GwtEvent<TableSelectionEvent.Handler> {
 
   @Override
   protected void dispatch(Handler handler) {
-    handler.onTableSelection(this);
+    handler.onFileSelectionUpdate(this);
   }
 
   @Override
@@ -70,27 +64,12 @@ public class TableSelectionEvent extends GwtEvent<TableSelectionEvent.Handler> {
     return source;
   }
 
-  public List<TableDto> getSelectedTables() {
-    return selectedTables;
-  }
-
-  /**
-   * Get the first selected table.
-   * @return null if none
-   */
-  public TableDto getSelectedTable() {
-    if(selectedTables != null && selectedTables.size() > 0) {
-      return selectedTables.get(0);
-    } else
-      return null;
-  }
-
   //
   // Inner Classes / Interfaces
   //
 
   public interface Handler extends EventHandler {
 
-    public void onTableSelection(TableSelectionEvent event);
+    public void onFileSelectionUpdate(FileSelectionUpdateEvent event);
   }
 }

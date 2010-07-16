@@ -19,6 +19,8 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
+import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionUpdateEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
@@ -83,8 +85,9 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   }
 
   protected void addEventHandlers() {
-    super.registerHandler(getDisplay().addSubmitClickHandler(new SubmitClickHandler()));
-    super.registerHandler(getDisplay().addJobLinkClickHandler(new DataCommonPresenter.JobLinkClickHandler(eventBus, jobListPresenter)));
+    super.registerHandler(eventBus.addHandler(TableListUpdateEvent.getType(), new TableListUpdateHandler()));
+    super.registerHandler(eventBus.addHandler(FileSelectionUpdateEvent.getType(), new FileSelectionUpdateHandler()));
+
   }
 
   protected void initDisplayComponents() {
@@ -93,8 +96,12 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
     initFileSelectionType();
     fileSelectionPresenter.bind();
+    super.registerHandler(getDisplay().addSubmitClickHandler(new SubmitClickHandler()));
+    super.registerHandler(getDisplay().addJobLinkClickHandler(new DataCommonPresenter.JobLinkClickHandler(eventBus, jobListPresenter)));
+    super.registerHandler(getDisplay().addFileFormatChangeHandler(new FileFormatChangeHandler()));
+    super.registerHandler(getDisplay().addDestinationFileClickHandler(new DestinationClickHandler()));
+    super.registerHandler(getDisplay().addDestinationDatasourceClickHandler(new DestinationClickHandler()));
     getDisplay().setFileWidgetDisplay(fileSelectionPresenter.getDisplay());
-    getDisplay().addFileFormatChangeHandler(new FileFormatChangeHandler());
 
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
@@ -140,6 +147,10 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     return result;
   }
 
+  private void updateSubmit() {
+    getDisplay().setSubmitEnabled(formValidationErrors().size() == 0);
+  }
+
   @Override
   protected void onPlaceRequest(PlaceRequest request) {
   }
@@ -160,11 +171,37 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   // Interfaces and classes
   //
 
+  class FileSelectionUpdateHandler implements FileSelectionUpdateEvent.Handler {
+    @Override
+    public void onFileSelectionUpdate(FileSelectionUpdateEvent event) {
+      if(fileSelectionPresenter.equals(event.getSource())) {
+        updateSubmit();
+      }
+    }
+  }
+
+  class TableListUpdateHandler implements TableListUpdateEvent.Handler {
+    @Override
+    public void onTableListUpdate(TableListUpdateEvent event) {
+      if(tableListPresenter.equals(event.getSource())) {
+        updateSubmit();
+      }
+    }
+  }
+
   class FileFormatChangeHandler implements ChangeHandler {
     @Override
     public void onChange(ChangeEvent arg0) {
       initFileSelectionType();
       fileSelectionPresenter.getDisplay().clearFile();
+      updateSubmit();
+    }
+  }
+
+  class DestinationClickHandler implements ClickHandler {
+    @Override
+    public void onClick(ClickEvent arg0) {
+      updateSubmit();
     }
   }
 
@@ -234,6 +271,10 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     String getOutFile();
 
     String getFileFormat();
+
+    HandlerRegistration addDestinationFileClickHandler(ClickHandler handler);
+
+    HandlerRegistration addDestinationDatasourceClickHandler(ClickHandler handler);
 
     HandlerRegistration addFileFormatChangeHandler(ChangeHandler handler);
 

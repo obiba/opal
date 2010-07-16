@@ -139,6 +139,16 @@ public class DataExportView extends DataCommonView implements DataExportPresente
   }
 
   @Override
+  public HandlerRegistration addDestinationFileClickHandler(ClickHandler handler) {
+    return destinationFile.addClickHandler(handler);
+  }
+
+  @Override
+  public HandlerRegistration addDestinationDatasourceClickHandler(ClickHandler handler) {
+    return destinationDataSource.addClickHandler(handler);
+  }
+
+  @Override
   public boolean isIncremental() {
     return incremental.getValue();
   }
@@ -203,6 +213,7 @@ public class DataExportView extends DataCommonView implements DataExportPresente
   public void renderFormStep() {
     super.renderFormStep();
     instructionsLabel.setText(translations.dataExportInstructions());
+    setSubmitEnabled(false);
   }
 
 }

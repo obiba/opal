@@ -18,6 +18,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionRequiredEvent;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -90,7 +91,8 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
 
       @Override
       public void onTableSelection(TableSelectionEvent event) {
-        if(TableListPresenter.this.equals(event.getCallSource())) {
+        if(TableListPresenter.this.equals(event.getSource())) {
+          boolean updated = false;
           for(TableDto selectedTable : event.getSelectedTables()) {
             boolean found = false;
             for(TableDto table : getTables()) {
@@ -102,7 +104,11 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
             if(!found) {
               getTables().add(selectedTable);
               getDisplay().addTable(selectedTable);
+              updated = true;
             }
+          }
+          if(updated) {
+            eventBus.fireEvent(new TableListUpdateEvent(TableListPresenter.this));
           }
         }
       }
@@ -119,6 +125,7 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
         }
         if(selectedIndices.size() > 0) {
           getDisplay().unselectAll(selectedIndices.get(0));
+          eventBus.fireEvent(new TableListUpdateEvent(TableListPresenter.this));
         }
       }
     }));

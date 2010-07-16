@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.web.gwt.app.client.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
@@ -65,7 +66,8 @@ public class DataImportPresenterTest extends AbstractGwtTestSetup {
     HandlerRegistration handlerRegistrationMock = createMock(HandlerRegistration.class);
 
     // Make sure that handlers are added to the event bus
-    expect(eventBusMock.addHandler((Type<FileSelectionEvent.Handler>) EasyMock.anyObject(), (FileSelectionEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
+    expect(eventBusMock.addHandler((Type<FileSelectionEvent.Handler>) EasyMock.anyObject(), (FileSelectionEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).times(2);
+    expect(eventBusMock.addHandler((Type<FileSelectionUpdateEvent.Handler>) EasyMock.anyObject(), (FileSelectionUpdateEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
 
     // Make sure that a ClickHandler is added to the Submit button
     expect(displayMock.addSubmitClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);

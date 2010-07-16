@@ -112,5 +112,7 @@ public class DataImportView extends DataCommonView implements DataImportPresente
   public void renderFormStep() {
     super.renderFormStep();
     instructionsLabel.setText(translations.dataImportInstructions());
+    setSubmitEnabled(false);
   }
+
 }

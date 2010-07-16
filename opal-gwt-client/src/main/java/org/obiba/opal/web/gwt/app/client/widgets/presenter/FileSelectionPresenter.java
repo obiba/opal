@@ -17,6 +17,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -97,6 +98,7 @@ public class FileSelectionPresenter extends WidgetPresenter<FileSelectionPresent
       public void onFileSelection(FileSelectionEvent event) {
         if(FileSelectionPresenter.this.equals(event.getSource())) {
           getDisplay().setFile(event.getSelectedFile());
+          eventBus.fireEvent(new FileSelectionUpdateEvent(FileSelectionPresenter.this));
         }
       }
 

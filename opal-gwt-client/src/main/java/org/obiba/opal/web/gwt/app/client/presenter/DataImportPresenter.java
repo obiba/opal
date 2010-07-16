@@ -16,6 +16,7 @@ import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -77,6 +78,7 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
   protected void addEventHandlers() {
     super.registerHandler(getDisplay().addSubmitClickHandler(new SubmitClickHandler()));
     super.registerHandler(getDisplay().addJobLinkClickHandler(new DataCommonPresenter.JobLinkClickHandler(eventBus, jobListPresenter)));
+    super.registerHandler(eventBus.addHandler(FileSelectionUpdateEvent.getType(), new FileSelectionUpdateHandler()));
   }
 
   protected void initDisplayComponents() {
@@ -123,6 +125,15 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
   //
   // Interfaces and classes
   //
+
+  class FileSelectionUpdateHandler implements FileSelectionUpdateEvent.Handler {
+    @Override
+    public void onFileSelectionUpdate(FileSelectionUpdateEvent event) {
+      if(fileSelectionPresenter.equals(event.getSource())) {
+        getDisplay().setSubmitEnabled(fileSelectionPresenter.getSelectedFile().length() > 0);
+      }
+    }
+  }
 
   class SubmitClickHandler implements ClickHandler {
 

@@ -69,6 +69,9 @@ public abstract class DataCommonPresenter {
 
     /** Add a handler to the job list */
     HandlerRegistration addJobLinkClickHandler(ClickHandler handler);
+
+    /** Enable the import/export button */
+    void setSubmitEnabled(boolean enabled);
   }
 
 }
