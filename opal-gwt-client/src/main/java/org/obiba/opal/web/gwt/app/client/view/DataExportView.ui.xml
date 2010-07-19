@@ -34,7 +34,7 @@
 		               <tr>
 		                 <td><g:Label><ui:msg description="File format field">Format:</ui:msg></g:Label></td>
 		                 <td><g:ListBox ui:field="fileFormat">
-		                   <g:item value="csv">CSV</g:item>
+		                   <g:item value="csv">CSV (csv)</g:item>
 		                   <g:item value="excel">Excel (xls,xlsx)</g:item>
 		                   <g:item value="xml">XML (zip)</g:item>
 		                 </g:ListBox></td>
@@ -110,7 +110,11 @@
 	       <ul>
 	         <li>CSV
 	           <br/>
-	           <ui:msg description="File destination information csv">Resulting file set is in a directory (Zip not supported yet)</ui:msg>
+	           <ui:msg description="File destination information csv">Select the file according to the export options (Zip output is not supported yet).</ui:msg>
+	           <ul>
+	             <li><ui:msg description="File destination information csv directory output">Select a directory when exporting several tables or when exporting both variables and values. Each sub-directory will contain the data for one table.</ui:msg></li>
+	             <li><ui:msg description="File destination information csv file output">Select a CSV file when exporting only values of one table.</ui:msg></li>
+	           </ul>
 	         </li>
 	         <li>Excel
 	           <br/>
