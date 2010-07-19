@@ -146,6 +146,8 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     FileObject outputFile = getOutputFile();
     if(getLocalFile(outputFile).isDirectory()) {
       destinationDatasource = getCsvDatasource(getLocalFile(outputFile));
+    } else if(outputFile.getName().getExtension().startsWith("csv")) {
+      destinationDatasource = getSingleTableCsvDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
     } else if(outputFile.getName().getExtension().startsWith("xls")) {
       destinationDatasource = new ExcelDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
     } else if(outputFile.getName().getExtension().startsWith("zip")) {
@@ -171,12 +173,38 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
         if(!options.getNoValues()) {
           createFileIfNotExists(dataFile = new File(tableDir, CsvDatasource.DATA_FILE));
         }
-        ds.addValueTable(table.getName(), variablesFile, dataFile);
-        ds.setVariablesHeader(table.getName(), CsvUtil.getCsvVariableHeader(table));
+        addCsvValueTable(ds, table, variablesFile, dataFile);
       } else {
         throw new IllegalArgumentException("Unable to create the directory: " + tableDir);
       }
     }
+    return ds;
+  }
+
+  private void addCsvValueTable(CsvDatasource ds, ValueTable table, File variablesFile, File dataFile) {
+    ds.addValueTable(table.getName(), variablesFile, dataFile);
+    ds.setVariablesHeader(table.getName(), CsvUtil.getCsvVariableHeader(table));
+  }
+
+  private CsvDatasource getSingleTableCsvDatasource(String name, final File csvFile) throws IOException {
+    CsvDatasource ds = new CsvDatasource(name);
+
+    // one table only
+    Set<ValueTable> tables = getValueTables();
+    if(tables.size() > 1) {
+      throw new IllegalArgumentException("Only one table expected when writting to a CSV file. Provide a directory instead for copying several tables.");
+    }
+
+    if(!options.getNoVariables() && !options.getNoValues()) {
+      throw new IllegalArgumentException("Writting both variables and values in the same CSV file is not supported. Provide a directory instead.");
+    } else if(!options.getNoVariables()) {
+      createFileIfNotExists(csvFile);
+      addCsvValueTable(ds, tables.iterator().next(), csvFile, null);
+    } else if(!options.getNoValues()) {
+      createFileIfNotExists(csvFile);
+      addCsvValueTable(ds, tables.iterator().next(), null, csvFile);
+    }
+
     return ds;
   }
 
