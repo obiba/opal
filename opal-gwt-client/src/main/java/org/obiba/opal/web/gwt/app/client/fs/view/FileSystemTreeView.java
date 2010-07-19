@@ -59,8 +59,7 @@ public class FileSystemTreeView implements Display {
     fileSystemTree.addItem(treeRoot);
     addBranch(treeRoot, rootDto);
     treeRoot.setState(true);
-    selectedFile = (FileDto) treeRoot.getUserObject();
-    fileSystemTree.setSelectedItem(treeRoot, true);
+    selectedFile = rootDto;
   }
 
   public HandlerRegistration addFileSystemTreeOpenHandler(OpenHandler<TreeItem> openHandler) {
@@ -105,12 +104,15 @@ public class FileSystemTreeView implements Display {
   }
 
   @Override
-  public void selectFile(FileDto folder) {
-    GWT.log("selecting " + folder.getPath());
+  public void selectFile(FileDto folder, boolean fireEvents) {
     TreeItem item = findTreeItem(folder);
-    fileSystemTree.setSelectedItem(item);
+    fileSystemTree.setSelectedItem(item, fireEvents);
     fileSystemTree.ensureSelectedItemVisible();
-    selectedFile = (FileDto) item.getUserObject();
+    selectedFile = folder;
+  }
+
+  public void selectFile(FileDto folder) {
+    selectFile(folder, true);
   }
 
   public FileDto getSelectedFile() {

@@ -107,6 +107,8 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   protected void onUnbind() {
     getDisplay().getFileSystemTree().remove(fileSystemTreePresenter.getDisplay().asWidget());
     getDisplay().getFolderDetailsPanel().remove(folderDetailsPresenter.getDisplay().asWidget());
+    folderDetailsPresenter.unbind();
+    fileSystemTreePresenter.unbind();
   }
 
   @Override
@@ -118,6 +120,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   @Override
   public void revealDisplay() {
     fileSystemTreePresenter.revealDisplay();
+    folderDetailsPresenter.revealDisplay();
   }
 
   protected void initDisplayComponents() {
