@@ -10,6 +10,8 @@
 package org.obiba.opal.core.service.impl;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileType;
@@ -122,6 +124,7 @@ public class DefaultImportService implements ImportService {
 
   private void copyToDestinationDatasource(FileObject file, String dispatchAttribute, Datasource destinationDatasource, FunctionalUnit unit) throws IOException, InterruptedException {
     FsDatasource sourceDatasource = new FsDatasource(file.getName().getBaseName(), opalRuntime.getFileSystem().getLocalFile(file), unit.getDatasourceEncryptionStrategy());
+
     try {
       sourceDatasource.initialise();
       copyValueTables(sourceDatasource, destinationDatasource, unit, dispatchAttribute);
@@ -131,17 +134,43 @@ public class DefaultImportService implements ImportService {
   }
 
   private void copyValueTables(Datasource source, Datasource destination, FunctionalUnit unit, String dispatchAttribute) throws IOException, InterruptedException {
-    for(ValueTable valueTable : source.getValueTables()) {
-      if(Thread.interrupted()) {
-        throw new InterruptedException("Thread interrupted");
-      }
+    Set<String> tablesToLock = getTablesToLock(source);
+    MagmaEngine.get().lockTables(tablesToLock);
 
-      if(valueTable.isForEntityType(keysTableEntityType)) {
-        copyParticipants(valueTable, source, destination, unit, dispatchAttribute);
-      } else {
-        DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(valueTable, destination);
+    try {
+      for(ValueTable valueTable : source.getValueTables()) {
+        if(Thread.interrupted()) {
+          throw new InterruptedException("Thread interrupted");
+        }
+
+        if(valueTable.isForEntityType(keysTableEntityType)) {
+          copyParticipants(valueTable, source, destination, unit, dispatchAttribute);
+        } else {
+          DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(valueTable, destination);
+        }
+      }
+    } finally {
+      MagmaEngine.get().unlockTables(tablesToLock);
+    }
+  }
+
+  private Set<String> getTablesToLock(Datasource source) {
+    Set<String> tablesToLock = new HashSet<String>();
+
+    boolean needToLockKeysTable = false;
+
+    for(ValueTable valueTable : source.getValueTables()) {
+      tablesToLock.add(valueTable.getDatasource() + "." + valueTable.getName());
+      if(valueTable.getEntityType().equals(keysTableEntityType)) {
+        needToLockKeysTable = true;
       }
     }
+
+    if(needToLockKeysTable) {
+      tablesToLock.add(keysTableReference);
+    }
+
+    return tablesToLock;
   }
 
   private void copyParticipants(ValueTable participantTable, Datasource source, Datasource destination, FunctionalUnit unit, final String dispatchAttribute) throws IOException {
