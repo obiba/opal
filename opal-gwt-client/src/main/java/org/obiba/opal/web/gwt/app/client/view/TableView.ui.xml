@@ -3,8 +3,7 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <ui:style>
-    .separator { border-bottom: 2px solid black; }
-    .left-aligned { float : left; margin-right : 0.5em }
+    .titlebar { margin-top: 10px; }
     .title-bold { font-weight: bold; font-size: medium; }
     .title { font-size: small; }
     .title-light { color: gray; font-size: small; }
@@ -23,52 +22,51 @@
       margin-right: 5px;
       float: left;
     }
+    .toolbar {
+    	margin: 10px;
+    }
     .toolbar img:hover {
       cursor: pointer;
     }
     .toolbar a:hover {
       cursor: pointer;
     }
+    .separator {
+    	border-bottom:2px solid #BBBBBB;
+    	margin-top:5px;
+    }
   </ui:style>
 
-  <g:LayoutPanel>
-    <g:layer left="1em" width="97%" top='0.5em' height="2em">
-      <g:FlowPanel>
-        <g:Label addStyleNames="{style.left-aligned},{style.title-bold}" ui:field="tableName">SwimmingHeight</g:Label>
-        <g:Label addStyleNames="{style.left-aligned},{style.title}">(Table)</g:Label>
-      </g:FlowPanel>     
-    </g:layer>
-    <g:layer top="2.9em" left="1em" height="2em" width="50%">
-      <g:FlowPanel addStyleNames="{style.toolbar},{style.toolbar-left}">
-        <g:Image ui:field="parentImage" url="image/up.png"></g:Image>
-        <g:Anchor ui:field="parentLink" addStyleNames="{style.left-aligned}">..</g:Anchor>
-      </g:FlowPanel>
-    </g:layer>
-    <g:layer top='2.5em' right="1em" width='50%' height='2em'>
-     <g:FlowPanel ui:field="toolbarPanel"  addStyleNames="{style.toolbar},{style.toolbar-right}">
-        <g:Image ui:field="nextImage" url="image/next.png"></g:Image>
-        <g:Image ui:field="previousImage" url="image/previous.png"></g:Image>
-        <g:Image ui:field="spreadsheetDownloadImage" url="image/spreadsheet.png"></g:Image>
+  <g:VerticalPanel width="100%" addStyleNames="navigator">
+     <g:FlowPanel addStyleNames="small-indent {style.titlebar}">
+       <g:Label addStyleNames="left-aligned {style.title-bold}" ui:field="tableName">SwimmingHeight</g:Label>
+       <g:Label addStyleNames="small-indent left-aligned {style.title}">(Table)</g:Label>
      </g:FlowPanel>
-    </g:layer>
-    <g:layer top="4.7em" height="0.5em" left="1em" right="1em">
-      <g:HTMLPanel>
-        <div class="{style.separator}" />
-      </g:HTMLPanel>
-    </g:layer>
-    <g:layer top='6em' left="1em" width='50%' height='2em'>
-      <g:FlowPanel>
-        <g:Label addStyleNames="{style.left-aligned},{style.title-light}">Entity Type:</g:Label>
-        <g:Label addStyleNames="{style.left-aligned},{style.title}" ui:field="entityType">Entity Name</g:Label>
-      </g:FlowPanel>     
-    </g:layer>     
-    <g:layer top='8em' left="1em" width='50%' height='2em'>
-      <g:Label ui:field="variablesTableTitle" addStyleNames="{style.left-aligned},{style.title-bold}"><ui:msg description="Variables label">Variables</ui:msg></g:Label>     
-    </g:layer>    
-     <g:layer top="7.5em" width="97%" left="1em" height="100em">
-       <g:FlowPanel>
-         <g2:CellTable width="100%" ui:field="table" addStyleNames="{style.tableList}" />
+      
+     <g:FlowPanel>
+       <g:FlowPanel addStyleNames="small-indent {style.toolbar} {style.toolbar-left}">
+         <g:Image ui:field="parentImage" url="image/up.png"></g:Image>
+         <g:Anchor ui:field="parentLink" addStyleNames="left-aligned">..</g:Anchor>
        </g:FlowPanel>
-     </g:layer>
-  </g:LayoutPanel>
+      
+       <g:FlowPanel ui:field="toolbarPanel"  addStyleNames="small-indent {style.toolbar} {style.toolbar-right}">
+         <g:Image ui:field="nextImage" url="image/next.png"></g:Image>
+         <g:Image ui:field="previousImage" url="image/previous.png"></g:Image>
+         <g:Image ui:field="spreadsheetDownloadImage" url="image/spreadsheet.png"></g:Image>
+       </g:FlowPanel>
+     </g:FlowPanel>
+     
+     <g:FlowPanel addStyleNames="{style.separator}"></g:FlowPanel>
+     
+     <g:HorizontalPanel spacing="10">
+       <g:Label addStyleNames="{style.title-light}">Entity Type:</g:Label>
+       <g:Label addStyleNames="{style.title}" ui:field="entityType">Entity Name</g:Label>
+     </g:HorizontalPanel>
+      
+     <g:FlowPanel addStyleNames="small-indent">
+       <g:Label ui:field="variablesTableTitle" addStyleNames="left-aligned {style.title-bold}"><ui:msg description="Variables label">Variables</ui:msg></g:Label>
+       <g2:CellTable width="100%" ui:field="table" addStyleNames="left-aligned {style.tableList}" />
+     </g:FlowPanel>
+  </g:VerticalPanel>
+
 </ui:UiBinder>
