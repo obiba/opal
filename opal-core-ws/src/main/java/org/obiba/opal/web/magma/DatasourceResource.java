@@ -124,7 +124,7 @@ public class DatasourceResource {
 
   @Path("/tables")
   public TablesResource getTables() {
-    return new TablesResource(name);
+    return new TablesResource(MagmaEngine.get().getDatasource(name));
   }
 
   @Bean

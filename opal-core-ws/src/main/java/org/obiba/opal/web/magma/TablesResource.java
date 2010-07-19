@@ -18,7 +18,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.magma.Datasource;
-import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
@@ -33,22 +32,22 @@ public class TablesResource {
   @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(TablesResource.class);
 
-  private final String datasource;
+  private final Datasource datasource;
 
-  public TablesResource(String datasource) {
+  public TablesResource(Datasource datasource) {
+    if(datasource == null) throw new IllegalArgumentException("datasource cannot be null");
     this.datasource = datasource;
   }
 
   @GET
   public List<Magma.TableDto> getTables() {
     final List<Magma.TableDto> tables = Lists.newArrayList();
-    Datasource ds = MagmaEngine.get().getDatasource(datasource);
-    for(ValueTable valueTable : ds.getValueTables()) {
-      URI tableLink = UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable").build(ds.getName(), valueTable.getName());
+    for(ValueTable valueTable : datasource.getValueTables()) {
+      URI tableLink = UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable").build(datasource.getName(), valueTable.getName());
       Magma.TableDto.Builder table = Magma.TableDto.newBuilder() //
       .setName(valueTable.getName()) //
       .setEntityType(valueTable.getEntityType()) //
-      .setDatasourceName(datasource) //
+      .setDatasourceName(datasource.getName()) //
       .setVariableCount(Iterables.size(valueTable.getVariables())) //
       .setValueSetCount(valueTable.getVariableEntities().size()) //
       .setLink(tableLink.toString());
