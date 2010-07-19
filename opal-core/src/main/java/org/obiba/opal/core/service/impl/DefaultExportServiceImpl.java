@@ -11,10 +11,8 @@ package org.obiba.opal.core.service.impl;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 
@@ -22,8 +20,6 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.audit.VariableEntityAuditLogManager;
@@ -33,8 +29,6 @@ import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
 import org.obiba.magma.support.DatasourceCopier.Builder;
-import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListener;
-import org.obiba.magma.type.TextType;
 import org.obiba.magma.views.IncrementalWhereClause;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.magma.FunctionalUnitView;
@@ -267,35 +261,4 @@ public class DefaultExportServiceImpl implements ExportService {
     }
   }
 
-  private class VariableEntityCopyEventListener implements DatasourceCopyValueSetEventListener {
-
-    private final Datasource destination;
-
-    private final Function<VariableEntity, VariableEntity> entityMapper;
-
-    public VariableEntityCopyEventListener(Datasource destination, Function<VariableEntity, VariableEntity> entityMapper) {
-      if(destination == null) throw new IllegalArgumentException("destination cannot be null");
-      this.destination = destination;
-      this.entityMapper = entityMapper;
-    }
-
-    @Override
-    public void onValueSetCopied(ValueTable source, ValueSet valueSet, String... tables) {
-      VariableEntity entity = entityMapper != null ? entityMapper.apply(valueSet.getVariableEntity()) : valueSet.getVariableEntity();
-      for(String tableName : tables) {
-        auditLogManager.createAuditEvent(auditLogManager.getAuditLog(entity), source, "COPY", createCopyDetails(entity, tableName));
-      }
-    }
-
-    @Override
-    public void onValueSetCopy(ValueTable source, ValueSet valueSet) {
-    }
-
-    private Map<String, Value> createCopyDetails(VariableEntity entity, String tableName) {
-      Map<String, Value> details = new HashMap<String, Value>();
-      details.put("destinationName", TextType.get().valueOf(destination.getName() + "." + tableName));
-      return details;
-    }
-
-  }
 }
