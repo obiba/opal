@@ -71,8 +71,6 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
     getDisplay().setTreeDisplay(fileSystemTreePresenter.getDisplay());
     getDisplay().setDetailsDisplay(folderDetailsPresenter.getDisplay());
-
-    folderDetailsPresenter.getDisplay().addFileSelectionHandler(new InternalFileSelectionHandler());
   }
 
   //
@@ -95,6 +93,9 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
   @Override
   public void revealDisplay() {
+    fileSystemTreePresenter.revealDisplay();
+    folderDetailsPresenter.revealDisplay();
+
     // Clear previous state.
     folderDetailsPresenter.getDisplay().clearSelection(); // clear previous selection (highlighted row)
     getDisplay().clearNewFileName(); // clear previous new file name
@@ -148,9 +149,14 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
   private void addEventHandlers() {
     addFileSelectionRequiredHandler(); // handler for file selection required
+    addFileSelectionHandler(); // handler for file selected in FolderDetails
     addFolderSelectionHandler(); // handler for folder selected in FileSystemTree
     addSelectButtonHandler();
     addCreateFolderButtonHandler();
+  }
+
+  private void addFileSelectionHandler() {
+    super.registerHandler(folderDetailsPresenter.getDisplay().addFileSelectionHandler(new InternalFileSelectionHandler()));
   }
 
   private void addFileSelectionRequiredHandler() {

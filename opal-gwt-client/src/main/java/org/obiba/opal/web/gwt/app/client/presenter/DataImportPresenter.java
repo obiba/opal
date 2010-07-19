@@ -82,7 +82,7 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
   }
 
   protected void initDisplayComponents() {
-    fileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
+    fileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE_OR_FOLDER);
     fileSelectionPresenter.bind();
     getDisplay().setFileWidgetDisplay(fileSelectionPresenter.getDisplay());
 

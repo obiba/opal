@@ -26,6 +26,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -44,7 +45,7 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
 
     void renderRows(FileDto rows);
 
-    void addFileSelectionHandler(FileSelectionHandler fileSelectionHandler);
+    HandlerRegistration addFileSelectionHandler(FileSelectionHandler fileSelectionHandler);
 
     SingleSelectionModel<FileDto> getTableSelectionModel();
 

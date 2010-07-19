@@ -21,7 +21,6 @@ import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import net.customware.gwt.presenter.client.EventBus;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
@@ -75,8 +74,6 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
 
     folderDetailsPresenter.getDisplay().setSelectionEnabled(true);
     expectLastCall().atLeastOnce();
-    folderDetailsPresenter.getDisplay().addFileSelectionHandler((FileSelectionHandler) EasyMock.anyObject());
-    expectLastCall().once();
   }
 
   //
@@ -102,6 +99,7 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     expect(eventBusMock.addHandler(eq(FileSystemTreeFolderSelectionChangeEvent.getType()), isA(FileSystemTreeFolderSelectionChangeEvent.Handler.class))).andReturn(null).once();
     expect(displayMock.addSelectButtonHandler((ClickHandler) anyObject())).andReturn(null).once();
     expect(displayMock.addCreateFolderButtonHandler((ClickHandler) anyObject())).andReturn(null).once();
+    expect(folderDetailsPresenter.getDisplay().addFileSelectionHandler((FileSelectionHandler) anyObject())).andReturn(null).once();
 
     replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
 
@@ -146,6 +144,8 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     sut.revealDisplay();
 
     // Verify
+    assertEquals(1, fileSystemTreePresenter.getRevealDisplayCount());
+    assertEquals(1, folderDetailsPresenter.getRevealDisplayCount());
     verify(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
   }
 
@@ -159,7 +159,7 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     sut.refreshDisplay();
 
     // Verify
-    assertEquals(1, fileSystemTreePresenter.getRefreshCount());
+    assertEquals(1, fileSystemTreePresenter.getRefreshDisplayCount());
     verify(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
   }
 
@@ -358,7 +358,9 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
 
     private int bindCount;
 
-    private int refreshCount;
+    private int revealDisplayCount;
+
+    private int refreshDisplayCount;
 
     public FileSystemTreePresenterSpy(FileSystemTreePresenter.Display display, EventBus eventBus) {
       super(display, eventBus);
@@ -368,22 +370,32 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
       bindCount++;
     }
 
+    public void revealDisplay() {
+      revealDisplayCount++;
+    }
+
     public void refreshDisplay() {
-      refreshCount++;
+      refreshDisplayCount++;
     }
 
     public int getBindCount() {
       return bindCount;
     }
 
-    public int getRefreshCount() {
-      return refreshCount;
+    public int getRevealDisplayCount() {
+      return revealDisplayCount;
+    }
+
+    public int getRefreshDisplayCount() {
+      return refreshDisplayCount;
     }
   }
 
   private static class FolderDetailsPresenterSpy extends FolderDetailsPresenter {
 
     private int bindCount;
+
+    private int revealDisplayCount;
 
     public FolderDetailsPresenterSpy(FolderDetailsPresenter.Display display, EventBus eventBus) {
       super(display, eventBus);
@@ -393,8 +405,16 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
       bindCount++;
     }
 
+    public void revealDisplay() {
+      revealDisplayCount++;
+    }
+
     public int getBindCount() {
       return bindCount;
+    }
+
+    public int getRevealDisplayCount() {
+      return revealDisplayCount;
     }
   }
 

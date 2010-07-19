@@ -28,6 +28,7 @@ import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -117,8 +118,8 @@ public class FolderDetailsView extends Composite implements Display {
     return foldersOnly;
   }
 
-  public void addFileSelectionHandler(FileSelectionHandler fileSelectionHandler) {
-    fileNameColumn.addFileSelectionHandler(fileSelectionHandler);
+  public HandlerRegistration addFileSelectionHandler(FileSelectionHandler fileSelectionHandler) {
+    return fileNameColumn.addFileSelectionHandler(fileSelectionHandler);
   }
 
   @Override
@@ -257,8 +258,15 @@ public class FolderDetailsView extends Composite implements Display {
       });
     }
 
-    public void addFileSelectionHandler(final FileSelectionHandler handler) {
+    public HandlerRegistration addFileSelectionHandler(final FileSelectionHandler handler) {
       fileSelectionHandlers.add(handler);
+
+      return new HandlerRegistration() {
+
+        public void removeHandler() {
+          fileSelectionHandlers.remove(handler);
+        }
+      };
     }
   }
 
