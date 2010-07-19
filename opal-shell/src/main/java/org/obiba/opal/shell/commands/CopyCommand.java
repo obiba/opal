@@ -23,6 +23,7 @@ import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.datasource.csv.CsvDatasource;
+import org.obiba.magma.datasource.csv.support.CsvUtil;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.datasource.nil.NullDatasource;
@@ -171,6 +172,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
           createFileIfNotExists(dataFile = new File(tableDir, CsvDatasource.DATA_FILE));
         }
         ds.addValueTable(table.getName(), variablesFile, dataFile);
+        ds.setVariablesHeader(table.getName(), CsvUtil.getCsvVariableHeader(table));
       } else {
         throw new IllegalArgumentException("Unable to create the directory: " + tableDir);
       }
