@@ -24,20 +24,26 @@ import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 
 /**
  * An Opal implementation of {@code PrivateVariableEntityMap}, on top of a Magma {@code ValueTable}.
  */
 public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
-  //
-  // Instance Variables
-  //
+
+  private static final Logger log = LoggerFactory.getLogger(OpalPrivateVariableEntityMap.class);
 
   private final ValueTable keysValueTable;
 
   private final Variable ownerVariable;
 
   private final IParticipantIdentifier participantIdentifier;
+
+  private final BiMap<VariableEntity, VariableEntity> publicToPrivate = HashBiMap.create();
 
   /**
    * 
@@ -50,6 +56,8 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     this.keysValueTable = keysValueTable;
     this.ownerVariable = ownerVariable;
     this.participantIdentifier = participantIdentifier;
+
+    constructCache();
   }
 
   //
@@ -58,59 +66,37 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
 
   public VariableEntity publicEntity(VariableEntity privateEntity) {
     if(privateEntity == null) throw new IllegalArgumentException("privateEntity cannot be null");
-
-    ValueTable keyTable = getKeyValueTable();
-    VariableValueSource ownerVariableSource = keyTable.getVariableValueSource(ownerVariable.getName());
-    for(ValueSet valueSet : keyTable.getValueSets()) {
-      Value ownerVariableValue = ownerVariableSource.getValue(valueSet);
-      if(!ownerVariableValue.isNull()) { // ValueSets of other owners will not have a value for this owner variable
-        if(ownerVariableValue.toString().equals(privateEntity.getIdentifier())) {
-          return valueSet.getVariableEntity();
-        }
-      }
-    }
-
-    return null;
+    VariableEntity entity = publicToPrivate.inverse().get(privateEntity);
+    log.debug("({})<-->{}", privateEntity.getIdentifier(), entity != null ? entity.getIdentifier() : null);
+    return entity;
   }
 
   public VariableEntity privateEntity(VariableEntity publicEntity) {
     if(publicEntity == null) throw new IllegalArgumentException("publicEntity cannot be null");
-
-    ValueTable keyTable = getKeyValueTable();
-    ValueSet valueSet = keyTable.getValueSet(publicEntity);
-    VariableValueSource ownerVariableSource = keyTable.getVariableValueSource(ownerVariable.getName());
-    Value ownerKey = ownerVariableSource.getValue(valueSet);
-    return new VariableEntityBean(publicEntity.getType(), ownerKey.toString());
+    VariableEntity entity = publicToPrivate.get(publicEntity);
+    log.debug("{}<-->({})", publicEntity.getIdentifier(), entity != null ? entity.getIdentifier() : null);
+    return entity;
   }
 
   public boolean hasPrivateEntity(VariableEntity privateEntity) {
     if(privateEntity == null) throw new IllegalArgumentException("privateEntity cannot be null");
-
-    ValueTable keyTable = getKeyValueTable();
-    VariableValueSource ownerVariableSource = keyTable.getVariableValueSource(ownerVariable.getName());
-    for(ValueSet keysValueSet : keyTable.getValueSets()) {
-      Value privateIdentifier = ownerVariableSource.getValue(keysValueSet);
-      if(!privateIdentifier.isNull()) { // ValueSets of other owners will not have a value for this owner variable
-        if(privateIdentifier.toString().equals(privateEntity.getIdentifier())) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return publicToPrivate.inverse().containsKey(privateEntity);
   }
 
   public VariableEntity createPublicEntity(VariableEntity privateEntity) {
     if(privateEntity == null) throw new IllegalArgumentException("privateEntity cannot be null");
     ValueTable keyTable = getKeyValueTable();
     for(int i = 0; i < 100; i++) {
-      VariableEntity publicEntity = new VariableEntityBean(privateEntity.getType(), participantIdentifier.generateParticipantIdentifier());
-      if(!keyTable.hasValueSet(publicEntity)) {
+      VariableEntity publicEntity = entityFor(participantIdentifier.generateParticipantIdentifier());
+      if(publicToPrivate.containsKey(publicEntity) == false) {
         try {
           ValueTableWriter vtw = keyTable.getDatasource().createWriter(keyTable.getName(), keyTable.getEntityType());
           ValueSetWriter vsw = vtw.writeValueSet(publicEntity);
           vsw.writeValue(this.ownerVariable, TextType.get().valueOf(privateEntity.getIdentifier()));
           vsw.close();
           vtw.close();
+          log.debug("{}<-->({}) added", publicEntity.getIdentifier(), privateEntity.getIdentifier());
+          publicToPrivate.put(publicEntity, entityFor(privateEntity.getIdentifier()));
         } catch(IOException e) {
           throw new MagmaRuntimeException(e);
         }
@@ -123,4 +109,22 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
   private ValueTable getKeyValueTable() {
     return keysValueTable;
   }
+
+  private VariableEntity entityFor(String identifier) {
+    return new VariableEntityBean(keysValueTable.getEntityType(), identifier);
+  }
+
+  private void constructCache() {
+    log.info("Constructing participant identifier cache");
+    ValueTable keyTable = getKeyValueTable();
+    VariableValueSource ownerVariableSource = keyTable.getVariableValueSource(ownerVariable.getName());
+    for(ValueSet valueSet : keyTable.getValueSets()) {
+      Value value = ownerVariableSource.getValue(valueSet);
+      if(value.isNull()) throw new IllegalStateException();
+      log.debug("{}<-->({}) cached", valueSet.getVariableEntity().getIdentifier(), value.toString());
+      publicToPrivate.put(entityFor(valueSet.getVariableEntity().getIdentifier()), entityFor(value.toString()));
+    }
+    log.info("Done");
+  }
+
 }
