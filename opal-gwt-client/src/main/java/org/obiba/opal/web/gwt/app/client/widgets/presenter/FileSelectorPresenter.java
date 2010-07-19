@@ -136,15 +136,15 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   }
 
   public boolean displaysFiles() {
-    return fileSelectionType.equals(FileSelectionType.FILE) || fileSelectionType.equals(FileSelectionType.EXISTING_FILE) || fileSelectionType.equals(FileSelectionType.EXISTING_FILE_OR_FOLDER);
+    return fileSelectionType.equals(FileSelectionType.FILE) || fileSelectionType.equals(FileSelectionType.EXISTING_FILE) || fileSelectionType.equals(FileSelectionType.FILE_OR_FOLDER) || fileSelectionType.equals(FileSelectionType.EXISTING_FILE_OR_FOLDER);
   }
 
   public boolean allowsFileCreation() {
-    return fileSelectionType.equals(FileSelectionType.FILE);
+    return fileSelectionType.equals(FileSelectionType.FILE) || fileSelectionType.equals(FileSelectionType.FILE_OR_FOLDER);
   }
 
   public boolean allowsFolderCreation() {
-    return fileSelectionType.equals(FileSelectionType.FILE) || fileSelectionType.equals(FileSelectionType.FOLDER);
+    return fileSelectionType.equals(FileSelectionType.FILE) || fileSelectionType.equals(FileSelectionType.FOLDER) || fileSelectionType.equals(FileSelectionType.FILE_OR_FOLDER);
   }
 
   private void addEventHandlers() {
@@ -207,6 +207,12 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     case EXISTING_FOLDER:
       selection = selectedFolder;
       break;
+    case FILE_OR_FOLDER:
+      selection = getFileSelection();
+      if(selection == null) {
+        selection = selectedFolder;
+      }
+      break;
     case EXISTING_FILE_OR_FOLDER:
       selection = (selectedFile != null) ? selectedFile : selectedFolder;
       break;
@@ -233,7 +239,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   //
 
   public enum FileSelectionType {
-    FILE, EXISTING_FILE, FOLDER, EXISTING_FOLDER, EXISTING_FILE_OR_FOLDER
+    FILE, EXISTING_FILE, FOLDER, EXISTING_FOLDER, FILE_OR_FOLDER, EXISTING_FILE_OR_FOLDER
   }
 
   public interface Display extends WidgetDisplay {

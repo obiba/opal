@@ -120,7 +120,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   private void initFileSelectionType() {
     if(getDisplay().getFileFormat().equalsIgnoreCase("csv")) {
-      fileSelectionPresenter.setFileSelectionType(FileSelectionType.FOLDER);
+      fileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE_OR_FOLDER);
     } else {
       fileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE);
     }
