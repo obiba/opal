@@ -4,6 +4,7 @@ import java.util.Set;
 
 import org.obiba.magma.Initialisable;
 import org.obiba.magma.NoSuchValueSetException;
+import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
@@ -121,5 +122,10 @@ class RestValueTable extends AbstractValueTable {
       }
       return set;
     }
+  }
+
+  @Override
+  public Timestamps getTimestamps(ValueSet valueSet) {
+    throw new UnsupportedOperationException();
   }
 }
