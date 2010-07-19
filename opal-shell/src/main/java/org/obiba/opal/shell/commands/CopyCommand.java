@@ -144,8 +144,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     Datasource destinationDatasource;
     FileObject outputFile = getOutputFile();
     if(getLocalFile(outputFile).isDirectory()) {
-      setUpCsvDatasourceFiles(getLocalFile(outputFile));
-      destinationDatasource = new CsvDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
+      destinationDatasource = getCsvDatasource(getLocalFile(outputFile));
     } else if(outputFile.getName().getExtension().startsWith("xls")) {
       destinationDatasource = new ExcelDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
     } else if(outputFile.getName().getExtension().startsWith("zip")) {
@@ -158,20 +157,25 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     return destinationDatasource;
   }
 
-  private void setUpCsvDatasourceFiles(File directory) throws IOException {
+  private CsvDatasource getCsvDatasource(final File directory) throws IOException {
+    CsvDatasource ds = new CsvDatasource(directory.getName());
     for(ValueTable table : getValueTables()) {
       File tableDir = new File(directory, table.getName());
       if(tableDir.exists() || tableDir.mkdir()) {
+        File variablesFile = null;
+        File dataFile = null;
         if(!options.getNoVariables()) {
-          createFileIfNotExists(new File(tableDir, CsvDatasource.VARIABLES_FILE));
+          createFileIfNotExists(variablesFile = new File(tableDir, CsvDatasource.VARIABLES_FILE));
         }
         if(!options.getNoValues()) {
-          createFileIfNotExists(new File(tableDir, CsvDatasource.DATA_FILE));
+          createFileIfNotExists(dataFile = new File(tableDir, CsvDatasource.DATA_FILE));
         }
+        ds.addValueTable(table.getName(), variablesFile, dataFile);
       } else {
         throw new IllegalArgumentException("Unable to create the directory: " + tableDir);
       }
     }
+    return ds;
   }
 
   private void createFileIfNotExists(File f) throws IOException {
