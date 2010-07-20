@@ -2,18 +2,18 @@
   xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
 
   <ui:style>
-    .right-aligned { float: right; }
+    .right-aligned { float: right; margin:10px; }
   </ui:style>
     
   <g:LayoutPanel>
-    <g:layer top="0" height="28em">
+    <g:layer top="0" height="27em">
       <g:ScrollPanel width="100%">
         <g2:CellTable width="100%" ui:field="table" />
       </g:ScrollPanel>
     </g:layer>
-    <g:layer bottom="0" height="2em">
+    <g:layer bottom="0" height="3em">
       <g:FlowPanel>
-        <g:Button ui:field="close" addStyleNames="{style.right-aligned}">Close</g:Button>
+        <g:Button ui:field="close" addStyleNames="{style.right-aligned}"><ui:msg description="Close label">Close</ui:msg></g:Button>
       </g:FlowPanel>
     </g:layer>
   </g:LayoutPanel>
