@@ -3,28 +3,36 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
   
   <ui:style>
-    .full-border { border: 1px solid; }
-    .top-border { border-top: 1px solid; }
+    .full-border { 
+    	border: #BBBBBB 1px solid; 
+    	height: 20em;
+    }
+    .top-border { 
+    	border-top: #BBBBBB 1px solid;
+    }
     .inline { display: inline; }
     .left-aligned { float: left; }
     .right-aligned { float: right; }
-    .top-margin { margin-top: 1em; }
-    .bottom-margin { margin-bottom: 1em; }
+    .left-margin { margin-left: 5px; }
+    .right-margin { margin-right: 5px; }
+    .top-margin { margin-top: 15px; }
+    .bottom-margin { margin-bottom: 5px; }
     .name-input { width: 90%; }
   </ui:style>
   
   <g:DockLayoutPanel unit="EM">
-    <g:north size="4">
-      <g:HTMLPanel ui:field="namePanel" addStyleNames="{style.top-margin} {style.bottom-margin}">
+    <g:center>
+      <g:FlowPanel>
+      
+      <g:HTMLPanel ui:field="namePanel" addStyleNames="{style.top-margin} {style.bottom-margin} {style.left-margin} {style.right-margin}">
         <g:Label addStyleNames="{style.inline}">
           <ui:msg description="Name label">Name</ui:msg>
         </g:Label>
         <g:Label addStyleNames="{style.inline}">:</g:Label> 
         <g:TextBox ui:field="newFileName" addStyleNames="{style.name-input}" />
       </g:HTMLPanel>
-    </g:north>
-    <g:center>
-      <g:SplitLayoutPanel ui:field="splitLayoutPanel" addStyleNames="{style.full-border}">
+        
+      <g:SplitLayoutPanel ui:field="splitLayoutPanel" addStyleNames="{style.full-border} {style.top-margin} {style.left-margin} {style.right-margin}">
         <g:west size="200">
           <g:ScrollPanel ui:field="fileSystemTreePanel">
           </g:ScrollPanel>
@@ -34,9 +42,11 @@
           </g:ScrollPanel>
         </g:center>
       </g:SplitLayoutPanel>
+      
+      </g:FlowPanel>
     </g:center>
     <g:south size="5">
-      <g:HTMLPanel addStyleNames="{style.top-border} {style.top-margin}">
+      <g:HTMLPanel addStyleNames="{style.top-border} {style.top-margin} {style.left-margin} {style.right-margin}">
         <span class="{style.left-aligned} {style.top-margin}">
           <g:HTMLPanel ui:field="createFolderPanel">
             <g:TextBox ui:field="createFolderName" />
@@ -45,7 +55,7 @@
             </g:Button>
           </g:HTMLPanel>
         </span>
-        <span class="{style.right-aligned} {style.top-margin}">
+        <span class="{style.right-aligned} {style.top-margin} {style.left-margin} {style.right-margin}">
           <g:Button ui:field="selectButton">
             <ui:msg description="Select button label">Select</ui:msg>
           </g:Button>

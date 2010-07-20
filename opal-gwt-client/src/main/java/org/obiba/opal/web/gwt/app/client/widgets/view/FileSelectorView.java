@@ -38,7 +38,9 @@ public class FileSelectorView extends DialogBox implements Display {
   // Constants
   //
 
-  private static final String DIALOG_HEIGHT = "30em";
+  private static final String DIALOG_HEIGHT = "29.5em";
+
+  private static final String DIALOG_SHORT_HEIGHT = "27em";
 
   private static final String DIALOG_WIDTH = "50em";
 
@@ -81,6 +83,8 @@ public class FileSelectorView extends DialogBox implements Display {
   @UiField
   Button cancelButton;
 
+  private DockLayoutPanel content;
+
   //
   // Constructors
   //
@@ -90,10 +94,15 @@ public class FileSelectorView extends DialogBox implements Display {
     setHeight(DIALOG_HEIGHT);
     setWidth(DIALOG_WIDTH);
 
-    DockLayoutPanel content = uiBinder.createAndBindUi(this);
+    content = uiBinder.createAndBindUi(this);
     content.setHeight(DIALOG_HEIGHT);
     content.setWidth(DIALOG_WIDTH);
     add(content);
+  }
+
+  private void updateHeight(String height) {
+    setHeight(height);
+    content.setHeight(height);
   }
 
   //
@@ -122,6 +131,7 @@ public class FileSelectorView extends DialogBox implements Display {
 
   public void setNewFilePanelVisible(boolean visible) {
     namePanel.setVisible(visible);
+    updateHeight(visible ? DIALOG_HEIGHT : DIALOG_SHORT_HEIGHT);
   }
 
   public void setNewFolderPanelVisible(boolean visible) {
