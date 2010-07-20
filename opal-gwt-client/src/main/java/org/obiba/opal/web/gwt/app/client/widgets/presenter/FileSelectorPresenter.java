@@ -19,6 +19,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.FileSelectionHandler;
@@ -177,7 +178,10 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   }
 
   private void addFolderSelectionHandler() {
-    super.registerHandler(eventBus.addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(), new FolderSelectionHandler()));
+    FolderSelectionHandler folderSelectionHandler = new FolderSelectionHandler();
+
+    super.registerHandler(eventBus.addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(), folderSelectionHandler));
+    super.registerHandler(eventBus.addHandler(FolderSelectionChangeEvent.getType(), folderSelectionHandler));
   }
 
   private void addCreateFolderButtonHandler() {
@@ -285,10 +289,18 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     }
   }
 
-  class FolderSelectionHandler implements FileSystemTreeFolderSelectionChangeEvent.Handler {
+  class FolderSelectionHandler implements FileSystemTreeFolderSelectionChangeEvent.Handler, FolderSelectionChangeEvent.Handler {
 
     public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
-      selectedFolder = event.getFolder().getPath();
+      handleFolderSelection(event.getFolder().getPath());
+    }
+
+    public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
+      handleFolderSelection(event.getFolder().getPath());
+    }
+
+    private void handleFolderSelection(String folderPath) {
+      selectedFolder = folderPath;
       selectedFile = null;
     }
   }

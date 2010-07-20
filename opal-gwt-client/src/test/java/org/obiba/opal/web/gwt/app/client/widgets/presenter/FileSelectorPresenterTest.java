@@ -24,6 +24,7 @@ import net.customware.gwt.presenter.client.EventBus;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.FileSelectionHandler;
@@ -97,6 +98,7 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     // Setup
     expect(eventBusMock.addHandler(eq(FileSelectionRequiredEvent.getType()), isA(FileSelectionRequiredEvent.Handler.class))).andReturn(null).once();
     expect(eventBusMock.addHandler(eq(FileSystemTreeFolderSelectionChangeEvent.getType()), isA(FileSystemTreeFolderSelectionChangeEvent.Handler.class))).andReturn(null).once();
+    expect(eventBusMock.addHandler(eq(FolderSelectionChangeEvent.getType()), isA(FolderSelectionChangeEvent.Handler.class))).andReturn(null).once();
     expect(displayMock.addSelectButtonHandler((ClickHandler) anyObject())).andReturn(null).once();
     expect(displayMock.addCancelButtonHandler((ClickHandler) anyObject())).andReturn(null).once();
     expect(displayMock.addCreateFolderButtonHandler((ClickHandler) anyObject())).andReturn(null).once();
