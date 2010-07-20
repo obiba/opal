@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileType;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
@@ -25,7 +26,6 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.datasource.csv.CsvDatasource;
 import org.obiba.magma.datasource.csv.support.CsvUtil;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
-import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.datasource.nil.NullDatasource;
 import org.obiba.magma.js.support.JavascriptMultiplexingStrategy;
 import org.obiba.magma.js.support.JavascriptVariableTransformer;
@@ -49,10 +49,22 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   @Autowired
   private ExportService exportService;
 
+  private FileDatasourceFactory fileDatasourceFactory;
+
   private static final Logger log = LoggerFactory.getLogger(CopyCommand.class);
 
   public void setExportService(ExportService exportService) {
     this.exportService = exportService;
+  }
+
+  public CopyCommand() {
+    super();
+
+    this.fileDatasourceFactory = new MultipleFileCsvDatasourceFactory();
+    fileDatasourceFactory.setNext(new SingleFileCsvDatasourceFactory())//
+    .setNext(new ExcelDatasourceFactory())//
+    .setNext(new FsDatasourceFactory()) //
+    .setNext(new NullDatasourceFactory());
   }
 
   public int execute() {
@@ -135,83 +147,13 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     if(options.isDestination()) {
       destinationDatasource = getDatasourceByName(options.getDestination());
     } else {
-      destinationDatasource = getFileBasedDatasource();
+      destinationDatasource = fileDatasourceFactory.createDatasource(getOutputFile());
+      if(destinationDatasource == null) {
+        throw new IllegalArgumentException("Unknown output datasource type");
+      }
       MagmaEngine.get().addDatasource(destinationDatasource);
     }
     return destinationDatasource;
-  }
-
-  private Datasource getFileBasedDatasource() throws IOException {
-    Datasource destinationDatasource;
-    FileObject outputFile = getOutputFile();
-    if(getLocalFile(outputFile).isDirectory()) {
-      destinationDatasource = getCsvDatasource(getLocalFile(outputFile));
-    } else if(outputFile.getName().getExtension().startsWith("csv")) {
-      destinationDatasource = getSingleTableCsvDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
-    } else if(outputFile.getName().getExtension().startsWith("xls")) {
-      destinationDatasource = new ExcelDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
-    } else if(outputFile.getName().getExtension().startsWith("zip")) {
-      destinationDatasource = new FsDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
-    } else if(outputFile.getName().getPath().equals("/dev/null")) {
-      destinationDatasource = new NullDatasource("/dev/null");
-    } else {
-      throw new IllegalArgumentException("unknown output datasource type");
-    }
-    return destinationDatasource;
-  }
-
-  private CsvDatasource getCsvDatasource(final File directory) throws IOException {
-    CsvDatasource ds = new CsvDatasource(directory.getName());
-    for(ValueTable table : getValueTables()) {
-      File tableDir = new File(directory, table.getName());
-      if(tableDir.exists() || tableDir.mkdir()) {
-        File variablesFile = null;
-        File dataFile = null;
-        if(!options.getNoVariables()) {
-          createFileIfNotExists(variablesFile = new File(tableDir, CsvDatasource.VARIABLES_FILE));
-        }
-        if(!options.getNoValues()) {
-          createFileIfNotExists(dataFile = new File(tableDir, CsvDatasource.DATA_FILE));
-        }
-        addCsvValueTable(ds, table, variablesFile, dataFile);
-      } else {
-        throw new IllegalArgumentException("Unable to create the directory: " + tableDir);
-      }
-    }
-    return ds;
-  }
-
-  private void addCsvValueTable(CsvDatasource ds, ValueTable table, File variablesFile, File dataFile) {
-    ds.addValueTable(table.getName(), variablesFile, dataFile);
-    ds.setVariablesHeader(table.getName(), CsvUtil.getCsvVariableHeader(table));
-  }
-
-  private CsvDatasource getSingleTableCsvDatasource(String name, final File csvFile) throws IOException {
-    CsvDatasource ds = new CsvDatasource(name);
-
-    // one table only
-    Set<ValueTable> tables = getValueTables();
-    if(tables.size() > 1) {
-      throw new IllegalArgumentException("Only one table expected when writting to a CSV file. Provide a directory instead for copying several tables.");
-    }
-
-    if(!options.getNoVariables() && !options.getNoValues()) {
-      throw new IllegalArgumentException("Writting both variables and values in the same CSV file is not supported. Provide a directory instead.");
-    } else if(!options.getNoVariables()) {
-      createFileIfNotExists(csvFile);
-      addCsvValueTable(ds, tables.iterator().next(), csvFile, null);
-    } else if(!options.getNoValues()) {
-      createFileIfNotExists(csvFile);
-      addCsvValueTable(ds, tables.iterator().next(), null, csvFile);
-    }
-
-    return ds;
-  }
-
-  private void createFileIfNotExists(File f) throws IOException {
-    if(!f.exists() && !f.createNewFile()) {
-      throw new IllegalArgumentException("Unable to create the file: " + f);
-    }
   }
 
   private Set<ValueTable> getValueTables() {
@@ -387,6 +329,152 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     for(String unparsed : unparsedList) {
       sb.append(' ');
       sb.append(unparsed);
+    }
+  }
+
+  //
+  // File datasource factory classes
+  //
+
+  abstract class FileDatasourceFactory {
+    protected FileDatasourceFactory next;
+
+    public FileDatasourceFactory setNext(FileDatasourceFactory next) {
+      this.next = next;
+      return next;
+    }
+
+    /**
+     * Create a datasource and if null, ask to the next factory in the chain to do it.
+     * @param outputFile
+     * @return null if no datasource could be created along the chain from this factory.
+     * @throws IOException
+     */
+    public Datasource createDatasource(final FileObject outputFile) throws IOException {
+      Datasource ds = internalCreateDatasource(outputFile);
+      if(ds == null && next != null) {
+        ds = next.createDatasource(outputFile);
+      }
+      return ds;
+    }
+
+    /**
+     * Create a datasource if applicable or return null.
+     * @param outputFile
+     * @return null if parameters are not applicable.
+     * @throws IOException
+     */
+    abstract protected Datasource internalCreateDatasource(final FileObject outputFile) throws IOException;
+  }
+
+  abstract class CsvDatasourceFactory extends FileDatasourceFactory {
+
+    protected void addCsvValueTable(CsvDatasource ds, ValueTable table, File variablesFile, File dataFile) {
+      ds.addValueTable(table.getName(), variablesFile, dataFile);
+      ds.setVariablesHeader(table.getName(), CsvUtil.getCsvVariableHeader(table));
+    }
+
+    protected void createFileIfNotExists(File f) throws IOException {
+      if(!f.exists() && !f.createNewFile()) {
+        throw new IllegalArgumentException("Unable to create the file: " + f);
+      }
+    }
+
+  }
+
+  class MultipleFileCsvDatasourceFactory extends CsvDatasourceFactory {
+
+    @Override
+    protected Datasource internalCreateDatasource(FileObject outputFile) throws IOException {
+      if(outputFile.getType().equals(FileType.FOLDER)) {
+        return getMultipleFileCsvDatasource(getLocalFile(outputFile));
+      }
+      return null;
+    }
+
+    private CsvDatasource getMultipleFileCsvDatasource(final File directory) throws IOException {
+      CsvDatasource ds = new CsvDatasource(directory.getName());
+      for(ValueTable table : getValueTables()) {
+        File tableDir = new File(directory, table.getName());
+        if(tableDir.exists() || tableDir.mkdir()) {
+          File variablesFile = null;
+          File dataFile = null;
+          if(!options.getNoVariables()) {
+            createFileIfNotExists(variablesFile = new File(tableDir, CsvDatasource.VARIABLES_FILE));
+          }
+          if(!options.getNoValues()) {
+            createFileIfNotExists(dataFile = new File(tableDir, CsvDatasource.DATA_FILE));
+          }
+          addCsvValueTable(ds, table, variablesFile, dataFile);
+        } else {
+          throw new IllegalArgumentException("Unable to create the directory: " + tableDir);
+        }
+      }
+      return ds;
+    }
+  }
+
+  class SingleFileCsvDatasourceFactory extends CsvDatasourceFactory {
+
+    @Override
+    protected Datasource internalCreateDatasource(FileObject outputFile) throws IOException {
+      if(outputFile.getName().getExtension().startsWith("csv")) {
+        return getSingleFileCsvDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
+      }
+      return null;
+    }
+
+    private CsvDatasource getSingleFileCsvDatasource(String name, final File csvFile) throws IOException {
+      CsvDatasource ds = new CsvDatasource(name);
+
+      // one table only
+      Set<ValueTable> tables = getValueTables();
+      if(tables.size() > 1) {
+        throw new IllegalArgumentException("Only one table expected when writting to a CSV file. Provide a directory instead for copying several tables.");
+      }
+
+      if(!options.getNoVariables() && !options.getNoValues()) {
+        throw new IllegalArgumentException("Writting both variables and values in the same CSV file is not supported. Provide a directory instead.");
+      } else if(!options.getNoVariables()) {
+        createFileIfNotExists(csvFile);
+        addCsvValueTable(ds, tables.iterator().next(), csvFile, null);
+      } else if(!options.getNoValues()) {
+        createFileIfNotExists(csvFile);
+        addCsvValueTable(ds, tables.iterator().next(), null, csvFile);
+      }
+
+      return ds;
+    }
+
+  }
+
+  class ExcelDatasourceFactory extends FileDatasourceFactory {
+    @Override
+    public Datasource internalCreateDatasource(final FileObject outputFile) {
+      if(outputFile.getName().getExtension().startsWith("xls")) {
+        return new ExcelDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
+      }
+      return null;
+    }
+  }
+
+  class FsDatasourceFactory extends FileDatasourceFactory {
+    @Override
+    public Datasource internalCreateDatasource(final FileObject outputFile) {
+      if(outputFile.getName().getExtension().startsWith("zip")) {
+        return new ExcelDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
+      }
+      return null;
+    }
+  }
+
+  class NullDatasourceFactory extends FileDatasourceFactory {
+    @Override
+    public Datasource internalCreateDatasource(final FileObject outputFile) {
+      if(outputFile.getName().getPath().equals("/dev/null")) {
+        return new NullDatasource("/dev/null");
+      }
+      return null;
     }
   }
 }
