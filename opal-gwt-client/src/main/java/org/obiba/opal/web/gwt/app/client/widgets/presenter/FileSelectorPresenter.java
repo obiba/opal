@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -57,6 +60,8 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
   String selectedFolder;
 
+  private List<SelectionResolver> selectionResolverChain;
+
   //
   // Constructors
   //
@@ -71,6 +76,13 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
     getDisplay().setTreeDisplay(fileSystemTreePresenter.getDisplay());
     getDisplay().setDetailsDisplay(folderDetailsPresenter.getDisplay());
+
+    selectionResolverChain = new ArrayList<SelectionResolver>();
+    selectionResolverChain.add(new FileSelectionResolver());
+    selectionResolverChain.add(new ExistingFileSelectionResolver());
+    selectionResolverChain.add(new AnyFolderSelectionResolver());
+    selectionResolverChain.add(new NewFileOrFolderSelectionResolver());
+    selectionResolverChain.add(new ExistingFileOrFolderSelectionResolver());
   }
 
   //
@@ -152,6 +164,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     addFileSelectionHandler(); // handler for file selected in FolderDetails
     addFolderSelectionHandler(); // handler for folder selected in FileSystemTree
     addSelectButtonHandler();
+    addCancelButtonHandler();
     addCreateFolderButtonHandler();
   }
 
@@ -175,6 +188,10 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     super.registerHandler(getDisplay().addSelectButtonHandler(new SelectButtonHandler()));
   }
 
+  private void addCancelButtonHandler() {
+    super.registerHandler(getDisplay().addCancelButtonHandler(new CancelButtonHandler()));
+  }
+
   private void createFolder(final String folder) {
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
@@ -196,42 +213,14 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   public String getSelection() {
     String selection = null;
 
-    switch(fileSelectionType) {
-    case FILE:
-      selection = getFileSelection();
-      break;
-    case EXISTING_FILE:
-      selection = selectedFile;
-      break;
-    case FOLDER:
-    case EXISTING_FOLDER:
-      selection = selectedFolder;
-      break;
-    case FILE_OR_FOLDER:
-      selection = getFileSelection();
-      if(selection == null) {
-        selection = selectedFolder;
+    for(SelectionResolver resolver : selectionResolverChain) {
+      selection = resolver.resolveSelection(fileSelectionType, selectedFolder, selectedFile, getDisplay().getNewFileName());
+      if(selection != null) {
+        break;
       }
-      break;
-    case EXISTING_FILE_OR_FOLDER:
-      selection = (selectedFile != null) ? selectedFile : selectedFolder;
-      break;
     }
 
     return selection;
-  }
-
-  private String getFileSelection() {
-    String fileSelection = null;
-
-    String newFileName = getDisplay().getNewFileName();
-    if(newFileName != null && newFileName.trim().length() != 0) {
-      fileSelection = (!selectedFolder.equals("/") ? selectedFolder + "/" : selectedFolder) + newFileName;
-    } else {
-      fileSelection = selectedFile;
-    }
-
-    return fileSelection;
   }
 
   //
@@ -261,6 +250,8 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     HasWidgets getFolderDetailsPanel();
 
     HandlerRegistration addSelectButtonHandler(ClickHandler handler);
+
+    HandlerRegistration addCancelButtonHandler(ClickHandler handler);
 
     HandlerRegistration addCreateFolderButtonHandler(ClickHandler handler);
 
@@ -323,6 +314,89 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
         eventBus.fireEvent(new FileSelectionEvent(FileSelectorPresenter.this.fileSelectionSource, selection));
       }
       getDisplay().hideDialog();
+    }
+  }
+
+  class CancelButtonHandler implements ClickHandler {
+
+    public void onClick(ClickEvent event) {
+      getDisplay().hideDialog();
+    }
+  }
+
+  interface SelectionResolver {
+
+    public String resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile, String newFileName);
+  }
+
+  static abstract class AbstractSelectionResolver implements SelectionResolver {
+
+    public abstract String resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile, String newFileName);
+
+    public String getFileSelection(String selectedFolder, String selectedFile, String newFileName) {
+      String fileSelection = null;
+
+      if(newFileName != null && newFileName.trim().length() != 0) {
+        fileSelection = (!selectedFolder.equals("/") ? selectedFolder + "/" : selectedFolder) + newFileName;
+      } else {
+        fileSelection = selectedFile;
+      }
+
+      return fileSelection;
+    }
+  }
+
+  static class FileSelectionResolver extends AbstractSelectionResolver {
+
+    public String resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile, String newFileName) {
+      if(type.equals(FileSelectionType.FILE)) {
+        return getFileSelection(selectedFolder, selectedFile, newFileName);
+      }
+      return null;
+    }
+  }
+
+  static class ExistingFileSelectionResolver extends AbstractSelectionResolver {
+
+    public String resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile, String newFileName) {
+      if(type.equals(FileSelectionType.EXISTING_FILE)) {
+        return selectedFile;
+      }
+      return null;
+    }
+  }
+
+  static class AnyFolderSelectionResolver extends AbstractSelectionResolver {
+
+    public String resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile, String newFileName) {
+      if(type.equals(FileSelectionType.FOLDER) || type.equals(FileSelectionType.EXISTING_FOLDER)) {
+        return selectedFolder;
+      }
+      return null;
+    }
+  }
+
+  static class NewFileOrFolderSelectionResolver extends AbstractSelectionResolver {
+
+    public String resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile, String newFileName) {
+      if(type.equals(FileSelectionType.FILE_OR_FOLDER)) {
+        String selection = getFileSelection(selectedFolder, selectedFile, newFileName);
+        if(selection == null) {
+          selection = selectedFolder;
+        }
+        return selection;
+      }
+      return null;
+    }
+  }
+
+  static class ExistingFileOrFolderSelectionResolver extends AbstractSelectionResolver {
+
+    public String resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile, String newFileName) {
+      if(type.equals(FileSelectionType.EXISTING_FILE_OR_FOLDER)) {
+        return (selectedFile != null) ? selectedFile : selectedFolder;
+      }
+      return null;
     }
   }
 }

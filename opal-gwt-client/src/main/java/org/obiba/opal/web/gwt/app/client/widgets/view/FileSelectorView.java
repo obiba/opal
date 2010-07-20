@@ -15,7 +15,6 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.Display;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -95,8 +94,6 @@ public class FileSelectorView extends DialogBox implements Display {
     content.setHeight(DIALOG_HEIGHT);
     content.setWidth(DIALOG_WIDTH);
     add(content);
-
-    addCancelHandler();
   }
 
   //
@@ -143,6 +140,10 @@ public class FileSelectorView extends DialogBox implements Display {
     return selectButton.addClickHandler(handler);
   }
 
+  public HandlerRegistration addCancelButtonHandler(ClickHandler handler) {
+    return cancelButton.addClickHandler(handler);
+  }
+
   public HandlerRegistration addCreateFolderButtonHandler(ClickHandler handler) {
     return createFolderButton.addClickHandler(handler);
   }
@@ -171,20 +172,6 @@ public class FileSelectorView extends DialogBox implements Display {
 
   public Widget asWidget() {
     return this;
-  }
-
-  //
-  // Methods
-  //
-
-  private void addCancelHandler() {
-    cancelButton.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        hideDialog();
-      }
-    });
   }
 
   //
