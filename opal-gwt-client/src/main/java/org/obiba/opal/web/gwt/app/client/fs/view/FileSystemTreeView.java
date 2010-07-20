@@ -82,13 +82,16 @@ public class FileSystemTreeView implements Display {
   }
 
   public void addBranch(FileDto folderToAdd) {
-    FileDto parentDto = FileDtos.getParent(folderToAdd);
+    // Only add a branch if the fileSystemTree has been initialized (has a root).
+    if(fileSystemTree.getItemCount() > 0) {
+      FileDto parentDto = FileDtos.getParent(folderToAdd);
 
-    TreeItem parentItem = findTreeItem(parentDto);
-    if(parentItem != null) {
-      parentItem.addItem(createTreeItem(folderToAdd));
-    } else {
-      addBranch(parentDto);
+      TreeItem parentItem = findTreeItem(parentDto);
+      if(parentItem != null) {
+        parentItem.addItem(createTreeItem(folderToAdd));
+      } else {
+        addBranch(parentDto);
+      }
     }
   }
 
