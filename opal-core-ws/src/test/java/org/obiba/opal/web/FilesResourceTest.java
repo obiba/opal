@@ -22,9 +22,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
@@ -139,7 +142,7 @@ public class FilesResourceTest {
   }
 
   @Test
-  public void testGetFoldersInFileSystem() throws FileSystemException {
+  public void testGetFoldersDetailsInFileSystem() throws FileSystemException {
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).atLeastOnce();
 
     replay(opalRuntimeMock);
@@ -186,6 +189,46 @@ public class FilesResourceTest {
   }
 
   @Test
+  public void testGetFile_GetCompressedFolderFromFileSystem() throws IOException {
+    expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).atLeastOnce();
+    replay(opalRuntimeMock);
+
+    checkCompressedFolder("/folder1", new String[] { "folder1", "folder1/folder11", "folder1/file11.txt", "folder1/folder11/folder111", "folder1/folder11/file111.txt", "folder1/folder11/folder111/file1111.txt", "folder1/folder11/folder111/file1112.txt" });
+    checkCompressedFolder("/folder2", new String[] { "folder2", "folder2/file21.txt" });
+    checkCompressedFolder("/folder3", new String[] { "folder3", "folder3/folder31", "folder3/folder31/file311.txt" });
+    checkCompressedFolder("/folder4", new String[] { "folder4", "folder4/folder41", "folder4/file41.txt", "folder4/file42.txt", "folder4/file43.txt" });
+    checkCompressedFolder("/folder5", new String[] { "folder5", "folder5/file51.txt" });
+    checkCompressedFolder("/", new String[] { "/", "folder1", "folder1/folder11", "folder1/file11.txt", "folder1/folder11/folder111", "folder1/folder11/file111.txt", "folder1/folder11/folder111/file1111.txt", "folder1/folder11/folder111/file1112.txt", "folder2", "folder2/file21.txt", "folder3", "folder3/folder31", "folder3/folder31/file311.txt", "folder4", "folder4/folder41", "folder4/file41.txt", "folder4/file42.txt", "folder4/file43.txt", "folder5", "folder5/file51.txt", "file2.txt" });
+
+    verify(opalRuntimeMock);
+
+  }
+
+  private void checkCompressedFolder(String folderPath, String[] expectedFolderContentArray) throws IOException {
+    Response response = filesResource.getFile(folderPath);
+    ZipFile zipfile = new ZipFile(((File) response.getEntity()).getPath());
+
+    // Check that all folders and files exist in the compressed archive that represents the folder.
+    ZipEntry zipEntry;
+    for(int i = 0; i < expectedFolderContentArray.length; i++) {
+      zipEntry = zipfile.getEntry(expectedFolderContentArray[i]);
+      Assert.assertNotNull(zipEntry);
+    }
+
+    Enumeration<ZipEntry> zipEnum = (Enumeration<ZipEntry>) zipfile.entries();
+    int count = 0;
+
+    while(zipEnum.hasMoreElements()) {
+      zipEnum.nextElement();
+      count++;
+    }
+
+    // Make sure that they are no unexpected files in the compressed archive.
+    Assert.assertEquals(expectedFolderContentArray.length, count);
+
+    zipfile.close();
+  }
+
   public void testGetFilesInFileSystem() throws IOException {
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).atLeastOnce();
 
