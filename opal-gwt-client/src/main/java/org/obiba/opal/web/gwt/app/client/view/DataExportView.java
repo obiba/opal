@@ -213,7 +213,6 @@ public class DataExportView extends DataCommonView implements DataExportPresente
   public void renderFormStep() {
     super.renderFormStep();
     instructionsLabel.setText(translations.dataExportInstructions());
-    setSubmitEnabled(false);
   }
 
 }

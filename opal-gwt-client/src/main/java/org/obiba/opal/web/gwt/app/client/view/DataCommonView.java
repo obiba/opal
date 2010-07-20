@@ -73,6 +73,7 @@ public abstract class DataCommonView extends Composite implements DataCommonPres
       }
     });
     renderFormStep();
+    setSubmitEnabled(false);
   }
 
   @Override
