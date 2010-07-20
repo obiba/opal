@@ -276,7 +276,8 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   class FileSelectionRequiredHandler implements FileSelectionRequiredEvent.Handler {
 
     public void onFileSelectionRequired(FileSelectionRequiredEvent event) {
-      selectedFile = selectedFolder = null; // clear previous selection
+      selectedFolder = "/"; // clear previous selection (initial folder is root)
+      selectedFile = null; // clear previous selection
       setFileSelectionSource(event.getSource());
       setFileSelectionType(event.getFileSelectionType());
       refreshDisplay();
