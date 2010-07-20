@@ -171,9 +171,6 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
 
           @Override
           public void onResponseCode(Request request, Response response) {
-            if(response.getStatusCode() == 200) {
-              eventBus.fireEvent(new UserMessageEvent(MessageDialogType.INFO, "completedJobsDeleted", null));
-            }
             refreshDisplay();
           }
         };
