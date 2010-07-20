@@ -333,4 +333,88 @@ public class FilesResourceTest {
 
     verify(opalRuntimeMock, fileObjectMock);
   }
+
+  @Test
+  public void testDeleteFile_FileDoesNotExist() throws FileSystemException {
+    expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
+
+    replay(opalRuntimeMock);
+
+    Response response = filesResource.deleteFile("/folder1/folder2/filethatdoesnotexist.txt");
+    Assert.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+
+    verify(opalRuntimeMock);
+  }
+
+  @Test
+  public void testDeleteFile_CannotDeleteFolderWithContent() throws FileSystemException {
+    expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
+
+    replay(opalRuntimeMock);
+
+    Response response = filesResource.deleteFile("/folder1");
+    Assert.assertEquals(Status.FORBIDDEN.getStatusCode(), response.getStatus());
+    Assert.assertEquals("cannotDeleteNotEmptyFolder", response.getEntity());
+
+    verify(opalRuntimeMock);
+
+  }
+
+  @Test
+  public void testDeleteFile_CannotDeleteReadOnlyFile() throws FileSystemException {
+    expect(fileObjectMock.getType()).andReturn(FileType.FILE).atLeastOnce();
+    expect(fileObjectMock.exists()).andReturn(true).atLeastOnce();
+    expect(fileObjectMock.isWriteable()).andReturn(false).atLeastOnce();
+
+    replay(fileObjectMock);
+
+    Response response = getFileResource().deleteFile("path");
+    Assert.assertEquals(Status.FORBIDDEN.getStatusCode(), response.getStatus());
+    Assert.assertEquals("cannotDeleteReadOnlyFile", response.getEntity());
+
+    verify(fileObjectMock);
+
+  }
+
+  @Test
+  public void testDeleteFile_FileDeletedSuccessfully() throws FileSystemException {
+    expect(fileObjectMock.getType()).andReturn(FileType.FILE).atLeastOnce();
+    expect(fileObjectMock.exists()).andReturn(true).atLeastOnce();
+    expect(fileObjectMock.isWriteable()).andReturn(true).atLeastOnce();
+    expect(fileObjectMock.delete()).andReturn(true).atLeastOnce();
+
+    replay(fileObjectMock);
+
+    Response response = getFileResource().deleteFile("path");
+    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+    verify(fileObjectMock);
+
+  }
+
+  @Test
+  public void testDeleteFile_CouldNotDeleteFile() throws FileSystemException {
+    expect(fileObjectMock.getType()).andReturn(FileType.FILE).atLeastOnce();
+    expect(fileObjectMock.exists()).andReturn(true).atLeastOnce();
+    expect(fileObjectMock.isWriteable()).andReturn(true).atLeastOnce();
+    expect(fileObjectMock.delete()).andThrow(new FileSystemException("test")).atLeastOnce();
+
+    replay(fileObjectMock);
+
+    Response response = getFileResource().deleteFile("path");
+    Assert.assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
+    Assert.assertEquals("couldNotDeleteFileError", response.getEntity());
+
+    verify(fileObjectMock);
+  }
+
+  private FilesResource getFileResource() {
+    FilesResource filesResource = new FilesResource(opalRuntimeMock) {
+      @Override
+      protected FileObject resolveFileInFileSystem(String path) throws FileSystemException {
+        return fileObjectMock;
+      }
+    };
+    return filesResource;
+  }
 }
