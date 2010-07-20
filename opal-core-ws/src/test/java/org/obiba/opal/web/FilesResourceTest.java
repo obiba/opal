@@ -143,14 +143,13 @@ public class FilesResourceTest {
 
     replay(opalRuntimeMock);
 
-    checkGetFileDetailsResponse("/", new String[] { "..", "folder1", "folder2", "folder3", "folder4", "folder5", "file2.txt" });
-    checkGetFileDetailsResponse("/folder1/folder11", new String[] { "folder1", "folder111", "file111.txt" });
-    checkGetFileDetailsResponse("/folder1/folder11/folder111", new String[] { "folder11", "file1111.txt", "file1112.txt" });
-    checkGetFileDetailsResponse("/folder2", new String[] { "root", "file21.txt" });
-    checkGetFileDetailsResponse("/folder3", new String[] { "root", "folder31" });
-    checkGetFileDetailsResponse("/folder4", new String[] { "root", "folder41", "file41.txt", "file42.txt", "file43.txt" });
-    checkGetFileDetailsResponse("/folder4/folder41", new String[] { "folder4" });
-    checkGetFileDetailsResponse("/folder5", new String[] { "root", "file51.txt" });
+    checkGetFileDetailsResponse("/", new String[] { "folder1", "folder2", "folder3", "folder4", "folder5", "file2.txt", "folder11", "file11.txt", "file21.txt", "folder31", "folder41", "file41.txt", "file42.txt", "file43.txt", "file51.txt" });
+    checkGetFileDetailsResponse("/folder1/folder11", new String[] { "folder111", "file111.txt", "file1111.txt", "file1112.txt" });
+    checkGetFileDetailsResponse("/folder1/folder11/folder111", new String[] { "file1111.txt", "file1112.txt" });
+    checkGetFileDetailsResponse("/folder2", new String[] { "file21.txt" });
+    checkGetFileDetailsResponse("/folder3", new String[] { "folder31", "file311.txt" });
+    checkGetFileDetailsResponse("/folder4", new String[] { "folder41", "file41.txt", "file42.txt", "file43.txt" });
+    checkGetFileDetailsResponse("/folder5", new String[] { "file51.txt" });
 
     verify(opalRuntimeMock);
 
@@ -167,9 +166,21 @@ public class FilesResourceTest {
     FileDto folder = (FileDto) response.getEntity();
     List<FileDto> folderContent = folder.getChildrenList();
 
+    // Check folder content recursively two levels down.
+    checkFolderContent(expectedFolderContent, folderContent, 2);
+
+    Assert.assertTrue(expectedFolderContent.isEmpty());
+  }
+
+  private void checkFolderContent(Set<String> expectedFolderContent, List<FileDto> folderContent, int level) {
     // Make sure folder content is as expected.
     for(FileDto oneFileOrFolder : folderContent) {
       Assert.assertTrue(expectedFolderContent.contains(oneFileOrFolder.getName()));
+      expectedFolderContent.remove(oneFileOrFolder.getName());
+      if(level > 0 && oneFileOrFolder.getChildrenCount() > 0) {
+        checkFolderContent(expectedFolderContent, oneFileOrFolder.getChildrenList(), level - 1);
+      }
+
     }
   }
 
