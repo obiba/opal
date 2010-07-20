@@ -10,7 +10,7 @@
 package org.obiba.opal.core.service.impl;
 
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.TreeSet;
 import java.util.Set;
 
 import org.apache.commons.vfs.FileObject;
@@ -135,7 +135,7 @@ public class DefaultImportService implements ImportService {
 
   private void copyValueTables(Datasource source, Datasource destination, FunctionalUnit unit, String dispatchAttribute) throws IOException, InterruptedException {
     Set<String> tablesToLock = getTablesToLock(source);
-    MagmaEngine.get().lockTables(tablesToLock);
+    MagmaEngine.get().lock(tablesToLock);
 
     try {
       for(ValueTable valueTable : source.getValueTables()) {
@@ -150,12 +150,12 @@ public class DefaultImportService implements ImportService {
         }
       }
     } finally {
-      MagmaEngine.get().unlockTables(tablesToLock);
+      MagmaEngine.get().unlock(tablesToLock);
     }
   }
 
   private Set<String> getTablesToLock(Datasource source) {
-    Set<String> tablesToLock = new HashSet<String>();
+    Set<String> tablesToLock = new TreeSet<String>();
 
     boolean needToLockKeysTable = false;
 
