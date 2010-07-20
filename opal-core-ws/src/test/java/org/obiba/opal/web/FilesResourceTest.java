@@ -38,6 +38,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
+import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -416,5 +417,69 @@ public class FilesResourceTest {
       }
     };
     return filesResource;
+  }
+
+  @Test
+  public void testCreateFolder_CannotCreateFolderPathAlreadyExist() throws FileSystemException, URISyntaxException {
+    expect(fileObjectMock.exists()).andReturn(true).atLeastOnce();
+
+    replay(fileObjectMock);
+
+    Response response = getFileResource().createFolder("path", uriInfoMock);
+    Assert.assertEquals(Status.FORBIDDEN.getStatusCode(), response.getStatus());
+    Assert.assertEquals("cannotCreateFolderPathAlreadyExist", response.getEntity());
+
+    verify(fileObjectMock);
+  }
+
+  @Test
+  public void testCreateFolder_CannotCreateFolderParentIsReadOnly() throws FileSystemException, URISyntaxException {
+    expect(fileObjectMock.exists()).andReturn(false).atLeastOnce();
+    FileObject parentFolderMock = createMock(FileObject.class);
+    expect(fileObjectMock.getParent()).andReturn(parentFolderMock).atLeastOnce();
+    expect(parentFolderMock.isWriteable()).andReturn(false).atLeastOnce();
+
+    replay(fileObjectMock, parentFolderMock);
+
+    Response response = getFileResource().createFolder("path", uriInfoMock);
+    Assert.assertEquals(Status.FORBIDDEN.getStatusCode(), response.getStatus());
+    Assert.assertEquals("cannotCreateFolderParentIsReadOnly", response.getEntity());
+
+    verify(fileObjectMock, parentFolderMock);
+  }
+
+  @Test
+  public void testCreateFolder_CannotCreateFolderUnexpectedError() throws FileSystemException, URISyntaxException {
+    expect(fileObjectMock.exists()).andReturn(false).atLeastOnce();
+    FileObject parentFolderMock = createMock(FileObject.class);
+    expect(fileObjectMock.getParent()).andReturn(parentFolderMock).atLeastOnce();
+    expect(parentFolderMock.isWriteable()).andReturn(true).atLeastOnce();
+    fileObjectMock.createFolder();
+    EasyMock.expectLastCall().andThrow(new FileSystemException("test")).atLeastOnce();
+
+    replay(fileObjectMock, parentFolderMock);
+
+    Response response = getFileResource().createFolder("path", uriInfoMock);
+    Assert.assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
+
+    verify(fileObjectMock, fileObjectMock);
+  }
+
+  @Test
+  public void testCreateFolder_FolderCreatedSuccessfully() throws FileSystemException, URISyntaxException {
+    expect(fileObjectMock.exists()).andReturn(false).atLeastOnce();
+    FileObject parentFolderMock = createMock(FileObject.class);
+    expect(fileObjectMock.getParent()).andReturn(parentFolderMock).atLeastOnce();
+    expect(parentFolderMock.isWriteable()).andReturn(true).atLeastOnce();
+    UriInfo uriInfoMock = createMock(UriInfo.class);
+    expect(uriInfoMock.getAbsolutePath()).andReturn(new URI("path"));
+    fileObjectMock.createFolder();
+
+    replay(fileObjectMock, uriInfoMock, parentFolderMock);
+
+    Response response = getFileResource().createFolder("path", uriInfoMock);
+    Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+
+    verify(fileObjectMock, uriInfoMock, fileObjectMock);
   }
 }
