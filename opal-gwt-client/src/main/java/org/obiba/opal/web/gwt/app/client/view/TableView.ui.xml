@@ -14,6 +14,9 @@
     .tableList td:first-child:hover {
       cursor: pointer;
     }
+    .tableList .title-bold {
+    	margin-top: 10px;
+    }
     .toolbar-right img {
       margin-left: 5px;
       float: right;
@@ -34,12 +37,13 @@
     .separator {
     	border-bottom:2px solid #BBBBBB;
     	margin-top:5px;
+    	margin-bottom:5px;
     }
   </ui:style>
 
   <g:VerticalPanel width="100%" addStyleNames="navigator">
      <g:FlowPanel addStyleNames="small-indent {style.titlebar}">
-       <g:Label addStyleNames="left-aligned {style.title-bold}" ui:field="tableName">SwimmingHeight</g:Label>
+       <g:Label addStyleNames="left-aligned {style.title-bold}" ui:field="tableName">Table Name</g:Label>
        <g:Label addStyleNames="small-indent left-aligned {style.title}">(Table)</g:Label>
      </g:FlowPanel>
       
@@ -58,14 +62,14 @@
      
      <g:FlowPanel addStyleNames="{style.separator}"></g:FlowPanel>
      
-     <g:HorizontalPanel spacing="10">
-       <g:Label addStyleNames="{style.title-light}">Entity Type:</g:Label>
-       <g:Label addStyleNames="{style.title}" ui:field="entityType">Entity Name</g:Label>
+     <g:HorizontalPanel addStyleNames="small-indent">
+       <g:Label addStyleNames="{style.title-light}"><ui:msg description="Entity type label">Entity Type</ui:msg>:</g:Label>
+       <g:Label addStyleNames="small-indent {style.title}" ui:field="entityType">Entity Name</g:Label>
      </g:HorizontalPanel>
       
-     <g:FlowPanel addStyleNames="small-indent">
+     <g:FlowPanel addStyleNames="small-indent {style.tableList}">
        <g:Label ui:field="variablesTableTitle" addStyleNames="left-aligned {style.title-bold}"><ui:msg description="Variables label">Variables</ui:msg></g:Label>
-       <g2:CellTable width="100%" ui:field="table" addStyleNames="left-aligned {style.tableList}" />
+       <g2:CellTable width="100%" ui:field="table" addStyleNames="left-aligned" />
      </g:FlowPanel>
   </g:VerticalPanel>
 

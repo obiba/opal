@@ -13,6 +13,9 @@
     .tableList td:first-child:hover {
       cursor: pointer;
     }
+    .tableList .title-bold {
+    	margin-top: 10px;
+    }
     .toolbar-right img {
       margin-left: 5px;
       float: right;
@@ -51,9 +54,9 @@
      
      <g:FlowPanel addStyleNames="{style.separator}"></g:FlowPanel>
            
-     <g:FlowPanel addStyleNames="small-indent">
+     <g:FlowPanel addStyleNames="small-indent {style.tableList}">
        <g:Label ui:field="tablesTableTitle" addStyleNames="left-aligned {style.title-bold}"><ui:msg description="Tables label">Tables</ui:msg></g:Label>
-       <g2:CellTable width="100%" ui:field="table" addStyleNames="left-aligned {style.tableList}" />
+       <g2:CellTable width="100%" ui:field="table" addStyleNames="left-aligned" />
      </g:FlowPanel>
   </g:VerticalPanel>
   
