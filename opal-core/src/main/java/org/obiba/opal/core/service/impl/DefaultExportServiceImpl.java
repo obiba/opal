@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ThreadFactory;
 
 import org.obiba.magma.Datasource;
@@ -116,6 +117,9 @@ public class DefaultExportServiceImpl implements ExportService {
 
     validateSourceDatasourceNotEqualDestinationDatasource(sourceTables, destinationDatasource);
 
+    Set<String> tablesToLock = getTablesToLock(sourceTables, destinationDatasource);
+    MagmaEngine.get().lock(tablesToLock);
+
     try {
       for(ValueTable table : sourceTables) {
         exportTableToDatasource(destinationDatasource, datasourceCopier, incremental, unit, table);
@@ -124,7 +128,19 @@ public class DefaultExportServiceImpl implements ExportService {
       // When implementing the ExcelDatasource:
       // Determine if this the ExcelDatasource. If yes then display the filename.
       throw new ExportException("An error was encountered while exporting to datasource '" + destinationDatasource + "'.", ex);
+    } finally {
+      MagmaEngine.get().unlock(tablesToLock);
     }
+  }
+
+  private Set<String> getTablesToLock(Set<ValueTable> sourceTables, Datasource destination) {
+    Set<String> tablesToLock = new TreeSet<String>();
+
+    for(ValueTable valueTable : sourceTables) {
+      tablesToLock.add(destination.getName() + "." + valueTable.getName());
+    }
+
+    return tablesToLock;
   }
 
   private void exportTableToDatasource(Datasource destinationDatasource, DatasourceCopier.Builder datasourceCopier, boolean incremental, FunctionalUnit unit, ValueTable table) throws InterruptedException, IOException {
