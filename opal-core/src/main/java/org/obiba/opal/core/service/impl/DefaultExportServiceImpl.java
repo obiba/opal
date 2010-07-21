@@ -11,6 +11,7 @@ package org.obiba.opal.core.service.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,6 +34,7 @@ import org.obiba.magma.support.DatasourceCopier.Builder;
 import org.obiba.magma.views.IncrementalWhereClause;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.magma.FunctionalUnitView;
+import org.obiba.opal.core.magma.concurrent.LockingActionTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ExportException;
 import org.obiba.opal.core.service.ExportService;
@@ -41,7 +43,6 @@ import org.obiba.opal.core.unit.FunctionalUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
@@ -51,7 +52,6 @@ import com.google.common.base.Function;
 /**
  * Default implementation of {@link ExportService}.
  */
-@Transactional
 public class DefaultExportServiceImpl implements ExportService {
 
   private final PlatformTransactionManager txManager;
@@ -105,31 +105,53 @@ public class DefaultExportServiceImpl implements ExportService {
     exportTablesToDatasource(unitName, sourceTables, destinationDatasource, datasourceCopier, incremental);
   }
 
-  public void exportTablesToDatasource(String unitName, Set<ValueTable> sourceTables, Datasource destinationDatasource, DatasourceCopier.Builder datasourceCopier, boolean incremental) throws InterruptedException {
+  public void exportTablesToDatasource(final String unitName, final Set<ValueTable> sourceTables, final Datasource destinationDatasource, final DatasourceCopier.Builder datasourceCopier, final boolean incremental) throws InterruptedException {
     Assert.notEmpty(sourceTables, "sourceTables must not be null or empty");
     Assert.notNull(destinationDatasource, "destinationDatasource must not be null");
     Assert.notNull(datasourceCopier, "datasourceCopier must not be null");
 
-    FunctionalUnit unit = null;
-    if(unitName != null) {
-      unit = validateFunctionalUnit(unitName);
-    }
+    final FunctionalUnit unit = (unitName != null) ? validateFunctionalUnit(unitName) : null;
 
     validateSourceDatasourceNotEqualDestinationDatasource(sourceTables, destinationDatasource);
 
-    Set<String> tablesToLock = getTablesToLock(sourceTables, destinationDatasource);
-    MagmaEngine.get().lock(tablesToLock);
-
     try {
-      for(ValueTable table : sourceTables) {
-        exportTableToDatasource(destinationDatasource, datasourceCopier, incremental, unit, table);
+      new LockingActionTemplate() {
+
+        @Override
+        protected Set<String> getLockNames() {
+          return getTablesToLock(sourceTables, destinationDatasource);
+        }
+
+        @Override
+        protected TransactionTemplate getTransactionTemplate() {
+          return new TransactionTemplate(txManager);
+        }
+
+        @Override
+        protected Action getAction() {
+          return new Action() {
+            public void execute() throws Exception {
+              try {
+                for(ValueTable table : sourceTables) {
+                  exportTableToDatasource(destinationDatasource, datasourceCopier, incremental, unit, table);
+                }
+              } catch(IOException ex) {
+                // When implementing the ExcelDatasource:
+                // Determine if this the ExcelDatasource. If yes then display the filename.
+                throw new ExportException("An error was encountered while exporting to datasource '" + destinationDatasource + "'.", ex);
+              }
+            }
+          };
+        }
+      }.execute();
+    } catch(InvocationTargetException ex) {
+      if(ex.getCause() instanceof ExportException) {
+        throw (ExportException) (ex.getCause());
+      } else if(ex.getCause() instanceof InterruptedException) {
+        throw (InterruptedException) (ex.getCause());
+      } else {
+        throw new RuntimeException(ex.getCause());
       }
-    } catch(IOException ex) {
-      // When implementing the ExcelDatasource:
-      // Determine if this the ExcelDatasource. If yes then display the filename.
-      throw new ExportException("An error was encountered while exporting to datasource '" + destinationDatasource + "'.", ex);
-    } finally {
-      MagmaEngine.get().unlock(tablesToLock);
     }
   }
 

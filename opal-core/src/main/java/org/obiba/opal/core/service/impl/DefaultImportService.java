@@ -10,8 +10,9 @@
 package org.obiba.opal.core.service.impl;
 
 import java.io.IOException;
-import java.util.TreeSet;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileType;
@@ -40,6 +41,7 @@ import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.magma.PrivateVariableEntityValueTable;
+import org.obiba.opal.core.magma.concurrent.LockingActionTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
@@ -48,14 +50,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
 /**
  * Default implementation of {@link ImportService}.
  */
-@Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = { RuntimeException.class, InterruptedException.class })
 public class DefaultImportService implements ImportService {
   //
   // Constants
@@ -67,6 +67,8 @@ public class DefaultImportService implements ImportService {
   //
   // Instance Variables
   //
+
+  private final TransactionTemplate txTemplate;
 
   private final OpalRuntime opalRuntime;
 
@@ -81,7 +83,8 @@ public class DefaultImportService implements ImportService {
   private final String keysTableEntityType;
 
   @Autowired
-  public DefaultImportService(OpalRuntime opalRuntime, VariableEntityAuditLogManager auditLogManager, IParticipantIdentifier participantIdentifier, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference, @Value("${org.obiba.opal.keys.entityType}") String keysTableEntityType) {
+  public DefaultImportService(TransactionTemplate txTemplate, OpalRuntime opalRuntime, VariableEntityAuditLogManager auditLogManager, IParticipantIdentifier participantIdentifier, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference, @Value("${org.obiba.opal.keys.entityType}") String keysTableEntityType) {
+    if(txTemplate == null) throw new IllegalArgumentException("txManager cannot be null");
     if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
     if(auditLogManager == null) throw new IllegalArgumentException("auditLogManager cannot be null");
     if(participantIdentifier == null) throw new IllegalArgumentException("participantIdentifier cannot be null");
@@ -93,6 +96,9 @@ public class DefaultImportService implements ImportService {
     this.participantIdentifier = participantIdentifier;
     this.keysTableReference = keysTableReference;
     this.keysTableEntityType = keysTableEntityType;
+
+    this.txTemplate = txTemplate;
+    this.txTemplate.setIsolationLevel(TransactionTemplate.ISOLATION_READ_COMMITTED);
   }
 
   //
@@ -133,24 +139,47 @@ public class DefaultImportService implements ImportService {
     }
   }
 
-  private void copyValueTables(Datasource source, Datasource destination, FunctionalUnit unit, String dispatchAttribute) throws IOException, InterruptedException {
-    Set<String> tablesToLock = getTablesToLock(source);
-    MagmaEngine.get().lock(tablesToLock);
-
+  private void copyValueTables(final Datasource source, final Datasource destination, final FunctionalUnit unit, final String dispatchAttribute) throws IOException, InterruptedException {
     try {
-      for(ValueTable valueTable : source.getValueTables()) {
-        if(Thread.interrupted()) {
-          throw new InterruptedException("Thread interrupted");
+      new LockingActionTemplate() {
+
+        @Override
+        protected Set<String> getLockNames() {
+          return getTablesToLock(source);
         }
 
-        if(valueTable.isForEntityType(keysTableEntityType)) {
-          copyParticipants(valueTable, source, destination, unit, dispatchAttribute);
-        } else {
-          DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(valueTable, destination);
+        @Override
+        protected TransactionTemplate getTransactionTemplate() {
+          return txTemplate;
         }
+
+        @Override
+        protected Action getAction() {
+          return new Action() {
+            public void execute() throws Exception {
+              for(ValueTable valueTable : source.getValueTables()) {
+                if(Thread.interrupted()) {
+                  throw new InterruptedException("Thread interrupted");
+                }
+
+                if(valueTable.isForEntityType(keysTableEntityType)) {
+                  copyParticipants(valueTable, source, destination, unit, dispatchAttribute);
+                } else {
+                  DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(valueTable, destination);
+                }
+              }
+            }
+          };
+        }
+      }.execute();
+    } catch(InvocationTargetException ex) {
+      if(ex.getCause() instanceof IOException) {
+        throw (IOException) (ex.getCause());
+      } else if(ex.getCause() instanceof InterruptedException) {
+        throw (InterruptedException) (ex.getCause());
+      } else {
+        throw new RuntimeException(ex.getCause());
       }
-    } finally {
-      MagmaEngine.get().unlock(tablesToLock);
     }
   }
 
