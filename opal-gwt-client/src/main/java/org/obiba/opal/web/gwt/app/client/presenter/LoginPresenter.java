@@ -123,7 +123,9 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
 
   @Override
   public void revealDisplay() {
-    display.focusOnUserName();
+    // TODO: Temporarily commenting out the "focus on user name" behaviour.
+    // This seems to lead to layout issues!
+    // display.focusOnUserName();
   }
 
   private void createSecurityResource(String username, String password) {
