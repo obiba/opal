@@ -291,13 +291,6 @@ public class VariableView extends Composite implements VariablePresenter.Display
     categoryTable.addColumn(new TextColumn<CategoryDto>() {
       @Override
       public String getValue(CategoryDto object) {
-        return object.hasCode() ? object.getCode() : "";
-      }
-    }, translations.codeLabel());
-
-    categoryTable.addColumn(new TextColumn<CategoryDto>() {
-      @Override
-      public String getValue(CategoryDto object) {
         return getCategoryLabel(object);
       }
     }, translations.labelLabel());
