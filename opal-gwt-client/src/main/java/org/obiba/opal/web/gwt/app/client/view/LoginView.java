@@ -74,16 +74,8 @@ public class LoginView extends Composite implements LoginPresenter.Display {
   }
 
   @Override
-  public void showPopup() {
-    // center();
+  public void focusOnUserName() {
     userName.setFocus(true);
-    // show();
-  }
-
-  @Override
-  public void showPopupWithGlassPanel() {
-    // center();
-    // show();
   }
 
   @Override
@@ -100,7 +92,7 @@ public class LoginView extends Composite implements LoginPresenter.Display {
   }
 
   @Override
-  public void hidePopup() {
+  public void clear() {
     errorMessage.setVisible(false);
     getPassword().setValue("");
   }

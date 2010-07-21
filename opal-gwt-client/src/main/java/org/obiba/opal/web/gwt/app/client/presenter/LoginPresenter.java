@@ -39,11 +39,9 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
 
   public interface Display extends WidgetDisplay {
 
-    public void showPopup();
+    public void focusOnUserName();
 
-    public void hidePopup();
-
-    public void showPopupWithGlassPanel();
+    public void clear();
 
     public void showErrorMessage();
 
@@ -125,7 +123,7 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
 
   @Override
   public void revealDisplay() {
-    display.showPopup();
+    display.focusOnUserName();
   }
 
   private void createSecurityResource(String username, String password) {
@@ -143,7 +141,7 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
       public void onResponseCode(Request request, Response response) {
         // When a 201 happens, we should have credentials, but we'll test anyway.
         if(credentials.hasCredentials()) {
-          display.hidePopup();
+          display.clear();
           eventBus.fireEvent(new SessionCreatedEvent(response.getHeader("Location")));
           resendFailedRequest();
         } else {
