@@ -89,6 +89,7 @@ public class DataExportPresenterTest extends AbstractGwtTestSetup {
     expect(displayMock.addFileFormatChangeHandler((ChangeHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
     expect(displayMock.addDestinationFileClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
     expect(displayMock.addDestinationDatasourceClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
+    expect(displayMock.addWithVariablesClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
 
     // Expects that the presenter makes these calls to the server when it binds itself
     ResourceRequestBuilder mockRequestBuilder = mockBridge.addMock(ResourceRequestBuilder.class);
