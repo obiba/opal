@@ -21,14 +21,12 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRefreshedEvent;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.FileSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FileDto;
-import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -60,12 +58,6 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   }
 
   @Inject
-  Provider<FileSystemTreePresenter> fileSystemTreePresenterProvider;
-
-  @Inject
-  Provider<FolderDetailsPresenter> folderDetailsPresenterProvider;
-
-  @Inject
   Provider<FileUploadDialogPresenter> fileUploadDialogPresenterProvider;
 
   FileSystemTreePresenter fileSystemTreePresenter;
@@ -74,7 +66,6 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
   FileUploadDialogPresenter fileUploadDialogPresenter;
 
-  @Inject
   CreateFolderDialogPresenter createFolderDialogPresenter;
 
   private Runnable actionRequiringConfirmation;
@@ -84,8 +75,12 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   private FileDto selectedFile;
 
   @Inject
-  public FileExplorerPresenter(Display display, EventBus eventBus) {
+  public FileExplorerPresenter(Display display, EventBus eventBus, FileSystemTreePresenter fileSystemTreePresenter, FolderDetailsPresenter folderDetailsPresenter, FileUploadDialogPresenter fileUploadDialogPresenter, CreateFolderDialogPresenter createFolderDialogPresenter) {
     super(display, eventBus);
+    this.fileSystemTreePresenter = fileSystemTreePresenter;
+    this.folderDetailsPresenter = folderDetailsPresenter;
+    this.fileUploadDialogPresenter = fileUploadDialogPresenter;
+    this.createFolderDialogPresenter = createFolderDialogPresenter;
   }
 
   @Override
@@ -125,10 +120,6 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
   protected void initDisplayComponents() {
 
-    fileSystemTreePresenter = fileSystemTreePresenterProvider.get();
-
-    folderDetailsPresenter = folderDetailsPresenterProvider.get();
-    //folderDetailsPresenter.getDisplay().addFileSelectionHandler(createFileSelectionHandler());
     folderDetailsPresenter.getDisplay().setSelectionEnabled(true);
 
     getDisplay().getFileSystemTree().add(fileSystemTreePresenter.getDisplay().asWidget());
@@ -227,17 +218,6 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
         actionRequiringConfirmation = null;
       }
     }
-  }
-
-  private FileSelectionHandler createFileSelectionHandler() {
-    return new FileSelectionHandler() {
-
-      public void onFileSelection(FileDto fileDto) {
-        if(fileDto.getType().isFileType(FileType.FILE)) {
-          downloadFile(fileDto);
-        }
-      }
-    };
   }
 
   private void deleteFile(final FileDto file) {
