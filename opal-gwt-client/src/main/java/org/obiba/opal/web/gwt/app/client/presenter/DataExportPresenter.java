@@ -101,6 +101,13 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     super.registerHandler(getDisplay().addFileFormatChangeHandler(new FileFormatChangeHandler()));
     super.registerHandler(getDisplay().addDestinationFileClickHandler(new DestinationClickHandler()));
     super.registerHandler(getDisplay().addDestinationDatasourceClickHandler(new DestinationClickHandler()));
+    super.registerHandler(getDisplay().addWithVariablesClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent arg0) {
+        updateSubmit();
+      }
+    }));
     getDisplay().setFileWidgetDisplay(fileSelectionPresenter.getDisplay());
 
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
@@ -136,12 +143,20 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   private List<String> formValidationErrors() {
     List<String> result = new ArrayList<String>();
     if(tableListPresenter.getTables().size() == 0) {
-      result.add("Must select at least one table for export");
+      result.add("At least one table must be selected for export.");
     }
     if(getDisplay().isDestinationFile()) {
       String filename = getDisplay().getOutFile();
       if(filename == null || filename.equals("")) {
-        result.add("filename cannot be empty");
+        result.add("File name cannot be empty.");
+      }
+      if(getDisplay().getFileFormat().equalsIgnoreCase("csv") && filename.endsWith("csv")) {
+        if(getDisplay().isWithVariables()) {
+          result.add("Variables and data cannot be exported in the same CSV file. Select a directory instead or do not export variables.");
+        }
+        if(tableListPresenter.getTables().size() > 1) {
+          result.add("Several tables cannot be exported in the same CSV file. Select a directory instead or export only one table.");
+        }
       }
     }
     return result;
@@ -277,6 +292,8 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     HandlerRegistration addDestinationDatasourceClickHandler(ClickHandler handler);
 
     HandlerRegistration addFileFormatChangeHandler(ChangeHandler handler);
+
+    HandlerRegistration addWithVariablesClickHandler(ClickHandler handler);
 
     boolean isIncremental();
 

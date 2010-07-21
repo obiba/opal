@@ -149,6 +149,11 @@ public class DataExportView extends DataCommonView implements DataExportPresente
   }
 
   @Override
+  public HandlerRegistration addWithVariablesClickHandler(ClickHandler handler) {
+    return withVariables.addClickHandler(handler);
+  }
+
+  @Override
   public boolean isIncremental() {
     return incremental.getValue();
   }
