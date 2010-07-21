@@ -91,11 +91,7 @@ a:hover {
 
 /* File Explorer Styles */ 
  
-table.folder-details td:first-child span.file {
-  color: blue;
-  text-decoration: underline;	
-}
-table.folder-details td:first-child span.file:hover {
+table.folder-details td:first-child span:hover {
   cursor: pointer;
 }
 

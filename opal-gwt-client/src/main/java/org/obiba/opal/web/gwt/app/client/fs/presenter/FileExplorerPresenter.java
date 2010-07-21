@@ -128,7 +128,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
     fileSystemTreePresenter = fileSystemTreePresenterProvider.get();
 
     folderDetailsPresenter = folderDetailsPresenterProvider.get();
-    folderDetailsPresenter.getDisplay().addFileSelectionHandler(createFileSelectionHandler());
+    //folderDetailsPresenter.getDisplay().addFileSelectionHandler(createFileSelectionHandler());
     folderDetailsPresenter.getDisplay().setSelectionEnabled(true);
 
     getDisplay().getFileSystemTree().add(fileSystemTreePresenter.getDisplay().asWidget());
