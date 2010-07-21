@@ -10,15 +10,14 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
-import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
-public class LoginView extends PopupPanel implements LoginPresenter.Display {
+public class LoginView extends Composite implements LoginPresenter.Display {
   @UiTemplate("LoginView.ui.xml")
   interface LoginViewUiBinder extends UiBinder<Widget, LoginView> {
   }
@@ -41,11 +40,8 @@ public class LoginView extends PopupPanel implements LoginPresenter.Display {
   Button login;
 
   public LoginView() {
-    // Clicking outside of the popupPanel will dismiss the panel, panel is modal
-    super(false, true);
-    add(uiBinder.createAndBindUi(this));
+    initWidget(uiBinder.createAndBindUi(this));
     errorMessage.setVisible(false);
-    setGlassEnabled(true);
     userName.setFocus(true);
   }
 
@@ -56,7 +52,7 @@ public class LoginView extends PopupPanel implements LoginPresenter.Display {
 
   @Override
   public Widget asWidget() {
-    return null;
+    return this;
   }
 
   @Override
@@ -79,18 +75,15 @@ public class LoginView extends PopupPanel implements LoginPresenter.Display {
 
   @Override
   public void showPopup() {
-    // Hide the background while the login popup is visible.
-    RootLayoutPanel.get().setVisible(false);
-
-    center();
+    // center();
     userName.setFocus(true);
-    show();
+    // show();
   }
 
   @Override
   public void showPopupWithGlassPanel() {
-    center();
-    show();
+    // center();
+    // show();
   }
 
   @Override
@@ -110,10 +103,6 @@ public class LoginView extends PopupPanel implements LoginPresenter.Display {
   public void hidePopup() {
     errorMessage.setVisible(false);
     getPassword().setValue("");
-    hide();
-
-    // Show the background while the login popup is invisible (i.e., user logged in).
-    RootLayoutPanel.get().setVisible(true);
   }
 
   @Override
