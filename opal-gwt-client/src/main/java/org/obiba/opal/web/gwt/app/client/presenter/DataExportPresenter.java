@@ -101,13 +101,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     super.registerHandler(getDisplay().addFileFormatChangeHandler(new FileFormatChangeHandler()));
     super.registerHandler(getDisplay().addDestinationFileClickHandler(new DestinationClickHandler()));
     super.registerHandler(getDisplay().addDestinationDatasourceClickHandler(new DestinationClickHandler()));
-    super.registerHandler(getDisplay().addWithVariablesClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent arg0) {
-        updateSubmit();
-      }
-    }));
+    super.registerHandler(getDisplay().addWithVariablesClickHandler(new WithVariablesClickHandler()));
     getDisplay().setFileWidgetDisplay(fileSelectionPresenter.getDisplay());
 
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
@@ -185,6 +179,13 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   //
   // Interfaces and classes
   //
+
+  class WithVariablesClickHandler implements ClickHandler {
+    @Override
+    public void onClick(ClickEvent arg0) {
+      updateSubmit();
+    }
+  }
 
   class FileSelectionUpdateHandler implements FileSelectionUpdateEvent.Handler {
     @Override
