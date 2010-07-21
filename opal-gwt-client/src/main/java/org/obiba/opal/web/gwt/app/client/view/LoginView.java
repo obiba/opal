@@ -14,6 +14,7 @@ import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -78,6 +79,9 @@ public class LoginView extends PopupPanel implements LoginPresenter.Display {
 
   @Override
   public void showPopup() {
+    // Hide the background while the login popup is visible.
+    RootLayoutPanel.get().setVisible(false);
+
     center();
     userName.setFocus(true);
     show();
@@ -107,6 +111,9 @@ public class LoginView extends PopupPanel implements LoginPresenter.Display {
     errorMessage.setVisible(false);
     getPassword().setValue("");
     hide();
+
+    // Show the background while the login popup is invisible (i.e., user logged in).
+    RootLayoutPanel.get().setVisible(true);
   }
 
   @Override

@@ -43,6 +43,9 @@ public class GwtApp implements EntryPoint {
     ApplicationPresenter presenter = opalGinjector.getApplicationPresenter();
     presenter.bind();
     presenter.revealDisplay();
+
+    // Start with the RootLayoutPanel invisible.
+    RootLayoutPanel.get().setVisible(false);
     RootLayoutPanel.get().add(presenter.getDisplay().asWidget());
   }
 
@@ -51,8 +54,10 @@ public class GwtApp implements EntryPoint {
     loginPresenter.bind();
     // Only display login if we don't currently have any credentials.
     if(opalGinjector.getRequestCredentials().hasCredentials() == false) {
-
       loginPresenter.revealDisplay();
+    } else {
+      // If we have credentials, show the RootLayoutPanel.
+      RootLayoutPanel.get().setVisible(true);
     }
   }
 
