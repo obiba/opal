@@ -5,26 +5,23 @@
     .topbar a:hover {
       cursor: pointer;
     }
+    .topbar a {
+    	margin-right: 10px;
+    	float: right;
+    	padding-top: 0.3em;
+    }
   </ui:style>
 
   <g:DockLayoutPanel unit="EM">
     <g:north size="4">
       <g:LayoutPanel>
         <g:layer top="0" height="2em">
-          <g:VerticalPanel width="100%">
-            <!--
-              Don't know why, but the ALIGN_RIGHT cannot be specified on the Panel itself, it has to be on this specific
-              cell...
-            -->
-            <g:Cell horizontalAlignment="ALIGN_RIGHT">
-              <g:HorizontalPanel spacing="10" ui:field="topBar" addStyleNames="{style.topbar}">
-                <g:Anchor ui:field="studies"><ui:msg description="Studies link text">Studies</ui:msg></g:Anchor>
-                <g:Anchor ui:field="profile"><ui:msg description="Profile link text">Profile</ui:msg></g:Anchor>
-                <g:Anchor ui:field="help"><ui:msg description="Help link text">Help</ui:msg></g:Anchor>
+          <g:FlowPanel  ui:field="topBar" addStyleNames="{style.topbar}">
                 <g:Anchor ui:field="quit"><ui:msg description="Quit link text">Quit</ui:msg></g:Anchor>
-              </g:HorizontalPanel>
-            </g:Cell>
-          </g:VerticalPanel>
+                <g:Anchor ui:field="help"><ui:msg description="Help link text">Help</ui:msg></g:Anchor>
+                <g:Anchor ui:field="profile"><ui:msg description="Profile link text">Profile</ui:msg></g:Anchor>
+            <g:Anchor ui:field="studies"><ui:msg description="Studies link text">Studies</ui:msg></g:Anchor>
+          </g:FlowPanel>
         </g:layer>
 
         <g:layer bottom="0" height="2em">
