@@ -21,6 +21,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
+import org.obiba.opal.web.magma.support.OpalResourceHelper;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.DatasourceDto;
 import org.slf4j.Logger;
@@ -42,7 +43,7 @@ public class DatasourcesResource {
 
   @Autowired
   public DatasourcesResource(@Value("${org.obiba.opal.keys.tableReference}") String keysTableReference) {
-    keysDatasourceName = extractKeysDatasourceName(keysTableReference);
+    keysDatasourceName = OpalResourceHelper.extractKeysDatasourceName(keysTableReference);
   }
 
   @GET
@@ -70,19 +71,6 @@ public class DatasourcesResource {
     sortByName(datasources);
 
     return datasources;
-  }
-
-  private String extractKeysDatasourceName(String keysTableReference) {
-    if(keysTableReference == null) {
-      throw new IllegalArgumentException("null keysTableReference");
-    }
-
-    int separatorIndex = keysTableReference.indexOf('.');
-    if(separatorIndex == -1) {
-      throw new IllegalArgumentException("keysTableReference missing datasource");
-    }
-
-    return keysTableReference.substring(0, separatorIndex);
   }
 
   private void sortByName(List<Magma.DatasourceDto> datasources) {

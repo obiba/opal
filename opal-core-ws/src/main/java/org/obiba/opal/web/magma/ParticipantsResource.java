@@ -9,9 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -20,9 +17,14 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
+import org.obiba.opal.web.magma.support.OpalResourceHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import com.google.common.collect.ImmutableSet;
 
 @Component
 @Path("/participants")
@@ -31,23 +33,24 @@ public class ParticipantsResource {
   @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(ParticipantsResource.class);
 
+  private String keysDatasourceName;
+
+  @Autowired
+  public ParticipantsResource(@Value("${org.obiba.opal.keys.tableReference}") String keysTableReference) {
+    keysDatasourceName = OpalResourceHelper.extractKeysDatasourceName(keysTableReference);
+  }
+
   @GET
   @Path("/count")
   public Response getParticipantCount() {
-    Set<String> participantIdentifiers = new HashSet<String>();
-
-    for(Datasource datasource : MagmaEngine.get().getDatasources()) {
-      for(ValueTable valueTable : datasource.getValueTables()) {
-        if(valueTable.isForEntityType("Participant")) {
-          for(VariableEntity entity : valueTable.getVariableEntities()) {
-            if(valueTable.hasValueSet(entity)) {
-              participantIdentifiers.add(entity.getIdentifier());
-            }
-          }
-        }
+    Datasource keysDs = MagmaEngine.get().getDatasource(keysDatasourceName);
+    ImmutableSet.Builder<String> participants = ImmutableSet.builder();
+    for(ValueTable table : keysDs.getValueTables()) {
+      for(VariableEntity entity : table.getVariableEntities()) {
+        participants.add(entity.getIdentifier());
       }
     }
-
-    return Response.ok(String.valueOf(participantIdentifiers.size())).build();
+    return Response.ok(String.valueOf(participants.build().size())).build();
   }
+
 }
