@@ -191,6 +191,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
       }
 
       if(credentials.hasExpired(builder)) {
+        // this is fired even if after a request for deleting the session
         eventBus.fireEvent(new SessionExpiredEvent(DefaultResourceRequestBuilder.this));
       } else if(codes != null && codes[code] != null) {
         codes[code].onResponseCode(request, response);

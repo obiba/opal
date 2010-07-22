@@ -18,13 +18,12 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
+import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.resources.OpalResources;
-import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -65,9 +64,6 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
     MenuItem getDashboardItem();
   }
-
-  @Inject
-  private RequestCredentials credentials;
 
   @Inject
   private Provider<DashboardPresenter> dashboardPresenter;
@@ -163,8 +159,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
     getDisplay().getQuit().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        ResourceRequestBuilderFactory.newBuilder().forResource("/auth/session/" + credentials.extractCredentials()).delete().send();
-        // Need to send to some type of no-workbench place.
+        eventBus.fireEvent(new SessionEndedEvent());
       }
     });
 
@@ -192,8 +187,6 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
     registerWorkbenchChangeEventHandler();
 
     registerUserMessageEventHandler();
-
-    updateWorkbench(dashboardPresenter.get());
   }
 
   @Override
@@ -210,6 +203,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
   @Override
   public void revealDisplay() {
+    updateWorkbench(dashboardPresenter.get());
   }
 
   private void registerWorkbenchChangeEventHandler() {

@@ -16,13 +16,10 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.event.SessionExpiredEvent;
-import org.obiba.opal.web.gwt.rest.client.DefaultResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -59,8 +56,6 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
 
   private final RequestCredentials credentials;
 
-  private DefaultResourceRequestBuilder<? extends JavaScriptObject> failedRequest;
-
   @Inject
   public LoginPresenter(Display display, EventBus eventBus, RequestCredentials credentials) {
     super(display, eventBus);
@@ -95,14 +90,6 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
         }
       }
     });
-
-    super.registerHandler(eventBus.addHandler(SessionExpiredEvent.getType(), new SessionExpiredEvent.Handler() {
-
-      @Override
-      public void onSessionExpired(SessionExpiredEvent event) {
-        failedRequest = event.getFailedRequest();
-      }
-    }));
   }
 
   private void createSecurityResource() {
@@ -145,7 +132,6 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
         if(credentials.hasCredentials()) {
           display.clear();
           eventBus.fireEvent(new SessionCreatedEvent(response.getHeader("Location")));
-          resendFailedRequest();
         } else {
           display.showErrorMessage();
         }
@@ -153,13 +139,4 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
     }).withFormBody("username", username, "password", password).send();
   }
 
-  /**
-   * If a request required authentication, re-send that same request after the user has been authenticated.
-   */
-  private void resendFailedRequest() {
-    if(failedRequest != null) {
-      failedRequest.send();
-      failedRequest = null;
-    }
-  }
 }

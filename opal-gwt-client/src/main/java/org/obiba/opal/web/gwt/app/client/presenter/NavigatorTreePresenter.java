@@ -19,8 +19,6 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.DatasourceSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.event.SessionExpiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -54,20 +52,6 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
   @Override
   protected void onBind() {
     super.registerHandler(getDisplay().getTree().addSelectionHandler(new TreeSelectionHandler()));
-
-    super.registerHandler(eventBus.addHandler(SessionCreatedEvent.getType(), new SessionCreatedEvent.Handler() {
-      @Override
-      public void onSessionCreated(SessionCreatedEvent event) {
-        refreshDisplay();
-      }
-    }));
-
-    super.registerHandler(eventBus.addHandler(SessionExpiredEvent.getType(), new SessionExpiredEvent.Handler() {
-      @Override
-      public void onSessionExpired(SessionExpiredEvent event) {
-        getDisplay().clear();
-      }
-    }));
 
     super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
 

@@ -1,8 +1,10 @@
 package org.obiba.opal.web.gwt.app.client;
 
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
+import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionExpiredEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileDownloadPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
@@ -13,12 +15,15 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
 import org.obiba.opal.web.gwt.inject.client.OpalGinjector;
 import org.obiba.opal.web.gwt.rest.client.DefaultResourceRequestBuilder;
+import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
 import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -26,6 +31,8 @@ import com.google.gwt.user.client.ui.RootLayoutPanel;
 public class GwtApp implements EntryPoint {
 
   private final OpalGinjector opalGinjector = GWT.create(OpalGinjector.class);
+
+  private Widget rootWidget;
 
   @Override
   public void onModuleLoad() {
@@ -39,24 +46,38 @@ public class GwtApp implements EntryPoint {
     initTableSelectorPresenter();
     initConfirmationPresenter();
 
+    updateRootLayout();
+
     registerHandlers();
+  }
+
+  private void updateRootLayout() {
+    // Only display login if we don't currently have any credentials.
+    if(opalGinjector.getRequestCredentials().hasCredentials() == false) {
+      revealDisplay(opalGinjector.getLoginPresenter());
+    } else {
+      revealDisplay(opalGinjector.getApplicationPresenter());
+    }
+  }
+
+  private void revealDisplay(WidgetPresenter<?> presenter) {
+    WidgetDisplay newRoot = presenter.getDisplay();
+    if(rootWidget != null) {
+      RootLayoutPanel.get().remove(rootWidget);
+    }
+    rootWidget = newRoot.asWidget();
+    RootLayoutPanel.get().add(rootWidget);
+    presenter.revealDisplay();
   }
 
   private void initApplicationPresenter() {
     ApplicationPresenter presenter = opalGinjector.getApplicationPresenter();
     presenter.bind();
-    presenter.revealDisplay();
-    RootLayoutPanel.get().add(presenter.getDisplay().asWidget());
   }
 
   private void initLoginPresenter() {
     LoginPresenter loginPresenter = opalGinjector.getLoginPresenter();
     loginPresenter.bind();
-    // Only display login if we don't currently have any credentials.
-    if(opalGinjector.getRequestCredentials().hasCredentials() == false) {
-      replaceRootLayoutPanelChild(opalGinjector.getApplicationPresenter().getDisplay(), loginPresenter.getDisplay());
-      loginPresenter.revealDisplay();
-    }
   }
 
   private void initFileDownloadPresenter() {
@@ -101,26 +122,29 @@ public class GwtApp implements EntryPoint {
       @Override
       public void onSessionExpired(SessionExpiredEvent event) {
         GWT.log("Session expired");
-
-        LoginPresenter loginPresenter = opalGinjector.getLoginPresenter();
-        replaceRootLayoutPanelChild(opalGinjector.getApplicationPresenter().getDisplay(), loginPresenter.getDisplay());
-        loginPresenter.revealDisplay();
+        revealDisplay(opalGinjector.getLoginPresenter());
       }
     });
     opalGinjector.getEventBus().addHandler(SessionCreatedEvent.getType(), new SessionCreatedEvent.Handler() {
       @Override
       public void onSessionCreated(SessionCreatedEvent event) {
         GWT.log("Session created");
+        updateRootLayout();
+      }
+    });
 
-        ApplicationPresenter applicationPresenter = opalGinjector.getApplicationPresenter();
-        replaceRootLayoutPanelChild(opalGinjector.getLoginPresenter().getDisplay(), applicationPresenter.getDisplay());
-        applicationPresenter.revealDisplay();
+    opalGinjector.getEventBus().addHandler(SessionEndedEvent.getType(), new SessionEndedEvent.Handler() {
+
+      @Override
+      public void onSessionEnded(SessionEndedEvent event) {
+        GWT.log("Session ended");
+        // swap the interface before the credentials are gone
+        revealDisplay(opalGinjector.getLoginPresenter());
+        RequestCredentials credentials = opalGinjector.getRequestCredentials();
+        // calling this makes the session expired event to be fired in return
+        ResourceRequestBuilderFactory.newBuilder().forResource("/auth/session/" + credentials.extractCredentials()).delete().send();
       }
     });
   }
 
-  private void replaceRootLayoutPanelChild(WidgetDisplay previousChild, WidgetDisplay newChild) {
-    RootLayoutPanel.get().remove(previousChild.asWidget());
-    RootLayoutPanel.get().add(newChild.asWidget());
-  }
 }
