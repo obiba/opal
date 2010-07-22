@@ -190,8 +190,8 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
         throw new IllegalStateException("Invalid status code.");
       }
 
-      if(credentials.hasExpired(builder)) {
-        // this is fired even if after a request for deleting the session
+      if(credentials.hasExpired(builder) || code == 401) {
+        // this is fired even after a request for deleting the session
         eventBus.fireEvent(new SessionExpiredEvent(DefaultResourceRequestBuilder.this));
       } else if(codes != null && codes[code] != null) {
         codes[code].onResponseCode(request, response);
