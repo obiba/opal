@@ -10,7 +10,9 @@
 package org.obiba.opal.client.presenter;
 
 import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import net.customware.gwt.presenter.client.EventBus;
@@ -32,7 +34,6 @@ import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.event.shared.GwtEvent.Type;
 
 public class DataExportPresenterTest extends AbstractGwtTestSetup {
 
@@ -70,10 +71,10 @@ public class DataExportPresenterTest extends AbstractGwtTestSetup {
     HandlerRegistration handlerRegistrationMock = createMock(HandlerRegistration.class);
 
     // Make sure that handlers are added to the event bus
-    expect(eventBusMock.addHandler((Type<TableSelectionEvent.Handler>) EasyMock.anyObject(), (TableSelectionEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
-    expect(eventBusMock.addHandler((Type<FileSelectionEvent.Handler>) EasyMock.anyObject(), (FileSelectionEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
-    expect(eventBusMock.addHandler((Type<TableListUpdateEvent.Handler>) EasyMock.anyObject(), (TableListUpdateEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
-    expect(eventBusMock.addHandler((Type<FileSelectionUpdateEvent.Handler>) EasyMock.anyObject(), (FileSelectionUpdateEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
+    expect(eventBusMock.addHandler(eq(TableSelectionEvent.getType()), isA(TableSelectionEvent.Handler.class))).andReturn(handlerRegistrationMock).once();
+    expect(eventBusMock.addHandler(eq(FileSelectionEvent.getType()), isA(FileSelectionEvent.Handler.class))).andReturn(handlerRegistrationMock).once();
+    expect(eventBusMock.addHandler(eq(TableListUpdateEvent.getType()), isA(TableListUpdateEvent.Handler.class))).andReturn(handlerRegistrationMock).once();
+    expect(eventBusMock.addHandler(eq(FileSelectionUpdateEvent.getType()), isA(FileSelectionUpdateEvent.Handler.class))).andReturn(handlerRegistrationMock).once();
 
     // Make sure that a ClickHandler is added to the Submit button
     expect(displayMock.addSubmitClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
