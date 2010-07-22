@@ -71,6 +71,7 @@ public class CreateFolderDialogView extends Composite implements Display {
   public void showDialog() {
     dialog.center();
     dialog.show();
+    folderToCreate.setFocus(true);
   }
 
   @Override
