@@ -37,7 +37,7 @@ public class ParticipantsResource {
 
   @Autowired
   public ParticipantsResource(@Value("${org.obiba.opal.keys.tableReference}") String keysTableReference) {
-    keysDatasourceName = OpalResourceHelper.extractKeysDatasourceName(keysTableReference);
+    keysDatasourceName = extractKeysDatasourceName(keysTableReference);
   }
 
   @GET
@@ -53,4 +53,7 @@ public class ParticipantsResource {
     return Response.ok(String.valueOf(participants.build().size())).build();
   }
 
+  String extractKeysDatasourceName(String keysTableReference) {
+    return OpalResourceHelper.extractKeysDatasourceName(keysTableReference);
+  }
 }

@@ -16,6 +16,7 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.ws.rs.core.Response;
@@ -39,22 +40,40 @@ public class ParticipantsResourceTest extends AbstractMagmaResourceTest {
 
   @Test
   public void testGetParticipantCount_ReturnsZeroWhenThereAreNoTables() {
-    // testGetParticipantCount(new HashSet<ValueTable>(), 0);
+    testGetParticipantCount(new HashSet<ValueTable>(), 0);
   }
 
-  // @Test
-  public void testGetParticipantCount_ReturnsZeroWhenThereAreNoParticipantTables() {
-    testGetParticipantCount(ImmutableSet.of(createMockTable(ImmutableSet.of(createMockEntity("Instrument", "I1")), "Instrument", "Participant")), 0);
+  @Test
+  public void testGetParticipantCount_WithSingleTable() {
+    Set<ValueTable> tables = ImmutableSet.of( //
+    /**/createMockTable(ImmutableSet.of(createMockEntity("P1"))) //
+    );
+
+    testGetParticipantCount(tables, 1);
   }
 
-  // @Test
-  public void testGetParticipantCount() {
-    testGetParticipantCount(ImmutableSet.of(createMockTable(ImmutableSet.of(createMockEntity("Participant", "P1"), createMockEntity("Participant", "P2")), "Participant", "Instrument"), createMockTable(ImmutableSet.of(createMockEntity("Instrument", "I1")), "Instrument", "Participant"), createMockTable(ImmutableSet.of(createMockEntity("Participant", "P1")), "Participant", "Instrument")), 2);
+  @Test
+  public void testGetParticipantCount_WithMultipleTablesDoesNotCountTheSameParticipantTwice() {
+    Set<ValueTable> tables = ImmutableSet.of( //
+    /**/createMockTable(ImmutableSet.of(createMockEntity("P1"))), //
+    /**/createMockTable(ImmutableSet.of(createMockEntity("P1"), createMockEntity("P2"))) //
+    );
+
+    testGetParticipantCount(tables, 2);
   }
 
   //
   // Helper Methods
   //
+
+  private ParticipantsResource createParticipantsResource() {
+    return new ParticipantsResource("keysTableReference") {
+
+      String extractKeysDatasourceName(String keysTableReference) {
+        return "mockDatasource";
+      }
+    };
+  }
 
   private void testGetParticipantCount(Set<ValueTable> tables, int expectedCount) {
     // Setup
@@ -71,7 +90,7 @@ public class ParticipantsResourceTest extends AbstractMagmaResourceTest {
     // Exercise
     MagmaEngine.get().addDatasource(mockDatasource);
 
-    ParticipantsResource sut = new ParticipantsResource("keysDs");
+    ParticipantsResource sut = createParticipantsResource();
     Response response = sut.getParticipantCount();
 
     MagmaEngine.get().removeDatasource(mockDatasource);
@@ -84,13 +103,10 @@ public class ParticipantsResourceTest extends AbstractMagmaResourceTest {
     assertEquals(String.valueOf(expectedCount), response.getEntity());
   }
 
-  private ValueTable createMockTable(Set<VariableEntity> entities, String type, String... otherTypes) {
+  private ValueTable createMockTable(Set<VariableEntity> entities) {
     ValueTable mockTable = createMock(ValueTable.class);
 
-    expect(mockTable.isForEntityType(type)).andReturn(true).anyTimes();
-    for(String otherType : otherTypes) {
-      expect(mockTable.isForEntityType(otherType)).andReturn(false).anyTimes();
-    }
+    expect(mockTable.isForEntityType("Participant")).andReturn(true).anyTimes();
     expect(mockTable.getVariableEntities()).andReturn(entities).anyTimes();
 
     for(VariableEntity entity : entities) {
@@ -102,10 +118,10 @@ public class ParticipantsResourceTest extends AbstractMagmaResourceTest {
     return mockTable;
   }
 
-  private VariableEntity createMockEntity(String type, String identifier) {
+  private VariableEntity createMockEntity(String identifier) {
     VariableEntity mockEntity = createMock(VariableEntity.class);
 
-    expect(mockEntity.getType()).andReturn(type).anyTimes();
+    expect(mockEntity.getType()).andReturn("Participant").anyTimes();
     expect(mockEntity.getIdentifier()).andReturn(identifier).anyTimes();
 
     replay(mockEntity);
