@@ -30,6 +30,10 @@ a:hover {
 	margin: auto;	
 }
 
+.title {
+  font-size: 1.3em;
+}
+
 /* Workbench */
 
 .workbench .top {
@@ -61,6 +65,7 @@ a:hover {
 
 .workbench .main .title {
 	font-weight: bold;
+	font-size: 1em;
 }
 
 .workbench .main .p {
@@ -88,16 +93,14 @@ a:hover {
 
 .workbench .information .title {
   font-weight: bold;
+  font-size: 1em;
 }
 
-.title {
-  font-size: 1.3em;
-}
+/* Workbench */
 
 .dashboard {
   padding: 0.5em 0 0 1em;
 }
-
 
 .dashboard .gwt-Label.title {
   font-weight: normal;
@@ -116,7 +119,18 @@ a:hover {
   font-weight: normal;
 }
 
+.dashboard #shortcuts a:hover {
+  text-decoration: none;
+}
 
+.dashboard #shortcuts a img {
+  margin-right: 10px;
+}
+
+.dashboard #shortcuts a {
+  font-weight: bold;
+  color: #000000;
+}
 
 /* File Explorer Styles */ 
  

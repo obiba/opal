@@ -13,24 +13,21 @@
       <g:Label addStyleNames="count" ui:field="participantCount" />
     </div>
     <div>
-      <g:Label>
         <ui:msg description="What to do now label">What to do now:</ui:msg>
-      </g:Label>
     </div>
-    <div>
-      <g:Anchor ui:field="exploreVariablesLink"><img src="image/spreadsheet.png"/></g:Anchor>
-      <g:Label><ui:msg description="Explore variables link label">Explore Variables</ui:msg>:</g:Label>
-      <ui:msg description="Explore variables link description">go through the tables and the variables and check the datasets content.</ui:msg>
-    </div>
-    <div>
-      <g:Anchor ui:field="importDataLink"><img src="image/previous.png"/></g:Anchor>
-      <g:Label><ui:msg description="Import data link label">Import Data</ui:msg>:</g:Label>
-      <ui:msg description="Import data link description">import some new data from a file in various format.</ui:msg>
-    </div>
-    <div>
-      <g:Anchor ui:field="exportDataLink"><img src="image/next.png"/></g:Anchor>
-      <g:Label><ui:msg description="Export data link label">Export Data</ui:msg>:</g:Label>
-      <ui:msg description="Import data link description">export the data to various destinations (file, database...).</ui:msg>
+    <div id="shortcuts" class="large-indent">
+	    <div>
+	      <g:Anchor ui:field="exploreVariablesLink"><img src="image/spreadsheet-big.png" align="middle"/><ui:msg description="Explore variables link label">Explore Variables</ui:msg></g:Anchor>:
+	      <ui:msg description="Explore variables link description">go through the tables and the variables and check the datasets content.</ui:msg>
+	    </div>
+	    <div>
+	      <g:Anchor ui:field="importDataLink"><img src="image/document-import.png" align="middle"/><ui:msg description="Import data link label">Import Data</ui:msg></g:Anchor>:
+	      <ui:msg description="Import data link description">import some new data from a file in various format.</ui:msg>
+	    </div>
+	    <div>
+	      <g:Anchor ui:field="exportDataLink"><img src="image/document-export.png" align="middle"/><ui:msg description="Export data link label">Export Data</ui:msg></g:Anchor>:
+	      <ui:msg description="Import data link description">export the data to various destinations (file, database...).</ui:msg>
+	    </div>
     </div>
   </g:HTMLPanel>
 </ui:UiBinder>
