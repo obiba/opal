@@ -37,10 +37,6 @@ a:hover {
     float: left;
     margin-right:20px;
 }
-
-.workbench .top .title {
-    font-size: 1.3em;
-}
   
 .workbench .top .summary { 
     margin-top:0.25em;
@@ -88,6 +84,34 @@ a:hover {
 .workbench .information .title {
   font-weight: bold;
 }
+
+.title {
+  font-size: 1.3em;
+}
+
+.dashboard {
+  padding: 0.5em 0 0 1em;
+}
+
+
+.dashboard .gwt-Label.title {
+  font-weight: normal;
+}
+
+.dashboard div {
+  margin-top:20px;
+}
+
+.dashboard .gwt-Label {
+  font-weight: bold;
+  display: inline;
+}
+
+.dashboard .gwt-Label.count {
+  font-weight: normal;
+}
+
+
 
 /* File Explorer Styles */ 
  

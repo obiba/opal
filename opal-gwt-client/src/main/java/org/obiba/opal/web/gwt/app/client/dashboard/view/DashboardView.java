@@ -13,9 +13,12 @@ import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -36,6 +39,18 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   //
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+
+  @UiField
+  Label participantCount;
+
+  @UiField
+  Anchor exploreVariablesLink;
+
+  @UiField
+  Anchor importDataLink;
+
+  @UiField
+  Anchor exportDataLink;
 
   //
   // Instance Variables
@@ -67,6 +82,22 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   @Override
   public void stopProcessing() {
 
+  }
+
+  public void setParticipantCount(int count) {
+    participantCount.setText(String.valueOf(count));
+  }
+
+  public Anchor getExploreVariablesLink() {
+    return exploreVariablesLink;
+  }
+
+  public Anchor getImportDataLink() {
+    return importDataLink;
+  }
+
+  public Anchor getExportDataLink() {
+    return exportDataLink;
   }
 
   //

@@ -1,11 +1,35 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" 
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <g:HTMLPanel>
-    <g:Label><ui:msg description="Dashboard menu item">Dashboard</ui:msg></g:Label>
+  <g:HTMLPanel addStyleNames="dashboard">
+    <g:Label addStyleNames="title">
+      <ui:msg description="Dashboard title" >Study Dashboard</ui:msg>
+    </g:Label>
+    <div>
+      <g:Label>
+        <ui:msg description="Participant count label">Number of Participants:</ui:msg>
+      </g:Label>
+      <g:Label addStyleNames="count" ui:field="participantCount" />
+    </div>
+    <div>
+      <g:Label>
+        <ui:msg description="What to do now label">What to do now:</ui:msg>
+      </g:Label>
+    </div>
+    <div>
+      <g:Anchor ui:field="exploreVariablesLink"><img src="image/spreadsheet.png"/></g:Anchor>
+      <ui:msg description="Explore variables link description">go through the tables and the variables and check the datasets content.</ui:msg>
+    </div>
+    <div>
+      <g:Anchor ui:field="importDataLink"><img src="image/previous.png"/></g:Anchor>
+      <g:Label><ui:msg description="Import data link label">Import Data</ui:msg>:</g:Label>
+      <ui:msg description="Import data link description">import some new data from a file in various format.</ui:msg>
+    </div>
+    <div>
+      <g:Anchor ui:field="exportDataLink"><img src="image/next.png"/></g:Anchor>
+      <g:Label><ui:msg description="Export data link label">Export Data</ui:msg>:</g:Label>
+      <ui:msg description="Import data link description">export the data to various destinations (file, database...).</ui:msg>
+    </div>
   </g:HTMLPanel>
 </ui:UiBinder>
