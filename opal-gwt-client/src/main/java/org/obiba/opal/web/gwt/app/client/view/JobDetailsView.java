@@ -87,10 +87,15 @@ public class JobDetailsView extends DialogBox implements Display {
     return this;
   }
 
+  @SuppressWarnings("unchecked")
   public void showDialog(CommandStateDto commandStateDto) {
-    setText("Job #" + commandStateDto.getId());
+    setText(translations.jobLabel() + " #" + commandStateDto.getId());
 
     JsArray<Message> jobMessages = commandStateDto.getMessagesArray();
+    if(jobMessages == null) {
+      jobMessages = (JsArray<Message>) JsArray.createArray();
+    }
+
     table.setData(0, jobMessages.length(), JsArrays.toList(jobMessages));
     table.setDataSize(jobMessages.length(), true);
 
