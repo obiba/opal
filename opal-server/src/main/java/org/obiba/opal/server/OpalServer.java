@@ -63,7 +63,7 @@ public class OpalServer {
           }
         });
 
-        System.out.println("Opal Server successfully started. Type the 'any key' to stop.");
+        System.out.println("Opal Server successfully started.");
         System.in.read();
         shutdown();
       } finally {
