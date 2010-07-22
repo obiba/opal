@@ -100,6 +100,9 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
   @Override
   protected void onUnbind() {
     navigatorTreePresenter.unbind();
+    datasourcePresenter.unbind();
+    tablePresenter.unbind();
+    variablePresenter.unbind();
   }
 
   @Override
