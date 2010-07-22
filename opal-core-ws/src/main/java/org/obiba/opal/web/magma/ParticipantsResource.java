@@ -14,6 +14,7 @@ import java.util.Set;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
@@ -32,7 +33,7 @@ public class ParticipantsResource {
 
   @GET
   @Path("/count")
-  public String getParticipantCount() {
+  public Response getParticipantCount() {
     Set<String> participantIdentifiers = new HashSet<String>();
 
     for(Datasource datasource : MagmaEngine.get().getDatasources()) {
@@ -47,7 +48,6 @@ public class ParticipantsResource {
       }
     }
 
-    return String.valueOf(participantIdentifiers.size());
+    return Response.ok(String.valueOf(participantIdentifiers.size())).build();
   }
-
 }
