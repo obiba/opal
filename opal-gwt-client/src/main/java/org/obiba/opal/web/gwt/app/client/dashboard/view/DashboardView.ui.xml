@@ -19,6 +19,7 @@
     </div>
     <div>
       <g:Anchor ui:field="exploreVariablesLink"><img src="image/spreadsheet.png"/></g:Anchor>
+      <g:Label><ui:msg description="Explore variables link label">Explore Variables</ui:msg>:</g:Label>
       <ui:msg description="Explore variables link description">go through the tables and the variables and check the datasets content.</ui:msg>
     </div>
     <div>
