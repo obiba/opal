@@ -310,6 +310,28 @@ public class WebShellResourceTest {
   }
 
   @Test
+  public void testDeleteCompletedCommands() {
+    // Setup
+    CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
+    mockCommandJobService.deleteCompletedCommands();
+    expectLastCall().once();
+
+    WebShellResource sut = new WebShellResource();
+    sut.setCommandJobService(mockCommandJobService);
+
+    replay(mockCommandJobService);
+
+    // Exercise
+    Response response = sut.deleteCompletedCommands();
+
+    // Verify mocks
+    verify(mockCommandJobService);
+
+    // Verify that the HTTP response code was OK (200).
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
   public void testImportData() {
     // Setup
     Integer jobId = 1;

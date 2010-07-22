@@ -17,6 +17,7 @@ import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,6 +53,8 @@ public class DefaultCommandJobServiceTest {
 
   private List<FutureCommandJob> futureCommandJobs;
 
+  private List<FutureCommandJob> jobsTerminated;
+
   //
   // Fixture Methods (setUp / tearDown)
   //
@@ -75,6 +78,10 @@ public class DefaultCommandJobServiceTest {
     sut = new DefaultCommandJobService() {
       protected List<FutureCommandJob> getFutureCommandJobs() {
         return futureCommandJobs != null ? futureCommandJobs : super.getFutureCommandJobs();
+      }
+
+      List<FutureCommandJob> getTerminatedJobs() {
+        return jobsTerminated != null ? jobsTerminated : super.getTerminatedJobs();
       }
     };
     sut.setExecutor(mockExecutor);
@@ -174,9 +181,9 @@ public class DefaultCommandJobServiceTest {
   public void testGetHistory_ReturnsAllJobsInReverseOrderOfSubmission() {
     // Test-specific setup
     futureCommandJobs = new ArrayList<FutureCommandJob>();
-    futureCommandJobs.add(new FutureCommandJob(createCommandJob(1, new Date(1))));
-    futureCommandJobs.add(new FutureCommandJob(createCommandJob(2, new Date(2))));
-    futureCommandJobs.add(new FutureCommandJob(createCommandJob(3, new Date(3))));
+    futureCommandJobs.add(new FutureCommandJob(createCommandJob(1, new Date(1), null)));
+    futureCommandJobs.add(new FutureCommandJob(createCommandJob(2, new Date(2), null)));
+    futureCommandJobs.add(new FutureCommandJob(createCommandJob(3, new Date(3), null)));
 
     // Exercise
     List<CommandJob> history = sut.getHistory();
@@ -243,6 +250,107 @@ public class DefaultCommandJobServiceTest {
     sut.deleteCommand(commandJob.getId());
   }
 
+  @Test
+  public void testDeleteCompletedCommands() {
+    // Test-specific setup
+
+    // Create some completed/terminated commands -- these SHOULD be deleted.
+    FutureCommandJob succeededJob = new FutureCommandJob(createCommandJob(1, new Date(1), Status.SUCCEEDED));
+    FutureCommandJob failedJob = new FutureCommandJob(createCommandJob(1, new Date(1), Status.FAILED));
+    FutureCommandJob cancelledJob = new FutureCommandJob(createCommandJob(1, new Date(1), Status.CANCELED));
+
+    // Put them in the list of future command jobs.
+    futureCommandJobs = new ArrayList<FutureCommandJob>();
+    futureCommandJobs.add(succeededJob);
+    futureCommandJobs.add(failedJob);
+    futureCommandJobs.add(cancelledJob);
+
+    // Put them in the sub-list of terminated jobs.
+    // Note: These are normally put there by the executor's afterExecute callback.
+    jobsTerminated = new ArrayList<FutureCommandJob>();
+    jobsTerminated.add(succeededJob);
+    jobsTerminated.add(failedJob);
+    jobsTerminated.add(cancelledJob);
+
+    // Exercise
+    sut.deleteCompletedCommands();
+
+    // Verify that all the completed/terminated jobs were removed
+    assertTrue(jobsTerminated.isEmpty());
+  }
+
+  @Test
+  public void testIsDeletable_ReturnsTrueForSucceededJob() {
+    // Test-specific setup
+    initCommandJob(Status.SUCCEEDED);
+
+    // Exercise
+    boolean isDeletable = sut.isDeletable(commandJob);
+
+    // Verify
+    assertEquals(true, isDeletable);
+  }
+
+  @Test
+  public void testIsDeletable_ReturnsTrueForFailedJob() {
+    // Test-specific setup
+    initCommandJob(Status.FAILED);
+
+    // Exercise
+    boolean isDeletable = sut.isDeletable(commandJob);
+
+    // Verify
+    assertEquals(true, isDeletable);
+  }
+
+  @Test
+  public void testIsDeletable_ReturnsTrueForCanceledJob() {
+    // Test-specific setup
+    initCommandJob(Status.CANCELED);
+
+    // Exercise
+    boolean isDeletable = sut.isDeletable(commandJob);
+
+    // Verify
+    assertEquals(true, isDeletable);
+  }
+
+  @Test
+  public void testIsDeletable_ReturnsFalseForNotStartedJob() {
+    // Test-specific setup
+    initCommandJob(Status.NOT_STARTED);
+
+    // Exercise
+    boolean isDeletable = sut.isDeletable(commandJob);
+
+    // Verify
+    assertEquals(false, isDeletable);
+  }
+
+  @Test
+  public void testIsDeletable_ReturnsFalseForInProgressJob() {
+    // Test-specific setup
+    initCommandJob(Status.IN_PROGRESS);
+
+    // Exercise
+    boolean isDeletable = sut.isDeletable(commandJob);
+
+    // Verify
+    assertEquals(false, isDeletable);
+  }
+
+  @Test
+  public void testIsDeletable_ReturnsFalseForCancelPendingJob() {
+    // Test-specific setup
+    initCommandJob(Status.CANCEL_PENDING);
+
+    // Exercise
+    boolean isDeletable = sut.isDeletable(commandJob);
+
+    // Verify
+    assertEquals(false, isDeletable);
+  }
+
   //
   // Helper Methods
   //
@@ -250,14 +358,14 @@ public class DefaultCommandJobServiceTest {
   private List<CommandJob> createJobHistory() {
     List<CommandJob> jobHistory = new ArrayList<CommandJob>();
 
-    jobHistory.add(createCommandJob(1, new Date(1l)));
-    jobHistory.add(createCommandJob(2, new Date(2l)));
-    jobHistory.add(createCommandJob(3, new Date(3l)));
+    jobHistory.add(createCommandJob(1, new Date(1l), null));
+    jobHistory.add(createCommandJob(2, new Date(2l), null));
+    jobHistory.add(createCommandJob(3, new Date(3l), null));
 
     return jobHistory;
   }
 
-  private CommandJob createCommandJob(Integer id, Date submitTime) {
+  private CommandJob createCommandJob(Integer id, Date submitTime, Status status) {
     Command<?> cmd = createMock(Command.class);
     cmd.setShell((OpalShell) EasyMock.anyObject());
     expectLastCall().once();
@@ -265,6 +373,7 @@ public class DefaultCommandJobServiceTest {
     CommandJob aCommandJob = new CommandJob(cmd);
     aCommandJob.setId(id);
     aCommandJob.setSubmitTime(submitTime);
+    aCommandJob.setStatus(status);
 
     EasyMock.replay(cmd);
     return aCommandJob;

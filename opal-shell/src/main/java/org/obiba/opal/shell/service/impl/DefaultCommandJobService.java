@@ -170,7 +170,7 @@ public class DefaultCommandJobService implements CommandJobService {
           log.info("CommandJob {} is not deletable (current status: {})", id, job.getStatus());
           throw new IllegalStateException("commandJob not deletable");
         }
-        jobsTerminated.remove(futureCommandJob);
+        getTerminatedJobs().remove(futureCommandJob);
         return;
       }
     }
@@ -181,7 +181,7 @@ public class DefaultCommandJobService implements CommandJobService {
     for(FutureCommandJob futureCommandJob : getFutureCommandJobs()) {
       CommandJob job = futureCommandJob.getCommandJob();
       if(isDeletable(job)) {
-        jobsTerminated.remove(futureCommandJob);
+        getTerminatedJobs().remove(futureCommandJob);
       }
     }
   }
@@ -202,13 +202,13 @@ public class DefaultCommandJobService implements CommandJobService {
     return new ThreadPoolExecutor(10, 10, 0, TimeUnit.MILLISECONDS, jobsNotStarted) {
       @Override
       protected void beforeExecute(Thread t, Runnable r) {
-        jobsStarted.add((FutureCommandJob) r);
+        getStartedJobs().add((FutureCommandJob) r);
       }
 
       @Override
       protected void afterExecute(Runnable r, Throwable t) {
-        jobsStarted.remove(r);
-        jobsTerminated.add((FutureCommandJob) r);
+        getStartedJobs().remove(r);
+        getTerminatedJobs().add((FutureCommandJob) r);
       }
     };
   }
@@ -234,15 +234,15 @@ public class DefaultCommandJobService implements CommandJobService {
     List<FutureCommandJob> allFutureCommandJobs = new ArrayList<FutureCommandJob>();
 
     synchronized(this) {
-      for(Runnable runnable : jobsNotStarted) {
+      for(Runnable runnable : getNotStartedJobs()) {
         allFutureCommandJobs.add((FutureCommandJob) runnable);
       }
 
-      for(FutureCommandJob futureCommandJob : jobsStarted) {
+      for(FutureCommandJob futureCommandJob : getStartedJobs()) {
         allFutureCommandJobs.add(futureCommandJob);
       }
 
-      for(FutureCommandJob futureCommandJob : jobsTerminated) {
+      for(FutureCommandJob futureCommandJob : getTerminatedJobs()) {
         allFutureCommandJobs.add(futureCommandJob);
       }
     }
@@ -250,7 +250,19 @@ public class DefaultCommandJobService implements CommandJobService {
     return allFutureCommandJobs;
   }
 
-  private boolean isDeletable(CommandJob commandJob) {
+  BlockingQueue<Runnable> getNotStartedJobs() {
+    return jobsNotStarted;
+  }
+
+  List<FutureCommandJob> getStartedJobs() {
+    return jobsStarted;
+  }
+
+  List<FutureCommandJob> getTerminatedJobs() {
+    return jobsTerminated;
+  }
+
+  public boolean isDeletable(CommandJob commandJob) {
     switch(commandJob.getStatus()) {
     case SUCCEEDED:
     case FAILED:
