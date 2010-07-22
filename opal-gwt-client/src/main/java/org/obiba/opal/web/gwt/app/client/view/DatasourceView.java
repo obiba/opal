@@ -71,6 +71,9 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   @UiField
   Image nextImage;
 
+  @UiField
+  Image loading;
+
   private TableNameColumn tableNameColumn;
 
   private Translations translations = GWT.create(Translations.class);
@@ -137,6 +140,20 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
       pager.setPage(pageIndex);
     }
     selectionModel.setSelected(tableDto, true);
+  }
+
+  @Override
+  public void beforeRenderRows() {
+    pager.setVisible(false);
+    table.setVisible(false);
+    loading.setVisible(true);
+  }
+
+  @Override
+  public void afterRenderRows() {
+    pager.setVisible(true);
+    table.setVisible(true);
+    loading.setVisible(false);
   }
 
   @SuppressWarnings("unchecked")

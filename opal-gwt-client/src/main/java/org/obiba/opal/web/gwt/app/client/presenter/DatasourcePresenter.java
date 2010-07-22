@@ -151,15 +151,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   }
 
   private void updateTable(final String tableName) {
-    ResourceRequestBuilderFactory.<JsArray<TableDto>> newBuilder().forResource("/datasource/" + datasourceName + "/tables").get().withCallback(new ResourceCallback<JsArray<TableDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<TableDto> resource) {
-        tables = resource;
-        getDisplay().renderRows(resource);
-        selectTable(tableName);
-      }
-
-    }).send();
+    ResourceRequestBuilderFactory.<JsArray<TableDto>> newBuilder().forResource("/datasource/" + datasourceName + "/tables").get().withCallback(new TablesResourceCallback(datasourceName, tableName)).send();
   }
 
   private void downloadMetadata(String datasource) {
@@ -196,6 +188,29 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   //
   // Interfaces and classes
   //
+
+  private final class TablesResourceCallback implements ResourceCallback<JsArray<TableDto>> {
+
+    private final String datasourceName;
+
+    private final String selectTableName;
+
+    private TablesResourceCallback(String datasourceName, String selectTableName) {
+      this.datasourceName = datasourceName;
+      this.selectTableName = selectTableName;
+      getDisplay().beforeRenderRows();
+    }
+
+    @Override
+    public void onResource(Response response, JsArray<TableDto> resource) {
+      if(this.datasourceName.equals(DatasourcePresenter.this.datasourceName)) {
+        tables = (resource != null) ? resource : (JsArray<TableDto>) JsArray.createArray();
+        getDisplay().renderRows(resource);
+        selectTable(selectTableName);
+        getDisplay().afterRenderRows();
+      }
+    }
+  }
 
   class TableNameFieldUpdater implements FieldUpdater<TableDto, String> {
     @Override
@@ -291,7 +306,11 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
     void setTableSelection(TableDto variable, int index);
 
+    void beforeRenderRows();
+
     void renderRows(JsArray<TableDto> rows);
+
+    void afterRenderRows();
 
     void setDatasourceName(String name);
 

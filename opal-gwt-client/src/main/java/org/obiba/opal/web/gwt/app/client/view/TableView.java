@@ -85,6 +85,9 @@ public class TableView extends Composite implements TablePresenter.Display {
   @UiField
   Image nextImage;
 
+  @UiField
+  Image loading;
+
   private VariableNameColumn variableNameColumn;
 
   private Translations translations = GWT.create(Translations.class);
@@ -142,6 +145,20 @@ public class TableView extends Composite implements TablePresenter.Display {
     ((InsertPanel) table.getParent()).insert(pager, 0);
     DOM.removeElementAttribute(pager.getElement(), "style");
     DOM.setStyleAttribute(pager.getElement(), "cssFloat", "right");
+  }
+
+  @Override
+  public void beforeRenderRows() {
+    pager.setVisible(false);
+    table.setVisible(false);
+    loading.setVisible(true);
+  }
+
+  @Override
+  public void afterRenderRows() {
+    pager.setVisible(true);
+    table.setVisible(true);
+    loading.setVisible(false);
   }
 
   @SuppressWarnings("unchecked")

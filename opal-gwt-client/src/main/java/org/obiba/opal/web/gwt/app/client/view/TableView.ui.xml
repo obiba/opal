@@ -66,11 +66,14 @@
        <g:Label addStyleNames="{style.title-light}"><ui:msg description="Entity type label">Entity Type</ui:msg>:</g:Label>
        <g:Label addStyleNames="small-indent {style.title}" ui:field="entityType">Entity Name</g:Label>
      </g:HorizontalPanel>
-      
+     
      <g:FlowPanel addStyleNames="small-indent {style.tableList}">
        <g:Label ui:field="variablesTableTitle" addStyleNames="left-aligned {style.title-bold}"><ui:msg description="Variables label">Variables</ui:msg></g:Label>
        <g2:CellTable width="100%" ui:field="table" addStyleNames="left-aligned" />
      </g:FlowPanel>
+     
+     <g:Image ui:field="loading" url="image/loading.gif" addStyleNames="loading"/>
+     
   </g:VerticalPanel>
 
 </ui:UiBinder>

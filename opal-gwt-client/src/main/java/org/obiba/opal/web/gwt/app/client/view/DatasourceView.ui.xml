@@ -58,6 +58,9 @@
        <g:Label ui:field="tablesTableTitle" addStyleNames="left-aligned {style.title-bold}"><ui:msg description="Tables label">Tables</ui:msg></g:Label>
        <g2:CellTable width="100%" ui:field="table" addStyleNames="left-aligned" />
      </g:FlowPanel>
+     
+     <g:Image ui:field="loading" url="image/loading.gif" addStyleNames="loading"/>
+     
   </g:VerticalPanel>
   
 </ui:UiBinder>

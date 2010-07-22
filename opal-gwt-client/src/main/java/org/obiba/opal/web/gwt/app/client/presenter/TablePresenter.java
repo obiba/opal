@@ -109,14 +109,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   }
 
   private void updateVariables() {
-    ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(table.getLink() + "/variables").get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<VariableDto> resource) {
-        variables = resource;
-        getDisplay().renderRows(variables);
-      }
-
-    }).send();
+    ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(table.getLink() + "/variables").get().withCallback(new VariablesResourceCallback(table)).send();
   }
 
   private void downloadMetadata() {
@@ -143,6 +136,26 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   //
   // Interfaces and classes
   //
+
+  class VariablesResourceCallback implements ResourceCallback<JsArray<VariableDto>> {
+
+    private TableDto table;
+
+    public VariablesResourceCallback(TableDto table) {
+      super();
+      this.table = table;
+      getDisplay().beforeRenderRows();
+    }
+
+    @Override
+    public void onResource(Response response, JsArray<VariableDto> resource) {
+      if(this.table.getLink().equals(TablePresenter.this.table.getLink())) {
+        variables = (resource != null) ? resource : (JsArray<VariableDto>) JsArray.createArray();
+        getDisplay().renderRows(variables);
+        getDisplay().afterRenderRows();
+      }
+    }
+  }
 
   class TableSelectionChangeHandler implements TableSelectionChangeEvent.Handler {
     @Override
@@ -223,7 +236,11 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
     void setVariableSelection(VariableDto variable, int index);
 
+    void beforeRenderRows();
+
     void renderRows(JsArray<VariableDto> rows);
+
+    void afterRenderRows();
 
     void clear();
 

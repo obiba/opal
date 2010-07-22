@@ -25,6 +25,11 @@ a:hover {
 	margin-left: 30px;
 }
 
+.loading {
+	display: block;
+	margin: auto;	
+}
+
 /* Workbench */
 
 .workbench .top {
