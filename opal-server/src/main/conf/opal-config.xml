@@ -69,6 +69,8 @@
 
         <settings>
           <defaultEntityType>Participant</defaultEntityType>
+          <createdTimestampColumnName>created</createdTimestampColumnName>
+          <updatedTimestampColumnName>updated</updatedTimestampColumnName>
         </settings>
       </org.obiba.magma.datasource.jdbc.JdbcDatasourceFactory>
       -->
