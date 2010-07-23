@@ -145,6 +145,7 @@ public class VariableView extends Composite implements VariablePresenter.Display
     categoryTablePager.firstPage();
     categoryTable.setData(0, categoryTable.getPageSize(), JsArrays.toList(categoryRows, 0, categoryTable.getPageSize()));
     categoryTable.setDataSize(categoryRows.length(), true);
+    categoryTable.redraw();
   }
 
   @SuppressWarnings("unchecked")
@@ -166,6 +167,7 @@ public class VariableView extends Composite implements VariablePresenter.Display
     attributeTablePager.firstPage();
     attributeTable.setData(0, attributeTable.getPageSize(), JsArrays.toList(attributeRows, 0, attributeTable.getPageSize()));
     attributeTable.setDataSize(attributeRows.length(), true);
+    attributeTable.redraw();
 
     label.setText(getAttributeValue(attributeRows, LABEL_ATTRIBUTE_NAME));
   }
