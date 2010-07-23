@@ -136,6 +136,8 @@ public class FileSystemTreeView implements Display {
   @Override
   public void removeBranch(FileDto folderToRemove) {
     TreeItem itemToRemove = findTreeItem(folderToRemove);
-    itemToRemove.remove();
+    if(itemToRemove != null) {
+      itemToRemove.remove();
+    }
   }
 }

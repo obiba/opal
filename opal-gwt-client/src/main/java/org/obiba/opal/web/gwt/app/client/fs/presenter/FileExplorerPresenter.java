@@ -180,6 +180,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
       @Override
       public void onFileSelectionChange(FileSelectionChangeEvent event) {
         selectedFile = event.getFile();
+        getDisplay().setEnabledFileDeleteButton(true);
       }
     }));
 
@@ -207,7 +208,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   }
 
   private void setEnableFileDeleteButton(FileDto folder) {
-    getDisplay().setEnabledFileDeleteButton(folder.getPath().equals("/") ? false : true);
+    getDisplay().setEnabledFileDeleteButton(folder.getPath().equals("/") ? false : folder.getChildrenCount() == 0);
   }
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
