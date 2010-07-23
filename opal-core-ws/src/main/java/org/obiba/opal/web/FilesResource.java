@@ -120,7 +120,7 @@ public class FilesResource {
     File localFile = opalRuntime.getFileSystem().getLocalFile(file);
     String mimeType = mimeTypes.getContentType(localFile);
 
-    return Response.ok(localFile, MediaType.valueOf(mimeType)).header("Content-Disposition", "attachment; filename=" + localFile.getName()).build();
+    return Response.ok(localFile, MediaType.valueOf(mimeType)).header("Content-Disposition", getContentDispositionOfAttachment(localFile.getName())).build();
   }
 
   private Response getFolder(FileObject folder) throws IOException {
@@ -132,7 +132,7 @@ public class FilesResource {
 
     compressFolder(compressedFolder, folder);
 
-    return Response.ok(compressedFolder, MediaType.valueOf(mimeType)).header("Content-Disposition", "attachment; filename=" + compressedFolder.getName()).build();
+    return Response.ok(compressedFolder, MediaType.valueOf(mimeType)).header("Content-Disposition", getContentDispositionOfAttachment(compressedFolder.getName())).build();
   }
 
   private Response getFolderDetails(FileObject folder) throws FileSystemException {
@@ -333,5 +333,9 @@ public class FilesResource {
       StreamUtil.silentSafeClose(inputStream);
 
     }
+  }
+
+  private String getContentDispositionOfAttachment(String fileName) {
+    return "attachment; filename=\"" + fileName + "\"";
   }
 }
