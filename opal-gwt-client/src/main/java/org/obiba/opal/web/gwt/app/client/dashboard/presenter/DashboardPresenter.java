@@ -16,8 +16,10 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.DataImportPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -44,6 +46,12 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
 
   @Inject
   private Provider<NavigatorPresenter> navigationPresenter;
+
+  @Inject
+  private Provider<FileExplorerPresenter> fileExplorerPresenter;
+
+  @Inject
+  private Provider<JobListPresenter> jobListPresenter;
 
   //
   // Constructors
@@ -92,6 +100,22 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
         eventBus.fireEvent(new WorkbenchChangeEvent(navigationPresenter.get()));
       }
     }));
+
+    super.registerHandler(getDisplay().getExploreFilesLink().addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        eventBus.fireEvent(new WorkbenchChangeEvent(fileExplorerPresenter.get()));
+      }
+    }));
+
+    super.registerHandler(getDisplay().getJobListLink().addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        eventBus.fireEvent(new WorkbenchChangeEvent(jobListPresenter.get()));
+      }
+    }));
   }
 
   @Override
@@ -130,6 +154,11 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
     HasClickHandlers getImportDataLink();
 
     HasClickHandlers getExportDataLink();
+
+    HasClickHandlers getExploreFilesLink();
+
+    HasClickHandlers getJobListLink();
+
   }
 
 }

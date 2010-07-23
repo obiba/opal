@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.dashboard.view;
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -51,6 +52,12 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
 
   @UiField
   Anchor exportDataLink;
+
+  @UiField
+  Anchor exploreFilesLink;
+
+  @UiField
+  Anchor jobsLink;
 
   //
   // Instance Variables
@@ -98,6 +105,16 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
 
   public Anchor getExportDataLink() {
     return exportDataLink;
+  }
+
+  @Override
+  public HasClickHandlers getExploreFilesLink() {
+    return exploreFilesLink;
+  }
+
+  @Override
+  public HasClickHandlers getJobListLink() {
+    return jobsLink;
   }
 
   //
