@@ -22,7 +22,6 @@ import org.obiba.opal.web.gwt.app.client.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -113,7 +112,6 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        GWT.log(response.getText());
         getDisplay().setParticipantCount(Integer.parseInt(response.getText()));
       }
     }).send();
