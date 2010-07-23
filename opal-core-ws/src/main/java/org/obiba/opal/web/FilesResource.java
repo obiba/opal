@@ -128,10 +128,11 @@ public class FilesResource {
     String folderName = folder.getName().getBaseName();
     File compressedFolder = new File(System.getProperty("java.io.tmpdir"), (folderName.equals("") ? "filesystem" : folderName) + "_" + dateTimeFormatter.format(System.currentTimeMillis()) + ".zip");
     compressedFolder.deleteOnExit();
+    String mimeType = mimeTypes.getContentType(compressedFolder);
 
     compressFolder(compressedFolder, folder);
 
-    return Response.ok(compressedFolder, MediaType.APPLICATION_OCTET_STREAM_TYPE).header("Content-Disposition", "attachment; filename=" + compressedFolder.getName()).build();
+    return Response.ok(compressedFolder, MediaType.valueOf(mimeType)).header("Content-Disposition", "attachment; filename=" + compressedFolder.getName()).build();
   }
 
   private Response getFolderDetails(FileObject folder) throws FileSystemException {
