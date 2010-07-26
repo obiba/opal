@@ -231,7 +231,6 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
         } else {
           selectedFile = null;
           eventBus.fireEvent(new FileDeletedEvent(file));
-          refreshDisplay();
         }
       }
     };
