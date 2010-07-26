@@ -4,7 +4,7 @@
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
-    <version>1.2-M3</version>
+    <version>1.2-SNAPSHOT</version>
   </parent>
   <groupId>org.obiba.opal</groupId>
   <artifactId>opal-ws</artifactId>
