@@ -248,11 +248,8 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
       if(getDisplay().isDestinationDataSource()) {
         dto.setDestination(getDisplay().getSelectedDatasource());
       } else {
-        String outputFileFormat = getDisplay().getFileFormat();
-        String outputFilePath = addFileExtensionIfMissing(getDisplay().getOutFile(), outputFileFormat);
-
-        dto.setFormat(outputFileFormat);
-        dto.setOut(outputFilePath);
+        dto.setFormat(getDisplay().getFileFormat());
+        dto.setOut(addFileExtensionIfMissing(getDisplay().getOutFile(), dto.getFormat()));
       }
       dto.setNonIncremental(!getDisplay().isIncremental());
       dto.setNoVariables(!getDisplay().isWithVariables());
