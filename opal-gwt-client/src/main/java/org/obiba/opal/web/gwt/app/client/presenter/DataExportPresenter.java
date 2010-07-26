@@ -248,8 +248,11 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
       if(getDisplay().isDestinationDataSource()) {
         dto.setDestination(getDisplay().getSelectedDatasource());
       } else {
-        dto.setOut(getDisplay().getOutFile());
-        dto.setFormat(getDisplay().getFileFormat());
+        String outputFileFormat = getDisplay().getFileFormat();
+        String outputFilePath = addFileExtensionIfMissing(getDisplay().getOutFile(), outputFileFormat);
+
+        dto.setFormat(outputFileFormat);
+        dto.setOut(outputFilePath);
       }
       dto.setNonIncremental(!getDisplay().isIncremental());
       dto.setNoVariables(!getDisplay().isWithVariables());
@@ -257,6 +260,20 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
       if(getDisplay().isUnitId()) dto.setUnit(getDisplay().getSelectedUnit());
 
       return dto;
+    }
+
+    private String addFileExtensionIfMissing(String outputFilePath, String outputFileFormat) {
+      String pathWithExtension = outputFilePath;
+
+      if(outputFileFormat.equals("csv") && !outputFilePath.endsWith(".csv")) {
+        pathWithExtension = outputFilePath + ".csv";
+      } else if(outputFileFormat.equals("excel") && !outputFilePath.endsWith(".xls") && !outputFilePath.endsWith(".xlsx")) {
+        pathWithExtension = outputFilePath + ".xlsx"; // prefer .xlsx over .xls
+      } else if(outputFileFormat.equals("xml") && !outputFilePath.endsWith(".zip")) {
+        pathWithExtension = outputFilePath + ".zip";
+      }
+
+      return pathWithExtension;
     }
 
   }
