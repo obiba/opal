@@ -78,7 +78,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
   private Provider<DataExportPresenter> dataExportPresenter;
 
   @Inject
-  private JobListPresenter jobListPresenter;
+  private Provider<JobListPresenter> jobListPresenter;
 
   @Inject
   private ErrorDialogPresenter messageDialog;
@@ -144,7 +144,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
       @Override
       public void execute() {
-        eventBus.fireEvent(new WorkbenchChangeEvent(jobListPresenter));
+        eventBus.fireEvent(new WorkbenchChangeEvent(jobListPresenter.get()));
       }
     });
 

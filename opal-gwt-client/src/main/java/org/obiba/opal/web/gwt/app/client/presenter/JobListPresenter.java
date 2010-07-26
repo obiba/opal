@@ -67,7 +67,6 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
 
     getDisplay().getActionsColumn().setActionHandler(new ActionHandler() {
       public void doAction(CommandStateDto dto, String actionName) {
-        System.out.println("Actions Column fieldUpdater.update = " + actionName);
         if(actionName != null) {
           doActionImpl(dto, actionName);
         }
