@@ -20,7 +20,6 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.Fil
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.resources.OpalResources;
-import org.obiba.opal.web.gwt.user.cellview.client.DateTimeColumn;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 
@@ -29,6 +28,8 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -203,11 +204,11 @@ public class FolderDetailsView extends Composite implements Display {
       }
     }, translations.sizeLabel());
 
-    table.addColumn(new DateTimeColumn<FileDto>() {
+    table.addColumn(new TextColumn<FileDto>() {
 
       @Override
-      public Date getValue(FileDto object) {
-        return new Date((long) object.getLastModifiedTime());
+      public String getValue(FileDto object) {
+        return !object.getName().equals("..") ? DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_SHORT).format(new Date((long) object.getLastModifiedTime())) : "";
       }
     }, translations.lastModifiedLabel());
 
