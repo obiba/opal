@@ -57,8 +57,7 @@ message LinkDto {
 
 message DescriptiveStatsDto {
   optional double min = 1;
-  // TODO: this should be called 'max', but there's a but in protostuff
-  optional double maximum = 2;
+  optional double max = 2;
   optional double mean = 3;
   optional double geometricMean = 4;
   optional int64 n = 5;
