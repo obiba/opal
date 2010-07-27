@@ -110,8 +110,8 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
     super.registerHandler(eventBus.addHandler(FolderCreationEvent.getType(), new FolderCreationEvent.Handler() {
 
       public void onFolderCreation(FolderCreationEvent event) {
-        // Refresh the current folder since a new folder was added.
-        refreshDisplay();
+        eventBus.fireEvent(new FolderSelectionChangeEvent(event.getFolder()));
+        updateTable(event.getFolder().getPath());
       }
     }));
   }
