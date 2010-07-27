@@ -81,6 +81,7 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   public DatasourceView() {
     initWidget(uiBinder.createAndBindUi(this));
     addTableColumns();
+    spreadsheetDownloadImage.setTitle(translations.exportToExcelTitle());
   }
 
   private void addTableColumns() {

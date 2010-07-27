@@ -95,6 +95,7 @@ public class TableView extends Composite implements TablePresenter.Display {
   public TableView() {
     initWidget(uiBinder.createAndBindUi(this));
     addTableColumns();
+    spreadsheetDownloadImage.setTitle(translations.exportToExcelTitle());
   }
 
   private void addTableColumns() {

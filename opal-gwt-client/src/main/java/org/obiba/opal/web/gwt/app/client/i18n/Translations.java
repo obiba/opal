@@ -242,4 +242,8 @@ public interface Translations extends Constants {
   @Description("Data import instructions conclusion")
   @DefaultStringValue("Data import job is launched.")
   String dataImportInstructionsConclusion();
+
+  @Description("Export to Excel icon title")
+  @DefaultStringValue("Export to Excel file")
+  String exportToExcelTitle();
 }
