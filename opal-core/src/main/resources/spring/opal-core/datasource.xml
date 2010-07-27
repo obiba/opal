@@ -10,7 +10,7 @@
 
     <property name="maxIdle" value="10" />
     <property name="initialSize" value="2" />
-    <property name="validationQuery" value="SELECT 1"/>
+    <property name="validationQuery" value="${org.obiba.opal.datasource.validationQuery}"/>
     <property name="testOnBorrow" value="true"/>
   </bean>
 
@@ -23,7 +23,7 @@
 
     <property name="maxIdle" value="10" />
     <property name="initialSize" value="2" />
-    <property name="validationQuery" value="SELECT 1"/>
+    <property name="validationQuery" value="${org.obiba.opal.datasource.validationQuery}"/>
     <property name="testOnBorrow" value="true"/>
   </bean>
 
