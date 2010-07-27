@@ -54,3 +54,21 @@ message LinkDto {
   required string rel = 1;
   required string link = 2;
 }
+
+message DescriptiveStatsDto {
+  optional double min = 1;
+  // TODO: this should be called 'max', but there's a but in protostuff
+  optional double maximum = 2;
+  optional double mean = 3;
+  optional double geometricMean = 4;
+  optional int64 n = 5;
+  optional double sum = 6;
+  optional double sumsq = 7;
+  optional double stdDev = 8;
+  optional double variance = 9;
+  repeated double percentiles = 10;
+  optional double skewness = 11;
+  optional double kurtosis = 12;
+  optional double median = 13;
+  repeated double values = 14;
+}

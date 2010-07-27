@@ -20,6 +20,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.json.JSONObject;
 import org.obiba.magma.Category;
 import org.obiba.magma.Value;
@@ -27,6 +28,7 @@ import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
+import org.obiba.opal.web.model.Magma.DescriptiveStatsDto;
 import org.obiba.opal.web.model.Magma.FrequencyDto;
 
 import com.google.common.collect.Maps;
@@ -80,6 +82,20 @@ public class VariableResource {
       }
     }
     return frequencies.values();
+  }
+
+  @GET
+  @Path("/univariate")
+  // Can we find a better name for this resource?
+  public DescriptiveStatsDto getUnivariateAnalysis() {
+    DescriptiveStatistics ds = new DescriptiveStatistics();
+    for(ValueSet vs : valueTable.getValueSets()) {
+      Value value = vvs.getValue(vs);
+      if(value.isNull() == false) {
+        ds.addValue(((Number) value.getValue()).doubleValue());
+      }
+    }
+    return DescriptiveStatsDto.newBuilder().setMin(ds.getMin()).setMaximum(ds.getMax()).setN(ds.getN()).setMean(ds.getMean()).setSum(ds.getSum()).setSumsq(ds.getSumsq()).setStdDev(ds.getStandardDeviation()).setVariance(ds.getVariance()).setSkewness(ds.getSkewness()).setGeometricMean(ds.getGeometricMean()).setKurtosis(ds.getKurtosis()).build();
   }
 
   private void count(String key, Map<String, FrequencyDto> frequencies) {
