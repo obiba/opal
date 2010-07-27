@@ -94,6 +94,7 @@ public class FilesResource {
 
   @GET
   @Path("/")
+  @AuthenticatedByCookie
   public Response getFileSystemRoot() throws IOException {
     return getFile("/");
   }
