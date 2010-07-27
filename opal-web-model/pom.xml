@@ -258,7 +258,7 @@
     <maven.compiler.target>1.6</maven.compiler.target>
     <gwt.version>2.1.0.M2</gwt.version>
     <protobuf.version>2.3.0</protobuf.version>
-    <protostuff.version>r1001.p01</protostuff.version>
+    <protostuff.version>r1005</protostuff.version>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
   </properties>
 
