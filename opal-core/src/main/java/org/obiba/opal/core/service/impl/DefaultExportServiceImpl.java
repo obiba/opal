@@ -270,8 +270,7 @@ public class DefaultExportServiceImpl implements ExportService {
   }
 
   private View getIncrementalView(ValueTable valueTable, Datasource destination) {
-    IncrementalWhereClause whereClause = new IncrementalWhereClause(destination.getName() + "." + valueTable.getName());
-    whereClause.setAuditLogManager(auditLogManager);
+    IncrementalWhereClause whereClause = new IncrementalWhereClause(valueTable.getDatasource().getName() + "." + valueTable.getName(), destination.getName() + "." + valueTable.getName());
 
     // Cache the where clause as it is quite expensive. This is ok since the incremental view is transient: used this
     // time only then thrown away.
