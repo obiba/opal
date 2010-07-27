@@ -104,6 +104,8 @@ public class CreateFolderDialogPresenter extends WidgetPresenter<CreateFolderDia
         String folderToCreate = getDisplay().getFolderToCreate().getText();
         if(folderToCreate.equals("")) {
           getDisplay().getErrorMsg().setText(translations.folderNameIsRequired());
+        } else if(folderToCreate.equals(".") || folderToCreate.equals("..")) {
+          getDisplay().getErrorMsg().setText(translations.dotNamesAreInvalid());
         } else {
           if(currentFolder.getPath().equals("/")) { // create under root
             createFolder("/" + folderToCreate);

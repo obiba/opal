@@ -223,6 +223,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("You must specify a folder name")
   String folderNameIsRequired();
 
+  @Description("Dot names are not permitted")
+  @DefaultStringValue("The names '.' and '..' are not permitted.")
+  String dotNamesAreInvalid();
+
   @Description("Data export instructions")
   @DefaultStringValue("Select the tables and the export destination.")
   String dataExportInstructions();
