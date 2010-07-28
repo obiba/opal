@@ -144,11 +144,12 @@ public class GwtApp implements EntryPoint {
         // swap the interface before the credentials are gone
         revealDisplay(opalGinjector.getLoginPresenter());
         RequestCredentials credentials = opalGinjector.getRequestCredentials();
-        if(credentials != null) {
+        if(credentials != null && credentials.hasCredentials()) {
+          // calling this makes the session expired event to be fired in return
+          ResourceRequestBuilderFactory.newBuilder().forResource("/auth/session/" + credentials.extractCredentials()).delete().send();
+
           credentials.invalidate();
         }
-        // calling this makes the session expired event to be fired in return
-        ResourceRequestBuilderFactory.newBuilder().forResource("/auth/session/" + credentials.extractCredentials()).delete().send();
 
       }
     });
