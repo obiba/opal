@@ -28,7 +28,6 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.audit.VariableEntityAuditLogManager;
-import org.obiba.magma.audit.support.CopyAuditor;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineTableResolver;
@@ -72,8 +71,6 @@ public class DefaultImportService implements ImportService {
 
   private final OpalRuntime opalRuntime;
 
-  private final VariableEntityAuditLogManager auditLogManager;
-
   private final IParticipantIdentifier participantIdentifier;
 
   /** Configured through org.obiba.opal.keys.tableReference */
@@ -92,7 +89,6 @@ public class DefaultImportService implements ImportService {
     if(keysTableEntityType == null) throw new IllegalArgumentException("keysTableEntityType cannot be null");
 
     this.opalRuntime = opalRuntime;
-    this.auditLogManager = auditLogManager;
     this.participantIdentifier = participantIdentifier;
     this.keysTableReference = keysTableReference;
     this.keysTableEntityType = keysTableEntityType;
@@ -250,11 +246,9 @@ public class DefaultImportService implements ImportService {
         return Variable.Builder.sameAs(variable).name(variable.hasAttribute(dispatchAttribute) ? variable.getName().replaceFirst("^.*\\.?" + variable.getAttributeStringValue(dispatchAttribute) + "\\.", "") : variable.getName()).build();
       }
     });
-    CopyAuditor auditor = auditLogManager.createAuditor(builder, destination, null);
     builder.build()
     // Copy participant's non-identifiable variables and data
     .copy(publicView, destination);
-    auditor.completeAuditing();
   }
 
   /**

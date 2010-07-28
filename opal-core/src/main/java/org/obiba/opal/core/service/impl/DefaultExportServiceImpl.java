@@ -24,8 +24,6 @@ import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
-import org.obiba.magma.audit.VariableEntityAuditLogManager;
-import org.obiba.magma.audit.support.CopyAuditor;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineTableResolver;
@@ -58,8 +56,6 @@ public class DefaultExportServiceImpl implements ExportService {
 
   private final OpalRuntime opalRuntime;
 
-  private final VariableEntityAuditLogManager auditLogManager;
-
   /** Configured through org.obiba.opal.keys.tableReference */
   private final String keysTableReference;
 
@@ -67,16 +63,14 @@ public class DefaultExportServiceImpl implements ExportService {
   private final String keysTableEntityType;
 
   @Autowired
-  public DefaultExportServiceImpl(PlatformTransactionManager txManager, OpalRuntime opalRuntime, VariableEntityAuditLogManager auditLogManager, @org.springframework.beans.factory.annotation.Value("${org.obiba.opal.keys.tableReference}") String keysTableReference, @org.springframework.beans.factory.annotation.Value("${org.obiba.opal.keys.entityType}") String keysTableEntityType) {
+  public DefaultExportServiceImpl(PlatformTransactionManager txManager, OpalRuntime opalRuntime, @org.springframework.beans.factory.annotation.Value("${org.obiba.opal.keys.tableReference}") String keysTableReference, @org.springframework.beans.factory.annotation.Value("${org.obiba.opal.keys.entityType}") String keysTableEntityType) {
     if(txManager == null) throw new IllegalArgumentException("txManager cannot be null");
     if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
-    if(auditLogManager == null) throw new IllegalArgumentException("auditLogManager cannot be null");
     if(keysTableReference == null) throw new IllegalArgumentException("keysTableReference cannot be null");
     if(keysTableEntityType == null) throw new IllegalArgumentException("keysTableEntityType cannot be null");
 
     this.txManager = txManager;
     this.opalRuntime = opalRuntime;
-    this.auditLogManager = auditLogManager;
     this.keysTableReference = keysTableReference;
     this.keysTableEntityType = keysTableEntityType;
   }
@@ -174,16 +168,12 @@ public class DefaultExportServiceImpl implements ExportService {
     // already been exported).
     table = incremental ? getIncrementalView(table, destinationDatasource) : table;
 
-    CopyAuditor auditor;
     // If the table contains an entity that requires key separation, create a "unit view" of the table (replace
     // public identifiers with private, unit-specific identifiers).
     // Also, replace the copier with one that persists the "public" identifiers in the audit log.
     if((unit != null) && table.isForEntityType(keysTableEntityType)) {
       FunctionalUnitView unitView = getUnitView(unit, table);
       table = unitView;
-      auditor = this.auditLogManager.createAuditor(datasourceCopier, destinationDatasource, unitView.getVariableEntityReverseTransformer());
-    } else {
-      auditor = this.auditLogManager.createAuditor(datasourceCopier, destinationDatasource, null);
     }
 
     // Go ahead and copy the result to the destination datasource.
@@ -194,7 +184,6 @@ public class DefaultExportServiceImpl implements ExportService {
         return new TransactionalThread(txManager, r);
       }
     }).build().copy();
-    auditor.completeAuditing();
   }
 
   public void exportTablesToExcelFile(String unitName, List<String> sourceTableNames, File destinationExcelFile, boolean incremental) throws InterruptedException {
