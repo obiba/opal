@@ -22,6 +22,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileType;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.commands.Command;
@@ -33,11 +37,14 @@ import org.obiba.opal.shell.web.CopyCommandOptionsDtoImpl;
 import org.obiba.opal.shell.web.ImportCommandOptionsDtoImpl;
 import org.obiba.opal.web.model.Commands;
 import org.obiba.opal.web.model.Commands.CommandStateDto;
+import org.obiba.opal.web.model.Commands.CopyCommandOptionsDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
 
 /**
  * Opal Web Shell services.
@@ -55,12 +62,22 @@ public class WebShellResource {
   // Instance Variables
   //
 
-  @Autowired
+  private OpalRuntime opalRuntime;
+
   private CommandJobService commandJobService;
 
-  @Autowired
-  @Qualifier("web")
   private CommandRegistry commandRegistry;
+
+  //
+  // Constructors
+  //
+
+  @Autowired
+  public WebShellResource(OpalRuntime opalRuntime, CommandJobService commandJobService, @Qualifier("web") CommandRegistry commandRegistry) {
+    this.opalRuntime = opalRuntime;
+    this.commandJobService = commandJobService;
+    this.commandRegistry = commandRegistry;
+  }
 
   //
   // Web Service Methods
@@ -154,8 +171,8 @@ public class WebShellResource {
 
   @POST
   @Path("/copy")
-  public Response copyData(Commands.CopyCommandOptionsDto options) {
-    CopyCommandOptions copyOptions = new CopyCommandOptionsDtoImpl(options);
+  public Response copyData(final Commands.CopyCommandOptionsDto options) {
+    CopyCommandOptions copyOptions = new WebShellCopyCommandOptions(options);
     Command<CopyCommandOptions> copyCommand = commandRegistry.newCommand("copy");
     copyCommand.setOptions(copyOptions);
 
@@ -200,5 +217,58 @@ public class WebShellResource {
     }
 
     return dtoBuilder.build();
+  }
+
+  FileObject resolveFileInFileSystem(String path) throws FileSystemException {
+    return opalRuntime.getFileSystem().getRoot().resolveFile(path);
+  }
+
+  //
+  // Inner Classes / Interfaces
+  //
+
+  @CommandLineInterface(application = "copy")
+  class WebShellCopyCommandOptions extends CopyCommandOptionsDtoImpl {
+
+    private String pathWithExtension;
+
+    public WebShellCopyCommandOptions(CopyCommandOptionsDto dto) {
+      super(dto);
+    }
+
+    @Override
+    public String getOut() {
+      if(dto.hasOut() && dto.hasFormat()) {
+        if(pathWithExtension == null) {
+          pathWithExtension = addFileExtensionIfMissing(dto.getOut(), dto.getFormat());
+        }
+        return pathWithExtension;
+      } else {
+        return super.getOut();
+      }
+    }
+
+    private String addFileExtensionIfMissing(String outputFilePath, String outputFileFormat) {
+      String pathWithExtension = outputFilePath;
+
+      FileObject file = null;
+      try {
+        file = resolveFileInFileSystem(outputFilePath);
+
+        if(file.getType() == FileType.FILE) {
+          if(outputFileFormat.equals("csv") && !outputFilePath.endsWith(".csv")) {
+            pathWithExtension = outputFilePath + ".csv";
+          } else if(outputFileFormat.equals("excel") && !outputFilePath.endsWith(".xls") && !outputFilePath.endsWith(".xlsx")) {
+            pathWithExtension = outputFilePath + ".xlsx"; // prefer .xlsx over .xls
+          } else if(outputFileFormat.equals("xml") && !outputFilePath.endsWith(".zip")) {
+            pathWithExtension = outputFilePath + ".zip";
+          }
+        }
+      } catch(FileSystemException ex) {
+        log.error("Unexpected file system exception in addFileExtensionIfMissing", ex);
+      }
+
+      return pathWithExtension;
+    }
   }
 }

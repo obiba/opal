@@ -22,7 +22,7 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
   // Instance Variables
   //
 
-  private CopyCommandOptionsDto dto;
+  protected CopyCommandOptionsDto dto;
 
   //
   // Constructors
@@ -103,5 +103,4 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
   public List<String> getTables() {
     return dto.getTablesList();
   }
-
 }

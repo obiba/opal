@@ -68,8 +68,7 @@ public class WebShellResourceTest {
     CommandJobService mockCommandJobService = createMock(CommandJobService.class);
     expect(mockCommandJobService.getCommand(jobId)).andReturn(job).atLeastOnce();
 
-    WebShellResource sut = new WebShellResource();
-    sut.setCommandJobService(mockCommandJobService);
+    WebShellResource sut = new WebShellResource(null, mockCommandJobService, null);
 
     replay(mockCommandJobService);
 
@@ -94,8 +93,7 @@ public class WebShellResourceTest {
     CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
     expect(mockCommandJobService.getCommand(bogusJobId)).andReturn(null).atLeastOnce();
 
-    WebShellResource sut = new WebShellResource();
-    sut.setCommandJobService(mockCommandJobService);
+    WebShellResource sut = new WebShellResource(null, mockCommandJobService, null);
 
     replay(mockCommandJobService);
 
@@ -117,8 +115,7 @@ public class WebShellResourceTest {
     CommandJobService mockCommandJobService = createMock(CommandJobService.class);
     expect(mockCommandJobService.getCommand(jobId)).andReturn(job).atLeastOnce();
 
-    WebShellResource sut = new WebShellResource();
-    sut.setCommandJobService(mockCommandJobService);
+    WebShellResource sut = new WebShellResource(null, mockCommandJobService, null);
 
     replay(mockCommandJobService);
 
@@ -143,8 +140,7 @@ public class WebShellResourceTest {
     CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
     expect(mockCommandJobService.getCommand(bogusJobId)).andReturn(null).atLeastOnce();
 
-    WebShellResource sut = new WebShellResource();
-    sut.setCommandJobService(mockCommandJobService);
+    WebShellResource sut = new WebShellResource(null, mockCommandJobService, null);
 
     replay(mockCommandJobService);
 
@@ -166,8 +162,7 @@ public class WebShellResourceTest {
     mockCommandJobService.cancelCommand(jobId);
     expectLastCall().atLeastOnce();
 
-    WebShellResource sut = new WebShellResource();
-    sut.setCommandJobService(mockCommandJobService);
+    WebShellResource sut = new WebShellResource(null, mockCommandJobService, null);
 
     replay(mockCommandJobService);
 
@@ -189,8 +184,7 @@ public class WebShellResourceTest {
     mockCommandJobService.cancelCommand(bogusJobId);
     expectLastCall().andThrow(new NoSuchCommandJobException(bogusJobId));
 
-    WebShellResource sut = new WebShellResource();
-    sut.setCommandJobService(mockCommandJobService);
+    WebShellResource sut = new WebShellResource(null, mockCommandJobService, null);
 
     replay(mockCommandJobService);
 
@@ -212,8 +206,7 @@ public class WebShellResourceTest {
     mockCommandJobService.cancelCommand(bogusJobId);
     expectLastCall().andThrow(new IllegalStateException());
 
-    WebShellResource sut = new WebShellResource();
-    sut.setCommandJobService(mockCommandJobService);
+    WebShellResource sut = new WebShellResource(null, mockCommandJobService, null);
 
     replay(mockCommandJobService);
 
@@ -231,7 +224,7 @@ public class WebShellResourceTest {
   public void testSetCommandStatus_ReturnsBadRequestResponseForNewStatusOtherThanCanceled() {
     // Setup
     Integer jobId = 1;
-    WebShellResource sut = new WebShellResource();
+    WebShellResource sut = new WebShellResource(null, null, null);
 
     // Exercise
     Response response = sut.setCommandStatus(jobId, Status.SUCCEEDED.toString());
@@ -248,8 +241,7 @@ public class WebShellResourceTest {
     mockCommandJobService.deleteCommand(jobId);
     expectLastCall().atLeastOnce();
 
-    WebShellResource sut = new WebShellResource();
-    sut.setCommandJobService(mockCommandJobService);
+    WebShellResource sut = new WebShellResource(null, mockCommandJobService, null);
 
     replay(mockCommandJobService);
 
@@ -271,8 +263,7 @@ public class WebShellResourceTest {
     mockCommandJobService.deleteCommand(bogusJobId);
     expectLastCall().andThrow(new NoSuchCommandJobException(bogusJobId));
 
-    WebShellResource sut = new WebShellResource();
-    sut.setCommandJobService(mockCommandJobService);
+    WebShellResource sut = new WebShellResource(null, mockCommandJobService, null);
 
     replay(mockCommandJobService);
 
@@ -294,8 +285,7 @@ public class WebShellResourceTest {
     mockCommandJobService.deleteCommand(jobId);
     expectLastCall().andThrow(new IllegalStateException());
 
-    WebShellResource sut = new WebShellResource();
-    sut.setCommandJobService(mockCommandJobService);
+    WebShellResource sut = new WebShellResource(null, mockCommandJobService, null);
 
     replay(mockCommandJobService);
 
@@ -316,8 +306,7 @@ public class WebShellResourceTest {
     mockCommandJobService.deleteCompletedCommands();
     expectLastCall().once();
 
-    WebShellResource sut = new WebShellResource();
-    sut.setCommandJobService(mockCommandJobService);
+    WebShellResource sut = new WebShellResource(null, mockCommandJobService, null);
 
     replay(mockCommandJobService);
 
@@ -342,9 +331,7 @@ public class WebShellResourceTest {
     CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
     expect(mockCommandJobService.launchCommand(eqCommandJob(createCommandJob(jobId, importCommand, null)))).andReturn(jobId).atLeastOnce();
 
-    WebShellResource sut = new WebShellResource();
-    sut.setCommandRegistry(mockCommandRegistry);
-    sut.setCommandJobService(mockCommandJobService);
+    WebShellResource sut = new WebShellResource(null, mockCommandJobService, mockCommandRegistry);
 
     replay(mockCommandRegistry, mockCommandJobService);
 
@@ -381,9 +368,7 @@ public class WebShellResourceTest {
     CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
     expect(mockCommandJobService.launchCommand(eqCommandJob(createCommandJob(jobId, copyCommand, null)))).andReturn(jobId).atLeastOnce();
 
-    WebShellResource sut = new WebShellResource();
-    sut.setCommandRegistry(mockCommandRegistry);
-    sut.setCommandJobService(mockCommandJobService);
+    WebShellResource sut = new WebShellResource(null, mockCommandJobService, mockCommandRegistry);
 
     replay(mockCommandRegistry, mockCommandJobService);
 
@@ -415,8 +400,7 @@ public class WebShellResourceTest {
     CommandJobService mockCommandJobService = createMockCommandJobService(commandJobList);
     expect(mockCommandJobService.getHistory()).andReturn(commandJobList).atLeastOnce();
 
-    WebShellResource sut = new WebShellResource();
-    sut.setCommandJobService(mockCommandJobService);
+    WebShellResource sut = new WebShellResource(null, mockCommandJobService, null);
 
     replay(mockCommandJobService);
 
