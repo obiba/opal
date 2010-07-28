@@ -56,7 +56,7 @@ public class FileSelectionView extends Composite implements FileSelectionPresent
     super();
     initWidget(uiBinder.createAndBindUi(this));
 
-    fileField.setEnabled(false);
+    fileField.setReadOnly(true);
   }
 
   //
