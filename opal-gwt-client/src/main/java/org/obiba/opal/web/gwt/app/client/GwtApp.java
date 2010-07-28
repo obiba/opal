@@ -22,6 +22,9 @@ import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.Window.ClosingEvent;
+import com.google.gwt.user.client.Window.ClosingHandler;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -145,6 +148,17 @@ public class GwtApp implements EntryPoint {
         ResourceRequestBuilderFactory.newBuilder().forResource("/auth/session/" + credentials.extractCredentials()).delete().send();
       }
     });
+
+    // Kills the session it the browser is closed or when navigating to another page.
+    Window.addWindowClosingHandler(new ClosingHandler() {
+
+      @Override
+      public void onWindowClosing(ClosingEvent arg0) {
+        opalGinjector.getEventBus().fireEvent(new SessionEndedEvent());
+      }
+
+    });
+
   }
 
 }
