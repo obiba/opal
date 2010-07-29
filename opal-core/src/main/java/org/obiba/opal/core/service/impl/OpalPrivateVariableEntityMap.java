@@ -120,9 +120,16 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     VariableValueSource ownerVariableSource = keyTable.getVariableValueSource(ownerVariable.getName());
     for(ValueSet valueSet : keyTable.getValueSets()) {
       Value value = ownerVariableSource.getValue(valueSet);
-      if(value.isNull()) throw new IllegalStateException();
-      log.debug("{}<-->({}) cached", valueSet.getVariableEntity().getIdentifier(), value.toString());
-      publicToPrivate.put(entityFor(valueSet.getVariableEntity().getIdentifier()), entityFor(value.toString()));
+      // OPAL-619: The value could be null, in which case don't cache it. Whenever new participant
+      // data are imported, the key variable is written first and its corresponding VariableValueSource
+      // is added *without a value* (see DefaultImportService.prepareKeysTable()). The key variable's
+      // value is written afterwards, in the process of copying the participant data to the destination
+      // datasource. Also, more obviously, it is not necessarily the case that all value sets have a value
+      // for all key variables.
+      if(!value.isNull()) {
+        log.debug("{}<-->({}) cached", valueSet.getVariableEntity().getIdentifier(), value.toString());
+        publicToPrivate.put(entityFor(valueSet.getVariableEntity().getIdentifier()), entityFor(value.toString()));
+      }
     }
     log.info("Done");
   }
