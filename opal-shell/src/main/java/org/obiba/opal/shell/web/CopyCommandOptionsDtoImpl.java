@@ -140,7 +140,12 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
     try {
       file = resolveFileInFileSystem(outputFilePath);
 
-      if(file.getType() == FileType.FILE) {
+      // Only add the extension if the file object is an existing file (FileType.FILE)
+      // or a new file (FileType.IMAGINARY). We assume here that any "imaginary" file object
+      // is a non-existent file, not a non-existent folder. This class is only used in the
+      // context of the Opal web interface and it is not possible there to launch a copy command
+      // where the output is a non-existent folder.
+      if(file.getType().equals(FileType.FILE) || file.getType().equals(FileType.IMAGINARY)) {
         if(outputFileFormat.equals("csv") && !outputFilePath.endsWith(".csv")) {
           modifiedPath = outputFilePath + ".csv";
         } else if(outputFileFormat.equals("excel") && !outputFilePath.endsWith(".xls") && !outputFilePath.endsWith(".xlsx")) {
