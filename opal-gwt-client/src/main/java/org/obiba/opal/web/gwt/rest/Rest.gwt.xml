@@ -2,4 +2,22 @@
 <module>
   <!-- Inherit the core Web Toolkit stuff. -->
   <inherits name='com.google.gwt.user.User' />
+
+  <!--
+    This tells GWT to use this concrete implementation whenever a call to GWT.create() is made for the interface type.
+  -->
+  
+  <!-- Fallthrough for all other browsers -->
+  <replace-with class="org.obiba.opal.web.gwt.rest.client.DefaultResourceRequestBuilder">
+    <when-type-assignable class="org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder" />
+  </replace-with>
+
+  <!-- Specific impl for IE -->
+  <replace-with class="org.obiba.opal.web.gwt.rest.client.IeResourceRequestBuilder">
+    <when-type-assignable class="org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder" />
+    <any>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
+    </any>
+  </replace-with>
 </module>
