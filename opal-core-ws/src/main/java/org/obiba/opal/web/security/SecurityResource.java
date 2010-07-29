@@ -48,8 +48,8 @@ public class SecurityResource extends AbstractSecurityComponent {
     try {
       SecurityUtils.getSubject().login(new UsernamePasswordToken(username, password));
     } catch(AuthenticationException e) {
-      // When a request contains credentials and they are invalid, the a 401 (Unauthorized) should be returned.
-      return Response.status(Status.UNAUTHORIZED).build();
+      // When a request contains credentials and they are invalid, the a 403 (Forbidden) should be returned.
+      return Response.status(Status.FORBIDDEN).build();
     }
     String sessionId = SecurityUtils.getSubject().getSession().getId().toString();
     log.info("Successfull session creation for user '{}' session ID is '{}'.", username, sessionId);
