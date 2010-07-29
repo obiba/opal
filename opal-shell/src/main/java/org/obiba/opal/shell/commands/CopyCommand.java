@@ -26,6 +26,7 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.datasource.csv.CsvDatasource;
 import org.obiba.magma.datasource.csv.support.CsvUtil;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
+import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.datasource.nil.NullDatasource;
 import org.obiba.magma.js.support.JavascriptMultiplexingStrategy;
 import org.obiba.magma.js.support.JavascriptVariableTransformer;
@@ -459,7 +460,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     @Override
     public Datasource internalCreateDatasource(final FileObject outputFile) {
       if(outputFile.getName().getExtension().startsWith("zip")) {
-        return new ExcelDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
+        return new FsDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
       }
       return null;
     }
