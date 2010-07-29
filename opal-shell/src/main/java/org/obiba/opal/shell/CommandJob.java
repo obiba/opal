@@ -109,16 +109,7 @@ public class CommandJob implements OpalShell, Runnable {
         errorCode = command.execute();
       }
 
-      // Update the status. Set to SUCCEEDED/FAILED, based on the error code, unless the status was changed to
-      // CANCEL_PENDING (i.e., job was interrupted); in that case set it to CANCELED.
-      if(status.equals(Status.IN_PROGRESS)) {
-        status = (errorCode == 0) ? Status.SUCCEEDED : Status.FAILED;
-      } else if(status.equals(Status.CANCEL_PENDING)) {
-        status = Status.CANCELED;
-      } else {
-        // Should never get here!
-        throw new IllegalStateException("Unexpected CommandJob status: " + status);
-      }
+      updateJobStatus(errorCode);
 
       printf("Job completed successfully.");
     } catch(RuntimeException ex) {
@@ -127,6 +118,20 @@ public class CommandJob implements OpalShell, Runnable {
       ex.printStackTrace();
     } finally {
       endTime = getCurrentTime();
+    }
+  }
+
+  private void updateJobStatus(int errorCode) {
+
+    // Update the status. Set to SUCCEEDED/FAILED, based on the error code, unless the status was changed to
+    // CANCEL_PENDING (i.e., job was interrupted); in that case set it to CANCELED.
+    if(status.equals(Status.IN_PROGRESS)) {
+      status = (errorCode == 0) ? Status.SUCCEEDED : Status.FAILED;
+    } else if(status.equals(Status.CANCEL_PENDING)) {
+      status = Status.CANCELED;
+    } else {
+      // Should never get here!
+      throw new IllegalStateException("Unexpected CommandJob status: " + status);
     }
   }
 
