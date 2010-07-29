@@ -162,7 +162,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
         getUnitDirectory(unit.getName());
       }
     } catch(RuntimeException e) {
-      log.error("The opal filesystem cannot be started.", e);
+      log.error("The opal filesystem cannot be started.");
       throw e;
     } catch(FileSystemException e) {
       log.error("Error creating functional unit's directory in the Opal File System.", e);
