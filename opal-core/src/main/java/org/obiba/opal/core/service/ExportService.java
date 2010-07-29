@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.core.service;
 
-import java.io.File;
 import java.util.List;
 import java.util.Set;
 
@@ -77,30 +76,5 @@ public interface ExportService {
    * @throws InterruptedException if the current thread was interrupted
    */
   public void exportTablesToDatasource(String unit, Set<ValueTable> sourceTables, Datasource destinationDatasource, DatasourceCopier.Builder datasourceCopier, boolean incremental) throws InterruptedException;
-
-  /**
-   * Export tables to an Excel file. This export operation will be logged.
-   * @param unit the functional unit to which the tables are being exported (for key separation)
-   * @param sourceTableNames tables to export.
-   * @param destinationExcelFilename tables will be copied to this Excel file.
-   * @param incremental if <code>true</code> the tables are exported incrementally (updates only)
-   * @throws NoSuchFunctionalUnitException if a unit has been specified that does not exist
-   * @throws UnsupportedOperationException Exporting to an Excel file is not currently implemented.
-   * @throws InterruptedException if the current thread was interrupted
-   */
-  public void exportTablesToExcelFile(String unit, List<String> sourceTableNames, File destinationExcelFile, boolean incremental) throws InterruptedException;
-
-  /**
-   * Export tables to an Excel file. This export operation will be logged.
-   * @param unit the functional unit to which the tables are being exported (for key separation)
-   * @param sourceTableNames tables to export.
-   * @param destinationExcelFilename tables will be copied to this Excel file.
-   * @param datasourceCopier copier used to perform the copy.
-   * @param incremental if <code>true</code> the tables are exported incrementally (updates only)
-   * @throws NoSuchFunctionalUnitException if a unit has been specified that does not exist
-   * @throws UnsupportedOperationException Exporting to an Excel file is not currently implemented.
-   * @throws InterruptedException if the current thread was interrupted
-   */
-  public void exportTablesToExcelFile(String unit, List<String> sourceTableNames, File destinationExcelFile, DatasourceCopier.Builder datasourceCopier, boolean incremental) throws InterruptedException;
 
 }

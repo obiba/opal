@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.core.service.impl;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
@@ -24,7 +23,6 @@ import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
-import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
@@ -186,46 +184,12 @@ public class DefaultExportServiceImpl implements ExportService {
     }).build().copy();
   }
 
-  public void exportTablesToExcelFile(String unitName, List<String> sourceTableNames, File destinationExcelFile, boolean incremental) throws InterruptedException {
-    Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
-    Assert.notNull(destinationExcelFile, "destinationExcelFile must not be null");
-
-    Datasource outputDatasource = buildExcelDatasource(destinationExcelFile);
-    try {
-      // Create a DatasourceCopier that will copy only the metadata and export.
-      exportTablesToDatasource(unitName, sourceTableNames, outputDatasource.getName(), incremental);
-    } finally {
-      outputDatasource.dispose();
-    }
-
-  }
-
-  public void exportTablesToExcelFile(String unitName, List<String> sourceTableNames, File destinationExcelFile, DatasourceCopier.Builder datasourceCopier, boolean incremental) throws InterruptedException {
-    Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
-    Assert.notNull(destinationExcelFile, "destinationExcelFile must not be null");
-
-    Datasource outputDatasource = buildExcelDatasource(destinationExcelFile);
-    try {
-      // Create a DatasourceCopier that will copy only the metadata and export.
-      exportTablesToDatasource(unitName, sourceTableNames, outputDatasource.getName(), datasourceCopier, incremental);
-    } finally {
-      outputDatasource.dispose();
-    }
-
-  }
-
   private FunctionalUnitView getUnitView(FunctionalUnit unit, ValueTable valueTable) {
     return new FunctionalUnitView(unit, valueTable, lookupKeysTable());
   }
 
   private ValueTable lookupKeysTable() {
     return MagmaEngineTableResolver.valueOf(keysTableReference).resolveTable();
-  }
-
-  private Datasource buildExcelDatasource(File destinationExcelFile) {
-    Datasource outputDatasource = new ExcelDatasource(destinationExcelFile.getName(), destinationExcelFile);
-    outputDatasource.initialise();
-    return outputDatasource;
   }
 
   private Set<ValueTable> getValueTablesByName(List<String> tableNames) throws NoSuchDatasourceException, NoSuchValueTableException, ExportException {
@@ -261,9 +225,7 @@ public class DefaultExportServiceImpl implements ExportService {
   private View getIncrementalView(ValueTable valueTable, Datasource destination) {
     IncrementalWhereClause whereClause = new IncrementalWhereClause(valueTable.getDatasource().getName() + "." + valueTable.getName(), destination.getName() + "." + valueTable.getName());
 
-    // Cache the where clause as it is quite expensive. This is ok since the incremental view is transient: used this
-    // time only then thrown away.
-    return View.Builder.newView(valueTable.getName(), valueTable).where(whereClause).cacheWhere().build();
+    return View.Builder.newView(valueTable.getName(), valueTable).where(whereClause).build();
   }
 
   static class TransactionalThread extends Thread {
