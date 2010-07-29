@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.OpenEvent;
 import com.google.gwt.event.logical.shared.OpenHandler;
@@ -109,6 +110,7 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
 
         eventBus.fireEvent(new FileSystemTreeFolderSelectionChangeEvent(selectedFile));
         eventBus.fireEvent(new FileSelectionChangeEvent(selectedFile));
+        getDisplay().selectFile(selectedFile, false);
 
         if(childrenNotAdded(selectedItem)) {
           ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta" + selectedFile.getPath()).get().withCallback(new ResourceCallback<FileDto>() {
