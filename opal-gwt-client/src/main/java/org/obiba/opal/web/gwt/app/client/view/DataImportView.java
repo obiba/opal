@@ -14,8 +14,8 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresente
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter.Display;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -55,13 +55,6 @@ public class DataImportView extends DataCommonView implements DataImportPresente
   @Override
   protected void initWidgets() {
     super.initWidgets();
-    shouldArchive.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        archiveSelection.setEnabled(shouldArchive.getValue());
-      }
-    });
   }
 
   @Override
@@ -112,6 +105,25 @@ public class DataImportView extends DataCommonView implements DataImportPresente
   public void renderFormStep() {
     super.renderFormStep();
     instructionsLabel.setText(translations.dataImportInstructions());
+  }
+
+  @Override
+  public HandlerRegistration addShouldArchiveClickHandler(ClickHandler handler) {
+    return shouldArchive.addClickHandler(handler);
+  }
+
+  @Override
+  public void enableArchiveSelection() {
+    boolean isEnabled = shouldArchive.getValue();
+    if(!isEnabled) {
+      archiveSelection.clearFile();
+    }
+    archiveSelection.setEnabled(isEnabled);
+  }
+
+  @Override
+  public boolean isArchiveSelectionEnabled() {
+    return archiveSelection.isEnabled();
   }
 
 }

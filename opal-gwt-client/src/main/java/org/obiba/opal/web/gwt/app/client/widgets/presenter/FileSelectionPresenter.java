@@ -137,6 +137,8 @@ public class FileSelectionPresenter extends WidgetPresenter<FileSelectionPresent
 
     void setEnabled(boolean enabled);
 
+    boolean isEnabled();
+
     void setFieldWidth(String width);
 
   }

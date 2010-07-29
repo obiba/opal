@@ -31,6 +31,7 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -79,6 +80,7 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
     super.registerHandler(getDisplay().addSubmitClickHandler(new SubmitClickHandler()));
     super.registerHandler(getDisplay().addJobLinkClickHandler(new DataCommonPresenter.JobLinkClickHandler(eventBus, jobListPresenter)));
     super.registerHandler(eventBus.addHandler(FileSelectionUpdateEvent.getType(), new FileSelectionUpdateHandler()));
+    super.registerHandler(getDisplay().addShouldArchiveClickHandler(new ShouldArchiveClickHandler()));
   }
 
   protected void initDisplayComponents() {
@@ -122,6 +124,11 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
   public void revealDisplay() {
   }
 
+  private void enableImport() {
+    boolean isArchiveEnabled = getDisplay().isArchiveSelectionEnabled();
+    getDisplay().setSubmitEnabled(fileSelectionPresenter.getSelectedFile().length() > 0 && (!isArchiveEnabled || (isArchiveEnabled && !getDisplay().getArchiveDirectory().equals(""))));
+  }
+
   //
   // Interfaces and classes
   //
@@ -129,9 +136,16 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
   class FileSelectionUpdateHandler implements FileSelectionUpdateEvent.Handler {
     @Override
     public void onFileSelectionUpdate(FileSelectionUpdateEvent event) {
-      if(fileSelectionPresenter.equals(event.getSource())) {
-        getDisplay().setSubmitEnabled(fileSelectionPresenter.getSelectedFile().length() > 0);
-      }
+      enableImport();
+    }
+  }
+
+  class ShouldArchiveClickHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent event) {
+      getDisplay().enableArchiveSelection();
+      enableImport();
     }
   }
 
@@ -175,6 +189,12 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
   public interface Display extends DataCommonPresenter.Display {
 
     String getSelectedFile();
+
+    HandlerRegistration addShouldArchiveClickHandler(ClickHandler handler);
+
+    void enableArchiveSelection();
+
+    boolean isArchiveSelectionEnabled();
 
     void setUnits(JsArray<FunctionalUnitDto> units);
 

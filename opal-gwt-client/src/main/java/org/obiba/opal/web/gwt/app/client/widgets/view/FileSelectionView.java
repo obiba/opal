@@ -106,4 +106,9 @@ public class FileSelectionView extends Composite implements FileSelectionPresent
     fileField.setText(text);
   }
 
+  @Override
+  public boolean isEnabled() {
+    return browseButton.isEnabled();
+  }
+
 }
