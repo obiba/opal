@@ -30,8 +30,9 @@ import org.obiba.magma.datasource.nil.NullDatasource;
 import org.obiba.magma.js.support.JavascriptMultiplexingStrategy;
 import org.obiba.magma.js.support.JavascriptVariableTransformer;
 import org.obiba.magma.support.DatasourceCopier;
+import org.obiba.magma.support.Disposables;
+import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MagmaEngineTableResolver;
-import org.obiba.opal.core.service.ExportException;
 import org.obiba.opal.core.service.ExportService;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.slf4j.Logger;
@@ -75,21 +76,17 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
       try {
         destinationDatasource = getDestinationDatasource();
-        exportService.exportTablesToDatasource(options.isUnit() ? options.getUnit() : null, getValueTables(), destinationDatasource, buildDatasourceCopier(destinationDatasource), !options.getNonIncremental());
+        Set<ValueTable> tables = getValueTables();
+        getShell().printf("Copying %d tables to %s.\n", tables.size(), destinationDatasource.getName());
+        exportService.exportTablesToDatasource(options.isUnit() ? options.getUnit() : null, tables, destinationDatasource, buildDatasourceCopier(destinationDatasource), !options.getNonIncremental());
+        getShell().printf("Successfully copied all tables.\n");
         errorCode = 0; // success!
-      } catch(ExportException e) {
-        getShell().printf("%s\n", e.getMessage());
-        e.printStackTrace(System.err);
       } catch(Exception e) {
         getShell().printf("%s\n", e.getMessage());
         e.printStackTrace(System.err);
       } finally {
         if(options.isOut() && destinationDatasource != null) {
-          try {
-            MagmaEngine.get().removeDatasource(destinationDatasource);
-          } catch(RuntimeException e) {
-
-          }
+          Disposables.silentlyDispose(destinationDatasource);
         }
       }
     }
@@ -151,7 +148,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       if(destinationDatasource == null) {
         throw new IllegalArgumentException("Unknown output datasource type");
       }
-      MagmaEngine.get().addDatasource(destinationDatasource);
+      Initialisables.initialise(destinationDatasource);
     }
     return destinationDatasource;
   }
