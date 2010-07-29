@@ -215,12 +215,13 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     ResourceRequestBuilderFactory.newBuilder().forResource("/files" + folder).put().withCallback(201, callbackHandler).withCallback(403, callbackHandler).withCallback(500, callbackHandler).send();
   }
 
-  public String getSelection() {
-    String selection = null;
+  public FileSelection getSelection() {
+    FileSelection selection = null;
 
     for(SelectionResolver resolver : selectionResolverChain) {
-      selection = resolver.resolveSelection(fileSelectionType, selectedFolder, selectedFile, getDisplay().getNewFileName());
-      if(selection != null) {
+      resolver.resolveSelection(fileSelectionType, selectedFolder, selectedFile, getDisplay().getNewFileName());
+      if(resolver.resolved()) {
+        selection = resolver.getSelection();
         break;
       }
     }
@@ -323,7 +324,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   class SelectButtonHandler implements ClickHandler {
 
     public void onClick(ClickEvent event) {
-      String selection = getSelection();
+      FileSelection selection = getSelection();
       if(selection != null) {
         eventBus.fireEvent(new FileSelectionEvent(FileSelectorPresenter.this.fileSelectionSource, selection));
       }
@@ -338,79 +339,117 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     }
   }
 
+  public static class FileSelection {
+
+    private String selectionPath;
+
+    private FileSelectionType selectionType;
+
+    public FileSelection(String selectionPath, FileSelectionType selectionType) {
+      this.selectionPath = selectionPath;
+      this.selectionType = selectionType;
+    }
+
+    public String getSelectionPath() {
+      return selectionPath;
+    }
+
+    public FileSelectionType getSelectionType() {
+      return selectionType;
+    }
+  }
+
   interface SelectionResolver {
 
-    public String resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile, String newFileName);
+    public void resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile, String newFileName);
+
+    public boolean resolved();
+
+    public FileSelection getSelection();
   }
 
   static abstract class AbstractSelectionResolver implements SelectionResolver {
 
-    public abstract String resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile, String newFileName);
+    protected FileSelection selection;
 
-    public String getFileSelection(String selectedFolder, String selectedFile, String newFileName) {
-      String fileSelection = null;
+    protected boolean resolved;
+
+    public boolean resolved() {
+      return resolved;
+    }
+
+    public FileSelection getSelection() {
+      return selection;
+    }
+
+    public FileSelection getFileSelection(String selectedFolder, String selectedFile, String newFileName) {
+      String selectionPath = null;
 
       if(newFileName != null && newFileName.trim().length() != 0) {
-        fileSelection = (!selectedFolder.equals("/") ? selectedFolder + "/" : selectedFolder) + newFileName;
+        selectionPath = (!selectedFolder.equals("/") ? selectedFolder + "/" : selectedFolder) + newFileName;
       } else {
-        fileSelection = selectedFile;
+        selectionPath = selectedFile;
       }
 
-      return fileSelection;
+      return new FileSelection(selectionPath, FileSelectionType.FILE);
     }
   }
 
   static class FileSelectionResolver extends AbstractSelectionResolver {
 
-    public String resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile, String newFileName) {
+    public void resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile, String newFileName) {
+      resolved = false;
       if(type.equals(FileSelectionType.FILE)) {
-        return getFileSelection(selectedFolder, selectedFile, newFileName);
+        selection = getFileSelection(selectedFolder, selectedFile, newFileName);
+        resolved = (selection.getSelectionPath() != null);
       }
-      return null;
     }
   }
 
   static class ExistingFileSelectionResolver extends AbstractSelectionResolver {
 
-    public String resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile, String newFileName) {
+    public void resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile, String newFileName) {
+      resolved = false;
       if(type.equals(FileSelectionType.EXISTING_FILE)) {
-        return selectedFile;
+        selection = new FileSelection(selectedFile, FileSelectionType.FILE);
+        resolved = (selection.getSelectionPath() != null);
       }
-      return null;
     }
   }
 
   static class AnyFolderSelectionResolver extends AbstractSelectionResolver {
 
-    public String resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile, String newFileName) {
+    public void resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile, String newFileName) {
+      resolved = false;
       if(type.equals(FileSelectionType.FOLDER) || type.equals(FileSelectionType.EXISTING_FOLDER)) {
-        return selectedFolder;
+        selection = new FileSelection(selectedFolder, FileSelectionType.FOLDER);
+        resolved = (selection.getSelectionPath() != null);
       }
-      return null;
     }
   }
 
   static class NewFileOrFolderSelectionResolver extends AbstractSelectionResolver {
 
-    public String resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile, String newFileName) {
+    public void resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile, String newFileName) {
+      resolved = false;
       if(type.equals(FileSelectionType.FILE_OR_FOLDER)) {
-        String selection = getFileSelection(selectedFolder, selectedFile, newFileName);
-        if(selection == null) {
-          selection = selectedFolder;
+        selection = getFileSelection(selectedFolder, selectedFile, newFileName);
+        if(selection.getSelectionPath() == null) {
+          selection = new FileSelection(selectedFolder, FileSelectionType.FOLDER);
         }
-        return selection;
+        resolved = (selection.getSelectionPath() != null);
       }
-      return null;
     }
   }
 
   static class ExistingFileOrFolderSelectionResolver extends AbstractSelectionResolver {
 
-    public String resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile, String newFileName) {
+    public void resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile, String newFileName) {
+      resolved = false;
       if(type.equals(FileSelectionType.EXISTING_FILE_OR_FOLDER)) {
-        return (selectedFile != null) ? selectedFile : selectedFolder;
+        selection = (selectedFile != null) ? new FileSelection(selectedFile, FileSelectionType.FILE) : new FileSelection(selectedFolder, FileSelectionType.FOLDER);
+        resolved = (selection.getSelectionPath() != null);
       }
-      return null;
     }
   }
 }

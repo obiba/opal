@@ -36,6 +36,8 @@ public class FileSelectionPresenter extends WidgetPresenter<FileSelectionPresent
 
   private FileSelectionType fileSelectionType = FileSelectionType.FILE;
 
+  private FileSelectionType fileTypeSelected;
+
   //
   // Constructors
   //
@@ -91,13 +93,18 @@ public class FileSelectionPresenter extends WidgetPresenter<FileSelectionPresent
     this.fileSelectionType = fileSelectionType;
   }
 
+  public FileSelectionType getFileTypeSelected() {
+    return fileTypeSelected;
+  }
+
   private void addEventHandlers() {
     super.registerHandler(eventBus.addHandler(FileSelectionEvent.getType(), new FileSelectionEvent.Handler() {
 
       @Override
       public void onFileSelection(FileSelectionEvent event) {
         if(FileSelectionPresenter.this.equals(event.getSource())) {
-          getDisplay().setFile(event.getSelectedFile());
+          fileTypeSelected = event.getSelectedFile().getSelectionType();
+          getDisplay().setFile(event.getSelectedFile().getSelectionPath());
           eventBus.fireEvent(new FileSelectionUpdateEvent(FileSelectionPresenter.this));
         }
       }
