@@ -98,9 +98,9 @@ public class CommandJob implements OpalShell, Runnable {
 
   public void run() {
     try {
-      int errorCode = 0;
-
       printf("Job started.");
+
+      int errorCode = 0;
 
       // Don't execute the command if the job has been cancelled.
       if(!status.equals(Status.CANCEL_PENDING)) {
@@ -119,12 +119,14 @@ public class CommandJob implements OpalShell, Runnable {
         // Should never get here!
         throw new IllegalStateException("Unexpected CommandJob status: " + status);
       }
+
+      printf("Job completed successfully.");
     } catch(RuntimeException ex) {
       status = Status.FAILED;
+      printf("Job has failed due to the following error :\n%s", ex.getMessage());
       ex.printStackTrace();
     } finally {
       endTime = getCurrentTime();
-      printf("Job completed.");
     }
   }
 
