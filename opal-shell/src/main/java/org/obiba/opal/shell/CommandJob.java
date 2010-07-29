@@ -100,6 +100,8 @@ public class CommandJob implements OpalShell, Runnable {
     try {
       int errorCode = 0;
 
+      printf("Job started.");
+
       // Don't execute the command if the job has been cancelled.
       if(!status.equals(Status.CANCEL_PENDING)) {
         status = Status.IN_PROGRESS;
@@ -122,6 +124,7 @@ public class CommandJob implements OpalShell, Runnable {
       ex.printStackTrace();
     } finally {
       endTime = getCurrentTime();
+      printf("Job completed.");
     }
   }
 
