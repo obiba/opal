@@ -63,7 +63,7 @@ public class SecurityResourceTest {
   @Test
   public void testLoginBadCredentials() {
     Response response = securityResource.createSession("admninistrator", "password");
-    Assert.assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+    Assert.assertEquals(Status.FORBIDDEN.getStatusCode(), response.getStatus());
   }
 
   @Test
