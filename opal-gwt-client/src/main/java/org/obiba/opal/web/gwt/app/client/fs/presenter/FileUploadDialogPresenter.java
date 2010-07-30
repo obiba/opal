@@ -135,9 +135,11 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
 
   private boolean fileExist(String fileName) {
     JsArray<FileDto> filesInCurrentDirectory = currentFolder.getChildrenArray();
-    for(int i = 0; i < filesInCurrentDirectory.length(); i++) {
-      if(fileName.equals(filesInCurrentDirectory.get(i).getName())) {
-        return true;
+    if(filesInCurrentDirectory != null) {
+      for(int i = 0; i < filesInCurrentDirectory.length(); i++) {
+        if(fileName.equals(filesInCurrentDirectory.get(i).getName())) {
+          return true;
+        }
       }
     }
     return false;
