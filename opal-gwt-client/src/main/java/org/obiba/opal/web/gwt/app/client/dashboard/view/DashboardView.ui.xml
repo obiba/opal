@@ -18,23 +18,23 @@
     <div id="shortcuts" class="large-indent">
 	    <div>
 	      <g:Anchor ui:field="exploreVariablesLink"><img src="image/48/spreadsheet.png" align="middle"/><ui:msg description="Explore variables link label">Explore Variables</ui:msg></g:Anchor>:
-	      <ui:msg description="Explore variables link description">go through the tables and the variables and check the datasets content.</ui:msg>
+	      <ui:msg description="Explore variables link description">browse tables and variables.</ui:msg>
 	    </div>
 	    <div>
 	      <g:Anchor ui:field="importDataLink"><img src="image/48/document-import.png" align="middle"/><ui:msg description="Import data link label">Import Data</ui:msg></g:Anchor>:
-	      <ui:msg description="Import data link description">import some new data from a file in various format.</ui:msg>
+	      <ui:msg description="Import data link description">create a job to import data from a file in various formats.</ui:msg>
 	    </div>
 	    <div>
 	      <g:Anchor ui:field="exportDataLink"><img src="image/48/document-export.png" align="middle"/><ui:msg description="Export data link label">Export Data</ui:msg></g:Anchor>:
-	      <ui:msg description="Export data link description">export the data to various destinations (file, database...).</ui:msg>
+	      <ui:msg description="Export data link description">create a job to export data to various destinations (files, databases, etc).</ui:msg>
 	    </div>
 	    <div>
-	      <g:Anchor ui:field="exploreFilesLink"><img src="image/48/folder.png" align="middle"/><ui:msg description="Explore files link label">Explore Files</ui:msg></g:Anchor>:
-	      <ui:msg description="Explore files link description">upload and download files on the server.</ui:msg>
+	      <g:Anchor ui:field="exploreFilesLink"><img src="image/48/folder.png" align="middle"/><ui:msg description="Manage Files link label">Manage Files</ui:msg></g:Anchor>:
+	      <ui:msg description="Manage Files link description">browse, upload and download files on the server.</ui:msg>
 	    </div>
 	    <div>
-	      <g:Anchor ui:field="jobsLink"><img src="image/48/job.png" align="middle"/><ui:msg description="Job List link label">Job List</ui:msg></g:Anchor>:
-	      <ui:msg description="Job List link description">check the status of the import/export jobs that are running on the server.</ui:msg>
+	      <g:Anchor ui:field="jobsLink"><img src="image/48/job.png" align="middle"/><ui:msg description="Manage Jobs link label">Manage Jobs</ui:msg></g:Anchor>:
+	      <ui:msg description="Manage Jobs link description">list and manage jobs that were launched on the server.</ui:msg>
 	    </div>
     </div>
   </g:HTMLPanel>

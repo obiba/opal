@@ -192,7 +192,7 @@ public interface Translations extends Constants {
   String singleTableSelectionInstructionsLabel();
 
   @Description("Datasource label")
-  @DefaultStringValue("Dataset")
+  @DefaultStringValue("Datasource")
   String datasourceLabel();
 
   @Description("Table selector title")
@@ -236,7 +236,7 @@ public interface Translations extends Constants {
   String dataExportInstructionsConclusion();
 
   @Description("Data import instructions")
-  @DefaultStringValue("Select the file to be imported and the destination dataset.")
+  @DefaultStringValue("Select the file to be imported and the destination datasource.")
   String dataImportInstructions();
 
   @Description("Data import instructions conclusion")
