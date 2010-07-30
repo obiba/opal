@@ -40,7 +40,7 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
 
     public void clear();
 
-    public void showErrorMessage();
+    public void showErrorMessageAndClearPassword();
 
     public HasValue<String> getUserName();
 
@@ -120,7 +120,7 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        display.showErrorMessage();
+        display.showErrorMessageAndClearPassword();
       }
     };
 
@@ -133,7 +133,7 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
           display.clear();
           eventBus.fireEvent(new SessionCreatedEvent(response.getHeader("Location")));
         } else {
-          display.showErrorMessage();
+          display.showErrorMessageAndClearPassword();
         }
       }
     }).withFormBody("username", username, "password", password).send();

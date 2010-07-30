@@ -79,7 +79,7 @@ public class LoginView extends Composite implements LoginPresenter.Display {
   }
 
   @Override
-  public void showErrorMessage() {
+  public void showErrorMessageAndClearPassword() {
     errorMessage.setVisible(true);
     new Animation() {
 
@@ -89,12 +89,13 @@ public class LoginView extends Composite implements LoginPresenter.Display {
       }
 
     }.run(200);
+    clearPassword();
   }
 
   @Override
   public void clear() {
     errorMessage.setVisible(false);
-    getPassword().setValue("");
+    clearPassword();
   }
 
   @Override
@@ -105,6 +106,10 @@ public class LoginView extends Composite implements LoginPresenter.Display {
   @Override
   public HasKeyUpHandlers getUserNameTextBox() {
     return userName;
+  }
+
+  private void clearPassword() {
+    getPassword().setValue("");
   }
 
 }
