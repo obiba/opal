@@ -43,7 +43,7 @@
  <g:VerticalPanel width="100%" addStyleNames="navigator">
      <g:FlowPanel addStyleNames="small-indent {style.titlebar}">
        <g:Label addStyleNames="left-aligned {style.title-bold}" ui:field="datasourceName">opal-data</g:Label>
-       <g:Label addStyleNames="small-indent left-aligned {style.title}"><ui:msg description="Dataset title in parentheses">(Dataset)</ui:msg></g:Label>
+       <g:Label addStyleNames="small-indent left-aligned {style.title}"><ui:msg description="Datasource title in parentheses">(Datasource)</ui:msg></g:Label>
      </g:FlowPanel>
       
      <g:FlowPanel ui:field="toolbarPanel"  addStyleNames="small-indent {style.toolbar} {style.toolbar-right}">
