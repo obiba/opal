@@ -45,7 +45,7 @@ public class RequestCredentials {
    * @return true if we currently have credentials to offer to the server.
    */
   public boolean hasCredentials() {
-    return extractCredentials() != null;
+    return extractCredentials() != null && !extractCredentials().isEmpty();
   }
 
   public void invalidate() {
