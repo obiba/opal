@@ -71,9 +71,6 @@ final class Dtos {
 
   public static CategoryDto.Builder asDto(Category from) {
     CategoryDto.Builder c = CategoryDto.newBuilder().setName(from.getName()).setIsMissing(from.isMissing());
-    if(from.getCode() != null) {
-      c.setCode(from.getCode());
-    }
     for(Attribute attribute : from.getAttributes()) {
       c.addAttributes(asDto(attribute));
     }
