@@ -144,7 +144,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
       if(filename == null || filename.equals("")) {
         result.add("File name cannot be empty.");
       }
-      if(getDisplay().getFileFormat().equalsIgnoreCase("csv") && fileSelectionPresenter.getFileTypeSelected().equals(FileSelectionType.FILE)) {
+      if(getDisplay().getFileFormat().equalsIgnoreCase("csv") && fileSelectionPresenter.getFileTypeSelected() != null && fileSelectionPresenter.getFileTypeSelected().equals(FileSelectionType.FILE)) {
         if(getDisplay().isWithVariables()) {
           result.add("Variables and data cannot be exported in the same CSV file. Select a directory instead or do not export variables.");
         }
