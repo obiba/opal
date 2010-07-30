@@ -55,7 +55,7 @@
     </g:north>
     <g:center>
       <g:LayoutPanel ui:field="workbench">
-        <g:layer top="0" height="100%">
+        <g:layer>
           <g:Label><ui:msg description="Workbench label">The Workbench</ui:msg></g:Label>
         </g:layer>
       </g:LayoutPanel>

@@ -10,19 +10,20 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
-public class LoginView extends Composite implements LoginPresenter.Display {
+public class LoginView implements LoginPresenter.Display {
   @UiTemplate("LoginView.ui.xml")
   interface LoginViewUiBinder extends UiBinder<Widget, LoginView> {
   }
 
   private static LoginViewUiBinder uiBinder = GWT.create(LoginViewUiBinder.class);
+
+  private final Widget panel;
 
   @UiField
   Label applicationName;
@@ -40,7 +41,7 @@ public class LoginView extends Composite implements LoginPresenter.Display {
   Button login;
 
   public LoginView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    panel = uiBinder.createAndBindUi(this);
     errorMessage.setVisible(false);
     userName.setFocus(true);
   }
@@ -52,7 +53,7 @@ public class LoginView extends Composite implements LoginPresenter.Display {
 
   @Override
   public Widget asWidget() {
-    return this;
+    return panel;
   }
 
   @Override

@@ -17,7 +17,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
@@ -27,13 +26,15 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  *
  */
-public class ApplicationView extends Composite implements ApplicationPresenter.Display {
+public class ApplicationView implements ApplicationPresenter.Display {
 
   @UiTemplate("ApplicationView.ui.xml")
   interface ViewUiBinder extends UiBinder<DockLayoutPanel, ApplicationView> {
   }
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+
+  private final DockLayoutPanel dock;
 
   @UiField
   Panel topBar;
@@ -75,7 +76,7 @@ public class ApplicationView extends Composite implements ApplicationPresenter.D
   Panel workbench;
 
   public ApplicationView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    dock = uiBinder.createAndBindUi(this);
   }
 
   @Override
@@ -119,7 +120,7 @@ public class ApplicationView extends Composite implements ApplicationPresenter.D
 
   @Override
   public Widget asWidget() {
-    return this;
+    return dock;
   }
 
   @Override
