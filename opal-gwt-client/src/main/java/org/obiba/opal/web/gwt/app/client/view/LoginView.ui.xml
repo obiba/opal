@@ -6,47 +6,43 @@
   </ui:style>
 
   <g:HTMLPanel>
-    <table style="height: 100%; margin: auto">
-      <tr>
-        <td>
-			    <table style="display: table-cell; vertical-align: middle; border: 3px solid #92C1F0; padding:20px;">
-						<tr>
-						  <td/>
-						  <td>
-						    <g:Label ui:field="applicationName" addStyleNames="{style.applicationTitle}"><ui:msg description="Opal application name">Opal</ui:msg></g:Label>
-						  </td>
-						</tr>
-						<tr>
-						  <td/>
-						  <td>
-						    <g:Label ui:field="errorMessage" addStyleNames="{style.error}"><ui:msg description="Authentication failed error message">Authentication Failed</ui:msg></g:Label>          
-						  </td>
-						</tr>
-						<tr>
-						  <td>
-						    <g:Label><ui:msg description="User name field label">User Name</ui:msg></g:Label>
-						  </td>
-						  <td>
-						    <g:TextBox ui:field="userName" width="15em"  />
-						  </td>
-						</tr>
-						<tr>
-						  <td>
-						    <g:Label><ui:msg description="Password field label">Password</ui:msg></g:Label>
-						  </td>
-						  <td>
-						    <g:PasswordTextBox ui:field="password" width="15em" />
-						  </td>
-						</tr>
-						<tr>
-						  <td/>
-						  <td>
-						    <g:Button ui:field="login"><ui:msg description="Sign in button label">Sign In</ui:msg></g:Button>
-						  </td>
-						</tr>
-			    </table>
-        </td>
-      </tr>
-    </table>
+    <div style="position:absolute; top:50%; left:50%;">
+      <table style="position:absolute; top:-6em; left:-12.5em; width:25em; height:12em; border: 3px solid #92C1F0;">
+      	<tr>
+      	  <td/>
+      	  <td>
+      	    <g:Label ui:field="applicationName" addStyleNames="{style.applicationTitle}"><ui:msg description="Opal application name">Opal</ui:msg></g:Label>
+      	  </td>
+      	</tr>
+      	<tr>
+      	  <td/>
+      	  <td>
+      	    <g:Label ui:field="errorMessage" addStyleNames="{style.error}"><ui:msg description="Authentication failed error message">Authentication Failed</ui:msg></g:Label>          
+      	  </td>
+      	</tr>
+      	<tr>
+      	  <td>
+      	    <g:Label><ui:msg description="User name field label">User Name</ui:msg></g:Label>
+      	  </td>
+      	  <td>
+      	    <g:TextBox ui:field="userName" width="15em"  />
+      	  </td>
+      	</tr>
+      	<tr>
+      	  <td>
+      	    <g:Label><ui:msg description="Password field label">Password</ui:msg></g:Label>
+      	  </td>
+      	  <td>
+      	    <g:PasswordTextBox ui:field="password" width="15em" />
+      	  </td>
+      	</tr>
+      	<tr>
+      	  <td/>
+      	  <td>
+      	    <g:Button ui:field="login"><ui:msg description="Sign in button label">Sign In</ui:msg></g:Button>
+      	  </td>
+      	</tr>
+      </table>
+    </div>
   </g:HTMLPanel>
 </ui:UiBinder>
