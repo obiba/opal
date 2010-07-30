@@ -51,7 +51,7 @@
 	         <tr>
 	           <td/>
 	           <td>
-	             <g:RadioButton name="destination" ui:field="destinationDataSource"><ui:msg description="Copy data to dataset">Copy data to dataset:</ui:msg></g:RadioButton>
+	             <g:RadioButton name="destination" ui:field="destinationDataSource"><ui:msg description="Copy data to datasource">Copy data to datasource:</ui:msg></g:RadioButton>
 	             <g:HTMLPanel addStyleNames="indent">
 	               <g:ListBox ui:field="datasources" />
 	             </g:HTMLPanel>

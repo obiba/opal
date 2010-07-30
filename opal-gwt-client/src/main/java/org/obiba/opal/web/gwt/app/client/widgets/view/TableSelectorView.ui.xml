@@ -27,7 +27,7 @@
             </tr>
             <tr>
               <td>
-                <g:Label><ui:msg description="Datasource label">Dataset</ui:msg>:</g:Label>                
+                <g:Label><ui:msg description="Datasource label">Datasource</ui:msg>:</g:Label>                
               </td>
               <td>
                 <g:ListBox ui:field="datasourceList" />

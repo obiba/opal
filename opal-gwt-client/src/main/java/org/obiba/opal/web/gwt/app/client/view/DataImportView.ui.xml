@@ -63,8 +63,8 @@
 	      <g:Label addStyleNames="title"><ui:msg description="Data File label">Data File</ui:msg></g:Label>
 	      <p><ui:msg description="Data File information">The data file is to be selected on the server side.Use the file explorer to upload a data file. Currently only Onyx exportation files can be imported.</ui:msg></p>
 	
-	      <g:Label addStyleNames="title"><ui:msg description="Destination Dataset label">Destination Dataset</ui:msg></g:Label>
-	      <p><ui:msg description="Destination Dataset information">Tables and variables will be created in the selected dataset prior to the importation of data.</ui:msg></p>
+	      <g:Label addStyleNames="title"><ui:msg description="Destination Datasource label">Destination Datasource</ui:msg></g:Label>
+	      <p><ui:msg description="Destination Datasource information">Tables and variables will be created in the selected datasource prior to the importation of data.</ui:msg></p>
 	
 	      <g:Label addStyleNames="title"><ui:msg description="Archive label">Archive</ui:msg></g:Label>
 	      <p><ui:msg description="Archive information">Select a directory on the server side where the data file will be stored once successfully imported.</ui:msg></p>
