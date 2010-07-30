@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -66,10 +67,12 @@ public class FileSystemTreeView implements Display {
     return fileSystemTree.addOpenHandler(openHandler);
   }
 
+  @SuppressWarnings("unchecked")
   public void addBranch(TreeItem treeItem, FileDto folderToAdd) {
     FileDto file;
-    for(int i = 0; i < folderToAdd.getChildrenArray().length(); i++) {
-      file = folderToAdd.getChildrenArray().get(i);
+    JsArray<FileDto> children = (folderToAdd.getChildrenCount() != 0) ? folderToAdd.getChildrenArray() : (JsArray<FileDto>) JsArray.createArray();
+    for(int i = 0; i < children.length(); i++) {
+      file = children.get(i);
 
       if(file.getType().isFileType(FileDto.FileType.FOLDER)) {
         TreeItem childItem = createTreeItem(file);
