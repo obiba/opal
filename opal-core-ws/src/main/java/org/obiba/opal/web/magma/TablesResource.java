@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
-import java.net.URI;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -24,7 +23,6 @@ import org.obiba.opal.web.model.Magma.TableDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 public class TablesResource {
@@ -42,16 +40,9 @@ public class TablesResource {
   @GET
   public List<Magma.TableDto> getTables() {
     final List<Magma.TableDto> tables = Lists.newArrayList();
+    UriBuilder tableLink = UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable");
     for(ValueTable valueTable : datasource.getValueTables()) {
-      URI tableLink = UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable").build(datasource.getName(), valueTable.getName());
-      Magma.TableDto.Builder table = Magma.TableDto.newBuilder() //
-      .setName(valueTable.getName()) //
-      .setEntityType(valueTable.getEntityType()) //
-      .setDatasourceName(datasource.getName()) //
-      .setVariableCount(Iterables.size(valueTable.getVariables())) //
-      .setValueSetCount(valueTable.getVariableEntities().size()) //
-      .setLink(tableLink.toString());
-      tables.add(table.build());
+      tables.add(Dtos.asDto(valueTable, tableLink).build());
     }
     sortByName(tables);
 

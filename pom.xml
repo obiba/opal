@@ -29,6 +29,7 @@
     <module>opal-ws</module>
     <module>opal-web-model</module>
     <module>opal-gwt-client</module>
+    <module>opal-rest-client</module>
   </modules>
 
   <dependencyManagement>

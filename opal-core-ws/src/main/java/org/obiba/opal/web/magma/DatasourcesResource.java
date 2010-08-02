@@ -21,7 +21,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.web.magma.support.OpalResourceHelper;
+import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.DatasourceDto;
 import org.slf4j.Logger;
@@ -43,7 +43,10 @@ public class DatasourcesResource {
 
   @Autowired
   public DatasourcesResource(@Value("${org.obiba.opal.keys.tableReference}") String keysTableReference) {
-    keysDatasourceName = OpalResourceHelper.extractKeysDatasourceName(keysTableReference);
+    keysDatasourceName = MagmaEngineTableResolver.valueOf(keysTableReference).getDatasourceName();
+    if(keysDatasourceName == null) {
+      throw new IllegalArgumentException("invalid keys table reference");
+    }
   }
 
   @GET

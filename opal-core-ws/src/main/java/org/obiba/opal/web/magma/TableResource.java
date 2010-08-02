@@ -43,12 +43,14 @@ import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.VariableEntityBean;
-import org.obiba.magma.xstream.XStreamValueSet;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.TableDto;
+import org.obiba.opal.web.model.Magma.ValueDto;
+import org.obiba.opal.web.model.Magma.ValueSetDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
-import org.obiba.opal.web.ws.security.NotAuthenticated;
+import org.obiba.opal.web.model.Magma.VariableEntityDto;
+import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 
@@ -68,24 +70,13 @@ public class TableResource {
 
   @GET
   public TableDto get(@Context final UriInfo uriInfo) {
-    TableDto.Builder builder = TableDto.newBuilder() //
-    .setName(valueTable.getName()) //
-    .setEntityType(valueTable.getEntityType()) //
-    .setDatasourceName(valueTable.getDatasource().getName()) //
-    .setVariableCount(Iterables.size(valueTable.getVariables())) //
-    .setValueSetCount(valueTable.getVariableEntities().size());
-
-    if(uriInfo != null) {
-      builder.setLink(uriInfo.getPath());
-    }
-
-    return builder.build();
+    return Dtos.asDto(valueTable, null).setLink(uriInfo.getPath()).build();
   }
 
   @GET
   @Path("/variables/xlsx")
   @Produces("application/vnd.ms-excel")
-  @NotAuthenticated
+  @AuthenticatedByCookie
   public Response getExcelDictionary() throws MagmaRuntimeException, IOException {
     String destinationName = valueTable.getDatasource().getName() + "." + valueTable.getName() + "-dictionary";
     ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
@@ -154,28 +145,32 @@ public class TableResource {
 
   @GET
   @Path("/entities")
-  @Produces("application/xml")
-  public Set<String> getEntities() {
-    return ImmutableSet.copyOf(Iterables.transform(valueTable.getValueSets(), new Function<ValueSet, String>() {
+  public Set<VariableEntityDto> getEntities() {
+    return ImmutableSet.copyOf(Iterables.transform(valueTable.getVariableEntities(), new Function<VariableEntity, VariableEntityDto>() {
       @Override
-      public String apply(ValueSet from) {
-        return from.getVariableEntity().getIdentifier();
+      public VariableEntityDto apply(VariableEntity from) {
+        return VariableEntityDto.newBuilder().setIdentifier(from.getIdentifier()).build();
       }
     }));
   }
 
   @GET
   @Path("/valueSet/{identifier}")
-  @Produces("application/xml")
-  public XStreamValueSet getValueSet(@PathParam("identifier") String identifier) {
+  public ValueSetDto getValueSet(@PathParam("identifier") String identifier) {
     VariableEntity entity = new VariableEntityBean(this.valueTable.getEntityType(), identifier);
     ValueSet valueSet = this.valueTable.getValueSet(entity);
-    XStreamValueSet xvs = new XStreamValueSet(this.valueTable.getName(), entity);
+    ValueSetDto.Builder builder = ValueSetDto.newBuilder();
+    builder.setEntity(VariableEntityDto.newBuilder().setIdentifier(identifier));
     for(Variable variable : this.valueTable.getVariables()) {
       Value value = this.valueTable.getValue(variable, valueSet);
-      xvs.setValue(variable, value);
+      builder.addVariables(variable.getName());
+      ValueDto.Builder valueBuilder = ValueDto.newBuilder().setValueType(variable.getValueType().getName()).setIsSequence(value.isSequence());
+      if(value.isNull() == false) {
+        valueBuilder.setValue(value.toString());
+      }
+      builder.addValues(valueBuilder);
     }
-    return xvs;
+    return builder.build();
   }
 
   @GET

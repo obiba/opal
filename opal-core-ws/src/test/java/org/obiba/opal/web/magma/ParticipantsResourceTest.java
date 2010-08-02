@@ -67,12 +67,7 @@ public class ParticipantsResourceTest extends AbstractMagmaResourceTest {
   //
 
   private ParticipantsResource createParticipantsResource() {
-    return new ParticipantsResource("keysTableReference") {
-
-      String extractKeysDatasourceName(String keysTableReference) {
-        return "mockDatasource";
-      }
-    };
+    return new ParticipantsResource("mockDatasource.keysTable");
   }
 
   private void testGetParticipantCount(Set<ValueTable> tables, int expectedCount) {

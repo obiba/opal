@@ -13,13 +13,16 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.magma.Attribute;
 import org.obiba.magma.Category;
+import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.opal.web.model.Magma.AttributeDto;
 import org.obiba.opal.web.model.Magma.CategoryDto;
 import org.obiba.opal.web.model.Magma.LinkDto;
+import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
 
 /**
  * Utilities for manipulating Magma Dto instances
@@ -83,5 +86,18 @@ final class Dtos {
       a.setLocale(from.getLocale().toString());
     }
     return a;
+  }
+
+  public static TableDto.Builder asDto(ValueTable valueTable, UriBuilder uriBuilder) {
+    TableDto.Builder builder = TableDto.newBuilder() //
+    .setName(valueTable.getName()) //
+    .setEntityType(valueTable.getEntityType()) //
+    .setDatasourceName(valueTable.getDatasource().getName()) //
+    .setVariableCount(Iterables.size(valueTable.getVariables())) //
+    .setValueSetCount(valueTable.getVariableEntities().size());
+    if(uriBuilder != null) {
+      builder.setLink(uriBuilder.build(valueTable.getDatasource().getName(), valueTable.getName()).toString());
+    }
+    return builder;
   }
 }
