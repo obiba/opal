@@ -85,6 +85,12 @@
 
       <dependency>
         <groupId>org.obiba.magma</groupId>
+        <artifactId>magma-datasource-null</artifactId>
+        <version>${magma.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.obiba.magma</groupId>
         <artifactId>magma-hibernate-common</artifactId>
         <version>${magma.version}</version>
         <exclusions>
@@ -716,8 +722,8 @@
 
     <pmd.ruleset.dir>${basedir}</pmd.ruleset.dir>
 
-    <obiba.commons.version>1.2-SNAPSHOT</obiba.commons.version>
-    <magma.version>1.2-SNAPSHOT</magma.version>
+    <obiba.commons.version>1.2.0</obiba.commons.version>
+    <magma.version>1.2.1</magma.version>
     <spring.version>3.0.2.RELEASE</spring.version>
     <spring-batch.version>2.0.3.RELEASE</spring-batch.version>
     <slf4j.version>1.5.10</slf4j.version>
@@ -739,7 +745,7 @@
     <liquibase.version>1.9.4</liquibase.version>
     <shiro.version>1.0.0-incubating</shiro.version>
     <bouncycastle.version>1.45</bouncycastle.version>
-    <commons-vfs.version>2.0-SNAPSHOT</commons-vfs.version>
+    <commons-vfs.version>2.0-r929316</commons-vfs.version>
     <mockftpserver.version>2.1</mockftpserver.version>
     <commons-fileupload.version>1.2.1</commons-fileupload.version>
     <commons-io.version>1.3.2</commons-io.version>
