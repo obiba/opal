@@ -34,7 +34,7 @@ import com.google.common.collect.Iterables;
 class RestValueTable extends AbstractValueTable {
 
   private final TableDto tableDto;
-  
+
   private final URI tableReference;
 
   public RestValueTable(RestDatasource datasource, TableDto dto) {
@@ -59,8 +59,9 @@ class RestValueTable extends AbstractValueTable {
       addVariableValueSource(new VariableValueSource() {
 
         private final Variable v;
-        
+
         {
+          // TODO: this is incomplete.
           v = Variable.Builder.newVariable(dto.getName(), ValueType.Factory.forName(dto.getValueType()), dto.getEntityType()).build();
         }
 
@@ -134,13 +135,13 @@ class RestValueTable extends AbstractValueTable {
   }
 
   private class LazyValueSet extends ValueSetBean {
-    
+
     private ValueSetDto valueSet;
 
     private LazyValueSet(ValueTable table, VariableEntity entity) {
       super(table, entity);
     }
-    
+
     public Value get(String name) {
       ValueSetDto valueSet = loadValueSet();
       for(int i = 0; i < valueSet.getVariablesCount(); i++) {
@@ -165,12 +166,12 @@ class RestValueTable extends AbstractValueTable {
   @Override
   public Timestamps getTimestamps(ValueSet valueSet) {
     return new Timestamps() {
-      
+
       @Override
       public Value getLastUpdate() {
         return DateTimeType.get().nullValue();
       }
-      
+
       @Override
       public Value getCreated() {
         return DateTimeType.get().nullValue();
