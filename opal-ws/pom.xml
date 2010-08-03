@@ -47,9 +47,8 @@
     <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java-format</artifactId>
-      <version>1.1</version>
+      <version>1.2-r36</version>
     </dependency>
-    
   </dependencies>
 
   <repositories>
