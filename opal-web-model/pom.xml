@@ -133,13 +133,15 @@
                     <include name="*.proto" />
                   </fileset>
                 </path>
-                <pathconvert pathsep=" " property="protofilesList" refid="protofiles" />
-
+                <pathconvert pathsep=" " property="protofilesList" refid="protofiles">
+					<map from="${basedir}/" to=""/>
+				</pathconvert>
+				
                 <!-- Compile our .proto file -->
-                <exec executable="${basedir}/tools/protoc-${os.protoc}" failonerror="true">
+                <exec dir="${basedir}" executable="${basedir}/tools/protoc-${os.protoc}" failonerror="true">
                   <arg value="--java_out=target/generated-sources/protobuf-server" />
                   <arg line="${protofilesList}" />
-                  <arg line="-I${basedir}/src/main/protobuf" />
+                  <arg line="-Isrc/main/protobuf" />
                 </exec>
               </tasks>
             </configuration>
