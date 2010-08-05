@@ -57,7 +57,6 @@
        <g:FlowPanel ui:field="toolbarPanel"  addStyleNames="small-indent {style.toolbar} {style.toolbar-right}">
          <g:Image ui:field="nextImage" url="image/next.png"></g:Image>
          <g:Image ui:field="previousImage" url="image/previous.png"></g:Image>
-         <g:Image ui:field="spreadsheetDownloadImage" url="image/spreadsheet.png"></g:Image>
        </g:FlowPanel>
      </g:FlowPanel>
      
