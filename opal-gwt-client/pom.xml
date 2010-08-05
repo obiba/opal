@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -26,7 +27,7 @@
       <version>${gwt.version}</version>
       <scope>provided</scope>
     </dependency>
-     <dependency>
+    <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-dev</artifactId>
       <version>${gwt.version}</version>
@@ -56,7 +57,12 @@
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
-
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwtquery-ui</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
     <!-- test -->
     <dependency>
       <groupId>junit</groupId>
@@ -72,7 +78,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
-        <version>2.1-beta-1</version>  
+        <version>2.1-beta-1</version>
         <configuration>
           <warSourceDirectory>war</warSourceDirectory>
           <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
@@ -93,7 +99,7 @@
         </executions>
         <configuration>
           <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
-          <runTarget>org.obiba.opal.web.gwt.app.GwtApp/Application.html</runTarget>
+          <runTarget>org.obiba.opal.web.gwt.ohs.OhsApp/Application.html</runTarget>
         </configuration>
       </plugin>
       <plugin>
@@ -111,9 +117,14 @@
           </tasks>
         </configuration>
       </plugin>
-    </plugins>    
+    </plugins>
   </build>
-
+  <repositories>
+    <repository>
+      <id>gwtquery-ui-repository</id>
+      <url>http://gwtquery-ui.googlecode.com/svn/mavenrepo</url>
+    </repository>
+  </repositories>
   <pluginRepositories>
     <pluginRepository>
       <id>obiba.org</id>

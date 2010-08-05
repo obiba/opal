@@ -1,0 +1,21 @@
+<!DOCTYPE module PUBLIC "//gwt-module/" "http://google-web-toolkit.googlecode.com/svn/tags/2.0.0/distro-source/core/src/gwt-module.dtd">
+<module>
+
+  <inherits name='gwtquery.plugins.UiGoogleCdn' />
+  <!-- Opal's WS data models -->
+  <inherits name='org.obiba.opal.web.model.Model' />
+
+  <!-- Specify the app entry point class. -->
+  <entry-point class='org.obiba.opal.web.gwt.ohs.client.OhsApp' />
+  <!-- 
+  <extend-property name='locale' values='fr'/>
+  <extend-property name='locale' values='en'/>
+  <set-property-fallback name="locale" value="en"/>
+ -->
+  <!-- This will limit the compile to a single browser: Firefox 3.x -->
+  <set-property name="user.agent" value="gecko1_8" />
+
+  <script src="http://jqueryui.com/themeroller/themeswitchertool/"/>
+  <stylesheet src="css/smoothness/jquery-ui-1.8.2.custom.css" />
+  
+</module>

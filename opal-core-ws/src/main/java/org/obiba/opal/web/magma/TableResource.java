@@ -178,6 +178,28 @@ public class TableResource {
     return xvs;
   }
 
+
+  @GET
+  @Path("/eval")
+  public Collection<ValueDto> eval(@QueryParam("valueType") String valueType, @QueryParam("script") String script, @QueryParam("limit") @DefaultValue("10") Integer limit) {
+    JavascriptValueSource jvs = new JavascriptValueSource();
+    jvs.setScript(script);
+    jvs.setValueType(ValueType.Factory.forName(valueType));
+    jvs.initialise();
+    int i = 0;
+    ImmutableList.Builder<ValueDto> values = ImmutableList.builder();
+    for(ValueSet valueSet : valueTable.getValueSets()) {
+      Value value = jvs.getValue(valueSet);
+      ValueDto.Builder valueBuilder = ValueDto.newBuilder().setValueType(jvs.getValueType().getName()).setIsSequence(value.isSequence());
+      if(value.isNull() == false) {
+        valueBuilder.setValue(value.toString());
+      }
+      values.add(valueBuilder.build());
+      if(i++ == limit) break;
+    }
+    return values.build();
+  }
+
   @GET
   @Path("/values.json")
   @Produces("application/json")

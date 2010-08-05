@@ -40,7 +40,6 @@ import org.springframework.stereotype.Component;
 /**
  *
  */
-@Component
 @ServerInterceptor
 public class SecurityInterceptor extends AbstractSecurityComponent implements PreProcessInterceptor, PostProcessInterceptor {
 

@@ -1,0 +1,70 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
+
+  <g:HTMLPanel ui:field="panel">
+    <div class="opal-table-selector">Table: <input type="text" size="100"/><button>Change</button></div>
+    <div id="tableEditor">
+      <div class="opal-navigator"><button class="opal-previous">Previous</button><button class="opal-next">Next</button> Goto: <input class="opal-goto" type="text"></input></div>
+      <fieldset class="opal-form-layout opal-variable">
+        <legend>Variable: <span></span></legend>
+        <ol>
+          <li><label for="valueType">Value Type</label>
+            <select id="valueType">
+              <option value="text">Text</option>
+              <option value="boolean">Boolean</option>
+              <option value="integer">Integer</option>
+              <option value="decimal">Decimal</option>
+              <option value="datetime">Datetime</option>
+              <option value="date">Date</option>
+            </select>
+          </li>
+          <li>
+            <label for="label">Label</label>
+            <textarea id="label" cols="100" rows="3"></textarea>
+          </li>
+          <li class="opal-script-item">
+            <label for="script">Script</label>
+            <g:TextArea ui:field="scriptArea" characterWidth="100" visibleLines="10"/>
+            <button>Test</button>
+            <div class="opal-script-result" title="Results">
+              <p class="ui-state-error ui-corner-all">
+                <span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-alert"></span>
+                <span class="opal-label"></span>
+              </p>
+              <ul></ul>
+            </div>
+          </li>
+          <li class="opal-categories-item">
+            <label>Categories</label>
+            <table class="opal-variable-categories" >
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Label</th>
+                  <th>Missing</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </li>
+          <li class="opal-attributes-item">
+            <label>Attributes</label>
+            <table class="opal-variable-attributes" >
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Locale</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </li>
+        </ol>
+      </fieldset>
+    </div>
+  </g:HTMLPanel>
+
+</ui:UiBinder>

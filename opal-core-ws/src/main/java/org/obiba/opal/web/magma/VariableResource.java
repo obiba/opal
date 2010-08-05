@@ -10,18 +10,15 @@
 package org.obiba.opal.web.magma;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.QueryParam;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.json.JSONObject;
 import org.obiba.magma.Category;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
@@ -30,7 +27,9 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.opal.web.model.Magma.DescriptiveStatsDto;
 import org.obiba.opal.web.model.Magma.FrequencyDto;
+import org.obiba.opal.web.model.Magma.ValueDto;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 public class VariableResource {
@@ -51,18 +50,20 @@ public class VariableResource {
   }
 
   @GET
-  @Path("/values.json")
-  @Produces("application/json")
-  public Response getValues() {
-    Map<String, Object> response = new HashMap<String, Object>();
-
-    List<Object> values = new LinkedList<Object>();
-    for(ValueSet vs : valueTable.getValueSets()) {
-      values.add(vvs.getValue(vs).getValue());
+  @Path("/values")
+  public Collection<ValueDto> getValues(@QueryParam("limit") @DefaultValue("10") Integer limit) {
+    int i = 0;
+    ImmutableList.Builder<ValueDto> values = ImmutableList.builder();
+    for(ValueSet valueSet : valueTable.getValueSets()) {
+      Value value = vvs.getValue(valueSet);
+      ValueDto.Builder valueBuilder = ValueDto.newBuilder().setValueType(vvs.getValueType().getName()).setIsSequence(value.isSequence());
+      if(value.isNull() == false) {
+        valueBuilder.setValue(value.toString());
+      }
+      values.add(valueBuilder.build());
+      if(i++ == limit) break;
     }
-    response.put(vvs.getVariable().getName(), values);
-
-    return Response.ok(new JSONObject(response).toString()).build();
+    return values.build();
   }
 
   @GET
