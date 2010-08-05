@@ -158,7 +158,6 @@ public class DatasourceResource {
         return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists")).build();
       } else {
         writeVariablesToTable(table, datasource);
-        System.out.println("UriBuilder " + UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable").build(name, table.getName()));
         return Response.created(UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable").build(name, table.getName())).build();
       }
     } catch(Exception e) {
@@ -171,12 +170,15 @@ public class DatasourceResource {
   }
 
   private void writeVariablesToTable(TableDto table, Datasource datasource) {
-    VariableWriter vw = datasource.createWriter(table.getName(), table.getEntityType()).writeVariables();
+    VariableWriter vw = null;
+    try {
+      vw = datasource.createWriter(table.getName(), table.getEntityType()).writeVariables();
 
-    for(VariableDto dto : table.getVariablesList()) {
-      vw.writeVariable(Dtos.fromDto(dto));
+      for(VariableDto dto : table.getVariablesList()) {
+        vw.writeVariable(Dtos.fromDto(dto));
+      }
+    } finally {
+      StreamUtil.silentSafeClose(vw);
     }
-
-    StreamUtil.silentSafeClose(vw);
   }
 }

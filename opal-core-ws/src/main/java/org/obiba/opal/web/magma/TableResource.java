@@ -31,6 +31,7 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
 import org.json.JSONObject;
 import org.obiba.core.util.StreamUtil;
@@ -53,6 +54,7 @@ import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.ValueSetDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
+import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
@@ -227,12 +229,28 @@ public class TableResource {
 
   @PUT
   public Response addOrUpdateVariables(List<VariableDto> variables) {
-    VariableWriter vw = valueTable.getDatasource().createWriter(valueTable.getName(), valueTable.getEntityType()).writeVariables();
-    for(VariableDto variable : variables) {
-      vw.writeVariable(Dtos.fromDto(variable));
+
+    VariableWriter vw = null;
+    try {
+
+      // @TODO Check if table can be modified and respond with "IllegalTableModification" (it seems like this cannot be
+      // done with the current Magma implementation).
+
+      vw = valueTable.getDatasource().createWriter(valueTable.getName(), valueTable.getEntityType()).writeVariables();
+      for(VariableDto variable : variables) {
+        vw.writeVariable(Dtos.fromDto(variable));
+      }
+
+      return Response.ok().build();
+    } catch(Exception e) {
+      return Response.status(Status.INTERNAL_SERVER_ERROR).entity(getErrorMessage(Status.INTERNAL_SERVER_ERROR, e.toString())).build();
+    } finally {
+      StreamUtil.silentSafeClose(vw);
     }
-    StreamUtil.silentSafeClose(vw);
-    return Response.ok().build();
+  }
+
+  private ClientErrorDto getErrorMessage(Status responseStatus, String errorStatus) {
+    return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus).build();
   }
 
   private void sortByName(List<Magma.VariableDto> variables) {

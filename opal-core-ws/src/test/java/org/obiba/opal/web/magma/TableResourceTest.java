@@ -19,7 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
 import junit.framework.Assert;
 
@@ -178,5 +180,12 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
 
     verify(valueTableMock, datasourceMock, valueTableWriterMock, variableWriterMock);
 
+  }
+
+  @Test
+  public void testAddOrUpdateVariables_InternalServerError() {
+    TableResource resource = new TableResource(null);
+    Response response = resource.addOrUpdateVariables(null);
+    Assert.assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
   }
 }
