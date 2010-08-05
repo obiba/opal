@@ -23,6 +23,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
@@ -38,6 +39,7 @@ import org.obiba.magma.support.Disposables;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
+import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,7 +141,36 @@ public class DatasourceResource {
 
   @PUT
   public Response createTable(TableDto table) {
-    Datasource datasource = MagmaEngine.get().getDatasource(name);
+
+    try {
+
+      Datasource datasource = MagmaEngine.get().getDatasource(name);
+
+      ClientErrorDto errorDto;
+
+      // @TODO Verify that the datasource allows table creation (Magma does not offer this yet)
+      // if(datasource.isReadOnly()) {
+      // errorMessage = return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST,
+      // "CannotCreateTable")).build();
+      // } else
+
+      if(datasource.hasValueTable(table.getName())) {
+        return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists")).build();
+      } else {
+        writeVariablesToTable(table, datasource);
+        System.out.println("UriBuilder " + UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable").build(name, table.getName()));
+        return Response.created(UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable").build(name, table.getName())).build();
+      }
+    } catch(Exception e) {
+      return Response.status(Status.INTERNAL_SERVER_ERROR).entity(getErrorMessage(Status.INTERNAL_SERVER_ERROR, e.getMessage())).build();
+    }
+  }
+
+  private ClientErrorDto getErrorMessage(Status responseStatus, String errorStatus) {
+    return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus).build();
+  }
+
+  private void writeVariablesToTable(TableDto table, Datasource datasource) {
     VariableWriter vw = datasource.createWriter(table.getName(), table.getEntityType()).writeVariables();
 
     for(VariableDto dto : table.getVariablesList()) {
@@ -147,7 +178,5 @@ public class DatasourceResource {
     }
 
     StreamUtil.silentSafeClose(vw);
-
-    return Response.created(UriBuilder.fromPath("/").path(DatasourceResource.class).build(table.getName())).build();
   }
 }

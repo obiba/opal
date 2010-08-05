@@ -18,6 +18,9 @@ import static org.easymock.EasyMock.verify;
 import java.io.IOException;
 import java.util.List;
 
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
 import junit.framework.Assert;
 
 import org.easymock.EasyMock;
@@ -31,6 +34,7 @@ import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
+import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,6 +85,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     expect(datasourceMock.createWriter("table", "entityType")).andReturn(valueTableWriterMock);
     expect(valueTableWriterMock.writeVariables()).andReturn(variableWriterMock);
     expect(datasourceMock.getName()).andReturn("testDatasource").atLeastOnce();
+    expect(datasourceMock.hasValueTable("table")).andReturn(false);
     datasourceMock.dispose();
     expectLastCall().atLeastOnce();
     variableWriterMock.writeVariable(isA(Variable.class));
@@ -91,12 +96,48 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     MagmaEngine.get().addDatasource(datasourceMock);
 
     DatasourceResource datasourceResource = new DatasourceResource(datasourceMock.getName());
-    datasourceResource.createTable(createTableDto());
+    Response response = datasourceResource.createTable(createTableDto());
 
-    datasourceMock.dispose();
+    Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+    Assert.assertEquals("/datasource/testDatasource/table/table", response.getMetadata().getFirst("Location").toString());
+
+    MagmaEngine.get().removeDatasource(datasourceMock);
 
     verify(datasourceMock, variableWriterMock, valueTableWriterMock);
 
+  }
+
+  @Test
+  public void testCreateTable_TableAlreadyExist() throws IOException {
+    Datasource datasourceMock = EasyMock.createMock(Datasource.class);
+
+    datasourceMock.initialise();
+    expect(datasourceMock.getName()).andReturn("testDatasource").atLeastOnce();
+    expect(datasourceMock.hasValueTable("table")).andReturn(true);
+    datasourceMock.dispose();
+    expectLastCall().atLeastOnce();
+
+    replay(datasourceMock);
+
+    MagmaEngine.get().addDatasource(datasourceMock);
+
+    DatasourceResource datasourceResource = new DatasourceResource(datasourceMock.getName());
+    Response response = datasourceResource.createTable(createTableDto());
+
+    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    Assert.assertEquals("TableAlreadyExists", ((ClientErrorDto) response.getEntity()).getStatus());
+
+    MagmaEngine.get().removeDatasource(datasourceMock);
+
+    verify(datasourceMock);
+  }
+
+  @Test
+  public void testCreateTable_InternalServerError() {
+    DatasourceResource datasourceResource = new DatasourceResource("");
+    Response response = datasourceResource.createTable(null);
+
+    Assert.assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
   }
 
   private TableDto createTableDto() {
