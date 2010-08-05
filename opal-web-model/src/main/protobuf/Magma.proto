@@ -16,6 +16,7 @@ message TableDto {
   optional int32 variableCount = 4;
   optional int32 valueSetCount = 5;
   optional string datasourceName = 6;
+  repeated VariableDto variables = 7;
 }
 
 message VariableDto {

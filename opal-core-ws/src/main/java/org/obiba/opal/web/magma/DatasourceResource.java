@@ -21,8 +21,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
@@ -34,6 +36,8 @@ import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.opal.web.model.Magma;
+import org.obiba.opal.web.model.Magma.TableDto;
+import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,4 +137,17 @@ public class DatasourceResource {
     return new TableResource(table);
   }
 
+  @PUT
+  public Response createTable(TableDto table) {
+    Datasource datasource = MagmaEngine.get().getDatasource(name);
+    VariableWriter vw = datasource.createWriter(table.getName(), table.getEntityType()).writeVariables();
+
+    for(VariableDto dto : table.getVariablesList()) {
+      vw.writeVariable(Dtos.fromDto(dto));
+    }
+
+    StreamUtil.silentSafeClose(vw);
+
+    return Response.created(UriBuilder.fromPath("/").path(DatasourceResource.class).build(table.getName())).build();
+  }
 }
