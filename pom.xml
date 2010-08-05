@@ -724,7 +724,7 @@
     <pmd.ruleset.dir>${basedir}</pmd.ruleset.dir>
 
     <obiba.commons.version>1.2.0</obiba.commons.version>
-    <magma.version>1.2.1</magma.version>
+    <magma.version>1.2-SNAPSHOT</magma.version>
     <spring.version>3.0.2.RELEASE</spring.version>
     <spring-batch.version>2.0.3.RELEASE</spring-batch.version>
     <slf4j.version>1.5.10</slf4j.version>
