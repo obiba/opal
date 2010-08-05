@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -32,6 +33,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONObject;
+import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
@@ -39,6 +41,7 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
+import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
@@ -220,6 +223,16 @@ public class TableResource {
       }
     }
     return response;
+  }
+
+  @POST
+  public Response addOrUpdateVariables(List<VariableDto> variables) {
+    VariableWriter vw = valueTable.getDatasource().createWriter(valueTable.getName(), valueTable.getEntityType()).writeVariables();
+    for(VariableDto variable : variables) {
+      vw.writeVariable(Dtos.fromDto(variable));
+    }
+    StreamUtil.silentSafeClose(vw);
+    return Response.ok().build();
   }
 
   private void sortByName(List<Magma.VariableDto> variables) {

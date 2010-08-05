@@ -14,6 +14,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,11 +23,16 @@ import javax.ws.rs.core.UriInfo;
 
 import junit.framework.Assert;
 
+import org.easymock.EasyMock;
 import org.jboss.resteasy.specimpl.UriBuilderImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableWriter;
+import org.obiba.magma.Variable;
+import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.slf4j.Logger;
@@ -139,5 +145,38 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     Assert.assertEquals(0, dto.getValueSetCount());
     Assert.assertEquals(DATASOURCE2, dto.getDatasourceName());
     Assert.assertEquals("/datasource/" + DATASOURCE2 + "/table/Weight", dto.getLink());
+  }
+
+  @Test
+  public void testAddOrUpdateVariables_UpdatingVariables() throws IOException {
+
+    ValueTable valueTableMock = EasyMock.createMock(ValueTable.class);
+    Datasource datasourceMock = EasyMock.createMock(Datasource.class);
+    ValueTableWriter valueTableWriterMock = EasyMock.createMock(ValueTableWriter.class);
+    VariableWriter variableWriterMock = EasyMock.createMock(VariableWriter.class);
+
+    TableResource resource = new TableResource(valueTableMock);
+
+    expect(valueTableMock.getDatasource()).andReturn(datasourceMock);
+    expect(valueTableMock.getName()).andReturn("name");
+    expect(valueTableMock.getEntityType()).andReturn("entityType");
+    expect(datasourceMock.createWriter("name", "entityType")).andReturn(valueTableWriterMock);
+    expect(valueTableWriterMock.writeVariables()).andReturn(variableWriterMock);
+
+    variableWriterMock.writeVariable(EasyMock.isA(Variable.class));
+    EasyMock.expectLastCall().times(5);
+    variableWriterMock.close();
+
+    replay(valueTableMock, datasourceMock, valueTableWriterMock, variableWriterMock);
+
+    List<VariableDto> variablesDto = Lists.newArrayList();
+    for(int i = 0; i < 5; i++) {
+      variablesDto.add(VariableDto.newBuilder().setName("name").setEntityType("entityType").setValueType("text").setIsRepeatable(false).build());
+    }
+
+    resource.addOrUpdateVariables(variablesDto);
+
+    verify(valueTableMock, datasourceMock, valueTableWriterMock, variableWriterMock);
+
   }
 }

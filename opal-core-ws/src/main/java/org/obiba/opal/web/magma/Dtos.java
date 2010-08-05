@@ -9,12 +9,16 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
+import java.util.Locale;
+
 import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.magma.Attribute;
 import org.obiba.magma.Category;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
+import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.AttributeDto;
 import org.obiba.opal.web.model.Magma.CategoryDto;
 import org.obiba.opal.web.model.Magma.LinkDto;
@@ -86,6 +90,54 @@ final class Dtos {
       a.setLocale(from.getLocale().toString());
     }
     return a;
+  }
+
+  public static Variable fromDto(VariableDto variableDto) {
+    Variable.Builder builder = Variable.Builder.newVariable(variableDto.getName(), ValueType.Factory.forName(variableDto.getValueType()), variableDto.getEntityType());
+    for(CategoryDto category : variableDto.getCategoriesList()) {
+      builder.addCategory(fromDto(category));
+    }
+
+    for(AttributeDto attribute : variableDto.getAttributesList()) {
+      builder.addAttribute(fromDto(attribute));
+    }
+
+    if(variableDto.getOccurrenceGroup() != null) {
+      builder.occurrenceGroup(variableDto.getOccurrenceGroup());
+    }
+
+    if(variableDto.getMimeType() != null) {
+      builder.mimeType(variableDto.getMimeType());
+    }
+
+    if(variableDto.getUnit() != null) {
+      builder.unit(variableDto.getUnit());
+    }
+
+    if(variableDto.getIsRepeatable()) {
+      builder.repeatable();
+    }
+
+    return builder.build();
+  }
+
+  public static Category fromDto(Magma.CategoryDto categoryDto) {
+    Category.Builder builder = Category.Builder.newCategory(categoryDto.getName()).missing(categoryDto.getIsMissing());
+    for(AttributeDto attributeDto : categoryDto.getAttributesList()) {
+      builder.addAttribute(fromDto(attributeDto));
+    }
+    return builder.build();
+  }
+
+  public static Attribute fromDto(AttributeDto attributeDto) {
+    Attribute.Builder builder = Attribute.Builder.newAttribute(attributeDto.getName());
+    if(attributeDto.getLocale() != null) {
+      builder.withValue(new Locale(attributeDto.getLocale()), attributeDto.getValue());
+    } else {
+      builder.withValue(attributeDto.getValue());
+    }
+
+    return builder.build();
   }
 
   public static TableDto.Builder asDto(ValueTable valueTable, UriBuilder uriBuilder) {
