@@ -13,6 +13,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.AbstractDatasource;
@@ -126,10 +127,7 @@ public class RestDatasource extends AbstractDatasource {
     } catch(IOException e) {
       throw new MagmaRuntimeException(e);
     } finally {
-      try {
-        if(is != null) is.close();
-      } catch(IOException e) {
-      }
+      StreamUtil.silentSafeClose(is);
     }
   }
 
@@ -143,10 +141,7 @@ public class RestDatasource extends AbstractDatasource {
     } catch(IOException e) {
       throw new MagmaRuntimeException(e);
     } finally {
-      try {
-        if(is != null) is.close();
-      } catch(IOException e) {
-      }
+      StreamUtil.silentSafeClose(is);
     }
   }
 
