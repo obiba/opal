@@ -264,4 +264,11 @@ public class TableResource {
 
     });
   }
+
+  @Path("/compare")
+  @Bean
+  public CompareResource getTable() {
+    return new CompareResource(valueTable);
+  }
+
 }
