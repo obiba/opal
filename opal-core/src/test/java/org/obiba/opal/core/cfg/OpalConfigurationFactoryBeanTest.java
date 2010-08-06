@@ -87,7 +87,7 @@ public class OpalConfigurationFactoryBeanTest {
     HibernateDatasourceFactory hibernateDatasourceFactory = (HibernateDatasourceFactory) datasourceFactory;
     SessionFactoryProvider sessionFactoryProvider = hibernateDatasourceFactory.getSessionFactoryProvider();
     assertNotNull(sessionFactoryProvider);
-    assertEquals("my-datasource", hibernateDatasourceFactory.getDatasourceName());
+    assertEquals("my-datasource", hibernateDatasourceFactory.getName());
     assertTrue(sessionFactoryProvider instanceof SpringBeanSessionFactoryProvider);
     SpringBeanSessionFactoryProvider springBeanSessionFactoryProvider = (SpringBeanSessionFactoryProvider) sessionFactoryProvider;
     assertNotNull(springBeanSessionFactoryProvider.getBeanFactory());
