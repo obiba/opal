@@ -19,6 +19,8 @@ public interface PrivateVariableEntityMap {
 
   public VariableEntity publicEntity(VariableEntity privateEntity);
 
+  public boolean hasPublicEntity(VariableEntity publicEntity);
+
   public VariableEntity privateEntity(VariableEntity publicEntity);
 
   public boolean hasPrivateEntity(VariableEntity privateEntity);

@@ -16,10 +16,10 @@ import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
+import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
-import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
@@ -81,6 +81,12 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
   public boolean hasPrivateEntity(VariableEntity privateEntity) {
     if(privateEntity == null) throw new IllegalArgumentException("privateEntity cannot be null");
     return publicToPrivate.inverse().containsKey(privateEntity);
+  }
+
+  @Override
+  public boolean hasPublicEntity(VariableEntity publicEntity) {
+    if(publicEntity == null) throw new IllegalArgumentException("publicEntity cannot be null");
+    return publicToPrivate.containsKey(publicEntity);
   }
 
   public VariableEntity createPublicEntity(VariableEntity privateEntity) {
