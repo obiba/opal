@@ -2,6 +2,8 @@
 <module>
 
   <inherits name='gwtquery.plugins.UiGoogleCdn' />
+    <!-- Client-side REST framework -->
+  <inherits name='org.obiba.opal.web.gwt.rest.Rest' />
   <!-- Opal's WS data models -->
   <inherits name='org.obiba.opal.web.model.Model' />
 

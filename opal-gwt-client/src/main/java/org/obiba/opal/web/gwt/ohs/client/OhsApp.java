@@ -17,6 +17,14 @@ import gwtquery.plugins.ui.widgets.Dialog;
 import gwtquery.plugins.ui.widgets.Autocomplete.Source;
 import gwtquery.plugins.ui.widgets.Button.Icons;
 
+import org.obiba.opal.web.gwt.rest.client.DefaultResourceRequestBuilder;
+import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.event.RequestCredentialsExpiredEvent;
+import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
+import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -27,13 +35,10 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.query.client.Function;
@@ -62,6 +67,9 @@ public class OhsApp implements EntryPoint {
 
   public interface Widgets extends Selectors {
 
+    @Selector("div.opal-login")
+    GQuery loginDialog();
+
     @Selector(".opal-table-selector input")
     GQuery tableSelector();
 
@@ -76,6 +84,9 @@ public class OhsApp implements EntryPoint {
 
     @Selector("button.opal-next")
     GQuery nextButton();
+
+    @Selector("button.opal-save")
+    GQuery saveButton();
 
     @Selector("input.opal-goto")
     GQuery gotoVariable();
@@ -114,6 +125,10 @@ public class OhsApp implements EntryPoint {
     GQuery attributesTable();
   }
 
+  private final DefaultEventBus eventBus = new DefaultEventBus();
+
+  private final RequestCredentials credentials = new RequestCredentials();
+
   @UiField
   HTMLPanel panel;
 
@@ -129,11 +144,30 @@ public class OhsApp implements EntryPoint {
   public OhsApp() {
     uiBinder.createAndBindUi(this);
     widgets = GWT.create(Widgets.class);
+    DefaultResourceRequestBuilder.setup(eventBus, credentials);
   }
 
   @Override
   public void onModuleLoad() {
     RootPanel.get().add(panel);
+    widgets.loginDialog().as(Ui).dialog(Dialog.Options.create().autoOpen(false).modal(true).buttons(Dialog.Buttons.create().define("Login", new Function() {
+      @Override
+      public void f(Element e) {
+        String username = $(e).parents(".ui-dialog").children("#username").val();
+        String password = $(e).parents(".ui-dialog").children("#password").val();
+        ResourceRequestBuilderFactory.newBuilder().forResource("/auth/sessions").post().withCallback(201, new ResponseCodeCallback() {
+
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            // When a 201 happens, we should have credentials, but we'll test anyway.
+            if(credentials.hasCredentials()) {
+              widgets.loginDialog().as(Ui).dialog().close();
+              loadTables();
+            }
+          }
+        }).withFormBody("username", username, "password", password).send();
+      }
+    })));
     widgets.tableEditor().hide();
     widgets.previousButton().as(Ui).button(Button.Options.create().icons(Icons.create().primary("ui-icon-circle-triangle-w"))).disable().click(new Function() {
       @Override
@@ -148,6 +182,14 @@ public class OhsApp implements EntryPoint {
         index++;
         initVariable();
       }
+    });
+    widgets.saveButton().as(Ui).button(Button.Options.create().icons(Icons.create().primary("ui-icon-disk"))).click(new Function() {
+      @Override
+      public void f(Element e) {
+        widgets.saveButton().as(Ui).button(Button.Options.create().icons(Icons.create().primary("ui-icon-pencil"))).disable();
+        saveVariable();
+      }
+
     });
     widgets.testButton().as(Ui).button(Button.Options.create().icons(Icons.create().secondary("ui-icon-calculator"))).disable().click(new Function() {
       @Override
@@ -197,7 +239,69 @@ public class OhsApp implements EntryPoint {
       }
     });
     widgets.gotoVariable().as(Ui).autocomplete().disable();
-    loadTables();
+    $(Document.get()).keydown(new Function() {
+      @Override
+      public boolean f(Event e) {
+        if(e.getCtrlKey()) {
+          boolean handled = true;
+          switch(e.getKeyCode()) {
+          case 'S':
+            widgets.saveButton().click();
+            break;
+          case 'T':
+            widgets.testButton().click();
+            break;
+          case KeyCodes.KEY_RIGHT:
+            widgets.nextButton().click();
+            break;
+          case KeyCodes.KEY_LEFT:
+            widgets.previousButton().click();
+            break;
+          default:
+            handled = false;
+          }
+          if(handled) {
+            e.stopPropagation();
+            return false;
+          }
+        }
+        return true;
+      }
+    });
+
+    if(credentials.hasCredentials()) {
+      loadTables();
+    } else {
+      widgets.loginDialog().as(Ui).dialog().open();
+    }
+
+    eventBus.addHandler(RequestCredentialsExpiredEvent.getType(), new RequestCredentialsExpiredEvent.Handler() {
+
+      @Override
+      public void onCredentialsExpired(RequestCredentialsExpiredEvent e) {
+        widgets.loginDialog().as(Ui).dialog().open();
+      }
+    });
+
+    eventBus.addHandler(RequestErrorEvent.getType(), new RequestErrorEvent.Handler() {
+
+      @Override
+      public void onRequestError(RequestErrorEvent e) {
+        widgets.errorMsg().show().children("span.opal-label").text(e.getException().getMessage());
+        widgets.valuesDialog().as(Ui).dialog().open();
+      }
+    });
+
+    eventBus.addHandler(UnhandledResponseEvent.getType(), new UnhandledResponseEvent.Handler() {
+
+      @Override
+      public void onUnhandledResponse(UnhandledResponseEvent e) {
+        if(credentials.hasCredentials() && e.getResponse().getStatusCode() >= 400) {
+          widgets.errorMsg().show().children("span.opal-label").text(e.getResponse().getText());
+          widgets.valuesDialog().as(Ui).dialog().open();
+        }
+      }
+    });
   }
 
   public void gotTables(JsArray<DatasourceDto> resource) {
@@ -239,7 +343,7 @@ public class OhsApp implements EntryPoint {
     for(int i = 0; i < this.variables.length(); i++) {
       VariableDto dto = this.variables.get(i);
       Autocomplete.Source source = Autocomplete.Source.create().value(Integer.toString(i));
-      String label = findAttribute("label", dto);
+      String label = findAttributeValue("label", dto);
       if(label.length() > 0) {
         source.label(dto.getName() + ": " + label);
       } else {
@@ -265,6 +369,20 @@ public class OhsApp implements EntryPoint {
 
   }
 
+  private void saveVariable() {
+    VariableDto dto = this.variables.get(index);
+    dto.setValueType(widgets.valueType().val());
+    findAttribute("label", dto).setValue(widgets.label().val());
+    findAttribute("script", dto).setValue(widgets.scriptArea().val());
+    ResourceRequestBuilderFactory.newBuilder().put().forResource(dto.getLink()).withResourceBody(VariableDto.stringify(dto)).withCallback(200, new ResponseCodeCallback() {
+
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        widgets.saveButton().as(Ui).button(Button.Options.create().icons(Icons.create().primary("ui-icon-disk"))).enable();
+      }
+    }).send();
+  }
+
   public void initVariable() {
     boolean enablePrevious = index > 0;
     boolean enableNext = index < variables.length() - 1;
@@ -275,8 +393,8 @@ public class OhsApp implements EntryPoint {
 
     VariableDto dto = variables.get(index);
     widgets.variableName().text(dto.getName());
-    widgets.label().val(findAttribute("label", dto));
-    widgets.scriptArea().val(findAttribute("script", dto));
+    widgets.label().val(findAttributeValue("label", dto));
+    widgets.scriptArea().val(findAttributeValue("script", dto));
     widgets.scriptArea().removeData("sel");
     widgets.testButton().as(Ui).button().enable();
     widgets.valueType().val(dto.getValueType());
@@ -289,7 +407,7 @@ public class OhsApp implements EntryPoint {
     for(int i = 0; i < dto.getCategoriesArray().length(); i++) {
       CategoryDto cat = dto.getCategoriesArray().get(i);
       String icon = cat.getIsMissing() ? "ui-icon ui-icon-check" : "ui-icon ui-icon-close";
-      $("<tr><td>" + cat.getName() + "</td><td>" + findAttribute("label", cat) + "</td><td class=\"" + icon + "\"></td><td><button id=\"edit\"></button><button id=\"delete\"></button></td></tr>").appendTo(widgets.categoriesTable())//
+      $("<tr><td>" + cat.getName() + "</td><td>" + findAttributeValue("label", cat) + "</td><td class=\"" + icon + "\"></td><td><button id=\"edit\"></button><button id=\"delete\"></button></td></tr>").appendTo(widgets.categoriesTable())//
       .children("#edit").as(Ui).button(Button.Options.create().text(false).icons(Button.Icons.create().primary("ui-icon-pencil")))//
       .next().as(Ui).button(Button.Options.create().text(false).icons(Button.Icons.create().primary("ui-icon-minus")));
     }/*
@@ -318,38 +436,48 @@ public class OhsApp implements EntryPoint {
     }
   }
 
-  private String findAttribute(String string, JsArray<AttributeDto> attrs) {
+  private AttributeDto findAttribute(String string, JsArray<AttributeDto> attrs) {
     for(int i = 0; i < attrs.length(); i++) {
       AttributeDto attr = attrs.get(i);
       if(attr.getName().equals(string)) {
-        return attr.getValue();
+        return attr;
       }
     }
-    return "";
+    return null;
   }
 
-  private String findAttribute(String string, VariableDto dto) {
+  private String findAttributeValue(String string, VariableDto dto) {
+    AttributeDto attr = findAttribute(string, dto.getAttributesArray());
+    return attr != null ? attr.getValue() : "";
+  }
+
+  private String findAttributeValue(String string, CategoryDto dto) {
+    AttributeDto attr = findAttribute(string, dto.getAttributesArray());
+    return attr != null ? attr.getValue() : "";
+  }
+
+  private AttributeDto findAttribute(String string, VariableDto dto) {
     return findAttribute(string, dto.getAttributesArray());
   }
 
-  private String findAttribute(String string, CategoryDto dto) {
+  private AttributeDto findAttribute(String string, CategoryDto dto) {
     return findAttribute(string, dto.getAttributesArray());
   }
 
   private void loadVariables(String tableUri) {
-    request("/ws" + tableUri + "/variables", new DefaultCallback<JsArray<VariableDto>>() {
+    request(tableUri + "/variables", new ResourceCallback<JsArray<VariableDto>>() {
 
       @Override
-      protected void onResource(JsArray<VariableDto> resource) {
+      public void onResource(Response response, JsArray<VariableDto> resource) {
         gotVariables(resource);
       }
     });
   }
 
   private void loadTables() {
-    request("/ws/datasources", new DefaultCallback<JsArray<DatasourceDto>>() {
+    request("/datasources", new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
-      protected void onResource(JsArray<DatasourceDto> resource) {
+      public void onResource(Response response, JsArray<DatasourceDto> resource) {
         gotTables(resource);
       }
     });
@@ -367,49 +495,24 @@ public class OhsApp implements EntryPoint {
   private void fetchValues(VariableDto variable) {
     widgets.values().children().remove();
 
+    boolean partial = true;
     String js = scriptArea.getSelectedText();
     if(js == null || js.length() == 0) {
+      partial = false;
       js = scriptArea.getText();
     }
 
-    request("/ws" + widgets.tableSelector().val() + "/eval?valueType=" + widgets.valueType().val() + "&script=" + URL.encodeComponent(js), new DefaultCallback<JsArray<ValueDto>>() {
+    request(widgets.tableSelector().val() + "/eval?valueType=" + (partial ? "text" : widgets.valueType().val()) + "&script=" + URL.encodeQueryString(js), new ResourceCallback<JsArray<ValueDto>>() {
+
       @Override
-      protected void onResource(JsArray<ValueDto> resource) {
+      public void onResource(Response response, JsArray<ValueDto> resource) {
         gotValues(resource);
       }
     });
   }
 
-  private void request(String uri, DefaultCallback<?> callback) {
-    RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, uri);
-    builder.setHeader("Accept", "application/json");
-    builder.setCallback(callback);
-    try {
-      builder.send();
-    } catch(RequestException e) {
-    }
+  private <T extends JavaScriptObject> void request(String uri, ResourceCallback<T> callback) {
+    ResourceRequestBuilderFactory.<T> newBuilder().forResource(uri).get().withCallback(callback).send();
   }
 
-  private abstract class DefaultCallback<T> implements RequestCallback {
-
-    @Override
-    public void onError(Request request, Throwable exception) {
-      widgets.errorMsg().show().children("span.opal-label").text(exception.getMessage());
-      widgets.valuesDialog().as(Ui).dialog().open();
-    }
-
-    @Override
-    public void onResponseReceived(Request request, Response response) {
-      if(response.getStatusCode() < 400) {
-        final T resource = (T) JsonUtils.unsafeEval(response.getText());
-        onResource(resource);
-      } else if(response.getStatusCode() >= 400) {
-        widgets.errorMsg().show().children("span.opal-label").text(response.getText());
-        widgets.valuesDialog().as(Ui).dialog().open();
-      }
-    }
-
-    abstract protected void onResource(T resource);
-
-  }
 }

@@ -167,6 +167,10 @@
                   <name>org.obiba.opal.web.model</name>
                   <value>org.obiba.opal.web.model.client.ws</value>
                 </property>
+                <property>
+                  <name>use_global_json</name>
+                  <value>true</value>
+                </property>
               </options>
             </protoModule>
             <protoModule>
@@ -178,6 +182,10 @@
                   <!-- Override the package name -->
                   <name>org.obiba.opal.web.model</name>
                   <value>org.obiba.opal.web.model.client.magma</value>
+                </property>
+                 <property>
+                  <name>use_global_json</name>
+                  <value>true</value>
                 </property>
               </options>
             </protoModule>
@@ -191,7 +199,11 @@
                   <name>generate_helper_methods</name>
                   <value>true</value>
                 </property>
-                <property>
+                  <property>
+                  <name>use_global_json</name>
+                  <value>true</value>
+                </property>
+               <property>
                   <!-- Override the package name -->
                   <name>org.obiba.opal.web.model</name>
                   <value>org.obiba.opal.web.model.client.opal</value>
@@ -207,6 +219,10 @@
                   <!-- Override the package name -->
                   <name>org.obiba.opal.web.model</name>
                   <value>org.obiba.opal.web.model.client.opal</value>
+                </property>
+                 <property>
+                  <name>use_global_json</name>
+                  <value>true</value>
                 </property>
               </options>
             </protoModule>

@@ -30,6 +30,11 @@
       <artifactId>magma-xstream</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>ohs-views</artifactId>
+      <version>1.2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20090211</version>

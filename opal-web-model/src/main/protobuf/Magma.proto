@@ -54,6 +54,12 @@ message LinkDto {
   required string link = 2;
 }
 
+message ValueDto {
+  required string valueType = 1;
+  required bool isSequence = 2;
+  optional string value = 3;
+}
+
 message DescriptiveStatsDto {
   optional double min = 1;
   optional double max = 2;

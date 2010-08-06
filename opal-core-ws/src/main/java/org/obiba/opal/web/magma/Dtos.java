@@ -9,10 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
+import java.util.Locale;
+
 import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.magma.Attribute;
 import org.obiba.magma.Category;
+import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.opal.web.model.Magma.AttributeDto;
 import org.obiba.opal.web.model.Magma.CategoryDto;
@@ -69,12 +72,42 @@ final class Dtos {
     return asDto(null, null, from);
   }
 
+  public static Variable fromDto(VariableDto dto) {
+    Variable.Builder builder = Variable.Builder.newVariable(dto.getName(), ValueType.Factory.forName(dto.getValueType()), dto.getEntityType());
+    if(dto.getIsRepeatable()) {
+      builder.repeatable();
+      builder.occurrenceGroup(dto.getOccurrenceGroup());
+    }
+    if(dto.hasMimeType()) {
+      builder.mimeType(dto.getMimeType());
+    }
+    if(dto.hasUnit()) {
+      builder.unit(dto.getUnit());
+    }
+    for(AttributeDto attr : dto.getAttributesList()) {
+      builder.addAttribute(fromDto(attr));
+    }
+    for(CategoryDto cat : dto.getCategoriesList()) {
+      builder.addCategory(fromDto(cat));
+    }
+
+    return builder.build();
+  }
+
   public static CategoryDto.Builder asDto(Category from) {
     CategoryDto.Builder c = CategoryDto.newBuilder().setName(from.getName()).setIsMissing(from.isMissing());
     for(Attribute attribute : from.getAttributes()) {
       c.addAttributes(asDto(attribute));
     }
     return c;
+  }
+
+  private static Category fromDto(CategoryDto dto) {
+    Category.Builder builder = Category.Builder.newCategory(dto.getName()).missing(dto.getIsMissing());
+    for(AttributeDto attr : dto.getAttributesList()) {
+      builder.addAttribute(fromDto(attr));
+    }
+    return builder.build();
   }
 
   public static AttributeDto.Builder asDto(Attribute from) {
@@ -84,4 +117,15 @@ final class Dtos {
     }
     return a;
   }
+
+  public static Attribute fromDto(AttributeDto dto) {
+    Attribute.Builder builder = Attribute.Builder.newAttribute(dto.getName());
+    if(dto.hasLocale()) {
+      builder.withValue(new Locale(dto.getLocale()), dto.getValue());
+    } else {
+      builder.withValue(dto.getValue());
+    }
+    return builder.build();
+  }
+
 }

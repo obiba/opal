@@ -1,9 +1,15 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
 
   <g:HTMLPanel ui:field="panel">
+    <div class="opal-dialog opal-login" title="Login">
+      <p>
+      <label for="username">Username</label><input id="username" type="text"></input>
+      <label for="password">Password</label><input id="password" type="password"></input>
+      </p>
+    </div>
     <div class="opal-table-selector">Table: <input type="text" size="100"/><button>Change</button></div>
     <div id="tableEditor">
-      <div class="opal-navigator"><button class="opal-previous">Previous</button><button class="opal-next">Next</button> Goto: <input class="opal-goto" type="text"></input></div>
+      <div class="opal-navigator"><button class="opal-previous">Previous</button><button class="opal-next">Next</button> Goto: <input class="opal-goto" type="text"></input> <button style="float:right" class="opal-save">Save</button></div>
       <fieldset class="opal-form-layout opal-variable">
         <legend>Variable: <span></span></legend>
         <ol>

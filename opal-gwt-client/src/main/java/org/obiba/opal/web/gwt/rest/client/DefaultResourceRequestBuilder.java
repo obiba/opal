@@ -12,11 +12,9 @@ package org.obiba.opal.web.gwt.rest.client;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.customware.gwt.presenter.client.EventBus;
-
-import org.obiba.opal.web.gwt.app.client.event.SessionExpiredEvent;
-import org.obiba.opal.web.gwt.inject.client.OpalGinjector;
+import org.obiba.opal.web.gwt.rest.client.event.RequestCredentialsExpiredEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
+import org.obiba.opal.web.gwt.rest.client.event.RequestEventBus;
 import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 
 import com.google.gwt.core.client.GWT;
@@ -31,15 +29,13 @@ import com.google.gwt.http.client.URL;
 
 public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implements ResourceRequestBuilder<T> {
 
-  private static OpalGinjector OPAL_GINJECTOR;
-
   private final static String OPAL_WS_ROOT = "/ws";
 
   private final static String RESOURCE_MEDIA_TYPE = "application/x-protobuf+json";
 
-  private final EventBus eventBus;
+  private static RequestEventBus eventBus;
 
-  private final RequestCredentials credentials;
+  private static RequestCredentials credentials;
 
   private String uri;
 
@@ -63,13 +59,11 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
   private RequestBuilder builder;
 
   public DefaultResourceRequestBuilder() {
-    if(OPAL_GINJECTOR == null) throw new IllegalStateException("initialize the OpalGinjector static variable before making a request");
-    this.eventBus = OPAL_GINJECTOR.getEventBus();
-    this.credentials = OPAL_GINJECTOR.getRequestCredentials();
   }
 
-  public static void setup(OpalGinjector opalGinjector) {
-    OPAL_GINJECTOR = opalGinjector;
+  public static void setup(RequestEventBus requestEventBus, RequestCredentials credentials) {
+    DefaultResourceRequestBuilder.eventBus = requestEventBus;
+    DefaultResourceRequestBuilder.credentials = credentials;
   }
 
   public DefaultResourceRequestBuilder<T> forResource(String resource) {
@@ -107,9 +101,9 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
   }
 
   public DefaultResourceRequestBuilder<T> withFormBody(String key1, String value1, String... keyValues) {
-    form.put(key1, com.google.gwt.http.client.URL.encodeComponent(value1));
+    form.put(key1, URL.encodeQueryString(value1));
     for(int i = 0; i < keyValues.length; i += 2) {
-      form.put(keyValues[i], com.google.gwt.http.client.URL.encodeComponent(keyValues[i + 1]));
+      form.put(keyValues[i], URL.encodeQueryString(keyValues[i + 1]));
     }
     return this;
   }
@@ -170,13 +164,14 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
     for(String key : this.form.keySet()) {
       String value = this.form.get(key);
       if(needSeparator) sb.append('&');
-      sb.append(key).append('=').append(URL.encode(value));
+      sb.append(key).append('=').append(value);
       needSeparator = true;
     }
     return sb.toString();
   }
 
   private class InnerCallback implements RequestCallback {
+
     @Override
     public void onError(Request request, Throwable exception) {
       eventBus.fireEvent(new RequestErrorEvent(exception));
@@ -192,7 +187,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
 
       if(credentials.hasExpired(builder) || code == 401) {
         // this is fired even after a request for deleting the session
-        eventBus.fireEvent(new SessionExpiredEvent(DefaultResourceRequestBuilder.this));
+        eventBus.fireEvent(new RequestCredentialsExpiredEvent());
       } else if(codes != null && codes[code] != null) {
         codes[code].onResponseCode(request, response);
       } else {
