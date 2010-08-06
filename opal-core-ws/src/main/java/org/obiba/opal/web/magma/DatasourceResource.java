@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.PreDestroy;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -59,6 +60,8 @@ public class DatasourceResource {
   @PathParam("name")
   private String name;
 
+  private Datasource transientDatasourceInstance;
+
   // Used by Spring. JAX-RS, will inject the name attribute
   public DatasourceResource() {
   }
@@ -68,9 +71,24 @@ public class DatasourceResource {
     this.name = name;
   }
 
+  @PreDestroy
+  public void destroy() {
+    if(transientDatasourceInstance != null) {
+      Disposables.silentlyDispose(transientDatasourceInstance);
+      transientDatasourceInstance = null;
+    }
+  }
+
   @GET
   public Magma.DatasourceDto get() {
-    Datasource ds = MagmaEngine.get().getDatasource(name);
+    Datasource ds = null;
+    if(MagmaEngine.get().hasDatasource(name)) {
+      ds = MagmaEngine.get().getDatasource(name);
+    } else {
+      ds = MagmaEngine.get().getTransientDatasourceInstance(name);
+      transientDatasourceInstance = ds;
+    }
+
     Magma.DatasourceDto.Builder datasource = Magma.DatasourceDto.newBuilder().setName(ds.getName());
 
     final List<String> tableNames = Lists.newArrayList();
