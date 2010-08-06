@@ -186,9 +186,7 @@ public class TableResource {
   @GET
   @Path("/eval")
   public Collection<ValueDto> eval(@QueryParam("valueType") String valueType, @QueryParam("script") String script, @QueryParam("limit") @DefaultValue("10") Integer limit) {
-    JavascriptValueSource jvs = new JavascriptValueSource();
-    jvs.setScript(script);
-    jvs.setValueType(ValueType.Factory.forName(valueType));
+    JavascriptValueSource jvs = new JavascriptValueSource(ValueType.Factory.forName(valueType), script);
     jvs.initialise();
     int i = 0;
     ImmutableList.Builder<ValueDto> values = ImmutableList.builder();
