@@ -21,11 +21,18 @@ import uk.co.flamingpenguin.jewel.cli.Unparsed;
 @CommandLineInterface(application = "import")
 public interface ImportCommandOptions extends HelpOption {
 
-  @Option(shortName = "u", description = "The functional unit.")
+  @Option(shortName = "u", description = "The functional unit. If not supplied, imported identifiers must exist in opal and are imported as is.")
   public String getUnit();
+
+  public boolean isUnit();
 
   @Option(shortName = "d", description = "The destination datasource into which the variable catalogue and the participants data will be imported.")
   public String getDestination();
+
+  @Option(shortName = "s", description = "Copy all tables from this datasource. If supplied, FILE is only used for archiving.")
+  public String getSource();
+
+  public boolean isSource();
 
   @Option(shortName = "a", description = "Archive directory. If a relative path is given, it is relative to the functional unit's directory.")
   public String getArchive();

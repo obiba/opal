@@ -24,12 +24,15 @@ import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.opal.core.crypt.KeyProviderException;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.service.NonExistentVariableEntitiesException;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@CommandUsage(description = "Imports one or more Onyx data files into a datasource.", syntax = "Syntax: import --unit NAME --destination NAME [--archive FILE] [_FILE_...]")
+import com.google.common.collect.Lists;
+
+@CommandUsage(description = "Imports one or more Onyx data files into a datasource.", syntax = "Syntax: import [--unit NAME] [--source NAME] --destination NAME [--archive FILE] [_FILE_...]")
 public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCommandOptions> {
 
   //
@@ -44,14 +47,23 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   public int execute() {
     int errorCode = 0;
 
-    if(getOpalRuntime().getFunctionalUnit(options.getUnit()) == null) {
+    if(options.isUnit() && getOpalRuntime().getFunctionalUnit(options.getUnit()) == null) {
       getShell().printf("Functional unit '%s' does not exist.\n", options.getUnit());
       return 1; // error!
     }
 
     List<FileObject> filesToImport = getFilesToImport();
 
-    if(!filesToImport.isEmpty()) {
+    if(options.isSource()) {
+      if(filesToImport.isEmpty()) {
+        errorCode = importFromDatasource(null);
+      } else if(filesToImport.size() == 1) {
+        errorCode = importFromDatasource(filesToImport.get(0));
+      } else {
+        getShell().printf("Expect only one file to archive when importing from a datasource.\n");
+        errorCode = 1;
+      }
+    } else if(!filesToImport.isEmpty()) {
       errorCode = importFiles(filesToImport);
     } else {
       // TODO: Should this be considered success or an error? Will treat as an error for now.
@@ -151,6 +163,30 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     return errorCode;
   }
 
+  private int importFromDatasource(FileObject file) {
+    String unitName = options.isUnit() ? options.getUnit() : null;
+    int errorCode = 1; // critical error (or interruption)!
+    try {
+      importService.importData(unitName, options.getSource(), options.getDestination());
+      if(file != null) archive(file);
+      errorCode = 0; // success!
+    } catch(NonExistentVariableEntitiesException ex) {
+      getShell().printf("Datasource '%s' cannot be imported 'as-is'. It contains the following entity ids which are not present as public identifiers in the keys database.\n", new Object[] { options.getSource(), ex.getNonExistentIdentifiers() });
+    } catch(NoSuchDatasourceException ex) {
+      getShell().printf("Datasource '%s' does not exist. Cannot import.\n", ex.getDatasourceName());
+    } catch(KeyProviderException ex) {
+      getShell().printf("Decryption exception: %s\n", ex.getMessage());
+    } catch(IOException ex) {
+      // Report an error and continue with the next file.
+      getShell().printf("Unrecoverable import exception: %s\n", ex.getMessage());
+      errorCode = 2; // non-critical error!
+    } catch(InterruptedException ex) {
+      // Report the interrupted and continue; the test for interruption will detect this condition.
+      getShell().printf("Thread interrupted");
+    }
+    return errorCode;
+  }
+
   private void archive(FileObject file) throws IOException {
     if(!options.isArchive()) {
       return;
@@ -177,12 +213,15 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     if(options.isFiles()) {
       filesToImport = resolveFiles(options.getFiles());
     } else {
-      try {
-        filesToImport = getFilesInFolder(getOpalRuntime().getUnitDirectory(options.getUnit()));
-      } catch(IOException ex) {
-        throw new RuntimeException(ex);
+      if(options.isUnit()) {
+        try {
+          filesToImport = getFilesInFolder(getOpalRuntime().getUnitDirectory(options.getUnit()));
+        } catch(IOException ex) {
+          throw new RuntimeException(ex);
+        }
       }
     }
+    if(filesToImport == null) return Lists.newArrayList();
     return filesToImport;
   }
 
@@ -192,7 +231,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     for(String filePath : filePaths) {
       try {
         file = getFileToImport(filePath);
-        if(file.exists() == false) {
+        if(file == null || file.exists() == false) {
           getShell().printf("'%s' does not exist\n", filePath);
           continue;
         }
@@ -241,11 +280,21 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   }
 
   private FileObject getFileInUnitDirectory(String filePath) throws FileSystemException {
-    FileObject unitDir = getOpalRuntime().getUnitDirectory(options.getUnit());
-    return unitDir.resolveFile(filePath);
+    if(options.isUnit()) {
+      FileObject unitDir = getOpalRuntime().getUnitDirectory(options.getUnit());
+      return unitDir.resolveFile(filePath);
+    } else {
+      return null;
+    }
   }
 
   private boolean isRelativeFilePath(String filePath) {
     return !(new File(filePath).isAbsolute());
+  }
+
+  private void archiveFiles(List<FileObject> filesToImport) throws IOException {
+    for(FileObject fileObject : filesToImport) {
+      archive(fileObject);
+    }
   }
 }

@@ -63,4 +63,19 @@ public class ImportCommandOptionsDtoImpl implements ImportCommandOptions {
   public List<String> getFiles() {
     return dto.getFilesList();
   }
+
+  @Override
+  public boolean isUnit() {
+    return false;
+  }
+
+  @Override
+  public String getSource() {
+    return null;
+  }
+
+  @Override
+  public boolean isSource() {
+    return false;
+  }
 }
