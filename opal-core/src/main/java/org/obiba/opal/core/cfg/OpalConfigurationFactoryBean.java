@@ -11,8 +11,14 @@ package org.obiba.opal.core.cfg;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.obiba.core.spring.xstream.InjectingReflectionProviderWrapper;
 import org.obiba.core.util.StreamUtil;
@@ -30,10 +36,11 @@ import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider
 /**
  * Spring FactoryBean that returns a singleton {@link OpalConfiguration}.
  */
-public class OpalConfigurationFactoryBean implements FactoryBean, ApplicationContextAware {
+public class OpalConfigurationFactoryBean implements FactoryBean<OpalConfiguration>, ApplicationContextAware {
   //
   // Instance Variables
   //
+  private static final Charset UTF8 = Charset.forName("UTF-8");
 
   private ApplicationContext applicationContext;
 
@@ -41,21 +48,38 @@ public class OpalConfigurationFactoryBean implements FactoryBean, ApplicationCon
 
   private File configFile;
 
-  private XStream xstream;
+  @PostConstruct
+  public void readConfiguration() throws IOException {
+    InputStreamReader isr = null;
+    try {
+      isr = new InputStreamReader(new FileInputStream(configFile), UTF8);
+      opalConfiguration = (OpalConfiguration) doCreateXStreamInstance(applicationContext).fromXML(isr);
+    } finally {
+      StreamUtil.silentSafeClose(isr);
+      MagmaEngine.get().shutdown();
+    }
+  }
+
+  @PreDestroy
+  public void writeConfiguration() throws IOException {
+    OutputStreamWriter writer = null;
+    try {
+      writer = new OutputStreamWriter(new FileOutputStream(configFile), UTF8);
+      doCreateXStreamInstance(applicationContext).toXML(opalConfiguration, writer);
+    } finally {
+      StreamUtil.silentSafeClose(writer);
+    }
+  }
 
   //
   // FactoryBean Methods
   //
 
-  public Object getObject() throws Exception {
-    if(opalConfiguration == null) {
-      initObject();
-    }
+  public OpalConfiguration getObject() throws Exception {
     return opalConfiguration;
   }
 
-  @SuppressWarnings("unchecked")
-  public Class getObjectType() {
+  public Class<OpalConfiguration> getObjectType() {
     return OpalConfiguration.class;
   }
 
@@ -79,26 +103,9 @@ public class OpalConfigurationFactoryBean implements FactoryBean, ApplicationCon
     this.configFile = configFile;
   }
 
-  public void setXstream(XStream xstream) {
-    this.xstream = xstream;
-  }
-
   protected XStream doCreateXStreamInstance(ApplicationContext applicationContext) {
     new MagmaEngine().extend(new MagmaJsExtension());
     return new DefaultXStreamFactory().createXStream(new InjectingReflectionProviderWrapper(new PureJavaReflectionProvider(), applicationContext));
   }
 
-  private void initObject() throws IOException {
-    InputStream serializedConfiguration = null;
-    try {
-      if(xstream == null) {
-        xstream = doCreateXStreamInstance(applicationContext);
-      }
-      serializedConfiguration = new FileInputStream(configFile);
-      opalConfiguration = (OpalConfiguration) xstream.fromXML(serializedConfiguration);
-    } finally {
-      StreamUtil.silentSafeClose(serializedConfiguration);
-      MagmaEngine.get().shutdown();
-    }
-  }
 }

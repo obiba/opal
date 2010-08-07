@@ -12,8 +12,8 @@
 
   <bean id="opalRuntime" class="org.obiba.opal.core.runtime.DefaultOpalRuntime">
     <constructor-arg>
-      <bean class="org.obiba.opal.core.cfg.OpalConfigurationFactoryBean">
-        <property name="configFile" value="${OPAL_HOME}/conf/opal-config.xml" />
+      <bean class="org.obiba.opal.core.cfg.OpalConfigurationIo">
+        <constructor-arg value="${OPAL_HOME}/conf/opal-config.xml" />
       </bean>
     </constructor-arg>
   </bean>

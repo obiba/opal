@@ -13,8 +13,13 @@ import java.util.Set;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
+import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.js.MagmaJsExtension;
+import org.obiba.magma.support.Disposables;
+import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.core.cfg.OpalConfiguration;
+import org.obiba.opal.core.cfg.OpalConfigurationIo;
 import org.obiba.opal.core.runtime.security.OpalSecurityManager;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
@@ -37,7 +42,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRuntime.class);
 
-  private final OpalConfiguration opalConfiguration;
+  private final OpalConfigurationIo opalConfigIo;
 
   @Autowired
   private PlatformTransactionManager txManager;
@@ -48,14 +53,22 @@ public class DefaultOpalRuntime implements OpalRuntime {
   @Autowired
   private OpalSecurityManager opalSecurityManager;
 
+  private OpalConfiguration opalConfiguration;
+
   private OpalFileSystem opalFileSystem;
 
-  public DefaultOpalRuntime(OpalConfiguration opalConfiguration) {
-    this.opalConfiguration = opalConfiguration;
+  public DefaultOpalRuntime(OpalConfigurationIo opalConfigIo) {
+    this.opalConfigIo = opalConfigIo;
   }
 
   @Override
   public void start() {
+
+    // We need these two extensions to read the opal config file
+    new MagmaEngine().extend(new MagmaXStreamExtension()).extend(new MagmaJsExtension());
+
+    readConfiguration();
+
     initSecurityManager();
 
     initMagmaEngine();
@@ -67,6 +80,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   @Override
   public void stop() {
+
     for(Service service : services) {
       try {
         if(service.isRunning()) service.stop();
@@ -78,11 +92,20 @@ public class DefaultOpalRuntime implements OpalRuntime {
     new TransactionTemplate(txManager).execute(new TransactionCallbackWithoutResult() {
       @Override
       protected void doInTransactionWithoutResult(TransactionStatus status) {
+        // Remove all datasources before writing the configuration.
+        // This is done so that Disposable instances are disposed of before being written to the config file
+        for(Datasource ds : MagmaEngine.get().getDatasources()) {
+          Disposables.silentlyDispose(ds);
+          MagmaEngine.get().removeDatasource(ds);
+        }
+
+//        opalConfigIo.writeConfiguration(opalConfiguration);
         MagmaEngine.get().shutdown();
       }
     });
 
     opalSecurityManager.stop();
+
   }
 
   @Override
@@ -125,14 +148,16 @@ public class DefaultOpalRuntime implements OpalRuntime {
     return unitDir;
   }
 
+  private void readConfiguration() {
+    opalConfiguration = opalConfigIo.readConfiguration();
+  }
+
   private void initSecurityManager() {
     opalSecurityManager.start();
   }
 
   private void initMagmaEngine() {
     try {
-      opalConfiguration.getMagmaEngineFactory().create();
-
       Runnable magmaEngineInit = new Runnable() {
         public void run() {
           opalConfiguration.getMagmaEngineFactory().initialize(MagmaEngine.get());
