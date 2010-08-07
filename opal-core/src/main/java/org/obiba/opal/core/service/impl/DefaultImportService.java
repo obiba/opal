@@ -23,27 +23,29 @@ import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.Variable;
-import org.obiba.magma.VariableEntity;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
+import org.obiba.magma.Variable;
+import org.obiba.magma.VariableEntity;
 import org.obiba.magma.audit.VariableEntityAuditLogManager;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
-import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListener;
 import org.obiba.magma.support.DatasourceCopier.MultiplexingStrategy;
 import org.obiba.magma.support.DatasourceCopier.VariableTransformer;
+import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.type.BooleanType;
 import org.obiba.magma.type.TextType;
 import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
+import org.obiba.opal.core.magma.PrivateVariableEntityMap;
 import org.obiba.opal.core.magma.PrivateVariableEntityValueTable;
 import org.obiba.opal.core.magma.concurrent.LockingActionTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.service.NonExistentVariableEntitiesException;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +54,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
+import com.google.common.collect.Sets;
+
 /**
  * Default implementation of {@link ImportService}.
  */
@@ -59,6 +63,8 @@ public class DefaultImportService implements ImportService {
   //
   // Constants
   //
+
+  public static final String STAGE_ATTRIBUTE_NAME = "stage";
 
   @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(DefaultImportService.class);
@@ -103,7 +109,7 @@ public class DefaultImportService implements ImportService {
 
   public void importData(String unitName, String datasourceName, FileObject file) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException, InterruptedException {
     // OPAL-170 Dispatch the variables in tables corresponding to Onyx stage attribute value.
-    importData(unitName, datasourceName, file, "stage");
+    importData(unitName, datasourceName, file, STAGE_ATTRIBUTE_NAME);
   }
 
   private void importData(String unitName, String datasourceName, FileObject file, String dispatchAttribute) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException, InterruptedException {
@@ -122,6 +128,32 @@ public class DefaultImportService implements ImportService {
     }
 
     copyToDestinationDatasource(file, dispatchAttribute, destinationDatasource, unit);
+  }
+
+  @Override
+  public void importData(String unitName, String sourceDatasourceName, String destinationDatasourceName) throws NoSuchFunctionalUnitException, IOException, InterruptedException {
+    if(unitName != null && unitName.equals("")) unitName = null;
+    if(unitName != null) Assert.isTrue(!unitName.equals(FunctionalUnit.OPAL_INSTANCE), "unitName cannot be " + FunctionalUnit.OPAL_INSTANCE);
+    Assert.hasText(sourceDatasourceName, "sourceDatasourceName is null or empty");
+    Assert.hasText(destinationDatasourceName, "destinationDatasourceName is null or empty");
+
+    Datasource sourceDatasource = MagmaEngine.get().getDatasource(sourceDatasourceName);
+    Datasource destinationDatasource = MagmaEngine.get().getDatasource(destinationDatasourceName);
+
+    FunctionalUnit unit = null;
+    if(unitName != null) {
+      unit = opalRuntime.getFunctionalUnit(unitName);
+      if(unit == null) {
+        throw new NoSuchFunctionalUnitException(unitName);
+      }
+    }
+
+    try {
+      sourceDatasource.initialise();
+      copyValueTables(sourceDatasource, destinationDatasource, unit, STAGE_ATTRIBUTE_NAME);
+    } finally {
+      sourceDatasource.dispose();
+    }
   }
 
   private void copyToDestinationDatasource(FileObject file, String dispatchAttribute, Datasource destinationDatasource, FunctionalUnit unit) throws IOException, InterruptedException {
@@ -159,7 +191,13 @@ public class DefaultImportService implements ImportService {
                 }
 
                 if(valueTable.isForEntityType(keysTableEntityType)) {
-                  copyParticipants(valueTable, source, destination, unit, dispatchAttribute);
+                  if(unit != null) {
+                    copyParticipants(valueTable, source, destination, unit, dispatchAttribute);
+                  } else {
+                    if(verifyAllEntitysExistInKeysDb(valueTable)) {
+                      DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(valueTable, destination);
+                    }
+                  }
                 } else {
                   DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(valueTable, destination);
                 }
@@ -177,6 +215,35 @@ public class DefaultImportService implements ImportService {
         throw new RuntimeException(ex.getCause());
       }
     }
+  }
+
+  private boolean verifyAllEntitysExistInKeysDb(ValueTable valueTable) {
+    Set<VariableEntity> nonExistentVariableEntities = Sets.newHashSet();
+
+    Set<VariableEntity> variableEntities = valueTable.getVariableEntities();
+    for(VariableEntity variableEntity : variableEntities) {
+      if(!entryExistsInKeysDb(variableEntity)) nonExistentVariableEntities.add(variableEntity);
+    }
+    if(nonExistentVariableEntities.size() > 0) throw new NonExistentVariableEntitiesException(nonExistentVariableEntities);
+    return true;
+  }
+
+  /**
+   * Returns true if the provided variableEntity exists as a public key inside the keys database.
+   * @param variableEntity determine if this variableEntity exists in the keys database as a public key.
+   * @return true if the variableEntity is in the keys database.
+   */
+  private boolean entryExistsInKeysDb(VariableEntity variableEntity) {
+    IParticipantIdentifier nonGeneratingParticipantIdentifier = new IParticipantIdentifier() {
+      public String generateParticipantIdentifier() {
+        throw new UnsupportedOperationException("cannot generate identifier");
+      }
+    };
+    for(Variable unit : lookupKeysTable().getVariables()) {
+      PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(lookupKeysTable(), unit, nonGeneratingParticipantIdentifier);
+      if(entityMap.hasPublicEntity(variableEntity)) return true;
+    }
+    return false;
   }
 
   private Set<String> getTablesToLock(Datasource source) {
