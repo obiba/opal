@@ -55,14 +55,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     List<FileObject> filesToImport = getFilesToImport();
 
     if(options.isSource()) {
-      if(filesToImport.isEmpty()) {
-        errorCode = importFromDatasource(null);
-      } else if(filesToImport.size() == 1) {
-        errorCode = importFromDatasource(filesToImport.get(0));
-      } else {
-        getShell().printf("Expect only one file to archive when importing from a datasource.\n");
-        errorCode = 1;
-      }
+      errorCode = importDatasource(filesToImport);
     } else if(!filesToImport.isEmpty()) {
       errorCode = importFiles(filesToImport);
     } else {
@@ -71,6 +64,19 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       errorCode = 1;
     }
 
+    return errorCode;
+  }
+
+  private int importDatasource(List<FileObject> filesToImport) {
+    int errorCode = 0;
+    if(filesToImport.isEmpty()) {
+      errorCode = importFromDatasource(null);
+    } else if(filesToImport.size() == 1) {
+      errorCode = importFromDatasource(filesToImport.get(0));
+    } else {
+      getShell().printf("Expect only one file to archive when importing from a datasource.\n");
+      errorCode = 1;
+    }
     return errorCode;
   }
 
