@@ -15,8 +15,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -33,8 +36,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -44,6 +47,8 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
+import org.codehaus.jettison.json.JSONArray;
+import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.web.model.Opal;
@@ -51,6 +56,7 @@ import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -64,6 +70,10 @@ public class FilesResource {
   private OpalRuntime opalRuntime;
 
   private MimetypesFileTypeMap mimeTypes;
+
+  @Autowired
+  @Value("${org.obiba.opal.charset.default}")
+  private String defaultCharset;
 
   @Autowired
   public FilesResource(OpalRuntime opalRuntime) {
@@ -338,5 +348,26 @@ public class FilesResource {
 
   private String getContentDispositionOfAttachment(String fileName) {
     return "attachment; filename=\"" + fileName + "\"";
+  }
+
+  @GET
+  @Cache
+  @Path("/charsets/available")
+  @Produces("application/json")
+  public Response getAvailableCharsets() {
+    SortedMap<String, Charset> charsets = java.nio.charset.Charset.availableCharsets();
+    List<String> names = new ArrayList<String>();
+    for(Charset charSet : charsets.values()) {
+      names.add(charSet.name());
+      names.addAll(charSet.aliases());
+    }
+    return Response.ok(new JSONArray(names).toString()).build();
+  }
+
+  @GET
+  @Cache
+  @Path("/charsets/default")
+  public String getDefaultCharset() {
+    return defaultCharset;
   }
 }

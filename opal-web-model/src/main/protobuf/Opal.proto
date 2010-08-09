@@ -49,3 +49,11 @@ message FileDto {
   optional int64 size = 5;
   optional int64 lastModifiedTime = 6;
 }
+
+message CsvDatasourceConfigDto {
+  required FileDto file = 1;
+  required string characterSet = 2;
+  optional string separator = 3;
+  optional string quote = 4;
+  optional int32 firstRow = 5;
+}

@@ -13,6 +13,8 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertThat;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -31,8 +33,8 @@ import java.util.zip.ZipFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import junit.framework.Assert;
 
@@ -524,5 +526,11 @@ public class FilesResourceTest {
     Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
     verify(fileObjectMock, uriInfoMock, fileObjectMock);
+  }
+
+  @Test
+  public void testCharsetsAvailable() throws Exception {
+    Response charSets = filesResource.getAvailableCharsets();
+    assertThat(charSets.getEntity().toString(), containsString("UTF-8"));
   }
 }
