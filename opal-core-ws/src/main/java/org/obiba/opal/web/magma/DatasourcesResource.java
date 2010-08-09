@@ -91,7 +91,7 @@ public class DatasourcesResource {
     if(factory != null) {
       String uid = MagmaEngine.get().addTransientDatasource(factory);
       Datasource ds = MagmaEngine.get().getTransientDatasourceInstance(uid);
-      return Response.ok().entity(Dtos.asDto(ds)).build();
+      return Response.ok().entity(Dtos.asDto(ds).build()).build();
     } else {
       return Response.status(Status.BAD_REQUEST).build();
     }
