@@ -15,13 +15,18 @@ import java.util.Comparator;
 import java.util.List;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.Response.Status;
 
 import org.obiba.magma.Datasource;
+import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.DatasourceDto;
 import org.slf4j.Logger;
@@ -40,6 +45,9 @@ public class DatasourcesResource {
   private static final Logger log = LoggerFactory.getLogger(DatasourcesResource.class);
 
   private String keysDatasourceName;
+
+  @Autowired
+  private DatasourceFactoryRegistry datasourceFactoryRegistry;
 
   @Autowired
   public DatasourcesResource(@Value("${org.obiba.opal.keys.tableReference}") String keysTableReference) {
@@ -74,6 +82,23 @@ public class DatasourcesResource {
     sortByName(datasources);
 
     return datasources;
+  }
+
+  @POST
+  public Response createDatasource(Magma.DatasourceFactoryDto factoryDto) {
+    DatasourceFactory factory = datasourceFactoryRegistry.parse(factoryDto);
+
+    if(factory != null) {
+      String uid = MagmaEngine.get().addTransientDatasource(factory);
+      Datasource ds = MagmaEngine.get().getTransientDatasourceInstance(uid);
+      return Response.ok().entity(Dtos.asDto(ds)).build();
+    } else {
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+  }
+
+  public void setDatasourceFactoryRegistry(DatasourceFactoryRegistry datasourceFactoryRegistry) {
+    this.datasourceFactoryRegistry = datasourceFactoryRegistry;
   }
 
   private void sortByName(List<Magma.DatasourceDto> datasources) {

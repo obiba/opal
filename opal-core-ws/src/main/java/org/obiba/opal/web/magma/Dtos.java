@@ -9,24 +9,29 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.magma.Attribute;
 import org.obiba.magma.Category;
+import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.AttributeDto;
 import org.obiba.opal.web.model.Magma.CategoryDto;
+import org.obiba.opal.web.model.Magma.DatasourceDto;
 import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 /**
  * Utilities for manipulating Magma Dto instances
@@ -150,6 +155,19 @@ final class Dtos {
     if(uriBuilder != null) {
       builder.setLink(uriBuilder.build(valueTable.getDatasource().getName(), valueTable.getName()).toString());
     }
+    return builder;
+  }
+
+  public static DatasourceDto.Builder asDto(Datasource datasource) {
+    Magma.DatasourceDto.Builder builder = Magma.DatasourceDto.newBuilder().setName(datasource.getName());
+
+    final List<String> tableNames = Lists.newArrayList();
+    for(ValueTable table : datasource.getValueTables()) {
+      tableNames.add(table.getName());
+    }
+    Collections.sort(tableNames);
+    builder.addAllTable(tableNames);
+
     return builder;
   }
 }

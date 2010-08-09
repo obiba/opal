@@ -3,6 +3,16 @@ package Magma;
 
 option java_package = "org.obiba.opal.web.model";
 
+message DatasourceFactoryDto {
+  required string type = 1;
+  optional ExcelDatasourceFactoryDto excel = 2;
+}
+
+message ExcelDatasourceFactoryDto {
+  required string file = 1;
+  optional bool readOnly = 2;
+}
+
 message DatasourceDto {
   required string name = 1;
   optional string link = 2;
