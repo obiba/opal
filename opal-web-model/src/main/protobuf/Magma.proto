@@ -4,13 +4,28 @@ package Magma;
 option java_package = "org.obiba.opal.web.model";
 
 message DatasourceFactoryDto {
-  required string type = 1;
-  optional ExcelDatasourceFactoryDto excel = 2;
+  optional ExcelDatasourceFactoryDto excel = 1;
+  optional CsvDatasourceFactoryDto csv = 2;
 }
 
 message ExcelDatasourceFactoryDto {
   required string file = 1;
   optional bool readOnly = 2;
+}
+
+message CsvDatasourceFactoryDto {
+  optional string bundle = 1;
+  repeated CsvDatasourceTableBundleDto tables = 2; 
+  optional string characterSet = 3;
+  optional string separator = 4;
+  optional string quote = 5;
+  optional int32 firstRow = 6;
+}
+
+message CsvDatasourceTableBundleDto {
+  required string name = 1;
+  optional string variables = 2;
+  optional string data = 3;
 }
 
 message DatasourceDto {

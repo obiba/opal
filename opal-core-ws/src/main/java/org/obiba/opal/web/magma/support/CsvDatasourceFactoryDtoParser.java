@@ -9,7 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.support;
 
+import java.io.File;
+
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.datasource.csv.support.CsvDatasourceFactory;
+import org.obiba.opal.web.model.Magma.CsvDatasourceFactoryDto;
+import org.obiba.opal.web.model.Magma.CsvDatasourceTableBundleDto;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 
 /**
@@ -19,7 +24,32 @@ public class CsvDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoP
 
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
-    throw new UnsupportedOperationException();
+    CsvDatasourceFactory factory = null;
+    if(dto.hasCsv()) {
+      factory = new CsvDatasourceFactory();
+      CsvDatasourceFactoryDto csvDto = dto.getCsv();
+      if(csvDto.hasBundle()) {
+        factory.setBundle(new File(dto.getCsv().getBundle()));
+      }
+      if(csvDto.hasSeparator()) {
+        factory.setSeparator(csvDto.getSeparator());
+      }
+      if(csvDto.hasQuote()) {
+        factory.setQuote(csvDto.getQuote());
+      }
+      if(csvDto.hasFirstRow()) {
+        factory.setFirstRow(csvDto.getFirstRow());
+      }
+      if(csvDto.hasCharacterSet()) {
+        factory.setCharacterSet(csvDto.getCharacterSet());
+      }
+      for(CsvDatasourceTableBundleDto tableBundleDto : csvDto.getTablesList()) {
+        File variables = tableBundleDto.hasVariables() ? new File(tableBundleDto.getVariables()) : null;
+        File data = tableBundleDto.hasData() ? new File(tableBundleDto.getData()) : null;
+        factory.addTable(tableBundleDto.getName(), variables, data);
+      }
+    }
+    return factory;
   }
 
 }
