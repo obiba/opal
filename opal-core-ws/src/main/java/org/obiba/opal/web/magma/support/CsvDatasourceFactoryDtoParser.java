@@ -13,21 +13,13 @@ import org.obiba.magma.DatasourceFactory;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 
 /**
- * A chain of responsibility for creating a datasource factory from its Dto.
+ *
  */
-public interface DatasourceFactoryDtoParser {
+public class CsvDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoParser {
 
-  /**
-   * Set the next parser and returns the next for chaining.
-   * @param next
-   * @return the next
-   */
-  public DatasourceFactoryDtoParser setNext(DatasourceFactoryDtoParser next);
+  @Override
+  protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
+    throw new UnsupportedOperationException();
+  }
 
-  /**
-   * Attempt for creating the factory and if not possible ask to the next parser, if any.
-   * @param dto
-   * @return null if unable to parse
-   */
-  public DatasourceFactory parse(DatasourceFactoryDto dto);
 }

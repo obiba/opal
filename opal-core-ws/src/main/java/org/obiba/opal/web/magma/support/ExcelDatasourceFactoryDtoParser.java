@@ -18,7 +18,7 @@ import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 /**
  *
  */
-public class ExcelDatasourceFactoryDtoParser extends DatasourceFactoryDtoParser {
+public class ExcelDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoParser {
 
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {

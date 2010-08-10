@@ -24,6 +24,7 @@ public class DatasourceFactoryRegistry {
   public DatasourceFactoryRegistry() {
     super();
     this.parser = new ExcelDatasourceFactoryDtoParser();
+    this.parser.setNext(new CsvDatasourceFactoryDtoParser());
   }
 
   public DatasourceFactory parse(DatasourceFactoryDto dto) {
