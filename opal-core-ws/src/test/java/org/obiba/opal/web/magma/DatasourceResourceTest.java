@@ -9,21 +9,25 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
+import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
 import junit.framework.Assert;
 
 import org.easymock.EasyMock;
+import org.jboss.resteasy.specimpl.UriBuilderImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.obiba.magma.Datasource;
@@ -31,6 +35,8 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
+import org.obiba.magma.datasource.excel.support.ExcelDatasourceFactory;
+import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
@@ -59,6 +65,69 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     Assert.assertEquals(2, dtos.size());
     Assert.assertEquals(DATASOURCE1, dtos.get(0).getName());
     Assert.assertEquals(DATASOURCE2, dtos.get(1).getName());
+  }
+
+  @Test
+  public void testDatasourcesPOST() {
+    DatasourcesResource resource = new DatasourcesResource("opal-keys.keys");
+    resource.setDatasourceFactoryRegistry(new DatasourceFactoryRegistry());
+
+    UriInfo uriInfoMock = createMock(UriInfo.class);
+    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromUri(BASE_URI));
+
+    Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder().setExcel(Magma.ExcelDatasourceFactoryDto.newBuilder().setFile(getDatasourcePath(DATASOURCE1)).setReadOnly(true).build()).build();
+
+    replay(uriInfoMock);
+    Response response = resource.createDatasource(uriInfoMock, factoryDto);
+    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+    Object entity = response.getEntity();
+    Assert.assertNotNull(entity);
+    try {
+      Magma.DatasourceDto dto = (Magma.DatasourceDto) entity;
+      Assert.assertTrue(MagmaEngine.get().hasTransientDatasource(dto.getName()));
+      Assert.assertNotNull(response.getMetadata().get("Location"));
+      Assert.assertEquals("[" + BASE_URI + "/datasource/" + dto.getName() + "]", response.getMetadata().get("Location").toString());
+    } catch(Exception e) {
+      Assert.assertFalse(true);
+    }
+
+    verify(uriInfoMock);
+  }
+
+  @Test
+  public void testTransientDatasourceInstanceGET() {
+    ExcelDatasourceFactory factory = new ExcelDatasourceFactory();
+    factory.setFile(new File(getDatasourcePath(DATASOURCE1)));
+    factory.setReadOnly(true);
+
+    String uid = MagmaEngine.get().addTransientDatasource(factory);
+
+    DatasourceResource resource = new DatasourceResource(uid);
+
+    Magma.DatasourceDto dto = resource.get();
+
+    Assert.assertNotNull(dto);
+    Assert.assertEquals(uid, dto.getName());
+  }
+
+  @Test
+  public void testTransientDatasourceDELETE() {
+    ExcelDatasourceFactory factory = new ExcelDatasourceFactory();
+    factory.setFile(new File(getDatasourcePath(DATASOURCE1)));
+    factory.setReadOnly(true);
+
+    String uid = MagmaEngine.get().addTransientDatasource(factory);
+
+    DatasourceResource resource = new DatasourceResource(uid);
+
+    Response response = resource.removeDatasource();
+
+    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    Assert.assertFalse(MagmaEngine.get().hasTransientDatasource(uid));
+
+    response = resource.removeDatasource();
+    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
   }
 
   @Test

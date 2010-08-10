@@ -49,8 +49,6 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
 
   private static final Logger log = LoggerFactory.getLogger(TableResourceTest.class);
 
-  private static final String BASE_URI = "http://localhost:8888/ws";
-
   @BeforeClass
   public static void before() {
     AbstractMagmaResourceTest.before();
