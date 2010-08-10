@@ -78,13 +78,7 @@ public class DatasourceResource {
 
   @GET
   public Magma.DatasourceDto get() {
-    Datasource ds = null;
-    if(MagmaEngine.get().hasDatasource(name)) {
-      ds = MagmaEngine.get().getDatasource(name);
-    } else {
-      ds = MagmaEngine.get().getTransientDatasourceInstance(name);
-      transientDatasourceInstance = ds;
-    }
+    Datasource ds = getDatasource();
 
     return Dtos.asDto(ds).build();
   }
@@ -101,7 +95,7 @@ public class DatasourceResource {
     destinationDatasource.initialise();
     try {
       DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyValues().build();
-      copier.copy(MagmaEngine.get().getDatasource(name), destinationDatasource);
+      copier.copy(getDatasource(), destinationDatasource);
     } finally {
       Disposables.silentlyDispose(destinationDatasource);
     }
@@ -110,13 +104,13 @@ public class DatasourceResource {
 
   @Path("/table/{table}")
   public TableResource getTable(@PathParam("table") String table) {
-    return getTableResource(MagmaEngine.get().getDatasource(name).getValueTable(table));
+    return getTableResource(getDatasource().getValueTable(table));
   }
 
   @PUT
   @Path("/table/{table}")
   public Response createTable(@Context UriInfo uri, @PathParam("table") String table, List<Variable> variables) throws IOException {
-    Datasource ds = MagmaEngine.get().getDatasource(name);
+    Datasource ds = getDatasource();
     if(ds.hasValueTable(table)) {
       throw new IllegalStateException("");
     }
@@ -136,7 +130,7 @@ public class DatasourceResource {
 
   @Path("/tables")
   public TablesResource getTables() {
-    return new TablesResource(MagmaEngine.get().getDatasource(name));
+    return new TablesResource(getDatasource());
   }
 
   @Bean
@@ -169,6 +163,17 @@ public class DatasourceResource {
     } catch(Exception e) {
       return Response.status(Status.INTERNAL_SERVER_ERROR).entity(getErrorMessage(Status.INTERNAL_SERVER_ERROR, e.getMessage())).build();
     }
+  }
+
+  private Datasource getDatasource() {
+    Datasource ds = null;
+    if(MagmaEngine.get().hasDatasource(name)) {
+      ds = MagmaEngine.get().getDatasource(name);
+    } else {
+      ds = MagmaEngine.get().getTransientDatasourceInstance(name);
+      transientDatasourceInstance = ds;
+    }
+    return ds;
   }
 
   private ClientErrorDto getErrorMessage(Status responseStatus, String errorStatus) {

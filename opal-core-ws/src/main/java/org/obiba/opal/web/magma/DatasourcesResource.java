@@ -17,8 +17,10 @@ import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
 import org.obiba.magma.Datasource;
@@ -29,6 +31,7 @@ import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.DatasourceDto;
+import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,15 +88,16 @@ public class DatasourcesResource {
   }
 
   @POST
-  public Response createDatasource(Magma.DatasourceFactoryDto factoryDto) {
+  public Response createDatasource(@Context final UriInfo uriInfo, Magma.DatasourceFactoryDto factoryDto) {
     DatasourceFactory factory = datasourceFactoryRegistry.parse(factoryDto);
 
     if(factory != null) {
       String uid = MagmaEngine.get().addTransientDatasource(factory);
       Datasource ds = MagmaEngine.get().getTransientDatasourceInstance(uid);
-      return Response.ok().entity(Dtos.asDto(ds).build()).build();
+      UriBuilder ub = uriInfo.getBaseUriBuilder().path("datasource").path(uid);
+      return Response.ok().entity(Dtos.asDto(ds).build()).location(ub.build()).build();
     } else {
-      return Response.status(Status.BAD_REQUEST).build();
+      return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "UnidentifiedDatasourceFactory")).build();
     }
   }
 
@@ -111,6 +115,10 @@ public class DatasourcesResource {
       }
 
     });
+  }
+
+  private ClientErrorDto getErrorMessage(Status responseStatus, String errorStatus) {
+    return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus).build();
   }
 
 }
