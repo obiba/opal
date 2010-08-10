@@ -43,13 +43,17 @@ public class CsvDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoP
       if(csvDto.hasCharacterSet()) {
         factory.setCharacterSet(csvDto.getCharacterSet());
       }
-      for(CsvDatasourceTableBundleDto tableBundleDto : csvDto.getTablesList()) {
-        File variables = tableBundleDto.hasVariables() ? new File(tableBundleDto.getVariables()) : null;
-        File data = tableBundleDto.hasData() ? new File(tableBundleDto.getData()) : null;
-        factory.addTable(tableBundleDto.getName(), variables, data);
-      }
+      addTableBundles(factory, csvDto);
     }
     return factory;
+  }
+
+  private void addTableBundles(CsvDatasourceFactory factory, CsvDatasourceFactoryDto csvDto) {
+    for(CsvDatasourceTableBundleDto tableBundleDto : csvDto.getTablesList()) {
+      File variables = tableBundleDto.hasVariables() ? new File(tableBundleDto.getVariables()) : null;
+      File data = tableBundleDto.hasData() ? new File(tableBundleDto.getData()) : null;
+      factory.addTable(tableBundleDto.getName(), variables, data);
+    }
   }
 
 }
