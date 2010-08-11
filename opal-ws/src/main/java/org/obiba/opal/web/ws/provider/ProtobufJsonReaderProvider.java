@@ -118,16 +118,16 @@ public class ProtobufJsonReaderProvider implements MessageBodyReader<Object> {
 
     Builder forMessage(final Class<Message> messageType) {
       if(messageType == null) throw new IllegalArgumentException("messageType cannot be null");
-      return (Builder) invokeStaticMethod(extractStaticMethod("newBuilder", methodCache, messageType), null);
+      return (Builder) invokeStaticMethod(extractStaticMethod("newBuilder", methodCache, messageType));
     }
 
   }
 
-  private static Object invokeStaticMethod(Method method, Object argument) {
+  private static Object invokeStaticMethod(Method method, Object... arguments) {
     if(method == null) throw new IllegalArgumentException("method cannot be null");
 
     try {
-      return method.invoke(null, argument);
+      return method.invoke(null, arguments);
     } catch(WebApplicationException e) {
       throw e;
     } catch(RuntimeException e) {
