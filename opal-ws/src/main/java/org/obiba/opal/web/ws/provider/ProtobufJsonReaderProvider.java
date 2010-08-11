@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.google.protobuf.ExtensionRegistry;
 import com.google.protobuf.JsonFormat;
 import com.google.protobuf.Message;
 import com.google.protobuf.Message.Builder;
@@ -43,13 +44,14 @@ import com.google.protobuf.Message.Builder;
  */
 @Component
 @Provider
-// TODO: should also provide "application/x-protobuf" for native protobuf encoding
 @Consumes( { "application/x-protobuf+json", "application/json" })
 public class ProtobufJsonReaderProvider implements MessageBodyReader<Object> {
 
   private static final Logger log = LoggerFactory.getLogger(ProtobufJsonReaderProvider.class);
 
   private final BuilderFactory builderFactory = new BuilderFactory();
+
+  private final ExtensionRegistryFactory extensionRegistryFactory = new ExtensionRegistryFactory();
 
   @Override
   public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
@@ -60,14 +62,15 @@ public class ProtobufJsonReaderProvider implements MessageBodyReader<Object> {
   public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
     Class<Message> messageType = extractMessageType(type, genericType, annotations, mediaType);
 
+    final ExtensionRegistry extensionRegistry = extensionRegistryFactory.forMessage(messageType);
     final Builder builder = builderFactory.forMessage(messageType);
 
     InputStreamReader input = new InputStreamReader(entityStream, "UTF-8");
     if(isWrapped(type, genericType, annotations, mediaType)) {
       // JsonFormat does not provide a mergeCollection method
-      return JsonIoUtil.mergeCollection(builder, input);
+      return JsonIoUtil.mergeCollection(input, extensionRegistry, builder);
     } else {
-      JsonFormat.merge(input, builder);
+      JsonFormat.merge(input, extensionRegistry, builder);
       return builder.build();
     }
   }
@@ -89,44 +92,71 @@ public class ProtobufJsonReaderProvider implements MessageBodyReader<Object> {
     }
   }
 
+  private static final class ExtensionRegistryFactory {
+
+    private Map<Class<?>, ExtensionRegistry> registryCache = new HashMap<Class<?>, ExtensionRegistry>();
+
+    private Map<Class<?>, Method> methodCache = new HashMap<Class<?>, Method>();
+
+    ExtensionRegistry forMessage(final Class<Message> messageType) {
+      if(messageType == null) throw new IllegalArgumentException("messageType cannot be null");
+
+      Class<?> enclosingType = messageType.getEnclosingClass();
+      if(registryCache.containsKey(enclosingType) == false) {
+        ExtensionRegistry registry = ExtensionRegistry.newInstance();
+        invokeStaticMethod(extractStaticMethod("registerAllExtensions", methodCache, messageType.getEnclosingClass()), registry);
+        registryCache.put(enclosingType, registry);
+      }
+      return registryCache.get(enclosingType);
+    }
+  }
+
   private static final class BuilderFactory {
 
-    private Map<Class<Message>, Method> methodCache = new HashMap<Class<Message>, Method>();
+    private Map<Class<?>, Method> methodCache = new HashMap<Class<?>, Method>();
 
     Builder forMessage(final Class<Message> messageType) {
       if(messageType == null) throw new IllegalArgumentException("messageType cannot be null");
+      return (Builder) invokeStaticMethod(extractStaticMethod("newBuilder", methodCache, messageType), null);
+    }
 
+  }
+
+  private static Object invokeStaticMethod(Method method, Object argument) {
+    if(method == null) throw new IllegalArgumentException("method cannot be null");
+
+    try {
+      return method.invoke(argument);
+    } catch(WebApplicationException e) {
+      throw e;
+    } catch(RuntimeException e) {
+      log.error("Error invoking '" + method.getName() + "' method for type " + method.getDeclaringClass().getName(), e);
+      throw new WebApplicationException(500);
+    } catch(IllegalAccessException e) {
+      log.error("Error invoking '" + method.getName() + "' method for type " + method.getDeclaringClass().getName(), e);
+      throw new WebApplicationException(500);
+    } catch(InvocationTargetException e) {
+      log.error("Error invoking '" + method.getName() + "' method for type " + method.getDeclaringClass().getName(), e);
+      throw new WebApplicationException(500);
+    }
+  }
+
+  private static Method extractStaticMethod(final String methodName, final Map<Class<?>, Method> methodCache, final Class<?> type) {
+    if(methodName == null) throw new IllegalArgumentException("methodName cannot be null");
+    if(methodCache == null) throw new IllegalArgumentException("methodCache cannot be null");
+    if(type == null) throw new IllegalArgumentException("type cannot be null");
+
+    if(methodCache.containsKey(type) == false) {
       try {
-        return (Builder) extractMethod(messageType).invoke(null);
-      } catch(WebApplicationException e) {
-        throw e;
-      } catch(RuntimeException e) {
-        log.error("Error invoking 'newBuilder' method for type " + messageType.getName(), e);
+        methodCache.put(type, type.getMethod(methodName));
+      } catch(SecurityException e) {
+        log.error("Error getting '" + methodName + "' method from type " + type.getName(), e);
         throw new WebApplicationException(500);
-      } catch(IllegalAccessException e) {
-        log.error("Error invoking 'newBuilder' method for type " + messageType.getName(), e);
-        throw new WebApplicationException(500);
-      } catch(InvocationTargetException e) {
-        log.error("Error invoking 'newBuilder' method for type " + messageType.getName(), e);
-        throw new WebApplicationException(500);
+      } catch(NoSuchMethodException e) {
+        throw new IllegalStateException("The type " + type.getName() + " does not define a '" + methodName + "' static method.");
       }
     }
-
-    synchronized private Method extractMethod(final Class<Message> messageType) {
-
-      if(methodCache.containsKey(messageType) == false) {
-        try {
-          methodCache.put(messageType, messageType.getMethod("newBuilder"));
-        } catch(SecurityException e) {
-          log.error("Error getting 'newBuilder' method from type " + messageType.getName(), e);
-          throw new WebApplicationException(500);
-        } catch(NoSuchMethodException e) {
-          throw new IllegalStateException("The Message type " + messageType.getName() + " does not define a 'newBuilder' static method.");
-        }
-      }
-      return methodCache.get(messageType);
-    }
-
+    return methodCache.get(type);
   }
 
 }

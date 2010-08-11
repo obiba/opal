@@ -5,6 +5,7 @@ import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import com.google.protobuf.ExtensionRegistry;
 import com.google.protobuf.JsonFormat;
 import com.google.protobuf.Message;
 import com.google.protobuf.Message.Builder;
@@ -24,8 +25,13 @@ public final class JsonIoUtil {
   private JsonIoUtil() {
   }
 
-  public static <T extends Message> ArrayList<T> mergeCollection(final Builder builder, final Readable readable) throws IOException {
+  public static <T extends Message> ArrayList<T> mergeCollection(final Readable readable, final Builder builder) throws IOException {
+    return mergeCollection(readable, ExtensionRegistry.getEmptyRegistry(), builder);
+  }
+
+  public static <T extends Message> ArrayList<T> mergeCollection(final Readable readable, final ExtensionRegistry extensionRegistry, final Builder builder) throws IOException {
     if(builder == null) throw new IllegalArgumentException("builder cannot be null");
+    if(extensionRegistry == null) throw new IllegalArgumentException("extensionRegistry cannot be null");
     if(readable == null) throw new IllegalArgumentException("readable cannot be null");
 
     CharBuffer cb = CharBuffer.allocate(1);
