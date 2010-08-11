@@ -31,13 +31,17 @@ import org.jboss.resteasy.specimpl.UriBuilderImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.obiba.magma.Datasource;
+import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.support.ExcelDatasourceFactory;
+import org.obiba.opal.web.magma.support.DatasourceFactoryDtoParser;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
+import org.obiba.opal.web.magma.support.ExcelDatasourceFactoryDtoParser;
 import org.obiba.opal.web.model.Magma;
+import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
@@ -70,7 +74,13 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testDatasourcesPOST() {
     DatasourcesResource resource = new DatasourcesResource("opal-keys.keys");
-    resource.setDatasourceFactoryRegistry(new DatasourceFactoryRegistry());
+    resource.setDatasourceFactoryRegistry(new DatasourceFactoryRegistry() {
+      @Override
+      public DatasourceFactory parse(DatasourceFactoryDto dto) {
+        DatasourceFactoryDtoParser parser = new ExcelDatasourceFactoryDtoParser();
+        return parser.parse(dto);
+      }
+    });
 
     UriInfo uriInfoMock = createMock(UriInfo.class);
     expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromUri(BASE_URI));

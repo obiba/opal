@@ -14,10 +14,12 @@ import java.io.File;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.excel.support.ExcelDatasourceFactory;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
+import org.springframework.stereotype.Component;
 
 /**
  *
  */
+@Component
 public class ExcelDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoParser {
 
   @Override

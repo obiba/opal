@@ -16,10 +16,12 @@ import org.obiba.magma.datasource.csv.support.CsvDatasourceFactory;
 import org.obiba.opal.web.model.Magma.CsvDatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.CsvDatasourceTableBundleDto;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
+import org.springframework.stereotype.Component;
 
 /**
  *
  */
+@Component
 public class CsvDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoParser {
 
   @Override

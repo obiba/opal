@@ -11,24 +11,35 @@ package org.obiba.opal.web.magma.support;
 
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 /**
  *
  */
 @Component
-public class DatasourceFactoryRegistry {
+public class DatasourceFactoryRegistry implements ApplicationContextAware {
 
   private DatasourceFactoryDtoParser parser;
 
-  public DatasourceFactoryRegistry() {
-    super();
-    this.parser = new ExcelDatasourceFactoryDtoParser();
-    this.parser.setNext(new CsvDatasourceFactoryDtoParser());
-  }
-
   public DatasourceFactory parse(DatasourceFactoryDto dto) {
     return parser.parse(dto);
+  }
+
+  @Override
+  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    DatasourceFactoryDtoParser current = null;
+    // chain the parsers that live in Spring
+    for(DatasourceFactoryDtoParser p : applicationContext.getBeansOfType(DatasourceFactoryDtoParser.class).values()) {
+      if(current == null) {
+        this.parser = p;
+        current = p;
+      } else {
+        current = current.setNext(p);
+      }
+    }
   }
 
 }
