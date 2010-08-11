@@ -84,6 +84,7 @@ public class ProtobufJsonReaderProvider implements MessageBodyReader<Object> {
     return false;
   }
 
+  @SuppressWarnings("unchecked")
   private Class<Message> extractMessageType(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
     if(isWrapped(type, genericType, annotations, mediaType)) {
       return Types.getCollectionBaseType(type, genericType);
@@ -126,7 +127,7 @@ public class ProtobufJsonReaderProvider implements MessageBodyReader<Object> {
     if(method == null) throw new IllegalArgumentException("method cannot be null");
 
     try {
-      return method.invoke(argument);
+      return method.invoke(null, argument);
     } catch(WebApplicationException e) {
       throw e;
     } catch(RuntimeException e) {
