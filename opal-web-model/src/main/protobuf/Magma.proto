@@ -6,6 +6,7 @@ option java_package = "org.obiba.opal.web.model";
 message DatasourceFactoryDto {
   optional ExcelDatasourceFactoryDto excel = 1;
   optional CsvDatasourceFactoryDto csv = 2;
+  optional FsDatasourceFactoryDto fs = 3;
 }
 
 message ExcelDatasourceFactoryDto {
@@ -26,6 +27,11 @@ message CsvDatasourceTableBundleDto {
   required string name = 1;
   optional string variables = 2;
   optional string data = 3;
+}
+
+message FsDatasourceFactoryDto {
+  required string file = 1;
+  optional string unit = 2;
 }
 
 message DatasourceDto {
