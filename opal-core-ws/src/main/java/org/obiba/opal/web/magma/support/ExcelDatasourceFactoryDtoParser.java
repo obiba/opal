@@ -9,11 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.support;
 
-import java.io.File;
-
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.excel.support.ExcelDatasourceFactory;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.Magma.ExcelDatasourceFactoryDto;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,8 +26,9 @@ public class ExcelDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDt
     ExcelDatasourceFactory factory = null;
     if(dto.hasExcel()) {
       factory = new ExcelDatasourceFactory();
-      factory.setFile(new File(dto.getExcel().getFile()));
-      factory.setReadOnly(dto.getExcel().getReadOnly());
+      ExcelDatasourceFactoryDto excelDto = dto.getExcel();
+      factory.setFile(resolveLocalFile(excelDto.getFile()));
+      factory.setReadOnly(excelDto.getReadOnly());
     }
     return factory;
   }

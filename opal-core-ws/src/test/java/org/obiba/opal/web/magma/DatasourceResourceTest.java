@@ -77,7 +77,12 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     resource.setDatasourceFactoryRegistry(new DatasourceFactoryRegistry() {
       @Override
       public DatasourceFactory parse(DatasourceFactoryDto dto) {
-        DatasourceFactoryDtoParser parser = new ExcelDatasourceFactoryDtoParser();
+        DatasourceFactoryDtoParser parser = new ExcelDatasourceFactoryDtoParser() {
+          @Override
+          protected File resolveLocalFile(String path) {
+            return new File(path);
+          }
+        };
         return parser.parse(dto);
       }
     });

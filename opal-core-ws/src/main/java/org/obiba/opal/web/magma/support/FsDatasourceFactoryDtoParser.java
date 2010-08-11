@@ -9,15 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.support;
 
-import java.io.File;
-
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.fs.support.FsDatasourceFactory;
-import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.obiba.opal.web.model.Magma.FsDatasourceFactoryDto;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,18 +23,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class FsDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoParser {
 
-  @Autowired
-  private OpalRuntime opalRuntime;
-
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
     FsDatasourceFactory factory = null;
     if(dto.hasFs()) {
       factory = new FsDatasourceFactory();
-      factory.setFile(new File(dto.getFs().getFile()));
-      if(dto.getFs().hasUnit()) {
-        String unitName = dto.getFs().getUnit();
-        FunctionalUnit unit = opalRuntime.getFunctionalUnit(unitName);
+      FsDatasourceFactoryDto fsDto = dto.getFs();
+      factory.setFile(resolveLocalFile(fsDto.getFile()));
+      if(fsDto.hasUnit()) {
+        String unitName = fsDto.getUnit();
+        FunctionalUnit unit = getOpalRuntime().getFunctionalUnit(unitName);
         if(unit == null) {
           throw new NoSuchFunctionalUnitException(unitName);
         }
@@ -46,9 +41,4 @@ public class FsDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoPa
     }
     return factory;
   }
-
-  public void setOpalRuntime(OpalRuntime opalRuntime) {
-    this.opalRuntime = opalRuntime;
-  }
-
 }
