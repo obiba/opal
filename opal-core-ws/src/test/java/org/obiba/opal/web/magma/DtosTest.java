@@ -22,7 +22,14 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.Variable;
 import org.obiba.opal.web.model.Magma.AttributeDto;
 import org.obiba.opal.web.model.Magma.CategoryDto;
+import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.Magma.ExcelDatasourceFactoryDto;
+import org.obiba.opal.web.model.Magma.HibernateDatasourceFactoryDto;
+import org.obiba.opal.web.model.Magma.JdbcDatasourceFactoryDto;
+import org.obiba.opal.web.model.Magma.JdbcDatasourceSettingsDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
+
+import com.google.protobuf.JsonFormat;
 
 public class DtosTest {
 
@@ -110,6 +117,35 @@ public class DtosTest {
     builder.setValue("value");
     AttributeDto attributesDto = builder.build();
     return attributesDto;
+  }
+
+  @Test
+  public void testDatasourceFactoryDtoJsonFormat() {
+    String json = JsonFormat.printToString(buildDatasourceFactoryDto());
+    System.out.println(json);
+  }
+
+  private DatasourceFactoryDto buildDatasourceFactoryDto() {
+    DatasourceFactoryDto.Builder builder = DatasourceFactoryDto.newBuilder();
+
+    ExcelDatasourceFactoryDto.Builder excelBuilder = ExcelDatasourceFactoryDto.newBuilder();
+    excelBuilder.setFile("/toto/tata.xlsx");
+    builder.setExtension(ExcelDatasourceFactoryDto.params, excelBuilder.build());
+
+    JdbcDatasourceFactoryDto.Builder jdbcBuilder = JdbcDatasourceFactoryDto.newBuilder();
+    jdbcBuilder.setDriver("com.mysql.jdbc.Driver");
+    jdbcBuilder.setUrl("jdbc:mysql://localhost:3306/mart");
+    jdbcBuilder.setUsername("root");
+    jdbcBuilder.setPassword("rootadmin");
+    JdbcDatasourceSettingsDto.Builder settingsBuilder = JdbcDatasourceSettingsDto.newBuilder();
+    settingsBuilder.setDefaultEntityType("Participant");
+    settingsBuilder.setUseMetadataTables(true);
+    jdbcBuilder.setSettings(settingsBuilder.build());
+    builder.setExtension(JdbcDatasourceFactoryDto.params, jdbcBuilder.build());
+
+    builder.setExtension(HibernateDatasourceFactoryDto.params, HibernateDatasourceFactoryDto.newBuilder().build());
+
+    return builder.build();
   }
 
 }

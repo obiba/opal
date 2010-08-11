@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.annotation.PreDestroy;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -27,6 +28,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.model.Magma;
@@ -49,14 +51,24 @@ public class DatasourcesResource {
 
   private String keysDatasourceName;
 
-  @Autowired
   private DatasourceFactoryRegistry datasourceFactoryRegistry;
 
+  private Datasource transientDatasourceInstance;
+
   @Autowired
-  public DatasourcesResource(@Value("${org.obiba.opal.keys.tableReference}") String keysTableReference) {
+  public DatasourcesResource(@Value("${org.obiba.opal.keys.tableReference}") String keysTableReference, DatasourceFactoryRegistry datasourceFactoryRegistry) {
     keysDatasourceName = MagmaEngineTableResolver.valueOf(keysTableReference).getDatasourceName();
+    this.datasourceFactoryRegistry = datasourceFactoryRegistry;
     if(keysDatasourceName == null) {
       throw new IllegalArgumentException("invalid keys table reference");
+    }
+  }
+
+  @PreDestroy
+  public void destroy() {
+    if(transientDatasourceInstance != null) {
+      Disposables.silentlyDispose(transientDatasourceInstance);
+      transientDatasourceInstance = null;
     }
   }
 
@@ -94,15 +106,12 @@ public class DatasourcesResource {
     if(factory != null) {
       String uid = MagmaEngine.get().addTransientDatasource(factory);
       Datasource ds = MagmaEngine.get().getTransientDatasourceInstance(uid);
+      transientDatasourceInstance = ds;
       UriBuilder ub = uriInfo.getBaseUriBuilder().path("datasource").path(uid);
       return Response.ok().entity(Dtos.asDto(ds).build()).location(ub.build()).build();
     } else {
       return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "UnidentifiedDatasourceFactory")).build();
     }
-  }
-
-  public void setDatasourceFactoryRegistry(DatasourceFactoryRegistry datasourceFactoryRegistry) {
-    this.datasourceFactoryRegistry = datasourceFactoryRegistry;
   }
 
   private void sortByName(List<Magma.DatasourceDto> datasources) {

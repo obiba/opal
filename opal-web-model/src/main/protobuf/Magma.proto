@@ -4,15 +4,15 @@ package Magma;
 option java_package = "org.obiba.opal.web.model";
 
 message DatasourceFactoryDto {
-  optional ExcelDatasourceFactoryDto excel = 1;
-  optional CsvDatasourceFactoryDto csv = 2;
-  optional FsDatasourceFactoryDto fs = 3;
-  optional JdbcDatasourceFactoryDto jdbc = 4;
+  extensions 1000 to max;
 }
 
 message ExcelDatasourceFactoryDto {
   required string file = 1;
   optional bool readOnly = 2;
+  extend DatasourceFactoryDto { 
+    optional ExcelDatasourceFactoryDto params = 1000; 
+  }
 }
 
 message CsvDatasourceFactoryDto {
@@ -22,6 +22,9 @@ message CsvDatasourceFactoryDto {
   optional string separator = 4;
   optional string quote = 5;
   optional int32 firstRow = 6;
+  extend DatasourceFactoryDto { 
+    optional CsvDatasourceFactoryDto params = 1001; 
+  }
 }
 
 message CsvDatasourceTableBundleDto {
@@ -33,6 +36,9 @@ message CsvDatasourceTableBundleDto {
 message FsDatasourceFactoryDto {
   required string file = 1;
   optional string unit = 2;
+  extend DatasourceFactoryDto { 
+    optional FsDatasourceFactoryDto params = 1002; 
+  }
 }
 
 message JdbcDatasourceFactoryDto {
@@ -40,12 +46,15 @@ message JdbcDatasourceFactoryDto {
   required string url = 2;
   required string username = 3;
   required string password = 4;
-  optional JdbcDatasourceSettingsDto settings = 5; 
+  required JdbcDatasourceSettingsDto settings = 5;
+  extend DatasourceFactoryDto { 
+    optional JdbcDatasourceFactoryDto params = 1003; 
+  } 
 }
 
 message JdbcDatasourceSettingsDto {
-  optional string defaultEntityType = 1;
-  optional bool useMetadataTables = 2;
+  required string defaultEntityType = 1;
+  required bool useMetadataTables = 2;
   repeated string mappedTables = 3;
   repeated JdbcValueTableSettingsDto tableSettings = 4;
   optional string defaultCreatedTimestampColumnName = 5;
@@ -59,6 +68,13 @@ message JdbcValueTableSettingsDto {
   repeated string entityIdentifierColumns = 4;
   optional string createdTimestampColumnName = 5;
   optional string updatedTimestampColumnName = 6;
+}
+
+message HibernateDatasourceFactoryDto {
+  optional bool key = 1;
+  extend DatasourceFactoryDto { 
+    optional HibernateDatasourceFactoryDto params = 1004; 
+  } 
 }
 
 message DatasourceDto {

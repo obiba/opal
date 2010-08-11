@@ -23,14 +23,16 @@ public class ExcelDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDt
 
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
-    ExcelDatasourceFactory factory = null;
-    if(dto.hasExcel()) {
-      factory = new ExcelDatasourceFactory();
-      ExcelDatasourceFactoryDto excelDto = dto.getExcel();
-      factory.setFile(resolveLocalFile(excelDto.getFile()));
-      factory.setReadOnly(excelDto.getReadOnly());
-    }
+    ExcelDatasourceFactory factory = new ExcelDatasourceFactory();
+    ExcelDatasourceFactoryDto excelDto = dto.getExtension(ExcelDatasourceFactoryDto.params);
+    factory.setFile(resolveLocalFile(excelDto.getFile()));
+    factory.setReadOnly(excelDto.getReadOnly());
     return factory;
+  }
+
+  @Override
+  public boolean canParse(DatasourceFactoryDto dto) {
+    return dto.hasExtension(ExcelDatasourceFactoryDto.params);
   }
 
 }

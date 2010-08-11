@@ -25,20 +25,22 @@ public class FsDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoPa
 
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
-    FsDatasourceFactory factory = null;
-    if(dto.hasFs()) {
-      factory = new FsDatasourceFactory();
-      FsDatasourceFactoryDto fsDto = dto.getFs();
-      factory.setFile(resolveLocalFile(fsDto.getFile()));
-      if(fsDto.hasUnit()) {
-        String unitName = fsDto.getUnit();
-        FunctionalUnit unit = getOpalRuntime().getFunctionalUnit(unitName);
-        if(unit == null) {
-          throw new NoSuchFunctionalUnitException(unitName);
-        }
-        factory.setEncryptionStrategy(unit.getDatasourceEncryptionStrategy());
+    FsDatasourceFactory factory = new FsDatasourceFactory();
+    FsDatasourceFactoryDto fsDto = dto.getExtension(FsDatasourceFactoryDto.params);
+    factory.setFile(resolveLocalFile(fsDto.getFile()));
+    if(fsDto.hasUnit()) {
+      String unitName = fsDto.getUnit();
+      FunctionalUnit unit = getOpalRuntime().getFunctionalUnit(unitName);
+      if(unit == null) {
+        throw new NoSuchFunctionalUnitException(unitName);
       }
+      factory.setEncryptionStrategy(unit.getDatasourceEncryptionStrategy());
     }
     return factory;
+  }
+
+  @Override
+  public boolean canParse(DatasourceFactoryDto dto) {
+    return dto.hasExtension(FsDatasourceFactoryDto.params);
   }
 }

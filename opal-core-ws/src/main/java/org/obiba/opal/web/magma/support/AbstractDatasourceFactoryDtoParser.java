@@ -14,6 +14,7 @@ import java.io.File;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.support.Initialisables;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,17 +24,10 @@ public abstract class AbstractDatasourceFactoryDtoParser implements DatasourceFa
   @Autowired
   private OpalRuntime opalRuntime;
 
-  DatasourceFactoryDtoParser next;
-
-  public DatasourceFactoryDtoParser setNext(DatasourceFactoryDtoParser next) {
-    this.next = next;
-    return next;
-  }
-
   public DatasourceFactory parse(DatasourceFactoryDto dto) {
     DatasourceFactory factory = internalParse(dto);
-    if(factory == null && next != null) {
-      factory = next.parse(dto);
+    if(factory != null) {
+      Initialisables.initialise(factory);
     }
     return factory;
   }

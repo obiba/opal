@@ -42,6 +42,7 @@ import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.magma.support.ExcelDatasourceFactoryDtoParser;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.Magma.ExcelDatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
@@ -63,7 +64,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
   @Test
   public void testDatasourcesGET() {
-    DatasourcesResource resource = new DatasourcesResource("opal-keys.keys");
+    DatasourcesResource resource = new DatasourcesResource("opal-keys.keys", newDatasourceFactoryRegistry());
 
     List<Magma.DatasourceDto> dtos = resource.getDatasources();
     Assert.assertEquals(2, dtos.size());
@@ -73,24 +74,12 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
   @Test
   public void testDatasourcesPOST() {
-    DatasourcesResource resource = new DatasourcesResource("opal-keys.keys");
-    resource.setDatasourceFactoryRegistry(new DatasourceFactoryRegistry() {
-      @Override
-      public DatasourceFactory parse(DatasourceFactoryDto dto) {
-        DatasourceFactoryDtoParser parser = new ExcelDatasourceFactoryDtoParser() {
-          @Override
-          protected File resolveLocalFile(String path) {
-            return new File(path);
-          }
-        };
-        return parser.parse(dto);
-      }
-    });
+    DatasourcesResource resource = new DatasourcesResource("opal-keys.keys", newDatasourceFactoryRegistry());
 
     UriInfo uriInfoMock = createMock(UriInfo.class);
     expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromUri(BASE_URI));
 
-    Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder().setExcel(Magma.ExcelDatasourceFactoryDto.newBuilder().setFile(getDatasourcePath(DATASOURCE1)).setReadOnly(true).build()).build();
+    Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder().setExtension(ExcelDatasourceFactoryDto.params, Magma.ExcelDatasourceFactoryDto.newBuilder().setFile(getDatasourcePath(DATASOURCE1)).setReadOnly(true).build()).build();
 
     replay(uriInfoMock);
     Response response = resource.createDatasource(uriInfoMock, factoryDto);
@@ -222,6 +211,21 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     Response response = datasourceResource.createTable(null);
 
     Assert.assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
+  }
+
+  private DatasourceFactoryRegistry newDatasourceFactoryRegistry() {
+    return new DatasourceFactoryRegistry() {
+      @Override
+      public DatasourceFactory parse(DatasourceFactoryDto dto) {
+        DatasourceFactoryDtoParser parser = new ExcelDatasourceFactoryDtoParser() {
+          @Override
+          protected File resolveLocalFile(String path) {
+            return new File(path);
+          }
+        };
+        return parser.parse(dto);
+      }
+    };
   }
 
   private TableDto createTableDto() {

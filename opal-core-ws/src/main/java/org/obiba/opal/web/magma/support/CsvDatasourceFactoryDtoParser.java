@@ -26,27 +26,24 @@ public class CsvDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoP
 
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
-    CsvDatasourceFactory factory = null;
-    if(dto.hasCsv()) {
-      factory = new CsvDatasourceFactory();
-      CsvDatasourceFactoryDto csvDto = dto.getCsv();
-      if(csvDto.hasBundle()) {
-        factory.setBundle(resolveLocalFile(csvDto.getBundle()));
-      }
-      if(csvDto.hasSeparator()) {
-        factory.setSeparator(csvDto.getSeparator());
-      }
-      if(csvDto.hasQuote()) {
-        factory.setQuote(csvDto.getQuote());
-      }
-      if(csvDto.hasFirstRow()) {
-        factory.setFirstRow(csvDto.getFirstRow());
-      }
-      if(csvDto.hasCharacterSet()) {
-        factory.setCharacterSet(csvDto.getCharacterSet());
-      }
-      addTableBundles(factory, csvDto);
+    CsvDatasourceFactory factory = new CsvDatasourceFactory();
+    CsvDatasourceFactoryDto csvDto = dto.getExtension(CsvDatasourceFactoryDto.params);
+    if(csvDto.hasBundle()) {
+      factory.setBundle(resolveLocalFile(csvDto.getBundle()));
     }
+    if(csvDto.hasSeparator()) {
+      factory.setSeparator(csvDto.getSeparator());
+    }
+    if(csvDto.hasQuote()) {
+      factory.setQuote(csvDto.getQuote());
+    }
+    if(csvDto.hasFirstRow()) {
+      factory.setFirstRow(csvDto.getFirstRow());
+    }
+    if(csvDto.hasCharacterSet()) {
+      factory.setCharacterSet(csvDto.getCharacterSet());
+    }
+    addTableBundles(factory, csvDto);
     return factory;
   }
 
@@ -56,6 +53,11 @@ public class CsvDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoP
       File data = tableBundleDto.hasData() ? resolveLocalFile(tableBundleDto.getData()) : null;
       factory.addTable(tableBundleDto.getName(), variables, data);
     }
+  }
+
+  @Override
+  public boolean canParse(DatasourceFactoryDto dto) {
+    return dto.hasExtension(CsvDatasourceFactoryDto.params);
   }
 
 }

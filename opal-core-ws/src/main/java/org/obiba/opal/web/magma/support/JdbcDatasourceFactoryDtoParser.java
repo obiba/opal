@@ -37,16 +37,11 @@ public class JdbcDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDto
 
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
-    JdbcDatasourceFactory factory = null;
-    if(dto.hasJdbc()) {
-      factory = new JdbcDatasourceFactory();
-      JdbcDatasourceFactoryDto jdbcDto = dto.getJdbc();
-      factory.setTransactionManager(transactionManager);
-      factory.setJdbcProperties(parseProperties(jdbcDto));
-      if(jdbcDto.hasSettings()) {
-        factory.setDatasourceSettings(parseSettings(jdbcDto.getSettings()));
-      }
-    }
+    JdbcDatasourceFactory factory = new JdbcDatasourceFactory();
+    JdbcDatasourceFactoryDto jdbcDto = dto.getExtension(JdbcDatasourceFactoryDto.params);
+    factory.setTransactionManager(transactionManager);
+    factory.setJdbcProperties(parseProperties(jdbcDto));
+    factory.setDatasourceSettings(parseSettings(jdbcDto.getSettings()));
     return factory;
   }
 
@@ -100,6 +95,11 @@ public class JdbcDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDto
 
   public void setTransactionManager(TransactionManager transactionManager) {
     this.transactionManager = transactionManager;
+  }
+
+  @Override
+  public boolean canParse(DatasourceFactoryDto dto) {
+    return dto.hasExtension(JdbcDatasourceFactoryDto.params);
   }
 
 }
