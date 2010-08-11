@@ -123,6 +123,8 @@ public class DtosTest {
   public void testDatasourceFactoryDtoJsonFormat() {
     String json = JsonFormat.printToString(buildDatasourceFactoryDto());
     System.out.println(json);
+    // non regression check for protobuf json format patch about nested extensions
+    Assert.assertEquals("{\"Magma.ExcelDatasourceFactoryDto.params\": {\"file\": \"/toto/tata.xlsx\"},\"Magma.JdbcDatasourceFactoryDto.params\": {\"driver\": \"com.mysql.jdbc.Driver\",\"url\": \"jdbc:mysql://localhost:3306/mart\",\"username\": \"root\",\"password\": \"rootadmin\",\"settings\": {\"defaultEntityType\": \"Participant\",\"useMetadataTables\": true}},\"Magma.HibernateDatasourceFactoryDto.params\": {}}", json);
   }
 
   private DatasourceFactoryDto buildDatasourceFactoryDto() {
