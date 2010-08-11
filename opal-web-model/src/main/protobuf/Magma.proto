@@ -7,6 +7,7 @@ message DatasourceFactoryDto {
   optional ExcelDatasourceFactoryDto excel = 1;
   optional CsvDatasourceFactoryDto csv = 2;
   optional FsDatasourceFactoryDto fs = 3;
+  optional JdbcDatasourceFactoryDto jdbc = 4;
 }
 
 message ExcelDatasourceFactoryDto {
@@ -32,6 +33,32 @@ message CsvDatasourceTableBundleDto {
 message FsDatasourceFactoryDto {
   required string file = 1;
   optional string unit = 2;
+}
+
+message JdbcDatasourceFactoryDto {
+  required string driver = 1;
+  required string url = 2;
+  required string username = 3;
+  required string password = 4;
+  optional JdbcDatasourceSettingsDto settings = 5; 
+}
+
+message JdbcDatasourceSettingsDto {
+  optional string defaultEntityType = 1;
+  optional bool useMetadataTables = 2;
+  repeated string mappedTables = 3;
+  repeated JdbcValueTableSettingsDto tableSettings = 4;
+  optional string defaultCreatedTimestampColumnName = 5;
+  optional string defaultUpdatedTimestampColumnName = 6;
+}
+
+message JdbcValueTableSettingsDto {
+  required string sqlTableName = 1;
+  optional string magmaTableName = 2;
+  required string entityType = 3;
+  repeated string entityIdentifierColumns = 4;
+  optional string createdTimestampColumnName = 5;
+  optional string updatedTimestampColumnName = 6;
 }
 
 message DatasourceDto {
