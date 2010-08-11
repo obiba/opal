@@ -104,7 +104,7 @@ public class ProtobufJsonReaderProvider implements MessageBodyReader<Object> {
       Class<?> enclosingType = messageType.getEnclosingClass();
       if(registryCache.containsKey(enclosingType) == false) {
         ExtensionRegistry registry = ExtensionRegistry.newInstance();
-        invokeStaticMethod(extractStaticMethod("registerAllExtensions", methodCache, messageType.getEnclosingClass()), registry);
+        invokeStaticMethod(extractStaticMethod("registerAllExtensions", methodCache, messageType.getEnclosingClass(), ExtensionRegistry.class), registry);
         registryCache.put(enclosingType, registry);
       }
       return registryCache.get(enclosingType);
@@ -141,14 +141,14 @@ public class ProtobufJsonReaderProvider implements MessageBodyReader<Object> {
     }
   }
 
-  private static Method extractStaticMethod(final String methodName, final Map<Class<?>, Method> methodCache, final Class<?> type) {
+  private static Method extractStaticMethod(final String methodName, final Map<Class<?>, Method> methodCache, final Class<?> type, Class<?>... arguments) {
     if(methodName == null) throw new IllegalArgumentException("methodName cannot be null");
     if(methodCache == null) throw new IllegalArgumentException("methodCache cannot be null");
     if(type == null) throw new IllegalArgumentException("type cannot be null");
 
     if(methodCache.containsKey(type) == false) {
       try {
-        methodCache.put(type, type.getMethod(methodName));
+        methodCache.put(type, type.getMethod(methodName, arguments));
       } catch(SecurityException e) {
         log.error("Error getting '" + methodName + "' method from type " + type.getName(), e);
         throw new WebApplicationException(500);
