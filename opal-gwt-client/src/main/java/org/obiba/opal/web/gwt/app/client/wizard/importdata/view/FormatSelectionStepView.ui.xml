@@ -1,0 +1,43 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
+
+  
+  <o:WorkbenchLayout>
+    <g:Label><ui:msg description="Data import title">Import Data</ui:msg></g:Label>
+    <g:Label><ui:msg description="Data import format selection summary">Select the type of data you wish to import</ui:msg></g:Label>
+    <g:Button ui:field="nextButton"><ui:msg description="Next button label">Next</ui:msg></g:Button>
+    <g:FlowPanel>
+      <g:HTMLPanel>
+        <table class="gwt-KeyValue" cellspacing="10">
+          <tbody>
+            <tr>
+              <td style="vertical-align:top">
+                <ui:msg description="Data format label">Data Format:</ui:msg>                
+              </td>
+              <td>
+                <g:ListBox ui:field='formatListBox' visibleItemCount='1'/>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </g:HTMLPanel>
+    </g:FlowPanel>
+    
+     <g:FlowPanel>
+        <g:HTMLPanel>
+          <g:Label addStyleNames="title"><ui:msg description="Data format label">Data Format</ui:msg></g:Label>
+          <p><ui:msg description="Number of formats information">There are two data file formats currently supported:</ui:msg></p>    
+          <ul>
+            <li><ui:msg description="CSV format information">CSV: first column contain the participant identifiers and variables are identified by subsequent column names. The variable dictionary can be specified in a later step.</ui:msg></li>
+            <li><ui:msg description="Opal XML information">Opal XML: usually this format is used by Onyx when exporting data. Comes with its own variable dictionary.</ui:msg></li>
+          </ul>
+        </g:HTMLPanel>
+     </g:FlowPanel>    
+    
+  </o:WorkbenchLayout>
+  
+</ui:UiBinder>
