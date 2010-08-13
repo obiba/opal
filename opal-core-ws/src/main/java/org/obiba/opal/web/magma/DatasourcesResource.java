@@ -118,17 +118,7 @@ public class DatasourcesResource {
       } catch(DatasourceParsingException pe) {
         // unable to create a datasource from that, so rollback
         MagmaEngine.get().removeTransientDatasource(uid);
-        ClientErrorDto.Builder clientError = getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed");
-
-        // build a parsing error dto list
-        if(pe.getChildren().size() == 0) {
-          clientError.addExtension(DatasourceParsingErrorDto.errors, newDatasourceParsingErrorDto(pe).build());
-        } else {
-          for(DatasourceParsingException child : pe.getChildrenAsList()) {
-            clientError.addExtension(DatasourceParsingErrorDto.errors, newDatasourceParsingErrorDto(child).build());
-          }
-        }
-        response = Response.status(Status.BAD_REQUEST).entity(clientError.build());
+        response = Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed", pe).build());
       } catch(MagmaRuntimeException e) {
         // unable to create a datasource from that too, so rollback
         MagmaEngine.get().removeTransientDatasource(uid);
@@ -155,6 +145,19 @@ public class DatasourcesResource {
 
   private ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus) {
     return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus);
+  }
+
+  private ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, DatasourceParsingException pe) {
+    ClientErrorDto.Builder clientError = ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus);
+    // build a parsing error dto list
+    if(pe.getChildren().size() == 0) {
+      clientError.addExtension(DatasourceParsingErrorDto.errors, newDatasourceParsingErrorDto(pe).build());
+    } else {
+      for(DatasourceParsingException child : pe.getChildrenAsList()) {
+        clientError.addExtension(DatasourceParsingErrorDto.errors, newDatasourceParsingErrorDto(child).build());
+      }
+    }
+    return clientError;
   }
 
   private DatasourceParsingErrorDto.Builder newDatasourceParsingErrorDto(DatasourceParsingException pe) {
