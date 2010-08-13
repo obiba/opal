@@ -268,9 +268,9 @@ public class DefaultImportService implements ImportService {
     final String keyVariableName = unit.getKeyVariableName();
     final View privateView = createPrivateView(participantTable, unit);
     final Variable keyVariable = prepareKeysTable(privateView, keyVariableName);
-    final OpalPrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(lookupKeysTable(), keyVariable, participantIdentifier);
 
-    FunctionalUnitView publicView = createPublicView(participantTable, unit);
+    final FunctionalUnitView publicView = createPublicView(participantTable, unit);
+    final PrivateVariableEntityMap entityMap = publicView.getPrivateVariableEntityMap();
 
     // prepare for copying participant data
     final ValueTableWriter keysTableWriter = writeToKeysTable();
@@ -287,7 +287,7 @@ public class DefaultImportService implements ImportService {
    * data datasource. It will also generate the public variable entity if it does not exist yet. As such, it must be
    * executed before the ValueSet is copied to the data datasource otherwise, it will not have an associated entity.
    */
-  private DatasourceCopyValueSetEventListener createKeysListener(final View privateView, final Variable keyVariable, final OpalPrivateVariableEntityMap entityMap, final ValueTableWriter keysTableWriter) {
+  private DatasourceCopyValueSetEventListener createKeysListener(final View privateView, final Variable keyVariable, final PrivateVariableEntityMap entityMap, final ValueTableWriter keysTableWriter) {
     DatasourceCopyValueSetEventListener createKeysListener = new DatasourceCopyValueSetEventListener() {
 
       public void onValueSetCopied(ValueTable source, ValueSet valueSet, String... destination) {
@@ -388,7 +388,7 @@ public class DefaultImportService implements ImportService {
   /**
    * Write the key variable and the identifier variables values; update the participant key private/public map.
    */
-  private VariableEntity copyParticipantIdentifiers(VariableEntity publicEntity, ValueTable privateView, Variable keyVariable, ValueTableWriter writer, OpalPrivateVariableEntityMap entityMap) {
+  private VariableEntity copyParticipantIdentifiers(VariableEntity publicEntity, ValueTable privateView, Variable keyVariable, ValueTableWriter writer, PrivateVariableEntityMap entityMap) {
     VariableEntity privateEntity = entityMap.privateEntity(publicEntity);
 
     ValueSetWriter vsw = writer.writeValueSet(publicEntity);

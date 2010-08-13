@@ -95,6 +95,10 @@ public class FunctionalUnitView extends View {
     }
   }
 
+  public PrivateVariableEntityMap getPrivateVariableEntityMap() {
+    return this.entityMap;
+  }
+
   @Override
   public BijectiveFunction<VariableEntity, VariableEntity> getVariableEntityMappingFunction() {
     return mappingFunction;
