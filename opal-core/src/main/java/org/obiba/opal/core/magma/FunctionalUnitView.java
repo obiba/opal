@@ -9,17 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.core.magma;
 
-import org.obiba.magma.NoSuchValueSetException;
-import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
+import org.obiba.magma.transform.BijectiveFunction;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.service.impl.OpalPrivateVariableEntityMap;
 import org.obiba.opal.core.unit.FunctionalUnit;
-
-import com.google.common.base.Function;
 
 /**
  * When an Opal table is exported to some functional unit, entities must be exported with the identifiers understood by
@@ -29,84 +26,126 @@ import com.google.common.base.Function;
  * appropriate to that unit.
  */
 public class FunctionalUnitView extends View {
-  //
-  // Instance Variables
-  //
 
-  private PrivateVariableEntityMap entityMap;
+  public enum Policy {
 
-  //
-  // Constructors
-  //
+    /**
+     * Make the unit's identifiers public. That is, the identifiers exposed by this table are the ones from the
+     * functional unit
+     */
+    UNIT_IDENTIFIERS_ARE_PUBLIC,
+
+    /**
+     * Make the unit's identifiers private. That is, the identifiers exposed by this table are the ones to which the
+     * functional unit's identifier map to in the keys table.
+     */
+    UNIT_IDENTIFIERS_ARE_PRIVATE;
+
+  }
+
+  private final PrivateVariableEntityMap entityMap;
+
+  private final boolean allowIdentifierGeneration;
+
+  private final BijectiveFunction<VariableEntity, VariableEntity> mappingFunction;
+
+  public FunctionalUnitView(FunctionalUnit unit, Policy policy, ValueTable dataTable, ValueTable keysTable) {
+    this(unit, policy, dataTable, keysTable, null);
+  }
 
   /**
    * Constructor.
    * 
    * @param unit functional unit
+   * @param policy the policy of which identifier to make public (opal identifier or unit identifier)
    * @param opalTable opal value table
    * @param keysTable opal keys table
+   * @param identifierGenerator strategy for generating missing identifiers. can be null, in which case, identifiers
+   * will not be generated
    */
-  public FunctionalUnitView(FunctionalUnit unit, ValueTable opalTable, ValueTable keysTable) {
-    super(opalTable.getName(), opalTable);
+  public FunctionalUnitView(FunctionalUnit unit, Policy policy, ValueTable dataTable, ValueTable keysTable, IParticipantIdentifier identifierGenerator) {
+    super(dataTable.getName(), dataTable);
+    if(unit == null) throw new IllegalArgumentException("unit cannot be null");
+    if(policy == null) throw new IllegalArgumentException("policy cannot be null");
+    if(dataTable == null) throw new IllegalArgumentException("dataTable cannot be null");
+    if(keysTable == null) throw new IllegalArgumentException("keysTable cannot be null");
+
+    allowIdentifierGeneration = identifierGenerator != null;
 
     Variable keyVariable = keysTable.getVariable(unit.getKeyVariableName());
 
-    IParticipantIdentifier nonGeneratingParticipantIdentifier = new IParticipantIdentifier() {
-      public String generateParticipantIdentifier() {
-        throw new UnsupportedOperationException("cannot generate identifier");
-      }
-    };
-
-    this.entityMap = new OpalPrivateVariableEntityMap(keysTable, keyVariable, nonGeneratingParticipantIdentifier);
-  }
-
-  //
-  // View Methods
-  //
-
-  /**
-   * Override <code>hasValueSet</code> to map the specified "private" entity (unit) to its "public" entity (opal).
-   */
-  @Override
-  public boolean hasValueSet(VariableEntity privateEntity) {
-    return super.hasValueSet(entityMap.publicEntity(privateEntity));
-  }
-
-  /**
-   * Override <code>getValueSet</code> to return the {@link ValueSet} with a reference to its "private" entity.
-   */
-  @Override
-  public ValueSet getValueSet(VariableEntity privateEntity) throws NoSuchValueSetException {
-    return super.getValueSet(entityMap.publicEntity(privateEntity));
-  }
-
-  /**
-   * Override <code>getVariableEntityTransformer</code> to transform "public" entities into "private" entities.
-   */
-  public Function<VariableEntity, VariableEntity> getVariableEntityTransformer() {
-    return new Function<VariableEntity, VariableEntity>() {
-      public VariableEntity apply(VariableEntity from) {
-        VariableEntity privateEntity = entityMap.privateEntity(from);
-        if(privateEntity == null) {
-          throw new RuntimeException("no private entity exists for public entity " + from);
+    if(allowIdentifierGeneration == false) {
+      identifierGenerator = new IParticipantIdentifier() {
+        public String generateParticipantIdentifier() {
+          throw new UnsupportedOperationException("cannot generate identifier");
         }
-        return privateEntity;
-      }
-    };
+      };
+    }
+
+    this.entityMap = new OpalPrivateVariableEntityMap(keysTable, keyVariable, identifierGenerator);
+    switch(policy) {
+    case UNIT_IDENTIFIERS_ARE_PUBLIC:
+      this.mappingFunction = new UnitIdentifiersArePublic();
+      break;
+    case UNIT_IDENTIFIERS_ARE_PRIVATE:
+      this.mappingFunction = new UnitIdentifiersArePrivate();
+      break;
+    default:
+      throw new IllegalArgumentException("unknown policy '" + policy + "'");
+    }
+  }
+
+  @Override
+  public BijectiveFunction<VariableEntity, VariableEntity> getVariableEntityMappingFunction() {
+    return mappingFunction;
   }
 
   /**
-   * Override <code>getVariableEntityTransformer</code> to transform "private" entities into "public" entities.
+   * Given an opal identifier, the apply() method will return the corresponding unit identifier.
+   * 
+   * <pre>
+   * apply: publicEntity --> privateEntity
+   * unapply: privateEntity --> publicEntity
+   * </pre>
    */
-  public Function<VariableEntity, VariableEntity> getVariableEntityReverseTransformer() {
-    return new Function<VariableEntity, VariableEntity>() {
-      public VariableEntity apply(VariableEntity from) {
-        VariableEntity publicEntity = entityMap.publicEntity(from);
-        if(publicEntity == null) {
-          throw new RuntimeException("no public entity exists for private entity " + from);
-        }
-        return publicEntity;
+  private class UnitIdentifiersArePublic implements BijectiveFunction<VariableEntity, VariableEntity> {
+    public VariableEntity apply(VariableEntity from) {
+      VariableEntity privateEntity = entityMap.privateEntity(from);
+      if(privateEntity == null) {
+        throw new RuntimeException("no private entity exists for public entity " + from);
       }
-    };
+      return privateEntity;
+    }
+
+    @Override
+    public VariableEntity unapply(VariableEntity from) {
+      return entityMap.publicEntity(from);
+    }
   }
+
+  /**
+   * Given a unit identifier, the apply() method will return the corresponding opal identifier. If {@code
+   * allowIdentifierGeneration} is true, the apply method will generate opal identifiers when one does not already
+   * exist.
+   * 
+   * <pre>
+   * apply: privateEntity --> publicEntity
+   * unapply: publicEntity --> privateEntity
+   * </pre>
+   */
+  private class UnitIdentifiersArePrivate implements BijectiveFunction<VariableEntity, VariableEntity> {
+    public VariableEntity apply(VariableEntity from) {
+      VariableEntity publicEntity = entityMap.publicEntity(from);
+      if(publicEntity == null && allowIdentifierGeneration) {
+        publicEntity = entityMap.createPublicEntity(from);
+      }
+      return publicEntity;
+    }
+
+    @Override
+    public VariableEntity unapply(VariableEntity from) {
+      return entityMap.privateEntity(from);
+    }
+  }
+
 }

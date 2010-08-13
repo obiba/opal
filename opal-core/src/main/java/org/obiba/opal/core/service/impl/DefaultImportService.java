@@ -23,24 +23,25 @@ import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.ValueTableWriter.ValueSetWriter;
-import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
+import org.obiba.magma.ValueTableWriter.ValueSetWriter;
+import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.audit.VariableEntityAuditLogManager;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
+import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListener;
 import org.obiba.magma.support.DatasourceCopier.MultiplexingStrategy;
 import org.obiba.magma.support.DatasourceCopier.VariableTransformer;
-import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.type.BooleanType;
 import org.obiba.magma.type.TextType;
 import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
+import org.obiba.opal.core.magma.FunctionalUnitView;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
-import org.obiba.opal.core.magma.PrivateVariableEntityValueTable;
+import org.obiba.opal.core.magma.FunctionalUnitView.Policy;
 import org.obiba.opal.core.magma.concurrent.LockingActionTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ImportService;
@@ -271,7 +272,7 @@ public class DefaultImportService implements ImportService {
     final Variable keyVariable = prepareKeysTable(privateView, keyVariableName);
     final OpalPrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(lookupKeysTable(), keyVariable, participantIdentifier);
 
-    PrivateVariableEntityValueTable publicView = createPublicView(participantTable, unit, entityMap);
+    FunctionalUnitView publicView = createPublicView(participantTable, unit);
 
     // prepare for copying participant data
     final ValueTableWriter keysTableWriter = writeToKeysTable();
@@ -302,7 +303,7 @@ public class DefaultImportService implements ImportService {
     return createKeysListener;
   }
 
-  private void copyPublicViewToDestinationDatasource(Datasource destination, final String dispatchAttribute, PrivateVariableEntityValueTable publicView, DatasourceCopyValueSetEventListener createKeysListener) throws IOException {
+  private void copyPublicViewToDestinationDatasource(Datasource destination, final String dispatchAttribute, FunctionalUnitView publicView, DatasourceCopyValueSetEventListener createKeysListener) throws IOException {
     DatasourceCopier.Builder builder = DatasourceCopier.Builder.newCopier() //
     .withLoggingListener().withThroughtputListener() //
     .withListener(createKeysListener)//
@@ -346,8 +347,8 @@ public class DefaultImportService implements ImportService {
    * @param entityMap
    * @return
    */
-  private PrivateVariableEntityValueTable createPublicView(ValueTable participantTable, final FunctionalUnit unit, final OpalPrivateVariableEntityMap entityMap) {
-    PrivateVariableEntityValueTable publicTable = new PrivateVariableEntityValueTable(participantTable.getName(), participantTable, entityMap);
+  private FunctionalUnitView createPublicView(ValueTable participantTable, final FunctionalUnit unit) {
+    FunctionalUnitView publicTable = new FunctionalUnitView(unit, Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, participantTable, lookupKeysTable(), participantIdentifier);
     publicTable.setSelectClause(new SelectClause() {
 
       public boolean select(Variable variable) {

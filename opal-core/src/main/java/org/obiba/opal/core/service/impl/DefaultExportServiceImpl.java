@@ -30,6 +30,7 @@ import org.obiba.magma.support.DatasourceCopier.Builder;
 import org.obiba.magma.views.IncrementalWhereClause;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.magma.FunctionalUnitView;
+import org.obiba.opal.core.magma.FunctionalUnitView.Policy;
 import org.obiba.opal.core.magma.concurrent.LockingActionTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ExportException;
@@ -168,10 +169,8 @@ public class DefaultExportServiceImpl implements ExportService {
 
     // If the table contains an entity that requires key separation, create a "unit view" of the table (replace
     // public identifiers with private, unit-specific identifiers).
-    // Also, replace the copier with one that persists the "public" identifiers in the audit log.
     if((unit != null) && table.isForEntityType(keysTableEntityType)) {
-      FunctionalUnitView unitView = getUnitView(unit, table);
-      table = unitView;
+      table = getUnitView(unit, table);
     }
 
     // Go ahead and copy the result to the destination datasource.
@@ -185,7 +184,8 @@ public class DefaultExportServiceImpl implements ExportService {
   }
 
   private FunctionalUnitView getUnitView(FunctionalUnit unit, ValueTable valueTable) {
-    return new FunctionalUnitView(unit, valueTable, lookupKeysTable());
+    // Make a view that converts opal identifiers to unit identifiers
+    return new FunctionalUnitView(unit, Policy.UNIT_IDENTIFIERS_ARE_PUBLIC, valueTable, lookupKeysTable());
   }
 
   private ValueTable lookupKeysTable() {
