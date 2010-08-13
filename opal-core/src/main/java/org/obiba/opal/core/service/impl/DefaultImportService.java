@@ -27,7 +27,6 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
-import org.obiba.magma.audit.VariableEntityAuditLogManager;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineTableResolver;
@@ -87,10 +86,9 @@ public class DefaultImportService implements ImportService {
   private final String keysTableEntityType;
 
   @Autowired
-  public DefaultImportService(TransactionTemplate txTemplate, OpalRuntime opalRuntime, VariableEntityAuditLogManager auditLogManager, IParticipantIdentifier participantIdentifier, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference, @Value("${org.obiba.opal.keys.entityType}") String keysTableEntityType) {
+  public DefaultImportService(TransactionTemplate txTemplate, OpalRuntime opalRuntime, IParticipantIdentifier participantIdentifier, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference, @Value("${org.obiba.opal.keys.entityType}") String keysTableEntityType) {
     if(txTemplate == null) throw new IllegalArgumentException("txManager cannot be null");
     if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
-    if(auditLogManager == null) throw new IllegalArgumentException("auditLogManager cannot be null");
     if(participantIdentifier == null) throw new IllegalArgumentException("participantIdentifier cannot be null");
     if(keysTableReference == null) throw new IllegalArgumentException("keysTableReference cannot be null");
     if(keysTableEntityType == null) throw new IllegalArgumentException("keysTableEntityType cannot be null");
