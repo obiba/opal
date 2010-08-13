@@ -18,6 +18,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.zip.ZipEntry;
@@ -353,7 +354,6 @@ public class FilesResource {
   @GET
   @Cache
   @Path("/charsets/available")
-  @Produces("application/json")
   public Response getAvailableCharsets() {
     SortedMap<String, Charset> charsets = java.nio.charset.Charset.availableCharsets();
     List<String> names = new ArrayList<String>();
@@ -367,7 +367,7 @@ public class FilesResource {
   @GET
   @Cache
   @Path("/charsets/default")
-  public String getDefaultCharset() {
-    return defaultCharset;
+  public Response getDefaultCharset() {
+    return Response.ok(new JSONArray(Arrays.asList(new String[] { defaultCharset })).toString()).build();
   }
 }
