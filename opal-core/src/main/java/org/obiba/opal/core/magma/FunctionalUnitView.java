@@ -43,6 +43,8 @@ public class FunctionalUnitView extends View {
 
   }
 
+  private final FunctionalUnit unit;
+
   private final PrivateVariableEntityMap entityMap;
 
   private final boolean allowIdentifierGeneration;
@@ -70,7 +72,8 @@ public class FunctionalUnitView extends View {
     if(dataTable == null) throw new IllegalArgumentException("dataTable cannot be null");
     if(keysTable == null) throw new IllegalArgumentException("keysTable cannot be null");
 
-    allowIdentifierGeneration = identifierGenerator != null;
+    this.unit = unit;
+    this.allowIdentifierGeneration = identifierGenerator != null;
 
     Variable keyVariable = keysTable.getVariable(unit.getKeyVariableName());
 
@@ -83,6 +86,7 @@ public class FunctionalUnitView extends View {
     }
 
     this.entityMap = new OpalPrivateVariableEntityMap(keysTable, keyVariable, identifierGenerator);
+
     switch(policy) {
     case UNIT_IDENTIFIERS_ARE_PUBLIC:
       this.mappingFunction = new UnitIdentifiersArePublic();
@@ -116,7 +120,7 @@ public class FunctionalUnitView extends View {
     public VariableEntity apply(VariableEntity from) {
       VariableEntity privateEntity = entityMap.privateEntity(from);
       if(privateEntity == null) {
-        throw new RuntimeException("no private entity exists for public entity " + from);
+        throw new RuntimeException("Functional unit '" + unit.getName() + "' does not have an identifier for entity '" + from.getIdentifier() + "'");
       }
       return privateEntity;
     }
