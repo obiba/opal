@@ -121,8 +121,11 @@ public class DatasourcesResource {
         response = Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed", pe).build());
       } catch(MagmaRuntimeException e) {
         // unable to create a datasource from that too, so rollback
+        e.printStackTrace();
         MagmaEngine.get().removeTransientDatasource(uid);
-        response = Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed").build());
+        ClientErrorDto.Builder clientError = getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed");
+        clientError.addArguments(e.getMessage());
+        response = Response.status(Status.BAD_REQUEST).entity(clientError.build());
       }
     } else {
       response = Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "UnidentifiedDatasourceFactory").build());
