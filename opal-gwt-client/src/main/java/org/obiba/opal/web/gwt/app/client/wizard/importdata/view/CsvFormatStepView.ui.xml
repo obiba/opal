@@ -1,0 +1,92 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
+
+  
+  <o:WorkbenchLayout>
+    <g:Label><ui:msg description="Data import title">Import Data</ui:msg></g:Label>
+    <g:Label><ui:msg description="Csv format summary">Enter additional information for the importation of data in the CSV format</ui:msg></g:Label>
+    <g:Button ui:field="nextButton"><ui:msg description="Next button label">Next</ui:msg></g:Button>
+    <g:FlowPanel>
+      <g:HTMLPanel>
+        <table class="gwt-KeyValue" cellspacing="10">
+          <tbody>
+            <tr>
+              <td style="vertical-align:top">
+                <ui:msg description="Select data file label">Select data file</ui:msg>
+                <g:SimplePanel ui:field="selectCsvFilePanel" />          
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <ui:msg description="Csv format options label">Csv Format Options:</ui:msg>                
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <ui:msg description="From row label">From Row:</ui:msg>                
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <ui:msg description="Separators label">Separators:</ui:msg>                
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <ui:msg description="Character set label">Character Set:</ui:msg>                
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <g:RadioButton name="charsetGroup" ui:field="charsetDefault"><ui:msg description="Use default charset label">use Opal's default value (<span ui:field='defaultCharset' />)</ui:msg></g:RadioButton>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <g:RadioButton name="charsetGroup" ui:field="charsetCommonList"><ui:msg description="Choose from a list of common charsets label">select from list of common character sets</ui:msg></g:RadioButton>
+                <g:ListBox ui:field='charsetCommonListBox' visibleItemCount='1'>
+                  <g:item>ISO-8859-1</g:item>
+                  <g:item>ISO-8859-2</g:item>
+                  <g:item>ISO-8859-3</g:item>
+                  <g:item>ISO-8859-4</g:item>
+                  <g:item>ISO-8859-5</g:item>
+                  <g:item>ISO-8859-6</g:item>
+                  <g:item>ISO-8859-7</g:item>
+                  <g:item>ISO-8859-8</g:item>
+                  <g:item>ISO-8859-9</g:item>
+                  <g:item>ISO-8859-13</g:item>
+                  <g:item>ISO-8859-15</g:item>
+                  <g:item>UTF-8</g:item>
+                  <g:item>UTF-16</g:item>
+                  <g:item>UTF-32</g:item>
+                </g:ListBox>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <g:RadioButton name="charsetGroup" ui:field="charsetSpecify"><ui:msg description="Enter a specific charset label">select a specific one</ui:msg></g:RadioButton>                
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </g:HTMLPanel>
+    </g:FlowPanel>
+    
+     <g:FlowPanel>
+        <g:HTMLPanel>
+          <g:Label addStyleNames="title"><ui:msg description="Data File label">Data File</ui:msg></g:Label>
+          <p><ui:msg description="Csv data file information">The CSV file to use must be on the server. Use the file explorer to upload it if it's not already there.</ui:msg></p>    
+          <g:Label addStyleNames="title"><ui:msg description="Csv options label">CSV Options</ui:msg></g:Label>
+          <p><ui:msg description="Csv options information">You can select the row from where Opal should start reading the file. Note that that this first row must contain the name of each column. You can also select the character that separates each value in the file (usually a comma) and the character used to quote values (usually used around free-text values). Note that the first column values are expected to be the participant identifiers.</ui:msg></p>    
+          <g:Label addStyleNames="title"><ui:msg description="Selecting character set label">Selecting a Character Set</ui:msg></g:Label>
+          <p><ui:msg description="Csv character set information">CSV is a text-based file (as opposed to a binary file) and does not contain all the information necessary to read it properly. Opal cannot know what types of characters it contains (latin, cyrillic, arabic, asian, etc.). In order to properly interpret the characters in the file, Opal must know the character set beforehand. When Opal is installed, a default value is specified. This should have been set to a character set that is common for your region, so is usually a safe choice. Otherwise, selecting ISO-8859-1 is usually safe for most "Western European" languages.</ui:msg></p>    
+        </g:HTMLPanel>
+     </g:FlowPanel>    
+    
+  </o:WorkbenchLayout>
+  
+</ui:UiBinder>
