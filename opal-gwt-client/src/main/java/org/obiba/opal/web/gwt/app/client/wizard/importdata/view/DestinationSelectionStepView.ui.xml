@@ -1,0 +1,47 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
+
+  
+  <o:WorkbenchLayout>
+    <g:Label><ui:msg description="Data import title">Import Data</ui:msg></g:Label>
+    <g:Label><ui:msg description="Destination selection summary">Select the destination (where you wish to write the data to)</ui:msg></g:Label>
+    <g:Button ui:field="nextButton"><ui:msg description="Next button label">Next</ui:msg></g:Button>
+    <g:FlowPanel>
+      <g:HTMLPanel>
+        <table class="gwt-KeyValue" cellspacing="10">
+          <tbody>
+            <tr>
+              <td style="vertical-align:top">
+                <ui:msg description="Destination dataset label">Destination Dataset:</ui:msg>        
+              </td>
+              <td>
+                <g:ListBox ui:field='datasetListBox' visibleItemCount='1'/>
+              </td>
+            </tr>
+            <tr>
+              <td style="vertical-align:top">
+                <ui:msg description="Destination table label">Destination Table:</ui:msg>        
+              </td>
+              <td>
+                <g:ListBox ui:field='tableListBox' visibleItemCount='1'/>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </g:HTMLPanel>
+    </g:FlowPanel>
+    
+     <g:FlowPanel>
+        <g:HTMLPanel>
+          <g:Label addStyleNames="title"><ui:msg description="Destination label">Destination</ui:msg></g:Label>
+          <p><ui:msg description="Destination information">Select the destination. This is where the data from your file will be written to.<p/>Opal will validate that the variables in the source are compatible with the ones in the destination before starting the process.</ui:msg></p>    
+        </g:HTMLPanel>
+     </g:FlowPanel>    
+    
+  </o:WorkbenchLayout>
+  
+</ui:UiBinder>
