@@ -9,6 +9,15 @@ message ClientErrorDto {
   extensions 1000 to max; // Extensions can be registered to provide additional error data on a case-by-case basis
 }
 
+message DatasourceParsingErrorDto {
+  required string defaultMessage = 1;
+  required string key = 2;
+  repeated string arguments = 3;
+  extend ClientErrorDto {
+    repeated DatasourceParsingErrorDto errors = 1000;
+  } 
+}
+
 message ServerErrorDto {
   required int32 code = 1; // Holds the HTTP status code (5xx)
   required string status = 2; // Holds a one-word error descritor. This should be usable as a key in localisation bundles.

@@ -41,6 +41,7 @@ import org.obiba.opal.web.magma.support.DatasourceFactoryDtoParser;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.magma.support.ExcelDatasourceFactoryDtoParser;
 import org.obiba.opal.web.model.Magma;
+import org.obiba.opal.web.model.Ws;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.ExcelDatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.TableDto;
@@ -97,6 +98,29 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     }
 
     verify(uriInfoMock);
+  }
+
+  @Test
+  public void testDatasourcesPOSTUserDefinedBogus() {
+    DatasourcesResource resource = new DatasourcesResource("opal-keys.keys", newDatasourceFactoryRegistry());
+
+    UriInfo uriInfoMock = createMock(UriInfo.class);
+    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromUri(BASE_URI));
+
+    File file = new File(DATASOURCES_FOLDER, "user-defined-bogus.xls");
+    Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder().setExtension(ExcelDatasourceFactoryDto.params, Magma.ExcelDatasourceFactoryDto.newBuilder().setFile(file.getAbsolutePath()).setReadOnly(true).build()).build();
+
+    replay(uriInfoMock);
+    Response response = resource.createDatasource(uriInfoMock, factoryDto);
+    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    ClientErrorDto error = (ClientErrorDto) response.getEntity();
+    // System.out.println(JsonFormat.printToString(error));
+    Assert.assertEquals("DatasourceCreationFailed", error.getStatus());
+    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), error.getCode());
+    Assert.assertEquals(15, error.getExtensionCount(Ws.DatasourceParsingErrorDto.errors));
+    Ws.DatasourceParsingErrorDto parsingError = error.getExtension(Ws.DatasourceParsingErrorDto.errors, 0);
+    Assert.assertEquals("VariableNameRequired", parsingError.getKey());
+    Assert.assertEquals("[Variables, 10, Table2]", parsingError.getArgumentsList().toString());
   }
 
   @Test

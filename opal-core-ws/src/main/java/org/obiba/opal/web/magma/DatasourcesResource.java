@@ -22,18 +22,22 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.support.DatasourceParsingException;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.DatasourceDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
+import org.obiba.opal.web.model.Ws.DatasourceParsingErrorDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,16 +106,38 @@ public class DatasourcesResource {
   @POST
   public Response createDatasource(@Context final UriInfo uriInfo, Magma.DatasourceFactoryDto factoryDto) {
     DatasourceFactory factory = datasourceFactoryRegistry.parse(factoryDto);
+    ResponseBuilder response = null;
 
     if(factory != null) {
       String uid = MagmaEngine.get().addTransientDatasource(factory);
-      Datasource ds = MagmaEngine.get().getTransientDatasourceInstance(uid);
-      transientDatasourceInstance = ds;
-      UriBuilder ub = uriInfo.getBaseUriBuilder().path("datasource").path(uid);
-      return Response.ok().entity(Dtos.asDto(ds).build()).location(ub.build()).build();
+      try {
+        Datasource ds = MagmaEngine.get().getTransientDatasourceInstance(uid);
+        transientDatasourceInstance = ds;
+        UriBuilder ub = uriInfo.getBaseUriBuilder().path("datasource").path(uid);
+        response = Response.ok().entity(Dtos.asDto(ds).build()).location(ub.build());
+      } catch(MagmaRuntimeException e) {
+        // unable to create a datasource from that, so rollback
+        MagmaEngine.get().removeTransientDatasource(uid);
+        ClientErrorDto.Builder clientError = getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed");
+
+        if(e.getCause() instanceof DatasourceParsingException) {
+          DatasourceParsingException pe = (DatasourceParsingException) e.getCause();
+          // build an parsing error dto list
+          if(pe.getChildren().size() == 0) {
+            clientError.addExtension(DatasourceParsingErrorDto.errors, newDatasourceParsingErrorDto(pe).build());
+          } else {
+            for(DatasourceParsingException child : pe.getChildrenAsList()) {
+              clientError.addExtension(DatasourceParsingErrorDto.errors, newDatasourceParsingErrorDto(child).build());
+            }
+          }
+        }
+        response = Response.status(Status.BAD_REQUEST).entity(clientError.build());
+      }
     } else {
-      return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "UnidentifiedDatasourceFactory")).build();
+      response = Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "UnidentifiedDatasourceFactory").build());
     }
+
+    return response.build();
   }
 
   private void sortByName(List<Magma.DatasourceDto> datasources) {
@@ -126,8 +152,18 @@ public class DatasourcesResource {
     });
   }
 
-  private ClientErrorDto getErrorMessage(Status responseStatus, String errorStatus) {
-    return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus).build();
+  private ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus) {
+    return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus);
+  }
+
+  private DatasourceParsingErrorDto.Builder newDatasourceParsingErrorDto(DatasourceParsingException pe) {
+    DatasourceParsingErrorDto.Builder parsingError = DatasourceParsingErrorDto.newBuilder();
+    parsingError.setDefaultMessage(pe.getMessage());
+    parsingError.setKey(pe.getKey());
+    for(Object arg : pe.getParameters()) {
+      parsingError.addArguments(arg.toString());
+    }
+    return parsingError;
   }
 
 }

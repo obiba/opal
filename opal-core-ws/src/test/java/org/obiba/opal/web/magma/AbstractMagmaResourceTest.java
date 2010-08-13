@@ -22,7 +22,7 @@ import org.obiba.magma.datasource.excel.ExcelDatasource;
  */
 public abstract class AbstractMagmaResourceTest {
 
-  private static final String DATASOURCES_FOLDER = "src/test/resources/datasources-novalues";
+  protected static final String DATASOURCES_FOLDER = "src/test/resources/datasources-novalues";
 
   public static final String DATASOURCE1 = "datasource1-novalues.xlsx";
 
