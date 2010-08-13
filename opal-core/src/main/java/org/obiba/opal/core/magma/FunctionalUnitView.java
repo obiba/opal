@@ -66,7 +66,8 @@ public class FunctionalUnitView extends View {
    * will not be generated
    */
   public FunctionalUnitView(FunctionalUnit unit, Policy policy, ValueTable dataTable, ValueTable keysTable, IParticipantIdentifier identifierGenerator) {
-    super(dataTable.getName(), dataTable);
+    // Null check on dataTable is required. If dataTable is null, we'll get NPE instead of IllegalArgumentException
+    super(dataTable == null ? null : dataTable.getName(), dataTable);
     if(unit == null) throw new IllegalArgumentException("unit cannot be null");
     if(policy == null) throw new IllegalArgumentException("policy cannot be null");
     if(dataTable == null) throw new IllegalArgumentException("dataTable cannot be null");
