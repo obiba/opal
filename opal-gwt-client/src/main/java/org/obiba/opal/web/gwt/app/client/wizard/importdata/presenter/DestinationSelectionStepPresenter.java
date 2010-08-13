@@ -15,6 +15,8 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
+import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -39,6 +41,9 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
     String getSelectedTable();
 
   }
+
+  @Inject
+  private DashboardPresenter dashboardPresenter;
 
   @Inject
   public DestinationSelectionStepPresenter(final Display display, final EventBus eventBus) {
@@ -86,6 +91,7 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
 
     @Override
     public void onClick(ClickEvent event) {
+      eventBus.fireEvent(new WorkbenchChangeEvent(dashboardPresenter));
     }
   }
 

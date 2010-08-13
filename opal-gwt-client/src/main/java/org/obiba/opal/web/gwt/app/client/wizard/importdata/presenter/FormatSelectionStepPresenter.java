@@ -35,6 +35,9 @@ public class FormatSelectionStepPresenter extends WidgetPresenter<FormatSelectio
   }
 
   @Inject
+  private CsvFormatStepPresenter csvFormatStepPresenter;
+
+  @Inject
   private DataImportPresenter dataImportPresenter;
 
   @Inject
@@ -79,7 +82,7 @@ public class FormatSelectionStepPresenter extends WidgetPresenter<FormatSelectio
       if(display.getImportFormat().equals(ImportFormat.CSV)) {
         ImportData importData = new ImportData();
         importData.setFormat(display.getImportFormat());
-        eventBus.fireEvent(new WizardStepChangeEvent(dataImportPresenter, importData));
+        eventBus.fireEvent(new WizardStepChangeEvent(csvFormatStepPresenter, importData));
       }
     }
   }

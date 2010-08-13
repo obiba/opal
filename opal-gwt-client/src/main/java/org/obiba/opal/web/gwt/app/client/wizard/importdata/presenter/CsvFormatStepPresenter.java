@@ -15,6 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -40,6 +41,9 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
 
   @SuppressWarnings("unused")
   private String defaultCharset;
+
+  @Inject
+  private DestinationSelectionStepPresenter destinationSelectionStepPresenter;
 
   @Inject
   private FileSelectionPresenter csvFileSelectionPresenter;
@@ -90,6 +94,7 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
 
     @Override
     public void onClick(ClickEvent event) {
+      eventBus.fireEvent(new WorkbenchChangeEvent(destinationSelectionStepPresenter));
     }
   }
 
