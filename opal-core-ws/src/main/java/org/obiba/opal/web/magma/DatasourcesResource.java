@@ -115,23 +115,24 @@ public class DatasourcesResource {
         transientDatasourceInstance = ds;
         UriBuilder ub = uriInfo.getBaseUriBuilder().path("datasource").path(uid);
         response = Response.ok().entity(Dtos.asDto(ds).build()).location(ub.build());
-      } catch(MagmaRuntimeException e) {
+      } catch(DatasourceParsingException pe) {
         // unable to create a datasource from that, so rollback
         MagmaEngine.get().removeTransientDatasource(uid);
         ClientErrorDto.Builder clientError = getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed");
 
-        if(e.getCause() instanceof DatasourceParsingException) {
-          DatasourceParsingException pe = (DatasourceParsingException) e.getCause();
-          // build an parsing error dto list
-          if(pe.getChildren().size() == 0) {
-            clientError.addExtension(DatasourceParsingErrorDto.errors, newDatasourceParsingErrorDto(pe).build());
-          } else {
-            for(DatasourceParsingException child : pe.getChildrenAsList()) {
-              clientError.addExtension(DatasourceParsingErrorDto.errors, newDatasourceParsingErrorDto(child).build());
-            }
+        // build a parsing error dto list
+        if(pe.getChildren().size() == 0) {
+          clientError.addExtension(DatasourceParsingErrorDto.errors, newDatasourceParsingErrorDto(pe).build());
+        } else {
+          for(DatasourceParsingException child : pe.getChildrenAsList()) {
+            clientError.addExtension(DatasourceParsingErrorDto.errors, newDatasourceParsingErrorDto(child).build());
           }
         }
         response = Response.status(Status.BAD_REQUEST).entity(clientError.build());
+      } catch(MagmaRuntimeException e) {
+        // unable to create a datasource from that too, so rollback
+        MagmaEngine.get().removeTransientDatasource(uid);
+        response = Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed").build());
       }
     } else {
       response = Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "UnidentifiedDatasourceFactory").build());
