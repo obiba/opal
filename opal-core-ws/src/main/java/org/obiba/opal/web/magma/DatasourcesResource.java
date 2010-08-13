@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.annotation.PreDestroy;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -57,22 +56,12 @@ public class DatasourcesResource {
 
   private DatasourceFactoryRegistry datasourceFactoryRegistry;
 
-  private Datasource transientDatasourceInstance;
-
   @Autowired
   public DatasourcesResource(@Value("${org.obiba.opal.keys.tableReference}") String keysTableReference, DatasourceFactoryRegistry datasourceFactoryRegistry) {
     keysDatasourceName = MagmaEngineTableResolver.valueOf(keysTableReference).getDatasourceName();
     this.datasourceFactoryRegistry = datasourceFactoryRegistry;
     if(keysDatasourceName == null) {
       throw new IllegalArgumentException("invalid keys table reference");
-    }
-  }
-
-  @PreDestroy
-  public void destroy() {
-    if(transientDatasourceInstance != null) {
-      Disposables.silentlyDispose(transientDatasourceInstance);
-      transientDatasourceInstance = null;
     }
   }
 
@@ -112,16 +101,15 @@ public class DatasourcesResource {
       String uid = MagmaEngine.get().addTransientDatasource(factory);
       try {
         Datasource ds = MagmaEngine.get().getTransientDatasourceInstance(uid);
-        transientDatasourceInstance = ds;
         UriBuilder ub = uriInfo.getBaseUriBuilder().path("datasource").path(uid);
         response = Response.ok().entity(Dtos.asDto(ds).build()).location(ub.build());
+        Disposables.silentlyDispose(ds);
       } catch(DatasourceParsingException pe) {
         // unable to create a datasource from that, so rollback
         MagmaEngine.get().removeTransientDatasource(uid);
         response = Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed", pe).build());
       } catch(MagmaRuntimeException e) {
         // unable to create a datasource from that too, so rollback
-        e.printStackTrace();
         MagmaEngine.get().removeTransientDatasource(uid);
         ClientErrorDto.Builder clientError = getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed");
         clientError.addArguments(e.getMessage());
