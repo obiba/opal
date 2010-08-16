@@ -111,9 +111,7 @@ public class DatasourcesResource {
       } catch(MagmaRuntimeException e) {
         // unable to create a datasource from that too, so rollback
         MagmaEngine.get().removeTransientDatasource(uid);
-        ClientErrorDto.Builder clientError = getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed");
-        clientError.addArguments(e.getMessage());
-        response = Response.status(Status.BAD_REQUEST).entity(clientError.build());
+        response = Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed", e).build());
       }
     } else {
       response = Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "UnidentifiedDatasourceFactory").build());
@@ -138,8 +136,15 @@ public class DatasourcesResource {
     return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus);
   }
 
+  private ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, MagmaRuntimeException e) {
+    ClientErrorDto.Builder clientError = getErrorMessage(responseStatus, errorStatus);
+    clientError.addArguments(e.getMessage());
+    return clientError;
+  }
+
   private ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, DatasourceParsingException pe) {
-    ClientErrorDto.Builder clientError = ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus);
+    ClientErrorDto.Builder clientError = getErrorMessage(responseStatus, errorStatus);
+    clientError.addArguments(pe.getMessage());
     // build a parsing error dto list
     if(pe.getChildren().size() == 0) {
       clientError.addExtension(DatasourceParsingErrorDto.errors, newDatasourceParsingErrorDto(pe).build());
