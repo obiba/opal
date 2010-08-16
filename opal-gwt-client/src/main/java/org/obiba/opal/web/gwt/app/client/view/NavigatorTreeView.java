@@ -14,6 +14,8 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.presenter.NavigatorTreePresenter;
 
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
@@ -25,9 +27,23 @@ public class NavigatorTreeView implements NavigatorTreePresenter.Display {
 
   Tree tree;
 
+  TreeItem currentSelection = null;
+
   public NavigatorTreeView() {
     tree = new Tree();
     tree.setAnimationEnabled(true);
+    tree.addSelectionHandler(new SelectionHandler<TreeItem>() {
+
+      @Override
+      public void onSelection(SelectionEvent<TreeItem> event) {
+        TreeItem item = event.getSelectedItem();
+        item.addStyleName("selected");
+        if(currentSelection != null && !currentSelection.equals(item)) {
+          currentSelection.removeStyleName("selected");
+        }
+        currentSelection = item;
+      }
+    });
   }
 
   @Override

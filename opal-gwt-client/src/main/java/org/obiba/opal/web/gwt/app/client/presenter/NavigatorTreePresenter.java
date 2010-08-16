@@ -101,11 +101,17 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
           for(int i = 0; i < datasources.length(); i++) {
             DatasourceDto ds = datasources.get(i);
             TreeItem dsItem = new TreeItem(ds.getName());
+            dsItem.addStyleName("magma-datasource");
             dsItem.setUserObject(ds);
             JsArrayString array = ds.getTableArray();
             if(array != null) {
               for(int j = 0; j < array.length(); j++) {
-                dsItem.addItem(array.get(j));
+                String tableName = array.get(j);
+                TreeItem tItem = dsItem.addItem(tableName);
+                tItem.addStyleName("magma-table");
+                if(isView(ds, tableName)) {
+                  tItem.addStyleName("magma-view");
+                }
               }
             }
             items.add(dsItem);
@@ -115,6 +121,15 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
         }
       }
     }).send();
+  }
+
+  private boolean isView(DatasourceDto ds, String tableName) {
+    JsArrayString array = ds.getViewArray();
+    if(array == null) return false;
+    for(int j = 0; j < array.length(); j++) {
+      if(tableName.equals(array.get(j))) return true;
+    }
+    return false;
   }
 
   //

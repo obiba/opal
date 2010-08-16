@@ -96,7 +96,7 @@ a:hover {
   font-size: 1em;
 }
 
-/* Workbench */
+/* Dashboard */
 
 .dashboard {
   padding: 0.5em 0 0 1em;
@@ -132,22 +132,63 @@ a:hover {
   color: #000000;
 }
 
+/* Variable browser */
+
+.gwt-Tree .magma-datasource .gwt-TreeItem {
+	background:transparent url(image/16/bundle.png) no-repeat scroll left center;
+	padding-left:20px;
+}
+
+.gwt-Tree .magma-table .gwt-TreeItem {
+	background:transparent url(image/16/table.png) no-repeat scroll left center;
+	padding-left:20px;
+}
+
+.gwt-Tree .magma-view .gwt-TreeItem {
+	background:transparent url(image/16/view.png) no-repeat scroll left center;
+	padding-left:20px;
+}
+
+/*.gwt-Tree .selected {
+	background-color: #bb5500;	
+}
+
+.gwt-Tree .magma-datasource.selected div {
+	background-color: #ffffff;	
+}
+
+.gwt-Tree .magma-datasource.selected div.gwt-TreeItem-selected {
+	background-color: #bb5500;	
+}*/
+
+.gwt-Tree .gwt-TreeItem-selected {
+	font-weight: bold;
+	/*color: #ffffff;*/
+}
+
 /* File Explorer Styles */ 
  
 table.folder-details td:first-child span:hover {
   cursor: pointer;
 }
 
-.gwt-MenuBar .gwt-MenuItem {
-  cursor:pointer;
-}
-
-.folder {
+.folder-details .folder {
 	background:transparent url(image/16/folder.png) no-repeat scroll left center;
 	padding-left:20px;
 }
 
-.file {
+.folder-details .file {
 	background:transparent url(image/16/document.png) no-repeat scroll left center;
 	padding-left:20px;
+}
+
+.gwt-Tree .folder .gwt-TreeItem {
+	background:transparent url(image/16/folder.png) no-repeat scroll left center;
+	padding-left:20px;
+}
+
+/* Menu bar */ 
+
+.gwt-MenuBar .gwt-MenuItem {
+  cursor:pointer;
 }
