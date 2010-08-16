@@ -35,8 +35,6 @@ import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.DatasourceDto;
-import org.obiba.opal.web.model.Ws.ClientErrorDto;
-import org.obiba.opal.web.model.Ws.DatasourceParsingErrorDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,14 +105,14 @@ public class DatasourcesResource {
       } catch(DatasourceParsingException pe) {
         // unable to create a datasource from that, so rollback
         MagmaEngine.get().removeTransientDatasource(uid);
-        response = Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed", pe).build());
+        response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed", pe).build());
       } catch(MagmaRuntimeException e) {
         // unable to create a datasource from that too, so rollback
         MagmaEngine.get().removeTransientDatasource(uid);
-        response = Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed", e).build());
+        response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed", e).build());
       }
     } else {
-      response = Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "UnidentifiedDatasourceFactory").build());
+      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "UnidentifiedDatasourceFactory").build());
     }
 
     return response.build();
@@ -130,40 +128,6 @@ public class DatasourcesResource {
       }
 
     });
-  }
-
-  private ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus) {
-    return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus);
-  }
-
-  private ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, MagmaRuntimeException e) {
-    ClientErrorDto.Builder clientError = getErrorMessage(responseStatus, errorStatus);
-    clientError.addArguments(e.getMessage());
-    return clientError;
-  }
-
-  private ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, DatasourceParsingException pe) {
-    ClientErrorDto.Builder clientError = getErrorMessage(responseStatus, errorStatus);
-    clientError.addArguments(pe.getMessage());
-    // build a parsing error dto list
-    if(pe.getChildren().size() == 0) {
-      clientError.addExtension(DatasourceParsingErrorDto.errors, newDatasourceParsingErrorDto(pe).build());
-    } else {
-      for(DatasourceParsingException child : pe.getChildrenAsList()) {
-        clientError.addExtension(DatasourceParsingErrorDto.errors, newDatasourceParsingErrorDto(child).build());
-      }
-    }
-    return clientError;
-  }
-
-  private DatasourceParsingErrorDto.Builder newDatasourceParsingErrorDto(DatasourceParsingException pe) {
-    DatasourceParsingErrorDto.Builder parsingError = DatasourceParsingErrorDto.newBuilder();
-    parsingError.setDefaultMessage(pe.getMessage());
-    parsingError.setKey(pe.getKey());
-    for(Object arg : pe.getParameters()) {
-      parsingError.addArguments(arg.toString());
-    }
-    return parsingError;
   }
 
 }

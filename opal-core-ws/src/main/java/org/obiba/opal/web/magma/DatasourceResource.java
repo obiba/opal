@@ -92,7 +92,7 @@ public class DatasourceResource {
       MagmaEngine.get().removeTransientDatasource(name);
       response = Response.ok();
     } else if(MagmaEngine.get().hasDatasource(name)) {
-      response = Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "NotTransientDatasourceRemovalUnsupported"));
+      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "NotTransientDatasourceRemovalUnsupported").build());
     } else {
       // returns silently
       response = Response.ok();
@@ -173,13 +173,13 @@ public class DatasourceResource {
       // } else
 
       if(datasource.hasValueTable(table.getName())) {
-        return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists")).build();
+        return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists").build()).build();
       } else {
         writeVariablesToTable(table, datasource);
         return Response.created(UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable").build(name, table.getName())).build();
       }
     } catch(Exception e) {
-      return Response.status(Status.INTERNAL_SERVER_ERROR).entity(getErrorMessage(Status.INTERNAL_SERVER_ERROR, e.getMessage())).build();
+      return Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, e.getMessage()).build()).build();
     }
   }
 
@@ -192,10 +192,6 @@ public class DatasourceResource {
       transientDatasourceInstance = ds;
     }
     return ds;
-  }
-
-  private ClientErrorDto getErrorMessage(Status responseStatus, String errorStatus) {
-    return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus).build();
   }
 
   private void writeVariablesToTable(TableDto table, Datasource datasource) {
