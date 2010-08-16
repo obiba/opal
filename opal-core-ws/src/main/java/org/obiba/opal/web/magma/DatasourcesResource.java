@@ -28,7 +28,6 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
-import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.DatasourceParsingException;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.MagmaEngineTableResolver;
@@ -72,17 +71,7 @@ public class DatasourcesResource {
       if(from.getName().equals(keysDatasourceName)) continue;
 
       URI dslink = UriBuilder.fromPath("/").path(DatasourceResource.class).build(from.getName());
-      Magma.DatasourceDto.Builder ds = Magma.DatasourceDto.newBuilder() //
-      .setName(from.getName()) //
-      .setLink(dslink.toString());
-
-      final List<String> tableNames = Lists.newArrayList();
-      for(ValueTable table : from.getValueTables()) {
-        tableNames.add(table.getName());
-      }
-      Collections.sort(tableNames);
-      ds.addAllTable(tableNames);
-
+      Magma.DatasourceDto.Builder ds = Dtos.asDto(from).setLink(dslink.toString());
       datasources.add(ds.build());
     }
     sortByName(datasources);

@@ -21,6 +21,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
+import org.obiba.magma.views.View;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.AttributeDto;
 import org.obiba.opal.web.model.Magma.CategoryDto;
@@ -152,6 +153,7 @@ final class Dtos {
     .setDatasourceName(valueTable.getDatasource().getName()) //
     .setVariableCount(Iterables.size(valueTable.getVariables())) //
     .setValueSetCount(valueTable.getVariableEntities().size());
+    builder.setView(valueTable instanceof View);
     if(uriBuilder != null) {
       builder.setLink(uriBuilder.build(valueTable.getDatasource().getName(), valueTable.getName()).toString());
     }
@@ -162,11 +164,17 @@ final class Dtos {
     Magma.DatasourceDto.Builder builder = Magma.DatasourceDto.newBuilder().setName(datasource.getName());
 
     final List<String> tableNames = Lists.newArrayList();
+    final List<String> viewNames = Lists.newArrayList();
     for(ValueTable table : datasource.getValueTables()) {
       tableNames.add(table.getName());
+      if(table instanceof View) {
+        viewNames.add(table.getName());
+      }
     }
     Collections.sort(tableNames);
+    Collections.sort(viewNames);
     builder.addAllTable(tableNames);
+    builder.addAllView(viewNames);
 
     return builder;
   }
