@@ -89,7 +89,7 @@ public class DatasourcesResource {
       try {
         Datasource ds = MagmaEngine.get().getTransientDatasourceInstance(uid);
         UriBuilder ub = uriInfo.getBaseUriBuilder().path("datasource").path(uid);
-        response = Response.ok().entity(Dtos.asDto(ds).build()).location(ub.build());
+        response = Response.created(ub.build()).entity(Dtos.asDto(ds).build());
         Disposables.silentlyDispose(ds);
       } catch(DatasourceParsingException pe) {
         // unable to create a datasource from that, so rollback

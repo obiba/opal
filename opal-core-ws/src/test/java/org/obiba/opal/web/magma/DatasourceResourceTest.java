@@ -84,7 +84,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     replay(uriInfoMock);
     Response response = resource.createDatasource(uriInfoMock, factoryDto);
-    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
     Object entity = response.getEntity();
     Assert.assertNotNull(entity);
