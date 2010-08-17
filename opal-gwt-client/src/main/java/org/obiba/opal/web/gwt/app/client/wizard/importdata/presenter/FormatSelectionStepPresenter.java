@@ -16,7 +16,6 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.WizardStepChangeEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 
@@ -38,7 +37,10 @@ public class FormatSelectionStepPresenter extends WidgetPresenter<FormatSelectio
   private CsvFormatStepPresenter csvFormatStepPresenter;
 
   @Inject
-  private DataImportPresenter dataImportPresenter;
+  private XmlFormatStepPresenter xmlFormatStepPresenter;
+
+  @Inject
+  private ImportData importData;
 
   @Inject
   public FormatSelectionStepPresenter(final Display display, final EventBus eventBus) {
@@ -79,10 +81,12 @@ public class FormatSelectionStepPresenter extends WidgetPresenter<FormatSelectio
 
     @Override
     public void onClick(ClickEvent event) {
+      importData.setFormat(display.getImportFormat());
       if(display.getImportFormat().equals(ImportFormat.CSV)) {
-        ImportData importData = new ImportData();
-        importData.setFormat(display.getImportFormat());
         eventBus.fireEvent(new WizardStepChangeEvent(csvFormatStepPresenter, importData));
+      }
+      if(display.getImportFormat().equals(ImportFormat.XML)) {
+        eventBus.fireEvent(new WizardStepChangeEvent(xmlFormatStepPresenter, importData));
       }
     }
   }

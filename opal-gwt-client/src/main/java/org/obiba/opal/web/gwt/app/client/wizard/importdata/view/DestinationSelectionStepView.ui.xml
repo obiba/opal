@@ -24,7 +24,7 @@
             </tr>
             <tr>
               <td style="vertical-align:top">
-                <ui:msg description="Destination table label">Destination Table:</ui:msg>        
+                <div ui:field='tableListBoxLabel'><ui:msg description="Destination table label">Destination Table:</ui:msg></div>  
               </td>
               <td>
                 <g:ListBox ui:field='tableListBox' visibleItemCount='1'/>

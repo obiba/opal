@@ -18,6 +18,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 
@@ -37,10 +38,15 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
     void setCsvFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
 
     void setDefaultCharset(String defaultCharset);
+
+    boolean isDefaultCharacterSet();
+
   }
 
-  @SuppressWarnings("unused")
   private String defaultCharset;
+
+  @Inject
+  private ImportData importData;
 
   @Inject
   private DestinationSelectionStepPresenter destinationSelectionStepPresenter;
@@ -94,7 +100,16 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
 
     @Override
     public void onClick(ClickEvent event) {
+      importData.setCharacterSet(getSelectedCharacterSet());
       eventBus.fireEvent(new WorkbenchChangeEvent(destinationSelectionStepPresenter));
+    }
+
+    private String getSelectedCharacterSet() {
+      if(getDisplay().isDefaultCharacterSet()) {
+        return defaultCharset;
+      } else {
+        return null;
+      }
     }
   }
 

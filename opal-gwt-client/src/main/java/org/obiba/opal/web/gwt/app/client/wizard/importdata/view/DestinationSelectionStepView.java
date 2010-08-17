@@ -15,6 +15,8 @@ import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.dom.client.DivElement;
+import com.google.gwt.dom.client.Style.Visibility;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -43,6 +45,9 @@ public class DestinationSelectionStepView extends Composite implements Destinati
 
   @UiField
   ListBox tableListBox;
+
+  @UiField
+  DivElement tableListBoxLabel;
 
   private JsArray<DatasourceDto> datasources;
 
@@ -113,5 +118,17 @@ public class DestinationSelectionStepView extends Composite implements Destinati
       }
     }
 
+  }
+
+  @Override
+  public void hideTables() {
+    tableListBoxLabel.getStyle().setVisibility(Visibility.HIDDEN);
+    tableListBox.setVisible(false);
+  }
+
+  @Override
+  public void showTables() {
+    tableListBoxLabel.getStyle().setVisibility(Visibility.VISIBLE);
+    tableListBox.setVisible(true);
   }
 }

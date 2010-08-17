@@ -15,36 +15,25 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.model.client.magma.DatasourceDto;
 
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
-public class DestinationSelectionStepPresenter extends WidgetPresenter<DestinationSelectionStepPresenter.Display> {
+public class XmlFormatStepPresenter extends WidgetPresenter<XmlFormatStepPresenter.Display> {
 
   public interface Display extends WidgetDisplay {
 
     HandlerRegistration addNextClickHandler(ClickHandler handler);
 
-    void setDatasources(JsArray<DatasourceDto> datasources);
+    void setXmlFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
 
-    String getSelectedDatasource();
-
-    String getSelectedTable();
-
-    void hideTables();
-
-    void showTables();
+    String getSelectedFile();
 
   }
 
@@ -52,10 +41,13 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
   private ImportData importData;
 
   @Inject
-  private DashboardPresenter dashboardPresenter;
+  private DestinationSelectionStepPresenter destinationSelectionStepPresenter;
 
   @Inject
-  public DestinationSelectionStepPresenter(final Display display, final EventBus eventBus) {
+  private FileSelectionPresenter xmlFileSelectionPresenter;
+
+  @Inject
+  public XmlFormatStepPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
   }
 
@@ -67,22 +59,10 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
   @Override
   protected void onBind() {
     addEventHandlers();
-    hideShowTables();
 
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<DatasourceDto> datasources) {
-        getDisplay().setDatasources(datasources);
-      }
-    }).send();
-  }
-
-  private void hideShowTables() {
-    if(importData.getImportFormat().equals(ImportFormat.XML)) {
-      getDisplay().hideTables();
-    } else {
-      getDisplay().showTables();
-    }
+    xmlFileSelectionPresenter.setFileSelectionType(FileSelectionType.FOLDER);
+    xmlFileSelectionPresenter.bind();
+    getDisplay().setXmlFileSelectorWidgetDisplay(xmlFileSelectionPresenter.getDisplay());
   }
 
   protected void addEventHandlers() {
@@ -109,9 +89,8 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
 
     @Override
     public void onClick(ClickEvent event) {
-      importData.setDestinationDatasourceName(getDisplay().getSelectedDatasource());
-      importData.setDestinationTableName(getDisplay().getSelectedTable());
-      eventBus.fireEvent(new WorkbenchChangeEvent(dashboardPresenter));
+      importData.setXmlFile(getDisplay().getSelectedFile());
+      eventBus.fireEvent(new WorkbenchChangeEvent(destinationSelectionStepPresenter));
     }
   }
 

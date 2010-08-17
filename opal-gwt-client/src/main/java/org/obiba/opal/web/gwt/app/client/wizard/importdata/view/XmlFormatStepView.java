@@ -11,10 +11,9 @@ package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.CsvFormatStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.XmlFormatStepPresenter;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -22,14 +21,13 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
-public class CsvFormatStepView extends Composite implements CsvFormatStepPresenter.Display {
+public class XmlFormatStepView extends Composite implements XmlFormatStepPresenter.Display {
 
-  @UiTemplate("CsvFormatStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, CsvFormatStepView> {
+  @UiTemplate("XmlFormatStepView.ui.xml")
+  interface ViewUiBinder extends UiBinder<Widget, XmlFormatStepView> {
   }
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
@@ -40,30 +38,23 @@ public class CsvFormatStepView extends Composite implements CsvFormatStepPresent
   Button nextButton;
 
   @UiField
-  SimplePanel selectCsvFilePanel;
+  SimplePanel selectXmlFilePanel;
 
-  @UiField
-  RadioButton charsetDefault;
-
-  @UiField
-  RadioButton charsetCommonList;
-
-  @UiField
-  RadioButton charsetSpecify;
-
-  @UiField
-  SpanElement defaultCharset;
-
-  public CsvFormatStepView() {
+  public XmlFormatStepView() {
     initWidget(uiBinder.createAndBindUi(this));
 
   }
 
   @Override
-  public void setCsvFileSelectorWidgetDisplay(Display display) {
-    selectCsvFilePanel.setWidget(display.asWidget());
+  public void setXmlFileSelectorWidgetDisplay(Display display) {
+    selectXmlFilePanel.setWidget(display.asWidget());
     fileSelection = display;
     fileSelection.setFieldWidth("20em");
+  }
+
+  @Override
+  public String getSelectedFile() {
+    return fileSelection.getFile();
   }
 
   @Override
@@ -82,16 +73,6 @@ public class CsvFormatStepView extends Composite implements CsvFormatStepPresent
   @Override
   public HandlerRegistration addNextClickHandler(ClickHandler handler) {
     return nextButton.addClickHandler(handler);
-  }
-
-  @Override
-  public void setDefaultCharset(String defaultCharset) {
-    this.defaultCharset.setInnerText(defaultCharset);
-  }
-
-  @Override
-  public boolean isDefaultCharacterSet() {
-    return charsetDefault.getValue();
   }
 
 }
