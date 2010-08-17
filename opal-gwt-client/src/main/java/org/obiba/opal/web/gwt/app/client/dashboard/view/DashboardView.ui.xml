@@ -17,7 +17,7 @@
     </div>
     <div id="shortcuts" class="large-indent">
 	    <div>
-	      <g:Anchor ui:field="exploreVariablesLink"><img src="image/48/spreadsheet.png" align="middle"/><ui:msg description="Explore variables link label">Explore Variables</ui:msg></g:Anchor>:
+	      <g:Anchor ui:field="exploreVariablesLink"><img src="image/48/table.png" align="middle"/><ui:msg description="Explore variables link label">Explore Variables</ui:msg></g:Anchor>:
 	      <ui:msg description="Explore variables link description">browse tables and variables.</ui:msg>
 	    </div>
 	    <div>
