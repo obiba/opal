@@ -21,11 +21,11 @@
 	      <ui:msg description="Explore variables link description">browse tables and variables.</ui:msg>
 	    </div>
 	    <div>
-	      <g:Anchor ui:field="importDataLink"><img src="image/48/document-import.png" align="middle"/><ui:msg description="Import data link label">Import Data</ui:msg></g:Anchor>:
+	      <g:Anchor ui:field="importDataLink"><img src="image/48/table-import.png" align="middle"/><ui:msg description="Import data link label">Import Data</ui:msg></g:Anchor>:
 	      <ui:msg description="Import data link description">create a job to import data from a file in various formats.</ui:msg>
 	    </div>
 	    <div>
-	      <g:Anchor ui:field="exportDataLink"><img src="image/48/document-export.png" align="middle"/><ui:msg description="Export data link label">Export Data</ui:msg></g:Anchor>:
+	      <g:Anchor ui:field="exportDataLink"><img src="image/48/table-export.png" align="middle"/><ui:msg description="Export data link label">Export Data</ui:msg></g:Anchor>:
 	      <ui:msg description="Export data link description">create a job to export data to various destinations (files, databases, etc).</ui:msg>
 	    </div>
 	    <div>
