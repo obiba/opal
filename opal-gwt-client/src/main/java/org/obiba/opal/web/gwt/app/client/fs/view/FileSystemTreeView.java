@@ -18,7 +18,10 @@ import org.obiba.opal.web.model.client.opal.FileDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
+import com.google.gwt.event.logical.shared.OpenEvent;
 import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Tree;
@@ -37,6 +40,20 @@ public class FileSystemTreeView implements Display {
 
   public FileSystemTreeView() {
     fileSystemTree = new Tree();
+    fileSystemTree.addOpenHandler(new OpenHandler<TreeItem>() {
+
+      @Override
+      public void onOpen(OpenEvent<TreeItem> event) {
+        event.getTarget().addStyleName("expanded");
+      }
+    });
+    fileSystemTree.addCloseHandler(new CloseHandler<TreeItem>() {
+
+      @Override
+      public void onClose(CloseEvent<TreeItem> event) {
+        event.getTarget().removeStyleName("expanded");
+      }
+    });
   }
 
   @Override
