@@ -39,23 +39,28 @@
               <ul></ul>
             </div>
           </li>
-          <li class="opal-categories-item">
-            <label>Categories</label>
-            <table class="opal-variable-categories" >
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Label</th>
-                  <th>Missing</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </li>
-          <li class="opal-attributes-item">
-            <label>Attributes</label>
+        </ol>
+        <div class="opal-tabs">
+          <ul>
+            <li><a href="#categories">Categories</a></li>
+            <li><a href="#attributes">Attributes</a></li>
+            <li><a href="#statistics">Statistics</a></li>
+          </ul>
+          <div id="categories">
+          <table class="opal-variable-categories" >
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Label</th>
+                <th>Missing</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+        <div id="attributes">
             <table class="opal-variable-attributes" >
               <thead>
                 <tr>
@@ -67,8 +72,13 @@
               <tbody>
               </tbody>
             </table>
-          </li>
-        </ol>
+          </div>
+          <div id="statistics">
+            <div id="opal-variable-histogram" style="width:400px">
+            </div>
+          </div>
+        </div>
+        
       </fieldset>
     </div>
   </g:HTMLPanel>

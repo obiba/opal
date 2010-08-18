@@ -14,6 +14,7 @@ import static gwtquery.plugins.ui.Ui.Ui;
 import gwtquery.plugins.ui.widgets.Autocomplete;
 import gwtquery.plugins.ui.widgets.Button;
 import gwtquery.plugins.ui.widgets.Dialog;
+import gwtquery.plugins.ui.widgets.Tabs;
 import gwtquery.plugins.ui.widgets.Autocomplete.Source;
 import gwtquery.plugins.ui.widgets.Button.Icons;
 
@@ -28,6 +29,8 @@ import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
+import org.obiba.opal.web.model.client.magma.DescriptiveStatsDto;
+import org.obiba.opal.web.model.client.magma.FrequencyDto;
 import org.obiba.opal.web.model.client.magma.ValueDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
@@ -115,14 +118,17 @@ public class OhsApp implements EntryPoint {
     @Selector("div.opal-script-result p.ui-state-error")
     GQuery errorMsg();
 
-    @Selector("li.opal-categories-item")
-    GQuery categories();
+    @Selector(".opal-tabs")
+    GQuery tabs();
 
     @Selector("table.opal-variable-categories tbody")
     GQuery categoriesTable();
 
     @Selector("table.opal-variable-attributes tbody")
     GQuery attributesTable();
+
+    @Selector("#opal-variable-histogram")
+    GQuery histogram();
   }
 
   private final DefaultEventBus eventBus = new DefaultEventBus();
@@ -140,6 +146,10 @@ public class OhsApp implements EntryPoint {
   JsArray<VariableDto> variables;
 
   int index;
+
+  Request currentRequest;
+
+  JqPlot currentPlot;
 
   public OhsApp() {
     uiBinder.createAndBindUi(this);
@@ -173,6 +183,7 @@ public class OhsApp implements EntryPoint {
       @Override
       public void f(Element e) {
         --index;
+        cancelPendingRequest();
         initVariable();
       }
     });
@@ -180,6 +191,7 @@ public class OhsApp implements EntryPoint {
       @Override
       public void f(Element e) {
         index++;
+        cancelPendingRequest();
         initVariable();
       }
     });
@@ -239,6 +251,7 @@ public class OhsApp implements EntryPoint {
       }
     });
     widgets.gotoVariable().as(Ui).autocomplete().disable();
+
     $(Document.get()).keydown(new Function() {
       @Override
       public boolean f(Event e) {
@@ -263,6 +276,19 @@ public class OhsApp implements EntryPoint {
           if(handled) {
             e.stopPropagation();
             return false;
+          }
+        }
+        return true;
+      }
+    });
+
+    widgets.tabs().as(Ui).tabs().bind(Tabs.Event.show, new Function() {
+      @Override
+      public boolean f(Event e, Object data) {
+        Tabs.Event tabevent = (Tabs.Event) data;
+        if(tabevent.panel().getId().equals("statistics")) {
+          if(currentPlot != null) {
+            currentPlot.redraw();
           }
         }
         return true;
@@ -400,6 +426,7 @@ public class OhsApp implements EntryPoint {
     widgets.valueType().val(dto.getValueType());
     initCategories(dto);
     initAttributes(dto);
+    plot(dto);
   }
 
   public void initCategories(VariableDto dto) {
@@ -434,6 +461,48 @@ public class OhsApp implements EntryPoint {
       .children("#edit").as(Ui).button(Button.Options.create().text(false).icons(Button.Icons.create().primary("ui-icon-pencil")))//
       .next().as(Ui).button(Button.Options.create().text(false).icons(Button.Icons.create().primary("ui-icon-minus")));
     }
+  }
+
+  private void plot(VariableDto dto) {
+    widgets.histogram().children().remove();
+    currentPlot = null;
+
+    if(isContinuous(dto)) {
+      request(dto.getLink() + "/univariate?p=0.05&=p0.5&p=5&p=10&p=15&p=20&p=25&p=30&p=35&p=40&p=45&p=50&p=55&p=60&p=65&p=70&p=75&p=80&p=85&p=90&p=95&p=99.5&p=99.95", new ResourceCallback<DescriptiveStatsDto>() {
+
+        @Override
+        public void onResource(Response response, DescriptiveStatsDto resource) {
+          JqPlotQQ plot = new JqPlotQQ("opal-variable-histogram", resource.getMin(), resource.getMax());
+          plot.push(resource.getPercentilesArray(), resource.getDistributionPercentilesArray());
+          plot.plot();
+          currentPlot = plot;
+        }
+      });
+    } else if(isCategorical(dto)) {
+      request(dto.getLink() + "/frequencies", new ResourceCallback<JsArray<FrequencyDto>>() {
+
+        @Override
+        public void onResource(Response response, JsArray<FrequencyDto> freqs) {
+          JqPlotBarChart plot = new JqPlotBarChart("opal-variable-histogram");
+          for(int i = 0; i < freqs.length(); i++) {
+            FrequencyDto value = freqs.get(i);
+            if(value.hasValue()) {
+              plot.push(value.getName(), value.getValue());
+            }
+          }
+          plot.plot();
+          currentPlot = plot;
+        }
+      });
+    }
+  }
+
+  private boolean isContinuous(VariableDto dto) {
+    return dto.getValueType().equalsIgnoreCase("decimal") || dto.getValueType().equalsIgnoreCase("integer");
+  }
+
+  private boolean isCategorical(VariableDto dto) {
+    return dto.getCategoriesArray().length() > 0;
   }
 
   private AttributeDto findAttribute(String string, JsArray<AttributeDto> attrs) {
@@ -511,8 +580,14 @@ public class OhsApp implements EntryPoint {
     });
   }
 
+  private void cancelPendingRequest() {
+    if(currentRequest != null && currentRequest.isPending()) {
+      currentRequest.cancel();
+    }
+  }
+
   private <T extends JavaScriptObject> void request(String uri, ResourceCallback<T> callback) {
-    ResourceRequestBuilderFactory.<T> newBuilder().forResource(uri).get().withCallback(callback).send();
+    currentRequest = ResourceRequestBuilderFactory.<T> newBuilder().forResource(uri).get().withCallback(callback).send();
   }
 
 }
