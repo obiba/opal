@@ -92,7 +92,6 @@ message TableDto {
   optional int32 valueSetCount = 5;
   optional string datasourceName = 6;
   repeated VariableDto variables = 7;
-  optional bool view = 8;
 }
 
 message VariableDto {

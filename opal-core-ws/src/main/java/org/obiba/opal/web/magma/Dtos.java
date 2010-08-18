@@ -153,7 +153,6 @@ final class Dtos {
     .setDatasourceName(valueTable.getDatasource().getName()) //
     .setVariableCount(Iterables.size(valueTable.getVariables())) //
     .setValueSetCount(valueTable.getVariableEntities().size());
-    builder.setView(valueTable instanceof View);
     if(uriBuilder != null) {
       builder.setLink(uriBuilder.build(valueTable.getDatasource().getName(), valueTable.getName()).toString());
     }
