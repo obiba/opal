@@ -55,6 +55,9 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
   private DashboardPresenter dashboardPresenter;
 
   @Inject
+  private IdentityArchiveStepPresenter identityArchiveStepPresenter;
+
+  @Inject
   public DestinationSelectionStepPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
   }
@@ -111,7 +114,13 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
     public void onClick(ClickEvent event) {
       importData.setDestinationDatasourceName(getDisplay().getSelectedDatasource());
       importData.setDestinationTableName(getDisplay().getSelectedTable());
-      eventBus.fireEvent(new WorkbenchChangeEvent(dashboardPresenter));
+
+      if(importData.getImportFormat().equals(ImportFormat.CSV)) {
+        eventBus.fireEvent(new WorkbenchChangeEvent(dashboardPresenter));
+      }
+      if(importData.getImportFormat().equals(ImportFormat.XML)) {
+        eventBus.fireEvent(new WorkbenchChangeEvent(identityArchiveStepPresenter));
+      }
     }
   }
 

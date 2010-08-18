@@ -1,0 +1,69 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
+
+  
+  <o:WorkbenchLayout>
+    <g:Label><ui:msg description="Data import title">Import Data</ui:msg></g:Label>
+    <g:Label><ui:msg description="Identity archive summary">Provide the following additional information</ui:msg></g:Label>
+    <g:Button ui:field="nextButton"><ui:msg description="Next button label">Next</ui:msg></g:Button>
+    <g:FlowPanel>
+      <g:HTMLPanel>
+        <table class="gwt-KeyValue" cellspacing="10">
+          <tbody>
+            <tr>
+              <td style="vertical-align:top">
+                <ui:msg description="Participant identifier in files label">The participant identifiers in the file(s) should:</ui:msg>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <g:RadioButton name="identifierGroup" ui:field="identifierAsIs"><ui:msg description="Leave identifier as-is label">be used as-is</ui:msg></g:RadioButton>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <g:RadioButton name="identifierGroup" ui:field="identifierSharedWithUnit"><ui:msg description="Share identifier with unit label">be considered as idenfiers shared with unit</ui:msg></g:RadioButton>
+                <g:ListBox ui:field="units" />
+              </td>
+            </tr>
+            <tr>
+              <td style="vertical-align:top">
+                <ui:msg description="Archive files label">Once a file has been successfully imported:</ui:msg>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <g:RadioButton name="archiveGroup" ui:field="archiveLeave"><ui:msg description="Leave file label">leave it where it is</ui:msg></g:RadioButton>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <g:RadioButton name="archiveGroup" ui:field="archiveMove"><ui:msg description="Move file label">move it to another folder</ui:msg></g:RadioButton>
+                <g:SimplePanel ui:field="archivePanel" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </g:HTMLPanel>
+    </g:FlowPanel>
+    
+     <g:FlowPanel>
+        <g:HTMLPanel>
+          <g:Label addStyleNames="title"><ui:msg description="Participant Identifier label">Participant Identifier</ui:msg></g:Label>
+          <p><ui:msg description="Unique identifier information">The unique identifiers in the imported file(s) can</ui:msg></p>
+          <ul>
+            <li><ui:msg description="CSV format information">be used exactly as they appear in the files and directly written to the destination.</ui:msg></li>
+            <li><ui:msg description="Opal XML information">be stored in a different place than the data found in the file(s). These identifiers are then substituted with identifiers that are known only by your organisation.<p/>This is usually done so that two organisations (units) may share data about participants without disclosing internal identifiers to one-another. Opal can effectively maintain any number of identifier per participant.</ui:msg></li>
+          </ul>
+          <g:Label addStyleNames="title"><ui:msg description="Archive label">Archive</ui:msg></g:Label>
+          <p><ui:msg description="Select archive directory information">If you wish, you can select a directory on the server side where the data file will be stored once successfully imported.</ui:msg></p>
+        </g:HTMLPanel>
+     </g:FlowPanel>    
+    
+  </o:WorkbenchLayout>
+  
+</ui:UiBinder>

@@ -21,6 +21,18 @@ public class ImportData {
 
   private String characterSet;
 
+  private boolean identifierAsIs;
+
+  private boolean identifierSharedWithUnit;
+
+  private String unit;
+
+  private boolean archiveLeave;
+
+  private boolean archiveMove;
+
+  private String archiveDirectory;
+
   public void setFormat(ImportFormat importFormat) {
     this.importFormat = importFormat;
   }
@@ -59,6 +71,58 @@ public class ImportData {
 
   public String getCharacterSet() {
     return characterSet;
+  }
+
+  public boolean isIdentifierAsIs() {
+    return identifierAsIs;
+  }
+
+  public void setIdentifierAsIs(boolean identifierAsIs) {
+    this.identifierAsIs = identifierAsIs;
+  }
+
+  public boolean isIdentifierSharedWithUnit() {
+    return identifierSharedWithUnit;
+  }
+
+  public void setIdentifierSharedWithUnit(boolean identifierSharedWithUnit) {
+    this.identifierSharedWithUnit = identifierSharedWithUnit;
+  }
+
+  public String getUnit() {
+    return unit;
+  }
+
+  public void setUnit(String unit) {
+    this.unit = unit;
+  }
+
+  public boolean isArchiveLeave() {
+    return archiveLeave;
+  }
+
+  public void setArchiveLeave(boolean archiveLeave) {
+    this.archiveLeave = archiveLeave;
+  }
+
+  public boolean isArchiveMove() {
+    return archiveMove;
+  }
+
+  public void setArchiveMove(boolean archiveMove) {
+    this.archiveMove = archiveMove;
+  }
+
+  public String getArchiveDirectory() {
+    return archiveDirectory;
+  }
+
+  public void setArchiveDirectory(String archiveDirectory) {
+    this.archiveDirectory = archiveDirectory;
+  }
+
+  public void setImportFormat(ImportFormat importFormat) {
+    this.importFormat = importFormat;
   }
 
 }
