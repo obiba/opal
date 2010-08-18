@@ -166,7 +166,7 @@ message DescriptiveStatsDto {
 
 message TableCompareDto {
   required TableDto compared = 1;
-  optional TableDto with = 2; // optional because this is absent when the destination table does not exist
+  optional TableDto withTable = 2; // optional because this is absent when the destination table does not exist
   repeated VariableDto newVariables = 3; // list of all variables present in "compared" but not in "with"
   repeated VariableDto existingVariables = 4; // list of all variables present in both and whose definitions are compatible
   repeated VariableDto missingVariables = 5; // list of all variables present in "with" but not in "compared"
@@ -181,7 +181,7 @@ message ConflictDto {
 
 message DatasourceCompareDto {
   required DatasourceDto compared = 1;
-  required DatasourceDto with = 2;
+  required DatasourceDto withTable = 2;
   repeated TableCompareDto differences = 3;
 }
 

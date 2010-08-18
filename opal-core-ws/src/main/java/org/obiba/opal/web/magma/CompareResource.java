@@ -61,7 +61,7 @@ public class CompareResource {
 
   @GET
   @Path("/{with}")
-  public Response compare(@PathParam("with") String with) {
+  public Response compareTable(@PathParam("with") String with) {
     ValueTable withTable = getValueTable(with);
 
     TableCompareDto dto = createTableCompareDto(compared, withTable);
@@ -100,7 +100,7 @@ public class CompareResource {
   private TableCompareDto createTableCompareDto(ValueTable compared, ValueTable with, Set<Variable> newVariables, Set<Variable> missingVariables, Set<Variable> existingVariables) {
     TableCompareDto.Builder dtoBuilder = TableCompareDto.newBuilder();
     dtoBuilder.setCompared(Dtos.asDto(compared, null));
-    dtoBuilder.setWith(Dtos.asDto(with, null));
+    dtoBuilder.setWithTable(Dtos.asDto(with, null));
 
     Set<ConflictDto> conflicts = getConflicts(compared, with, existingVariables);
     dtoBuilder.addAllConflicts(conflicts);

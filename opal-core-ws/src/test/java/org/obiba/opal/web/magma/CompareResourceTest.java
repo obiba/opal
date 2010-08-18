@@ -45,7 +45,7 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
 
     // Exercise
     CompareResource sut = createCompareResource(compared, with);
-    Response response = sut.compare("dsWith.with");
+    Response response = sut.compareTable("dsWith.with");
 
     // Verify
     assertNotNull(response);
@@ -66,7 +66,7 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
 
     // Exercise
     CompareResource sut = createCompareResource(compared, with);
-    Response response = sut.compare("dsWith.with");
+    Response response = sut.compareTable("dsWith.with");
 
     // Verify
     assertNotNull(response);
@@ -88,7 +88,7 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
 
     // Exercise
     CompareResource sut = createCompareResource(compared, with);
-    Response response = sut.compare("dsWith.with");
+    Response response = sut.compareTable("dsWith.with");
 
     // Verify
     assertNotNull(response);
@@ -114,7 +114,7 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
 
     // Exercise
     CompareResource sut = createCompareResource(compared, with);
-    Response response = sut.compare("dsWith.with");
+    Response response = sut.compareTable("dsWith.with");
 
     // Verify
     assertNotNull(response);
@@ -138,7 +138,7 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
 
     // Exercise
     CompareResource sut = createCompareResource(compared, with);
-    Response response = sut.compare("dsWith.with");
+    Response response = sut.compareTable("dsWith.with");
 
     // Verify
     assertNotNull(response);
