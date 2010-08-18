@@ -9,17 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.core.magma;
 
-import org.obiba.magma.NoSuchValueSetException;
-import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
+import org.obiba.magma.transform.BijectiveFunction;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.service.impl.OpalPrivateVariableEntityMap;
 import org.obiba.opal.core.unit.FunctionalUnit;
-
-import com.google.common.base.Function;
 
 /**
  * When an Opal table is exported to some functional unit, entities must be exported with the identifiers understood by
@@ -60,31 +57,11 @@ public class FunctionalUnitView extends View {
     this.entityMap = new OpalPrivateVariableEntityMap(keysTable, keyVariable, nonGeneratingParticipantIdentifier);
   }
 
-  //
-  // View Methods
-  //
-
   /**
-   * Override <code>hasValueSet</code> to map the specified "private" entity (unit) to its "public" entity (opal).
+   * Override <code>getVariableEntityMappingFunction</code> to transform "public" entities into "private" entities.
    */
-  @Override
-  public boolean hasValueSet(VariableEntity privateEntity) {
-    return super.hasValueSet(entityMap.publicEntity(privateEntity));
-  }
-
-  /**
-   * Override <code>getValueSet</code> to return the {@link ValueSet} with a reference to its "private" entity.
-   */
-  @Override
-  public ValueSet getValueSet(VariableEntity privateEntity) throws NoSuchValueSetException {
-    return super.getValueSet(entityMap.publicEntity(privateEntity));
-  }
-
-  /**
-   * Override <code>getVariableEntityTransformer</code> to transform "public" entities into "private" entities.
-   */
-  public Function<VariableEntity, VariableEntity> getVariableEntityTransformer() {
-    return new Function<VariableEntity, VariableEntity>() {
+  public BijectiveFunction<VariableEntity, VariableEntity> getVariableEntityMappingFunction() {
+    return new BijectiveFunction<VariableEntity, VariableEntity>() {
       public VariableEntity apply(VariableEntity from) {
         VariableEntity privateEntity = entityMap.privateEntity(from);
         if(privateEntity == null) {
@@ -92,15 +69,9 @@ public class FunctionalUnitView extends View {
         }
         return privateEntity;
       }
-    };
-  }
 
-  /**
-   * Override <code>getVariableEntityTransformer</code> to transform "private" entities into "public" entities.
-   */
-  public Function<VariableEntity, VariableEntity> getVariableEntityReverseTransformer() {
-    return new Function<VariableEntity, VariableEntity>() {
-      public VariableEntity apply(VariableEntity from) {
+      @Override
+      public VariableEntity unapply(VariableEntity from) {
         VariableEntity publicEntity = entityMap.publicEntity(from);
         if(publicEntity == null) {
           throw new RuntimeException("no public entity exists for private entity " + from);
@@ -109,4 +80,5 @@ public class FunctionalUnitView extends View {
       }
     };
   }
+
 }

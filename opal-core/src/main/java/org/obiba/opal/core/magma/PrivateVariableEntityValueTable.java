@@ -9,13 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.core.magma;
 
-import org.obiba.magma.NoSuchValueSetException;
-import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
+import org.obiba.magma.transform.BijectiveFunction;
 import org.obiba.magma.views.View;
-
-import com.google.common.base.Function;
 
 /**
  * A view that uses a {@code PrivateVariableEntityMap} instance to map private entity identifiers to public ones and
@@ -46,37 +43,22 @@ public class PrivateVariableEntityValueTable extends View {
     this.privateMap = privateMap;
   }
 
-  //
-  // View Methods
-  //
-
   /**
-   * Override <code>hasValueSet</code> to map the specified "public" entity to its "private" entity.
+   * Override <code>getVariableEntityMappingFunction</code> to transform "private" entities into "public" entities.
    */
-  @Override
-  public boolean hasValueSet(VariableEntity publicEntity) {
-    return super.hasValueSet(privateMap.privateEntity(publicEntity));
-  }
-
-  /**
-   * Override <code>getValueSet</code> to return the {@link ValueSet} with a reference to its "public" entity.
-   */
-  @Override
-  public ValueSet getValueSet(VariableEntity publicEntity) throws NoSuchValueSetException {
-    return super.getValueSet(privateMap.privateEntity(publicEntity));
-  }
-
-  /**
-   * Override <code>getVariableEntityTransformer</code> to transform "private" entities into "public" entities.
-   */
-  public Function<VariableEntity, VariableEntity> getVariableEntityTransformer() {
-    return new Function<VariableEntity, VariableEntity>() {
-      public VariableEntity apply(VariableEntity from) {
-        VariableEntity publicEntity = privateMap.publicEntity(from);
+  public BijectiveFunction<VariableEntity, VariableEntity> getVariableEntityMappingFunction() {
+    return new BijectiveFunction<VariableEntity, VariableEntity>() {
+      public VariableEntity apply(VariableEntity privateEntity) {
+        VariableEntity publicEntity = privateMap.publicEntity(privateEntity);
         if(publicEntity == null) {
-          publicEntity = privateMap.createPublicEntity(from);
+          publicEntity = privateMap.createPublicEntity(privateEntity);
         }
         return publicEntity;
+      }
+
+      @Override
+      public VariableEntity unapply(VariableEntity publicEntity) {
+        return privateMap.privateEntity(publicEntity);
       }
     };
   }

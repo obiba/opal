@@ -34,9 +34,9 @@ public class FunctionalUnit {
 
   private DatasourceEncryptionStrategy datasourceEncryptionStrategy;
 
-  private UnitKeyStoreService unitKeyStoreService;
-
   private SelectClause select;
+
+  private transient UnitKeyStoreService unitKeyStoreService;
 
   //
   // Constructors
