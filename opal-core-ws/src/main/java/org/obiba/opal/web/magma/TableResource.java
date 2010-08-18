@@ -267,7 +267,7 @@ public class TableResource {
 
   @Path("/compare")
   @Bean
-  public CompareResource getTable() {
+  public CompareResource getTableCompare() {
     return new CompareResource(valueTable);
   }
 
