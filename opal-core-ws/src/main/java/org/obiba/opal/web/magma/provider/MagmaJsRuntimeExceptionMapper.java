@@ -15,14 +15,19 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.magma.js.MagmaJsRuntimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 @Provider
 public class MagmaJsRuntimeExceptionMapper implements ExceptionMapper<MagmaJsRuntimeException> {
 
+  private static final Logger log = LoggerFactory.getLogger(MagmaJsRuntimeExceptionMapper.class);
+
   @Override
   public Response toResponse(MagmaJsRuntimeException exception) {
+    log.warn("Js Exception", exception);
     return Response.status(Status.BAD_REQUEST).entity(exception.getMessage()).build();
   }
 

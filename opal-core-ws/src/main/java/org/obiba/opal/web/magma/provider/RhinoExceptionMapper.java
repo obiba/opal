@@ -16,14 +16,20 @@ import javax.ws.rs.ext.Provider;
 
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.WrappedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 @Provider
 public class RhinoExceptionMapper implements ExceptionMapper<RhinoException> {
 
+  private static final Logger log = LoggerFactory.getLogger(MagmaJsRuntimeExceptionMapper.class);
+
   @Override
   public Response toResponse(RhinoException exception) {
+    log.warn("Js Exception", exception);
+
     Throwable t = exception;
     if(exception instanceof WrappedException) {
       t = ((WrappedException) exception).getWrappedException();

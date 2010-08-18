@@ -75,4 +75,5 @@ message DescriptiveStatsDto {
   optional double kurtosis = 12;
   optional double median = 13;
   repeated double values = 14;
+  repeated double distributionPercentiles = 15;
 }

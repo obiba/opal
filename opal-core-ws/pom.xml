@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>opal</artifactId>
@@ -40,9 +41,9 @@
       <version>20090211</version>
     </dependency>
     <dependency>
-     <groupId>org.apache.commons</groupId>
-     <artifactId>commons-math</artifactId>
-     <version>2.1</version>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-math</artifactId>
+      <version>2.1</version>
     </dependency>
     <dependency>
       <groupId>com.google.visualization</groupId>
@@ -86,7 +87,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>2.4.3</version>        
+        <version>2.4.3</version>
         <configuration>
           <!-- Required for testing Opal file system (maven was not copying empty directories from test resources) -->
           <includeEmptyDirs>true</includeEmptyDirs>

@@ -11,7 +11,6 @@ package org.obiba.opal.web.magma;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Map;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -21,14 +20,18 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.math.MathException;
+import org.apache.commons.math.distribution.ContinuousDistribution;
+import org.apache.commons.math.distribution.NormalDistributionImpl;
+import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.obiba.magma.Category;
 import org.obiba.magma.Value;
-import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
+import org.obiba.magma.VectorSource;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.Initialisables;
@@ -43,7 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class VariableResource {
 
@@ -91,61 +94,102 @@ public class VariableResource {
   @GET
   @Path("/values")
   public Collection<ValueDto> getValues(@QueryParam("limit") @DefaultValue("10") Integer limit) {
-    int i = 0;
     ImmutableList.Builder<ValueDto> values = ImmutableList.builder();
-    for(ValueSet valueSet : valueTable.getValueSets()) {
-      Value value = vvs.getValue(valueSet);
-      ValueDto.Builder valueBuilder = ValueDto.newBuilder().setValueType(vvs.getValueType().getName()).setIsSequence(value.isSequence());
-      if(value.isNull() == false) {
-        valueBuilder.setValue(value.toString());
+    VectorSource vectorSource = vvs.asVectorSource();
+    if(vectorSource != null) {
+      int i = 0;
+      for(Value value : vectorSource.getValues(Sets.newTreeSet(valueTable.getVariableEntities()))) {
+        ValueDto.Builder valueBuilder = ValueDto.newBuilder().setValueType(vvs.getValueType().getName()).setIsSequence(value.isSequence());
+        if(value.isNull() == false) {
+          valueBuilder.setValue(value.toString());
+        }
+        values.add(valueBuilder.build());
+        if(limit >= 0 && i++ >= limit) break;
       }
-      values.add(valueBuilder.build());
-      if(i++ == limit) break;
     }
     return values.build();
   }
 
   @GET
-  @Path("/frequencies.json")
+  @Path("/frequencies")
   public Collection<FrequencyDto> getDataTable() {
-    Map<String, FrequencyDto> frequencies = Maps.newLinkedHashMap();
-    for(Category c : vvs.getVariable().getCategories()) {
-      frequencies.put(c.getName(), FrequencyDto.newBuilder().setName(c.getName()).setValue(0).build());
-    }
-    frequencies.put("N/A", FrequencyDto.newBuilder().setName("N/A").setValue(0).build());
-    for(ValueSet vs : valueTable.getValueSets()) {
-      Value value = vvs.getValue(vs);
-      if(value.isNull()) {
-        count("N/A", frequencies);
-      } else {
-        count(value.toString(), frequencies);
+    VectorSource vectorSource = vvs.asVectorSource();
+    if(vectorSource != null) {
+      Frequency freq = new Frequency();
+      for(Value value : vectorSource.getValues(Sets.newTreeSet(valueTable.getVariableEntities()))) {
+        if(value.isNull() == false) {
+          freq.addValue(value.toString());
+        } else {
+          freq.addValue("N/A");
+        }
       }
+
+      ImmutableList.Builder<FrequencyDto> dtos = ImmutableList.builder();
+      for(Category c : vvs.getVariable().getCategories()) {
+        dtos.add(FrequencyDto.newBuilder().setName(c.getName()).setValue((int) freq.getCount(c.getName())).build());
+      }
+      dtos.add(FrequencyDto.newBuilder().setName("N/A").setValue((int) freq.getCount("N/A")).build());
+      return dtos.build();
+
     }
-    return frequencies.values();
+    return ImmutableList.of();
   }
 
   @GET
   @Path("/univariate")
   // Can we find a better name for this resource?
-  public DescriptiveStatsDto getUnivariateAnalysis() {
-    DescriptiveStatistics ds = new DescriptiveStatistics();
-    for(ValueSet vs : valueTable.getValueSets()) {
-      Value value = vvs.getValue(vs);
-      if(value.isNull() == false) {
-        ds.addValue(((Number) value.getValue()).doubleValue());
-      }
+  public DescriptiveStatsDto getUnivariateAnalysis(@QueryParam("d") @DefaultValue("normal") Distribution distribution, @QueryParam("p") Double[] percentiles) {
+    VectorSource vectorSource = vvs.asVectorSource();
+    if(vectorSource != null) {
+      return distribution.calc(vectorSource.getValues(Sets.newTreeSet(valueTable.getVariableEntities())), percentiles).build();
     }
-    return DescriptiveStatsDto.newBuilder().setMin(ds.getMin()).setMax(ds.getMax()).setN(ds.getN()).setMean(ds.getMean()).setSum(ds.getSum()).setSumsq(ds.getSumsq()).setStdDev(ds.getStandardDeviation()).setVariance(ds.getVariance()).setSkewness(ds.getSkewness()).setGeometricMean(ds.getGeometricMean()).setKurtosis(ds.getKurtosis()).build();
+    throw new UnsupportedOperationException();
   }
 
-  private void count(String key, Map<String, FrequencyDto> frequencies) {
-    FrequencyDto value = frequencies.get(key);
-    if(value == null) {
-      value = FrequencyDto.newBuilder().setName(key).setValue(1).build();
-    } else {
-      // Need to derive a new FrequencyDTO because they are immutable
-      value = value.toBuilder().setValue(value.getValue() + 1).build();
+  public static enum Distribution {
+    normal {
+      @Override
+      public ContinuousDistribution getDistribution(DescriptiveStatistics ds) {
+        if(ds.getStandardDeviation() > 0) {
+          return new NormalDistributionImpl(ds.getMean(), ds.getStandardDeviation());
+        }
+        return null;
+      }
+    },
+    lognormal {
+      @Override
+      public ContinuousDistribution getDistribution(DescriptiveStatistics ds) {
+        return new NormalDistributionImpl(ds.getMean(), ds.getStandardDeviation());
+      }
+    };;
+    abstract ContinuousDistribution getDistribution(DescriptiveStatistics ds);
+    
+    public DescriptiveStatsDto.Builder calc(Iterable<Value> values, Double[] percentiles) {
+      DescriptiveStatistics ds = new DescriptiveStatistics();
+      for(Value value : values) {
+        if(value.isNull() == false) {
+          ds.addValue(((Number) value.getValue()).doubleValue());
+        }
+      }
+      ContinuousDistribution cd = getDistribution(ds);
+      return percentiles(ds, cd, DescriptiveStatsDto.newBuilder().setMin(ds.getMin()).setMax(ds.getMax()).setN(ds.getN()).setMean(ds.getMean()).setSum(ds.getSum()).setSumsq(ds.getSumsq()).setStdDev(ds.getStandardDeviation()).setVariance(ds.getVariance()).setSkewness(ds.getSkewness()).setGeometricMean(ds.getGeometricMean()).setKurtosis(ds.getKurtosis()), percentiles);
     }
-    frequencies.put(key, value);
+
+    private DescriptiveStatsDto.Builder percentiles(DescriptiveStatistics ds, ContinuousDistribution cd, DescriptiveStatsDto.Builder builder, Double[] percentiles) {
+      if(percentiles != null) {
+        for(Double p : percentiles) {
+          builder.addPercentiles(ds.getPercentile(p));
+          if(cd != null) {
+            try {
+              builder.addDistributionPercentiles(cd.inverseCumulativeProbability(p/100d));
+            } catch(MathException e) {
+              log.error("oops", e);
+            }
+          }
+        }
+      }
+      return builder;
+    }
   }
+
 }
