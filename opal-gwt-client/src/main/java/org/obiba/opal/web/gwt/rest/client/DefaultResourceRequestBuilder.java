@@ -149,11 +149,12 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
     return builder;
   }
 
-  public void send() {
+  public Request send() {
     try {
-      build().send();
+      return build().send();
     } catch(RequestException e) {
       eventBus.fireEvent(new RequestErrorEvent(e));
+      return null;
     }
   }
 
