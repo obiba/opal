@@ -12,6 +12,7 @@ import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
+import org.obiba.magma.VectorSource;
 import org.obiba.magma.support.AbstractValueTable;
 import org.obiba.magma.support.ValueSetBean;
 import org.obiba.magma.support.VariableEntityBean;
@@ -60,6 +61,11 @@ class RestValueTable extends AbstractValueTable {
         @Override
         public ValueType getValueType() {
           return v.getValueType();
+        }
+
+        @Override
+        public VectorSource asVectorSource() {
+          return null;
         }
 
       });
