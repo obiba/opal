@@ -24,3 +24,13 @@ message ServerErrorDto {
   repeated string arguments = 3; // Arguments to be passed during localisation
   extensions 1000 to max; // Extensions can be registered to provide additional error data on a case-by-case basis
 }
+
+message InvalidExcelDatasourceDto {
+  required string sheet = 1;
+  required uint32 line = 2;
+  optional string msg = 3;
+  extend ClientErrorDto {
+    repeated InvalidExcelDatasourceDto invalidExcelDatasource = 1001;
+  }
+}
+
