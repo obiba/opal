@@ -37,6 +37,7 @@
               <g:MenuBar vertical="true">
                 <g:MenuItem ui:field="dataImportItem"><ui:msg description="Import menu item">Import...</ui:msg></g:MenuItem>
                 <g:MenuItem ui:field="dataExportItem"><ui:msg description="Export menu item">Export...</ui:msg></g:MenuItem>
+                <g:MenuItem ui:field="testItem">New Import (temporary)...</g:MenuItem>
               </g:MenuBar>
             </g:MenuItem>
             <g:MenuItem ui:field="fileExplorer">

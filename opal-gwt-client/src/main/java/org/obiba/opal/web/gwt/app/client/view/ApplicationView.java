@@ -67,6 +67,9 @@ public class ApplicationView implements ApplicationPresenter.Display {
   MenuItem dataExportItem;
 
   @UiField
+  MenuItem testItem;
+
+  @UiField
   MenuItem listJobsItem;
 
   @UiField
@@ -146,6 +149,11 @@ public class ApplicationView implements ApplicationPresenter.Display {
   @Override
   public HasClickHandlers getStudies() {
     return studies;
+  }
+
+  @Override
+  public MenuItem getTestItem() {
+    return testItem;
   }
 
 }
