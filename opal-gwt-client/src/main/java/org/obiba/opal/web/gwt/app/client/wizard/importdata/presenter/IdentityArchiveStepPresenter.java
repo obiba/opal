@@ -9,25 +9,32 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
+import java.util.Arrays;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
+import org.obiba.opal.web.model.client.opal.ImportCommandOptionsDto;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
@@ -69,10 +76,13 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
   private ImportData importData;
 
   @Inject
+  private ErrorDialogPresenter errorDialog;
+
+  @Inject
   private FileSelectionPresenter archiveFolderSelectionPresenter;
 
   @Inject
-  private DashboardPresenter dashboardPresenter;
+  private ConclusionStepPresenter conclusionStepPresenter;
 
   @Inject
   public IdentityArchiveStepPresenter(final Display display, final EventBus eventBus) {
@@ -160,7 +170,7 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
       importData.setArchiveLeave(getDisplay().isArchiveLeave());
       importData.setArchiveMove(getDisplay().isArchiveMove());
       importData.setArchiveDirectory(getDisplay().getArchiveDirectory());
-      eventBus.fireEvent(new WorkbenchChangeEvent(dashboardPresenter));
+      submitJob();
     }
 
   }
@@ -172,6 +182,40 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
         getDisplay().setUnits(units);
       }
     }).send();
+  }
+
+  private void submitJob() {
+    ImportCommandOptionsDto dto = ImportCommandOptionsDto.create();
+    dto.setDestination(importData.getDestinationDatasourceName());
+    dto.setArchive(getDisplay().getArchiveDirectory());
+    JsArrayString selectedFiles = JavaScriptObject.createArray().cast();
+    selectedFiles.push(importData.getXmlFile());
+    dto.setFilesArray(selectedFiles);
+    dto.setUnit(getDisplay().getSelectedUnit());
+    ResourceRequestBuilderFactory.newBuilder().forResource("/shell/import").post() //
+    .withResourceBody(ImportCommandOptionsDto.stringify(dto)) //
+    .withCallback(400, new ClientFailureResponseCodeCallBack()) //
+    .withCallback(201, new SuccessResponseCodeCallBack()).send();
+  }
+
+  class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      errorDialog.bind();
+      errorDialog.setErrors(Arrays.asList(new String[] { response.getText() }));
+      errorDialog.revealDisplay();
+    }
+  }
+
+  class SuccessResponseCodeCallBack implements ResponseCodeCallback {
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      String location = response.getHeader("Location");
+      String jobId = location.substring(location.lastIndexOf('/') + 1);
+      importData.setJobId(jobId);
+
+      eventBus.fireEvent(new WorkbenchChangeEvent(conclusionStepPresenter));
+    }
   }
 
 }
