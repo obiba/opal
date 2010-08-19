@@ -185,6 +185,7 @@ public class DatasourceResource {
 
   @Path("/compare")
   @Bean
+  @Scope("request")
   public CompareResource getTableCompare() {
     return new CompareResource(getDatasource());
   }
