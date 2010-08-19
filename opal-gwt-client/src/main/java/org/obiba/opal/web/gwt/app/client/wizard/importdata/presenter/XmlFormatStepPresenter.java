@@ -60,7 +60,7 @@ public class XmlFormatStepPresenter extends WidgetPresenter<XmlFormatStepPresent
   protected void onBind() {
     addEventHandlers();
 
-    xmlFileSelectionPresenter.setFileSelectionType(FileSelectionType.FOLDER);
+    xmlFileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE_OR_FOLDER);
     xmlFileSelectionPresenter.bind();
     getDisplay().setXmlFileSelectorWidgetDisplay(xmlFileSelectionPresenter.getDisplay());
   }
