@@ -27,11 +27,13 @@ public class JqPlotBarChart extends JqPlot {
     super(id);
   }
 
-  public void push(String category, double value) {
+  public void push(String category, double value, double pct) {
     labels.push(category);
     JsArrayNumber series = JsArrayNumber.createArray().cast();
+    series.push(pct);
+    // TODO: Make another yaxis to display the actual number of observations
     series.push(value);
-    data.push(value);
+    data.push(pct);
   }
 
   public void plot() {
@@ -39,7 +41,7 @@ public class JqPlotBarChart extends JqPlot {
     plotData.push(this.data);
     Properties p = $$("{" + //
     "  title:'Frequency Plot'," + //
-    "  seriesDefaults:{renderer:$wnd.jQuery.jqplot.BarRenderer,rendererOptions:{varyBarColor: true}}," + //
+    "  seriesDefaults:{renderer:$wnd.jQuery.jqplot.BarRenderer,rendererOptions:{varyBarColor: true},pointLabels:{show:true,hideZeros:true,ypadding:3,edgeTolerance:-5}}," + //
     "  axes:{" + //
     "    xaxis:{" + //
     "      tickRenderer: $wnd.jQuery.jqplot.CanvasAxisTickRenderer," + //
@@ -48,8 +50,8 @@ public class JqPlotBarChart extends JqPlot {
     "      ticks:" + stringify(labels) + //
     "    }," + //
     "    yaxis:{" + //
-    "      min:0," + // 
-    "      tickOptions:{formatString:'%d'} " + //
+    "      min:0,max:100,pad:0," + // 
+    "      tickOptions:{formatString:'%d%%'} " + //
     "    }" + //
     "  } " + //
     "}");

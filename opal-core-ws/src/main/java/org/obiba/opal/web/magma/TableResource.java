@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -34,6 +35,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONObject;
+import org.mozilla.javascript.Scriptable;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
@@ -44,6 +46,7 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.JavascriptValueSource;
+import org.obiba.magma.js.MagmaContext;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.VariableEntityBean;
@@ -185,21 +188,28 @@ public class TableResource {
 
   @GET
   @Path("/eval")
-  public Collection<ValueDto> eval(@QueryParam("valueType") String valueType, @QueryParam("script") String script, @QueryParam("limit") @DefaultValue("10") Integer limit) {
-    JavascriptValueSource jvs = new JavascriptValueSource(ValueType.Factory.forName(valueType), script);
+  public Collection<ValueDto> eval(@QueryParam("valueType") String valueType, @QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("10") int limit) {
+    JavascriptValueSource jvs = new JavascriptValueSource(ValueType.Factory.forName(valueType), script) {
+      @Override
+      protected void enterContext(MagmaContext ctx, Scriptable scope) {
+        ctx.push(ValueTable.class, valueTable);
+      }
+    };
     jvs.initialise();
-    int i = 0;
-    ImmutableList.Builder<ValueDto> values = ImmutableList.builder();
-    for(ValueSet valueSet : valueTable.getValueSets()) {
-      Value value = jvs.getValue(valueSet);
+
+    List<VariableEntity> entities = new ArrayList<VariableEntity>(valueTable.getVariableEntities());
+    int end = Math.min(offset + limit, entities.size());
+    Iterable<Value> values = jvs.asVectorSource().getValues(new TreeSet<VariableEntity>(entities.subList(offset, end)));
+
+    ImmutableList.Builder<ValueDto> dtos = ImmutableList.builder();
+    for(Value value : values) {
       ValueDto.Builder valueBuilder = ValueDto.newBuilder().setValueType(jvs.getValueType().getName()).setIsSequence(value.isSequence());
       if(value.isNull() == false) {
         valueBuilder.setValue(value.toString());
       }
-      values.add(valueBuilder.build());
-      if(i++ == limit) break;
+      dtos.add(valueBuilder.build());
     }
-    return values.build();
+    return dtos.build();
   }
 
   @GET

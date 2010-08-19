@@ -3,9 +3,19 @@
   <g:HTMLPanel ui:field="panel">
     <div class="opal-dialog opal-login" title="Login">
       <p>
-      <label for="username">Username</label><input id="username" type="text"></input>
-      <label for="password">Password</label><input id="password" type="password"></input>
+        <label for="username">Username</label><input id="username" type="text"></input>
+        <label for="password">Password</label><input id="password" type="password"></input>
       </p>
+    </div>
+    <div class="opal-feedback-dialog" title="Results">
+      <p class="ui-state-error ui-corner-all">
+        <span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-alert"></span>
+        <span class="opal-label"></span>
+      </p>
+      <div class="opal-script-result">
+        <ul></ul>
+        <button>More</button>
+      </div>
     </div>
     <div class="opal-table-selector">Table: <input type="text" size="100"/><button>Change</button></div>
     <div id="tableEditor">
@@ -31,13 +41,6 @@
             <label for="script">Script</label>
             <g:TextArea ui:field="scriptArea" characterWidth="100" visibleLines="10"/>
             <button>Test</button>
-            <div class="opal-script-result" title="Results">
-              <p class="ui-state-error ui-corner-all">
-                <span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-alert"></span>
-                <span class="opal-label"></span>
-              </p>
-              <ul></ul>
-            </div>
           </li>
         </ol>
         <div class="opal-tabs">

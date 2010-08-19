@@ -126,9 +126,9 @@ public class VariableResource {
 
       ImmutableList.Builder<FrequencyDto> dtos = ImmutableList.builder();
       for(Category c : vvs.getVariable().getCategories()) {
-        dtos.add(FrequencyDto.newBuilder().setName(c.getName()).setValue((int) freq.getCount(c.getName())).build());
+        dtos.add(FrequencyDto.newBuilder().setName(c.getName()).setValue((int) freq.getCount(c.getName())).setPct(freq.getPct(c.getName())).build());
       }
-      dtos.add(FrequencyDto.newBuilder().setName("N/A").setValue((int) freq.getCount("N/A")).build());
+      dtos.add(FrequencyDto.newBuilder().setName("N/A").setValue((int) freq.getCount("N/A")).setPct(freq.getPct("N/A")).build());
       return dtos.build();
 
     }

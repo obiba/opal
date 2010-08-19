@@ -47,6 +47,7 @@ message AttributeDto {
 message FrequencyDto {
   required string name = 1;
   required int32 value = 2;
+  required double pct = 3;
 }
 
 message LinkDto {

@@ -109,14 +109,20 @@ public class OhsApp implements EntryPoint {
     @Selector(".opal-script-item button")
     GQuery testButton();
 
+    @Selector("div.opal-feedback-dialog")
+    GQuery feedbackDialog();
+
+    @Selector("div.opal-feedback-dialog p.ui-state-error")
+    GQuery errorMsg();
+
     @Selector("div.opal-script-result")
-    GQuery valuesDialog();
+    GQuery evalResults();
 
     @Selector("div.opal-script-result ul")
     GQuery values();
 
-    @Selector("div.opal-script-result p.ui-state-error")
-    GQuery errorMsg();
+    @Selector("div.opal-script-result button")
+    GQuery moreValues();
 
     @Selector(".opal-tabs")
     GQuery tabs();
@@ -206,8 +212,7 @@ public class OhsApp implements EntryPoint {
     widgets.testButton().as(Ui).button(Button.Options.create().icons(Icons.create().secondary("ui-icon-calculator"))).disable().click(new Function() {
       @Override
       public boolean f(Event e) {
-        VariableDto dto = variables.get(index);
-        fetchValues(dto);
+        fetchValues(0);
         return false;
       }
     });
@@ -242,7 +247,14 @@ public class OhsApp implements EntryPoint {
         return true;
       }
     });
-    widgets.valuesDialog().as(Ui).dialog(Dialog.Options.create().autoOpen(false).title("Results").resizable(true));
+    widgets.feedbackDialog().as(Ui).dialog(Dialog.Options.create().autoOpen(false).title("Results").resizable(true));
+    widgets.moreValues().as(Ui).button().click(new Function() {
+      @Override
+      public void f(Element e) {
+        Integer newOffset = $(e).data("offset", Integer.class) + 10;
+        fetchValues(newOffset);
+      }
+    });
     widgets.tableSelectorButton().as(Ui).button(Button.Options.create().icons(Icons.create().primary("ui-icon-pencil"))).click(new Function() {
       @Override
       public void f(Element e) {
@@ -314,7 +326,8 @@ public class OhsApp implements EntryPoint {
       @Override
       public void onRequestError(RequestErrorEvent e) {
         widgets.errorMsg().show().children("span.opal-label").text(e.getException().getMessage());
-        widgets.valuesDialog().as(Ui).dialog().open();
+        widgets.evalResults().hide();
+        widgets.feedbackDialog().as(Ui).dialog().open();
       }
     });
 
@@ -324,7 +337,8 @@ public class OhsApp implements EntryPoint {
       public void onUnhandledResponse(UnhandledResponseEvent e) {
         if(credentials.hasCredentials() && e.getResponse().getStatusCode() >= 400) {
           widgets.errorMsg().show().children("span.opal-label").text(e.getResponse().getText());
-          widgets.valuesDialog().as(Ui).dialog().open();
+          widgets.evalResults().hide();
+          widgets.feedbackDialog().as(Ui).dialog().open();
         }
       }
     });
@@ -487,7 +501,7 @@ public class OhsApp implements EntryPoint {
           for(int i = 0; i < freqs.length(); i++) {
             FrequencyDto value = freqs.get(i);
             if(value.hasValue()) {
-              plot.push(value.getName(), value.getValue());
+              plot.push(value.getName(),value.getValue(),  value.getPct() * 100);
             }
           }
           plot.plot();
@@ -558,10 +572,12 @@ public class OhsApp implements EntryPoint {
       $("<li>" + value + "</li>").appendTo(widgets.values());
     }
     widgets.errorMsg().hide();
-    widgets.valuesDialog().as(Ui).dialog().open();
+    widgets.evalResults().show();
+    widgets.feedbackDialog().as(Ui).dialog().open();
   }
 
-  private void fetchValues(VariableDto variable) {
+  private void fetchValues(int offset) {
+    widgets.moreValues().data("offset", offset);
     widgets.values().children().remove();
 
     boolean partial = true;
@@ -571,7 +587,7 @@ public class OhsApp implements EntryPoint {
       js = scriptArea.getText();
     }
 
-    request(widgets.tableSelector().val() + "/eval?valueType=" + (partial ? "text" : widgets.valueType().val()) + "&script=" + URL.encodeQueryString(js), new ResourceCallback<JsArray<ValueDto>>() {
+    request(widgets.tableSelector().val() + "/eval?valueType=" + (partial ? "text" : widgets.valueType().val()) + "&offset=" + offset + "&script=" + URL.encodeQueryString(js), new ResourceCallback<JsArray<ValueDto>>() {
 
       @Override
       public void onResource(Response response, JsArray<ValueDto> resource) {

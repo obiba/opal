@@ -11,7 +11,6 @@ package org.obiba.opal.web.gwt.ohs.client;
 
 import static com.google.gwt.query.client.GQuery.$$;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayNumber;
@@ -40,9 +39,7 @@ public class JqPlotQQ extends JqPlot {
   public void plot() {
     JsArray plotData = JsArray.createArray().cast();
     plotData.push(getXequalsY());
-    // plotData.push(getTest());
     plotData.push(data);
-    GWT.log(stringify(plotData));
     Properties p = $$("{" + //
     "  title:'Normal Probability Plot'," + //
     "  axesDefaults:{pad:0, min:" + min + ", max:" + max + "}," + //
@@ -59,13 +56,6 @@ public class JqPlotQQ extends JqPlot {
     JsArray<JsArrayNumber> xeqy = JsArray.createArray().cast();
     xeqy.push(point(min, min));
     xeqy.push(point(max, max));
-    return xeqy;
-  }
-
-  private JsArray<JsArrayNumber> getTest() {
-    JsArray<JsArrayNumber> xeqy = JsArray.createArray().cast();
-    xeqy.push(point(min, max));
-    xeqy.push(point(max, min));
     return xeqy;
   }
 
