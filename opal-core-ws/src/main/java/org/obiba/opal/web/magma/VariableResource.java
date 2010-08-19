@@ -140,7 +140,7 @@ public class VariableResource {
   // Can we find a better name for this resource?
   public DescriptiveStatsDto getUnivariateAnalysis(@QueryParam("d") @DefaultValue("normal") Distribution distribution, @QueryParam("p") Double[] percentiles) {
     VectorSource vectorSource = vvs.asVectorSource();
-    if(vectorSource != null) {
+    if(vectorSource != null && vectorSource.getValueType().isNumeric()) {
       return distribution.calc(vectorSource.getValues(Sets.newTreeSet(valueTable.getVariableEntities())), percentiles).build();
     }
     return null;
