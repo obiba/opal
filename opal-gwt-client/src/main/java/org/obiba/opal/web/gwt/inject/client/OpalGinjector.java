@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
@@ -31,12 +32,19 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresente
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ConclusionStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.CsvFormatStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DestinationSelectionStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.FormatSelectionStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.IdentityArchiveStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.XmlFormatStepPresenter;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
 
-@GinModules( { OpalGinModule.class, DashboardModule.class, NavigatorModule.class, FileSystemModule.class, JobModule.class })
+@GinModules({ OpalGinModule.class, DashboardModule.class, NavigatorModule.class, FileSystemModule.class, JobModule.class, ImportModule.class })
 public interface OpalGinjector extends Ginjector {
 
   EventBus getEventBus();
@@ -82,5 +90,21 @@ public interface OpalGinjector extends Ginjector {
   ConfirmationPresenter getConfirmationPresenter();
 
   CreateFolderDialogPresenter getCreateFolderDialogPresenter();
+
+  DataImportPresenter getDataImportPresenter();
+
+  FormatSelectionStepPresenter getFormatSelectionStepPresenter();
+
+  CsvFormatStepPresenter getCsvFormatStepPresenter();
+
+  XmlFormatStepPresenter getXmlFormatStepPresenter();
+
+  DestinationSelectionStepPresenter getDestinationSelectionStepPresenter();
+
+  ImportData getImportData();
+
+  IdentityArchiveStepPresenter getIdentityArchiveStepPresenter();
+
+  ConclusionStepPresenter getConclusionStepPresenter();
 
 }
