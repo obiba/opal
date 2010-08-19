@@ -29,8 +29,12 @@
             <g:MenuItem  ui:field="dashboardItem">
               <ui:msg description="Dashboard menu item">Dashboard</ui:msg>              
             </g:MenuItem>
-            <g:MenuItem ui:field="exploreVariablesItem">
+            <g:MenuItem>
               <ui:msg description="Variables label">Variables</ui:msg>
+              <g:MenuBar vertical="true">
+                <g:MenuItem ui:field="exploreVariablesItem"><ui:msg description="Explore variables menu item">Explore variables...</ui:msg></g:MenuItem>
+                <g:MenuItem ui:field="importVariablesItem"><ui:msg description="Import variables menu item">Import variables...</ui:msg></g:MenuItem>
+              </g:MenuBar>
             </g:MenuItem>
             <g:MenuItem>
               <ui:msg description="Data menu item">Data</ui:msg>              
