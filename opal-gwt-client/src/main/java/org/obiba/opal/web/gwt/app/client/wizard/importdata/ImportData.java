@@ -33,6 +33,8 @@ public class ImportData {
 
   private String archiveDirectory;
 
+  private String jobId;
+
   public void setFormat(ImportFormat importFormat) {
     this.importFormat = importFormat;
   }
@@ -123,6 +125,14 @@ public class ImportData {
 
   public void setImportFormat(ImportFormat importFormat) {
     this.importFormat = importFormat;
+  }
+
+  public String getJobId() {
+    return jobId;
+  }
+
+  public void setJobId(String jobId) {
+    this.jobId = jobId;
   }
 
 }

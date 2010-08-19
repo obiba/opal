@@ -101,7 +101,7 @@ public class IdentityArchiveStepView extends Composite implements IdentityArchiv
 
   @Override
   public String getSelectedUnit() {
-    return null;
+    return units.getItemText(units.getSelectedIndex());
   }
 
   @Override
