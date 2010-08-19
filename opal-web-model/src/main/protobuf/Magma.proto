@@ -181,7 +181,7 @@ message ConflictDto {
 
 message DatasourceCompareDto {
   required DatasourceDto compared = 1;
-  required DatasourceDto withTable = 2;
-  repeated TableCompareDto differences = 3;
+  required DatasourceDto withDatasource = 2;
+  repeated TableCompareDto tableComparisons = 3;
 }
 

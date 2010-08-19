@@ -183,6 +183,12 @@ public class DatasourceResource {
     }
   }
 
+  @Path("/compare")
+  @Bean
+  public CompareResource getTableCompare() {
+    return new CompareResource(getDatasource());
+  }
+
   private Datasource getDatasource() {
     Datasource ds = null;
     if(MagmaEngine.get().hasDatasource(name)) {

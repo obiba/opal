@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,12 +17,15 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
+import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.web.model.Magma.ConflictDto;
+import org.obiba.opal.web.model.Magma.DatasourceCompareDto;
 import org.obiba.opal.web.model.Magma.TableCompareDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.springframework.stereotype.Component;
@@ -42,7 +46,9 @@ public class CompareResource {
   // Instance Variables
   //
 
-  ValueTable compared;
+  Datasource comparedDatasource;
+
+  ValueTable comparedTable;
 
   //
   // Constructors
@@ -51,8 +57,12 @@ public class CompareResource {
   public CompareResource() {
   }
 
-  public CompareResource(ValueTable compared) {
-    this.compared = compared;
+  public CompareResource(Datasource comparedDatasource) {
+    this.comparedDatasource = comparedDatasource;
+  }
+
+  public CompareResource(ValueTable comparedTable) {
+    this.comparedTable = comparedTable;
   }
 
   //
@@ -61,24 +71,50 @@ public class CompareResource {
 
   @GET
   @Path("/{with}")
-  public Response compareTable(@PathParam("with") String with) {
-    ValueTable withTable = getValueTable(with);
+  public Response compare(@PathParam("with") String with) {
+    if(comparedDatasource != null) {
+      Datasource withDatasource = getDatasource(with);
+      DatasourceCompareDto dto = createDatasourceCompareDto(comparedDatasource, withDatasource);
+      return Response.ok().entity(dto).build();
+    } else if(comparedTable != null) {
+      ValueTable withTable = getValueTable(with);
+      TableCompareDto dto = createTableCompareDto(comparedTable, withTable);
+      return Response.ok().entity(dto).build();
+    } else {
+      return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
 
-    TableCompareDto dto = createTableCompareDto(compared, withTable);
-
-    return Response.ok().entity(dto).build();
+  @VisibleForTesting
+  Datasource getDatasource(String datasourceName) {
+    return MagmaEngine.get().getDatasource(datasourceName);
   }
 
   @VisibleForTesting
   ValueTable getValueTable(String fqTableName) {
     String datasourceName = MagmaEngineTableResolver.valueOf(fqTableName).getDatasourceName();
     String tableName = MagmaEngineTableResolver.valueOf(fqTableName).getTableName();
-
-    System.out.println("datasourceName " + datasourceName);
-    System.out.println("tableName " + tableName);
-
     ValueTable withTable = MagmaEngine.get().getDatasource(datasourceName).getValueTable(tableName);
+
     return withTable;
+  }
+
+  private DatasourceCompareDto createDatasourceCompareDto(Datasource compared, Datasource with) {
+    DatasourceCompareDto.Builder dtoBuilder = DatasourceCompareDto.newBuilder();
+    dtoBuilder.setCompared(Dtos.asDto(compared));
+    dtoBuilder.setWithDatasource(Dtos.asDto(with));
+
+    for(ValueTable vt : compared.getValueTables()) {
+      TableCompareDto tableCompareDto = null;
+      if(with.hasValueTable(vt.getName())) {
+        tableCompareDto = createTableCompareDto(vt, with.getValueTable(vt.getName()));
+      } else {
+        tableCompareDto = createTableCompareDtoWhereSecondTableDoesNotExist(vt);
+      }
+      dtoBuilder.addTableComparisons(tableCompareDto);
+    }
+
+    return dtoBuilder.build();
   }
 
   private TableCompareDto createTableCompareDto(ValueTable compared, ValueTable with) {
@@ -97,13 +133,25 @@ public class CompareResource {
     return createTableCompareDto(compared, with, newVariables, missingVariables, existingVariables);
   }
 
+  private TableCompareDto createTableCompareDtoWhereSecondTableDoesNotExist(ValueTable compared) {
+    Set<Variable> variablesInCompared = asSet(compared.getVariables());
+    Set<Variable> newVariables = new HashSet<Variable>(variablesInCompared);
+    Set<Variable> missingVariables = new HashSet<Variable>();
+    Set<Variable> existingVariables = new HashSet<Variable>();
+
+    return createTableCompareDto(compared, null, newVariables, missingVariables, existingVariables);
+  }
+
   private TableCompareDto createTableCompareDto(ValueTable compared, ValueTable with, Set<Variable> newVariables, Set<Variable> missingVariables, Set<Variable> existingVariables) {
     TableCompareDto.Builder dtoBuilder = TableCompareDto.newBuilder();
     dtoBuilder.setCompared(Dtos.asDto(compared, null));
-    dtoBuilder.setWithTable(Dtos.asDto(with, null));
 
-    Set<ConflictDto> conflicts = getConflicts(compared, with, existingVariables);
-    dtoBuilder.addAllConflicts(conflicts);
+    Set<ConflictDto> conflicts = Collections.emptySet();
+    if(with != null) {
+      dtoBuilder.setWithTable(Dtos.asDto(with, null));
+      conflicts = getConflicts(compared, with, existingVariables);
+      dtoBuilder.addAllConflicts(conflicts);
+    }
 
     for(Variable v : newVariables) {
       dtoBuilder.addNewVariables(Dtos.asDto(v));
