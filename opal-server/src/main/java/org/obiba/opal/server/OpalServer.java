@@ -73,6 +73,7 @@ public class OpalServer {
   }
 
   final void shutdown() {
+    System.out.println("Opal Server shuting down.");
     ctx.getBean(OpalRuntime.class).stop();
   }
 

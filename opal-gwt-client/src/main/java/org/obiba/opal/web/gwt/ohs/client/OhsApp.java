@@ -505,7 +505,7 @@ public class OhsApp implements EntryPoint {
   }
 
   private boolean isContinuous(VariableDto dto) {
-    return dto.getValueType().equalsIgnoreCase("decimal") || dto.getValueType().equalsIgnoreCase("integer");
+    return isCategorical(dto) == false && dto.getValueType().equalsIgnoreCase("decimal") || dto.getValueType().equalsIgnoreCase("integer");
   }
 
   private boolean isCategorical(VariableDto dto) {
