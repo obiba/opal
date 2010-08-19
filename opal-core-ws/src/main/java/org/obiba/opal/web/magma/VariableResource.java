@@ -143,7 +143,7 @@ public class VariableResource {
     if(vectorSource != null) {
       return distribution.calc(vectorSource.getValues(Sets.newTreeSet(valueTable.getVariableEntities())), percentiles).build();
     }
-    throw new UnsupportedOperationException();
+    return null;
   }
 
   public static enum Distribution {

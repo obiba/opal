@@ -445,35 +445,28 @@ public class OhsApp implements EntryPoint {
 
   public void initCategories(VariableDto dto) {
     widgets.categoriesTable().children().remove();
-    for(int i = 0; i < dto.getCategoriesArray().length(); i++) {
-      CategoryDto cat = dto.getCategoriesArray().get(i);
-      String icon = cat.getIsMissing() ? "ui-icon ui-icon-check" : "ui-icon ui-icon-close";
-      $("<tr><td>" + cat.getName() + "</td><td>" + findAttributeValue("label", cat) + "</td><td class=\"" + icon + "\"></td><td><button id=\"edit\"></button><button id=\"delete\"></button></td></tr>").appendTo(widgets.categoriesTable())//
-      .children("#edit").as(Ui).button(Button.Options.create().text(false).icons(Button.Icons.create().primary("ui-icon-pencil")))//
-      .next().as(Ui).button(Button.Options.create().text(false).icons(Button.Icons.create().primary("ui-icon-minus")));
-    }/*
-      * $("<tr><td><input type=\"text\"/></td><td><label for=\"missing\">Toggle</label><input id=\"missing\" type=\"checkbox\"/></td><td><button id=\"add\"></button></td></tr>"
-      * ).appendTo(widgets.categoriesTable())//
-      * .children("#missing").as(Ui).button(Button.Options.create().icons(Button.
-      * Icons.create().primary("ui-icon-close"))).click(new Function() {
-      * 
-      * @Override public void f(Element e) { boolean checked = ((InputElement) e.cast()).isChecked();
-      * $(e).as(Ui).button(Button.Options.create().icons(Button.Icons.create().primary(checked ? "ui-icon-check" :
-      * "ui-icon-close"))); }
-      * }).parents("tr").children("#add").as(Ui).button(Button.Options.create().text(false).icons(Button
-      * .Icons.create().primary("ui-icon-plus")));
-      */
+    if(dto.getCategoriesArray() != null) {
+      for(int i = 0; i < dto.getCategoriesArray().length(); i++) {
+        CategoryDto cat = dto.getCategoriesArray().get(i);
+        String icon = cat.getIsMissing() ? "ui-icon ui-icon-check" : "ui-icon ui-icon-close";
+        $("<tr><td>" + cat.getName() + "</td><td>" + findAttributeValue("label", cat) + "</td><td class=\"" + icon + "\"></td><td><button id=\"edit\"></button><button id=\"delete\"></button></td></tr>").appendTo(widgets.categoriesTable())//
+        .children("#edit").as(Ui).button(Button.Options.create().text(false).icons(Button.Icons.create().primary("ui-icon-pencil")))//
+        .next().as(Ui).button(Button.Options.create().text(false).icons(Button.Icons.create().primary("ui-icon-minus")));
+      }
+    }
   }
 
   public void initAttributes(VariableDto dto) {
     widgets.attributesTable().children().remove();
-    for(int i = 0; i < dto.getAttributesArray().length(); i++) {
-      AttributeDto attr = dto.getAttributesArray().get(i);
+    if(dto.getAttributesArray() != null) {
+      for(int i = 0; i < dto.getAttributesArray().length(); i++) {
+        AttributeDto attr = dto.getAttributesArray().get(i);
 
-      $("<tr><td>" + attr.getName() + "</td><td>" + attr.getLocale() + "</td><td>" + attr.getValue() + "</td><td><button id=\"edit\"></button><button id=\"delete\"></button></td></tr>")//
-      .appendTo(widgets.attributesTable())//
-      .children("#edit").as(Ui).button(Button.Options.create().text(false).icons(Button.Icons.create().primary("ui-icon-pencil")))//
-      .next().as(Ui).button(Button.Options.create().text(false).icons(Button.Icons.create().primary("ui-icon-minus")));
+        $("<tr><td>" + attr.getName() + "</td><td>" + attr.getLocale() + "</td><td>" + attr.getValue() + "</td><td><button id=\"edit\"></button><button id=\"delete\"></button></td></tr>")//
+        .appendTo(widgets.attributesTable())//
+        .children("#edit").as(Ui).button(Button.Options.create().text(false).icons(Button.Icons.create().primary("ui-icon-pencil")))//
+        .next().as(Ui).button(Button.Options.create().text(false).icons(Button.Icons.create().primary("ui-icon-minus")));
+      }
     }
   }
 
@@ -501,7 +494,7 @@ public class OhsApp implements EntryPoint {
           for(int i = 0; i < freqs.length(); i++) {
             FrequencyDto value = freqs.get(i);
             if(value.hasValue()) {
-              plot.push(value.getName(),value.getValue(),  value.getPct() * 100);
+              plot.push(value.getName(), value.getValue(), value.getPct() * 100);
             }
           }
           plot.plot();
@@ -516,14 +509,16 @@ public class OhsApp implements EntryPoint {
   }
 
   private boolean isCategorical(VariableDto dto) {
-    return dto.getCategoriesArray().length() > 0;
+    return dto.getCategoriesArray() != null && dto.getCategoriesArray().length() > 0;
   }
 
   private AttributeDto findAttribute(String string, JsArray<AttributeDto> attrs) {
-    for(int i = 0; i < attrs.length(); i++) {
-      AttributeDto attr = attrs.get(i);
-      if(attr.getName().equals(string)) {
-        return attr;
+    if(attrs != null) {
+      for(int i = 0; i < attrs.length(); i++) {
+        AttributeDto attr = attrs.get(i);
+        if(attr.getName().equals(string)) {
+          return attr;
+        }
       }
     }
     return null;
@@ -579,6 +574,7 @@ public class OhsApp implements EntryPoint {
   private void fetchValues(int offset) {
     widgets.moreValues().data("offset", offset);
     widgets.values().children().remove();
+    $("<span>Results: " + (offset + 1) + "-" + (offset + 10) + "</span>").appendTo(widgets.values());
 
     boolean partial = true;
     String js = scriptArea.getSelectedText();
