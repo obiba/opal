@@ -15,7 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.event.WizardStepChangeEvent;
+import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 
@@ -83,10 +83,10 @@ public class FormatSelectionStepPresenter extends WidgetPresenter<FormatSelectio
     public void onClick(ClickEvent event) {
       importData.setFormat(display.getImportFormat());
       if(display.getImportFormat().equals(ImportFormat.CSV)) {
-        eventBus.fireEvent(new WizardStepChangeEvent(csvFormatStepPresenter, importData));
+        eventBus.fireEvent(new WorkbenchChangeEvent(csvFormatStepPresenter));
       }
       if(display.getImportFormat().equals(ImportFormat.XML)) {
-        eventBus.fireEvent(new WizardStepChangeEvent(xmlFormatStepPresenter, importData));
+        eventBus.fireEvent(new WorkbenchChangeEvent(xmlFormatStepPresenter));
       }
     }
   }
