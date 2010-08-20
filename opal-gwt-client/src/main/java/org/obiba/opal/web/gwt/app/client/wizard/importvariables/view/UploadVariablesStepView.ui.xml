@@ -18,6 +18,11 @@
               <td style="vertical-align:top">
                 <ui:msg description="Variables File label">Variables File</ui:msg>:                
               </td>
+              <td>
+                <g:FormPanel ui:field="fileUploadForm" encoding="multipart/form-data" method="POST">
+                  <g:FileUpload ui:field="fileToUpload" name="fileToUpload" />
+                </g:FormPanel>
+              </td>
             </tr>
           </tbody>
         </table>

@@ -15,6 +15,8 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -22,11 +24,15 @@ import com.google.inject.Inject;
 
 public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariablesStepPresenter.Display> {
   //
+  // Instance Variables
+  //
+
+  //
   // Constructors
   //
 
   @Inject
-  public UploadVariablesStepPresenter(final Display display, final EventBus eventBus) {
+  public UploadVariablesStepPresenter(final Display display, final EventBus eventBus, FileSelectionPresenter fileSelectionPresenter) {
     super(display, eventBus);
   }
 
@@ -65,20 +71,27 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
   }
 
   //
+  // Methods
+  //
+
+  //
   // Inner Classes / Interfaces
   //
 
   public interface Display extends WidgetDisplay {
 
     HandlerRegistration addNextClickHandler(ClickHandler handler);
+
+    String getVariablesFilename();
+
+    void uploadVariablesFile();
   }
 
   class NextClickHandler implements ClickHandler {
 
     @Override
     public void onClick(ClickEvent event) {
-      // TODO: Not implemented
+      getDisplay().uploadVariablesFile();
     }
   }
-
 }

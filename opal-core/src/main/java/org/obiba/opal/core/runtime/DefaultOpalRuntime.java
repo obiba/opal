@@ -101,7 +101,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
           }
         }
 
-//        opalConfigIo.writeConfiguration(opalConfiguration);
+        // opalConfigIo.writeConfiguration(opalConfiguration);
         MagmaEngine.get().shutdown();
       }
     });
@@ -188,6 +188,10 @@ public class DefaultOpalRuntime implements OpalRuntime {
       for(FunctionalUnit unit : opalConfiguration.getFunctionalUnits()) {
         getUnitDirectory(unit.getName());
       }
+
+      // Create tmp folder, if it does not exist.
+      FileObject tmpFolder = getFileSystem().getRoot().resolveFile("tmp");
+      tmpFolder.createFolder();
     } catch(RuntimeException e) {
       log.error("The opal filesystem cannot be started.");
       throw e;

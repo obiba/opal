@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importvariables.view;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.UploadVariablesStepPresenter;
 
 import com.google.gwt.core.client.GWT;
@@ -20,6 +19,8 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FileUpload;
+import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class UploadVariablesStepView extends Composite implements UploadVariablesStepPresenter.Display {
@@ -29,14 +30,18 @@ public class UploadVariablesStepView extends Composite implements UploadVariable
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
-
   //
   // Instance Variables
   //
 
   @UiField
   Button nextButton;
+
+  @UiField
+  FormPanel fileUploadForm;
+
+  @UiField
+  FileUpload fileToUpload;
 
   //
   // Constructors
@@ -50,9 +55,22 @@ public class UploadVariablesStepView extends Composite implements UploadVariable
   // UploadVariablesStepPresenter.Display Methods
   //
 
-  @Override
   public HandlerRegistration addNextClickHandler(ClickHandler handler) {
     return nextButton.addClickHandler(handler);
+  }
+
+  public String getVariablesFilename() {
+    return fileToUpload.getFilename();
+  }
+
+  public void uploadVariablesFile() {
+    if(getVariablesFilename() != null && !getVariablesFilename().isEmpty()) {
+      // Note: Not sure why the double slash (//) is required in the URI. Looks like a bug in
+      // FilesResource.
+      String uri = "/ws/files//tmp/" + getVariablesFilename();
+      fileUploadForm.setAction(uri);
+      fileUploadForm.submit();
+    }
   }
 
   public Widget asWidget() {
