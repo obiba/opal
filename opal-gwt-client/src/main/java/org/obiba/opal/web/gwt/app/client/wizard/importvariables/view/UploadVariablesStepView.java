@@ -66,6 +66,10 @@ public class UploadVariablesStepView extends Composite implements UploadVariable
     return downloadExcelTemplateButton.addClickHandler(handler);
   }
 
+  public HandlerRegistration addUploadCompleteHandler(FormPanel.SubmitCompleteHandler handler) {
+    return fileUploadForm.addSubmitCompleteHandler(handler);
+  }
+
   public String getVariablesFilename() {
     return fileToUpload.getFilename();
   }

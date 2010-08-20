@@ -22,6 +22,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.inject.Inject;
 
 public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariablesStepPresenter.Display> {
@@ -60,6 +62,7 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
   protected void addEventHandlers() {
     super.registerHandler(getDisplay().addNextClickHandler(new NextClickHandler()));
     super.registerHandler(getDisplay().addDownloadExcelTemplateClickHandler(new DownloadExcelTemplateClickHandler()));
+    super.registerHandler(getDisplay().addUploadCompleteHandler(new UploadCompleteHandler()));
   }
 
   @Override
@@ -93,6 +96,8 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
 
     HandlerRegistration addDownloadExcelTemplateClickHandler(ClickHandler handler);
 
+    HandlerRegistration addUploadCompleteHandler(FormPanel.SubmitCompleteHandler handler);
+
     String getVariablesFilename();
 
     void uploadVariablesFile();
@@ -100,7 +105,6 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
 
   class NextClickHandler implements ClickHandler {
 
-    @Override
     public void onClick(ClickEvent event) {
       getDisplay().uploadVariablesFile();
     }
@@ -108,10 +112,17 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
 
   class DownloadExcelTemplateClickHandler implements ClickHandler {
 
-    @Override
     public void onClick(ClickEvent event) {
       String uri = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")).append("ws/templates").append(EXCEL_TEMPLATE).toString();
       eventBus.fireEvent(new FileDownloadEvent(uri));
+    }
+  }
+
+  class UploadCompleteHandler implements FormPanel.SubmitCompleteHandler {
+
+    public void onSubmitComplete(SubmitCompleteEvent event) {
+      // TODO: Implement creation of transient excel datasource following upload.
+      System.out.println("Upload completed!!!");
     }
   }
 }
