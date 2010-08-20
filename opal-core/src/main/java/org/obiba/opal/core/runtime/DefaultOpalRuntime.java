@@ -16,7 +16,6 @@ import org.apache.commons.vfs.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.js.MagmaJsExtension;
-import org.obiba.magma.support.Disposables;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationIo;
@@ -95,8 +94,11 @@ public class DefaultOpalRuntime implements OpalRuntime {
         // Remove all datasources before writing the configuration.
         // This is done so that Disposable instances are disposed of before being written to the config file
         for(Datasource ds : MagmaEngine.get().getDatasources()) {
-          Disposables.silentlyDispose(ds);
-          MagmaEngine.get().removeDatasource(ds);
+          try {
+            MagmaEngine.get().removeDatasource(ds);
+          } catch(RuntimeException e) {
+            log.warn("Ignoring exception during shutdown sequence.", e);
+          }
         }
 
 //        opalConfigIo.writeConfiguration(opalConfiguration);
