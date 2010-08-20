@@ -32,7 +32,8 @@
      <g:FlowPanel>
         <g:HTMLPanel>
           <g:Label addStyleNames="title"><ui:msg description="Variables File label">Variables File</ui:msg></g:Label>
-          <p><ui:msg description="Supported variables file format information">The following file format is supported for describing the variables:</ui:msg></p>    
+          <p><ui:msg description="Supported variables file format information">The following file format is supported for describing the variables:</ui:msg></p>
+          <p><g:Button ui:field="downloadExcelTemplateButton">Download Opal Excel Template</g:Button></p>    
         </g:HTMLPanel>
      </g:FlowPanel>      
   </o:WorkbenchLayout>

@@ -15,14 +15,22 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.inject.Inject;
 
 public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariablesStepPresenter.Display> {
+  //
+  // Constants
+  //
+
+  private static final String EXCEL_TEMPLATE = "/opalVariableTemplate.xls";
+
   //
   // Instance Variables
   //
@@ -51,6 +59,7 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
 
   protected void addEventHandlers() {
     super.registerHandler(getDisplay().addNextClickHandler(new NextClickHandler()));
+    super.registerHandler(getDisplay().addDownloadExcelTemplateClickHandler(new DownloadExcelTemplateClickHandler()));
   }
 
   @Override
@@ -82,6 +91,8 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
 
     HandlerRegistration addNextClickHandler(ClickHandler handler);
 
+    HandlerRegistration addDownloadExcelTemplateClickHandler(ClickHandler handler);
+
     String getVariablesFilename();
 
     void uploadVariablesFile();
@@ -92,6 +103,15 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
     @Override
     public void onClick(ClickEvent event) {
       getDisplay().uploadVariablesFile();
+    }
+  }
+
+  class DownloadExcelTemplateClickHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent event) {
+      String uri = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")).append("ws/templates").append(EXCEL_TEMPLATE).toString();
+      eventBus.fireEvent(new FileDownloadEvent(uri));
     }
   }
 }

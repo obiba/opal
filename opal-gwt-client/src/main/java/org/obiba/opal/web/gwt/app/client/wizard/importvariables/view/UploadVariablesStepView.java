@@ -43,6 +43,9 @@ public class UploadVariablesStepView extends Composite implements UploadVariable
   @UiField
   FileUpload fileToUpload;
 
+  @UiField
+  Button downloadExcelTemplateButton;
+
   //
   // Constructors
   //
@@ -57,6 +60,10 @@ public class UploadVariablesStepView extends Composite implements UploadVariable
 
   public HandlerRegistration addNextClickHandler(ClickHandler handler) {
     return nextButton.addClickHandler(handler);
+  }
+
+  public HandlerRegistration addDownloadExcelTemplateClickHandler(ClickHandler handler) {
+    return downloadExcelTemplateButton.addClickHandler(handler);
   }
 
   public String getVariablesFilename() {
