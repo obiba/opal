@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.resources.OpalResources;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.FormatSelectionStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.UploadVariablesStepPresenter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -53,6 +54,8 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
     MenuItem getExploreVariables();
 
+    MenuItem getImportVariables();
+
     void updateWorkbench(Widget workbench);
 
     MenuItem getDataImportItem();
@@ -73,6 +76,9 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
   @Inject
   private Provider<NavigatorPresenter> navigationPresenter;
+
+  @Inject
+  private Provider<UploadVariablesStepPresenter> uploadVariablesStepPresenter;
 
   @Inject
   private Provider<DataImportPresenter> dataImportPresenter;
@@ -127,6 +133,14 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       @Override
       public void execute() {
         eventBus.fireEvent(new WorkbenchChangeEvent(navigationPresenter.get()));
+      }
+    });
+
+    getDisplay().getImportVariables().setCommand(new Command() {
+
+      @Override
+      public void execute() {
+        eventBus.fireEvent(new WorkbenchChangeEvent(uploadVariablesStepPresenter.get()));
       }
     });
 

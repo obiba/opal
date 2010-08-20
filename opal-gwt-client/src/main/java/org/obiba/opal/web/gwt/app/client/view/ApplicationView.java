@@ -61,6 +61,9 @@ public class ApplicationView implements ApplicationPresenter.Display {
   MenuItem exploreVariablesItem;
 
   @UiField
+  MenuItem importVariablesItem;
+
+  @UiField
   MenuItem dataImportItem;
 
   @UiField
@@ -90,6 +93,11 @@ public class ApplicationView implements ApplicationPresenter.Display {
   @Override
   public MenuItem getExploreVariables() {
     return exploreVariablesItem;
+  }
+
+  @Override
+  public MenuItem getImportVariables() {
+    return importVariablesItem;
   }
 
   @Override
