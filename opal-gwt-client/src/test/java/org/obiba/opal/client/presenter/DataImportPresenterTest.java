@@ -87,8 +87,7 @@ public class DataImportPresenterTest extends AbstractGwtTestSetup {
     expect(mockRequestBuilder.withCallback((ResourceCallback) EasyMock.anyObject())).andReturn(mockRequestBuilder).anyTimes();
     expect(mockRequestBuilder.forResource("/datasources")).andReturn(mockRequestBuilder).once();
     expect(mockRequestBuilder.forResource("/functional-units")).andReturn(mockRequestBuilder).once();
-    mockRequestBuilder.send();
-    EasyMock.expectLastCall().anyTimes();
+    expect(mockRequestBuilder.send()).andReturn(null).anyTimes();
 
     replay(eventBusMock, displayMock, fileSelectionDisplayMock, archiveSelectionDisplayMock, mockRequestBuilder);
 

@@ -1,11 +1,11 @@
 package org.obiba.opal.web.gwt.app.client;
 
+import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
-import org.obiba.opal.web.gwt.app.client.event.SessionExpiredEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileDownloadPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
@@ -17,11 +17,14 @@ import org.obiba.opal.web.gwt.inject.client.OpalGinjector;
 import org.obiba.opal.web.gwt.rest.client.DefaultResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.event.RequestCredentialsExpiredEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
+import org.obiba.opal.web.gwt.rest.client.event.RequestEventBus;
 import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.ClosingEvent;
 import com.google.gwt.user.client.Window.ClosingHandler;
@@ -39,8 +42,16 @@ public class GwtApp implements EntryPoint {
 
   @Override
   public void onModuleLoad() {
+
+    final EventBus bus = opalGinjector.getEventBus();
     // TODO: is there a better way to provide the dependencies to instances created with GWT.create()?
-    DefaultResourceRequestBuilder.setup(opalGinjector);
+    DefaultResourceRequestBuilder.setup(new RequestEventBus() {
+
+      @Override
+      public void fireEvent(GwtEvent<?> event) {
+        bus.fireEvent(event);
+      }
+    }, opalGinjector.getRequestCredentials());
 
     initFileDownloadPresenter();
     initFileSelectorPresenter();
@@ -121,10 +132,9 @@ public class GwtApp implements EntryPoint {
         GWT.log("Request error: ", e.getException());
       }
     });
-    opalGinjector.getEventBus().addHandler(SessionExpiredEvent.getType(), new SessionExpiredEvent.Handler() {
+    opalGinjector.getEventBus().addHandler(RequestCredentialsExpiredEvent.getType(), new RequestCredentialsExpiredEvent.Handler() {
       @Override
-      public void onSessionExpired(SessionExpiredEvent event) {
-        GWT.log("Session expired");
+      public void onCredentialsExpired(RequestCredentialsExpiredEvent e) {
         revealDisplay(opalGinjector.getLoginPresenter());
       }
     });
