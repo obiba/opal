@@ -11,7 +11,7 @@ package org.obiba.opal.web;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URL;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.ws.rs.GET;
@@ -39,10 +39,10 @@ public class TemplateResource {
   @Path("/{templateFilename:[\\w\\.]+}")
   @AuthenticatedByCookie
   public Response getTemplate(@PathParam("templateFilename") String templateFilename) throws IOException {
-    InputStream templateStream = getClass().getResourceAsStream("/META-INF/templates/" + templateFilename);
-    if(templateStream != null) {
+    URL templateURL = getClass().getResource("/META-INF/templates/" + templateFilename);
+    if(templateURL != null) {
       String mimeType = mimeTypes.getContentType(new File(templateFilename));
-      return Response.ok(templateStream, MediaType.valueOf(mimeType)).header("Content-Disposition", getContentDispositionOfAttachment(templateFilename)).build();
+      return Response.ok(templateURL.getContent(), MediaType.valueOf(mimeType)).header("Content-Disposition", getContentDispositionOfAttachment(templateFilename)).build();
     } else {
       return Response.status(Status.NOT_FOUND).entity("The template specified does not exist: " + templateFilename).build();
     }
