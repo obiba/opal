@@ -41,6 +41,7 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
   @Inject
   private JobListPresenter jobListPresenter;
 
+  // Provider used here to break a circular dependency.
   @Inject
   private Provider<FormatSelectionStepPresenter> formatSelectionStepPresenter;
 
