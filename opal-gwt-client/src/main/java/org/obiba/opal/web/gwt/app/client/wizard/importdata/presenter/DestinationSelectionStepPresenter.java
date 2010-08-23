@@ -134,7 +134,6 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
 
         @Override
         public void onResource(Response response, JavaScriptObject resource) {
-          System.out.println("Response code: " + response.getStatusCode());
           if(response.getStatusCode() == 201) {
             DatasourceDto datasourceDto = (DatasourceDto) resource;
             importData.setTransientDatasourceName(datasourceDto.getName());
