@@ -16,6 +16,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
+import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -27,8 +28,12 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class SelectDestinationDatasourceStepPresenter extends WidgetPresenter<SelectDestinationDatasourceStepPresenter.Display> {
+
+  @Inject
+  private Provider<UploadVariablesStepPresenter> uploadVariablesStepPresenter;
 
   @Inject
   public SelectDestinationDatasourceStepPresenter(Display display, EventBus eventBus) {
@@ -40,6 +45,8 @@ public class SelectDestinationDatasourceStepPresenter extends WidgetPresenter<Se
     String getSelectedDatasource();
 
     HandlerRegistration addNextClickHandler(ClickHandler handler);
+
+    HandlerRegistration addCancelClickHandler(ClickHandler handler);
 
     void setDatasources(JsArray<DatasourceDto> datasources);
 
@@ -68,6 +75,7 @@ public class SelectDestinationDatasourceStepPresenter extends WidgetPresenter<Se
 
   private void addEventHandlers() {
     registerHandler(getDisplay().addNextClickHandler(new NextClickHandler()));
+    registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
   }
 
   @Override
@@ -94,6 +102,13 @@ public class SelectDestinationDatasourceStepPresenter extends WidgetPresenter<Se
       } else {
         // eventBus.fireEvent(new WorkbenchChangeEvent(compareDatasourceReportPresenter));
       }
+    }
+  }
+
+  class CancelClickHandler implements ClickHandler {
+
+    public void onClick(ClickEvent event) {
+      eventBus.fireEvent(new WorkbenchChangeEvent(uploadVariablesStepPresenter.get()));
     }
   }
 

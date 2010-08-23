@@ -40,6 +40,9 @@ public class SelectDestinationDatasourceStepView extends Composite implements Se
   Button nextButton;
 
   @UiField
+  Button cancelButton;
+
+  @UiField
   FormPanel datasourceForm;
 
   @UiField
@@ -57,10 +60,17 @@ public class SelectDestinationDatasourceStepView extends Composite implements Se
   // UploadVariablesStepPresenter.Display Methods
   //
 
+  @Override
   public HandlerRegistration addNextClickHandler(ClickHandler handler) {
     return nextButton.addClickHandler(handler);
   }
 
+  @Override
+  public HandlerRegistration addCancelClickHandler(ClickHandler handler) {
+    return cancelButton.addClickHandler(handler);
+  }
+
+  @Override
   public String getSelectedDatasource() {
     return datasource.getValue(datasource.getSelectedIndex());
   }
