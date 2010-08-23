@@ -16,7 +16,6 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
@@ -48,7 +47,7 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
   //
 
   @Inject
-  public UploadVariablesStepPresenter(final Display display, final EventBus eventBus, FileSelectionPresenter fileSelectionPresenter) {
+  public UploadVariablesStepPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
   }
 
@@ -131,7 +130,6 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
       ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
         public void onResponseCode(Request request, Response response) {
-          System.out.println("Response code: " + response.getStatusCode());
           if(response.getStatusCode() == 201) {
             // TODO: Next wizard step.
           } else {
@@ -141,7 +139,7 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
       };
 
       DatasourceFactoryDto dto = createDatasourceFactoryDto();
-      ResourceRequestBuilderFactory.newBuilder().forResource("/datasources").post().accept("application/json").withResourceBody(DatasourceFactoryDto.stringify(dto)).withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler).send();
+      ResourceRequestBuilderFactory.newBuilder().forResource("/datasources").post().accept("application/x-protobuf+json").withResourceBody(DatasourceFactoryDto.stringify(dto)).withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler).send();
     }
 
     private DatasourceFactoryDto createDatasourceFactoryDto() {
