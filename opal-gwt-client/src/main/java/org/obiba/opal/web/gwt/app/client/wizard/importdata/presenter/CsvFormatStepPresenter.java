@@ -135,10 +135,14 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
 
     @Override
     public void onClick(ClickEvent event) {
-      getValidatedRow();
+      int row = getValidatedRow();
       validateCharacterSet(getSelectedCharacterSet());
 
       if(errors.isEmpty()) {
+        importData.setCsvFile(csvFileSelectionPresenter.getSelectedFile());
+        importData.setRow(row);
+        importData.setField(getDisplay().getFieldSeparator());
+        importData.setQuote(getDisplay().getQuote());
         importData.setCharacterSet(getSelectedCharacterSet());
         eventBus.fireEvent(new WorkbenchChangeEvent(destinationSelectionStepPresenter));
       } else {

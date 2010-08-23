@@ -21,8 +21,13 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.model.client.magma.CsvDatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.CsvDatasourceTableBundleDto;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
+import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -116,11 +121,58 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
       importData.setDestinationTableName(getDisplay().getSelectedTable());
 
       if(importData.getImportFormat().equals(ImportFormat.CSV)) {
-        eventBus.fireEvent(new WorkbenchChangeEvent(dashboardPresenter));
+        createTransientCsvDatasource();
       }
       if(importData.getImportFormat().equals(ImportFormat.XML)) {
         eventBus.fireEvent(new WorkbenchChangeEvent(identityArchiveStepPresenter));
       }
+    }
+
+    private void createTransientCsvDatasource() {
+
+      ResourceCallback<JavaScriptObject> callbackHandler = new ResourceCallback<JavaScriptObject>() {
+
+        @Override
+        public void onResource(Response response, JavaScriptObject resource) {
+          System.out.println("Response code: " + response.getStatusCode());
+          if(response.getStatusCode() == 201) {
+            DatasourceDto datasourceDto = (DatasourceDto) resource;
+            importData.setTransientDatasourceName(datasourceDto.getName());
+            eventBus.fireEvent(new WorkbenchChangeEvent(identityArchiveStepPresenter));
+          } else {
+            // TODO: Handle errors
+            @SuppressWarnings("unused")
+            ClientErrorDto clientErrorDto = (ClientErrorDto) resource;
+          }
+        }
+
+      };
+
+      DatasourceFactoryDto dto = createDatasourceFactoryDto();
+      ResourceRequestBuilderFactory.newBuilder().forResource("/datasources").post().accept("application/json").withResourceBody(DatasourceFactoryDto.stringify(dto)) //
+      .withCallback(callbackHandler).send();
+    }
+
+    private DatasourceFactoryDto createDatasourceFactoryDto() {
+
+      CsvDatasourceTableBundleDto csvDatasourceTableBundleDto = CsvDatasourceTableBundleDto.create();
+      csvDatasourceTableBundleDto.setName(importData.getDestinationTableName());
+
+      @SuppressWarnings("unchecked")
+      JsArray<CsvDatasourceTableBundleDto> tables = (JsArray<CsvDatasourceTableBundleDto>) JsArray.createArray();
+      tables.push(csvDatasourceTableBundleDto);
+
+      CsvDatasourceFactoryDto csvDatasourceFactoryDto = CsvDatasourceFactoryDto.create();
+      csvDatasourceFactoryDto.setCharacterSet(importData.getCharacterSet());
+      csvDatasourceFactoryDto.setFirstRow(importData.getRow());
+      csvDatasourceFactoryDto.setQuote(importData.getQuote());
+      csvDatasourceFactoryDto.setSeparator(importData.getField());
+      csvDatasourceFactoryDto.setTablesArray(tables);
+
+      DatasourceFactoryDto dto = DatasourceFactoryDto.create();
+      dto.setExtension(CsvDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, csvDatasourceFactoryDto);
+
+      return dto;
     }
   }
 

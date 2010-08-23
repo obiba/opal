@@ -35,6 +35,16 @@ public class ImportData {
 
   private String jobId;
 
+  private int row;
+
+  private String quote;
+
+  private String field;
+
+  private String csvFile;
+
+  private String transientDatasourceName;
+
   public void setFormat(ImportFormat importFormat) {
     this.importFormat = importFormat;
   }
@@ -133,6 +143,46 @@ public class ImportData {
 
   public void setJobId(String jobId) {
     this.jobId = jobId;
+  }
+
+  public int getRow() {
+    return row;
+  }
+
+  public void setRow(int row) {
+    this.row = row;
+  }
+
+  public String getCsvFile() {
+    return csvFile;
+  }
+
+  public void setCsvFile(String csvFile) {
+    this.csvFile = csvFile;
+  }
+
+  public String getQuote() {
+    return quote;
+  }
+
+  public void setQuote(String quote) {
+    this.quote = quote;
+  }
+
+  public String getField() {
+    return field;
+  }
+
+  public void setField(String field) {
+    this.field = field;
+  }
+
+  public String getTransientDatasourceName() {
+    return transientDatasourceName;
+  }
+
+  public void setTransientDatasourceName(String transientDatasourceName) {
+    this.transientDatasourceName = transientDatasourceName;
   }
 
 }
