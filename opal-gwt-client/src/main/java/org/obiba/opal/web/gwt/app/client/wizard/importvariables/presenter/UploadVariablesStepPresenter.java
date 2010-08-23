@@ -17,11 +17,17 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.inject.Inject;
@@ -121,8 +127,32 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
   class UploadCompleteHandler implements FormPanel.SubmitCompleteHandler {
 
     public void onSubmitComplete(SubmitCompleteEvent event) {
-      // TODO: Implement creation of transient excel datasource following upload.
-      System.out.println("Upload completed!!!");
+
+      ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+        public void onResponseCode(Request request, Response response) {
+          System.out.println("Response code: " + response.getStatusCode());
+          if(response.getStatusCode() == 201) {
+            // TODO: Next wizard step.
+          } else {
+            // TODO: Handle error.
+          }
+        }
+      };
+
+      DatasourceFactoryDto dto = createDatasourceFactoryDto();
+      ResourceRequestBuilderFactory.newBuilder().forResource("/datasources").post().accept("application/json").withResourceBody(DatasourceFactoryDto.stringify(dto)).withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler).send();
+    }
+
+    private DatasourceFactoryDto createDatasourceFactoryDto() {
+      ExcelDatasourceFactoryDto excelDto = ExcelDatasourceFactoryDto.create();
+      excelDto.setFile("/tmp/" + getDisplay().getVariablesFilename());
+      excelDto.setReadOnly(true);
+
+      DatasourceFactoryDto dto = DatasourceFactoryDto.create();
+      dto.setExtension(ExcelDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, excelDto);
+
+      return dto;
     }
   }
 }
