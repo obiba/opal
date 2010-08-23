@@ -254,4 +254,20 @@ public interface Translations extends Constants {
   @Description("Opal XML label")
   @DefaultStringValue("Opal XML")
   String opalXmlLabel();
+
+  @Description("Row must be integer message")
+  @DefaultStringValue("Row must be an integer.")
+  String rowMustBeIntegerMessage();
+
+  @Description("Row must be positive message")
+  @DefaultStringValue("Row must must be a postive value.")
+  String rowMustBePositiveMessage();
+
+  @Description("Charset must not be null message")
+  @DefaultStringValue("The character set must not be null or empty.")
+  String charsetMustNotBeNullMessage();
+
+  @Description("Charset does not exist message")
+  @DefaultStringValue("The specified character set could not be found.")
+  String charsetDoesNotExistMessage();
 }

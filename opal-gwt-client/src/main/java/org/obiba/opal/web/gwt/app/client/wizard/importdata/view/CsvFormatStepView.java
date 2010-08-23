@@ -22,8 +22,11 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 public class CsvFormatStepView extends Composite implements CsvFormatStepPresenter.Display {
@@ -43,10 +46,22 @@ public class CsvFormatStepView extends Composite implements CsvFormatStepPresent
   SimplePanel selectCsvFilePanel;
 
   @UiField
+  TextBox row;
+
+  @UiField
+  ListBox field;
+
+  @UiField
+  ListBox quote;
+
+  @UiField
   RadioButton charsetDefault;
 
   @UiField
   RadioButton charsetCommonList;
+
+  @UiField
+  ListBox charsetCommonListBox;
 
   @UiField
   RadioButton charsetSpecify;
@@ -54,9 +69,17 @@ public class CsvFormatStepView extends Composite implements CsvFormatStepPresent
   @UiField
   SpanElement defaultCharset;
 
+  @UiField
+  TextBox charsetSpecifyTextBox;
+
   public CsvFormatStepView() {
     initWidget(uiBinder.createAndBindUi(this));
+    populateField();
+  }
 
+  private void populateField() {
+    row.setSize("2em", "1em");
+    row.setText("1");
   }
 
   @Override
@@ -92,6 +115,46 @@ public class CsvFormatStepView extends Composite implements CsvFormatStepPresent
   @Override
   public boolean isDefaultCharacterSet() {
     return charsetDefault.getValue();
+  }
+
+  @Override
+  public String getFieldSeparator() {
+    return field.getValue(field.getSelectedIndex());
+  }
+
+  @Override
+  public String getQuote() {
+    return quote.getItemText(quote.getSelectedIndex());
+  }
+
+  @Override
+  public HasText getRowText() {
+    return row;
+  }
+
+  @Override
+  public void setNextEnabled(boolean enabled) {
+    nextButton.setEnabled(enabled);
+  }
+
+  @Override
+  public HasText getCharsetSpecifyText() {
+    return charsetSpecifyTextBox;
+  }
+
+  @Override
+  public boolean isCharsetCommonList() {
+    return charsetCommonList.getValue();
+  }
+
+  @Override
+  public boolean isCharsetSpecify() {
+    return charsetSpecify.getValue();
+  }
+
+  @Override
+  public String getCharsetCommonList() {
+    return charsetCommonListBox.getValue(charsetCommonListBox.getSelectedIndex());
   }
 
 }

@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -16,17 +19,22 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 
 public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresenter.Display> {
@@ -35,15 +43,37 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
 
     HandlerRegistration addNextClickHandler(ClickHandler handler);
 
+    void setNextEnabled(boolean enabled);
+
     void setCsvFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
 
     void setDefaultCharset(String defaultCharset);
 
     boolean isDefaultCharacterSet();
 
+    boolean isCharsetCommonList();
+
+    String getCharsetCommonList();
+
+    String getFieldSeparator();
+
+    String getQuote();
+
+    HasText getRowText();
+
+    boolean isCharsetSpecify();
+
+    HasText getCharsetSpecifyText();
+
   }
 
+  private List<String> errors = new ArrayList<String>();
+
+  private List<String> availableCharsets = new ArrayList<String>();
+
   private String defaultCharset;
+
+  private static Translations translations = GWT.create(Translations.class);
 
   @Inject
   private ImportData importData;
@@ -53,6 +83,9 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
 
   @Inject
   private FileSelectionPresenter csvFileSelectionPresenter;
+
+  @Inject
+  private ErrorDialogPresenter errorDialog;
 
   @Inject
   public CsvFormatStepPresenter(final Display display, final EventBus eventBus) {
@@ -71,13 +104,15 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
     getDefaultCharset();
     getAvailableCharsets();
 
-    csvFileSelectionPresenter.setFileSelectionType(FileSelectionType.FOLDER);
+    csvFileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
     csvFileSelectionPresenter.bind();
     getDisplay().setCsvFileSelectorWidgetDisplay(csvFileSelectionPresenter.getDisplay());
+    getDisplay().setNextEnabled(false);
   }
 
   protected void addEventHandlers() {
     super.registerHandler(getDisplay().addNextClickHandler(new NextClickHandler()));
+    super.registerHandler(eventBus.addHandler(FileSelectionUpdateEvent.getType(), new FileSelectionUpdateHandler()));
   }
 
   @Override
@@ -100,17 +135,71 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
 
     @Override
     public void onClick(ClickEvent event) {
-      importData.setCharacterSet(getSelectedCharacterSet());
-      eventBus.fireEvent(new WorkbenchChangeEvent(destinationSelectionStepPresenter));
+      getValidatedRow();
+      validateCharacterSet(getSelectedCharacterSet());
+
+      if(errors.isEmpty()) {
+        importData.setCharacterSet(getSelectedCharacterSet());
+        eventBus.fireEvent(new WorkbenchChangeEvent(destinationSelectionStepPresenter));
+      } else {
+        errorDialog.bind();
+        errorDialog.setErrors(errors);
+        errorDialog.addOkayClickHandler(new ClickHandler() {
+
+          @Override
+          public void onClick(ClickEvent arg0) {
+            errors.clear();
+          }
+        });
+        errorDialog.revealDisplay();
+      }
+
     }
 
-    private String getSelectedCharacterSet() {
-      if(getDisplay().isDefaultCharacterSet()) {
-        return defaultCharset;
-      } else {
-        return null;
-      }
+  }
+
+  private String getSelectedCharacterSet() {
+    String charset = null;
+    if(getDisplay().isDefaultCharacterSet()) {
+      charset = defaultCharset;
+    } else if(getDisplay().isCharsetCommonList()) {
+      charset = getDisplay().getCharsetCommonList();
+    } else if(getDisplay().isCharsetSpecify()) {
+      charset = getDisplay().getCharsetSpecifyText().getText();
     }
+    return charset;
+  }
+
+  private void validateCharacterSet(String charset) {
+    if(charset == null || charset.equals("")) {
+      errors.add(translations.charsetMustNotBeNullMessage());
+
+    } else if(!charsetExistsInAvailableCharsets(charset)) {
+      errors.add(translations.charsetDoesNotExistMessage());
+    }
+  }
+
+  private boolean charsetExistsInAvailableCharsets(String charset) {
+    for(String availableCharset : availableCharsets) {
+      if(charset.equals(availableCharset)) return true;
+    }
+    return false;
+  }
+
+  private int getValidatedRow() {
+    int row = getRow();
+    if(row < 1) errors.add(translations.rowMustBePositiveMessage());
+    return row;
+  }
+
+  private int getRow() {
+    int row = 1;
+    try {
+      row = Integer.parseInt(getDisplay().getRowText().getText());
+    } catch(NumberFormatException e) {
+      errors.add(translations.rowMustBeIntegerMessage());
+    }
+    return row;
   }
 
   public void getDefaultCharset() {
@@ -131,10 +220,21 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
       @Override
       public void onResource(Response response, JsArrayString datasources) {
         for(int i = 0; i < datasources.length(); i++) {
-          // GWT.log(datasources.get(i));
+          availableCharsets.add(datasources.get(i));
         }
       }
     }).send();
+  }
+
+  private void enableImport() {
+    getDisplay().setNextEnabled(csvFileSelectionPresenter.getSelectedFile().length() > 0);
+  }
+
+  class FileSelectionUpdateHandler implements FileSelectionUpdateEvent.Handler {
+    @Override
+    public void onFileSelectionUpdate(FileSelectionUpdateEvent event) {
+      enableImport();
+    }
   }
 
 }
