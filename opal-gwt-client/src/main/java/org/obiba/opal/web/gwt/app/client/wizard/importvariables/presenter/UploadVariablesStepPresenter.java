@@ -15,6 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -35,6 +36,9 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
   //
   // Constants
   //
+
+  @Inject
+  private SelectDestinationDatasourceStepPresenter destinationDatasourceStepPresenter;
 
   private static final String EXCEL_TEMPLATE = "/opalVariableTemplate.xls";
 
@@ -131,7 +135,7 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
 
         public void onResponseCode(Request request, Response response) {
           if(response.getStatusCode() == 201) {
-            // TODO: Next wizard step.
+            eventBus.fireEvent(new WorkbenchChangeEvent(destinationDatasourceStepPresenter));
           } else {
             // TODO: Handle error.
           }

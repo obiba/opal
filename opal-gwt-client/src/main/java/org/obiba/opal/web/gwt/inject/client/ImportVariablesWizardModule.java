@@ -9,7 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.inject.client;
 
+import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.SelectDestinationDatasourceStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.UploadVariablesStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importvariables.view.SelectDestinationDatasourceStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.view.UploadVariablesStepView;
 
 import com.google.gwt.inject.client.AbstractGinModule;
@@ -23,6 +25,7 @@ public class ImportVariablesWizardModule extends AbstractGinModule {
   @Override
   protected void configure() {
     bind(UploadVariablesStepPresenter.Display.class).to(UploadVariablesStepView.class).in(Singleton.class);
+    bind(SelectDestinationDatasourceStepPresenter.Display.class).to(SelectDestinationDatasourceStepView.class).in(Singleton.class);
   }
 
 }
