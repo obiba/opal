@@ -21,8 +21,10 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -37,14 +39,17 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
   // Constants
   //
 
-  @Inject
-  private SelectDestinationDatasourceStepPresenter destinationDatasourceStepPresenter;
-
   private static final String EXCEL_TEMPLATE = "/opalVariableTemplate.xls";
 
   //
   // Instance Variables
   //
+
+  @Inject
+  private SelectDestinationDatasourceStepPresenter destinationDatasourceStepPresenter;
+
+  @Inject
+  private ValidationReportStepPresenter validationReportStepPresenter;
 
   //
   // Constructors
@@ -137,13 +142,15 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
           if(response.getStatusCode() == 201) {
             eventBus.fireEvent(new WorkbenchChangeEvent(destinationDatasourceStepPresenter));
           } else {
-            // TODO: Handle error.
+            final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+            validationReportStepPresenter.getDisplay().setErrors(errorDto);
+            eventBus.fireEvent(new WorkbenchChangeEvent(validationReportStepPresenter));
           }
         }
       };
 
       DatasourceFactoryDto dto = createDatasourceFactoryDto();
-      ResourceRequestBuilderFactory.newBuilder().forResource("/datasources").post().accept("application/x-protobuf+json").withResourceBody(DatasourceFactoryDto.stringify(dto)).withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler).send();
+      ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource("/datasources").post().accept("application/x-protobuf+json").withResourceBody(DatasourceFactoryDto.stringify(dto)).withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler).send();
     }
 
     private DatasourceFactoryDto createDatasourceFactoryDto() {
