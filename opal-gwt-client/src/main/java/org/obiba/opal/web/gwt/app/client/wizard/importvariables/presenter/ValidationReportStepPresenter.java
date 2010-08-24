@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter;
 
+import java.util.List;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -16,7 +18,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
+import org.obiba.opal.web.model.client.ws.DatasourceParsingErrorDto;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -87,7 +89,7 @@ public class ValidationReportStepPresenter extends WidgetPresenter<ValidationRep
 
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
 
-    void setErrors(ClientErrorDto dto);
+    void setErrors(List<DatasourceParsingErrorDto> errors);
   }
 
   class CancelClickHandler implements ClickHandler {

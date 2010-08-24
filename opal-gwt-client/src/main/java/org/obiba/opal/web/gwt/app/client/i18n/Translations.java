@@ -132,7 +132,7 @@ public interface Translations extends Constants {
   String unitLabel();
 
   @Description("User message map")
-  @DefaultStringMapValue( { "jobCancelled", "Job cancelled.", "jobDeleted", "Job deleted.", "completedJobsDeleted", "All completed jobs deleted.", "SetCommandStatus_NotFound", "Job could not be cancelled (not found).", "SetCommandStatus_BadRequest_IllegalStatus", "Job status cannot be set to the specified value.", "SetCommandStatus_BadRequest_NotCancellable", "Job has completed and has already been cancelled.", "DeleteCommand_NotFound", "Job could not be deleted (not found).", "DeleteCommand_BadRequest_NotDeletable", "Job is currently running and therefore cannot be deleted at this time.", "cannotCreateFolderPathAlreadyExist", "Could not create the folder, a folder or a file exist with that name at the specified path.", "cannotCreateFolderParentIsReadOnly", "Could create the following folder because its parent folder is read-only.", "cannotCreatefolderUnexpectedError", "There was an unexpected error while creating the folder.", "cannotDeleteNotEmptyFolder", "This folder contains one or many file(s) and as a result cannot be deleted.", "cannotDeleteReadOnlyFile", "Could delete the  file or folder because it is read-only.", "couldNotDeleteFileError", "There was an error while deleting the file or folder.", "datasourceMustBeSelected", "You must select a datasource." })
+  @DefaultStringMapValue( { "jobCancelled", "Job cancelled.", "jobDeleted", "Job deleted.", "completedJobsDeleted", "All completed jobs deleted.", "SetCommandStatus_NotFound", "Job could not be cancelled (not found).", "SetCommandStatus_BadRequest_IllegalStatus", "Job status cannot be set to the specified value.", "SetCommandStatus_BadRequest_NotCancellable", "Job has completed and has already been cancelled.", "DeleteCommand_NotFound", "Job could not be deleted (not found).", "DeleteCommand_BadRequest_NotDeletable", "Job is currently running and therefore cannot be deleted at this time.", "cannotCreateFolderPathAlreadyExist", "Could not create the folder, a folder or a file exist with that name at the specified path.", "cannotCreateFolderParentIsReadOnly", "Could create the following folder because its parent folder is read-only.", "cannotCreatefolderUnexpectedError", "There was an unexpected error while creating the folder.", "cannotDeleteNotEmptyFolder", "This folder contains one or many file(s) and as a result cannot be deleted.", "cannotDeleteReadOnlyFile", "Could delete the  file or folder because it is read-only.", "couldNotDeleteFileError", "There was an error while deleting the file or folder.", "datasourceMustBeSelected", "You must select a datasource.", "fileReadError", "The file could not be read." })
   Map<String, String> userMessageMap();
 
   @Description("You must select a file message")
@@ -260,7 +260,7 @@ public interface Translations extends Constants {
   String rowMustBeIntegerMessage();
 
   @Description("Row must be positive message")
-  @DefaultStringValue("Row must must be a postive value.")
+  @DefaultStringValue("Row must must be a positive value.")
   String rowMustBePositiveMessage();
 
   @Description("Charset must not be null message")

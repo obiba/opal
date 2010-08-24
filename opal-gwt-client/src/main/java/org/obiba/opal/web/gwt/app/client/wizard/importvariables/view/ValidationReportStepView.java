@@ -9,12 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importvariables.view;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ValidationReportStepPresenter;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
+import org.obiba.opal.web.model.client.ws.DatasourceParsingErrorDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -47,7 +46,7 @@ public class ValidationReportStepView extends Composite implements ValidationRep
   Button cancelButton;
 
   @UiField
-  CellTable<ClientErrorDto> table;
+  CellTable<DatasourceParsingErrorDto> table;
 
   //
   // Constructors
@@ -66,14 +65,10 @@ public class ValidationReportStepView extends Composite implements ValidationRep
     return cancelButton.addClickHandler(handler);
   }
 
-  public void setErrors(ClientErrorDto dto) {
-    // TODO: If the dto contains multiple errors, extract them all.
-    final List<ClientErrorDto> errors = Arrays.asList(dto);
+  public void setErrors(final List<DatasourceParsingErrorDto> errors) {
+    table.setDelegate(new Delegate<DatasourceParsingErrorDto>() {
 
-    table.setDelegate(new Delegate<ClientErrorDto>() {
-
-      @Override
-      public void onRangeChanged(ListView<ClientErrorDto> listView) {
+      public void onRangeChanged(ListView<DatasourceParsingErrorDto> listView) {
         int start = listView.getRange().getStart();
         int length = listView.getRange().getLength();
         listView.setData(start, length, errors);
@@ -105,24 +100,24 @@ public class ValidationReportStepView extends Composite implements ValidationRep
   }
 
   private void addTableColumns() {
-    table.addColumn(new TextColumn<ClientErrorDto>() {
+    table.addColumn(new TextColumn<DatasourceParsingErrorDto>() {
       @Override
-      public String getValue(ClientErrorDto dto) {
+      public String getValue(DatasourceParsingErrorDto dto) {
         return dto.getArgumentsArray().get(0);
       }
     }, translations.sheetLabel());
 
-    table.addColumn(new TextColumn<ClientErrorDto>() {
+    table.addColumn(new TextColumn<DatasourceParsingErrorDto>() {
       @Override
-      public String getValue(ClientErrorDto dto) {
+      public String getValue(DatasourceParsingErrorDto dto) {
         return dto.getArgumentsArray().get(1);
       }
     }, translations.rowNumberLabel());
 
-    table.addColumn(new TextColumn<ClientErrorDto>() {
+    table.addColumn(new TextColumn<DatasourceParsingErrorDto>() {
       @Override
-      public String getValue(ClientErrorDto dto) {
-        return dto.getStatus();
+      public String getValue(DatasourceParsingErrorDto dto) {
+        return dto.getKey();
       }
     }, translations.errorLabel());
   }

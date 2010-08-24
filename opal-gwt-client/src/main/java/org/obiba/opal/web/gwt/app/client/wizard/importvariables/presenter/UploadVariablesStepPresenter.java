@@ -9,21 +9,30 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
+import org.obiba.opal.web.model.client.ws.DatasourceParsingErrorDto;
+import org.obiba.opal.web.model.client.ws.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -40,6 +49,8 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
   //
 
   private static final String EXCEL_TEMPLATE = "/opalVariableTemplate.xls";
+
+  private static Translations translations = GWT.create(Translations.class);
 
   //
   // Instance Variables
@@ -143,8 +154,13 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
             eventBus.fireEvent(new WorkbenchChangeEvent(destinationDatasourceStepPresenter));
           } else {
             final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-            validationReportStepPresenter.getDisplay().setErrors(errorDto);
-            eventBus.fireEvent(new WorkbenchChangeEvent(validationReportStepPresenter));
+
+            if(errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
+              validationReportStepPresenter.getDisplay().setErrors(extractDatasourceParsingErrors(errorDto));
+              eventBus.fireEvent(new WorkbenchChangeEvent(validationReportStepPresenter));
+            } else {
+              eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "fileReadError", null));
+            }
           }
         }
       };
@@ -162,6 +178,20 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
       dto.setExtension(ExcelDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, excelDto);
 
       return dto;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<DatasourceParsingErrorDto> extractDatasourceParsingErrors(ClientErrorDto dto) {
+      List<DatasourceParsingErrorDto> datasourceParsingErrors = new ArrayList<DatasourceParsingErrorDto>();
+
+      JsArray<DatasourceParsingErrorDto> errors = (JsArray<DatasourceParsingErrorDto>) dto.getExtension(ClientErrorDtoExtensions.errors);
+      if(errors != null) {
+        for(int i = 0; i < errors.length(); i++) {
+          datasourceParsingErrors.add(errors.get(i));
+        }
+      }
+
+      return datasourceParsingErrors;
     }
   }
 }
