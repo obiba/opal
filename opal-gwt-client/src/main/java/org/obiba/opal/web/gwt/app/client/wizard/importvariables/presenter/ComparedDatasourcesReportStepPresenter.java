@@ -15,45 +15,36 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.model.client.magma.DatasourceDto;
+import org.obiba.opal.web.model.client.magma.DatasourceCompareDto;
 
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
-public class SelectDestinationDatasourceStepPresenter extends WidgetPresenter<SelectDestinationDatasourceStepPresenter.Display> {
-
-  @Inject
-  private Provider<UploadVariablesStepPresenter> uploadVariablesStepPresenterProvider;
+public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<ComparedDatasourcesReportStepPresenter.Display> {
 
   @Inject
-  private Provider<ComparedDatasourcesReportStepPresenter> comparedDatasourcesReportPresenterProvider;
+  private UploadVariablesStepPresenter uploadVariablesStepPresenter;
 
   private String sourceDatasourceName;
 
+  private String targetDatasourceName;
+
   @Inject
-  public SelectDestinationDatasourceStepPresenter(Display display, EventBus eventBus) {
+  public ComparedDatasourcesReportStepPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
   }
 
   public interface Display extends WidgetDisplay {
 
-    String getSelectedDatasource();
-
     HandlerRegistration addNextClickHandler(ClickHandler handler);
 
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
-
-    void setDatasources(JsArray<DatasourceDto> datasources);
 
   }
 
@@ -65,14 +56,14 @@ public class SelectDestinationDatasourceStepPresenter extends WidgetPresenter<Se
   @Override
   protected void onBind() {
     addEventHandlers();
-    initDatasources();
+    initComparedDatasourceReport();
   }
 
-  private void initDatasources() {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+  private void initComparedDatasourceReport() {
+    ResourceRequestBuilderFactory.<DatasourceCompareDto> newBuilder().forResource("/datasource/" + sourceDatasourceName + "/compare/" + targetDatasourceName).get().withCallback(new ResourceCallback<DatasourceCompareDto>() {
       @Override
-      public void onResource(Response response, JsArray<DatasourceDto> datasources) {
-        getDisplay().setDatasources(datasources);
+      public void onResource(Response response, DatasourceCompareDto resource) {
+        System.out.println("cOMPARED DATASOURCE " + resource.getCompared().getName());
       }
     }).send();
 
@@ -103,23 +94,20 @@ public class SelectDestinationDatasourceStepPresenter extends WidgetPresenter<Se
     this.sourceDatasourceName = sourceDatasourceName;
   }
 
+  public void setTargetDatasourceName(String targetDatasourceName) {
+    this.targetDatasourceName = targetDatasourceName;
+  }
+
   class NextClickHandler implements ClickHandler {
+
     public void onClick(ClickEvent event) {
-      String selectedDatasourceName = getDisplay().getSelectedDatasource();
-      if(selectedDatasourceName.equals("")) {
-        eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "datasourceMustBeSelected", null));
-      } else {
-        ComparedDatasourcesReportStepPresenter compareDatasourcesReportPresenterProvider = comparedDatasourcesReportPresenterProvider.get();
-        compareDatasourcesReportPresenterProvider.setSourceDatasourceName(sourceDatasourceName);
-        compareDatasourcesReportPresenterProvider.setTargetDatasourceName(selectedDatasourceName);
-        eventBus.fireEvent(new WorkbenchChangeEvent(compareDatasourcesReportPresenterProvider));
-      }
     }
   }
 
   class CancelClickHandler implements ClickHandler {
+
     public void onClick(ClickEvent event) {
-      eventBus.fireEvent(new WorkbenchChangeEvent(uploadVariablesStepPresenterProvider.get()));
+      eventBus.fireEvent(new WorkbenchChangeEvent(uploadVariablesStepPresenter));
     }
   }
 

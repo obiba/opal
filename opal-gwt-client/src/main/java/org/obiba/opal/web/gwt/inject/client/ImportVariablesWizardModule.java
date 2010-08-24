@@ -9,9 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.inject.client;
 
+import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.SelectDestinationDatasourceStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.UploadVariablesStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ValidationReportStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importvariables.view.ComparedDatasourcesReportStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.view.SelectDestinationDatasourceStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.view.UploadVariablesStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.view.ValidationReportStepView;
@@ -29,6 +31,7 @@ public class ImportVariablesWizardModule extends AbstractGinModule {
     bind(UploadVariablesStepPresenter.Display.class).to(UploadVariablesStepView.class).in(Singleton.class);
     bind(SelectDestinationDatasourceStepPresenter.Display.class).to(SelectDestinationDatasourceStepView.class).in(Singleton.class);
     bind(ValidationReportStepPresenter.Display.class).to(ValidationReportStepView.class).in(Singleton.class);
+    bind(ComparedDatasourcesReportStepPresenter.Display.class).to(ComparedDatasourcesReportStepView.class).in(Singleton.class);
   }
 
 }

@@ -1,0 +1,44 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
+
+  <o:WorkbenchLayout>
+    <g:Label><ui:msg description="Import Variables title">Import Variables</ui:msg></g:Label>
+    <g:Label><ui:msg description="Compared Datasources Report summary">Review the modifications before applying them</ui:msg></g:Label>
+    <g:FlowPanel>
+      <g:Button ui:field="cancelButton"><ui:msg description="Cancel button label">Cancel</ui:msg></g:Button>    
+      <g:Button ui:field="nextButton"><ui:msg description="Next button label">Next</ui:msg></g:Button>
+    </g:FlowPanel>
+    
+    <g:FlowPanel>
+      <g:TabLayoutPanel ui:field="tablesPanel" barUnit='EM' barHeight='3'/>
+      <g:HTMLPanel>
+        <table class="gwt-KeyValue" cellspacing="10">
+          <tbody>
+            <tr>
+              <td style="vertical-align:top">
+                <ui:msg description="New variables label">New Variables</ui:msg>:                
+              </td>
+            </tr>
+            <tr>
+              <td style="vertical-align:top">
+                <ui:msg description="Modified variables label">Modified Variables</ui:msg>:                
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </g:HTMLPanel>
+    </g:FlowPanel>
+    
+     <g:FlowPanel>
+        <g:HTMLPanel>
+          <g:Label addStyleNames="title"><ui:msg description="Variables creation modification review label">Variable Creation/Modification Review</ui:msg></g:Label>
+          <p><ui:msg description="Variables creation modification review information"><p>Review the modifications before they are applied to the datasource.</p><p>Affected tables are displayed to the left.  For each of them, a report shows which variables are going to be created and which are going to be modified.</p><p>Modifications to variables can be ignored by ticking checkbox above the report. This will affect all tables.</p></ui:msg></p>
+        </g:HTMLPanel>
+     </g:FlowPanel>      
+  </o:WorkbenchLayout>
+
+</ui:UiBinder>

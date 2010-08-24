@@ -22,8 +22,9 @@ import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -36,7 +37,6 @@ import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
@@ -144,10 +144,11 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
 
     public void onSubmitComplete(SubmitCompleteEvent event) {
 
-      ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
-
-        public void onResponseCode(Request request, Response response) {
+      ResourceCallback<DatasourceDto> callbackHandler = new ResourceCallback<DatasourceDto>() {
+        @Override
+        public void onResource(Response response, DatasourceDto resource) {
           if(response.getStatusCode() == 201) {
+            destinationDatasourceStepPresenter.setSourceDatasourceName(((DatasourceDto) resource).getName());
             eventBus.fireEvent(new WorkbenchChangeEvent(destinationDatasourceStepPresenter));
           } else {
             final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
@@ -163,7 +164,7 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
       };
 
       DatasourceFactoryDto dto = createDatasourceFactoryDto();
-      ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource("/datasources").post().accept("application/x-protobuf+json").withResourceBody(DatasourceFactoryDto.stringify(dto)).withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler).send();
+      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasources").post().accept("application/x-protobuf+json").withResourceBody(DatasourceFactoryDto.stringify(dto)).withCallback(callbackHandler).send();
     }
 
     private DatasourceFactoryDto createDatasourceFactoryDto() {
