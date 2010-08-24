@@ -44,12 +44,6 @@ message AttributeDto {
   optional string locale = 3;
 }
 
-message FrequencyDto {
-  required string name = 1;
-  required int32 value = 2;
-  required double pct = 3;
-}
-
 message LinkDto {
   required string rel = 1;
   required string link = 2;
@@ -59,22 +53,4 @@ message ValueDto {
   required string valueType = 1;
   required bool isSequence = 2;
   optional string value = 3;
-}
-
-message DescriptiveStatsDto {
-  optional double min = 1;
-  optional double max = 2;
-  optional double mean = 3;
-  optional double geometricMean = 4;
-  optional int64 n = 5;
-  optional double sum = 6;
-  optional double sumsq = 7;
-  optional double stdDev = 8;
-  optional double variance = 9;
-  repeated double percentiles = 10;
-  optional double skewness = 11;
-  optional double kurtosis = 12;
-  optional double median = 13;
-  repeated double values = 14;
-  repeated double distributionPercentiles = 15;
 }

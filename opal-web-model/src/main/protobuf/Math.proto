@@ -1,0 +1,62 @@
+import "Ws.proto";
+package Math;
+
+option java_package = "org.obiba.opal.web.model";
+
+message SummaryStatisticsDto {
+  required string resource = 1;
+  extensions 1000 to max;
+}
+
+message CategoricalSummaryDto {
+
+  repeated FrequencyDto frequencies = 1;
+
+  extend SummaryStatisticsDto {
+    optional CategoricalSummaryDto categorical = 1000;
+  }
+}
+
+message ContinuousSummaryDto {
+
+  required DescriptiveStatsDto summary = 1;
+  repeated double distributionPercentiles = 2;
+  repeated IntervalFrequencyDto intervalFrequency = 3;
+
+  extend SummaryStatisticsDto {
+    optional ContinuousSummaryDto continuous = 1001;
+  }
+}
+
+message FrequencyDto {
+  required string value = 1;
+  required int64 freq = 2;
+  required double pct = 3;
+  optional int64 cummFreq = 4;
+  optional double cummPct = 5;
+}
+
+message IntervalFrequencyDto {
+  required double lower = 1;
+  required double upper = 2;
+  required int64 freq = 3;
+  required double density = 4;
+  required double densityPct = 5;
+}
+
+message DescriptiveStatsDto {
+  optional double min = 1;
+  optional double max = 2;
+  optional double mean = 3;
+  optional double geometricMean = 4;
+  optional int64 n = 5;
+  optional double sum = 6;
+  optional double sumsq = 7;
+  optional double stdDev = 8;
+  optional double variance = 9;
+  repeated double percentiles = 10;
+  optional double skewness = 11;
+  optional double kurtosis = 12;
+  optional double median = 13;
+  repeated double values = 14;
+}

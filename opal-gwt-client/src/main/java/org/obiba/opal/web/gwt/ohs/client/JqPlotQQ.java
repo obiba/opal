@@ -24,8 +24,7 @@ public class JqPlotQQ extends JqPlot {
 
   private final double max;
 
-  public JqPlotQQ(String id, double min, double max) {
-    super(id);
+  public JqPlotQQ(double min, double max) {
     this.min = min;
     this.max = max;
   }
@@ -36,7 +35,7 @@ public class JqPlotQQ extends JqPlot {
     }
   }
 
-  public void plot() {
+  public void plot(String id) {
     JsArray plotData = JsArray.createArray().cast();
     plotData.push(getXequalsY());
     plotData.push(data);
@@ -49,7 +48,7 @@ public class JqPlotQQ extends JqPlot {
     "  ]" + // 
     "}");
 
-    plot(plotData, p);
+    plot(id, plotData, p);
   }
 
   private JsArray<JsArrayNumber> getXequalsY() {

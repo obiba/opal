@@ -47,7 +47,7 @@
           <ul>
             <li><a href="#categories">Categories</a></li>
             <li><a href="#attributes">Attributes</a></li>
-            <li><a href="#statistics">Statistics</a></li>
+            <li><a href="#summary">Summary</a></li>
           </ul>
           <div id="categories">
           <table class="opal-variable-categories" >
@@ -76,9 +76,7 @@
               </tbody>
             </table>
           </div>
-          <div id="statistics">
-            <div id="opal-variable-histogram" style="width:400px">
-            </div>
+          <div id="summary" class="opal-summary-tab">
           </div>
         </div>
         

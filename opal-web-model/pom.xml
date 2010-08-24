@@ -189,6 +189,22 @@
                 </property>
               </options>
             </protoModule>
+             <protoModule>
+              <source>src/main/protobuf/Math.proto</source>
+              <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
+              <outputDir>target/generated-sources/protobuf-gwt</outputDir>
+              <options>
+                <property>
+                  <!-- Override the package name -->
+                  <name>org.obiba.opal.web.model</name>
+                  <value>org.obiba.opal.web.model.client.math</value>
+                </property>
+                 <property>
+                  <name>use_global_json</name>
+                  <value>true</value>
+                </property>
+              </options>
+            </protoModule>
             <protoModule>
               <source>src/main/protobuf/Opal.proto</source>
               <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>

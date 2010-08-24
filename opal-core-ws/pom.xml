@@ -32,6 +32,11 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-math</artifactId>
+      <version>1.2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.magma</groupId>
       <artifactId>ohs-views</artifactId>
       <version>1.2-SNAPSHOT</version>
     </dependency>

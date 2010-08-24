@@ -11,7 +11,6 @@ package org.obiba.opal.web.gwt.ohs.client;
 
 import static com.google.gwt.query.client.GQuery.$$;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayNumber;
 import com.google.gwt.core.client.JsArrayString;
@@ -23,8 +22,7 @@ public class JqPlotBarChart extends JqPlot {
 
   private final JsArrayString labels = JsArrayString.createArray().cast();
 
-  public JqPlotBarChart(String id) {
-    super(id);
+  public JqPlotBarChart() {
   }
 
   public void push(String category, double value, double pct) {
@@ -36,7 +34,7 @@ public class JqPlotBarChart extends JqPlot {
     data.push(pct);
   }
 
-  public void plot() {
+  public void plot(String id) {
     JsArray<JsArrayNumber> plotData = JsArray.createArray().cast();
     plotData.push(this.data);
     Properties p = $$("{" + //
@@ -55,12 +53,7 @@ public class JqPlotBarChart extends JqPlot {
     "    }" + //
     "  } " + //
     "}");
-    plot(plotData, p);
+    plot(id, plotData, p);
   }
-
-  public static native String stringify(JavaScriptObject obj)
-  /*-{
-    return $wnd.JSON.stringify(obj);
-  }-*/;
 
 }

@@ -20,12 +20,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.math.MathException;
-import org.apache.commons.math.distribution.ContinuousDistribution;
-import org.apache.commons.math.distribution.NormalDistributionImpl;
-import org.apache.commons.math.stat.Frequency;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.obiba.magma.Category;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
@@ -38,8 +32,10 @@ import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.views.ListClause;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ohs.ExcelVariablesClause;
-import org.obiba.opal.web.model.Magma.DescriptiveStatsDto;
-import org.obiba.opal.web.model.Magma.FrequencyDto;
+import org.obiba.opal.web.math.AbstractSummaryStatisticsResource;
+import org.obiba.opal.web.math.CategoricalSummaryStatisticsResource;
+import org.obiba.opal.web.math.ContinuousSummaryStatisticsResource;
+import org.obiba.opal.web.math.DefaultSummaryStatisticsResource;
 import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.slf4j.Logger;
@@ -110,86 +106,18 @@ public class VariableResource {
     return values.build();
   }
 
-  @GET
-  @Path("/frequencies")
-  public Collection<FrequencyDto> getDataTable() {
+  @Path("/summary")
+  public AbstractSummaryStatisticsResource getSummary() {
     VectorSource vectorSource = vvs.asVectorSource();
+
     if(vectorSource != null) {
-      Frequency freq = new Frequency();
-      for(Value value : vectorSource.getValues(Sets.newTreeSet(valueTable.getVariableEntities()))) {
-        if(value.isNull() == false) {
-          freq.addValue(value.toString());
-        } else {
-          freq.addValue("N/A");
-        }
+      if(vvs.getVariable().hasCategories()) {
+        return new CategoricalSummaryStatisticsResource(this.valueTable, this.vvs.getVariable(), this.vvs.asVectorSource());
+      } else if(vvs.getVariable().getValueType().isNumeric()) {
+        return new ContinuousSummaryStatisticsResource(this.valueTable, this.vvs.getVariable(), this.vvs.asVectorSource());
       }
-
-      ImmutableList.Builder<FrequencyDto> dtos = ImmutableList.builder();
-      for(Category c : vvs.getVariable().getCategories()) {
-        dtos.add(FrequencyDto.newBuilder().setName(c.getName()).setValue((int) freq.getCount(c.getName())).setPct(freq.getPct(c.getName())).build());
-      }
-      dtos.add(FrequencyDto.newBuilder().setName("N/A").setValue((int) freq.getCount("N/A")).setPct(freq.getPct("N/A")).build());
-      return dtos.build();
-
     }
-    return ImmutableList.of();
-  }
-
-  @GET
-  @Path("/univariate")
-  // Can we find a better name for this resource?
-  public DescriptiveStatsDto getUnivariateAnalysis(@QueryParam("d") @DefaultValue("normal") Distribution distribution, @QueryParam("p") Double[] percentiles) {
-    VectorSource vectorSource = vvs.asVectorSource();
-    if(vectorSource != null && vectorSource.getValueType().isNumeric()) {
-      return distribution.calc(vectorSource.getValues(Sets.newTreeSet(valueTable.getVariableEntities())), percentiles).build();
-    }
-    return null;
-  }
-
-  public static enum Distribution {
-    normal {
-      @Override
-      public ContinuousDistribution getDistribution(DescriptiveStatistics ds) {
-        if(ds.getStandardDeviation() > 0) {
-          return new NormalDistributionImpl(ds.getMean(), ds.getStandardDeviation());
-        }
-        return null;
-      }
-    },
-    lognormal {
-      @Override
-      public ContinuousDistribution getDistribution(DescriptiveStatistics ds) {
-        return new NormalDistributionImpl(ds.getMean(), ds.getStandardDeviation());
-      }
-    };;
-    abstract ContinuousDistribution getDistribution(DescriptiveStatistics ds);
-    
-    public DescriptiveStatsDto.Builder calc(Iterable<Value> values, Double[] percentiles) {
-      DescriptiveStatistics ds = new DescriptiveStatistics();
-      for(Value value : values) {
-        if(value.isNull() == false) {
-          ds.addValue(((Number) value.getValue()).doubleValue());
-        }
-      }
-      ContinuousDistribution cd = getDistribution(ds);
-      return percentiles(ds, cd, DescriptiveStatsDto.newBuilder().setMin(ds.getMin()).setMax(ds.getMax()).setN(ds.getN()).setMean(ds.getMean()).setSum(ds.getSum()).setSumsq(ds.getSumsq()).setStdDev(ds.getStandardDeviation()).setVariance(ds.getVariance()).setSkewness(ds.getSkewness()).setGeometricMean(ds.getGeometricMean()).setKurtosis(ds.getKurtosis()), percentiles);
-    }
-
-    private DescriptiveStatsDto.Builder percentiles(DescriptiveStatistics ds, ContinuousDistribution cd, DescriptiveStatsDto.Builder builder, Double[] percentiles) {
-      if(percentiles != null) {
-        for(Double p : percentiles) {
-          builder.addPercentiles(ds.getPercentile(p));
-          if(cd != null) {
-            try {
-              builder.addDistributionPercentiles(cd.inverseCumulativeProbability(p/100d));
-            } catch(MathException e) {
-              log.error("oops", e);
-            }
-          }
-        }
-      }
-      return builder;
-    }
+    return new DefaultSummaryStatisticsResource(this.valueTable, this.vvs.getVariable(), this.vvs.asVectorSource());
   }
 
 }

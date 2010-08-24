@@ -29,10 +29,14 @@ import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
-import org.obiba.opal.web.model.client.magma.DescriptiveStatsDto;
-import org.obiba.opal.web.model.client.magma.FrequencyDto;
 import org.obiba.opal.web.model.client.magma.ValueDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
+import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
+import org.obiba.opal.web.model.client.math.DescriptiveStatsDto;
+import org.obiba.opal.web.model.client.math.FrequencyDto;
+import org.obiba.opal.web.model.client.math.IntervalFrequencyDto;
+import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -133,8 +137,11 @@ public class OhsApp implements EntryPoint {
     @Selector("table.opal-variable-attributes tbody")
     GQuery attributesTable();
 
-    @Selector("#opal-variable-histogram")
-    GQuery histogram();
+    @Selector(".opal-summary-tab")
+    GQuery summary();
+
+    @Selector(".opal-summary-tab div.opal-plot")
+    GQuery plots();
   }
 
   private final DefaultEventBus eventBus = new DefaultEventBus();
@@ -154,8 +161,6 @@ public class OhsApp implements EntryPoint {
   int index;
 
   Request currentRequest;
-
-  JqPlot currentPlot;
 
   public OhsApp() {
     uiBinder.createAndBindUi(this);
@@ -298,10 +303,8 @@ public class OhsApp implements EntryPoint {
       @Override
       public boolean f(Event e, Object data) {
         Tabs.Event tabevent = (Tabs.Event) data;
-        if(tabevent.panel().getId().equals("statistics")) {
-          if(currentPlot != null) {
-            currentPlot.redraw();
-          }
+        if(tabevent.panel().getId().equals(widgets.summary().get(0).getId())) {
+          JqPlot.redraw(widgets.plots());
         }
         return true;
       }
@@ -471,45 +474,54 @@ public class OhsApp implements EntryPoint {
   }
 
   private void plot(VariableDto dto) {
-    widgets.histogram().children().remove();
-    currentPlot = null;
+    widgets.summary().children().remove();
 
-    if(isContinuous(dto)) {
-      request(dto.getLink() + "/univariate?p=0.05&=p0.5&p=5&p=10&p=15&p=20&p=25&p=30&p=35&p=40&p=45&p=50&p=55&p=60&p=65&p=70&p=75&p=80&p=85&p=90&p=95&p=99.5&p=99.95", new ResourceCallback<DescriptiveStatsDto>() {
+    request(dto.getLink() + "/summary", new ResourceCallback<SummaryStatisticsDto>() {
 
-        @Override
-        public void onResource(Response response, DescriptiveStatsDto resource) {
-          JqPlotQQ plot = new JqPlotQQ("opal-variable-histogram", resource.getMin(), resource.getMax());
-          plot.push(resource.getPercentilesArray(), resource.getDistributionPercentilesArray());
-          plot.plot();
-          currentPlot = plot;
+      @Override
+      public void onResource(Response response, SummaryStatisticsDto resource) {
+        if(resource.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical) != null) {
+          categoricalSummary((CategoricalSummaryDto) resource.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast());
+        } else if(resource.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous) != null) {
+          continuousSummary((ContinuousSummaryDto) resource.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous).cast());
         }
-      });
-    } else if(isCategorical(dto)) {
-      request(dto.getLink() + "/frequencies", new ResourceCallback<JsArray<FrequencyDto>>() {
 
-        @Override
-        public void onResource(Response response, JsArray<FrequencyDto> freqs) {
-          JqPlotBarChart plot = new JqPlotBarChart("opal-variable-histogram");
-          for(int i = 0; i < freqs.length(); i++) {
-            FrequencyDto value = freqs.get(i);
-            if(value.hasValue()) {
-              plot.push(value.getName(), value.getValue(), value.getPct() * 100);
-            }
-          }
-          plot.plot();
-          currentPlot = plot;
-        }
-      });
+        widgets.summary().append("<div style=\"clear:both\"/>");
+
+      }
+    });
+  }
+
+  private void categoricalSummary(CategoricalSummaryDto dto) {
+    JqPlotBarChart plot = new JqPlotBarChart();
+    for(int i = 0; i < dto.getFrequenciesArray().length(); i++) {
+      FrequencyDto value = dto.getFrequenciesArray().get(i);
+      if(value.hasValue()) {
+        plot.push(value.getValue(), value.getFreq(), value.getPct() * 100);
+      }
     }
+    addPlot(plot);
   }
 
-  private boolean isContinuous(VariableDto dto) {
-    return isCategorical(dto) == false && dto.getValueType().equalsIgnoreCase("decimal") || dto.getValueType().equalsIgnoreCase("integer");
+  private void continuousSummary(ContinuousSummaryDto dto) {
+    DescriptiveStatsDto ds = dto.getSummary();
+    if(dto.getIntervalFrequencyArray() != null) {
+      JqPlotHistogram plot = new JqPlotHistogram(ds.getMin(), ds.getMax());
+      for(int i = 0; i < dto.getIntervalFrequencyArray().length(); i++) {
+        IntervalFrequencyDto value = dto.getIntervalFrequencyArray().get(i);
+        plot.push(value.getLower(), value.getUpper(), value.getDensity());
+      }
+      addPlot(plot);
+    }
+    JqPlotQQ qqplot = new JqPlotQQ(ds.getMin(), ds.getMax());
+    qqplot.push(ds.getPercentilesArray(), dto.getDistributionPercentilesArray());
+    addPlot(qqplot);
   }
 
-  private boolean isCategorical(VariableDto dto) {
-    return dto.getCategoriesArray() != null && dto.getCategoriesArray().length() > 0;
+  private void addPlot(JqPlot plot) {
+    String id = Document.get().createUniqueId();
+    widgets.summary().append("<div id=\"" + id + "\" class=\"opal-plot\" style=\"width:400px;float:left;margin-right:2em\"/>");
+    plot.plot(id);
   }
 
   private AttributeDto findAttribute(String string, JsArray<AttributeDto> attrs) {
