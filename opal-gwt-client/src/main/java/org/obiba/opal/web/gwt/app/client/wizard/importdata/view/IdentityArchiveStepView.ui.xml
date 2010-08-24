@@ -21,7 +21,7 @@
             </tr>
             <tr>
               <td>
-                <g:RadioButton name="identifierGroup" ui:field="identifierAsIs"><ui:msg description="Leave identifier as-is label">be used as-is</ui:msg></g:RadioButton>
+                <g:RadioButton name="identifierGroup" ui:field="identifierAsIs" checked="true"><ui:msg description="Leave identifier as-is label">be used as-is</ui:msg></g:RadioButton>
               </td>
             </tr>
             <tr>
@@ -37,7 +37,7 @@
             </tr>
             <tr>
               <td>
-                <g:RadioButton name="archiveGroup" ui:field="archiveLeave"><ui:msg description="Leave file label">leave it where it is</ui:msg></g:RadioButton>
+                <g:RadioButton name="archiveGroup" ui:field="archiveLeave" checked="true"><ui:msg description="Leave file label">leave it where it is</ui:msg></g:RadioButton>
               </td>
             </tr>
             <tr>
