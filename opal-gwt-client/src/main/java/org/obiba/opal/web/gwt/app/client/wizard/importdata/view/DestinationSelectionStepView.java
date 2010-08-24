@@ -105,6 +105,11 @@ public class DestinationSelectionStepView extends Composite implements Destinati
     return this.tableListBox.getValue(this.tableListBox.getSelectedIndex());
   }
 
+  @Override
+  public boolean hasTable() {
+    return this.tableListBox.getItemCount() > 0;
+  }
+
   private void displayTablesFor(String datasourceName) {
     this.tableListBox.clear();
     for(int i = 0; i < datasources.length(); i++) {

@@ -9,28 +9,37 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.CsvDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.CsvDatasourceTableBundleDto;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
+import org.obiba.opal.web.model.client.ws.DatasourceParsingErrorDto;
+import org.obiba.opal.web.model.client.ws.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
@@ -44,6 +53,8 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
 
     String getSelectedDatasource();
 
+    boolean hasTable();
+
     String getSelectedTable();
 
     void hideTables();
@@ -54,6 +65,9 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
 
   @Inject
   private ImportData importData;
+
+  @Inject
+  private ValidationReportStepPresenter validationReportStepPresenter;
 
   @Inject
   private IdentityArchiveStepPresenter identityArchiveStepPresenter;
@@ -114,7 +128,7 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
     @Override
     public void onClick(ClickEvent event) {
       importData.setDestinationDatasourceName(getDisplay().getSelectedDatasource());
-      importData.setDestinationTableName(getDisplay().getSelectedTable());
+      if(getDisplay().hasTable()) importData.setDestinationTableName(getDisplay().getSelectedTable());
 
       if(importData.getImportFormat().equals(ImportFormat.CSV)) {
         createTransientCsvDatasource();
@@ -126,36 +140,48 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
 
     private void createTransientCsvDatasource() {
 
-      ResourceCallback<JavaScriptObject> callbackHandler = new ResourceCallback<JavaScriptObject>() {
+      ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
-        @Override
-        public void onResource(Response response, JavaScriptObject resource) {
+        public void onResponseCode(Request request, Response response) {
           if(response.getStatusCode() == 201) {
-            if(resource instanceof DatasourceDto) {
-              DatasourceDto datasourceDto = (DatasourceDto) resource;
-              importData.setTransientDatasourceName(datasourceDto.getName());
-              eventBus.fireEvent(new WorkbenchChangeEvent(identityArchiveStepPresenter));
-            }
+            DatasourceDto datasourceDto = (DatasourceDto) JsonUtils.unsafeEval(response.getText());
+            importData.setTransientDatasourceName(datasourceDto.getName());
+            eventBus.fireEvent(new WorkbenchChangeEvent(identityArchiveStepPresenter));
           } else {
-            if(resource instanceof ClientErrorDto) {
-              // TODO: Handle errors
-              ClientErrorDto clientErrorDto = (ClientErrorDto) resource;
-              clientErrorDto.getCode();
+            final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+            if(errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
+              validationReportStepPresenter.getDisplay().setErrors(extractDatasourceParsingErrors(errorDto));
+              eventBus.fireEvent(new WorkbenchChangeEvent(validationReportStepPresenter));
+            } else {
+              eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "fileReadError", null));
             }
           }
         }
 
+        @SuppressWarnings("unchecked")
+        private List<DatasourceParsingErrorDto> extractDatasourceParsingErrors(ClientErrorDto dto) {
+          List<DatasourceParsingErrorDto> datasourceParsingErrors = new ArrayList<DatasourceParsingErrorDto>();
+
+          JsArray<DatasourceParsingErrorDto> errors = (JsArray<DatasourceParsingErrorDto>) dto.getExtension(ClientErrorDtoExtensions.errors);
+          if(errors != null) {
+            for(int i = 0; i < errors.length(); i++) {
+              datasourceParsingErrors.add(errors.get(i));
+            }
+          }
+
+          return datasourceParsingErrors;
+        }
       };
 
       DatasourceFactoryDto dto = createDatasourceFactoryDto();
-      ResourceRequestBuilderFactory.newBuilder().forResource("/datasources").post().accept("application/json").withResourceBody(DatasourceFactoryDto.stringify(dto)) //
-      .withCallback(callbackHandler).send();
+      ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource("/datasources").post().accept("application/x-protobuf+json").withResourceBody(DatasourceFactoryDto.stringify(dto)).withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler).send();
     }
 
     private DatasourceFactoryDto createDatasourceFactoryDto() {
 
       CsvDatasourceTableBundleDto csvDatasourceTableBundleDto = CsvDatasourceTableBundleDto.create();
       csvDatasourceTableBundleDto.setName(importData.getDestinationTableName());
+      csvDatasourceTableBundleDto.setData(importData.getCsvFile());
 
       @SuppressWarnings("unchecked")
       JsArray<CsvDatasourceTableBundleDto> tables = (JsArray<CsvDatasourceTableBundleDto>) JsArray.createArray();
