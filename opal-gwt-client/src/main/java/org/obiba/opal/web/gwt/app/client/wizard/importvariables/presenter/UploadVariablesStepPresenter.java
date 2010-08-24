@@ -21,7 +21,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -49,8 +48,6 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
   //
 
   private static final String EXCEL_TEMPLATE = "/opalVariableTemplate.xls";
-
-  private static Translations translations = GWT.create(Translations.class);
 
   //
   // Instance Variables
