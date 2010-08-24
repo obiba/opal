@@ -7,7 +7,7 @@
 
   <o:WorkbenchLayout>
     <g:Label><ui:msg description="Import Variables title">Import Variables</ui:msg></g:Label>
-    <g:Label><ui:msg description="Import Variables summary">Select the variables file to use for creating or updating tables</ui:msg></g:Label>
+    <g:Label><ui:msg description="Upload Variables Step summary">Select the variables file to use for creating or updating tables</ui:msg></g:Label>
     <g:Button ui:field="nextButton"><ui:msg description="Next button label">Next</ui:msg></g:Button>
     
     <g:FlowPanel>

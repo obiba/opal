@@ -8,7 +8,7 @@
 
   <o:WorkbenchLayout>
     <g:Label><ui:msg description="Import Variables title">Import Variables</ui:msg></g:Label>
-    <g:Label><ui:msg description="Import Variables summary">Some formatting errors have been detected. You should fix them before importing variables.</ui:msg></g:Label>
+    <g:Label><ui:msg description="Validation Report Step summary">Some formatting errors have been detected. You should fix them before importing variables.</ui:msg></g:Label>
     <g:Button ui:field="cancelButton"><ui:msg description="Cancel button label">Cancel</ui:msg></g:Button>
     
     <g:FlowPanel>
