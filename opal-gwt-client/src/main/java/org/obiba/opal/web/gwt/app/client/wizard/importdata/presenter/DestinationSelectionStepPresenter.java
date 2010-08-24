@@ -15,7 +15,6 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
@@ -55,9 +54,6 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
 
   @Inject
   private ImportData importData;
-
-  @Inject
-  private DashboardPresenter dashboardPresenter;
 
   @Inject
   private IdentityArchiveStepPresenter identityArchiveStepPresenter;
@@ -135,13 +131,17 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
         @Override
         public void onResource(Response response, JavaScriptObject resource) {
           if(response.getStatusCode() == 201) {
-            DatasourceDto datasourceDto = (DatasourceDto) resource;
-            importData.setTransientDatasourceName(datasourceDto.getName());
-            eventBus.fireEvent(new WorkbenchChangeEvent(identityArchiveStepPresenter));
+            if(resource instanceof DatasourceDto) {
+              DatasourceDto datasourceDto = (DatasourceDto) resource;
+              importData.setTransientDatasourceName(datasourceDto.getName());
+              eventBus.fireEvent(new WorkbenchChangeEvent(identityArchiveStepPresenter));
+            }
           } else {
-            // TODO: Handle errors
-            @SuppressWarnings("unused")
-            ClientErrorDto clientErrorDto = (ClientErrorDto) resource;
+            if(resource instanceof ClientErrorDto) {
+              // TODO: Handle errors
+              ClientErrorDto clientErrorDto = (ClientErrorDto) resource;
+              clientErrorDto.getCode();
+            }
           }
         }
 
