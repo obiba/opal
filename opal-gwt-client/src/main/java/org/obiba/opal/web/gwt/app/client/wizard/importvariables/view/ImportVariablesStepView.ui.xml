@@ -6,13 +6,21 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
+  <ui:style>
+    .list-header {
+      margin-left: 1em;
+      margin-top: 1em;
+    }
+  </ui:style>
+  
   <o:WorkbenchLayout withInfo="false">
     <g:Label><ui:msg description="Import Variables title">Import Variables</ui:msg></g:Label>
-    <g:Label><ui:msg description="Validation Report Step summary">Some formatting errors have been detected. You should fix them before importing variables.</ui:msg></g:Label>
-    <g:Button ui:field="cancelButton"><ui:msg description="Cancel button label">Cancel</ui:msg></g:Button>
+    <g:Label><ui:msg description="Import Variables summary">Importing variables</ui:msg></g:Label>
+    <g:SimplePanel />
     
     <g:FlowPanel>
-      <g2:CellTable width="100%" ui:field="table" />
+      <g:Label addStyleNames="{style.list-header}"><ui:msg description="Created/updated table list header">Importing variables to the following tables:</ui:msg></g:Label>
+      <g:FlowPanel ui:field="tableListPanel" />
     </g:FlowPanel> 
   </o:WorkbenchLayout>
 
