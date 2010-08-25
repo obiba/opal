@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.shell.commands;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -185,6 +184,6 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
   }
 
   private boolean isRelativeFilePath(String filePath) {
-    return !(new File(filePath).isAbsolute());
+    return !filePath.startsWith("/");
   }
 }

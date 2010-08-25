@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.shell.commands;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -295,7 +294,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   }
 
   private boolean isRelativeFilePath(String filePath) {
-    return !(new File(filePath).isAbsolute());
+    return !filePath.startsWith("/");
   }
 
   private void archiveFiles(List<FileObject> filesToImport) throws IOException {

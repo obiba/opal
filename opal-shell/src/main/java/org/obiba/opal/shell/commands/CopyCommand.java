@@ -304,7 +304,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   private boolean isRelativeFilePath(String filePath) {
-    return !(new File(filePath).isAbsolute());
+    return !filePath.startsWith("/");
   }
 
   private void appendOption(StringBuffer sb, String option, boolean optionSpecified, String value) {
