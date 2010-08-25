@@ -49,6 +49,7 @@ import org.obiba.magma.js.JavascriptValueSource;
 import org.obiba.magma.js.MagmaContext;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
+import org.obiba.magma.support.ValueTableWrapper;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.xstream.XStreamValueSet;
 import org.obiba.opal.web.model.Magma;
@@ -192,7 +193,11 @@ public class TableResource {
     JavascriptValueSource jvs = new JavascriptValueSource(ValueType.Factory.forName(valueType), script) {
       @Override
       protected void enterContext(MagmaContext ctx, Scriptable scope) {
-        ctx.push(ValueTable.class, valueTable);
+        if(valueTable instanceof ValueTableWrapper) {
+          ctx.push(ValueTable.class, ((ValueTableWrapper) valueTable).getWrappedValueTable());
+        } else {
+          ctx.push(ValueTable.class, valueTable);
+        }
       }
     };
     jvs.initialise();

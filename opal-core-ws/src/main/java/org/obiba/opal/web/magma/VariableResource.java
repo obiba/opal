@@ -113,7 +113,7 @@ public class VariableResource {
     if(vectorSource != null) {
       if(vvs.getVariable().hasCategories()) {
         return new CategoricalSummaryStatisticsResource(this.valueTable, this.vvs.getVariable(), this.vvs.asVectorSource());
-      } else if(vvs.getVariable().getValueType().isNumeric()) {
+      } else if(vvs.getValueType().isNumeric()) {
         return new ContinuousSummaryStatisticsResource(this.valueTable, this.vvs.getVariable(), this.vvs.asVectorSource());
       }
     }
