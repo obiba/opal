@@ -473,7 +473,7 @@ public class OhsApp implements EntryPoint {
     }
   }
 
-  private void plot(VariableDto dto) {
+  private void plot(final VariableDto dto) {
     widgets.summary().children().remove();
 
     request(dto.getLink() + "/summary", new ResourceCallback<SummaryStatisticsDto>() {
@@ -483,7 +483,7 @@ public class OhsApp implements EntryPoint {
         if(resource.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical) != null) {
           categoricalSummary((CategoricalSummaryDto) resource.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast());
         } else if(resource.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous) != null) {
-          continuousSummary((ContinuousSummaryDto) resource.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous).cast());
+          continuousSummary((ContinuousSummaryDto) resource.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous).cast(), dto.getValueType().equalsIgnoreCase("integer"));
         }
 
         widgets.summary().append("<div style=\"clear:both\"/>");
@@ -503,10 +503,10 @@ public class OhsApp implements EntryPoint {
     addPlot(plot);
   }
 
-  private void continuousSummary(ContinuousSummaryDto dto) {
+  private void continuousSummary(ContinuousSummaryDto dto, boolean integer) {
     DescriptiveStatsDto ds = dto.getSummary();
     if(dto.getIntervalFrequencyArray() != null) {
-      JqPlotHistogram plot = new JqPlotHistogram(ds.getMin(), ds.getMax());
+      JqPlotHistogram plot = new JqPlotHistogram(ds.getMin(), ds.getMax(), integer);
       for(int i = 0; i < dto.getIntervalFrequencyArray().length(); i++) {
         IntervalFrequencyDto value = dto.getIntervalFrequencyArray().get(i);
         plot.push(value.getLower(), value.getUpper(), value.getDensity());

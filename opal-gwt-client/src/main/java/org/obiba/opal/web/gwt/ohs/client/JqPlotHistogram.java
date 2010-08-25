@@ -23,15 +23,22 @@ public class JqPlotHistogram extends JqPlot {
 
   private final JsArray<JsArrayNumber> data = JsArray.createArray().cast();
 
+  private boolean integers = false;
+
   private double min;
 
   private double max;
 
   private double binSize;
 
-  public JqPlotHistogram(double min, double max) {
+  public JqPlotHistogram(double min, double max, boolean integers) {
+    this.integers = integers;
     this.min = min;
     this.max = max;
+  }
+
+  public JqPlotHistogram(double min, double max) {
+    this(min, max, false);
   }
 
   public void push(double lower, double upper, double freq) {
@@ -49,10 +56,10 @@ public class JqPlotHistogram extends JqPlot {
     plotData.push(data);
     Properties p = $$("{" + //
     "  title:'Histogram'," + //
-    "  seriesDefaults:{renderer:$wnd.jQuery.jqplot.BarRenderer,rendererOptions:{barMargin:35}}," + //
+    "  seriesDefaults:{renderer:$wnd.jQuery.jqplot.BarRenderer,rendererOptions:{barMargin:35},pointLabels:{show:true,hideZeros:true,ypadding:3,edgeTolerance:-5}}," + //
     "  axes:{" + //
     "    xaxis:{" + //
-    // "         min:" + (min) + ",max:" + (max) + //
+    "      tickOptions:{formatString:'" + (this.integers ? "%.0d" : "%d") + "'}," + //
     "      ticks:" + stringify(makeTicks()) + //
     "    }," + //
     "    yaxis:{" + //
