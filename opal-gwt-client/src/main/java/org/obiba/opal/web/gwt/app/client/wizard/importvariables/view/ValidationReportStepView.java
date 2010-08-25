@@ -117,7 +117,7 @@ public class ValidationReportStepView extends Composite implements ValidationRep
     table.addColumn(new TextColumn<DatasourceParsingErrorDto>() {
       @Override
       public String getValue(DatasourceParsingErrorDto dto) {
-        return dto.getKey();
+        return translations.datasourceParsingErrorMap().get(dto.getKey());
       }
     }, translations.errorLabel());
   }

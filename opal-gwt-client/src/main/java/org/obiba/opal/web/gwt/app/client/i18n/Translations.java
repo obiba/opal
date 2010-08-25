@@ -282,4 +282,8 @@ public interface Translations extends Constants {
   @Description("Error label")
   @DefaultStringValue("Error")
   String errorLabel();
+
+  @Description("Datasource parsing error map")
+  @DefaultStringMapValue( { "CategoryNameRequired", "Category name required", "CategoryVariableNameRequired", "Category variable name required", "DuplicateCategoryName", "Duplicate category name", "DuplicateColumns", "Duplicate columns", "DuplicateVariableName", "Duplicate variable name", "TableDefinitionErrors", "Table definition errors", "UnexpectedErrorInCategory", "Unexpected error in category", "UnexpectedErrorInVariable", "Unexpected error in variable", "UnidentifiedVariableName", "Unidentified variable name", "UnknownValueType", "Unknown value type", "VariableCategoriesDefinitionErrors", "Variable categories definition errors", "VariableNameCannotContainColon", "Variable name cannot contain colon", "VariableNameRequired", "Variable name required" })
+  Map<String, String> datasourceParsingErrorMap();
 }
