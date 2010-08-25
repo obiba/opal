@@ -11,6 +11,15 @@
       margin-left: 1em;
       margin-top: 1em;
     }
+    
+    .return-label {
+      margin-top: 1em;
+      margin-left: 1em;
+    }
+    
+    .return-button {
+      margin-left: 2em;
+    }
   </ui:style>
   
   <o:WorkbenchLayout withInfo="false">
@@ -21,7 +30,8 @@
     <g:FlowPanel>
       <g:Label addStyleNames="{style.list-header}"><ui:msg description="Created/updated table list header">Importing variables to the following tables:</ui:msg></g:Label>
       <g:FlowPanel ui:field="tableListPanel" />
-      <g:Button ui:field="returnButton">Return to Import Variables</g:Button>
+      <g:Label addStyleNames="{style.return-label}"><ui:msg description="Return to Import Variables label">You may now import a new variables dictionary:</ui:msg></g:Label>
+      <g:Button ui:field="returnButton" addStyleNames="{style.return-label}"><ui:msg description="Return to Import Variables button label">Return to Import Variables</ui:msg></g:Button>
     </g:FlowPanel> 
   </o:WorkbenchLayout>
 

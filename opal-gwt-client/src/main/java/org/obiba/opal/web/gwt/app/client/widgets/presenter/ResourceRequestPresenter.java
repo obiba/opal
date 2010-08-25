@@ -32,14 +32,17 @@ public class ResourceRequestPresenter<T extends JavaScriptObject> extends Widget
 
   private ResourceRequestBuilder<T> requestBuilder;
 
+  private ResponseCodeCallback callback;
+
   //
   // Constructors
   //
 
-  public ResourceRequestPresenter(final Display display, final EventBus eventBus, final ResourceRequestBuilder<T> requestBuilder) {
+  public ResourceRequestPresenter(final Display display, final EventBus eventBus, final ResourceRequestBuilder<T> requestBuilder, final ResponseCodeCallback callback) {
     super(display, eventBus);
 
     this.requestBuilder = requestBuilder;
+    this.callback = callback;
   }
 
   //
@@ -80,31 +83,39 @@ public class ResourceRequestPresenter<T extends JavaScriptObject> extends Widget
   //
 
   public void setSuccessCodes(Integer... codes) {
-    final ResponseCodeCallback callback = new ResponseCodeCallback() {
+    final ResponseCodeCallback internalCallback = new ResponseCodeCallback() {
 
       public void onResponseCode(Request request, Response response) {
         getDisplay().completed();
+
+        if(callback != null) {
+          callback.onResponseCode(request, response);
+        }
       }
     };
 
     if(codes != null) {
       for(int code : codes) {
-        requestBuilder.withCallback(code, callback);
+        requestBuilder.withCallback(code, internalCallback);
       }
     }
   }
 
   public void setErrorCodes(Integer... codes) {
-    final ResponseCodeCallback callback = new ResponseCodeCallback() {
+    final ResponseCodeCallback internalCallback = new ResponseCodeCallback() {
 
       public void onResponseCode(Request request, Response response) {
         getDisplay().failed();
+
+        if(callback != null) {
+          callback.onResponseCode(request, response);
+        }
       }
     };
 
     if(codes != null) {
       for(int code : codes) {
-        requestBuilder.withCallback(code, callback);
+        requestBuilder.withCallback(code, internalCallback);
       }
     }
   }

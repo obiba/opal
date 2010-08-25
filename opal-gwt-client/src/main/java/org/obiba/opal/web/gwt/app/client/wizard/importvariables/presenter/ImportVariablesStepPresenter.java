@@ -9,26 +9,47 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.view.ResourceRequestView;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class ImportVariablesStepPresenter extends WidgetPresenter<ImportVariablesStepPresenter.Display> {
   //
   // Instance Variables
   //
+
+  @Inject
+  private Provider<UploadVariablesStepPresenter> uploadVariablesStepPresenter;
+
+  /**
+   * Resource requests.
+   */
+  private Set<ResourceRequestPresenter<? extends JavaScriptObject>> resourceRequests;
+
+  /**
+   * Number of resource requests completed (successfully or with an error).
+   */
+  private int resourceRequestsCompleted;
 
   //
   // Constructors
@@ -37,6 +58,8 @@ public class ImportVariablesStepPresenter extends WidgetPresenter<ImportVariable
   @Inject
   public ImportVariablesStepPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
+
+    resourceRequests = new LinkedHashSet<ResourceRequestPresenter<? extends JavaScriptObject>>();
   }
 
   //
@@ -78,18 +101,27 @@ public class ImportVariablesStepPresenter extends WidgetPresenter<ImportVariable
   //
 
   public void clearResourceRequests() {
+    resourceRequests.clear();
+    resourceRequestsCompleted = 0;
+
     getDisplay().clearResourceRequests();
+    getDisplay().setReturnButtonEnabled(false);
   }
 
   public <T extends JavaScriptObject> void addResourceRequest(String resourceName, ResourceRequestBuilder<T> requestBuilder) {
-    ResourceRequestPresenter<T> resourceRequestPresenter = new ResourceRequestPresenter<T>(new ResourceRequestView(), eventBus, requestBuilder);
+    ResourceRequestPresenter<T> resourceRequestPresenter = new ResourceRequestPresenter<T>(new ResourceRequestView(), eventBus, requestBuilder, new ImportVariablesResponseCodeCallback());
     resourceRequestPresenter.getDisplay().setResourceName(resourceName);
     resourceRequestPresenter.setSuccessCodes(200, 201);
     resourceRequestPresenter.setErrorCodes(400, 500);
 
+    resourceRequests.add(resourceRequestPresenter);
     getDisplay().addResourceRequest(resourceRequestPresenter.getDisplay());
+  }
 
-    resourceRequestPresenter.sendRequest();
+  public void sendResourceRequests() {
+    for(ResourceRequestPresenter<? extends JavaScriptObject> r : resourceRequests) {
+      r.sendRequest();
+    }
   }
 
   //
@@ -102,13 +134,26 @@ public class ImportVariablesStepPresenter extends WidgetPresenter<ImportVariable
 
     void addResourceRequest(ResourceRequestPresenter.Display resourceRequestDisplay);
 
+    void setReturnButtonEnabled(boolean enabled);
+
     HandlerRegistration addReturnClickHandler(ClickHandler handler);
   }
 
-  static class ReturnClickHandler implements ClickHandler {
+  class ReturnClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent event) {
-      // TODO Auto-generated method stub
+      eventBus.fireEvent(new WorkbenchChangeEvent(uploadVariablesStepPresenter.get()));
+    }
+  }
+
+  class ImportVariablesResponseCodeCallback implements ResponseCodeCallback {
+
+    public void onResponseCode(Request request, Response response) {
+      resourceRequestsCompleted++;
+
+      if(resourceRequestsCompleted == resourceRequests.size()) {
+        getDisplay().setReturnButtonEnabled(true);
+      }
     }
   }
 }

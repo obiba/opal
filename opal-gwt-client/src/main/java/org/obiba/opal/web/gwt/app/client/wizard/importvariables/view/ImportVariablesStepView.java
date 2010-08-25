@@ -60,6 +60,10 @@ public class ImportVariablesStepView extends Composite implements ImportVariable
     tableListPanel.add(resourceRequestDisplay.asWidget());
   }
 
+  public void setReturnButtonEnabled(boolean enabled) {
+    returnButton.setEnabled(enabled);
+  }
+
   public HandlerRegistration addReturnClickHandler(ClickHandler handler) {
     return returnButton.addClickHandler(handler);
   }
