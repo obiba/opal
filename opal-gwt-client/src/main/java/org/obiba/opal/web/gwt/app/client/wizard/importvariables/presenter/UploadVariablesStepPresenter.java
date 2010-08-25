@@ -24,6 +24,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
@@ -37,6 +38,7 @@ import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
@@ -144,27 +146,32 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
 
     public void onSubmitComplete(SubmitCompleteEvent event) {
 
-      ResourceCallback<DatasourceDto> callbackHandler = new ResourceCallback<DatasourceDto>() {
-        @Override
+      ResourceCallback<DatasourceDto> callback = new ResourceCallback<DatasourceDto>() {
+
         public void onResource(Response response, DatasourceDto resource) {
           if(response.getStatusCode() == 201) {
             destinationDatasourceStepPresenter.setSourceDatasourceName(((DatasourceDto) resource).getName());
             eventBus.fireEvent(new WorkbenchChangeEvent(destinationDatasourceStepPresenter));
-          } else {
-            final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+          }
+        }
+      };
 
-            if(errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
-              validationReportStepPresenter.getDisplay().setErrors(extractDatasourceParsingErrors(errorDto));
-              eventBus.fireEvent(new WorkbenchChangeEvent(validationReportStepPresenter));
-            } else {
-              eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "fileReadError", null));
-            }
+      ResponseCodeCallback errorCallback = new ResponseCodeCallback() {
+
+        public void onResponseCode(Request request, Response response) {
+          final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+
+          if(errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
+            validationReportStepPresenter.getDisplay().setErrors(extractDatasourceParsingErrors(errorDto));
+            eventBus.fireEvent(new WorkbenchChangeEvent(validationReportStepPresenter));
+          } else {
+            eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "fileReadError", null));
           }
         }
       };
 
       DatasourceFactoryDto dto = createDatasourceFactoryDto();
-      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasources").post().accept("application/x-protobuf+json").withResourceBody(DatasourceFactoryDto.stringify(dto)).withCallback(callbackHandler).send();
+      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasources").post().accept("application/x-protobuf+json").withResourceBody(DatasourceFactoryDto.stringify(dto)).withCallback(callback).withCallback(400, errorCallback).withCallback(500, errorCallback).send();
     }
 
     private DatasourceFactoryDto createDatasourceFactoryDto() {
