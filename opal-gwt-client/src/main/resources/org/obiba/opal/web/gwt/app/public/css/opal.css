@@ -197,3 +197,15 @@ table.folder-details td:first-child span:hover {
 .gwt-MenuBar .gwt-MenuItem {
   cursor:pointer;
 }
+
+div.tableComparison-conflict {
+  color:red;
+}
+
+div.tableComparison-creation {
+  color:green;
+}
+
+div.tableComparison-modification {
+  color:yellow;
+}

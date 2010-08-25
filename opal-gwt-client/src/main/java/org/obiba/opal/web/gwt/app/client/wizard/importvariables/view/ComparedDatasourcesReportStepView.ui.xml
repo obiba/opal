@@ -10,27 +10,12 @@
     <g:Label><ui:msg description="Compared Datasources Report summary">Review the modifications before applying them</ui:msg></g:Label>
     <g:FlowPanel>
       <g:Button ui:field="cancelButton"><ui:msg description="Cancel button label">Cancel</ui:msg></g:Button>    
-      <g:Button ui:field="nextButton"><ui:msg description="Next button label">Next</ui:msg></g:Button>
+      <g:Button ui:field="saveButton"><ui:msg description="Save button label">Save</ui:msg></g:Button>
     </g:FlowPanel>
     
     <g:FlowPanel>
-      <g:TabLayoutPanel ui:field="tablesPanel" barUnit='EM' barHeight='3'/>
-      <g:HTMLPanel>
-        <table class="gwt-KeyValue" cellspacing="10">
-          <tbody>
-            <tr>
-              <td style="vertical-align:top">
-                <ui:msg description="New variables label">New Variables</ui:msg>:                
-              </td>
-            </tr>
-            <tr>
-              <td style="vertical-align:top">
-                <ui:msg description="Modified variables label">Modified Variables</ui:msg>:                
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </g:HTMLPanel>
+      <g:CheckBox ui:field="ignoreAllModifications"><ui:msg description="Ignore all modifications label">Ignore all modifications</ui:msg></g:CheckBox>
+      <g:TabLayoutPanel ui:field="tableChangesPanel" barUnit='EM' barHeight='3'/>
     </g:FlowPanel>
     
      <g:FlowPanel>
