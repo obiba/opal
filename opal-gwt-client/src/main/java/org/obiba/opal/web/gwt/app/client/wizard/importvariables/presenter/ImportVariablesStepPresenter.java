@@ -112,7 +112,7 @@ public class ImportVariablesStepPresenter extends WidgetPresenter<ImportVariable
     ResourceRequestPresenter<T> resourceRequestPresenter = new ResourceRequestPresenter<T>(new ResourceRequestView(), eventBus, requestBuilder, new ImportVariablesResponseCodeCallback());
     resourceRequestPresenter.getDisplay().setResourceName(resourceName);
     resourceRequestPresenter.setSuccessCodes(200, 201);
-    resourceRequestPresenter.setErrorCodes(400, 500);
+    resourceRequestPresenter.setErrorCodes(400, 404, 405, 500);
 
     resourceRequests.add(resourceRequestPresenter);
     getDisplay().addResourceRequest(resourceRequestPresenter.getDisplay());
