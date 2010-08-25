@@ -13,9 +13,12 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresen
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ImportVariablesStepPresenter;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -33,6 +36,9 @@ public class ImportVariablesStepView extends Composite implements ImportVariable
 
   @UiField
   FlowPanel tableListPanel;
+
+  @UiField
+  Button returnButton;
 
   //
   // Constructors
@@ -52,6 +58,10 @@ public class ImportVariablesStepView extends Composite implements ImportVariable
 
   public void addResourceRequest(Display resourceRequestDisplay) {
     tableListPanel.add(resourceRequestDisplay.asWidget());
+  }
+
+  public HandlerRegistration addReturnClickHandler(ClickHandler handler) {
+    return returnButton.addClickHandler(handler);
   }
 
   public Widget asWidget() {

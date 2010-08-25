@@ -21,6 +21,7 @@
     <g:FlowPanel>
       <g:Label addStyleNames="{style.list-header}"><ui:msg description="Created/updated table list header">Importing variables to the following tables:</ui:msg></g:Label>
       <g:FlowPanel ui:field="tableListPanel" />
+      <g:Button ui:field="returnButton">Return to Import Variables</g:Button>
     </g:FlowPanel> 
   </o:WorkbenchLayout>
 

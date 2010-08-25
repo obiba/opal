@@ -20,6 +20,9 @@ import org.obiba.opal.web.gwt.app.client.widgets.view.ResourceRequestView;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.inject.Inject;
 
 public class ImportVariablesStepPresenter extends WidgetPresenter<ImportVariablesStepPresenter.Display> {
@@ -50,6 +53,7 @@ public class ImportVariablesStepPresenter extends WidgetPresenter<ImportVariable
   }
 
   protected void addEventHandlers() {
+    super.registerHandler(getDisplay().addReturnClickHandler(new ReturnClickHandler()));
   }
 
   @Override
@@ -97,5 +101,14 @@ public class ImportVariablesStepPresenter extends WidgetPresenter<ImportVariable
     void clearResourceRequests();
 
     void addResourceRequest(ResourceRequestPresenter.Display resourceRequestDisplay);
+
+    HandlerRegistration addReturnClickHandler(ClickHandler handler);
+  }
+
+  static class ReturnClickHandler implements ClickHandler {
+
+    public void onClick(ClickEvent event) {
+      // TODO Auto-generated method stub
+    }
   }
 }
