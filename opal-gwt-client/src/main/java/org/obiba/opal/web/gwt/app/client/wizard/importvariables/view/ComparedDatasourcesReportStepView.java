@@ -69,6 +69,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   public ComparedDatasourcesReportStepView() {
     initWidget(uiBinder.createAndBindUi(this));
     tableChangesPanel.clear();
+    saveButton.setEnabled(false);
   }
 
   //
@@ -100,6 +101,12 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     tableComparePanel.add(variableChangesPanel);
     tableChangesPanel.add(tableComparePanel, getTableCompareTabHeader(tableCompareData, comparisonResult));
     tableChangesPanel.setHeight("500px");
+  }
+
+  @Override
+  public void setEnabledSaveButton(boolean enabled) {
+    saveButton.setEnabled(enabled);
+
   }
 
   private FlowPanel getTableCompareTabHeader(TableCompareDto tableCompareData, ComparisonResult comparisonResult) {
