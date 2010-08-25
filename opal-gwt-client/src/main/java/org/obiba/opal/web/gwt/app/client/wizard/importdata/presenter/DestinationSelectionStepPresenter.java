@@ -157,24 +157,24 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
             }
           }
         }
-
-        @SuppressWarnings("unchecked")
-        private List<DatasourceParsingErrorDto> extractDatasourceParsingErrors(ClientErrorDto dto) {
-          List<DatasourceParsingErrorDto> datasourceParsingErrors = new ArrayList<DatasourceParsingErrorDto>();
-
-          JsArray<DatasourceParsingErrorDto> errors = (JsArray<DatasourceParsingErrorDto>) dto.getExtension(ClientErrorDtoExtensions.errors);
-          if(errors != null) {
-            for(int i = 0; i < errors.length(); i++) {
-              datasourceParsingErrors.add(errors.get(i));
-            }
-          }
-
-          return datasourceParsingErrors;
-        }
       };
 
       DatasourceFactoryDto dto = createDatasourceFactoryDto();
       ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource("/datasources").post().accept("application/x-protobuf+json").withResourceBody(DatasourceFactoryDto.stringify(dto)).withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler).send();
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<DatasourceParsingErrorDto> extractDatasourceParsingErrors(ClientErrorDto dto) {
+      List<DatasourceParsingErrorDto> datasourceParsingErrors = new ArrayList<DatasourceParsingErrorDto>();
+
+      JsArray<DatasourceParsingErrorDto> errors = (JsArray<DatasourceParsingErrorDto>) dto.getExtension(ClientErrorDtoExtensions.errors);
+      if(errors != null) {
+        for(int i = 0; i < errors.length(); i++) {
+          datasourceParsingErrors.add(errors.get(i));
+        }
+      }
+
+      return datasourceParsingErrors;
     }
 
     private DatasourceFactoryDto createDatasourceFactoryDto() {
