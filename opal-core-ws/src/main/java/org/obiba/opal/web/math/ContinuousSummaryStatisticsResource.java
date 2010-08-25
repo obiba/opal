@@ -21,10 +21,12 @@ import org.apache.commons.math.distribution.NormalDistributionImpl;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VectorSource;
 import org.obiba.magma.math.stat.IntervalFrequency;
 import org.obiba.magma.math.stat.IntervalFrequency.Interval;
+import org.obiba.magma.type.IntegerType;
 import org.obiba.opal.web.model.Math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.Math.DescriptiveStatsDto;
 import org.obiba.opal.web.model.Math.IntervalFrequencyDto;
@@ -51,7 +53,7 @@ public class ContinuousSummaryStatisticsResource extends AbstractSummaryStatisti
     if(percentiles == null || percentiles.size() == 0) {
       percentiles = ImmutableList.<Double> of(0.05d, 0.5d, 5d, 10d, 15d, 20d, 25d, 30d, 35d, 40d, 45d, 50d, 55d, 60d, 65d, 70d, 75d, 80d, 85d, 90d, 95d, 99.5d, 99.95d);
     }
-    return SummaryStatisticsDto.newBuilder().setResource(getVariable().getName()).setExtension(ContinuousSummaryDto.continuous, distribution.calc(getValues(), percentiles, intervals).build()).build();
+    return SummaryStatisticsDto.newBuilder().setResource(getVariable().getName()).setExtension(ContinuousSummaryDto.continuous, distribution.calc(getVariable().getValueType(), getValues(), percentiles, intervals).build()).build();
   }
 
   public static enum Distribution {
@@ -73,7 +75,7 @@ public class ContinuousSummaryStatisticsResource extends AbstractSummaryStatisti
 
     abstract ContinuousDistribution getDistribution(DescriptiveStatistics ds);
 
-    public ContinuousSummaryDto.Builder calc(Iterable<Value> values, List<Double> percentiles, int intervals) {
+    public ContinuousSummaryDto.Builder calc(ValueType type, Iterable<Value> values, List<Double> percentiles, int intervals) {
       DescriptiveStatistics ds = new DescriptiveStatistics();
       for(Value value : values) {
         if(value.isNull() == false) {
@@ -84,7 +86,7 @@ public class ContinuousSummaryStatisticsResource extends AbstractSummaryStatisti
       DescriptiveStatsDto.Builder builder = DescriptiveStatsDto.newBuilder().setMin(ds.getMin()).setMax(ds.getMax()).setN(ds.getN()).setMean(ds.getMean()).setSum(ds.getSum()).setSumsq(ds.getSumsq()).setStdDev(ds.getStandardDeviation()).setVariance(ds.getVariance()).setSkewness(ds.getSkewness()).setGeometricMean(ds.getGeometricMean()).setKurtosis(ds.getKurtosis());
       ContinuousSummaryDto.Builder continuous = ContinuousSummaryDto.newBuilder();
       if(ds.getVariance() > 0) {
-        IntervalFrequency bf = new IntervalFrequency(ds.getMin(), ds.getMax(), intervals);
+        IntervalFrequency bf = new IntervalFrequency(ds.getMin(), ds.getMax(), intervals, type == IntegerType.get());
         for(double d : ds.getSortedValues()) {
           bf.add(d);
         }
