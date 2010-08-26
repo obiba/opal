@@ -70,6 +70,14 @@ public class UploadVariablesStepView extends Composite implements UploadVariable
     return fileUploadForm.addSubmitCompleteHandler(handler);
   }
 
+  public void clear() {
+    fileToUpload.removeFromParent();
+    fileToUpload = new FileUpload();
+    fileToUpload.setName("fileToUpload");
+
+    fileUploadForm.add(fileToUpload);
+  }
+
   public String getVariablesFilename() {
     return fileToUpload.getFilename();
   }

@@ -91,6 +91,7 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
 
   @Override
   public void revealDisplay() {
+    getDisplay().clear();
   }
 
   @Override
@@ -122,9 +123,12 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
 
     HandlerRegistration addUploadCompleteHandler(FormPanel.SubmitCompleteHandler handler);
 
+    void clear();
+
     String getVariablesFilename();
 
     void uploadVariablesFile();
+
   }
 
   class NextClickHandler implements ClickHandler {
