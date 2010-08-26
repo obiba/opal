@@ -9,9 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -19,7 +16,6 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter.Display.ComparisonResult;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -97,6 +93,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
           getDisplay().addTableCompareTab(tableComparison, comparisonResult);
           if(comparisonResult == ComparisonResult.CONFLICT) {
             conflictsExist = true;
+            break;
           }
         }
         getDisplay().setEnabledSaveButton(!conflictsExist);
@@ -147,33 +144,31 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
   class SaveClickHandler implements ClickHandler {
 
+    @SuppressWarnings("unchecked")
     public void onClick(ClickEvent event) {
       importVariablesStepPresenter.clearResourceRequests();
 
-      List<VariableDto> variableToUpdateList = new ArrayList<VariableDto>();
-      List<TableCompareDto> comparedTablesList = JsArrays.toList(comparedTables);
-      for(TableCompareDto tableCompareDto : comparedTablesList) {
-        variableToUpdateList.addAll(JsArrays.toList(tableCompareDto.getNewVariablesArray()));
-        variableToUpdateList.addAll(JsArrays.toList(tableCompareDto.getExistingVariablesArray()));
+      for(int tableIndex = 0; tableIndex < comparedTables.length(); tableIndex++) {
+        TableCompareDto tableCompareDto = comparedTables.get(tableIndex);
 
-        JsArray<VariableDto> variablesToStringify = getVariableToStringify(variableToUpdateList);
+        JsArray<VariableDto> variablesToStringify = (JsArray<VariableDto>) JsArray.createArray();
+        for(int variableIndex = 0; variableIndex < tableCompareDto.getNewVariablesArray().length(); variableIndex++) {
+          VariableDto variableDto = tableCompareDto.getNewVariablesArray().get(variableIndex);
+          purgeH(variableDto);
+          variablesToStringify.push(variableDto);
+        }
+        for(int variableIndex = 0; variableIndex < tableCompareDto.getExistingVariablesArray().length(); variableIndex++) {
+          VariableDto variableDto = tableCompareDto.getExistingVariablesArray().get(variableIndex);
+          purgeH(variableDto);
+          variablesToStringify.push(variableDto);
+        }
 
         importVariablesStepPresenter.addResourceRequest(tableCompareDto.getCompared().getName(), ResourceRequestBuilderFactory.newBuilder().post().forResource("/datasource/" + targetDatasourceName + "/table/" + tableCompareDto.getCompared().getName() + "/variables").accept("application/x-protobuf+json").withResourceBody(stringify(variablesToStringify)));
-        variableToUpdateList.clear();
       }
 
       importVariablesStepPresenter.sendResourceRequests();
 
       eventBus.fireEvent(new WorkbenchChangeEvent(importVariablesStepPresenter));
-
-    }
-
-    private JsArray<VariableDto> getVariableToStringify(List<VariableDto> variableToUpdateList) {
-      JsArray<VariableDto> variablesToStringify = JsArray.createArray().cast();
-      for(VariableDto variableDto : variableToUpdateList) {
-        variablesToStringify.push(variableDto);
-      }
-      return variablesToStringify;
     }
   }
 
@@ -184,8 +179,18 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
     }
   }
 
-  public static native String stringify(JavaScriptObject obj) /*-{
-                                                               return $wnd.JSON.stringify(obj);
-                                                               }-*/;
+  public static native String stringify(JavaScriptObject obj)
+  /*-{
+  return $wnd.JSON.stringify(obj);
+  }-*/;
 
+  /**
+   * Remove the '$H' property mysteriously added to the VariableDto object.
+   * 
+   * @param obj
+   */
+  public static native void purgeH(JavaScriptObject obj)
+  /*-{
+  delete obj['$H'];
+  }-*/;
 }
