@@ -20,6 +20,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
@@ -38,6 +39,7 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 import org.obiba.opal.web.model.client.ws.DatasourceParsingErrorDto;
 import org.obiba.opal.web.model.client.ws.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -77,6 +79,8 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
 
   @Inject
   private IdentityArchiveStepPresenter identityArchiveStepPresenter;
+
+  private static Translations translations = GWT.create(Translations.class);
 
   @Inject
   public DestinationSelectionStepPresenter(final Display display, final EventBus eventBus) {
@@ -232,7 +236,7 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
     if(tableComparison.getNewVariablesArray() != null) {
       for(int i = 0; i < tableComparison.getNewVariablesArray().length(); i++) {
         VariableDto variableDto = tableComparison.getNewVariablesArray().get(i);
-        validationErrors.add(new CsvValidationError(variableDto.getName(), "VariablePresentInSourceButNotDestination"));
+        validationErrors.add(new CsvValidationError(variableDto.getName(), translations.datasourceComparisonErrorMap().get("VariablePresentInSourceButNotDestination")));
       }
     }
   }
@@ -241,7 +245,7 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
     if(tableComparison.getConflictsArray() != null) {
       for(int i = 0; i < tableComparison.getConflictsArray().length(); i++) {
         ConflictDto conflictDto = tableComparison.getConflictsArray().get(i);
-        validationErrors.add(new CsvValidationError(conflictDto.getVariable().getName(), "ConflictError"));
+        validationErrors.add(new CsvValidationError(conflictDto.getVariable().getName(), translations.datasourceComparisonErrorMap().get(conflictDto.getCode())));
       }
     }
   }
