@@ -33,7 +33,11 @@ public class NavigatorMenuBar extends MenuBar {
 
   private MenuBar addMenu;
 
+  private MenuItem editItem;
+
   private Translations translations = GWT.create(Translations.class);
+
+  private boolean separated = false;
 
   public NavigatorMenuBar() {
     super();
@@ -52,11 +56,16 @@ public class NavigatorMenuBar extends MenuBar {
     addItem(parentItem);
   }
 
+  private void ensureSeparation() {
+    if(!separated) {
+      addSeparator();
+      separated = true;
+    }
+  }
+
   public NavigatorMenuBar withToolsMenu() {
     if(toolsMenu == null) {
-      if(addMenu == null) {
-        addSeparator();
-      }
+      ensureSeparation();
       toolsMenu = new MenuBar(true);
       MenuItem toolsItem = new MenuItem("", toolsMenu);
       toolsItem.addStyleName("tools");
@@ -67,9 +76,7 @@ public class NavigatorMenuBar extends MenuBar {
 
   public NavigatorMenuBar withAddMenu() {
     if(addMenu == null) {
-      if(toolsMenu == null) {
-        addSeparator();
-      }
+      ensureSeparation();
       addMenu = new MenuBar(true);
       MenuItem addItem = new MenuItem("", addMenu);
       addItem.addStyleName("add");
@@ -119,10 +126,11 @@ public class NavigatorMenuBar extends MenuBar {
 
   public void setExcelDownloadCommand(Command cmd) {
     if(excelDownloadItem == null) {
-      excelDownloadItem = new MenuItem(translations.exportToExcelTitle(), (Command) null);
+      excelDownloadItem = new MenuItem(translations.exportToExcelTitle(), cmd);
       getToolsMenu().addItem(excelDownloadItem);
+    } else {
+      excelDownloadItem.setCommand(cmd);
     }
-    excelDownloadItem.setCommand(cmd);
   }
 
   public MenuBar getToolsMenu() {
@@ -133,6 +141,17 @@ public class NavigatorMenuBar extends MenuBar {
   public MenuBar getAddMenu() {
     withAddMenu();
     return addMenu;
+  }
+
+  public void setEditCommand(Command cmd) {
+    if(editItem == null) {
+      ensureSeparation();
+      editItem = new MenuItem("", cmd);
+      editItem.addStyleName("edit");
+      addItem(editItem);
+    } else {
+      editItem.setCommand(cmd);
+    }
   }
 
 }

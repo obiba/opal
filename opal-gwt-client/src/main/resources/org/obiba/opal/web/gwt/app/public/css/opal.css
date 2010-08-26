@@ -194,6 +194,12 @@ a:hover {
 	width:25px;
 }
 
+.navigator .gwt-MenuItem.edit {
+	background:url("image/20/edit.png") no-repeat scroll left center transparent;
+	height: 20px;
+	width:25px;
+}
+
 .navigator .gwt-MenuItem.next {
 	background:url("image/20/next.png") no-repeat scroll left center transparent;
 	height: 20px;
