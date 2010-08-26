@@ -12,7 +12,8 @@
     <g:Button ui:field="cancelButton"><ui:msg description="Cancel button label">Cancel</ui:msg></g:Button>
     
     <g:FlowPanel>
-      <g2:CellTable width="100%" ui:field="table" />
+      <g2:CellTable width="100%" ui:field="parsingTable" />
+      <g2:CellTable width="100%" ui:field="validationTable" />
     </g:FlowPanel> 
   </o:WorkbenchLayout>
 

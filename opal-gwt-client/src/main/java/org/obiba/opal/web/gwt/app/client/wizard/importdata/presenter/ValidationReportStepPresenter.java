@@ -18,6 +18,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DestinationSelectionStepPresenter.CsvValidationError;
 import org.obiba.opal.web.model.client.ws.DatasourceParsingErrorDto;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -90,7 +91,9 @@ public class ValidationReportStepPresenter extends WidgetPresenter<ValidationRep
 
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
 
-    void setErrors(List<DatasourceParsingErrorDto> errors);
+    void setParsingErrors(List<DatasourceParsingErrorDto> errors);
+
+    void setValidationErrors(List<CsvValidationError> errors);
   }
 
   class CancelClickHandler implements ClickHandler {

@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DestinationSelectionStepPresenter.CsvValidationError;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ValidationReportStepPresenter;
 import org.obiba.opal.web.model.client.ws.DatasourceParsingErrorDto;
 
@@ -46,7 +47,10 @@ public class ValidationReportStepView extends Composite implements ValidationRep
   Button cancelButton;
 
   @UiField
-  CellTable<DatasourceParsingErrorDto> table;
+  CellTable<DatasourceParsingErrorDto> parsingTable;
+
+  @UiField
+  CellTable<CsvValidationError> validationTable;
 
   //
   // Constructors
@@ -65,8 +69,10 @@ public class ValidationReportStepView extends Composite implements ValidationRep
     return cancelButton.addClickHandler(handler);
   }
 
-  public void setErrors(final List<DatasourceParsingErrorDto> errors) {
-    table.setDelegate(new Delegate<DatasourceParsingErrorDto>() {
+  public void setParsingErrors(final List<DatasourceParsingErrorDto> errors) {
+    validationTable.setVisible(false);
+    parsingTable.setVisible(true);
+    parsingTable.setDelegate(new Delegate<DatasourceParsingErrorDto>() {
 
       public void onRangeChanged(ListView<DatasourceParsingErrorDto> listView) {
         int start = listView.getRange().getStart();
@@ -75,9 +81,27 @@ public class ValidationReportStepView extends Composite implements ValidationRep
       }
     });
 
-    table.setData(0, table.getPageSize(), errors);
-    table.setDataSize(errors.size(), true);
-    table.redraw();
+    parsingTable.setData(0, parsingTable.getPageSize(), errors);
+    parsingTable.setDataSize(errors.size(), true);
+    parsingTable.redraw();
+  }
+
+  public void setValidationErrors(final List<CsvValidationError> errors) {
+    parsingTable.setVisible(false);
+    validationTable.setVisible(true);
+    validationTable.setDelegate(new Delegate<CsvValidationError>() {
+
+      @Override
+      public void onRangeChanged(ListView<CsvValidationError> listView) {
+        int start = listView.getRange().getStart();
+        int length = listView.getRange().getLength();
+        listView.setData(start, length, errors);
+      }
+    });
+
+    validationTable.setData(0, validationTable.getPageSize(), errors);
+    validationTable.setDataSize(errors.size(), true);
+    validationTable.redraw();
   }
 
   public Widget asWidget() {
@@ -95,17 +119,39 @@ public class ValidationReportStepView extends Composite implements ValidationRep
   //
 
   private void initTable() {
-    table.setSelectionEnabled(false);
-    addTableColumns();
+    parsingTable.setSelectionEnabled(false);
+    addParsingTableColumns();
+    validationTable.setSelectionEnabled(false);
+    addValidationColumns();
   }
 
-  private void addTableColumns() {
+  private void addParsingTableColumns() {
 
-    table.addColumn(new TextColumn<DatasourceParsingErrorDto>() {
+    parsingTable.addColumn(new TextColumn<DatasourceParsingErrorDto>() {
       @Override
       public String getValue(DatasourceParsingErrorDto dto) {
         return translations.datasourceParsingErrorMap().get(dto.getKey());
       }
+    }, translations.errorLabel());
+  }
+
+  private void addValidationColumns() {
+    validationTable.addColumn(new TextColumn<CsvValidationError>() {
+
+      @Override
+      public String getValue(CsvValidationError error) {
+        return error.getColumn();
+      }
+
+    }, "variable");
+
+    validationTable.addColumn(new TextColumn<CsvValidationError>() {
+
+      @Override
+      public String getValue(CsvValidationError error) {
+        return error.getErrorMessageKey();
+      }
+
     }, translations.errorLabel());
   }
 

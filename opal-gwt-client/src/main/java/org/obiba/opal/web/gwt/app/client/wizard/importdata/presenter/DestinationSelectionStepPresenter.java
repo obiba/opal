@@ -26,10 +26,14 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.magma.ConflictDto;
 import org.obiba.opal.web.model.client.magma.CsvDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.CsvDatasourceTableBundleDto;
+import org.obiba.opal.web.model.client.magma.DatasourceCompareDto;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.TableCompareDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 import org.obiba.opal.web.model.client.ws.DatasourceParsingErrorDto;
 import org.obiba.opal.web.model.client.ws.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
@@ -62,6 +66,8 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
     void showTables();
 
   }
+
+  private List<CsvValidationError> validationErrors = new ArrayList<CsvValidationError>();
 
   @Inject
   private ImportData importData;
@@ -146,11 +152,11 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
           if(response.getStatusCode() == 201) {
             DatasourceDto datasourceDto = (DatasourceDto) JsonUtils.unsafeEval(response.getText());
             importData.setTransientDatasourceName(datasourceDto.getName());
-            eventBus.fireEvent(new WorkbenchChangeEvent(identityArchiveStepPresenter));
+            datasourceDiff();
           } else {
             final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
             if(errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
-              validationReportStepPresenter.getDisplay().setErrors(extractDatasourceParsingErrors(errorDto));
+              validationReportStepPresenter.getDisplay().setParsingErrors(extractDatasourceParsingErrors(errorDto));
               eventBus.fireEvent(new WorkbenchChangeEvent(validationReportStepPresenter));
             } else {
               eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "fileReadError", null));
@@ -199,6 +205,76 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
 
       return dto;
     }
+  }
+
+  private void datasourceDiff() {
+    validationErrors.clear();
+    ResourceRequestBuilderFactory.<DatasourceCompareDto> newBuilder().forResource("/datasource/" + importData.getTransientDatasourceName() + "/compare/" + importData.getDestinationDatasourceName()).get().withCallback(new ResourceCallback<DatasourceCompareDto>() {
+
+      @Override
+      public void onResource(Response response, DatasourceCompareDto resource) {
+        JsArray<TableCompareDto> comparedTables = resource.getTableComparisonsArray();
+        for(int i = 0; i < comparedTables.length(); i++) {
+          TableCompareDto tableComparison = comparedTables.get(i);
+          collectValidationErrors(tableComparison);
+        }
+        moveToNextStepAfterDatasourceDiff();
+      }
+    }).send();
+  }
+
+  private void collectValidationErrors(TableCompareDto tableComparison) {
+    collectMissingVariableValidationErrors(tableComparison);
+    collectConflictValidationErrors(tableComparison);
+  }
+
+  private void collectMissingVariableValidationErrors(TableCompareDto tableComparison) {
+    if(tableComparison.getNewVariablesArray() != null) {
+      for(int i = 0; i < tableComparison.getNewVariablesArray().length(); i++) {
+        VariableDto variableDto = tableComparison.getNewVariablesArray().get(i);
+        validationErrors.add(new CsvValidationError(variableDto.getName(), "VariablePresentInSourceButNotDestination"));
+      }
+    }
+  }
+
+  private void collectConflictValidationErrors(TableCompareDto tableComparison) {
+    if(tableComparison.getConflictsArray() != null) {
+      for(int i = 0; i < tableComparison.getConflictsArray().length(); i++) {
+        ConflictDto conflictDto = tableComparison.getConflictsArray().get(i);
+        validationErrors.add(new CsvValidationError(conflictDto.getVariable().getName(), "ConflictError"));
+      }
+    }
+  }
+
+  protected void moveToNextStepAfterDatasourceDiff() {
+    if(validationErrors.isEmpty()) {
+      eventBus.fireEvent(new WorkbenchChangeEvent(identityArchiveStepPresenter));
+    } else {
+      validationReportStepPresenter.getDisplay().setValidationErrors(validationErrors);
+      eventBus.fireEvent(new WorkbenchChangeEvent(validationReportStepPresenter));
+    }
+  }
+
+  public static class CsvValidationError {
+
+    private final String column;
+
+    private final String errorMessageKey;
+
+    public CsvValidationError(String column, String errorMessageKey) {
+      super();
+      this.column = column;
+      this.errorMessageKey = errorMessageKey;
+    }
+
+    public String getColumn() {
+      return column;
+    }
+
+    public String getErrorMessageKey() {
+      return errorMessageKey;
+    }
+
   }
 
 }
