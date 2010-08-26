@@ -183,7 +183,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
         newTableDto.setEntityType(comparedTableDto.getEntityType());
         newTableDto.setVariablesArray(variables);
 
-        return ResourceRequestBuilderFactory.newBuilder().post().forResource("/datasource/" + targetDatasourceName + "/tables").accept("application/x-protobuf+json").withResourceBody(stringify(variables));
+        return ResourceRequestBuilderFactory.newBuilder().post().forResource("/datasource/" + targetDatasourceName + "/tables").accept("application/x-protobuf+json").withResourceBody(stringify(newTableDto));
       } else {
         return ResourceRequestBuilderFactory.newBuilder().post().forResource("/datasource/" + targetDatasourceName + "/table/" + comparedTableDto.getName() + "/variables").accept("application/x-protobuf+json").withResourceBody(stringify(variables));
       }
