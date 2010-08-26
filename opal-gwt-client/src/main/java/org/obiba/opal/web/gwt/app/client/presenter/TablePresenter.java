@@ -31,10 +31,8 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.Command;
 import com.google.inject.Inject;
 
 public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
@@ -65,11 +63,10 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   protected void onBind() {
     super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
     super.registerHandler(eventBus.addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
-    super.registerHandler(getDisplay().addSpreadSheetClickHandler(new SpreadSheetClickHandler()));
-    super.registerHandler(getDisplay().addParentLinkClickHandler(new ParentClickHandler()));
-    super.registerHandler(getDisplay().addParentImageClickHandler(new ParentClickHandler()));
-    super.registerHandler(getDisplay().addNextClickHandler(new NextClickHandler()));
-    super.registerHandler(getDisplay().addPreviousClickHandler(new PreviousClickHandler()));
+    getDisplay().setExcelDownloadCommand(new ExcelDownloadCommand());
+    getDisplay().setParentCommand(new ParentCommand());
+    getDisplay().setPreviousCommand(new PreviousCommand());
+    getDisplay().setNextCommand(new NextCommand());
     super.getDisplay().setVariableNameFieldUpdater(new VariableNameFieldUpdater());
 
   }
@@ -137,6 +134,40 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   // Interfaces and classes
   //
 
+  final class NextCommand implements Command {
+    @Override
+    public void execute() {
+      eventBus.fireEvent(new SiblingTableSelectionEvent(table, Direction.NEXT));
+    }
+  }
+
+  final class PreviousCommand implements Command {
+    @Override
+    public void execute() {
+      eventBus.fireEvent(new SiblingTableSelectionEvent(table, Direction.PREVIOUS));
+    }
+  }
+
+  final class ParentCommand implements Command {
+    @Override
+    public void execute() {
+      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasource/" + table.getDatasourceName()).get().withCallback(new ResourceCallback<DatasourceDto>() {
+        @Override
+        public void onResource(Response response, DatasourceDto resource) {
+          eventBus.fireEvent(new DatasourceSelectionChangeEvent(resource));
+        }
+
+      }).send();
+    }
+  }
+
+  final class ExcelDownloadCommand implements Command {
+    @Override
+    public void execute() {
+      downloadMetadata();
+    }
+  }
+
   class VariablesResourceCallback implements ResourceCallback<JsArray<VariableDto>> {
 
     private TableDto table;
@@ -198,40 +229,6 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     }
   }
 
-  class PreviousClickHandler implements ClickHandler {
-    @Override
-    public void onClick(ClickEvent event) {
-      eventBus.fireEvent(new SiblingTableSelectionEvent(table, Direction.PREVIOUS));
-    }
-  }
-
-  class NextClickHandler implements ClickHandler {
-    @Override
-    public void onClick(ClickEvent event) {
-      eventBus.fireEvent(new SiblingTableSelectionEvent(table, Direction.NEXT));
-    }
-  }
-
-  class ParentClickHandler implements ClickHandler {
-    @Override
-    public void onClick(ClickEvent event) {
-      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasource/" + table.getDatasourceName()).get().withCallback(new ResourceCallback<DatasourceDto>() {
-        @Override
-        public void onResource(Response response, DatasourceDto resource) {
-          eventBus.fireEvent(new DatasourceSelectionChangeEvent(resource));
-        }
-
-      }).send();
-    }
-  }
-
-  class SpreadSheetClickHandler implements ClickHandler {
-    @Override
-    public void onClick(ClickEvent event) {
-      downloadMetadata();
-    }
-  }
-
   public interface Display extends WidgetDisplay {
 
     void setVariableSelection(VariableDto variable, int index);
@@ -248,15 +245,13 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
     void setEntityType(String text);
 
-    HandlerRegistration addParentLinkClickHandler(ClickHandler handler);
+    void setExcelDownloadCommand(Command cmd);
 
-    HandlerRegistration addParentImageClickHandler(ClickHandler handler);
+    void setParentCommand(Command cmd);
 
-    HandlerRegistration addSpreadSheetClickHandler(ClickHandler handler);
+    void setNextCommand(Command cmd);
 
-    HandlerRegistration addNextClickHandler(ClickHandler handler);
-
-    HandlerRegistration addPreviousClickHandler(ClickHandler handler);
+    void setPreviousCommand(Command cmd);
 
     void setParentName(String name);
 

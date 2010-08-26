@@ -166,6 +166,68 @@ a:hover {
 	/*color: #ffffff;*/
 }
 
+.navigator .gwt-MenuBar {
+	background:none repeat scroll 0 0 #FFFFFF;
+	border:0 none;
+}
+
+.navigator .gwt-MenuBar-horizontal .gwt-MenuItem {
+	color:#666666;
+	font-weight:bold;
+	padding:0px;
+	vertical-align:bottom;
+}
+
+.navigator .gwt-MenuBar-horizontal .gwt-MenuItemSeparator {
+	padding-right:5px;
+}
+
+.navigator .gwt-MenuItem.tools {
+	background:url("image/20/tools.png") no-repeat scroll left center transparent;
+	height: 20px;
+	width:25px;
+}
+
+.navigator .gwt-MenuItem.add {
+	background:url("image/20/add-item.png") no-repeat scroll left center transparent;
+	height: 20px;
+	width:25px;
+}
+
+.navigator .gwt-MenuItem.next {
+	background:url("image/20/next.png") no-repeat scroll left center transparent;
+	height: 20px;
+	width:25px;
+}
+
+.navigator .gwt-MenuItem.next.disabled {
+	background:url("image/20/next-disabled.png") no-repeat scroll left center transparent;
+}
+
+.navigator .gwt-MenuItem.previous {
+	background:url("image/20/previous.png") no-repeat scroll left center transparent;
+	height: 20px;
+	width:25px;
+}
+
+.navigator .gwt-MenuItem.previous.disabled {
+	background:url("image/20/previous-disabled.png") no-repeat scroll left center transparent;
+}
+
+.navigator .gwt-MenuItem.parent {
+	background:url("image/20/up.png") no-repeat scroll left center transparent;
+	height: 20px;
+	width:25px;
+}
+
+.navigator .gwt-MenuItem.parent.disabled {
+	background:url("image/20/up-disabled.png") no-repeat scroll left center transparent;
+}
+
+.gwt-MenuBar-vertical .gwt-MenuItem {
+	color:#535353;
+}
+
 /* File Explorer Styles */ 
  
 table.folder-details td:first-child span:hover {

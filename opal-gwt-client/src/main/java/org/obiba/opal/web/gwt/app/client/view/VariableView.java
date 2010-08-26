@@ -17,18 +17,15 @@ import org.obiba.opal.web.model.client.magma.CategoryDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -58,10 +55,9 @@ public class VariableView extends Composite implements VariablePresenter.Display
   //
 
   @UiField
-  Anchor parentLink;
-
-  @UiField
   FlowPanel toolbarPanel;
+
+  private NavigatorMenuBar toolbar;
 
   @UiField
   Label variableName;
@@ -103,21 +99,13 @@ public class VariableView extends Composite implements VariablePresenter.Display
 
   SimplePager<AttributeDto> attributeTablePager;
 
-  @UiField
-  Image parentImage;
-
-  @UiField
-  Image previousImage;
-
-  @UiField
-  Image nextImage;
-
   //
   // Constructors
   //
 
   public VariableView() {
     initWidget(uiBinder.createAndBindUi(this));
+    toolbarPanel.add(toolbar = new NavigatorMenuBar());
     initCategoryTable();
     initAttributeTable();
   }
@@ -222,49 +210,33 @@ public class VariableView extends Composite implements VariablePresenter.Display
   }
 
   @Override
-  public HandlerRegistration addParentLinkClickHandler(ClickHandler handler) {
-    return parentLink.addClickHandler(handler);
-  }
-
-  @Override
-  public HandlerRegistration addParentImageClickHandler(ClickHandler handler) {
-    return parentImage.addClickHandler(handler);
-  }
-
-  @Override
   public void setParentName(String name) {
-    parentLink.setText(name);
-    parentImage.setTitle(name);
+    toolbar.setParentName(name);
   }
 
   @Override
   public void setNextName(String name) {
-    nextImage.setTitle(name);
-    if(name != null && name.length() > 0) {
-      nextImage.setUrl("image/next.png");
-    } else {
-      nextImage.setUrl("image/next-disabled.png");
-    }
+    toolbar.setNextName(name);
   }
 
   @Override
   public void setPreviousName(String name) {
-    previousImage.setTitle(name);
-    if(name != null && name.length() > 0) {
-      previousImage.setUrl("image/previous.png");
-    } else {
-      previousImage.setUrl("image/previous-disabled.png");
-    }
+    toolbar.setPreviousName(name);
   }
 
   @Override
-  public HandlerRegistration addPreviousClickHandler(ClickHandler handler) {
-    return previousImage.addClickHandler(handler);
+  public void setParentCommand(Command cmd) {
+    toolbar.setParentCommand(cmd);
   }
 
   @Override
-  public HandlerRegistration addNextClickHandler(ClickHandler handler) {
-    return nextImage.addClickHandler(handler);
+  public void setNextCommand(Command cmd) {
+    toolbar.setNextCommand(cmd);
+  }
+
+  @Override
+  public void setPreviousCommand(Command cmd) {
+    toolbar.setPreviousCommand(cmd);
   }
 
   private void initCategoryTable() {

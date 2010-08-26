@@ -31,9 +31,9 @@ public class ResourceRequestView extends Composite implements ResourceRequestPre
 
   private static final String IN_PROGRESS_IMAGE_URL = "image/in-progress.gif";
 
-  private static final String COMPLETED_IMAGE_URL = "image/tick.gif";
+  private static final String COMPLETED_IMAGE_URL = "image/20/tick.png";
 
-  private static final String FAILED_IMAGE_URL = "image/error.gif";
+  private static final String FAILED_IMAGE_URL = "image/20/error.png";
 
   //
   // Static Variables

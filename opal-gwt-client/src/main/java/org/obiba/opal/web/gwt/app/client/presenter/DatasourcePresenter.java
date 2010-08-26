@@ -29,8 +29,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.Command;
 import com.google.inject.Inject;
 
 public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Display> {
@@ -59,9 +59,9 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   protected void onBind() {
     super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionHandler()));
     super.registerHandler(eventBus.addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionHandler()));
-    super.registerHandler(getDisplay().addSpreadSheetClickHandler(new SpreadSheetClickHandler()));
-    super.registerHandler(getDisplay().addNextClickHandler(new NextClickHandler()));
-    super.registerHandler(getDisplay().addPreviousClickHandler(new PreviousClickHandler()));
+    getDisplay().setExcelDownloadCommand(new ExcelDownloadCommand());
+    getDisplay().setNextCommand(new NextCommand());
+    getDisplay().setPreviousCommand(new PreviousCommand());
     super.registerHandler(eventBus.addHandler(SiblingTableSelectionEvent.getType(), new SiblingTableSelectionHandler()));
     super.getDisplay().setTableNameFieldUpdater(new TableNameFieldUpdater());
 
@@ -188,6 +188,41 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   //
   // Interfaces and classes
   //
+
+  final class PreviousCommand implements Command {
+    @Override
+    public void execute() {
+      for(int i = 0; i < datasources.length(); i++) {
+        if(datasources.get(i).getName().equals(datasourceName)) {
+          if(i != 0) {
+            eventBus.fireEvent(new DatasourceSelectionChangeEvent(datasources.get(i - 1)));
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  final class NextCommand implements Command {
+    @Override
+    public void execute() {
+      for(int i = 0; i < datasources.length(); i++) {
+        if(datasources.get(i).getName().equals(datasourceName)) {
+          if(i < datasources.length() - 1) {
+            eventBus.fireEvent(new DatasourceSelectionChangeEvent(datasources.get(i + 1)));
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  final class ExcelDownloadCommand implements Command {
+    @Override
+    public void execute() {
+      downloadMetadata(datasourceName);
+    }
+  }
 
   private final class TablesResourceCallback implements ResourceCallback<JsArray<TableDto>> {
 
@@ -318,11 +353,11 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
     void setNextName(String name);
 
-    HandlerRegistration addNextClickHandler(ClickHandler handler);
+    void setExcelDownloadCommand(Command cmd);
 
-    HandlerRegistration addPreviousClickHandler(ClickHandler handler);
+    void setNextCommand(Command cmd);
 
-    HandlerRegistration addSpreadSheetClickHandler(ClickHandler handler);
+    void setPreviousCommand(Command cmd);
 
     void setTableNameFieldUpdater(FieldUpdater<TableDto, String> updater);
   }

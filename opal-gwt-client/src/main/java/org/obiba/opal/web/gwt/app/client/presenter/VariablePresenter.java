@@ -29,10 +29,8 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.Command;
 import com.google.inject.Inject;
 
 /**
@@ -65,10 +63,10 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   @Override
   protected void onBind() {
     super.registerHandler(eventBus.addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionHandler()));
-    super.registerHandler(getDisplay().addParentLinkClickHandler(new ParentClickHandler()));
-    super.registerHandler(getDisplay().addParentImageClickHandler(new ParentClickHandler()));
-    super.registerHandler(getDisplay().addNextClickHandler(new NextClickHandler()));
-    super.registerHandler(getDisplay().addPreviousClickHandler(new PreviousClickHandler()));
+
+    getDisplay().setParentCommand(new ParentCommand());
+    getDisplay().setNextCommand(new NextCommand());
+    getDisplay().setPreviousCommand(new PreviousCommand());
   }
 
   @Override
@@ -119,30 +117,32 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   // Interfaces and classes
   //
 
-  class VariableSelectionHandler implements VariableSelectionChangeEvent.Handler {
+  /**
+   *
+   */
+  final class PreviousCommand implements Command {
     @Override
-    public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-      updateDisplay(event.getSelection(), event.getPrevious(), event.getNext());
-    }
-  }
-
-  class PreviousClickHandler implements ClickHandler {
-    @Override
-    public void onClick(ClickEvent event) {
+    public void execute() {
       eventBus.fireEvent(new SiblingVariableSelectionEvent(variable, Direction.PREVIOUS));
     }
   }
 
-  class NextClickHandler implements ClickHandler {
+  /**
+   *
+   */
+  final class NextCommand implements Command {
     @Override
-    public void onClick(ClickEvent event) {
+    public void execute() {
       eventBus.fireEvent(new SiblingVariableSelectionEvent(variable, Direction.NEXT));
     }
   }
 
-  class ParentClickHandler implements ClickHandler {
+  /**
+   *
+   */
+  final class ParentCommand implements Command {
     @Override
-    public void onClick(ClickEvent event) {
+    public void execute() {
       ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource(variable.getParentLink().getLink()).get().withCallback(new ResourceCallback<TableDto>() {
         @Override
         public void onResource(Response response, TableDto resource) {
@@ -150,6 +150,13 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
         }
 
       }).send();
+    }
+  }
+
+  class VariableSelectionHandler implements VariableSelectionChangeEvent.Handler {
+    @Override
+    public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
+      updateDisplay(event.getSelection(), event.getPrevious(), event.getNext());
     }
   }
 
@@ -175,13 +182,11 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
     void setNextName(String name);
 
-    HandlerRegistration addParentLinkClickHandler(ClickHandler handler);
+    void setParentCommand(Command cmd);
 
-    HandlerRegistration addParentImageClickHandler(ClickHandler handler);
+    void setNextCommand(Command cmd);
 
-    HandlerRegistration addNextClickHandler(ClickHandler handler);
-
-    HandlerRegistration addPreviousClickHandler(ClickHandler handler);
+    void setPreviousCommand(Command cmd);
 
     void renderCategoryRows(JsArray<CategoryDto> rows);
 

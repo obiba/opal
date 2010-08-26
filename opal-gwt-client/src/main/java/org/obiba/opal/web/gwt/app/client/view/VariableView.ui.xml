@@ -48,17 +48,7 @@
        <g:Label addStyleNames="small-indent left-aligned {style.title}">(Variable)</g:Label>
      </g:FlowPanel>
       
-     <g:FlowPanel>
-       <g:FlowPanel addStyleNames="small-indent {style.toolbar} {style.toolbar-left}">
-         <g:Image ui:field="parentImage" url="image/up.png"></g:Image>
-         <g:Anchor ui:field="parentLink" addStyleNames="left-aligned">..</g:Anchor>
-       </g:FlowPanel>
-      
-       <g:FlowPanel ui:field="toolbarPanel"  addStyleNames="small-indent {style.toolbar} {style.toolbar-right}">
-         <g:Image ui:field="nextImage" url="image/next.png"></g:Image>
-         <g:Image ui:field="previousImage" url="image/previous.png"></g:Image>
-       </g:FlowPanel>
-     </g:FlowPanel>
+     <g:FlowPanel ui:field="toolbarPanel"  addStyleNames="small-indent {style.toolbar} {style.toolbar-right}"/>
      
      <g:FlowPanel addStyleNames="{style.separator}"></g:FlowPanel>
      

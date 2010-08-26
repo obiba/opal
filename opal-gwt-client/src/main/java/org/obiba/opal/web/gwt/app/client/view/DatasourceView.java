@@ -19,8 +19,6 @@ import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -28,6 +26,7 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -53,9 +52,6 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   Label tablesTableTitle;
 
   @UiField
-  FlowPanel toolbarPanel;
-
-  @UiField
   CellTable<TableDto> table;
 
   SelectionModel<TableDto> selectionModel = new SingleSelectionModel<TableDto>();
@@ -63,13 +59,9 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   SimplePager<TableDto> pager;
 
   @UiField
-  Image spreadsheetDownloadImage;
+  FlowPanel toolbarPanel;
 
-  @UiField
-  Image previousImage;
-
-  @UiField
-  Image nextImage;
+  private NavigatorMenuBar toolbar;
 
   @UiField
   Image loading;
@@ -80,8 +72,9 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
   public DatasourceView() {
     initWidget(uiBinder.createAndBindUi(this));
+    toolbarPanel.add(toolbar = new NavigatorMenuBar());
+    toolbar.setParentName(null);
     addTableColumns();
-    spreadsheetDownloadImage.setTitle(translations.exportToExcelTitle());
   }
 
   private void addTableColumns() {
@@ -185,37 +178,27 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
   @Override
   public void setNextName(String name) {
-    nextImage.setTitle(name);
-    if(name != null && name.length() > 0) {
-      nextImage.setUrl("image/next.png");
-    } else {
-      nextImage.setUrl("image/next-disabled.png");
-    }
+    toolbar.setNextName(name);
   }
 
   @Override
   public void setPreviousName(String name) {
-    previousImage.setTitle(name);
-    if(name != null && name.length() > 0) {
-      previousImage.setUrl("image/previous.png");
-    } else {
-      previousImage.setUrl("image/previous-disabled.png");
-    }
+    toolbar.setPreviousName(name);
   }
 
   @Override
-  public HandlerRegistration addNextClickHandler(ClickHandler handler) {
-    return nextImage.addClickHandler(handler);
+  public void setNextCommand(Command cmd) {
+    toolbar.setNextCommand(cmd);
   }
 
   @Override
-  public HandlerRegistration addPreviousClickHandler(ClickHandler handler) {
-    return previousImage.addClickHandler(handler);
+  public void setPreviousCommand(Command cmd) {
+    toolbar.setPreviousCommand(cmd);
   }
 
   @Override
-  public HandlerRegistration addSpreadSheetClickHandler(ClickHandler handler) {
-    return spreadsheetDownloadImage.addClickHandler(handler);
+  public void setExcelDownloadCommand(Command cmd) {
+    toolbar.setExcelDownloadCommand(cmd);
   }
 
   private abstract class TableNameColumn extends Column<TableDto, String> implements HasFieldUpdater<TableDto, String> {

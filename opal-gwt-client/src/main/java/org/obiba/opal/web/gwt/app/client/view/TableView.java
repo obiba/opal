@@ -21,8 +21,6 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -30,8 +28,8 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -52,10 +50,9 @@ public class TableView extends Composite implements TablePresenter.Display {
   private static TableViewUiBinder uiBinder = GWT.create(TableViewUiBinder.class);
 
   @UiField
-  Image parentImage;
+  FlowPanel toolbarPanel;
 
-  @UiField
-  Anchor parentLink;
+  private NavigatorMenuBar toolbar;
 
   @UiField
   Label tableName;
@@ -67,23 +64,11 @@ public class TableView extends Composite implements TablePresenter.Display {
   Label entityType;
 
   @UiField
-  FlowPanel toolbarPanel;
-
-  @UiField
   CellTable<VariableDto> table;
 
   SelectionModel<VariableDto> selectionModel = new SingleSelectionModel<VariableDto>();
 
   SimplePager<VariableDto> pager;
-
-  @UiField
-  Image spreadsheetDownloadImage;
-
-  @UiField
-  Image previousImage;
-
-  @UiField
-  Image nextImage;
 
   @UiField
   Image loading;
@@ -94,8 +79,8 @@ public class TableView extends Composite implements TablePresenter.Display {
 
   public TableView() {
     initWidget(uiBinder.createAndBindUi(this));
+    toolbarPanel.add(toolbar = new NavigatorMenuBar());
     addTableColumns();
-    spreadsheetDownloadImage.setTitle(translations.exportToExcelTitle());
   }
 
   private void addTableColumns() {
@@ -222,54 +207,38 @@ public class TableView extends Composite implements TablePresenter.Display {
   }
 
   @Override
-  public HandlerRegistration addSpreadSheetClickHandler(ClickHandler handler) {
-    return spreadsheetDownloadImage.addClickHandler(handler);
+  public void setExcelDownloadCommand(Command cmd) {
+    toolbar.setExcelDownloadCommand(cmd);
   }
 
   @Override
   public void setParentName(String name) {
-    parentLink.setText(name);
-    parentImage.setTitle(name);
+    toolbar.setParentName(name);
   }
 
   @Override
   public void setNextName(String name) {
-    nextImage.setTitle(name);
-    if(name != null && name.length() > 0) {
-      nextImage.setUrl("image/next.png");
-    } else {
-      nextImage.setUrl("image/next-disabled.png");
-    }
+    toolbar.setNextName(name);
   }
 
   @Override
   public void setPreviousName(String name) {
-    previousImage.setTitle(name);
-    if(name != null && name.length() > 0) {
-      previousImage.setUrl("image/previous.png");
-    } else {
-      previousImage.setUrl("image/previous-disabled.png");
-    }
+    toolbar.setPreviousName(name);
   }
 
   @Override
-  public HandlerRegistration addParentLinkClickHandler(ClickHandler handler) {
-    return parentLink.addClickHandler(handler);
+  public void setParentCommand(Command cmd) {
+    toolbar.setParentCommand(cmd);
   }
 
   @Override
-  public HandlerRegistration addParentImageClickHandler(ClickHandler handler) {
-    return parentImage.addClickHandler(handler);
+  public void setNextCommand(Command cmd) {
+    toolbar.setNextCommand(cmd);
   }
 
   @Override
-  public HandlerRegistration addNextClickHandler(ClickHandler handler) {
-    return nextImage.addClickHandler(handler);
-  }
-
-  @Override
-  public HandlerRegistration addPreviousClickHandler(ClickHandler handler) {
-    return previousImage.addClickHandler(handler);
+  public void setPreviousCommand(Command cmd) {
+    toolbar.setPreviousCommand(cmd);
   }
 
   private abstract class VariableNameColumn extends Column<VariableDto, String> implements HasFieldUpdater<VariableDto, String> {

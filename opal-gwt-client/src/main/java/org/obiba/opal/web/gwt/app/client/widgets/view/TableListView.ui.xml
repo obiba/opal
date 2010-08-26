@@ -18,8 +18,8 @@
     <g:HorizontalPanel>
    	  <g:ListBox ui:field="tableList" multipleSelect="true"></g:ListBox>
    	  <g:VerticalPanel addStyleNames="{style.toolbar},{style.toolbar-right}">
-        <g:Image ui:field="addImage" url="image/list-add.png"></g:Image>
-        <g:Image ui:field="removeImage" url="image/list-remove.png"></g:Image>
+        <g:Image ui:field="addImage" url="image/20/list-add.png"></g:Image>
+        <g:Image ui:field="removeImage" url="image/20/list-remove.png"></g:Image>
    	  </g:VerticalPanel>	
     </g:HorizontalPanel>
     

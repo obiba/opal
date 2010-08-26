@@ -22,9 +22,9 @@ import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.GwtEvent.Type;
+import com.google.gwt.user.client.Command;
 
 public class VariablePresenterTest extends AbstractGwtTestSetup {
 
@@ -47,10 +47,9 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
     HandlerRegistration handlerRegistrationMock = createMock(HandlerRegistration.class);
     expect(eventBusMock.addHandler((Type<VariableSelectionChangeEvent.Handler>) EasyMock.anyObject(), (VariableSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
 
-    expect(displayMock.addParentLinkClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
-    expect(displayMock.addParentImageClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
-    expect(displayMock.addPreviousClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
-    expect(displayMock.addNextClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
+    displayMock.setNextCommand((Command) EasyMock.anyObject());
+    displayMock.setPreviousCommand((Command) EasyMock.anyObject());
+    displayMock.setParentCommand((Command) EasyMock.anyObject());
 
     replay(displayMock, eventBusMock);
     variablePresenter.bind();
