@@ -32,17 +32,11 @@
     <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-math</artifactId>
-      <version>1.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20090211</version>
-    </dependency>
-    <dependency>
-     <groupId>org.apache.commons</groupId>
-     <artifactId>commons-math</artifactId>
-     <version>2.1</version>
     </dependency>
     <dependency>
       <groupId>com.google.visualization</groupId>
