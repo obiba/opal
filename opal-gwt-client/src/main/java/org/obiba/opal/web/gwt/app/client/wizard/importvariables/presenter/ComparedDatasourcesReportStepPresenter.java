@@ -18,9 +18,11 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter.Display.ComparisonResult;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.DatasourceCompareDto;
 import org.obiba.opal.web.model.client.magma.TableCompareDto;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.JavaScriptObject;
@@ -166,13 +168,27 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
           variablesToStringify.push(variableDto);
         }
 
-        importVariablesStepPresenter.addResourceRequest(tableCompareDto.getCompared().getName(), ResourceRequestBuilderFactory.newBuilder().post().forResource("/datasource/" + targetDatasourceName + "/table/" + tableCompareDto.getCompared().getName() + "/variables").accept("application/x-protobuf+json").withResourceBody(stringify(variablesToStringify)));
+        importVariablesStepPresenter.addResourceRequest(tableCompareDto.getCompared().getName(), createResourceRequestBuilder(tableCompareDto.getCompared(), !tableCompareDto.hasWithTable(), variablesToStringify));
       }
 
       importVariablesStepPresenter.sendResourceRequests();
 
       eventBus.fireEvent(new WorkbenchChangeEvent(importVariablesStepPresenter));
     }
+
+    ResourceRequestBuilder<? extends JavaScriptObject> createResourceRequestBuilder(TableDto comparedTableDto, boolean newTable, JsArray<VariableDto> variables) {
+      if(newTable) {
+        TableDto newTableDto = TableDto.create();
+        newTableDto.setName(comparedTableDto.getName());
+        newTableDto.setEntityType(comparedTableDto.getEntityType());
+        newTableDto.setVariablesArray(variables);
+
+        return ResourceRequestBuilderFactory.newBuilder().post().forResource("/datasource/" + targetDatasourceName + "/tables").accept("application/x-protobuf+json").withResourceBody(stringify(variables));
+      } else {
+        return ResourceRequestBuilderFactory.newBuilder().post().forResource("/datasource/" + targetDatasourceName + "/table/" + comparedTableDto.getName() + "/variables").accept("application/x-protobuf+json").withResourceBody(stringify(variables));
+      }
+    }
+
   }
 
   class CancelClickHandler implements ClickHandler {
