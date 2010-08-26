@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -160,6 +161,15 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
   public void revealDisplay() {
   }
 
+  public void initUnits() {
+    ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
+      @Override
+      public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
+        getDisplay().setUnits(units);
+      }
+    }).send();
+  }
+
   class NextClickHandler implements ClickHandler {
 
     @Override
@@ -170,21 +180,23 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
       importData.setArchiveLeave(getDisplay().isArchiveLeave());
       importData.setArchiveMove(getDisplay().isArchiveMove());
       importData.setArchiveDirectory(getDisplay().getArchiveDirectory());
-      submitJob();
+      if(importData.getImportFormat().equals(ImportFormat.XML)) {
+        submitJob(createXmlImportCommandOptionsDto());
+      } else if(importData.getImportFormat().equals(ImportFormat.CSV)) {
+        submitJob(createCsvImportCommandOptionsDto());
+      }
     }
 
   }
 
-  public void initUnits() {
-    ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
-        getDisplay().setUnits(units);
-      }
-    }).send();
+  private void submitJob(ImportCommandOptionsDto dto) {
+    ResourceRequestBuilderFactory.newBuilder().forResource("/shell/import").post() //
+    .withResourceBody(ImportCommandOptionsDto.stringify(dto)) //
+    .withCallback(400, new ClientFailureResponseCodeCallBack()) //
+    .withCallback(201, new SuccessResponseCodeCallBack()).send();
   }
 
-  private void submitJob() {
+  private ImportCommandOptionsDto createXmlImportCommandOptionsDto() {
     ImportCommandOptionsDto dto = ImportCommandOptionsDto.create();
     dto.setDestination(importData.getDestinationDatasourceName());
     dto.setArchive(getDisplay().getArchiveDirectory());
@@ -192,10 +204,21 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
     selectedFiles.push(importData.getXmlFile());
     dto.setFilesArray(selectedFiles);
     dto.setUnit(getDisplay().getSelectedUnit());
-    ResourceRequestBuilderFactory.newBuilder().forResource("/shell/import").post() //
-    .withResourceBody(ImportCommandOptionsDto.stringify(dto)) //
-    .withCallback(400, new ClientFailureResponseCodeCallBack()) //
-    .withCallback(201, new SuccessResponseCodeCallBack()).send();
+    return dto;
+  }
+
+  private ImportCommandOptionsDto createCsvImportCommandOptionsDto() {
+    ImportCommandOptionsDto dto = ImportCommandOptionsDto.create();
+    dto.setDestination(importData.getDestinationDatasourceName());
+    if(importData.isArchiveMove()) {
+      dto.setArchive(importData.getArchiveDirectory());
+      JsArrayString selectedFiles = JavaScriptObject.createArray().cast();
+      selectedFiles.push(importData.getCsvFile());
+      dto.setFilesArray(selectedFiles);
+    }
+    if(importData.isIdentifierSharedWithUnit()) dto.setUnit(importData.getUnit());
+    dto.setSource(importData.getTransientDatasourceName());
+    return dto;
   }
 
   class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {

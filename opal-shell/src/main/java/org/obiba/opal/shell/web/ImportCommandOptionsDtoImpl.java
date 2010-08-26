@@ -71,11 +71,11 @@ public class ImportCommandOptionsDtoImpl implements ImportCommandOptions {
 
   @Override
   public String getSource() {
-    return null;
+    return dto.getSource();
   }
 
   @Override
   public boolean isSource() {
-    return false;
+    return dto.hasSource();
   }
 }
