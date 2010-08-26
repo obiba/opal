@@ -123,14 +123,15 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     return tabHeader;
   }
 
+  @SuppressWarnings("unchecked")
   private TabLayoutPanel initVariableChangesPanel(TableCompareDto tableCompareData, FlowPanel tableComparePanel) {
     TabLayoutPanel variableChangesPanel = new TabLayoutPanel(3, Unit.EM);
     variableChangesPanel.setHeight("100%");
     variableChangesPanel.setWidth("100%");
 
-    JsArray<VariableDto> newVariables = tableCompareData.getNewVariablesArray();
-    JsArray<VariableDto> modifiedVariables = tableCompareData.getExistingVariablesArray();
-    JsArray<ConflictDto> conflicts = tableCompareData.getConflictsArray();
+    JsArray<VariableDto> newVariables = (JsArray<VariableDto>) (tableCompareData.getNewVariablesArray() != null ? tableCompareData.getNewVariablesArray() : JsArray.createArray());
+    JsArray<VariableDto> modifiedVariables = (JsArray<VariableDto>) (tableCompareData.getExistingVariablesArray() != null ? tableCompareData.getExistingVariablesArray() : JsArray.createArray());
+    JsArray<ConflictDto> conflicts = (JsArray<ConflictDto>) (tableCompareData.getConflictsArray() != null ? tableCompareData.getConflictsArray() : JsArray.createArray());
 
     addVariableChangesSummary(tableComparePanel, newVariables, modifiedVariables);
 
@@ -198,7 +199,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
       @Override
       public String getValue(ConflictDto conflict) {
         StringBuilder builder = new StringBuilder();
-        JsArrayString arguments = conflict.getArgumentsArray();
+        JsArrayString arguments = (JsArrayString) (conflict.getArgumentsArray() != null ? conflict.getArgumentsArray() : JsArrayString.createArray());
         for(int i = 0; i < arguments.length(); i++) {
           builder.append(arguments.get(i).toString() + " ");
         }
@@ -234,9 +235,10 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     }, translations.unitLabel());
 
     table.addColumn(new TextColumn<VariableDto>() {
+      @SuppressWarnings("unchecked")
       @Override
       public String getValue(VariableDto variable) {
-        JsArray<AttributeDto> attributes = variable.getAttributesArray();
+        JsArray<AttributeDto> attributes = (JsArray<AttributeDto>) (variable.getAttributesArray() != null ? variable.getAttributesArray() : JsArray.createArray());
         AttributeDto attribute = null;
         for(int i = 0; i < attributes.length(); i++) {
           attribute = attributes.get(i);
@@ -244,7 +246,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
             break;
           }
         }
-        return attribute.getValue();
+        return attribute != null ? attribute.getValue() : "";
       }
     }, translations.labelLabel());
 

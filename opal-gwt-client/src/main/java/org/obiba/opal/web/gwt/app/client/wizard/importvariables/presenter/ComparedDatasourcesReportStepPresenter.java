@@ -150,15 +150,18 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
       for(int tableIndex = 0; tableIndex < comparedTables.length(); tableIndex++) {
         TableCompareDto tableCompareDto = comparedTables.get(tableIndex);
+        JsArray<VariableDto> newVariables = (JsArray<VariableDto>) (tableCompareDto.getNewVariablesArray() != null ? tableCompareDto.getNewVariablesArray() : JsArray.createArray());
+        JsArray<VariableDto> existingVariables = (JsArray<VariableDto>) (tableCompareDto.getExistingVariablesArray() != null ? tableCompareDto.getExistingVariablesArray() : JsArray.createArray());
 
         JsArray<VariableDto> variablesToStringify = (JsArray<VariableDto>) JsArray.createArray();
-        for(int variableIndex = 0; variableIndex < tableCompareDto.getNewVariablesArray().length(); variableIndex++) {
-          VariableDto variableDto = tableCompareDto.getNewVariablesArray().get(variableIndex);
+
+        for(int variableIndex = 0; variableIndex < newVariables.length(); variableIndex++) {
+          VariableDto variableDto = newVariables.get(variableIndex);
           purgeH(variableDto);
           variablesToStringify.push(variableDto);
         }
-        for(int variableIndex = 0; variableIndex < tableCompareDto.getExistingVariablesArray().length(); variableIndex++) {
-          VariableDto variableDto = tableCompareDto.getExistingVariablesArray().get(variableIndex);
+        for(int variableIndex = 0; variableIndex < existingVariables.length(); variableIndex++) {
+          VariableDto variableDto = existingVariables.get(variableIndex);
           purgeH(variableDto);
           variablesToStringify.push(variableDto);
         }
