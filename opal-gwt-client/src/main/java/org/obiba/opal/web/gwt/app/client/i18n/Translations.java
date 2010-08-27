@@ -291,4 +291,16 @@ public interface Translations extends Constants {
   @DefaultStringMapValue({ "IncompatibleValueType", "Incompatible value type", "IncompatibleEntityType", "Incompatible entity type", "VariablePresentInSourceButNotDestination", "Variable exists in source but not in destination" })
   Map<String, String> datasourceComparisonErrorMap();
 
+  @Description("New variables label")
+  @DefaultStringValue("New Variables")
+  String newVariablesLabel();
+
+  @Description("Modified variables label")
+  @DefaultStringValue("Modified Variables")
+  String modifiedVariablesLabel();
+
+  @Description("Conflicted variables label")
+  @DefaultStringValue("Conflicts")
+  String conflictedVariablesLabel();
+
 }

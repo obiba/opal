@@ -94,7 +94,6 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     tableChangesPanel.clear();
     saveButton.setEnabled(false);
     ignoreAllModifications.setValue(false);
-    ignoreAllModifications.setVisible(false);
   }
 
   @Override
@@ -117,11 +116,6 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   @Override
   public boolean ignoreAllModifications() {
     return ignoreAllModifications.getValue();
-  }
-
-  @Override
-  public void setVisibleIgnoreAllModifications(boolean enabled) {
-    ignoreAllModifications.setVisible(enabled);
   }
 
   private FlowPanel getTableCompareTabHeader(TableCompareDto tableCompareData, ComparisonResult comparisonResult) {
@@ -165,26 +159,26 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   }
 
   private void addVariableChangesSummary(FlowPanel tableComparePanel, JsArray<VariableDto> newVariables, JsArray<VariableDto> modifiedVariables) {
-    tableComparePanel.add(new Label("New Variables :" + String.valueOf(newVariables.length())));
-    tableComparePanel.add(new Label("Modified Variables :" + String.valueOf(modifiedVariables.length())));
+    tableComparePanel.add(new Label(translations.newVariablesLabel() + ": " + String.valueOf(newVariables.length())));
+    tableComparePanel.add(new Label(translations.modifiedVariablesLabel() + ": " + String.valueOf(modifiedVariables.length())));
   }
 
   private void addModifiedVariablesTab(JsArray<VariableDto> modifiedVariables, TabLayoutPanel variableChangesPanel) {
     CellTable<VariableDto> modifiedVariablesDetails = initVariableDetailsTable();
     populateVariableDetailsTable(modifiedVariables, modifiedVariablesDetails);
-    variableChangesPanel.add(modifiedVariablesDetails, "Modified Variables");
+    variableChangesPanel.add(modifiedVariablesDetails, translations.modifiedVariablesLabel());
   }
 
   private void addConflictsTab(JsArray<ConflictDto> conflicts, TabLayoutPanel variableChangesPanel) {
     CellTable<ConflictDto> variableConflictsDetails = initVariableConflictsTable();
     populateConflictsTable(conflicts, variableConflictsDetails);
-    variableChangesPanel.add(variableConflictsDetails, "Conflicts");
+    variableChangesPanel.add(variableConflictsDetails, translations.conflictedVariablesLabel());
   }
 
   private void addNewVariablesTab(JsArray<VariableDto> newVariables, TabLayoutPanel variableChangesPanel) {
     CellTable<VariableDto> newVariablesDetails = initVariableDetailsTable();
     populateVariableDetailsTable(newVariables, newVariablesDetails);
-    variableChangesPanel.add(newVariablesDetails, "New Variables");
+    variableChangesPanel.add(newVariablesDetails, translations.newVariablesLabel());
   }
 
   private void populateVariableDetailsTable(JsArray<VariableDto> variables, CellTable<VariableDto> table) {
