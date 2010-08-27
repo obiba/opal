@@ -200,8 +200,8 @@ public class VariableView extends Composite implements VariablePresenter.Display
   }
 
   @Override
-  public void setRepeatable(String text) {
-    repeatable.setText(text);
+  public void setRepeatable(boolean repeatable) {
+    this.repeatable.setText(repeatable ? translations.yesLabel() : translations.noLabel());
   }
 
   @Override

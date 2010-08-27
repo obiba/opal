@@ -19,7 +19,6 @@ import org.obiba.opal.web.gwt.app.client.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.SiblingVariableSelectionEvent.Direction;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
@@ -27,7 +26,6 @@ import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
@@ -37,8 +35,6 @@ import com.google.inject.Inject;
  *
  */
 public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display> {
-
-  private static Translations translations = GWT.create(Translations.class);
 
   private VariableDto variable;
 
@@ -97,7 +93,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
       getDisplay().setValueType(variableDto.getValueType());
       getDisplay().setMimeType(variableDto.hasMimeType() ? variableDto.getMimeType() : "");
       getDisplay().setUnit(variableDto.hasUnit() ? variableDto.getUnit() : "");
-      getDisplay().setRepeatable(variableDto.getIsRepeatable() ? translations.yesLabel() : translations.noLabel());
+      getDisplay().setRepeatable(variableDto.getIsRepeatable());
       getDisplay().setOccurrenceGroup(variableDto.getIsRepeatable() ? variableDto.getOccurrenceGroup() : "");
 
       getDisplay().setParentName(variableDto.getParentLink().getRel());
@@ -172,7 +168,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
     void setUnit(String text);
 
-    void setRepeatable(String text);
+    void setRepeatable(boolean repeatable);
 
     void setOccurrenceGroup(String text);
 
