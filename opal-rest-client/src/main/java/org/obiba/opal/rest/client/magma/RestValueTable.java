@@ -1,11 +1,9 @@
 package org.obiba.opal.rest.client.magma;
 
+import java.net.URI;
 import java.util.Set;
 
-import org.apache.commons.httpclient.URI;
-import org.apache.commons.httpclient.URIException;
 import org.obiba.magma.Initialisable;
-import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.NoSuchValueSetException;
 import org.obiba.magma.NoSuchVariableException;
 import org.obiba.magma.Timestamps;
@@ -96,16 +94,7 @@ class RestValueTable extends AbstractValueTable {
   }
 
   URI newReference(String... segments) {
-    try {
-      URI uri = this.tableReference;
-      for(String segment : segments) {
-        segment = segment.endsWith("/") ? segment : segment + "/";
-        uri = new URI(uri, segment, false);
-      }
-      return uri;
-    } catch(URIException e) {
-      throw new MagmaRuntimeException(e);
-    }
+    return getDatasource().buildURI(this.tableReference, segments);
   }
 
   private class FederatedVariableEntityProvider implements VariableEntityProvider, Initialisable {

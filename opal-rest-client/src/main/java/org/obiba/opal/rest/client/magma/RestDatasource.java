@@ -2,12 +2,12 @@ package org.obiba.opal.rest.client.magma;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.httpclient.URI;
-import org.apache.commons.httpclient.URIException;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -35,10 +35,10 @@ public class RestDatasource extends AbstractDatasource {
 
   private Set<String> cachedTableNames;
 
-  public RestDatasource(String name, String uri, String username, char[] password) throws URIException {
+  public RestDatasource(String name, String uri, String username, char[] password) throws URISyntaxException {
     super(name, "rest");
     this.client = new DefaultHttpClient();
-    this.datasourceURI = new URI(uri.endsWith("/") ? uri : uri + "/", false);
+    this.datasourceURI = new URI(uri.endsWith("/") ? uri : uri + "/");
   }
 
   @Override
@@ -99,16 +99,16 @@ public class RestDatasource extends AbstractDatasource {
   }
 
   URI newReference(String... segments) {
-    try {
-      URI uri = this.datasourceURI;
-      for(String segment : segments) {
-        segment = segment.endsWith("/") ? segment : segment + "/";
-        uri = new URI(uri, segment, false);
-      }
-      return uri;
-    } catch(URIException e) {
-      throw new MagmaRuntimeException(e);
+    return buildURI(this.datasourceURI, segments);
+  }
+  
+  URI buildURI(final URI root, String ... segments) {
+    URI uri = root;
+    for(String segment : segments) {
+      segment = segment.endsWith("/") ? segment : segment + "/";
+      uri = uri.resolve(segment);
     }
+    return uri;
   }
 
   @SuppressWarnings("unchecked")
@@ -146,7 +146,7 @@ public class RestDatasource extends AbstractDatasource {
   }
 
   HttpResponse get(URI uri) throws ClientProtocolException, IOException {
-    HttpGet get = new HttpGet(uri.getURI());
+    HttpGet get = new HttpGet(uri);
     get.addHeader("Accept", "application/x-protobuf");
     return client.execute(get);
   }
