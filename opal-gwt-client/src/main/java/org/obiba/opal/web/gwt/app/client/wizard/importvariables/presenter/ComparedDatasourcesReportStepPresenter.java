@@ -144,51 +144,49 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
     this.targetDatasourceName = targetDatasourceName;
   }
 
+  private void addUpdateVariablesResourceRequests() {
+    for(int tableIndex = 0; tableIndex < comparedTables.length(); tableIndex++) {
+      TableCompareDto tableCompareDto = comparedTables.get(tableIndex);
+      JsArray<VariableDto> newVariables = (JsArray<VariableDto>) (tableCompareDto.getNewVariablesArray() != null ? tableCompareDto.getNewVariablesArray() : JsArray.createArray());
+      JsArray<VariableDto> existingVariables = (JsArray<VariableDto>) (tableCompareDto.getExistingVariablesArray() != null ? tableCompareDto.getExistingVariablesArray() : JsArray.createArray());
+
+      JsArray<VariableDto> variablesToStringify = (JsArray<VariableDto>) JsArray.createArray();
+      addVariables(newVariables, variablesToStringify);
+      addVariables(existingVariables, variablesToStringify);
+
+      importVariablesStepPresenter.addResourceRequest(tableCompareDto.getCompared().getName(), createResourceRequestBuilder(tableCompareDto.getCompared(), !tableCompareDto.hasWithTable(), variablesToStringify));
+    }
+  }
+
+  private void addVariables(JsArray<VariableDto> variables, JsArray<VariableDto> variablesToStringify) {
+    for(int variableIndex = 0; variableIndex < variables.length(); variableIndex++) {
+      VariableDto variableDto = variables.get(variableIndex);
+      purgeH(variableDto);
+      variablesToStringify.push(variableDto);
+    }
+  }
+
+  ResourceRequestBuilder<? extends JavaScriptObject> createResourceRequestBuilder(TableDto comparedTableDto, boolean newTable, JsArray<VariableDto> variables) {
+    if(newTable) {
+      TableDto newTableDto = TableDto.create();
+      newTableDto.setName(comparedTableDto.getName());
+      newTableDto.setEntityType(comparedTableDto.getEntityType());
+      newTableDto.setVariablesArray(variables);
+
+      return ResourceRequestBuilderFactory.newBuilder().post().forResource("/datasource/" + targetDatasourceName + "/tables").accept("application/x-protobuf+json").withResourceBody(stringify(newTableDto));
+    } else {
+      return ResourceRequestBuilderFactory.newBuilder().post().forResource("/datasource/" + targetDatasourceName + "/table/" + comparedTableDto.getName() + "/variables").accept("application/x-protobuf+json").withResourceBody(stringify(variables));
+    }
+  }
+
   class SaveClickHandler implements ClickHandler {
 
-    @SuppressWarnings("unchecked")
     public void onClick(ClickEvent event) {
       importVariablesStepPresenter.clearResourceRequests();
-
-      for(int tableIndex = 0; tableIndex < comparedTables.length(); tableIndex++) {
-        TableCompareDto tableCompareDto = comparedTables.get(tableIndex);
-        JsArray<VariableDto> newVariables = (JsArray<VariableDto>) (tableCompareDto.getNewVariablesArray() != null ? tableCompareDto.getNewVariablesArray() : JsArray.createArray());
-        JsArray<VariableDto> existingVariables = (JsArray<VariableDto>) (tableCompareDto.getExistingVariablesArray() != null ? tableCompareDto.getExistingVariablesArray() : JsArray.createArray());
-
-        JsArray<VariableDto> variablesToStringify = (JsArray<VariableDto>) JsArray.createArray();
-
-        for(int variableIndex = 0; variableIndex < newVariables.length(); variableIndex++) {
-          VariableDto variableDto = newVariables.get(variableIndex);
-          purgeH(variableDto);
-          variablesToStringify.push(variableDto);
-        }
-        for(int variableIndex = 0; variableIndex < existingVariables.length(); variableIndex++) {
-          VariableDto variableDto = existingVariables.get(variableIndex);
-          purgeH(variableDto);
-          variablesToStringify.push(variableDto);
-        }
-
-        importVariablesStepPresenter.addResourceRequest(tableCompareDto.getCompared().getName(), createResourceRequestBuilder(tableCompareDto.getCompared(), !tableCompareDto.hasWithTable(), variablesToStringify));
-      }
-
+      addUpdateVariablesResourceRequests();
       importVariablesStepPresenter.sendResourceRequests();
-
       eventBus.fireEvent(new WorkbenchChangeEvent(importVariablesStepPresenter));
     }
-
-    ResourceRequestBuilder<? extends JavaScriptObject> createResourceRequestBuilder(TableDto comparedTableDto, boolean newTable, JsArray<VariableDto> variables) {
-      if(newTable) {
-        TableDto newTableDto = TableDto.create();
-        newTableDto.setName(comparedTableDto.getName());
-        newTableDto.setEntityType(comparedTableDto.getEntityType());
-        newTableDto.setVariablesArray(variables);
-
-        return ResourceRequestBuilderFactory.newBuilder().post().forResource("/datasource/" + targetDatasourceName + "/tables").accept("application/x-protobuf+json").withResourceBody(stringify(newTableDto));
-      } else {
-        return ResourceRequestBuilderFactory.newBuilder().post().forResource("/datasource/" + targetDatasourceName + "/table/" + comparedTableDto.getName() + "/variables").accept("application/x-protobuf+json").withResourceBody(stringify(variables));
-      }
-    }
-
   }
 
   class CancelClickHandler implements ClickHandler {
