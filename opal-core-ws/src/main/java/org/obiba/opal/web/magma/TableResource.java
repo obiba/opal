@@ -15,10 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -36,7 +33,6 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
-import org.json.JSONObject;
 import org.mozilla.javascript.Scriptable;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.MagmaRuntimeException;
@@ -216,53 +212,9 @@ public class TableResource {
     return dtos.build();
   }
 
-  @GET
-  @Path("/values.json")
-  @Produces("application/json")
-  public Response getValuesAsJson(@QueryParam("v") List<String> variables) {
-    return Response.ok(new JSONObject(readValues(variables)).toString()).build();
-  }
-
-  @GET
-  @Path("/values.xml")
-  @Produces("application/xml")
-  public Map<String, List<Object>> getValuesAsXml(@QueryParam("v") List<String> variables) {
-    return readValues(variables);
-  }
-
   @Path("/variable/{variable}")
   public VariableResource getVariable(@PathParam("variable") String name) {
     return getVariableResource(valueTable.getVariableValueSource(name));
-  }
-
-  @Bean
-  @Scope("request")
-  public VariableResource getVariableResource(VariableValueSource source) {
-    return new VariableResource(this.valueTable, source);
-  }
-
-  private Map<String, List<Object>> readValues(List<String> variables) {
-    Map<String, List<Object>> response = new LinkedHashMap<String, List<Object>>();
-
-    if(variables == null || variables.size() == 0) {
-      variables = ImmutableList.copyOf(Iterables.transform(valueTable.getVariables(), new Function<Variable, String>() {
-        @Override
-        public String apply(Variable from) {
-          return from.getName();
-        }
-      }));
-    }
-
-    for(String name : variables) {
-      response.put(name, new LinkedList<Object>());
-    }
-
-    for(ValueSet vs : valueTable.getValueSets()) {
-      for(Map.Entry<String, List<Object>> entry : response.entrySet()) {
-        entry.getValue().add(valueTable.getVariableValueSource(entry.getKey()).getValue(vs).getValue());
-      }
-    }
-    return response;
   }
 
   @POST
@@ -287,6 +239,18 @@ public class TableResource {
     }
   }
 
+  @Bean
+  @Scope("request")
+  public VariableResource getVariableResource(VariableValueSource source) {
+    return new VariableResource(this.valueTable, source);
+  }
+
+  @Bean
+  @Path("/compare")
+  public CompareResource getTableCompare() {
+    return new CompareResource(valueTable);
+  }
+
   private ClientErrorDto getErrorMessage(Status responseStatus, String errorStatus) {
     return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus).build();
   }
@@ -301,12 +265,6 @@ public class TableResource {
       }
 
     });
-  }
-
-  @Path("/compare")
-  @Bean
-  public CompareResource getTableCompare() {
-    return new CompareResource(valueTable);
   }
 
 }
