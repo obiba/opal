@@ -94,21 +94,20 @@ public class DatasourcesResource {
     } catch(NoSuchDatasourceFactoryException e) {
       response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "UnidentifiedDatasourceFactory").build());
     } catch(DatasourceParsingException pe) {
-      if(uid != null) {
-        // unable to create a datasource from that, so rollback
-        MagmaEngine.get().removeTransientDatasource(uid);
-      }
+      removeTransientDatasource(uid);
       response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed", pe).build());
     } catch(MagmaRuntimeException e) {
-      // unable to create a datasource from that too, so rollback
-      if(uid != null) {
-        // unable to create a datasource from that, so rollback
-        MagmaEngine.get().removeTransientDatasource(uid);
-      }
+      removeTransientDatasource(uid);
       response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed", e).build());
     }
 
     return response.build();
+  }
+
+  private void removeTransientDatasource(String uid) {
+    if(uid != null) {
+      MagmaEngine.get().removeTransientDatasource(uid);
+    }
   }
 
   private void sortByName(List<Magma.DatasourceDto> datasources) {
