@@ -25,6 +25,36 @@ public class JsArrays {
   private JsArrays() {
   }
 
+  /**
+   * Concatenates the provided arrays into a newly constructed array. Returns the new array.
+   */
+  public static <T extends JavaScriptObject> JsArray<T> concat(JsArray<T>... arrays) {
+    JsArray<T> concat = JavaScriptObject.createArray().cast();
+    return pushAll(concat, arrays);
+  }
+
+  /**
+   * Pushes elements from all provided arrays into {@code lhs}
+   */
+  public static <T extends JavaScriptObject> JsArray<T> pushAll(JsArray<T> lhs, JsArray<T>... arrays) {
+    for(JsArray<T> array : arrays) {
+      pushAll(lhs, array);
+    }
+    return lhs;
+  }
+
+  /**
+   * Pushes elements from {@code rhs} into {@code lhs}
+   */
+  public static <T extends JavaScriptObject> JsArray<T> pushAll(JsArray<T> lhs, JsArray<T> rhs) {
+    if(rhs != null) {
+      for(int i = 0; i < rhs.length(); i++) {
+        lhs.push(rhs.get(i));
+      }
+    }
+    return lhs;
+  }
+
   public static <T extends JavaScriptObject> Iterable<T> toIterable(final JsArray<T> values) {
     return new Iterable<T>() {
 

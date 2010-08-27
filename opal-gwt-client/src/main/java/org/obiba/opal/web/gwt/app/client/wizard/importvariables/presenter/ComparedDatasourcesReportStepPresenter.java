@@ -16,6 +16,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter.Display.ComparisonResult;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
@@ -154,24 +155,8 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   private void addUpdateVariablesResourceRequests() {
     for(int tableIndex = 0; tableIndex < comparedTables.length(); tableIndex++) {
       TableCompareDto tableCompareDto = comparedTables.get(tableIndex);
-      JsArray<VariableDto> newVariables = (JsArray<VariableDto>) (tableCompareDto.getNewVariablesArray() != null ? tableCompareDto.getNewVariablesArray() : JsArray.createArray());
-      JsArray<VariableDto> existingVariables = (JsArray<VariableDto>) (tableCompareDto.getExistingVariablesArray() != null ? tableCompareDto.getExistingVariablesArray() : JsArray.createArray());
-
-      JsArray<VariableDto> variablesToStringify = (JsArray<VariableDto>) JsArray.createArray();
-      addVariables(newVariables, variablesToStringify);
-      addVariables(existingVariables, variablesToStringify);
-
-      ResourceRequestBuilder<? extends JavaScriptObject> resourceRequestBuilder = createResourceRequestBuilder(tableCompareDto.getCompared(), !tableCompareDto.hasWithTable(), variablesToStringify);
-      if(resourceRequestBuilder != null) {
-        importVariablesStepPresenter.addResourceRequest(tableCompareDto.getCompared().getName(), createResourceRequestBuilder(tableCompareDto.getCompared(), !tableCompareDto.hasWithTable(), variablesToStringify));
-      }
-    }
-  }
-
-  private void addVariables(JsArray<VariableDto> variables, JsArray<VariableDto> variablesToStringify) {
-    for(int variableIndex = 0; variableIndex < variables.length(); variableIndex++) {
-      VariableDto variableDto = variables.get(variableIndex);
-      variablesToStringify.push(variableDto);
+      JsArray<VariableDto> variablesToStringify = JsArrays.concat(tableCompareDto.getNewVariablesArray(), tableCompareDto.getExistingVariablesArray());
+      importVariablesStepPresenter.addResourceRequest(tableCompareDto.getCompared().getName(), createResourceRequestBuilder(tableCompareDto.getCompared(), !tableCompareDto.hasWithTable(), variablesToStringify));
     }
   }
 
@@ -182,11 +167,11 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
       newTableDto.setEntityType(comparedTableDto.getEntityType());
       newTableDto.setVariablesArray(variables);
 
-      return ResourceRequestBuilderFactory.newBuilder().post().forResource("/datasource/" + targetDatasourceName + "/tables").accept("application/x-protobuf+json").withResourceBody(stringify(newTableDto));
+      return ResourceRequestBuilderFactory.newBuilder().post().forResource("/datasource/" + targetDatasourceName + "/tables").withResourceBody(stringify(newTableDto));
     } else if(getDisplay().ignoreAllModifications()) {
       return null;
     } else {
-      return ResourceRequestBuilderFactory.newBuilder().post().forResource("/datasource/" + targetDatasourceName + "/table/" + comparedTableDto.getName() + "/variables").accept("application/x-protobuf+json").withResourceBody(stringify(variables));
+      return ResourceRequestBuilderFactory.newBuilder().post().forResource("/datasource/" + targetDatasourceName + "/table/" + comparedTableDto.getName() + "/variables").withResourceBody(stringify(variables));
     }
   }
 

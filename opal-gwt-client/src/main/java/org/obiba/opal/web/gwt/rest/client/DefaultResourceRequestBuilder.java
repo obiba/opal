@@ -10,7 +10,9 @@
 package org.obiba.opal.web.gwt.rest.client;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.obiba.opal.web.gwt.rest.client.event.RequestCredentialsExpiredEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
@@ -43,7 +45,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
 
   private String body;
 
-  private String acceptHeader;
+  private Set<String> accept = new HashSet<String>();
 
   private Map<String, String> form = new HashMap<String, String>();
 
@@ -73,6 +75,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
   }
 
   public DefaultResourceRequestBuilder<T> withCallback(ResourceCallback<T> callback) {
+    accept(RESOURCE_MEDIA_TYPE);
     this.resourceCallback = callback;
     return this;
   }
@@ -86,7 +89,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
   }
 
   public DefaultResourceRequestBuilder<T> accept(String acceptHeader) {
-    this.acceptHeader = acceptHeader;
+    this.accept.add(acceptHeader);
     return this;
   }
 
@@ -97,6 +100,8 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
   }
 
   public DefaultResourceRequestBuilder<T> withResourceBody(/* T.stringify() */String dto) {
+    // In this case, the response should be of the same type. Tell the server we accept the type we posted.
+    accept(RESOURCE_MEDIA_TYPE);
     return withBody(RESOURCE_MEDIA_TYPE, dto);
   }
 
@@ -136,10 +141,9 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
   public RequestBuilder build() {
     builder = new RequestBuilder(method, uri);
     builder.setCallback(new InnerCallback());
-    if(resourceCallback != null && acceptHeader == null) {
-      builder.setHeader("Accept", RESOURCE_MEDIA_TYPE);
+    if(this.accept.size() > 0) {
+      builder.setHeader("Accept", buildAcceptHeader());
     }
-    if(acceptHeader != null) builder.setHeader("Accept", acceptHeader);
     if(body != null) {
       builder.setHeader("Content-Type", contentType);
       builder.setRequestData(body);
@@ -156,6 +160,17 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
       eventBus.fireEvent(new RequestErrorEvent(e));
       return null;
     }
+  }
+
+  private String buildAcceptHeader() {
+    StringBuilder sb = new StringBuilder();
+    boolean first = true;
+    for(String accept : this.accept) {
+      if(first != true) sb.append(", ");
+      sb.append(accept);
+      first = false;
+    }
+    return sb.toString();
   }
 
   private String encodeForm() {
