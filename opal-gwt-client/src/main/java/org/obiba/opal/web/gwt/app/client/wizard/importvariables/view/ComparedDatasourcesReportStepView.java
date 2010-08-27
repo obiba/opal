@@ -68,10 +68,6 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
 
   public ComparedDatasourcesReportStepView() {
     initWidget(uiBinder.createAndBindUi(this));
-    tableChangesPanel.clear();
-    saveButton.setEnabled(false);
-    ignoreAllModifications.setValue(false);
-    ignoreAllModifications.setVisible(false);
   }
 
   //
@@ -96,6 +92,9 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   @Override
   public void clearDisplay() {
     tableChangesPanel.clear();
+    saveButton.setEnabled(false);
+    ignoreAllModifications.setValue(false);
+    ignoreAllModifications.setVisible(false);
   }
 
   @Override

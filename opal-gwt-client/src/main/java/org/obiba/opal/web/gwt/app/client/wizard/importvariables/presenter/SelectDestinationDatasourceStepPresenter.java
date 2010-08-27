@@ -109,10 +109,11 @@ public class SelectDestinationDatasourceStepPresenter extends WidgetPresenter<Se
       if(selectedDatasourceName.equals("")) {
         eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "datasourceMustBeSelected", null));
       } else {
-        ComparedDatasourcesReportStepPresenter compareDatasourcesReportPresenterProvider = comparedDatasourcesReportPresenterProvider.get();
-        compareDatasourcesReportPresenterProvider.setSourceDatasourceName(sourceDatasourceName);
-        compareDatasourcesReportPresenterProvider.setTargetDatasourceName(selectedDatasourceName);
-        eventBus.fireEvent(new WorkbenchChangeEvent(compareDatasourcesReportPresenterProvider));
+        ComparedDatasourcesReportStepPresenter compareDatasourcesReportPresenter = comparedDatasourcesReportPresenterProvider.get();
+        compareDatasourcesReportPresenter.setSourceDatasourceName(sourceDatasourceName);
+        compareDatasourcesReportPresenter.setTargetDatasourceName(selectedDatasourceName);
+        compareDatasourcesReportPresenter.getDisplay().clearDisplay();
+        eventBus.fireEvent(new WorkbenchChangeEvent(compareDatasourcesReportPresenter));
       }
     }
   }
