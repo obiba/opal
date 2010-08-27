@@ -9,6 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.support;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 
 /**
@@ -18,7 +22,7 @@ public class NoSuchDatasourceFactoryException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
 
-  private final DatasourceFactoryDto dto;
+  private transient DatasourceFactoryDto dto;
 
   public NoSuchDatasourceFactoryException(DatasourceFactoryDto dto) {
     this.dto = dto;
@@ -26,5 +30,23 @@ public class NoSuchDatasourceFactoryException extends RuntimeException {
 
   public DatasourceFactoryDto getDto() {
     return dto;
+  }
+
+  private void writeObject(ObjectOutputStream out) throws IOException {
+    out.defaultWriteObject();
+
+    // Serialize dto.
+    out.write(dto.getSerializedSize());
+    out.write(dto.toByteArray());
+  }
+
+  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    in.defaultReadObject();
+
+    // Deserialize dto.
+    int dtoByteCount = in.readInt();
+    byte[] dtoBytes = new byte[dtoByteCount];
+    in.readFully(dtoBytes);
+    dto = DatasourceFactoryDto.parseFrom(dtoBytes);
   }
 }
