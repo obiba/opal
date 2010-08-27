@@ -34,7 +34,9 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ComparedDatasourcesReportStepView extends Composite implements ComparedDatasourcesReportStepPresenter.Display {
@@ -135,8 +137,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   @SuppressWarnings("unchecked")
   private TabLayoutPanel initVariableChangesPanel(TableCompareDto tableCompareData, FlowPanel tableComparePanel) {
     TabLayoutPanel variableChangesPanel = new TabLayoutPanel(3, Unit.EM);
-    variableChangesPanel.setHeight("100%");
-    variableChangesPanel.setWidth("100%");
+    variableChangesPanel.setStyleName("variableChanges");
 
     JsArray<VariableDto> newVariables = (JsArray<VariableDto>) (tableCompareData.getNewVariablesArray() != null ? tableCompareData.getNewVariablesArray() : JsArray.createArray());
     JsArray<VariableDto> modifiedVariables = (JsArray<VariableDto>) (tableCompareData.getExistingVariablesArray() != null ? tableCompareData.getExistingVariablesArray() : JsArray.createArray());
@@ -145,11 +146,11 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     addVariableChangesSummary(tableComparePanel, newVariables, modifiedVariables);
 
     if(newVariables.length() > 0) {
-      addNewVariablesTab(newVariables, variableChangesPanel);
+      addVariablesTab(newVariables, variableChangesPanel, translations.newVariablesLabel());
     }
 
     if(modifiedVariables.length() > 0) {
-      addModifiedVariablesTab(modifiedVariables, variableChangesPanel);
+      addVariablesTab(modifiedVariables, variableChangesPanel, translations.modifiedVariablesLabel());
     }
 
     if(conflicts.length() > 0) {
@@ -163,22 +164,28 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     tableComparePanel.add(new Label(translations.modifiedVariablesLabel() + ": " + String.valueOf(modifiedVariables.length())));
   }
 
-  private void addModifiedVariablesTab(JsArray<VariableDto> modifiedVariables, TabLayoutPanel variableChangesPanel) {
-    CellTable<VariableDto> modifiedVariablesDetails = initVariableDetailsTable();
-    populateVariableDetailsTable(modifiedVariables, modifiedVariablesDetails);
-    variableChangesPanel.add(modifiedVariablesDetails, translations.modifiedVariablesLabel());
-  }
-
   private void addConflictsTab(JsArray<ConflictDto> conflicts, TabLayoutPanel variableChangesPanel) {
     CellTable<ConflictDto> variableConflictsDetails = initVariableConflictsTable();
+    variableConflictsDetails.setStyleName("variableChangesDetails");
     populateConflictsTable(conflicts, variableConflictsDetails);
-    variableChangesPanel.add(variableConflictsDetails, translations.conflictedVariablesLabel());
+    ScrollPanel conflictsPanel = new ScrollPanel();
+    VerticalPanel conflictsPanelVert = new VerticalPanel();
+    conflictsPanelVert.setWidth("100%");
+    conflictsPanelVert.add(variableConflictsDetails);
+    conflictsPanel.add(conflictsPanelVert);
+    variableChangesPanel.add(conflictsPanel, translations.conflictedVariablesLabel());
   }
 
-  private void addNewVariablesTab(JsArray<VariableDto> newVariables, TabLayoutPanel variableChangesPanel) {
+  private void addVariablesTab(JsArray<VariableDto> variables, TabLayoutPanel variableChangesPanel, String tabTitle) {
     CellTable<VariableDto> newVariablesDetails = initVariableDetailsTable();
-    populateVariableDetailsTable(newVariables, newVariablesDetails);
-    variableChangesPanel.add(newVariablesDetails, translations.newVariablesLabel());
+    newVariablesDetails.setStyleName("variableChangesDetails");
+    populateVariableDetailsTable(variables, newVariablesDetails);
+    ScrollPanel newVariablePanel = new ScrollPanel();
+    VerticalPanel newVariablePanelVert = new VerticalPanel();
+    newVariablePanelVert.setWidth("100%");
+    newVariablePanelVert.add(newVariablesDetails);
+    newVariablePanel.add(newVariablePanelVert);
+    variableChangesPanel.add(newVariablePanel, tabTitle);
   }
 
   private void populateVariableDetailsTable(JsArray<VariableDto> variables, CellTable<VariableDto> table) {

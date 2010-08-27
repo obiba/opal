@@ -267,13 +267,27 @@ table.folder-details td:first-child span:hover {
 }
 
 div.tableComparison-conflict {
-  color:red;
+	background:transparent url(image/20/error.png) no-repeat scroll left center;
+	height:18px;
+	width:150px;
 }
 
 div.tableComparison-creation {
-  color:green;
+	background:transparent url(image/20/list-add.png) no-repeat scroll left center;
+	height:18px;
+	width:150px;
 }
 
 div.tableComparison-modification {
-  color:yellow;
+	background:transparent url(image/20/edit.png) no-repeat scroll left center;
+	height:18px;
+	width:150px;
+}
+
+div.variableChanges {
+  height:100%;
+}
+
+table.variableChangesDetails {
+  width:100%;
 }
