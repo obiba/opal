@@ -101,7 +101,6 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
           getDisplay().addTableCompareTab(tableComparison, comparisonResult);
           if(comparisonResult == ComparisonResult.CONFLICT) {
             conflictsExist = true;
-            break;
           }
         }
         getDisplay().setEnabledSaveButton(!conflictsExist);

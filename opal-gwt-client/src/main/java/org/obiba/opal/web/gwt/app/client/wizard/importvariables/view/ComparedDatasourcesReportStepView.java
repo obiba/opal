@@ -151,15 +151,15 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
 
     addVariableChangesSummary(tableComparePanel, newVariables, modifiedVariables);
 
-    if(newVariables != null) {
+    if(newVariables.length() > 0) {
       addNewVariablesTab(newVariables, variableChangesPanel);
     }
 
-    if(modifiedVariables != null) {
+    if(modifiedVariables.length() > 0) {
       addModifiedVariablesTab(modifiedVariables, variableChangesPanel);
     }
 
-    if(conflicts != null) {
+    if(conflicts.length() > 0) {
       addConflictsTab(conflicts, variableChangesPanel);
     }
     return variableChangesPanel;
