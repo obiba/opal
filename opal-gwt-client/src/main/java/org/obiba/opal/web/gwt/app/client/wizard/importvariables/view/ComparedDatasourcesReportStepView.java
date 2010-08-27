@@ -70,6 +70,8 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     initWidget(uiBinder.createAndBindUi(this));
     tableChangesPanel.clear();
     saveButton.setEnabled(false);
+    ignoreAllModifications.setValue(false);
+    ignoreAllModifications.setVisible(false);
   }
 
   //
@@ -84,6 +86,11 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   @Override
   public HandlerRegistration addCancelClickHandler(ClickHandler handler) {
     return cancelButton.addClickHandler(handler);
+  }
+
+  @Override
+  public HandlerRegistration addIgnoreAllModificationsHandler(ClickHandler handler) {
+    return ignoreAllModifications.addClickHandler(handler);
   }
 
   @Override
@@ -106,7 +113,16 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   @Override
   public void setEnabledSaveButton(boolean enabled) {
     saveButton.setEnabled(enabled);
+  }
 
+  @Override
+  public boolean ignoreAllModifications() {
+    return ignoreAllModifications.getValue();
+  }
+
+  @Override
+  public void setVisibleIgnoreAllModifications(boolean enabled) {
+    ignoreAllModifications.setVisible(enabled);
   }
 
   private FlowPanel getTableCompareTabHeader(TableCompareDto tableCompareData, ComparisonResult comparisonResult) {

@@ -62,11 +62,17 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
 
+    HandlerRegistration addIgnoreAllModificationsHandler(ClickHandler ignoreAllModificationsClickHandler);
+
     void addTableCompareTab(TableCompareDto tableCompareData, ComparisonResult comparisonResult);
 
     void clearDisplay();
 
     void setEnabledSaveButton(boolean enabled);
+
+    void setVisibleIgnoreAllModifications(boolean enabled);
+
+    boolean ignoreAllModifications();
 
   }
 
@@ -99,6 +105,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
           }
         }
         getDisplay().setEnabledSaveButton(!conflictsExist);
+        getDisplay().setVisibleIgnoreAllModifications(conflictsExist);
       }
 
     }).send();
@@ -108,6 +115,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   private void addEventHandlers() {
     registerHandler(getDisplay().addSaveClickHandler(new SaveClickHandler()));
     registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
+    registerHandler(getDisplay().addIgnoreAllModificationsHandler(new IgnoreAllModificationsClickHandler()));
   }
 
   @Override
@@ -154,7 +162,10 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
       addVariables(newVariables, variablesToStringify);
       addVariables(existingVariables, variablesToStringify);
 
-      importVariablesStepPresenter.addResourceRequest(tableCompareDto.getCompared().getName(), createResourceRequestBuilder(tableCompareDto.getCompared(), !tableCompareDto.hasWithTable(), variablesToStringify));
+      ResourceRequestBuilder<? extends JavaScriptObject> resourceRequestBuilder = createResourceRequestBuilder(tableCompareDto.getCompared(), !tableCompareDto.hasWithTable(), variablesToStringify);
+      if(resourceRequestBuilder != null) {
+        importVariablesStepPresenter.addResourceRequest(tableCompareDto.getCompared().getName(), createResourceRequestBuilder(tableCompareDto.getCompared(), !tableCompareDto.hasWithTable(), variablesToStringify));
+      }
     }
   }
 
@@ -174,6 +185,8 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
       newTableDto.setVariablesArray(variables);
 
       return ResourceRequestBuilderFactory.newBuilder().post().forResource("/datasource/" + targetDatasourceName + "/tables").accept("application/x-protobuf+json").withResourceBody(stringify(newTableDto));
+    } else if(getDisplay().ignoreAllModifications()) {
+      return null;
     } else {
       return ResourceRequestBuilderFactory.newBuilder().post().forResource("/datasource/" + targetDatasourceName + "/table/" + comparedTableDto.getName() + "/variables").accept("application/x-protobuf+json").withResourceBody(stringify(variables));
     }
@@ -193,6 +206,13 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
     public void onClick(ClickEvent event) {
       eventBus.fireEvent(new WorkbenchChangeEvent(uploadVariablesStepPresenter));
+    }
+  }
+
+  class IgnoreAllModificationsClickHandler implements ClickHandler {
+
+    public void onClick(ClickEvent event) {
+      getDisplay().setEnabledSaveButton(getDisplay().ignoreAllModifications());
     }
   }
 
