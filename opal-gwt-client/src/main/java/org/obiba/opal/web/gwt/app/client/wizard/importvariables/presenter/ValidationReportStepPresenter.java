@@ -43,6 +43,11 @@ public class ValidationReportStepPresenter extends WidgetPresenter<ValidationRep
     super(display, eventBus);
   }
 
+  ValidationReportStepPresenter(final Display display, final EventBus eventBus, Provider<UploadVariablesStepPresenter> uploadVariablesStepPresenter) {
+    super(display, eventBus);
+    this.uploadVariablesStepPresenter = uploadVariablesStepPresenter;
+  }
+
   //
   // WidgetPresenter Methods
   //
