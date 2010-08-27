@@ -9,25 +9,22 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.support;
 
-import org.obiba.magma.DatasourceFactory;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 
 /**
- * A datasource factory from its Dto.
+ *
  */
-public interface DatasourceFactoryDtoParser {
+public class NoSuchDatasourceFactoryException extends RuntimeException {
 
-  /**
-   * Parses the provided {@code dto} instance and builds a corresponding {@code DatasourceFactory} instance.
-   * @param dto
-   * @return the factory
-   */
-  public DatasourceFactory parse(DatasourceFactoryDto dto);
+  private static final long serialVersionUID = 1L;
 
-  /**
-   * Returns true when this instance is capable of parsing {@code dto} and convert it into a {@code DatasourceFactory}
-   * @param dto
-   * @return
-   */
-  public boolean canParse(DatasourceFactoryDto dto);
+  private final DatasourceFactoryDto dto;
+
+  public NoSuchDatasourceFactoryException(DatasourceFactoryDto dto) {
+    this.dto = dto;
+  }
+
+  public DatasourceFactoryDto getDto() {
+    return dto;
+  }
 }

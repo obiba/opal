@@ -22,20 +22,32 @@ import org.springframework.stereotype.Component;
 @Component
 public class DatasourceFactoryRegistry {
 
-  @Autowired
-  private Set<DatasourceFactoryDtoParser> parsers;
+  private final Set<DatasourceFactoryDtoParser> parsers;
 
-  public void setParsers(Set<DatasourceFactoryDtoParser> parsers) {
+  @Autowired
+  public DatasourceFactoryRegistry(Set<DatasourceFactoryDtoParser> parsers) {
+    if(parsers == null) throw new IllegalArgumentException("parsers cannot be null");
     this.parsers = parsers;
   }
 
-  public DatasourceFactory parse(DatasourceFactoryDto dto) {
+  /**
+   * Parses the provided {@code DatasourceFactoryDto} instance using one of the registered {@code
+   * DatasourceFactoryDtoParser} instance. If none of the registered {@code DatasourceFactoryDtoParser} is able to parse
+   * the given {@code DatasourceFactoryDto} this method will throw a {@code NoSuchDatasourceFactoryException}
+   * 
+   * @param dto the {@code DatasourceFactoryDto} to parse
+   * @return an instance of {@code DatasourceFactory} for the given {@code dto}
+   * @throws NoSuchDatasourceFactoryException when no {@code DatasourceFactoryDtoParser} is available to parse the given
+   * {@code dto}
+   */
+  public DatasourceFactory parse(DatasourceFactoryDto dto) throws NoSuchDatasourceFactoryException {
+    if(dto == null) throw new IllegalArgumentException("dto cannot be null");
     for(DatasourceFactoryDtoParser parser : parsers) {
       if(parser.canParse(dto)) {
         return parser.parse(dto);
       }
     }
-    return null;
+    throw new NoSuchDatasourceFactoryException(dto);
   }
 
 }

@@ -24,8 +24,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class HibernateDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoParser {
 
+  private final BeanFactory beanFactory;
+
   @Autowired
-  private BeanFactory beanFactory;
+  public HibernateDatasourceFactoryDtoParser(BeanFactory beanFactory) {
+    this.beanFactory = beanFactory;
+  }
 
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
@@ -37,10 +41,6 @@ public class HibernateDatasourceFactoryDtoParser extends AbstractDatasourceFacto
       factory.setSessionFactoryProvider(new SpringBeanSessionFactoryProvider(beanFactory, "opalSessionFactory"));
     }
     return factory;
-  }
-
-  public void setBeanFactory(BeanFactory beanFactory) {
-    this.beanFactory = beanFactory;
   }
 
   @Override

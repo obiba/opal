@@ -31,7 +31,6 @@ import org.jboss.resteasy.specimpl.UriBuilderImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.obiba.magma.Datasource;
-import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
@@ -42,13 +41,14 @@ import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.magma.support.ExcelDatasourceFactoryDtoParser;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Ws;
-import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.ExcelDatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  *
@@ -238,18 +238,12 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
   }
 
   private DatasourceFactoryRegistry newDatasourceFactoryRegistry() {
-    return new DatasourceFactoryRegistry() {
+    return new DatasourceFactoryRegistry(ImmutableSet.<DatasourceFactoryDtoParser> of(new ExcelDatasourceFactoryDtoParser() {
       @Override
-      public DatasourceFactory parse(DatasourceFactoryDto dto) {
-        DatasourceFactoryDtoParser parser = new ExcelDatasourceFactoryDtoParser() {
-          @Override
-          protected File resolveLocalFile(String path) {
-            return new File(path);
-          }
-        };
-        return parser.parse(dto);
+      protected File resolveLocalFile(String path) {
+        return new File(path);
       }
-    };
+    }));
   }
 
   private TableDto createTableDto() {

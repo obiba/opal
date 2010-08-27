@@ -32,8 +32,17 @@ import com.google.common.collect.ImmutableSet;
 @Component
 public class JdbcDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoParser {
 
+  private final TransactionManager transactionManager;
+
   @Autowired(required = false)
-  private TransactionManager transactionManager;
+  public JdbcDatasourceFactoryDtoParser(TransactionManager transactionManager) {
+    this.transactionManager = transactionManager;
+  }
+
+  @Override
+  public boolean canParse(DatasourceFactoryDto dto) {
+    return dto.hasExtension(JdbcDatasourceFactoryDto.params);
+  }
 
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
@@ -91,15 +100,6 @@ public class JdbcDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDto
       settings.setUpdatedTimestampColumnName(dto.getUpdatedTimestampColumnName());
     }
     return settings;
-  }
-
-  public void setTransactionManager(TransactionManager transactionManager) {
-    this.transactionManager = transactionManager;
-  }
-
-  @Override
-  public boolean canParse(DatasourceFactoryDto dto) {
-    return dto.hasExtension(JdbcDatasourceFactoryDto.params);
   }
 
 }
