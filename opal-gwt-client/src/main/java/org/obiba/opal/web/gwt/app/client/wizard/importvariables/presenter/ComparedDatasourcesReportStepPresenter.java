@@ -171,7 +171,6 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   private void addVariables(JsArray<VariableDto> variables, JsArray<VariableDto> variablesToStringify) {
     for(int variableIndex = 0; variableIndex < variables.length(); variableIndex++) {
       VariableDto variableDto = variables.get(variableIndex);
-      purgeH(variableDto);
       variablesToStringify.push(variableDto);
     }
   }
@@ -220,13 +219,4 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   return $wnd.JSON.stringify(obj);
   }-*/;
 
-  /**
-   * Remove the '$H' property mysteriously added to the VariableDto object.
-   * 
-   * @param obj
-   */
-  public static native void purgeH(JavaScriptObject obj)
-  /*-{
-  delete obj['$H'];
-  }-*/;
 }
