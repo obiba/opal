@@ -141,8 +141,12 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
   class DownloadExcelTemplateClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent event) {
-      String uri = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")).append("ws/templates").append(EXCEL_TEMPLATE).toString();
-      eventBus.fireEvent(new FileDownloadEvent(uri));
+      String url = new StringBuilder(getUrlPrefix()).append("ws/templates").append(EXCEL_TEMPLATE).toString();
+      eventBus.fireEvent(new FileDownloadEvent(url));
+    }
+
+    String getUrlPrefix() {
+      return GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "");
     }
   }
 
