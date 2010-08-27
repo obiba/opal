@@ -14,7 +14,7 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-spring</artifactId>
-      <version>2.0-beta-2</version>
+      <version>${resteasy.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
@@ -43,12 +43,12 @@
     <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
-      <version>2.3.0</version>
+      <version>${protobuf.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java-format</artifactId>
-      <version>1.2-r36p11-17</version>
+      <version>${protobuf-java-format.version}</version>
     </dependency>
 
     <!--
@@ -75,7 +75,10 @@
   </repositories>
 
   <properties>
+    <resteasy.version>2.0-beta-2</resteasy.version>
     <jetty.version>7.0.2.v20100331</jetty.version>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
+    <protobuf.version>2.3.0</protobuf.version>
+    <protobuf-java-format.version>1.2-r36p03</protobuf-java-format.version>
   </properties>
 </project>
