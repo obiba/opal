@@ -44,6 +44,11 @@ public class ImportCommandOptionsDtoImpl implements ImportCommandOptions {
     return dto.getUnit();
   }
 
+  @Override
+  public boolean isUnit() {
+    return dto.hasUnit();
+  }
+
   public String getDestination() {
     return dto.getDestination();
   }
@@ -62,11 +67,6 @@ public class ImportCommandOptionsDtoImpl implements ImportCommandOptions {
 
   public List<String> getFiles() {
     return dto.getFilesList();
-  }
-
-  @Override
-  public boolean isUnit() {
-    return false;
   }
 
   @Override
