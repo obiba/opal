@@ -30,7 +30,7 @@ message CommandStateDto {
 
 message ImportCommandOptionsDto {
   optional string unit = 1;
-  required string destination = 2;
+  optional string destination = 2;
   optional string archive = 3;
   repeated string files = 4;
   optional string source = 5;
