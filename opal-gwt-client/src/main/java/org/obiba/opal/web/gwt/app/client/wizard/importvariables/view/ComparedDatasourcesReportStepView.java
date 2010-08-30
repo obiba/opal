@@ -245,22 +245,23 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     table.addColumn(new TextColumn<ConflictDto>() {
       @Override
       public String getValue(ConflictDto conflict) {
-        return conflict.getCode();
+        return conflict.getVariable().getName();
       }
-    }, translations.codeLabel());
-
+    }, translations.nameLabel());
     table.addColumn(new TextColumn<ConflictDto>() {
       @Override
       public String getValue(ConflictDto conflict) {
+
         StringBuilder builder = new StringBuilder();
         JsArrayString arguments = (JsArrayString) (conflict.getArgumentsArray() != null ? conflict.getArgumentsArray() : JsArrayString.createArray());
         for(int i = 0; i < arguments.length(); i++) {
           builder.append(arguments.get(i).toString() + " ");
         }
 
-        return builder.toString();
+        return translations.datasourceComparisonErrorMap().get(conflict.getCode()) + ", " + builder.toString();
       }
     }, translations.messageLabel());
+
     return table;
   }
 
