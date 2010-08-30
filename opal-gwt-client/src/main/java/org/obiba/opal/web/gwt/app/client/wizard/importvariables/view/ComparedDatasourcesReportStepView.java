@@ -27,6 +27,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -38,6 +39,8 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListView;
+import com.google.gwt.view.client.ListView.Delegate;
 
 public class ComparedDatasourcesReportStepView extends Composite implements ComparedDatasourcesReportStepPresenter.Display {
   //
@@ -63,6 +66,10 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
 
   @UiField
   CheckBox ignoreAllModifications;
+
+  private SimplePager<VariableDto> variableDetailsPager;
+
+  private SimplePager<ConflictDto> variableConflictsPager;
 
   //
   // Constructors
@@ -107,7 +114,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
 
     tableComparePanel.add(variableChangesPanel);
     tableChangesPanel.add(tableComparePanel, getTableCompareTabHeader(tableCompareData, comparisonResult));
-    tableChangesPanel.setHeight("500px");
+    tableChangesPanel.setHeight("730px");
   }
 
   @Override
@@ -160,46 +167,77 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   }
 
   private void addVariableChangesSummary(FlowPanel tableComparePanel, JsArray<VariableDto> newVariables, JsArray<VariableDto> modifiedVariables) {
-    tableComparePanel.add(new Label(translations.newVariablesLabel() + ": " + String.valueOf(newVariables.length())));
-    tableComparePanel.add(new Label(translations.modifiedVariablesLabel() + ": " + String.valueOf(modifiedVariables.length())));
+    FlowPanel variableChangesSummaryPanel = new FlowPanel();
+    variableChangesSummaryPanel.setStyleName("variableChangesSummaryPanel");
+    variableChangesSummaryPanel.add(new Label(translations.newVariablesLabel() + ": " + String.valueOf(newVariables.length())));
+    variableChangesSummaryPanel.add(new Label(translations.modifiedVariablesLabel() + ": " + String.valueOf(modifiedVariables.length())));
+    tableComparePanel.add(variableChangesSummaryPanel);
   }
 
   private void addConflictsTab(JsArray<ConflictDto> conflicts, TabLayoutPanel variableChangesPanel) {
     CellTable<ConflictDto> variableConflictsDetails = initVariableConflictsTable();
     variableConflictsDetails.setStyleName("variableChangesDetails");
-    populateConflictsTable(conflicts, variableConflictsDetails);
     ScrollPanel conflictsPanel = new ScrollPanel();
     VerticalPanel conflictsPanelVert = new VerticalPanel();
     conflictsPanelVert.setWidth("100%");
+    variableConflictsPager = initVariableConflictsPager(variableConflictsDetails);
+    conflictsPanelVert.add(variableConflictsPager);
     conflictsPanelVert.add(variableConflictsDetails);
+    conflictsPanelVert.setStyleName("variableConflictsDetailsVert");
     conflictsPanel.add(conflictsPanelVert);
     variableChangesPanel.add(conflictsPanel, translations.conflictedVariablesLabel());
+    populateConflictsTable(conflicts, variableConflictsDetails);
   }
 
   private void addVariablesTab(JsArray<VariableDto> variables, TabLayoutPanel variableChangesPanel, String tabTitle) {
-    CellTable<VariableDto> newVariablesDetails = initVariableDetailsTable();
-    newVariablesDetails.setStyleName("variableChangesDetails");
-    populateVariableDetailsTable(variables, newVariablesDetails);
-    ScrollPanel newVariablePanel = new ScrollPanel();
-    VerticalPanel newVariablePanelVert = new VerticalPanel();
-    newVariablePanelVert.setWidth("100%");
-    newVariablePanelVert.add(newVariablesDetails);
-    newVariablePanel.add(newVariablePanelVert);
-    variableChangesPanel.add(newVariablePanel, tabTitle);
+    CellTable<VariableDto> variablesDetails = initVariableDetailsTable();
+    variablesDetails.setStyleName("variableChangesDetails");
+    ScrollPanel variablePanel = new ScrollPanel();
+    VerticalPanel variablePanelVert = new VerticalPanel();
+    variablePanelVert.setWidth("100%");
+    variableDetailsPager = initVariableDetailsPager(variablesDetails);
+    variablePanelVert.add(variableDetailsPager);
+    variablePanelVert.add(variablesDetails);
+    variablePanelVert.setStyleName("variableChangesDetailsVert");
+    variablePanel.add(variablePanelVert);
+    variableChangesPanel.add(variablePanel, tabTitle);
+    populateVariableDetailsTable(variables, variablesDetails);
   }
 
-  private void populateVariableDetailsTable(JsArray<VariableDto> variables, CellTable<VariableDto> table) {
-    int variableCount = variables.length();
-    table.setPageSize(variableCount);
-    table.setDataSize(variableCount, true);
-    table.setData(0, variableCount, JsArrays.toList(variables, 0, variableCount));
+  private void populateVariableDetailsTable(final JsArray<VariableDto> variables, CellTable<VariableDto> table) {
+    table.setDelegate(new Delegate<VariableDto>() {
+
+      @Override
+      public void onRangeChanged(ListView<VariableDto> listView) {
+        int start = listView.getRange().getStart();
+        int length = listView.getRange().getLength();
+        listView.setData(start, length, JsArrays.toList(variables, start, length));
+      }
+
+    });
+
+    variableDetailsPager.firstPage();
+    table.setDataSize(variables.length(), true);
+    table.setData(0, table.getPageSize(), JsArrays.toList(variables, 0, table.getPageSize()));
+    table.redraw();
   }
 
-  private void populateConflictsTable(JsArray<ConflictDto> conflicts, CellTable<ConflictDto> table) {
-    int conflictsCount = conflicts.length();
-    table.setPageSize(conflictsCount);
-    table.setDataSize(conflictsCount, true);
-    table.setData(0, conflictsCount, JsArrays.toList(conflicts, 0, conflictsCount));
+  private void populateConflictsTable(final JsArray<ConflictDto> conflicts, CellTable<ConflictDto> table) {
+    table.setDelegate(new Delegate<ConflictDto>() {
+
+      @Override
+      public void onRangeChanged(ListView<ConflictDto> listView) {
+        int start = listView.getRange().getStart();
+        int length = listView.getRange().getLength();
+        listView.setData(start, length, JsArrays.toList(conflicts, start, length));
+      }
+
+    });
+
+    variableConflictsPager.firstPage();
+    table.setDataSize(conflicts.length(), true);
+    table.setData(0, table.getPageSize(), JsArrays.toList(conflicts, 0, table.getPageSize()));
+    table.redraw();
   }
 
   private CellTable<ConflictDto> initVariableConflictsTable() {
@@ -267,6 +305,20 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     }, translations.labelLabel());
 
     return table;
+  }
+
+  SimplePager<VariableDto> initVariableDetailsPager(CellTable<VariableDto> table) {
+    table.setPageSize(20);
+    SimplePager<VariableDto> variableDetailsPager = new SimplePager<VariableDto>(table);
+    table.setPager(variableDetailsPager);
+    return variableDetailsPager;
+  }
+
+  SimplePager<ConflictDto> initVariableConflictsPager(CellTable<ConflictDto> table) {
+    table.setPageSize(20);
+    SimplePager<ConflictDto> variableConflictsPager = new SimplePager<ConflictDto>(table);
+    table.setPager(variableConflictsPager);
+    return variableConflictsPager;
   }
 
   public Widget asWidget() {

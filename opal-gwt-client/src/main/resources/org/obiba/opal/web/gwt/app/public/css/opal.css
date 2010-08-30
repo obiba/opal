@@ -291,3 +291,43 @@ div.variableChanges {
 table.variableChangesDetails {
   width:100%;
 }
+
+table.variableChangesDetailsVert table.variableChangesDetails tr > td  {
+  text-align:left; 
+}
+
+
+table.variableConflictsDetailsVert table.variableChangesDetails tr > td  {
+  text-align:left; 
+}
+
+table.variableChangesDetailsVert tr > td {
+  text-align:right;
+  white-space:nowrap;
+  width:100%;
+}
+
+table.variableConflictsDetailsVert tr > td {
+  text-align:right;
+  white-space:nowrap;
+  width:100%;
+}
+
+div.ignoreAllModifications {
+  padding:10px 10px 2px;
+}
+
+div.ignoreAllModifications > span > label {
+  padding-left:10px;
+  font-weight:bold;
+}
+
+div.variableChangesSummaryPanel > div {
+  font-weight:bold;
+  margin:5px;
+}
+
+div.variableChanges {
+  margin:10px;
+  height:600px;
+}
