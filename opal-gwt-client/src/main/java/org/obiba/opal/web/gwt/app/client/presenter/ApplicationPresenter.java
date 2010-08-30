@@ -62,8 +62,6 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
     MenuItem getDataExportItem();
 
-    MenuItem getTestItem();
-
     MenuItem getListJobsItem();
 
     MenuItem getFileExplorer();
@@ -79,9 +77,6 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
   @Inject
   private Provider<UploadVariablesStepPresenter> uploadVariablesStepPresenter;
-
-  @Inject
-  private Provider<DataImportPresenter> dataImportPresenter;
 
   @Inject
   private Provider<DataExportPresenter> dataExportPresenter;
@@ -145,14 +140,6 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
     });
 
     getDisplay().getDataImportItem().setCommand(new Command() {
-
-      @Override
-      public void execute() {
-        eventBus.fireEvent(new WorkbenchChangeEvent(dataImportPresenter.get()));
-      }
-    });
-
-    getDisplay().getTestItem().setCommand(new Command() {
 
       @Override
       public void execute() {
