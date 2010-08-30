@@ -18,7 +18,6 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
@@ -44,7 +43,7 @@ import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
 
-@GinModules( { OpalGinModule.class, DashboardModule.class, NavigatorModule.class, FileSystemModule.class, JobModule.class, ImportModule.class, ImportVariablesWizardModule.class })
+@GinModules({ OpalGinModule.class, DashboardModule.class, NavigatorModule.class, FileSystemModule.class, JobModule.class, ImportModule.class, ImportVariablesWizardModule.class })
 public interface OpalGinjector extends Ginjector {
 
   EventBus getEventBus();
@@ -90,8 +89,6 @@ public interface OpalGinjector extends Ginjector {
   ConfirmationPresenter getConfirmationPresenter();
 
   CreateFolderDialogPresenter getCreateFolderDialogPresenter();
-
-  DataImportPresenter getDataImportPresenter();
 
   FormatSelectionStepPresenter getFormatSelectionStepPresenter();
 
