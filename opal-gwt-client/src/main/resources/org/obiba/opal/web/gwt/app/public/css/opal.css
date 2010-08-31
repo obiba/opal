@@ -266,6 +266,9 @@ table.folder-details td:first-child span:hover {
   cursor:pointer;
 }
 
+
+/* Import variables */ 
+
 div.tableComparison-conflict {
 	background:transparent url(image/20/error.png) no-repeat scroll left center;
 	height:18px;
@@ -330,5 +333,9 @@ div.variableChangesSummaryPanel > div {
 
 div.variableChanges {
   margin:10px;
-  height:600px;
+  height:550px;
+}
+
+div.gwt-TabLayoutPanel.tableChangesPanel div.gwt-TabLayoutPanelTabs {
+  width:100% !important;
 }

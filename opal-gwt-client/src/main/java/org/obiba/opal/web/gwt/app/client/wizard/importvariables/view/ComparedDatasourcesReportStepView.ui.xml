@@ -17,7 +17,7 @@
       <g:HTMLPanel addStyleNames="ignoreAllModifications">
         <g:CheckBox ui:field="ignoreAllModifications"><ui:msg description="Ignore all modifications label">Ignore all modifications</ui:msg></g:CheckBox>
       </g:HTMLPanel>
-      <g:TabLayoutPanel ui:field="tableChangesPanel" barUnit='EM' barHeight='3'/>
+      <g:TabLayoutPanel ui:field="tableChangesPanel" barUnit='EM' barHeight='6' addStyleNames="tableChangesPanel"/>
     </g:FlowPanel>
     
      <g:FlowPanel>
