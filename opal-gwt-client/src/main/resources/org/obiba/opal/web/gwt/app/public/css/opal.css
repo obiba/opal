@@ -290,6 +290,7 @@ div.variableChanges {
 
 table.variableChangesDetails {
   width:100%;
+  table-layout:fixed;
 }
 
 table.variableChangesDetailsVert table.variableChangesDetails tr > td  {
