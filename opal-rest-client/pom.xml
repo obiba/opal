@@ -45,8 +45,7 @@
   <properties>
     <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
-
     <httpclient.version>4.0.1</httpclient.version>
   </properties>
-  
+
 </project>

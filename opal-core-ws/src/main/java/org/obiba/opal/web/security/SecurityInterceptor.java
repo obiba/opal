@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response.Status;
 
@@ -68,13 +69,19 @@ public class SecurityInterceptor extends AbstractSecurityComponent implements Pr
     }
 
     String sessionId = extractCookieValue(request, method);
+    String authorization = extractAuthorization(request);
     if(isValidSessionId(sessionId)) {
       Subject s = new Subject.Builder(getSecurityManager()).sessionId(sessionId).buildSubject();
       s.getSession().touch();
-      log.debug("Binding subject {} session {} to executring thread {}", new Object[] { s.getPrincipal(), sessionId, Thread.currentThread().getId() });
+      log.debug("Binding subject {} session {} to executing thread {}", new Object[] { s.getPrincipal(), sessionId, Thread.currentThread().getId() });
       ThreadContext.bind(s);
+    } else if(authorization != null) {
+      AuthorizationToken token = new AuthorizationToken(authorization.substring((X_OPAL_AUTH + " ").length()));
+      SecurityUtils.getSubject().login(token);
+      sessionId = SecurityUtils.getSubject().getSession().getId().toString();
+      log.info("Successfull session creation for user '{}' session ID is '{}'.", token.getUsername(), sessionId);
     } else {
-      return (ServerResponse) ServerResponse.status(Status.UNAUTHORIZED).build();
+      return (ServerResponse) ServerResponse.status(Status.UNAUTHORIZED).header(HttpHeaders.WWW_AUTHENTICATE, X_OPAL_AUTH + " realm=\"Opal\"").build();
     }
     return null;
   }
@@ -98,7 +105,7 @@ public class SecurityInterceptor extends AbstractSecurityComponent implements Pr
         Subject s = ThreadContext.getSubject();
         if(s != null) {
           Session session = s.getSession(false);
-          log.debug("Unbinding subject {} session {} from executring thread {}", new Object[] { s.getPrincipal(), (session != null ? session.getId() : "null"), Thread.currentThread().getId() });
+          log.debug("Unbinding subject {} session {} from executing thread {}", new Object[] { s.getPrincipal(), (session != null ? session.getId() : "null"), Thread.currentThread().getId() });
         }
       }
 
@@ -127,6 +134,14 @@ public class SecurityInterceptor extends AbstractSecurityComponent implements Pr
       if(values != null && values.size() == 1) {
         return values.get(0);
       }
+    }
+    return null;
+  }
+
+  protected String extractAuthorization(HttpRequest request) {
+    List<String> values = request.getHttpHeaders().getRequestHeader(HttpHeaders.AUTHORIZATION);
+    if(values != null && values.size() == 1) {
+      return values.get(0);
     }
     return null;
   }

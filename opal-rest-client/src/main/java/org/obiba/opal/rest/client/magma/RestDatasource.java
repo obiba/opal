@@ -8,11 +8,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.http.HttpMessage;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.BasicHttpContext;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
@@ -21,6 +28,7 @@ import org.obiba.magma.support.Initialisables;
 import org.obiba.opal.web.model.Magma.TableDto;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -33,11 +41,25 @@ public class RestDatasource extends AbstractDatasource {
 
   private final HttpClient client;
 
+  private final BasicHttpContext ctx;
+
+  private final BasicCookieStore cs;
+
   private Set<String> cachedTableNames;
 
   public RestDatasource(String name, String uri, String username, char[] password) throws URISyntaxException {
     super(name, "rest");
-    this.client = new DefaultHttpClient();
+
+    DefaultHttpClient httpClient = new DefaultHttpClient();
+    httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, new String(password)));
+    httpClient.getParams().setParameter("http.protocol.handle-authentication", Boolean.TRUE);
+    httpClient.getParams().setParameter("http.auth.target-scheme-pref", ImmutableList.of(OpalAuthScheme.NAME));
+    httpClient.getAuthSchemes().register(OpalAuthScheme.NAME, new OpalAuthScheme.Factory());
+    ctx = new BasicHttpContext();
+    ctx.setAttribute(ClientContext.AUTH_SCHEME_PREF, ImmutableList.of(OpalAuthScheme.NAME));
+    ctx.setAttribute(ClientContext.COOKIE_STORE, cs = new BasicCookieStore());
+
+    this.client = httpClient;
     this.datasourceURI = new URI(uri.endsWith("/") ? uri : uri + "/");
   }
 
@@ -101,8 +123,8 @@ public class RestDatasource extends AbstractDatasource {
   URI newReference(String... segments) {
     return buildURI(this.datasourceURI, segments);
   }
-  
-  URI buildURI(final URI root, String ... segments) {
+
+  URI buildURI(final URI root, String... segments) {
     URI uri = root;
     for(String segment : segments) {
       segment = segment.endsWith("/") ? segment : segment + "/";
@@ -148,6 +170,15 @@ public class RestDatasource extends AbstractDatasource {
   HttpResponse get(URI uri) throws ClientProtocolException, IOException {
     HttpGet get = new HttpGet(uri);
     get.addHeader("Accept", "application/x-protobuf");
-    return client.execute(get);
+    authenticate(get);
+    return client.execute(get, ctx);
+  }
+
+  void authenticate(HttpMessage msg) {
+    for(Cookie c : cs.getCookies()) {
+      if(c.getName().equalsIgnoreCase("opalsid")) {
+        msg.addHeader(OpalAuthScheme.NAME, c.getValue());
+      }
+    }
   }
 }

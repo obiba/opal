@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -22,6 +23,17 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-vfs</artifactId>
+      <version>${commons-vfs.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>commons-httpclient</groupId>
+          <artifactId>commons-httpclient</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -30,15 +42,25 @@
     </dependency>
 
     <dependency>
-      <groupId>org.mockftpserver</groupId>
-      <artifactId>MockFtpServer</artifactId>
-    </dependency>
-    
-    <dependency>
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
-      <scope>TEST</scope>
+      <version>${commons-httpclient.version}</version>
+      <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.mockftpserver</groupId>
+      <artifactId>MockFtpServer</artifactId>
+      <version>${mockftpserver.version}</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
   </dependencies>
 
   <repositories>
@@ -56,5 +78,8 @@
 
   <properties>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
+    <commons-vfs.version>2.0-r929316</commons-vfs.version>
+    <commons-httpclient.version>3.1</commons-httpclient.version>
+    <mockftpserver.version>2.1</mockftpserver.version>
   </properties>
 </project>
