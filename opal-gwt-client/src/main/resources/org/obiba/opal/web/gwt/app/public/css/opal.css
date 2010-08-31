@@ -305,13 +305,13 @@ table.variableConflictsDetailsVert table.variableChangesDetails tr > td  {
   text-align:left; 
 }
 
-table.variableChangesDetailsVert tr > td {
+table.variableChangesDetailsVert div.variableDetailsPager tr > td {
   text-align:right;
   white-space:nowrap;
   width:100%;
 }
 
-table.variableConflictsDetailsVert tr > td {
+table.variableConflictsDetailsVert div.variableDetailsPager tr > td {
   text-align:right;
   white-space:nowrap;
   width:100%;

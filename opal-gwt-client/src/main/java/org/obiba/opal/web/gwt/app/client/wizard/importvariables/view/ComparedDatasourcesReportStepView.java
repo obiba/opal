@@ -180,8 +180,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     ScrollPanel conflictsPanel = new ScrollPanel();
     VerticalPanel conflictsPanelVert = new VerticalPanel();
     conflictsPanelVert.setWidth("100%");
-    variableConflictsPager = initVariableConflictsPager(variableConflictsDetails);
-    conflictsPanelVert.add(variableConflictsPager);
+    conflictsPanelVert.add(initVariableConflictsPager(variableConflictsDetails));
     conflictsPanelVert.add(variableConflictsDetails);
     conflictsPanelVert.setStyleName("variableConflictsDetailsVert");
     conflictsPanel.add(conflictsPanelVert);
@@ -195,8 +194,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     ScrollPanel variablePanel = new ScrollPanel();
     VerticalPanel variablePanelVert = new VerticalPanel();
     variablePanelVert.setWidth("100%");
-    variableDetailsPager = initVariableDetailsPager(variablesDetails);
-    variablePanelVert.add(variableDetailsPager);
+    variablePanelVert.add(initVariableDetailsPager(variablesDetails));
     variablePanelVert.add(variablesDetails);
     variablePanelVert.setStyleName("variableChangesDetailsVert");
     variablePanel.add(variablePanelVert);
@@ -317,18 +315,24 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     return table;
   }
 
-  SimplePager<VariableDto> initVariableDetailsPager(CellTable<VariableDto> table) {
+  FlowPanel initVariableDetailsPager(CellTable<VariableDto> table) {
     table.setPageSize(20);
-    SimplePager<VariableDto> variableDetailsPager = new SimplePager<VariableDto>(table);
+    variableDetailsPager = new SimplePager<VariableDto>(table);
     table.setPager(variableDetailsPager);
-    return variableDetailsPager;
+    FlowPanel pagerPanel = new FlowPanel();
+    pagerPanel.setStyleName("variableDetailsPager");
+    pagerPanel.add(variableDetailsPager);
+    return pagerPanel;
   }
 
-  SimplePager<ConflictDto> initVariableConflictsPager(CellTable<ConflictDto> table) {
+  FlowPanel initVariableConflictsPager(CellTable<ConflictDto> table) {
     table.setPageSize(20);
-    SimplePager<ConflictDto> variableConflictsPager = new SimplePager<ConflictDto>(table);
+    variableConflictsPager = new SimplePager<ConflictDto>(table);
     table.setPager(variableConflictsPager);
-    return variableConflictsPager;
+    FlowPanel pagerPanel = new FlowPanel();
+    pagerPanel.setStyleName("variableConflictsPager");
+    pagerPanel.add(variableConflictsPager);
+    return pagerPanel;
   }
 
   public Widget asWidget() {
