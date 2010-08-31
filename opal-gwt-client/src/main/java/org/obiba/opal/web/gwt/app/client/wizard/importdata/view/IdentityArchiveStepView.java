@@ -93,6 +93,7 @@ public class IdentityArchiveStepView extends Composite implements IdentityArchiv
 
   @Override
   public void setUnits(JsArray<FunctionalUnitDto> units) {
+    this.units.clear();
     for(int i = 0; i < units.length(); i++) {
       this.units.addItem(units.get(i).getName());
     }
