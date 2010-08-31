@@ -213,12 +213,23 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     }
   }
 
+  /**
+   * The user may have supplied a file or a list of files at the command line to be imported. If the user has not
+   * supplied a file (or files) but has supplied a unit, then all the files that are available in the associated unit
+   * directory will be imported.
+   * 
+   * If data is imported from another datasource then it would seem that there is no reason to specify a file. But it is
+   * permitted that a user can specify one file in this case. The specified file is used only for archiving purposes
+   * only.
+   * @return A List of files to be imported. The List may be empty.
+   */
   private List<FileObject> getFilesToImport() {
     List<FileObject> filesToImport = null;
     if(options.isFiles()) {
       filesToImport = resolveFiles(options.getFiles());
     } else {
-      if(options.isUnit()) {
+      if(options.isUnit() && !options.isSource()) {
+        // If we're importing from a datasource we don't want to read files from the unit directory.
         try {
           filesToImport = getFilesInFolder(getOpalRuntime().getUnitDirectory(options.getUnit()));
         } catch(IOException ex) {
