@@ -300,18 +300,7 @@ table.variableChangesDetailsVert table.variableChangesDetails tr > td  {
   text-align:left; 
 }
 
-
-table.variableConflictsDetailsVert table.variableChangesDetails tr > td  {
-  text-align:left; 
-}
-
-table.variableChangesDetailsVert div.variableDetailsPager tr > td {
-  text-align:right;
-  white-space:nowrap;
-  width:100%;
-}
-
-table.variableConflictsDetailsVert div.variableDetailsPager tr > td {
+div.variableChangesPager tr > td {
   text-align:right;
   white-space:nowrap;
   width:100%;
