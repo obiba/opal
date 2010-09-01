@@ -59,7 +59,7 @@ public class SecurityInterceptor extends AbstractSecurityComponent implements Pr
   @Override
   public ServerResponse preProcess(HttpRequest request, ResourceMethod method) throws Failure, WebApplicationException {
     if(ThreadContext.getSubject() != null) {
-      log.error("Previous executing subject was not properly unbound from executing thread. Unbinding now.");
+      log.warn("Previous executing subject was not properly unbound from executing thread. Unbinding now.");
       ThreadContext.unbindSubject();
     }
 
@@ -67,23 +67,7 @@ public class SecurityInterceptor extends AbstractSecurityComponent implements Pr
     if(method.getMethod().isAnnotationPresent(NotAuthenticated.class) || method.getResourceClass().isAnnotationPresent(NotAuthenticated.class)) {
       return null;
     }
-
-    String sessionId = extractCookieValue(request, method);
-    String authorization = extractAuthorization(request);
-    if(isValidSessionId(sessionId)) {
-      Subject s = new Subject.Builder(getSecurityManager()).sessionId(sessionId).buildSubject();
-      s.getSession().touch();
-      log.debug("Binding subject {} session {} to executing thread {}", new Object[] { s.getPrincipal(), sessionId, Thread.currentThread().getId() });
-      ThreadContext.bind(s);
-    } else if(authorization != null) {
-      AuthorizationToken token = new AuthorizationToken(authorization.substring((X_OPAL_AUTH + " ").length()));
-      SecurityUtils.getSubject().login(token);
-      sessionId = SecurityUtils.getSubject().getSession().getId().toString();
-      log.info("Successfull session creation for user '{}' session ID is '{}'.", token.getUsername(), sessionId);
-    } else {
-      return (ServerResponse) ServerResponse.status(Status.UNAUTHORIZED).header(HttpHeaders.WWW_AUTHENTICATE, X_OPAL_AUTH + " realm=\"Opal\"").build();
-    }
-    return null;
+    return authenticate(request, method);
   }
 
   @Override
@@ -114,6 +98,25 @@ public class SecurityInterceptor extends AbstractSecurityComponent implements Pr
     }
   }
 
+  private ServerResponse authenticate(HttpRequest request, ResourceMethod method) {
+    String sessionId = extractCookieValue(request, method);
+    String authorization = getFirstHeaderValue(HttpHeaders.AUTHORIZATION, request);
+    if(isValidSessionId(sessionId)) {
+      Subject s = new Subject.Builder(getSecurityManager()).sessionId(sessionId).buildSubject();
+      s.getSession().touch();
+      log.debug("Binding subject {} session {} to executing thread {}", new Object[] { s.getPrincipal(), sessionId, Thread.currentThread().getId() });
+      ThreadContext.bind(s);
+    } else if(authorization != null) {
+      HttpAuthorizationToken token = new HttpAuthorizationToken(X_OPAL_AUTH, authorization);
+      SecurityUtils.getSubject().login(token);
+      sessionId = SecurityUtils.getSubject().getSession().getId().toString();
+      log.info("Successfull session creation for user '{}' session ID is '{}'.", token.getUsername(), sessionId);
+    } else {
+      return (ServerResponse) ServerResponse.status(Status.UNAUTHORIZED).header(HttpHeaders.WWW_AUTHENTICATE, X_OPAL_AUTH + " realm=\"Opal\"").build();
+    }
+    return null;
+  }
+
   private boolean isWebServiceAuthenticated(Annotation[] annotations) {
     for(Annotation annotation : annotations) {
       if(annotation instanceof NotAuthenticated) return false;
@@ -121,25 +124,20 @@ public class SecurityInterceptor extends AbstractSecurityComponent implements Pr
     return true;
   }
 
-  protected String extractCookieValue(HttpRequest request, ResourceMethod method) {
-
+  private String extractCookieValue(HttpRequest request, ResourceMethod method) {
     if(method.getMethod().isAnnotationPresent(AuthenticatedByCookie.class) || method.getResourceClass().isAnnotationPresent(AuthenticatedByCookie.class)) {
       Cookie cookie = request.getHttpHeaders().getCookies().get(OPAL_SESSION_ID_COOKIE_NAME);
       if(cookie != null) {
         return cookie.getValue();
       }
-
     } else {
-      List<String> values = request.getHttpHeaders().getRequestHeader(X_OPAL_AUTH);
-      if(values != null && values.size() == 1) {
-        return values.get(0);
-      }
+      return getFirstHeaderValue(X_OPAL_AUTH, request);
     }
     return null;
   }
 
-  protected String extractAuthorization(HttpRequest request) {
-    List<String> values = request.getHttpHeaders().getRequestHeader(HttpHeaders.AUTHORIZATION);
+  private String getFirstHeaderValue(String header, HttpRequest request) {
+    List<String> values = request.getHttpHeaders().getRequestHeader(header);
     if(values != null && values.size() == 1) {
       return values.get(0);
     }

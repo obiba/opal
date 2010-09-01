@@ -17,9 +17,9 @@ import org.apache.http.util.CharArrayBuffer;
 import org.apache.http.util.EncodingUtils;
 
 public class OpalAuthScheme extends BasicScheme {
-  
+
   public static final String NAME = "X-Opal-Auth";
-  
+
   @Override
   public String getRealm() {
     return null;
@@ -29,84 +29,61 @@ public class OpalAuthScheme extends BasicScheme {
   public String getSchemeName() {
     return NAME;
   }
-  
 
   /**
    * Produces basic authorization header for the given set of {@link Credentials}.
    * 
    * @param credentials The set of credentials to be used for authentication
    * @param request The request being authenticated
-   * @throws InvalidCredentialsException if authentication credentials are not 
-   *   valid or not applicable for this authentication scheme
-   * @throws AuthenticationException if authorization string cannot 
-   *   be generated due to an authentication failure
+   * @throws InvalidCredentialsException if authentication credentials are not valid or not applicable for this
+   * authentication scheme
+   * @throws AuthenticationException if authorization string cannot be generated due to an authentication failure
    * 
    * @return a basic authorization string
    */
-  public Header authenticate(
-          final Credentials credentials, 
-          final HttpRequest request) throws AuthenticationException {
+  public Header authenticate(final Credentials credentials, final HttpRequest request) throws AuthenticationException {
+    if(credentials == null) throw new IllegalArgumentException("credentials may not be null");
+    if(request == null) throw new IllegalArgumentException("request may not be null");
 
-      if (credentials == null) {
-          throw new IllegalArgumentException("Credentials may not be null");
-      }
-      if (request == null) {
-          throw new IllegalArgumentException("HTTP request may not be null");
-      }
-      
-      String charset = AuthParams.getCredentialCharset(request.getParams());
-      return authenticate(credentials, charset, isProxy());
+    String charset = AuthParams.getCredentialCharset(request.getParams());
+    return authenticate(credentials, charset, isProxy());
   }
-  
+
   /**
-   * Returns a basic <tt>Authorization</tt> header value for the given 
-   * {@link Credentials} and charset.
+   * Returns a basic <tt>Authorization</tt> header value for the given {@link Credentials} and charset.
    * 
    * @param credentials The credentials to encode.
    * @param charset The charset to use for encoding the credentials
    * 
    * @return a basic authorization header
    */
-  public static Header authenticate(
-          final Credentials credentials, 
-          final String charset, 
-          boolean proxy) {
-      if (credentials == null) {
-          throw new IllegalArgumentException("Credentials may not be null"); 
-      }
-      if (charset == null) {
-          throw new IllegalArgumentException("charset may not be null");
-      }
+  public static Header authenticate(final Credentials credentials, final String charset, boolean proxy) {
+    if(credentials == null) throw new IllegalArgumentException("credentials may not be null");
+    if(charset == null) throw new IllegalArgumentException("charset may not be null");
 
-      StringBuilder tmp = new StringBuilder();
-      tmp.append(credentials.getUserPrincipal().getName());
-      tmp.append(":");
-      tmp.append((credentials.getPassword() == null) ? "null" : credentials.getPassword());
+    StringBuilder tmp = new StringBuilder()//
+    .append(credentials.getUserPrincipal().getName())//
+    .append(":")//
+    .append((credentials.getPassword() == null) ? "null" : credentials.getPassword());
 
-      byte[] base64password = Base64.encodeBase64(
-              EncodingUtils.getBytes(tmp.toString(), charset));
-      
-      CharArrayBuffer buffer = new CharArrayBuffer(32);
-      if (proxy) {
-          buffer.append(AUTH.PROXY_AUTH_RESP);
-      } else {
-          buffer.append(AUTH.WWW_AUTH_RESP);
-      }
-      buffer.append(": ");
-      buffer.append(NAME);
-      buffer.append(" ");
-      buffer.append(base64password, 0, base64password.length);
-      
-      return new BufferedHeader(buffer);
+    byte[] base64password = Base64.encodeBase64(EncodingUtils.getBytes(tmp.toString(), charset));
+
+    CharArrayBuffer buffer = new CharArrayBuffer(32);
+    buffer.append(proxy ? AUTH.PROXY_AUTH_RESP : AUTH.WWW_AUTH_RESP);
+    buffer.append(": ");
+    buffer.append(NAME);
+    buffer.append(" ");
+    buffer.append(base64password, 0, base64password.length);
+
+    return new BufferedHeader(buffer);
   }
-  
-  
+
   public static final class Factory implements AuthSchemeFactory {
 
     @Override
     public AuthScheme newInstance(HttpParams params) {
       return new OpalAuthScheme();
     }
-    
+
   }
 }

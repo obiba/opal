@@ -11,24 +11,25 @@ package org.obiba.opal.web.security;
 
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.pam.UnsupportedTokenException;
 import org.apache.shiro.codec.Base64;
 
 /**
  *
  */
-public class AuthorizationToken extends UsernamePasswordToken implements AuthenticationToken {
+public class HttpAuthorizationToken extends UsernamePasswordToken implements AuthenticationToken {
 
   private static final long serialVersionUID = 4520790559763117320L;
 
-  public AuthorizationToken(String encoded) {
-    this(encoded, null);
+  public HttpAuthorizationToken(String scheme, String authorization) {
+    this(scheme, authorization, null);
   }
 
-  public AuthorizationToken(String encoded, String host) {
-    this(new DecodedCredentials(encoded), host);
+  public HttpAuthorizationToken(String scheme, String authorization, String host) {
+    this(new DecodedCredentials(scheme, authorization), host);
   }
 
-  private AuthorizationToken(DecodedCredentials decoded, String host) {
+  private HttpAuthorizationToken(DecodedCredentials decoded, String host) {
     super(decoded.getUsername(), decoded.getPassword(), host);
   }
 
@@ -38,8 +39,15 @@ public class AuthorizationToken extends UsernamePasswordToken implements Authent
 
     private final String password;
 
-    DecodedCredentials(String encoded) {
-      String decoded[] = Base64.decodeToString(encoded).split(":", 2);
+    DecodedCredentials(String scheme, String authorization) throws UnsupportedTokenException {
+      // Scheme <token>
+      String schemeAndToken[] = authorization.split(" ", 2);
+
+      if(scheme.equals(schemeAndToken[0]) == false) {
+        throw new UnsupportedTokenException();
+      }
+
+      String decoded[] = Base64.decodeToString(schemeAndToken[1]).split(":", 2);
       username = decoded[0];
       password = decoded[1];
     }
