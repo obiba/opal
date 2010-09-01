@@ -151,7 +151,8 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
 
     JsArray<VariableDto> newVariables = getNullAsEmptyArray(tableCompareData.getNewVariablesArray());
     JsArray<VariableDto> modifiedVariables = getNullAsEmptyArray(tableCompareData.getExistingVariablesArray());
-    addVariableChangesSummary(tableComparePanel, newVariables, modifiedVariables);
+    JsArray<ConflictDto> conflicts = getNullAsEmptyArray(tableCompareData.getConflictsArray());
+    addVariableChangesSummary(tableComparePanel, newVariables, modifiedVariables, conflicts);
 
     if(newVariables.length() > 0) {
       addVariablesTab(newVariables, variableChangesPanel, translations.newVariablesLabel());
@@ -161,7 +162,6 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
       addVariablesTab(modifiedVariables, variableChangesPanel, translations.modifiedVariablesLabel());
     }
 
-    JsArray<ConflictDto> conflicts = getNullAsEmptyArray(tableCompareData.getConflictsArray());
     if(conflicts.length() > 0) {
       addConflictsTab(conflicts, variableChangesPanel);
     }
@@ -173,7 +173,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     return (JsArray<T>) (array != null ? array : JsArray.createArray());
   }
 
-  private void addVariableChangesSummary(FlowPanel tableComparePanel, JsArray<VariableDto> newVariables, JsArray<VariableDto> modifiedVariables) {
+  private void addVariableChangesSummary(FlowPanel tableComparePanel, JsArray<VariableDto> newVariables, JsArray<VariableDto> modifiedVariables, JsArray<ConflictDto> conflicts) {
     FlowPanel variableChangesSummaryPanel = new FlowPanel();
     variableChangesSummaryPanel.setStyleName("variableChangesSummaryPanel");
     variableChangesSummaryPanel.add(new Label(translations.newVariablesLabel() + ": " + String.valueOf(newVariables.length())));
@@ -304,8 +304,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
       }
 
       private void getLabelsString(JsArray<AttributeDto> attributes, AttributeDto attribute, StringBuilder labels, int i) {
-        labels.append(attribute.getLocale().toString() + ":");
-        labels.append(attribute != null ? attribute.getValue() : "");
+        labels.append(attribute.getLocale().toString() + ":" + attribute.getValue());
         if(i < attributes.length() - 1) {
           labels.append(", ");
         }
