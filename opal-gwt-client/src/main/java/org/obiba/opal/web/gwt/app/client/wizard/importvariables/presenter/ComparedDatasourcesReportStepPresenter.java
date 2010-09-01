@@ -47,6 +47,10 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
   private JsArray<TableCompareDto> comparedTables;
 
+  private boolean conflictsExist;
+
+  private boolean modificationsExist;
+
   @Inject
   public ComparedDatasourcesReportStepPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
@@ -70,6 +74,8 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
     void setEnabledSaveButton(boolean enabled);
 
+    void setEnabledIgnoreAllModifications(boolean enabled);
+
     boolean ignoreAllModifications();
 
   }
@@ -92,16 +98,19 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
       @Override
       public void onResource(Response response, DatasourceCompareDto resource) {
         comparedTables = resource.getTableComparisonsArray();
-        boolean conflictsExist = false;
+        conflictsExist = false;
         for(int i = 0; i < comparedTables.length(); i++) {
           TableCompareDto tableComparison = comparedTables.get(i);
           ComparisonResult comparisonResult = getTableComparisonResult(tableComparison);
           getDisplay().addTableCompareTab(tableComparison, comparisonResult);
           if(comparisonResult == ComparisonResult.CONFLICT) {
             conflictsExist = true;
+          } else if(comparisonResult == ComparisonResult.MODIFICATION) {
+            modificationsExist = true;
           }
         }
         getDisplay().setEnabledSaveButton(!conflictsExist);
+        getDisplay().setEnabledIgnoreAllModifications(conflictsExist || modificationsExist);
       }
 
     }).send();
@@ -207,7 +216,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   class IgnoreAllModificationsClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent event) {
-      getDisplay().setEnabledSaveButton(getDisplay().ignoreAllModifications());
+      getDisplay().setEnabledSaveButton(!conflictsExist || getDisplay().ignoreAllModifications());
     }
   }
 

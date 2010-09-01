@@ -100,6 +100,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     tableChangesPanel.clear();
     saveButton.setEnabled(false);
     ignoreAllModifications.setValue(false);
+    ignoreAllModifications.setEnabled(false);
   }
 
   @Override
@@ -124,6 +125,11 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     return ignoreAllModifications.getValue();
   }
 
+  @Override
+  public void setEnabledIgnoreAllModifications(boolean enabled) {
+    ignoreAllModifications.setEnabled(enabled);
+  }
+
   private FlowPanel getTableCompareTabHeader(TableCompareDto tableCompareData, ComparisonResult comparisonResult) {
     FlowPanel tabHeader = new FlowPanel();
     if(comparisonResult == ComparisonResult.CONFLICT) {
@@ -143,10 +149,8 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     TabLayoutPanel variableChangesPanel = new TabLayoutPanel(3, Unit.EM);
     variableChangesPanel.setStyleName("variableChanges");
 
-    JsArray<VariableDto> newVariables = (JsArray<VariableDto>) (tableCompareData.getNewVariablesArray() != null ? tableCompareData.getNewVariablesArray() : JsArray.createArray());
-    JsArray<VariableDto> modifiedVariables = (JsArray<VariableDto>) (tableCompareData.getExistingVariablesArray() != null ? tableCompareData.getExistingVariablesArray() : JsArray.createArray());
-    JsArray<ConflictDto> conflicts = (JsArray<ConflictDto>) (tableCompareData.getConflictsArray() != null ? tableCompareData.getConflictsArray() : JsArray.createArray());
-
+    JsArray<VariableDto> newVariables = getNullAsEmptyArray(tableCompareData.getNewVariablesArray());
+    JsArray<VariableDto> modifiedVariables = getNullAsEmptyArray(tableCompareData.getExistingVariablesArray());
     addVariableChangesSummary(tableComparePanel, newVariables, modifiedVariables);
 
     if(newVariables.length() > 0) {
@@ -157,10 +161,16 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
       addVariablesTab(modifiedVariables, variableChangesPanel, translations.modifiedVariablesLabel());
     }
 
+    JsArray<ConflictDto> conflicts = getNullAsEmptyArray(tableCompareData.getConflictsArray());
     if(conflicts.length() > 0) {
       addConflictsTab(conflicts, variableChangesPanel);
     }
     return variableChangesPanel;
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T extends JavaScriptObject> JsArray<T> getNullAsEmptyArray(JsArray<T> array) {
+    return (JsArray<T>) (array != null ? array : JsArray.createArray());
   }
 
   private void addVariableChangesSummary(FlowPanel tableComparePanel, JsArray<VariableDto> newVariables, JsArray<VariableDto> modifiedVariables) {
@@ -274,14 +284,14 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     }, translations.unitLabel());
 
     table.addColumn(new TextColumn<VariableDto>() {
-      @SuppressWarnings("unchecked")
+
       @Override
       public String getValue(VariableDto variable) {
         return getVariableLabels(variable);
       }
 
       private String getVariableLabels(VariableDto variable) {
-        JsArray<AttributeDto> attributes = (JsArray<AttributeDto>) (variable.getAttributesArray() != null ? variable.getAttributesArray() : JsArray.createArray());
+        JsArray<AttributeDto> attributes = getNullAsEmptyArray(variable.getAttributesArray());
         AttributeDto attribute = null;
         StringBuilder labels = new StringBuilder();
         for(int i = 0; i < attributes.length(); i++) {
