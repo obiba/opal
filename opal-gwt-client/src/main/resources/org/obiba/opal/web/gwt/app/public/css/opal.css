@@ -565,3 +565,9 @@ div.variableChanges {
 div.gwt-TabLayoutPanel.tableChangesPanel div.gwt-TabLayoutPanelTabs {
   width:100% !important;
 }
+
+div.variableChangesSummaryPanel > div > em {
+  font-style:normal; 
+  margin:5px;
+  color:red;
+}

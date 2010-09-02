@@ -106,6 +106,7 @@ message VariableDto {
   repeated CategoryDto categories = 9;
   optional string unit = 10;
   optional LinkDto parentLink = 11;
+  optional bool isNewVariable = 12;
 }
 
 message CategoryDto {

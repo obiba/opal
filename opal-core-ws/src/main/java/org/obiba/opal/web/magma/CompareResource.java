@@ -32,7 +32,6 @@ import org.obiba.opal.web.model.Magma.VariableDto;
 import org.springframework.stereotype.Component;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Sets;
 
 @Component
 public class CompareResource {
@@ -151,11 +150,8 @@ public class CompareResource {
     Set<ConflictDto> conflicts = Collections.emptySet();
     if(with != null) {
       dtoBuilder.setWithTable(Dtos.asDto(with, null));
-
-      Set<Variable> modifiedVariables = Sets.newHashSet(existingVariables);
-      modifiedVariables.addAll(newVariables);
-
-      conflicts = getConflicts(compared, with, modifiedVariables);
+      conflicts = getConflicts(compared, with, existingVariables, false);
+      conflicts.addAll(getConflicts(compared, with, newVariables, true));
       dtoBuilder.addAllConflicts(conflicts);
     }
 
@@ -172,7 +168,7 @@ public class CompareResource {
     return dtoBuilder.build();
   }
 
-  private Set<ConflictDto> getConflicts(ValueTable compared, ValueTable with, Set<Variable> variables) {
+  private Set<ConflictDto> getConflicts(ValueTable compared, ValueTable with, Set<Variable> variables, boolean newVariable) {
     Set<ConflictDto> conflicts = new HashSet<ConflictDto>();
 
     for(Variable v : variables) {
@@ -180,13 +176,13 @@ public class CompareResource {
 
       Variable variableInCompared = compared.getVariable(name);
       if(!variableInCompared.getEntityType().equals(with.getEntityType())) {
-        conflicts.add(createConflictDto(Dtos.asDto(v).build(), INCOMPATIBLE_ENTITY_TYPE, variableInCompared.getEntityType(), with.getEntityType()));
+        conflicts.add(createConflictDto(Dtos.asDto(v).setIsNewVariable(newVariable).build(), INCOMPATIBLE_ENTITY_TYPE, variableInCompared.getEntityType(), with.getEntityType()));
       }
 
       try {
         Variable variableInWith = with.getVariable(name);
         if(!variableInCompared.getValueType().equals(variableInWith.getValueType())) {
-          conflicts.add(createConflictDto(Dtos.asDto(v).build(), INCOMPATIBLE_VALUE_TYPE, variableInCompared.getValueType().getName(), variableInWith.getValueType().getName()));
+          conflicts.add(createConflictDto(Dtos.asDto(v).setIsNewVariable(newVariable).build(), INCOMPATIBLE_VALUE_TYPE, variableInCompared.getValueType().getName(), variableInWith.getValueType().getName()));
         }
       } catch(NoSuchVariableException variableDoesNotExist) {
         // Case where the variable does not exist in Opal but its destination table already exist.

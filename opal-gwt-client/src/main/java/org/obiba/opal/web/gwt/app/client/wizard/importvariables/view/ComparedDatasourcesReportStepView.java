@@ -35,7 +35,6 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -176,9 +175,32 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   private void addVariableChangesSummary(FlowPanel tableComparePanel, JsArray<VariableDto> newVariables, JsArray<VariableDto> modifiedVariables, JsArray<ConflictDto> conflicts) {
     FlowPanel variableChangesSummaryPanel = new FlowPanel();
     variableChangesSummaryPanel.setStyleName("variableChangesSummaryPanel");
-    variableChangesSummaryPanel.add(new Label(translations.newVariablesLabel() + ": " + String.valueOf(newVariables.length())));
-    variableChangesSummaryPanel.add(new Label(translations.modifiedVariablesLabel() + ": " + String.valueOf(modifiedVariables.length())));
+    int conflictsCount[] = getConflictsCounts(conflicts);
+    variableChangesSummaryPanel.add(new HTML(getNewVariablesCountLabel(newVariables, conflictsCount)));
+    variableChangesSummaryPanel.add(new HTML(getModifiedVariablesCountLabel(modifiedVariables, conflictsCount)));
     tableComparePanel.add(variableChangesSummaryPanel);
+  }
+
+  private String getModifiedVariablesCountLabel(JsArray<VariableDto> modifiedVariables, int[] conflictsCount) {
+    return translations.modifiedVariablesLabel() + ": " + String.valueOf(modifiedVariables.length() + conflictsCount[1]) + (conflictsCount[1] > 0 ? " <em>(" + conflictsCount[1] + " " + translations.conflictedVariablesLabel() + ")</em>" : "");
+  }
+
+  private String getNewVariablesCountLabel(JsArray<VariableDto> newVariables, int[] conflictsCount) {
+    return translations.newVariablesLabel() + ": " + String.valueOf(newVariables.length() + conflictsCount[0]) + (conflictsCount[0] > 0 ? " <em>(" + conflictsCount[0] + " " + translations.conflictedVariablesLabel() + ")</em>" : "");
+  }
+
+  private int[] getConflictsCounts(JsArray<ConflictDto> conflicts) {
+    int conflictsCount[] = { 0, 0 };
+    for(int i = 0; i < conflicts.length(); i++) {
+
+      GWT.log("conflict " + conflicts.get(i).getVariable().getIsNewVariable());
+      if(conflicts.get(i).getVariable().getIsNewVariable()) {
+        conflictsCount[0]++;
+      } else {
+        conflictsCount[1]++;
+      }
+    }
+    return conflictsCount;
   }
 
   private void addConflictsTab(JsArray<ConflictDto> conflicts, TabLayoutPanel variableChangesPanel) {
@@ -209,7 +231,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   }
 
   FlowPanel initVariableChangesPager(CellTable<? extends JavaScriptObject> table, SimplePager<? extends JavaScriptObject> pager) {
-    table.setPageSize(20);
+    table.setPageSize(18);
     FlowPanel pagerPanel = new FlowPanel();
     pagerPanel.setStyleName("variableChangesPager");
     pagerPanel.add(pager);
