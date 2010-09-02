@@ -23,24 +23,24 @@ import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.ValueTableWriter.ValueSetWriter;
-import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
+import org.obiba.magma.ValueTableWriter.ValueSetWriter;
+import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
+import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListener;
 import org.obiba.magma.support.DatasourceCopier.MultiplexingStrategy;
 import org.obiba.magma.support.DatasourceCopier.VariableTransformer;
-import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.type.BooleanType;
 import org.obiba.magma.type.TextType;
 import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.magma.FunctionalUnitView;
-import org.obiba.opal.core.magma.FunctionalUnitView.Policy;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
+import org.obiba.opal.core.magma.FunctionalUnitView.Policy;
 import org.obiba.opal.core.magma.concurrent.LockingActionTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ImportService;
@@ -225,32 +225,13 @@ public class DefaultImportService implements ImportService {
   }
 
   private boolean verifyAllEntitysExistInKeysDb(ValueTable valueTable) {
-    Set<VariableEntity> nonExistentVariableEntities = Sets.newHashSet();
+    Set<VariableEntity> nonExistentVariableEntities = Sets.newHashSet(valueTable.getVariableEntities());
+    Set<VariableEntity> entitiesInKeysTable = lookupKeysTable().getVariableEntities();
 
-    Set<VariableEntity> variableEntities = valueTable.getVariableEntities();
-    for(VariableEntity variableEntity : variableEntities) {
-      if(!entryExistsInKeysDb(variableEntity)) nonExistentVariableEntities.add(variableEntity);
-    }
+    // Remove all entities that exist in the keys table. Whatever is left are the ones that don't exist...
+    nonExistentVariableEntities.removeAll(entitiesInKeysTable);
     if(nonExistentVariableEntities.size() > 0) throw new NonExistentVariableEntitiesException(nonExistentVariableEntities);
     return true;
-  }
-
-  /**
-   * Returns true if the provided variableEntity exists as a public key inside the keys database.
-   * @param variableEntity determine if this variableEntity exists in the keys database as a public key.
-   * @return true if the variableEntity is in the keys database.
-   */
-  private boolean entryExistsInKeysDb(VariableEntity variableEntity) {
-    IParticipantIdentifier nonGeneratingParticipantIdentifier = new IParticipantIdentifier() {
-      public String generateParticipantIdentifier() {
-        throw new UnsupportedOperationException("cannot generate identifier");
-      }
-    };
-    for(Variable unit : lookupKeysTable().getVariables()) {
-      PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(lookupKeysTable(), unit, nonGeneratingParticipantIdentifier);
-      if(entityMap.hasPublicEntity(variableEntity)) return true;
-    }
-    return false;
   }
 
   private Set<String> getTablesToLock(Datasource source) {
