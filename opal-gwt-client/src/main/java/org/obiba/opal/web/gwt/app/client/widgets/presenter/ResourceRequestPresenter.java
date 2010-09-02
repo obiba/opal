@@ -19,6 +19,8 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 
@@ -133,10 +135,17 @@ public class ResourceRequestPresenter<T extends JavaScriptObject> extends Widget
 
     void setResourceName(String resourceName);
 
+    HandlerRegistration setResourceClickHandler(ResourceClickHandler handler);
+
     void inProgress();
 
     void completed();
 
     void failed();
+  }
+
+  public interface ResourceClickHandler extends ClickHandler {
+
+    public String getResourceLink();
   }
 }

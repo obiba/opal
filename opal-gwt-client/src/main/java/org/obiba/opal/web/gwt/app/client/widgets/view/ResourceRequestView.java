@@ -10,8 +10,10 @@
 package org.obiba.opal.web.gwt.app.client.widgets.view;
 
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter.ResourceClickHandler;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -65,6 +67,10 @@ public class ResourceRequestView extends Composite implements ResourceRequestPre
 
   public void setResourceName(String resourceName) {
     this.resourceName.setText(resourceName);
+  }
+
+  public HandlerRegistration setResourceClickHandler(ResourceClickHandler handler) {
+    return resourceName.addClickHandler(handler);
   }
 
   public void inProgress() {

@@ -171,7 +171,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
       if(variablesToStringify.length() > 0) {
         ResourceRequestBuilder<? extends JavaScriptObject> resourceRequestBuilder = createResourceRequestBuilder(tableCompareDto.getCompared(), !tableCompareDto.hasWithTable(), variablesToStringify);
-        importVariablesStepPresenter.addResourceRequest(tableCompareDto.getCompared().getName(), createResourceRequestBuilder(tableCompareDto.getCompared(), !tableCompareDto.hasWithTable(), variablesToStringify));
+        importVariablesStepPresenter.addResourceRequest(tableCompareDto.getCompared().getName(), "/datasource/" + targetDatasourceName + "/table/" + tableCompareDto.getCompared().getName(), createResourceRequestBuilder(tableCompareDto.getCompared(), !tableCompareDto.hasWithTable(), variablesToStringify));
       }
     }
   }

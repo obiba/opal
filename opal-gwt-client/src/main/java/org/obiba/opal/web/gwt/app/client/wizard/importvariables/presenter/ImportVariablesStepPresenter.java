@@ -18,11 +18,16 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter.ResourceClickHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.view.ResourceRequestView;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -108,9 +113,10 @@ public class ImportVariablesStepPresenter extends WidgetPresenter<ImportVariable
     getDisplay().setReturnButtonEnabled(false);
   }
 
-  public <T extends JavaScriptObject> void addResourceRequest(String resourceName, ResourceRequestBuilder<T> requestBuilder) {
+  public <T extends JavaScriptObject> void addResourceRequest(String resourceName, String resourceLink, ResourceRequestBuilder<T> requestBuilder) {
     ResourceRequestPresenter<T> resourceRequestPresenter = new ResourceRequestPresenter<T>(new ResourceRequestView(), eventBus, requestBuilder, new ImportVariablesResponseCodeCallback());
     resourceRequestPresenter.getDisplay().setResourceName(resourceName);
+    resourceRequestPresenter.getDisplay().setResourceClickHandler(new TableResourceClickHandler(resourceLink));
     resourceRequestPresenter.setSuccessCodes(200, 201);
     resourceRequestPresenter.setErrorCodes(400, 404, 405, 500);
 
@@ -154,6 +160,33 @@ public class ImportVariablesStepPresenter extends WidgetPresenter<ImportVariable
       if(resourceRequestsCompleted == resourceRequests.size()) {
         getDisplay().setReturnButtonEnabled(true);
       }
+    }
+  }
+
+  class TableResourceClickHandler implements ResourceClickHandler {
+
+    private String resourceLink;
+
+    public TableResourceClickHandler(String resourceLink) {
+      this.resourceLink = resourceLink;
+    }
+
+    public String getResourceLink() {
+      return resourceLink;
+    }
+
+    public void onClick(ClickEvent event) {
+      fireTableSelectionChangeEvent(getResourceLink());
+    }
+
+    private void fireTableSelectionChangeEvent(final String tableName) {
+      ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource(getResourceLink()).get().withCallback(new ResourceCallback<TableDto>() {
+
+        @Override
+        public void onResource(Response response, TableDto resource) {
+          eventBus.fireEvent(new TableSelectionChangeEvent(ImportVariablesStepPresenter.this, resource, null, null));
+        }
+      }).send();
     }
   }
 }
