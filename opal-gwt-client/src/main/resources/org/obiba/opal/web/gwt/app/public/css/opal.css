@@ -1,4 +1,24 @@
+/* Corner radius */
+.ui-corner-tl { -moz-border-radius-topleft: 0.5em; -webkit-border-top-left-radius: 0.5em; }
+.ui-corner-tr { -moz-border-radius-topright: 0.5em; -webkit-border-top-right-radius: 0.5em; }
+.ui-corner-bl { -moz-border-radius-bottomleft: 0.5em; -webkit-border-bottom-left-radius: 0.5em; }
+.ui-corner-br { -moz-border-radius-bottomright: 0.5em; -webkit-border-bottom-right-radius: 0.5em; }
+.ui-corner-top { -moz-border-radius-topleft: 0.5em; -webkit-border-top-left-radius: 0.5em; -moz-border-radius-topright: 0.5em; -webkit-border-top-right-radius: 0.5em; }
+.ui-corner-bottom { -moz-border-radius-bottomleft: 0.5em; -webkit-border-bottom-left-radius: 0.5em; -moz-border-radius-bottomright: 0.5em; -webkit-border-bottom-right-radius: 0.5em; }
+.ui-corner-right {  -moz-border-radius-topright: 0.5em; -webkit-border-top-right-radius: 0.5em; -moz-border-radius-bottomright: 0.5em; -webkit-border-bottom-right-radius: 0.5em; }
+.ui-corner-left { -moz-border-radius-topleft: 0.5em; -webkit-border-top-left-radius: 0.5em; -moz-border-radius-bottomleft: 0.5em; -webkit-border-bottom-left-radius: 0.5em; }
+.ui-corner-all { -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; }
+
 /* General */
+
+body {
+  text-align: left;
+  background: url(image/background_tile.png) repeat;
+  font-family: arial, verdana, sans-serif;
+  font-size:12px;
+  overflow: hidden;
+  height: 100%;
+}
 
 a:hover {
 	cursor: pointer;
@@ -34,17 +54,167 @@ a:hover {
   font-size: 1.3em;
 }
 
+.gwt-MenuBar-horizontal .gwt-MenuItem {
+	padding-top:3px;
+	padding-bottom:5px;
+}
+
+.gwt-MenuBar-horizontal .gwt-MenuItemSeparator {
+	background-color: transparent;
+}
+
+.gwt-MenuBar-vertical .gwt-MenuItem.gwt-MenuItem-selected {
+	background-color: #feede0;
+}
+
+.gwt-TabLayoutPanel .gwt-TabLayoutPanelTab {
+	background:none repeat scroll 0 0 #888888;
+	color: #ffffff;
+	font-weight:normal;
+	-moz-border-radius-topleft: 0.5em; -webkit-border-top-left-radius: 0.5em; 
+	-moz-border-radius-topright: 0.5em; -webkit-border-top-right-radius: 0.5em;
+}
+
+.gwt-TabLayoutPanel .gwt-TabLayoutPanelTab.gwt-TabLayoutPanelTab-selected {
+	background:none repeat scroll 0 0 #C65F00;
+	font-weight:normal;
+}
+
+.gwt-TabLayoutPanel .gwt-TabLayoutPanelContent {
+	border-color:#BBBBBB;
+	border-width:1px 0 0 1px;
+}
+
+.gwt-SplitLayoutPanel-HDragger {
+	background-color: #B4A291;
+}
+
+.gwt-PopupPanel {
+	border:5px solid #DDDDDD;
+	-moz-border-radius: 0.5em; -webkit-border-radius: 0.5em;
+}
+
+.gwt-DialogBox .Caption {
+	border-top:5px solid #DDDDDD;
+}
+
+/* CellTable 
+
+.GEO005SGB {
+	background-color:#DEBB9D;
+	color: #000000;
+}
+
+.GEO005SP {
+	border-bottom:1px solid #6F7277;
+	font-weight: normal;
+}*/
+
+/* Login */
+
+.login {
+	 position:absolute; 
+	 top:50%; 
+	 left:50%;	 
+}
+
+.login > table {
+	 border: 3px solid #c65f00;
+	 background-color: #ffffff;	 
+	 -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em;
+	 padding: 1em;
+	 position:absolute; 
+	 top:-6em; 
+	 left:-12.5em; 
+	 width:30em; 
+	 height:12em;
+}
+
+/* Notification */
+
+.notification .title {
+	font-weight: bold; 
+	font-size:1.2em;
+}
+
+.notification .message {
+	color: black; 
+	font-style:italic;
+}
+
+/* Top */
+
+.topbar {
+	background-color: #c65f00;
+}
+
+.topbar a:hover {
+	cursor: pointer;
+}
+    
+.topbar a {
+    margin-right: 10px;
+    float: right;
+    padding-top: 0.3em;
+}
+
+.topbar a, a:visited, a:hover {
+	color:#ffffff;
+}
+
+.top .gwt-MenuBar table {
+	border-spacing:10px 0;
+}
+
+.top .gwt-MenuBar-horizontal {
+	background: transparent;
+	border: 0px;
+	margin-left:40px;
+}
+
+.top .gwt-MenuBar-horizontal .gwt-MenuItem {
+	background-color: #888888;
+	color: #cccccc;
+	-moz-border-radius-bottomleft: 0.5em; -webkit-border-bottom-left-radius: 0.5em; 
+	-moz-border-radius-bottomright: 0.5em; -webkit-border-bottom-right-radius: 0.5em;
+}
+
+.top .gwt-MenuBar-horizontal .gwt-MenuItem.selected {
+	background-color: #c65f00;
+	color: #ffffff;
+}
+
+.top .gwt-MenuBar-horizontal .gwt-MenuItem.gwt-MenuItem-selected {
+	background-color: #d78f4e;
+	color: #ffffff;
+}
+
+/* Content */
+
+.main-content {
+	background-color: #ffffff;
+	margin:10px 50px;
+	border:3px solid #C65F00;
+}
+
 /* Workbench */
 
 .workbench .top {
-	border-bottom:1px solid #BBBBBB;
     padding: 0.5em 0 0 1em;
     float: left;
+    background:#D78F4E;
+    border-bottom:1px solid #B4A291;
+    color:#ffffff;
 }
 
 .workbench .top .header {
     float: left;
     margin-right:20px;
+}
+
+.workbench .top .header .title {
+	font-size:1.2em;
+	font-weight:bold;
 }
   
 .workbench .top .summary { 
@@ -73,9 +243,18 @@ a:hover {
 }
 
 .workbench .information .header {
+	color:#444444;
+	font-weight:bold;
 	height: 2em;
+	background:url("gwt/standard/images/hborder.png") repeat-x scroll 0 -2003px #E3E8F3;
+	border-bottom:1px solid #B4A291;
 }
-	
+
+.workbench .information .header .gwt-Label {
+	padding-left:5px;
+	padding-top:5px;
+}
+
 .workbench .information .header img {
   cursor:pointer;
   padding-top: 5px;
@@ -107,7 +286,7 @@ a:hover {
 }
 
 .dashboard div {
-  margin-top:20px;
+  margin-top:10px;
 }
 
 .dashboard .gwt-Label {
@@ -166,8 +345,51 @@ a:hover {
 	/*color: #ffffff;*/
 }
 
+.navigator .titlebar {
+	background-color:#ECE5DE;
+	color:#444444;
+    padding-bottom:3px;
+    padding-left:10px;
+    padding-top:3px;
+}
+
+.navigator .titlebar div {
+	display:inline;
+}
+
+.navigator .titlebar .title {
+	font-weight:bold;
+	font-size:1.2em;
+}
+
+.navigator  .toolbar {
+  	background-color:#ECE5DE;
+  	border-bottom:1px solid #B4A291;
+  	padding-bottom:5px;
+  	padding-left:10px;
+  	margin-bottom:5px;
+}
+
+.navigator .toolbar-right img {
+	margin-left: 5px;
+    float: right;
+}
+
+.navigator  .toolbar-left img {
+    margin-right: 5px;
+    float: left;
+}
+
+.navigator  .toolbar img:hover {
+    cursor: pointer;
+}
+
+.navigator .toolbar a:hover {
+    cursor: pointer;
+}
+
 .navigator .gwt-MenuBar {
-	background:none repeat scroll 0 0 #FFFFFF;
+	background:transparent;
 	border:0 none;
 }
 
@@ -180,6 +402,10 @@ a:hover {
 
 .navigator .gwt-MenuBar-horizontal .gwt-MenuItemSeparator {
 	padding-right:5px;
+}
+
+.navigator .gwt-MenuBar-horizontal .gwt-MenuItem-selected {
+		
 }
 
 .navigator .gwt-MenuItem.tools {
@@ -233,6 +459,17 @@ a:hover {
 .gwt-MenuBar-vertical .gwt-MenuItem {
 	color:#535353;
 }
+
+.navigator .tableList td:first-child  {
+      text-decoration: underline;
+    }
+    .navigator .tableList td:first-child:hover {
+      cursor: pointer;
+    }
+    .navigator .tableList .title-bold {
+    	margin-top: 10px;
+    	font-weight: bold;
+    }
 
 /* File Explorer Styles */ 
  

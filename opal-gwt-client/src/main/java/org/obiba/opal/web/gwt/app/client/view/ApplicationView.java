@@ -58,10 +58,16 @@ public class ApplicationView implements ApplicationPresenter.Display {
   MenuItem dashboardItem;
 
   @UiField
+  MenuItem variablesItem;
+
+  @UiField
   MenuItem exploreVariablesItem;
 
   @UiField
   MenuItem importVariablesItem;
+
+  @UiField
+  MenuItem dataItem;
 
   @UiField
   MenuItem dataImportItem;
@@ -77,6 +83,8 @@ public class ApplicationView implements ApplicationPresenter.Display {
 
   @UiField
   Panel workbench;
+
+  MenuItem currentSelection;
 
   public ApplicationView() {
     dock = uiBinder.createAndBindUi(this);
@@ -154,6 +162,25 @@ public class ApplicationView implements ApplicationPresenter.Display {
   @Override
   public HasClickHandlers getStudies() {
     return studies;
+  }
+
+  @Override
+  public void setCurrentSelection(MenuItem selection) {
+    if(currentSelection != null) {
+      currentSelection.removeStyleName("selected");
+    }
+    selection.addStyleName("selected");
+    currentSelection = selection;
+  }
+
+  @Override
+  public MenuItem getDataItem() {
+    return dataItem;
+  }
+
+  @Override
+  public MenuItem getVariablesItem() {
+    return variablesItem;
   }
 
 }

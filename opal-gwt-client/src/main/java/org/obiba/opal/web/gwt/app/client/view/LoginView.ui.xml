@@ -6,8 +6,8 @@
   </ui:style>
 
   <g:HTMLPanel>
-    <div style="position:absolute; top:50%; left:50%;">
-      <table style="position:absolute; top:-6em; left:-12.5em; width:25em; height:12em; border: 3px solid #92C1F0;">
+    <div class="login ui-corner-all">
+      <table>
       	<tr>
       	  <td/>
       	  <td>

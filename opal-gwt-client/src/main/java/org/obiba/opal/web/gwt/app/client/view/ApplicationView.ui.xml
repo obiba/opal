@@ -1,22 +1,11 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <ui:style>
-    .topbar a:hover {
-      cursor: pointer;
-    }
-    .topbar a {
-    	margin-right: 10px;
-    	float: right;
-    	padding-top: 0.3em;
-    }
-  </ui:style>
-
   <g:DockLayoutPanel unit="EM">
     <g:north size="4">
-      <g:LayoutPanel>
+      <g:LayoutPanel addStyleNames="top">
         <g:layer top="0" height="2em">
-          <g:FlowPanel  ui:field="topBar" addStyleNames="{style.topbar}">
+          <g:FlowPanel  ui:field="topBar" addStyleNames="topbar">
                 <g:Anchor ui:field="quit"><ui:msg description="Quit link text">Quit</ui:msg></g:Anchor>
                 <g:Anchor ui:field="help"><ui:msg description="Help link text">Help</ui:msg></g:Anchor>
                 <g:Anchor ui:field="profile"><ui:msg description="Profile link text">Profile</ui:msg></g:Anchor>
@@ -29,14 +18,14 @@
             <g:MenuItem  ui:field="dashboardItem">
               <ui:msg description="Dashboard menu item">Dashboard</ui:msg>              
             </g:MenuItem>
-            <g:MenuItem>
+            <g:MenuItem ui:field="variablesItem">
               <ui:msg description="Variables label">Variables</ui:msg>
               <g:MenuBar vertical="true">
                 <g:MenuItem ui:field="exploreVariablesItem"><ui:msg description="Explore variables menu item">Explore variables...</ui:msg></g:MenuItem>
                 <g:MenuItem ui:field="importVariablesItem"><ui:msg description="Import variables menu item">Import variables...</ui:msg></g:MenuItem>
               </g:MenuBar>
             </g:MenuItem>
-            <g:MenuItem>
+            <g:MenuItem ui:field="dataItem">
               <ui:msg description="Data menu item">Data</ui:msg>              
               <g:MenuBar vertical="true">
                 <g:MenuItem ui:field="dataImportItem"><ui:msg description="Import menu item">Import...</ui:msg></g:MenuItem>
@@ -58,7 +47,7 @@
       </g:LayoutPanel>
     </g:north>
     <g:center>
-      <g:LayoutPanel ui:field="workbench">
+      <g:LayoutPanel ui:field="workbench" addStyleNames="main-content ui-corner-all">
         <g:layer>
           <g:Label><ui:msg description="Workbench label">The Workbench</ui:msg></g:Label>
         </g:layer>

@@ -1,57 +1,16 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <ui:style>
-    .titlebar { margin-top: 10px; }
-    .title-bold { font-weight: bold; font-size: medium; }
-    .title { font-size: small; }
-    .title-light { color: gray; font-size: small; }
-    .tableList td:first-child  {
-      color: blue;
-      text-decoration: underline;
-    }
-    .tableList td:first-child:hover {
-      cursor: pointer;
-    }
-    .tableList .title-bold {
-    	margin-top: 10px;
-    }
-    .toolbar-right img {
-      margin-left: 5px;
-      float: right;
-    }
-    .toolbar-left img {
-      margin-right: 5px;
-      float: left;
-    }
-    .toolbar {
-    	margin: 10px;
-    }
-    .toolbar img:hover {
-      cursor: pointer;
-    }
-    .toolbar a:hover {
-      cursor: pointer;
-    }
-    .separator {
-    	border-bottom:2px solid #BBBBBB;
-    	margin-top:5px;
-    	margin-bottom:5px;
-    }
-    </ui:style>
- 
  <g:VerticalPanel width="100%" addStyleNames="navigator">
-     <g:FlowPanel addStyleNames="small-indent {style.titlebar}">
-       <g:Label addStyleNames="left-aligned {style.title-bold}" ui:field="datasourceName">opal-data</g:Label>
-       <g:Label addStyleNames="small-indent left-aligned {style.title}"><ui:msg description="Datasource title in parentheses">(Datasource)</ui:msg></g:Label>
+     <g:FlowPanel addStyleNames="titlebar">
+       <g:Label addStyleNames="title" ui:field="datasourceName">opal-data</g:Label>
+       <g:Label addStyleNames="small-indent"><ui:msg description="Datasource title in parentheses">(Datasource)</ui:msg></g:Label>
      </g:FlowPanel>
       
-     <g:FlowPanel ui:field="toolbarPanel" addStyleNames="small-indent {style.toolbar} {style.toolbar-left}"/>
-     
-     <g:FlowPanel addStyleNames="{style.separator}"></g:FlowPanel>
+     <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
            
-     <g:FlowPanel addStyleNames="small-indent {style.tableList}">
-       <g:Label ui:field="tablesTableTitle" addStyleNames="left-aligned {style.title-bold}"><ui:msg description="Tables label">Tables</ui:msg></g:Label>
+     <g:FlowPanel addStyleNames="tableList">
+       <g:Label ui:field="tablesTableTitle" addStyleNames="small-indent left-aligned title-bold"><ui:msg description="Tables label">Tables</ui:msg></g:Label>
        <g2:CellTable width="100%" ui:field="table" addStyleNames="left-aligned" />
      </g:FlowPanel>
      

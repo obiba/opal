@@ -16,8 +16,8 @@
         <g:east size="400">
           <g:DockLayoutPanel addStyleNames="information" unit="EM">
             <g:north size="2.3">
-              <g:FlowPanel addStyleNames="header gwt-MenuBar-horizontal">
-                <g:Label addStyleNames="left-aligned gwt-MenuItem"><ui:msg description="Information label">Information</ui:msg></g:Label>
+              <g:FlowPanel addStyleNames="header">
+                <g:Label addStyleNames="left-aligned"><ui:msg description="Information label">Information</ui:msg></g:Label>
                 <g:Image ui:field="closeInfo" url="image/close.png" addStyleNames="right-aligned"></g:Image>
               </g:FlowPanel>
             </g:north>

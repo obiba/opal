@@ -3,55 +3,19 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <ui:style>
-    .titlebar { margin-top: 10px; }
-    .title-bold { font-weight: bold; font-size: medium; }
     .title { font-size: small; }
     .title-light { color: gray; font-size: small; }
-    .tableList td:first-child  {
-      color: blue;
-      text-decoration: underline;
-    }
-    .tableList td:first-child:hover {
-      cursor: pointer;
-    }
-    .tableList .title-bold {
-    	margin-top: 10px;
-    }
-    .toolbar-right img {
-      margin-left: 5px;
-      float: right;
-    }
-    .toolbar-left img {
-      margin-right: 5px;
-      float: left;
-    }
-    .toolbar {
-    	margin: 10px;
-    }
-    .toolbar img:hover {
-      cursor: pointer;
-    }
-    .toolbar a:hover {
-      cursor: pointer;
-    }
-    .separator {
-    	border-bottom:2px solid #BBBBBB;
-    	margin-top:5px;
-    	margin-bottom:5px;
-    }
     .left-aligned { float : left; margin-right : 0.5em }
   </ui:style>
 
   <g:VerticalPanel width="100%" addStyleNames="navigator">
-     <g:FlowPanel addStyleNames="small-indent {style.titlebar}">
-       <g:Label addStyleNames="left-aligned {style.title-bold}" ui:field="variableName">Variable Name</g:Label>
-       <g:Label addStyleNames="small-indent left-aligned {style.title}">(Variable)</g:Label>
+     <g:FlowPanel addStyleNames="titlebar">
+       <g:Label addStyleNames="title" ui:field="variableName">Variable Name</g:Label>
+       <g:Label addStyleNames="small-indent">(Variable)</g:Label>
      </g:FlowPanel>
       
-     <g:FlowPanel ui:field="toolbarPanel"  addStyleNames="small-indent {style.toolbar} {style.toolbar-right}"/>
-     
-     <g:FlowPanel addStyleNames="{style.separator}"></g:FlowPanel>
-     
+     <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
+           
      <g:HorizontalPanel width="97%" addStyleNames="small-indent">
 	     <g:VerticalPanel>
 	        <g:HorizontalPanel>
@@ -83,9 +47,9 @@
 	     </g:VerticalPanel>  
      </g:HorizontalPanel>
      
-     <g:HorizontalPanel spacing="10">
+     <g:HorizontalPanel addStyleNames="small-indent">
        <g:Label addStyleNames="{style.title-light}"><ui:msg description="Label label">Label</ui:msg>:</g:Label>
-       <g:Label addStyleNames="{style.title}" ui:field="label" />
+       <g:Label addStyleNames="small-indent {style.title}" ui:field="label" />
      </g:HorizontalPanel>
      
      <g:TabLayoutPanel barHeight="2" barUnit="EM" width="97%" height="30em" addStyleNames="small-indent">

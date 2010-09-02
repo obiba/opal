@@ -52,11 +52,15 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
     HasClickHandlers getStudies();
 
+    MenuItem getVariablesItem();
+
     MenuItem getExploreVariables();
 
     MenuItem getImportVariables();
 
     void updateWorkbench(Widget workbench);
+
+    MenuItem getDataItem();
 
     MenuItem getDataImportItem();
 
@@ -67,6 +71,8 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
     MenuItem getFileExplorer();
 
     MenuItem getDashboardItem();
+
+    void setCurrentSelection(MenuItem selection);
   }
 
   @Inject
@@ -120,6 +126,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       @Override
       public void execute() {
         eventBus.fireEvent(new WorkbenchChangeEvent(dashboardPresenter.get()));
+        getDisplay().setCurrentSelection(getDisplay().getDashboardItem());
       }
     });
 
@@ -128,6 +135,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       @Override
       public void execute() {
         eventBus.fireEvent(new WorkbenchChangeEvent(navigationPresenter.get()));
+        getDisplay().setCurrentSelection(getDisplay().getVariablesItem());
       }
     });
 
@@ -136,6 +144,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       @Override
       public void execute() {
         eventBus.fireEvent(new WorkbenchChangeEvent(uploadVariablesStepPresenter.get()));
+        getDisplay().setCurrentSelection(getDisplay().getVariablesItem());
       }
     });
 
@@ -144,6 +153,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       @Override
       public void execute() {
         eventBus.fireEvent(new WorkbenchChangeEvent(formatSelectionStepPresenter.get()));
+        getDisplay().setCurrentSelection(getDisplay().getDataItem());
       }
     });
 
@@ -152,6 +162,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       @Override
       public void execute() {
         eventBus.fireEvent(new WorkbenchChangeEvent(dataExportPresenter.get()));
+        getDisplay().setCurrentSelection(getDisplay().getDataItem());
       }
     });
 
@@ -160,6 +171,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       @Override
       public void execute() {
         eventBus.fireEvent(new WorkbenchChangeEvent(jobListPresenter.get()));
+        getDisplay().setCurrentSelection(getDisplay().getListJobsItem());
       }
     });
 
@@ -168,6 +180,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       @Override
       public void execute() {
         eventBus.fireEvent(new WorkbenchChangeEvent(fileExplorerPresenter.get()));
+        getDisplay().setCurrentSelection(getDisplay().getFileExplorer());
       }
     });
 
@@ -219,6 +232,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
   @Override
   public void revealDisplay() {
     updateWorkbench(dashboardPresenter.get());
+    getDisplay().setCurrentSelection(getDisplay().getDashboardItem());
   }
 
   private void registerWorkbenchChangeEventHandler() {

@@ -1,11 +1,15 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
 
+  <o:WorkbenchLayout withInfo="false">
+    <g:Label><ui:msg description="Dashboard title" >Study Dashboard</ui:msg></g:Label>
+    <g:Label></g:Label>
+    <g:FlowPanel></g:FlowPanel>
   <g:HTMLPanel addStyleNames="dashboard">
-    <g:Label addStyleNames="title">
-      <ui:msg description="Dashboard title" >Study Dashboard</ui:msg>
-    </g:Label>
     <div>
       <g:Label>
         <ui:msg description="Participant count label">Number of Participants:</ui:msg>
@@ -37,5 +41,6 @@
 	      <ui:msg description="Manage Jobs link description">list and manage jobs that were launched on the server.</ui:msg>
 	    </div>
     </div>
-  </g:HTMLPanel>
+  </g:HTMLPanel> 
+  </o:WorkbenchLayout>
 </ui:UiBinder>

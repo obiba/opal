@@ -3,61 +3,25 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <ui:style>
-    .titlebar { margin-top: 10px; }
-    .title-bold { font-weight: bold; font-size: medium; }
     .title { font-size: small; }
     .title-light { color: gray; font-size: small; }
-    .tableList td:first-child  {
-      color: blue;
-      text-decoration: underline;
-    }
-    .tableList td:first-child:hover {
-      cursor: pointer;
-    }
-    .tableList .title-bold {
-    	margin-top: 10px;
-    }
-    .toolbar-right img {
-      margin-left: 5px;
-      float: right;
-    }
-    .toolbar-left img {
-      margin-right: 5px;
-      float: left;
-    }
-    .toolbar {
-    	margin: 10px;
-    }
-    .toolbar img:hover {
-      cursor: pointer;
-    }
-    .toolbar a:hover {
-      cursor: pointer;
-    }
-    .separator {
-    	border-bottom:2px solid #BBBBBB;
-    	margin-top:5px;
-    	margin-bottom:5px;
-    }
   </ui:style>
 
   <g:VerticalPanel width="100%" addStyleNames="navigator">
-     <g:FlowPanel addStyleNames="small-indent {style.titlebar}">
-       <g:Label addStyleNames="left-aligned {style.title-bold}" ui:field="tableName">Table Name</g:Label>
-       <g:Label addStyleNames="small-indent left-aligned {style.title}">(Table)</g:Label>
+     <g:FlowPanel addStyleNames="titlebar">
+       <g:Label addStyleNames="title" ui:field="tableName">Table Name</g:Label>
+       <g:Label addStyleNames="small-indent">(Table)</g:Label>
      </g:FlowPanel>
       
-     <g:FlowPanel ui:field="toolbarPanel" addStyleNames="small-indent {style.toolbar} {style.toolbar-left}"/>
-     
-     <g:FlowPanel addStyleNames="{style.separator}"></g:FlowPanel>
+     <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
      
      <g:HorizontalPanel addStyleNames="small-indent">
        <g:Label addStyleNames="{style.title-light}"><ui:msg description="Entity type label">Entity Type</ui:msg>:</g:Label>
        <g:Label addStyleNames="small-indent {style.title}" ui:field="entityType">Entity Name</g:Label>
      </g:HorizontalPanel>
      
-     <g:FlowPanel addStyleNames="small-indent {style.tableList}">
-       <g:Label ui:field="variablesTableTitle" addStyleNames="left-aligned {style.title-bold}"><ui:msg description="Variables label">Variables</ui:msg></g:Label>
+     <g:FlowPanel addStyleNames="tableList">
+       <g:Label ui:field="variablesTableTitle" addStyleNames="small-indent left-aligned title-bold"><ui:msg description="Variables label">Variables</ui:msg></g:Label>
        <g2:CellTable width="100%" ui:field="table" addStyleNames="left-aligned" />
      </g:FlowPanel>
      

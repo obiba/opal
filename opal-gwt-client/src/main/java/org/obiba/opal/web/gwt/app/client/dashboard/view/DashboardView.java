@@ -18,7 +18,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -28,7 +27,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class DashboardView extends Composite implements DashboardPresenter.Display {
 
   @UiTemplate("DashboardView.ui.xml")
-  interface ViewUiBinder extends UiBinder<HTMLPanel, DashboardView> {
+  interface ViewUiBinder extends UiBinder<Widget, DashboardView> {
   }
 
   //
