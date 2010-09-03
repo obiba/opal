@@ -75,4 +75,9 @@ public class XmlFormatStepView extends Composite implements XmlFormatStepPresent
     return nextButton.addClickHandler(handler);
   }
 
+  @Override
+  public void setNextEnabled(boolean enabled) {
+    nextButton.setEnabled(enabled);
+  }
+
 }

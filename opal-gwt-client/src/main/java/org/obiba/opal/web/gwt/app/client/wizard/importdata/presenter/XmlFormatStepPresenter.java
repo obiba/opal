@@ -16,6 +16,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
@@ -34,6 +35,8 @@ public class XmlFormatStepPresenter extends WidgetPresenter<XmlFormatStepPresent
     void setXmlFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
 
     String getSelectedFile();
+
+    void setNextEnabled(boolean enabled);
 
   }
 
@@ -63,10 +66,12 @@ public class XmlFormatStepPresenter extends WidgetPresenter<XmlFormatStepPresent
     xmlFileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE_OR_FOLDER);
     xmlFileSelectionPresenter.bind();
     getDisplay().setXmlFileSelectorWidgetDisplay(xmlFileSelectionPresenter.getDisplay());
+    getDisplay().setNextEnabled(false);
   }
 
   protected void addEventHandlers() {
     super.registerHandler(getDisplay().addNextClickHandler(new NextClickHandler()));
+    super.registerHandler(eventBus.addHandler(FileSelectionUpdateEvent.getType(), new FileSelectionUpdateHandler()));
   }
 
   @Override
@@ -91,6 +96,17 @@ public class XmlFormatStepPresenter extends WidgetPresenter<XmlFormatStepPresent
     public void onClick(ClickEvent event) {
       importData.setXmlFile(getDisplay().getSelectedFile());
       eventBus.fireEvent(new WorkbenchChangeEvent(destinationSelectionStepPresenter));
+    }
+  }
+
+  private void enableImport() {
+    getDisplay().setNextEnabled(xmlFileSelectionPresenter.getSelectedFile().length() > 0);
+  }
+
+  class FileSelectionUpdateHandler implements FileSelectionUpdateEvent.Handler {
+    @Override
+    public void onFileSelectionUpdate(FileSelectionUpdateEvent event) {
+      enableImport();
     }
   }
 
