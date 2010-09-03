@@ -10,7 +10,7 @@
 package org.obiba.opal.web.magma;
 
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.ws.rs.GET;
@@ -122,13 +122,13 @@ public class CompareResource {
     Set<Variable> variablesInCompared = asSet(compared.getVariables());
     Set<Variable> variablesInWith = asSet(with.getVariables());
 
-    Set<Variable> newVariables = new HashSet<Variable>(variablesInCompared);
+    Set<Variable> newVariables = new LinkedHashSet<Variable>(variablesInCompared);
     newVariables.removeAll(variablesInWith);
 
-    Set<Variable> missingVariables = new HashSet<Variable>(variablesInWith);
+    Set<Variable> missingVariables = new LinkedHashSet<Variable>(variablesInWith);
     missingVariables.removeAll(variablesInCompared);
 
-    Set<Variable> existingVariables = new HashSet<Variable>(variablesInCompared);
+    Set<Variable> existingVariables = new LinkedHashSet<Variable>(variablesInCompared);
     existingVariables.retainAll(variablesInWith);
 
     return createTableCompareDto(compared, with, newVariables, missingVariables, existingVariables);
@@ -136,9 +136,9 @@ public class CompareResource {
 
   private TableCompareDto createTableCompareDtoWhereSecondTableDoesNotExist(ValueTable compared) {
     Set<Variable> variablesInCompared = asSet(compared.getVariables());
-    Set<Variable> newVariables = new HashSet<Variable>(variablesInCompared);
-    Set<Variable> missingVariables = new HashSet<Variable>();
-    Set<Variable> existingVariables = new HashSet<Variable>();
+    Set<Variable> newVariables = new LinkedHashSet<Variable>(variablesInCompared);
+    Set<Variable> missingVariables = new LinkedHashSet<Variable>();
+    Set<Variable> existingVariables = new LinkedHashSet<Variable>();
 
     return createTableCompareDto(compared, null, newVariables, missingVariables, existingVariables);
   }
@@ -169,7 +169,7 @@ public class CompareResource {
   }
 
   private Set<ConflictDto> getConflicts(ValueTable compared, ValueTable with, Set<Variable> variables, boolean newVariable) {
-    Set<ConflictDto> conflicts = new HashSet<ConflictDto>();
+    Set<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>();
 
     for(Variable v : variables) {
       String name = v.getName();
@@ -193,9 +193,9 @@ public class CompareResource {
   }
 
   private Set<Variable> getUnconflicting(Set<Variable> variables, Set<ConflictDto> conflicts) {
-    Set<Variable> unconflicting = new HashSet<Variable>();
+    Set<Variable> unconflicting = new LinkedHashSet<Variable>();
 
-    Set<String> conflicting = new HashSet<String>();
+    Set<String> conflicting = new LinkedHashSet<String>();
     for(ConflictDto dto : conflicts) {
       conflicting.add(dto.getVariable().getName());
     }
@@ -223,7 +223,7 @@ public class CompareResource {
   }
 
   private <T> Set<T> asSet(Iterable<T> iterable) {
-    Set<T> set = new HashSet<T>();
+    Set<T> set = new LinkedHashSet<T>();
 
     for(T elem : iterable) {
       set.add(elem);
