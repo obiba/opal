@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ThreadFactory;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileType;
@@ -28,8 +29,10 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.fs.FsDatasource;
+import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.obiba.magma.support.MultithreadedDatasourceCopier;
 import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListener;
 import org.obiba.magma.support.DatasourceCopier.MultiplexingStrategy;
 import org.obiba.magma.support.DatasourceCopier.VariableTransformer;
@@ -45,12 +48,13 @@ import org.obiba.opal.core.magma.concurrent.LockingActionTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
-import org.obiba.opal.core.service.NonExistentVariableEntitiesException;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
@@ -201,9 +205,13 @@ public class DefaultImportService implements ImportService {
                   if(unit != null) {
                     copyParticipants(valueTable, source, destination, unit, dispatchAttribute);
                   } else {
-                    if(verifyAllEntitysExistInKeysDb(valueTable)) {
-                      DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(valueTable, destination);
-                    }
+                    addMissingEntitiesToKeysTable(valueTable);
+                    MultithreadedDatasourceCopier.Builder.newCopier().withThreads(new ThreadFactory() {
+                      @Override
+                      public Thread newThread(Runnable r) {
+                        return new TransactionalThread(r);
+                      }
+                    }).withCopier(newCopierForParticipants(dispatchAttribute, valueTable)).from(valueTable).to(destination).build().copy();
                   }
                 } else {
                   DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(valueTable, destination);
@@ -224,14 +232,25 @@ public class DefaultImportService implements ImportService {
     }
   }
 
-  private boolean verifyAllEntitysExistInKeysDb(ValueTable valueTable) {
+  private Set<VariableEntity> addMissingEntitiesToKeysTable(ValueTable valueTable) {
     Set<VariableEntity> nonExistentVariableEntities = Sets.newHashSet(valueTable.getVariableEntities());
     Set<VariableEntity> entitiesInKeysTable = lookupKeysTable().getVariableEntities();
 
     // Remove all entities that exist in the keys table. Whatever is left are the ones that don't exist...
     nonExistentVariableEntities.removeAll(entitiesInKeysTable);
-    if(nonExistentVariableEntities.size() > 0) throw new NonExistentVariableEntitiesException(nonExistentVariableEntities);
-    return true;
+    if(nonExistentVariableEntities.size() > 0) {
+      ValueTableWriter keysTableWriter = writeToKeysTable();
+      try {
+        for(VariableEntity ve : nonExistentVariableEntities) {
+          keysTableWriter.writeValueSet(ve).close();
+        }
+      } catch(IOException e) {
+        throw new RuntimeException(e);
+      } finally {
+        Closeables.closeQuietly(keysTableWriter);
+      }
+    }
+    return nonExistentVariableEntities;
   }
 
   private Set<String> getTablesToLock(Datasource source) {
@@ -290,18 +309,21 @@ public class DefaultImportService implements ImportService {
     return createKeysListener;
   }
 
-  private void copyPublicViewToDestinationDatasource(Datasource destination, final String dispatchAttribute, FunctionalUnitView publicView, DatasourceCopyValueSetEventListener createKeysListener) throws IOException {
-    DatasourceCopier.Builder builder = DatasourceCopier.Builder.newCopier() //
+  private DatasourceCopier.Builder newCopierForParticipants(final String dispatchAttribute, final ValueTable sourceTable) {
+    return DatasourceCopier.Builder.newCopier() //
     .withLoggingListener().withThroughtputListener() //
-    .withListener(createKeysListener)//
-    .withMultiplexingStrategy(new VariableAttributeMutiplexingStrategy(dispatchAttribute, publicView.getName()))//
+    .withMultiplexingStrategy(new VariableAttributeMutiplexingStrategy(dispatchAttribute, sourceTable.getName()))//
     .withVariableTransformer(new VariableTransformer() {
       /** Remove the dispatch attribute from the variable name. This is onyx-specific. See OPAL-170 */
       public Variable transform(Variable variable) {
         return Variable.Builder.sameAs(variable).name(variable.hasAttribute(dispatchAttribute) ? variable.getName().replaceFirst("^.*\\.?" + variable.getAttributeStringValue(dispatchAttribute) + "\\.", "") : variable.getName()).build();
       }
     });
-    builder.build()
+  }
+
+  private void copyPublicViewToDestinationDatasource(Datasource destination, final String dispatchAttribute, FunctionalUnitView publicView, DatasourceCopyValueSetEventListener createKeysListener) throws IOException {
+    newCopierForParticipants(dispatchAttribute, publicView) //
+    .withListener(createKeysListener).build()
     // Copy participant's non-identifiable variables and data
     .copy(publicView, destination);
   }
@@ -431,6 +453,24 @@ public class DefaultImportService implements ImportService {
 
     public String multiplexValueSet(VariableEntity entity, Variable variable) {
       return multiplexVariable(variable);
+    }
+  }
+
+  class TransactionalThread extends Thread {
+
+    private Runnable runnable;
+
+    public TransactionalThread(Runnable runnable) {
+      this.runnable = runnable;
+    }
+
+    public void run() {
+      txTemplate.execute(new TransactionCallbackWithoutResult() {
+        @Override
+        protected void doInTransactionWithoutResult(TransactionStatus status) {
+          runnable.run();
+        }
+      });
     }
   }
 }
