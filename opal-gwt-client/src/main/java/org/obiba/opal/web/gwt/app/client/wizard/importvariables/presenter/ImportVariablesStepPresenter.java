@@ -18,7 +18,6 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter.ResourceClickHandler;
@@ -184,7 +183,7 @@ public class ImportVariablesStepPresenter extends WidgetPresenter<ImportVariable
 
         @Override
         public void onResource(Response response, TableDto resource) {
-          eventBus.fireEvent(new TableSelectionChangeEvent(ImportVariablesStepPresenter.this, resource, null, null));
+          // TODO: Fire an event trigger display of the selected table.
         }
       }).send();
     }
