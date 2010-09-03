@@ -29,6 +29,7 @@
       <groupId>com.dyuproject.protostuff</groupId>
       <artifactId>protostuff-core</artifactId>
       <version>${protostuff.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
