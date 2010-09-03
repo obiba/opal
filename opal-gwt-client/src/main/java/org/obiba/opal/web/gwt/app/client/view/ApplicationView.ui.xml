@@ -6,10 +6,7 @@
       <g:LayoutPanel addStyleNames="top">
         <g:layer top="0" height="2em">
           <g:FlowPanel  ui:field="topBar" addStyleNames="topbar">
-                <g:Anchor ui:field="quit"><ui:msg description="Quit link text">Quit</ui:msg></g:Anchor>
-                <g:Anchor ui:field="help"><ui:msg description="Help link text">Help</ui:msg></g:Anchor>
-                <g:Anchor ui:field="profile"><ui:msg description="Profile link text">Profile</ui:msg></g:Anchor>
-            <g:Anchor ui:field="studies"><ui:msg description="Studies link text">Studies</ui:msg></g:Anchor>
+            <g:Anchor ui:field="quit"><ui:msg description="Quit link text">Quit</ui:msg></g:Anchor>
           </g:FlowPanel>
         </g:layer>
 

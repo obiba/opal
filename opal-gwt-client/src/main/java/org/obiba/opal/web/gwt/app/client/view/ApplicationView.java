@@ -46,15 +46,6 @@ public class ApplicationView implements ApplicationPresenter.Display {
   Anchor quit;
 
   @UiField
-  Anchor help;
-
-  @UiField
-  Anchor profile;
-
-  @UiField
-  Anchor studies;
-
-  @UiField
   MenuItem dashboardItem;
 
   @UiField
@@ -147,21 +138,6 @@ public class ApplicationView implements ApplicationPresenter.Display {
   @Override
   public MenuItem getFileExplorer() {
     return fileExplorer;
-  }
-
-  @Override
-  public HasClickHandlers getHelp() {
-    return help;
-  }
-
-  @Override
-  public HasClickHandlers getProfile() {
-    return profile;
-  }
-
-  @Override
-  public HasClickHandlers getStudies() {
-    return studies;
   }
 
   @Override

@@ -46,12 +46,6 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
     HasClickHandlers getQuit();
 
-    HasClickHandlers getHelp();
-
-    HasClickHandlers getProfile();
-
-    HasClickHandlers getStudies();
-
     MenuItem getVariablesItem();
 
     MenuItem getExploreVariables();
@@ -188,27 +182,6 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       @Override
       public void onClick(ClickEvent event) {
         eventBus.fireEvent(new SessionEndedEvent());
-      }
-    });
-
-    getDisplay().getHelp().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-
-      }
-    });
-
-    getDisplay().getProfile().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-
-      }
-    });
-
-    getDisplay().getStudies().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-
       }
     });
 
