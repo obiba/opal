@@ -92,7 +92,7 @@ public class OpalJavaClient {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends Message, B extends T.Builder> T getResource(Class<T> messageType, URI uri, B builder) {
+  public <T extends Message> T getResource(Class<T> messageType, URI uri, Message.Builder builder) {
     InputStream is = null;
     try {
       HttpResponse response = get(uri);
