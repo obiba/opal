@@ -59,7 +59,7 @@ public class RestDatasource extends AbstractDatasource {
 
   @Override
   protected Set<String> getValueTableNames() {
-    Iterable<TableDto> s = readResources(newReference("tables"), TableDto.newBuilder());
+    Iterable<TableDto> s = opalClient.getResources(TableDto.class, newReference("tables"), TableDto.newBuilder());
     return ImmutableSet.copyOf(Iterables.transform(s, new Function<TableDto, String>() {
 
       @Override
@@ -72,7 +72,7 @@ public class RestDatasource extends AbstractDatasource {
 
   @Override
   protected ValueTable initialiseValueTable(final String tableName) {
-    return new RestValueTable(this, (TableDto) readResource(newReference("table", tableName), TableDto.newBuilder()));
+    return new RestValueTable(this, opalClient.getResource(TableDto.class, newReference("table", tableName), TableDto.newBuilder()));
   }
 
   private void refresh() {
@@ -91,6 +91,10 @@ public class RestDatasource extends AbstractDatasource {
       super.addValueTable(vt);
     }
   }
+  
+  OpalJavaClient getOpalClient() {
+    return opalClient;
+  }
 
   URI newReference(String... segments) {
     return opalClient.buildURI(this.datasourceURI, segments);
@@ -100,11 +104,4 @@ public class RestDatasource extends AbstractDatasource {
     return opalClient.buildURI(root, segments);
   }
 
-  <T extends Message> List<T> readResources(URI uri, Message.Builder builder) {
-    return opalClient.getResources(uri, builder);
-  }
-
-  <T extends Message> T readResource(URI uri, Message.Builder builder) {
-    return opalClient.getResource(uri, builder);
-  }
 }

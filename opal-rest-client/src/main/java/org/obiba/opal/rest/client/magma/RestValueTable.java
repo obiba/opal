@@ -53,7 +53,7 @@ class RestValueTable extends AbstractValueTable {
     provider.initialise();
     super.setVariableEntityProvider(provider);
 
-    Iterable<VariableDto> variables = getDatasource().readResources(newReference("variables"), VariableDto.newBuilder());
+    Iterable<VariableDto> variables = getOpalClient().getResources(VariableDto.class, newReference("variables"), VariableDto.newBuilder());
     for(final VariableDto dto : variables) {
       addVariableValueSource(new VariableValueSource() {
 
@@ -93,6 +93,10 @@ class RestValueTable extends AbstractValueTable {
     return new LazyValueSet(this, entity);
   }
 
+  OpalJavaClient getOpalClient() {
+    return getDatasource().getOpalClient();
+  }
+
   URI newReference(String... segments) {
     return getDatasource().buildURI(this.tableReference, segments);
   }
@@ -108,7 +112,7 @@ class RestValueTable extends AbstractValueTable {
 
     @Override
     public void initialise() {
-      entities = getDatasource().readResources(newReference("entities"), VariableEntityDto.newBuilder());
+      entities = getOpalClient().getResources(VariableEntityDto.class, newReference("entities"), VariableEntityDto.newBuilder());
     }
 
     @Override
@@ -152,7 +156,7 @@ class RestValueTable extends AbstractValueTable {
 
     synchronized ValueSetDto loadValueSet() {
       if(valueSet == null) {
-        valueSet = getDatasource().readResource(newReference("valueSet", getVariableEntity().getIdentifier()), ValueSetDto.newBuilder());
+        valueSet = getOpalClient().getResource(ValueSetDto.class, newReference("valueSet", getVariableEntity().getIdentifier()), ValueSetDto.newBuilder());
       }
       return valueSet;
     }

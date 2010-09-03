@@ -21,6 +21,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.MagmaRuntimeException;
+import org.obiba.opal.web.model.Magma.TableDto;
+import org.obiba.opal.web.model.Magma.TableDto.Builder;
 
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Message;
@@ -70,7 +72,7 @@ public class OpalJavaClient {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends Message> List<T> getResources(URI uri, Message.Builder builder) {
+  public <T extends Message> List<T> getResources(Class<T> messageType, URI uri, Message.Builder builder) {
     ArrayList<T> resources = new ArrayList<T>();
     InputStream is = null;
     try {
@@ -90,7 +92,7 @@ public class OpalJavaClient {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends Message> T getResource(URI uri, Message.Builder builder) {
+  public <T extends Message, B extends T.Builder> T getResource(Class<T> messageType, URI uri, B builder) {
     InputStream is = null;
     try {
       HttpResponse response = get(uri);
@@ -117,4 +119,5 @@ public class OpalJavaClient {
       }
     }
   }
+
 }
