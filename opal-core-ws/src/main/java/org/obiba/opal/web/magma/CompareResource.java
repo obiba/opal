@@ -137,8 +137,8 @@ public class CompareResource {
   private TableCompareDto createTableCompareDtoWhereSecondTableDoesNotExist(ValueTable compared) {
     Set<Variable> variablesInCompared = asSet(compared.getVariables());
     Set<Variable> newVariables = new LinkedHashSet<Variable>(variablesInCompared);
-    Set<Variable> missingVariables = new LinkedHashSet<Variable>();
-    Set<Variable> existingVariables = new LinkedHashSet<Variable>();
+    Set<Variable> missingVariables = new LinkedHashSet<Variable>(5000);
+    Set<Variable> existingVariables = new LinkedHashSet<Variable>(5000);
 
     return createTableCompareDto(compared, null, newVariables, missingVariables, existingVariables);
   }
@@ -169,7 +169,7 @@ public class CompareResource {
   }
 
   private Set<ConflictDto> getConflicts(ValueTable compared, ValueTable with, Set<Variable> variables, boolean newVariable) {
-    Set<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>();
+    Set<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(5000);
 
     for(Variable v : variables) {
       String name = v.getName();
@@ -193,9 +193,9 @@ public class CompareResource {
   }
 
   private Set<Variable> getUnconflicting(Set<Variable> variables, Set<ConflictDto> conflicts) {
-    Set<Variable> unconflicting = new LinkedHashSet<Variable>();
+    Set<Variable> unconflicting = new LinkedHashSet<Variable>(5000);
 
-    Set<String> conflicting = new LinkedHashSet<String>();
+    Set<String> conflicting = new LinkedHashSet<String>(5000);
     for(ConflictDto dto : conflicts) {
       conflicting.add(dto.getVariable().getName());
     }
@@ -223,7 +223,7 @@ public class CompareResource {
   }
 
   private <T> Set<T> asSet(Iterable<T> iterable) {
-    Set<T> set = new LinkedHashSet<T>();
+    Set<T> set = new LinkedHashSet<T>(5000);
 
     for(T elem : iterable) {
       set.add(elem);
