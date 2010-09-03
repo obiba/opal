@@ -49,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.protobuf.JsonFormat;
 
 /**
  *
@@ -119,8 +120,8 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), error.getCode());
     Assert.assertEquals(15, error.getExtensionCount(Ws.DatasourceParsingErrorDto.errors));
     Ws.DatasourceParsingErrorDto parsingError = error.getExtension(Ws.DatasourceParsingErrorDto.errors, 0);
-    Assert.assertEquals("VariableNameRequired", parsingError.getKey());
-    Assert.assertEquals("[Variables, 10, Table2]", parsingError.getArgumentsList().toString());
+    Assert.assertEquals("DuplicateCategoryName", parsingError.getKey());
+    Assert.assertEquals("[Categories, 4, Table1, Var1, C2]", parsingError.getArgumentsList().toString());
   }
 
   @Test
