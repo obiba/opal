@@ -514,19 +514,19 @@ table.folder-details td:first-child span:hover {
 div.tableComparison-conflict {
 	background:transparent url(image/20/error.png) no-repeat scroll left center;
 	height:18px;
-	width:150px;
+	padding-left:25px;
 }
 
 div.tableComparison-creation {
 	background:transparent url(image/20/list-add.png) no-repeat scroll left center;
 	height:18px;
-	width:150px;
+	padding-left:25px;
 }
 
 div.tableComparison-modification {
 	background:transparent url(image/20/edit.png) no-repeat scroll left center;
 	height:18px;
-	width:150px;
+	padding-left:25px;
 }
 
 div.variableChanges {
@@ -535,7 +535,6 @@ div.variableChanges {
 
 table.variableChangesDetails {
   width:100%;
-  table-layout:fixed;
 }
 
 table.variableChangesDetailsVert table.variableChangesDetails tr > td  {
