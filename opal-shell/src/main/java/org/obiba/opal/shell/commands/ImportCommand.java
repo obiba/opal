@@ -175,8 +175,6 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       importService.importData(unitName, options.getSource(), options.getDestination());
       if(file != null) archive(file);
       errorCode = 0; // success!
-    } catch(NonExistentVariableEntitiesException ex) {
-      getShell().printf("Datasource '%s' cannot be imported 'as-is'. It contains the following entity ids which are not present as public identifiers in the keys database.\n", new Object[] { options.getSource(), ex.getNonExistentIdentifiers() });
     } catch(NoSuchDatasourceException ex) {
       getShell().printf("Datasource '%s' does not exist. Cannot import.\n", ex.getDatasourceName());
     } catch(KeyProviderException ex) {
@@ -188,8 +186,22 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     } catch(InterruptedException ex) {
       // Report the interrupted and continue; the test for interruption will detect this condition.
       getShell().printf("Thread interrupted");
+    } catch(RuntimeException ex) {
+      runtimeExceptionHandler(ex);
     }
     return errorCode;
+  }
+
+  private void runtimeExceptionHandler(RuntimeException ex) {
+    if(ex.getCause() != null && ex.getCause() instanceof NonExistentVariableEntitiesException) {
+      getShell().printf("Datasource '%s' cannot be imported 'as-is'. It contains the following entity ids which are not present as public identifiers in the keys database. %s\n", new Object[] { options.getSource(), ((NonExistentVariableEntitiesException) ex.getCause()).getNonExistentIdentifiers() });
+    } else {
+      if(ex.getCause() != null) {
+        getShell().printf(ex.getCause().getMessage());
+      } else {
+        getShell().printf(ex.getMessage());
+      }
+    }
   }
 
   private void archive(FileObject file) throws IOException {
