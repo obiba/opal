@@ -134,6 +134,9 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
       pager.setPage(pageIndex);
     }
     selectionModel.setSelected(tableDto, true);
+    // int row = index - table.getPageSize() * pageIndex;
+    // System.out.println("row=" + row);
+    // table.getRowElement(row).addClassName("selected");
   }
 
   @Override

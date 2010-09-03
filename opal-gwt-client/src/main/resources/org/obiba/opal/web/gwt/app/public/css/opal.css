@@ -98,9 +98,14 @@ a:hover {
 	border-top:5px solid #DDDDDD;
 }
 
-/* CellTable 
+/* CellTable */
 
-.GEO005SGB {
+.tableList .selected {
+	background-color:#DEBB9D;
+	color: #000000;
+}
+
+/* .GEO005SGB {
 	background-color:#DEBB9D;
 	color: #000000;
 }
