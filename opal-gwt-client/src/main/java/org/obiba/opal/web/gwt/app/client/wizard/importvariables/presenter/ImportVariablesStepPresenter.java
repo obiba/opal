@@ -162,7 +162,7 @@ public class ImportVariablesStepPresenter extends WidgetPresenter<ImportVariable
     }
   }
 
-  class TableResourceClickHandler implements ResourceClickHandler {
+  static class TableResourceClickHandler implements ResourceClickHandler {
 
     private String resourceLink;
 
@@ -183,7 +183,7 @@ public class ImportVariablesStepPresenter extends WidgetPresenter<ImportVariable
 
         @Override
         public void onResource(Response response, TableDto resource) {
-          // TODO: Fire an event trigger display of the selected table.
+          // TODO: Fire an event to trigger display of the selected table.
         }
       }).send();
     }
