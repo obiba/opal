@@ -33,8 +33,8 @@ import java.util.zip.ZipFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
 import junit.framework.Assert;
 
@@ -276,7 +276,7 @@ public class FilesResourceTest {
   public void testUploadFileToFileSystem() throws FileUploadException, IOException, URISyntaxException {
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
     expect(fileItemMock.getInputStream()).andReturn(getClass().getResourceAsStream("/files-to-upload/fileToUpload.txt")).once();
-    expect(uriInfoMock.getAbsolutePath()).andReturn(new URI("test")).once();
+    expect(uriInfoMock.getBaseUri()).andReturn(new URI("http://localhost:8888")).once();
 
     FilesResource fileResource = new FilesResource(opalRuntimeMock) {
       @Override

@@ -154,6 +154,8 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
 
     public void onSubmitComplete(SubmitCompleteEvent event) {
 
+      String tmpFilePath = event.getResults();
+
       ResourceCallback<DatasourceDto> callback = new ResourceCallback<DatasourceDto>() {
 
         public void onResource(Response response, DatasourceDto resource) {
@@ -178,13 +180,13 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
         }
       };
 
-      DatasourceFactoryDto dto = createDatasourceFactoryDto();
+      DatasourceFactoryDto dto = createDatasourceFactoryDto(tmpFilePath);
       ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasources").post().withResourceBody(DatasourceFactoryDto.stringify(dto)).withCallback(callback).withCallback(400, errorCallback).withCallback(500, errorCallback).send();
     }
 
-    private DatasourceFactoryDto createDatasourceFactoryDto() {
+    private DatasourceFactoryDto createDatasourceFactoryDto(String tmpFilePath) {
       ExcelDatasourceFactoryDto excelDto = ExcelDatasourceFactoryDto.create();
-      excelDto.setFile("/tmp/" + getDisplay().getVariablesFilename());
+      excelDto.setFile(tmpFilePath);
       excelDto.setReadOnly(true);
 
       DatasourceFactoryDto dto = DatasourceFactoryDto.create();

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.SortedMap;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -37,8 +38,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -208,7 +209,8 @@ public class FilesResource {
   @AuthenticatedByCookie
   public Response uploadFile(@PathParam("path") String path, @Context UriInfo uriInfo, @Context HttpServletRequest request) throws FileSystemException, FileUploadException {
 
-    FileObject fileToWriteTo = resolveFileInFileSystem(path);
+    String fileToWritePath = getPathOfFileToWrite(path);
+    FileObject fileToWriteTo = resolveFileInFileSystem(fileToWritePath);
     FileObject folderOfFileToWriteTo = fileToWriteTo.getParent();
 
     FileItem uploadedFile = getUploadedFile(request, fileToWriteTo);
@@ -227,10 +229,13 @@ public class FilesResource {
 
     writeUploadedFileToFileSystem(uploadedFile, fileToWriteTo);
 
-    log.info("The following file was uploaded to Opal file system : {}", path);
+    log.info("The following file was uploaded to Opal file system : {}", fileToWritePath);
 
-    return Response.created(uriInfo.getAbsolutePath()).entity(path + " created").build();
+    return Response.created(uriInfo.getBaseUri().resolve(fileToWritePath)).entity(fileToWritePath).build();
+  }
 
+  private String getPathOfFileToWrite(String path) {
+    return path.startsWith("/tmp/") ? "/tmp/" + UUID.randomUUID().toString() + ".tmp" : path;
   }
 
   private Response getPathNotExistResponse(String path) {
