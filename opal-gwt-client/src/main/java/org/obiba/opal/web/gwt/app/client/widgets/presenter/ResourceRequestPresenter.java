@@ -17,8 +17,10 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
@@ -109,6 +111,11 @@ public class ResourceRequestPresenter<T extends JavaScriptObject> extends Widget
       public void onResponseCode(Request request, Response response) {
         getDisplay().failed();
 
+        if(response.getText() != null) {
+          ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+          getDisplay().showErrorMessage(errorDto.getStatus());
+        }
+
         if(callback != null) {
           callback.onResponseCode(request, response);
         }
@@ -134,6 +141,8 @@ public class ResourceRequestPresenter<T extends JavaScriptObject> extends Widget
   public interface Display extends WidgetDisplay {
 
     void setResourceName(String resourceName);
+
+    void showErrorMessage(String status);
 
     HandlerRegistration setResourceClickHandler(ResourceClickHandler handler);
 

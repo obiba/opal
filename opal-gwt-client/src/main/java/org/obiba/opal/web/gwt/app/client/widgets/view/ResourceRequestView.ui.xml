@@ -15,12 +15,18 @@
     	margin-left: 1.5em;
     	vertical-align: middle;
     }
+    .error-message {
+        color:red;
+        display: inline;
+        padding-left:1em;
+    }    
   </ui:style>
   
   <g:HTMLPanel>
     <span>
       <g:Label ui:field="resourceName" addStyleNames="{style.resource-name}">Resource</g:Label>
       <g:Image ui:field="requestStatus" addStyleNames="{style.request-status}"></g:Image>
+      <g:Label ui:field="errorMessage" addStyleNames="{style.error-message}"/>      
     </span>
   </g:HTMLPanel>
   

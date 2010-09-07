@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.view;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter.ResourceClickHandler;
 
@@ -43,12 +44,17 @@ public class ResourceRequestView extends Composite implements ResourceRequestPre
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
+  private static Translations translations = GWT.create(Translations.class);
+
   //
   // Instance Variables
   //
 
   @UiField
   Label resourceName;
+
+  @UiField
+  Label errorMessage;
 
   @UiField
   Image requestStatus;
@@ -97,6 +103,15 @@ public class ResourceRequestView extends Composite implements ResourceRequestPre
   public void stopProcessing() {
   }
 
+  @Override
+  public void showErrorMessage(String status) {
+    String errorMessage = translations.statusMap().get(status);
+    if(errorMessage == null) {
+      errorMessage = status;
+    }
+    this.errorMessage.setText(errorMessage);
+  }
+
   //
   // Inner Classes / Interfaces
   //
@@ -104,4 +119,5 @@ public class ResourceRequestView extends Composite implements ResourceRequestPre
   @UiTemplate("ResourceRequestView.ui.xml")
   interface ViewUiBinder extends UiBinder<HTMLPanel, ResourceRequestView> {
   }
+
 }
