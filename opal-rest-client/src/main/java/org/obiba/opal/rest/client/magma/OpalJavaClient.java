@@ -21,8 +21,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.MagmaRuntimeException;
-import org.obiba.opal.web.model.Magma.TableDto;
-import org.obiba.opal.web.model.Magma.TableDto.Builder;
 
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Message;

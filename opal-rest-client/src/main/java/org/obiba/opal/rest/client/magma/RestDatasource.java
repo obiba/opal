@@ -32,7 +32,7 @@ public class RestDatasource extends AbstractDatasource {
   public RestDatasource(String name, OpalJavaClient opalClient, String remoteDatasource) {
     super(name, "rest");
     this.opalClient = opalClient;
-    this.datasourceURI = opalClient.buildURI(remoteDatasource);
+    this.datasourceURI = opalClient.buildURI("datasource",remoteDatasource);
   }
 
   @Override
