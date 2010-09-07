@@ -31,6 +31,7 @@ message CsvDatasourceTableBundleDto {
   required string name = 1;
   optional string variables = 2;
   optional string data = 3;
+  optional string refTable = 4;
 }
 
 message FsDatasourceFactoryDto {

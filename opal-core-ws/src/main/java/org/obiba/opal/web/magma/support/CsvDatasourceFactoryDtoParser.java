@@ -12,7 +12,9 @@ package org.obiba.opal.web.magma.support;
 import java.io.File;
 
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.ValueTable;
 import org.obiba.magma.datasource.csv.support.CsvDatasourceFactory;
+import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.web.model.Magma.CsvDatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.CsvDatasourceTableBundleDto;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
@@ -51,7 +53,12 @@ public class CsvDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoP
     for(CsvDatasourceTableBundleDto tableBundleDto : csvDto.getTablesList()) {
       File variables = tableBundleDto.hasVariables() ? resolveLocalFile(tableBundleDto.getVariables()) : null;
       File data = tableBundleDto.hasData() ? resolveLocalFile(tableBundleDto.getData()) : null;
-      factory.addTable(tableBundleDto.getName(), variables, data);
+      ValueTable refTable = tableBundleDto.hasRefTable() ? MagmaEngineTableResolver.valueOf(tableBundleDto.getRefTable()).resolveTable() : null;
+      if(refTable != null) {
+        factory.addTable(refTable, data);
+      } else {
+        factory.addTable(tableBundleDto.getName(), variables, data);
+      }
     }
   }
 
