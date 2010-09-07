@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import net.customware.gwt.presenter.client.EventBus;
@@ -22,7 +21,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
@@ -37,23 +35,18 @@ import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.TableCompareDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.opal.CommandStateDto;
-import org.obiba.opal.web.model.client.opal.CopyCommandOptionsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 import org.obiba.opal.web.model.client.ws.DatasourceParsingErrorDto;
 import org.obiba.opal.web.model.client.ws.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.Random;
 import com.google.inject.Inject;
 
 public class DestinationSelectionStepPresenter extends WidgetPresenter<DestinationSelectionStepPresenter.Display> {
@@ -78,13 +71,8 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
 
   private List<CsvValidationError> validationErrors = new ArrayList<CsvValidationError>();
 
-  private String variablesCsvFilename;
-
   @Inject
   private ImportData importData;
-
-  @Inject
-  private ErrorDialogPresenter errorDialog;
 
   @Inject
   private ValidationReportStepPresenter validationReportStepPresenter;
@@ -153,7 +141,7 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
       if(getDisplay().hasTable()) importData.setDestinationTableName(getDisplay().getSelectedTable());
 
       if(importData.getImportFormat().equals(ImportFormat.CSV)) {
-        copyDestinationVariablesToCsvFile();
+        createTransientCsvDatasource();
       }
       if(importData.getImportFormat().equals(ImportFormat.XML)) {
         eventBus.fireEvent(new WorkbenchChangeEvent(identityArchiveStepPresenter));
@@ -232,89 +220,6 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
 
   }
 
-  private void copyDestinationVariablesToCsvFile() {
-    CopyCommandOptionsDto dto = createCopyCommandOptionsDto();
-    submitJob(dto);
-
-  }
-
-  private CopyCommandOptionsDto createCopyCommandOptionsDto() {
-    CopyCommandOptionsDto dto = CopyCommandOptionsDto.create();
-    JsArrayString selectedTables = JavaScriptObject.createArray().cast();
-    selectedTables.push(importData.getDestinationDatasourceName() + "." + importData.getDestinationTableName());
-    dto.setTablesArray(selectedTables);
-    dto.setNoValues(true);
-    variablesCsvFilename = createTemporaryVariablesCsvFilename();
-    dto.setOut(variablesCsvFilename);
-    dto.setFormat(importData.getImportFormat().name());
-    return dto;
-  }
-
-  private void submitJob(CopyCommandOptionsDto dto) {
-    ResourceRequestBuilderFactory.newBuilder().forResource("/shell/copy").post() //
-    .withResourceBody(CopyCommandOptionsDto.stringify(dto)) //
-    .withCallback(400, new ClientFailureResponseCodeCallBack()) //
-    .withCallback(201, new SuccessResponseCodeCallBack()).send();
-  }
-
-  class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {
-    @Override
-    public void onResponseCode(Request request, Response response) {
-      displayErrorDialog(response.getText());
-    }
-  }
-
-  class SuccessResponseCodeCallBack implements ResponseCodeCallback {
-    @Override
-    public void onResponseCode(Request request, Response response) {
-      String location = response.getHeader("Location");
-      String jobId = location.substring(location.lastIndexOf('/') + 1);
-      isItDone(jobId);
-    }
-  }
-
-  private String createTemporaryVariablesCsvFilename() {
-    return "/tmp/" + createRandomString() + "variables.csv";
-  }
-
-  private String createRandomString() {
-    StringBuilder sb = new StringBuilder();
-    for(int i = 0; i < 10; i++) {
-      sb.append(Random.nextInt(10));
-    }
-    return sb.toString();
-  }
-
-  private void isItDone(final String id) {
-    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
-
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == 200) {
-          if(response.getText().equalsIgnoreCase("IN_PROGRESS")) {
-            isItDone(id);
-          } else if(response.getText().equalsIgnoreCase("SUCCEEDED")) {
-            createTransientCsvDatasource();
-          } else {
-            displayErrorDialog(response.getText());
-          }
-        } else {
-          displayErrorDialog(response.getText());
-        }
-        refreshDisplay();
-      }
-    };
-
-    ResourceRequestBuilderFactory.<JsArray<CommandStateDto>> newBuilder().forResource("/shell/command/" + id + "/status").get().withCallback(400, callbackHandler).withCallback(404, callbackHandler).withCallback(200, callbackHandler).send();
-  }
-
-  private void displayErrorDialog(String message) {
-    errorDialog.bind();
-    errorDialog.setErrors(Arrays.asList(new String[] { message }));
-    errorDialog.revealDisplay();
-
-  }
-
   public void createTransientCsvDatasource() {
 
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
@@ -359,7 +264,7 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
     CsvDatasourceTableBundleDto csvDatasourceTableBundleDto = CsvDatasourceTableBundleDto.create();
     csvDatasourceTableBundleDto.setName(importData.getDestinationTableName());
     csvDatasourceTableBundleDto.setData(importData.getCsvFile());
-    csvDatasourceTableBundleDto.setVariables(variablesCsvFilename);
+    csvDatasourceTableBundleDto.setRefTable(importData.getDestinationDatasourceName() + "." + importData.getDestinationTableName());
 
     @SuppressWarnings("unchecked")
     JsArray<CsvDatasourceTableBundleDto> tables = (JsArray<CsvDatasourceTableBundleDto>) JsArray.createArray();
