@@ -199,11 +199,11 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
   private ImportCommandOptionsDto createXmlImportCommandOptionsDto() {
     ImportCommandOptionsDto dto = ImportCommandOptionsDto.create();
     dto.setDestination(importData.getDestinationDatasourceName());
-    dto.setArchive(getDisplay().getArchiveDirectory());
+    dto.setArchive(importData.getArchiveDirectory());
     JsArrayString selectedFiles = JavaScriptObject.createArray().cast();
     selectedFiles.push(importData.getXmlFile());
     dto.setFilesArray(selectedFiles);
-    dto.setUnit(getDisplay().getSelectedUnit());
+    if(importData.isIdentifierSharedWithUnit()) dto.setUnit(importData.getUnit());
     return dto;
   }
 
