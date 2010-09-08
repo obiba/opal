@@ -21,6 +21,7 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ImportVariablesStepView extends Composite implements ImportVariablesStepPresenter.Display {
@@ -33,6 +34,9 @@ public class ImportVariablesStepView extends Composite implements ImportVariable
   //
   // Instance Variables
   //
+
+  @UiField
+  Label tableListLabel;
 
   @UiField
   FlowPanel tableListPanel;
@@ -53,10 +57,12 @@ public class ImportVariablesStepView extends Composite implements ImportVariable
   //
 
   public void clearResourceRequests() {
+    tableListLabel.setVisible(false);
     tableListPanel.clear();
   }
 
   public void addResourceRequest(Display resourceRequestDisplay) {
+    tableListLabel.setVisible(true);
     tableListPanel.add(resourceRequestDisplay.asWidget());
   }
 

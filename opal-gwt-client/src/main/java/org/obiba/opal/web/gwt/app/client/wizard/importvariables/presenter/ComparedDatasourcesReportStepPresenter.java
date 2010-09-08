@@ -157,6 +157,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
     this.targetDatasourceName = targetDatasourceName;
   }
 
+  @SuppressWarnings("unchecked")
   private void addUpdateVariablesResourceRequests() {
     for(int tableIndex = 0; tableIndex < comparedTables.length(); tableIndex++) {
       TableCompareDto tableCompareDto = comparedTables.get(tableIndex);
@@ -170,7 +171,6 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
       }
 
       if(variablesToStringify.length() > 0) {
-        ResourceRequestBuilder<? extends JavaScriptObject> resourceRequestBuilder = createResourceRequestBuilder(tableCompareDto.getCompared(), !tableCompareDto.hasWithTable(), variablesToStringify);
         importVariablesStepPresenter.addResourceRequest(tableCompareDto.getCompared().getName(), "/datasource/" + targetDatasourceName + "/table/" + tableCompareDto.getCompared().getName(), createResourceRequestBuilder(tableCompareDto.getCompared(), !tableCompareDto.hasWithTable(), variablesToStringify));
       }
     }
@@ -201,7 +201,10 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
     public void onClick(ClickEvent event) {
       importVariablesStepPresenter.clearResourceRequests();
       addUpdateVariablesResourceRequests();
-      importVariablesStepPresenter.sendResourceRequests();
+      if(importVariablesStepPresenter.getResourceRequestCount() != 0) {
+        importVariablesStepPresenter.setReturnButtonEnabled(false);
+        importVariablesStepPresenter.sendResourceRequests();
+      }
       eventBus.fireEvent(new WorkbenchChangeEvent(importVariablesStepPresenter));
     }
   }

@@ -109,7 +109,6 @@ public class ImportVariablesStepPresenter extends WidgetPresenter<ImportVariable
     resourceRequestsCompleted = 0;
 
     getDisplay().clearResourceRequests();
-    getDisplay().setReturnButtonEnabled(false);
   }
 
   public <T extends JavaScriptObject> void addResourceRequest(String resourceName, String resourceLink, ResourceRequestBuilder<T> requestBuilder) {
@@ -123,10 +122,18 @@ public class ImportVariablesStepPresenter extends WidgetPresenter<ImportVariable
     getDisplay().addResourceRequest(resourceRequestPresenter.getDisplay());
   }
 
+  public int getResourceRequestCount() {
+    return resourceRequests.size();
+  }
+
   public void sendResourceRequests() {
     for(ResourceRequestPresenter<? extends JavaScriptObject> r : resourceRequests) {
       r.sendRequest();
     }
+  }
+
+  public void setReturnButtonEnabled(boolean enabled) {
+    getDisplay().setReturnButtonEnabled(enabled);
   }
 
   //
