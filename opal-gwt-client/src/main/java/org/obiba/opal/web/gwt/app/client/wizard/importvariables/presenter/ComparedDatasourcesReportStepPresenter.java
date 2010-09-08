@@ -140,10 +140,10 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   }
 
   private ComparisonResult getTableComparisonResult(TableCompareDto tableComparison) {
-    if(!tableComparison.hasWithTable()) {
-      return ComparisonResult.CREATION;
-    } else if(tableComparison.getConflictsArray() != null && tableComparison.getConflictsArray().length() > 0) {
+    if(tableComparison.getConflictsArray() != null && tableComparison.getConflictsArray().length() > 0) {
       return ComparisonResult.CONFLICT;
+    } else if(!tableComparison.hasWithTable()) {
+      return ComparisonResult.CREATION;
     } else {
       return ComparisonResult.MODIFICATION;
     }

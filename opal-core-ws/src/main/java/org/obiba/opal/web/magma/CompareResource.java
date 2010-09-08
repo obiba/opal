@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -147,13 +146,15 @@ public class CompareResource {
     TableCompareDto.Builder dtoBuilder = TableCompareDto.newBuilder();
     dtoBuilder.setCompared(Dtos.asDto(compared, null));
 
-    Set<ConflictDto> conflicts = Collections.emptySet();
+    Set<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(5000);
+
     if(with != null) {
       dtoBuilder.setWithTable(Dtos.asDto(with, null));
-      conflicts = getConflicts(compared, with, existingVariables, false);
-      conflicts.addAll(getConflicts(compared, with, newVariables, true));
-      dtoBuilder.addAllConflicts(conflicts);
     }
+
+    conflicts.addAll(getConflicts(compared, with, existingVariables, false));
+    conflicts.addAll(getConflicts(compared, with, newVariables, true));
+    dtoBuilder.addAllConflicts(conflicts);
 
     for(Variable v : getUnconflicting(newVariables, conflicts)) {
       dtoBuilder.addNewVariables(Dtos.asDto(v));
@@ -171,21 +172,36 @@ public class CompareResource {
   private Set<ConflictDto> getConflicts(ValueTable compared, ValueTable with, Set<Variable> variables, boolean newVariable) {
     Set<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(5000);
 
+    String entityType = null;
     for(Variable v : variables) {
-      String name = v.getName();
 
-      Variable variableInCompared = compared.getVariable(name);
-      if(!variableInCompared.getEntityType().equals(with.getEntityType())) {
-        conflicts.add(createConflictDto(Dtos.asDto(v).setIsNewVariable(newVariable).build(), INCOMPATIBLE_ENTITY_TYPE, variableInCompared.getEntityType(), with.getEntityType()));
+      if(entityType == null) {
+        entityType = v.getEntityType();
       }
 
-      try {
-        Variable variableInWith = with.getVariable(name);
-        if(!variableInCompared.getValueType().equals(variableInWith.getValueType())) {
-          conflicts.add(createConflictDto(Dtos.asDto(v).setIsNewVariable(newVariable).build(), INCOMPATIBLE_VALUE_TYPE, variableInCompared.getValueType().getName(), variableInWith.getValueType().getName()));
+      String name = v.getName();
+
+      // Target (with) table already exist
+      if(with != null) {
+        Variable variableInCompared = compared.getVariable(name);
+        if(!variableInCompared.getEntityType().equals(with.getEntityType())) {
+          conflicts.add(createConflictDto(Dtos.asDto(v).setIsNewVariable(newVariable).build(), INCOMPATIBLE_ENTITY_TYPE, variableInCompared.getEntityType(), with.getEntityType()));
         }
-      } catch(NoSuchVariableException variableDoesNotExist) {
-        // Case where the variable does not exist in Opal but its destination table already exist.
+
+        try {
+          Variable variableInWith = with.getVariable(name);
+          if(!variableInCompared.getValueType().equals(variableInWith.getValueType())) {
+            conflicts.add(createConflictDto(Dtos.asDto(v).setIsNewVariable(newVariable).build(), INCOMPATIBLE_VALUE_TYPE, variableInCompared.getValueType().getName(), variableInWith.getValueType().getName()));
+          }
+        } catch(NoSuchVariableException variableDoesNotExist) {
+          // Case where the variable does not exist in Opal but its destination table already exist.
+        }
+
+        // Target (with) will be created
+      } else {
+        if(!entityType.equals(v.getEntityType())) {
+          conflicts.add(createConflictDto(Dtos.asDto(v).setIsNewVariable(true).build(), INCOMPATIBLE_ENTITY_TYPE, entityType, v.getEntityType()));
+        }
       }
     }
 
