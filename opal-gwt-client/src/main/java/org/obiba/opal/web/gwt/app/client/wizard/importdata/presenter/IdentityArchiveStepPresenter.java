@@ -47,11 +47,17 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
 
     boolean isIdentifierAsIs();
 
+    void setIdentifierAsIs(boolean checked);
+
     boolean isIdentifierSharedWithUnit();
+
+    void setIdentifierSharedWithUnit(boolean checked);
 
     void setUnits(JsArray<FunctionalUnitDto> units);
 
     String getSelectedUnit();
+
+    void setSelectedUnit(String unit);
 
     HandlerRegistration addIdentifierAsIsClickHandler(ClickHandler handler);
 
@@ -115,23 +121,28 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
   }
 
   private void addIdentifierEventHandlers() {
+    super.registerHandler(getDisplay().addIdentifierAsIsClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent arg0) {
+        getDisplay().setUnitEnabled(false);
+      }
+    }));
+    super.registerHandler(getDisplay().addIdentifierSharedWithUnitClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent arg0) {
+        getDisplay().setUnitEnabled(true);
+      }
+    }));
+  }
+
+  private void initPreviouslyProvidedIdentifier() {
     if(isIdentifierAlreadyProvided()) {
+      if(importData.getUnit() != null && !importData.getUnit().equals("")) getDisplay().setSelectedUnit(importData.getUnit());
+      getDisplay().setIdentifierAsIs(importData.isIdentifierAsIs());
+      getDisplay().setIdentifierSharedWithUnit(importData.isIdentifierSharedWithUnit());
       getDisplay().setIdentityEnabled(false);
-    } else {
-      super.registerHandler(getDisplay().addIdentifierAsIsClickHandler(new ClickHandler() {
-
-        @Override
-        public void onClick(ClickEvent arg0) {
-          getDisplay().setUnitEnabled(false);
-        }
-      }));
-      super.registerHandler(getDisplay().addIdentifierSharedWithUnitClickHandler(new ClickHandler() {
-
-        @Override
-        public void onClick(ClickEvent arg0) {
-          getDisplay().setUnitEnabled(true);
-        }
-      }));
     }
   }
 
@@ -177,6 +188,7 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
       @Override
       public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
         getDisplay().setUnits(units);
+        initPreviouslyProvidedIdentifier();
       }
     }).send();
   }

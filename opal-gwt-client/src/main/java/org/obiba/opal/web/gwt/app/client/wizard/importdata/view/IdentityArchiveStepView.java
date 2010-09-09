@@ -160,4 +160,24 @@ public class IdentityArchiveStepView extends Composite implements IdentityArchiv
     units.setEnabled(enabled);
   }
 
+  @Override
+  public void setIdentifierAsIs(boolean checked) {
+    identifierAsIs.setValue(checked);
+  }
+
+  @Override
+  public void setIdentifierSharedWithUnit(boolean checked) {
+    identifierSharedWithUnit.setValue(checked);
+  }
+
+  @Override
+  public void setSelectedUnit(String unit) {
+    for(int i = 0; i < units.getItemCount(); i++) {
+      if(units.getItemText(i).equals(unit)) {
+        units.setSelectedIndex(i);
+        break;
+      }
+    }
+  }
+
 }
