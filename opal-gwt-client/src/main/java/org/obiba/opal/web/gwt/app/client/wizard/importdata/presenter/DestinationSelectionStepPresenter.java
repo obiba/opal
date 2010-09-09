@@ -144,7 +144,8 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
         createTransientCsvDatasource();
       }
       if(importData.getImportFormat().equals(ImportFormat.XML)) {
-        datasourceDiff();
+        // datasourceDiff(); // TODO Temporary workaround to allow data to be imported.
+        eventBus.fireEvent(new WorkbenchChangeEvent(identityArchiveStepPresenter));
       }
     }
 
