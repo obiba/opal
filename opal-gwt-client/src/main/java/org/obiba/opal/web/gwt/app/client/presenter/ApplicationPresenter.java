@@ -23,7 +23,6 @@ import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.resources.OpalResources;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.FormatSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.UploadVariablesStepPresenter;
 
@@ -104,7 +103,6 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
   @Inject
   public ApplicationPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
-    OpalResources.INSTANCE.css().ensureInjected();
   }
 
   @Override

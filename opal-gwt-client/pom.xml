@@ -107,7 +107,7 @@
         </executions>
         <configuration>
           <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
-          <runTarget>org.obiba.opal.web.gwt.app.GwtApp/Application.html</runTarget>
+          <runTarget>org.obiba.opal.web.gwt.app.GwtApp/index.html</runTarget>
         </configuration>
       </plugin>
       <plugin>
@@ -119,7 +119,7 @@
               <arg value="-jar" />
               <arg value="${basedir}/tools/jython-2.5.1-standalone.jar" />
               <arg value="${basedir}/tools/mergelocales.py" />
-              <arg value="${basedir}/target/extra/org.obiba.opal.web.gwt.app.GwtApp/" />
+              <arg value="${basedir}/target/extra/opal/" />
               <arg value="${basedir}/src/main/java/com/google/gwt/i18n/client/" />
             </exec>
           </tasks>

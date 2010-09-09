@@ -19,7 +19,6 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.Dis
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.FileSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.resources.OpalResources;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 
@@ -140,8 +139,6 @@ public class FolderDetailsView extends Composite implements Display {
     addTableColumns();
 
     table.addStyleName("folder-details");
-    OpalResources.INSTANCE.css().ensureInjected();
-
     tableSelectionModel = new SingleSelectionModel<FileDto>();
     table.setSelectionModel(tableSelectionModel);
   }
