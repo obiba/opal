@@ -105,7 +105,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
           getDisplay().addTableCompareTab(tableComparison, comparisonResult);
           if(comparisonResult == ComparisonResult.CONFLICT) {
             conflictsExist = true;
-          } else if(comparisonResult == ComparisonResult.MODIFICATION) {
+          } else if(tableComparison.getExistingVariablesArray() != null) {
             modificationsExist = true;
           }
         }
