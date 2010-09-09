@@ -20,6 +20,12 @@
                 <g:SimplePanel ui:field="selectXmlFilePanel" />          
               </td>
             </tr>
+            <tr>
+              <td style="vertical-align:top">
+                <ui:msg description="Unit label">Unit</ui:msg>
+                <g:ListBox ui:field="units" />
+              </td>
+            </tr>
           </tbody>
         </table>
       </g:HTMLPanel>

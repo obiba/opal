@@ -9,21 +9,40 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
+import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.FsDatasourceFactoryDto;
+import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
+import org.obiba.opal.web.model.client.ws.DatasourceParsingErrorDto;
+import org.obiba.opal.web.model.client.ws.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
 public class XmlFormatStepPresenter extends WidgetPresenter<XmlFormatStepPresenter.Display> {
@@ -38,10 +57,17 @@ public class XmlFormatStepPresenter extends WidgetPresenter<XmlFormatStepPresent
 
     void setNextEnabled(boolean enabled);
 
+    void setUnits(JsArray<FunctionalUnitDto> units);
+
+    String getSelectedUnit();
+
   }
 
   @Inject
   private ImportData importData;
+
+  @Inject
+  private ValidationReportStepPresenter validationReportStepPresenter;
 
   @Inject
   private DestinationSelectionStepPresenter destinationSelectionStepPresenter;
@@ -62,6 +88,7 @@ public class XmlFormatStepPresenter extends WidgetPresenter<XmlFormatStepPresent
   @Override
   protected void onBind() {
     addEventHandlers();
+    initUnits();
 
     xmlFileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE_OR_FOLDER);
     xmlFileSelectionPresenter.bind();
@@ -95,8 +122,72 @@ public class XmlFormatStepPresenter extends WidgetPresenter<XmlFormatStepPresent
     @Override
     public void onClick(ClickEvent event) {
       importData.setXmlFile(getDisplay().getSelectedFile());
-      eventBus.fireEvent(new WorkbenchChangeEvent(destinationSelectionStepPresenter));
+      setIdentityImportData();
+      createTransientDatasource();
     }
+
+    private void setIdentityImportData() {
+      if(getDisplay().getSelectedUnit().equals("")) {
+        importData.setIdentifierAsIs(true);
+        importData.setIdentifierSharedWithUnit(false);
+      } else {
+        importData.setIdentifierAsIs(false);
+        importData.setIdentifierSharedWithUnit(true);
+        importData.setUnit(getDisplay().getSelectedUnit());
+      }
+    }
+  }
+
+  public void createTransientDatasource() {
+
+    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+      public void onResponseCode(Request request, Response response) {
+        if(response.getStatusCode() == 201) {
+          DatasourceDto datasourceDto = (DatasourceDto) JsonUtils.unsafeEval(response.getText());
+          importData.setTransientDatasourceName(datasourceDto.getName());
+          eventBus.fireEvent(new WorkbenchChangeEvent(destinationSelectionStepPresenter));
+        } else {
+          final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+          if(errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
+            validationReportStepPresenter.getDisplay().setParsingErrors(extractDatasourceParsingErrors(errorDto));
+            eventBus.fireEvent(new WorkbenchChangeEvent(validationReportStepPresenter));
+          } else {
+            eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "fileReadError", null));
+          }
+        }
+      }
+    };
+
+    DatasourceFactoryDto dto = createDatasourceFactoryDto();
+    ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource("/datasources").post().withResourceBody(DatasourceFactoryDto.stringify(dto)).withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler).send();
+  }
+
+  @SuppressWarnings("unchecked")
+  private List<DatasourceParsingErrorDto> extractDatasourceParsingErrors(ClientErrorDto dto) {
+    List<DatasourceParsingErrorDto> datasourceParsingErrors = new ArrayList<DatasourceParsingErrorDto>();
+
+    JsArray<DatasourceParsingErrorDto> errors = (JsArray<DatasourceParsingErrorDto>) dto.getExtension(ClientErrorDtoExtensions.errors);
+    if(errors != null) {
+      for(int i = 0; i < errors.length(); i++) {
+        datasourceParsingErrors.add(errors.get(i));
+      }
+    }
+
+    return datasourceParsingErrors;
+  }
+
+  private DatasourceFactoryDto createDatasourceFactoryDto() {
+
+    FsDatasourceFactoryDto fsDatasourceFactoryDto = FsDatasourceFactoryDto.create();
+    fsDatasourceFactoryDto.setFile(importData.getXmlFile());
+    fsDatasourceFactoryDto.setUnit(importData.getUnit());
+
+    DatasourceFactoryDto dto = DatasourceFactoryDto.create();
+    dto.setExtension(FsDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, fsDatasourceFactoryDto);
+
+    return dto;
+
   }
 
   private void enableImport() {
@@ -108,6 +199,15 @@ public class XmlFormatStepPresenter extends WidgetPresenter<XmlFormatStepPresent
     public void onFileSelectionUpdate(FileSelectionUpdateEvent event) {
       enableImport();
     }
+  }
+
+  public void initUnits() {
+    ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
+      @Override
+      public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
+        getDisplay().setUnits(units);
+      }
+    }).send();
   }
 
 }

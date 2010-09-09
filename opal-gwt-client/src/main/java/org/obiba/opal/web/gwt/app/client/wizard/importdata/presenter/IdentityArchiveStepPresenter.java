@@ -71,6 +71,9 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
 
     void setUnitEnabled(boolean enabled);
 
+    /** Allows the identity (unit) section of the form to be enabled and disabled. */
+    void setIdentityEnabled(boolean enabled);
+
   }
 
   @Inject
@@ -112,20 +115,28 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
   }
 
   private void addIdentifierEventHandlers() {
-    super.registerHandler(getDisplay().addIdentifierAsIsClickHandler(new ClickHandler() {
+    if(isIdentifierAlreadyProvided()) {
+      getDisplay().setIdentityEnabled(false);
+    } else {
+      super.registerHandler(getDisplay().addIdentifierAsIsClickHandler(new ClickHandler() {
 
-      @Override
-      public void onClick(ClickEvent arg0) {
-        getDisplay().setUnitEnabled(false);
-      }
-    }));
-    super.registerHandler(getDisplay().addIdentifierSharedWithUnitClickHandler(new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent arg0) {
+          getDisplay().setUnitEnabled(false);
+        }
+      }));
+      super.registerHandler(getDisplay().addIdentifierSharedWithUnitClickHandler(new ClickHandler() {
 
-      @Override
-      public void onClick(ClickEvent arg0) {
-        getDisplay().setUnitEnabled(true);
-      }
-    }));
+        @Override
+        public void onClick(ClickEvent arg0) {
+          getDisplay().setUnitEnabled(true);
+        }
+      }));
+    }
+  }
+
+  private boolean isIdentifierAlreadyProvided() {
+    return importData.isIdentifierAsIs() || importData.isIdentifierSharedWithUnit();
   }
 
   private void addArchiveEventHandlers() {

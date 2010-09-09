@@ -153,4 +153,11 @@ public class IdentityArchiveStepView extends Composite implements IdentityArchiv
     units.setEnabled(enabled);
   }
 
+  @Override
+  public void setIdentityEnabled(boolean enabled) {
+    identifierAsIs.setEnabled(enabled);
+    identifierSharedWithUnit.setEnabled(enabled);
+    units.setEnabled(enabled);
+  }
+
 }

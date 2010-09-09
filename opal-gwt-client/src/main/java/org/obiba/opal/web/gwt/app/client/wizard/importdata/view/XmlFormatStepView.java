@@ -12,8 +12,10 @@ package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.XmlFormatStepPresenter;
+import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -21,6 +23,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -36,6 +39,9 @@ public class XmlFormatStepView extends Composite implements XmlFormatStepPresent
 
   @UiField
   Button nextButton;
+
+  @UiField
+  ListBox units;
 
   @UiField
   SimplePanel selectXmlFilePanel;
@@ -78,6 +84,20 @@ public class XmlFormatStepView extends Composite implements XmlFormatStepPresent
   @Override
   public void setNextEnabled(boolean enabled) {
     nextButton.setEnabled(enabled);
+  }
+
+  @Override
+  public void setUnits(JsArray<FunctionalUnitDto> units) {
+    this.units.clear();
+    this.units.addItem("");
+    for(int i = 0; i < units.length(); i++) {
+      this.units.addItem(units.get(i).getName());
+    }
+  }
+
+  @Override
+  public String getSelectedUnit() {
+    return units.getItemText(units.getSelectedIndex());
   }
 
 }
