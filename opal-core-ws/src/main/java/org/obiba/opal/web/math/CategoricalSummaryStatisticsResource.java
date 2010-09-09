@@ -30,7 +30,7 @@ import com.google.common.collect.Iterables;
  */
 public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatisticsResource {
 
-  private final static String NULL_NAME = "N/A";
+  final static String NULL_NAME = "N/A";
 
   /**
    * @param valueTable
@@ -65,19 +65,23 @@ public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatist
   private Frequency computeFrequencyDistribution() {
     Frequency freq = new Frequency();
     for(Value value : getValues()) {
+      addValue(freq, value);
+    }
+    return freq;
+  }
+
+  private void addValue(Frequency freq, Value value) {
+    if(value.isSequence()) {
+      for(Value v : value.asSequence().getValue()) {
+        addValue(freq, v);
+      }
+    } else {
       if(value.isNull() == false) {
-        if(value.isSequence()) {
-          for(Value v : value.asSequence().getValue()) {
-            freq.addValue(v.toString());
-          }
-        } else {
-          freq.addValue(value.toString());
-        }
+        freq.addValue(value.toString());
       } else {
         freq.addValue(NULL_NAME);
       }
     }
-    return freq;
   }
 
   /**
