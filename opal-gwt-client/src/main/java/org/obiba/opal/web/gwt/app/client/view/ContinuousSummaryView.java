@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.view;
 
-import org.obiba.opal.web.gwt.plot.client.JqPlot;
 import org.obiba.opal.web.gwt.plot.client.HistogramPlot;
+import org.obiba.opal.web.gwt.plot.client.JqPlot;
 import org.obiba.opal.web.gwt.plot.client.NormalProbabilityPlot;
 import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.client.math.DescriptiveStatsDto;
@@ -74,7 +74,7 @@ public class ContinuousSummaryView extends Composite {
 
   final JqPlot qqPlot;
 
-  public ContinuousSummaryView(ContinuousSummaryDto continuous, boolean isInteger) {
+  public ContinuousSummaryView(ContinuousSummaryDto continuous) {
     widget = uiBinder.createAndBindUi(this);
     initWidget(widget);
     obs.setText("" + continuous.getSummary().getN());
@@ -91,7 +91,7 @@ public class ContinuousSummaryView extends Composite {
 
     DescriptiveStatsDto ds = continuous.getSummary();
     if(ds.getVariance() > 0) {
-      HistogramPlot plot = new HistogramPlot("histogram-plot", ds.getMin(), ds.getMax(), isInteger);
+      HistogramPlot plot = new HistogramPlot("histogram-plot", ds.getMin(), ds.getMax());
       if(continuous.getIntervalFrequencyArray() != null) {
         for(int i = 0; i < continuous.getIntervalFrequencyArray().length(); i++) {
           IntervalFrequencyDto value = continuous.getIntervalFrequencyArray().get(i);

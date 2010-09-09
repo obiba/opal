@@ -24,24 +24,16 @@ public class HistogramPlot extends JqPlot {
 
   private final JsArray<JsArrayNumber> data = JsArray.createArray().cast();
 
-  /** TODO: When this is true, tick labels could be formated as whole values */
-  private boolean integers = false;
-
   private double min;
 
   private double max;
 
   private double binSize;
 
-  public HistogramPlot(String id, double min, double max, boolean integers) {
+  public HistogramPlot(String id, double min, double max) {
     super(id);
-    this.integers = integers;
     this.min = min;
     this.max = max;
-  }
-
-  public HistogramPlot(String id, double min, double max) {
-    this(id, min, max, false);
   }
 
   public void push(double lower, double upper, double freq) {

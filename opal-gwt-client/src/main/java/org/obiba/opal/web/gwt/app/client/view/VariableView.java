@@ -205,7 +205,7 @@ public class VariableView extends Composite implements VariablePresenter.Display
     summary.clear();
     if(dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous) != null) {
       ContinuousSummaryDto continuous = dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous).cast();
-      summary.add(new ContinuousSummaryView(continuous, false));
+      summary.add(new ContinuousSummaryView(continuous));
     } else if(dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical) != null) {
       CategoricalSummaryDto categorical = dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
       summary.add(new CategoricalSummaryView(categorical));
