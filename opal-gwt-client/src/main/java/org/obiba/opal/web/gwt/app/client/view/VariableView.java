@@ -197,7 +197,7 @@ public class VariableView extends Composite implements VariablePresenter.Display
   @Override
   public void requestingSummary() {
     summary.clear();
-    summary.add(new Image("images/loading.gif"));
+    summary.add(new Image("image/loading.gif"));
   }
 
   @Override
