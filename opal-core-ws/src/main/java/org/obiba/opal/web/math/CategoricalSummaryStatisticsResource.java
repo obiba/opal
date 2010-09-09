@@ -43,23 +43,8 @@ public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatist
 
   @GET
   public SummaryStatisticsDto compute() {
-    Frequency freq = new Frequency();
-    for(Value value : getValues()) {
-      if(value.isNull() == false) {
-        if(value.isSequence()) {
-          for(Value v : value.asSequence().getValue()) {
-            freq.addValue(v.toString());
-          }
-        } else {
-          freq.addValue(value.toString());
-        }
-      } else {
-        freq.addValue(NULL_NAME);
-      }
-    }
-
+    Frequency freq = computeFrequencyDistribution();
     CategoricalSummaryDto.Builder builder = CategoricalSummaryDto.newBuilder();
-
     long max = 0;
     // Mode is the most frequent value
     String mode = NULL_NAME;
@@ -75,6 +60,24 @@ public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatist
     }
     builder.setMode(mode);
     return SummaryStatisticsDto.newBuilder().setResource(getVariable().getName()).setExtension(CategoricalSummaryDto.categorical, builder.build()).build();
+  }
+
+  private Frequency computeFrequencyDistribution() {
+    Frequency freq = new Frequency();
+    for(Value value : getValues()) {
+      if(value.isNull() == false) {
+        if(value.isSequence()) {
+          for(Value v : value.asSequence().getValue()) {
+            freq.addValue(v.toString());
+          }
+        } else {
+          freq.addValue(value.toString());
+        }
+      } else {
+        freq.addValue(NULL_NAME);
+      }
+    }
+    return freq;
   }
 
   /**
