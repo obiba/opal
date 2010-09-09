@@ -21,10 +21,16 @@ import org.obiba.opal.web.model.Math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.Math.FrequencyDto;
 import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
 
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+
 /**
  *
  */
 public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatisticsResource {
+
+  private final static String NULL_NAME = "N/A";
 
   /**
    * @param valueTable
@@ -48,17 +54,41 @@ public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatist
           freq.addValue(value.toString());
         }
       } else {
-        freq.addValue("N/A");
+        freq.addValue(NULL_NAME);
       }
     }
 
     CategoricalSummaryDto.Builder builder = CategoricalSummaryDto.newBuilder();
 
-    for(Category c : getVariable().getCategories()) {
-      builder.addFrequencies(FrequencyDto.newBuilder().setValue(c.getName()).setFreq(freq.getCount(c.getName())).setPct(freq.getPct(c.getName())));
+    long max = 0;
+    // Mode is the most frequent value
+    String mode = NULL_NAME;
+    // Iterate over all category names with an additional one for the null values. The loop will also determine the mode
+    // of the distribution (most frequent value)
+    for(String value : Iterables.concat(categoryNames(), ImmutableList.of(NULL_NAME))) {
+      long count = freq.getCount(value);
+      if(count > max) {
+        max = count;
+        mode = value;
+      }
+      builder.addFrequencies(FrequencyDto.newBuilder().setValue(value).setFreq(freq.getCount(value)).setPct(freq.getPct(value)));
     }
-    builder.addFrequencies(FrequencyDto.newBuilder().setValue("N/A").setFreq(freq.getCount("N/A")).setPct(freq.getPct("N/A")));
+    builder.setMode(mode);
     return SummaryStatisticsDto.newBuilder().setResource(getVariable().getName()).setExtension(CategoricalSummaryDto.categorical, builder.build()).build();
+  }
+
+  /**
+   * Returns an iterable of category names
+   */
+  private Iterable<String> categoryNames() {
+    return Iterables.transform(getVariable().getCategories(), new Function<Category, String>() {
+
+      @Override
+      public String apply(Category from) {
+        return from.getName();
+      }
+
+    });
   }
 
 }

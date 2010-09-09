@@ -72,7 +72,7 @@ public interface Translations extends Constants {
   String statusLabel();
 
   @Description("Status map")
-  @DefaultStringMapValue({ "NOT_STARTED", "Not Started", "IN_PROGRESS", "In Progress", "SUCCEEDED", "Succeeded", "FAILED", "Failed", "CANCEL_PENDING", "Cancel Pending", "CANCELED", "Cancelled" })
+  @DefaultStringMapValue( { "NOT_STARTED", "Not Started", "IN_PROGRESS", "In Progress", "SUCCEEDED", "Succeeded", "FAILED", "Failed", "CANCEL_PENDING", "Cancel Pending", "CANCELED", "Cancelled" })
   Map<String, String> statusMap();
 
   @Description("Actions label")
@@ -80,7 +80,7 @@ public interface Translations extends Constants {
   String actionsLabel();
 
   @Description("Action map")
-  @DefaultStringMapValue({ "Log", "Log", "Cancel", "Cancel", "Delete", "Delete" })
+  @DefaultStringMapValue( { "Log", "Log", "Cancel", "Cancel", "Delete", "Delete" })
   Map<String, String> actionMap();
 
   @Description("Size label")
@@ -132,7 +132,7 @@ public interface Translations extends Constants {
   String unitLabel();
 
   @Description("User message map")
-  @DefaultStringMapValue({ "jobCancelled", "Job cancelled.", "jobDeleted", "Job deleted.", "completedJobsDeleted", "All completed jobs deleted.", "SetCommandStatus_NotFound", "Job could not be cancelled (not found).", "SetCommandStatus_BadRequest_IllegalStatus", "Job status cannot be set to the specified value.", "SetCommandStatus_BadRequest_NotCancellable", "Job has completed and has already been cancelled.", "DeleteCommand_NotFound", "Job could not be deleted (not found).", "DeleteCommand_BadRequest_NotDeletable", "Job is currently running and therefore cannot be deleted at this time.", "cannotCreateFolderPathAlreadyExist", "Could not create the folder, a folder or a file exist with that name at the specified path.", "cannotCreateFolderParentIsReadOnly", "Could create the following folder because its parent folder is read-only.", "cannotCreatefolderUnexpectedError", "There was an unexpected error while creating the folder.", "cannotDeleteNotEmptyFolder", "This folder contains one or many file(s) and as a result cannot be deleted.", "cannotDeleteReadOnlyFile", "Could delete the  file or folder because it is read-only.", "couldNotDeleteFileError", "There was an error while deleting the file or folder.", "datasourceMustBeSelected", "You must select a datasource.", "fileReadError", "The file could not be read." })
+  @DefaultStringMapValue( { "jobCancelled", "Job cancelled.", "jobDeleted", "Job deleted.", "completedJobsDeleted", "All completed jobs deleted.", "SetCommandStatus_NotFound", "Job could not be cancelled (not found).", "SetCommandStatus_BadRequest_IllegalStatus", "Job status cannot be set to the specified value.", "SetCommandStatus_BadRequest_NotCancellable", "Job has completed and has already been cancelled.", "DeleteCommand_NotFound", "Job could not be deleted (not found).", "DeleteCommand_BadRequest_NotDeletable", "Job is currently running and therefore cannot be deleted at this time.", "cannotCreateFolderPathAlreadyExist", "Could not create the folder, a folder or a file exist with that name at the specified path.", "cannotCreateFolderParentIsReadOnly", "Could create the following folder because its parent folder is read-only.", "cannotCreatefolderUnexpectedError", "There was an unexpected error while creating the folder.", "cannotDeleteNotEmptyFolder", "This folder contains one or many file(s) and as a result cannot be deleted.", "cannotDeleteReadOnlyFile", "Could delete the  file or folder because it is read-only.", "couldNotDeleteFileError", "There was an error while deleting the file or folder.", "datasourceMustBeSelected", "You must select a datasource.", "fileReadError", "The file could not be read." })
   Map<String, String> userMessageMap();
 
   @Description("You must select a file message")
@@ -212,11 +212,11 @@ public interface Translations extends Constants {
   String logLabel();
 
   @Description("Confirmation title map")
-  @DefaultStringMapValue({ "clearJobsList", "Clear Jobs List", "cancelJob", "Cancel Job", "replaceExistingFile", "Replace File", "deleteFile", "Delete File" })
+  @DefaultStringMapValue( { "clearJobsList", "Clear Jobs List", "cancelJob", "Cancel Job", "replaceExistingFile", "Replace File", "deleteFile", "Delete File" })
   Map<String, String> confirmationTitleMap();
 
   @Description("Confirmation message map")
-  @DefaultStringMapValue({ "confirmClearJobsList", "All the completed jobs (succeeded, failed or cancelled) will be removed from the jobs list. Currently running jobs will be unaffected.<br /><br />Please confirm that you want to clear the jobs list.", "confirmCancelJob", "The job will be cancelled. Changes will be rolled back as much as possible: although cancelled, a job might be partially completed.<br /><br />Please confirm that you want cancel this job.", "confirmReplaceExistingFile", "The file that you are uploading already exist in the file system.<br /><br />Please confirm that you want to replace the existing file.", "confirmDeleteFile", "The file will be removed from the file system.<br /><br />Please confirm that you want to delete this file." })
+  @DefaultStringMapValue( { "confirmClearJobsList", "All the completed jobs (succeeded, failed or cancelled) will be removed from the jobs list. Currently running jobs will be unaffected.<br /><br />Please confirm that you want to clear the jobs list.", "confirmCancelJob", "The job will be cancelled. Changes will be rolled back as much as possible: although cancelled, a job might be partially completed.<br /><br />Please confirm that you want cancel this job.", "confirmReplaceExistingFile", "The file that you are uploading already exist in the file system.<br /><br />Please confirm that you want to replace the existing file.", "confirmDeleteFile", "The file will be removed from the file system.<br /><br />Please confirm that you want to delete this file." })
   Map<String, String> confirmationMessageMap();
 
   @Description("A name is required when creating a new folder")
@@ -284,11 +284,11 @@ public interface Translations extends Constants {
   String errorLabel();
 
   @Description("Datasource parsing error map")
-  @DefaultStringMapValue({ "CategoryNameRequired", "Category name required", "CategoryVariableNameRequired", "Category variable name required", "DuplicateCategoryName", "Duplicate category name", "DuplicateColumns", "Duplicate columns", "DuplicateVariableName", "Duplicate variable name", "TableDefinitionErrors", "Table definition errors", "UnexpectedErrorInCategory", "Unexpected error in category", "UnexpectedErrorInVariable", "Unexpected error in variable", "UnidentifiedVariableName", "Unidentified variable name", "UnknownValueType", "Unknown value type", "VariableCategoriesDefinitionErrors", "Variable categories definition errors", "VariableNameCannotContainColon", "Variable name cannot contain colon", "VariableNameRequired", "Variable name required", "CsvInitialisationError", "Error occurred initialising csv datasource", "CsvVariablesHeaderMustContainName", "The variables.csv header must contain 'name'", "CsvVariablesHeaderMustContainValueType", "The variables.csv header must contain 'valueType'.", "CsvVariablesHeaderMustContainEntityType", "The variables.csv header must contain 'entityType'.", "CsvCannotCreateWriter", "Cannot create writer", "CsvCannotSetVariableHeader", "Cannot set variables header", "CsvCannotObtainWriter", "Can not get csv writer", "CsvCannotObtainReader", "Can not get csv reader" })
+  @DefaultStringMapValue( { "CategoryNameRequired", "Category name required", "CategoryVariableNameRequired", "Category variable name required", "DuplicateCategoryName", "Duplicate category name", "DuplicateColumns", "Duplicate columns", "DuplicateVariableName", "Duplicate variable name", "TableDefinitionErrors", "Table definition errors", "UnexpectedErrorInCategory", "Unexpected error in category", "UnexpectedErrorInVariable", "Unexpected error in variable", "UnidentifiedVariableName", "Unidentified variable name", "UnknownValueType", "Unknown value type", "VariableCategoriesDefinitionErrors", "Variable categories definition errors", "VariableNameCannotContainColon", "Variable name cannot contain colon", "VariableNameRequired", "Variable name required", "CsvInitialisationError", "Error occurred initialising csv datasource", "CsvVariablesHeaderMustContainName", "The variables.csv header must contain 'name'", "CsvVariablesHeaderMustContainValueType", "The variables.csv header must contain 'valueType'.", "CsvVariablesHeaderMustContainEntityType", "The variables.csv header must contain 'entityType'.", "CsvCannotCreateWriter", "Cannot create writer", "CsvCannotSetVariableHeader", "Cannot set variables header", "CsvCannotObtainWriter", "Can not get csv writer", "CsvCannotObtainReader", "Can not get csv reader" })
   Map<String, String> datasourceParsingErrorMap();
 
   @Description("Datasource comparison error map")
-  @DefaultStringMapValue({ "IncompatibleValueType", "Incompatible value type", "IncompatibleEntityType", "Incompatible entity type", "VariablePresentInSourceButNotDestination", "Variable exists in source but not in destination" })
+  @DefaultStringMapValue( { "IncompatibleValueType", "Incompatible value type", "IncompatibleEntityType", "Incompatible entity type", "VariablePresentInSourceButNotDestination", "Variable exists in source but not in destination" })
   Map<String, String> datasourceComparisonErrorMap();
 
   @Description("New variables label")
@@ -303,4 +303,7 @@ public interface Translations extends Constants {
   @DefaultStringValue("Conflicts")
   String conflictedVariablesLabel();
 
+  @Description("No data available label")
+  @DefaultStringValue("No data available")
+  String noDataAvailableLabel();
 }

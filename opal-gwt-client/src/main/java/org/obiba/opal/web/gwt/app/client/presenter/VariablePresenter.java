@@ -25,8 +25,10 @@ import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
 import com.google.inject.Inject;
@@ -37,6 +39,10 @@ import com.google.inject.Inject;
 public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display> {
 
   private VariableDto variable;
+
+  private SummaryStatisticsDto summary;
+
+  private Request summaryRequest;
 
   //
   // Constructors
@@ -63,6 +69,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     getDisplay().setParentCommand(new ParentCommand());
     getDisplay().setNextCommand(new NextCommand());
     getDisplay().setPreviousCommand(new PreviousCommand());
+    getDisplay().setSummaryTabCommand(new SummaryCommand());
   }
 
   @Override
@@ -109,6 +116,35 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     return variableDto.getName().equals(variable.getName()) && variableDto.getParentLink().getRel().equals(variable.getParentLink().getRel());
   }
 
+  /**
+   * @param selection
+   */
+  private void requestSummary(final VariableDto selection) {
+    getDisplay().requestingSummary();
+    summaryRequest = ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder().forResource(variable.getLink() + "/summary").get().withCallback(new ResourceCallback<SummaryStatisticsDto>() {
+      @Override
+      public void onResource(Response response, SummaryStatisticsDto resource) {
+        if(isCurrentVariable(selection)) {
+          summary = resource;
+          getDisplay().renderSummary(resource);
+        }
+      }
+
+    }).send();
+  }
+
+  private void cancelPendingSummaryRequest() {
+    summary = null;
+    if(summaryRequest != null && summaryRequest.isPending()) {
+      summaryRequest.cancel();
+      summaryRequest = null;
+    }
+  }
+
+  private boolean hasSummaryOrPendingRequest() {
+    return summary != null || (summaryRequest != null && summaryRequest.isPending());
+  }
+
   //
   // Interfaces and classes
   //
@@ -149,10 +185,26 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     }
   }
 
+  /**
+   *
+   */
+  final class SummaryCommand implements Command {
+    @Override
+    public void execute() {
+      if(hasSummaryOrPendingRequest() == false) {
+        requestSummary(variable);
+      }
+    }
+  }
+
   class VariableSelectionHandler implements VariableSelectionChangeEvent.Handler {
     @Override
     public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
+      cancelPendingSummaryRequest();
       updateDisplay(event.getSelection(), event.getPrevious(), event.getNext());
+      if(getDisplay().isSummaryTabSelected()) {
+        requestSummary(event.getSelection());
+      }
     }
   }
 
@@ -187,5 +239,13 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     void renderCategoryRows(JsArray<CategoryDto> rows);
 
     void renderAttributeRows(JsArray<AttributeDto> rows);
+
+    void setSummaryTabCommand(Command cmd);
+
+    boolean isSummaryTabSelected();
+
+    void requestingSummary();
+
+    void renderSummary(SummaryStatisticsDto summary);
   }
 }

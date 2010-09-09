@@ -14,9 +14,14 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.VariablePresenter;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
+import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
+import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
+import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -26,7 +31,10 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
@@ -45,6 +53,8 @@ public class VariableView extends Composite implements VariablePresenter.Display
   private static final String DEFAULT_LOCALE_NAME = "default";
 
   private static final String LABEL_ATTRIBUTE_NAME = "label";
+
+  private static final Integer SUMMARY_TAB_INDEX = 2;
 
   private static VariableViewUiBinder uiBinder = GWT.create(VariableViewUiBinder.class);
 
@@ -84,6 +94,9 @@ public class VariableView extends Composite implements VariablePresenter.Display
   Label label;
 
   @UiField
+  TabLayoutPanel tabs;
+
+  @UiField
   Label categoryTableTitle;
 
   @UiField
@@ -98,6 +111,9 @@ public class VariableView extends Composite implements VariablePresenter.Display
   CellTable<AttributeDto> attributeTable;
 
   SimplePager<AttributeDto> attributeTablePager;
+
+  @UiField
+  Panel summary;
 
   //
   // Constructors
@@ -158,6 +174,44 @@ public class VariableView extends Composite implements VariablePresenter.Display
     attributeTable.redraw();
 
     label.setText(getAttributeValue(attributeRows, LABEL_ATTRIBUTE_NAME));
+  }
+
+  @Override
+  public void setSummaryTabCommand(final Command cmd) {
+    tabs.addSelectionHandler(new SelectionHandler<Integer>() {
+
+      @Override
+      public void onSelection(SelectionEvent<Integer> event) {
+        if(event.getSelectedItem() == SUMMARY_TAB_INDEX) {
+          cmd.execute();
+        }
+      }
+    });
+  }
+
+  @Override
+  public boolean isSummaryTabSelected() {
+    return tabs.getSelectedIndex() == SUMMARY_TAB_INDEX;
+  }
+
+  @Override
+  public void requestingSummary() {
+    summary.clear();
+    summary.add(new Image("images/loading.gif"));
+  }
+
+  @Override
+  public void renderSummary(SummaryStatisticsDto dto) {
+    summary.clear();
+    if(dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous) != null) {
+      ContinuousSummaryDto continuous = dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous).cast();
+      summary.add(new ContinuousSummaryView(continuous, false));
+    } else if(dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical) != null) {
+      CategoricalSummaryDto categorical = dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
+      summary.add(new CategoricalSummaryView(categorical));
+    } else {
+      summary.add(new Label(translations.noDataAvailableLabel()));
+    }
   }
 
   public Widget asWidget() {

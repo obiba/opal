@@ -1,0 +1,12 @@
+<!DOCTYPE module PUBLIC "//gwt-module/" "http://google-web-toolkit.googlecode.com/svn/tags/2.0.0/distro-source/core/src/gwt-module.dtd">
+<module>
+  <inherits name="com.google.gwt.core.Core" />
+  <script src="jquery-1.4.2.min.js"/>
+  <script src="jqplot/jquery.jqplot.js"/>
+  <script src="jqplot/plugins/jqplot.categoryAxisRenderer.min.js"/>
+  <script src="jqplot/plugins/jqplot.barRenderer.min.js"/>
+  <script src="jqplot/plugins/jqplot.pointLabels.min.js"/>
+  <script src="jqplot/plugins/jqplot.canvasTextRenderer.min.js"/>
+  <script src="jqplot/plugins/jqplot.canvasAxisTickRenderer.min.js"/>
+  <stylesheet src="jqplot/jquery.jqplot.min.css" />
+</module>

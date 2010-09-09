@@ -25,6 +25,9 @@
   <!-- Opal CellView Module -->
   <inherits name='org.obiba.opal.web.gwt.user.cellview.CellView' />
 
+  <!-- Opal Ploting Module -->
+  <inherits name='org.obiba.opal.web.gwt.plot.Plots' />
+
   <!-- Specify the app entry point class. -->
   <entry-point class='org.obiba.opal.web.gwt.app.client.GwtApp' />
   
