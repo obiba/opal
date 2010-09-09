@@ -144,8 +144,7 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
         createTransientCsvDatasource();
       }
       if(importData.getImportFormat().equals(ImportFormat.XML)) {
-        // datasourceDiff(); // TODO Temporary workaround to allow data to be imported.
-        eventBus.fireEvent(new WorkbenchChangeEvent(identityArchiveStepPresenter));
+        datasourceDiff();
       }
     }
 
@@ -168,10 +167,11 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
   }
 
   private void collectValidationErrors(TableCompareDto tableComparison) {
-    collectMissingVariableValidationErrors(tableComparison);
+    // collectMissingVariableValidationErrors(tableComparison); // TODO Re-enable as part of OPAL-712.
     collectConflictValidationErrors(tableComparison);
   }
 
+  @SuppressWarnings("unused")
   private void collectMissingVariableValidationErrors(TableCompareDto tableComparison) {
     if(tableComparison.getNewVariablesArray() != null) {
       for(int i = 0; i < tableComparison.getNewVariablesArray().length(); i++) {
