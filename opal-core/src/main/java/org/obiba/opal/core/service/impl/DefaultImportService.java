@@ -35,6 +35,7 @@ import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListener;
 import org.obiba.magma.support.DatasourceCopier.MultiplexingStrategy;
 import org.obiba.magma.support.DatasourceCopier.VariableTransformer;
+import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
 import org.obiba.magma.type.BooleanType;
@@ -240,10 +241,14 @@ public class DefaultImportService implements ImportService {
 
   private Set<VariableEntity> addMissingEntitiesToKeysTable(ValueTable valueTable) {
     Set<VariableEntity> nonExistentVariableEntities = Sets.newHashSet(valueTable.getVariableEntities());
-    Set<VariableEntity> entitiesInKeysTable = lookupKeysTable().getVariableEntities();
 
-    // Remove all entities that exist in the keys table. Whatever is left are the ones that don't exist...
-    nonExistentVariableEntities.removeAll(entitiesInKeysTable);
+    MagmaEngineReferenceResolver tableResolver = MagmaEngineTableResolver.valueOf(keysTableReference);
+    if(MagmaEngine.get().getDatasource(tableResolver.getDatasourceName()).hasValueTable(tableResolver.getTableName())) {
+      // Remove all entities that exist in the keys table. Whatever is left are the ones that don't exist...
+      Set<VariableEntity> entitiesInKeysTable = lookupKeysTable().getVariableEntities();
+      nonExistentVariableEntities.removeAll(entitiesInKeysTable);
+    }
+
     if(nonExistentVariableEntities.size() > 0) {
       ValueTableWriter keysTableWriter = writeToKeysTable();
       try {
@@ -256,6 +261,7 @@ public class DefaultImportService implements ImportService {
         Closeables.closeQuietly(keysTableWriter);
       }
     }
+
     return nonExistentVariableEntities;
   }
 
