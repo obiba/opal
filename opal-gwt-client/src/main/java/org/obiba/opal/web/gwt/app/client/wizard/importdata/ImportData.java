@@ -45,6 +45,26 @@ public class ImportData {
 
   private String transientDatasourceName;
 
+  public void clear() {
+    importFormat = null;
+    xmlFile = null;
+    destinationDatasourceName = null;
+    destinationTableName = null;
+    characterSet = null;
+    identifierAsIs = false;
+    identifierSharedWithUnit = false;
+    unit = null;
+    archiveLeave = false;
+    archiveMove = false;
+    archiveDirectory = null;
+    jobId = null;
+    row = 0;
+    quote = null;
+    field = null;
+    csvFile = null;
+    transientDatasourceName = null;
+  }
+
   public void setFormat(ImportFormat importFormat) {
     this.importFormat = importFormat;
   }

@@ -81,6 +81,7 @@ public class FormatSelectionStepPresenter extends WidgetPresenter<FormatSelectio
 
     @Override
     public void onClick(ClickEvent event) {
+      importData.clear();
       importData.setFormat(display.getImportFormat());
       if(display.getImportFormat().equals(ImportFormat.CSV)) {
         eventBus.fireEvent(new WorkbenchChangeEvent(csvFormatStepPresenter));

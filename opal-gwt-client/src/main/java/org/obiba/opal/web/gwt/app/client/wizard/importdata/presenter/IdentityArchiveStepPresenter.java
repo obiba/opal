@@ -143,6 +143,8 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
       getDisplay().setIdentifierAsIs(importData.isIdentifierAsIs());
       getDisplay().setIdentifierSharedWithUnit(importData.isIdentifierSharedWithUnit());
       getDisplay().setIdentityEnabled(false);
+    } else {
+      getDisplay().setIdentityEnabled(true);
     }
   }
 
