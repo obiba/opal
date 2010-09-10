@@ -2,7 +2,6 @@ package org.obiba.opal.rest.client.magma;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.Set;
 
 import org.obiba.magma.ValueTable;
@@ -15,7 +14,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
-import com.google.protobuf.Message;
 
 public class RestDatasource extends AbstractDatasource {
 

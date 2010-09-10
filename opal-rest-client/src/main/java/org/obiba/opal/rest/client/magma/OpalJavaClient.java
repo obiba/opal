@@ -46,7 +46,7 @@ public class OpalJavaClient {
     this.opalURI = new URI(uri.endsWith("/") ? uri : uri + "/");
 
     DefaultHttpClient httpClient = new DefaultHttpClient();
-    httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, new String(password)));
+    httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
     httpClient.getParams().setParameter("http.protocol.handle-authentication", Boolean.TRUE);
     httpClient.getParams().setParameter("http.auth.target-scheme-pref", ImmutableList.of(OpalAuthScheme.NAME));
     httpClient.getAuthSchemes().register(OpalAuthScheme.NAME, new OpalAuthScheme.Factory());
