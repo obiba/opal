@@ -89,6 +89,7 @@
               <directory>war</directory>
               <includes>
                 <include>org.obiba.**</include>
+                <include>opal</include>
               </includes>
             </fileset>
           </filesets>
