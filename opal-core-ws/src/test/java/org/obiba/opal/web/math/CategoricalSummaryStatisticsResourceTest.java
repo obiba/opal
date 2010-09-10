@@ -80,6 +80,13 @@ public class CategoricalSummaryStatisticsResourceTest {
     assertThat(categoricalDto.getMode(), is("CAT1"));
   }
 
+  @Test
+  public void test_compute_withNullSequence() {
+    Variable mockVariable = Variable.Builder.newVariable("mock", TextType.get(), "mock").addCategories("CAT1", "CAT2").build();
+    CategoricalSummaryDto categoricalDto = compute(mockVariable, ImmutableList.of(TextType.get().nullSequence(), Values.asSequence(TextType.get(), "CAT1")));
+    assertThat(categoricalDto.getMode(), is("CAT1"));
+  }
+
   private CategoricalSummaryDto compute(Variable variable, Iterable<Value> values) {
     ValueTable mockTable = createMock(ValueTable.class);
     VectorSource mockSource = createMock(VectorSource.class);

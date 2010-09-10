@@ -47,6 +47,7 @@ public class ContinuousSummaryStatisticsResource extends AbstractSummaryStatisti
    */
   public ContinuousSummaryStatisticsResource(ValueTable valueTable, Variable variable, VectorSource vectorSource) {
     super(valueTable, variable, vectorSource);
+    if(variable.getValueType().isNumeric() == false) throw new IllegalArgumentException("variable is not continuous");
   }
 
   @GET
@@ -79,9 +80,7 @@ public class ContinuousSummaryStatisticsResource extends AbstractSummaryStatisti
     public ContinuousSummaryDto.Builder calc(ValueType type, Iterable<Value> values, List<Double> percentiles, int intervals) {
       DescriptiveStatistics ds = new DescriptiveStatistics();
       for(Value value : values) {
-        if(value.isNull() == false) {
-          ds.addValue(((Number) value.getValue()).doubleValue());
-        }
+        addValue(ds, value);
       }
 
       DescriptiveStatsDto.Builder builder = DescriptiveStatsDto.newBuilder().setMin(ds.getMin()).setMax(ds.getMax()).setN(ds.getN()).setMean(ds.getMean()).setSum(ds.getSum()).setSumsq(ds.getSumsq()).setStdDev(ds.getStandardDeviation()).setVariance(ds.getVariance()).setSkewness(ds.getSkewness()).setGeometricMean(ds.getGeometricMean()).setKurtosis(ds.getKurtosis()).setMedian(ds.apply(new Median()));
@@ -106,6 +105,18 @@ public class ContinuousSummaryStatisticsResource extends AbstractSummaryStatisti
         }
       }
       return continuous.setSummary(builder);
+    }
+
+    private void addValue(DescriptiveStatistics ds, Value value) {
+      if(value.isNull() == false) {
+        if(value.isSequence()) {
+          for(Value v : value.asSequence().getValue()) {
+            addValue(ds, v);
+          }
+        } else {
+          ds.addValue(((Number) value.getValue()).doubleValue());
+        }
+      }
     }
 
   }

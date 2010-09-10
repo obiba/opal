@@ -72,8 +72,12 @@ public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatist
 
   private void addValue(Frequency freq, Value value) {
     if(value.isSequence()) {
-      for(Value v : value.asSequence().getValue()) {
-        addValue(freq, v);
+      if(value.isNull()) {
+        freq.addValue(NULL_NAME);
+      } else {
+        for(Value v : value.asSequence().getValue()) {
+          addValue(freq, v);
+        }
       }
     } else {
       if(value.isNull() == false) {
