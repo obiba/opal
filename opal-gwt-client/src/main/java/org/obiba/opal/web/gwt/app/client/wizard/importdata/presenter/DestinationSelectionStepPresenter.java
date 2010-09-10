@@ -100,9 +100,24 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
       public void onResource(Response response, JsArray<DatasourceDto> datasources) {
+        if(importData.getImportFormat().equals(ImportFormat.CSV)) {
+          datasources = removeDatasourcesWithoutTables(datasources);
+        }
         getDisplay().setDatasources(datasources);
       }
     }).send();
+  }
+
+  private JsArray<DatasourceDto> removeDatasourcesWithoutTables(JsArray<DatasourceDto> datasources) {
+    @SuppressWarnings("unchecked")
+    JsArray<DatasourceDto> result = (JsArray<DatasourceDto>) JsArray.createArray();
+    for(int i = 0; i < datasources.length(); i++) {
+      DatasourceDto d = datasources.get(i);
+      if(d.getTableArray() != null && d.getTableArray().length() > 0) {
+        result.push(d);
+      }
+    }
+    return result;
   }
 
   private void hideShowTables() {
