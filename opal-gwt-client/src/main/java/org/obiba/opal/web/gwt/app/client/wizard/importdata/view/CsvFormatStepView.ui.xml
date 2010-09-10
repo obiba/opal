@@ -34,13 +34,15 @@
             <tr>
               <td>
                 <ui:msg description="Separators label">Separators:</ui:msg>
-                Field:<g:ListBox ui:field="field">
+                <ui:msg description="Field label">Field</ui:msg>:
+                <g:ListBox ui:field="field">
                   <g:item>,</g:item>
                   <g:item>;</g:item>
                   <g:item>:</g:item>
                   <g:item value='\t'>tab</g:item>
                 </g:ListBox>          
-                Quote:<g:ListBox ui:field="quote">
+                <ui:msg description="Quote label">Quote</ui:msg>:
+                <g:ListBox ui:field="quote">
                   <g:item>"</g:item>
                   <g:item>'</g:item>
                 </g:ListBox>          
