@@ -129,14 +129,6 @@
     </plugins>
   </build>
 
-  <repositories>
-    <!-- Repository added to fix OPAL-679. Caysed by usage of "first 2.1M2 jars" (yes, there are many!) -->
-    <repository>
-      <id>gwt2.1m2</id>
-      <url>http://google-web-toolkit.googlecode.com/svn/2.1.0.M2/gwt/maven/</url>
-    </repository>
-  </repositories>
-
   <pluginRepositories>
     <pluginRepository>
       <id>obiba.org</id>

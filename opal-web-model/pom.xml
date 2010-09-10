@@ -255,11 +255,8 @@
 
     </plugins>
   </build>
+
   <repositories>
-    <repository>
-      <id>obiba</id>
-      <url>http://maven.obiba.org/maven2</url>
-    </repository>
     <repository>
       <id>protobuf-java-format</id>
       <url>http://protobuf-java-format.googlecode.com/svn/trunk/repo/</url>
@@ -270,6 +267,7 @@
       <url>http://protostuff.googlecode.com/svn/repos/maven2</url>
     </repository>
   </repositories>
+
   <pluginRepositories>
     <pluginRepository>
       <id>obiba</id>
