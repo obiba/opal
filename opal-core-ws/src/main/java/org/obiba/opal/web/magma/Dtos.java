@@ -18,6 +18,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.obiba.magma.Attribute;
 import org.obiba.magma.Category;
 import org.obiba.magma.Datasource;
+import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
@@ -28,6 +29,7 @@ import org.obiba.opal.web.model.Magma.CategoryDto;
 import org.obiba.opal.web.model.Magma.DatasourceDto;
 import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.TableDto;
+import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 
 import com.google.common.base.Function;
@@ -38,6 +40,15 @@ import com.google.common.collect.Lists;
  * Utilities for manipulating Magma Dto instances
  */
 final class Dtos {
+
+  public static final Function<Value, ValueDto> valueAsDtoFunc = new Function<Value, ValueDto>() {
+
+    @Override
+    public ValueDto apply(Value from) {
+      return asDto(from).build();
+    }
+
+  };
 
   public static Function<Variable, VariableDto> asDtoFunc(final LinkDto tableLink, final UriBuilder uriBuilder) {
     return new Function<Variable, VariableDto>() {
@@ -177,4 +188,13 @@ final class Dtos {
 
     return builder;
   }
+
+  public static ValueDto.Builder asDto(Value value) {
+    ValueDto.Builder valueBuilder = ValueDto.newBuilder().setValueType(value.getValueType().getName()).setIsSequence(value.isSequence());
+    if(value.isNull() == false) {
+      valueBuilder.setValue(value.toString());
+    }
+    return valueBuilder;
+  }
+
 }
