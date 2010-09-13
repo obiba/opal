@@ -40,7 +40,6 @@ import org.obiba.opal.web.magma.support.DatasourceFactoryDtoParser;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.magma.support.ExcelDatasourceFactoryDtoParser;
 import org.obiba.opal.web.model.Magma;
-import org.obiba.opal.web.model.Ws;
 import org.obiba.opal.web.model.Magma.ExcelDatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
@@ -49,7 +48,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.protobuf.JsonFormat;
 
 /**
  *
@@ -118,8 +116,8 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     // System.out.println(JsonFormat.printToString(error));
     Assert.assertEquals("DatasourceCreationFailed", error.getStatus());
     Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), error.getCode());
-    Assert.assertEquals(15, error.getExtensionCount(Ws.DatasourceParsingErrorDto.errors));
-    Ws.DatasourceParsingErrorDto parsingError = error.getExtension(Ws.DatasourceParsingErrorDto.errors, 0);
+    Assert.assertEquals(15, error.getExtensionCount(Magma.DatasourceParsingErrorDto.errors));
+    Magma.DatasourceParsingErrorDto parsingError = error.getExtension(Magma.DatasourceParsingErrorDto.errors, 0);
     Assert.assertEquals("DuplicateCategoryName", parsingError.getKey());
     Assert.assertEquals("[Categories, 4, Table1, Var1, C2]", parsingError.getArgumentsList().toString());
   }

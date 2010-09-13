@@ -12,9 +12,9 @@ package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DestinationSelectionStepPresenter.CsvValidationError;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ValidationReportStepPresenter;
-import org.obiba.opal.web.model.client.ws.DatasourceParsingErrorDto;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DestinationSelectionStepPresenter.CsvValidationError;
+import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;

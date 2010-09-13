@@ -13,8 +13,8 @@ import javax.ws.rs.core.Response.Status;
 
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.support.DatasourceParsingException;
+import org.obiba.opal.web.model.Magma.DatasourceParsingErrorDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
-import org.obiba.opal.web.model.Ws.DatasourceParsingErrorDto;
 
 /**
  * Utilities for handling ClientError Dtos.

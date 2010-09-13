@@ -78,6 +78,15 @@ message HibernateDatasourceFactoryDto {
   } 
 }
 
+message DatasourceParsingErrorDto {
+  required string defaultMessage = 1;
+  required string key = 2;
+  repeated string arguments = 3;
+  extend Ws.ClientErrorDto {
+    repeated DatasourceParsingErrorDto errors = 1000;
+  } 
+}
+
 message DatasourceDto {
   required string name = 1;
   optional string link = 2;
