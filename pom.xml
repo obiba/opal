@@ -536,11 +536,6 @@
   </dependencyManagement>
 
   <dependencies>
-    <dependency>
-      <groupId>org.obiba</groupId>
-      <artifactId>obiba-core</artifactId>
-    </dependency>
-
     <!-- Logging -->
     <!-- Every child should use SLF4J for logging -->
     <dependency>

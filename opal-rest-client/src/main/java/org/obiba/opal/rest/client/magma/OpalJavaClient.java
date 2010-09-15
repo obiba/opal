@@ -19,8 +19,8 @@ import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
-import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.MagmaRuntimeException;
+import org.obiba.magma.lang.Closeables;
 
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Message;
@@ -85,7 +85,7 @@ public class OpalJavaClient {
     } catch(IOException e) {
       throw new MagmaRuntimeException(e);
     } finally {
-      StreamUtil.silentSafeClose(is);
+      Closeables.closeQuietly(is);
     }
   }
 
@@ -99,7 +99,7 @@ public class OpalJavaClient {
     } catch(IOException e) {
       throw new MagmaRuntimeException(e);
     } finally {
-      StreamUtil.silentSafeClose(is);
+      Closeables.closeQuietly(is);
     }
   }
 
