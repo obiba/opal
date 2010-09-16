@@ -223,4 +223,9 @@ public class DefaultOpalRuntime implements OpalRuntime {
       });
     }
   }
+
+  @Override
+  public void writeOpalConfiguration() {
+    opalConfigIo.writeConfiguration(opalConfiguration);
+  }
 }
