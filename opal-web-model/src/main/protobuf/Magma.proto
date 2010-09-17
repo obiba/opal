@@ -183,6 +183,17 @@ message OutlierRemovingViewDto {
   }
 }
 
+message JavaScriptErrorDto {
+  required string message = 1;      // RhinoException.details()
+  required string sourceName = 2;   // RhinoException.sourceName()
+  required int32 lineNumber = 3;    // RhinoException.lineNumber()
+  optional string lineSource = 4;   // RhinoException.lineSource()
+  optional int32 columnNumber = 5;  // RhinoException.columnNumber()
+  extend Ws.ClientErrorDto {
+    repeated JavaScriptErrorDto errors = 1001;
+  }
+}
+
 message TableCompareDto {
   required TableDto compared = 1;
   optional TableDto withTable = 2; // optional because this is absent when the destination table does not exist
