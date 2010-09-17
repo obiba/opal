@@ -102,6 +102,7 @@ message TableDto {
   optional int32 valueSetCount = 5;
   optional string datasourceName = 6;
   repeated VariableDto variables = 7;
+  optional string viewLink = 8;
 }
 
 message VariableDto {
@@ -151,6 +152,35 @@ message ValueDto {
 message LinkDto {
   required string rel = 1;
   required string link = 2;
+}
+
+message ViewDto {
+  repeated string from = 1;
+  extensions 1000 to max; 
+}
+
+message JavaScriptViewDto {
+  optional string select = 1;
+  optional string where = 2;
+  extend ViewDto {
+    optional JavaScriptViewDto view = 1000;
+  }
+}
+
+message VariableListViewDto {
+  repeated VariableDto variables = 1;
+  optional string where = 2;
+  extend ViewDto {
+    optional VariableListViewDto view = 1001;
+  }
+}
+
+message OutlierRemovingViewDto {
+  required double stdDevMultiplier = 1;
+  optional string valueForOutlier = 2;
+  extend ViewDto {
+    optional OutlierRemovingViewDto view = 1002;
+  }
 }
 
 message TableCompareDto {
