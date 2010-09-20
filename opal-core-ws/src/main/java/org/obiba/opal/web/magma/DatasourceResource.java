@@ -113,10 +113,12 @@ public class DatasourceResource {
       MagmaEngine.get().removeTransientDatasource(name);
       response = Response.ok();
     } else if(MagmaEngine.get().hasDatasource(name)) {
-      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "NotTransientDatasourceRemovalUnsupported").build());
-    } else {
-      // returns silently
+      MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource(name));
+      opalRuntime.getOpalConfiguration().getMagmaEngineFactory().removeFactory(name);
+      opalRuntime.writeOpalConfiguration();
       response = Response.ok();
+    } else {
+      response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound"));
     }
 
     return response.build();

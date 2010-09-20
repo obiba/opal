@@ -121,6 +121,41 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
   }
 
   @Test
+  public void testRemoveDatasource_RemoveNonTransientDatasource() {
+
+    createNewDatasource("datasourceToRemove");
+
+    OpalRuntime opalruntimeMock = createMock(OpalRuntime.class);
+    OpalConfiguration opalConfig = new OpalConfiguration();
+
+    MagmaEngineFactory factory = new MagmaEngineFactory();
+    ExcelDatasourceFactory excelFactory = new ExcelDatasourceFactory();
+    excelFactory.setName("datasourceToRemove");
+    factory.withFactory(excelFactory);
+    opalConfig.setMagmaEngineFactory(factory);
+
+    expect(opalruntimeMock.getOpalConfiguration()).andReturn(opalConfig);
+    opalruntimeMock.writeOpalConfiguration();
+
+    replay(opalruntimeMock);
+
+    DatasourceResource resource = new DatasourceResource(newDatasourceFactoryRegistry(), opalruntimeMock, "datasourceToRemove");
+    Response response = resource.removeDatasource();
+
+    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void testRemoveDatasource_DatasourceNotFound() {
+    OpalRuntime opalruntimeMock = createMock(OpalRuntime.class);
+
+    DatasourceResource resource = new DatasourceResource(newDatasourceFactoryRegistry(), opalruntimeMock, "datasourceNotExist");
+    Response response = resource.removeDatasource();
+
+    Assert.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+  }
+
+  @Test
   public void testDatasourcesPOST() {
     DatasourcesResource resource = new DatasourcesResource("opal-keys.keys", newDatasourceFactoryRegistry());
 
@@ -202,7 +237,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     Assert.assertFalse(MagmaEngine.get().hasTransientDatasource(uid));
 
     response = resource.removeDatasource();
-    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    Assert.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
   }
 
   @Test
