@@ -51,6 +51,7 @@ public class JdbcDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDto
     factory.setTransactionManager(transactionManager);
     factory.setJdbcProperties(parseProperties(jdbcDto));
     factory.setDatasourceSettings(parseSettings(jdbcDto.getSettings()));
+    factory.setName(dto.getName());
     return factory;
   }
 

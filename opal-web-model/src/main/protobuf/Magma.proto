@@ -4,6 +4,7 @@ package Magma;
 option java_package = "org.obiba.opal.web.model";
 
 message DatasourceFactoryDto {
+  optional string name = 1;
   extensions 1000 to max;
 }
 

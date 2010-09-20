@@ -36,6 +36,7 @@ public class FsDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoPa
       }
       factory.setEncryptionStrategy(unit.getDatasourceEncryptionStrategy());
     }
+    factory.setName(dto.getName());
     return factory;
   }
 

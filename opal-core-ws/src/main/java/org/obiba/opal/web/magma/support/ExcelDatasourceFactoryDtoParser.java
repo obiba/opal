@@ -26,6 +26,7 @@ public class ExcelDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDt
     ExcelDatasourceFactory factory = new ExcelDatasourceFactory();
     ExcelDatasourceFactoryDto excelDto = dto.getExtension(ExcelDatasourceFactoryDto.params);
     factory.setFile(resolveLocalFile(excelDto.getFile()));
+    factory.setName(dto.getName());
     factory.setReadOnly(excelDto.getReadOnly());
     return factory;
   }

@@ -30,6 +30,8 @@ import javax.ws.rs.core.Response.Status;
 
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
+import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.DuplicateDatasourceNameException;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
@@ -38,7 +40,11 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
+import org.obiba.magma.support.DatasourceParsingException;
 import org.obiba.magma.support.Disposables;
+import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
+import org.obiba.opal.web.magma.support.NoSuchDatasourceFactoryException;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
@@ -46,6 +52,7 @@ import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -62,13 +69,26 @@ public class DatasourceResource {
 
   private Datasource transientDatasourceInstance;
 
-  // Used by Spring. JAX-RS, will inject the name attribute
-  public DatasourceResource() {
+  DatasourceFactoryRegistry datasourceFactoryRegistry;
+
+  private OpalRuntime opalRuntime;
+
+  @Autowired
+  public DatasourceResource(DatasourceFactoryRegistry datasourceFactoryRegistry, OpalRuntime opalRuntime) {
+    super();
+    this.datasourceFactoryRegistry = datasourceFactoryRegistry;
+    this.opalRuntime = opalRuntime;
   }
 
   // Used for testing
   public DatasourceResource(String name) {
     this.name = name;
+  }
+
+  public DatasourceResource(DatasourceFactoryRegistry datasourceFactoryRegistry, OpalRuntime opalRuntime, String name) {
+    this.name = name;
+    this.datasourceFactoryRegistry = datasourceFactoryRegistry;
+    this.opalRuntime = opalRuntime;
   }
 
   @PreDestroy
@@ -215,4 +235,29 @@ public class DatasourceResource {
       StreamUtil.silentSafeClose(vw);
     }
   }
+
+  @PUT
+  public Response createDatasource(@Context final UriInfo uriInfo, Magma.DatasourceFactoryDto factoryDto) {
+    ResponseBuilder response = null;
+    try {
+      DatasourceFactory factory = datasourceFactoryRegistry.parse(factoryDto);
+      Datasource ds = MagmaEngine.get().addDatasource(factory);
+      opalRuntime.getOpalConfiguration().getMagmaEngineFactory().withFactory(factory);
+      opalRuntime.writeOpalConfiguration();
+      UriBuilder ub = uriInfo.getBaseUriBuilder().path("datasource").path(ds.getName());
+      response = Response.created(ub.build()).entity(Dtos.asDto(ds).build());
+      Disposables.silentlyDispose(ds);
+    } catch(NoSuchDatasourceFactoryException noSuchDatasourceFactoryEx) {
+      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "UnidentifiedDatasourceFactory").build());
+    } catch(DuplicateDatasourceNameException duplicateDsNameEx) {
+      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DuplicateDatasourceName").build());
+    } catch(DatasourceParsingException dsParsingEx) {
+      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed", dsParsingEx).build());
+    } catch(MagmaRuntimeException dsCreationFailedEx) {
+      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed", dsCreationFailedEx).build());
+    }
+
+    return response.build();
+  }
+
 }
