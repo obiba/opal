@@ -15,4 +15,9 @@
       <property name="minimum" value="7" />
     </properties>
   </rule>
+  <rule ref="rulesets/design.xml/AvoidDeeplyNestedIfStmts">
+    <properties>
+      <property name="problemDepth" value="3" />
+    </properties>
+  </rule>
 </ruleset>
