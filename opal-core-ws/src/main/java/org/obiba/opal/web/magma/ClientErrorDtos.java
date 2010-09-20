@@ -11,9 +11,11 @@ package org.obiba.opal.web.magma;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.mozilla.javascript.RhinoException;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.support.DatasourceParsingException;
 import org.obiba.opal.web.model.Magma.DatasourceParsingErrorDto;
+import org.obiba.opal.web.model.Magma.JavaScriptErrorDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
 
 /**
@@ -45,6 +47,14 @@ public class ClientErrorDtos {
     return clientError;
   }
 
+  public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, RhinoException exception) {
+    ClientErrorDto.Builder clientError = getErrorMessage(responseStatus, errorStatus);
+    clientError.addArguments(exception.getMessage());
+    clientError.addExtension(JavaScriptErrorDto.errors, newJavaScriptErrorDto(exception).build());
+
+    return clientError;
+  }
+
   private static DatasourceParsingErrorDto.Builder newDatasourceParsingErrorDto(DatasourceParsingException pe) {
     DatasourceParsingErrorDto.Builder parsingError = DatasourceParsingErrorDto.newBuilder();
     parsingError.setDefaultMessage(pe.getMessage());
@@ -53,5 +63,21 @@ public class ClientErrorDtos {
       parsingError.addArguments(arg.toString());
     }
     return parsingError;
+  }
+
+  private static JavaScriptErrorDto.Builder newJavaScriptErrorDto(RhinoException exception) {
+    JavaScriptErrorDto.Builder javaScriptErrorDtoBuilder = JavaScriptErrorDto.newBuilder() //
+    .setMessage(exception.details()) //
+    .setSourceName(exception.sourceName()) //
+    .setLineNumber(exception.lineNumber()); //
+
+    if(exception.lineSource() != null) {
+      javaScriptErrorDtoBuilder.setLineSource(exception.lineSource());
+    }
+    if(exception.columnNumber() != 0) { // column number is 0 if unknown
+      javaScriptErrorDtoBuilder.setColumnNumber(exception.columnNumber());
+    }
+
+    return javaScriptErrorDtoBuilder;
   }
 }
