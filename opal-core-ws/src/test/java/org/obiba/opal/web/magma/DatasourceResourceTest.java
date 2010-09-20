@@ -36,6 +36,9 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.support.ExcelDatasourceFactory;
+import org.obiba.magma.support.MagmaEngineFactory;
+import org.obiba.opal.core.cfg.OpalConfiguration;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.web.magma.support.DatasourceFactoryDtoParser;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.magma.support.ExcelDatasourceFactoryDtoParser;
@@ -70,6 +73,51 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     Assert.assertEquals(2, dtos.size());
     Assert.assertEquals(DATASOURCE1, dtos.get(0).getName());
     Assert.assertEquals(DATASOURCE2, dtos.get(1).getName());
+  }
+
+  @Test
+  public void testCreateDatasource_DatasourceCreatedSuccessfully() {
+    Response response = createNewDatasource("newDatasourceCreated");
+    Assert.assertTrue(MagmaEngine.get().hasDatasource("newDatasourceCreated"));
+    Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+
+  }
+
+  private Response createNewDatasource(String name) {
+    OpalRuntime opalruntimeMock = createMock(OpalRuntime.class);
+    UriInfo uriInfoMock = createMock(UriInfo.class);
+
+    OpalConfiguration opalConfig = new OpalConfiguration();
+    opalConfig.setMagmaEngineFactory(new MagmaEngineFactory());
+
+    expect(opalruntimeMock.getOpalConfiguration()).andReturn(opalConfig);
+    opalruntimeMock.writeOpalConfiguration();
+    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromUri(BASE_URI));
+
+    replay(uriInfoMock, opalruntimeMock);
+
+    DatasourceResource resource = new DatasourceResource(newDatasourceFactoryRegistry(), opalruntimeMock, name);
+    Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder().setName(name).setExtension(ExcelDatasourceFactoryDto.params, Magma.ExcelDatasourceFactoryDto.newBuilder().setFile(getDatasourcePath(DATASOURCE1)).setReadOnly(true).build()).build();
+
+    Response response = resource.createDatasource(uriInfoMock, factoryDto);
+
+    verify(uriInfoMock, opalruntimeMock);
+    return response;
+  }
+
+  @Test
+  public void testCreateDatasource_DuplicateDatasourceName() {
+    createNewDatasource("newDatasourceDuplicate");
+
+    OpalRuntime opalruntimeMock = createMock(OpalRuntime.class);
+    UriInfo uriInfoMock = createMock(UriInfo.class);
+
+    DatasourceResource resource = new DatasourceResource(newDatasourceFactoryRegistry(), opalruntimeMock, "newDatasourceDuplicate");
+    Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder().setName("newDatasourceDuplicate").setExtension(ExcelDatasourceFactoryDto.params, Magma.ExcelDatasourceFactoryDto.newBuilder().setFile(getDatasourcePath(DATASOURCE1)).setReadOnly(true).build()).build();
+    Response response = resource.createDatasource(uriInfoMock, factoryDto);
+
+    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    Assert.assertEquals(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DuplicateDatasourceName").build(), response.getEntity());
   }
 
   @Test
