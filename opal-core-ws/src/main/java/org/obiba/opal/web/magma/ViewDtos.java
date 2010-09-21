@@ -20,14 +20,14 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.js.views.VariablesClause;
-import org.obiba.magma.math.OutlierRemovingView;
 import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.obiba.magma.views.JoinTable;
 import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.WhereClause;
 import org.obiba.magma.views.View.Builder;
+import org.obiba.magma.views.support.NoneClause;
 import org.obiba.opal.web.model.Magma.JavaScriptViewDto;
-import org.obiba.opal.web.model.Magma.OutlierRemovingViewDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableListViewDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
@@ -40,7 +40,7 @@ public final class ViewDtos {
   // Constants
   //
 
-  private static final ViewDtoExtension[] EXTENSIONS = { new JavaScriptViewDtoExtension(), new VariableListViewDtoExtension(), new OutlierRemovingViewDtoExtension() };
+  private static final ViewDtoExtension[] EXTENSIONS = { new JavaScriptViewDtoExtension(), new VariableListViewDtoExtension(), };
 
   //
   // Utilities
@@ -54,11 +54,20 @@ public final class ViewDtos {
     View.Builder builder = View.Builder.newView(viewName, (ValueTable[]) fromTables.toArray(new ValueTable[fromTables.size()]));
     for(ViewDtoExtension extension : EXTENSIONS) {
       if(extension.isExtensionOf(viewDto)) {
-        view = extension.build(viewDto, builder);
+        view = extension.fromDto(viewDto, builder);
       }
     }
 
     return view;
+  }
+
+  public static ViewDto asDto(View view) {
+    for(ViewDtoExtension extension : EXTENSIONS) {
+      if(extension.isDtoOf(view)) {
+        return extension.asDto(view);
+      }
+    }
+    throw new RuntimeException("Unknown view type");
   }
 
   private static List<ValueTable> getFromTables(ViewDto viewDto) {
@@ -73,6 +82,10 @@ public final class ViewDtos {
     return fromTables;
   }
 
+  private static String toStringReference(ValueTable vt) {
+    return vt.getDatasource().getName() + "." + vt.getName();
+  }
+
   //
   // Inner Classes / Interfaces
   //
@@ -81,7 +94,11 @@ public final class ViewDtos {
 
     boolean isExtensionOf(ViewDto viewDto);
 
-    View build(ViewDto viewDto, View.Builder viewBuilder);
+    boolean isDtoOf(View view);
+
+    View fromDto(ViewDto viewDto, View.Builder viewBuilder);
+
+    ViewDto asDto(View view);
   }
 
   static class JavaScriptViewDtoExtension implements ViewDtoExtension {
@@ -90,7 +107,11 @@ public final class ViewDtos {
       return viewDto.hasExtension(JavaScriptViewDto.view);
     }
 
-    public View build(ViewDto viewDto, Builder viewBuilder) {
+    public boolean isDtoOf(View view) {
+      return (view.getListClause() instanceof NoneClause);
+    }
+
+    public View fromDto(ViewDto viewDto, Builder viewBuilder) {
       JavaScriptViewDto jsDto = viewDto.getExtension(JavaScriptViewDto.view);
 
       if(jsDto.hasSelect()) {
@@ -104,6 +125,32 @@ public final class ViewDtos {
 
       return viewBuilder.build();
     }
+
+    public ViewDto asDto(View view) {
+      ViewDto.Builder viewDtoBuilder = ViewDto.newBuilder();
+
+      ValueTable from = view.getWrappedValueTable();
+      if(from instanceof JoinTable) {
+        List<ValueTable> fromTables = ((JoinTable) from).getTables();
+        for(ValueTable vt : fromTables) {
+          viewDtoBuilder.addFrom(toStringReference(vt));
+        }
+      } else {
+        viewDtoBuilder.addFrom(toStringReference(from));
+      }
+
+      JavaScriptViewDto.Builder jsDtoBuilder = JavaScriptViewDto.newBuilder();
+      if(view.getSelectClause() instanceof JavascriptClause) {
+        jsDtoBuilder.setSelect(((JavascriptClause) view.getSelectClause()).getScript());
+      }
+      if(view.getWhereClause() instanceof JavascriptClause) {
+        jsDtoBuilder.setWhere(((JavascriptClause) view.getWhereClause()).getScript());
+      }
+
+      viewDtoBuilder.setExtension(JavaScriptViewDto.view, jsDtoBuilder.build());
+
+      return null;
+    }
   }
 
   static class VariableListViewDtoExtension implements ViewDtoExtension {
@@ -112,7 +159,11 @@ public final class ViewDtos {
       return viewDto.hasExtension(VariableListViewDto.view);
     }
 
-    public View build(ViewDto viewDto, Builder viewBuilder) {
+    public boolean isDtoOf(View view) {
+      return (!(view.getListClause() instanceof NoneClause));
+    }
+
+    public View fromDto(ViewDto viewDto, Builder viewBuilder) {
       VariableListViewDto listDto = viewDto.getExtension(VariableListViewDto.view);
 
       if(listDto.hasWhere()) {
@@ -131,19 +182,31 @@ public final class ViewDtos {
 
       return viewBuilder.build();
     }
-  }
 
-  static class OutlierRemovingViewDtoExtension implements ViewDtoExtension {
+    public ViewDto asDto(View view) {
+      ViewDto.Builder viewDtoBuilder = ViewDto.newBuilder();
 
-    public boolean isExtensionOf(ViewDto viewDto) {
-      return viewDto.hasExtension(OutlierRemovingViewDto.view);
-    }
+      ValueTable from = view.getWrappedValueTable();
+      if(from instanceof JoinTable) {
+        List<ValueTable> fromTables = ((JoinTable) from).getTables();
+        for(ValueTable vt : fromTables) {
+          viewDtoBuilder.addFrom(toStringReference(vt));
+        }
+      } else {
+        viewDtoBuilder.addFrom(toStringReference(from));
+      }
 
-    public View build(ViewDto viewDto, Builder viewBuilder) {
-      // OutlierRemovingViewDto outlierDto = viewDto.getExtension(OutlierRemovingViewDto.view);
+      VariableListViewDto.Builder listDtoBuilder = VariableListViewDto.newBuilder();
+      for(Variable v : view.getVariables()) {
+        listDtoBuilder.addVariables(Dtos.asDto(v));
+      }
+      if(view.getWhereClause() instanceof JavascriptClause) {
+        listDtoBuilder.setWhere(((JavascriptClause) view.getWhereClause()).getScript());
+      }
 
-      // TODO: Create the OutlierRemovingView based on the dto.
-      return new OutlierRemovingView();
+      viewDtoBuilder.setExtension(VariableListViewDto.view, listDtoBuilder.build());
+
+      return null;
     }
   }
 }

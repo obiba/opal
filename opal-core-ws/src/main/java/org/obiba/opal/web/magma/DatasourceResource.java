@@ -50,7 +50,6 @@ import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
-import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -70,6 +69,8 @@ public class DatasourceResource {
   DatasourceFactoryRegistry datasourceFactoryRegistry;
 
   private OpalRuntime opalRuntime;
+
+  private ViewManager viewManager;
 
   @Autowired
   public DatasourceResource(DatasourceFactoryRegistry datasourceFactoryRegistry, OpalRuntime opalRuntime) {
@@ -178,6 +179,12 @@ public class DatasourceResource {
     return new TableResource(table);
   }
 
+  @Bean
+  @Scope("request")
+  public ViewResource getViewResource(View view) {
+    return new ViewResource(view);
+  }
+
   @POST
   @Path("/tables")
   public Response createTable(TableDto table) {
@@ -186,7 +193,7 @@ public class DatasourceResource {
 
       Datasource datasource = MagmaEngine.get().getDatasource(name);
 
-      ClientErrorDto errorDto;
+      // ClientErrorDto errorDto;
 
       // @TODO Verify that the datasource allows table creation (Magma does not offer this yet)
       // if(datasource.isReadOnly()) {
@@ -247,6 +254,13 @@ public class DatasourceResource {
     return Response.ok().build();
   }
 
+  @GET
+  @Path("/view/{name}")
+  public Response getView(@PathParam("name") String viewName) {
+    View view = viewManager.getView(getDatasource().getName(), viewName);
+    return Response.ok().entity(ViewDtos.asDto(view)).build();
+  }
+
   private Datasource getDatasource() {
     Datasource ds = null;
     if(MagmaEngine.get().hasDatasource(name)) {
@@ -276,13 +290,24 @@ public class DatasourceResource {
   }
 
   private boolean datasourceHasView(String viewName) {
-    // TODO: Ask the ViewManager.
-    // return viewManager.hasView(getDatasource().getName(), viewName);
-    return false;
+    return viewManager.hasView(getDatasource().getName(), viewName);
   }
 
   private void createOrUpdateViewImpl(View view) {
-    // TODO: Have the ViewManager create or update the view.
-    // viewManager.addView(getDatasource().getName(), view);
+    viewManager.addView(getDatasource().getName(), view);
+  }
+
+  //
+  // Inner Classes / Interfaces
+  //
+
+  /* TO BE REMOVED once actual ViewManager interface is committed */
+  static interface ViewManager {
+
+    void addView(String datasourceName, View view);
+
+    boolean hasView(String datasourceName, String viewName);
+
+    View getView(String datasourceName, String viewName);
   }
 }
