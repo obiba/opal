@@ -1,0 +1,7 @@
+<set>
+  <org.obiba.magma.views.View>
+    <select class="org.obiba.magma.views.support.AllClause"/>
+    <where class="org.obiba.magma.views.support.AllClause"/>
+    <variables class="org.obiba.magma.views.support.NoneClause"/>
+  </org.obiba.magma.views.View>
+</set>
