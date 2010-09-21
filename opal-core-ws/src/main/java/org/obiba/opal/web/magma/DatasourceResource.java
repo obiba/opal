@@ -42,16 +42,16 @@ import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.DatasourceParsingException;
 import org.obiba.magma.support.Disposables;
+import org.obiba.magma.views.View;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.magma.support.NoSuchDatasourceFactoryException;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
+import org.obiba.opal.web.model.Magma.ViewDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
@@ -61,8 +61,6 @@ import org.springframework.stereotype.Component;
 @Scope("request")
 @Path("/datasource/{name}")
 public class DatasourceResource {
-
-  private static final Logger log = LoggerFactory.getLogger(DatasourceResource.class);
 
   @PathParam("name")
   private String name;
@@ -214,30 +212,6 @@ public class DatasourceResource {
     return new CompareResource(getDatasource());
   }
 
-  private Datasource getDatasource() {
-    Datasource ds = null;
-    if(MagmaEngine.get().hasDatasource(name)) {
-      ds = MagmaEngine.get().getDatasource(name);
-    } else {
-      ds = MagmaEngine.get().getTransientDatasourceInstance(name);
-      transientDatasourceInstance = ds;
-    }
-    return ds;
-  }
-
-  private void writeVariablesToTable(TableDto table, Datasource datasource) {
-    VariableWriter vw = null;
-    try {
-      vw = datasource.createWriter(table.getName(), table.getEntityType()).writeVariables();
-
-      for(VariableDto dto : table.getVariablesList()) {
-        vw.writeVariable(Dtos.fromDto(dto));
-      }
-    } finally {
-      StreamUtil.silentSafeClose(vw);
-    }
-  }
-
   @PUT
   public Response createDatasource(@Context final UriInfo uriInfo, Magma.DatasourceFactoryDto factoryDto) {
     ResponseBuilder response = null;
@@ -262,4 +236,53 @@ public class DatasourceResource {
     return response.build();
   }
 
+  @PUT
+  @Path("/view/{name}")
+  public Response createOrUpdateView(@PathParam("name") String viewName, ViewDto viewDto) {
+    if(datasourceHasTable(viewName) && !datasourceHasView(viewName)) {
+      return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists").build()).build();
+    }
+    createOrUpdateViewImpl(ViewDtos.fromDto(viewName, viewDto));
+
+    return Response.ok().build();
+  }
+
+  private Datasource getDatasource() {
+    Datasource ds = null;
+    if(MagmaEngine.get().hasDatasource(name)) {
+      ds = MagmaEngine.get().getDatasource(name);
+    } else {
+      ds = MagmaEngine.get().getTransientDatasourceInstance(name);
+      transientDatasourceInstance = ds;
+    }
+    return ds;
+  }
+
+  private void writeVariablesToTable(TableDto table, Datasource datasource) {
+    VariableWriter vw = null;
+    try {
+      vw = datasource.createWriter(table.getName(), table.getEntityType()).writeVariables();
+
+      for(VariableDto dto : table.getVariablesList()) {
+        vw.writeVariable(Dtos.fromDto(dto));
+      }
+    } finally {
+      StreamUtil.silentSafeClose(vw);
+    }
+  }
+
+  private boolean datasourceHasTable(String viewName) {
+    return getDatasource().hasValueTable(viewName);
+  }
+
+  private boolean datasourceHasView(String viewName) {
+    // TODO: Ask the ViewManager.
+    // return viewManager.hasView(getDatasource().getName(), viewName);
+    return false;
+  }
+
+  private void createOrUpdateViewImpl(View view) {
+    // TODO: Have the ViewManager create or update the view.
+    // viewManager.addView(getDatasource().getName(), view);
+  }
 }
