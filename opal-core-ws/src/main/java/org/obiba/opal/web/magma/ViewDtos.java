@@ -49,7 +49,9 @@ public final class ViewDtos {
   public static View fromDto(String viewName, ViewDto viewDto) {
     View view = null;
 
-    View.Builder builder = View.Builder.newView(viewName, (ValueTable[]) getFromTables(viewDto).toArray());
+    List<ValueTable> fromTables = getFromTables(viewDto);
+
+    View.Builder builder = View.Builder.newView(viewName, (ValueTable[]) fromTables.toArray(new ValueTable[fromTables.size()]));
     for(ViewDtoExtension extension : EXTENSIONS) {
       if(extension.isExtensionOf(viewDto)) {
         view = extension.build(viewDto, builder);
