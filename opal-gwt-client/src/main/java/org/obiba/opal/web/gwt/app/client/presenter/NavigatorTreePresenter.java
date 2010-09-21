@@ -98,26 +98,34 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
       public void onResource(Response response, JsArray<DatasourceDto> datasources) {
         if(datasources != null) {
           ArrayList<TreeItem> items = new ArrayList<TreeItem>(datasources.length());
-          for(int i = 0; i < datasources.length(); i++) {
-            DatasourceDto ds = datasources.get(i);
-            TreeItem dsItem = new TreeItem(ds.getName());
-            dsItem.addStyleName("magma-datasource");
-            dsItem.setUserObject(ds);
-            JsArrayString array = ds.getTableArray();
-            if(array != null) {
-              for(int j = 0; j < array.length(); j++) {
-                String tableName = array.get(j);
-                TreeItem tItem = dsItem.addItem(tableName);
-                tItem.addStyleName("magma-table");
-                if(isView(ds, tableName)) {
-                  tItem.addStyleName("magma-view");
-                }
-              }
-            }
-            items.add(dsItem);
-          }
+          addDatasources(datasources, items);
           getDisplay().setItems(items);
           getDisplay().selectFirstDatasource();
+        }
+      }
+
+      private void addDatasources(JsArray<DatasourceDto> datasources, ArrayList<TreeItem> items) {
+        for(int i = 0; i < datasources.length(); i++) {
+          DatasourceDto ds = datasources.get(i);
+          TreeItem dsItem = new TreeItem(ds.getName());
+          dsItem.addStyleName("magma-datasource");
+          dsItem.setUserObject(ds);
+          addTables(ds, dsItem);
+          items.add(dsItem);
+        }
+      }
+
+      private void addTables(DatasourceDto ds, TreeItem dsItem) {
+        JsArrayString array = ds.getTableArray();
+        if(array != null) {
+          for(int j = 0; j < array.length(); j++) {
+            String tableName = array.get(j);
+            TreeItem tItem = dsItem.addItem(tableName);
+            tItem.addStyleName("magma-table");
+            if(isView(ds, tableName)) {
+              tItem.addStyleName("magma-view");
+            }
+          }
         }
       }
     }).send();
