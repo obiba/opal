@@ -251,6 +251,10 @@ public class TableResource {
     return new CompareResource(valueTable);
   }
 
+  ValueTable getValueTable() {
+    return valueTable;
+  }
+
   private ClientErrorDto getErrorMessage(Status responseStatus, String errorStatus) {
     return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus).build();
   }

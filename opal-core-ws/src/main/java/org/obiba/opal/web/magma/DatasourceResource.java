@@ -254,11 +254,10 @@ public class DatasourceResource {
     return Response.ok().build();
   }
 
-  @GET
   @Path("/view/{name}")
-  public Response getView(@PathParam("name") String viewName) {
+  public ViewResource getView(@PathParam("name") String viewName) {
     View view = viewManager.getView(getDatasource().getName(), viewName);
-    return Response.ok().entity(ViewDtos.asDto(view)).build();
+    return getViewResource(view);
   }
 
   private Datasource getDatasource() {
