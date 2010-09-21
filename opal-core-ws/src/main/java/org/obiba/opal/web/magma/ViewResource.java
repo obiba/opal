@@ -11,9 +11,7 @@ package org.obiba.opal.web.magma;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.views.View;
@@ -34,7 +32,7 @@ public class ViewResource extends TableResource {
   //
 
   @GET
-  public ViewDto getView(@Context final UriInfo uriInfo) {
+  public ViewDto getView() {
     return ViewDtos.asDto((View) getValueTable());
   }
 
