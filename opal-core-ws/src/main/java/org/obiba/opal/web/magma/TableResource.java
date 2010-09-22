@@ -51,6 +51,7 @@ import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.JavascriptValueSource;
 import org.obiba.magma.js.MagmaContext;
 import org.obiba.magma.js.ScriptableVariable;
+import org.obiba.magma.js.ScriptableVariableEntity;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.ValueTableWrapper;
@@ -159,8 +160,10 @@ public class TableResource {
 
   @GET
   @Path("/entities")
-  public Set<VariableEntityDto> getEntities() {
-    return ImmutableSet.copyOf(Iterables.transform(valueTable.getVariableEntities(), new Function<VariableEntity, VariableEntityDto>() {
+  public Set<VariableEntityDto> getEntities(@QueryParam("script") String script) {
+    Iterable<VariableEntity> entities = (script != null) ? filterEntities(valueTable.getVariableEntities(), script) : valueTable.getVariableEntities();
+
+    return ImmutableSet.copyOf(Iterables.transform(entities, new Function<VariableEntity, VariableEntityDto>() {
       @Override
       public VariableEntityDto apply(VariableEntity from) {
         return VariableEntityDto.newBuilder().setIdentifier(from.getIdentifier()).build();
@@ -275,6 +278,21 @@ public class TableResource {
     return filteredVariables;
   }
 
+  private Iterable<VariableEntity> filterEntities(Iterable<VariableEntity> entities, String script) {
+    List<VariableEntity> filteredEntities = new ArrayList<VariableEntity>();
+
+    for(VariableEntity entity : entities) {
+      Object result = evalEntityScript(script, entity);
+      if(result instanceof Boolean) {
+        if(((Boolean) result)) {
+          filteredEntities.add(entity);
+        }
+      }
+    }
+
+    return filteredEntities;
+  }
+
   private Object evalVariableScript(final String script, final Variable variable) {
     return ContextFactory.getGlobal().call(new ContextAction() {
 
@@ -283,6 +301,23 @@ public class TableResource {
         MagmaContext context = MagmaContext.asMagmaContext(ctx);
         // Don't pollute the global scope
         Scriptable scope = new ScriptableVariable(context.newLocalScope(), variable);
+
+        final Script compiledScript = context.compileString(script, "", 1, null);
+        Object value = compiledScript.exec(ctx, scope);
+
+        return value;
+      }
+    });
+  }
+
+  private Object evalEntityScript(final String script, final VariableEntity entity) {
+    return ContextFactory.getGlobal().call(new ContextAction() {
+
+      @Override
+      public Object run(org.mozilla.javascript.Context ctx) {
+        MagmaContext context = MagmaContext.asMagmaContext(ctx);
+        // Don't pollute the global scope
+        Scriptable scope = new ScriptableVariableEntity(context.newLocalScope(), entity);
 
         final Script compiledScript = context.compileString(script, "", 1, null);
         Object value = compiledScript.exec(ctx, scope);
