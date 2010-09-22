@@ -33,9 +33,6 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
-import org.mozilla.javascript.ContextAction;
-import org.mozilla.javascript.ContextFactory;
-import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.MagmaRuntimeException;
@@ -50,8 +47,7 @@ import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.JavascriptValueSource;
 import org.obiba.magma.js.MagmaContext;
-import org.obiba.magma.js.ScriptableVariable;
-import org.obiba.magma.js.ScriptableVariableEntity;
+import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.ValueTableWrapper;
@@ -122,7 +118,7 @@ public class TableResource {
     String tableUri = tableub.build().toString();
     LinkDto.Builder tableLinkBuilder = LinkDto.newBuilder().setLink(tableUri).setRel(valueTable.getName());
 
-    Iterable<Variable> variables = (script != null) ? filterVariables(valueTable.getVariables(), script) : valueTable.getVariables();
+    Iterable<Variable> variables = filterVariables(valueTable, script);
     ArrayList<VariableDto> variableDtos = Lists.newArrayList(Iterables.transform(variables, Dtos.asDtoFunc(tableLinkBuilder.build(), ub)));
     sortByName(variableDtos);
 
@@ -161,7 +157,7 @@ public class TableResource {
   @GET
   @Path("/entities")
   public Set<VariableEntityDto> getEntities(@QueryParam("script") String script) {
-    Iterable<VariableEntity> entities = (script != null) ? filterEntities(valueTable.getVariableEntities(), script) : valueTable.getVariableEntities();
+    Iterable<VariableEntity> entities = filterEntities(valueTable, script);
 
     return ImmutableSet.copyOf(Iterables.transform(entities, new Function<VariableEntity, VariableEntityDto>() {
       @Override
@@ -263,68 +259,40 @@ public class TableResource {
     return valueTable;
   }
 
-  private Iterable<Variable> filterVariables(Iterable<Variable> variables, String script) {
-    List<Variable> filteredVariables = new ArrayList<Variable>();
+  private Iterable<Variable> filterVariables(ValueTable valueTable, String script) {
+    if(script == null) {
+      return valueTable.getVariables();
+    }
 
-    for(Variable variable : variables) {
-      Object result = evalVariableScript(script, variable);
-      if(result instanceof Boolean) {
-        if(((Boolean) result)) {
-          filteredVariables.add(variable);
-        }
+    JavascriptClause jsClause = new JavascriptClause(script);
+    jsClause.initialise();
+
+    List<Variable> filteredVariables = new ArrayList<Variable>();
+    for(Variable variable : valueTable.getVariables()) {
+      if(jsClause.select(variable)) {
+        filteredVariables.add(variable);
       }
     }
 
     return filteredVariables;
   }
 
-  private Iterable<VariableEntity> filterEntities(Iterable<VariableEntity> entities, String script) {
-    List<VariableEntity> filteredEntities = new ArrayList<VariableEntity>();
+  private Iterable<VariableEntity> filterEntities(ValueTable valueTable, String script) {
+    if(script == null) {
+      return valueTable.getVariableEntities();
+    }
 
-    for(VariableEntity entity : entities) {
-      Object result = evalEntityScript(script, entity);
-      if(result instanceof Boolean) {
-        if(((Boolean) result)) {
-          filteredEntities.add(entity);
-        }
+    JavascriptClause jsClause = new JavascriptClause(script);
+    jsClause.initialise();
+
+    List<VariableEntity> filteredEntities = new ArrayList<VariableEntity>();
+    for(ValueSet valueSet : valueTable.getValueSets()) {
+      if(jsClause.where(valueSet)) {
+        filteredEntities.add(valueSet.getVariableEntity());
       }
     }
 
     return filteredEntities;
-  }
-
-  private Object evalVariableScript(final String script, final Variable variable) {
-    return ContextFactory.getGlobal().call(new ContextAction() {
-
-      @Override
-      public Object run(org.mozilla.javascript.Context ctx) {
-        MagmaContext context = MagmaContext.asMagmaContext(ctx);
-        // Don't pollute the global scope
-        Scriptable scope = new ScriptableVariable(context.newLocalScope(), variable);
-
-        final Script compiledScript = context.compileString(script, "", 1, null);
-        Object value = compiledScript.exec(ctx, scope);
-
-        return value;
-      }
-    });
-  }
-
-  private Object evalEntityScript(final String script, final VariableEntity entity) {
-    return ContextFactory.getGlobal().call(new ContextAction() {
-
-      @Override
-      public Object run(org.mozilla.javascript.Context ctx) {
-        MagmaContext context = MagmaContext.asMagmaContext(ctx);
-        // Don't pollute the global scope
-        Scriptable scope = new ScriptableVariableEntity(context.newLocalScope(), entity);
-
-        final Script compiledScript = context.compileString(script, "", 1, null);
-        Object value = compiledScript.exec(ctx, scope);
-
-        return value;
-      }
-    });
   }
 
   private ClientErrorDto getErrorMessage(Status responseStatus, String errorStatus) {
