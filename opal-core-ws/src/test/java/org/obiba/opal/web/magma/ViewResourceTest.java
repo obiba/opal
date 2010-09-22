@@ -14,7 +14,6 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.views.View;
-import org.obiba.opal.web.model.Magma.TableDto;
 
 /**
  * Unit tests for {@link ViewResource}.
@@ -37,7 +36,7 @@ public class ViewResourceTest {
   }
 
   @Test
-  public void testGetFrom_ReturnsDtoOfWrappedValueTable() {
+  public void testGetFrom_ReturnsTableResourceForWrappedTable() {
     // Setup
     ValueTable fromTable = new AbstractValueTableStub() {
       @Override
@@ -49,9 +48,9 @@ public class ViewResourceTest {
 
     // Exercise
     ViewResource sut = new ViewResource(view);
-    TableDto fromTableDto = sut.getFrom();
+    TableResource fromTableResource = sut.getFrom();
 
     // Verify
-    assertEquals("fromTable", fromTableDto.getName());
+    assertEquals("fromTable", fromTableResource.getValueTable().getName());
   }
 }

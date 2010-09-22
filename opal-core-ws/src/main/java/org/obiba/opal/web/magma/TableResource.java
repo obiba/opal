@@ -33,6 +33,9 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
+import org.mozilla.javascript.ContextAction;
+import org.mozilla.javascript.ContextFactory;
+import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.MagmaRuntimeException;
@@ -47,6 +50,7 @@ import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.JavascriptValueSource;
 import org.obiba.magma.js.MagmaContext;
+import org.obiba.magma.js.ScriptableVariable;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.ValueTableWrapper;
@@ -104,7 +108,7 @@ public class TableResource {
 
   @GET
   @Path("/variables")
-  public Iterable<VariableDto> getVariables(@Context final UriInfo uriInfo) {
+  public Iterable<VariableDto> getVariables(@Context final UriInfo uriInfo, @QueryParam("script") String script) {
     ArrayList<PathSegment> segments = Lists.newArrayList(uriInfo.getPathSegments());
     segments.remove(segments.size() - 1);
     final UriBuilder ub = uriInfo.getBaseUriBuilder();
@@ -117,10 +121,11 @@ public class TableResource {
     String tableUri = tableub.build().toString();
     LinkDto.Builder tableLinkBuilder = LinkDto.newBuilder().setLink(tableUri).setRel(valueTable.getName());
 
-    ArrayList<VariableDto> variables = Lists.newArrayList(Iterables.transform(valueTable.getVariables(), Dtos.asDtoFunc(tableLinkBuilder.build(), ub)));
-    sortByName(variables);
+    Iterable<Variable> variables = (script != null) ? filterVariables(valueTable.getVariables(), script) : valueTable.getVariables();
+    ArrayList<VariableDto> variableDtos = Lists.newArrayList(Iterables.transform(variables, Dtos.asDtoFunc(tableLinkBuilder.build(), ub)));
+    sortByName(variableDtos);
 
-    return variables;
+    return variableDtos;
   }
 
   @GET
@@ -253,6 +258,38 @@ public class TableResource {
 
   ValueTable getValueTable() {
     return valueTable;
+  }
+
+  private Iterable<Variable> filterVariables(Iterable<Variable> variables, String script) {
+    List<Variable> filteredVariables = new ArrayList<Variable>();
+
+    for(Variable variable : variables) {
+      Object result = evalVariableScript(script, variable);
+      if(result instanceof Boolean) {
+        if(((Boolean) result)) {
+          filteredVariables.add(variable);
+        }
+      }
+    }
+
+    return filteredVariables;
+  }
+
+  private Object evalVariableScript(final String script, final Variable variable) {
+    return ContextFactory.getGlobal().call(new ContextAction() {
+
+      @Override
+      public Object run(org.mozilla.javascript.Context ctx) {
+        MagmaContext context = MagmaContext.asMagmaContext(ctx);
+        // Don't pollute the global scope
+        Scriptable scope = new ScriptableVariable(context.newLocalScope(), variable);
+
+        final Script compiledScript = context.compileString(script, "", 1, null);
+        Object value = compiledScript.exec(ctx, scope);
+
+        return value;
+      }
+    });
   }
 
   private ClientErrorDto getErrorMessage(Status responseStatus, String errorStatus) {

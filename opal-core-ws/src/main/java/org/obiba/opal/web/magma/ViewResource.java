@@ -11,12 +11,11 @@ package org.obiba.opal.web.magma;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.UriBuilder;
 
-import org.obiba.magma.ValueTable;
 import org.obiba.magma.views.View;
-import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Scope;
 
 public class ViewResource extends TableResource {
   //
@@ -36,14 +35,10 @@ public class ViewResource extends TableResource {
     return ViewDtos.asDto((View) getValueTable());
   }
 
-  @GET
   @Path("/from")
-  public TableDto getFrom() {
-    View view = (View) getValueTable();
-    ValueTable fromTable = ((View) getValueTable()).getWrappedValueTable();
-    UriBuilder tableLink = UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable");
-    UriBuilder viewLink = UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getView");
-
-    return Dtos.asDto(fromTable, tableLink).setViewLink(viewLink.build(fromTable.getDatasource().getName(), view.getName()).toString()).build();
+  @Bean
+  @Scope("request")
+  public TableResource getFrom() {
+    return new TableResource(((View) getValueTable()).getWrappedValueTable());
   }
 }
