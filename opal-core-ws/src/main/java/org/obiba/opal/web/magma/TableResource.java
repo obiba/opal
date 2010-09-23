@@ -52,6 +52,7 @@ import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.ValueTableWrapper;
 import org.obiba.magma.support.VariableEntityBean;
+import org.obiba.opal.web.magma.support.InvalidRequestException;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.TableDto;
@@ -123,6 +124,23 @@ public class TableResource {
     sortByName(variableDtos);
 
     return variableDtos;
+  }
+
+  @GET
+  @Path("variables/query")
+  public Iterable<ValueDto> getVariablesQuery(@QueryParam("script") String script) {
+    if(script == null) {
+      throw new InvalidRequestException("'script' parameter required");
+    }
+
+    Iterable<Value> values = queryVariables(valueTable, script);
+    ArrayList<ValueDto> valueDtos = Lists.newArrayList(Iterables.transform(values, new Function<Value, ValueDto>() {
+      public ValueDto apply(Value from) {
+        return Dtos.asDto(from).build();
+      }
+    }));
+
+    return valueDtos;
   }
 
   @GET
@@ -275,6 +293,18 @@ public class TableResource {
     }
 
     return filteredVariables;
+  }
+
+  private Iterable<Value> queryVariables(ValueTable valueTable, String script) {
+    JavascriptClause jsClause = new JavascriptClause(script);
+    jsClause.initialise();
+
+    List<Value> values = new ArrayList<Value>();
+    for(Variable variable : valueTable.getVariables()) {
+      values.add(jsClause.query(variable));
+    }
+
+    return values;
   }
 
   private Iterable<VariableEntity> filterEntities(ValueTable valueTable, String script) {
