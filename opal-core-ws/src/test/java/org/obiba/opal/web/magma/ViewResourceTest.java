@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
@@ -38,19 +41,18 @@ public class ViewResourceTest {
   @Test
   public void testGetFrom_ReturnsTableResourceForWrappedTable() {
     // Setup
-    ValueTable fromTable = new AbstractValueTableStub() {
-      @Override
-      public String getName() {
-        return "fromTable";
-      }
-    };
-    View view = new View("testView", fromTable);
+    ValueTable fromTableMock = createMock(ValueTable.class);
+    expect(fromTableMock.getName()).andReturn("fromTable").atLeastOnce();
+
+    View view = new View("testView", fromTableMock);
+    ViewResource sut = new ViewResource(view);
+
+    replay(fromTableMock);
 
     // Exercise
-    ViewResource sut = new ViewResource(view);
     TableResource fromTableResource = sut.getFrom();
 
-    // Verify
+    // Verify state
     assertEquals("fromTable", fromTableResource.getValueTable().getName());
   }
 }
