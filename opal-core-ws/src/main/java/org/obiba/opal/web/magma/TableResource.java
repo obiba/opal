@@ -396,7 +396,7 @@ public class TableResource {
     return filteredEntities;
   }
 
-  private Variable buildTransientVariable(ValueType valueType, boolean repeatable, String script) {
+  Variable buildTransientVariable(ValueType valueType, boolean repeatable, String script) {
     Variable.Builder builder = new Variable.Builder("transient", valueType, valueTable.getEntityType()).extend(JavascriptVariableBuilder.class).setScript(script);
 
     if(repeatable) {

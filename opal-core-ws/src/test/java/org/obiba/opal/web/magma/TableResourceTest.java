@@ -13,10 +13,15 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
@@ -35,11 +40,14 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
+import org.obiba.magma.type.TextType;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
+import org.obiba.opal.web.model.Opal.LocaleDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 /**
@@ -185,5 +193,90 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     TableResource resource = new TableResource(null);
     Response response = resource.addOrUpdateVariables(null);
     Assert.assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void testGetLocales_WhenNoDisplayLocaleSpecifiedReturnsLocaleDtosWithDisplayFieldUnset() {
+    // Setup
+    TableResource sut = new TableResource(null);
+    sut.setLocales(ImmutableSet.of(new Locale("en"), new Locale("fr")));
+
+    // Exercise
+    Iterable<LocaleDto> localeDtos = sut.getLocales(null);
+
+    // Verify
+    assertNotNull(localeDtos);
+    assertEquals(sut.getLocales().size(), ImmutableSet.copyOf(localeDtos).size());
+    for(LocaleDto localeDto : localeDtos) {
+      assertFalse(localeDto.hasDisplay());
+    }
+  }
+
+  @Test
+  public void testGetLocales_WhenDisplayLocaleIsEnglishReturnsLocaleDtosWithDisplayFieldInEnglish() {
+    // Setup
+    TableResource sut = new TableResource(null);
+    sut.setLocales(ImmutableSet.of(new Locale("en"), new Locale("fr")));
+
+    // Exercise
+    Iterable<LocaleDto> localeDtos = sut.getLocales("en");
+
+    // Verify
+    assertNotNull(localeDtos);
+    assertEquals(sut.getLocales().size(), ImmutableSet.copyOf(localeDtos).size());
+    for(LocaleDto localeDto : localeDtos) {
+      assertTrue(localeDto.hasDisplay());
+      if(localeDto.getName().equals("en")) {
+        assertEquals("English", localeDto.getDisplay());
+      } else if(localeDto.getName().equals("fr")) {
+        assertEquals("French", localeDto.getDisplay());
+      }
+    }
+  }
+
+  @Test
+  public void testGetLocales_WhenDisplayLocaleIsFrenchReturnsLocaleDtosWithDisplayFieldInFrench() {
+    // Setup
+    TableResource sut = new TableResource(null);
+    sut.setLocales(ImmutableSet.of(new Locale("en"), new Locale("fr")));
+
+    // Exercise
+    Iterable<LocaleDto> localeDtos = sut.getLocales("fr");
+
+    // Verify
+    assertNotNull(localeDtos);
+    assertEquals(sut.getLocales().size(), ImmutableSet.copyOf(localeDtos).size());
+    for(LocaleDto localeDto : localeDtos) {
+      assertTrue(localeDto.hasDisplay());
+      if(localeDto.getName().equals("en")) {
+        assertEquals("anglais", localeDto.getDisplay());
+      } else if(localeDto.getName().equals("fr")) {
+        assertEquals("fran\u00e7ais", localeDto.getDisplay());
+      }
+    }
+  }
+
+  @Test
+  public void testBuildTransientVariable_BuildsVariableAsSpecified() {
+    // Setup
+    ValueTable mockTable = createMock(ValueTable.class);
+    expect(mockTable.getEntityType()).andReturn("Participant").atLeastOnce();
+    TableResource sut = new TableResource(mockTable);
+    String script = "$('someVar')";
+
+    replay(mockTable);
+
+    // Exercise
+    Variable variable = sut.buildTransientVariable(TextType.get(), false, script);
+
+    // Verify behaviour
+    verify(mockTable);
+
+    // Verify state
+    assertNotNull(variable);
+    assertEquals("Participant", variable.getEntityType());
+    assertEquals(TextType.get(), variable.getValueType());
+    assertEquals(false, variable.isRepeatable());
+    assertEquals(variable.getAttribute("script").getValue().getValue(), script);
   }
 }
