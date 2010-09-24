@@ -31,6 +31,7 @@ import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
+import org.obiba.opal.web.model.Opal.LocaleDto;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
@@ -201,4 +202,13 @@ final class Dtos {
     return valueBuilder;
   }
 
+  public static LocaleDto asDto(Locale locale, Locale displayLocale) {
+    LocaleDto.Builder builder = LocaleDto.newBuilder().setName(locale.toString());
+
+    if(displayLocale != null) {
+      builder.setDisplay(locale.getDisplayName(displayLocale));
+    }
+
+    return builder.build();
+  }
 }

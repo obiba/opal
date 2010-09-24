@@ -11,7 +11,11 @@ package org.obiba.opal.web.magma;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 import javax.annotation.PreDestroy;
 import javax.ws.rs.DELETE;
@@ -21,6 +25,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -50,8 +55,10 @@ import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
+import org.obiba.opal.web.model.Opal.LocaleDto;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -71,6 +78,12 @@ public class DatasourceResource {
   private OpalRuntime opalRuntime;
 
   private ViewManager viewManager;
+
+  @Autowired
+  private @Value("${org.obiba.opal.languages}")
+  String localesProperty;
+
+  private Set<Locale> locales;
 
   @Autowired
   public DatasourceResource(DatasourceFactoryRegistry datasourceFactoryRegistry, OpalRuntime opalRuntime) {
@@ -258,6 +271,26 @@ public class DatasourceResource {
   public ViewResource getView(@PathParam("viewName") String viewName) {
     View view = viewManager.getView(getDatasource().getName(), viewName);
     return getViewResource(view);
+  }
+
+  @GET
+  @Path("/locales")
+  public Iterable<LocaleDto> getLocales(@QueryParam("locale") String displayLocale) {
+    if(locales == null) {
+      locales = new LinkedHashSet<Locale>();
+
+      String[] localeNames = localesProperty.split(",");
+      for(String localeName : localeNames) {
+        locales.add(new Locale(localeName.trim()));
+      }
+    }
+
+    List<LocaleDto> localeDtos = new ArrayList<LocaleDto>();
+    for(Locale locale : locales) {
+      localeDtos.add(Dtos.asDto(locale, displayLocale != null ? new Locale(displayLocale) : null));
+    }
+
+    return localeDtos;
   }
 
   private Datasource getDatasource() {
