@@ -14,6 +14,10 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 
+import java.util.LinkedHashSet;
+import java.util.Locale;
+import java.util.Set;
+
 import org.junit.Test;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.views.View;
@@ -46,6 +50,9 @@ public class ViewResourceTest {
 
     View view = new View("testView", fromTableMock);
     ViewResource sut = new ViewResource(view);
+    Set<Locale> locales = new LinkedHashSet<Locale>();
+    locales.add(new Locale("en"));
+    sut.setLocales(locales);
 
     replay(fromTableMock);
 

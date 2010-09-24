@@ -39,6 +39,8 @@ public class ViewResource extends TableResource {
   @Bean
   @Scope("request")
   public TableResource getFrom() {
-    return new TableResource(((View) getValueTable()).getWrappedValueTable());
+    TableResource tableResource = new TableResource(((View) getValueTable()).getWrappedValueTable());
+    tableResource.setLocales(getLocales());
+    return tableResource;
   }
 }

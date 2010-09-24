@@ -15,7 +15,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -63,6 +65,7 @@ import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.ValueSetDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
+import org.obiba.opal.web.model.Opal.LocaleDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.springframework.context.annotation.Bean;
@@ -78,8 +81,17 @@ public class TableResource {
 
   private final ValueTable valueTable;
 
+  private Set<Locale> locales;
+
   public TableResource(ValueTable valueTable) {
     this.valueTable = valueTable;
+  }
+
+  public void setLocales(Set<Locale> locales) {
+    this.locales = new LinkedHashSet<Locale>();
+    if(locales != null) {
+      this.locales.addAll(locales);
+    }
   }
 
   @GET
@@ -321,6 +333,17 @@ public class TableResource {
     return new CompareResource(valueTable);
   }
 
+  @GET
+  @Path("/locales")
+  public Iterable<LocaleDto> getLocales(@QueryParam("locale") String displayLocale) {
+    List<LocaleDto> localeDtos = new ArrayList<LocaleDto>();
+    for(Locale locale : locales) {
+      localeDtos.add(Dtos.asDto(locale, displayLocale != null ? new Locale(displayLocale) : null));
+    }
+
+    return localeDtos;
+  }
+
   ValueTable getValueTable() {
     return valueTable;
   }
@@ -397,5 +420,9 @@ public class TableResource {
       }
 
     });
+  }
+
+  Set<Locale> getLocales() {
+    return Collections.unmodifiableSet(locales);
   }
 }

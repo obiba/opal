@@ -189,13 +189,17 @@ public class DatasourceResource {
   @Bean
   @Scope("request")
   public TableResource getTableResource(ValueTable table) {
-    return new TableResource(table);
+    TableResource tableResource = new TableResource(table);
+    tableResource.setLocales(getLocales());
+    return tableResource;
   }
 
   @Bean
   @Scope("request")
   public ViewResource getViewResource(View view) {
-    return new ViewResource(view);
+    ViewResource viewResource = new ViewResource(view);
+    viewResource.setLocales(getLocales());
+    return viewResource;
   }
 
   @POST
@@ -276,17 +280,8 @@ public class DatasourceResource {
   @GET
   @Path("/locales")
   public Iterable<LocaleDto> getLocales(@QueryParam("locale") String displayLocale) {
-    if(locales == null) {
-      locales = new LinkedHashSet<Locale>();
-
-      String[] localeNames = localesProperty.split(",");
-      for(String localeName : localeNames) {
-        locales.add(new Locale(localeName.trim()));
-      }
-    }
-
     List<LocaleDto> localeDtos = new ArrayList<LocaleDto>();
-    for(Locale locale : locales) {
+    for(Locale locale : getLocales()) {
       localeDtos.add(Dtos.asDto(locale, displayLocale != null ? new Locale(displayLocale) : null));
     }
 
@@ -327,6 +322,19 @@ public class DatasourceResource {
 
   private void createOrUpdateViewImpl(View view) {
     viewManager.addView(getDatasource().getName(), view);
+  }
+
+  private Set<Locale> getLocales() {
+    if(locales == null) {
+      locales = new LinkedHashSet<Locale>();
+
+      String[] localeNames = localesProperty.split(",");
+      for(String localeName : localeNames) {
+        locales.add(new Locale(localeName.trim()));
+      }
+    }
+
+    return locales;
   }
 
   //
