@@ -10,9 +10,7 @@
 package org.obiba.opal.web.magma;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.TreeSet;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -21,9 +19,10 @@ import javax.ws.rs.QueryParam;
 
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.VectorSource;
+import org.obiba.opal.web.magma.TableResource.DefaultValueProvider;
+import org.obiba.opal.web.magma.TableResource.ValueProvider;
 import org.obiba.opal.web.magma.support.InvalidRequestException;
 import org.obiba.opal.web.math.AbstractSummaryStatisticsResource;
 import org.obiba.opal.web.math.CategoricalSummaryStatisticsResource;
@@ -38,9 +37,16 @@ public class VariableResource {
 
   private final VariableValueSource vvs;
 
+  private ValueProvider valueProvider;
+
   public VariableResource(ValueTable valueTable, VariableValueSource vvs) {
     this.valueTable = valueTable;
     this.vvs = vvs;
+    this.valueProvider = new DefaultValueProvider();
+  }
+
+  public void setValueProvider(ValueProvider valueProvider) {
+    this.valueProvider = valueProvider;
   }
 
   @GET
@@ -55,24 +61,13 @@ public class VariableResource {
       throw new InvalidRequestException("IllegalParameterValue", "limit", String.valueOf(limit));
     }
 
-    VectorSource vectorSource = vvs.asVectorSource();
+    Iterable<Value> values = valueProvider.getValues(valueTable, vvs, offset, limit);
 
-    if(vectorSource != null) {
-      // TODO: Refactor this code. We are creating a TreeSet (to sort the entities), then converting to a List
-      // (to extract the desired sublist), then converting it back to a TreeSet (because VectorSource.getValues
-      // expects a SortedSet of entities).
-      TreeSet<VariableEntity> sortedEntities = new TreeSet<VariableEntity>(valueTable.getVariableEntities());
-      int end = Math.min(offset + limit, sortedEntities.size());
-      List<VariableEntity> entitySubList = (new ArrayList<VariableEntity>(sortedEntities)).subList(offset, end);
-      Iterable<Value> values = vectorSource.getValues(new TreeSet<VariableEntity>(entitySubList));
-
-      List<ValueDto> valueDtos = new ArrayList<ValueDto>();
-      for(Value value : values) {
-        valueDtos.add(Dtos.asDto(value).build());
-      }
-      return valueDtos;
+    List<ValueDto> valueDtos = new ArrayList<ValueDto>();
+    for(Value value : values) {
+      valueDtos.add(Dtos.asDto(value).build());
     }
-    return Collections.emptyList();
+    return valueDtos;
   }
 
   @Path("/summary")
