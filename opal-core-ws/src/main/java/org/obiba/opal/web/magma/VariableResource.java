@@ -58,9 +58,13 @@ public class VariableResource {
     VectorSource vectorSource = vvs.asVectorSource();
 
     if(vectorSource != null) {
-      List<VariableEntity> entities = new ArrayList<VariableEntity>(valueTable.getVariableEntities());
-      int end = Math.min(offset + limit, entities.size());
-      Iterable<Value> values = vectorSource.getValues(new TreeSet<VariableEntity>(entities.subList(offset, end)));
+      // TODO: Refactor this code. We are creating a TreeSet (to sort the entities), then converting to a List
+      // (to extract the desired sublist), then converting it back to a TreeSet (because VectorSource.getValues
+      // expects a SortedSet of entities).
+      TreeSet<VariableEntity> sortedEntities = new TreeSet<VariableEntity>(valueTable.getVariableEntities());
+      int end = Math.min(offset + limit, sortedEntities.size());
+      List<VariableEntity> entitySubList = (new ArrayList<VariableEntity>(sortedEntities)).subList(offset, end);
+      Iterable<Value> values = vectorSource.getValues(new TreeSet<VariableEntity>(entitySubList));
 
       List<ValueDto> valueDtos = new ArrayList<ValueDto>();
       for(Value value : values) {
