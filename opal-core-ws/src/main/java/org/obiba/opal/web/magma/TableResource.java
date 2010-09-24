@@ -135,7 +135,7 @@ public class TableResource {
   @Path("variables/query")
   public Iterable<ValueDto> getVariablesQuery(@QueryParam("script") String script) {
     if(script == null) {
-      throw new InvalidRequestException("'script' parameter required");
+      throw new InvalidRequestException("RequiredParameter", "script");
     }
 
     Iterable<Value> values = queryVariables(valueTable, script);
@@ -248,10 +248,10 @@ public class TableResource {
   @Path("/variable/_transient/values")
   public Iterable<ValueDto> getTransientValues(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit, @QueryParam("valueType") String valueTypeName, @QueryParam("repeatable") Boolean repeatable, @QueryParam("script") String script) {
     if(limit == null) {
-      throw new InvalidRequestException("'limit' parameter required");
+      throw new InvalidRequestException("RequiredParameter", "limit");
     }
     if(limit < 0) {
-      throw new InvalidRequestException("Illegal 'limit' parameter value (" + limit + ")");
+      throw new InvalidRequestException("IllegalParameterValue", "limit", String.valueOf(limit));
     }
     if(valueTypeName == null) {
       valueTypeName = TextType.get().getName();
@@ -260,7 +260,7 @@ public class TableResource {
       repeatable = false;
     }
     if(script == null) {
-      throw new InvalidRequestException("'script' parameter required");
+      throw new InvalidRequestException("RequiredParameter", "script");
     }
 
     Variable transientVariable = buildTransientVariable(resolveValueType(valueTypeName), repeatable, script);
@@ -286,7 +286,7 @@ public class TableResource {
     try {
       valueType = ValueType.Factory.forName(valueTypeName);
     } catch(IllegalArgumentException ex) {
-      throw new InvalidRequestException("Illegal 'valueType' parameter value (" + valueTypeName + ")");
+      throw new InvalidRequestException("IllegalParameterValue", "valueType", valueTypeName);
     }
     return valueType;
   }

@@ -9,6 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.support;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Signals an invalid HTTP request (missing parameter, illegal parameter value, etc.).
  */
@@ -20,10 +24,32 @@ public class InvalidRequestException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 
   //
+  // Instance Variables
+  //
+
+  private List<String> messageArgs;
+
+  //
   // Constructors
   //
 
-  public InvalidRequestException(String message) {
+  public InvalidRequestException(String message, String... messageArgs) {
     super(message);
+
+    this.messageArgs = new ArrayList<String>();
+
+    if(messageArgs != null) {
+      for(String messageArg : messageArgs) {
+        this.messageArgs.add(messageArg);
+      }
+    }
+  }
+
+  //
+  // Methods
+  //
+
+  public List<String> getMessageArgs() {
+    return Collections.unmodifiableList(messageArgs);
   }
 }

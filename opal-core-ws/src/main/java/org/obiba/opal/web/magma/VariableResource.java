@@ -52,10 +52,10 @@ public class VariableResource {
   @Path("/values")
   public Iterable<ValueDto> getValues(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
     if(limit == null) {
-      throw new InvalidRequestException("'limit' parameter required");
+      throw new InvalidRequestException("RequiredParameter", "limit");
     }
     if(limit < 0) {
-      throw new InvalidRequestException("Illegal 'limit' parameter value (" + limit + ")");
+      throw new InvalidRequestException("IllegalParameterValue", "limit", String.valueOf(limit));
     }
 
     VectorSource vectorSource = vvs.asVectorSource();

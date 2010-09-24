@@ -15,6 +15,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.opal.web.magma.support.InvalidRequestException;
+import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,6 +26,12 @@ public class InvalidRequestExceptionMapper implements ExceptionMapper<InvalidReq
   //
 
   public Response toResponse(InvalidRequestException exception) {
-    return Response.status(Status.BAD_REQUEST).entity(exception.getMessage()).build();
+    ClientErrorDto errorDto = ClientErrorDto.newBuilder() //
+    .setCode(Status.BAD_REQUEST.getStatusCode()) //
+    .setStatus(exception.getMessage()) //
+    .addAllArguments(exception.getMessageArgs()) //
+    .build();
+
+    return Response.status(Status.BAD_REQUEST).entity(errorDto).build();
   }
 }
