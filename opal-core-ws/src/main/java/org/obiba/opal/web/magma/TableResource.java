@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -56,7 +55,6 @@ import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.ValueTableWrapper;
 import org.obiba.magma.support.VariableEntityBean;
-import org.obiba.magma.type.TextType;
 import org.obiba.opal.web.magma.support.InvalidRequestException;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.LinkDto;
@@ -246,18 +244,9 @@ public class TableResource {
 
   @GET
   @Path("/variable/_transient/values")
-  public Iterable<ValueDto> getTransientValues(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit, @QueryParam("valueType") String valueTypeName, @QueryParam("repeatable") Boolean repeatable, @QueryParam("script") String script) {
-    if(limit == null) {
-      throw new InvalidRequestException("RequiredParameter", "limit");
-    }
+  public Iterable<ValueDto> getTransientValues(@QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") @DefaultValue("10") Integer limit, @QueryParam("valueType") @DefaultValue("text") String valueTypeName, @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String script) {
     if(limit < 0) {
       throw new InvalidRequestException("IllegalParameterValue", "limit", String.valueOf(limit));
-    }
-    if(valueTypeName == null) {
-      valueTypeName = TextType.get().getName();
-    }
-    if(repeatable == null) {
-      repeatable = false;
     }
     if(script == null) {
       throw new InvalidRequestException("RequiredParameter", "script");
@@ -268,7 +257,10 @@ public class TableResource {
     jvvs.initialise();
     VectorSource vectorSource = jvvs.asVectorSource();
 
-    Iterable<Value> values = subList(vectorSource.getValues(new TreeSet<VariableEntity>(valueTable.getVariableEntities())), offset != null ? offset : 0, limit);
+    List<VariableEntity> entities = new ArrayList<VariableEntity>(valueTable.getVariableEntities());
+    int end = Math.min(offset + limit, entities.size());
+    Iterable<Value> values = vectorSource.getValues(new TreeSet<VariableEntity>(entities.subList(offset, end)));
+
     List<ValueDto> valueDtos = new ArrayList<ValueDto>();
     for(Value value : values) {
       valueDtos.add(Dtos.asDto(value).build());
@@ -385,24 +377,6 @@ public class TableResource {
     }
 
     return builder.build();
-  }
-
-  /** TODO: This method is a duplicate - also occurs in VariableResource. */
-  private <T> Iterable<T> subList(Iterable<T> iterable, int offset, int limit) {
-    List<T> subList = new ArrayList<T>();
-
-    Iterator<T> iterator = iterable.iterator();
-    for(int i = 0; i < offset; i++) {
-      iterator.next();
-    }
-
-    int count = 0;
-    while(iterator.hasNext() && count < limit) {
-      subList.add(iterator.next());
-      count++;
-    }
-
-    return subList;
   }
 
   private ClientErrorDto getErrorMessage(Status responseStatus, String errorStatus) {

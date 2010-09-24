@@ -11,10 +11,10 @@ package org.obiba.opal.web.magma;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -50,10 +50,7 @@ public class VariableResource {
 
   @GET
   @Path("/values")
-  public Iterable<ValueDto> getValues(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
-    if(limit == null) {
-      throw new InvalidRequestException("RequiredParameter", "limit");
-    }
+  public Iterable<ValueDto> getValues(@QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") @DefaultValue("10") Integer limit) {
     if(limit < 0) {
       throw new InvalidRequestException("IllegalParameterValue", "limit", String.valueOf(limit));
     }
@@ -61,7 +58,10 @@ public class VariableResource {
     VectorSource vectorSource = vvs.asVectorSource();
 
     if(vectorSource != null) {
-      Iterable<Value> values = subList(vectorSource.getValues(new TreeSet<VariableEntity>(valueTable.getVariableEntities())), offset != null ? offset : 0, limit);
+      List<VariableEntity> entities = new ArrayList<VariableEntity>(valueTable.getVariableEntities());
+      int end = Math.min(offset + limit, entities.size());
+      Iterable<Value> values = vectorSource.getValues(new TreeSet<VariableEntity>(entities.subList(offset, end)));
+
       List<ValueDto> valueDtos = new ArrayList<ValueDto>();
       for(Value value : values) {
         valueDtos.add(Dtos.asDto(value).build());
@@ -83,23 +83,5 @@ public class VariableResource {
       }
     }
     return new DefaultSummaryStatisticsResource(this.valueTable, this.vvs.getVariable(), this.vvs.asVectorSource());
-  }
-
-  /** TODO: This method is a duplicate - also occurs in TableResource. */
-  private <T> Iterable<T> subList(Iterable<T> iterable, int offset, int limit) {
-    List<T> subList = new ArrayList<T>();
-
-    Iterator<T> iterator = iterable.iterator();
-    for(int i = 0; i < offset; i++) {
-      iterator.next();
-    }
-
-    int count = 0;
-    while(iterator.hasNext() && count < limit) {
-      subList.add(iterator.next());
-      count++;
-    }
-
-    return subList;
   }
 }
