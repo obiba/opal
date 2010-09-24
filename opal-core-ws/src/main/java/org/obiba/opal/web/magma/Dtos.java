@@ -167,6 +167,10 @@ final class Dtos {
     if(uriBuilder != null) {
       builder.setLink(uriBuilder.build(valueTable.getDatasource().getName(), valueTable.getName()).toString());
     }
+    if(valueTable instanceof View) {
+      UriBuilder viewLink = UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getView");
+      builder.setViewLink(viewLink.build(valueTable.getDatasource().getName(), valueTable.getName()).toString());
+    }
     return builder;
   }
 

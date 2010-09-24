@@ -254,8 +254,8 @@ public class DatasourceResource {
     return Response.ok().build();
   }
 
-  @Path("/view/{name}")
-  public ViewResource getView(@PathParam("name") String viewName) {
+  @Path("/view/{viewName}")
+  public ViewResource getView(@PathParam("viewName") String viewName) {
     View view = viewManager.getView(getDatasource().getName(), viewName);
     return getViewResource(view);
   }
