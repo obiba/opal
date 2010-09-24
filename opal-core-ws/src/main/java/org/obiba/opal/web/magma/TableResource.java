@@ -81,10 +81,17 @@ public class TableResource {
 
   private final ValueTable valueTable;
 
+  private ValueProvider valueProvider;
+
   private Set<Locale> locales;
 
   public TableResource(ValueTable valueTable) {
     this.valueTable = valueTable;
+    this.valueProvider = new DefaultValueProvider();
+  }
+
+  public void setValueProvider(ValueProvider valueProvider) {
+    this.valueProvider = valueProvider;
   }
 
   public void setLocales(Set<Locale> locales) {
@@ -265,17 +272,9 @@ public class TableResource {
     }
 
     Variable transientVariable = buildTransientVariable(resolveValueType(valueTypeName), repeatable, script);
-    JavascriptVariableValueSource jvvs = new JavascriptVariableValueSource(transientVariable, valueTable);
-    jvvs.initialise();
-    VectorSource vectorSource = jvvs.asVectorSource();
+    VariableValueSource vvs = getTransientVariableValueSource(transientVariable);
 
-    // TODO: Refactor this code. We are creating a TreeSet (to sort the entities), then converting to a List
-    // (to extract the desired sublist), then converting it back to a TreeSet (because VectorSource.getValues
-    // expects a SortedSet of entities).
-    TreeSet<VariableEntity> sortedEntities = new TreeSet<VariableEntity>(valueTable.getVariableEntities());
-    int end = Math.min(offset + limit, sortedEntities.size());
-    List<VariableEntity> entitySubList = (new ArrayList<VariableEntity>(sortedEntities)).subList(offset, end);
-    Iterable<Value> values = vectorSource.getValues(new TreeSet<VariableEntity>(entitySubList));
+    Iterable<Value> values = valueProvider.getValues(valueTable, vvs, offset, limit);
 
     List<ValueDto> valueDtos = new ArrayList<ValueDto>();
     for(Value value : values) {
@@ -285,10 +284,13 @@ public class TableResource {
     return valueDtos;
   }
 
-  /**
-   * @param valueTypeName
-   * @return
-   */
+  VariableValueSource getTransientVariableValueSource(Variable transientVariable) {
+    JavascriptVariableValueSource jvvs = new JavascriptVariableValueSource(transientVariable, valueTable);
+    jvvs.initialise();
+
+    return jvvs;
+  }
+
   private ValueType resolveValueType(String valueTypeName) {
     ValueType valueType = null;
     try {
@@ -424,5 +426,33 @@ public class TableResource {
 
   Set<Locale> getLocales() {
     return Collections.unmodifiableSet(locales);
+  }
+
+  //
+  // Inner Classes / Interfaces
+  //
+
+  static interface ValueProvider {
+
+    public Iterable<Value> getValues(ValueTable vt, VariableValueSource vvs, int offset, int limit);
+  }
+
+  static class DefaultValueProvider implements ValueProvider {
+
+    public Iterable<Value> getValues(ValueTable vt, VariableValueSource vvs, int offset, int limit) {
+      VectorSource vectorSource = vvs.asVectorSource();
+      if(vectorSource == null) {
+        return Collections.emptyList();
+      }
+
+      // TODO: Refactor this code. We are creating a TreeSet (to sort the entities), then converting to a List
+      // (to extract the desired sublist), then converting it back to a TreeSet (because VectorSource.getValues
+      // expects a SortedSet of entities).
+      TreeSet<VariableEntity> sortedEntities = new TreeSet<VariableEntity>(vt.getVariableEntities());
+      int end = Math.min(offset + limit, sortedEntities.size());
+      List<VariableEntity> entitySubList = (new ArrayList<VariableEntity>(sortedEntities)).subList(offset, end);
+
+      return vectorSource.getValues(new TreeSet<VariableEntity>(entitySubList));
+    }
   }
 }

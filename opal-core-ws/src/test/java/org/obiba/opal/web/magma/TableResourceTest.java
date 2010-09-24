@@ -36,12 +36,16 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
+import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.type.TextType;
+import org.obiba.opal.web.magma.TableResource.ValueProvider;
 import org.obiba.opal.web.model.Magma;
+import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Opal.LocaleDto;
 import org.slf4j.Logger;
@@ -278,5 +282,53 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     assertEquals(TextType.get(), variable.getValueType());
     assertEquals(false, variable.isRepeatable());
     assertEquals(variable.getAttribute("script").getValue().getValue(), script);
+  }
+
+  @Test
+  public void getTransientValues() {
+    // Setup
+    ValueTable mockTable = createMock(ValueTable.class);
+    expect(mockTable.getEntityType()).andReturn("Participant").atLeastOnce();
+
+    final VariableValueSource mockVariableValueSource = createMock(VariableValueSource.class);
+
+    int offset = 0;
+    int limit = 3;
+    Iterable<Value> values = createTextValues("value1", "value2", "value3");
+    ValueProvider mockValueProvider = createMock(ValueProvider.class);
+    expect(mockValueProvider.getValues(mockTable, mockVariableValueSource, offset, limit)).andReturn(values).atLeastOnce();
+
+    TableResource sut = new TableResource(mockTable) {
+
+      @Override
+      VariableValueSource getTransientVariableValueSource(Variable transientVariable) {
+        return mockVariableValueSource;
+      }
+    };
+    sut.setValueProvider(mockValueProvider);
+
+    replay(mockTable, mockValueProvider);
+
+    // Exercise
+    Iterable<ValueDto> valueDtos = sut.getTransientValues(0, 3, TextType.get().getName(), false, "$('someVar')");
+
+    // Verify
+    assertNotNull(valueDtos);
+    assertEquals(limit, ImmutableSet.copyOf(valueDtos).size());
+
+    int i = 0;
+    for(ValueDto valueDto : valueDtos) {
+      assertEquals(TextType.get().getName(), valueDto.getValueType());
+      assertEquals("value" + (++i), valueDto.getValue());
+    }
+  }
+
+  private Iterable<Value> createTextValues(String... textValues) {
+    List<Value> values = new ArrayList<Value>();
+    for(String textValue : textValues) {
+      values.add(TextType.get().valueOf(textValue));
+    }
+
+    return values;
   }
 }
