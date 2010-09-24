@@ -85,6 +85,7 @@ public class VariableResource {
     return new DefaultSummaryStatisticsResource(this.valueTable, this.vvs.getVariable(), this.vvs.asVectorSource());
   }
 
+  /** TODO: This method is a duplicate - also occurs in TableResource. */
   private <T> Iterable<T> subList(Iterable<T> iterable, int offset, int limit) {
     List<T> subList = new ArrayList<T>();
 
