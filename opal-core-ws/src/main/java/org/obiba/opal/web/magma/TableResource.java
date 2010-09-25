@@ -45,7 +45,6 @@ import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
-import org.obiba.magma.VectorSource;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.JavascriptValueSource;
@@ -57,7 +56,9 @@ import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.ValueTableWrapper;
 import org.obiba.magma.support.VariableEntityBean;
+import org.obiba.opal.web.magma.support.DefaultPagingVectorSourceImpl;
 import org.obiba.opal.web.magma.support.InvalidRequestException;
+import org.obiba.opal.web.magma.support.PagingVectorSource;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.TableDto;
@@ -81,17 +82,10 @@ public class TableResource {
 
   private final ValueTable valueTable;
 
-  private ValueProvider valueProvider;
-
   private Set<Locale> locales;
 
   public TableResource(ValueTable valueTable) {
     this.valueTable = valueTable;
-    this.valueProvider = new DefaultValueProvider();
-  }
-
-  public void setValueProvider(ValueProvider valueProvider) {
-    this.valueProvider = valueProvider;
   }
 
   public void setLocales(Set<Locale> locales) {
@@ -274,7 +268,7 @@ public class TableResource {
     Variable transientVariable = buildTransientVariable(resolveValueType(valueTypeName), repeatable, script);
     VariableValueSource vvs = getTransientVariableValueSource(transientVariable);
 
-    Iterable<Value> values = valueProvider.getValues(valueTable, vvs, offset, limit);
+    Iterable<Value> values = getPagingVectorSource(vvs).getValues(offset, limit);
 
     List<ValueDto> valueDtos = new ArrayList<ValueDto>();
     for(Value value : values) {
@@ -289,6 +283,10 @@ public class TableResource {
     jvvs.initialise();
 
     return jvvs;
+  }
+
+  PagingVectorSource getPagingVectorSource(VariableValueSource vvs) {
+    return new DefaultPagingVectorSourceImpl(valueTable, vvs);
   }
 
   private ValueType resolveValueType(String valueTypeName) {
@@ -426,33 +424,5 @@ public class TableResource {
 
   Set<Locale> getLocales() {
     return Collections.unmodifiableSet(locales);
-  }
-
-  //
-  // Inner Classes / Interfaces
-  //
-
-  static interface ValueProvider {
-
-    public Iterable<Value> getValues(ValueTable vt, VariableValueSource vvs, int offset, int limit);
-  }
-
-  static class DefaultValueProvider implements ValueProvider {
-
-    public Iterable<Value> getValues(ValueTable vt, VariableValueSource vvs, int offset, int limit) {
-      VectorSource vectorSource = vvs.asVectorSource();
-      if(vectorSource == null) {
-        return Collections.emptyList();
-      }
-
-      // TODO: Refactor this code. We are creating a TreeSet (to sort the entities), then converting to a List
-      // (to extract the desired sublist), then converting it back to a TreeSet (because VectorSource.getValues
-      // expects a SortedSet of entities).
-      TreeSet<VariableEntity> sortedEntities = new TreeSet<VariableEntity>(vt.getVariableEntities());
-      int end = Math.min(offset + limit, sortedEntities.size());
-      List<VariableEntity> entitySubList = (new ArrayList<VariableEntity>(sortedEntities)).subList(offset, end);
-
-      return vectorSource.getValues(new TreeSet<VariableEntity>(entitySubList));
-    }
   }
 }

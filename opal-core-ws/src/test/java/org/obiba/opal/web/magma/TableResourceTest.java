@@ -43,7 +43,7 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.type.TextType;
-import org.obiba.opal.web.magma.TableResource.ValueProvider;
+import org.obiba.opal.web.magma.support.PagingVectorSource;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
@@ -290,24 +290,21 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     ValueTable mockTable = createMock(ValueTable.class);
     expect(mockTable.getEntityType()).andReturn("Participant").atLeastOnce();
 
-    final VariableValueSource mockVariableValueSource = createMock(VariableValueSource.class);
-
     int offset = 0;
     int limit = 3;
     Iterable<Value> values = createTextValues("value1", "value2", "value3");
-    ValueProvider mockValueProvider = createMock(ValueProvider.class);
-    expect(mockValueProvider.getValues(mockTable, mockVariableValueSource, offset, limit)).andReturn(values).atLeastOnce();
+    final PagingVectorSource mockPagingVectorSource = createMock(PagingVectorSource.class);
+    expect(mockPagingVectorSource.getValues(offset, limit)).andReturn(values).atLeastOnce();
 
     TableResource sut = new TableResource(mockTable) {
 
       @Override
-      VariableValueSource getTransientVariableValueSource(Variable transientVariable) {
-        return mockVariableValueSource;
+      PagingVectorSource getPagingVectorSource(VariableValueSource vvs) {
+        return mockPagingVectorSource;
       }
     };
-    sut.setValueProvider(mockValueProvider);
 
-    replay(mockTable, mockValueProvider);
+    replay(mockTable, mockPagingVectorSource);
 
     // Exercise
     Iterable<ValueDto> valueDtos = sut.getTransientValues(0, 3, TextType.get().getName(), false, "$('someVar')");
