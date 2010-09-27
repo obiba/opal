@@ -53,7 +53,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
   @Autowired
   private OpalSecurityManager opalSecurityManager;
 
-  @Autowired
   private OpalConfiguration opalConfiguration;
 
   @Autowired

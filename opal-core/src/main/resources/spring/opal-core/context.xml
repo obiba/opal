@@ -22,6 +22,9 @@
   </bean>
 
   <bean id="viewManager" class="org.obiba.magma.views.impl.DefaultViewManagerImpl">
+    <constructor-arg>
+      <bean class="org.obiba.opal.core.cfg.OpalViewPersistenceStrategy" />
+    </constructor-arg>
   </bean>
   
 </beans>
