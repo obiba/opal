@@ -113,6 +113,10 @@ public class DatasourceResource {
     this.opalRuntime = opalRuntime;
   }
 
+  public void setLocalesProperty(String localesProperty) {
+    this.localesProperty = localesProperty;
+  }
+
   @GET
   public Magma.DatasourceDto get() {
     Datasource ds = getDatasource();

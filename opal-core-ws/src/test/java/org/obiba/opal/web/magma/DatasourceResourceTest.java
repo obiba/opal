@@ -33,11 +33,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.NoSuchValueTableException;
+import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.datasource.excel.support.ExcelDatasourceFactory;
 import org.obiba.magma.support.MagmaEngineFactory;
+import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.runtime.OpalRuntime;
@@ -381,6 +384,63 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     // Verify state
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void testGetView_GetsViewFromViewManager() {
+    // Setup
+    String mockDatasourceName = "mockDatasource";
+    String viewName = "viewToGet";
+
+    final Datasource mockDatasource = createMock(Datasource.class);
+    expect(mockDatasource.getName()).andReturn(mockDatasourceName).atLeastOnce();
+
+    View view = new View(viewName, createMock(ValueTable.class));
+    ViewManager mockViewManager = createMock(ViewManager.class);
+    expect(mockViewManager.getView(mockDatasourceName, viewName)).andReturn(view).atLeastOnce();
+
+    OpalRuntime mockOpalRuntime = createMock(OpalRuntime.class);
+    expect(mockOpalRuntime.getViewManager()).andReturn(mockViewManager).atLeastOnce();
+
+    DatasourceResource sut = createDatasourceResource(mockDatasourceName, mockDatasource);
+    sut.setOpalRuntime(mockOpalRuntime);
+    sut.setLocalesProperty("en");
+
+    replay(mockDatasource, mockViewManager, mockOpalRuntime);
+
+    // Exercise
+    ViewResource viewResource = sut.getView(viewName);
+
+    // Verify behaviour
+    verify(mockViewManager);
+
+    // Verify state
+    assertEquals(viewName, viewResource.getValueTable().getName());
+  }
+
+  @Test(expected = NoSuchValueTableException.class)
+  public void testGetView_ThrowsNoSuchValueTableExceptionWhenViewDoesNotExist() {
+    // Setup
+    String mockDatasourceName = "mockDatasource";
+    String viewName = "viewToGet";
+
+    final Datasource mockDatasource = createMock(Datasource.class);
+    expect(mockDatasource.getName()).andReturn(mockDatasourceName).atLeastOnce();
+
+    ViewManager mockViewManager = createMock(ViewManager.class);
+    expect(mockViewManager.getView(mockDatasourceName, viewName)).andThrow(new NoSuchValueTableException(viewName));
+
+    OpalRuntime mockOpalRuntime = createMock(OpalRuntime.class);
+    expect(mockOpalRuntime.getViewManager()).andReturn(mockViewManager).atLeastOnce();
+
+    DatasourceResource sut = createDatasourceResource(mockDatasourceName, mockDatasource);
+    sut.setOpalRuntime(mockOpalRuntime);
+    sut.setLocalesProperty("en");
+
+    replay(mockDatasource, mockViewManager, mockOpalRuntime);
+
+    // Exercise
+    ViewResource viewResource = sut.getView(viewName);
   }
 
   private DatasourceResource createDatasourceResource(String mockDatasourceName, final Datasource mockDatasource) {
