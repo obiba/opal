@@ -17,9 +17,11 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.js.MagmaJsExtension;
 import org.obiba.magma.views.ViewManager;
+import org.obiba.magma.views.impl.DefaultViewManagerImpl;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationIo;
+import org.obiba.opal.core.cfg.OpalViewPersistenceStrategy;
 import org.obiba.opal.core.runtime.security.OpalSecurityManager;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
@@ -55,7 +57,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   private OpalConfiguration opalConfiguration;
 
-  @Autowired
   private ViewManager viewManager;
 
   private OpalFileSystem opalFileSystem;
@@ -155,6 +156,9 @@ public class DefaultOpalRuntime implements OpalRuntime {
   }
 
   public ViewManager getViewManager() {
+    if(viewManager == null) {
+      viewManager = new DefaultViewManagerImpl(new OpalViewPersistenceStrategy());
+    }
     return viewManager;
   }
 

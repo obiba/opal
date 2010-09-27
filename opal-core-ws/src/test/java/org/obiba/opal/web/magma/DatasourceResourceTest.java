@@ -575,7 +575,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     replay(mockDatasource, mockViewManager, mockOpalRuntime);
 
     // Exercise
-    ViewResource viewResource = sut.getView(viewName);
+    sut.getView(viewName);
   }
 
   @Test
