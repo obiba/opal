@@ -15,6 +15,7 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
@@ -317,6 +318,73 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     Response response = datasourceResource.createTable(null);
 
     Assert.assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void testRemoveView_ReturnsNotFoundResponseWhenViewDoesNotExist() {
+    // Setup
+    String mockDatasourceName = "mockDatasource";
+    String bogusViewName = "bogusView";
+
+    final Datasource mockDatasource = createMock(Datasource.class);
+    expect(mockDatasource.getName()).andReturn(mockDatasourceName).atLeastOnce();
+
+    DatasourceResource.ViewManager mockViewManager = createMock(DatasourceResource.ViewManager.class);
+    expect(mockViewManager.hasView(mockDatasourceName, bogusViewName)).andReturn(false).atLeastOnce();
+
+    DatasourceResource sut = createDatasourceResource(mockDatasourceName, mockDatasource);
+    sut.setViewManager(mockViewManager);
+
+    replay(mockDatasource, mockViewManager);
+
+    // Exercise
+    Response response = sut.removeView(bogusViewName);
+
+    // Verify behaviour
+    verify(mockViewManager);
+
+    // Verify state
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void testRemoveView_RemovesViewByDelegatingToViewManager() {
+    // Setup
+    String mockDatasourceName = "mockDatasource";
+    String viewName = "viewToRemove";
+
+    final Datasource mockDatasource = createMock(Datasource.class);
+    expect(mockDatasource.getName()).andReturn(mockDatasourceName).atLeastOnce();
+
+    DatasourceResource.ViewManager mockViewManager = createMock(DatasourceResource.ViewManager.class);
+    expect(mockViewManager.hasView(mockDatasourceName, viewName)).andReturn(true).atLeastOnce();
+    mockViewManager.removeView(mockDatasourceName, viewName);
+    expectLastCall().once();
+
+    DatasourceResource sut = createDatasourceResource(mockDatasourceName, mockDatasource);
+    sut.setViewManager(mockViewManager);
+
+    replay(mockDatasource, mockViewManager);
+
+    // Exercise
+    Response response = sut.removeView(viewName);
+
+    // Verify behaviour
+    verify(mockViewManager);
+
+    // Verify state
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  private DatasourceResource createDatasourceResource(String mockDatasourceName, final Datasource mockDatasource) {
+    DatasourceResource sut = new DatasourceResource(mockDatasourceName) {
+
+      @Override
+      Datasource getDatasource() {
+        return mockDatasource;
+      }
+    };
+    return sut;
   }
 
   private DatasourceFactoryRegistry newDatasourceFactoryRegistry() {
