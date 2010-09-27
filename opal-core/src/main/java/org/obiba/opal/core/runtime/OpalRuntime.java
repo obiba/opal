@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
+import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
@@ -34,6 +35,8 @@ public interface OpalRuntime {
   public FunctionalUnit getFunctionalUnit(String unitName);
 
   public FileObject getUnitDirectory(String unitName) throws NoSuchFunctionalUnitException, FileSystemException;
+
+  public ViewManager getViewManager();
 
   public void start();
 

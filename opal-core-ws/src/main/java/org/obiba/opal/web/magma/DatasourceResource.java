@@ -28,10 +28,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
@@ -41,8 +41,8 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.Variable;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
+import org.obiba.magma.Variable;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.DatasourceParsingException;
@@ -77,8 +77,6 @@ public class DatasourceResource {
 
   private OpalRuntime opalRuntime;
 
-  private ViewManager viewManager;
-
   @Autowired
   private @Value("${org.obiba.opal.languages}")
   String localesProperty;
@@ -111,8 +109,8 @@ public class DatasourceResource {
     }
   }
 
-  public void setViewManager(ViewManager viewManager) {
-    this.viewManager = viewManager;
+  public void setOpalRuntime(OpalRuntime opalRuntime) {
+    this.opalRuntime = opalRuntime;
   }
 
   @GET
@@ -270,7 +268,7 @@ public class DatasourceResource {
     if(datasourceHasTable(viewName) && !datasourceHasView(viewName)) {
       return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists").build()).build();
     }
-    viewManager.addView(getDatasource().getName(), ViewDtos.fromDto(viewName, viewDto));
+    opalRuntime.getViewManager().addView(getDatasource().getName(), ViewDtos.fromDto(viewName, viewDto));
 
     return Response.ok().build();
   }
@@ -281,14 +279,14 @@ public class DatasourceResource {
     if(!datasourceHasView(viewName)) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    viewManager.removeView(getDatasource().getName(), viewName);
+    opalRuntime.getViewManager().removeView(getDatasource().getName(), viewName);
 
     return Response.ok().build();
   }
 
   @Path("/view/{viewName}")
   public ViewResource getView(@PathParam("viewName") String viewName) {
-    View view = viewManager.getView(getDatasource().getName(), viewName);
+    View view = opalRuntime.getViewManager().getView(getDatasource().getName(), viewName);
     return getViewResource(view);
   }
 
@@ -332,7 +330,7 @@ public class DatasourceResource {
   }
 
   private boolean datasourceHasView(String viewName) {
-    return viewManager.hasView(getDatasource().getName(), viewName);
+    return opalRuntime.getViewManager().hasView(getDatasource().getName(), viewName);
   }
 
   private Set<Locale> getLocales() {
@@ -346,21 +344,5 @@ public class DatasourceResource {
     }
 
     return locales;
-  }
-
-  //
-  // Inner Classes / Interfaces
-  //
-
-  /* TO BE REMOVED once actual ViewManager interface is committed */
-  static interface ViewManager {
-
-    void addView(String datasourceName, View view);
-
-    void removeView(String datasourceName, String viewName);
-
-    boolean hasView(String datasourceName, String viewName);
-
-    View getView(String datasourceName, String viewName);
   }
 }

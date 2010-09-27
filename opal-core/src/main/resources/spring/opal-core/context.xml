@@ -21,4 +21,7 @@
   <bean id="participantIdentifier" class="org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl">
   </bean>
 
+  <bean id="viewManager" class="org.obiba.magma.views.impl.DefaultViewManagerImpl">
+  </bean>
+  
 </beans>

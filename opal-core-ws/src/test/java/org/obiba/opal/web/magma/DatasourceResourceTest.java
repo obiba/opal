@@ -22,8 +22,8 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import junit.framework.Assert;
 
@@ -34,10 +34,11 @@ import org.junit.Test;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.Variable;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
+import org.obiba.magma.Variable;
 import org.obiba.magma.datasource.excel.support.ExcelDatasourceFactory;
 import org.obiba.magma.support.MagmaEngineFactory;
+import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.web.magma.support.DatasourceFactoryDtoParser;
@@ -329,13 +330,16 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     final Datasource mockDatasource = createMock(Datasource.class);
     expect(mockDatasource.getName()).andReturn(mockDatasourceName).atLeastOnce();
 
-    DatasourceResource.ViewManager mockViewManager = createMock(DatasourceResource.ViewManager.class);
+    ViewManager mockViewManager = createMock(ViewManager.class);
     expect(mockViewManager.hasView(mockDatasourceName, bogusViewName)).andReturn(false).atLeastOnce();
 
-    DatasourceResource sut = createDatasourceResource(mockDatasourceName, mockDatasource);
-    sut.setViewManager(mockViewManager);
+    OpalRuntime mockOpalRuntime = createMock(OpalRuntime.class);
+    expect(mockOpalRuntime.getViewManager()).andReturn(mockViewManager).atLeastOnce();
 
-    replay(mockDatasource, mockViewManager);
+    DatasourceResource sut = createDatasourceResource(mockDatasourceName, mockDatasource);
+    sut.setOpalRuntime(mockOpalRuntime);
+
+    replay(mockDatasource, mockViewManager, mockOpalRuntime);
 
     // Exercise
     Response response = sut.removeView(bogusViewName);
@@ -356,15 +360,18 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     final Datasource mockDatasource = createMock(Datasource.class);
     expect(mockDatasource.getName()).andReturn(mockDatasourceName).atLeastOnce();
 
-    DatasourceResource.ViewManager mockViewManager = createMock(DatasourceResource.ViewManager.class);
+    ViewManager mockViewManager = createMock(ViewManager.class);
     expect(mockViewManager.hasView(mockDatasourceName, viewName)).andReturn(true).atLeastOnce();
     mockViewManager.removeView(mockDatasourceName, viewName);
     expectLastCall().once();
 
-    DatasourceResource sut = createDatasourceResource(mockDatasourceName, mockDatasource);
-    sut.setViewManager(mockViewManager);
+    OpalRuntime mockOpalRuntime = createMock(OpalRuntime.class);
+    expect(mockOpalRuntime.getViewManager()).andReturn(mockViewManager).atLeastOnce();
 
-    replay(mockDatasource, mockViewManager);
+    DatasourceResource sut = createDatasourceResource(mockDatasourceName, mockDatasource);
+    sut.setOpalRuntime(mockOpalRuntime);
+
+    replay(mockDatasource, mockViewManager, mockOpalRuntime);
 
     // Exercise
     Response response = sut.removeView(viewName);

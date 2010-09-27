@@ -16,6 +16,7 @@ import org.apache.commons.vfs.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.js.MagmaJsExtension;
+import org.obiba.magma.views.ViewManager;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationIo;
@@ -52,7 +53,11 @@ public class DefaultOpalRuntime implements OpalRuntime {
   @Autowired
   private OpalSecurityManager opalSecurityManager;
 
+  @Autowired
   private OpalConfiguration opalConfiguration;
+
+  @Autowired
+  private ViewManager viewManager;
 
   private OpalFileSystem opalFileSystem;
 
@@ -148,6 +153,10 @@ public class DefaultOpalRuntime implements OpalRuntime {
     unitDir.createFolder();
 
     return unitDir;
+  }
+
+  public ViewManager getViewManager() {
+    return viewManager;
   }
 
   private void readConfiguration() {
