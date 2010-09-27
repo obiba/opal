@@ -16,10 +16,12 @@ import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -28,6 +30,7 @@ import javax.ws.rs.core.UriInfo;
 import junit.framework.Assert;
 
 import org.easymock.EasyMock;
+import org.easymock.IArgumentMatcher;
 import org.jboss.resteasy.specimpl.UriBuilderImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -49,12 +52,16 @@ import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.magma.support.ExcelDatasourceFactoryDtoParser;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.ExcelDatasourceFactoryDto;
+import org.obiba.opal.web.model.Magma.JavaScriptViewDto;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
+import org.obiba.opal.web.model.Magma.ViewDto;
+import org.obiba.opal.web.model.Opal.LocaleDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -325,6 +332,134 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
   }
 
   @Test
+  public void testCreateOrUpdateView_AddsViewByDelegatingToViewManager() {
+    // Setup
+    String mockDatasourceName = "mockDatasource";
+    String viewName = "viewToAdd";
+    String fqViewName = mockDatasourceName + "." + "fromTable";
+
+    ValueTable mockFromTable = createMock(ValueTable.class);
+
+    final Datasource mockDatasource = createMock(Datasource.class);
+    mockDatasource.initialise();
+    expect(mockDatasource.getName()).andReturn(mockDatasourceName).atLeastOnce();
+    expect(mockDatasource.hasValueTable(viewName)).andReturn(false).atLeastOnce();
+    expect(mockDatasource.getValueTable("fromTable")).andReturn(mockFromTable).atLeastOnce();
+    mockDatasource.dispose();
+
+    JavaScriptViewDto jsViewDto = JavaScriptViewDto.newBuilder().build();
+    ViewDto viewDto = ViewDto.newBuilder().addFrom(fqViewName).setExtension(JavaScriptViewDto.view, jsViewDto).build();
+
+    ViewManager mockViewManager = createMock(ViewManager.class);
+    mockViewManager.addView(EasyMock.same(mockDatasourceName), eqView(new View(viewName, mockFromTable)));
+    expectLastCall().once();
+
+    OpalRuntime mockOpalRuntime = createMock(OpalRuntime.class);
+    expect(mockOpalRuntime.getViewManager()).andReturn(mockViewManager).atLeastOnce();
+
+    DatasourceResource sut = createDatasourceResource(mockDatasourceName, mockDatasource);
+    sut.setOpalRuntime(mockOpalRuntime);
+
+    replay(mockDatasource, mockFromTable, mockViewManager, mockOpalRuntime);
+
+    // Exercise
+    MagmaEngine.get().addDatasource(mockDatasource);
+    Response response = sut.createOrUpdateView(viewName, viewDto);
+    MagmaEngine.get().removeDatasource(mockDatasource);
+
+    // Verify behaviour
+    verify(mockViewManager);
+
+    // Verify state
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void testCreateOrUpdateView_UpdatesViewIfViewExistsByDelegatingToViewManager() {
+    // Setup
+    String mockDatasourceName = "mockDatasource";
+    String viewName = "viewToUpdate";
+    String fqViewName = mockDatasourceName + "." + "fromTable";
+
+    ValueTable mockFromTable = createMock(ValueTable.class);
+
+    final Datasource mockDatasource = createMock(Datasource.class);
+    mockDatasource.initialise();
+    expect(mockDatasource.getName()).andReturn(mockDatasourceName).atLeastOnce();
+    expect(mockDatasource.hasValueTable(viewName)).andReturn(true).atLeastOnce();
+    expect(mockDatasource.getValueTable("fromTable")).andReturn(mockFromTable).atLeastOnce();
+    mockDatasource.dispose();
+
+    JavaScriptViewDto jsViewDto = JavaScriptViewDto.newBuilder().build();
+    ViewDto viewDto = ViewDto.newBuilder().addFrom(fqViewName).setExtension(JavaScriptViewDto.view, jsViewDto).build();
+
+    ViewManager mockViewManager = createMock(ViewManager.class);
+    expect(mockViewManager.hasView(mockDatasourceName, viewName)).andReturn(true).atLeastOnce();
+    mockViewManager.addView(EasyMock.same(mockDatasourceName), eqView(new View(viewName, mockFromTable)));
+    expectLastCall().once();
+
+    OpalRuntime mockOpalRuntime = createMock(OpalRuntime.class);
+    expect(mockOpalRuntime.getViewManager()).andReturn(mockViewManager).atLeastOnce();
+
+    DatasourceResource sut = createDatasourceResource(mockDatasourceName, mockDatasource);
+    sut.setOpalRuntime(mockOpalRuntime);
+
+    replay(mockDatasource, mockFromTable, mockViewManager, mockOpalRuntime);
+
+    // Exercise
+    MagmaEngine.get().addDatasource(mockDatasource);
+    Response response = sut.createOrUpdateView(viewName, viewDto);
+    MagmaEngine.get().removeDatasource(mockDatasource);
+
+    // Verify behaviour
+    verify(mockViewManager);
+
+    // Verify state
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void testCreateOrUpdateView_ReturnsBadRequestResponseIfDatasourceHasRegularTableWithSameName() {
+    // Setup
+    String mockDatasourceName = "mockDatasource";
+    String viewName = "viewToAdd";
+    String fqViewName = mockDatasourceName + "." + "fromTable";
+
+    ValueTable mockFromTable = createMock(ValueTable.class);
+
+    final Datasource mockDatasource = createMock(Datasource.class);
+    mockDatasource.initialise();
+    expect(mockDatasource.getName()).andReturn(mockDatasourceName).atLeastOnce();
+    expect(mockDatasource.hasValueTable(viewName)).andReturn(true).atLeastOnce();
+    mockDatasource.dispose();
+
+    JavaScriptViewDto jsViewDto = JavaScriptViewDto.newBuilder().build();
+    ViewDto viewDto = ViewDto.newBuilder().addFrom(fqViewName).setExtension(JavaScriptViewDto.view, jsViewDto).build();
+
+    ViewManager mockViewManager = createMock(ViewManager.class);
+    expect(mockViewManager.hasView(mockDatasourceName, viewName)).andReturn(false).atLeastOnce();
+
+    OpalRuntime mockOpalRuntime = createMock(OpalRuntime.class);
+    expect(mockOpalRuntime.getViewManager()).andReturn(mockViewManager).atLeastOnce();
+
+    DatasourceResource sut = createDatasourceResource(mockDatasourceName, mockDatasource);
+    sut.setOpalRuntime(mockOpalRuntime);
+
+    replay(mockDatasource, mockFromTable, mockViewManager, mockOpalRuntime);
+
+    // Exercise
+    MagmaEngine.get().addDatasource(mockDatasource);
+    Response response = sut.createOrUpdateView(viewName, viewDto);
+    MagmaEngine.get().removeDatasource(mockDatasource);
+
+    // Verify behaviour
+    verify(mockViewManager);
+
+    // Verify state
+    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+
+  @Test
   public void testRemoveView_ReturnsNotFoundResponseWhenViewDoesNotExist() {
     // Setup
     String mockDatasourceName = "mockDatasource";
@@ -443,6 +578,41 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     ViewResource viewResource = sut.getView(viewName);
   }
 
+  @Test
+  public void testGetLocales_WhenDisplayLocaleSpecifiedReturnsLocaleDtosWithDisplayFieldSet() {
+    // Setup
+    DatasourceResource sut = new DatasourceResource("theDatasource");
+    sut.setLocalesProperty("en, fr");
+
+    // Exercise
+    String displayLocaleName = "en";
+    Iterable<LocaleDto> localeDtos = sut.getLocales(displayLocaleName);
+
+    // Verify
+    assertNotNull(localeDtos);
+    ImmutableList<LocaleDto> localeDtoList = ImmutableList.copyOf(localeDtos);
+    assertEquals(2, localeDtoList.size());
+    assertEqualsLocaleDto(localeDtoList.get(0), "en", displayLocaleName);
+    assertEqualsLocaleDto(localeDtoList.get(1), "fr", displayLocaleName);
+  }
+
+  @Test
+  public void testGetLocales_WhenDisplayLocaleNotSpecifiedReturnsLocaleDtosWithDisplayFieldNotSet() {
+    // Setup
+    DatasourceResource sut = new DatasourceResource("theDatasource");
+    sut.setLocalesProperty("en, fr");
+
+    // Exercise
+    Iterable<LocaleDto> localeDtos = sut.getLocales(null);
+
+    // Verify
+    assertNotNull(localeDtos);
+    ImmutableList<LocaleDto> localeDtoList = ImmutableList.copyOf(localeDtos);
+    assertEquals(2, localeDtoList.size());
+    assertEqualsLocaleDto(localeDtoList.get(0), "en", null);
+    assertEqualsLocaleDto(localeDtoList.get(1), "fr", null);
+  }
+
   private DatasourceResource createDatasourceResource(String mockDatasourceName, final Datasource mockDatasource) {
     DatasourceResource sut = new DatasourceResource(mockDatasourceName) {
 
@@ -467,5 +637,52 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     TableDto.Builder builder = TableDto.newBuilder().setName("table").setEntityType("entityType");
     builder.addVariables(VariableDto.newBuilder().setName("name").setEntityType("entityType").setValueType("text").setIsRepeatable(true));
     return builder.build();
+  }
+
+  private void assertEqualsLocaleDto(LocaleDto localeDto, String localeName, String displayLocaleName) {
+    assertEquals(localeName, localeDto.getName());
+
+    assertEquals(displayLocaleName != null, localeDto.hasDisplay());
+
+    if(localeDto.hasDisplay()) {
+      assertEquals(new Locale(localeName).getDisplayName(new Locale(displayLocaleName)), localeDto.getDisplay());
+    }
+  }
+
+  //
+  // Inner Classes
+  //
+
+  static class ViewMatcher implements IArgumentMatcher {
+
+    private View expected;
+
+    public ViewMatcher(View expected) {
+      this.expected = expected;
+    }
+
+    @Override
+    public boolean matches(Object actual) {
+      if(actual instanceof View) {
+        return ((View) actual).getName().equals(expected.getName());
+      } else {
+        return false;
+      }
+    }
+
+    @Override
+    public void appendTo(StringBuffer buffer) {
+      buffer.append("eqView(");
+      buffer.append(expected.getClass().getName());
+      buffer.append(" with name \"");
+      buffer.append(expected.getName());
+      buffer.append("\")");
+    }
+
+  }
+
+  static View eqView(View in) {
+    EasyMock.reportMatcher(new ViewMatcher(in));
+    return null;
   }
 }
