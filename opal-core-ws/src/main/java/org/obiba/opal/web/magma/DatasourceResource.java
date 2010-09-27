@@ -111,6 +111,10 @@ public class DatasourceResource {
     }
   }
 
+  public void setViewManager(ViewManager viewManager) {
+    this.viewManager = viewManager;
+  }
+
   @GET
   public Magma.DatasourceDto get() {
     Datasource ds = getDatasource();
@@ -261,12 +265,23 @@ public class DatasourceResource {
   }
 
   @PUT
-  @Path("/view/{name}")
-  public Response createOrUpdateView(@PathParam("name") String viewName, ViewDto viewDto) {
+  @Path("/view/{viewName}")
+  public Response createOrUpdateView(@PathParam("viewName") String viewName, ViewDto viewDto) {
     if(datasourceHasTable(viewName) && !datasourceHasView(viewName)) {
       return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists").build()).build();
     }
-    createOrUpdateViewImpl(ViewDtos.fromDto(viewName, viewDto));
+    viewManager.addView(getDatasource().getName(), ViewDtos.fromDto(viewName, viewDto));
+
+    return Response.ok().build();
+  }
+
+  @DELETE
+  @Path("/view/{viewName}")
+  public Response removeView(@PathParam("viewName") String viewName) {
+    if(!datasourceHasView(viewName)) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+    viewManager.removeView(getDatasource().getName(), viewName);
 
     return Response.ok().build();
   }
@@ -288,7 +303,7 @@ public class DatasourceResource {
     return localeDtos;
   }
 
-  private Datasource getDatasource() {
+  Datasource getDatasource() {
     Datasource ds = null;
     if(MagmaEngine.get().hasDatasource(name)) {
       ds = MagmaEngine.get().getDatasource(name);
@@ -320,10 +335,6 @@ public class DatasourceResource {
     return viewManager.hasView(getDatasource().getName(), viewName);
   }
 
-  private void createOrUpdateViewImpl(View view) {
-    viewManager.addView(getDatasource().getName(), view);
-  }
-
   private Set<Locale> getLocales() {
     if(locales == null) {
       locales = new LinkedHashSet<Locale>();
@@ -345,6 +356,8 @@ public class DatasourceResource {
   static interface ViewManager {
 
     void addView(String datasourceName, View view);
+
+    void removeView(String datasourceName, String viewName);
 
     boolean hasView(String datasourceName, String viewName);
 
