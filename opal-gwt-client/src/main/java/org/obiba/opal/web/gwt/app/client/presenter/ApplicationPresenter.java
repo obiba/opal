@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.wizard.createview.view.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.FormatSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.UploadVariablesStepPresenter;
 
@@ -47,6 +48,8 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
     MenuItem getDatasourcesItem();
 
+    MenuItem getNewViewItem();
+
     MenuItem getExploreVariables();
 
     MenuItem getImportVariables();
@@ -68,6 +71,9 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
   @Inject
   private Provider<DashboardPresenter> dashboardPresenter;
+
+  @Inject
+  private Provider<CreateViewStepPresenter> createViewStepPresenter;
 
   @Inject
   private Provider<NavigatorPresenter> navigationPresenter;
@@ -117,6 +123,15 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       public void execute() {
         eventBus.fireEvent(new WorkbenchChangeEvent(dashboardPresenter.get()));
         getDisplay().setCurrentSelection(getDisplay().getDashboardItem());
+      }
+    });
+
+    getDisplay().getNewViewItem().setCommand(new Command() {
+
+      @Override
+      public void execute() {
+        eventBus.fireEvent(new WorkbenchChangeEvent(createViewStepPresenter.get()));
+        getDisplay().setCurrentSelection(getDisplay().getDatasourcesItem());
       }
     });
 

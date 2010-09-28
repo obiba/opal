@@ -1,0 +1,76 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
+
+  <o:WorkbenchLayout>
+    <g:Label><ui:msg description="Create View title">Create View</ui:msg></g:Label>
+    <g:Label><ui:msg description="Create View Step summary">Select the datasource to which to attach the view and provide view settings.</ui:msg></g:Label>
+    <g:FlowPanel>
+      <g:Button ui:field="cancelButton"><ui:msg description="Cancel button label">Cancel</ui:msg></g:Button>
+      <g:Button ui:field="createButton"><ui:msg description="Create button label">Create</ui:msg></g:Button>
+    </g:FlowPanel>
+    
+    <g:FlowPanel>
+      <g:HTMLPanel>
+        <table class="gwt-KeyValue" cellspacing="10">
+          <tbody>
+            <tr>
+              <td>TODO</td>
+            </tr>
+          </tbody>
+        </table>
+      </g:HTMLPanel>
+    </g:FlowPanel>
+    
+     <g:FlowPanel>
+        <g:HTMLPanel>
+          <g:Label addStyleNames="title"><ui:msg description="Datasource label">Datasource</ui:msg></g:Label>
+          <p>
+            <ui:msg description="Datasource information for view creation">
+            A view is always attached to a datasource. This datasource can be an existing one (any of kind) or can 
+            be created for that purpose.
+            </ui:msg>
+          </p>
+          
+          <g:Label addStyleNames="title"><ui:msg description="Name label">Name</ui:msg></g:Label>
+          <p>
+            <ui:msg description="Name information for view creation">
+            The view name is required and should not include special characters such as ':'.
+            </ui:msg>
+          </p>
+          
+          <g:Label addStyleNames="title"><ui:msg description="Tables label">Tables</ui:msg></g:Label>
+          <p>
+            <ui:msg description="Tables information for view creation">
+            The view is always built on top of one or more tables.
+            The view can define a subset of the tables' entities, a subset of the tables' variables, 
+            or can define variables derived from the tables' variables.
+            </ui:msg>
+          </p>
+          
+          <g:Label addStyleNames="title"><ui:msg description="Variables label">Variables</ui:msg></g:Label>
+          <p>
+            <ui:msg description="Variables information for view creation">
+            There are different ways of specifying the variables of a view:
+            </ui:msg>
+          <ul>
+            <li>
+              <ui:msg description="Derived variables information for view creation">
+              list of derived variables: some variables can be enumerated and for each of them a script will be executed on demand to get the values.
+              </ui:msg>
+            </li>
+            <li>
+              <ui:msg description="Selection of variables information for view creation">
+              selection of variables: variables are filtered using a script.
+              </ui:msg>
+            </li>
+          </ul>
+          </p>
+        </g:HTMLPanel>
+     </g:FlowPanel>      
+  </o:WorkbenchLayout>
+
+</ui:UiBinder>

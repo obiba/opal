@@ -55,7 +55,7 @@ public class ApplicationView implements ApplicationPresenter.Display {
   MenuItem exploreVariablesItem;
 
   @UiField
-  MenuItem datasourcesNewItem;
+  MenuItem newViewItem;
 
   @UiField
   MenuItem importVariablesItem;
@@ -84,6 +84,11 @@ public class ApplicationView implements ApplicationPresenter.Display {
   @Override
   public MenuItem getDashboardItem() {
     return dashboardItem;
+  }
+
+  @Override
+  public MenuItem getNewViewItem() {
+    return newViewItem;
   }
 
   @Override

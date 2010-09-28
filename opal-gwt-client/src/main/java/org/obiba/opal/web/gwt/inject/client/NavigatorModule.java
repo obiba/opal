@@ -19,6 +19,8 @@ import org.obiba.opal.web.gwt.app.client.view.NavigatorTreeView;
 import org.obiba.opal.web.gwt.app.client.view.NavigatorView;
 import org.obiba.opal.web.gwt.app.client.view.TableView;
 import org.obiba.opal.web.gwt.app.client.view.VariableView;
+import org.obiba.opal.web.gwt.app.client.wizard.createview.view.CreateViewStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.createview.view.CreateViewStepView;
 
 import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.inject.Singleton;
@@ -38,6 +40,7 @@ public class NavigatorModule extends AbstractGinModule {
     bind(DatasourcePresenter.Display.class).to(DatasourceView.class);
     bind(TablePresenter.Display.class).to(TableView.class);
     bind(VariablePresenter.Display.class).to(VariableView.class);
+    bind(CreateViewStepPresenter.Display.class).to(CreateViewStepView.class);
   }
 
 }
