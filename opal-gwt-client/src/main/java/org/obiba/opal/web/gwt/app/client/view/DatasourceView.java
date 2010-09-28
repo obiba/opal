@@ -34,9 +34,9 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
+import com.google.gwt.view.client.ListView.Delegate;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
-import com.google.gwt.view.client.ListView.Delegate;
 
 public class DatasourceView extends Composite implements DatasourcePresenter.Display {
   @UiTemplate("DatasourceView.ui.xml")
@@ -202,6 +202,11 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   @Override
   public void setExcelDownloadCommand(Command cmd) {
     toolbar.setExcelDownloadCommand(cmd);
+  }
+
+  @Override
+  public void setAddViewCommand(Command cmd) {
+    toolbar.setAddViewCommand(cmd);
   }
 
   private abstract class TableNameColumn extends Column<TableDto, String> implements HasFieldUpdater<TableDto, String> {

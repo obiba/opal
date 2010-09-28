@@ -31,6 +31,8 @@ public class NavigatorMenuBar extends MenuBar {
 
   private MenuItem excelDownloadItem;
 
+  private MenuItem addViewItem;
+
   private MenuBar addMenu;
 
   private MenuItem editItem;
@@ -130,6 +132,15 @@ public class NavigatorMenuBar extends MenuBar {
       getToolsMenu().addItem(excelDownloadItem);
     } else {
       excelDownloadItem.setCommand(cmd);
+    }
+  }
+
+  public void setAddViewCommand(Command cmd) {
+    if(addViewItem == null) {
+      addViewItem = new MenuItem(translations.viewLabel(), cmd);
+      getAddMenu().addItem(addViewItem);
+    } else {
+      addViewItem.setCommand(cmd);
     }
   }
 

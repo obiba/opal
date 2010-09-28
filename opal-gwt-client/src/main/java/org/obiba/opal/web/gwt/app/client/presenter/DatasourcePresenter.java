@@ -60,6 +60,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionHandler()));
     super.registerHandler(eventBus.addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionHandler()));
     getDisplay().setExcelDownloadCommand(new ExcelDownloadCommand());
+    getDisplay().setAddViewCommand(new AddViewCommand());
     getDisplay().setNextCommand(new NextCommand());
     getDisplay().setPreviousCommand(new PreviousCommand());
     super.registerHandler(eventBus.addHandler(SiblingTableSelectionEvent.getType(), new SiblingTableSelectionHandler()));
@@ -159,6 +160,11 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     eventBus.fireEvent(new FileDownloadEvent(downloadUrl));
   }
 
+  private void addView(String datasource) {
+    // TODO: Implement DatasourcePresenter.addView().
+    GWT.log("<addView>");
+  }
+
   private String getPreviousTableName(int index) {
     TableDto previous = null;
     if(index > 0) {
@@ -221,6 +227,13 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     @Override
     public void execute() {
       downloadMetadata(datasourceName);
+    }
+  }
+
+  final class AddViewCommand implements Command {
+    @Override
+    public void execute() {
+      addView(datasourceName);
     }
   }
 
@@ -354,6 +367,8 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     void setNextName(String name);
 
     void setExcelDownloadCommand(Command cmd);
+
+    void setAddViewCommand(Command cmd);
 
     void setNextCommand(Command cmd);
 
