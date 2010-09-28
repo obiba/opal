@@ -51,11 +51,11 @@ public class ApplicationView implements ApplicationPresenter.Display {
   @UiField
   MenuItem datasourcesItem;
 
-  // @UiField
-  // MenuItem variablesItem;
-
   @UiField
   MenuItem exploreVariablesItem;
+
+  @UiField
+  MenuItem datasourcesNewItem;
 
   @UiField
   MenuItem importVariablesItem;
