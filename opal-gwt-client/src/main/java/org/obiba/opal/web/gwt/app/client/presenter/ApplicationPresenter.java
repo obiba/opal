@@ -45,15 +45,13 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
     HasClickHandlers getQuit();
 
-    MenuItem getVariablesItem();
+    MenuItem getDatasourcesItem();
 
     MenuItem getExploreVariables();
 
     MenuItem getImportVariables();
 
     void updateWorkbench(Widget workbench);
-
-    MenuItem getDataItem();
 
     MenuItem getDataImportItem();
 
@@ -127,7 +125,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       @Override
       public void execute() {
         eventBus.fireEvent(new WorkbenchChangeEvent(navigationPresenter.get()));
-        getDisplay().setCurrentSelection(getDisplay().getVariablesItem());
+        getDisplay().setCurrentSelection(getDisplay().getDatasourcesItem());
       }
     });
 
@@ -136,7 +134,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       @Override
       public void execute() {
         eventBus.fireEvent(new WorkbenchChangeEvent(uploadVariablesStepPresenter.get()));
-        getDisplay().setCurrentSelection(getDisplay().getVariablesItem());
+        getDisplay().setCurrentSelection(getDisplay().getDatasourcesItem());
       }
     });
 
@@ -145,7 +143,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       @Override
       public void execute() {
         eventBus.fireEvent(new WorkbenchChangeEvent(formatSelectionStepPresenter.get()));
-        getDisplay().setCurrentSelection(getDisplay().getDataItem());
+        getDisplay().setCurrentSelection(getDisplay().getDatasourcesItem());
       }
     });
 
@@ -154,7 +152,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       @Override
       public void execute() {
         eventBus.fireEvent(new WorkbenchChangeEvent(dataExportPresenter.get()));
-        getDisplay().setCurrentSelection(getDisplay().getDataItem());
+        getDisplay().setCurrentSelection(getDisplay().getDatasourcesItem());
       }
     });
 

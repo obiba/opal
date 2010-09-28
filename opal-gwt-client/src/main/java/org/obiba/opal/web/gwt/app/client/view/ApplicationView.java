@@ -49,16 +49,16 @@ public class ApplicationView implements ApplicationPresenter.Display {
   MenuItem dashboardItem;
 
   @UiField
-  MenuItem variablesItem;
+  MenuItem datasourcesItem;
+
+  // @UiField
+  // MenuItem variablesItem;
 
   @UiField
   MenuItem exploreVariablesItem;
 
   @UiField
   MenuItem importVariablesItem;
-
-  @UiField
-  MenuItem dataItem;
 
   @UiField
   MenuItem dataImportItem;
@@ -150,13 +150,8 @@ public class ApplicationView implements ApplicationPresenter.Display {
   }
 
   @Override
-  public MenuItem getDataItem() {
-    return dataItem;
-  }
-
-  @Override
-  public MenuItem getVariablesItem() {
-    return variablesItem;
+  public MenuItem getDatasourcesItem() {
+    return datasourcesItem;
   }
 
 }

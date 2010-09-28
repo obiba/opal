@@ -15,20 +15,15 @@
             <g:MenuItem  ui:field="dashboardItem">
               <ui:msg description="Dashboard menu item">Dashboard</ui:msg>              
             </g:MenuItem>
-            <g:MenuItem ui:field="variablesItem">
-              <ui:msg description="Variables label">Variables</ui:msg>
+            <g:MenuItem ui:field="datasourcesItem">
+              <ui:msg description="Datasources label">Datasources</ui:msg>
               <g:MenuBar vertical="true">
-                <g:MenuItem ui:field="exploreVariablesItem"><ui:msg description="Explore variables menu item">Explore variables...</ui:msg></g:MenuItem>
-                <g:MenuItem ui:field="importVariablesItem"><ui:msg description="Import variables menu item">Import variables...</ui:msg></g:MenuItem>
+                <g:MenuItem ui:field="exploreVariablesItem"><ui:msg description="Explore variables menu item">Explore variables...</ui:msg></g:MenuItem>  
+                <g:MenuItem ui:field="importVariablesItem"><ui:msg description="Import variables menu item">Import Variables...</ui:msg></g:MenuItem>
+                <g:MenuItem ui:field="dataImportItem"><ui:msg description="Import menu item">Import Data...</ui:msg></g:MenuItem>
+                <g:MenuItem ui:field="dataExportItem"><ui:msg description="Export menu item">Export Data...</ui:msg></g:MenuItem>
               </g:MenuBar>
-            </g:MenuItem>
-            <g:MenuItem ui:field="dataItem">
-              <ui:msg description="Data menu item">Data</ui:msg>              
-              <g:MenuBar vertical="true">
-                <g:MenuItem ui:field="dataImportItem"><ui:msg description="Import menu item">Import...</ui:msg></g:MenuItem>
-                <g:MenuItem ui:field="dataExportItem"><ui:msg description="Export menu item">Export...</ui:msg></g:MenuItem>
-              </g:MenuBar>
-            </g:MenuItem>
+            </g:MenuItem>            
             <g:MenuItem ui:field="fileExplorer">
               <ui:msg description="Files menu item">Files</ui:msg>
             </g:MenuItem>
