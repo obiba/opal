@@ -161,6 +161,11 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     eventBus.fireEvent(new FileDownloadEvent(downloadUrl));
   }
 
+  private void removeDatasource(String datasource) {
+    // TODO: confirm before deleting
+    ResourceRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName).delete().send();
+  }
+
   private void addView(String datasource) {
     // TODO: Implement DatasourcePresenter.addView().
     GWT.log("<addView>");
@@ -234,7 +239,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   final class RemoveDatasourceCommand implements Command {
     @Override
     public void execute() {
-
+      removeDatasource(datasourceName);
     }
   }
 
