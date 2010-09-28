@@ -32,11 +32,12 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
-import com.google.gwt.view.client.ListView.Delegate;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
+import com.google.gwt.view.client.ListView.Delegate;
 
 public class DatasourceView extends Composite implements DatasourcePresenter.Display {
   @UiTemplate("DatasourceView.ui.xml")
@@ -202,6 +203,12 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   @Override
   public void setExcelDownloadCommand(Command cmd) {
     toolbar.setExcelDownloadCommand(cmd);
+  }
+
+  @Override
+  public void setRemoveDatasourceCommand(Command cmd) {
+    toolbar.getToolsMenu().addSeparator();
+    toolbar.getToolsMenu().addItem(new MenuItem(translations.removeLabel(), cmd));
   }
 
   @Override

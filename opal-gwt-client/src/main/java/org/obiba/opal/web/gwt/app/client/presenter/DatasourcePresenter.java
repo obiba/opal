@@ -60,6 +60,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionHandler()));
     super.registerHandler(eventBus.addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionHandler()));
     getDisplay().setExcelDownloadCommand(new ExcelDownloadCommand());
+    getDisplay().setRemoveDatasourceCommand(new RemoveDatasourceCommand());
     getDisplay().setAddViewCommand(new AddViewCommand());
     getDisplay().setNextCommand(new NextCommand());
     getDisplay().setPreviousCommand(new PreviousCommand());
@@ -230,6 +231,13 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     }
   }
 
+  final class RemoveDatasourceCommand implements Command {
+    @Override
+    public void execute() {
+
+    }
+  }
+
   final class AddViewCommand implements Command {
     @Override
     public void execute() {
@@ -367,6 +375,8 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     void setNextName(String name);
 
     void setExcelDownloadCommand(Command cmd);
+
+    void setRemoveDatasourceCommand(Command cmd);
 
     void setAddViewCommand(Command cmd);
 

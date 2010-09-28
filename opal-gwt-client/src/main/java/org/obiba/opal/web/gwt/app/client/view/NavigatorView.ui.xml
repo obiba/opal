@@ -9,7 +9,11 @@
   <o:WorkbenchLayout withInfo="false">
     <g:Label><ui:msg description="Variable explorer title">Variable Explorer</ui:msg></g:Label>
     <g:Label></g:Label>
-    <g:FlowPanel></g:FlowPanel>
+    <g:FlowPanel>
+      <g:Button ui:field="createDatasourceButton">
+        <ui:msg description="Create Datasource label">Create Datasource</ui:msg>
+      </g:Button>
+    </g:FlowPanel>
     <g:SplitLayoutPanel>
       <g:center> 
         <g:ScrollPanel width="100%" ui:field="navigatorDisplayPanel" />
