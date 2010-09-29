@@ -19,7 +19,7 @@ import org.obiba.opal.web.gwt.app.client.view.NavigatorTreeView;
 import org.obiba.opal.web.gwt.app.client.view.NavigatorView;
 import org.obiba.opal.web.gwt.app.client.view.TableView;
 import org.obiba.opal.web.gwt.app.client.view.VariableView;
-import org.obiba.opal.web.gwt.app.client.wizard.createview.view.CreateViewStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.view.CreateViewStepView;
 
 import com.google.gwt.inject.client.AbstractGinModule;
