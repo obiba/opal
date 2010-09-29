@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createview.presenter;
 
+import java.util.Collections;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -16,11 +18,15 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
+import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -28,6 +34,12 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPresenter.Display> {
+  //
+  // Static Variables
+  //
+
+  private static Translations translations = GWT.create(Translations.class);
+
   //
   // Instance Variables
   //
@@ -76,6 +88,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
   protected void addEventHandlers() {
     super.registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
+    super.registerHandler(getDisplay().addCreateClickHandler(new CreateClickHandler()));
     super.registerHandler(getDisplay().addSelectExistingDatasourceClickHandler(new SelectExistingDatasourceClickHandler()));
     super.registerHandler(getDisplay().addCreateNewDatasourceClickHandler(new CreateNewDatasourceClickHandler()));
   }
@@ -119,6 +132,8 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
     void setTableSelector(TableListPresenter.Display tableSelector);
 
+    String getViewName();
+
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
 
     HandlerRegistration addCreateClickHandler(ClickHandler handler);
@@ -134,6 +149,17 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
       eventBus.fireEvent(new WorkbenchChangeEvent(dashboardPresenter.get()));
       ApplicationPresenter.Display appDisplay = applicationPresenter.get().getDisplay();
       appDisplay.setCurrentSelection(appDisplay.getDashboardItem());
+    }
+  }
+
+  class CreateClickHandler implements ClickHandler {
+
+    public void onClick(ClickEvent event) {
+      if(getDisplay().getViewName() == null) {
+        eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "ViewNameRequired", Collections.EMPTY_LIST));
+      } else if(tableListPresenter.getTables().isEmpty()) {
+        eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "TableSelectionRequired", null));
+      }
     }
   }
 

@@ -58,6 +58,9 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   @UiField
   SimplePanel tableSelectorPanel;
 
+  @UiField
+  TextBox viewNameTextBox;
+
   private DatasourceSelectorPresenter.Display datasourceSelector;
 
   //
@@ -87,6 +90,11 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
 
   public void setTableSelector(TableListPresenter.Display tableSelector) {
     tableSelectorPanel.add(tableSelector.asWidget());
+  }
+
+  public String getViewName() {
+    String viewName = viewNameTextBox.getText().trim();
+    return viewName.length() != 0 ? viewName : null;
   }
 
   public HandlerRegistration addCancelClickHandler(ClickHandler handler) {

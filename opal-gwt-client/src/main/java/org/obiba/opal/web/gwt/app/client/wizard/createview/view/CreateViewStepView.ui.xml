@@ -37,7 +37,7 @@
                 <g:Label><ui:msg description="Name of the view label">Name of the view</ui:msg>:</g:Label>          
               </td>
               <td>
-                <g:TextBox />
+                <g:TextBox ui:field="viewNameTextBox" />
               </td>
             </tr>
             <tr>
