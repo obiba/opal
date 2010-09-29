@@ -259,12 +259,16 @@ a:hover {
 }
 
 .workbench .main .title {
-	font-weight: bold;
-	font-size: 1em;
+    font-weight: bold;
+    font-size: 1em;
 }
 
 .workbench .main .p {
-	padding: 10px;
+     padding: 10px;
+}
+
+.workbench .main a, a:visited, a:hover {
+     color:#000000;
 }
 
 .workbench .information .header {

@@ -24,7 +24,7 @@
   
   <g:HTMLPanel>
     <span>
-      <g:Label ui:field="resourceName" addStyleNames="{style.resource-name}">Resource</g:Label>
+      <g:Anchor ui:field="resourceName" addStyleNames="{style.resource-name}">Resource</g:Anchor>
       <g:Image ui:field="requestStatus" addStyleNames="{style.request-status}"></g:Image>
       <g:Label ui:field="errorMessage" addStyleNames="{style.error-message}"/>      
     </span>

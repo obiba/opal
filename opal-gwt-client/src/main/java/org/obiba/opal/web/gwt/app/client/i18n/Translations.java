@@ -314,4 +314,12 @@ public interface Translations extends Constants {
   @Description("View label")
   @DefaultStringValue("View")
   String viewLabel();
+
+  @Description("Create Datasource Completed summary")
+  @DefaultStringValue("The datasource was successfully created.")
+  String datasourceCreationCompleted();
+
+  @Description("Create Datasource Failed summary")
+  @DefaultStringValue("The datasource creation has failed.")
+  String datasourceCreationFailed();
 }

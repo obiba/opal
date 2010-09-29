@@ -18,22 +18,13 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.HibernateDatasourceFactoryDto;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -47,6 +38,9 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
 
   @Inject
   private Provider<DashboardPresenter> dashboardPresenter;
+
+  @Inject
+  private Provider<CreateDatasourceConclusionStepPresenter> createDatasourceConclusionStepPresenter;
 
   //
   // Constructors
@@ -123,27 +117,10 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
   class CreateClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent arg0) {
-      String name = getDisplay().getDatasourceName();
-
-      ResourceCallback<DatasourceDto> callback = new ResourceCallback<DatasourceDto>() {
-
-        public void onResource(Response response, DatasourceDto resource) {
-          if(response.getStatusCode() == 201) {
-            // eventBus.fireEvent(new WorkbenchChangeEvent(dashboardPresenter.get()));
-          }
-        }
-      };
-
-      ResponseCodeCallback errorCallback = new ResponseCodeCallback() {
-
-        public void onResponseCode(Request request, Response response) {
-          final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-          GWT.log(errorDto.getStatus());
-        }
-      };
-
       DatasourceFactoryDto dto = createDatasourceFactoryDto();
-      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasource/" + name).put().withResourceBody(DatasourceFactoryDto.stringify(dto)).withCallback(callback).withCallback(400, errorCallback).withCallback(500, errorCallback).send();
+      CreateDatasourceConclusionStepPresenter presenter = createDatasourceConclusionStepPresenter.get();
+      presenter.setDatasourceFactory(dto);
+      eventBus.fireEvent(new WorkbenchChangeEvent(presenter));
     }
 
     private DatasourceFactoryDto createDatasourceFactoryDto() {
