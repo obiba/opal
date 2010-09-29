@@ -85,6 +85,8 @@ public class DatasourceSelectorPresenter extends WidgetPresenter<DatasourceSelec
 
   public interface Display extends WidgetDisplay {
 
+    void setEnabled(boolean enabled);
+
     void setDatasources(JsArray<DatasourceDto> datasources);
 
     String getSelection();

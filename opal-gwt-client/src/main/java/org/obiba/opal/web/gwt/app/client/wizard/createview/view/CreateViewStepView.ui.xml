@@ -23,12 +23,12 @@
               </td>
               <td>
                 <g:FlowPanel>
-                  <g:RadioButton name="datasourceGroup"><ui:msg description="Select an existing datasource label">Select an existing datasource:</ui:msg></g:RadioButton>
+                  <g:RadioButton name="datasourceGroup" ui:field="selectExistingDatasourceRadioButton"><ui:msg description="Select an existing datasource label">Select an existing datasource:</ui:msg></g:RadioButton>
                   <g:SimplePanel addStyleNames="inline small-indent" ui:field="datasourceSelectorPanel" />
                 </g:FlowPanel>
                 <g:FlowPanel addStyleNames="small-top-margin">
-                  <g:RadioButton name="datasourceGroup"><ui:msg description="Create a new datasource label">Create a new datasource:</ui:msg></g:RadioButton>
-                  <g:TextBox addStyleNames="small-indent" />
+                  <g:RadioButton name="datasourceGroup" ui:field="createNewDatasourceRadioButton"><ui:msg description="Create a new datasource label">Create a new datasource:</ui:msg></g:RadioButton>
+                  <g:TextBox ui:field="createNewDatasourceTextBox" addStyleNames="small-indent" />
                 </g:FlowPanel>
               </td>
             </tr>

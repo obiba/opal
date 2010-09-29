@@ -68,6 +68,8 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
   protected void addEventHandlers() {
     super.registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
+    super.registerHandler(getDisplay().addSelectExistingDatasourceClickHandler(new SelectExistingDatasourceClickHandler()));
+    super.registerHandler(getDisplay().addCreateNewDatasourceClickHandler(new CreateNewDatasourceClickHandler()));
   }
 
   @Override
@@ -78,6 +80,8 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   @Override
   public void refreshDisplay() {
     datasourceSelectorPresenter.refreshDisplay();
+    getDisplay().setDatasourceSelectorEnabled(false);
+    getDisplay().setNewDatasourceInputEnabled(false);
   }
 
   @Override
@@ -101,17 +105,41 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
     void setDatasourceSelector(DatasourceSelectorPresenter.Display datasourceSelector);
 
+    void setDatasourceSelectorEnabled(boolean enabled);
+
+    void setNewDatasourceInputEnabled(boolean enabled);
+
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
 
     HandlerRegistration addCreateClickHandler(ClickHandler handler);
+
+    HandlerRegistration addSelectExistingDatasourceClickHandler(ClickHandler handler);
+
+    HandlerRegistration addCreateNewDatasourceClickHandler(ClickHandler handler);
   }
 
   class CancelClickHandler implements ClickHandler {
 
-    public void onClick(ClickEvent arg0) {
+    public void onClick(ClickEvent event) {
       eventBus.fireEvent(new WorkbenchChangeEvent(dashboardPresenter.get()));
       ApplicationPresenter.Display appDisplay = applicationPresenter.get().getDisplay();
       appDisplay.setCurrentSelection(appDisplay.getDashboardItem());
+    }
+  }
+
+  class SelectExistingDatasourceClickHandler implements ClickHandler {
+
+    public void onClick(ClickEvent event) {
+      getDisplay().setDatasourceSelectorEnabled(true);
+      getDisplay().setNewDatasourceInputEnabled(false);
+    }
+  }
+
+  class CreateNewDatasourceClickHandler implements ClickHandler {
+
+    public void onClick(ClickEvent event) {
+      getDisplay().setDatasourceSelectorEnabled(false);
+      getDisplay().setNewDatasourceInputEnabled(true);
     }
   }
 }

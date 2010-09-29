@@ -40,7 +40,10 @@ public class DatasourceSelectorView extends Composite implements DatasourceSelec
   // DatasourceSelectorPresenter.Display Methods
   //
 
-  @Override
+  public void setEnabled(boolean enabled) {
+    datasourceListBox.setEnabled(enabled);
+  }
+
   public void setDatasources(JsArray<DatasourceDto> datasources) {
     datasourceListBox.clear();
 
@@ -49,22 +52,18 @@ public class DatasourceSelectorView extends Composite implements DatasourceSelec
     }
   }
 
-  @Override
   public String getSelection() {
     int selectedIndex = datasourceListBox.getSelectedIndex();
     return selectedIndex != -1 ? datasourceListBox.getValue(selectedIndex) : null;
   }
 
-  @Override
   public Widget asWidget() {
     return this;
   }
 
-  @Override
   public void startProcessing() {
   }
 
-  @Override
   public void stopProcessing() {
   }
 }

@@ -20,7 +20,9 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 public class CreateViewStepView extends Composite implements CreateViewStepPresenter.Display {
@@ -41,7 +43,18 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   Button createButton;
 
   @UiField
+  RadioButton selectExistingDatasourceRadioButton;
+
+  @UiField
+  RadioButton createNewDatasourceRadioButton;
+
+  @UiField
+  TextBox createNewDatasourceTextBox;
+
+  @UiField
   SimplePanel datasourceSelectorPanel;
+
+  private DatasourceSelectorPresenter.Display datasourceSelector;
 
   //
   // Constructors
@@ -56,7 +69,16 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   //
 
   public void setDatasourceSelector(DatasourceSelectorPresenter.Display datasourceSelector) {
+    this.datasourceSelector = datasourceSelector;
     datasourceSelectorPanel.add(datasourceSelector.asWidget());
+  }
+
+  public void setDatasourceSelectorEnabled(boolean enabled) {
+    datasourceSelector.setEnabled(enabled);
+  }
+
+  public void setNewDatasourceInputEnabled(boolean enabled) {
+    createNewDatasourceTextBox.setEnabled(enabled);
   }
 
   public HandlerRegistration addCancelClickHandler(ClickHandler handler) {
@@ -65,6 +87,14 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
 
   public HandlerRegistration addCreateClickHandler(ClickHandler handler) {
     return createButton.addClickHandler(handler);
+  }
+
+  public HandlerRegistration addSelectExistingDatasourceClickHandler(ClickHandler handler) {
+    return selectExistingDatasourceRadioButton.addClickHandler(handler);
+  }
+
+  public HandlerRegistration addCreateNewDatasourceClickHandler(ClickHandler handler) {
+    return createNewDatasourceRadioButton.addClickHandler(handler);
   }
 
   public Widget asWidget() {
