@@ -13,6 +13,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NavigatorTreePresenter;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -67,6 +68,11 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   @Override
   public HasWidgets getDetailsPanel() {
     return navigatorDisplayPanel;
+  }
+
+  @Override
+  public void addCreateDatasourceClickHandler(ClickHandler handler) {
+    createDatasourceButton.addClickHandler(handler);
   }
 
 }

@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourceStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.FormatSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.UploadVariablesStepPresenter;
@@ -47,6 +48,8 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
     HasClickHandlers getQuit();
 
     MenuItem getDatasourcesItem();
+
+    MenuItem getNewDatasourceItem();
 
     MenuItem getNewViewItem();
 
@@ -74,6 +77,9 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
   @Inject
   private Provider<CreateViewStepPresenter> createViewStepPresenter;
+
+  @Inject
+  private Provider<CreateDatasourceStepPresenter> createDatasourceStepPresenter;
 
   @Inject
   private Provider<NavigatorPresenter> navigationPresenter;
@@ -123,6 +129,15 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       public void execute() {
         eventBus.fireEvent(new WorkbenchChangeEvent(dashboardPresenter.get()));
         getDisplay().setCurrentSelection(getDisplay().getDashboardItem());
+      }
+    });
+
+    getDisplay().getNewDatasourceItem().setCommand(new Command() {
+
+      @Override
+      public void execute() {
+        eventBus.fireEvent(new WorkbenchChangeEvent(createDatasourceStepPresenter.get()));
+        getDisplay().setCurrentSelection(getDisplay().getDatasourcesItem());
       }
     });
 
