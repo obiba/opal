@@ -19,6 +19,8 @@ import org.obiba.opal.web.gwt.app.client.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -41,6 +43,8 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
   private JsArray<DatasourceDto> datasources;
 
+  private Runnable removeDatasourceConfirmation;
+
   //
   // Constructors
   //
@@ -59,6 +63,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   protected void onBind() {
     super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionHandler()));
     super.registerHandler(eventBus.addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionHandler()));
+    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
     getDisplay().setExcelDownloadCommand(new ExcelDownloadCommand());
     getDisplay().setRemoveDatasourceCommand(new RemoveDatasourceCommand());
     getDisplay().setAddViewCommand(new AddViewCommand());
@@ -239,7 +244,23 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   final class RemoveDatasourceCommand implements Command {
     @Override
     public void execute() {
-      removeDatasource(datasourceName);
+      removeDatasourceConfirmation = new Runnable() {
+        public void run() {
+          removeDatasource(datasourceName);
+        }
+      };
+
+      eventBus.fireEvent(new ConfirmationRequiredEvent(removeDatasourceConfirmation, "removeDatasource", "confirmRemoveDatasource"));
+    }
+  }
+
+  class ConfirmationEventHandler implements ConfirmationEvent.Handler {
+
+    public void onConfirmation(ConfirmationEvent event) {
+      if(removeDatasourceConfirmation != null && event.getSource().equals(removeDatasourceConfirmation) && event.isConfirmed()) {
+        removeDatasourceConfirmation.run();
+        removeDatasourceConfirmation = null;
+      }
     }
   }
 
