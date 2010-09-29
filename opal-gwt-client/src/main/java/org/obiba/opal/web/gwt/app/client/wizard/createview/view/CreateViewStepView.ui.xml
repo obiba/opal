@@ -4,10 +4,6 @@
   ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
-
-  <ui:style>
-    .field-label { display: inline; }
-  </ui:style>
   
   <o:WorkbenchLayout>
     <g:Label><ui:msg description="Create View title">Create View</ui:msg></g:Label>
@@ -33,7 +29,7 @@
                     <g:item>opal-data</g:item>
                   </g:ListBox>
                 </g:FlowPanel>
-                <g:FlowPanel>
+                <g:FlowPanel addStyleNames="small-top-margin">
                   <g:RadioButton name="datasourceGroup"><ui:msg description="Create a new datasource label">Create a new datasource:</ui:msg></g:RadioButton>
                   <g:TextBox addStyleNames="small-indent" />
                 </g:FlowPanel>
@@ -41,7 +37,7 @@
             </tr>
             <tr>
               <td>
-                <ui:msg description="Name of the view label">Name of the view</ui:msg>          
+                <g:Label><ui:msg description="Name of the view label">Name of the view</ui:msg>:</g:Label>          
               </td>
               <td>
                 <g:TextBox />
@@ -57,11 +53,9 @@
                 <g:Label><ui:msg description="Variables label">Variables</ui:msg>:</g:Label>           
               </td>
               <td>
-                <g:VerticalPanel>
-                  <g:Label><ui:msg description="Select how the variables will be defined label">Select how the variables will be defined:</ui:msg></g:Label>
-                  <g:RadioButton name="variablesGroup"><ui:msg description="Apply a global filter on the selected tables label">Apply a global filter on the selected tables</ui:msg></g:RadioButton>
-                  <g:RadioButton name="variablesGroup"><ui:msg description="Add each variable one by one label">Add each variable one by one</ui:msg></g:RadioButton>
-                </g:VerticalPanel>
+                <g:Label><ui:msg description="Select how the variables will be defined label">Select how the variables will be defined:</ui:msg></g:Label>
+                <g:RadioButton name="variablesGroup" addStyleNames="block small-top-margin"><ui:msg description="Apply a global filter on the selected tables label">Apply a global filter on the selected tables</ui:msg></g:RadioButton>
+                <g:RadioButton name="variablesGroup" addStyleNames="block small-top-margin"><ui:msg description="Add each variable one by one label">Add each variable one by one</ui:msg></g:RadioButton>
               </td>
             </tr>
           </tbody>
