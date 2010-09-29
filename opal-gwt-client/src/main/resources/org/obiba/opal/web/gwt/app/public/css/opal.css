@@ -49,6 +49,10 @@ a:hover {
   display: block;
 }
 
+.inline {
+  display: inline;
+}
+
 .small-top-margin {
   margin-top: 10px;
 }

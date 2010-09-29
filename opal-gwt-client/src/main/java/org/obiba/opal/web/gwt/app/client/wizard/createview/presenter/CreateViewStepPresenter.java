@@ -18,6 +18,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -36,6 +37,9 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   @Inject
   private Provider<DashboardPresenter> dashboardPresenter;
 
+  @Inject
+  private DatasourceSelectorPresenter datasourceSelectorPresenter;
+
   //
   // Constructors
   //
@@ -51,11 +55,15 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
   @Override
   protected void onBind() {
+    datasourceSelectorPresenter.bind();
+    getDisplay().setDatasourceSelector(datasourceSelectorPresenter.getDisplay());
+
     addEventHandlers();
   }
 
   @Override
   protected void onUnbind() {
+    datasourceSelectorPresenter.unbind();
   }
 
   protected void addEventHandlers() {
@@ -64,10 +72,12 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
   @Override
   public void revealDisplay() {
+    refreshDisplay();
   }
 
   @Override
   public void refreshDisplay() {
+    datasourceSelectorPresenter.refreshDisplay();
   }
 
   @Override
@@ -88,6 +98,8 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   //
 
   public interface Display extends WidgetDisplay {
+
+    void setDatasourceSelector(DatasourceSelectorPresenter.Display datasourceSelector);
 
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
 

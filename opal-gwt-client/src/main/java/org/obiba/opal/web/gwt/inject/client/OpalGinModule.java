@@ -25,11 +25,13 @@ import org.obiba.opal.web.gwt.app.client.view.ErrorDialogView;
 import org.obiba.opal.web.gwt.app.client.view.LoginView;
 import org.obiba.opal.web.gwt.app.client.view.UnhandledResponseNotificationView;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.view.ConfirmationView;
+import org.obiba.opal.web.gwt.app.client.widgets.view.DatasourceSelectorView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.FileSelectionView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.FileSelectorView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.TableListView;
@@ -63,6 +65,7 @@ public class OpalGinModule extends AbstractGinModule {
     bind(TableListPresenter.Display.class).to(TableListView.class);
     bind(FileSelectionPresenter.Display.class).to(FileSelectionView.class);
     bind(ConfirmationPresenter.Display.class).to(ConfirmationView.class).in(Singleton.class);
+    bind(DatasourceSelectorPresenter.Display.class).to(DatasourceSelectorView.class);
     bind(CreateFolderDialogPresenter.Display.class).to(CreateFolderDialogView.class).in(Singleton.class);
 
     // Concrete classes (such as NavigatorPresenter) don't need to be "bound". Simply define a getter in the

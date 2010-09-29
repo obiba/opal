@@ -24,10 +24,7 @@
               <td>
                 <g:FlowPanel>
                   <g:RadioButton name="datasourceGroup"><ui:msg description="Select an existing datasource label">Select an existing datasource:</ui:msg></g:RadioButton>
-                  <g:ListBox  addStyleNames="small-indent" ui:field="charsetCommonListBox" visibleItemCount="1">
-                    <!-- TODO: Fetch these from the web service -->
-                    <g:item>opal-data</g:item>
-                  </g:ListBox>
+                  <g:SimplePanel addStyleNames="inline small-indent" ui:field="datasourceSelectorPanel" />
                 </g:FlowPanel>
                 <g:FlowPanel addStyleNames="small-top-margin">
                   <g:RadioButton name="datasourceGroup"><ui:msg description="Create a new datasource label">Create a new datasource:</ui:msg></g:RadioButton>

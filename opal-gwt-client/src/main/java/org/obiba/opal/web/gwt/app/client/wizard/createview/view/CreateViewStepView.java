@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createview.view;
 
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 
 import com.google.gwt.core.client.GWT;
@@ -19,6 +20,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class CreateViewStepView extends Composite implements CreateViewStepPresenter.Display {
@@ -38,6 +40,9 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   @UiField
   Button createButton;
 
+  @UiField
+  SimplePanel datasourceSelectorPanel;
+
   //
   // Constructors
   //
@@ -49,6 +54,10 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   //
   // CreateViewStepPresenter.Display Methods
   //
+
+  public void setDatasourceSelector(DatasourceSelectorPresenter.Display datasourceSelector) {
+    datasourceSelectorPanel.add(datasourceSelector.asWidget());
+  }
 
   public HandlerRegistration addCancelClickHandler(ClickHandler handler) {
     return cancelButton.addClickHandler(handler);
