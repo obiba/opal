@@ -70,6 +70,8 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
         if(response.getStatusCode() == 201) {
           datasourceDto = (DatasourceDto) JsonUtils.unsafeEval(response.getText());
           getDisplay().setCompleted();
+        } else {
+          getDisplay().setFailed();
         }
       }
     });
@@ -92,7 +94,7 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
 
     });
     resourceRequestPresenter.setSuccessCodes(201);
-    resourceRequestPresenter.setErrorCodes(400, 500);
+    resourceRequestPresenter.setErrorCodes(400, 405, 500);
 
     getDisplay().setDatasourceRequestDisplay(resourceRequestPresenter.getDisplay());
 
