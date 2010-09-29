@@ -18,11 +18,15 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
+import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
@@ -31,9 +35,11 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Display> {
 
@@ -44,6 +50,9 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   private JsArray<DatasourceDto> datasources;
 
   private Runnable removeDatasourceConfirmation;
+
+  @Inject
+  private Provider<NavigatorPresenter> navigationPresenter;
 
   //
   // Constructors
@@ -167,8 +176,20 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   }
 
   private void removeDatasource(String datasource) {
-    // TODO: confirm before deleting
-    ResourceRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName).delete().send();
+
+    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        if(response.getStatusCode() != Response.SC_OK) {
+          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, response.getText(), null));
+        } else {
+          eventBus.fireEvent(new WorkbenchChangeEvent(navigationPresenter.get()));
+        }
+      }
+    };
+
+    ResourceRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler).withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
   }
 
   private void addView(String datasource) {

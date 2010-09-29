@@ -83,4 +83,14 @@ public class CreateDatasourceStepView extends Composite implements CreateDatasou
   @UiTemplate("CreateDatasourceStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, CreateDatasourceStepView> {
   }
+
+  @Override
+  public String getDatasourceName() {
+    return datasourceName.getText();
+  }
+
+  @Override
+  public String getDatasourceType() {
+    return datasourceType.getItemText(datasourceType.getSelectedIndex());
+  }
 }
