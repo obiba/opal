@@ -15,14 +15,26 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
+import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPresenter.Display> {
   //
   // Instance Variables
   //
+
+  @Inject
+  private Provider<ApplicationPresenter> applicationPresenter;
+
+  @Inject
+  private Provider<DashboardPresenter> dashboardPresenter;
 
   //
   // Constructors
@@ -47,7 +59,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   }
 
   protected void addEventHandlers() {
-    // super.registerHandler(getDisplay().addNextClickHandler(new NextClickHandler()));
+    super.registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
   }
 
   @Override
@@ -80,5 +92,14 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
 
     HandlerRegistration addCreateClickHandler(ClickHandler handler);
+  }
+
+  class CancelClickHandler implements ClickHandler {
+
+    public void onClick(ClickEvent arg0) {
+      eventBus.fireEvent(new WorkbenchChangeEvent(dashboardPresenter.get()));
+      ApplicationPresenter.Display appDisplay = applicationPresenter.get().getDisplay();
+      appDisplay.setCurrentSelection(appDisplay.getDashboardItem());
+    }
   }
 }
