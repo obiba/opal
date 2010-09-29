@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard.createview.view;
 
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 
 import com.google.gwt.core.client.GWT;
@@ -54,6 +55,9 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   @UiField
   SimplePanel datasourceSelectorPanel;
 
+  @UiField
+  SimplePanel tableSelectorPanel;
+
   private DatasourceSelectorPresenter.Display datasourceSelector;
 
   //
@@ -79,6 +83,10 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
 
   public void setNewDatasourceInputEnabled(boolean enabled) {
     createNewDatasourceTextBox.setEnabled(enabled);
+  }
+
+  public void setTableSelector(TableListPresenter.Display tableSelector) {
+    tableSelectorPanel.add(tableSelector.asWidget());
   }
 
   public HandlerRegistration addCancelClickHandler(ClickHandler handler) {

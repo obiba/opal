@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -40,6 +41,9 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   @Inject
   private DatasourceSelectorPresenter datasourceSelectorPresenter;
 
+  @Inject
+  private TableListPresenter tableListPresenter;
+
   //
   // Constructors
   //
@@ -58,12 +62,16 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     datasourceSelectorPresenter.bind();
     getDisplay().setDatasourceSelector(datasourceSelectorPresenter.getDisplay());
 
+    tableListPresenter.bind();
+    getDisplay().setTableSelector(tableListPresenter.getDisplay());
+
     addEventHandlers();
   }
 
   @Override
   protected void onUnbind() {
     datasourceSelectorPresenter.unbind();
+    tableListPresenter.unbind();
   }
 
   protected void addEventHandlers() {
@@ -108,6 +116,8 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     void setDatasourceSelectorEnabled(boolean enabled);
 
     void setNewDatasourceInputEnabled(boolean enabled);
+
+    void setTableSelector(TableListPresenter.Display tableSelector);
 
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
 

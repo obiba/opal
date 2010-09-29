@@ -42,7 +42,10 @@
             </tr>
             <tr>
               <td>
-                <g:Label><ui:msg description="Tables label">Tables</ui:msg>:</g:Label>           
+                <g:Label><ui:msg description="Tables label">Tables</ui:msg>:</g:Label>        
+              </td>
+              <td>
+                <g:SimplePanel ui:field="tableSelectorPanel" />
               </td>
             </tr>
             <tr>
