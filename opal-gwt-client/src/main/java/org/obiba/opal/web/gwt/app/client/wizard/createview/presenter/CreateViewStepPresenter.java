@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard.createview.presenter;
 
 import java.util.Collections;
+import java.util.List;
 
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
@@ -25,6 +26,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
+import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -159,7 +161,22 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
         eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "ViewNameRequired", Collections.EMPTY_LIST));
       } else if(tableListPresenter.getTables().isEmpty()) {
         eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "TableSelectionRequired", null));
+      } else if(tableEntityTypesDoNotMatch(tableListPresenter.getTables())) {
+        eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "TableEntityTypesDoNotMatch", null));
       }
+    }
+
+    private boolean tableEntityTypesDoNotMatch(List<TableDto> tableDtos) {
+      String entityType = tableDtos.get(0).getEntityType();
+
+      for(int i = 1; i < tableDtos.size(); i++) {
+        TableDto tableDto = tableDtos.get(i);
+        if(!tableDto.getEntityType().equals(entityType)) {
+          return true;
+        }
+      }
+
+      return false;
     }
   }
 
