@@ -9,9 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createview.presenter;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -35,15 +32,7 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
   // Instance Variables
   //
 
-  /**
-   * Resource requests.
-   */
-  private Set<ResourceRequestPresenter<? extends JavaScriptObject>> resourceRequests;
-
-  /**
-   * Number of resource requests completed (successfully or with an error).
-   */
-  private int resourceRequestsCompleted;
+  private ResourceRequestPresenter<? extends JavaScriptObject> resourceRequestPresenter;
 
   //
   // Constructors
@@ -52,8 +41,6 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
   @Inject
   public ConclusionStepPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
-
-    resourceRequests = new LinkedHashSet<ResourceRequestPresenter<? extends JavaScriptObject>>();
   }
 
   //
@@ -92,35 +79,23 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
   // Methods
   //
 
-  public void clearResourceRequest() {
-    resourceRequests.clear();
-    resourceRequestsCompleted = 0;
-
-    getDisplay().clearResourceRequest();
-  }
-
-  public <T extends JavaScriptObject> void addResourceRequest(String resourceName, String resourceLink, ResourceRequestBuilder<T> requestBuilder) {
-    ResourceRequestPresenter<T> resourceRequestPresenter = new ResourceRequestPresenter<T>(new ResourceRequestView(), eventBus, requestBuilder, new ConclusionResponseCodeCallback());
+  public <T extends JavaScriptObject> void setResourceRequest(String resourceName, String resourceLink, ResourceRequestBuilder<T> requestBuilder) {
+    resourceRequestPresenter = new ResourceRequestPresenter<T>(new ResourceRequestView(), eventBus, requestBuilder, new ConclusionResponseCodeCallback());
     resourceRequestPresenter.getDisplay().setResourceName(resourceName);
     resourceRequestPresenter.setSuccessCodes(200, 201);
     resourceRequestPresenter.setErrorCodes(400, 404, 405, 500);
 
-    resourceRequests.add(resourceRequestPresenter);
-    getDisplay().addResourceRequest(resourceRequestPresenter.getDisplay());
-  }
-
-  public int getResourceRequestCount() {
-    return resourceRequests.size();
+    getDisplay().setResourceRequest(resourceRequestPresenter.getDisplay());
   }
 
   public void sendResourceRequest() {
-    for(ResourceRequestPresenter<? extends JavaScriptObject> r : resourceRequests) {
-      r.sendRequest();
+    if(resourceRequestPresenter != null) {
+      resourceRequestPresenter.sendRequest();
     }
   }
 
-  public void setConfigureViewButtonEnabled(boolean enabled) {
-    getDisplay().setConfigureViewButtonEnabled(enabled);
+  public void showConfigureViewWidgets(boolean show) {
+    getDisplay().showConfigureViewWidgets(show);
   }
 
   //
@@ -129,11 +104,9 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
 
   public interface Display extends WidgetDisplay {
 
-    void clearResourceRequest();
+    void setResourceRequest(ResourceRequestPresenter.Display resourceRequestDisplay);
 
-    void addResourceRequest(ResourceRequestPresenter.Display resourceRequestDisplay);
-
-    void setConfigureViewButtonEnabled(boolean enabled);
+    void showConfigureViewWidgets(boolean show);
 
     HandlerRegistration addConfigureViewClickHandler(ClickHandler handler);
   }
@@ -141,10 +114,9 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
   class ConclusionResponseCodeCallback implements ResponseCodeCallback {
 
     public void onResponseCode(Request request, Response response) {
-      resourceRequestsCompleted++;
-
-      if(resourceRequestsCompleted == resourceRequests.size()) {
-        getDisplay().setConfigureViewButtonEnabled(true);
+      int statusCode = response.getStatusCode();
+      if(statusCode == 200 || statusCode == 201) {
+        getDisplay().showConfigureViewWidgets(true);
       }
     }
   }

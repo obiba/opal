@@ -22,6 +22,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ConclusionStepView extends Composite implements ConclusionStepPresenter.Display {
@@ -39,7 +40,10 @@ public class ConclusionStepView extends Composite implements ConclusionStepPrese
   Label processingViewLabel;
 
   @UiField
-  FlowPanel resourceRequestPanel;
+  SimplePanel resourceRequestPanel;
+
+  @UiField
+  FlowPanel configureViewPanel;
 
   @UiField
   Button configureViewButton;
@@ -56,18 +60,12 @@ public class ConclusionStepView extends Composite implements ConclusionStepPrese
   // ConclusionStepPresenter.Display Methods
   //
 
-  public void clearResourceRequest() {
-    processingViewLabel.setVisible(false);
-    resourceRequestPanel.clear();
+  public void setResourceRequest(Display resourceRequestDisplay) {
+    resourceRequestPanel.setWidget(resourceRequestDisplay.asWidget());
   }
 
-  public void addResourceRequest(Display resourceRequestDisplay) {
-    processingViewLabel.setVisible(true);
-    resourceRequestPanel.add(resourceRequestDisplay.asWidget());
-  }
-
-  public void setConfigureViewButtonEnabled(boolean enabled) {
-    configureViewButton.setEnabled(enabled);
+  public void showConfigureViewWidgets(boolean show) {
+    configureViewPanel.setVisible(show);
   }
 
   public HandlerRegistration addConfigureViewClickHandler(ClickHandler handler) {

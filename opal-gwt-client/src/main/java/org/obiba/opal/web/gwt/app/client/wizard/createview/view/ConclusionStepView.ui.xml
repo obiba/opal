@@ -20,9 +20,11 @@
     
     <g:FlowPanel>
       <g:Label ui:field="processingViewLabel" addStyleNames="{style.label}"><ui:msg description="Processing view label">Processing view:</ui:msg></g:Label>
-      <g:FlowPanel ui:field="resourceRequestPanel" />
-      <g:Label addStyleNames="{style.label}"><ui:msg description="Continue view configuration label">You may now continue view configuration:</ui:msg></g:Label>
-      <g:Button ui:field="configureViewButton" addStyleNames="{style.label}"><ui:msg description="Configure View button label">Configure View</ui:msg></g:Button>
+      <g:SimplePanel ui:field="resourceRequestPanel" />
+      <g:FlowPanel ui:field="configureViewPanel">
+        <g:Label addStyleNames="{style.label}"><ui:msg description="Continue view configuration label">You may now continue view configuration:</ui:msg></g:Label>
+        <g:Button ui:field="configureViewButton" addStyleNames="{style.label}"><ui:msg description="Configure View button label">Configure View</ui:msg></g:Button>
+      </g:FlowPanel>
     </g:FlowPanel> 
   </o:WorkbenchLayout>
 

@@ -181,16 +181,14 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     }
 
     private void createView() {
-      conclusionStepPresenter.clearResourceRequest();
-      addCreateViewResourceRequest();
-      if(conclusionStepPresenter.getResourceRequestCount() != 0) {
-        conclusionStepPresenter.setConfigureViewButtonEnabled(false);
-        conclusionStepPresenter.sendResourceRequest();
-      }
+      setCreateViewResourceRequest();
+      conclusionStepPresenter.showConfigureViewWidgets(false);
+      conclusionStepPresenter.sendResourceRequest();
+
       eventBus.fireEvent(new WorkbenchChangeEvent(conclusionStepPresenter));
     }
 
-    private void addCreateViewResourceRequest() {
+    private void setCreateViewResourceRequest() {
       // Get the view name and datasource name.
       String viewName = getDisplay().getViewName();
       String datasourceName = getDisplay().isAttachingToExistingDatasource() ? getDisplay().getExistingDatasourceName() : getDisplay().getNewDatasourceName();
@@ -205,7 +203,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
       ViewDto viewDto = viewDtoBuilder.build();
 
       // Add the resource request to the ConclusionStepPresenter.
-      conclusionStepPresenter.addResourceRequest(viewName, "/datasource/" + datasourceName + "/view/" + viewName, ResourceRequestBuilderFactory.newBuilder().put().forResource("/datasource/" + datasourceName + "/view/" + viewName).accept("application/x-protobuf+json").withResourceBody(stringify(viewDto)));
+      conclusionStepPresenter.setResourceRequest(viewName, "/datasource/" + datasourceName + "/view/" + viewName, ResourceRequestBuilderFactory.newBuilder().put().forResource("/datasource/" + datasourceName + "/view/" + viewName).accept("application/x-protobuf+json").withResourceBody(stringify(viewDto)));
     }
 
     private boolean tableEntityTypesDoNotMatch(List<TableDto> tableDtos) {
