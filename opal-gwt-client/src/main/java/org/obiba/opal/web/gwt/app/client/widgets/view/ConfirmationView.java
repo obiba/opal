@@ -32,9 +32,9 @@ public class ConfirmationView extends DialogBox implements Display {
   // Constants
   //
 
-  private static final String DIALOG_HEIGHT = "20em";
+  private static final String DIALOG_HEIGHT = "15em";
 
-  private static final String DIALOG_WIDTH = "32em";
+  private static final String DIALOG_WIDTH = "30em";
 
   //
   // Static Variables

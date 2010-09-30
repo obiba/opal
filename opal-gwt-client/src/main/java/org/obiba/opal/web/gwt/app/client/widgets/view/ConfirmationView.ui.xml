@@ -3,22 +3,16 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
   
   <ui:style>
-    .full-border { border: 1px solid; }
-    .top-border { border-top: 1px solid; }
-    .inline { display: inline; }
-    .left-aligned { float: left; }
     .right-aligned { float: right; }
-    .top-margin { margin-top: 1em; }
-    .bottom-margin { margin-bottom: 1em; }
-    .name-input { width: 90%; }
+    .top-margin { margin-top: 0.5em; }
   </ui:style>
   
   <g:DockLayoutPanel unit="EM">
     <g:center>
-      <g:HTML ui:field="message">Confirmation message.</g:HTML>
+      <g:HTML ui:field="message" addStyleNames="main">Confirmation message.</g:HTML>
     </g:center>
-    <g:south size="5">
-      <g:HTMLPanel addStyleNames="{style.top-border} {style.top-margin}">
+    <g:south size="3.25">
+      <g:HTMLPanel addStyleNames="footer">
         <span class="{style.right-aligned} {style.top-margin}">
           <g:Button ui:field="yesButton">
             <ui:msg description="Yes label">Yes</ui:msg>

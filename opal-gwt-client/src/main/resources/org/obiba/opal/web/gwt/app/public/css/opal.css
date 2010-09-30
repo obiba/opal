@@ -114,8 +114,27 @@ a:hover {
 	-moz-border-radius: 0.5em; -webkit-border-radius: 0.5em;
 }
 
+/* DialogBox */
+
 .gwt-DialogBox .Caption {
 	border-top:5px solid #DDDDDD;
+}
+
+.gwt-DialogBox .dialogMiddleCenter {
+	padding:0px;
+}
+
+.gwt-DialogBox .dialogContent .main {
+	padding:10px;
+}
+
+.gwt-DialogBox .dialogContent .footer {
+	background-color:#ECE5DE;
+	border-top:1px solid #B4A291;
+}
+
+.gwt-DialogBox .dialogContent .footer .gwt-Button {
+	margin-right:10px;
 }
 
 /* CellTable */
