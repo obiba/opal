@@ -18,18 +18,24 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NavigatorPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
-import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -153,30 +159,45 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
   class CreateClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent arg0) {
-      DatasourceFactoryDto dto = createDatasourceFactoryDto();
-      if(dto.getName().length() > 0) {
-        CreateDatasourceConclusionStepPresenter presenter = createDatasourceConclusionStepPresenter.get();
-        presenter.setDatasourceFactory(dto);
-        eventBus.fireEvent(new WorkbenchChangeEvent(presenter));
+      final String datasourceName = getDatasourceName();
+      if(datasourceName.length() == 0) {
+        eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "DatasourceNameRequired", null));
       } else {
-        // TODO: error message
+        // check datasource name does not already exist
+        ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<DatasourceDto> datasources) {
+            boolean validated = true;
+            if(datasources != null) {
+              for(int i = 0; i < datasources.length(); i++) {
+                DatasourceDto ds = datasources.get(i);
+                if(ds.getName().equals(datasourceName)) {
+                  eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "DatasourceAlreadyExistsWithThisName", null));
+                  validated = false;
+                  break;
+                }
+              }
+            }
+
+            if(validated) {
+              DatasourceFactoryDto dto = createDatasourceFactoryDto();
+              CreateDatasourceConclusionStepPresenter presenter = createDatasourceConclusionStepPresenter.get();
+              presenter.setDatasourceFactory(dto);
+              eventBus.fireEvent(new WorkbenchChangeEvent(presenter));
+            }
+          }
+        }).send();
+
       }
+    }
+
+    private String getDatasourceName() {
+      return getDisplay().getDatasourceName().trim();
     }
 
     private DatasourceFactoryDto createDatasourceFactoryDto() {
       DatasourceFactoryDto dto = getDisplay().getDatasourceForm().getDatasourceFactory();
-      dto.setName(getDisplay().getDatasourceName().trim());
-      return dto;
-    }
-
-    private DatasourceFactoryDto createExcelDatasourceFactoryDto(String filePath) {
-      ExcelDatasourceFactoryDto extensionDto = ExcelDatasourceFactoryDto.create();
-      extensionDto.setFile(filePath);
-      extensionDto.setReadOnly(false);
-
-      DatasourceFactoryDto dto = DatasourceFactoryDto.create();
-      dto.setExtension(ExcelDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, extensionDto);
-
+      dto.setName(getDatasourceName());
       return dto;
     }
   }

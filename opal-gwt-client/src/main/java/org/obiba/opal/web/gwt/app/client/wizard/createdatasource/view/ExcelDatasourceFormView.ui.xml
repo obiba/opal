@@ -5,7 +5,7 @@
   ui:generateLocales="default">
   
   <g:HTMLPanel>
-    <table class="gwt-KeyValue" cellspacing="10">
+    <table class="gwt-KeyValue">
           <tbody>
             <tr>
               <td>
@@ -18,6 +18,5 @@
           </tbody>
         </table>
   </g:HTMLPanel>
-  
   
 </ui:UiBinder>

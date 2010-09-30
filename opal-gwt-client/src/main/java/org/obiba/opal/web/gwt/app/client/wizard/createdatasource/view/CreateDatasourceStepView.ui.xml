@@ -39,10 +39,20 @@
                 </g:ListBox>
               </td>
             </tr>
+            <tr>
+              <td colspan="2">
+                <g:Label><ui:msg description="Datasource Options label">Datasource type specific options</ui:msg>:</g:Label>          
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>
+                <g:SimplePanel ui:field="datasourceForm"/>
+              </td>
+            </tr>
           </tbody>
         </table>
       </g:HTMLPanel>
-      <g:SimplePanel ui:field="datasourceForm"/>
     </g:FlowPanel>
     
      <g:FlowPanel>

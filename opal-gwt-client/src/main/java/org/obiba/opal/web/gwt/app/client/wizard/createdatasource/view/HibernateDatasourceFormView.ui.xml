@@ -4,6 +4,6 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
   
-  <g:Label addStyleNames="small-indent"><ui:msg description="Hibernate Datasource form">No options</ui:msg></g:Label>
+  <g:Label><ui:msg description="Hibernate Datasource form">No options</ui:msg></g:Label>
 
 </ui:UiBinder>
