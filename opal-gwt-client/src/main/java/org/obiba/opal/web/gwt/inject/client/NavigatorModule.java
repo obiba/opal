@@ -23,8 +23,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.Creat
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourceStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.CreateDatasourceConclusionStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.CreateDatasourceStepView;
-import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.createview.view.CreateViewStepView;
 
 import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.inject.Singleton;
@@ -44,7 +42,6 @@ public class NavigatorModule extends AbstractGinModule {
     bind(DatasourcePresenter.Display.class).to(DatasourceView.class);
     bind(TablePresenter.Display.class).to(TableView.class);
     bind(VariablePresenter.Display.class).to(VariableView.class);
-    bind(CreateViewStepPresenter.Display.class).to(CreateViewStepView.class);
     bind(CreateDatasourceStepPresenter.Display.class).to(CreateDatasourceStepView.class);
     bind(CreateDatasourceConclusionStepPresenter.Display.class).to(CreateDatasourceConclusionStepView.class);
   }

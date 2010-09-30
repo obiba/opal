@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createview.presenter;
 
-import java.util.Collections;
 import java.util.List;
 
 import net.customware.gwt.presenter.client.EventBus;
@@ -21,14 +20,16 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.ViewDto;
 
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -36,12 +37,6 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPresenter.Display> {
-  //
-  // Static Variables
-  //
-
-  private static Translations translations = GWT.create(Translations.class);
-
   //
   // Instance Variables
   //
@@ -57,6 +52,9 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
   @Inject
   private TableListPresenter tableListPresenter;
+
+  @Inject
+  private ConclusionStepPresenter conclusionStepPresenter;
 
   //
   // Constructors
@@ -136,6 +134,14 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
     String getViewName();
 
+    boolean isAttachingToExistingDatasource();
+
+    boolean isAttachingToNewDatasource();
+
+    String getExistingDatasourceName();
+
+    String getNewDatasourceName();
+
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
 
     HandlerRegistration addCreateClickHandler(ClickHandler handler);
@@ -158,12 +164,38 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
     public void onClick(ClickEvent event) {
       if(getDisplay().getViewName() == null) {
-        eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "ViewNameRequired", Collections.EMPTY_LIST));
+        eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "ViewNameRequired", null));
       } else if(tableListPresenter.getTables().isEmpty()) {
         eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "TableSelectionRequired", null));
       } else if(tableEntityTypesDoNotMatch(tableListPresenter.getTables())) {
         eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "TableEntityTypesDoNotMatch", null));
+      } else { // OK -- go ahead and create the view
+        createView();
       }
+    }
+
+    private void createView() {
+      conclusionStepPresenter.clearResourceRequest();
+      addCreateViewResourceRequest();
+      if(conclusionStepPresenter.getResourceRequestCount() != 0) {
+        conclusionStepPresenter.setConfigureViewButtonEnabled(false);
+        conclusionStepPresenter.sendResourceRequest();
+      }
+      eventBus.fireEvent(new WorkbenchChangeEvent(conclusionStepPresenter));
+    }
+
+    private void addCreateViewResourceRequest() {
+      ViewDto viewDto = ViewDto.create();
+      String viewName = getDisplay().getViewName();
+      String datasourceName = getDisplay().isAttachingToExistingDatasource() ? getDisplay().getExistingDatasourceName() : getDisplay().getNewDatasourceName();
+
+      JsArrayString fromTables = JavaScriptObject.createArray().cast();
+      for(TableDto tableDto : tableListPresenter.getTables()) {
+        fromTables.push(tableDto.getDatasourceName() + "." + tableDto.getName());
+      }
+      viewDto.setFromArray(fromTables);
+
+      conclusionStepPresenter.addResourceRequest(viewName, "/datasource/" + datasourceName + "/view/" + viewName, ResourceRequestBuilderFactory.newBuilder().put().forResource("/datasource/" + datasourceName + "/view/" + viewName).accept("application/x-protobuf+json").withResourceBody(stringify(viewDto)));
     }
 
     private boolean tableEntityTypesDoNotMatch(List<TableDto> tableDtos) {
@@ -195,4 +227,9 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
       getDisplay().setNewDatasourceInputEnabled(true);
     }
   }
+
+  public static native String stringify(JavaScriptObject obj)
+  /*-{
+  return $wnd.JSON.stringify(obj);
+  }-*/;
 }

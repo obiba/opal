@@ -97,6 +97,22 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
     return viewName.length() != 0 ? viewName : null;
   }
 
+  public boolean isAttachingToExistingDatasource() {
+    return selectExistingDatasourceRadioButton.getValue();
+  }
+
+  public boolean isAttachingToNewDatasource() {
+    return createNewDatasourceRadioButton.getValue();
+  }
+
+  public String getExistingDatasourceName() {
+    return isAttachingToExistingDatasource() ? datasourceSelector.getSelection() : null;
+  }
+
+  public String getNewDatasourceName() {
+    return isAttachingToNewDatasource() ? createNewDatasourceTextBox.getValue() : null;
+  }
+
   public HandlerRegistration addCancelClickHandler(ClickHandler handler) {
     return cancelButton.addClickHandler(handler);
   }
