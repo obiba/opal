@@ -167,23 +167,8 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
         ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
           @Override
           public void onResource(Response response, JsArray<DatasourceDto> datasources) {
-            boolean validated = true;
-            if(datasources != null) {
-              for(int i = 0; i < datasources.length(); i++) {
-                DatasourceDto ds = datasources.get(i);
-                if(ds.getName().equals(datasourceName)) {
-                  eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "DatasourceAlreadyExistsWithThisName", null));
-                  validated = false;
-                  break;
-                }
-              }
-            }
-
-            if(validated) {
-              DatasourceFactoryDto dto = createDatasourceFactoryDto();
-              CreateDatasourceConclusionStepPresenter presenter = createDatasourceConclusionStepPresenter.get();
-              presenter.setDatasourceFactory(dto);
-              eventBus.fireEvent(new WorkbenchChangeEvent(presenter));
+            if(validateDatasourceNameUnicity(datasourceName, datasources) && validateDatasourceForm()) {
+              createDatasource();
             }
           }
         }).send();
@@ -195,10 +180,35 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
       return getDisplay().getDatasourceName().trim();
     }
 
-    private DatasourceFactoryDto createDatasourceFactoryDto() {
+    private boolean validateDatasourceNameUnicity(final String datasourceName, JsArray<DatasourceDto> datasources) {
+      if(datasources != null) {
+        for(int i = 0; i < datasources.length(); i++) {
+          DatasourceDto ds = datasources.get(i);
+          if(ds.getName().equals(datasourceName)) {
+            eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "DatasourceAlreadyExistsWithThisName", null));
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+
+    private boolean validateDatasourceForm() {
+      String error = getDisplay().getDatasourceForm().validate();
+      if(error != null) {
+        eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, error, null));
+        return false;
+      }
+      return true;
+    }
+
+    private void createDatasource() {
       DatasourceFactoryDto dto = getDisplay().getDatasourceForm().getDatasourceFactory();
       dto.setName(getDatasourceName());
-      return dto;
+
+      CreateDatasourceConclusionStepPresenter presenter = createDatasourceConclusionStepPresenter.get();
+      presenter.setDatasourceFactory(dto);
+      eventBus.fireEvent(new WorkbenchChangeEvent(presenter));
     }
   }
 }

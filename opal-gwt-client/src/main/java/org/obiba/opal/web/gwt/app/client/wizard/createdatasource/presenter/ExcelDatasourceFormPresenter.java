@@ -108,4 +108,15 @@ public class ExcelDatasourceFormPresenter extends WidgetPresenter<ExcelDatasourc
 
   }
 
+  @Override
+  public String validate() {
+    String file = fileSelectionPresenter.getSelectedFile();
+    if(file.length() == 0) {
+      return "ExcelFileRequired";
+    } else if(!file.endsWith(".xls") && !file.endsWith(".xlsx")) {
+      return "ExcelFileSuffixInvalid";
+    }
+    return null;
+  }
+
 }

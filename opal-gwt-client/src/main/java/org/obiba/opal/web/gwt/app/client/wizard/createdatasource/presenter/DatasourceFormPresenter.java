@@ -27,6 +27,8 @@ public interface DatasourceFormPresenter extends Presenter {
 
   public void setDatasourceFactory(DatasourceFactoryDto dto);
 
+  public String validate();
+
   public interface Display extends WidgetDisplay {
 
   }

@@ -85,4 +85,9 @@ public class HibernateDatasourceFormPresenter extends WidgetPresenter<Datasource
 
   }
 
+  @Override
+  public String validate() {
+    return null;
+  }
+
 }
