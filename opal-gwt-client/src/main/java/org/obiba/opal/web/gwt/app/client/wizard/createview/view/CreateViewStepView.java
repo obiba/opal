@@ -61,6 +61,12 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   @UiField
   TextBox viewNameTextBox;
 
+  @UiField
+  RadioButton applyingGlobalVariableFilterRadioButton;
+
+  @UiField
+  RadioButton addingVariablesOneByOneRadioButton;
+
   private DatasourceSelectorPresenter.Display datasourceSelector;
 
   //
@@ -111,6 +117,14 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
 
   public String getNewDatasourceName() {
     return isAttachingToNewDatasource() ? createNewDatasourceTextBox.getValue() : null;
+  }
+
+  public boolean isApplyingGlobalVariableFilter() {
+    return applyingGlobalVariableFilterRadioButton.getValue();
+  }
+
+  public boolean isAddingVariablesOneByOne() {
+    return addingVariablesOneByOneRadioButton.getValue();
   }
 
   public HandlerRegistration addCancelClickHandler(ClickHandler handler) {

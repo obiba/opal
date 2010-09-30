@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
+import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -29,7 +30,6 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -142,6 +142,10 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
     String getNewDatasourceName();
 
+    boolean isApplyingGlobalVariableFilter();
+
+    boolean isAddingVariablesOneByOne();
+
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
 
     HandlerRegistration addCreateClickHandler(ClickHandler handler);
@@ -169,6 +173,8 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
         eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "TableSelectionRequired", null));
       } else if(tableEntityTypesDoNotMatch(tableListPresenter.getTables())) {
         eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "TableEntityTypesDoNotMatch", null));
+      } else if(!getDisplay().isApplyingGlobalVariableFilter() && !getDisplay().isAddingVariablesOneByOne()) {
+        eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "VariableDefinitionMethodRequired", null));
       } else { // OK -- go ahead and create the view
         createView();
       }
@@ -185,16 +191,20 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     }
 
     private void addCreateViewResourceRequest() {
-      ViewDto viewDto = ViewDto.create();
+      // Get the view name and datasource name.
       String viewName = getDisplay().getViewName();
       String datasourceName = getDisplay().isAttachingToExistingDatasource() ? getDisplay().getExistingDatasourceName() : getDisplay().getNewDatasourceName();
 
-      JsArrayString fromTables = JavaScriptObject.createArray().cast();
-      for(TableDto tableDto : tableListPresenter.getTables()) {
-        fromTables.push(tableDto.getDatasourceName() + "." + tableDto.getName());
+      // Build the ViewDto for the request.
+      ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().fromTables(tableListPresenter.getTables());
+      if(getDisplay().isApplyingGlobalVariableFilter()) {
+        viewDtoBuilder.defaultJavaScriptView();
+      } else if(getDisplay().isAddingVariablesOneByOne()) {
+        viewDtoBuilder.defaultVariableListView();
       }
-      viewDto.setFromArray(fromTables);
+      ViewDto viewDto = viewDtoBuilder.build();
 
+      // Add the resource request to the ConclusionStepPresenter.
       conclusionStepPresenter.addResourceRequest(viewName, "/datasource/" + datasourceName + "/view/" + viewName, ResourceRequestBuilderFactory.newBuilder().put().forResource("/datasource/" + datasourceName + "/view/" + viewName).accept("application/x-protobuf+json").withResourceBody(stringify(viewDto)));
     }
 

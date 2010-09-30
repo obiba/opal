@@ -54,8 +54,8 @@
               </td>
               <td>
                 <g:Label><ui:msg description="Select how the variables will be defined label">Select how the variables will be defined:</ui:msg></g:Label>
-                <g:RadioButton name="variablesGroup" addStyleNames="block small-top-margin"><ui:msg description="Apply a global filter on the selected tables label">Apply a global filter on the selected tables</ui:msg></g:RadioButton>
-                <g:RadioButton name="variablesGroup" addStyleNames="block small-top-margin"><ui:msg description="Add each variable one by one label">Add each variable one by one</ui:msg></g:RadioButton>
+                <g:RadioButton name="variablesGroup" ui:field="applyingGlobalVariableFilterRadioButton" addStyleNames="block small-top-margin"><ui:msg description="Apply a global filter on the selected tables label">Apply a global filter on the selected tables</ui:msg></g:RadioButton>
+                <g:RadioButton name="variablesGroup" ui:field="addingVariablesOneByOneRadioButton" addStyleNames="block small-top-margin"><ui:msg description="Add each variable one by one label">Add each variable one by one</ui:msg></g:RadioButton>
               </td>
             </tr>
           </tbody>
