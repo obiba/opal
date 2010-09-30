@@ -112,8 +112,12 @@ public class ResourceRequestPresenter<T extends JavaScriptObject> extends Widget
         getDisplay().failed();
 
         if(response.getText() != null) {
-          ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-          getDisplay().showErrorMessage(errorDto.getStatus());
+          try {
+            ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+            getDisplay().showErrorMessage(errorDto.getStatus());
+          } catch(Exception e) {
+            getDisplay().showErrorMessage("Unknown Error");
+          }
         }
 
         if(callback != null) {
