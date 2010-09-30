@@ -42,6 +42,7 @@
           </tbody>
         </table>
       </g:HTMLPanel>
+      <g:SimplePanel ui:field="datasourceForm"/>
     </g:FlowPanel>
     
      <g:FlowPanel>

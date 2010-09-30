@@ -31,6 +31,8 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresente
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.ExcelDatasourceFormPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.HibernateDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.CsvFormatStepPresenter;
@@ -42,6 +44,7 @@ import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
+
 
 @GinModules( { OpalGinModule.class, DashboardModule.class, NavigatorModule.class, FileSystemModule.class, JobModule.class, ImportModule.class, ImportVariablesWizardModule.class, CreateViewWizardModule.class })
 public interface OpalGinjector extends Ginjector {
@@ -104,4 +107,7 @@ public interface OpalGinjector extends Ginjector {
 
   ConclusionStepPresenter getConclusionStepPresenter();
 
+  HibernateDatasourceFormPresenter getHibernateDatasourceFormPresenter();
+
+  ExcelDatasourceFormPresenter getExcelDatasourceFormPresenter();
 }

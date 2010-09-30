@@ -9,19 +9,24 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.NavigatorPresenter;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
-import org.obiba.opal.web.model.client.magma.HibernateDatasourceFactoryDto;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -37,10 +42,18 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
   private Provider<ApplicationPresenter> applicationPresenter;
 
   @Inject
-  private Provider<DashboardPresenter> dashboardPresenter;
+  private Provider<NavigatorPresenter> navigatorPresenter;
 
   @Inject
   private Provider<CreateDatasourceConclusionStepPresenter> createDatasourceConclusionStepPresenter;
+
+  @Inject
+  private HibernateDatasourceFormPresenter hibernateDatasourceFormPresenter;
+
+  @Inject
+  private ExcelDatasourceFormPresenter excelDatasourceFormPresenter;
+
+  private Set<DatasourceFormPresenter> datasourceFormPresenters = new HashSet<DatasourceFormPresenter>();
 
   //
   // Constructors
@@ -58,6 +71,12 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
   @Override
   protected void onBind() {
     addEventHandlers();
+
+    // FIXME: Is there a way of registering these automatically ? Injecting the set fails.
+    datasourceFormPresenters.add(hibernateDatasourceFormPresenter);
+    datasourceFormPresenters.add(excelDatasourceFormPresenter);
+
+    getDisplay().setDatasourceForm(hibernateDatasourceFormPresenter);
   }
 
   @Override
@@ -67,6 +86,19 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
   protected void addEventHandlers() {
     super.registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
     super.registerHandler(getDisplay().addCreateClickHandler(new CreateClickHandler()));
+    super.registerHandler(getDisplay().addDatasourceTypeChangeHandler(new ChangeHandler() {
+
+      @Override
+      public void onChange(ChangeEvent evt) {
+        GWT.log(getDisplay().getDatasourceType());
+        for(DatasourceFormPresenter formPresenter : datasourceFormPresenters) {
+          if(formPresenter.isForType(getDisplay().getDatasourceType())) {
+            getDisplay().setDatasourceForm(formPresenter);
+            break;
+          }
+        }
+      }
+    }));
   }
 
   @Override
@@ -103,14 +135,18 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
 
     HandlerRegistration addCreateClickHandler(ClickHandler handler);
+
+    HandlerRegistration addDatasourceTypeChangeHandler(ChangeHandler handler);
+
+    void setDatasourceForm(DatasourceFormPresenter formPresenter);
+
+    DatasourceFormPresenter getDatasourceForm();
   }
 
   class CancelClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent arg0) {
-      eventBus.fireEvent(new WorkbenchChangeEvent(dashboardPresenter.get()));
-      ApplicationPresenter.Display appDisplay = applicationPresenter.get().getDisplay();
-      appDisplay.setCurrentSelection(appDisplay.getDashboardItem());
+      eventBus.fireEvent(new WorkbenchChangeEvent(navigatorPresenter.get()));
     }
   }
 
@@ -118,23 +154,18 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
 
     public void onClick(ClickEvent arg0) {
       DatasourceFactoryDto dto = createDatasourceFactoryDto();
-      CreateDatasourceConclusionStepPresenter presenter = createDatasourceConclusionStepPresenter.get();
-      presenter.setDatasourceFactory(dto);
-      eventBus.fireEvent(new WorkbenchChangeEvent(presenter));
+      if(dto.getName().length() > 0) {
+        CreateDatasourceConclusionStepPresenter presenter = createDatasourceConclusionStepPresenter.get();
+        presenter.setDatasourceFactory(dto);
+        eventBus.fireEvent(new WorkbenchChangeEvent(presenter));
+      } else {
+        // TODO: error message
+      }
     }
 
     private DatasourceFactoryDto createDatasourceFactoryDto() {
-      DatasourceFactoryDto dto = createHibernateDatasourceFactoryDto();
-      dto.setName(getDisplay().getDatasourceName());
-      return dto;
-    }
-
-    private DatasourceFactoryDto createHibernateDatasourceFactoryDto() {
-      HibernateDatasourceFactoryDto extensionDto = HibernateDatasourceFactoryDto.create();
-
-      DatasourceFactoryDto dto = DatasourceFactoryDto.create();
-      dto.setExtension(HibernateDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, extensionDto);
-
+      DatasourceFactoryDto dto = getDisplay().getDatasourceForm().getDatasourceFactory();
+      dto.setName(getDisplay().getDatasourceName().trim());
       return dto;
     }
 
