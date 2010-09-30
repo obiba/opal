@@ -111,13 +111,16 @@ public class ResourceRequestPresenter<T extends JavaScriptObject> extends Widget
       public void onResponseCode(Request request, Response response) {
         getDisplay().failed();
 
-        if(response.getText() != null) {
+        if(response.getText() != null && response.getText().length() != 0) {
           try {
             ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
             getDisplay().showErrorMessage(errorDto.getStatus());
           } catch(Exception e) {
-            getDisplay().showErrorMessage("Unknown Error");
+            // Should never get here!
+            getDisplay().showErrorMessage("Internal Error");
           }
+        } else {
+          getDisplay().showErrorMessage("Unknown Error");
         }
 
         if(callback != null) {
