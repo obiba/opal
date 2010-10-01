@@ -127,6 +127,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Variables")
   String variablesLabel();
 
+  @Description("Variable label")
+  @DefaultStringValue("Variable")
+  String variableLabel();
+
   @Description("Unit label")
   @DefaultStringValue("Unit")
   String unitLabel();

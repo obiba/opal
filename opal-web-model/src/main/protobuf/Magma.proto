@@ -157,6 +157,8 @@ message LinkDto {
 
 message ViewDto {
   repeated string from = 1;
+  optional string name = 2;  
+  optional string datasourceName = 3;  
   extensions 1000 to max; 
 }
 

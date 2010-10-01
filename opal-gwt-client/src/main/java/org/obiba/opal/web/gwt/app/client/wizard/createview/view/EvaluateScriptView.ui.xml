@@ -1,0 +1,18 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
+
+  <g:FlowPanel>
+    <g:TextArea ui:field="scriptArea" />
+    <g:Button ui:field="testScript">
+      <ui:msg description="Test script button label">Test</ui:msg>
+    </g:Button>
+    <g:DisclosurePanel ui:field="resultsPanel">
+      <g:header>
+        <ui:msg description="Results label">Results</ui:msg>
+      </g:header>
+      <g:VerticalPanel ui:field="testResults"/>
+    </g:DisclosurePanel>
+    <g:Label ui:field="testCount">test</g:Label>
+  </g:FlowPanel>
+
+</ui:UiBinder>

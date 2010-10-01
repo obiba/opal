@@ -12,6 +12,14 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/war/WEB-INF/classes"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/war/WEB-INF/classes"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/war/WEB-INF/classes"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/war/WEB-INF/classes"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/war/WEB-INF/classes"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/war/WEB-INF/classes"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/war/WEB-INF/classes"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/war/WEB-INF/classes"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/war/WEB-INF/classes"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/war/WEB-INF/classes"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/war/WEB-INF/classes"/>
         <property name="context-root" value="opal-gwt-client"/>
         <property name="java-output-path" value="/opal-gwt-client/war/WEB-INF/classes"/>
     </wb-module>
