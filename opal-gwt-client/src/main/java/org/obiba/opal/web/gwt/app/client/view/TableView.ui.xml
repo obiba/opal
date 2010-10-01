@@ -10,7 +10,7 @@
   <g:VerticalPanel width="100%" addStyleNames="navigator">
      <g:FlowPanel addStyleNames="titlebar">
        <g:Label addStyleNames="title" ui:field="tableName">Table Name</g:Label>
-       <g:Label addStyleNames="small-indent">(Table)</g:Label>
+       <g:Label addStyleNames="small-indent" ui:field="tableOrView">(View)</g:Label>
      </g:FlowPanel>
       
      <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>

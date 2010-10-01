@@ -37,9 +37,9 @@ import com.google.gwt.user.client.ui.InsertPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
+import com.google.gwt.view.client.ListView.Delegate;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
-import com.google.gwt.view.client.ListView.Delegate;
 
 public class TableView extends Composite implements TablePresenter.Display {
 
@@ -56,6 +56,9 @@ public class TableView extends Composite implements TablePresenter.Display {
 
   @UiField
   Label tableName;
+
+  @UiField
+  Label tableOrView;
 
   @UiField
   Label variablesTableTitle;
@@ -199,6 +202,11 @@ public class TableView extends Composite implements TablePresenter.Display {
   @Override
   public void setTableName(String name) {
     tableName.setText(name);
+  }
+
+  public void setTableIsView(boolean tableIsView) {
+    String tableOrViewText = tableIsView ? translations.viewLabel() : translations.tableLabel();
+    tableOrView.setText("(" + tableOrViewText + ")");
   }
 
   @Override

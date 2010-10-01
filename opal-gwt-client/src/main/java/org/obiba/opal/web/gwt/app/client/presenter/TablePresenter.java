@@ -17,10 +17,10 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -92,6 +92,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       table = tableDto;
       getDisplay().clear();
       getDisplay().setTableName(tableDto.getName());
+      getDisplay().setTableIsView(tableDto.hasViewLink());
       getDisplay().setEntityType(tableDto.getEntityType());
       getDisplay().setParentName(tableDto.getDatasourceName());
       getDisplay().setPreviousName(previous);
@@ -242,6 +243,8 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     void clear();
 
     void setTableName(String name);
+
+    void setTableIsView(boolean tableIsView);
 
     void setEntityType(String text);
 
