@@ -92,11 +92,15 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       table = tableDto;
       getDisplay().clear();
       getDisplay().setTableName(tableDto.getName());
-      getDisplay().setTableIsView(tableDto.hasViewLink());
+      getDisplay().setTableIsView(tableIsView());
       getDisplay().setEntityType(tableDto.getEntityType());
       getDisplay().setParentName(tableDto.getDatasourceName());
       getDisplay().setPreviousName(previous);
       getDisplay().setNextName(next);
+
+      if(tableIsView()) {
+        getDisplay().setEditCommand(new EditCommand());
+      }
 
       updateVariables();
     }
@@ -129,6 +133,10 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       next = variables.get(index + 1);
     }
     return next;
+  }
+
+  private boolean tableIsView() {
+    return table.hasViewLink();
   }
 
   //
@@ -166,6 +174,13 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     @Override
     public void execute() {
       downloadMetadata();
+    }
+  }
+
+  final class EditCommand implements Command {
+    @Override
+    public void execute() {
+      GWT.log("<edit>");
     }
   }
 
@@ -255,6 +270,8 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     void setNextCommand(Command cmd);
 
     void setPreviousCommand(Command cmd);
+
+    void setEditCommand(Command cmd);
 
     void setParentName(String name);
 

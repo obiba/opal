@@ -249,6 +249,11 @@ public class TableView extends Composite implements TablePresenter.Display {
     toolbar.setPreviousCommand(cmd);
   }
 
+  @Override
+  public void setEditCommand(Command cmd) {
+    toolbar.setEditCommand(cmd);
+  }
+
   private abstract class VariableNameColumn extends Column<VariableDto, String> implements HasFieldUpdater<VariableDto, String> {
     public VariableNameColumn() {
       super(new ClickableTextCell());
