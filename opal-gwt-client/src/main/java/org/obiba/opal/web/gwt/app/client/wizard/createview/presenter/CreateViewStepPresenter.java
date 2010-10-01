@@ -9,7 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createview.presenter;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
@@ -23,6 +25,13 @@ import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
+import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
+import org.obiba.opal.web.gwt.app.client.validator.DisallowedCharactersValidator;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.MatchingTableEntitiesValidator;
+import org.obiba.opal.web.gwt.app.client.validator.MinimumSizeCollectionValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredOptionValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
@@ -41,6 +50,8 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -140,15 +151,23 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
     void setTableSelector(TableListPresenter.Display tableSelector);
 
-    String getViewName();
+    HasValue<Boolean> getAttachToExistingDatasourceOption();
+
+    HasValue<Boolean> getAttachToNewDatasourceOption();
+
+    HasText getExistingDatasourceName();
+
+    HasText getNewDatasourceName();
+
+    HasText getViewName();
+
+    HasValue<Boolean> getApplyGlobalVariableFilterOption();
+
+    HasValue<Boolean> getAddVariablesOneByOneOption();
 
     boolean isAttachingToExistingDatasource();
 
     boolean isAttachingToNewDatasource();
-
-    String getExistingDatasourceName();
-
-    String getNewDatasourceName();
 
     boolean isApplyingGlobalVariableFilter();
 
@@ -174,10 +193,30 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
   class CreateClickHandler implements ClickHandler {
 
+    private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+
+    @SuppressWarnings("unchecked")
+    public CreateClickHandler() {
+      validators.add(new RequiredOptionValidator(RequiredOptionValidator.asSet(getDisplay().getAttachToExistingDatasourceOption(), getDisplay().getAttachToNewDatasourceOption()), "ViewMustBeAttachedToExistingOrNewDatasource"));
+      validators.add(new ConditionalValidator(getDisplay().getAttachToNewDatasourceOption(), new RequiredTextValidator(getDisplay().getNewDatasourceName(), "DatasourceNameRequired")));
+      validators.add(new ConditionalValidator(getDisplay().getAttachToNewDatasourceOption(), new DisallowedCharactersValidator(getDisplay().getNewDatasourceName(), new char[] { '.', ':' }, "DatasourceNameDisallowedChars")));
+      validators.add(new RequiredTextValidator(getDisplay().getViewName(), "ViewNameRequired"));
+      validators.add(new DisallowedCharactersValidator(getDisplay().getViewName(), new char[] { '.', ':' }, "ViewNameDisallowedChars"));
+
+      MinimumSizeCollectionValidator.HasCollection<TableDto> tablesField = new MinimumSizeCollectionValidator.HasCollection<TableDto>() {
+        public Collection<TableDto> getCollection() {
+          return tableListPresenter.getTables();
+        }
+      };
+      validators.add(new MinimumSizeCollectionValidator<TableDto>(tablesField, 1, "TableSelectionRequired"));
+      validators.add(new MatchingTableEntitiesValidator(tablesField));
+      validators.add(new RequiredOptionValidator(RequiredOptionValidator.asSet(getDisplay().getApplyGlobalVariableFilterOption(), getDisplay().getAddVariablesOneByOneOption()), "VariableDefinitionMethodRequired"));
+    }
+
     public void onClick(ClickEvent event) {
-      UserMessageEvent errorEvent = validate();
-      if(errorEvent != null) {
-        eventBus.fireEvent(errorEvent);
+      String errorMessageKey = validate();
+      if(errorMessageKey != null) {
+        eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, errorMessageKey, null));
         return;
       }
 
@@ -188,29 +227,19 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
       }
     }
 
-    UserMessageEvent validate() {
-      UserMessageEvent errorEvent = null;
-      if(!getDisplay().isAttachingToExistingDatasource() && !getDisplay().isAttachingToNewDatasource()) {
-        errorEvent = new UserMessageEvent(MessageDialogType.ERROR, "ViewMustBeAttachedToExistingOrNewDatasource", null);
-      } else if(getDisplay().isAttachingToExistingDatasource() && getDisplay().getExistingDatasourceName() == null) {
-        errorEvent = new UserMessageEvent(MessageDialogType.ERROR, "datasourceMustBeSelected", null);
-      } else if(getDisplay().isAttachingToNewDatasource() && getDisplay().getNewDatasourceName() == null) {
-        errorEvent = new UserMessageEvent(MessageDialogType.ERROR, "DatasourceNameRequired", null);
-      } else if(getDisplay().getViewName() == null) {
-        errorEvent = new UserMessageEvent(MessageDialogType.ERROR, "ViewNameRequired", null);
-      } else if(tableListPresenter.getTables().isEmpty()) {
-        errorEvent = new UserMessageEvent(MessageDialogType.ERROR, "TableSelectionRequired", null);
-      } else if(tableEntityTypesDoNotMatch(tableListPresenter.getTables())) {
-        errorEvent = new UserMessageEvent(MessageDialogType.ERROR, "TableEntityTypesDoNotMatch", null);
-      } else if(!getDisplay().isApplyingGlobalVariableFilter() && !getDisplay().isAddingVariablesOneByOne()) {
-        errorEvent = new UserMessageEvent(MessageDialogType.ERROR, "VariableDefinitionMethodRequired", null);
+    String validate() {
+      for(FieldValidator validator : validators) {
+        String errorMessageKey = validator.validate();
+        if(errorMessageKey != null) {
+          return errorMessageKey;
+        }
       }
-      return errorEvent;
+      return null;
     }
 
     void createNewDatasourceAndView() {
       DatasourceFactoryDto dsFactoryDto = DatasourceFactoryDto.create();
-      dsFactoryDto.setName(getDisplay().getNewDatasourceName());
+      dsFactoryDto.setName(getDisplay().getNewDatasourceName().getText());
       HibernateDatasourceFactoryDto hibFactoryDto = HibernateDatasourceFactoryDto.create();
       dsFactoryDto.setExtension(HibernateDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, hibFactoryDto);
 
@@ -241,8 +270,8 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
     void createView() {
       // Get the view name and datasource name.
-      String viewName = getDisplay().getViewName();
-      String datasourceName = getDisplay().isAttachingToExistingDatasource() ? getDisplay().getExistingDatasourceName() : getDisplay().getNewDatasourceName();
+      String viewName = getDisplay().getViewName().getText();
+      String datasourceName = getDisplay().isAttachingToExistingDatasource() ? getDisplay().getExistingDatasourceName().getText() : getDisplay().getNewDatasourceName().getText();
 
       // Build the ViewDto for the request.
       ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().fromTables(tableListPresenter.getTables());
@@ -261,19 +290,6 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
       conclusionStepPresenter.showConfigureViewWidgets(false);
       conclusionStepPresenter.sendResourceRequest();
       eventBus.fireEvent(new WorkbenchChangeEvent(conclusionStepPresenter));
-    }
-
-    private boolean tableEntityTypesDoNotMatch(List<TableDto> tableDtos) {
-      String entityType = tableDtos.get(0).getEntityType();
-
-      for(int i = 1; i < tableDtos.size(); i++) {
-        TableDto tableDto = tableDtos.get(i);
-        if(!tableDto.getEntityType().equals(entityType)) {
-          return true;
-        }
-      }
-
-      return false;
     }
   }
 

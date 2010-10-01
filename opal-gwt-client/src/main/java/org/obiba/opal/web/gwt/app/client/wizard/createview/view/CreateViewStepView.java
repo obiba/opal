@@ -21,6 +21,8 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -98,9 +100,24 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
     tableSelectorPanel.add(tableSelector.asWidget());
   }
 
-  public String getViewName() {
-    String viewName = viewNameTextBox.getText().trim();
-    return viewName.length() != 0 ? viewName : null;
+  public HasValue<Boolean> getAttachToExistingDatasourceOption() {
+    return selectExistingDatasourceRadioButton;
+  }
+
+  public HasValue<Boolean> getAttachToNewDatasourceOption() {
+    return createNewDatasourceRadioButton;
+  }
+
+  public HasText getViewName() {
+    return viewNameTextBox;
+  }
+
+  public HasValue<Boolean> getApplyGlobalVariableFilterOption() {
+    return applyingGlobalVariableFilterRadioButton;
+  }
+
+  public HasValue<Boolean> getAddVariablesOneByOneOption() {
+    return addingVariablesOneByOneRadioButton;
   }
 
   public boolean isAttachingToExistingDatasource() {
@@ -111,12 +128,23 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
     return createNewDatasourceRadioButton.getValue();
   }
 
-  public String getExistingDatasourceName() {
-    return isAttachingToExistingDatasource() ? datasourceSelector.getSelection() : null;
+  public HasText getExistingDatasourceName() {
+    final String selectedDatasourceName = isAttachingToExistingDatasource() ? datasourceSelector.getSelection() : null;
+
+    return new HasText() {
+
+      public String getText() {
+        return selectedDatasourceName;
+      }
+
+      public void setText(String text) {
+        throw new UnsupportedOperationException("cannot set existing datasource name");
+      }
+    };
   }
 
-  public String getNewDatasourceName() {
-    return isAttachingToNewDatasource() ? createNewDatasourceTextBox.getValue() : null;
+  public HasText getNewDatasourceName() {
+    return createNewDatasourceTextBox;
   }
 
   public boolean isApplyingGlobalVariableFilter() {
