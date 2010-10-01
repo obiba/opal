@@ -33,6 +33,9 @@ public class DisallowedCharactersValidator extends AbstractFieldValidator {
     if(disallowedChars == null) {
       throw new IllegalArgumentException("null disallowedChars");
     }
+    if(disallowedChars.length == 0) {
+      throw new IllegalArgumentException("zero-length disallowedChars");
+    }
 
     this.textField = textField;
 
@@ -47,15 +50,15 @@ public class DisallowedCharactersValidator extends AbstractFieldValidator {
   @Override
   protected boolean hasError() {
     String text = textField.getText();
+
     if(text != null) {
-      if(disallowedChars.length != 0) {
-        for(char c : disallowedChars) {
-          if(text.indexOf(c) != -1) {
-            return true;
-          }
+      for(char c : disallowedChars) {
+        if(text.indexOf(c) != -1) {
+          return true;
         }
       }
     }
+
     return false;
   }
 
