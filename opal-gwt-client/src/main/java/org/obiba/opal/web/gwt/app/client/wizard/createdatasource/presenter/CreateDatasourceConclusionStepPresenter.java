@@ -56,6 +56,8 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
 
   private DatasourceDto datasourceDto;
 
+  private WidgetPresenter<?> returnPresenter;
+
   @Inject
   public CreateDatasourceConclusionStepPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
@@ -70,6 +72,7 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
         if(response.getStatusCode() == 201) {
           datasourceDto = (DatasourceDto) JsonUtils.unsafeEval(response.getText());
           getDisplay().setCompleted();
+          returnPresenter = createDatasourceStepPresenter.get();
         } else {
           getDisplay().setFailed();
         }
@@ -99,6 +102,10 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
     getDisplay().setDatasourceRequestDisplay(resourceRequestPresenter.getDisplay());
 
     resourceRequestPresenter.sendRequest();
+  }
+
+  public void setReturnPresenter(WidgetPresenter<?> presenter) {
+    this.returnPresenter = presenter;
   }
 
   @Override
@@ -135,7 +142,7 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
 
     @Override
     public void onClick(ClickEvent arg0) {
-      eventBus.fireEvent(new WorkbenchChangeEvent(createDatasourceStepPresenter.get()));
+      eventBus.fireEvent(new WorkbenchChangeEvent(returnPresenter));
     }
 
   }

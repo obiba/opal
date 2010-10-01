@@ -28,7 +28,6 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -77,34 +76,35 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
   @Override
   protected void onBind() {
     addEventHandlers();
-
-    // FIXME: Is there a way of registering these automatically ? Injecting the set fails.
-    datasourceFormPresenters.add(hibernateDatasourceFormPresenter);
-    datasourceFormPresenters.add(excelDatasourceFormPresenter);
-
-    getDisplay().setDatasourceForm(hibernateDatasourceFormPresenter);
+    registerDatasourceFormPresenters();
   }
 
   @Override
   protected void onUnbind() {
+    datasourceFormPresenters.clear();
+  }
+
+  private void registerDatasourceFormPresenters() {
+    // FIXME: Is there a way of registering these automatically ? Injecting the set fails.
+    datasourceFormPresenters.add(hibernateDatasourceFormPresenter);
+    datasourceFormPresenters.add(excelDatasourceFormPresenter);
+    updateDatasourceFormDisplay();
+  }
+
+  private void updateDatasourceFormDisplay() {
+    // GWT.log(getDisplay().getDatasourceType());
+    for(DatasourceFormPresenter formPresenter : datasourceFormPresenters) {
+      if(formPresenter.isForType(getDisplay().getDatasourceType())) {
+        getDisplay().setDatasourceForm(formPresenter);
+        break;
+      }
+    }
   }
 
   protected void addEventHandlers() {
     super.registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
     super.registerHandler(getDisplay().addCreateClickHandler(new CreateClickHandler()));
-    super.registerHandler(getDisplay().addDatasourceTypeChangeHandler(new ChangeHandler() {
-
-      @Override
-      public void onChange(ChangeEvent evt) {
-        GWT.log(getDisplay().getDatasourceType());
-        for(DatasourceFormPresenter formPresenter : datasourceFormPresenters) {
-          if(formPresenter.isForType(getDisplay().getDatasourceType())) {
-            getDisplay().setDatasourceForm(formPresenter);
-            break;
-          }
-        }
-      }
-    }));
+    super.registerHandler(getDisplay().addDatasourceTypeChangeHandler(new DatasourceTypeChangeHandler()));
   }
 
   @Override
@@ -131,6 +131,13 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
   //
   // Inner Classes / Interfaces
   //
+
+  final class DatasourceTypeChangeHandler implements ChangeHandler {
+    @Override
+    public void onChange(ChangeEvent evt) {
+      updateDatasourceFormDisplay();
+    }
+  }
 
   public interface Display extends WidgetDisplay {
 
@@ -203,6 +210,7 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
 
       CreateDatasourceConclusionStepPresenter presenter = createDatasourceConclusionStepPresenter.get();
       presenter.setDatasourceFactory(dto);
+      presenter.setReturnPresenter(CreateDatasourceStepPresenter.this);
       eventBus.fireEvent(new WorkbenchChangeEvent(presenter));
     }
   }
