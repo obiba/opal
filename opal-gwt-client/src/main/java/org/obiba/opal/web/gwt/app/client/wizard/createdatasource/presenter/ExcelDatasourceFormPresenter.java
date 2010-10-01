@@ -14,6 +14,8 @@ import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
@@ -82,11 +84,6 @@ public class ExcelDatasourceFormPresenter extends WidgetPresenter<ExcelDatasourc
   }
 
   @Override
-  public void setDatasourceFactory(DatasourceFactoryDto dto) {
-
-  }
-
-  @Override
   public void refreshDisplay() {
     // TODO Auto-generated method stub
 
@@ -109,14 +106,22 @@ public class ExcelDatasourceFormPresenter extends WidgetPresenter<ExcelDatasourc
   }
 
   @Override
-  public String validate() {
+  public boolean validate() {
+    boolean isValid = true;
     String file = fileSelectionPresenter.getSelectedFile();
+
     if(file.length() == 0) {
-      return "ExcelFileRequired";
+      isValid = false;
+      fireErrorEvent("ExcelFileRequired");
     } else if(!file.endsWith(".xls") && !file.endsWith(".xlsx")) {
-      return "ExcelFileSuffixInvalid";
+      isValid = false;
+      fireErrorEvent("ExcelFileSuffixInvalid");
     }
-    return null;
+
+    return isValid;
   }
 
+  private void fireErrorEvent(String error) {
+    eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, error, null));
+  }
 }

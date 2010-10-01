@@ -25,9 +25,11 @@ public interface DatasourceFormPresenter extends Presenter {
 
   public DatasourceFactoryDto getDatasourceFactory();
 
-  public void setDatasourceFactory(DatasourceFactoryDto dto);
-
-  public String validate();
+  /**
+   * True if the form data in the form are valid. Responsible for displaying the appropriate error message.
+   * @return
+   */
+  public boolean validate();
 
   public interface Display extends WidgetDisplay {
 

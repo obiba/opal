@@ -194,12 +194,7 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
     }
 
     private boolean validateDatasourceForm() {
-      String error = getDisplay().getDatasourceForm().validate();
-      if(error != null) {
-        eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, error, null));
-        return false;
-      }
-      return true;
+      return getDisplay().getDatasourceForm().validate();
     }
 
     private void createDatasource() {

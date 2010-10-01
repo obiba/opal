@@ -69,11 +69,6 @@ public class HibernateDatasourceFormPresenter extends WidgetPresenter<Datasource
   }
 
   @Override
-  public void setDatasourceFactory(DatasourceFactoryDto dto) {
-
-  }
-
-  @Override
   public void refreshDisplay() {
     // TODO Auto-generated method stub
 
@@ -86,8 +81,8 @@ public class HibernateDatasourceFormPresenter extends WidgetPresenter<Datasource
   }
 
   @Override
-  public String validate() {
-    return null;
+  public boolean validate() {
+    return true;
   }
 
 }
