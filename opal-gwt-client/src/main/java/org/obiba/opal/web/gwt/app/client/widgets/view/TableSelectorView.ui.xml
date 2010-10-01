@@ -8,16 +8,17 @@
     .top-border { border-top: 1px solid; }
     .inline { display: inline; }
     .left-aligned { float: left; }
-    .right-aligned { float: right; }
-    .top-margin { margin-top: 1em; }
     .bottom-margin { margin-bottom: 1em; }
     .name-input { width: 90%; }
     .instructions { font-weight: bold; margin-bottom: 1em; }
+    
+    .right-aligned { float: right; }
+    .top-margin { margin-top: 0.5em; }
   </ui:style>
   
   <g:DockLayoutPanel unit="EM">
     <g:center>
-      <g:HTMLPanel width="100%">
+      <g:HTMLPanel width="100%" addStyleNames="main">
         <table width="100%" class="gwt-KeyValue">
           <tbody>
             <tr>
@@ -55,8 +56,8 @@
         </table>
       </g:HTMLPanel>
     </g:center>
-    <g:south size="5">
-      <g:HTMLPanel addStyleNames="{style.top-border} {style.top-margin}">
+    <g:south size="3.25">
+      <g:HTMLPanel addStyleNames="footer">
         <span class="{style.right-aligned} {style.top-margin}">
           <g:Button ui:field="selectButton">
             <ui:msg description="Select button label">Select</ui:msg>
@@ -66,7 +67,7 @@
           </g:Button>
         </span>
       </g:HTMLPanel>
-    </g:south> 
+    </g:south>
   </g:DockLayoutPanel>
   
 </ui:UiBinder>
