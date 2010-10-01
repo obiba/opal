@@ -30,7 +30,7 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.LayoutPanel;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionModel;
@@ -46,7 +46,7 @@ public class JobDetailsView extends DialogBox implements Display {
   private static final String DIALOG_WIDTH = "40em";
 
   @UiTemplate("JobDetailsView.ui.xml")
-  interface JobDetailsViewUiBinder extends UiBinder<LayoutPanel, JobDetailsView> {
+  interface JobDetailsViewUiBinder extends UiBinder<DockLayoutPanel, JobDetailsView> {
   }
 
   private static JobDetailsViewUiBinder uiBinder = GWT.create(JobDetailsViewUiBinder.class);
@@ -69,7 +69,7 @@ public class JobDetailsView extends DialogBox implements Display {
     setHeight(DIALOG_HEIGHT);
     setWidth(DIALOG_WIDTH);
 
-    LayoutPanel content = uiBinder.createAndBindUi(this);
+    DockLayoutPanel content = uiBinder.createAndBindUi(this);
     content.setHeight(DIALOG_HEIGHT);
     content.setWidth(DIALOG_WIDTH);
     add(content);

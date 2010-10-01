@@ -137,6 +137,10 @@ a:hover {
 	margin-right:10px;
 }
 
+.gwt-DialogBox .dialogContent .footer span {
+	margin-left:10px;
+}
+
 /* CellTable */
 
 .tableList .selected {

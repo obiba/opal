@@ -15,14 +15,14 @@
     .right-aligned { float: right; }
     .left-margin { margin-left: 5px; }
     .right-margin { margin-right: 5px; }
-    .top-margin { margin-top: 15px; }
+    .top-margin { margin-top: 0.5em; }
     .bottom-margin { margin-bottom: 5px; }
     .name-input { width: 90%; }
   </ui:style>
   
   <g:DockLayoutPanel unit="EM">
     <g:center>
-      <g:FlowPanel>
+      <g:FlowPanel addStyleNames="main">
       
       <g:HTMLPanel ui:field="namePanel" addStyleNames="{style.top-margin} {style.bottom-margin} {style.left-margin} {style.right-margin}">
         <g:Label addStyleNames="{style.inline}">
@@ -45,8 +45,8 @@
       
       </g:FlowPanel>
     </g:center>
-    <g:south size="5">
-      <g:HTMLPanel addStyleNames="{style.top-border} {style.top-margin} {style.left-margin} {style.right-margin}">
+    <g:south size="3.25">
+      <g:HTMLPanel addStyleNames="footer">
         <span class="{style.left-aligned} {style.top-margin}">
           <g:HTMLPanel ui:field="createFolderPanel">
             <g:TextBox ui:field="createFolderName" />
@@ -64,7 +64,7 @@
           </g:Button>
         </span>
       </g:HTMLPanel>
-    </g:south> 
+    </g:south>
   </g:DockLayoutPanel>
   
 </ui:UiBinder>

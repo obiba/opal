@@ -38,9 +38,9 @@ public class FileSelectorView extends DialogBox implements Display {
   // Constants
   //
 
-  private static final String DIALOG_HEIGHT = "29.5em";
+  private static final String DIALOG_HEIGHT = "28.5em";
 
-  private static final String DIALOG_SHORT_HEIGHT = "27em";
+  private static final String DIALOG_SHORT_HEIGHT = "26em";
 
   private static final String DIALOG_WIDTH = "50em";
 

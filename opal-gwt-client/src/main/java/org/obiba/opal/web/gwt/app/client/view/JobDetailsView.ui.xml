@@ -3,19 +3,22 @@
 
   <ui:style>
     .right-aligned { float: right; margin:10px; }
+    .top-margin { margin-top: 0.5em; }
   </ui:style>
     
-  <g:LayoutPanel>
-    <g:layer top="0" height="27em">
+  <g:DockLayoutPanel unit="EM">
+    <g:center>
       <g:ScrollPanel width="100%">
-        <g2:CellTable width="100%" ui:field="table" />
+        <g2:CellTable width="100%" ui:field="table" addStyleNames="main"/>
       </g:ScrollPanel>
-    </g:layer>
-    <g:layer bottom="0" height="3em">
-      <g:FlowPanel>
-        <g:Button ui:field="close" addStyleNames="{style.right-aligned}"><ui:msg description="Close label">Close</ui:msg></g:Button>
-      </g:FlowPanel>
-    </g:layer>
-  </g:LayoutPanel>
+    </g:center>
+    <g:south size="3.25">
+      <g:HTMLPanel addStyleNames="footer">
+        <span class="{style.right-aligned} {style.top-margin}">
+          <g:Button ui:field="close"><ui:msg description="Close label">Close</ui:msg></g:Button>
+        </span>
+      </g:HTMLPanel>
+    </g:south> 
+  </g:DockLayoutPanel>
   
 </ui:UiBinder>
