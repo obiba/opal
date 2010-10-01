@@ -82,14 +82,17 @@ public class ResourceRequestView extends Composite implements ResourceRequestPre
 
   public void inProgress() {
     requestStatus.setUrl(IN_PROGRESS_IMAGE_URL);
+    resourceName.setEnabled(false);
   }
 
   public void completed() {
     requestStatus.setUrl(COMPLETED_IMAGE_URL);
+    resourceName.setEnabled(true);
   }
 
   public void failed() {
     requestStatus.setUrl(FAILED_IMAGE_URL);
+    resourceName.setEnabled(false);
   }
 
   public Widget asWidget() {

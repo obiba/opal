@@ -1,11 +1,10 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
   xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
   ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
-  
   <o:WorkbenchLayout withInfo="false">
     <g:Label><ui:msg description="Create Datasource title">Create Datasource</ui:msg></g:Label>
     <g:Label ui:field="summary"><ui:msg description="Create Datasource Process summary">The datasource is in the process of being created.</ui:msg></g:Label>
@@ -16,6 +15,7 @@
        <g:Label ui:field="completed" addStyleNames="p"><ui:msg description="Datasource creation completed">You may now create another datasource:</ui:msg></g:Label>
        <g:Label ui:field="failed" addStyleNames="p"><ui:msg description="Datasource creation failed">Some errors have been detected. You should fix them before creating this datasource:</ui:msg></g:Label>
        <g:Button ui:field="returnButton" addStyleNames="large-indent"><ui:msg description="Return Datasource Creation button">Return to Datasource Creation</ui:msg></g:Button>
+       <o:DatasourceParsingErrorTable ui:field="datasourceParsingErrorTable" addStyleNames="p full-width"/>
      </g:FlowPanel>
   </o:WorkbenchLayout>
   

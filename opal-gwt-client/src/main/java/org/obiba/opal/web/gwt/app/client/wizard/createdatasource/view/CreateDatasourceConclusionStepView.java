@@ -12,6 +12,9 @@ package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourceConclusionStepPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.DatasourceParsingErrorTable;
+import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -48,6 +51,9 @@ public class CreateDatasourceConclusionStepView extends Composite implements Cre
   @UiField
   Button returnButton;
 
+  @UiField
+  DatasourceParsingErrorTable datasourceParsingErrorTable;
+
   private Translations translations = GWT.create(Translations.class);
 
   public CreateDatasourceConclusionStepView() {
@@ -55,6 +61,7 @@ public class CreateDatasourceConclusionStepView extends Composite implements Cre
     completed.setVisible(false);
     failed.setVisible(false);
     returnButton.setVisible(false);
+    datasourceParsingErrorTable.setVisible(false);
   }
 
   @Override
@@ -88,10 +95,15 @@ public class CreateDatasourceConclusionStepView extends Composite implements Cre
   }
 
   @Override
-  public void setFailed() {
+  public void setFailed(ClientErrorDto errorDto) {
     summary.setText(translations.datasourceCreationFailed());
     failed.setVisible(true);
     returnButton.setVisible(true);
+
+    if(errorDto != null && errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
+      datasourceParsingErrorTable.setErrors(errorDto);
+      datasourceParsingErrorTable.setVisible(true);
+    }
   }
 
 }

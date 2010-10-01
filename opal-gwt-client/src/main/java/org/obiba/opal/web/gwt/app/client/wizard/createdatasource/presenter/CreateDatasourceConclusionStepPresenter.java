@@ -25,7 +25,9 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -45,7 +47,7 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
 
     void setCompleted();
 
-    void setFailed();
+    void setFailed(ClientErrorDto errorDto);
   }
 
   @Inject
@@ -73,10 +75,14 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
           datasourceDto = (DatasourceDto) JsonUtils.unsafeEval(response.getText());
           getDisplay().setCompleted();
           returnPresenter = createDatasourceStepPresenter.get();
+        } else if(response.getText() != null && response.getText().length() != 0) {
+          GWT.log(response.getText());
+          getDisplay().setFailed((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
         } else {
-          getDisplay().setFailed();
+          getDisplay().setFailed(null);
         }
       }
+
     });
     resourceRequestPresenter.getDisplay().setResourceName(dto.getName());
     resourceRequestPresenter.getDisplay().setResourceClickHandler(new ResourceClickHandler() {

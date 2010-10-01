@@ -45,6 +45,10 @@ a:hover {
 	margin-left: 30px;
 }
 
+.full-width {
+	width: 100%;	
+}
+
 .block {
   display: block;
 }
