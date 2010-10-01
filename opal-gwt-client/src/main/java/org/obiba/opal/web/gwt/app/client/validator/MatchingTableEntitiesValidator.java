@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.app.client.validator;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.obiba.opal.web.gwt.app.client.validator.MinimumSizeCollectionValidator.HasCollection;
+import org.obiba.opal.web.gwt.app.client.ui.HasCollection;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
 /**

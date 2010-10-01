@@ -9,7 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.validator;
 
-import java.util.Collection;
+import org.obiba.opal.web.gwt.app.client.ui.HasCollection;
+
 
 /**
  *
@@ -40,14 +41,5 @@ public class MinimumSizeCollectionValidator<T> extends AbstractFieldValidator {
   @Override
   protected boolean hasError() {
     return collectionField.getCollection().size() < minSize;
-  }
-
-  //
-  // Inner Classes / Interfaces
-  //
-
-  public static interface HasCollection<T> {
-
-    Collection<T> getCollection();
   }
 }

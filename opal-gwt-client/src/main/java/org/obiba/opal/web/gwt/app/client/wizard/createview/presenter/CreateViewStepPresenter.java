@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
+import org.obiba.opal.web.gwt.app.client.ui.HasCollection;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.DisallowedCharactersValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -203,7 +204,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
       validators.add(new RequiredTextValidator(getDisplay().getViewName(), "ViewNameRequired"));
       validators.add(new DisallowedCharactersValidator(getDisplay().getViewName(), new char[] { '.', ':' }, "ViewNameDisallowedChars"));
 
-      MinimumSizeCollectionValidator.HasCollection<TableDto> tablesField = new MinimumSizeCollectionValidator.HasCollection<TableDto>() {
+      HasCollection<TableDto> tablesField = new HasCollection<TableDto>() {
         public Collection<TableDto> getCollection() {
           return tableListPresenter.getTables();
         }
