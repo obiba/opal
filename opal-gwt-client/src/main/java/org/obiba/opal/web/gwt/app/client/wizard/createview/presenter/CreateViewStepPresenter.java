@@ -25,14 +25,22 @@ import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageD
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.HibernateDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -167,28 +175,71 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   class CreateClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent event) {
-      if(getDisplay().getViewName() == null) {
-        eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "ViewNameRequired", null));
-      } else if(tableListPresenter.getTables().isEmpty()) {
-        eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "TableSelectionRequired", null));
-      } else if(tableEntityTypesDoNotMatch(tableListPresenter.getTables())) {
-        eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "TableEntityTypesDoNotMatch", null));
-      } else if(!getDisplay().isApplyingGlobalVariableFilter() && !getDisplay().isAddingVariablesOneByOne()) {
-        eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "VariableDefinitionMethodRequired", null));
-      } else { // OK -- go ahead and create the view
+      UserMessageEvent errorEvent = validate();
+      if(errorEvent != null) {
+        eventBus.fireEvent(errorEvent);
+        return;
+      }
+
+      if(getDisplay().isAttachingToNewDatasource()) {
+        createNewDatasourceAndView();
+      } else {
         createView();
       }
     }
 
-    private void createView() {
-      setCreateViewResourceRequest();
-      conclusionStepPresenter.showConfigureViewWidgets(false);
-      conclusionStepPresenter.sendResourceRequest();
-
-      eventBus.fireEvent(new WorkbenchChangeEvent(conclusionStepPresenter));
+    UserMessageEvent validate() {
+      UserMessageEvent errorEvent = null;
+      if(!getDisplay().isAttachingToExistingDatasource() && !getDisplay().isAttachingToNewDatasource()) {
+        errorEvent = new UserMessageEvent(MessageDialogType.ERROR, "ViewMustBeAttachedToExistingOrNewDatasource", null);
+      } else if(getDisplay().isAttachingToExistingDatasource() && getDisplay().getExistingDatasourceName() == null) {
+        errorEvent = new UserMessageEvent(MessageDialogType.ERROR, "datasourceMustBeSelected", null);
+      } else if(getDisplay().isAttachingToNewDatasource() && getDisplay().getNewDatasourceName() == null) {
+        errorEvent = new UserMessageEvent(MessageDialogType.ERROR, "DatasourceNameRequired", null);
+      } else if(getDisplay().getViewName() == null) {
+        errorEvent = new UserMessageEvent(MessageDialogType.ERROR, "ViewNameRequired", null);
+      } else if(tableListPresenter.getTables().isEmpty()) {
+        errorEvent = new UserMessageEvent(MessageDialogType.ERROR, "TableSelectionRequired", null);
+      } else if(tableEntityTypesDoNotMatch(tableListPresenter.getTables())) {
+        errorEvent = new UserMessageEvent(MessageDialogType.ERROR, "TableEntityTypesDoNotMatch", null);
+      } else if(!getDisplay().isApplyingGlobalVariableFilter() && !getDisplay().isAddingVariablesOneByOne()) {
+        errorEvent = new UserMessageEvent(MessageDialogType.ERROR, "VariableDefinitionMethodRequired", null);
+      }
+      return errorEvent;
     }
 
-    private void setCreateViewResourceRequest() {
+    void createNewDatasourceAndView() {
+      DatasourceFactoryDto dsFactoryDto = DatasourceFactoryDto.create();
+      dsFactoryDto.setName(getDisplay().getNewDatasourceName());
+      HibernateDatasourceFactoryDto hibFactoryDto = HibernateDatasourceFactoryDto.create();
+      dsFactoryDto.setExtension(HibernateDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, hibFactoryDto);
+
+      ResponseCodeCallback responseCodeCallback = new ResponseCodeCallback() {
+
+        public void onResponseCode(Request request, Response response) {
+          if(response.getStatusCode() == 201) {
+            createView();
+          } else {
+            String errorMessage = null;
+            if(response.getText() != null && response.getText().length() != 0) {
+              try {
+                ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+                errorMessage = errorDto.getStatus();
+              } catch(Exception ex) {
+                // Should never get here!
+                errorMessage = "InternalError";
+              }
+            } else {
+              errorMessage = "UnknownError";
+            }
+            eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, errorMessage, null));
+          }
+        }
+      };
+      ResourceRequestBuilderFactory.newBuilder().put().forResource("/datasource/" + getDisplay().getNewDatasourceName()).accept("application/x-protobuf+json").withResourceBody(stringify(dsFactoryDto)).withCallback(201, responseCodeCallback).withCallback(400, responseCodeCallback).send();
+    }
+
+    void createView() {
       // Get the view name and datasource name.
       String viewName = getDisplay().getViewName();
       String datasourceName = getDisplay().isAttachingToExistingDatasource() ? getDisplay().getExistingDatasourceName() : getDisplay().getNewDatasourceName();
@@ -202,8 +253,14 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
       }
       ViewDto viewDto = viewDtoBuilder.build();
 
-      // Add the resource request to the ConclusionStepPresenter.
-      conclusionStepPresenter.setResourceRequest(viewName, "/datasource/" + datasourceName + "/view/" + viewName, ResourceRequestBuilderFactory.newBuilder().put().forResource("/datasource/" + datasourceName + "/view/" + viewName).accept("application/x-protobuf+json").withResourceBody(stringify(viewDto)));
+      // Create the resource request (the builder).
+      ResourceRequestBuilder<JavaScriptObject> resourceRequestBuilder = ResourceRequestBuilderFactory.newBuilder().put().forResource("/datasource/" + datasourceName + "/view/" + viewName).accept("application/x-protobuf+json").withResourceBody(stringify(viewDto));
+
+      // Update the Conclusion step then fire a WorkbenchChangeEvent to move to that step.
+      conclusionStepPresenter.setResourceRequest(viewName, "/datasource/" + datasourceName + "/view/" + viewName, resourceRequestBuilder);
+      conclusionStepPresenter.showConfigureViewWidgets(false);
+      conclusionStepPresenter.sendResourceRequest();
+      eventBus.fireEvent(new WorkbenchChangeEvent(conclusionStepPresenter));
     }
 
     private boolean tableEntityTypesDoNotMatch(List<TableDto> tableDtos) {
