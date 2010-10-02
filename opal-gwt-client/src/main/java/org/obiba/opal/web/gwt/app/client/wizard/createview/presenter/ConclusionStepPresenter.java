@@ -56,14 +56,11 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
 
   @Override
   protected void onBind() {
+    addEventHandlers();
   }
 
   @Override
   protected void onUnbind() {
-  }
-
-  protected void addEventHandlers() {
-    getDisplay().addConfigureViewClickHandler(new ConfigureViewClickHandler());
   }
 
   @Override
@@ -104,6 +101,10 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
 
   public void showConfigureViewWidgets(boolean show) {
     getDisplay().showConfigureViewWidgets(show);
+  }
+
+  private void addEventHandlers() {
+    super.registerHandler(getDisplay().addConfigureViewClickHandler(new ConfigureViewClickHandler()));
   }
 
   //
