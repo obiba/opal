@@ -124,9 +124,9 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
 
     public void onResponseCode(Request request, Response response) {
       int statusCode = response.getStatusCode();
-      // if(statusCode == 200 || statusCode == 201) {
-      getDisplay().showConfigureViewWidgets(true);
-      // }
+      if(statusCode == 200 || statusCode == 201) {
+        getDisplay().showConfigureViewWidgets(true);
+      }
     }
   }
 
