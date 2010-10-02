@@ -24,6 +24,7 @@ import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
+import org.obiba.opal.web.gwt.app.client.support.ClientErrorDtos;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.HasCollection;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
@@ -42,10 +43,8 @@ import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.HibernateDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -166,14 +165,6 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
     HasValue<Boolean> getAddVariablesOneByOneOption();
 
-    boolean isAttachingToExistingDatasource();
-
-    boolean isAttachingToNewDatasource();
-
-    boolean isApplyingGlobalVariableFilter();
-
-    boolean isAddingVariablesOneByOne();
-
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
 
     HandlerRegistration addCreateClickHandler(ClickHandler handler);
@@ -221,7 +212,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
         return;
       }
 
-      if(getDisplay().isAttachingToNewDatasource()) {
+      if(getDisplay().getAttachToNewDatasourceOption().getValue()) {
         createNewDatasourceAndView();
       } else {
         createView();
@@ -250,18 +241,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
           if(response.getStatusCode() == 201) {
             createView();
           } else {
-            String errorMessage = null;
-            if(response.getText() != null && response.getText().length() != 0) {
-              try {
-                ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-                errorMessage = errorDto.getStatus();
-              } catch(Exception ex) {
-                // Should never get here!
-                errorMessage = "InternalError";
-              }
-            } else {
-              errorMessage = "UnknownError";
-            }
+            String errorMessage = ClientErrorDtos.getStatus(response.getText());
             eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, errorMessage, null));
           }
         }
@@ -272,13 +252,13 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     void createView() {
       // Get the view name and datasource name.
       String viewName = getDisplay().getViewName().getText();
-      String datasourceName = getDisplay().isAttachingToExistingDatasource() ? getDisplay().getExistingDatasourceName().getText() : getDisplay().getNewDatasourceName().getText();
+      String datasourceName = getDisplay().getAttachToExistingDatasourceOption().getValue() ? getDisplay().getExistingDatasourceName().getText() : getDisplay().getNewDatasourceName().getText();
 
       // Build the ViewDto for the request.
       ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().fromTables(tableListPresenter.getTables());
-      if(getDisplay().isApplyingGlobalVariableFilter()) {
+      if(getDisplay().getApplyGlobalVariableFilterOption().getValue()) {
         viewDtoBuilder.defaultJavaScriptView();
-      } else if(getDisplay().isAddingVariablesOneByOne()) {
+      } else if(getDisplay().getAddVariablesOneByOneOption().getValue()) {
         viewDtoBuilder.defaultVariableListView();
       }
       ViewDto viewDto = viewDtoBuilder.build();

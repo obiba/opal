@@ -120,16 +120,8 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
     return addingVariablesOneByOneRadioButton;
   }
 
-  public boolean isAttachingToExistingDatasource() {
-    return selectExistingDatasourceRadioButton.getValue();
-  }
-
-  public boolean isAttachingToNewDatasource() {
-    return createNewDatasourceRadioButton.getValue();
-  }
-
   public HasText getExistingDatasourceName() {
-    final String selectedDatasourceName = isAttachingToExistingDatasource() ? datasourceSelector.getSelection() : null;
+    final String selectedDatasourceName = getAttachToExistingDatasourceOption().getValue() ? datasourceSelector.getSelection() : null;
 
     return new HasText() {
 
@@ -145,14 +137,6 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
 
   public HasText getNewDatasourceName() {
     return createNewDatasourceTextBox;
-  }
-
-  public boolean isApplyingGlobalVariableFilter() {
-    return applyingGlobalVariableFilterRadioButton.getValue();
-  }
-
-  public boolean isAddingVariablesOneByOne() {
-    return addingVariablesOneByOneRadioButton.getValue();
   }
 
   public HandlerRegistration addCancelClickHandler(ClickHandler handler) {
