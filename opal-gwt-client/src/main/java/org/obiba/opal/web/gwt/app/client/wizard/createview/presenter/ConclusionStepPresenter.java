@@ -15,17 +15,21 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.view.ResourceRequestView;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPresenter.Display> {
   //
@@ -33,6 +37,9 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
   //
 
   private ResourceRequestPresenter<? extends JavaScriptObject> resourceRequestPresenter;
+
+  @Inject
+  private Provider<NavigatorPresenter> navigationPresenter;
 
   //
   // Constructors
@@ -56,6 +63,7 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
   }
 
   protected void addEventHandlers() {
+    getDisplay().addConfigureViewClickHandler(new ConfigureViewClickHandler());
   }
 
   @Override
@@ -115,9 +123,16 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
 
     public void onResponseCode(Request request, Response response) {
       int statusCode = response.getStatusCode();
-      if(statusCode == 200 || statusCode == 201) {
-        getDisplay().showConfigureViewWidgets(true);
-      }
+      // if(statusCode == 200 || statusCode == 201) {
+      getDisplay().showConfigureViewWidgets(true);
+      // }
+    }
+  }
+
+  class ConfigureViewClickHandler implements ClickHandler {
+
+    public void onClick(ClickEvent event) {
+      eventBus.fireEvent(new WorkbenchChangeEvent(navigationPresenter.get()));
     }
   }
 }
