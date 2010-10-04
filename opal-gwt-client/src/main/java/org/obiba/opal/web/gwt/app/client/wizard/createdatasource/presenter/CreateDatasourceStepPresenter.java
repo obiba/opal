@@ -58,6 +58,9 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
   @Inject
   private ExcelDatasourceFormPresenter excelDatasourceFormPresenter;
 
+  @Inject
+  private FsDatasourceFormPresenter fsDatasourceFormPresenter;
+
   private Set<DatasourceFormPresenter> datasourceFormPresenters = new HashSet<DatasourceFormPresenter>();
 
   //
@@ -88,6 +91,7 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
     // FIXME: Is there a way of registering these automatically ? Injecting the set fails.
     datasourceFormPresenters.add(hibernateDatasourceFormPresenter);
     datasourceFormPresenters.add(excelDatasourceFormPresenter);
+    datasourceFormPresenters.add(fsDatasourceFormPresenter);
     updateDatasourceFormDisplay();
   }
 
