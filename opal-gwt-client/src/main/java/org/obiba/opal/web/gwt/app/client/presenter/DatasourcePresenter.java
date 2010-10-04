@@ -67,6 +67,12 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     super(display, eventBus);
   }
 
+  // visible for testing
+  public DatasourcePresenter(Display display, EventBus eventBus, CreateViewStepPresenter createViewStepPresenter) {
+    super(display, eventBus);
+    this.createViewStepPresenter = createViewStepPresenter;
+  }
+
   @Override
   public Place getPlace() {
     return null;

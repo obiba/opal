@@ -23,12 +23,13 @@ import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.GwtEvent.Type;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 
 public class DatasourcePresenterTest extends AbstractGwtTestSetup {
@@ -37,13 +38,17 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
 
   private DatasourcePresenter.Display displayMock;
 
+  private CreateViewStepPresenterSpy createViewStepPresenterSpy;
+
   private DatasourcePresenter datasourcePresenter;
 
   @Before
   public void setUp() {
     displayMock = createMock(DatasourcePresenter.Display.class);
     eventBusMock = createMock(EventBus.class);
-    datasourcePresenter = new DatasourcePresenter(displayMock, eventBusMock);
+    createViewStepPresenterSpy = createCreateViewStepPresenterSpy(eventBusMock);
+
+    datasourcePresenter = new DatasourcePresenter(displayMock, eventBusMock, createViewStepPresenterSpy);
   }
 
   @SuppressWarnings("unchecked")
@@ -66,5 +71,38 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
     datasourcePresenter.bind();
 
     verify(displayMock, eventBusMock);
+  }
+
+  private CreateViewStepPresenterSpy createCreateViewStepPresenterSpy(EventBus eventBus) {
+    CreateViewStepPresenter.Display displayMock = createMock(CreateViewStepPresenter.Display.class);
+
+    return new CreateViewStepPresenterSpy(displayMock, eventBus);
+  }
+
+  private static class CreateViewStepPresenterSpy extends CreateViewStepPresenter {
+
+    private int bindCount;
+
+    private int unbindCount;
+
+    public CreateViewStepPresenterSpy(CreateViewStepPresenter.Display display, EventBus eventBus) {
+      super(display, eventBus);
+    }
+
+    protected void onBind() {
+      bindCount++;
+    }
+
+    protected void onUnbind() {
+      unbindCount++;
+    }
+
+    public int getBindCount() {
+      return bindCount;
+    }
+
+    public int getUnbindCount() {
+      return unbindCount;
+    }
   }
 }
