@@ -17,15 +17,21 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.ViewConfigurationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent.Direction;
+import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -33,9 +39,11 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
@@ -45,6 +53,11 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
   @Inject
   private ConfigureViewStepPresenter configureViewStepPresenter;
+
+  @Inject
+  private Provider<NavigatorPresenter> navigationPresenter;
+
+  private Runnable removeViewConfirmation;
 
   //
   // Constructors
@@ -71,6 +84,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
     super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
     super.registerHandler(eventBus.addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
+    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new RemoveViewConfirmationEventHandler()));
     getDisplay().setExcelDownloadCommand(new ExcelDownloadCommand());
     getDisplay().setParentCommand(new ParentCommand());
     getDisplay().setPreviousCommand(new PreviousCommand());
@@ -113,6 +127,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       getDisplay().setNextName(next);
 
       if(tableIsView()) {
+        getDisplay().setRemoveCommand(new RemoveCommand());
         getDisplay().setEditCommand(new EditCommand());
       }
 
@@ -147,6 +162,24 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       next = variables.get(index + 1);
     }
     return next;
+  }
+
+  private void removeView(String viewName) {
+
+    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        if(response.getStatusCode() != Response.SC_OK) {
+          String errorMessage = response.getText().length() != 0 ? response.getText() : "UnknownError";
+          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, errorMessage, null));
+        } else {
+          eventBus.fireEvent(new WorkbenchChangeEvent(navigationPresenter.get()));
+        }
+      }
+    };
+
+    ResourceRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/view/" + table.getName()).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler).withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
   }
 
   private boolean tableIsView() {
@@ -191,11 +224,33 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     }
   }
 
+  final class RemoveCommand implements Command {
+    @Override
+    public void execute() {
+      removeViewConfirmation = new Runnable() {
+        public void run() {
+          removeView(table.getName());
+        }
+      };
+
+      eventBus.fireEvent(new ConfirmationRequiredEvent(removeViewConfirmation, "removeView", "confirmRemoveView"));
+    }
+  }
+
+  class RemoveViewConfirmationEventHandler implements ConfirmationEvent.Handler {
+
+    public void onConfirmation(ConfirmationEvent event) {
+      if(removeViewConfirmation != null && event.getSource().equals(removeViewConfirmation) && event.isConfirmed()) {
+        removeViewConfirmation.run();
+        removeViewConfirmation = null;
+      }
+    }
+  }
+
   final class EditCommand implements Command {
     @Override
     public void execute() {
-      // TODO: Create a ViewConfigurationRequiredEvent with the actual datasource and view names.
-      eventBus.fireEvent(new ViewConfigurationRequiredEvent("theDatasource", "theView"));
+      eventBus.fireEvent(new ViewConfigurationRequiredEvent(table.getDatasourceName(), table.getName()));
     }
   }
 
@@ -285,6 +340,8 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     void setNextCommand(Command cmd);
 
     void setPreviousCommand(Command cmd);
+
+    void setRemoveCommand(Command cmd);
 
     void setEditCommand(Command cmd);
 

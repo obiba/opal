@@ -22,13 +22,14 @@ import org.junit.Test;
 import org.obiba.opal.web.gwt.app.client.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.TablePresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.GwtEvent.Type;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 
 public class TablePresenterTest extends AbstractGwtTestSetup {
@@ -56,6 +57,7 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     HandlerRegistration handlerRegistrationMock = createMock(HandlerRegistration.class);
     expect(eventBusMock.addHandler((Type<TableSelectionChangeEvent.Handler>) EasyMock.anyObject(), (TableSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
     expect(eventBusMock.addHandler((Type<SiblingVariableSelectionEvent.Handler>) EasyMock.anyObject(), (SiblingVariableSelectionEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
+    expect(eventBusMock.addHandler((Type<ConfirmationEvent.Handler>) EasyMock.anyObject(), (ConfirmationEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
 
     displayMock.setNextCommand((Command) EasyMock.anyObject());
     displayMock.setPreviousCommand((Command) EasyMock.anyObject());

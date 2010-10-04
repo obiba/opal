@@ -35,6 +35,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InsertPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
 import com.google.gwt.view.client.ListView.Delegate;
@@ -247,6 +248,12 @@ public class TableView extends Composite implements TablePresenter.Display {
   @Override
   public void setPreviousCommand(Command cmd) {
     toolbar.setPreviousCommand(cmd);
+  }
+
+  @Override
+  public void setRemoveCommand(Command cmd) {
+    toolbar.getToolsMenu().addSeparator();
+    toolbar.getToolsMenu().addItem(new MenuItem(translations.removeLabel(), cmd));
   }
 
   @Override
