@@ -69,10 +69,6 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
   //
 
   private void addEventHandlers() {
-    addViewConfigurationRequiredHandler();
-  }
-
-  private void addViewConfigurationRequiredHandler() {
     super.registerHandler(eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredHandler()));
   }
 

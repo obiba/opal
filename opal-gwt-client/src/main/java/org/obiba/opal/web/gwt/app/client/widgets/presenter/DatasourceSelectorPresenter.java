@@ -79,6 +79,10 @@ public class DatasourceSelectorPresenter extends WidgetPresenter<DatasourceSelec
     return getDisplay().getSelection();
   }
 
+  public void setSelection(String datasourceName) {
+    getDisplay().setSelection(datasourceName);
+  }
+
   //
   // Inner Classes / Interfaces
   //
@@ -88,6 +92,8 @@ public class DatasourceSelectorPresenter extends WidgetPresenter<DatasourceSelec
     void setEnabled(boolean enabled);
 
     void setDatasources(JsArray<DatasourceDto> datasources);
+
+    void setSelection(String datasourceName);
 
     String getSelection();
   }

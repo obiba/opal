@@ -130,7 +130,9 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
       }
 
       public void setText(String text) {
-        throw new UnsupportedOperationException("cannot set existing datasource name");
+        if(text != null) {
+          datasourceSelector.setSelection(text);
+        }
       }
     };
   }
