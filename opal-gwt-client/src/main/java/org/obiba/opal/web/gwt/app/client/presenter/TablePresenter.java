@@ -20,8 +20,10 @@ import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -41,6 +43,9 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
   private TableDto table;
 
+  @Inject
+  private ConfigureViewStepPresenter configureViewStepPresenter;
+
   //
   // Constructors
   //
@@ -54,13 +59,16 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     super(display, eventBus);
   }
 
-  @Override
-  public Place getPlace() {
-    return null;
+  // visible for testing
+  public TablePresenter(final Display display, final EventBus eventBus, final ConfigureViewStepPresenter configureViewStepPresenter) {
+    super(display, eventBus);
+    this.configureViewStepPresenter = configureViewStepPresenter;
   }
 
   @Override
   protected void onBind() {
+    configureViewStepPresenter.bind();
+
     super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
     super.registerHandler(eventBus.addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
     getDisplay().setExcelDownloadCommand(new ExcelDownloadCommand());
@@ -72,11 +80,17 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   }
 
   @Override
-  protected void onPlaceRequest(PlaceRequest request) {
+  protected void onUnbind() {
+    configureViewStepPresenter.unbind();
   }
 
   @Override
-  protected void onUnbind() {
+  public Place getPlace() {
+    return null;
+  }
+
+  @Override
+  protected void onPlaceRequest(PlaceRequest request) {
   }
 
   @Override
@@ -177,11 +191,11 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     }
   }
 
-  final static class EditCommand implements Command {
+  final class EditCommand implements Command {
     @Override
     public void execute() {
-      // TODO: Implement EditCommand.execute().
-      GWT.log("<edit>");
+      // TODO: Create a ViewConfigurationRequiredEvent with the actual datasource and view names.
+      eventBus.fireEvent(new ViewConfigurationRequiredEvent("theDatasource", "theView"));
     }
   }
 

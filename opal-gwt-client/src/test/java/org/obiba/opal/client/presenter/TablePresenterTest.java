@@ -13,6 +13,7 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
 import net.customware.gwt.presenter.client.EventBus;
 
 import org.easymock.EasyMock;
@@ -21,6 +22,7 @@ import org.junit.Test;
 import org.obiba.opal.web.gwt.app.client.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.TablePresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
@@ -37,16 +39,20 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
 
   private TablePresenter presenter;
 
+  private ConfigureViewStepPresenterSpy configureViewStepPresenterSpy;
+
   @Before
   public void setUp() {
     displayMock = createMock(TablePresenter.Display.class);
     eventBusMock = createMock(EventBus.class);
-    presenter = new TablePresenter(displayMock, eventBusMock);
+    configureViewStepPresenterSpy = createConfigureViewStepPresenterSpy(eventBusMock);
+
+    presenter = new TablePresenter(displayMock, eventBusMock, configureViewStepPresenterSpy);
   }
 
   @SuppressWarnings("unchecked")
   @Test
-  public void testThatEventHandlersAreAddedToUIComponents() throws Exception {
+  public void testOnBind_RegistersHandlersAndBindsDependencies() {
     HandlerRegistration handlerRegistrationMock = createMock(HandlerRegistration.class);
     expect(eventBusMock.addHandler((Type<TableSelectionChangeEvent.Handler>) EasyMock.anyObject(), (TableSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
     expect(eventBusMock.addHandler((Type<SiblingVariableSelectionEvent.Handler>) EasyMock.anyObject(), (SiblingVariableSelectionEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
@@ -61,5 +67,50 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     presenter.bind();
 
     verify(displayMock, eventBusMock);
+
+    assertEquals(1, configureViewStepPresenterSpy.getBindCount());
+  }
+
+  @Test
+  public void testOnUnbind_UnbindsDependencies() {
+    replay(displayMock, eventBusMock);
+    presenter.unbind();
+
+    verify(displayMock, eventBusMock);
+
+    assertEquals(1, configureViewStepPresenterSpy.getUnbindCount());
+  }
+
+  private ConfigureViewStepPresenterSpy createConfigureViewStepPresenterSpy(EventBus eventBus) {
+    ConfigureViewStepPresenter.Display displayMock = createMock(ConfigureViewStepPresenter.Display.class);
+
+    return new ConfigureViewStepPresenterSpy(displayMock, eventBus);
+  }
+
+  private static class ConfigureViewStepPresenterSpy extends ConfigureViewStepPresenter {
+
+    private int bindCount;
+
+    private int unbindCount;
+
+    public ConfigureViewStepPresenterSpy(ConfigureViewStepPresenter.Display display, EventBus eventBus) {
+      super(display, eventBus);
+    }
+
+    protected void onBind() {
+      bindCount++;
+    }
+
+    protected void onUnbind() {
+      unbindCount++;
+    }
+
+    public int getBindCount() {
+      return bindCount;
+    }
+
+    public int getUnbindCount() {
+      return unbindCount;
+    }
   }
 }

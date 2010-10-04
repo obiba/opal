@@ -15,10 +15,10 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NavigatorPresenter;
+import org.obiba.opal.web.gwt.app.client.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.view.ResourceRequestView;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 
@@ -29,7 +29,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPresenter.Display> {
   //
@@ -39,7 +38,7 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
   private ResourceRequestPresenter<? extends JavaScriptObject> resourceRequestPresenter;
 
   @Inject
-  private Provider<NavigatorPresenter> navigationPresenter;
+  private ConfigureViewStepPresenter configureViewStepPresenter;
 
   //
   // Constructors
@@ -56,11 +55,13 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
 
   @Override
   protected void onBind() {
+    configureViewStepPresenter.bind();
     addEventHandlers();
   }
 
   @Override
   protected void onUnbind() {
+    configureViewStepPresenter.unbind();
   }
 
   @Override
@@ -133,7 +134,8 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
   class ConfigureViewClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent event) {
-      eventBus.fireEvent(new WorkbenchChangeEvent(navigationPresenter.get()));
+      // TODO: Create a ViewConfigurationRequiredEvent with the actual datasource and view names.
+      eventBus.fireEvent(new ViewConfigurationRequiredEvent("theDatasource", "theView"));
     }
   }
 }
