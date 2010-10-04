@@ -70,7 +70,7 @@ public class ExcelDatasourceFormPresenter extends WidgetPresenter<ExcelDatasourc
   public DatasourceFactoryDto getDatasourceFactory() {
     ExcelDatasourceFactoryDto extensionDto = ExcelDatasourceFactoryDto.create();
     extensionDto.setFile(fileSelectionPresenter.getSelectedFile());
-    extensionDto.setReadOnly(true);
+    extensionDto.setReadOnly(false);
 
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
     dto.setExtension(ExcelDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, extensionDto);
