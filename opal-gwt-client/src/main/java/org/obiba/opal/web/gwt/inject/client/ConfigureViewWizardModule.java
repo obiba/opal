@@ -10,7 +10,9 @@
 package org.obiba.opal.web.gwt.inject.client;
 
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.SaveErrorsStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.ConfigureViewStepView;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.SaveErrorsStepView;
 
 import com.google.gwt.inject.client.AbstractGinModule;
 
@@ -22,5 +24,6 @@ public class ConfigureViewWizardModule extends AbstractGinModule {
   @Override
   protected void configure() {
     bind(ConfigureViewStepPresenter.Display.class).to(ConfigureViewStepView.class);
+    bind(SaveErrorsStepPresenter.Display.class).to(SaveErrorsStepView.class);
   }
 }
