@@ -31,9 +31,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Response.Status;
 
 import org.mozilla.javascript.Scriptable;
 import org.obiba.core.util.StreamUtil;
@@ -41,11 +41,11 @@ import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
-import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.JavascriptValueSource;
 import org.obiba.magma.js.JavascriptVariableBuilder;
@@ -137,7 +137,7 @@ public class TableResource {
 
     Iterable<Variable> variables = filterVariables(valueTable, script);
     ArrayList<VariableDto> variableDtos = Lists.newArrayList(Iterables.transform(variables, Dtos.asDtoFunc(tableLinkBuilder.build(), ub)));
-    sortByName(variableDtos);
+    sortVariableDtoByName(variableDtos);
 
     return variableDtos;
   }
@@ -183,7 +183,7 @@ public class TableResource {
     }
 
     ArrayList<VariableDto> variables = Lists.newArrayList(Iterables.transform(group, Dtos.asDtoFunc(tableLinkBuilder.build(), ub)));
-    sortByName(variables);
+    sortVariableDtoByName(variables);
 
     return variables;
   }
@@ -370,6 +370,9 @@ public class TableResource {
     JavascriptClause jsClause = new JavascriptClause(script);
     jsClause.initialise();
 
+    Iterable<Variable> variables = valueTable.getVariables();
+    sortVariableByName(Lists.newArrayList(variables));
+
     List<Value> values = new ArrayList<Value>();
     for(Variable variable : valueTable.getVariables()) {
       values.add(jsClause.query(variable));
@@ -410,7 +413,18 @@ public class TableResource {
     return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus).build();
   }
 
-  private void sortByName(List<Magma.VariableDto> variables) {
+  private void sortVariableByName(List<Variable> variables) {
+    Collections.sort(variables, new Comparator<Variable>() {
+
+      @Override
+      public int compare(Variable v1, Variable v2) {
+        return v1.getName().compareTo(v2.getName());
+      }
+
+    });
+  }
+
+  private void sortVariableDtoByName(List<Magma.VariableDto> variables) {
     // sort alphabetically
     Collections.sort(variables, new Comparator<Magma.VariableDto>() {
 
