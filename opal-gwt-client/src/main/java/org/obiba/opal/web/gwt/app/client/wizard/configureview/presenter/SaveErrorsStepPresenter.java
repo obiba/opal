@@ -17,8 +17,10 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.model.client.magma.JavaScriptErrorDto;
 
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.inject.Inject;
@@ -27,6 +29,9 @@ public class SaveErrorsStepPresenter extends WidgetPresenter<SaveErrorsStepPrese
   //
   // Instance Variables
   //
+
+  @Inject
+  private ConfigureViewStepPresenter configureViewStepPresenter;
 
   //
   // Constructors
@@ -72,6 +77,7 @@ public class SaveErrorsStepPresenter extends WidgetPresenter<SaveErrorsStepPrese
   //
 
   private void addEventHandlers() {
+    super.registerHandler(getDisplay().addBackClickHandler(new BackClickHandler()));
   }
 
   //
@@ -85,5 +91,12 @@ public class SaveErrorsStepPresenter extends WidgetPresenter<SaveErrorsStepPrese
     void setErrors(List<JavaScriptErrorDto> errors);
 
     HandlerRegistration addBackClickHandler(ClickHandler handler);
+  }
+
+  class BackClickHandler implements ClickHandler {
+
+    public void onClick(ClickEvent event) {
+      eventBus.fireEvent(new WorkbenchChangeEvent(configureViewStepPresenter));
+    }
   }
 }
