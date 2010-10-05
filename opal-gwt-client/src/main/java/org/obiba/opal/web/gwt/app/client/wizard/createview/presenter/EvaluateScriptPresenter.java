@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createview.presenter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -18,6 +21,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.ValueDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -43,9 +47,13 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
   public interface Display extends WidgetDisplay {
     String getScript();
 
+    String getSelectedScript();
+
+    void setSelectedScript(String script);
+
     HandlerRegistration addTestScriptClickHandler(ClickHandler handler);
 
-    void addResults(JsArray<VariableDto> variables);
+    void addResults(List<Result> variables);
 
     HandlerRegistration addHideResultsPanelHandler(CloseHandler handler);
 
@@ -56,6 +64,7 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     void clearResults();
 
     void setTestCount(int count);
+
   }
 
   @Override
@@ -107,7 +116,14 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
 
     @Override
     public void onClick(ClickEvent event) {
-      ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variables").get().withCallback(new VariablesResourceCallback()).send();
+      String selectedScript = getDisplay().getSelectedScript();
+
+      if(selectedScript.isEmpty()) {
+        ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variables?script=" + getDisplay().getScript()).get().withCallback(new VariablesResourceCallback(false)).send();
+      } else {
+        ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variables").get().withCallback(new VariablesResourceCallback(true)).send();
+      }
+
     }
   }
 
@@ -131,11 +147,88 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
 
   public class VariablesResourceCallback implements ResourceCallback<JsArray<VariableDto>> {
 
+    private boolean withValues;
+
+    public VariablesResourceCallback(boolean withValues) {
+      this.withValues = withValues;
+    }
+
     @Override
     public void onResource(Response response, JsArray<VariableDto> variables) {
       getDisplay().clearResults();
-      getDisplay().addResults(variables);
+      List<Result> results = buildResultList(variables);
+
+      String selectedScript = getDisplay().getSelectedScript();
+
+      if(withValues) {
+        ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variables/query?script=" + selectedScript).get().withCallback(new QueryVariablesResourceCallback(results, selectedScript)).send();
+      } else {
+        getDisplay().addResults(results);
+      }
+
       getDisplay().setTestCount(variables.length());
+    }
+
+    private List<Result> buildResultList(JsArray<VariableDto> results) {
+      List<Result> resultsList = new ArrayList<EvaluateScriptPresenter.Result>();
+      for(int i = 0; i < results.length(); i++) {
+        resultsList.add(new Result(results.get(i)));
+      }
+      return resultsList;
+    }
+
+  }
+
+  public class QueryVariablesResourceCallback implements ResourceCallback<JsArray<ValueDto>> {
+
+    private List<Result> results;
+
+    private String selectedScript;
+
+    public QueryVariablesResourceCallback(List<Result> results, String selectedScript) {
+      super();
+      this.selectedScript = selectedScript;
+      this.results = results;
+    }
+
+    @Override
+    public void onResource(Response response, JsArray<ValueDto> values) {
+      getDisplay().clearResults();
+      getDisplay().addResults(addValueToResults(results, values));
+    }
+
+    private List<Result> addValueToResults(List<Result> results, JsArray<ValueDto> values) {
+      int i = 0;
+      for(Result result : results) {
+        result.setValue(values.get(i++));
+      }
+      return results;
+    }
+  }
+
+  public class Result {
+    private ValueDto value;
+
+    private VariableDto variable;
+
+    public Result(VariableDto variable) {
+      this.variable = variable;
+    }
+
+    public ValueDto getValue() {
+      return value;
+    }
+
+    public void setValue(ValueDto value) {
+      this.value = value;
+    }
+
+    public VariableDto getVariable() {
+      return variable;
+    }
+
+    public void setVariable(VariableDto variable) {
+      this.variable = variable;
     }
 
   }

@@ -9,14 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createview.view;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
-import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter.Result;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.OpenHandler;
@@ -102,18 +101,15 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
 
   @Override
   public String getScript() {
-    String script = scriptArea.getSelectedText();
-    if(script.equals("")) {
-      script = scriptArea.getText();
-    }
-    return script;
+    return scriptArea.getText();
   }
 
   @Override
-  public void addResults(JsArray<VariableDto> variables) {
-    CellTable<VariableDto> table = setupColumns();
-    SimplePager<VariableDto> pager = new SimplePager<VariableDto>(table);
-    populateResultsTable(variables, table, pager);
+  public void addResults(List<Result> results) {
+    CellTable<Result> table = setupColumns();
+    table.setPageSize(10);
+    SimplePager<Result> pager = new SimplePager<Result>(table);
+    populateResultsTable(results, table, pager);
     testResults.add(pager);
     testResults.add(table);
   }
@@ -128,36 +124,56 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
     testCount.setText("Count: " + count);
   }
 
-  private <T extends JavaScriptObject> void populateResultsTable(final JsArray<T> results, CellTable<T> table, SimplePager<T> pager) {
+  private <T extends Object> void populateResultsTable(final List<T> results, CellTable<T> table, SimplePager<T> pager) {
+
     table.setDelegate(new Delegate<T>() {
 
       @Override
       public void onRangeChanged(ListView<T> listView) {
         int start = listView.getRange().getStart();
         int length = listView.getRange().getLength();
-        listView.setData(start, length, JsArrays.toList(results, start, length));
+        listView.setData(start, length, results.subList(start, length > results.size() ? results.size() : start + length));
       }
 
     });
 
     pager.firstPage();
-    table.setPageSize(10);
-    table.setPager(pager);
-    table.setDataSize(results.length(), true);
-    table.setData(0, table.getPageSize(), JsArrays.toList(results, 0, table.getPageSize()));
+    table.setDataSize(results.size(), true);
     table.redraw();
   }
 
-  private CellTable<VariableDto> setupColumns() {
-    CellTable<VariableDto> table = new CellTable<VariableDto>();
-    table.addColumn(new TextColumn<VariableDto>() {
+  private CellTable<Result> setupColumns() {
+    CellTable<Result> table = new CellTable<Result>();
+    table.addColumn(new TextColumn<Result>() {
       @Override
-      public String getValue(VariableDto variable) {
-        return variable.getName();
+      public String getValue(Result result) {
+        return result.getVariable().getName();
       }
     }, translations.variableLabel());
-
+    table.addColumn(new TextColumn<Result>() {
+      @Override
+      public String getValue(Result result) {
+        return result.getValue().getValue();
+      }
+    }, translations.valueLabel());
     return table;
+  }
+
+  @Override
+  public String getSelectedScript() {
+    return scriptArea.getSelectedText();
+  }
+
+  @Override
+  public void setSelectedScript(String script) {
+    int start = scriptArea.getText().indexOf(script);
+
+    GWT.log("start " + start);
+    GWT.log("end " + (start + script.length()));
+
+    if(start > -1) {
+      scriptArea.setSelectionRange(start, script.length());
+    }
   }
 
 }
