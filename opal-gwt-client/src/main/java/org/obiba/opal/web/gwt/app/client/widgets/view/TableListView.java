@@ -114,6 +114,11 @@ public class TableListView extends Composite implements TableListPresenter.Displ
   }
 
   @Override
+  public void clear() {
+    tableList.clear();
+  }
+
+  @Override
   public void removeTable(int index) {
     tableList.removeItem(index);
   }

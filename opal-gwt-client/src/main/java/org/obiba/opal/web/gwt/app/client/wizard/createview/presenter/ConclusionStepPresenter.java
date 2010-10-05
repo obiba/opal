@@ -18,7 +18,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.view.ResourceRequestView;
-import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 
@@ -37,9 +36,6 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
 
   private ResourceRequestPresenter<? extends JavaScriptObject> resourceRequestPresenter;
 
-  @Inject
-  private ConfigureViewStepPresenter configureViewStepPresenter;
-
   //
   // Constructors
   //
@@ -55,13 +51,11 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
 
   @Override
   protected void onBind() {
-    configureViewStepPresenter.bind();
     addEventHandlers();
   }
 
   @Override
   protected void onUnbind() {
-    configureViewStepPresenter.unbind();
   }
 
   @Override
@@ -88,8 +82,8 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
   public <T extends JavaScriptObject> void setResourceRequest(String resourceName, String resourceLink, ResourceRequestBuilder<T> requestBuilder) {
     resourceRequestPresenter = new ResourceRequestPresenter<T>(new ResourceRequestView(), eventBus, requestBuilder, new ConclusionResponseCodeCallback());
     resourceRequestPresenter.getDisplay().setResourceName(resourceName);
-    resourceRequestPresenter.setSuccessCodes(200, 201);
-    resourceRequestPresenter.setErrorCodes(400, 404, 405, 500);
+    resourceRequestPresenter.setSuccessCodes(Response.SC_OK, Response.SC_CREATED);
+    resourceRequestPresenter.setErrorCodes(Response.SC_BAD_REQUEST, Response.SC_NOT_FOUND, Response.SC_METHOD_NOT_ALLOWED, Response.SC_INTERNAL_SERVER_ERROR);
 
     getDisplay().setResourceRequest(resourceRequestPresenter.getDisplay());
   }
@@ -125,7 +119,7 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
 
     public void onResponseCode(Request request, Response response) {
       int statusCode = response.getStatusCode();
-      if(statusCode == 200 || statusCode == 201) {
+      if(statusCode == Response.SC_OK || statusCode == Response.SC_CREATED) {
         getDisplay().showConfigureViewWidgets(true);
       }
     }

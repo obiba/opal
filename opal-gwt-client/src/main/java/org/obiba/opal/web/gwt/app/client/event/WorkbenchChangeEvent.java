@@ -29,6 +29,10 @@ public class WorkbenchChangeEvent extends GwtEvent<WorkbenchChangeEvent.Handler>
 
   private final WidgetPresenter<?> workbench;
 
+  private boolean bindWorkbench = true;
+
+  private boolean unbindWorkbench = true;
+
   /**
    * @param selectedItem
    */
@@ -36,8 +40,22 @@ public class WorkbenchChangeEvent extends GwtEvent<WorkbenchChangeEvent.Handler>
     this.workbench = workbench;
   }
 
+  public WorkbenchChangeEvent(WidgetPresenter<?> workbench, boolean bindWorkbench, boolean unbindWorkbench) {
+    this.workbench = workbench;
+    this.bindWorkbench = bindWorkbench;
+    this.unbindWorkbench = unbindWorkbench;
+  }
+
   public WidgetPresenter<?> getWorkbench() {
     return workbench;
+  }
+
+  public boolean shouldBindWorkbench() {
+    return bindWorkbench;
+  }
+
+  public boolean shouldUnbindWorkbench() {
+    return unbindWorkbench;
   }
 
   public static Type<Handler> getType() {

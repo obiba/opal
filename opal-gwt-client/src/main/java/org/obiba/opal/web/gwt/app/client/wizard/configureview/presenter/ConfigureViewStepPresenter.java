@@ -82,7 +82,7 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
   class ViewConfigurationRequiredHandler implements ViewConfigurationRequiredEvent.Handler {
 
     public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
-      eventBus.fireEvent(new WorkbenchChangeEvent(ConfigureViewStepPresenter.this));
+      eventBus.fireEvent(new WorkbenchChangeEvent(ConfigureViewStepPresenter.this, false, false));
     }
   }
 }

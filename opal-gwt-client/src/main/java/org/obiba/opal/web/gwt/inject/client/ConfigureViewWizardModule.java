@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.ConfigureView
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.SaveErrorsStepView;
 
 import com.google.gwt.inject.client.AbstractGinModule;
+import com.google.inject.Singleton;
 
 /**
  * Bind concrete implementations to interfaces within the Configure View wizard.
@@ -23,7 +24,7 @@ public class ConfigureViewWizardModule extends AbstractGinModule {
 
   @Override
   protected void configure() {
-    bind(ConfigureViewStepPresenter.Display.class).to(ConfigureViewStepView.class);
-    bind(SaveErrorsStepPresenter.Display.class).to(SaveErrorsStepView.class);
+    bind(ConfigureViewStepPresenter.Display.class).to(ConfigureViewStepView.class).in(Singleton.class);
+    bind(SaveErrorsStepPresenter.Display.class).to(SaveErrorsStepView.class).in(Singleton.class);
   }
 }

@@ -21,6 +21,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
+import org.obiba.opal.web.gwt.app.client.event.ViewCreationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
@@ -106,6 +107,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   }
 
   protected void addEventHandlers() {
+    super.registerHandler(eventBus.addHandler(ViewCreationRequiredEvent.getType(), new ViewCreationRequiredHandler()));
     super.registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
     super.registerHandler(getDisplay().addCreateClickHandler(new CreateClickHandler()));
     super.registerHandler(getDisplay().addSelectExistingDatasourceClickHandler(new SelectExistingDatasourceClickHandler()));
@@ -114,14 +116,13 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
   @Override
   public void revealDisplay() {
-    refreshDisplay();
+    datasourceSelectorPresenter.refreshDisplay();
+    getDisplay().clear();
   }
 
   @Override
   public void refreshDisplay() {
     datasourceSelectorPresenter.refreshDisplay();
-    getDisplay().setDatasourceSelectorEnabled(false);
-    getDisplay().setNewDatasourceInputEnabled(false);
   }
 
   @Override
@@ -142,6 +143,8 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   //
 
   public interface Display extends WidgetDisplay {
+
+    void clear();
 
     void setDatasourceSelector(DatasourceSelectorPresenter.Display datasourceSelector);
 
@@ -172,6 +175,13 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     HandlerRegistration addSelectExistingDatasourceClickHandler(ClickHandler handler);
 
     HandlerRegistration addCreateNewDatasourceClickHandler(ClickHandler handler);
+  }
+
+  class ViewCreationRequiredHandler implements ViewCreationRequiredEvent.Handler {
+
+    public void onViewCreationRequired(ViewCreationRequiredEvent event) {
+      eventBus.fireEvent(new WorkbenchChangeEvent(CreateViewStepPresenter.this, false, false));
+    }
   }
 
   class CancelClickHandler implements ClickHandler {

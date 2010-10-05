@@ -71,6 +71,8 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
 
   private DatasourceSelectorPresenter.Display datasourceSelector;
 
+  private TableListPresenter.Display tableSelector;
+
   //
   // Constructors
   //
@@ -82,6 +84,27 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   //
   // CreateViewStepPresenter.Display Methods
   //
+
+  public void clear() {
+    selectExistingDatasourceRadioButton.setValue(false);
+    if(datasourceSelector != null) {
+      datasourceSelector.setEnabled(false);
+      datasourceSelector.selectFirst();
+    }
+
+    createNewDatasourceRadioButton.setValue(false);
+    createNewDatasourceTextBox.setText("");
+    createNewDatasourceTextBox.setEnabled(false);
+
+    viewNameTextBox.setText("");
+
+    if(tableSelector != null) {
+      tableSelector.clear();
+    }
+
+    applyingGlobalVariableFilterRadioButton.setValue(false);
+    addingVariablesOneByOneRadioButton.setValue(false);
+  }
 
   public void setDatasourceSelector(DatasourceSelectorPresenter.Display datasourceSelector) {
     this.datasourceSelector = datasourceSelector;
@@ -97,6 +120,7 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   }
 
   public void setTableSelector(TableListPresenter.Display tableSelector) {
+    this.tableSelector = tableSelector;
     tableSelectorPanel.add(tableSelector.asWidget());
   }
 

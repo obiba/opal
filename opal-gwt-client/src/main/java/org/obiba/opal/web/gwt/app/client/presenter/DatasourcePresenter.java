@@ -19,12 +19,12 @@ import org.obiba.opal.web.gwt.app.client.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
+import org.obiba.opal.web.gwt.app.client.event.ViewCreationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -55,9 +55,6 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   @Inject
   private Provider<NavigatorPresenter> navigationPresenter;
 
-  @Inject
-  private CreateViewStepPresenter createViewStepPresenter;
-
   //
   // Constructors
   //
@@ -67,12 +64,6 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     super(display, eventBus);
   }
 
-  // visible for testing
-  public DatasourcePresenter(Display display, EventBus eventBus, CreateViewStepPresenter createViewStepPresenter) {
-    super(display, eventBus);
-    this.createViewStepPresenter = createViewStepPresenter;
-  }
-
   @Override
   public Place getPlace() {
     return null;
@@ -80,8 +71,6 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
   @Override
   protected void onBind() {
-    createViewStepPresenter.bind();
-
     super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionHandler()));
     super.registerHandler(eventBus.addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionHandler()));
     super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
@@ -97,7 +86,6 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
   @Override
   protected void onUnbind() {
-    createViewStepPresenter.unbind();
   }
 
   private int getTableIndex(String tableName) {
@@ -188,6 +176,10 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     eventBus.fireEvent(new FileDownloadEvent(downloadUrl));
   }
 
+  private void addView(String datasource) {
+    eventBus.fireEvent(new ViewCreationRequiredEvent(datasource));
+  }
+
   private void removeDatasource(String datasource) {
 
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
@@ -203,10 +195,6 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     };
 
     ResourceRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler).withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
-  }
-
-  private void addView(String datasource) {
-    eventBus.fireEvent(new WorkbenchChangeEvent(createViewStepPresenter));
   }
 
   private String getPreviousTableName(int index) {

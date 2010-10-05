@@ -154,6 +154,8 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
 
     void setListVisibleItemCount(int count);
 
+    void clear();
+
     void removeTable(int index);
 
     void addTable(TableDto table);

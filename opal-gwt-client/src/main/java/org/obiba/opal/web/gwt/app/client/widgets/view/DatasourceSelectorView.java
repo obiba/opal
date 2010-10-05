@@ -52,6 +52,12 @@ public class DatasourceSelectorView extends Composite implements DatasourceSelec
     }
   }
 
+  public void selectFirst() {
+    if(datasourceListBox.getItemCount() != 0) {
+      datasourceListBox.setSelectedIndex(0);
+    }
+  }
+
   public void setSelection(String datasourceName) {
     for(int i = 0; i < datasourceListBox.getItemCount(); i++) {
       String item = datasourceListBox.getValue(i);

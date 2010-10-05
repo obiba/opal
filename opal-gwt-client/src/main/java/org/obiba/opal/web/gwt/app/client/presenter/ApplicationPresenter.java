@@ -20,11 +20,11 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
+import org.obiba.opal.web.gwt.app.client.event.ViewCreationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourceStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.FormatSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.UploadVariablesStepPresenter;
 
@@ -76,9 +76,6 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
   private Provider<DashboardPresenter> dashboardPresenter;
 
   @Inject
-  private Provider<CreateViewStepPresenter> createViewStepPresenter;
-
-  @Inject
   private Provider<CreateDatasourceStepPresenter> createDatasourceStepPresenter;
 
   @Inject
@@ -103,6 +100,8 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
   private Provider<FileExplorerPresenter> fileExplorerPresenter;
 
   private WidgetPresenter<?> workbench;
+
+  private boolean unbindPreviousWorkbench;
 
   private static Translations translations = GWT.create(Translations.class);
 
@@ -145,7 +144,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
       @Override
       public void execute() {
-        eventBus.fireEvent(new WorkbenchChangeEvent(createViewStepPresenter.get()));
+        eventBus.fireEvent(new ViewCreationRequiredEvent());
         getDisplay().setCurrentSelection(getDisplay().getDatasourcesItem());
       }
     });
@@ -230,7 +229,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
   @Override
   public void revealDisplay() {
-    updateWorkbench(dashboardPresenter.get());
+    eventBus.fireEvent(new WorkbenchChangeEvent(dashboardPresenter.get()));
     getDisplay().setCurrentSelection(getDisplay().getDashboardItem());
   }
 
@@ -239,17 +238,22 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
       @Override
       public void onWorkbenchChanged(WorkbenchChangeEvent event) {
-        updateWorkbench(event.getWorkbench());
+        updateWorkbench(event);
       }
     }));
   }
 
-  private void updateWorkbench(WidgetPresenter<?> newWorkbench) {
-    if(workbench != null) {
+  private void updateWorkbench(WorkbenchChangeEvent event) {
+    if(workbench != null && unbindPreviousWorkbench) {
       workbench.unbind();
     }
-    workbench = newWorkbench;
-    workbench.bind();
+    unbindPreviousWorkbench = event.shouldUnbindWorkbench();
+
+    workbench = event.getWorkbench();
+    if(event.shouldBindWorkbench()) {
+      workbench.bind();
+    }
+
     WidgetDisplay wd = (WidgetDisplay) workbench.getDisplay();
     getDisplay().updateWorkbench(wd.asWidget());
     workbench.revealDisplay();

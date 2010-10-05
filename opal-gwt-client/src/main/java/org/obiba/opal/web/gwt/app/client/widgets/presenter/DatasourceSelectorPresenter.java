@@ -93,6 +93,8 @@ public class DatasourceSelectorPresenter extends WidgetPresenter<DatasourceSelec
 
     void setDatasources(JsArray<DatasourceDto> datasources);
 
+    void selectFirst();
+
     void setSelection(String datasourceName);
 
     String getSelection();

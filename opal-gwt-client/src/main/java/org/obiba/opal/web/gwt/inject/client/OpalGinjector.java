@@ -35,6 +35,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.Configur
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.ExcelDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.FsDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.HibernateDatasourceFormPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.view.EvaluateScriptView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ConclusionStepPresenter;
@@ -117,5 +118,7 @@ public interface OpalGinjector extends Ginjector {
 
   FsDatasourceFormPresenter getFsDatasourceFormPresenter();
 
-  ConfigureViewStepPresenter getConfigureViewPresenter();
+  CreateViewStepPresenter getCreateViewStepPresenter();
+
+  ConfigureViewStepPresenter getConfigureViewStepPresenter();
 }

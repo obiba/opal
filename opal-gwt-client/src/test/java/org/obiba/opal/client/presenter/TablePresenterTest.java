@@ -13,7 +13,6 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
 import net.customware.gwt.presenter.client.EventBus;
 
 import org.easymock.EasyMock;
@@ -23,13 +22,12 @@ import org.obiba.opal.web.gwt.app.client.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.gwt.user.client.Command;
 
 public class TablePresenterTest extends AbstractGwtTestSetup {
@@ -40,15 +38,12 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
 
   private TablePresenter presenter;
 
-  private ConfigureViewStepPresenterSpy configureViewStepPresenterSpy;
-
   @Before
   public void setUp() {
     displayMock = createMock(TablePresenter.Display.class);
     eventBusMock = createMock(EventBus.class);
-    configureViewStepPresenterSpy = createConfigureViewStepPresenterSpy(eventBusMock);
 
-    presenter = new TablePresenter(displayMock, eventBusMock, configureViewStepPresenterSpy);
+    presenter = new TablePresenter(displayMock, eventBusMock);
   }
 
   @SuppressWarnings("unchecked")
@@ -69,50 +64,5 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     presenter.bind();
 
     verify(displayMock, eventBusMock);
-
-    assertEquals(1, configureViewStepPresenterSpy.getBindCount());
-  }
-
-  @Test
-  public void testOnUnbind_UnbindsDependencies() {
-    replay(displayMock, eventBusMock);
-    presenter.unbind();
-
-    verify(displayMock, eventBusMock);
-
-    assertEquals(1, configureViewStepPresenterSpy.getUnbindCount());
-  }
-
-  private ConfigureViewStepPresenterSpy createConfigureViewStepPresenterSpy(EventBus eventBus) {
-    ConfigureViewStepPresenter.Display displayMock = createMock(ConfigureViewStepPresenter.Display.class);
-
-    return new ConfigureViewStepPresenterSpy(displayMock, eventBus);
-  }
-
-  private static class ConfigureViewStepPresenterSpy extends ConfigureViewStepPresenter {
-
-    private int bindCount;
-
-    private int unbindCount;
-
-    public ConfigureViewStepPresenterSpy(ConfigureViewStepPresenter.Display display, EventBus eventBus) {
-      super(display, eventBus);
-    }
-
-    protected void onBind() {
-      bindCount++;
-    }
-
-    protected void onUnbind() {
-      unbindCount++;
-    }
-
-    public int getBindCount() {
-      return bindCount;
-    }
-
-    public int getUnbindCount() {
-      return unbindCount;
-    }
   }
 }

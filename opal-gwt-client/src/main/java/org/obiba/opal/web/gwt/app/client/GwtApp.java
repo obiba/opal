@@ -14,6 +14,8 @@ import org.obiba.opal.web.gwt.app.client.resources.OpalResources;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.inject.client.OpalGinjector;
 import org.obiba.opal.web.gwt.rest.client.DefaultResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
@@ -61,6 +63,7 @@ public class GwtApp implements EntryPoint {
     initLoginPresenter();
     initTableSelectorPresenter();
     initConfirmationPresenter();
+    initViewWizards();
 
     updateRootLayout();
 
@@ -115,6 +118,14 @@ public class GwtApp implements EntryPoint {
   private void initConfirmationPresenter() {
     ConfirmationPresenter confirmationPresenter = opalGinjector.getConfirmationPresenter();
     confirmationPresenter.bind();
+  }
+
+  private void initViewWizards() {
+    CreateViewStepPresenter createViewStepPresenter = opalGinjector.getCreateViewStepPresenter();
+    createViewStepPresenter.bind();
+
+    ConfigureViewStepPresenter configureViewStepPresenter = opalGinjector.getConfigureViewStepPresenter();
+    configureViewStepPresenter.bind();
   }
 
   private void registerHandlers() {

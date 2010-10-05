@@ -17,18 +17,17 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent;
-import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
+import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -52,9 +51,6 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   private TableDto table;
 
   @Inject
-  private ConfigureViewStepPresenter configureViewStepPresenter;
-
-  @Inject
   private Provider<NavigatorPresenter> navigationPresenter;
 
   private Runnable removeViewConfirmation;
@@ -72,16 +68,8 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     super(display, eventBus);
   }
 
-  // visible for testing
-  public TablePresenter(final Display display, final EventBus eventBus, final ConfigureViewStepPresenter configureViewStepPresenter) {
-    super(display, eventBus);
-    this.configureViewStepPresenter = configureViewStepPresenter;
-  }
-
   @Override
   protected void onBind() {
-    configureViewStepPresenter.bind();
-
     super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
     super.registerHandler(eventBus.addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
     super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new RemoveViewConfirmationEventHandler()));
@@ -95,7 +83,6 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
   @Override
   protected void onUnbind() {
-    configureViewStepPresenter.unbind();
   }
 
   @Override
