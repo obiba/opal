@@ -401,4 +401,12 @@ public interface Translations extends Constants {
   @Description("Item label")
   @DefaultStringValue("Item")
   String itemLabel();
+
+  @Description("Script label")
+  @DefaultStringValue("Script")
+  String scriptLabel();
+
+  @Description("Line label")
+  @DefaultStringValue("Line")
+  String lineLabel();
 }

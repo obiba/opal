@@ -9,12 +9,18 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 
+import java.util.List;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.model.client.magma.JavaScriptErrorDto;
+
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.inject.Inject;
 
 public class SaveErrorsStepPresenter extends WidgetPresenter<SaveErrorsStepPresenter.Display> {
@@ -73,5 +79,11 @@ public class SaveErrorsStepPresenter extends WidgetPresenter<SaveErrorsStepPrese
   //
 
   public interface Display extends WidgetDisplay {
+
+    void clear();
+
+    void setErrors(List<JavaScriptErrorDto> errors);
+
+    HandlerRegistration addBackClickHandler(ClickHandler handler);
   }
 }

@@ -9,17 +9,26 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.SaveErrorsStepPresenter;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
+import org.obiba.opal.web.model.client.magma.JavaScriptErrorDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListView;
+import com.google.gwt.view.client.ListView.Delegate;
 
 public class SaveErrorsStepView extends Composite implements SaveErrorsStepPresenter.Display {
   //
@@ -27,6 +36,8 @@ public class SaveErrorsStepView extends Composite implements SaveErrorsStepPrese
   //
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+
+  private static Translations translations = GWT.create(Translations.class);
 
   //
   // Instance Variables
@@ -36,7 +47,7 @@ public class SaveErrorsStepView extends Composite implements SaveErrorsStepPrese
   Button backButton;
 
   @UiField
-  CellTable<ClientErrorDto> errorsTable;
+  CellTable<JavaScriptErrorDto> errorsTable;
 
   //
   // Constructors
@@ -44,11 +55,36 @@ public class SaveErrorsStepView extends Composite implements SaveErrorsStepPrese
 
   public SaveErrorsStepView() {
     initWidget(uiBinder.createAndBindUi(this));
+    initTable();
   }
 
   //
-  // ConfigureViewStepPresenter.Display Methods
+  // SaveErrorsStepPresenter.Display Methods
   //
+
+  public void clear() {
+    List<JavaScriptErrorDto> noErrors = Collections.emptyList();
+    setErrors(noErrors);
+  }
+
+  public void setErrors(final List<JavaScriptErrorDto> errors) {
+    errorsTable.setDelegate(new Delegate<JavaScriptErrorDto>() {
+
+      public void onRangeChanged(ListView<JavaScriptErrorDto> listView) {
+        int start = listView.getRange().getStart();
+        int length = listView.getRange().getLength();
+        listView.setData(start, length, errors);
+      }
+    });
+
+    errorsTable.setData(0, errorsTable.getPageSize(), errors);
+    errorsTable.setDataSize(errors.size(), true);
+    errorsTable.redraw();
+  }
+
+  public HandlerRegistration addBackClickHandler(ClickHandler handler) {
+    return backButton.addClickHandler(handler);
+  }
 
   public Widget asWidget() {
     return this;
@@ -58,6 +94,38 @@ public class SaveErrorsStepView extends Composite implements SaveErrorsStepPrese
   }
 
   public void stopProcessing() {
+  }
+
+  //
+  // Methods
+  //
+
+  private void initTable() {
+    errorsTable.setSelectionEnabled(false);
+    addTableColumns();
+  }
+
+  private void addTableColumns() {
+    errorsTable.addColumn(new TextColumn<JavaScriptErrorDto>() {
+      @Override
+      public String getValue(JavaScriptErrorDto dto) {
+        return dto.getSourceName();
+      }
+    }, "Script");// translations.scriptLabel());
+
+    errorsTable.addColumn(new TextColumn<JavaScriptErrorDto>() {
+      @Override
+      public String getValue(JavaScriptErrorDto dto) {
+        return "" + dto.getLineNumber();
+      }
+    }, "Line");// translations.lineLabel());
+
+    errorsTable.addColumn(new TextColumn<JavaScriptErrorDto>() {
+      @Override
+      public String getValue(JavaScriptErrorDto dto) {
+        return dto.getMessage();
+      }
+    }, translations.errorLabel());
   }
 
   //
