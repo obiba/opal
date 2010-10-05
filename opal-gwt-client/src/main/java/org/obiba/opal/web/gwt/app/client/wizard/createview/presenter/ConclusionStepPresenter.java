@@ -36,6 +36,10 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
 
   private ResourceRequestPresenter<? extends JavaScriptObject> resourceRequestPresenter;
 
+  private String datasourceName;
+
+  private String viewName;
+
   //
   // Constructors
   //
@@ -79,9 +83,12 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
   // Methods
   //
 
-  public <T extends JavaScriptObject> void setResourceRequest(String resourceName, String resourceLink, ResourceRequestBuilder<T> requestBuilder) {
+  public <T extends JavaScriptObject> void setResourceRequest(String datasourceName, String viewName, String resourceLink, ResourceRequestBuilder<T> requestBuilder) {
+    this.datasourceName = datasourceName;
+    this.viewName = viewName;
+
     resourceRequestPresenter = new ResourceRequestPresenter<T>(new ResourceRequestView(), eventBus, requestBuilder, new ConclusionResponseCodeCallback());
-    resourceRequestPresenter.getDisplay().setResourceName(resourceName);
+    resourceRequestPresenter.getDisplay().setResourceName(viewName);
     resourceRequestPresenter.setSuccessCodes(Response.SC_OK, Response.SC_CREATED);
     resourceRequestPresenter.setErrorCodes(Response.SC_BAD_REQUEST, Response.SC_NOT_FOUND, Response.SC_METHOD_NOT_ALLOWED, Response.SC_INTERNAL_SERVER_ERROR);
 
@@ -128,8 +135,7 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
   class ConfigureViewClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent event) {
-      // TODO: Create a ViewConfigurationRequiredEvent with the actual datasource and view names.
-      eventBus.fireEvent(new ViewConfigurationRequiredEvent("theDatasource", "theView"));
+      eventBus.fireEvent(new ViewConfigurationRequiredEvent(datasourceName, viewName));
     }
   }
 }

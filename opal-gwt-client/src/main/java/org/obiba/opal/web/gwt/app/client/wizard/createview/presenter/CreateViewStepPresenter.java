@@ -277,7 +277,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
       ResourceRequestBuilder<JavaScriptObject> resourceRequestBuilder = ResourceRequestBuilderFactory.newBuilder().put().forResource("/datasource/" + datasourceName + "/view/" + viewName).accept("application/x-protobuf+json").withResourceBody(stringify(viewDto));
 
       // Update the Conclusion step then fire a WorkbenchChangeEvent to move to that step.
-      conclusionStepPresenter.setResourceRequest(viewName, "/datasource/" + datasourceName + "/view/" + viewName, resourceRequestBuilder);
+      conclusionStepPresenter.setResourceRequest(datasourceName, viewName, "/datasource/" + datasourceName + "/view/" + viewName, resourceRequestBuilder);
       conclusionStepPresenter.showConfigureViewWidgets(false);
       conclusionStepPresenter.sendResourceRequest();
       eventBus.fireEvent(new WorkbenchChangeEvent(conclusionStepPresenter));
