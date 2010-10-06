@@ -57,6 +57,8 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
   @UiField
   Label testCount;
 
+  CellTable<Result> resultTable;
+
   public EvaluateScriptView() {
     initWidget(uiBinder.createAndBindUi(this));
   }
@@ -106,12 +108,12 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
 
   @Override
   public void addResults(List<Result> results) {
-    CellTable<Result> table = setupColumns();
-    table.setPageSize(10);
-    SimplePager<Result> pager = new SimplePager<Result>(table);
-    populateResultsTable(results, table, pager);
+    // CellTable<Result> table = setupColumns();
+    resultTable.setPageSize(10);
+    SimplePager<Result> pager = new SimplePager<Result>(resultTable);
+    populateResultsTable(results, resultTable, pager);
     testResults.add(pager);
-    testResults.add(table);
+    testResults.add(resultTable);
   }
 
   @Override
@@ -174,6 +176,31 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
     if(start > -1) {
       scriptArea.setSelectionRange(start, script.length());
     }
+  }
+
+  @Override
+  public void initializeResultTable() {
+    resultTable = new CellTable<EvaluateScriptPresenter.Result>();
+  }
+
+  @Override
+  public void addVariableColumn() {
+    resultTable.addColumn(new TextColumn<Result>() {
+      @Override
+      public String getValue(Result result) {
+        return result.getVariable().getName();
+      }
+    }, translations.variableLabel());
+  }
+
+  @Override
+  public void addValueColumn() {
+    resultTable.addColumn(new TextColumn<Result>() {
+      @Override
+      public String getValue(Result result) {
+        return result.getValue().getValue();
+      }
+    }, translations.valueLabel());
   }
 
 }

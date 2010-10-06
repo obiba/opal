@@ -37,7 +37,13 @@ import com.google.inject.Inject;
 
 public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPresenter.Display> {
 
+  public enum Mode {
+    VARIABLE, ENTITY_VALUE;
+  }
+
   private TableDto view;
+
+  private Mode evaluationMode;
 
   @Inject
   public EvaluateScriptPresenter(Display display, EventBus eventBus) {
@@ -62,6 +68,12 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     void showTestCount(boolean show);
 
     void clearResults();
+
+    void initializeResultTable();
+
+    void addVariableColumn();
+
+    void addValueColumn();
 
     void setTestCount(int count);
 
@@ -112,6 +124,10 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     this.view = view;
   }
 
+  public void setEvaluationMode(Mode evaluationMode) {
+    this.evaluationMode = evaluationMode;
+  }
+
   public class TestScriptClickHandler implements ClickHandler {
 
     @Override
@@ -119,9 +135,17 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
       String selectedScript = getDisplay().getSelectedScript();
 
       if(selectedScript.isEmpty()) {
-        ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variables?script=" + getDisplay().getScript()).get().withCallback(new VariablesResourceCallback(false)).send();
+        if(evaluationMode == Mode.ENTITY_VALUE) {
+          ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variable/_transient/values?script=" + getDisplay().getScript()).get().withCallback(new EntityValuesResourceCallback()).send();
+        } else {
+          ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variables?script=" + getDisplay().getScript()).get().withCallback(new VariablesResourceCallback(false)).send();
+        }
       } else {
-        ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variables").get().withCallback(new VariablesResourceCallback(true)).send();
+        if(evaluationMode == Mode.ENTITY_VALUE) {
+          ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variable/_transient/values?script=" + getDisplay().getSelectedScript()).get().withCallback(new EntityValuesResourceCallback()).send();
+        } else {
+          ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variables").get().withCallback(new VariablesResourceCallback(true)).send();
+        }
       }
 
     }
@@ -156,12 +180,15 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     @Override
     public void onResource(Response response, JsArray<VariableDto> variables) {
       getDisplay().clearResults();
+      getDisplay().initializeResultTable();
+      getDisplay().addVariableColumn();
+
       List<Result> results = buildResultList(variables);
 
       String selectedScript = getDisplay().getSelectedScript();
 
       if(withValues) {
-        ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variables/query?script=" + selectedScript).get().withCallback(new QueryVariablesResourceCallback(results, selectedScript)).send();
+        ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variables/query?script=" + selectedScript).get().withCallback(new ValueResourceCallback(results)).send();
       } else {
         getDisplay().addResults(results);
       }
@@ -179,31 +206,49 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
 
   }
 
-  public class QueryVariablesResourceCallback implements ResourceCallback<JsArray<ValueDto>> {
+  public class ValueResourceCallback implements ResourceCallback<JsArray<ValueDto>> {
 
     private List<Result> results;
 
-    private String selectedScript;
-
-    public QueryVariablesResourceCallback(List<Result> results, String selectedScript) {
+    public ValueResourceCallback(List<Result> results) {
       super();
-      this.selectedScript = selectedScript;
       this.results = results;
     }
 
     @Override
     public void onResource(Response response, JsArray<ValueDto> values) {
       getDisplay().clearResults();
+      getDisplay().addValueColumn();
       getDisplay().addResults(addValueToResults(results, values));
     }
 
-    private List<Result> addValueToResults(List<Result> results, JsArray<ValueDto> values) {
+  }
+
+  private List<Result> addValueToResults(List<Result> results, JsArray<ValueDto> values) {
+    if(results == null) {
+      results = new ArrayList<EvaluateScriptPresenter.Result>();
+      for(int i = 0; i < values.length(); i++) {
+        results.add(new Result(values.get(i)));
+      }
+    } else {
       int i = 0;
       for(Result result : results) {
         result.setValue(values.get(i++));
       }
-      return results;
     }
+    return results;
+  }
+
+  public class EntityValuesResourceCallback implements ResourceCallback<JsArray<ValueDto>> {
+
+    @Override
+    public void onResource(Response response, JsArray<ValueDto> values) {
+      getDisplay().clearResults();
+      getDisplay().initializeResultTable();
+      getDisplay().addValueColumn();
+      getDisplay().addResults(addValueToResults(null, values));
+    }
+
   }
 
   public class Result {
@@ -213,6 +258,10 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
 
     public Result(VariableDto variable) {
       this.variable = variable;
+    }
+
+    public Result(ValueDto value) {
+      this.value = value;
     }
 
     public ValueDto getValue() {
