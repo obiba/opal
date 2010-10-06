@@ -14,6 +14,8 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter.Result;
+import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -187,4 +189,12 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
     resultsPanel.setOpen(visible);
   }
 
+  @Override
+  public void showErrorMessage(ClientErrorDto errorDto) {
+    testResults.add(new Label("Script error:"));
+
+    if(errorDto != null && errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
+      testResults.add(new Label("Script error: " + errorDto.getCode()));
+    }
+  }
 }

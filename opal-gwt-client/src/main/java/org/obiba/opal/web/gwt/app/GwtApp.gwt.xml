@@ -36,6 +36,6 @@
   <set-property-fallback name="locale" value="en"/>
 
   <!-- This will limit the compile to a single browser: Firefox 3.x -->
-  <!--set-property name="user.agent" value="gecko1_8" /-->
+  <set-property name="user.agent" value="gecko1_8" />
 
 </module>

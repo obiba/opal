@@ -20,10 +20,12 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableEntityDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -33,6 +35,7 @@ import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.OpenEvent;
 import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
@@ -79,6 +82,8 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     void setTestVariableCount(int count);
 
     void showResults(boolean visible);
+
+    void showErrorMessage(ClientErrorDto errorDto);
 
   }
 
@@ -135,21 +140,27 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
 
     @Override
     public void onClick(ClickEvent event) {
-      String selectedScript = getDisplay().getSelectedScript();
 
+      String viewResource = "/datasource/" + view.getDatasourceName() + "/table/" + view.getName();
+      String variablesResource = viewResource + "/variables";
+      String transientVariableResource = viewResource + "/variable/_transient/values";
+      String entitiesResource = viewResource + "/entities";
+
+      String selectedScript = getDisplay().getSelectedScript();
       if(selectedScript.isEmpty()) {
+        String script = getDisplay().getScript();
         if(evaluationMode == Mode.ENTITY_VALUE) {
-          ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variable/_transient/values?script=" + getDisplay().getScript()).get().withCallback(new EntityValuesResourceCallback()).send();
+          ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource(transientVariableResource + "?script=" + script).get().withCallback(new EntityValueResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).send();
         } else if(evaluationMode == Mode.VARIABLE) {
-          ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variables?script=" + getDisplay().getScript()).get().withCallback(new VariablesResourceCallback(false)).send();
+          ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(variablesResource + "?script=" + script).get().withCallback(new VariablesResourceCallback(false)).withCallback(400, new InvalidScriptResourceCallBack()).send();
         } else if(evaluationMode == Mode.ENTITY) {
-          ResourceRequestBuilderFactory.<JsArray<VariableEntityDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/entities?script=" + getDisplay().getScript()).get().withCallback(new EntityResourceCallback()).send();
+          ResourceRequestBuilderFactory.<JsArray<VariableEntityDto>> newBuilder().forResource(entitiesResource + "?script=" + script).get().withCallback(new EntityResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).send();
         }
       } else {
         if(evaluationMode == Mode.ENTITY_VALUE || evaluationMode == Mode.ENTITY) {
-          ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variable/_transient/values?script=" + getDisplay().getSelectedScript()).get().withCallback(new EntityValuesResourceCallback()).send();
+          ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource(transientVariableResource + "?script=" + selectedScript).get().withCallback(new EntityValueResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).send();
         } else if(evaluationMode == Mode.VARIABLE) {
-          ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variables").get().withCallback(new VariablesResourceCallback(true)).send();
+          ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(variablesResource).get().withCallback(new VariablesResourceCallback(true)).send();
         }
       }
 
@@ -196,7 +207,7 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
       String selectedScript = getDisplay().getSelectedScript();
 
       if(withValues) {
-        ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variables/query?script=" + selectedScript).get().withCallback(new ValueResourceCallback(results)).send();
+        ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variables/query?script=" + selectedScript).get().withCallback(new VariableValueResourceCallback(results)).withCallback(400, new InvalidScriptResourceCallBack()).send();
       } else {
         getDisplay().addResults(results);
       }
@@ -215,11 +226,11 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
 
   }
 
-  public class ValueResourceCallback implements ResourceCallback<JsArray<ValueDto>> {
+  public class VariableValueResourceCallback implements ResourceCallback<JsArray<ValueDto>> {
 
     private List<Result> results;
 
-    public ValueResourceCallback(List<Result> results) {
+    public VariableValueResourceCallback(List<Result> results) {
       super();
       this.results = results;
     }
@@ -258,7 +269,7 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
 
   }
 
-  private class EntityValuesResourceCallback implements ResourceCallback<JsArray<ValueDto>> {
+  private class EntityValueResourceCallback implements ResourceCallback<JsArray<ValueDto>> {
 
     @Override
     public void onResource(Response response, JsArray<ValueDto> values) {
@@ -266,6 +277,17 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
       getDisplay().initializeResultTable();
       getDisplay().addValueColumn();
       getDisplay().addResults(addValueToResults(null, values));
+    }
+
+  }
+
+  public class InvalidScriptResourceCallBack implements ResponseCodeCallback {
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      getDisplay().clearResults();
+      getDisplay().showErrorMessage(null);
+      // getDisplay().showErrorMessage((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
     }
 
   }
