@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.magma.VariableEntityDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -38,7 +39,7 @@ import com.google.inject.Inject;
 public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPresenter.Display> {
 
   public enum Mode {
-    VARIABLE, ENTITY_VALUE;
+    VARIABLE, ENTITY, ENTITY_VALUE;
   }
 
   private TableDto view;
@@ -65,8 +66,6 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
 
     HandlerRegistration addShowResultsPanelHandler(OpenHandler handler);
 
-    void showTestCount(boolean show);
-
     void clearResults();
 
     void initializeResultTable();
@@ -75,7 +74,11 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
 
     void addValueColumn();
 
-    void setTestCount(int count);
+    void setTestEntityCount(int count);
+
+    void setTestVariableCount(int count);
+
+    void showResults(boolean visible);
 
   }
 
@@ -99,8 +102,8 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
 
   private void addEventHandlers() {
     super.registerHandler(getDisplay().addTestScriptClickHandler(new TestScriptClickHandler()));
-    super.registerHandler(getDisplay().addHideResultsPanelHandler(new HideResultsCloseHandler()));
-    super.registerHandler(getDisplay().addShowResultsPanelHandler(new ShowResultsOpenHandler()));
+    // super.registerHandler(getDisplay().addHideResultsPanelHandler(new HideResultsCloseHandler()));
+    // super.registerHandler(getDisplay().addShowResultsPanelHandler(new ShowResultsOpenHandler()));
   }
 
   @Override
@@ -137,16 +140,20 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
       if(selectedScript.isEmpty()) {
         if(evaluationMode == Mode.ENTITY_VALUE) {
           ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variable/_transient/values?script=" + getDisplay().getScript()).get().withCallback(new EntityValuesResourceCallback()).send();
-        } else {
+        } else if(evaluationMode == Mode.VARIABLE) {
           ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variables?script=" + getDisplay().getScript()).get().withCallback(new VariablesResourceCallback(false)).send();
+        } else if(evaluationMode == Mode.ENTITY) {
+          ResourceRequestBuilderFactory.<JsArray<VariableEntityDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/entities?script=" + getDisplay().getScript()).get().withCallback(new EntityResourceCallback()).send();
         }
       } else {
-        if(evaluationMode == Mode.ENTITY_VALUE) {
+        if(evaluationMode == Mode.ENTITY_VALUE || evaluationMode == Mode.ENTITY) {
           ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variable/_transient/values?script=" + getDisplay().getSelectedScript()).get().withCallback(new EntityValuesResourceCallback()).send();
-        } else {
+        } else if(evaluationMode == Mode.VARIABLE) {
           ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variables").get().withCallback(new VariablesResourceCallback(true)).send();
         }
       }
+
+      getDisplay().showResults(true);
 
     }
   }
@@ -155,7 +162,7 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
 
     @Override
     public void onOpen(OpenEvent event) {
-      getDisplay().showTestCount(false);
+      // getDisplay().showTestCount(false);
     }
 
   }
@@ -164,7 +171,7 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
 
     @Override
     public void onClose(CloseEvent event) {
-      getDisplay().showTestCount(true);
+      // getDisplay().showTestCount(true);
     }
 
   }
@@ -180,6 +187,7 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     @Override
     public void onResource(Response response, JsArray<VariableDto> variables) {
       getDisplay().clearResults();
+      getDisplay().setTestVariableCount(variables.length());
       getDisplay().initializeResultTable();
       getDisplay().addVariableColumn();
 
@@ -193,7 +201,8 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
         getDisplay().addResults(results);
       }
 
-      getDisplay().setTestCount(variables.length());
+      getDisplay().showResults(true);
+
     }
 
     private List<Result> buildResultList(JsArray<VariableDto> results) {
@@ -239,7 +248,17 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     return results;
   }
 
-  public class EntityValuesResourceCallback implements ResourceCallback<JsArray<ValueDto>> {
+  private class EntityResourceCallback implements ResourceCallback<JsArray<VariableEntityDto>> {
+
+    @Override
+    public void onResource(Response response, JsArray<VariableEntityDto> resource) {
+      getDisplay().clearResults();
+      getDisplay().setTestEntityCount(resource.length());
+    }
+
+  }
+
+  private class EntityValuesResourceCallback implements ResourceCallback<JsArray<ValueDto>> {
 
     @Override
     public void onResource(Response response, JsArray<ValueDto> values) {

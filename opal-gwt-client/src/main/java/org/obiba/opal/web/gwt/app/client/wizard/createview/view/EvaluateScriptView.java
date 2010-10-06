@@ -54,9 +54,6 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
   @UiField
   DisclosurePanel resultsPanel;
 
-  @UiField
-  Label testCount;
-
   CellTable<Result> resultTable;
 
   public EvaluateScriptView() {
@@ -97,18 +94,12 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
   }
 
   @Override
-  public void showTestCount(boolean show) {
-    testCount.setVisible(show);
-  }
-
-  @Override
   public String getScript() {
     return scriptArea.getText();
   }
 
   @Override
   public void addResults(List<Result> results) {
-    // CellTable<Result> table = setupColumns();
     resultTable.setPageSize(10);
     SimplePager<Result> pager = new SimplePager<Result>(resultTable);
     populateResultsTable(results, resultTable, pager);
@@ -122,8 +113,13 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
   }
 
   @Override
-  public void setTestCount(int count) {
-    testCount.setText("Count: " + count);
+  public void setTestVariableCount(int count) {
+    testResults.add(new Label("Variables: " + count));
+  }
+
+  @Override
+  public void setTestEntityCount(int count) {
+    testResults.add(new Label("Entities: " + count));
   }
 
   private <T extends Object> void populateResultsTable(final List<T> results, CellTable<T> table, SimplePager<T> pager) {
@@ -142,23 +138,6 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
     pager.firstPage();
     table.setDataSize(results.size(), true);
     table.redraw();
-  }
-
-  private CellTable<Result> setupColumns() {
-    CellTable<Result> table = new CellTable<Result>();
-    table.addColumn(new TextColumn<Result>() {
-      @Override
-      public String getValue(Result result) {
-        return result.getVariable().getName();
-      }
-    }, translations.variableLabel());
-    table.addColumn(new TextColumn<Result>() {
-      @Override
-      public String getValue(Result result) {
-        return result.getValue().getValue();
-      }
-    }, translations.valueLabel());
-    return table;
   }
 
   @Override
@@ -201,6 +180,11 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
         return result.getValue().getValue();
       }
     }, translations.valueLabel());
+  }
+
+  @Override
+  public void showResults(boolean visible) {
+    resultsPanel.setOpen(visible);
   }
 
 }

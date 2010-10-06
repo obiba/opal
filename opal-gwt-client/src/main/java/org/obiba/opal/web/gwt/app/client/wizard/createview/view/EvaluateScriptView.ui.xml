@@ -12,7 +12,6 @@
       </g:header>
       <g:VerticalPanel ui:field="testResults"/>
     </g:DisclosurePanel>
-    <g:Label ui:field="testCount">test</g:Label>
   </g:FlowPanel>
 
 </ui:UiBinder>
