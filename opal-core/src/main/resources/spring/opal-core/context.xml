@@ -16,6 +16,9 @@
         <constructor-arg value="${OPAL_HOME}/conf/opal-config.xml" />
       </bean>
     </constructor-arg>
+    <property name="viewPersistenceStrategy">
+      <bean class="org.obiba.opal.core.cfg.OpalViewPersistenceStrategy"/>
+    </property>
   </bean>
 
   <bean id="participantIdentifier" class="org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl">

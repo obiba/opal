@@ -14,14 +14,16 @@ import java.util.Set;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.obiba.magma.Datasource;
+import org.obiba.magma.DatasourceTransformer;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.js.MagmaJsExtension;
 import org.obiba.magma.views.ViewManager;
+import org.obiba.magma.views.ViewPersistenceStrategy;
 import org.obiba.magma.views.impl.DefaultViewManagerImpl;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationIo;
-import org.obiba.opal.core.cfg.OpalViewPersistenceStrategy;
 import org.obiba.opal.core.runtime.security.OpalSecurityManager;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
@@ -45,6 +47,8 @@ public class DefaultOpalRuntime implements OpalRuntime {
   private static final Logger log = LoggerFactory.getLogger(OpalRuntime.class);
 
   private final OpalConfigurationIo opalConfigIo;
+
+  private ViewPersistenceStrategy viewPersistenceStrategy;
 
   @Autowired
   private PlatformTransactionManager txManager;
@@ -76,6 +80,8 @@ public class DefaultOpalRuntime implements OpalRuntime {
     initSecurityManager();
 
     initMagmaEngine();
+
+    initViewManager();
 
     initServices();
 
@@ -157,7 +163,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   public ViewManager getViewManager() {
     if(viewManager == null) {
-      viewManager = new DefaultViewManagerImpl(new OpalViewPersistenceStrategy());
+      viewManager = new DefaultViewManagerImpl(viewPersistenceStrategy);
     }
     return viewManager;
   }
@@ -181,6 +187,11 @@ public class DefaultOpalRuntime implements OpalRuntime {
     } catch(RuntimeException e) {
       log.error("Could not create MagmaEngine.", e);
     }
+  }
+
+  private void initViewManager() {
+    if(!(getViewManager() instanceof DatasourceTransformer)) throw new MagmaRuntimeException("Expected ViewManager to be an instanceof DatasourceTransformer.");
+    MagmaEngine.get().addDatasourceTransformer((DatasourceTransformer) getViewManager());
   }
 
   private void initServices() {
@@ -239,5 +250,9 @@ public class DefaultOpalRuntime implements OpalRuntime {
   @Override
   public void writeOpalConfiguration() {
     opalConfigIo.writeConfiguration(opalConfiguration);
+  }
+
+  public void setViewPersistenceStrategy(ViewPersistenceStrategy viewPersistenceStrategy) {
+    this.viewPersistenceStrategy = viewPersistenceStrategy;
   }
 }
