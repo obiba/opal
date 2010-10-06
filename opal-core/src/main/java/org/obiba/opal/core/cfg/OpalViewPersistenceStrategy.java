@@ -54,9 +54,10 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
 
   @Override
   public void writeViews(String datasourceName, Set<View> views) {
-    if(!viewsDirectory.isDirectory()) throw new RuntimeException("The views directory '" + viewsDirectory.getAbsolutePath() + "' does not exist.");
+    createViewsDirectory(); // Creates the views directory if it doesn't exist.
+    deleteViews(datasourceName); // Delete the old views before writing new ones.
     if(views.isEmpty()) {
-      if(!getDatasourceFile(datasourceName).delete()) throw new RuntimeException("Failed to delete the views file '" + getDatasourceFile(datasourceName).getAbsolutePath() + "'.");
+      // Do nothing. The file containing the views has already been deleted.
     } else {
       XStream xstream = new DefaultXStreamFactory().createXStream();
       OutputStreamWriter writer = null;
@@ -71,6 +72,18 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
       } finally {
         StreamUtil.silentSafeClose(writer);
       }
+    }
+  }
+
+  private void createViewsDirectory() {
+    if(!viewsDirectory.isDirectory()) {
+      if(!viewsDirectory.mkdirs()) throw new RuntimeException("The views directory '" + viewsDirectory.getAbsolutePath() + "' could not be created.");
+    }
+  }
+
+  private void deleteViews(String datasourceName) {
+    if(getDatasourceFile(datasourceName).exists()) {
+      if(!getDatasourceFile(datasourceName).delete()) throw new RuntimeException("Failed to delete the views file '" + getDatasourceFile(datasourceName).getAbsolutePath() + "'.");
     }
   }
 
