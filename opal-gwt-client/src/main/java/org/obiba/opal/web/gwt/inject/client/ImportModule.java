@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.inject.client;
 
+import org.obiba.opal.web.gwt.app.client.widgets.view.CsvFormatStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.CsvFormatStepPresenter;
@@ -18,7 +19,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.IdentityArc
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ValidationReportStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.XmlFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.ConclusionStepView;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.CsvFormatStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.DestinationSelectionStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.FormatSelectionStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.IdentityArchiveStepView;
