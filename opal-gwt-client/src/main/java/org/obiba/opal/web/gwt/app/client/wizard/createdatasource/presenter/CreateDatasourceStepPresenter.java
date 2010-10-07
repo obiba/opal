@@ -61,6 +61,9 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
   @Inject
   private FsDatasourceFormPresenter fsDatasourceFormPresenter;
 
+  @Inject
+  private JdbcDatasourceFormPresenter jdbcDatasourceFormPresenter;
+
   private Set<DatasourceFormPresenter> datasourceFormPresenters = new HashSet<DatasourceFormPresenter>();
 
   //
@@ -92,6 +95,7 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
     datasourceFormPresenters.add(hibernateDatasourceFormPresenter);
     datasourceFormPresenters.add(excelDatasourceFormPresenter);
     datasourceFormPresenters.add(fsDatasourceFormPresenter);
+    datasourceFormPresenters.add(jdbcDatasourceFormPresenter);
     updateDatasourceFormDisplay();
   }
 
