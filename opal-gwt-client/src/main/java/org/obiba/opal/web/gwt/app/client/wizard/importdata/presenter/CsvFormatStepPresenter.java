@@ -15,13 +15,13 @@ import java.util.List;
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionUpdateEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.CsvOptionsDisplay;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
@@ -34,37 +34,15 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 
 public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresenter.Display> {
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends CsvOptionsDisplay {
 
     HandlerRegistration addNextClickHandler(ClickHandler handler);
 
     void setNextEnabled(boolean enabled);
-
-    void setCsvFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
-
-    void setDefaultCharset(String defaultCharset);
-
-    boolean isDefaultCharacterSet();
-
-    boolean isCharsetCommonList();
-
-    String getCharsetCommonList();
-
-    String getFieldSeparator();
-
-    String getQuote();
-
-    HasText getRowText();
-
-    boolean isCharsetSpecify();
-
-    HasText getCharsetSpecifyText();
-
   }
 
   private List<String> errors = new ArrayList<String>();
