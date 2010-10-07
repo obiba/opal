@@ -51,7 +51,7 @@ public class FsDatasourceFormPresenter extends WidgetPresenter<FsDatasourceFormP
   @Override
   protected void onBind() {
     fileSelectionPresenter.bind();
-    fileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE);
+    fileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
     getDisplay().setFileSelectorWidgetDisplay(fileSelectionPresenter.getDisplay());
   }
 
