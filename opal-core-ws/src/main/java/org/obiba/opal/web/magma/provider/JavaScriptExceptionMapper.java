@@ -28,6 +28,6 @@ public class JavaScriptExceptionMapper implements ExceptionMapper<RhinoException
 
   public Response toResponse(RhinoException exception) {
     ClientErrorDto.Builder errorDtoBuilder = ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "JavaScriptException", exception);
-    return Response.status(Status.BAD_REQUEST).entity(errorDtoBuilder.build()).build();
+    return Response.status(Status.BAD_REQUEST).type("application/x-protobuf+json").entity(errorDtoBuilder.build()).build();
   }
 }
