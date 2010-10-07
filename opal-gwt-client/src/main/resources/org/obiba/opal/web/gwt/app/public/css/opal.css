@@ -626,3 +626,19 @@ div.variableChangesSummaryPanel > div > em {
   margin:5px;
   color:red;
 }
+
+/* Script test UI */ 
+
+div.evaluateScriptPanel {
+  width:100%;
+  text-align:right;
+}
+
+.resultsPanel {
+  width:100%;
+}
+
+.resultsPanel table.content {
+  border-left-style:none;
+  margin-left:0px;
+}

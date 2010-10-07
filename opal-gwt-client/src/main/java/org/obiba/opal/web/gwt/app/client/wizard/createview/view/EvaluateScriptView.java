@@ -14,13 +14,10 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter.Result;
-import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.CloseHandler;
-import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -62,12 +59,13 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
     initWidget(uiBinder.createAndBindUi(this));
   }
 
-  public Widget asWidget() {
-    return this;
-  }
-
   @UiTemplate("EvaluateScriptView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, EvaluateScriptView> {
+  }
+
+  @Override
+  public Widget asWidget() {
+    return this;
   }
 
   @Override
@@ -85,14 +83,6 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
   @Override
   public HandlerRegistration addTestScriptClickHandler(ClickHandler handler) {
     return testScript.addClickHandler(handler);
-  }
-
-  public HandlerRegistration addShowResultsPanelHandler(OpenHandler handler) {
-    return resultsPanel.addOpenHandler(handler);
-  }
-
-  public HandlerRegistration addHideResultsPanelHandler(CloseHandler handler) {
-    return resultsPanel.addCloseHandler(handler);
   }
 
   @Override
@@ -150,10 +140,6 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
   @Override
   public void setSelectedScript(String script) {
     int start = scriptArea.getText().indexOf(script);
-
-    GWT.log("start " + start);
-    GWT.log("end " + (start + script.length()));
-
     if(start > -1) {
       scriptArea.setSelectionRange(start, script.length());
     }
@@ -191,10 +177,17 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
 
   @Override
   public void showErrorMessage(ClientErrorDto errorDto) {
-    testResults.add(new Label("Script error:"));
+    // TODO Get error from Dto and display it
+    testResults.add(new Label("Script error!"));
+  }
 
-    if(errorDto != null && errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
-      testResults.add(new Label("Script error: " + errorDto.getCode()));
-    }
+  @Override
+  public void setReadOnly(boolean readOnly) {
+    scriptArea.setReadOnly(readOnly);
+  }
+
+  @Override
+  public void setScript(String script) {
+    scriptArea.setText(script);
   }
 }
