@@ -27,12 +27,13 @@ public class OpalViewPersistenceStrategyTest {
     viewPersistenceStrategy = new OpalViewPersistenceStrategy();
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testReadWithNonExistentDirectory() throws Exception {
     System.setProperty(OpalViewPersistenceStrategy.OPAL_HOME_SYSTEM_PROPERTY_NAME, getTestFilesRoot() + File.separator + EMPTY_DIRECTORY);
     // Re-initialise to pick up the the OPAL_HOME specified for this test.
     viewPersistenceStrategy = new OpalViewPersistenceStrategy();
-    viewPersistenceStrategy.readViews("datasourceName");
+    Set<View> result = viewPersistenceStrategy.readViews("datasourceName");
+    assertThat(result.isEmpty(), is(true));
   }
 
   @Test

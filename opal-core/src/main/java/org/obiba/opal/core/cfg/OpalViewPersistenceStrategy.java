@@ -24,6 +24,8 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewPersistenceStrategy;
 import org.obiba.magma.xstream.DefaultXStreamFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
 import com.thoughtworks.xstream.XStream;
@@ -34,6 +36,8 @@ import com.thoughtworks.xstream.XStream;
  * Datasource.
  */
 public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
+
+  private static final Logger log = LoggerFactory.getLogger(OpalViewPersistenceStrategy.class);
 
   final static String OPAL_HOME_SYSTEM_PROPERTY_NAME = "OPAL_HOME";
 
@@ -90,8 +94,11 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   @SuppressWarnings("unchecked")
   @Override
   public Set<View> readViews(String datasourceName) {
-    if(!viewsDirectory.isDirectory()) throw new RuntimeException("The views directory '" + viewsDirectory.getAbsolutePath() + "' does not exist.");
     Set<View> result = ImmutableSet.of();
+    if(!viewsDirectory.isDirectory()) {
+      log.info("The views directory '" + viewsDirectory.getAbsolutePath() + "' does not exist.");
+      return result;
+    }
     XStream xstream = new DefaultXStreamFactory().createXStream();
     InputStreamReader reader = null;
     try {
