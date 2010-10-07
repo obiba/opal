@@ -41,7 +41,7 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     VARIABLE, ENTITY, ENTITY_VALUE;
   }
 
-  private TableDto view;
+  private TableDto table;
 
   private Mode evaluationMode;
 
@@ -117,8 +117,8 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     getDisplay().setReadOnly(readyOnly);
   }
 
-  public void setView(TableDto view) {
-    this.view = view;
+  public void setTable(TableDto table) {
+    this.table = table;
   }
 
   public void setEvaluationMode(Mode evaluationMode) {
@@ -153,7 +153,7 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     @Override
     public void onClick(ClickEvent event) {
 
-      String viewResource = "/datasource/" + view.getDatasourceName() + "/table/" + view.getName();
+      String viewResource = "/datasource/" + table.getDatasourceName() + "/table/" + table.getName();
       String variablesResource = viewResource + "/variables";
       String transientVariableResource = viewResource + "/variable/_transient/values";
       String entitiesResource = viewResource + "/entities";
@@ -201,7 +201,7 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
       List<Result> results = buildResultList(variables);
 
       if(withValues) {
-        ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource("/datasource/" + view.getDatasourceName() + "/table/" + view.getName() + "/variables/query?script=" + selectedScript).get().withCallback(new VariableValueResourceCallback(results)).withCallback(400, new InvalidScriptResourceCallBack()).send();
+        ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName() + "/variables/query?script=" + selectedScript).get().withCallback(new VariableValueResourceCallback(results)).withCallback(400, new InvalidScriptResourceCallBack()).send();
       } else {
         getDisplay().addResults(results);
       }

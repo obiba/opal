@@ -148,6 +148,7 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
   @Override
   public void initializeResultTable() {
     resultTable = new CellTable<EvaluateScriptPresenter.Result>();
+    resultTable.setWidth("100%");
   }
 
   @Override
