@@ -9,7 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.JdbcDatasourceFormPresenter;
+import org.obiba.opal.web.model.client.opal.JdbcDriverDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -120,6 +123,12 @@ public class JdbcDatasourceFormView extends Composite implements JdbcDatasourceF
 
   public HasText getDefaultUpdatedTimestampColumnName() {
     return defaultUpdatedTimestampColumnName;
+  }
+
+  public void setJdbcDrivers(List<JdbcDriverDto> drivers) {
+    for(JdbcDriverDto driverDto : drivers) {
+      driver.addItem(driverDto.getDriverName(), driverDto.getDriverClass());
+    }
   }
 
   @Override

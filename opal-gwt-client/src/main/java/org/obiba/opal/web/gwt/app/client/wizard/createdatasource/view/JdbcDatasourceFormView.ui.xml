@@ -17,9 +17,7 @@
                 <g:Label addStyleNames="indent"><ui:msg description="Driver label">Driver</ui:msg>:</g:Label>          
               </td>
               <td>
-                <g:ListBox ui:field="driver" visibleItemCount="1" addStyleNames="small-indent">
-                  <g:item value="com.mysql.jdbc.Driver">MySQL 5.1</g:item>
-                </g:ListBox>
+                <g:ListBox ui:field="driver" visibleItemCount="1" addStyleNames="small-indent" />
               </td>
             </tr>
             <tr>

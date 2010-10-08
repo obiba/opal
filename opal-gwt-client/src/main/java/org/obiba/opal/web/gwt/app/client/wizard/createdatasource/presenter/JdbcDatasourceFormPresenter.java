@@ -9,7 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.customware.gwt.presenter.client.EventBus;
@@ -22,10 +24,15 @@ import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageD
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredOptionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.JdbcDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.JdbcDatasourceSettingsDto;
+import org.obiba.opal.web.model.client.opal.JdbcDriverDto;
 
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
@@ -61,6 +68,7 @@ public class JdbcDatasourceFormPresenter extends WidgetPresenter<JdbcDatasourceF
 
   @Override
   protected void onBind() {
+    setJdbcDrivers();
   }
 
   @Override
@@ -126,6 +134,20 @@ public class JdbcDatasourceFormPresenter extends WidgetPresenter<JdbcDatasourceF
     return settingsDto;
   }
 
+  private void setJdbcDrivers() {
+    ResourceRequestBuilderFactory.<JsArray<JdbcDriverDto>> newBuilder().forResource("/system/jdbcDrivers").get().withCallback(new ResourceCallback<JsArray<JdbcDriverDto>>() {
+
+      @Override
+      public void onResource(Response response, JsArray<JdbcDriverDto> drivers) {
+        List<JdbcDriverDto> driverList = new ArrayList<JdbcDriverDto>();
+        for(int i = 0; i < drivers.length(); i++) {
+          driverList.add(drivers.get(i));
+        }
+        getDisplay().setJdbcDrivers(driverList);
+      }
+    }).send();
+  }
+
   //
   // Interfaces and Inner Classes
   //
@@ -147,6 +169,8 @@ public class JdbcDatasourceFormPresenter extends WidgetPresenter<JdbcDatasourceF
     HasText getDefaultCreatedTimestampColumnName();
 
     HasText getDefaultUpdatedTimestampColumnName();
+
+    void setJdbcDrivers(List<JdbcDriverDto> drivers);
   }
 
   @Override

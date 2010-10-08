@@ -10,7 +10,7 @@
 package org.obiba.opal.web.magma;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -59,7 +59,7 @@ public class SystemResource {
 
   private Map<String, String> getJdbcDriverMap() {
     if(jdbcDrivers == null) {
-      jdbcDrivers = new HashMap<String, String>();
+      jdbcDrivers = new LinkedHashMap<String, String>();
 
       String[] drivers = jdbcDriversProperty.split(",");
       for(String driver : drivers) {
