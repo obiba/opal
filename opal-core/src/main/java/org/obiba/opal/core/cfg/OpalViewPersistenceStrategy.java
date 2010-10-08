@@ -18,6 +18,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
@@ -113,7 +114,8 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   }
 
   private String normalizeDatasourceName(String datasourceName) {
-    return datasourceName;
+    Pattern escaper = Pattern.compile("([^a-zA-Z0-9-_. ])");
+    return escaper.matcher(datasourceName).replaceAll("");
   }
 
   private File getDatasourceFile(String datasourceName) {
