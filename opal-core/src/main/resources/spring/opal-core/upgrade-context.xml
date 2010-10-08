@@ -96,6 +96,7 @@
           <property name="appliesTo" value="1.1" />  
         </bean>
         <ref bean="opal-dataUpgrade-1.1" />
+        <ref bean="opal-viewsUpgrade-1.4.0" />
       </list>
     </property>
 
@@ -119,5 +120,11 @@
     <property name="description" value="Copy 'DEFAULT_STUDY_ID' keystore from study_key_store to unit_key_store, then drop study_key_store."/>
     <property name="appliesTo" value="1.1" />     
   </bean>
+  
+  <bean id="opal-viewsUpgrade-1.4.0" class="org.obiba.opal.core.runtime.upgrade.ViewsUpgrade_1_4_0">
+    <property name="description" value="Update action table 'type' field." />
+    <property name="appliesTo" value="1.4.0" />
+    <property name="configFile" value="${OPAL_HOME}/conf/opal-config.xml" />
+  </bean>  
   
 </beans>

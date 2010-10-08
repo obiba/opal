@@ -40,11 +40,11 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
 
   private static final Logger log = LoggerFactory.getLogger(OpalViewPersistenceStrategy.class);
 
-  final static String OPAL_HOME_SYSTEM_PROPERTY_NAME = "OPAL_HOME";
+  public final static String OPAL_HOME_SYSTEM_PROPERTY_NAME = "OPAL_HOME";
 
-  private static final String CONF_DIRECTORY_NAME = "conf";
+  public static final String CONF_DIRECTORY_NAME = "conf";
 
-  private static final String VIEWS_DIRECTORY_NAME = "views";
+  public static final String VIEWS_DIRECTORY_NAME = "views";
 
   private static final Charset UTF8 = Charset.forName("UTF-8");
 
