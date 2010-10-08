@@ -21,6 +21,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
+import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RegExValidator;
@@ -35,6 +36,9 @@ import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
@@ -57,11 +61,13 @@ public class CsvDatasourceFormPresenter extends WidgetPresenter<CsvDatasourceFor
   @Inject
   private FileSelectionPresenter csvFileSelectionPresenter;
 
-  private HasText selectedFile;
-
   private List<String> availableCharsets = new ArrayList<String>();
 
   private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+
+  private HasText selectedFile;
+
+  private HasValue<Boolean> isSpecificCharsetAvailable;
 
   //
   // Constructors
@@ -74,6 +80,7 @@ public class CsvDatasourceFormPresenter extends WidgetPresenter<CsvDatasourceFor
     validators.add(new RequiredTextValidator(getSelectedFile(), "NoDataFileSelected"));
     validators.add(new RegExValidator(getDisplay().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
     validators.add(new ConditionalValidator(getDisplay().isCharsetSpecify(), new RequiredTextValidator(getDisplay().getCharsetSpecifyText(), "SpecificCharsetNotIndicated")));
+    validators.add(new ConditionalValidator(getDisplay().isCharsetSpecify(), new ConditionValidator(isSpecificCharsetAvailable(), "CharsetNotAvailable")));
   }
 
   //
@@ -218,6 +225,31 @@ public class CsvDatasourceFormPresenter extends WidgetPresenter<CsvDatasourceFor
       };
     }
     return selectedFile;
+  }
+
+  private HasValue<Boolean> isSpecificCharsetAvailable() {
+    if(isSpecificCharsetAvailable == null) {
+      isSpecificCharsetAvailable = new HasValue<Boolean>() {
+
+        public Boolean getValue() {
+          return availableCharsets.contains(getDisplay().getCharsetSpecifyText().getText());
+        }
+
+        public void setValue(Boolean arg0) {
+        }
+
+        public void setValue(Boolean arg0, boolean arg1) {
+        }
+
+        public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Boolean> arg0) {
+          return null;
+        }
+
+        public void fireEvent(GwtEvent<?> arg0) {
+        }
+      };
+    }
+    return isSpecificCharsetAvailable;
   }
 
   //
