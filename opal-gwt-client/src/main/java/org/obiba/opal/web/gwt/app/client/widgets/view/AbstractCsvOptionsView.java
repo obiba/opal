@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresente
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -30,23 +31,8 @@ public abstract class AbstractCsvOptionsView extends Composite implements CsvOpt
   }
 
   @Override
-  public void setDefaultCharset(String defaultCharset) {
-    getCsvOptions().setDefaultCharset(defaultCharset);
-  }
-
-  @Override
-  public boolean isDefaultCharacterSet() {
-    return getCsvOptions().isDefaultCharacterSet();
-  }
-
-  @Override
-  public boolean isCharsetCommonList() {
-    return getCsvOptions().isCharsetCommonList();
-  }
-
-  @Override
-  public String getCharsetCommonList() {
-    return getCsvOptions().getCharsetCommonList();
+  public HasText getRowText() {
+    return getCsvOptions().getRowText();
   }
 
   @Override
@@ -60,12 +46,27 @@ public abstract class AbstractCsvOptionsView extends Composite implements CsvOpt
   }
 
   @Override
-  public HasText getRowText() {
-    return getCsvOptions().getRowText();
+  public HasValue<Boolean> isDefaultCharacterSet() {
+    return getCsvOptions().isDefaultCharacterSet();
   }
 
   @Override
-  public boolean isCharsetSpecify() {
+  public void setDefaultCharset(String defaultCharset) {
+    getCsvOptions().setDefaultCharset(defaultCharset);
+  }
+
+  @Override
+  public HasValue<Boolean> isCharsetCommonList() {
+    return getCsvOptions().isCharsetCommonList();
+  }
+
+  @Override
+  public String getCharsetCommonList() {
+    return getCsvOptions().getCharsetCommonList();
+  }
+
+  @Override
+  public HasValue<Boolean> isCharsetSpecify() {
     return getCsvOptions().isCharsetSpecify();
   }
 

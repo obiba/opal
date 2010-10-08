@@ -20,6 +20,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -91,12 +92,8 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
     fileSelection.setFieldWidth("20em");
   }
 
-  public void setDefaultCharset(String defaultCharset) {
-    this.defaultCharset.setInnerText(defaultCharset);
-  }
-
-  public boolean isDefaultCharacterSet() {
-    return charsetDefault.getValue();
+  public HasText getRowText() {
+    return row;
   }
 
   public String getFieldSeparator() {
@@ -107,24 +104,28 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
     return quote.getItemText(quote.getSelectedIndex());
   }
 
-  public HasText getRowText() {
-    return row;
+  public HasValue<Boolean> isDefaultCharacterSet() {
+    return charsetDefault;
   }
 
-  public HasText getCharsetSpecifyText() {
-    return charsetSpecifyTextBox;
+  public void setDefaultCharset(String defaultCharset) {
+    this.defaultCharset.setInnerText(defaultCharset);
   }
 
-  public boolean isCharsetCommonList() {
-    return charsetCommonList.getValue();
-  }
-
-  public boolean isCharsetSpecify() {
-    return charsetSpecify.getValue();
+  public HasValue<Boolean> isCharsetCommonList() {
+    return charsetCommonList;
   }
 
   public String getCharsetCommonList() {
     return charsetCommonListBox.getValue(charsetCommonListBox.getSelectedIndex());
+  }
+
+  public HasValue<Boolean> isCharsetSpecify() {
+    return charsetSpecify;
+  }
+
+  public HasText getCharsetSpecifyText() {
+    return charsetSpecifyTextBox;
   }
 
   public Widget asWidget() {

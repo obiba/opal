@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 
 /**
  *
@@ -20,21 +21,21 @@ public interface CsvOptionsDisplay extends WidgetDisplay {
 
   void setCsvFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
 
-  void setDefaultCharset(String defaultCharset);
-
-  boolean isDefaultCharacterSet();
-
-  boolean isCharsetCommonList();
-
-  String getCharsetCommonList();
+  HasText getRowText();
 
   String getFieldSeparator();
 
   String getQuote();
 
-  HasText getRowText();
+  void setDefaultCharset(String defaultCharset);
 
-  boolean isCharsetSpecify();
+  HasValue<Boolean> isDefaultCharacterSet();
+
+  HasValue<Boolean> isCharsetCommonList();
+
+  String getCharsetCommonList();
+
+  HasValue<Boolean> isCharsetSpecify();
 
   HasText getCharsetSpecifyText();
 }

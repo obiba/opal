@@ -21,12 +21,14 @@ import org.obiba.opal.web.gwt.app.client.view.TableView;
 import org.obiba.opal.web.gwt.app.client.view.VariableView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourceConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourceStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CsvDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.ExcelDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.FsDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.HibernateDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.JdbcDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.CreateDatasourceConclusionStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.CreateDatasourceStepView;
+import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.CsvDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.ExcelDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.FsDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.HibernateDatasourceFormView;
@@ -56,6 +58,7 @@ public class NavigatorModule extends AbstractGinModule {
     bind(ExcelDatasourceFormPresenter.Display.class).to(ExcelDatasourceFormView.class);
     bind(FsDatasourceFormPresenter.Display.class).to(FsDatasourceFormView.class);
     bind(JdbcDatasourceFormPresenter.Display.class).to(JdbcDatasourceFormView.class);
+    bind(CsvDatasourceFormPresenter.Display.class).to(CsvDatasourceFormView.class);
   }
 
 }
