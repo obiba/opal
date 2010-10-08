@@ -30,8 +30,10 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.CsvDatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.CsvDatasourceTableBundleDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -43,11 +45,19 @@ import com.google.inject.Inject;
  */
 public class CsvDatasourceFormPresenter extends WidgetPresenter<CsvDatasourceFormPresenter.Display> implements DatasourceFormPresenter {
   //
+  // Constants
+  //
+
+  private static final String DEFAULT_TABLE_NAME = "table";
+
+  //
   // Instance Variables
   //
 
   @Inject
   private FileSelectionPresenter csvFileSelectionPresenter;
+
+  private HasText selectedFile;
 
   private List<String> availableCharsets = new ArrayList<String>();
 
@@ -61,6 +71,7 @@ public class CsvDatasourceFormPresenter extends WidgetPresenter<CsvDatasourceFor
   public CsvDatasourceFormPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
 
+    validators.add(new RequiredTextValidator(getSelectedFile(), "NoDataFileSelected"));
     validators.add(new RegExValidator(getDisplay().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
     validators.add(new ConditionalValidator(getDisplay().isCharsetSpecify(), new RequiredTextValidator(getDisplay().getCharsetSpecifyText(), "SpecificCharsetNotIndicated")));
   }
@@ -107,22 +118,7 @@ public class CsvDatasourceFormPresenter extends WidgetPresenter<CsvDatasourceFor
   //
 
   public DatasourceFactoryDto getDatasourceFactory() {
-    CsvDatasourceFactoryDto extensionDto = CsvDatasourceFactoryDto.create();
-
-    if(getDisplay().getRowText().getText().trim().length() != 0) {
-      extensionDto.setFirstRow(Integer.parseInt(getDisplay().getRowText().getText()));
-    }
-
-    extensionDto.setSeparator(getDisplay().getFieldSeparator());
-    extensionDto.setQuote(getDisplay().getQuote());
-
-    if(!getDisplay().isDefaultCharacterSet().getValue()) {
-      if(getDisplay().isCharsetCommonList().getValue()) {
-        extensionDto.setCharacterSet(getDisplay().getCharsetCommonList());
-      } else if(getDisplay().isCharsetSpecify().getValue()) {
-        extensionDto.setCharacterSet(getDisplay().getCharsetSpecifyText().getText());
-      }
-    }
+    CsvDatasourceFactoryDto extensionDto = createCsvDatasourceFactoryDto();
 
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
     dto.setExtension(CsvDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, extensionDto);
@@ -138,7 +134,54 @@ public class CsvDatasourceFormPresenter extends WidgetPresenter<CsvDatasourceFor
   // Methods
   //
 
-  public void getDefaultCharset() {
+  private CsvDatasourceFactoryDto createCsvDatasourceFactoryDto() {
+    CsvDatasourceFactoryDto extensionDto = CsvDatasourceFactoryDto.create();
+
+    if(getDisplay().getRowText().getText().trim().length() != 0) {
+      extensionDto.setFirstRow(Integer.parseInt(getDisplay().getRowText().getText()));
+    }
+
+    extensionDto.setSeparator(getDisplay().getFieldSeparator());
+    extensionDto.setQuote(getDisplay().getQuote());
+
+    String charset = getCharset();
+    if(charset != null) {
+      extensionDto.setCharacterSet(charset);
+    }
+
+    extensionDto.setTablesArray(createCsvDatasourceTableBundleDtoArray());
+
+    return extensionDto;
+  }
+
+  @SuppressWarnings("unchecked")
+  private JsArray<CsvDatasourceTableBundleDto> createCsvDatasourceTableBundleDtoArray() {
+    JsArray<CsvDatasourceTableBundleDto> tableBundleDtoArray = (JsArray<CsvDatasourceTableBundleDto>) JsArray.createArray();
+
+    CsvDatasourceTableBundleDto csvDatasourceTableBundleDto = CsvDatasourceTableBundleDto.create();
+    csvDatasourceTableBundleDto.setName(DEFAULT_TABLE_NAME);
+    csvDatasourceTableBundleDto.setData(csvFileSelectionPresenter.getSelectedFile());
+
+    tableBundleDtoArray.push(csvDatasourceTableBundleDto);
+
+    return tableBundleDtoArray;
+  }
+
+  private String getCharset() {
+    String charset = null;
+
+    if(!getDisplay().isDefaultCharacterSet().getValue()) {
+      if(getDisplay().isCharsetCommonList().getValue()) {
+        charset = getDisplay().getCharsetCommonList();
+      } else if(getDisplay().isCharsetSpecify().getValue()) {
+        charset = getDisplay().getCharsetSpecifyText().getText();
+      }
+    }
+
+    return charset;
+  }
+
+  private void getDefaultCharset() {
     ResourceRequestBuilderFactory.<JsArrayString> newBuilder().forResource("/files/charsets/default").get().withCallback(new ResourceCallback<JsArrayString>() {
 
       @Override
@@ -150,7 +193,7 @@ public class CsvDatasourceFormPresenter extends WidgetPresenter<CsvDatasourceFor
 
   }
 
-  public void getAvailableCharsets() {
+  private void getAvailableCharsets() {
     ResourceRequestBuilderFactory.<JsArrayString> newBuilder().forResource("/files/charsets/available").get().withCallback(new ResourceCallback<JsArrayString>() {
       @Override
       public void onResource(Response response, JsArrayString datasources) {
@@ -159,6 +202,22 @@ public class CsvDatasourceFormPresenter extends WidgetPresenter<CsvDatasourceFor
         }
       }
     }).send();
+  }
+
+  private HasText getSelectedFile() {
+    if(selectedFile == null) {
+      selectedFile = new HasText() {
+
+        public String getText() {
+          return csvFileSelectionPresenter.getSelectedFile();
+        }
+
+        public void setText(String text) {
+          // do nothing
+        }
+      };
+    }
+    return selectedFile;
   }
 
   //
