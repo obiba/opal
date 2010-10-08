@@ -54,3 +54,8 @@ message LocaleDto {
   required string name = 1;    // Locale.toString()
   optional string display = 2; // Locale.getDisplayName(clientLocale)
 }
+
+message JdbcDriverDto {
+  required string driverName = 1;  // e.g., "MySQL 5.1"
+  required string driverClass = 2; // e.g., "com.mysql.jdbc.Driver" 
+}
