@@ -28,6 +28,12 @@ import com.google.inject.Inject;
  */
 public class DatasourceSelectorPresenter extends WidgetPresenter<DatasourceSelectorPresenter.Display> {
   //
+  // Instance Variables
+  //
+
+  private DatasourcesRefreshedCallback datasourcesRefreshedCallback;
+
+  //
   // Constructors
   //
 
@@ -58,6 +64,10 @@ public class DatasourceSelectorPresenter extends WidgetPresenter<DatasourceSelec
 
       public void onResource(Response response, JsArray<DatasourceDto> datasources) {
         getDisplay().setDatasources(datasources);
+
+        if(datasourcesRefreshedCallback != null) {
+          datasourcesRefreshedCallback.onDatasourcesRefreshed();
+        }
       }
     }).send();
   }
@@ -83,6 +93,10 @@ public class DatasourceSelectorPresenter extends WidgetPresenter<DatasourceSelec
     getDisplay().setSelection(datasourceName);
   }
 
+  public void setDatasourcesRefreshedCallback(DatasourcesRefreshedCallback datasourcesRefreshedCallback) {
+    this.datasourcesRefreshedCallback = datasourcesRefreshedCallback;
+  }
+
   //
   // Inner Classes / Interfaces
   //
@@ -98,5 +112,10 @@ public class DatasourceSelectorPresenter extends WidgetPresenter<DatasourceSelec
     void setSelection(String datasourceName);
 
     String getSelection();
+  }
+
+  public interface DatasourcesRefreshedCallback {
+
+    public void onDatasourcesRefreshed();
   }
 }

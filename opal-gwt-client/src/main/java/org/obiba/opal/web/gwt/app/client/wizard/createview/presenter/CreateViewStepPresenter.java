@@ -36,6 +36,7 @@ import org.obiba.opal.web.gwt.app.client.validator.MinimumSizeCollectionValidato
 import org.obiba.opal.web.gwt.app.client.validator.RequiredOptionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter.DatasourcesRefreshedCallback;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -76,6 +77,8 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   @Inject
   private ConclusionStepPresenter conclusionStepPresenter;
 
+  private String datasourceName;
+
   //
   // Constructors
   //
@@ -92,6 +95,14 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   @Override
   protected void onBind() {
     datasourceSelectorPresenter.bind();
+    datasourceSelectorPresenter.setDatasourcesRefreshedCallback(new DatasourcesRefreshedCallback() {
+
+      public void onDatasourcesRefreshed() {
+        if(datasourceName != null) {
+          getDisplay().getExistingDatasourceName().setText(datasourceName);
+        }
+      }
+    });
     getDisplay().setDatasourceSelector(datasourceSelectorPresenter.getDisplay());
 
     tableListPresenter.bind();
@@ -117,7 +128,17 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   @Override
   public void revealDisplay() {
     datasourceSelectorPresenter.refreshDisplay();
+
     getDisplay().clear();
+    if(datasourceName != null) {
+      getDisplay().getAttachToExistingDatasourceOption().setValue(true);
+      getDisplay().setAttachToExistingDatasourceOptionEnabled(false);
+
+      getDisplay().getAttachToNewDatasourceOption().setValue(false);
+      getDisplay().setAttachToNewDatasourceOptionEnabled(false);
+
+      getDisplay().setDatasourceSelectorEnabled(false);
+    }
   }
 
   @Override
@@ -156,7 +177,11 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
     HasValue<Boolean> getAttachToExistingDatasourceOption();
 
+    void setAttachToExistingDatasourceOptionEnabled(boolean enabled);
+
     HasValue<Boolean> getAttachToNewDatasourceOption();
+
+    void setAttachToNewDatasourceOptionEnabled(boolean enabled);
 
     HasText getExistingDatasourceName();
 
@@ -180,6 +205,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   class ViewCreationRequiredHandler implements ViewCreationRequiredEvent.Handler {
 
     public void onViewCreationRequired(ViewCreationRequiredEvent event) {
+      datasourceName = event.getDatasourceName();
       eventBus.fireEvent(new WorkbenchChangeEvent(CreateViewStepPresenter.this, false, false));
     }
   }

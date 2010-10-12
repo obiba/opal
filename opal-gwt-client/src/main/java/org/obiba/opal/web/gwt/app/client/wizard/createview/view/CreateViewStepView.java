@@ -86,12 +86,14 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   //
 
   public void clear() {
+    selectExistingDatasourceRadioButton.setEnabled(true);
     selectExistingDatasourceRadioButton.setValue(false);
     if(datasourceSelector != null) {
       datasourceSelector.setEnabled(false);
       datasourceSelector.selectFirst();
     }
 
+    createNewDatasourceRadioButton.setEnabled(true);
     createNewDatasourceRadioButton.setValue(false);
     createNewDatasourceTextBox.setText("");
     createNewDatasourceTextBox.setEnabled(false);
@@ -128,8 +130,16 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
     return selectExistingDatasourceRadioButton;
   }
 
+  public void setAttachToExistingDatasourceOptionEnabled(boolean enabled) {
+    selectExistingDatasourceRadioButton.setEnabled(enabled);
+  }
+
   public HasValue<Boolean> getAttachToNewDatasourceOption() {
     return createNewDatasourceRadioButton;
+  }
+
+  public void setAttachToNewDatasourceOptionEnabled(boolean enabled) {
+    createNewDatasourceRadioButton.setEnabled(enabled);
   }
 
   public HasText getViewName() {
