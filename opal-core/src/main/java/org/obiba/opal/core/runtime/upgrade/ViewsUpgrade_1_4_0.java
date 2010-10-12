@@ -11,9 +11,23 @@ package org.obiba.opal.core.runtime.upgrade;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
@@ -29,6 +43,10 @@ import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalViewPersistenceStrategy;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.thoughtworks.xstream.XStream;
@@ -41,6 +59,8 @@ import de.schlichtherle.io.FileInputStream;
  * {@code View}s associated with that {@code Datasource}.
  */
 public class ViewsUpgrade_1_4_0 extends AbstractUpgradeStep {
+
+  private static final String VIEWS_ELEMENT_NAME = "views";
 
   private static final Charset CHARSET = Charset.availableCharsets().get("UTF-8");
 
@@ -60,6 +80,7 @@ public class ViewsUpgrade_1_4_0 extends AbstractUpgradeStep {
       if(datasourceTransformer instanceof ViewAwareDatasourceTransformer) {
         ViewAwareDatasourceTransformer viewAwareDatasourceTransformer = (ViewAwareDatasourceTransformer) datasourceTransformer;
         viewPersistenceStrategy.writeViews(datasourceFactory.getName(), viewAwareDatasourceTransformer.getViews());
+        deleteViewsFromOpalConfigurationFile();
       }
     }
   }
@@ -89,4 +110,38 @@ public class ViewsUpgrade_1_4_0 extends AbstractUpgradeStep {
   OpalConfiguration getOpalConfiguration() {
     return opalConfiguration;
   }
+
+  private void deleteViewsFromOpalConfigurationFile() {
+    String error = "Could not delete views from Opal configuration file.";
+    try {
+      InputStream inputStream = new FileInputStream(configFile);
+      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+      DocumentBuilder builder = factory.newDocumentBuilder();
+      Document doc = builder.parse(inputStream);
+      TransformerFactory tFactory = TransformerFactory.newInstance();
+      Transformer tFormer = tFactory.newTransformer();
+      NodeList viewsElements = doc.getElementsByTagName(VIEWS_ELEMENT_NAME);
+      deleteNodes(viewsElements);
+      Source source = new DOMSource(doc);
+      Result dest = new StreamResult(new FileOutputStream(configFile));
+      tFormer.transform(source, dest);
+    } catch(ParserConfigurationException e) {
+      throw new RuntimeException(error, e);
+    } catch(SAXException e) {
+      throw new RuntimeException(error, e);
+    } catch(IOException e) {
+      throw new RuntimeException(error, e);
+    } catch(TransformerException e) {
+      throw new RuntimeException(error, e);
+    }
+
+  }
+
+  private void deleteNodes(NodeList nodes) {
+    for(int i = nodes.getLength() - 1; i >= 0; i--) {
+      Node node = nodes.item(i);
+      node.getParentNode().removeChild(node);
+    }
+  }
+
 }
