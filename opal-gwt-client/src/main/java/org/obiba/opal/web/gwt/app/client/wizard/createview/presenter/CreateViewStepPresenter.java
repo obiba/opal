@@ -128,6 +128,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   @Override
   public void revealDisplay() {
     datasourceSelectorPresenter.refreshDisplay();
+    tableListPresenter.getTables().clear();
 
     getDisplay().clear();
     if(datasourceName != null) {
