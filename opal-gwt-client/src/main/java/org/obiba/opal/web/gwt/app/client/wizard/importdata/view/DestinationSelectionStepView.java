@@ -62,7 +62,6 @@ public class DestinationSelectionStepView extends Composite implements Destinati
       @Override
       public void onChange(ChangeEvent event) {
         displayTablesFor(datasetListBox.getValue(datasetListBox.getSelectedIndex()));
-
       }
     });
   }
@@ -97,7 +96,7 @@ public class DestinationSelectionStepView extends Composite implements Destinati
       this.datasetListBox.addItem(datasources.get(i).getName(), datasources.get(i).getName());
     }
     this.datasources = datasources;
-    if(datasources.length() > 1) displayTablesFor(datasources.get(0).getName());
+    if(datasources.length() > 0) displayTablesFor(datasources.get(0).getName());
   }
 
   @Override
