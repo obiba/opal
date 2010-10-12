@@ -15,6 +15,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,8 +40,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -231,7 +233,7 @@ public class FilesResource {
 
     log.info("The following file was uploaded to Opal file system : {}", fileToWritePath);
 
-    return Response.created(uriInfo.getBaseUri().resolve(fileToWritePath)).entity(fileToWritePath).build();
+    return Response.created(uriInfo.getBaseUri().resolve(toUrlEncoded(fileToWritePath))).entity(fileToWritePath).build();
   }
 
   private String getPathOfFileToWrite(String path) {
@@ -374,5 +376,15 @@ public class FilesResource {
   @Path("/charsets/default")
   public Response getDefaultCharset() {
     return Response.ok(new JSONArray(Arrays.asList(new String[] { defaultCharset })).toString()).build();
+  }
+
+  private String toUrlEncoded(String s) {
+    String encoded = null;
+    try {
+      encoded = URLEncoder.encode(s, "UTF-8");
+    } catch(UnsupportedEncodingException ex) {
+      encoded = s;
+    }
+    return encoded;
   }
 }
