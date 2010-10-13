@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.nio.charset.Charset;
 
@@ -113,28 +114,42 @@ public class ViewsUpgrade_1_4_0 extends AbstractUpgradeStep {
 
   private void deleteViewsFromOpalConfigurationFile() {
     String error = "Could not delete views from Opal configuration file.";
+    OutputStream outputStream = null;
     try {
-      InputStream inputStream = new FileInputStream(configFile);
-      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder builder = factory.newDocumentBuilder();
-      Document doc = builder.parse(inputStream);
+      Document doc = getOpalConfigurationAsDocument();
       TransformerFactory tFactory = TransformerFactory.newInstance();
       Transformer tFormer = tFactory.newTransformer();
       NodeList viewsElements = doc.getElementsByTagName(VIEWS_ELEMENT_NAME);
       deleteNodes(viewsElements);
       Source source = new DOMSource(doc);
-      Result dest = new StreamResult(new FileOutputStream(configFile));
+      Result dest = new StreamResult(outputStream = new FileOutputStream(configFile));
       tFormer.transform(source, dest);
+    } catch(IOException e) {
+      throw new RuntimeException(error, e);
+    } catch(TransformerException e) {
+      throw new RuntimeException(error, e);
+    } finally {
+      StreamUtil.silentSafeClose(outputStream);
+    }
+  }
+
+  private Document getOpalConfigurationAsDocument() {
+    String error = "Could not read Opal configuration file.";
+    InputStream inputStream = null;
+    try {
+      inputStream = new FileInputStream(configFile);
+      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+      DocumentBuilder builder = factory.newDocumentBuilder();
+      return builder.parse(inputStream);
     } catch(ParserConfigurationException e) {
       throw new RuntimeException(error, e);
     } catch(SAXException e) {
       throw new RuntimeException(error, e);
     } catch(IOException e) {
       throw new RuntimeException(error, e);
-    } catch(TransformerException e) {
-      throw new RuntimeException(error, e);
+    } finally {
+      StreamUtil.silentSafeClose(inputStream);
     }
-
   }
 
   private void deleteNodes(NodeList nodes) {
