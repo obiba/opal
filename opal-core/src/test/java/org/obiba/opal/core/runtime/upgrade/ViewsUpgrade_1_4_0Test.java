@@ -1,6 +1,5 @@
 package org.obiba.opal.core.runtime.upgrade;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
@@ -13,7 +12,6 @@ import org.junit.Test;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewPersistenceStrategy;
 import org.obiba.opal.core.cfg.OpalViewPersistenceStrategy;
-import org.obiba.runtime.Version;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -56,16 +54,6 @@ public class ViewsUpgrade_1_4_0Test {
     sut.setConfigFile(workingOpalConfigFile);
     sut.readOpalConfiguration();
     assertThat(sut.getOpalConfiguration(), notNullValue());
-  }
-
-  @Test
-  public void testUgradeWritesNewViews() throws Exception {
-    File starbucksViews = new File(getTestFilesRoot() + File.separator + OpalViewPersistenceStrategy.CONF_DIRECTORY_NAME + File.separator + OpalViewPersistenceStrategy.VIEWS_DIRECTORY_NAME + File.separator + "starbucks.xml");
-    assertThat(starbucksViews.exists(), is(false));
-
-    sut.setConfigFile(workingOpalConfigFile);
-    sut.execute(new Version("22.22"));
-    assertThat(starbucksViews.exists(), is(true));
   }
 
   private String getTestFilesRoot() {

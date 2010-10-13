@@ -80,7 +80,12 @@ public class ViewsUpgrade_1_4_0 extends AbstractUpgradeStep {
       DatasourceTransformer datasourceTransformer = datasourceFactory.getDatasourceTransformer();
       if(datasourceTransformer instanceof ViewAwareDatasourceTransformer) {
         ViewAwareDatasourceTransformer viewAwareDatasourceTransformer = (ViewAwareDatasourceTransformer) datasourceTransformer;
-        viewPersistenceStrategy.writeViews(datasourceFactory.getName(), viewAwareDatasourceTransformer.getViews());
+        try {
+          new MagmaEngine().extend(new MagmaJsExtension()).extend(new MagmaXStreamExtension());
+          viewPersistenceStrategy.writeViews(datasourceFactory.getName(), viewAwareDatasourceTransformer.getViews());
+        } finally {
+          MagmaEngine.get().shutdown();
+        }
         deleteViewsFromOpalConfigurationFile();
       }
     }
