@@ -25,6 +25,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewPersistenceStrategy;
 import org.obiba.magma.xstream.DefaultXStreamFactory;
+import org.obiba.magma.xstream.converter.ValueTableConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +66,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
       // Do nothing. The file containing the views has already been deleted.
     } else {
       XStream xstream = new DefaultXStreamFactory().createXStream();
+      xstream.registerConverter(new ValueTableConverter());
       OutputStreamWriter writer = null;
       try {
         if(!getDatasourceFile(datasourceName).createNewFile()) throw new RuntimeException("Failed to create the views file '" + getDatasourceFile(datasourceName).getAbsolutePath() + "'.");
@@ -101,6 +103,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
       return result;
     }
     XStream xstream = new DefaultXStreamFactory().createXStream();
+    xstream.registerConverter(new ValueTableConverter());
     InputStreamReader reader = null;
     try {
       reader = new InputStreamReader(new FileInputStream(getDatasourceFile(datasourceName)), UTF8);
