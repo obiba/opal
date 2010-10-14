@@ -20,7 +20,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -43,9 +42,6 @@ public class CreateFolderDialogView extends Composite implements Display {
 
   @UiField
   TextBox folderToCreate;
-
-  @UiField
-  Label errorMsg;
 
   public CreateFolderDialogView() {
     initWidget(uiBinder.createAndBindUi(this));
@@ -92,11 +88,6 @@ public class CreateFolderDialogView extends Composite implements Display {
   @Override
   public HasText getFolderToCreate() {
     return folderToCreate;
-  }
-
-  @Override
-  public HasText getErrorMsg() {
-    return errorMsg;
   }
 
   @Override

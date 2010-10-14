@@ -2,26 +2,28 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <ui:style>
+    .inline { display: inline; }
     .right-aligned { float: right; }
-    .top-margin { margin-top: 0.5em; }
+    .top-margin { margin: 0.5em; }
   </ui:style>
 
-  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" height="10em" width="30em">
-    <g:caption><ui:msg description="Error dialog title">Errors</ui:msg></g:caption>
-    <g:DockLayoutPanel unit="EM" height="10em" width="30em">
+  <g:PopupPanel ui:field="dialog" autoHideEnabled="true" modal="true" animationEnabled="true" addStyleNames="notification">
+    <g:DockLayoutPanel unit="PX" height="100px" width="300px">
+      <g:north size="30">
+        <g:HTMLPanel addStyleNames="header {style.top-margin}">
+          <g:Label ui:field="caption" addStyleNames="{style.inline}"><ui:msg description="Error dialog title">Errors</ui:msg></g:Label>
+          <span class="{style.right-aligned}">
+            <g:Anchor ui:field="okay">x</g:Anchor>
+          </span>
+        </g:HTMLPanel>
+      </g:north>
       <g:center>
         <g:ScrollPanel>
           <g:VerticalPanel width="100%" ui:field="messagePanel" addStyleNames="main"/>
         </g:ScrollPanel>
       </g:center>
-      <g:south size="3.25">
-        <g:HTMLPanel addStyleNames="footer">
-          <span class="{style.right-aligned} {style.top-margin}">
-            <g:Button ui:field="okay"><ui:msg description="Okay button label">Okay</ui:msg></g:Button>
-          </span>
-        </g:HTMLPanel>
-      </g:south> 
+       
     </g:DockLayoutPanel> 
-  </g:DialogBox>
+  </g:PopupPanel>
 
 </ui:UiBinder>

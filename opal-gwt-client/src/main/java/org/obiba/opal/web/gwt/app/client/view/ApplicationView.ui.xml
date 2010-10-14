@@ -6,7 +6,9 @@
       <g:LayoutPanel addStyleNames="top">
         <g:layer top="0" height="2em">
           <g:FlowPanel  ui:field="topBar" addStyleNames="topbar">
+            <g:Label>Opal</g:Label>
             <g:Anchor ui:field="quit"><ui:msg description="Quit link text">Quit</ui:msg></g:Anchor>
+            <g:Anchor ui:field="help"><ui:msg description="Help link text">Help</ui:msg></g:Anchor>
           </g:FlowPanel>
         </g:layer>
 
@@ -54,5 +56,11 @@
         </g:layer>
       </g:LayoutPanel>
     </g:center>
+    <g:south size="1.2">
+      <g:FlowPanel addStyleNames="footbar">
+        <g:Label>copyright</g:Label>
+        <g:Anchor ui:field="obiba">obiba.org</g:Anchor>
+      </g:FlowPanel>
+    </g:south>
   </g:DockLayoutPanel>
 </ui:UiBinder>

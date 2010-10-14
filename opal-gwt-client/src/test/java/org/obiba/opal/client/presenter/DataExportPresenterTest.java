@@ -22,8 +22,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.web.gwt.app.client.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionEvent;
-import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionUpdateEvent;
-import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
@@ -73,8 +71,6 @@ public class DataExportPresenterTest extends AbstractGwtTestSetup {
     // Make sure that handlers are added to the event bus
     expect(eventBusMock.addHandler(eq(TableSelectionEvent.getType()), isA(TableSelectionEvent.Handler.class))).andReturn(handlerRegistrationMock).once();
     expect(eventBusMock.addHandler(eq(FileSelectionEvent.getType()), isA(FileSelectionEvent.Handler.class))).andReturn(handlerRegistrationMock).once();
-    expect(eventBusMock.addHandler(eq(TableListUpdateEvent.getType()), isA(TableListUpdateEvent.Handler.class))).andReturn(handlerRegistrationMock).once();
-    expect(eventBusMock.addHandler(eq(FileSelectionUpdateEvent.getType()), isA(FileSelectionUpdateEvent.Handler.class))).andReturn(handlerRegistrationMock).once();
 
     // Make sure that a ClickHandler is added to the Submit button
     expect(displayMock.addSubmitClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
@@ -88,9 +84,6 @@ public class DataExportPresenterTest extends AbstractGwtTestSetup {
     expect(displayMock.getFileFormat()).andReturn("csv");
     displayMock.setFileWidgetDisplay(fileSelectionDisplayMock);
     expect(displayMock.addFileFormatChangeHandler((ChangeHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
-    expect(displayMock.addDestinationFileClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
-    expect(displayMock.addDestinationDatasourceClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
-    expect(displayMock.addWithVariablesClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
 
     // Expects that the presenter makes these calls to the server when it binds itself
     ResourceRequestBuilder mockRequestBuilder = mockBridge.addMock(ResourceRequestBuilder.class);

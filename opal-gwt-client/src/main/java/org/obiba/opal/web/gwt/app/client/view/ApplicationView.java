@@ -12,10 +12,13 @@ package org.obiba.opal.web.gwt.app.client.view;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.MenuBar;
@@ -43,7 +46,13 @@ public class ApplicationView implements ApplicationPresenter.Display {
   MenuBar menuBar;
 
   @UiField
+  Anchor help;
+
+  @UiField
   Anchor quit;
+
+  @UiField
+  Anchor obiba;
 
   @UiField
   MenuItem dashboardItem;
@@ -82,6 +91,14 @@ public class ApplicationView implements ApplicationPresenter.Display {
 
   public ApplicationView() {
     dock = uiBinder.createAndBindUi(this);
+
+    obiba.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent arg0) {
+        Window.open("http://obiba.org", "_blank", null);
+      }
+    });
   }
 
   @Override
@@ -128,6 +145,11 @@ public class ApplicationView implements ApplicationPresenter.Display {
   @Override
   public HasClickHandlers getQuit() {
     return quit;
+  }
+
+  @Override
+  public HasClickHandlers getHelp() {
+    return help;
   }
 
   @Override

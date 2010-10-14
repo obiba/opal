@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.presenter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.customware.gwt.presenter.client.EventBus;
@@ -17,10 +18,10 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.inject.Inject;
 
 /**
@@ -32,12 +33,22 @@ public class ErrorDialogPresenter extends WidgetPresenter<ErrorDialogPresenter.D
 
     public void showPopup();
 
-    public HasClickHandlers getOkay();
+    public void setMessages(List<String> messages);
 
-    public void setErrors(List<String> errors);
+    public void setCaption(String txt);
 
-    public void setCaption(String caption);
+    public void setMessageType(MessageDialogType type);
 
+    public void addNotificationCloseHandler(final NotificationCloseHandler handler);
+  }
+
+  public interface NotificationCloseHandler {
+    /**
+     * Called when {@link CloseEvent} is fired.
+     * 
+     * @param event the {@link CloseEvent} that was fired
+     */
+    void onClose(CloseEvent<?> event);
   }
 
   @Inject
@@ -74,11 +85,36 @@ public class ErrorDialogPresenter extends WidgetPresenter<ErrorDialogPresenter.D
     display.showPopup();
   }
 
-  public void setErrors(List<String> errors) {
-    display.setErrors(errors);
+  public void setNotification(UserMessageEvent event) {
+    setMessageDialogType(event.getMessageType());
+
+    if(event.getTitle() != null) {
+      getDisplay().setCaption(event.getTitle());
+    }
+
+    List<String> translatedMessages = new ArrayList<String>();
+    for(String message : event.getMessages()) {
+      if(translations.userMessageMap().containsKey(message)) {
+        translatedMessages.add(translations.userMessageMap().get(message));
+      } else {
+        translatedMessages.add(message);
+      }
+    }
+    setMessages(translatedMessages);
+
+    addNotificationCloseHandler(event.getNotificationCloseHandler());
+  }
+
+  public void setTitle(String title) {
+    getDisplay().setCaption(title);
+  }
+
+  public void setMessages(List<String> messages) {
+    display.setMessages(messages);
   }
 
   public void setMessageDialogType(MessageDialogType messageDialogType) {
+    getDisplay().setMessageType(messageDialogType);
     switch(messageDialogType) {
     case ERROR:
       getDisplay().setCaption(translations.errorDialogTitle());
@@ -92,11 +128,14 @@ public class ErrorDialogPresenter extends WidgetPresenter<ErrorDialogPresenter.D
     }
   }
 
+  public void addNotificationCloseHandler(final NotificationCloseHandler handler) {
+    if(handler != null) {
+      getDisplay().addNotificationCloseHandler(handler);
+    }
+  }
+
   public enum MessageDialogType {
     ERROR, WARNING, INFO
   }
 
-  public void addOkayClickHandler(ClickHandler clickHandler) {
-    registerHandler(display.getOkay().addClickHandler(clickHandler));
-  }
 }

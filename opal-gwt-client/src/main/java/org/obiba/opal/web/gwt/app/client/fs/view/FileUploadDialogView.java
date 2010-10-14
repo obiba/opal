@@ -54,9 +54,6 @@ public class FileUploadDialogView extends Composite implements Display {
   FormPanel form;
 
   @UiField
-  Label errorMsg;
-
-  @UiField
   VerticalPanel inputFieldPanel;
 
   public FileUploadDialogView() {
@@ -119,11 +116,6 @@ public class FileUploadDialogView extends Composite implements Display {
   @Override
   public HasText getRemoteFolderName() {
     return remoteFolderName;
-  }
-
-  @Override
-  public HasText getErrorMsg() {
-    return errorMsg;
   }
 
 }

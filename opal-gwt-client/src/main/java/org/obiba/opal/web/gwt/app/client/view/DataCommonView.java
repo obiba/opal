@@ -73,7 +73,6 @@ public abstract class DataCommonView extends Composite implements DataCommonPres
       }
     });
     renderFormStep();
-    setSubmitEnabled(false);
   }
 
   @Override
@@ -133,8 +132,4 @@ public abstract class DataCommonView extends Composite implements DataCommonPres
     return jobLink.addClickHandler(handler);
   }
 
-  @Override
-  public void setSubmitEnabled(boolean enabled) {
-    submit.setEnabled(enabled);
-  }
 }

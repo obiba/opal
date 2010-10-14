@@ -113,9 +113,34 @@ a:hover {
 	background-color: #B4A291;
 }
 
+/* Popup */ 
+
 .gwt-PopupPanel {
 	border:5px solid #DDDDDD;
 	-moz-border-radius: 0.5em; -webkit-border-radius: 0.5em;
+}
+
+.notification {
+	border:5px solid #222222;
+	background-color: #222222;
+	opacity: 0.9;
+	color:#ffffff;
+	-moz-border-radius: 0.5em; -webkit-border-radius: 0.5em;
+	float:right;
+}
+
+.notification.error {
+	border-color:#8d0000;
+	background-color: #8d0000;
+}
+
+.notification .header {
+	font-weight:bold;
+}
+
+.notification a, .notification a:visited, .notification a:hover {
+    color:#ffffff;
+    text-decoration: none;
 }
 
 /* DialogBox */
@@ -200,6 +225,14 @@ a:hover {
 	background-color: #c65f00;
 }
 
+.topbar > .gwt-Label {
+	color:#FFFFFF;
+display:inline;
+font-size:1.5em;
+font-weight:bold;
+margin-left:10px;
+}
+
 .topbar a:hover {
 	cursor: pointer;
 }
@@ -241,11 +274,27 @@ a:hover {
 	color: #ffffff;
 }
 
+/* Foot */
+
+.footbar {
+	font-size:0.9em;
+	margin-left: 50px;
+}
+
+.footbar .gwt-Label {
+	display: inline;
+	margin-right: 5px;
+}
+
+.footbar a {
+	color: #000000;
+}
+
 /* Content */
 
 .main-content {
 	background-color: #ffffff;
-	margin:10px 50px;
+	margin:10px 50px 0px 50px;
 	border:3px solid #C65F00;
 }
 
@@ -294,7 +343,7 @@ a:hover {
      padding: 10px;
 }
 
-.workbench .main a, a:visited, a:hover {
+.workbench .main a, .workbench .main a:visited, .workbench .main a:hover {
      color:#000000;
 }
 
@@ -418,7 +467,7 @@ a:hover {
 	font-size:1.2em;
 }
 
-.navigator  .toolbar {
+.navigator .toolbar {
   	background-color:#ECE5DE;
   	border-bottom:1px solid #B4A291;
   	padding-bottom:5px;

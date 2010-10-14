@@ -49,8 +49,6 @@ public class CreateFolderDialogPresenter extends WidgetPresenter<CreateFolderDia
 
     HasText getFolderToCreate();
 
-    HasText getErrorMsg();
-
     HasCloseHandlers<DialogBox> getDialog();
 
   }
@@ -95,7 +93,6 @@ public class CreateFolderDialogPresenter extends WidgetPresenter<CreateFolderDia
 
   protected void initDisplayComponents() {
     getDisplay().getFolderToCreate().setText("");
-    getDisplay().getErrorMsg().setText("");
   }
 
   private void addEventHandlers() {
@@ -103,9 +100,9 @@ public class CreateFolderDialogPresenter extends WidgetPresenter<CreateFolderDia
       public void onClick(ClickEvent event) {
         String folderToCreate = getDisplay().getFolderToCreate().getText();
         if(folderToCreate.equals("")) {
-          getDisplay().getErrorMsg().setText(translations.folderNameIsRequired());
+          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, translations.folderNameIsRequired(), null));
         } else if(folderToCreate.equals(".") || folderToCreate.equals("..")) {
-          getDisplay().getErrorMsg().setText(translations.dotNamesAreInvalid());
+          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, translations.dotNamesAreInvalid(), null));
         } else {
           if(currentFolder.getPath().equals("/")) { // create under root
             createFolder("/" + folderToCreate);

@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.presenter;
 
-import java.util.Arrays;
-
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -33,6 +31,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -46,6 +45,8 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
   public interface Display extends WidgetDisplay {
 
     HasClickHandlers getQuit();
+
+    HasClickHandlers getHelp();
 
     MenuItem getDatasourcesItem();
 
@@ -210,6 +211,13 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       }
     });
 
+    getDisplay().getHelp().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        Window.open("http://wiki.obiba.org/confluence/display/OPALDOC/Opal+User+Guide", "_blank", null);
+      }
+    });
+
     registerWorkbenchChangeEventHandler();
 
     registerUserMessageEventHandler();
@@ -265,8 +273,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       @Override
       public void onUserMessage(UserMessageEvent event) {
         messageDialog.bind();
-        messageDialog.setMessageDialogType(event.getMessageType());
-        messageDialog.setErrors(Arrays.asList(translations.userMessageMap().get(event.getMessage())));
+        messageDialog.setNotification(event);
         messageDialog.revealDisplay();
       }
     }));

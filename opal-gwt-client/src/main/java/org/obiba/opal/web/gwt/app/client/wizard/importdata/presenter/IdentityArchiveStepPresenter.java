@@ -9,16 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
-import java.util.Arrays;
-
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
@@ -84,9 +83,6 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
 
   @Inject
   private ImportData importData;
-
-  @Inject
-  private ErrorDialogPresenter errorDialog;
 
   @Inject
   private FileSelectionPresenter archiveFolderSelectionPresenter;
@@ -249,9 +245,7 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
   class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      errorDialog.bind();
-      errorDialog.setErrors(Arrays.asList(new String[] { response.getText() }));
-      errorDialog.revealDisplay();
+      eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, response.getText(), null));
     }
   }
 

@@ -17,9 +17,11 @@ import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
+import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.NotificationCloseHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.CsvOptionsDisplay;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
@@ -32,6 +34,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -61,9 +64,6 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
 
   @Inject
   private FileSelectionPresenter csvFileSelectionPresenter;
-
-  @Inject
-  private ErrorDialogPresenter errorDialog;
 
   @Inject
   public CsvFormatStepPresenter(final Display display, final EventBus eventBus) {
@@ -124,18 +124,14 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
         importData.setCharacterSet(getSelectedCharacterSet());
         eventBus.fireEvent(new WorkbenchChangeEvent(destinationSelectionStepPresenter));
       } else {
-        errorDialog.bind();
-        errorDialog.setErrors(errors);
-        errorDialog.addOkayClickHandler(new ClickHandler() {
+        eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, errors, null, new NotificationCloseHandler() {
 
           @Override
-          public void onClick(ClickEvent arg0) {
+          public void onClose(CloseEvent<?> event) {
             errors.clear();
           }
-        });
-        errorDialog.revealDisplay();
+        }));
       }
-
     }
 
   }

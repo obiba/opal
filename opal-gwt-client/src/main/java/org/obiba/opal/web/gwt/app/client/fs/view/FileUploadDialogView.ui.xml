@@ -19,7 +19,6 @@
     <g:DockLayoutPanel unit="EM" height="10em" width="35em">
       <g:center>
         <g:VerticalPanel ui:field="inputFieldPanel" addStyleNames="main {style.optionsPanelMsg}">
-          <g:Label ui:field="errorMsg" addStyleNames="{style.errorMsg}" />
           <g:HorizontalPanel>
             <g:Label>
               <ui:msg description="Select file to upload label">Select the file to be uploaded in directory:</ui:msg>

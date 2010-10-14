@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.presenter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import net.customware.gwt.presenter.client.EventBus;
@@ -18,9 +17,8 @@ import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
-import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionUpdateEvent;
-import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
@@ -45,9 +43,6 @@ import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
 public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Display> {
-
-  @Inject
-  private ErrorDialogPresenter errorDialog;
 
   @Inject
   private TableListPresenter tableListPresenter;
@@ -81,13 +76,6 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   @Override
   protected void onBind() {
     initDisplayComponents();
-    addEventHandlers();
-  }
-
-  protected void addEventHandlers() {
-    super.registerHandler(eventBus.addHandler(TableListUpdateEvent.getType(), new TableListUpdateHandler()));
-    super.registerHandler(eventBus.addHandler(FileSelectionUpdateEvent.getType(), new FileSelectionUpdateHandler()));
-
   }
 
   protected void initDisplayComponents() {
@@ -99,9 +87,6 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     super.registerHandler(getDisplay().addSubmitClickHandler(new SubmitClickHandler()));
     super.registerHandler(getDisplay().addJobLinkClickHandler(new DataCommonPresenter.JobLinkClickHandler(eventBus, jobListPresenter)));
     super.registerHandler(getDisplay().addFileFormatChangeHandler(new FileFormatChangeHandler()));
-    super.registerHandler(getDisplay().addDestinationFileClickHandler(new DestinationClickHandler()));
-    super.registerHandler(getDisplay().addDestinationDatasourceClickHandler(new DestinationClickHandler()));
-    super.registerHandler(getDisplay().addWithVariablesClickHandler(new WithVariablesClickHandler()));
     getDisplay().setFileWidgetDisplay(fileSelectionPresenter.getDisplay());
 
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
@@ -128,10 +113,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   }
 
   private void displayMessages(MessageDialogType type, List<String> messages) {
-    errorDialog.bind();
-    errorDialog.setMessageDialogType(type);
-    errorDialog.setErrors(messages);
-    errorDialog.revealDisplay();
+    eventBus.fireEvent(new UserMessageEvent(type, messages, null));
   }
 
   private List<String> formValidationErrors() {
@@ -156,10 +138,6 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     return result;
   }
 
-  private void updateSubmit() {
-    getDisplay().setSubmitEnabled(formValidationErrors().size() == 0);
-  }
-
   @Override
   protected void onPlaceRequest(PlaceRequest request) {
   }
@@ -180,44 +158,11 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   // Interfaces and classes
   //
 
-  class WithVariablesClickHandler implements ClickHandler {
-    @Override
-    public void onClick(ClickEvent arg0) {
-      updateSubmit();
-    }
-  }
-
-  class FileSelectionUpdateHandler implements FileSelectionUpdateEvent.Handler {
-    @Override
-    public void onFileSelectionUpdate(FileSelectionUpdateEvent event) {
-      if(fileSelectionPresenter.equals(event.getSource())) {
-        updateSubmit();
-      }
-    }
-  }
-
-  class TableListUpdateHandler implements TableListUpdateEvent.Handler {
-    @Override
-    public void onTableListUpdate(TableListUpdateEvent event) {
-      if(tableListPresenter.equals(event.getSource())) {
-        updateSubmit();
-      }
-    }
-  }
-
   class FileFormatChangeHandler implements ChangeHandler {
     @Override
     public void onChange(ChangeEvent arg0) {
       initFileSelectionType();
       fileSelectionPresenter.getDisplay().clearFile();
-      updateSubmit();
-    }
-  }
-
-  class DestinationClickHandler implements ClickHandler {
-    @Override
-    public void onClick(ClickEvent arg0) {
-      updateSubmit();
     }
   }
 
@@ -263,9 +208,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      errorDialog.bind();
-      errorDialog.setErrors(Arrays.asList(new String[] { response.getText() }));
-      errorDialog.revealDisplay();
+      eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, response.getText(), null));
     }
   }
 
