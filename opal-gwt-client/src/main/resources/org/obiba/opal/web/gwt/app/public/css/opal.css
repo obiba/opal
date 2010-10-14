@@ -207,14 +207,14 @@ a:hover {
 	 height:12em;
 }
 
-/* Notification */
+/* Network Notification */ 
 
-.notification .title {
+.network-notification .title {
 	font-weight: bold; 
 	font-size:1.2em;
 }
 
-.notification .message {
+.network-notification .message {
 	color: black; 
 	font-style:italic;
 }
