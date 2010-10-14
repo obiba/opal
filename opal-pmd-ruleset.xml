@@ -20,4 +20,5 @@
       <property name="problemDepth" value="3" />
     </properties>
   </rule>
+  <rule ref="rulesets/design.xml/AvoidReassigningParameters" />
 </ruleset>
