@@ -155,7 +155,10 @@ public class NavigatorMenuBar extends MenuBar {
   }
 
   public void setEditCommand(Command cmd) {
-    if(editItem == null) {
+    if(cmd == null && editItem != null) {
+      removeItem(editItem);
+      editItem = null;
+    } else if(cmd != null && editItem == null) {
       ensureSeparation();
       editItem = new MenuItem("", cmd);
       editItem.addStyleName("edit");

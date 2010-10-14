@@ -36,6 +36,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InsertPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuItem;
+import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
 import com.google.gwt.view.client.ListView.Delegate;
@@ -80,6 +81,10 @@ public class TableView extends Composite implements TablePresenter.Display {
   private VariableNameColumn variableNameColumn;
 
   private Translations translations = GWT.create(Translations.class);
+
+  private MenuItem removeItem;
+
+  private MenuItemSeparator removeItemSeparator;
 
   public TableView() {
     initWidget(uiBinder.createAndBindUi(this));
@@ -252,8 +257,17 @@ public class TableView extends Composite implements TablePresenter.Display {
 
   @Override
   public void setRemoveCommand(Command cmd) {
-    toolbar.getToolsMenu().addSeparator();
-    toolbar.getToolsMenu().addItem(new MenuItem(translations.removeLabel(), cmd));
+
+    if(removeItem != null) {
+      toolbar.getToolsMenu().removeSeparator(removeItemSeparator);
+      toolbar.getToolsMenu().removeItem(removeItem);
+    }
+
+    if(cmd != null) {
+      removeItemSeparator = toolbar.getToolsMenu().addSeparator();
+      removeItem = toolbar.getToolsMenu().addItem(new MenuItem(translations.removeLabel(), cmd));
+    }
+
   }
 
   @Override

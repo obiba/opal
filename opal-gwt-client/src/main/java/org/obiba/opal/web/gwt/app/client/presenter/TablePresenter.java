@@ -17,13 +17,13 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
-import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
@@ -116,6 +116,9 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       if(tableIsView()) {
         getDisplay().setRemoveCommand(new RemoveCommand());
         getDisplay().setEditCommand(new EditCommand());
+      } else {
+        getDisplay().setRemoveCommand(null);
+        getDisplay().setEditCommand(null);
       }
 
       updateVariables();
