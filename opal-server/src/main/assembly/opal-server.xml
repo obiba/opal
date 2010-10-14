@@ -52,6 +52,15 @@
         <include>**/*.*</include>
       </includes>
     </fileSet>
+    
+    <fileSet>
+      <directory>../opal-reporting/lib/birt-runtime-2_6_1/ReportEngine</directory>
+      <outputDirectory>ReportEngine</outputDirectory>
+      <includes>
+        <include>**/*.*</include>
+      </includes>
+    </fileSet>
+    
   </fileSets>
   <dependencySets>
     <!-- Copy dependency jar files to 'lib' -->
