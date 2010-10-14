@@ -7,10 +7,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.view;
+package org.obiba.opal.web.gwt.app.client.navigator.view;
 
-import org.obiba.opal.web.gwt.app.client.presenter.NavigatorPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.NavigatorTreePresenter;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorTreePresenter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;

@@ -9,10 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.inject.client;
 
-import org.obiba.opal.web.gwt.app.client.presenter.JobDetailsPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter;
-import org.obiba.opal.web.gwt.app.client.view.JobDetailsView;
-import org.obiba.opal.web.gwt.app.client.view.JobListView;
+import org.obiba.opal.web.gwt.app.client.job.presenter.JobDetailsPresenter;
+import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
+import org.obiba.opal.web.gwt.app.client.job.view.JobDetailsView;
+import org.obiba.opal.web.gwt.app.client.job.view.JobListView;
 
 import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.inject.Singleton;

@@ -9,16 +9,16 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.inject.client;
 
-import org.obiba.opal.web.gwt.app.client.presenter.DatasourcePresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.NavigatorPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.NavigatorTreePresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.TablePresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.VariablePresenter;
-import org.obiba.opal.web.gwt.app.client.view.DatasourceView;
-import org.obiba.opal.web.gwt.app.client.view.NavigatorTreeView;
-import org.obiba.opal.web.gwt.app.client.view.NavigatorView;
-import org.obiba.opal.web.gwt.app.client.view.TableView;
-import org.obiba.opal.web.gwt.app.client.view.VariableView;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.DatasourcePresenter;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorTreePresenter;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
+import org.obiba.opal.web.gwt.app.client.navigator.view.DatasourceView;
+import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorTreeView;
+import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorView;
+import org.obiba.opal.web.gwt.app.client.navigator.view.TableView;
+import org.obiba.opal.web.gwt.app.client.navigator.view.VariableView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourceConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourceStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CsvDatasourceFormPresenter;

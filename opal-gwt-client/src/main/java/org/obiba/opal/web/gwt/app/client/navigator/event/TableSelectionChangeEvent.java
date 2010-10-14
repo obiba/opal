@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.event;
+package org.obiba.opal.web.gwt.app.client.navigator.event;
 
 import org.obiba.opal.web.model.client.magma.TableDto;
 
@@ -15,40 +15,55 @@ import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
 /**
- *
+ * Event to indicate that a Magma Table has been selected.
  */
-public class SiblingTableSelectionEvent extends GwtEvent<SiblingTableSelectionEvent.Handler> {
+public class TableSelectionChangeEvent extends GwtEvent<TableSelectionChangeEvent.Handler> {
 
   public interface Handler extends EventHandler {
 
-    void onSiblingTableSelection(SiblingTableSelectionEvent event);
+    void onTableSelectionChanged(TableSelectionChangeEvent event);
 
-  }
-
-  public enum Direction {
-    NEXT, PREVIOUS
   }
 
   private static Type<Handler> TYPE;
 
-  private final TableDto currentSelection;
+  private final TableDto tableDto;
 
-  private final Direction direction;
+  private final String previous;
+
+  private final String next;
+
+  private final Object source;
 
   /**
    * @param selectedItem
    */
-  public SiblingTableSelectionEvent(TableDto currentItem, Direction direction) {
-    this.currentSelection = currentItem;
-    this.direction = direction;
+  public TableSelectionChangeEvent(Object source, TableDto tableDto) {
+    this(source, tableDto, null, null);
   }
 
-  public TableDto getCurrentSelection() {
-    return currentSelection;
+  public TableSelectionChangeEvent(Object source, TableDto tableDto, String previous, String next) {
+    super();
+    this.source = source;
+    this.tableDto = tableDto;
+    this.previous = previous;
+    this.next = next;
   }
 
-  public Direction getDirection() {
-    return direction;
+  public Object getSource() {
+    return source;
+  }
+
+  public TableDto getSelection() {
+    return tableDto;
+  }
+
+  public String getPrevious() {
+    return previous;
+  }
+
+  public String getNext() {
+    return next;
   }
 
   public static Type<Handler> getType() {
@@ -57,12 +72,11 @@ public class SiblingTableSelectionEvent extends GwtEvent<SiblingTableSelectionEv
 
   @Override
   protected void dispatch(Handler handler) {
-    handler.onSiblingTableSelection(this);
+    handler.onTableSelectionChanged(this);
   }
 
   @Override
   public Type<Handler> getAssociatedType() {
     return TYPE;
   }
-
 }

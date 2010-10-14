@@ -7,62 +7,55 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.event;
+package org.obiba.opal.web.gwt.app.client.navigator.event;
 
-import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
 /**
- * Event to indicate that a Magma Table has been selected.
+ *
  */
-public class TableSelectionChangeEvent extends GwtEvent<TableSelectionChangeEvent.Handler> {
+public class VariableSelectionChangeEvent extends GwtEvent<VariableSelectionChangeEvent.Handler> {
 
   public interface Handler extends EventHandler {
 
-    void onTableSelectionChanged(TableSelectionChangeEvent event);
+    void onVariableSelectionChanged(VariableSelectionChangeEvent event);
 
   }
 
   private static Type<Handler> TYPE;
 
-  private final TableDto tableDto;
+  private final VariableDto selection;
 
-  private final String previous;
+  private final VariableDto previous;
 
-  private final String next;
-
-  private final Object source;
+  private final VariableDto next;
 
   /**
    * @param selectedItem
    */
-  public TableSelectionChangeEvent(Object source, TableDto tableDto) {
-    this(source, tableDto, null, null);
+  public VariableSelectionChangeEvent(VariableDto selectedItem) {
+    this(selectedItem, null, null);
+
   }
 
-  public TableSelectionChangeEvent(Object source, TableDto tableDto, String previous, String next) {
-    super();
-    this.source = source;
-    this.tableDto = tableDto;
+  public VariableSelectionChangeEvent(VariableDto selectedItem, VariableDto previous, VariableDto next) {
+    this.selection = selectedItem;
     this.previous = previous;
     this.next = next;
   }
 
-  public Object getSource() {
-    return source;
+  public VariableDto getSelection() {
+    return selection;
   }
 
-  public TableDto getSelection() {
-    return tableDto;
-  }
-
-  public String getPrevious() {
+  public VariableDto getPrevious() {
     return previous;
   }
 
-  public String getNext() {
+  public VariableDto getNext() {
     return next;
   }
 
@@ -72,7 +65,7 @@ public class TableSelectionChangeEvent extends GwtEvent<TableSelectionChangeEven
 
   @Override
   protected void dispatch(Handler handler) {
-    handler.onTableSelectionChanged(this);
+    handler.onVariableSelectionChanged(this);
   }
 
   @Override

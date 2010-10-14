@@ -7,11 +7,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.view;
+package org.obiba.opal.web.gwt.app.client.navigator.view;
 
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.presenter.NavigatorTreePresenter;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorTreePresenter;
 
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;

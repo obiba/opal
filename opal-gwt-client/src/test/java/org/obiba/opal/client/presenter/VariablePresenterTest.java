@@ -18,8 +18,8 @@ import net.customware.gwt.presenter.client.EventBus;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
-import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.VariablePresenter;
+import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
 import com.google.gwt.event.shared.HandlerRegistration;

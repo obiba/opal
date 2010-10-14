@@ -7,20 +7,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.view;
+package org.obiba.opal.web.gwt.app.client.job.view;
 
-import static org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.CANCEL_ACTION;
-import static org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.LOG_ACTION;
+import static org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter.CANCEL_ACTION;
+import static org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter.LOG_ACTION;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.ActionHandler;
-import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.presenter.JobListPresenter.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WorkbenchLayout;
 import org.obiba.opal.web.gwt.user.cellview.client.DateTimeColumn;
 import org.obiba.opal.web.model.client.opal.CommandStateDto;

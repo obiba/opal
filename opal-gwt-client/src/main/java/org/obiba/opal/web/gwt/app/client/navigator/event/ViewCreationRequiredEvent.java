@@ -7,15 +7,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.event;
+package org.obiba.opal.web.gwt.app.client.navigator.event;
 
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
 /**
- * An event signalling that an Opal view needs to be configured.
+ * An event signalling that an Opal view needs to be created.
  */
-public class ViewConfigurationRequiredEvent extends GwtEvent<ViewConfigurationRequiredEvent.Handler> {
+public class ViewCreationRequiredEvent extends GwtEvent<ViewCreationRequiredEvent.Handler> {
   //
   // Static Variables
   //
@@ -28,15 +28,15 @@ public class ViewConfigurationRequiredEvent extends GwtEvent<ViewConfigurationRe
 
   private String datasourceName;
 
-  private String viewName;
-
   //
   // Constructors
   //
 
-  public ViewConfigurationRequiredEvent(String datasourceName, String viewName) {
+  public ViewCreationRequiredEvent(String datasourceName) {
     this.datasourceName = datasourceName;
-    this.viewName = viewName;
+  }
+
+  public ViewCreationRequiredEvent() {
   }
 
   //
@@ -45,7 +45,7 @@ public class ViewConfigurationRequiredEvent extends GwtEvent<ViewConfigurationRe
 
   @Override
   protected void dispatch(Handler handler) {
-    handler.onViewConfigurationRequired(this);
+    handler.onViewCreationRequired(this);
   }
 
   @Override
@@ -61,12 +61,8 @@ public class ViewConfigurationRequiredEvent extends GwtEvent<ViewConfigurationRe
     return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
   }
 
-  public String getDatsourceName() {
+  public String getDatasourceName() {
     return datasourceName;
-  }
-
-  public String getViewName() {
-    return viewName;
   }
 
   //
@@ -75,6 +71,6 @@ public class ViewConfigurationRequiredEvent extends GwtEvent<ViewConfigurationRe
 
   public interface Handler extends EventHandler {
 
-    public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event);
+    public void onViewCreationRequired(ViewCreationRequiredEvent event);
   }
 }

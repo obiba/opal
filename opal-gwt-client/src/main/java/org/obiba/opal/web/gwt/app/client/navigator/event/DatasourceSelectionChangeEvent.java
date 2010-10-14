@@ -7,56 +7,37 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.event;
+package org.obiba.opal.web.gwt.app.client.navigator.event;
 
-import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
 
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
 /**
- *
+ * Event to indicate that a Magma Datasource has been selected.
  */
-public class VariableSelectionChangeEvent extends GwtEvent<VariableSelectionChangeEvent.Handler> {
+public class DatasourceSelectionChangeEvent extends GwtEvent<DatasourceSelectionChangeEvent.Handler> {
 
   public interface Handler extends EventHandler {
 
-    void onVariableSelectionChanged(VariableSelectionChangeEvent event);
+    void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event);
 
   }
 
   private static Type<Handler> TYPE;
 
-  private final VariableDto selection;
-
-  private final VariableDto previous;
-
-  private final VariableDto next;
+  private final DatasourceDto datasourceDto;
 
   /**
    * @param selectedItem
    */
-  public VariableSelectionChangeEvent(VariableDto selectedItem) {
-    this(selectedItem, null, null);
-
+  public DatasourceSelectionChangeEvent(DatasourceDto datasourceDto) {
+    this.datasourceDto = datasourceDto;
   }
 
-  public VariableSelectionChangeEvent(VariableDto selectedItem, VariableDto previous, VariableDto next) {
-    this.selection = selectedItem;
-    this.previous = previous;
-    this.next = next;
-  }
-
-  public VariableDto getSelection() {
-    return selection;
-  }
-
-  public VariableDto getPrevious() {
-    return previous;
-  }
-
-  public VariableDto getNext() {
-    return next;
+  public DatasourceDto getSelection() {
+    return datasourceDto;
   }
 
   public static Type<Handler> getType() {
@@ -65,7 +46,7 @@ public class VariableSelectionChangeEvent extends GwtEvent<VariableSelectionChan
 
   @Override
   protected void dispatch(Handler handler) {
-    handler.onVariableSelectionChanged(this);
+    handler.onDatasourceSelectionChanged(this);
   }
 
   @Override
