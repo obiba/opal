@@ -17,8 +17,8 @@ import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
@@ -112,8 +112,8 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     }
   }
 
-  private void displayMessages(MessageDialogType type, List<String> messages) {
-    eventBus.fireEvent(new UserMessageEvent(type, messages, null));
+  private void displayMessages(NotificationType type, List<String> messages) {
+    eventBus.fireEvent(new NotificationEvent(type, messages, null));
   }
 
   private List<String> formValidationErrors() {
@@ -172,7 +172,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     public void onClick(ClickEvent event) {
       List<String> errors = formValidationErrors();
       if(!errors.isEmpty()) {
-        displayMessages(MessageDialogType.ERROR, errors);
+        displayMessages(NotificationType.ERROR, errors);
       } else {
         ResourceRequestBuilderFactory.newBuilder().forResource("/shell/copy").post() //
         .withResourceBody(CopyCommandOptionsDto.stringify(createCopycommandOptions())) //
@@ -208,7 +208,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, response.getText(), null));
+      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
     }
   }
 

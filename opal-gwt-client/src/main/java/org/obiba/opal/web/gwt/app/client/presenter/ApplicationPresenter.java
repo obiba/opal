@@ -17,7 +17,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
-import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ViewCreationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
@@ -95,7 +95,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
   private Provider<JobListPresenter> jobListPresenter;
 
   @Inject
-  private ErrorDialogPresenter messageDialog;
+  private NotificationPresenter messageDialog;
 
   @Inject
   private Provider<FileExplorerPresenter> fileExplorerPresenter;
@@ -268,10 +268,10 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
   }
 
   private void registerUserMessageEventHandler() {
-    super.registerHandler(eventBus.addHandler(UserMessageEvent.getType(), new UserMessageEvent.Handler() {
+    super.registerHandler(eventBus.addHandler(NotificationEvent.getType(), new NotificationEvent.Handler() {
 
       @Override
-      public void onUserMessage(UserMessageEvent event) {
+      public void onUserMessage(NotificationEvent event) {
         messageDialog.bind();
         messageDialog.setNotification(event);
         messageDialog.revealDisplay();

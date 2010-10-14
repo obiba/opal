@@ -16,12 +16,12 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderDialogPresente
 import org.obiba.opal.web.gwt.app.client.fs.view.CreateFolderDialogView;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.DataExportPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.view.ApplicationView;
 import org.obiba.opal.web.gwt.app.client.view.DataExportView;
-import org.obiba.opal.web.gwt.app.client.view.ErrorDialogView;
+import org.obiba.opal.web.gwt.app.client.view.NotificationView;
 import org.obiba.opal.web.gwt.app.client.view.LoginView;
 import org.obiba.opal.web.gwt.app.client.view.UnhandledResponseNotificationView;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationPresenter;
@@ -60,7 +60,7 @@ public class OpalGinModule extends AbstractGinModule {
 
     // Don't bind as singleton because the ApplicationPresenter expects a new instance on every display
     bind(DataExportPresenter.Display.class).to(DataExportView.class);
-    bind(ErrorDialogPresenter.Display.class).to(ErrorDialogView.class);
+    bind(NotificationPresenter.Display.class).to(NotificationView.class);
 
     bind(FileSelectorPresenter.Display.class).to(FileSelectorView.class).in(Singleton.class);
     bind(TableSelectorPresenter.Display.class).to(TableSelectorView.class).in(Singleton.class);

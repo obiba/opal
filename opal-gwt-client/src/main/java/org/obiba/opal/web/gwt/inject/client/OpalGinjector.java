@@ -19,7 +19,7 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.DatasourcePresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NavigatorTreePresenter;
@@ -69,7 +69,7 @@ public interface OpalGinjector extends Ginjector {
 
   UnhandledResponseNotificationPresenter getUnhandledResponseNotificationPresenter();
 
-  ErrorDialogPresenter getErrorDialogPresenter();
+  NotificationPresenter getErrorDialogPresenter();
 
   NavigatorTreePresenter getNavigatorTreePresenter();
 

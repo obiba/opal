@@ -18,10 +18,10 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -251,7 +251,7 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
             validationReportStepPresenter.getDisplay().setParsingErrors(extractDatasourceParsingErrors(errorDto));
             eventBus.fireEvent(new WorkbenchChangeEvent(validationReportStepPresenter));
           } else {
-            eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "fileReadError", null));
+            eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "fileReadError", null));
           }
         }
       }

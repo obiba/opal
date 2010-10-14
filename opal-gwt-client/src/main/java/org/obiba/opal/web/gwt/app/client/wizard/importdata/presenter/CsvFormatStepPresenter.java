@@ -17,11 +17,11 @@ import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
-import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.NotificationCloseHandler;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationCloseHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.CsvOptionsDisplay;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
@@ -124,7 +124,7 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
         importData.setCharacterSet(getSelectedCharacterSet());
         eventBus.fireEvent(new WorkbenchChangeEvent(destinationSelectionStepPresenter));
       } else {
-        eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, errors, null, new NotificationCloseHandler() {
+        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errors, null, new NotificationCloseHandler() {
 
           @Override
           public void onClose(CloseEvent<?> event) {

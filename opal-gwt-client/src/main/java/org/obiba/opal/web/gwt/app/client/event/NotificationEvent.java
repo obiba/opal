@@ -14,8 +14,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
-import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.NotificationCloseHandler;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationCloseHandler;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
@@ -23,17 +23,17 @@ import com.google.gwt.event.shared.GwtEvent;
 /**
  *
  */
-public class UserMessageEvent extends GwtEvent<UserMessageEvent.Handler> {
+public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
 
   public interface Handler extends EventHandler {
 
-    void onUserMessage(UserMessageEvent event);
+    void onUserMessage(NotificationEvent event);
 
   }
 
   private static Type<Handler> TYPE;
 
-  private MessageDialogType messageType;
+  private NotificationType notificationType;
 
   private String title;
 
@@ -47,7 +47,7 @@ public class UserMessageEvent extends GwtEvent<UserMessageEvent.Handler> {
   // Constructors
   //
 
-  public UserMessageEvent(MessageDialogType messageType, List<String> messages, List<String> messageArgs, NotificationCloseHandler notificationCloseHandler) {
+  public NotificationEvent(NotificationType notificationType, List<String> messages, List<String> messageArgs, NotificationCloseHandler notificationCloseHandler) {
     if(messages.isEmpty()) {
       throw new IllegalArgumentException("Missing message");
     }
@@ -55,22 +55,22 @@ public class UserMessageEvent extends GwtEvent<UserMessageEvent.Handler> {
       messageArgs = new ArrayList<String>();
     }
 
-    this.messageType = messageType;
+    this.notificationType = notificationType;
     this.messages = messages;
     this.messageArgs = new ArrayList<String>(messageArgs);
     this.notificationCloseHandler = notificationCloseHandler;
   }
 
-  public UserMessageEvent(MessageDialogType messageType, List<String> messages, List<String> messageArgs) {
-    this(messageType, messages, messageArgs, null);
+  public NotificationEvent(NotificationType notificationType, List<String> messages, List<String> messageArgs) {
+    this(notificationType, messages, messageArgs, null);
   }
 
-  public UserMessageEvent(MessageDialogType messageType, String message, List<String> messageArgs, NotificationCloseHandler notificationCloseHandler) {
-    this(messageType, Arrays.asList(message), messageArgs, notificationCloseHandler);
+  public NotificationEvent(NotificationType notificationType, String message, List<String> messageArgs, NotificationCloseHandler notificationCloseHandler) {
+    this(notificationType, Arrays.asList(message), messageArgs, notificationCloseHandler);
   }
 
-  public UserMessageEvent(MessageDialogType messageType, String message, List<String> messageArgs) {
-    this(messageType, message, messageArgs, null);
+  public NotificationEvent(NotificationType notificationType, String message, List<String> messageArgs) {
+    this(notificationType, message, messageArgs, null);
   }
 
   //
@@ -95,12 +95,12 @@ public class UserMessageEvent extends GwtEvent<UserMessageEvent.Handler> {
     return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
   }
 
-  public MessageDialogType getMessageType() {
-    return messageType;
+  public NotificationType getNotificationType() {
+    return notificationType;
   }
 
-  public UserMessageEvent setMessageType(MessageDialogType messageType) {
-    this.messageType = messageType;
+  public NotificationEvent setNotificationType(NotificationType notificationType) {
+    this.notificationType = notificationType;
     return this;
   }
 
@@ -108,12 +108,12 @@ public class UserMessageEvent extends GwtEvent<UserMessageEvent.Handler> {
     return title;
   }
 
-  public UserMessageEvent setTitle(String title) {
+  public NotificationEvent setTitle(String title) {
     this.title = title;
     return this;
   }
 
-  public UserMessageEvent addMessage(String message) {
+  public NotificationEvent addMessage(String message) {
     if(message != null) {
       getMessages().add(message);
     }
@@ -132,7 +132,7 @@ public class UserMessageEvent extends GwtEvent<UserMessageEvent.Handler> {
     return notificationCloseHandler;
   }
 
-  public UserMessageEvent setNotificationCloseHandler(NotificationCloseHandler notificationCloseHandler) {
+  public NotificationEvent setNotificationCloseHandler(NotificationCloseHandler notificationCloseHandler) {
     this.notificationCloseHandler = notificationCloseHandler;
     return this;
   }

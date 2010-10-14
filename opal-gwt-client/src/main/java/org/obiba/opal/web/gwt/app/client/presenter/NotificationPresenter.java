@@ -18,7 +18,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 
 import com.google.gwt.event.logical.shared.CloseEvent;
@@ -27,7 +27,7 @@ import com.google.inject.Inject;
 /**
  * Presenter used to display error, warning and info messages in a dialog box.
  */
-public class ErrorDialogPresenter extends WidgetPresenter<ErrorDialogPresenter.Display> {
+public class NotificationPresenter extends WidgetPresenter<NotificationPresenter.Display> {
 
   public interface Display extends WidgetDisplay {
 
@@ -37,7 +37,7 @@ public class ErrorDialogPresenter extends WidgetPresenter<ErrorDialogPresenter.D
 
     public void setCaption(String txt);
 
-    public void setMessageType(MessageDialogType type);
+    public void setNotificationType(NotificationType type);
 
     public void addNotificationCloseHandler(final NotificationCloseHandler handler);
   }
@@ -55,7 +55,7 @@ public class ErrorDialogPresenter extends WidgetPresenter<ErrorDialogPresenter.D
   private Translations translations;
 
   @Inject
-  public ErrorDialogPresenter(Display display, EventBus eventBus) {
+  public NotificationPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
   }
 
@@ -85,8 +85,8 @@ public class ErrorDialogPresenter extends WidgetPresenter<ErrorDialogPresenter.D
     display.showPopup();
   }
 
-  public void setNotification(UserMessageEvent event) {
-    setMessageDialogType(event.getMessageType());
+  public void setNotification(NotificationEvent event) {
+    setMessageDialogType(event.getNotificationType());
 
     if(event.getTitle() != null) {
       getDisplay().setCaption(event.getTitle());
@@ -113,8 +113,8 @@ public class ErrorDialogPresenter extends WidgetPresenter<ErrorDialogPresenter.D
     display.setMessages(messages);
   }
 
-  public void setMessageDialogType(MessageDialogType messageDialogType) {
-    getDisplay().setMessageType(messageDialogType);
+  public void setMessageDialogType(NotificationType messageDialogType) {
+    getDisplay().setNotificationType(messageDialogType);
     switch(messageDialogType) {
     case ERROR:
       getDisplay().setCaption(translations.errorDialogTitle());
@@ -134,7 +134,7 @@ public class ErrorDialogPresenter extends WidgetPresenter<ErrorDialogPresenter.D
     }
   }
 
-  public enum MessageDialogType {
+  public enum NotificationType {
     ERROR, WARNING, INFO
   }
 

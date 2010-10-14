@@ -20,12 +20,12 @@ import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.event.SiblingTableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.event.TableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -162,7 +162,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() != Response.SC_OK) {
           String errorMessage = response.getText().length() != 0 ? response.getText() : "UnknownError";
-          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, errorMessage, null));
+          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errorMessage, null));
         } else {
           eventBus.fireEvent(new WorkbenchChangeEvent(navigationPresenter.get()));
         }

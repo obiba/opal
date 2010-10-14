@@ -20,11 +20,11 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
-import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ViewCreationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.support.ClientErrorDtos;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.HasCollection;
@@ -245,7 +245,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     public void onClick(ClickEvent event) {
       String errorMessageKey = validate();
       if(errorMessageKey != null) {
-        eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, errorMessageKey, null));
+        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errorMessageKey, null));
         return;
       }
 
@@ -279,7 +279,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
             createView();
           } else {
             String errorMessage = ClientErrorDtos.getStatus(response.getText());
-            eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, errorMessage, null));
+            eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errorMessage, null));
           }
         }
       };

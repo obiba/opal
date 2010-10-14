@@ -15,13 +15,13 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.event.UserMessageEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRefreshedEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -135,7 +135,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
       @Override
       public void onClick(ClickEvent event) {
         if(selectedFile == null) {
-          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, "fileMustBeSelected", null));
+          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "fileMustBeSelected", null));
         } else {
           actionRequiringConfirmation = new Runnable() {
             public void run() {
@@ -227,7 +227,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
       @Override
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() != Response.SC_OK) {
-          eventBus.fireEvent(new UserMessageEvent(MessageDialogType.ERROR, response.getText(), null));
+          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
         } else {
           selectedFile = null;
           eventBus.fireEvent(new FileDeletedEvent(file));

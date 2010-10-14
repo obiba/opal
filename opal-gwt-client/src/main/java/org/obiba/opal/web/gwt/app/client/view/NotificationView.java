@@ -11,9 +11,9 @@ package org.obiba.opal.web.gwt.app.client.view;
 
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.MessageDialogType;
-import org.obiba.opal.web.gwt.app.client.presenter.ErrorDialogPresenter.NotificationCloseHandler;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationCloseHandler;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -34,10 +34,10 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * View used to display error, warning and info messages in a dialog box.
  */
-public class ErrorDialogView extends Composite implements ErrorDialogPresenter.Display {
+public class NotificationView extends Composite implements NotificationPresenter.Display {
 
-  @UiTemplate("ErrorDialogView.ui.xml")
-  interface ViewUiBinder extends UiBinder<PopupPanel, ErrorDialogView> {
+  @UiTemplate("NotificationView.ui.xml")
+  interface ViewUiBinder extends UiBinder<PopupPanel, NotificationView> {
   }
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
@@ -54,7 +54,7 @@ public class ErrorDialogView extends Composite implements ErrorDialogPresenter.D
   @UiField
   Anchor okay;
 
-  public ErrorDialogView() {
+  public NotificationView() {
     uiBinder.createAndBindUi(this);
 
     dialog.setGlassEnabled(false);
@@ -104,7 +104,7 @@ public class ErrorDialogView extends Composite implements ErrorDialogPresenter.D
   }
 
   @Override
-  public void setMessageType(MessageDialogType type) {
+  public void setNotificationType(NotificationType type) {
     dialog.addStyleName(type.toString().toLowerCase());
   }
 
