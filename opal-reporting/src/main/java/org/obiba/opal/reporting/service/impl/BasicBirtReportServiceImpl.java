@@ -102,7 +102,7 @@ public class BasicBirtReportServiceImpl implements ReportService {
 
   @Override
   public void start() {
-    birtExec = System.getProperty(OPAL_HOME_SYSTEM_PROPERTY_NAME) + File.separator + "ReportEngine" + File.separator + "genReport";
+    birtExec = System.getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME) + File.separator + "ReportEngine" + File.separator + "genReport";
     if(System.getProperty("os.name").contains("Windows")) {
       birtExec += ".bat";
     } else {

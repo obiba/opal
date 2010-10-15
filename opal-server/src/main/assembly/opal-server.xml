@@ -51,23 +51,16 @@
       <includes>
         <include>**/*.*</include>
       </includes>
-    </fileSet>
-    
-    <fileSet>
-      <directory>../opal-reporting/lib/birt-runtime-2_6_1/ReportEngine</directory>
-      <outputDirectory>ReportEngine</outputDirectory>
-      <includes>
-        <include>**/*.*</include>
-      </includes>
-    </fileSet>
-    
+    </fileSet>   
   </fileSets>
   <dependencySets>
+    
     <!-- Copy dependency jar files to 'lib' -->
     <dependencySet>
       <outputDirectory>lib</outputDirectory>
       <excludes>
         <exclude>org.obiba.opal:opal-gwt-client:*</exclude>
+        <exclude>org.eclipse.birt:birt-report-engine:*</exclude>
       </excludes>      
       <scope>runtime</scope>
     </dependencySet>
@@ -80,6 +73,25 @@
       <scope>runtime</scope>
       <unpack>true</unpack>      
     </dependencySet>    
+    
+    <!-- Unpack BIRT Report Engine distribution -->
+    <dependencySet>
+      <outputDirectory>.</outputDirectory>
+      <includes>
+        <include>org.eclipse.birt:birt-report-engine:*</include>
+      </includes>      
+      <scope>runtime</scope>
+      <unpack>true</unpack>  
+    </dependencySet>
+    
+    <!-- Configure BIRT with default jdbc drivers -->
+    <dependencySet>
+      <outputDirectory>birt-runtime-2_6_1/ReportEngine/plugins/org.eclipse.birt.report.data.oda.jdbc_2.6.1.v20100909/drivers</outputDirectory>
+      <includes>
+        <include>mysql:mysql-connector-java:*</include>
+      </includes>
+      <scope>runtime</scope>
+    </dependencySet>
     
   </dependencySets>
 </assembly>

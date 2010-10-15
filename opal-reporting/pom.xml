@@ -39,26 +39,31 @@
     
     <dependency>
       <groupId>org.eclipse.birt</groupId>
-      <artifactId>coreapi</artifactId>
+      <artifactId>birt-coreapi</artifactId>
       <version>${birt.version}</version>
-      <scope>system</scope>
-      <systemPath>${birt.lib}/coreapi.jar</systemPath>
+      <scope>provided</scope>
     </dependency>
     
     <dependency>
       <groupId>org.eclipse.birt</groupId>
-      <artifactId>modelapi</artifactId>
+      <artifactId>birt-modelapi</artifactId>
       <version>${birt.version}</version>
-      <scope>system</scope>
-      <systemPath>${birt.lib}/modelapi.jar</systemPath>
+      <scope>provided</scope>
     </dependency>
     
     <dependency>
       <groupId>org.eclipse.birt</groupId>
-      <artifactId>engineapi</artifactId>
+      <artifactId>birt-engineapi</artifactId>
       <version>${birt.version}</version>
-      <scope>system</scope>
-      <systemPath>${birt.lib}/engineapi.jar</systemPath>
+      <scope>provided</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.eclipse.birt</groupId>
+      <artifactId>birt-report-engine</artifactId>
+      <version>${birt.version}</version>
+      <scope>runtime</scope>
+      <type>zip</type>
     </dependency>
   </dependencies>
 
@@ -74,7 +79,6 @@
   <properties>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
     <birt.version>2.6.1</birt.version>
-    <birt.lib>${basedir}/lib/birt-runtime-2_6_1/ReportEngine/lib</birt.lib>
   </properties>
   
 </project>

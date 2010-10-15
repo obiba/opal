@@ -39,6 +39,8 @@ public class BirtReportServiceImpl implements ReportService {
 
   final static String OPAL_HOME_SYSTEM_PROPERTY_NAME = "OPAL_HOME";
 
+  final static String BIRT_HOME_SYSTEM_PROPERTY_NAME = "BIRT_HOME";
+
   private static IReportEngine engine;
 
   @Override
@@ -100,7 +102,7 @@ public class BirtReportServiceImpl implements ReportService {
 
     try {
       // make sure BIRT_HOME is set and valid
-      File reportEngineHome = new File(System.getProperty(OPAL_HOME_SYSTEM_PROPERTY_NAME), "ReportEngine");
+      File reportEngineHome = new File(System.getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME), "ReportEngine");
 
       // TODO: check that report engine home exists
       log.info("reportEngineHome=" + reportEngineHome.getAbsolutePath());
