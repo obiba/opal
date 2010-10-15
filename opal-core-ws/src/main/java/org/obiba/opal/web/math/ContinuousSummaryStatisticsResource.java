@@ -52,10 +52,13 @@ public class ContinuousSummaryStatisticsResource extends AbstractSummaryStatisti
 
   @GET
   public SummaryStatisticsDto compute(@QueryParam("d") @DefaultValue("normal") Distribution distribution, @QueryParam("p") List<Double> percentiles, @QueryParam("intervals") @DefaultValue("10") int intervals) {
-    if(percentiles == null || percentiles.size() == 0) {
-      percentiles = ImmutableList.<Double> of(0.05d, 0.5d, 5d, 10d, 15d, 20d, 25d, 30d, 35d, 40d, 45d, 50d, 55d, 60d, 65d, 70d, 75d, 80d, 85d, 90d, 95d, 99.5d, 99.95d);
+    List<Double> percentilesOrDefault = null;
+    if(percentiles != null && !percentiles.isEmpty()) {
+      percentilesOrDefault = percentiles;
+    } else { // default
+      percentilesOrDefault = ImmutableList.<Double> of(0.05d, 0.5d, 5d, 10d, 15d, 20d, 25d, 30d, 35d, 40d, 45d, 50d, 55d, 60d, 65d, 70d, 75d, 80d, 85d, 90d, 95d, 99.5d, 99.95d);
     }
-    return SummaryStatisticsDto.newBuilder().setResource(getVariable().getName()).setExtension(ContinuousSummaryDto.continuous, distribution.calc(getVariable().getValueType(), getValues(), percentiles, intervals).build()).build();
+    return SummaryStatisticsDto.newBuilder().setResource(getVariable().getName()).setExtension(ContinuousSummaryDto.continuous, distribution.calc(getVariable().getValueType(), getValues(), percentilesOrDefault, intervals).build()).build();
   }
 
   public static enum Distribution {

@@ -10,15 +10,15 @@ import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.CommandUsage;
 
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException;
-import uk.co.flamingpenguin.jewel.cli.CliFactory;
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException.ValidationError;
+import uk.co.flamingpenguin.jewel.cli.CliFactory;
 
 import com.google.common.collect.Sets;
 
 /**
  * Implements {@code OpalShell} but does not specify how user interactions are implemented. Extending classes must
- * implement three methods {@code printf(String, Object...)}, {@code passwordPrompt(String, Object...)} and {@code
- * prompt(String, Object...)}
+ * implement three methods {@code printf(String, Object...)}, {@code passwordPrompt(String, Object...)} and
+ * {@code prompt(String, Object...)}
  */
 public abstract class AbstractOpalShell implements OpalShell {
 
@@ -91,11 +91,11 @@ public abstract class AbstractOpalShell implements OpalShell {
   public abstract String prompt(String format, Object... args);
 
   private void executeCommand(String commandName, String[] args) {
-    args = Arrays.copyOfRange(args, 1, args.length);
+    String[] commandArgs = Arrays.copyOfRange(args, 1, args.length); // omit args[0], the command name
     try {
       // Create the options object.
       Class<?> optionsClass = commandRegistry.getOptionsClass(commandName);
-      Object options = CliFactory.parseArguments(optionsClass, args);
+      Object options = CliFactory.parseArguments(optionsClass, commandArgs);
       Command<Object> command = commandRegistry.newCommand(commandName);
       command.setOptions(options);
       command.setShell(this);

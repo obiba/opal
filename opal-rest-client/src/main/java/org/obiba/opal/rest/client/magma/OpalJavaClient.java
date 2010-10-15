@@ -73,13 +73,16 @@ public class OpalJavaClient {
   public <T extends Message> List<T> getResources(Class<T> messageType, URI uri, Message.Builder builder) {
     ArrayList<T> resources = new ArrayList<T>();
     InputStream is = null;
+    Message.Builder messageBuilder = builder;
+    
     try {
       HttpResponse response = get(uri);
       is = response.getEntity().getContent();
-      while(builder.mergeDelimitedFrom(is)) {
-        T message = (T) builder.build();
+
+      while(messageBuilder.mergeDelimitedFrom(is)) {
+        T message = (T) messageBuilder.build();
         resources.add(message);
-        builder = message.newBuilderForType();
+        messageBuilder = message.newBuilderForType();
       }
       return resources;
     } catch(IOException e) {
