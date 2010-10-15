@@ -78,15 +78,18 @@ public class FunctionalUnitView extends View {
 
     Variable keyVariable = keysTable.getVariable(unit.getKeyVariableName());
 
-    if(allowIdentifierGeneration == false) {
-      identifierGenerator = new IParticipantIdentifier() {
+    IParticipantIdentifier identifierGeneratorOrDefault = null;
+    if(allowIdentifierGeneration) {
+      identifierGeneratorOrDefault = identifierGenerator;
+    } else { // default
+      identifierGeneratorOrDefault = new IParticipantIdentifier() {
         public String generateParticipantIdentifier() {
           throw new UnsupportedOperationException("cannot generate identifier");
         }
       };
     }
 
-    this.entityMap = new OpalPrivateVariableEntityMap(keysTable, keyVariable, identifierGenerator);
+    this.entityMap = new OpalPrivateVariableEntityMap(keysTable, keyVariable, identifierGeneratorOrDefault);
 
     switch(policy) {
     case UNIT_IDENTIFIERS_ARE_PUBLIC:
@@ -133,9 +136,9 @@ public class FunctionalUnitView extends View {
   }
 
   /**
-   * Given a unit identifier, the apply() method will return the corresponding opal identifier. If {@code
-   * allowIdentifierGeneration} is true, the apply method will generate opal identifiers when one does not already
-   * exist.
+   * Given a unit identifier, the apply() method will return the corresponding opal identifier. If
+   * {@code allowIdentifierGeneration} is true, the apply method will generate opal identifiers when one does not
+   * already exist.
    * 
    * <pre>
    * apply: privateEntity --> publicEntity
