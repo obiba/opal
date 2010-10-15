@@ -75,24 +75,24 @@ public class BasicBirtReportServiceImpl implements ReportService {
   }
 
   private String getBirtCommandLine(String format, Map<String, String> parameters, String reportDesign, String reportOutput) {
-    String cmd = birtExec;
+    StringBuffer cmd = new StringBuffer(birtExec);
 
     if(format != null) {
-      cmd += " -f " + format;
+      cmd.append(" -f ").append(format);
     }
 
     if(parameters != null && parameters.size() > 0) {
-      cmd += " -p";
+      cmd.append(" -p");
       for(Entry<String, String> entry : parameters.entrySet()) {
-        cmd += " " + entry.getKey() + "=" + entry.getValue();
+        cmd.append(" ").append(entry.getKey()).append("=").append(entry.getValue());
       }
     }
 
-    cmd += " -o " + reportOutput;
+    cmd.append(" -o ").append(reportOutput);
 
-    cmd += " " + reportDesign;
+    cmd.append(" ").append(reportDesign);
 
-    return cmd;
+    return cmd.toString();
   }
 
   @Override

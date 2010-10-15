@@ -41,7 +41,7 @@ public class BirtReportServiceImpl implements ReportService {
 
   final static String BIRT_HOME_SYSTEM_PROPERTY_NAME = "BIRT_HOME";
 
-  private static IReportEngine engine;
+  private IReportEngine engine;
 
   @Override
   public void render(String format, Map<String, String> parameters, String reportDesign, String reportOutput) throws ReportException {
