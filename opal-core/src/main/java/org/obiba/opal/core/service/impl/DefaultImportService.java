@@ -24,28 +24,28 @@ import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.ValueTableWriter.ValueSetWriter;
-import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
+import org.obiba.magma.ValueTableWriter.ValueSetWriter;
+import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.DatasourceCopier;
-import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListener;
-import org.obiba.magma.support.DatasourceCopier.MultiplexingStrategy;
-import org.obiba.magma.support.DatasourceCopier.VariableTransformer;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
+import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListener;
+import org.obiba.magma.support.DatasourceCopier.MultiplexingStrategy;
+import org.obiba.magma.support.DatasourceCopier.VariableTransformer;
 import org.obiba.magma.type.BooleanType;
 import org.obiba.magma.type.TextType;
 import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.magma.FunctionalUnitView;
-import org.obiba.opal.core.magma.FunctionalUnitView.Policy;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
+import org.obiba.opal.core.magma.FunctionalUnitView.Policy;
 import org.obiba.opal.core.magma.concurrent.LockingActionTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ImportService;
@@ -118,8 +118,10 @@ public class DefaultImportService implements ImportService {
   }
 
   private void importData(String unitName, String datasourceName, FileObject file, String dispatchAttribute) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException, InterruptedException {
-    if(unitName != null && unitName.equals("")) unitName = null;
-    if(unitName != null) Assert.isTrue(!unitName.equals(FunctionalUnit.OPAL_INSTANCE), "unitName cannot be " + FunctionalUnit.OPAL_INSTANCE);
+    // If unitName is the empty string, coerce it to null.
+    String nonEmptyUnitName = (unitName != null && unitName.equals("")) ? null : unitName;
+
+    if(nonEmptyUnitName != null) Assert.isTrue(!nonEmptyUnitName.equals(FunctionalUnit.OPAL_INSTANCE), "unitName cannot be " + FunctionalUnit.OPAL_INSTANCE);
     Assert.hasText(datasourceName, "datasourceName is null or empty");
     Assert.notNull(file, "file is null");
     Assert.isTrue(file.getType() == FileType.FILE, "No such file (" + file.getName().getPath() + ")");
@@ -128,10 +130,10 @@ public class DefaultImportService implements ImportService {
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(datasourceName);
 
     FunctionalUnit unit = null;
-    if(unitName != null) {
-      unit = opalRuntime.getFunctionalUnit(unitName);
+    if(nonEmptyUnitName != null) {
+      unit = opalRuntime.getFunctionalUnit(nonEmptyUnitName);
       if(unit == null) {
-        throw new NoSuchFunctionalUnitException(unitName);
+        throw new NoSuchFunctionalUnitException(nonEmptyUnitName);
       }
     }
 
@@ -140,8 +142,10 @@ public class DefaultImportService implements ImportService {
 
   @Override
   public void importData(String unitName, String sourceDatasourceName, String destinationDatasourceName) throws NoSuchFunctionalUnitException, IOException, InterruptedException {
-    if(unitName != null && unitName.equals("")) unitName = null;
-    if(unitName != null) Assert.isTrue(!unitName.equals(FunctionalUnit.OPAL_INSTANCE), "unitName cannot be " + FunctionalUnit.OPAL_INSTANCE);
+    // If unitName is the empty string, coerce it to null.
+    String nonEmptyUnitName = (unitName != null && unitName.equals("")) ? null : unitName;
+
+    if(nonEmptyUnitName != null) Assert.isTrue(!nonEmptyUnitName.equals(FunctionalUnit.OPAL_INSTANCE), "unitName cannot be " + FunctionalUnit.OPAL_INSTANCE);
     Assert.hasText(sourceDatasourceName, "sourceDatasourceName is null or empty");
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName is null or empty");
 
@@ -149,10 +153,10 @@ public class DefaultImportService implements ImportService {
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(destinationDatasourceName);
 
     FunctionalUnit unit = null;
-    if(unitName != null) {
-      unit = opalRuntime.getFunctionalUnit(unitName);
+    if(nonEmptyUnitName != null) {
+      unit = opalRuntime.getFunctionalUnit(nonEmptyUnitName);
       if(unit == null) {
-        throw new NoSuchFunctionalUnitException(unitName);
+        throw new NoSuchFunctionalUnitException(nonEmptyUnitName);
       }
     }
 

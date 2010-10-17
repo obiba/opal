@@ -165,16 +165,16 @@ public class DefaultExportServiceImpl implements ExportService {
 
     // If the incremental option was specified, create an incremental view of the table (leaving out what has
     // already been exported).
-    table = incremental ? getIncrementalView(table, destinationDatasource) : table;
+    ValueTable tableToCopy = incremental ? getIncrementalView(table, destinationDatasource) : table;
 
     // If the table contains an entity that requires key separation, create a "unit view" of the table (replace
     // public identifiers with private, unit-specific identifiers).
-    if((unit != null) && table.isForEntityType(keysTableEntityType)) {
-      table = getUnitView(unit, table);
+    if((unit != null) && tableToCopy.isForEntityType(keysTableEntityType)) {
+      tableToCopy = getUnitView(unit, tableToCopy);
     }
 
     // Go ahead and copy the result to the destination datasource.
-    MultithreadedDatasourceCopier.Builder.newCopier().from(table).to(destinationDatasource).withCopier(datasourceCopier).withReaders(4).withThreads(new ThreadFactory() {
+    MultithreadedDatasourceCopier.Builder.newCopier().from(tableToCopy).to(destinationDatasource).withCopier(datasourceCopier).withReaders(4).withThreads(new ThreadFactory() {
 
       @Override
       public Thread newThread(Runnable r) {
