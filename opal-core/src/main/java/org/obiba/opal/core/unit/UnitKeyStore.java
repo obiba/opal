@@ -244,11 +244,10 @@ public class UnitKeyStore implements KeyProvider {
       PublicKey publicKey = cert.getPublicKey();
 
       // Return a key pair
-      keyPair = new KeyPair(publicKey, (PrivateKey) key);
+      return new KeyPair(publicKey, (PrivateKey) key);
     } else {
       throw new KeyPairNotFoundException("KeyPair not found for specified alias (" + alias + ")");
     }
-    return keyPair;
   }
 
   private KeyPair findKeyPairForPublicKey(PublicKey publicKey, Enumeration<String> aliases) {
