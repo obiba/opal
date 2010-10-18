@@ -134,18 +134,20 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
   }
 
   private List<Result> addValueToResults(List<Result> results, JsArray<ValueDto> values) {
+    List<Result> resultsWithValues = null;
     if(results == null) {
-      results = new ArrayList<EvaluateScriptPresenter.Result>();
+      resultsWithValues = new ArrayList<EvaluateScriptPresenter.Result>();
       for(int i = 0; i < values.length(); i++) {
-        results.add(new Result(values.get(i)));
+        resultsWithValues.add(new Result(values.get(i)));
       }
     } else {
+      resultsWithValues = new ArrayList(results);
       int i = 0;
-      for(Result result : results) {
+      for(Result result : resultsWithValues) {
         result.setValue(values.get(i++));
       }
     }
-    return results;
+    return resultsWithValues;
   }
 
   public class TestScriptClickHandler implements ClickHandler {

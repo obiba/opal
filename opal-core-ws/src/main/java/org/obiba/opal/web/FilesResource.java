@@ -175,8 +175,6 @@ public class FilesResource {
     // Get the children for the current folder (list of files & folders).
     FileObject[] children = parentFolder.getChildren();
 
-    level--;
-
     // Loop through all children.
     for(int i = 0; i < children.length; i++) {
 
@@ -192,8 +190,8 @@ public class FilesResource {
 
       fileBuilder.setLastModifiedTime(children[i].getContent().getLastModifiedTime());
 
-      if(children[i].getType().hasChildren() && children[i].getChildren().length > 0 && level > 0) {
-        addChildren(fileBuilder, children[i], level);
+      if(children[i].getType().hasChildren() && children[i].getChildren().length > 0 && (level - 1) > 0) {
+        addChildren(fileBuilder, children[i], level - 1);
       }
 
       // Add the current child to the parent FileDto (folder).

@@ -51,13 +51,10 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
     if(messages.isEmpty()) {
       throw new IllegalArgumentException("Missing message");
     }
-    if(messageArgs == null) {
-      messageArgs = new ArrayList<String>();
-    }
 
     this.notificationType = notificationType;
     this.messages = messages;
-    this.messageArgs = new ArrayList<String>(messageArgs);
+    this.messageArgs = (messageArgs != null) ? new ArrayList<String>(messageArgs) : new ArrayList<String>();
     this.notificationCloseHandler = notificationCloseHandler;
   }
 

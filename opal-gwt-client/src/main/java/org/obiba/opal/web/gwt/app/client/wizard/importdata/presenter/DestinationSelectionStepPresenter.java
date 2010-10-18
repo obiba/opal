@@ -34,9 +34,9 @@ import org.obiba.opal.web.model.client.magma.DatasourceCompareDto;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto;
+import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.magma.TableCompareDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
@@ -100,10 +100,13 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
       public void onResource(Response response, JsArray<DatasourceDto> datasources) {
+        JsArray<DatasourceDto> selectableDatasources = null;
         if(importData.getImportFormat().equals(ImportFormat.CSV)) {
-          datasources = removeDatasourcesWithoutTables(datasources);
+          selectableDatasources = removeDatasourcesWithoutTables(datasources);
+        } else {
+          selectableDatasources = datasources;
         }
-        getDisplay().setDatasources(datasources);
+        getDisplay().setDatasources(selectableDatasources);
       }
     }).send();
   }
