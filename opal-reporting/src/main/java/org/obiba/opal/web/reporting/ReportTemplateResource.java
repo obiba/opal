@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
+import org.obiba.opal.core.cfg.ReportTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.reporting.service.ReportService;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
@@ -42,11 +43,29 @@ public class ReportTemplateResource {
 
   private final ReportService reportService;
 
+  // Added for testing
+  public ReportTemplateResource(String name, OpalRuntime opalRuntime, ReportService reportService) {
+    super();
+    this.name = name;
+    this.opalRuntime = opalRuntime;
+    this.reportService = reportService;
+  }
+
   @Autowired
   public ReportTemplateResource(OpalRuntime opalRuntime, ReportService reportService) {
     super();
     this.opalRuntime = opalRuntime;
     this.reportService = reportService;
+  }
+
+  @GET
+  public Response getReportTemplate() {
+    ReportTemplate reportTemplate = opalRuntime.getOpalConfiguration().getReportTemplate(name);
+    if(reportTemplate == null) {
+      return Response.status(Status.NOT_FOUND).build();
+    } else {
+      return Response.ok(Dtos.asDto(reportTemplate)).build();
+    }
   }
 
   // TODO: to be REMOVED, only for testing
