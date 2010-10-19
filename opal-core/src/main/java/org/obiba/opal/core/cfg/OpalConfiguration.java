@@ -28,12 +28,15 @@ public class OpalConfiguration {
 
   private Set<FunctionalUnit> functionalUnits;
 
+  private Set<ReportTemplate> reportTemplates;
+
   //
   // Constructors
   //
 
   public OpalConfiguration() {
     functionalUnits = Sets.newLinkedHashSet();
+    reportTemplates = Sets.newLinkedHashSet();
   }
 
   //
@@ -74,6 +77,30 @@ public class OpalConfiguration {
     if(functionalUnits != null) {
       this.functionalUnits.addAll(functionalUnits);
     }
+  }
+
+  public Set<ReportTemplate> getReportTemplates() {
+    return Collections.unmodifiableSet(reportTemplates);
+  }
+
+  public void setReportTemplates(Set<ReportTemplate> reportTemplates) {
+    this.reportTemplates.clear();
+    if(reportTemplates != null) {
+      this.reportTemplates.addAll(reportTemplates);
+    }
+  }
+
+  public ReportTemplate getReportTemplate(String name) {
+    for(ReportTemplate reportTemplate : reportTemplates) {
+      if(reportTemplate.getName().equals(name)) {
+        return reportTemplate;
+      }
+    }
+    return null;
+  }
+
+  public boolean hasReportTemplates() {
+    return reportTemplates.size() > 0;
   }
 
 }
