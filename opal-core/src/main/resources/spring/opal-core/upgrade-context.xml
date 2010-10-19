@@ -75,6 +75,9 @@
             </bean>
           </property>
         </bean>
+        <bean class="org.obiba.runtime.upgrade.InstallStepAdapter">
+          <property name="upgradeStep" ref="quartzSchema-1.4.0" />
+        </bean>
         <!--  
         <bean id="createSpringBatchSchema" class="org.obiba.runtime.upgrade.InstallStepAdapter">
           <property name="upgradeStep">
@@ -97,6 +100,7 @@
         </bean>
         <ref bean="opal-dataUpgrade-1.1" />
         <ref bean="opal-viewsUpgrade-1.4.0" />
+        <ref bean="quartzSchema-1.4.0" />
       </list>
     </property>
 
@@ -112,7 +116,7 @@
     <property name="methodOwner" ref="&amp;opalSessionFactory" />
     <property name="methodName" value="updateDatabaseSchema" />
   </bean>
-  
+              
   <bean id="opal-dataUpgrade-1.1" class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
     <property name="dataSource" ref="opalDataSource" />
     <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/" />
@@ -126,5 +130,14 @@
     <property name="appliesTo" value="1.4.0" />
     <property name="configFile" value="${OPAL_HOME}/conf/opal-config.xml" />
   </bean>  
+  
+  <!--  The "1.4.0" here refers to the "appliesTo" Opal version, not the version of Quartz! -->
+  <bean id="quartzSchema-1.4.0" class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
+    <property name="description" value="Install Quartz Schema." />
+    <property name="dataSource" ref="opalDataSource" />
+    <property name="scriptPath" value="classpath:/META-INF/opal/install-scripts/quartz/" />
+    <property name="scriptBasename" value="tables"/>
+    <property name="appliesTo" value="1.4.0" />
+  </bean>
   
 </beans>
