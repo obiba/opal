@@ -66,8 +66,7 @@ public class ReportTemplateResourceTest {
     Response response = reportTemplate.getReportTemplate();
     Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-    ReportTemplateDto reportTemplateDto = (ReportTemplateDto) reportTemplate.getReportTemplate().getEntity();
-
+    ReportTemplateDto reportTemplateDto = (ReportTemplateDto) response.getEntity();
     Assert.assertEquals("template3", reportTemplateDto.getName());
 
     verify(opalRuntimeMock);
@@ -83,6 +82,37 @@ public class ReportTemplateResourceTest {
     ReportTemplateResource reportTemplate = new ReportTemplateResource("template9", opalRuntimeMock, reportServiceMock);
 
     Response response = reportTemplate.getReportTemplate();
+    Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+
+    verify(opalRuntimeMock);
+  }
+
+  @Test
+  public void testDeleteReportTemplate_ReportTemplateDeleted() {
+    expect(opalRuntimeMock.getOpalConfiguration()).andReturn(opalConfiguration).atLeastOnce();
+
+    replay(opalRuntimeMock);
+
+    ReportTemplateResource reportTemplate = new ReportTemplateResource("template2", opalRuntimeMock, reportServiceMock);
+    Response response = reportTemplate.deleteReportTemplate();
+
+    Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+    Assert.assertTrue(opalConfiguration.getReportTemplate("template2") == null);
+
+    verify(opalRuntimeMock);
+
+  }
+
+  @Test
+  public void testDeleteReportTemplate_ReportTemplateNotFound() {
+    expect(opalRuntimeMock.getOpalConfiguration()).andReturn(opalConfiguration).atLeastOnce();
+
+    replay(opalRuntimeMock);
+
+    ReportTemplateResource reportTemplate = new ReportTemplateResource("template9", opalRuntimeMock, reportServiceMock);
+
+    Response response = reportTemplate.deleteReportTemplate();
     Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
 
     verify(opalRuntimeMock);
