@@ -19,18 +19,24 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import junit.framework.Assert;
 
+import org.jboss.resteasy.specimpl.UriBuilderImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.ReportTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.reporting.service.ReportService;
+import org.obiba.opal.shell.service.CommandSchedulerService;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
+import org.obiba.opal.web.model.Ws.ClientErrorDto;
 
 public class ReportTemplateResourceTest {
+
+  public static final String BASE_URI = "http://localhost:8888/ws";
 
   private OpalRuntime opalRuntimeMock;
 
@@ -52,18 +58,18 @@ public class ReportTemplateResourceTest {
     reportTemplates.add(getReportTemplate("template3"));
     reportTemplates.add(getReportTemplate("template4"));
     opalConfiguration.setReportTemplates(reportTemplates);
+
+    expect(opalRuntimeMock.getOpalConfiguration()).andReturn(opalConfiguration).anyTimes();
   }
 
   @Test
   public void testGetReportTemplate_ReportTemplateFoundAndReturned() {
 
-    expect(opalRuntimeMock.getOpalConfiguration()).andReturn(opalConfiguration).atLeastOnce();
-
     replay(opalRuntimeMock);
 
-    ReportTemplateResource reportTemplate = new ReportTemplateResource("template3", opalRuntimeMock, reportServiceMock);
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template3", opalRuntimeMock, reportServiceMock);
 
-    Response response = reportTemplate.getReportTemplate();
+    Response response = reportTemplateResource.getReportTemplate();
     Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
     ReportTemplateDto reportTemplateDto = (ReportTemplateDto) response.getEntity();
@@ -75,13 +81,12 @@ public class ReportTemplateResourceTest {
 
   @Test
   public void testGetReportTemplate_ReportTemplateNotFound() {
-    expect(opalRuntimeMock.getOpalConfiguration()).andReturn(opalConfiguration).atLeastOnce();
 
     replay(opalRuntimeMock);
 
-    ReportTemplateResource reportTemplate = new ReportTemplateResource("template9", opalRuntimeMock, reportServiceMock);
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template9", opalRuntimeMock, reportServiceMock);
 
-    Response response = reportTemplate.getReportTemplate();
+    Response response = reportTemplateResource.getReportTemplate();
     Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
 
     verify(opalRuntimeMock);
@@ -89,31 +94,83 @@ public class ReportTemplateResourceTest {
 
   @Test
   public void testDeleteReportTemplate_ReportTemplateDeleted() {
-    expect(opalRuntimeMock.getOpalConfiguration()).andReturn(opalConfiguration).atLeastOnce();
 
-    replay(opalRuntimeMock);
+    CommandSchedulerService commandSchedulerServiceMock = createMock(CommandSchedulerService.class);
+    commandSchedulerServiceMock.deleteCommand("template2", "reports");
 
-    ReportTemplateResource reportTemplate = new ReportTemplateResource("template2", opalRuntimeMock, reportServiceMock);
-    Response response = reportTemplate.deleteReportTemplate();
+    replay(opalRuntimeMock, commandSchedulerServiceMock);
+
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template2", opalRuntimeMock, reportServiceMock, commandSchedulerServiceMock);
+    Response response = reportTemplateResource.deleteReportTemplate();
 
     Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
     Assert.assertTrue(opalConfiguration.getReportTemplate("template2") == null);
 
-    verify(opalRuntimeMock);
+    verify(opalRuntimeMock, commandSchedulerServiceMock);
 
   }
 
   @Test
   public void testDeleteReportTemplate_ReportTemplateNotFound() {
-    expect(opalRuntimeMock.getOpalConfiguration()).andReturn(opalConfiguration).atLeastOnce();
 
     replay(opalRuntimeMock);
 
-    ReportTemplateResource reportTemplate = new ReportTemplateResource("template9", opalRuntimeMock, reportServiceMock);
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template9", opalRuntimeMock, reportServiceMock);
 
-    Response response = reportTemplate.deleteReportTemplate();
+    Response response = reportTemplateResource.deleteReportTemplate();
     Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+
+    verify(opalRuntimeMock);
+  }
+
+  @Test
+  public void testUpdateReportTemplate_NewReportTemplateCreated() {
+    UriInfo uriInfoMock = createMock(UriInfo.class);
+    expect(uriInfoMock.getAbsolutePath()).andReturn(UriBuilderImpl.fromUri(BASE_URI).build("")).atLeastOnce();
+
+    CommandSchedulerService commandSchedulerServiceMock = createMock(CommandSchedulerService.class);
+    commandSchedulerServiceMock.scheduleCommand("template9", "reports", "schedule");
+
+    replay(opalRuntimeMock, uriInfoMock, commandSchedulerServiceMock);
+
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template9", opalRuntimeMock, reportServiceMock, commandSchedulerServiceMock);
+    Response response = reportTemplateResource.updateReportTemplate(uriInfoMock, Dtos.asDto(getReportTemplate("template9")));
+
+    Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+    Assert.assertEquals(BASE_URI, response.getMetadata().get("location").get(0).toString());
+
+    verify(opalRuntimeMock, uriInfoMock, commandSchedulerServiceMock);
+  }
+
+  @Test
+  public void testUpdateReportTemplate_ExistingReportTemplateUpdated() {
+
+    CommandSchedulerService commandSchedulerServiceMock = createMock(CommandSchedulerService.class);
+    commandSchedulerServiceMock.scheduleCommand("template1", "reports", "schedule");
+
+    replay(opalRuntimeMock, commandSchedulerServiceMock);
+
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template1", opalRuntimeMock, reportServiceMock, commandSchedulerServiceMock);
+    Response response = reportTemplateResource.updateReportTemplate(createMock(UriInfo.class), Dtos.asDto(getReportTemplate("template1")));
+
+    Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+    verify(opalRuntimeMock, commandSchedulerServiceMock);
+
+  }
+
+  @Test
+  public void testUpdateReportTemplate_ErrorEncountered() {
+    UriInfo uriInfoMock = createMock(UriInfo.class);
+
+    replay(opalRuntimeMock);
+
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template1", opalRuntimeMock, reportServiceMock);
+    Response response = reportTemplateResource.updateReportTemplate(uriInfoMock, Dtos.asDto(getReportTemplate("template2")));
+
+    Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    Assert.assertEquals("CouldNotUpdateTheReportTemplate", ((ClientErrorDto) response.getEntity()).getStatus());
 
     verify(opalRuntimeMock);
   }
@@ -123,6 +180,7 @@ public class ReportTemplateResourceTest {
     reportTemplate.setName(name);
     reportTemplate.setDesign("design");
     reportTemplate.setFormat("format");
+    reportTemplate.setSchedule("schedule");
     reportTemplate.setParameters(new HashMap<String, String>());
     return reportTemplate;
   }
