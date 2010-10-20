@@ -18,7 +18,25 @@ import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.ParameterDto;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
 
+import com.google.common.collect.Maps;
+
 public class Dtos {
+
+  public static ReportTemplate fromDto(ReportTemplateDto reportTemplateDto) {
+    ReportTemplate reportTemplate = new ReportTemplate();
+    reportTemplate.setName(reportTemplateDto.getName());
+    reportTemplate.setDesign(reportTemplateDto.getDesign());
+    reportTemplate.setFormat(reportTemplateDto.getFormat());
+    Map<String, String> params = Maps.newLinkedHashMap();
+    for(ParameterDto param : reportTemplateDto.getParametersList()) {
+      params.put(param.getKey(), param.getValue());
+    }
+    String schedule = reportTemplateDto.getCron();
+    if(schedule != null) {
+      reportTemplate.setSchedule(reportTemplateDto.getCron());
+    }
+    return reportTemplate;
+  }
 
   public static ReportTemplateDto asDto(ReportTemplate reportTemplate) {
     ReportTemplateDto.Builder dtoBuilder = ReportTemplateDto.newBuilder().setName(reportTemplate.getName()).setDesign(reportTemplate.getDesign()).setFormat(reportTemplate.getFormat());

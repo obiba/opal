@@ -106,6 +106,10 @@ public class OpalConfiguration {
     }
   }
 
+  public void addReportTemplate(ReportTemplate reportTemplate) {
+    reportTemplates.add(reportTemplate);
+  }
+
   public boolean hasReportTemplates() {
     return reportTemplates.size() > 0;
   }

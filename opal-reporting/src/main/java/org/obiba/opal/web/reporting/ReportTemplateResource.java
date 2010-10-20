@@ -13,22 +13,30 @@ import java.io.File;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
+import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.ReportTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.reporting.service.ReportService;
+import org.obiba.opal.shell.service.CommandSchedulerService;
+import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.model.Opal.ReportTemplateDto;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 @Component
 @Scope("request")
@@ -37,6 +45,8 @@ public class ReportTemplateResource {
 
   private static final Logger log = LoggerFactory.getLogger(ReportTemplateResource.class);
 
+  private static final String reportShedullingGroup = "reports";
+
   @PathParam("name")
   private String name;
 
@@ -44,19 +54,27 @@ public class ReportTemplateResource {
 
   private final ReportService reportService;
 
+  private final CommandSchedulerService commandSchedulerService;
+
   // Added for unit tests
   public ReportTemplateResource(String name, OpalRuntime opalRuntime, ReportService reportService) {
+    this(name, opalRuntime, reportService, null);
+  }
+
+  public ReportTemplateResource(String name, OpalRuntime opalRuntime, ReportService reportService, CommandSchedulerService commandSchedulerService) {
     super();
     this.name = name;
     this.opalRuntime = opalRuntime;
     this.reportService = reportService;
+    this.commandSchedulerService = commandSchedulerService;
   }
 
   @Autowired
-  public ReportTemplateResource(OpalRuntime opalRuntime, ReportService reportService) {
+  public ReportTemplateResource(OpalRuntime opalRuntime, ReportService reportService, CommandSchedulerService commandSchedulerService) {
     super();
     this.opalRuntime = opalRuntime;
     this.reportService = reportService;
+    this.commandSchedulerService = commandSchedulerService;
   }
 
   @GET
@@ -76,7 +94,44 @@ public class ReportTemplateResource {
       return Response.status(Status.NOT_FOUND).build();
     } else {
       opalRuntime.getOpalConfiguration().removeReportTemplate(name);
+      if(reportTemplateToRemove.getSchedule() != null) {
+        commandSchedulerService.deleteCommand(name, reportShedullingGroup);
+      }
       return Response.ok().build();
+    }
+  }
+
+  @PUT
+  public Response updateReportTemplate(@Context UriInfo uriInfo, ReportTemplateDto reportTemplateDto) {
+
+    try {
+      Assert.isTrue(reportTemplateDto.getName().equals(name), "The report template data submited is in conflict with name provided in the web service call.");
+
+      OpalConfiguration opalConfig = opalRuntime.getOpalConfiguration();
+      ReportTemplate reportTemplate = opalConfig.getReportTemplate(name);
+      if(reportTemplate == null) {
+        addReportTemplate(reportTemplateDto, opalConfig);
+        return Response.created(uriInfo.getAbsolutePath()).build();
+      } else {
+        opalConfig.removeReportTemplate(name);
+        addReportTemplate(reportTemplateDto, opalConfig);
+        return Response.ok().build();
+      }
+    } catch(Exception couldNotUpdateTheReportTemplate) {
+      return Response.status(Response.Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "CouldNotUpdateTheReportTemplate").build()).build();
+    }
+
+  }
+
+  private void addReportTemplate(ReportTemplateDto reportTemplateDto, OpalConfiguration opalConfig) {
+    ReportTemplate reportTemplate = Dtos.fromDto(reportTemplateDto);
+    opalConfig.addReportTemplate(reportTemplate);
+    scheduleCommand(reportTemplate);
+  }
+
+  private void scheduleCommand(ReportTemplate reportTemplate) {
+    if(reportTemplate.getSchedule() != null) {
+      commandSchedulerService.scheduleCommand(name, "reports", reportTemplate.getSchedule());
     }
   }
 

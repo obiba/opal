@@ -26,6 +26,11 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-core-ws</artifactId>
+      <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
       <artifactId>opal-ws</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -36,7 +41,7 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-web-model</artifactId>
+      <artifactId>opal-shell</artifactId>
       <version>${project.version}</version>
     </dependency>    
     
