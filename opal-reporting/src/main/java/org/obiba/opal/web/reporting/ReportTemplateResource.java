@@ -11,6 +11,7 @@ package org.obiba.opal.web.reporting;
 
 import java.io.File;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -43,7 +44,7 @@ public class ReportTemplateResource {
 
   private final ReportService reportService;
 
-  // Added for testing
+  // Added for unit tests
   public ReportTemplateResource(String name, OpalRuntime opalRuntime, ReportService reportService) {
     super();
     this.name = name;
@@ -65,6 +66,17 @@ public class ReportTemplateResource {
       return Response.status(Status.NOT_FOUND).build();
     } else {
       return Response.ok(Dtos.asDto(reportTemplate)).build();
+    }
+  }
+
+  @DELETE
+  public Response deleteReportTemplate() {
+    ReportTemplate reportTemplateToRemove = opalRuntime.getOpalConfiguration().getReportTemplate(name);
+    if(reportTemplateToRemove == null) {
+      return Response.status(Status.NOT_FOUND).build();
+    } else {
+      opalRuntime.getOpalConfiguration().removeReportTemplate(name);
+      return Response.ok().build();
     }
   }
 
