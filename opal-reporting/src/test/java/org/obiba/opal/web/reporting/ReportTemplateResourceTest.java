@@ -30,6 +30,8 @@ import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.ReportTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.reporting.service.ReportService;
+import org.obiba.opal.shell.CommandRegistry;
+import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.service.CommandSchedulerService;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
@@ -44,6 +46,8 @@ public class ReportTemplateResourceTest {
 
   private OpalConfiguration opalConfiguration;
 
+  private CommandRegistry commandRegistry;
+
   Set<ReportTemplate> reportTemplates;
 
   @Before
@@ -51,6 +55,7 @@ public class ReportTemplateResourceTest {
     opalRuntimeMock = createMock(OpalRuntime.class);
     reportServiceMock = createMock(ReportService.class);
     opalConfiguration = new OpalConfiguration();
+    commandRegistry = createMock(CommandRegistry.class);
 
     reportTemplates = new LinkedHashSet<ReportTemplate>();
     reportTemplates.add(getReportTemplate("template1"));
@@ -100,7 +105,7 @@ public class ReportTemplateResourceTest {
 
     replay(opalRuntimeMock, commandSchedulerServiceMock);
 
-    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template2", opalRuntimeMock, reportServiceMock, commandSchedulerServiceMock);
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template2", opalRuntimeMock, reportServiceMock, commandSchedulerServiceMock, commandRegistry);
     Response response = reportTemplateResource.deleteReportTemplate();
 
     Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -132,31 +137,42 @@ public class ReportTemplateResourceTest {
     CommandSchedulerService commandSchedulerServiceMock = createMock(CommandSchedulerService.class);
     commandSchedulerServiceMock.scheduleCommand("template9", "reports", "schedule");
 
-    replay(opalRuntimeMock, uriInfoMock, commandSchedulerServiceMock);
+    @SuppressWarnings("unchecked")
+    Command<Object> commandMock = createMock(Command.class);
+    commandSchedulerServiceMock.addCommand("template9", "reports", commandMock);
 
-    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template9", opalRuntimeMock, reportServiceMock, commandSchedulerServiceMock);
+    expect(commandRegistry.newCommand("report")).andReturn(commandMock);
+
+    replay(opalRuntimeMock, uriInfoMock, commandSchedulerServiceMock, commandRegistry);
+
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template9", opalRuntimeMock, reportServiceMock, commandSchedulerServiceMock, commandRegistry);
     Response response = reportTemplateResource.updateReportTemplate(uriInfoMock, Dtos.asDto(getReportTemplate("template9")));
 
     Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
     Assert.assertEquals(BASE_URI, response.getMetadata().get("location").get(0).toString());
 
-    verify(opalRuntimeMock, uriInfoMock, commandSchedulerServiceMock);
+    verify(opalRuntimeMock, uriInfoMock, commandSchedulerServiceMock, commandRegistry);
   }
 
   @Test
   public void testUpdateReportTemplate_ExistingReportTemplateUpdated() {
 
+    @SuppressWarnings("unchecked")
+    Command<Object> commandMock = createMock(Command.class);
+    expect(commandRegistry.newCommand("report")).andReturn(commandMock);
+
     CommandSchedulerService commandSchedulerServiceMock = createMock(CommandSchedulerService.class);
     commandSchedulerServiceMock.scheduleCommand("template1", "reports", "schedule");
+    commandSchedulerServiceMock.addCommand("template1", "reports", commandMock);
 
-    replay(opalRuntimeMock, commandSchedulerServiceMock);
+    replay(opalRuntimeMock, commandSchedulerServiceMock, commandRegistry);
 
-    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template1", opalRuntimeMock, reportServiceMock, commandSchedulerServiceMock);
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template1", opalRuntimeMock, reportServiceMock, commandSchedulerServiceMock, commandRegistry);
     Response response = reportTemplateResource.updateReportTemplate(createMock(UriInfo.class), Dtos.asDto(getReportTemplate("template1")));
 
     Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-    verify(opalRuntimeMock, commandSchedulerServiceMock);
+    verify(opalRuntimeMock, commandSchedulerServiceMock, commandRegistry);
 
   }
 
