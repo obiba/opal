@@ -9,10 +9,7 @@
   <import resource="tx.xml" />
   <import resource="hibernate-services.xml" />
   <import resource="version.xml" />
-  
-  <!-- 
   <import resource="quartz.xml" />
-  -->
 
   <bean id="opalRuntime" class="org.obiba.opal.core.runtime.DefaultOpalRuntime">
     <constructor-arg>

@@ -9,19 +9,23 @@
  ******************************************************************************/
 package org.obiba.opal.shell.service.impl.quartz;
 
+import java.text.ParseException;
+
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.service.CommandSchedulerService;
 import org.obiba.opal.shell.service.CommandSchedulerServiceException;
 import org.quartz.CronTrigger;
+import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Quartz-based implementation of {@link CommandSchedulerService}.
  */
-// @Component
+@Component
 public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerService {
   //
   // Instance Variables
@@ -35,8 +39,14 @@ public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerServic
   //
 
   public void addCommand(String name, String group, Command<?> command) {
-    // Create QuartzCommandJob.
-    // Call scheduler.addJob(...)
+    JobDetail jobDetail = new JobDetail(name, group, QuartzCommandJob.class);
+    jobDetail.getJobDataMap().put("command", command.toString());
+
+    try {
+      scheduler.addJob(jobDetail, true);
+    } catch(SchedulerException ex) {
+      throw new CommandSchedulerServiceException(ex);
+    }
   }
 
   public void deleteCommand(String name, String group) {
@@ -47,8 +57,14 @@ public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerServic
     }
   }
 
-  public void scheduleCommand(String name, String group, String schedule) {
-
+  public void scheduleCommand(String name, String group, String cronExpression) {
+    try {
+      scheduler.scheduleJob(new CronTrigger(name + "-trigger", group, name, group, cronExpression));
+    } catch(SchedulerException ex) {
+      throw new CommandSchedulerServiceException(ex);
+    } catch(ParseException ex) {
+      throw new CommandSchedulerServiceException(ex);
+    }
   }
 
   public void unscheduleCommand(String name, String group) {

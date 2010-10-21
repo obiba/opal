@@ -41,11 +41,11 @@ public interface CommandSchedulerService {
    * 
    * @param name the command's name
    * @param group the command's group
-   * @param schedule the command's execution schedule, a cron expression (for details, see
+   * @param cronExpression the command's execution schedule, a cron expression (for details, see
    * {@link org.quartz.CronTrigger})
    * @throws CommandSchedulerServiceException on any type of scheduler exception
    */
-  void scheduleCommand(String name, String group, String schedule);
+  void scheduleCommand(String name, String group, String cronExpression);
 
   /**
    * Unschedules a command. Note that calling this method does not delete the command; it may still be referenced by

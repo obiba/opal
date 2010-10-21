@@ -117,7 +117,13 @@ public class DefaultCommandJobService implements CommandJobService {
     Integer id = nextJobId();
 
     commandJob.setId(id);
-    commandJob.setOwner(userProvider.getUsername());
+
+    // TODO: Temporarily setting the owner to "Unknown." Previously, the owner was set to the value of
+    // userProvider.getUsername(). However, this causes an UnavailableSecurityManagerException if no user
+    // is logged in (this could happen when a command is launched by a Quartz trigger at a time when no
+    // user has logged into Opal).
+    commandJob.setOwner("Unknown");
+
     commandJob.setSubmitTime(getCurrentTime());
 
     FutureCommandJob futureCommandJob = new FutureCommandJob(commandJob);

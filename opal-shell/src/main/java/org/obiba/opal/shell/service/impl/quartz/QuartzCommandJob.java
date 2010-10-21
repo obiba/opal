@@ -20,8 +20,11 @@ import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.context.ApplicationContext;
 
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException;
 import uk.co.flamingpenguin.jewel.cli.CliFactory;
@@ -35,17 +38,38 @@ public class QuartzCommandJob implements Job {
   //
 
   @Autowired
-  private CommandJobService commandJobService;
-
-  @Autowired
   @Qualifier("web")
   private CommandRegistry commandRegistry;
+
+  @Autowired
+  private CommandJobService commandJobService;
 
   //
   // Job Methods
   //
 
   public void execute(JobExecutionContext context) throws JobExecutionException {
+    autowireSelf(context);
+
+    CommandJob commandJob = new CommandJob(getCommand(context));
+    commandJobService.launchCommand(commandJob);
+  }
+
+  //
+  // Methods
+  //
+
+  private void autowireSelf(JobExecutionContext context) throws JobExecutionException {
+    ApplicationContext applicationContext = null;
+    try {
+      applicationContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");
+    } catch(SchedulerException ex) {
+      throw new JobExecutionException("applicationContext lookup failed", ex);
+    }
+    applicationContext.getAutowireCapableBeanFactory().autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_NO, false);
+  }
+
+  private Command<?> getCommand(JobExecutionContext context) throws JobExecutionException {
     JobDataMap dataMap = context.getJobDetail().getJobDataMap();
     String commandLine = dataMap.getString("command");
 
@@ -55,14 +79,8 @@ public class QuartzCommandJob implements Job {
     } catch(ArgumentValidationException ex) {
       throw new JobExecutionException("Invalid job parameter 'command': " + commandLine, ex);
     }
-
-    CommandJob commandJob = new CommandJob(command);
-    commandJobService.launchCommand(commandJob);
+    return command;
   }
-
-  //
-  // Methods
-  //
 
   private Command<?> toCommand(String commandLine) throws ArgumentValidationException {
     String[] commandLineArray = CommandLines.parseArguments(commandLine);
