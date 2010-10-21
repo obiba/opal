@@ -33,14 +33,17 @@ import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.CopyCommand;
 import org.obiba.opal.shell.commands.ImportCommand;
+import org.obiba.opal.shell.commands.ReportCommand;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
+import org.obiba.opal.shell.commands.options.ReportCommandOptions;
 import org.obiba.opal.shell.service.CommandJobService;
 import org.obiba.opal.shell.service.NoSuchCommandJobException;
 import org.obiba.opal.web.model.Commands.CommandStateDto;
+import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
 import org.obiba.opal.web.model.Commands.CopyCommandOptionsDto;
 import org.obiba.opal.web.model.Commands.ImportCommandOptionsDto;
-import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
+import org.obiba.opal.web.model.Commands.ReportCommandOptionsDto;
 
 /**
  * Unit tests for {@link WebShellResource}.
@@ -391,6 +394,38 @@ public class WebShellResourceTest {
     assertEquals("/shell/command/" + jobId, response.getMetadata().getFirst("Location").toString());
   }
 
+  @Test
+  public void testCreateReport() {
+    // Setup
+    Integer jobId = 1;
+    CommandRegistry mockCommandRegistry = createMockCommandRegistry();
+    ReportCommand reportCommand = createReportCommand();
+    expect(mockCommandRegistry.<ReportCommandOptions> newCommand(reportCommand.getName())).andReturn(reportCommand).atLeastOnce();
+
+    CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
+    expect(mockCommandJobService.launchCommand(eqCommandJob(createCommandJob(jobId, reportCommand, null)))).andReturn(jobId).atLeastOnce();
+
+    WebShellResource sut = new WebShellResource(null, mockCommandJobService, mockCommandRegistry);
+
+    replay(mockCommandRegistry, mockCommandJobService);
+
+    // Exercise
+    ReportCommandOptionsDto optionsDto = createReportCommandOptionsDto("test report");
+    Response response = sut.createReport(optionsDto);
+
+    // Verify mocks
+    verify(mockCommandRegistry, mockCommandJobService);
+
+    // Verify that the options in the dto were applied to the launched command
+    ReportCommandOptions importOptions = reportCommand.getOptions();
+    assertEquals(optionsDto.getName(), importOptions.getName());
+
+    // Verify that the HTTP response code was CREATED (201) and that the "Location"
+    // header was set to '/shell/command/{jobId}'.
+    assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+    assertEquals("/shell/command/" + jobId, response.getMetadata().getFirst("Location").toString());
+  }
+
   //
   // Private Methods
   //
@@ -470,6 +505,14 @@ public class WebShellResourceTest {
     return dtoBuilder.build();
   }
 
+  private ReportCommandOptionsDto createReportCommandOptionsDto(String name) {
+    ReportCommandOptionsDto.Builder dtoBuilder = ReportCommandOptionsDto.newBuilder();
+
+    dtoBuilder.setName(name);
+
+    return dtoBuilder.build();
+  }
+
   private CopyCommandOptionsDto createCopyCommandOptionsDto(String source, String destination, String out, String multiplex, String transform, String... tables) {
     CopyCommandOptionsDto.Builder dtoBuilder = CopyCommandOptionsDto.newBuilder();
 
@@ -521,6 +564,27 @@ public class WebShellResourceTest {
       @Override
       public String toString() {
         return "import args";
+      }
+
+      @Override
+      public int execute() {
+        return 0;
+      }
+    };
+
+    return command;
+  }
+
+  private ReportCommand createReportCommand() {
+    ReportCommand command = new ReportCommand() {
+      @Override
+      public String getName() {
+        return "report";
+      }
+
+      @Override
+      public String toString() {
+        return "report args";
       }
 
       @Override
