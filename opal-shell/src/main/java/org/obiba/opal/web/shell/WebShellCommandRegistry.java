@@ -12,8 +12,10 @@ package org.obiba.opal.web.shell;
 import org.obiba.opal.shell.AbstractCommandRegistry;
 import org.obiba.opal.shell.commands.CopyCommand;
 import org.obiba.opal.shell.commands.ImportCommand;
+import org.obiba.opal.shell.commands.ReportCommand;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
+import org.obiba.opal.shell.commands.options.ReportCommandOptions;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -29,5 +31,6 @@ public class WebShellCommandRegistry extends AbstractCommandRegistry {
 
     addAvailableCommand(ImportCommand.class, ImportCommandOptions.class);
     addAvailableCommand(CopyCommand.class, CopyCommandOptions.class);
+    addAvailableCommand(ReportCommand.class, ReportCommandOptions.class);
   }
 }

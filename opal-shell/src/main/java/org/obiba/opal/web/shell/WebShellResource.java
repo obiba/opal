@@ -19,8 +19,8 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.shell.CommandJob;
@@ -28,10 +28,12 @@ import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
+import org.obiba.opal.shell.commands.options.ReportCommandOptions;
 import org.obiba.opal.shell.service.CommandJobService;
 import org.obiba.opal.shell.service.NoSuchCommandJobException;
 import org.obiba.opal.shell.web.CopyCommandOptionsDtoImpl;
 import org.obiba.opal.shell.web.ImportCommandOptionsDtoImpl;
+import org.obiba.opal.shell.web.ReportCommandOptionsDtoImpl;
 import org.obiba.opal.web.model.Commands;
 import org.obiba.opal.web.model.Commands.CommandStateDto;
 import org.slf4j.Logger;
@@ -171,6 +173,16 @@ public class WebShellResource {
     copyCommand.setOptions(copyOptions);
 
     return launchCommand(copyCommand);
+  }
+
+  @POST
+  @Path("/report")
+  public Response createReport(Commands.ReportCommandOptionsDto options) {
+    ReportCommandOptions reportOptions = new ReportCommandOptionsDtoImpl(options);
+    Command<ReportCommandOptions> reportCommand = commandRegistry.newCommand("report");
+    reportCommand.setOptions(reportOptions);
+
+    return launchCommand(reportCommand);
   }
 
   //

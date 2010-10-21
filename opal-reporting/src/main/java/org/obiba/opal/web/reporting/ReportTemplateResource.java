@@ -27,6 +27,9 @@ import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.ReportTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.reporting.service.ReportService;
+import org.obiba.opal.shell.CommandRegistry;
+import org.obiba.opal.shell.commands.Command;
+import org.obiba.opal.shell.commands.options.ReportCommandOptions;
 import org.obiba.opal.shell.service.CommandSchedulerService;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
@@ -34,6 +37,7 @@ import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -56,25 +60,29 @@ public class ReportTemplateResource {
 
   private final CommandSchedulerService commandSchedulerService;
 
+  private final CommandRegistry commandRegistry;
+
   // Added for unit tests
   public ReportTemplateResource(String name, OpalRuntime opalRuntime, ReportService reportService) {
-    this(name, opalRuntime, reportService, null);
+    this(name, opalRuntime, reportService, null, null);
   }
 
-  public ReportTemplateResource(String name, OpalRuntime opalRuntime, ReportService reportService, CommandSchedulerService commandSchedulerService) {
+  public ReportTemplateResource(String name, OpalRuntime opalRuntime, ReportService reportService, CommandSchedulerService commandSchedulerService, CommandRegistry commandRegistry) {
     super();
     this.name = name;
     this.opalRuntime = opalRuntime;
     this.reportService = reportService;
     this.commandSchedulerService = commandSchedulerService;
+    this.commandRegistry = commandRegistry;
   }
 
   @Autowired
-  public ReportTemplateResource(OpalRuntime opalRuntime, ReportService reportService, CommandSchedulerService commandSchedulerService) {
+  public ReportTemplateResource(OpalRuntime opalRuntime, ReportService reportService, CommandSchedulerService commandSchedulerService, @Qualifier("web") CommandRegistry commandRegistry) {
     super();
     this.opalRuntime = opalRuntime;
     this.reportService = reportService;
     this.commandSchedulerService = commandSchedulerService;
+    this.commandRegistry = commandRegistry;
   }
 
   @GET
@@ -94,9 +102,7 @@ public class ReportTemplateResource {
       return Response.status(Status.NOT_FOUND).build();
     } else {
       opalRuntime.getOpalConfiguration().removeReportTemplate(name);
-      if(reportTemplateToRemove.getSchedule() != null) {
-        commandSchedulerService.deleteCommand(name, reportShedullingGroup);
-      }
+      commandSchedulerService.deleteCommand(name, reportShedullingGroup);
       return Response.ok().build();
     }
   }
@@ -126,7 +132,26 @@ public class ReportTemplateResource {
   private void addReportTemplate(ReportTemplateDto reportTemplateDto, OpalConfiguration opalConfig) {
     ReportTemplate reportTemplate = Dtos.fromDto(reportTemplateDto);
     opalConfig.addReportTemplate(reportTemplate);
+    addCommand();
     scheduleCommand(reportTemplate);
+  }
+
+  private void addCommand() {
+    ReportCommandOptions reportOptions = new ReportCommandOptions() {
+
+      @Override
+      public boolean isHelp() {
+        return false;
+      }
+
+      @Override
+      public String getName() {
+        return name;
+      }
+    };
+    Command<ReportCommandOptions> reportCommand = commandRegistry.newCommand("report");
+    reportCommand.setOptions(reportOptions);
+    commandSchedulerService.addCommand(name, "reports", reportCommand);
   }
 
   private void scheduleCommand(ReportTemplate reportTemplate) {

@@ -49,3 +49,7 @@ message CopyCommandOptionsDto {
   repeated string tables = 10;
   optional string format = 11;
 }
+
+message ReportCommandOptionsDto {
+  required string name = 1;
+}
