@@ -23,6 +23,17 @@ public interface CommandJobService extends Service {
    * Assigns an id to a command job and submits it for asynchronous execution.
    * 
    * @param commandJob the submitted command job
+   * @param the command job's owner
+   * @return the command job's id
+   */
+  public Integer launchCommand(CommandJob commandJob, String owner);
+
+  /**
+   * Assigns an id to a command job and submits it for asynchronous execution.
+   * 
+   * The command job's owner is set to the current user.
+   * 
+   * @param commandJob the submitted command job
    * @return the command job's id
    */
   public Integer launchCommand(CommandJob commandJob);

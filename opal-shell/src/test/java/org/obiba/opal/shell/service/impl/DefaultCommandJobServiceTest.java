@@ -27,7 +27,6 @@ import java.util.concurrent.Executor;
 import org.easymock.EasyMock;
 import org.easymock.IArgumentMatcher;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.obiba.magma.audit.UserProvider;
 import org.obiba.opal.shell.CommandJob;
@@ -162,7 +161,6 @@ public class DefaultCommandJobServiceTest {
     assertNotNull(commandJob.getId());
   }
 
-  @Ignore("Temporarily ignoring this test. The owner is always set to 'Unknown' due to an issue with commands launched when no user is logged in (e.g., by Quartz).")
   @Test
   public void testLaunchCommand_MakesTheCurrentUserTheOwnerOfTheCommandJob() {
     sut.launchCommand(commandJob);

@@ -52,7 +52,7 @@ public class QuartzCommandJob implements Job {
     autowireSelf(context);
 
     CommandJob commandJob = new CommandJob(getCommand(context));
-    commandJobService.launchCommand(commandJob);
+    commandJobService.launchCommand(commandJob, "System");
   }
 
   //
