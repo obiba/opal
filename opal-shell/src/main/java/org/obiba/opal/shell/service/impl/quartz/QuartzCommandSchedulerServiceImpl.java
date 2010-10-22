@@ -31,8 +31,16 @@ public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerServic
   // Instance Variables
   //
 
-  @Autowired
   private Scheduler scheduler;
+
+  //
+  // Constructors
+  //
+
+  @Autowired
+  public QuartzCommandSchedulerServiceImpl(Scheduler scheduler) {
+    this.scheduler = scheduler;
+  }
 
   //
   // CommandSchedulerService Methods
