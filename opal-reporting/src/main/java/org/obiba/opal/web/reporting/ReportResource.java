@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,15 +51,16 @@ public class ReportResource {
   @Path("/public/{obfuscated-file:.*}")
   @NotAuthenticated
   public Response getReport(@PathParam("obfuscated-file") String obfuscatedFile) throws FileSystemException {
-    // TODO: go through reports directory content, hash the report paths "<report template name>/<report file name>" and
-    // compare to 'obfuscated-file'
-    String file = obfuscatedFile;
-    File report = opalRuntime.getFileSystem().getLocalFile(resolveFileInFileSystem("/reports/" + file));
-    if(!report.exists()) {
+    OpalFileSystem fileSystem = opalRuntime.getFileSystem();
+    System.out.println("filesystem " + fileSystem);
+    FileObject reportFolder = fileSystem.getRoot().resolveFile("/reports");
+    FileObject reportFile = fileSystem.resolveFileFromObfuscatedPath(reportFolder, obfuscatedFile);
+    if(reportFile == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    String mimeType = mimeTypes.getContentType(report);
-    return Response.ok(report, MediaType.valueOf(mimeType)).header("Content-Disposition", getContentDispositionOfAttachment(report.getName())).build();
+    File reportLocalFile = fileSystem.getLocalFile(reportFile);
+    String mimeType = mimeTypes.getContentType(reportLocalFile);
+    return Response.ok(reportLocalFile, MediaType.valueOf(mimeType)).header("Content-Disposition", getContentDispositionOfAttachment(reportLocalFile.getName())).build();
   }
 
   protected FileObject resolveFileInFileSystem(String path) throws FileSystemException {

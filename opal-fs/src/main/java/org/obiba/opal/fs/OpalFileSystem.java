@@ -63,9 +63,10 @@ public interface OpalFileSystem {
    * Searches the Virtual File System (VFS) for a file with a path that corresponds to the obfuscated path and returns
    * it. Returns null if not path is found for the obfuscated path.
    * 
+   * @param baseFolder The base folder on which the search will be performed.
    * @param obfuscatedPath The obfuscated path.
    * @return The path corresponding to the obfuscated path in the VFS.
    */
-  public FileObject resolveFileFromObfuscatedPath(String obfuscatedPath);
+  public FileObject resolveFileFromObfuscatedPath(FileObject baseFolder, String obfuscatedPath);
 
 }

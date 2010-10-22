@@ -159,9 +159,9 @@ public class OpalFileSystemImpl implements OpalFileSystem {
   }
 
   @Override
-  public FileObject resolveFileFromObfuscatedPath(String obfuscatedPath) {
+  public FileObject resolveFileFromObfuscatedPath(FileObject baseFolder, String obfuscatedPath) {
     try {
-      return searchFolder(root, obfuscatedPath);
+      return searchFolder(baseFolder, obfuscatedPath);
     } catch(FileSystemException e) {
       throw new RuntimeException("Unsuspected error : ", e);
     }

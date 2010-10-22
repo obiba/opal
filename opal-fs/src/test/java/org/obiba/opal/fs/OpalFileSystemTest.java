@@ -116,27 +116,31 @@ public class OpalFileSystemTest {
     file = fsLocalRoot.resolveFile("/test2/temp.pem");
     obfuscatedFilePath = fsLocal.getObfuscatedPath(file);
     Assert.assertEquals("508e41fae4e3de7a3045c2c9108f7fec", obfuscatedFilePath);
+
+    file = fsLocalRoot.resolveFile("/reports/test2/test21/temp.pem");
+    obfuscatedFilePath = fsLocal.getObfuscatedPath(file);
+    Assert.assertEquals("f5f0f7be20e4b7eadca209fb071292b", obfuscatedFilePath);
   }
 
   @Test
   public void testResolveFileFromObfuscatedPath_PathIsResolved() throws FileSystemException {
-    FileObject file = fsLocal.resolveFileFromObfuscatedPath("227379988e6f2c3e9eb87b1f7d7bd055");
+    FileObject file = fsLocal.resolveFileFromObfuscatedPath(fsLocalRoot, "227379988e6f2c3e9eb87b1f7d7bd055");
     Assert.assertEquals("/temp.pem", file.getName().getPath());
 
-    file = fsLocal.resolveFileFromObfuscatedPath("269dd3644748e20182274c7a9de2ee6");
+    file = fsLocal.resolveFileFromObfuscatedPath(fsLocalRoot, "269dd3644748e20182274c7a9de2ee6");
     Assert.assertEquals("/test2/test21/temp2.pem", file.getName().getPath());
 
-    file = fsLocal.resolveFileFromObfuscatedPath("30aa4ab41dbfeecb9e92d223bcaccb4");
+    file = fsLocal.resolveFileFromObfuscatedPath(fsLocalRoot, "30aa4ab41dbfeecb9e92d223bcaccb4");
     Assert.assertEquals("/test2/test21/temp.pem", file.getName().getPath());
 
-    file = fsLocal.resolveFileFromObfuscatedPath("508e41fae4e3de7a3045c2c9108f7fec");
+    file = fsLocal.resolveFileFromObfuscatedPath(fsLocalRoot, "508e41fae4e3de7a3045c2c9108f7fec");
     Assert.assertEquals("/test2/temp.pem", file.getName().getPath());
 
   }
 
   @Test
   public void testResolveFileFromObfuscatedPath_PathIsNotResolved() throws FileSystemException {
-    FileObject file = fsLocal.resolveFileFromObfuscatedPath("xxxx");
+    FileObject file = fsLocal.resolveFileFromObfuscatedPath(fsLocalRoot, "xxxx");
     Assert.assertNull(file);
 
   }
