@@ -51,4 +51,21 @@ public interface OpalFileSystem {
    */
   public boolean isLocalFile(FileObject virtualFile);
 
+  /**
+   * Converts the path of a file in the Virtual File System (VFS) to an "obfuscated" path an returns it.
+   * 
+   * @param virtualFile The file for which we want to get an obfuscated path.
+   * @return The obfuscated path.
+   */
+  public String getObfuscatedPath(FileObject virtualFile);
+
+  /**
+   * Searches the Virtual File System (VFS) for a file with a path that corresponds to the obfuscated path and returns
+   * it. Returns null if not path is found for the obfuscated path.
+   * 
+   * @param obfuscatedPath The obfuscated path.
+   * @return The path corresponding to the obfuscated path in the VFS.
+   */
+  public FileObject resolveFileFromObfuscatedPath(String obfuscatedPath);
+
 }

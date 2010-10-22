@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
@@ -129,4 +131,59 @@ public class OpalFileSystemImpl implements OpalFileSystem {
 
   }
 
+  @Override
+  public String getObfuscatedPath(FileObject virtualFile) {
+    return obfuscate(virtualFile.getName().getPath());
+  }
+
+  private String obfuscate(String stringToObfuscate) {
+    return convertBytesToString(getDigester().digest(stringToObfuscate.getBytes()));
+  }
+
+  private String convertBytesToString(byte[] digestedBytes) {
+    StringBuilder hexString = new StringBuilder();
+    for(int i = 0; i < digestedBytes.length; i++) {
+      hexString.append(Integer.toHexString(0xFF & digestedBytes[i]));
+    }
+    return hexString.toString();
+  }
+
+  private MessageDigest getDigester() {
+    MessageDigest digester = null;
+    try {
+      digester = MessageDigest.getInstance("MD5");
+    } catch(NoSuchAlgorithmException e) {
+      throw new RuntimeException("Cannot find the specified digesting algorithm", e);
+    }
+    return digester;
+  }
+
+  @Override
+  public FileObject resolveFileFromObfuscatedPath(String obfuscatedPath) {
+    try {
+      return searchFolder(root, obfuscatedPath);
+    } catch(FileSystemException e) {
+      throw new RuntimeException("Unsuspected error : ", e);
+    }
+
+  }
+
+  private FileObject searchFolder(FileObject folder, String obfuscatedPath) throws FileSystemException {
+
+    FileObject matchingFile = null;
+    for(FileObject file : folder.getChildren()) {
+
+      if(file.getType().equals(FileType.FOLDER) && file.getChildren().length > 0) {
+        matchingFile = searchFolder(file, obfuscatedPath);
+      }
+
+      if(obfuscate(file.getName().getPath()).equals(obfuscatedPath)) {
+        matchingFile = file;
+        break;
+      }
+
+    }
+
+    return matchingFile;
+  }
 }
