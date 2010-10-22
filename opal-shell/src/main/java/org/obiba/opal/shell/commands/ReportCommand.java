@@ -11,6 +11,7 @@ package org.obiba.opal.shell.commands;
 
 import org.obiba.opal.shell.commands.options.ReportCommandOptions;
 
+@CommandUsage(description = "Generate a report based on the specified report template.", syntax = "Syntax: report --name TEMPLATE")
 public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCommandOptions> {
 
   @Override
