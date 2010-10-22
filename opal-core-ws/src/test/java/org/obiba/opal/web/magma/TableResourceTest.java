@@ -118,7 +118,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     replay(uriInfoMock);
     replay(segments.toArray());
 
-    List<VariableDto> dtos = Lists.newArrayList(resource.getVariables(uriInfoMock, null));
+    List<VariableDto> dtos = Lists.newArrayList(resource.getVariables(uriInfoMock, null, 0, null));
 
     verify(uriInfoMock);
     verify(segments.toArray());

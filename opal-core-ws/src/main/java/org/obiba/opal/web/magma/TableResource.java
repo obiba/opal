@@ -31,9 +31,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
 import org.mozilla.javascript.Scriptable;
 import org.obiba.core.util.StreamUtil;
@@ -41,11 +41,11 @@ import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
+import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.JavascriptValueSource;
 import org.obiba.magma.js.JavascriptVariableBuilder;
@@ -122,7 +122,14 @@ public class TableResource {
 
   @GET
   @Path("/variables")
-  public Iterable<VariableDto> getVariables(@Context final UriInfo uriInfo, @QueryParam("script") String script) {
+  public Iterable<VariableDto> getVariables(@Context final UriInfo uriInfo, @QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit) {
+    if(offset < 0) {
+      throw new InvalidRequestException("IllegalParameterValue", "offset", String.valueOf(limit));
+    }
+    if(limit != null && limit < 0) {
+      throw new InvalidRequestException("IllegalParameterValue", "limit", String.valueOf(limit));
+    }
+
     ArrayList<PathSegment> segments = Lists.newArrayList(uriInfo.getPathSegments());
     segments.remove(segments.size() - 1);
     final UriBuilder ub = uriInfo.getBaseUriBuilder();
@@ -135,7 +142,7 @@ public class TableResource {
     String tableUri = tableub.build().toString();
     LinkDto.Builder tableLinkBuilder = LinkDto.newBuilder().setLink(tableUri).setRel(valueTable.getName());
 
-    Iterable<Variable> variables = filterVariables(valueTable, script);
+    Iterable<Variable> variables = filterVariables(valueTable, script, offset, limit);
     ArrayList<VariableDto> variableDtos = Lists.newArrayList(Iterables.transform(variables, Dtos.asDtoFunc(tableLinkBuilder.build(), ub)));
     sortVariableDtoByName(variableDtos);
 
@@ -144,12 +151,18 @@ public class TableResource {
 
   @GET
   @Path("variables/query")
-  public Iterable<ValueDto> getVariablesQuery(@QueryParam("script") String script) {
+  public Iterable<ValueDto> getVariablesQuery(@QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit) {
     if(script == null) {
       throw new InvalidRequestException("RequiredParameter", "script");
     }
+    if(offset < 0) {
+      throw new InvalidRequestException("IllegalParameterValue", "offset", String.valueOf(limit));
+    }
+    if(limit != null && limit < 0) {
+      throw new InvalidRequestException("IllegalParameterValue", "limit", String.valueOf(limit));
+    }
 
-    Iterable<Value> values = queryVariables(valueTable, script);
+    Iterable<Value> values = queryVariables(valueTable, script, offset, limit);
     ArrayList<ValueDto> valueDtos = Lists.newArrayList(Iterables.transform(values, new Function<Value, ValueDto>() {
       public ValueDto apply(Value from) {
         return Dtos.asDto(from).build();
@@ -258,6 +271,9 @@ public class TableResource {
   @GET
   @Path("/variable/_transient/values")
   public Iterable<ValueDto> getTransientValues(@QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") @DefaultValue("10") Integer limit, @QueryParam("valueType") @DefaultValue("text") String valueTypeName, @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String script) {
+    if(offset < 0) {
+      throw new InvalidRequestException("IllegalParameterValue", "offset", String.valueOf(limit));
+    }
     if(limit < 0) {
       throw new InvalidRequestException("IllegalParameterValue", "limit", String.valueOf(limit));
     }
@@ -348,33 +364,41 @@ public class TableResource {
     return valueTable;
   }
 
-  private Iterable<Variable> filterVariables(ValueTable valueTable, String script) {
-    if(script == null) {
-      return valueTable.getVariables();
-    }
+  private Iterable<Variable> filterVariables(ValueTable valueTable, String script, Integer offset, Integer limit) {
+    List<Variable> filteredVariables = null;
 
-    JavascriptClause jsClause = new JavascriptClause(script);
-    jsClause.initialise();
+    if(script != null) {
+      JavascriptClause jsClause = new JavascriptClause(script);
+      jsClause.initialise();
 
-    List<Variable> filteredVariables = new ArrayList<Variable>();
-    for(Variable variable : valueTable.getVariables()) {
-      if(jsClause.select(variable)) {
-        filteredVariables.add(variable);
+      filteredVariables = new ArrayList<Variable>();
+      for(Variable variable : valueTable.getVariables()) {
+        if(jsClause.select(variable)) {
+          filteredVariables.add(variable);
+        }
       }
+    } else {
+      filteredVariables = Lists.newArrayList(valueTable.getVariables());
     }
 
-    return filteredVariables;
+    int fromIndex = (offset < filteredVariables.size()) ? offset : filteredVariables.size();
+    int toIndex = (limit != null) ? Math.min(fromIndex + limit, filteredVariables.size()) : filteredVariables.size();
+
+    return filteredVariables.subList(fromIndex, toIndex);
   }
 
-  private Iterable<Value> queryVariables(ValueTable valueTable, String script) {
+  private Iterable<Value> queryVariables(ValueTable valueTable, String script, Integer offset, Integer limit) {
     JavascriptClause jsClause = new JavascriptClause(script);
     jsClause.initialise();
 
-    Iterable<Variable> variables = valueTable.getVariables();
-    sortVariableByName(Lists.newArrayList(variables));
+    List<Variable> variables = Lists.newArrayList(valueTable.getVariables());
+    sortVariableByName(variables);
+
+    int fromIndex = (offset < variables.size()) ? offset : variables.size();
+    int toIndex = (limit != null) ? Math.min(fromIndex + limit, variables.size()) : variables.size();
 
     List<Value> values = new ArrayList<Value>();
-    for(Variable variable : valueTable.getVariables()) {
+    for(Variable variable : variables.subList(fromIndex, toIndex)) {
       values.add(jsClause.query(variable));
     }
 
