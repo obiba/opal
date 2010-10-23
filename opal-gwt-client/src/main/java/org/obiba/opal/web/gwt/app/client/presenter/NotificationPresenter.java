@@ -109,15 +109,11 @@ public class NotificationPresenter extends WidgetPresenter<NotificationPresenter
     addNotificationCloseHandler(event.getNotificationCloseHandler());
   }
 
-  public void setTitle(String title) {
-    getDisplay().setCaption(title);
-  }
-
-  public void setMessages(List<String> messages) {
+  private void setMessages(List<String> messages) {
     display.setMessages(messages);
   }
 
-  public void setMessageDialogType(NotificationType messageDialogType) {
+  private void setMessageDialogType(NotificationType messageDialogType) {
     getDisplay().setNotificationType(messageDialogType);
     switch(messageDialogType) {
     case ERROR:
@@ -132,7 +128,7 @@ public class NotificationPresenter extends WidgetPresenter<NotificationPresenter
     }
   }
 
-  public void addNotificationCloseHandler(final NotificationCloseHandler handler) {
+  private void addNotificationCloseHandler(final NotificationCloseHandler handler) {
     if(handler != null) {
       getDisplay().addNotificationCloseHandler(handler);
     }

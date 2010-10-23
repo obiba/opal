@@ -14,13 +14,15 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Timer;
 
 /**
- *
+ * Fade an element, default is fade-in.
  */
 public class FadeAnimation extends Timer {
 
-  private double opacity = 0;
+  private double opacity;
 
-  private double opacityMax = 0.85;
+  private double from = 0;
+
+  private double to = 1;
 
   private int period = 1;
 
@@ -28,54 +30,94 @@ public class FadeAnimation extends Timer {
 
   private Element element;
 
-  private FadeAnimation() {
+  private FadedHandler handler;
+
+  private FadeAnimation(Element element) {
     super();
+    this.element = element;
   }
 
   @Override
   public void run() {
-    if(opacity < opacityMax) {
+    if(from < to && opacity < to) {
       opacity += step;
-      setOpacity(opacity);
+      applyOpacity();
+    } else if(from > to && opacity > to) {
+      opacity -= step;
+      applyOpacity();
     } else {
+      if(handler != null) {
+        handler.onFaded(element);
+      }
       cancel();
     }
   }
 
-  public FadeAnimation setOpacity(double opacity) {
-    this.opacity = opacity;
+  private void applyOpacity() {
     DOM.setStyleAttribute(element, "opacity", Double.toString(opacity));
-    return this;
   }
 
-  public FadeAnimation setOpacityMax(double opacityMax) {
-    this.opacityMax = opacityMax;
-    return this;
-  }
-
-  public FadeAnimation setPeriod(int period) {
-    this.period = period;
-    return this;
-  }
-
-  public FadeAnimation setStep(double step) {
-    this.step = step;
-    return this;
-  }
-
-  public void start() {
-    setOpacity(opacity);
+  private void start() {
+    opacity = from;
+    applyOpacity();
     scheduleRepeating(period);
   }
 
-  public static FadeAnimation create(Element element) {
-    FadeAnimation timer = new FadeAnimation();
-    timer.element = element;
-    return timer;
+  /**
+   * Callback when fading is over.
+   */
+  public interface FadedHandler {
+    public void onFaded(Element element);
   }
 
-  public static void start(Element element) {
-    create(element).start();
+  public class Builder {
+    private FadeAnimation fader;
+
+    Builder(FadeAnimation fader) {
+      super();
+      this.fader = fader;
+    }
+
+    public Builder from(double from) {
+      fader.from = from;
+      return this;
+    }
+
+    public Builder to(double to) {
+      fader.to = to;
+      return this;
+    }
+
+    public Builder by(double step) {
+      fader.step = step;
+      return this;
+    }
+
+    public Builder every(int millis) {
+      fader.period = millis;
+      return this;
+    }
+
+    public Builder then(FadedHandler handler) {
+      fader.handler = handler;
+      return this;
+    }
+
+    public FadeAnimation start() {
+      fader.start();
+      return fader;
+    }
+
+  }
+
+  public static Builder create(Element element) {
+    FadeAnimation fader = new FadeAnimation(element);
+    Builder builder = fader.new Builder(fader);
+    return builder;
+  }
+
+  public static FadeAnimation start(Element element) {
+    return create(element).start();
   }
 
 }

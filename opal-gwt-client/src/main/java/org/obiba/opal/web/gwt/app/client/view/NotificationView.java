@@ -14,6 +14,7 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationCloseHandler;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.view.FadeAnimation.FadedHandler;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -23,6 +24,7 @@ import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
@@ -57,6 +59,8 @@ public class NotificationView extends Composite implements NotificationPresenter
 
   private boolean sticky = true;
 
+  private Timer nonStickyTimer;
+
   public NotificationView() {
     uiBinder.createAndBindUi(this);
 
@@ -77,17 +81,27 @@ public class NotificationView extends Composite implements NotificationPresenter
   @Override
   public void showPopup() {
     dialog.setPopupPosition(Window.getClientWidth() - 350, 50);
-    FadeAnimation.start(dialog.getElement());
+    FadeAnimation.create(dialog.getElement()).from(0).to(0.85).start();
     dialog.show();
     if(!sticky) {
-      Timer timer = new Timer() {
+      nonStickyTimer = new Timer() {
 
         @Override
         public void run() {
-          dialog.hide();
+          if(dialog.isShowing()) {
+            FadeAnimation.create(dialog.getElement()).from(0.85).to(0).then(new FadedHandler() {
+
+              @Override
+              public void onFaded(Element element) {
+                dialog.hide();
+              }
+            }).start();
+          }
         }
       };
-      timer.schedule(5000);
+      nonStickyTimer.schedule(5000);
+    } else {
+      nonStickyTimer = null;
     }
   }
 
@@ -119,6 +133,16 @@ public class NotificationView extends Composite implements NotificationPresenter
 
   @Override
   public void setNotificationType(NotificationType type) {
+    // check one is not being shown
+    if(dialog.isShowing()) {
+      dialog.hide();
+    }
+    // cancel a running sticky timer
+    if(nonStickyTimer != null) {
+      nonStickyTimer.cancel();
+      nonStickyTimer = null;
+    }
+
     dialog.removeStyleName(NotificationType.ERROR.toString().toLowerCase());
     dialog.removeStyleName(NotificationType.WARNING.toString().toLowerCase());
     dialog.removeStyleName(NotificationType.INFO.toString().toLowerCase());
