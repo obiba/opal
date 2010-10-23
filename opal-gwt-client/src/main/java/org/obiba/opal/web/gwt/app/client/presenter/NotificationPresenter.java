@@ -39,6 +39,8 @@ public class NotificationPresenter extends WidgetPresenter<NotificationPresenter
 
     public void setNotificationType(NotificationType type);
 
+    public void setSticky(boolean sticky);
+
     public void addNotificationCloseHandler(final NotificationCloseHandler handler);
   }
 
@@ -101,6 +103,8 @@ public class NotificationPresenter extends WidgetPresenter<NotificationPresenter
       }
     }
     setMessages(translatedMessages);
+
+    getDisplay().setSticky(event.isSticky());
 
     addNotificationCloseHandler(event.getNotificationCloseHandler());
   }

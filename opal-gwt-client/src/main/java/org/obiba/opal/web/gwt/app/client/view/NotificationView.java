@@ -23,6 +23,7 @@ import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
@@ -54,6 +55,8 @@ public class NotificationView extends Composite implements NotificationPresenter
   @UiField
   Anchor okay;
 
+  private boolean sticky = true;
+
   public NotificationView() {
     uiBinder.createAndBindUi(this);
 
@@ -76,6 +79,16 @@ public class NotificationView extends Composite implements NotificationPresenter
     dialog.setPopupPosition(Window.getClientWidth() - 350, 50);
     FadeAnimation.start(dialog.getElement());
     dialog.show();
+    if(!sticky) {
+      Timer timer = new Timer() {
+
+        @Override
+        public void run() {
+          dialog.hide();
+        }
+      };
+      timer.schedule(5000);
+    }
   }
 
   @Override
@@ -106,6 +119,9 @@ public class NotificationView extends Composite implements NotificationPresenter
 
   @Override
   public void setNotificationType(NotificationType type) {
+    dialog.removeStyleName(NotificationType.ERROR.toString().toLowerCase());
+    dialog.removeStyleName(NotificationType.WARNING.toString().toLowerCase());
+    dialog.removeStyleName(NotificationType.INFO.toString().toLowerCase());
     dialog.addStyleName(type.toString().toLowerCase());
   }
 
@@ -118,6 +134,11 @@ public class NotificationView extends Composite implements NotificationPresenter
         handler.onClose(event);
       }
     });
+  }
+
+  @Override
+  public void setSticky(boolean sticky) {
+    this.sticky = sticky;
   }
 
 }

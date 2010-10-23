@@ -43,6 +43,8 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
 
   private NotificationCloseHandler notificationCloseHandler;
 
+  private boolean sticky = true;
+
   //
   // Constructors
   //
@@ -115,6 +117,15 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
       getMessages().add(message);
     }
     return this;
+  }
+
+  public NotificationEvent nonSticky() {
+    this.sticky = false;
+    return this;
+  }
+
+  public boolean isSticky() {
+    return sticky;
   }
 
   public List<String> getMessages() {
