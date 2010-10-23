@@ -7,7 +7,7 @@
     .top-margin { margin: 0.5em; }
   </ui:style>
 
-  <g:PopupPanel ui:field="dialog" autoHideEnabled="true" modal="true" animationEnabled="true" addStyleNames="notification">
+  <g:PopupPanel ui:field="dialog" autoHideEnabled="true" modal="true" animationEnabled="false" addStyleNames="notification">
     <g:DockLayoutPanel unit="PX" height="80px" width="300px">
       <g:north size="20">
         <g:HTMLPanel addStyleNames="header {style.top-margin}">

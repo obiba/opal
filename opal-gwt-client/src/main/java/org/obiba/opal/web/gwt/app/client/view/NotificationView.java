@@ -12,8 +12,8 @@ package org.obiba.opal.web.gwt.app.client.view;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationCloseHandler;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -74,6 +74,7 @@ public class NotificationView extends Composite implements NotificationPresenter
   @Override
   public void showPopup() {
     dialog.setPopupPosition(Window.getClientWidth() - 350, 50);
+    FadeAnimation.start(dialog.getElement());
     dialog.show();
   }
 
