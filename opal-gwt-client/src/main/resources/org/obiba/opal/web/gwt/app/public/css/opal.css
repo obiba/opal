@@ -236,11 +236,16 @@ margin-left:10px;
 .topbar a:hover {
 	cursor: pointer;
 }
-    
+
+.topbar img {
+	margin-left: 10px;
+	padding-top: 0.3em;
+}
+
 .topbar a {
     margin-right: 10px;
     float: right;
-    padding-top: 0.3em;
+    padding-top: 0.6em;
 }
 
 .topbar a, a:visited, a:hover {

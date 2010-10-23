@@ -2,11 +2,11 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <g:DockLayoutPanel unit="EM">
-    <g:north size="4">
+    <g:north size="4.5">
       <g:LayoutPanel addStyleNames="top">
-        <g:layer top="0" height="2em">
+        <g:layer top="0" height="2.5em">
           <g:FlowPanel  ui:field="topBar" addStyleNames="topbar">
-            <g:Label>Opal</g:Label>
+            <g:Image url="image/logo-opal-white.png"></g:Image>
             <g:Anchor ui:field="quit"><ui:msg description="Quit link text">Quit</ui:msg></g:Anchor>
             <g:Anchor ui:field="help"><ui:msg description="Help link text">Help</ui:msg></g:Anchor>
           </g:FlowPanel>
