@@ -1,5 +1,8 @@
 package org.obiba.opal.core.cfg;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -8,6 +11,8 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.obiba.magma.Datasource;
+import org.obiba.magma.ValueTable;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewPersistenceStrategy;
 
@@ -56,9 +61,18 @@ public class OpalViewPersistenceStrategyTest {
 
   @Test
   public void testWriteEmptySetRemovesFile() throws Exception {
+    Datasource datasourceMock = createMock(Datasource.class);
+    expect(datasourceMock.getName()).andReturn("opal-data").atLeastOnce();
+
+    ValueTable valueTableMock = createMock(ValueTable.class);
+    expect(valueTableMock.getName()).andReturn("Participants").atLeastOnce();
+    expect(valueTableMock.getDatasource()).andReturn(datasourceMock).atLeastOnce();
+
+    replay(datasourceMock, valueTableMock);
+
     // Write a temporary views file with a single view.
     Set<View> views = Sets.<View> newHashSet();
-    View view = new View();
+    View view = new View("aView", valueTableMock);
     views.add(view);
     viewPersistenceStrategy.writeViews("temporary-views", views);
     // Verify the temporary views file exists.
@@ -73,8 +87,17 @@ public class OpalViewPersistenceStrategyTest {
 
   @Test
   public void testWriteSingleView() throws Exception {
+    Datasource datasourceMock = createMock(Datasource.class);
+    expect(datasourceMock.getName()).andReturn("opal-data").atLeastOnce();
+
+    ValueTable valueTableMock = createMock(ValueTable.class);
+    expect(valueTableMock.getName()).andReturn("Participants").atLeastOnce();
+    expect(valueTableMock.getDatasource()).andReturn(datasourceMock).atLeastOnce();
+
+    replay(datasourceMock, valueTableMock);
+
     Set<View> views = Sets.<View> newHashSet();
-    View view = new View();
+    View view = new View("aView", valueTableMock);
     views.add(view);
     viewPersistenceStrategy.writeViews("single-views", views);
   }
