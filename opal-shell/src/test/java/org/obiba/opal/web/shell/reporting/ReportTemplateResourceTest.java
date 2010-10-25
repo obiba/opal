@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.reporting;
+package org.obiba.opal.web.shell.reporting;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
@@ -35,6 +35,8 @@ import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.service.CommandSchedulerService;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
+import org.obiba.opal.web.reporting.Dtos;
+import org.obiba.opal.web.shell.reporting.ReportTemplateResource;
 
 public class ReportTemplateResourceTest {
 
