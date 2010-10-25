@@ -18,8 +18,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
@@ -45,7 +45,7 @@ import org.springframework.util.Assert;
 
 @Component
 @Scope("request")
-@Path("/report-templates/{name}")
+@Path("/report-template/{name}")
 public class ReportTemplateResource {
 
   private static final Logger log = LoggerFactory.getLogger(ReportTemplateResource.class);
