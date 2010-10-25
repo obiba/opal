@@ -70,12 +70,12 @@ public class FadeAnimation extends Timer {
     public void onFaded(Element element);
   }
 
-  public class Builder {
+  public static class Builder {
     private FadeAnimation fader;
 
-    Builder(FadeAnimation fader) {
+    Builder(Element element) {
       super();
-      this.fader = fader;
+      this.fader = new FadeAnimation(element);
     }
 
     public Builder from(double from) {
@@ -111,8 +111,7 @@ public class FadeAnimation extends Timer {
   }
 
   public static Builder create(Element element) {
-    FadeAnimation fader = new FadeAnimation(element);
-    Builder builder = fader.new Builder(fader);
+    Builder builder = new Builder(element);
     return builder;
   }
 
