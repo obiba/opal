@@ -54,6 +54,8 @@ public class FadeAnimation extends Timer {
   }
 
   private void applyOpacity() {
+    opacity = Math.max(opacity, 0);
+    opacity = Math.min(opacity, 1);
     DOM.setStyleAttribute(element, "opacity", Double.toString(opacity));
   }
 
