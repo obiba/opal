@@ -15,6 +15,7 @@ import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -22,6 +23,8 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.SelectionModel.SelectionChangeHandler;
+import com.google.gwt.view.client.SingleSelectionModel;
 
 public class ReportTemplateListView extends Composite implements ReportTemplateListPresenter.Display {
 
@@ -34,7 +37,10 @@ public class ReportTemplateListView extends Composite implements ReportTemplateL
   @UiField
   CellTable<ReportTemplateDto> reportTemplateTable;
 
+  SingleSelectionModel<ReportTemplateDto> selectionModel;
+
   public ReportTemplateListView() {
+    selectionModel = new SingleSelectionModel<ReportTemplateDto>();
     initWidget(uiBinder.createAndBindUi(this));
     initTable();
   }
@@ -60,13 +66,24 @@ public class ReportTemplateListView extends Composite implements ReportTemplateL
     reportTemplateTable.setData(0, templateCount, JsArrays.toList(templates, 0, templateCount));
   }
 
+  public ReportTemplateDto getSelectedReportTemplate() {
+    return selectionModel.getSelectedObject();
+  }
+
   private void initTable() {
+
     reportTemplateTable.addColumn(new TextColumn<ReportTemplateDto>() {
       @Override
       public String getValue(ReportTemplateDto dto) {
         return dto.getName();
       }
     });
+    reportTemplateTable.setSelectionEnabled(true);
+    reportTemplateTable.setSelectionModel(selectionModel);
   }
 
+  @Override
+  public HandlerRegistration addSelectReportTemplateHandler(SelectionChangeHandler handler) {
+    return selectionModel.addSelectionChangeHandler(handler);
+  }
 }

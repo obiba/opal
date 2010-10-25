@@ -15,18 +15,26 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.view.client.SelectionModel.SelectionChangeEvent;
+import com.google.gwt.view.client.SelectionModel.SelectionChangeHandler;
 import com.google.inject.Inject;
 
 public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateListPresenter.Display> {
 
   public interface Display extends WidgetDisplay {
     void setReportTemplates(JsArray<ReportTemplateDto> templates);
+
+    ReportTemplateDto getSelectedReportTemplate();
+
+    HandlerRegistration addSelectReportTemplateHandler(SelectionChangeHandler handler);
   }
 
   @Inject
@@ -36,41 +44,57 @@ public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateL
 
   @Override
   public void refreshDisplay() {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
   public void revealDisplay() {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
   protected void onBind() {
-    ResourceRequestBuilderFactory.<JsArray<ReportTemplateDto>> newBuilder().forResource("/report-templates").get().withCallback(new ResourceCallback<JsArray<ReportTemplateDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<ReportTemplateDto> templates) {
-        getDisplay().setReportTemplates(templates);
-      }
-    }).send();
+    initUiComponents();
+    addHandlers();
   }
 
   @Override
   protected void onUnbind() {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
   public Place getPlace() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   protected void onPlaceRequest(PlaceRequest request) {
-    // TODO Auto-generated method stub
+  }
+
+  private void initUiComponents() {
+    ResourceRequestBuilderFactory.<JsArray<ReportTemplateDto>> newBuilder().forResource("/report-templates").get().withCallback(new ReportTemplatesResourceCallback()).send();
+  }
+
+  private void addHandlers() {
+    super.registerHandler(getDisplay().addSelectReportTemplateHandler(new ReportTemplateSelectionChangeHandler()));
+
+  }
+
+  private class ReportTemplateSelectionChangeHandler implements SelectionChangeHandler {
+
+    @Override
+    public void onSelectionChange(SelectionChangeEvent event) {
+      ReportTemplateDto selectedReportTemplate = getDisplay().getSelectedReportTemplate();
+      if(selectedReportTemplate != null) {
+        eventBus.fireEvent(new ReportTemplateSelectedEvent(selectedReportTemplate));
+      }
+    }
+  }
+
+  private class ReportTemplatesResourceCallback implements ResourceCallback<JsArray<ReportTemplateDto>> {
+
+    @Override
+    public void onResource(Response response, JsArray<ReportTemplateDto> templates) {
+      getDisplay().setReportTemplates(templates);
+    }
 
   }
 
