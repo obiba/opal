@@ -81,12 +81,12 @@ public class FadeAnimation extends Timer {
     }
 
     public Builder from(double from) {
-      fader.from = from;
+      fader.from = Math.min(from, 1);
       return this;
     }
 
     public Builder to(double to) {
-      fader.to = to;
+      fader.to = Math.max(to, 0);
       return this;
     }
 
