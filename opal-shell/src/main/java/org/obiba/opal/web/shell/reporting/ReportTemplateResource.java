@@ -50,7 +50,7 @@ public class ReportTemplateResource {
 
   private static final Logger log = LoggerFactory.getLogger(ReportTemplateResource.class);
 
-  private static final String reportShedullingGroup = "reports";
+  private static final String REPORT_SCHEDULING_GROUP = "reports";
 
   @PathParam("name")
   private String name;
@@ -103,38 +103,53 @@ public class ReportTemplateResource {
       return Response.status(Status.NOT_FOUND).build();
     } else {
       opalRuntime.getOpalConfiguration().removeReportTemplate(name);
-      commandSchedulerService.deleteCommand(name, reportShedullingGroup);
+      commandSchedulerService.deleteCommand(name, REPORT_SCHEDULING_GROUP);
       return Response.ok().build();
     }
   }
 
   @PUT
   public Response updateReportTemplate(@Context UriInfo uriInfo, ReportTemplateDto reportTemplateDto) {
+    boolean isNew = !reportTemplateExists();
 
     try {
-      Assert.isTrue(reportTemplateDto.getName().equals(name), "The report template data submited is in conflict with name provided in the web service call.");
+      Assert.isTrue(reportTemplateDto.getName().equals(name), "The report template name in the URI does not match the name given in the request body DTO.");
 
-      OpalConfiguration opalConfig = opalRuntime.getOpalConfiguration();
-      ReportTemplate reportTemplate = opalConfig.getReportTemplate(name);
-      if(reportTemplate == null) {
-        addReportTemplate(reportTemplateDto, opalConfig);
-        return Response.created(uriInfo.getAbsolutePath()).build();
-      } else {
-        opalConfig.removeReportTemplate(name);
-        addReportTemplate(reportTemplateDto, opalConfig);
-        return Response.ok().build();
-      }
+      updateOpalConfiguration(reportTemplateDto);
+      updateSchedule(reportTemplateDto, isNew);
     } catch(Exception couldNotUpdateTheReportTemplate) {
+      couldNotUpdateTheReportTemplate.printStackTrace();
       return Response.status(Response.Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "CouldNotUpdateTheReportTemplate").build()).build();
     }
 
+    return isNew ? Response.created(uriInfo.getAbsolutePath()).build() : Response.ok().build();
   }
 
-  private void addReportTemplate(ReportTemplateDto reportTemplateDto, OpalConfiguration opalConfig) {
-    ReportTemplate reportTemplate = Dtos.fromDto(reportTemplateDto);
+  private boolean reportTemplateExists() {
+    return opalRuntime.getOpalConfiguration().hasReportTemplate(name);
+  }
+
+  private void updateOpalConfiguration(ReportTemplateDto reportTemplateDto) {
+    OpalConfiguration opalConfig = opalRuntime.getOpalConfiguration();
+
+    ReportTemplate reportTemplate = opalConfig.getReportTemplate(name);
+    if(reportTemplate != null) {
+      opalConfig.removeReportTemplate(reportTemplateDto.getName());
+    }
+
+    reportTemplate = Dtos.fromDto(reportTemplateDto);
     opalConfig.addReportTemplate(reportTemplate);
-    addCommand();
-    scheduleCommand(reportTemplate);
+  }
+
+  private void updateSchedule(ReportTemplateDto reportTemplateDto, boolean addToScheduler) {
+    if(addToScheduler) {
+      addCommand();
+    }
+
+    commandSchedulerService.unscheduleCommand(name, REPORT_SCHEDULING_GROUP);
+    if(reportTemplateDto.hasCron()) {
+      commandSchedulerService.scheduleCommand(name, REPORT_SCHEDULING_GROUP, reportTemplateDto.getCron());
+    }
   }
 
   private void addCommand() {
@@ -153,12 +168,6 @@ public class ReportTemplateResource {
     Command<ReportCommandOptions> reportCommand = commandRegistry.newCommand("report");
     reportCommand.setOptions(reportOptions);
     commandSchedulerService.addCommand(name, "reports", reportCommand);
-  }
-
-  private void scheduleCommand(ReportTemplate reportTemplate) {
-    if(reportTemplate.getSchedule() != null) {
-      commandSchedulerService.scheduleCommand(name, "reports", reportTemplate.getSchedule());
-    }
   }
 
   // TODO: to be REMOVED, only for testing

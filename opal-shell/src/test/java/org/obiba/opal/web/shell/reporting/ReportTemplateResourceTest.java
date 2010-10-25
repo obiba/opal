@@ -36,7 +36,6 @@ import org.obiba.opal.shell.service.CommandSchedulerService;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.reporting.Dtos;
-import org.obiba.opal.web.shell.reporting.ReportTemplateResource;
 
 public class ReportTemplateResourceTest {
 
@@ -137,6 +136,7 @@ public class ReportTemplateResourceTest {
     expect(uriInfoMock.getAbsolutePath()).andReturn(UriBuilderImpl.fromUri(BASE_URI).build("")).atLeastOnce();
 
     CommandSchedulerService commandSchedulerServiceMock = createMock(CommandSchedulerService.class);
+    commandSchedulerServiceMock.unscheduleCommand("template9", "reports");
     commandSchedulerServiceMock.scheduleCommand("template9", "reports", "schedule");
 
     @SuppressWarnings("unchecked")
@@ -158,14 +158,9 @@ public class ReportTemplateResourceTest {
 
   @Test
   public void testUpdateReportTemplate_ExistingReportTemplateUpdated() {
-
-    @SuppressWarnings("unchecked")
-    Command<Object> commandMock = createMock(Command.class);
-    expect(commandRegistry.newCommand("report")).andReturn(commandMock);
-
     CommandSchedulerService commandSchedulerServiceMock = createMock(CommandSchedulerService.class);
+    commandSchedulerServiceMock.unscheduleCommand("template1", "reports");
     commandSchedulerServiceMock.scheduleCommand("template1", "reports", "schedule");
-    commandSchedulerServiceMock.addCommand("template1", "reports", commandMock);
 
     replay(opalRuntimeMock, commandSchedulerServiceMock, commandRegistry);
 

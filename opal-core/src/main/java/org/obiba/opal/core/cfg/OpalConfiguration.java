@@ -99,6 +99,10 @@ public class OpalConfiguration {
     return null;
   }
 
+  public boolean hasReportTemplate(String name) {
+    return getReportTemplate(name) != null;
+  }
+
   public void removeReportTemplate(String name) {
     ReportTemplate reportTemplateToRemove = getReportTemplate(name);
     if(reportTemplateToRemove != null) {
