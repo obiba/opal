@@ -85,6 +85,9 @@ public class ApplicationView implements ApplicationPresenter.Display {
   MenuItem fileExplorer;
 
   @UiField
+  MenuItem reportsItem;
+
+  @UiField
   Panel workbench;
 
   MenuItem currentSelection;
@@ -173,6 +176,11 @@ public class ApplicationView implements ApplicationPresenter.Display {
   @Override
   public MenuItem getFileExplorer() {
     return fileExplorer;
+  }
+
+  @Override
+  public MenuItem getReportsItem() {
+    return reportsItem;
   }
 
   @Override

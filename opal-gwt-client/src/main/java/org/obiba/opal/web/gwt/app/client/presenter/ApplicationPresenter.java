@@ -16,14 +16,15 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
-import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewCreationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
+import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourceStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.FormatSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.UploadVariablesStepPresenter;
@@ -72,11 +73,16 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
     MenuItem getDashboardItem();
 
+    MenuItem getReportsItem();
+
     void setCurrentSelection(MenuItem selection);
   }
 
   @Inject
   private Provider<DashboardPresenter> dashboardPresenter;
+
+  @Inject
+  private Provider<ReportTemplateListPresenter> reportTemplateListPresenter;
 
   @Inject
   private Provider<CreateDatasourceStepPresenter> createDatasourceStepPresenter;
@@ -131,6 +137,15 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       public void execute() {
         eventBus.fireEvent(new WorkbenchChangeEvent(dashboardPresenter.get()));
         getDisplay().setCurrentSelection(getDisplay().getDashboardItem());
+      }
+    });
+
+    getDisplay().getReportsItem().setCommand(new Command() {
+
+      @Override
+      public void execute() {
+        eventBus.fireEvent(new WorkbenchChangeEvent(reportTemplateListPresenter.get()));
+        getDisplay().setCurrentSelection(getDisplay().getReportsItem());
       }
     });
 

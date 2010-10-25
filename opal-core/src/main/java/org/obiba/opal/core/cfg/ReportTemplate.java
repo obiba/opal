@@ -11,6 +11,8 @@ package org.obiba.opal.core.cfg;
 
 import java.util.Map;
 
+import com.google.common.collect.Maps;
+
 public class ReportTemplate {
 
   private String name;
@@ -20,6 +22,11 @@ public class ReportTemplate {
   private String format;
 
   private Map<String, String> parameters;
+
+  public ReportTemplate() {
+    super();
+    parameters = Maps.newHashMap();
+  }
 
   private String schedule;
 

@@ -38,6 +38,9 @@
             <g:MenuItem ui:field="fileExplorer">
               <ui:msg description="Files menu item">Files</ui:msg>
             </g:MenuItem>
+            <g:MenuItem ui:field="reportsItem">
+              <ui:msg description="Reports menu item">Reports</ui:msg>
+            </g:MenuItem>            
             <g:MenuItem ui:field="listJobsItem">
               <ui:msg description="Jobs menu item">Jobs</ui:msg>
             </g:MenuItem>           
