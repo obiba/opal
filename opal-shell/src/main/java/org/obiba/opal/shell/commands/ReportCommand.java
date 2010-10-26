@@ -52,7 +52,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     // Render it.
     Date reportDate = new Date();
     try {
-      reportService.render(reportTemplate.getFormat(), reportTemplate.getParameters(), reportTemplate.getDesign(), getReportOutput(reportTemplateName, reportTemplate.getFormat(), reportDate));
+      reportService.render(reportTemplate.getFormat(), reportTemplate.getParameters(), getReportDesign(reportTemplate.getDesign()), getReportOutput(reportTemplateName, reportTemplate.getFormat(), reportDate));
     } catch(ReportException ex) {
       getShell().printf("Error rendering report: '%s'\n", ex.getMessage());
       return 2;
@@ -73,6 +73,12 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
   @Override
   public String toString() {
     return "report -n " + getOptions().getName();
+  }
+
+  private String getReportDesign(String reportDesign) throws FileSystemException {
+    FileObject reportDesignFile = getFile(reportDesign);
+
+    return getLocalFile(reportDesignFile).getPath();
   }
 
   private String getReportOutput(String reportTemplateName, String reportFormat, Date reportDate) throws FileSystemException {

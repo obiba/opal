@@ -11,6 +11,7 @@ package org.obiba.opal.web.shell.reporting;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
@@ -135,6 +136,9 @@ public class ReportTemplateResourceTest {
     UriInfo uriInfoMock = createMock(UriInfo.class);
     expect(uriInfoMock.getAbsolutePath()).andReturn(UriBuilderImpl.fromUri(BASE_URI).build("")).atLeastOnce();
 
+    opalRuntimeMock.writeOpalConfiguration();
+    expectLastCall().once();
+
     CommandSchedulerService commandSchedulerServiceMock = createMock(CommandSchedulerService.class);
     commandSchedulerServiceMock.unscheduleCommand("template9", "reports");
     commandSchedulerServiceMock.scheduleCommand("template9", "reports", "schedule");
@@ -158,6 +162,9 @@ public class ReportTemplateResourceTest {
 
   @Test
   public void testUpdateReportTemplate_ExistingReportTemplateUpdated() {
+    opalRuntimeMock.writeOpalConfiguration();
+    expectLastCall().once();
+
     CommandSchedulerService commandSchedulerServiceMock = createMock(CommandSchedulerService.class);
     commandSchedulerServiceMock.unscheduleCommand("template1", "reports");
     commandSchedulerServiceMock.scheduleCommand("template1", "reports", "schedule");
