@@ -696,3 +696,22 @@ div.evaluateScriptPanel {
   border-left-style:none;
   margin-left:0px;
 }
+
+/* Reports UI */ 
+
+table.producedReports {
+  border-collapse: collapse;
+}
+
+table.producedReports a {
+  padding:5px;
+}
+
+table.producedReports tr td {
+  padding:4px 15px;
+}
+
+table.producedReports tr.evenRow td {
+  background-color:#F3F7FB;
+  border:0;
+}

@@ -18,7 +18,6 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter.HasActionHandler;
-import org.obiba.opal.web.gwt.user.cellview.client.DateTimeColumn;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
 import com.google.gwt.core.client.GWT;
@@ -57,7 +56,6 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
 
   public ReportTemplateDetailsView() {
     initWidget(uiBinder.createAndBindUi(this));
-    initTable();
   }
 
   @Override
@@ -77,36 +75,21 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   public void setProducedReports(FileDto reportFolder) {
     JsArray<FileDto> reports = reportFolder.getChildrenArray();
     int reportCount = reports.length();
-    producedReportsTable.setPageSize(reportCount);
-    producedReportsTable.setDataSize(reportCount, true);
-    producedReportsTable.setData(0, reportCount, JsArrays.toList(reports, 0, reportCount));
-
     reportTemplateDetails.clear();
     producedReports = new Grid(reportCount + 1, 2);
     producedReports.setTitle("Reports");
     producedReports.setHTML(0, 0, "<b>Produced Date</b>");
     producedReports.setHTML(0, 1, "<b>Action</b>");
+    producedReports.setStyleName("producedReports");
 
     int i = 1;
     for(FileDto report : JsArrays.toIterable(reports)) {
       producedReports.setText(i, 0, new Date((long) report.getLastModifiedTime()).toString());
       producedReports.setWidget(i, 1, new ReportActionPanel(report));
+      producedReports.getRowFormatter().setStyleName(i, i % 2 == 0 ? "evenRow" : "oddRow");
       i++;
     }
     reportTemplateDetails.add(producedReports);
-  }
-
-  private void initTable() {
-    producedReportsTable.setTitle("Reports");
-    producedReportsTable.addColumn(new DateTimeColumn<FileDto>() {
-
-      @Override
-      public Date getValue(FileDto reportFile) {
-        // return new Date((long) reportFile.getLastModifiedTime());
-        return new Date();
-      }
-
-    });
   }
 
   private class ReportActionPanel extends FlowPanel {
