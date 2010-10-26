@@ -5,8 +5,8 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
   ui:generateLocales="default">
 
-  <g:FlowPanel>
-    <g2:CellTable ui:field="producedReports"/>
+  <g:FlowPanel ui:field="reportTemplateDetails">
+    <g2:CellTable ui:field="producedReportsTable"/>
   </g:FlowPanel>
 
 </ui:UiBinder>

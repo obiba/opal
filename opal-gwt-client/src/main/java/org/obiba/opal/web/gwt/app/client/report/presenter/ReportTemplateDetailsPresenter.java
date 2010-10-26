@@ -15,19 +15,41 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
 public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTemplateDetailsPresenter.Display> {
 
+  public static final String DELETE_ACTION = "Delete";
+
+  public static final String DOWNLOAD_ACTION = "Download";
+
+  private Runnable actionRequiringConfirmation;
+
   public interface Display extends WidgetDisplay {
-    void setProducedReports(JsArray<FileDto> reports);
+    void setProducedReports(FileDto reports);
+
+    void setActionHandler(ActionHandler handler);
+  }
+
+  public interface ActionHandler {
+    void doAction(FileDto dto, String actionName);
+  }
+
+  public interface HasActionHandler {
+    void setActionHandler(ActionHandler handler);
   }
 
   @Inject
@@ -63,19 +85,59 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
   }
 
   private void initUiComponents() {
-    ResourceRequestBuilderFactory.<JsArray<FileDto>> newBuilder().forResource("/files/meta/reports").get().withCallback(new ProducedReportsResourceCallback()).send();
+    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta/reports").get().withCallback(new ProducedReportsResourceCallback()).send();
   }
 
   private void addHandlers() {
-
+    getDisplay().setActionHandler(new ActionHandler() {
+      public void doAction(FileDto dto, String actionName) {
+        if(actionName != null) {
+          doActionImpl(dto, actionName);
+        }
+      }
+    });
   }
 
-  private class ProducedReportsResourceCallback implements ResourceCallback<JsArray<FileDto>> {
+  protected void doActionImpl(final FileDto dto, String actionName) {
+    GWT.log("action name is " + actionName + " file is " + dto.getName());
+    if(actionName.equals(DOWNLOAD_ACTION)) {
+      downloadFile(dto);
+    } else if(actionName.equals(DELETE_ACTION)) {
+      actionRequiringConfirmation = new Runnable() {
+        public void run() {
+          deleteFile(dto);
+        }
+      };
+      eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "deleteFile", "confirmDeleteFile"));
+    }
+  }
+
+  private void deleteFile(final FileDto file) {
+    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        if(response.getStatusCode() != Response.SC_OK) {
+          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
+        } else {
+          eventBus.fireEvent(new FileDeletedEvent(file));
+        }
+      }
+    };
+
+    ResourceRequestBuilderFactory.newBuilder().forResource("/files" + file.getPath()).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler).withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+  }
+
+  private void downloadFile(final FileDto file) {
+    String url = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")).append("ws/files").append(file.getPath()).toString();
+    eventBus.fireEvent(new FileDownloadEvent(url));
+  }
+
+  private class ProducedReportsResourceCallback implements ResourceCallback<FileDto> {
 
     @Override
-    public void onResource(Response response, JsArray<FileDto> reports) {
-      GWT.log("reports size " + reports.length());
-      getDisplay().setProducedReports(reports);
+    public void onResource(Response response, FileDto reportFolder) {
+      getDisplay().setProducedReports(reportFolder);
     }
 
   }
