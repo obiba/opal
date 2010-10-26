@@ -18,8 +18,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
@@ -118,7 +118,6 @@ public class ReportTemplateResource {
       updateOpalConfiguration(reportTemplateDto);
       updateSchedule(reportTemplateDto, isNew);
     } catch(Exception couldNotUpdateTheReportTemplate) {
-      couldNotUpdateTheReportTemplate.printStackTrace();
       return Response.status(Response.Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "CouldNotUpdateTheReportTemplate").build()).build();
     }
 
