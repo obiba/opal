@@ -9,8 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.inject.client;
 
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.AttributeDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.SaveErrorsStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.AttributeDialogView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.ConfigureViewStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.SaveErrorsStepView;
 
@@ -26,5 +28,6 @@ public class ConfigureViewWizardModule extends AbstractGinModule {
   protected void configure() {
     bind(ConfigureViewStepPresenter.Display.class).to(ConfigureViewStepView.class).in(Singleton.class);
     bind(SaveErrorsStepPresenter.Display.class).to(SaveErrorsStepView.class).in(Singleton.class);
+    bind(AttributeDialogPresenter.Display.class).to(AttributeDialogView.class);
   }
 }

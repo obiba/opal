@@ -9,7 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.AttributeDialogPresenter;
+
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -20,8 +23,9 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Widget;
 
-public class AttributeDialogView extends Composite {
+public class AttributeDialogView extends Composite implements AttributeDialogPresenter.Display {
 
   @UiTemplate("AttributeDialogView.ui.xml")
   interface MyUiBinder extends UiBinder<DialogBox, AttributeDialogView> {
@@ -56,6 +60,45 @@ public class AttributeDialogView extends Composite {
   public AttributeDialogView() {
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
+  }
+
+  @Override
+  public Widget asWidget() {
+    return this;
+  }
+
+  @Override
+  public void startProcessing() {
+  }
+
+  @Override
+  public void stopProcessing() {
+  }
+
+  @Override
+  public void showDialog() {
+    dialog.center();
     dialog.show();
+  }
+
+  @Override
+  public void hideDialog() {
+    dialog.hide();
+  }
+
+  @Override
+  public Button getCancelButton() {
+    return cancelButton;
+  }
+
+  @Override
+  public Button getSaveButton() {
+    return saveButton;
+  }
+
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @Override
+  public HasCloseHandlers getDialog() {
+    return dialog;
   }
 }
