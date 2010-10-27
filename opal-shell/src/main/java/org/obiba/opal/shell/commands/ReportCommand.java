@@ -77,9 +77,9 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
       return 3;
     }
 
-    // if (!reportTemplate.getEmailNotificationList().isEmpty()) {
-    sendEmailNotification();
-    // }
+    if(!reportTemplate.getEmailNotificationAddresses().isEmpty()) {
+      sendEmailNotification(reportTemplate);
+    }
 
     return 0;
   }
@@ -116,21 +116,22 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     return reportTemplateName + "-" + reportDateText + "." + reportFormat;
   }
 
-  private void sendEmailNotification() {
-    String reportTemplateName = getOptions().getName();
+  private void sendEmailNotification(ReportTemplate reportTemplate) {
+    String reportTemplateName = reportTemplate.getName();
 
     SimpleMailMessage message = new SimpleMailMessage();
     message.setFrom("opal-mailer@obiba.org");
     message.setSubject("[Opal] Report: " + reportTemplateName);
     message.setText(getEmailNotificationText(reportTemplateName));
 
-    // TODO: Send an email to each address in the email notification list (reportTemplate.getEmailNotificationList()).
-    message.setTo("opal-admin@study.com");
-    try {
-      mailSender.send(message);
-    } catch(MailException ex) {
-      getShell().printf("Email notification not sent: %s", ex.getMessage());
-      log.error("Email notification not sent: {}", ex.getMessage());
+    for(String emailAddress : reportTemplate.getEmailNotificationAddresses()) {
+      message.setTo(emailAddress);
+      try {
+        mailSender.send(message);
+      } catch(MailException ex) {
+        getShell().printf("Email notification not sent: %s", ex.getMessage());
+        log.error("Email notification not sent: {}", ex.getMessage());
+      }
     }
   }
 

@@ -66,6 +66,7 @@ message ReportTemplateDto {
   required string format = 3;
   repeated ParameterDto parameters = 4;
   optional string cron = 5;
+  repeated string emailNotification = 6;
 }
 
 message ParameterDto {

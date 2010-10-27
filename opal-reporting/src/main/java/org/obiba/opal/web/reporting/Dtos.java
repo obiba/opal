@@ -19,6 +19,7 @@ import org.obiba.opal.web.model.Opal.ParameterDto;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class Dtos {
 
@@ -27,14 +28,19 @@ public class Dtos {
     reportTemplate.setName(reportTemplateDto.getName());
     reportTemplate.setDesign(reportTemplateDto.getDesign());
     reportTemplate.setFormat(reportTemplateDto.getFormat());
+
     Map<String, String> params = Maps.newLinkedHashMap();
     for(ParameterDto param : reportTemplateDto.getParametersList()) {
       params.put(param.getKey(), param.getValue());
     }
+
     String schedule = reportTemplateDto.getCron();
     if(schedule != null) {
       reportTemplate.setSchedule(reportTemplateDto.getCron());
     }
+
+    reportTemplate.setEmailNotificationAddresses(Sets.newHashSet(reportTemplateDto.getEmailNotificationList()));
+
     return reportTemplate;
   }
 
@@ -43,10 +49,14 @@ public class Dtos {
     for(Map.Entry<String, String> param : reportTemplate.getParameters().entrySet()) {
       dtoBuilder.addParameters(ParameterDto.newBuilder().setKey(param.getKey()).setValue(param.getValue()));
     }
+
     String schedule = reportTemplate.getSchedule();
     if(schedule != null) {
       dtoBuilder.setCron(schedule);
     }
+
+    dtoBuilder.addAllEmailNotification(reportTemplate.getEmailNotificationAddresses());
+
     return dtoBuilder.build();
   }
 

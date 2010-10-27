@@ -10,10 +10,15 @@
 package org.obiba.opal.core.cfg;
 
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class ReportTemplate {
+  //
+  // Instance Variables
+  //
 
   private String name;
 
@@ -23,12 +28,23 @@ public class ReportTemplate {
 
   private Map<String, String> parameters;
 
+  private String schedule;
+
+  private Set<String> emailNotificationAddresses;
+
+  //
+  // Constructors
+  //
+
   public ReportTemplate() {
     super();
     parameters = Maps.newHashMap();
+    emailNotificationAddresses = Sets.newHashSet();
   }
 
-  private String schedule;
+  //
+  // Methods
+  //
 
   public String getName() {
     return name;
@@ -59,7 +75,10 @@ public class ReportTemplate {
   }
 
   public void setParameters(Map<String, String> parameters) {
-    this.parameters = parameters;
+    this.parameters.clear();
+    if(parameters != null) {
+      this.parameters.putAll(parameters);
+    }
   }
 
   public String getSchedule() {
@@ -68,5 +87,16 @@ public class ReportTemplate {
 
   public void setSchedule(String schedule) {
     this.schedule = schedule;
+  }
+
+  public Set<String> getEmailNotificationAddresses() {
+    return emailNotificationAddresses;
+  }
+
+  public void setEmailNotificationAddresses(Set<String> emailNotificationAddresses) {
+    this.emailNotificationAddresses.clear();
+    if(emailNotificationAddresses != null) {
+      this.emailNotificationAddresses.addAll(emailNotificationAddresses);
+    }
   }
 }
