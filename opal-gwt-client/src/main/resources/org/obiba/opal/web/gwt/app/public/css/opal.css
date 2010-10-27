@@ -715,3 +715,9 @@ table.producedReports tr.evenRow td {
   background-color:#F3F7FB;
   border:0;
 }
+
+table.reportTemplateList {
+  width:100%;
+}
+
+

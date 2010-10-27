@@ -72,6 +72,7 @@ public class ReportTemplateListView extends Composite implements ReportTemplateL
 
   private void initTable() {
 
+    reportTemplateTable.setStyleName("reportTemplateList");
     reportTemplateTable.addColumn(new TextColumn<ReportTemplateDto>() {
       @Override
       public String getValue(ReportTemplateDto dto) {
