@@ -12,13 +12,16 @@ package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.AttributeDialogPresenter;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.ScrollPanel;
@@ -100,5 +103,36 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   @Override
   public HasCloseHandlers getDialog() {
     return dialog;
+  }
+
+  @Override
+  public HandlerRegistration addNameDropdownRadioChoiceHandler(ClickHandler handler) {
+    return nameDropdownRadioChoice.addClickHandler(handler);
+  }
+
+  @Override
+  public HandlerRegistration addNameFieldRadioChoiceHandler(ClickHandler handler) {
+    return nameFieldRadioChoice.addClickHandler(handler);
+  }
+
+  @Override
+  public void setLabelsEnabled(boolean enabled) {
+    labels.setEnabled(enabled);
+  }
+
+  @Override
+  public void setAttributeNameEnabled(boolean enabled) {
+    attributeName.setEnabled(enabled);
+  }
+
+  @Override
+  public void selectNameDropdownRadioChoice() {
+    nameDropdownRadioChoice.setValue(true, true);
+    nameFieldRadioChoice.setValue(false, true);
+  }
+
+  @Override
+  public HasText getAttributeName() {
+    return attributeName;
   }
 }

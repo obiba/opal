@@ -21,7 +21,9 @@ import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 
 /**
@@ -40,6 +42,19 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
     HasClickHandlers getSaveButton();
 
     HasClickHandlers getCancelButton();
+
+    HandlerRegistration addNameDropdownRadioChoiceHandler(ClickHandler handler);
+
+    HandlerRegistration addNameFieldRadioChoiceHandler(ClickHandler handler);
+
+    void setLabelsEnabled(boolean enabled);
+
+    void setAttributeNameEnabled(boolean enabled);
+
+    void selectNameDropdownRadioChoice();
+
+    HasText getAttributeName();
+
   }
 
   @Inject
@@ -61,6 +76,15 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   @Override
   protected void onBind() {
     addEventHandlers();
+    addRadioButtonNameEventHandlers();
+    resetForm();
+  }
+
+  private void resetForm() {
+    getDisplay().setLabelsEnabled(true);
+    getDisplay().setAttributeNameEnabled(false);
+    getDisplay().selectNameDropdownRadioChoice();
+    getDisplay().getAttributeName().setText("");
   }
 
   private void addEventHandlers() {
@@ -77,11 +101,32 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
         unbind();
       }
     }));
+
+  }
+
+  private void addRadioButtonNameEventHandlers() {
+    super.registerHandler(getDisplay().addNameDropdownRadioChoiceHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        getDisplay().setAttributeNameEnabled(false);
+        getDisplay().setLabelsEnabled(true);
+      }
+    }));
+
+    super.registerHandler(getDisplay().addNameFieldRadioChoiceHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        getDisplay().setAttributeNameEnabled(true);
+        getDisplay().setLabelsEnabled(false);
+      }
+    }));
+
   }
 
   @Override
   protected void onUnbind() {
-    // TODO Auto-generated method stub
 
   }
 
