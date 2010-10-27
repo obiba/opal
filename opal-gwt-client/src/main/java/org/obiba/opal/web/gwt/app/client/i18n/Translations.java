@@ -409,4 +409,20 @@ public interface Translations extends Constants {
   @Description("Line label")
   @DefaultStringValue("Line")
   String lineLabel();
+
+  @Description("Add new category title")
+  @DefaultStringValue("Add New Category")
+  String addNewCategory();
+
+  @Description("Edit category title")
+  @DefaultStringValue("Edit Category")
+  String editCategory();
+
+  @Description("Add new attribute title")
+  @DefaultStringValue("Add New Attribute")
+  String addNewAttribute();
+
+  @Description("Edit attribute title")
+  @DefaultStringValue("Edit Attribute")
+  String editAttribute();
 }
