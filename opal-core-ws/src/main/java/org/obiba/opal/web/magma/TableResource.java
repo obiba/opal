@@ -120,6 +120,14 @@ public class TableResource {
     return Response.ok(excelOutput.toByteArray(), "application/vnd.ms-excel").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".xlsx\"").build();
   }
 
+  /**
+   * Get a chunk of variables, optionally filtered by a script
+   * @param uriInfo
+   * @param script script for filtering the variables
+   * @param offset
+   * @param limit
+   * @return
+   */
   @GET
   @Path("/variables")
   public Iterable<VariableDto> getVariables(@Context final UriInfo uriInfo, @QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit) {
@@ -172,6 +180,12 @@ public class TableResource {
     return valueDtos;
   }
 
+  /**
+   * Get the variables in a occurrence group.
+   * @param uriInfo
+   * @param occurrenceGroup
+   * @return
+   */
   @GET
   @Path("/variables/occurrenceGroup/{occurrenceGroup}")
   public Iterable<VariableDto> getOccurrenceGroupVariables(@Context final UriInfo uriInfo, @PathParam("occurrenceGroup") String occurrenceGroup) {
@@ -201,6 +215,11 @@ public class TableResource {
     return variables;
   }
 
+  /**
+   * Get the entities, optionally filtered by a script.
+   * @param script script for filtering the entities
+   * @return
+   */
   @GET
   @Path("/entities")
   public Set<VariableEntityDto> getEntities(@QueryParam("script") String script) {
@@ -214,14 +233,25 @@ public class TableResource {
     }));
   }
 
+  /**
+   * Get the value set from the given entity identifier, for the variables filtered by the optional 'select' script.
+   * @param identifier
+   * @param select script for filtering the variables
+   * @return
+   */
   @GET
   @Path("/valueSet/{identifier}")
-  public ValueSetDto getValueSet(@PathParam("identifier") String identifier) {
+  public ValueSetDto getValueSet(@PathParam("identifier") String identifier, @QueryParam("select") String select) {
     VariableEntity entity = new VariableEntityBean(this.valueTable.getEntityType(), identifier);
+    Iterable<Variable> variables = filterVariables(valueTable, select, 0, null);
+    return getValueSet(entity, variables);
+  }
+
+  private ValueSetDto getValueSet(VariableEntity entity, Iterable<Variable> variables) {
     ValueSet valueSet = this.valueTable.getValueSet(entity);
     ValueSetDto.Builder builder = ValueSetDto.newBuilder();
-    builder.setEntity(VariableEntityDto.newBuilder().setIdentifier(identifier));
-    for(Variable variable : this.valueTable.getVariables()) {
+    builder.setEntity(VariableEntityDto.newBuilder().setIdentifier(entity.getIdentifier()));
+    for(Variable variable : variables) {
       Value value = this.valueTable.getValue(variable, valueSet);
       builder.addVariables(variable.getName());
       ValueDto.Builder valueBuilder = ValueDto.newBuilder().setValueType(variable.getValueType().getName()).setIsSequence(value.isSequence());
@@ -231,6 +261,34 @@ public class TableResource {
       builder.addValues(valueBuilder);
     }
     return builder.build();
+  }
+
+  /**
+   * Get a chunk of value sets, optionally filters the variables and/or the entities.
+   * @param select script for filtering the variables
+   * @param where script for filtering the entities
+   * @param offset
+   * @param limit
+   * @return
+   */
+  @GET
+  @Path("/valueSets")
+  public Collection<ValueSetDto> getValueSets(@QueryParam("select") String select, @QueryParam("where") String where, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("100") int limit) {
+    Iterable<Variable> variables = filterVariables(valueTable, select, 0, null);
+
+    List<VariableEntity> entities;
+    if(where != null) {
+      entities = getFilteredEntities(valueTable, where);
+    } else {
+      entities = new ArrayList<VariableEntity>(valueTable.getVariableEntities());
+    }
+    int end = Math.min(offset + limit, entities.size());
+
+    ImmutableList.Builder<ValueSetDto> dtos = ImmutableList.builder();
+    for(VariableEntity entity : entities.subList(offset, end)) {
+      dtos.add(getValueSet(entity, variables));
+    }
+    return dtos.build();
   }
 
   @GET
@@ -408,6 +466,14 @@ public class TableResource {
   private Iterable<VariableEntity> filterEntities(ValueTable valueTable, String script) {
     if(script == null) {
       return valueTable.getVariableEntities();
+    }
+
+    return getFilteredEntities(valueTable, script);
+  }
+
+  private List<VariableEntity> getFilteredEntities(ValueTable valueTable, String script) {
+    if(script == null) {
+      throw new IllegalArgumentException("Entities filter script cannot be null.");
     }
 
     JavascriptClause jsClause = new JavascriptClause(script);
