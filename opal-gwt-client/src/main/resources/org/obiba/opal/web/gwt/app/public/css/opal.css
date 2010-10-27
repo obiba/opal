@@ -699,25 +699,13 @@ div.evaluateScriptPanel {
 
 /* Reports UI */ 
 
-table.producedReports {
-  border-collapse: collapse;
-}
-
-table.producedReports a {
-  padding:5px;
-}
-
-table.producedReports tr td {
-  padding:4px 15px;
-}
-
-table.producedReports tr.evenRow td {
-  background-color:#F3F7FB;
-  border:0;
-}
-
 table.reportTemplateList {
   width:100%;
+}
+
+table.producedReports td span {
+  padding-right:20px;
+  cursor:pointer;
 }
 
 

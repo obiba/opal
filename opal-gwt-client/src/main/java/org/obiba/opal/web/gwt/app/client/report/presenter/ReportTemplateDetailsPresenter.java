@@ -9,9 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.report.presenter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -21,7 +18,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
@@ -31,6 +27,7 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -44,9 +41,9 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
   private Runnable actionRequiringConfirmation;
 
   public interface Display extends WidgetDisplay {
-    void setProducedReports(List<FileDto> reports);
+    void setProducedReports(JsArray<FileDto> reports);
 
-    void setActionHandler(ActionHandler handler);
+    HasActionHandler getActionColumn();
   }
 
   public interface ActionHandler {
@@ -90,11 +87,11 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
   }
 
   private void initUiComponents() {
-    getDisplay().setProducedReports(new ArrayList<FileDto>());
+    getDisplay().setProducedReports(null);
   }
 
   private void addHandlers() {
-    getDisplay().setActionHandler(new ActionHandler() {
+    getDisplay().getActionColumn().setActionHandler(new ActionHandler() {
       public void doAction(FileDto dto, String actionName) {
         if(actionName != null) {
           doActionImpl(dto, actionName);
@@ -150,7 +147,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      getDisplay().setProducedReports(new ArrayList<FileDto>());
+      getDisplay().setProducedReports(null);
     }
   }
 
@@ -158,7 +155,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
     @Override
     public void onResource(Response response, FileDto reportFolder) {
-      getDisplay().setProducedReports(JsArrays.toList(reportFolder.getChildrenArray()));
+      getDisplay().setProducedReports(reportFolder.getChildrenArray());
     }
 
   }

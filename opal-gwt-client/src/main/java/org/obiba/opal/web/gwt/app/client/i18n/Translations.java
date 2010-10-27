@@ -72,7 +72,7 @@ public interface Translations extends Constants {
   String statusLabel();
 
   @Description("Status map")
-  @DefaultStringMapValue( { "NOT_STARTED", "Not Started", //
+  @DefaultStringMapValue({ "NOT_STARTED", "Not Started", //
   "IN_PROGRESS", "In Progress", //
   "SUCCEEDED", "Succeeded", //
   "FAILED", "Failed", //
@@ -86,7 +86,7 @@ public interface Translations extends Constants {
   String actionsLabel();
 
   @Description("Action map")
-  @DefaultStringMapValue( { "Log", "Log", //
+  @DefaultStringMapValue({ "Log", "Log", //
   "Cancel", "Cancel", //
   "Delete", "Delete" })
   Map<String, String> actionMap();
@@ -144,7 +144,7 @@ public interface Translations extends Constants {
   String unitLabel();
 
   @Description("User message map")
-  @DefaultStringMapValue( { "jobCancelled", "Job cancelled.", //
+  @DefaultStringMapValue({ "jobCancelled", "Job cancelled.", //
   "jobDeleted", "Job deleted.", //
   "completedJobsDeleted", "All completed jobs deleted.", //
   "SetCommandStatus_NotFound", "Job could not be cancelled (not found).", //
@@ -257,7 +257,7 @@ public interface Translations extends Constants {
   String logLabel();
 
   @Description("Confirmation title map")
-  @DefaultStringMapValue( { "clearJobsList", "Clear Jobs List", //
+  @DefaultStringMapValue({ "clearJobsList", "Clear Jobs List", //
   "cancelJob", "Cancel Job", //
   "replaceExistingFile", "Replace File", //
   "deleteFile", "Delete File", //
@@ -265,7 +265,7 @@ public interface Translations extends Constants {
   Map<String, String> confirmationTitleMap();
 
   @Description("Confirmation message map")
-  @DefaultStringMapValue( { "confirmClearJobsList", "All the completed jobs (succeeded, failed or cancelled) will be removed from the jobs list. Currently running jobs will be unaffected.<br /><br />Please confirm that you want to clear the jobs list.", //
+  @DefaultStringMapValue({ "confirmClearJobsList", "All the completed jobs (succeeded, failed or cancelled) will be removed from the jobs list. Currently running jobs will be unaffected.<br /><br />Please confirm that you want to clear the jobs list.", //
   "confirmCancelJob", "The job will be cancelled. Changes will be rolled back as much as possible: although cancelled, a job might be partially completed.<br /><br />Please confirm that you want cancel this job.", //
   "confirmReplaceExistingFile", "The file that you are uploading already exist in the file system.<br /><br />Please confirm that you want to replace the existing file.", //
   "confirmDeleteFile", "The file will be removed from the file system.<br /><br />Please confirm that you want to delete this file.", //
@@ -337,7 +337,7 @@ public interface Translations extends Constants {
   String errorLabel();
 
   @Description("Datasource parsing error map")
-  @DefaultStringMapValue( { "CategoryNameRequired", "Category name required", //
+  @DefaultStringMapValue({ "CategoryNameRequired", "Category name required", //
   "CategoryVariableNameRequired", "Category variable name required", //
   "DuplicateCategoryName", "Duplicate category name", //
   "DuplicateColumns", "Duplicate columns", //
@@ -361,7 +361,7 @@ public interface Translations extends Constants {
   Map<String, String> datasourceParsingErrorMap();
 
   @Description("Datasource comparison error map")
-  @DefaultStringMapValue( { "IncompatibleValueType", "Incompatible value type", //
+  @DefaultStringMapValue({ "IncompatibleValueType", "Incompatible value type", //
   "IncompatibleEntityType", "Incompatible entity type", //
   "VariablePresentInSourceButNotDestination", "Variable exists in source but not in destination" })
   Map<String, String> datasourceComparisonErrorMap();
@@ -425,4 +425,8 @@ public interface Translations extends Constants {
   @Description("Edit attribute title")
   @DefaultStringValue("Edit Attribute")
   String editAttribute();
+
+  @Description("Report produced date")
+  @DefaultStringValue("Produced Date")
+  String producedDate();
 }

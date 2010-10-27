@@ -60,10 +60,18 @@ public class ReportTemplateListView extends Composite implements ReportTemplateL
 
   @Override
   public void setReportTemplates(JsArray<ReportTemplateDto> templates) {
+    clearSelection();
     int templateCount = templates.length();
     reportTemplateTable.setPageSize(templateCount);
     reportTemplateTable.setDataSize(templateCount, true);
     reportTemplateTable.setData(0, templateCount, JsArrays.toList(templates, 0, templateCount));
+  }
+
+  private void clearSelection() {
+    if(getSelectedReportTemplate() != null) {
+      selectionModel.setSelected(getSelectedReportTemplate(), false);
+      reportTemplateTable.redraw();
+    }
   }
 
   public ReportTemplateDto getSelectedReportTemplate() {

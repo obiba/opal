@@ -12,27 +12,40 @@ package org.obiba.opal.web.gwt.app.client.report.view;
 import static org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter.DOWNLOAD_ACTION;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter.HasActionHandler;
 import org.obiba.opal.web.model.client.opal.FileDto;
-import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 
+import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.Cell;
+import com.google.gwt.cell.client.ClickableTextCell;
+import com.google.gwt.cell.client.CompositeCell;
+import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.cell.client.HasCell;
+import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.SimplePager;
+import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Grid;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListView;
+import com.google.gwt.view.client.ListView.Delegate;
 
 public class ReportTemplateDetailsView extends Composite implements ReportTemplateDetailsPresenter.Display {
 
@@ -42,20 +55,39 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
 
   private static ReportTemplateDetailsViewUiBinder uiBinder = GWT.create(ReportTemplateDetailsViewUiBinder.class);
 
+  private static Translations translations = GWT.create(Translations.class);
+
   @UiField
   CellTable<FileDto> producedReportsTable;
 
-  @UiField
-  FlowPanel reportTemplateDetails;
+  SimplePager<FileDto> pager;
 
-  Grid producedReports;
-
+  @SuppressWarnings("unused")
   private HasActionHandler actionsColumn;
-
-  private ActionHandler actionHandler;
 
   public ReportTemplateDetailsView() {
     initWidget(uiBinder.createAndBindUi(this));
+    initTable();
+  }
+
+  private void initTable() {
+    producedReportsTable.addColumn(new TextColumn<FileDto>() {
+      @Override
+      public String getValue(FileDto file) {
+        return new Date((long) file.getLastModifiedTime()).toString();
+      }
+    }, translations.producedDate());
+
+    actionsColumn = new ActionsColumn();
+    producedReportsTable.addColumn((ActionsColumn) actionsColumn, translations.actionsLabel());
+    addTablePager();
+  }
+
+  private void addTablePager() {
+    producedReportsTable.setPageSize(10);
+    pager = new SimplePager<FileDto>(producedReportsTable);
+    producedReportsTable.setPager(pager);
+    ((VerticalPanel) producedReportsTable.getParent()).insert(pager, 0);
   }
 
   @Override
@@ -72,58 +104,123 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   }
 
   @Override
-  public void setProducedReports(List<FileDto> files) {
-    int reportCount = files.size();
-    reportTemplateDetails.clear();
-    producedReports = new Grid(reportCount + 1, 2);
-    producedReports.setTitle("Reports");
-    producedReports.setHTML(0, 0, "<b>Produced Date</b>");
-    producedReports.setHTML(0, 1, "<b>Action</b>");
-    producedReports.setStyleName("producedReports");
+  public void setProducedReports(final JsArray<FileDto> files) {
 
-    int i = 1;
-    for(FileDto file : files) {
-      if(file.getType().isFileType(FileType.FILE)) {
-        GWT.log(file.getType().getName());
-        producedReports.setText(i, 0, new Date((long) file.getLastModifiedTime()).toString());
-        producedReports.setWidget(i, 1, new ReportActionPanel(file));
-        producedReports.getRowFormatter().setStyleName(i, i % 2 == 0 ? "evenRow" : "oddRow");
-        i++;
+    @SuppressWarnings("unchecked")
+    final JsArray<FileDto> reports = files != null ? files : (JsArray<FileDto>) JsArray.createArray();
+
+    producedReportsTable.setDelegate(new Delegate<FileDto>() {
+
+      @Override
+      public void onRangeChanged(ListView<FileDto> listView) {
+        int start = listView.getRange().getStart();
+        int length = listView.getRange().getLength();
+        listView.setData(start, length, JsArrays.toList(reports, start, length));
       }
-    }
-    reportTemplateDetails.add(producedReports);
+    });
+
+    pager.firstPage();
+    int pageSize = producedReportsTable.getPageSize();
+    producedReportsTable.setData(0, pageSize, JsArrays.toList(reports, 0, pageSize));
+    producedReportsTable.setDataSize(reports.length(), true);
+    producedReportsTable.redraw();
   }
 
-  private class ReportActionPanel extends FlowPanel {
+  // TODO Extract the following ActionsColumn and ActionsCell cells class. These should be part of some generic
+  // component. JobListView should also be refactored because it includes similar classes.
+  static class ActionsColumn extends Column<FileDto, FileDto> implements HasActionHandler {
 
-    FileDto report;
+    public ActionsColumn() {
+      super(new ActionsCell());
+    }
 
-    public ReportActionPanel(final FileDto report) {
-      super();
-      this.report = report;
+    public FileDto getValue(FileDto object) {
+      return object;
+    }
 
-      Anchor downloadLink = new Anchor("Download");
-      Anchor deleteLink = new Anchor("Delete");
-      downloadLink.addClickHandler(new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent event) {
-          actionHandler.doAction(report, DOWNLOAD_ACTION);
+    public void setActionHandler(ActionHandler actionHandler) {
+      ((ActionsCell) getCell()).setActionHandler(actionHandler);
+    }
+  }
+
+  static class ActionsCell extends AbstractCell<FileDto> {
+
+    private CompositeCell<FileDto> delegateCell;
+
+    private FieldUpdater<FileDto, String> hasCellFieldUpdater;
+
+    private ActionHandler actionHandler;
+
+    public ActionsCell() {
+      hasCellFieldUpdater = new FieldUpdater<FileDto, String>() {
+        public void update(int rowIndex, FileDto object, String value) {
+          if(actionHandler != null) {
+            actionHandler.doAction(object, value);
+          }
         }
-      });
-      deleteLink.addClickHandler(new ClickHandler() {
+      };
+    }
+
+    @Override
+    public Object onBrowserEvent(Element parent, FileDto value, Object viewData, NativeEvent event, ValueUpdater<FileDto> valueUpdater) {
+      refreshActions(value);
+
+      return delegateCell.onBrowserEvent(parent, value, viewData, event, valueUpdater);
+    }
+
+    @Override
+    public void render(FileDto value, Object viewData, StringBuilder sb) {
+      refreshActions(value);
+
+      delegateCell.render(value, viewData, sb);
+    }
+
+    public void setActionHandler(ActionHandler actionHandler) {
+      this.actionHandler = actionHandler;
+    }
+
+    private void refreshActions(FileDto value) {
+      delegateCell = createCompositeCell(DOWNLOAD_ACTION, DELETE_ACTION);
+    }
+
+    private CompositeCell<FileDto> createCompositeCell(String... actionNames) {
+      List<HasCell<FileDto, ?>> hasCells = new ArrayList<HasCell<FileDto, ?>>();
+
+      final Cell<String> cell = new ClickableTextCell() {
+
         @Override
-        public void onClick(ClickEvent event) {
-          actionHandler.doAction(report, DELETE_ACTION);
+        public void render(String value, Object viewData, StringBuilder sb) {
+          super.render(translations.actionMap().get(value), viewData, sb);
         }
-      });
-      add(downloadLink);
-      add(deleteLink);
+      };
+
+      for(final String actionName : actionNames) {
+        hasCells.add(new HasCell<FileDto, String>() {
+
+          @Override
+          public Cell<String> getCell() {
+            return cell;
+          }
+
+          @Override
+          public FieldUpdater<FileDto, String> getFieldUpdater() {
+            return hasCellFieldUpdater;
+          }
+
+          @Override
+          public String getValue(FileDto object) {
+            return actionName;
+          }
+        });
+      }
+
+      return new CompositeCell<FileDto>(hasCells);
     }
   }
 
   @Override
-  public void setActionHandler(ActionHandler handler) {
-    this.actionHandler = handler;
+  public HasActionHandler getActionColumn() {
+    return actionsColumn;
   }
 
 }
