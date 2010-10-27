@@ -65,6 +65,10 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   private OpalFileSystem opalFileSystem;
 
+  private Object syncConfig = new Object();
+
+  private Object syncFs = new Object();
+
   public DefaultOpalRuntime(OpalConfigurationIo opalConfigIo) {
     this.opalConfigIo = opalConfigIo;
   }
@@ -128,11 +132,33 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   @Override
   public OpalConfiguration getOpalConfiguration() {
+    synchronized(syncConfig) {
+      while(opalConfiguration == null) {
+        try {
+          log.debug("Waiting for opalConfiguration...");
+          syncConfig.wait();
+        } catch(InterruptedException ex) {
+          ;
+        }
+      }
+    }
+    log.debug("Returning opalConfiguration");
     return opalConfiguration;
   }
 
   @Override
   public OpalFileSystem getFileSystem() {
+    synchronized(syncFs) {
+      while(opalFileSystem == null) {
+        try {
+          log.info("Waiting for opalFileSystem...");
+          syncFs.wait();
+        } catch(InterruptedException ex) {
+          ;
+        }
+      }
+    }
+    log.info("Returning opalFileSystem");
     return opalFileSystem;
   }
 
@@ -169,7 +195,10 @@ public class DefaultOpalRuntime implements OpalRuntime {
   }
 
   private void readConfiguration() {
-    opalConfiguration = opalConfigIo.readConfiguration();
+    synchronized(syncConfig) {
+      opalConfiguration = opalConfigIo.readConfiguration();
+      syncConfig.notifyAll();
+    }
   }
 
   private void initSecurityManager() {
@@ -205,21 +234,24 @@ public class DefaultOpalRuntime implements OpalRuntime {
   }
 
   private void initFileSystem() {
-    try {
-      opalFileSystem = new OpalFileSystemImpl(opalConfiguration.getFileSystemRoot());
-      // Create the folders for each FunctionalUnit
-      for(FunctionalUnit unit : opalConfiguration.getFunctionalUnits()) {
-        getUnitDirectory(unit.getName());
-      }
+    synchronized(syncFs) {
+      try {
+        opalFileSystem = new OpalFileSystemImpl(opalConfiguration.getFileSystemRoot());
+        // Create the folders for each FunctionalUnit
+        for(FunctionalUnit unit : opalConfiguration.getFunctionalUnits()) {
+          getUnitDirectory(unit.getName());
+        }
 
-      // Create tmp folder, if it does not exist.
-      FileObject tmpFolder = getFileSystem().getRoot().resolveFile("tmp");
-      tmpFolder.createFolder();
-    } catch(RuntimeException e) {
-      log.error("The opal filesystem cannot be started.");
-      throw e;
-    } catch(FileSystemException e) {
-      log.error("Error creating functional unit's directory in the Opal File System.", e);
+        // Create tmp folder, if it does not exist.
+        FileObject tmpFolder = getFileSystem().getRoot().resolveFile("tmp");
+        tmpFolder.createFolder();
+      } catch(RuntimeException e) {
+        log.error("The opal filesystem cannot be started.");
+        throw e;
+      } catch(FileSystemException e) {
+        log.error("Error creating functional unit's directory in the Opal File System.", e);
+      }
+      syncFs.notifyAll();
     }
   }
 
