@@ -18,13 +18,20 @@ import org.obiba.opal.core.cfg.ReportTemplate;
 import org.obiba.opal.reporting.service.ReportException;
 import org.obiba.opal.reporting.service.ReportService;
 import org.obiba.opal.shell.commands.options.ReportCommandOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailException;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 
 @CommandUsage(description = "Generate a report based on the specified report template.", syntax = "Syntax: report --name TEMPLATE")
 public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCommandOptions> {
   //
   // Constants
   //
+
+  private static final Logger log = LoggerFactory.getLogger(ReportCommand.class);
 
   private static final String DATE_FORMAT_PATTERN = "yyyyMMdd_HHmm";
 
@@ -35,10 +42,12 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
   @Autowired
   private ReportService reportService;
 
+  @Autowired
+  private MailSender mailSender;
+
   //
   // AbstractOpalRuntimeDependentCommand Methods
   //
-
   @Override
   public int execute() {
     // Get the report template.
@@ -61,7 +70,9 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
       return 3;
     }
 
-    // TODO: Send notification email.
+    // if (!reportTemplate.getEmailNotificationList().isEmpty()) {
+    sendEmailNotification();
+    // }
 
     return 0;
   }
@@ -96,5 +107,25 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     String reportDateText = dateFormat.format(reportDate);
 
     return reportTemplateName + "-" + reportDateText + "." + reportFormat;
+  }
+
+  private void sendEmailNotification() {
+    String reportTemplateName = getOptions().getName();
+
+    SimpleMailMessage message = new SimpleMailMessage();
+    message.setFrom("opal-mailer@obiba.org");
+    message.setSubject("[Opal] Report: " + reportTemplateName);
+
+    // TODO: Use a Velocity template to create the message content.
+    message.setText("A new report about \"" + reportTemplateName + "\" is available for download.");
+
+    // TODO: Send an email to each address in the email notification list (reportTemplate.getEmailNotificationList()).
+    message.setTo("opal-admin@study.com");
+    try {
+      mailSender.send(message);
+    } catch(MailException ex) {
+      getShell().printf("Email notification not sent: %s", ex.getMessage());
+      log.error("Email notification not sent: {}", ex.getMessage());
+    }
   }
 }
