@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
+import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
 
 import com.google.gwt.core.client.GWT;
@@ -33,7 +34,7 @@ public class LabelListView extends Composite implements LabelListPresenter.Displ
 
   private LocaleDto baseLanguage;
 
-  private Map<LocaleDto, TextBox> languageLabelMap;
+  private Map<String, TextBox> languageLabelMap = new HashMap<String, TextBox>();
 
   private Translations translations = GWT.create(Translations.class);
 
@@ -57,14 +58,14 @@ public class LabelListView extends Composite implements LabelListPresenter.Displ
 
   @Override
   public void setLanguages(JsArray<LocaleDto> languages) {
-    languageLabelMap = new HashMap<LocaleDto, TextBox>();
+    panel.clear();
+    languageLabelMap.clear();
     grid = new Grid(languages.length(), 2);
     for(int i = 0; i < languages.length(); i++) {
       if(i == 0) baseLanguage = languages.get(0);
-      GWT.log(languages.get(i).getName());
       grid.setWidget(i, 0, new Label(getLabelText(languages.get(i).getName(), i)));
-      languageLabelMap.put(languages.get(i), new TextBox());
-      grid.setWidget(i, 1, languageLabelMap.get(languages.get(i)));
+      languageLabelMap.put(languages.get(i).getName(), new TextBox());
+      grid.setWidget(i, 1, languageLabelMap.get(languages.get(i).getName()));
     }
     panel.add(grid);
   }
@@ -79,13 +80,27 @@ public class LabelListView extends Composite implements LabelListPresenter.Displ
   }
 
   @Override
-  public Map<LocaleDto, TextBox> getLanguageLabelMap() {
+  public Map<String, TextBox> getLanguageLabelMap() {
     return languageLabelMap;
   }
 
   @Override
   public LocaleDto getBaseLanguage() {
     return baseLanguage;
+  }
+
+  @Override
+  public void displayAttributes(String attributeName, JsArray<AttributeDto> attributes) {
+    for(int i = 0; i < attributes.length(); i++) {
+      AttributeDto dto = attributes.get(i);
+      if(attributeName != null && attributeName.equals(dto.getName())) {
+        if(languageLabelMap.containsKey(dto.getLocale())) {
+          TextBox textBox = languageLabelMap.get(dto.getLocale());
+          textBox.setValue(dto.getValue());
+        }
+      }
+    }
+
   }
 
 }

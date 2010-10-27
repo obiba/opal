@@ -19,6 +19,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -32,26 +33,21 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
 
     public void setLanguages(JsArray<LocaleDto> languages);
 
-    public Map<LocaleDto, TextBox> getLanguageLabelMap();
+    public Map<String, TextBox> getLanguageLabelMap();
 
     public LocaleDto getBaseLanguage();
 
+    public void displayAttributes(String attributeName, JsArray<AttributeDto> attributes);
+
   }
+
+  private String attributeToDisplay;
+
+  private JsArray<AttributeDto> attributes;
 
   @Inject
   public LabelListPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
-  }
-
-  private void getLanguages() {
-    ResourceRequestBuilderFactory.<JsArray<LocaleDto>> newBuilder().forResource("/datasource/opal-data/locales").get().withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<LocaleDto> resource) {
-        @SuppressWarnings("unchecked")
-        JsArray<LocaleDto> languages = (resource != null) ? resource : (JsArray<LocaleDto>) JsArray.createArray();
-        getDisplay().setLanguages(languages);
-      }
-    }).send();
   }
 
   @Override
@@ -67,6 +63,18 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
     getLanguages();
   }
 
+  private void getLanguages() {
+    ResourceRequestBuilderFactory.<JsArray<LocaleDto>> newBuilder().forResource("/datasource/opal-data/locales").get().withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
+      @Override
+      public void onResource(Response response, JsArray<LocaleDto> resource) {
+        @SuppressWarnings("unchecked")
+        JsArray<LocaleDto> languages = (resource != null) ? resource : (JsArray<LocaleDto>) JsArray.createArray();
+        getDisplay().setLanguages(languages);
+        getDisplay().displayAttributes(attributeToDisplay, attributes);
+      }
+    }).send();
+  }
+
   @Override
   protected void onUnbind() {
   }
@@ -78,6 +86,18 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
 
   @Override
   protected void onPlaceRequest(PlaceRequest request) {
+  }
+
+  public void setAttributes(JsArray<AttributeDto> attributes) {
+    this.attributes = attributes;
+  }
+
+  public void setAttributeToDisplay(String attributeToDisplay) {
+    this.attributeToDisplay = attributeToDisplay;
+  }
+
+  public void updateFields() {
+    getDisplay().displayAttributes(attributeToDisplay, attributes);
   }
 
 }
