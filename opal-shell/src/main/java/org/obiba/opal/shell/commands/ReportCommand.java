@@ -122,11 +122,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     SimpleMailMessage message = new SimpleMailMessage();
     message.setFrom("opal-mailer@obiba.org");
     message.setSubject("[Opal] Report: " + reportTemplateName);
-    // message.setText(getEmailNotificationText(reportTemplateName));
-
-    String text = getEmailNotificationText(reportTemplateName);
-    log.info("DSPATHIS email text:\n\n{}", text);
-    message.setText(text);
+    message.setText(getEmailNotificationText(reportTemplateName));
 
     // TODO: Send an email to each address in the email notification list (reportTemplate.getEmailNotificationList()).
     message.setTo("opal-admin@study.com");
