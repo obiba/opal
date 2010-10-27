@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.reporting.service.impl;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -45,16 +44,12 @@ public class BasicBirtReportServiceImpl implements ReportService {
 
     try {
       Process p = r.exec(getBirtCommandLine(format, parameters, reportDesign, reportOutput));
-      InputStream in = p.getInputStream();
-      BufferedInputStream buf = new BufferedInputStream(in);
-      InputStreamReader inread = new InputStreamReader(buf);
-      BufferedReader bufferedreader = new BufferedReader(inread);
 
-      // Read the birt output
-      String line;
-      while((line = bufferedreader.readLine()) != null) {
-        System.out.println(line);
-      }
+      OutputPurger outputErrorPurger = new OutputPurger(p.getErrorStream());
+      OutputPurger outputPurger = new OutputPurger(p.getInputStream());
+      outputErrorPurger.start();
+      outputPurger.start();
+
       // Check for birt failure
       try {
         if(p.waitFor() != 0) {
@@ -62,12 +57,6 @@ public class BasicBirtReportServiceImpl implements ReportService {
         }
       } catch(InterruptedException e) {
         System.err.println(e);
-      } finally {
-        // Close the InputStream
-        bufferedreader.close();
-        inread.close();
-        buf.close();
-        in.close();
       }
     } catch(IOException e) {
       System.err.println(e.getMessage());
@@ -104,6 +93,7 @@ public class BasicBirtReportServiceImpl implements ReportService {
   public void start() {
     birtExec = System.getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME) + File.separator + "ReportEngine" + File.separator + "genReport";
     if(System.getProperty("os.name").contains("Windows")) {
+      birtExec = "cmd.exe /c " + birtExec;
       birtExec += ".bat";
     } else {
       birtExec += ".sh";
@@ -118,4 +108,24 @@ public class BasicBirtReportServiceImpl implements ReportService {
     running = false;
   }
 
+  class OutputPurger extends Thread {
+
+    InputStream inputStream;
+
+    OutputPurger(InputStream pInputStream) {
+      inputStream = pInputStream;
+    }
+
+    public void run() {
+      try {
+        InputStreamReader wReader = new InputStreamReader(inputStream);
+        BufferedReader wBuffReader = new BufferedReader(wReader);
+
+        while((wBuffReader.readLine()) != null) {
+        }
+
+      } catch(IOException wEx) {
+      }
+    }
+  }
 }
