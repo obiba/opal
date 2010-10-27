@@ -21,7 +21,7 @@
               <tbody>
                 <tr>
                   <td>
-                    <ui:msg description="Name label">Name</ui:msg>
+                    <ui:msg description="Name label">Name</ui:msg>:
                   </td>
                   <td>
 	                 <g:HTMLPanel addStyleNames="indent">
@@ -29,7 +29,7 @@
 	                     <tbody>
 	                       <tr>
 	                         <td>
-	                           <g:RadioButton name="name" ui:field="nameDropdownRadioChoice"><ui:msg description="Predefined label">Predefined:</ui:msg></g:RadioButton><g:ListBox ui:field="labels" />
+	                           <g:RadioButton name="name" ui:field="nameDropdownRadioChoice" checked="true"><ui:msg description="Predefined label">Predefined:</ui:msg></g:RadioButton><g:ListBox ui:field="labels" />
 	                         </td>
 	                       </tr>
 	                       <tr>
