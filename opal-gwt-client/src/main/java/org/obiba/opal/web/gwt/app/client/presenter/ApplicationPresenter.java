@@ -24,7 +24,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewCreationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
-import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateListPresenter;
+import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourceStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.FormatSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.UploadVariablesStepPresenter;
@@ -82,7 +82,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
   private Provider<DashboardPresenter> dashboardPresenter;
 
   @Inject
-  private Provider<ReportTemplateListPresenter> reportTemplateListPresenter;
+  private Provider<ReportTemplatePresenter> reportTemplatePresenter;
 
   @Inject
   private Provider<CreateDatasourceStepPresenter> createDatasourceStepPresenter;
@@ -144,7 +144,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
       @Override
       public void execute() {
-        eventBus.fireEvent(new WorkbenchChangeEvent(reportTemplateListPresenter.get()));
+        eventBus.fireEvent(new WorkbenchChangeEvent(reportTemplatePresenter.get()));
         getDisplay().setCurrentSelection(getDisplay().getReportsItem());
       }
     });

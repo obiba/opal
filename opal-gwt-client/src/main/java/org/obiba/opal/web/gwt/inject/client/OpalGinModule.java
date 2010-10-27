@@ -19,8 +19,12 @@ import org.obiba.opal.web.gwt.app.client.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
+import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateListPresenter;
+import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresenter;
+import org.obiba.opal.web.gwt.app.client.report.view.ReportTemplateDetailsView;
 import org.obiba.opal.web.gwt.app.client.report.view.ReportTemplateListView;
+import org.obiba.opal.web.gwt.app.client.report.view.ReportTemplateView;
 import org.obiba.opal.web.gwt.app.client.view.ApplicationView;
 import org.obiba.opal.web.gwt.app.client.view.DataExportView;
 import org.obiba.opal.web.gwt.app.client.view.LoginView;
@@ -72,7 +76,11 @@ public class OpalGinModule extends AbstractGinModule {
     bind(DatasourceSelectorPresenter.Display.class).to(DatasourceSelectorView.class);
     bind(CreateFolderDialogPresenter.Display.class).to(CreateFolderDialogView.class).in(Singleton.class);
     bind(EvaluateScriptPresenter.Display.class).to(EvaluateScriptView.class).in(Singleton.class);
+    
+    // TODO Move this to a ReportTemplate module
     bind(ReportTemplateListPresenter.Display.class).to(ReportTemplateListView.class).in(Singleton.class);
+    bind(ReportTemplateDetailsPresenter.Display.class).to(ReportTemplateDetailsView.class).in(Singleton.class);
+    bind(ReportTemplatePresenter.Display.class).to(ReportTemplateView.class).in(Singleton.class);
 
     // Concrete classes (such as NavigatorPresenter) don't need to be "bound". Simply define a getter in the
     // OpalGinjector interface and they'll "just work".

@@ -1,0 +1,27 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
+
+  
+  <o:WorkbenchLayout withInfo="false">
+    <g:Label><ui:msg description="Reports title">Report Templates</ui:msg></g:Label>
+    <g:Label></g:Label>
+    <g:FlowPanel>
+      <g:Button ui:field="reportTemplateButton">
+        <ui:msg description="Add Report Template label">Add Report Template</ui:msg>
+      </g:Button>
+    </g:FlowPanel>
+    <g:SplitLayoutPanel>
+      <g:center> 
+        <g:ScrollPanel width="100%" ui:field="reportTemplateDetailsPanel" />
+      </g:center>
+      <g:west size='240'>
+        <g:ScrollPanel ui:field="reportTemplateListPanel"/>
+      </g:west>
+    </g:SplitLayoutPanel>  
+  </o:WorkbenchLayout>
+  
+</ui:UiBinder>

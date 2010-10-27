@@ -13,15 +13,15 @@ import static org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateD
 import static org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter.DOWNLOAD_ACTION;
 
 import java.util.Date;
+import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter.HasActionHandler;
 import org.obiba.opal.web.model.client.opal.FileDto;
+import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -72,9 +72,8 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   }
 
   @Override
-  public void setProducedReports(FileDto reportFolder) {
-    JsArray<FileDto> reports = reportFolder.getChildrenArray();
-    int reportCount = reports.length();
+  public void setProducedReports(List<FileDto> files) {
+    int reportCount = files.size();
     reportTemplateDetails.clear();
     producedReports = new Grid(reportCount + 1, 2);
     producedReports.setTitle("Reports");
@@ -83,11 +82,14 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
     producedReports.setStyleName("producedReports");
 
     int i = 1;
-    for(FileDto report : JsArrays.toIterable(reports)) {
-      producedReports.setText(i, 0, new Date((long) report.getLastModifiedTime()).toString());
-      producedReports.setWidget(i, 1, new ReportActionPanel(report));
-      producedReports.getRowFormatter().setStyleName(i, i % 2 == 0 ? "evenRow" : "oddRow");
-      i++;
+    for(FileDto file : files) {
+      if(file.getType().isFileType(FileType.FILE)) {
+        GWT.log(file.getType().getName());
+        producedReports.setText(i, 0, new Date((long) file.getLastModifiedTime()).toString());
+        producedReports.setWidget(i, 1, new ReportActionPanel(file));
+        producedReports.getRowFormatter().setStyleName(i, i % 2 == 0 ? "evenRow" : "oddRow");
+        i++;
+      }
     }
     reportTemplateDetails.add(producedReports);
   }

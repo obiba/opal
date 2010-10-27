@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.report.presenter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -18,7 +21,9 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -39,7 +44,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
   private Runnable actionRequiringConfirmation;
 
   public interface Display extends WidgetDisplay {
-    void setProducedReports(FileDto reports);
+    void setProducedReports(List<FileDto> reports);
 
     void setActionHandler(ActionHandler handler);
   }
@@ -85,7 +90,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
   }
 
   private void initUiComponents() {
-    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta/reports").get().withCallback(new ProducedReportsResourceCallback()).send();
+    getDisplay().setProducedReports(new ArrayList<FileDto>());
   }
 
   private void addHandlers() {
@@ -96,10 +101,18 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
         }
       }
     });
+
+    super.registerHandler(eventBus.addHandler(ReportTemplateSelectedEvent.getType(), new ReportTemplateSelectedEvent.Handler() {
+
+      @Override
+      public void onReportTemplateSelected(ReportTemplateSelectedEvent event) {
+        ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta/reports/" + event.getReportTemplate().getName()).get().withCallback(new ProducedReportsResourceCallback()).withCallback(404, new NoProducedReportsResourceCallback()).send();
+      }
+    }));
+
   }
 
   protected void doActionImpl(final FileDto dto, String actionName) {
-    GWT.log("action name is " + actionName + " file is " + dto.getName());
     if(actionName.equals(DOWNLOAD_ACTION)) {
       downloadFile(dto);
     } else if(actionName.equals(DELETE_ACTION)) {
@@ -133,11 +146,19 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
     eventBus.fireEvent(new FileDownloadEvent(url));
   }
 
+  private class NoProducedReportsResourceCallback implements ResponseCodeCallback {
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      getDisplay().setProducedReports(new ArrayList<FileDto>());
+    }
+  }
+
   private class ProducedReportsResourceCallback implements ResourceCallback<FileDto> {
 
     @Override
     public void onResource(Response response, FileDto reportFolder) {
-      getDisplay().setProducedReports(reportFolder);
+      getDisplay().setProducedReports(JsArrays.toList(reportFolder.getChildrenArray()));
     }
 
   }
