@@ -9,14 +9,14 @@
     .top-margin { margin-top: 0.5em; }
   </ui:style>
 
-  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" height="15em" width="35em">
+  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" height="18em" width="35em">
     <g:caption>
       <ui:msg description="Add new attribute title" >Add New Attribute</ui:msg>
     </g:caption>
-    <g:DockLayoutPanel unit="EM" height="15em" width="35em">
+    <g:DockLayoutPanel unit="EM" height="18em" width="35em">
       <g:center>
         <g:VerticalPanel  addStyleNames="main {style.optionsPanelMsg}">
-          <g:HTMLPanel>
+          <g:HTMLPanel height="5.5em">
             <table class="gwt-KeyValue" cellspacing="10">
               <tbody>
                 <tr>
@@ -45,7 +45,7 @@
               </tbody>
             </table>
           </g:HTMLPanel>
-          <g:ScrollPanel ui:field="inputFieldPanel" height="8em"/>
+          <g:ScrollPanel ui:field="scrollPanel" height="8em"/>
         </g:VerticalPanel>
       </g:center>
       <g:south size="3.25">

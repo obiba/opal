@@ -9,12 +9,18 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 
+import java.util.List;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
+import org.obiba.opal.web.model.client.magma.AttributeDto;
+
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -24,6 +30,7 @@ import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
@@ -55,7 +62,22 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
     HasText getAttributeName();
 
+    void addLabelListPresenter(Widget widget);
+
+    void removeLabelListPresenter(Widget widget);
+
   }
+
+  private String datasourceName;
+
+  private JsArray<AttributeDto> attributes;
+
+  private String attributeNameToDisplay;
+
+  private List<String> labels;
+
+  @Inject
+  private LabelListPresenter labelListPresenter;
 
   @Inject
   public AttributeDialogPresenter(Display display, EventBus eventBus) {
@@ -64,17 +86,21 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
   @Override
   public void refreshDisplay() {
-    // TODO Auto-generated method stub
-
+    labelListPresenter.refreshDisplay();
   }
 
   @Override
   public void revealDisplay() {
     getDisplay().showDialog();
+    labelListPresenter.revealDisplay();
   }
 
   @Override
   protected void onBind() {
+    labelListPresenter.setAttributes(attributes);
+    labelListPresenter.setAttributeToDisplay(attributeNameToDisplay);
+    labelListPresenter.bind();
+    getDisplay().addLabelListPresenter(labelListPresenter.getDisplay().asWidget());
     addEventHandlers();
     addRadioButtonNameEventHandlers();
     resetForm();
@@ -127,7 +153,8 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
   @Override
   protected void onUnbind() {
-
+    getDisplay().removeLabelListPresenter(labelListPresenter.getDisplay().asWidget());
+    labelListPresenter.unbind();
   }
 
   @Override

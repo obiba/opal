@@ -52,7 +52,7 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   TextBox attributeName;
 
   @UiField
-  ScrollPanel inputFieldPanel;
+  ScrollPanel scrollPanel;
 
   @UiField
   Button saveButton;
@@ -134,5 +134,16 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   @Override
   public HasText getAttributeName() {
     return attributeName;
+  }
+
+  @Override
+  public void addLabelListPresenter(Widget widget) {
+    scrollPanel.clear();
+    scrollPanel.add(widget);
+  }
+
+  @Override
+  public void removeLabelListPresenter(Widget widget) {
+    scrollPanel.remove(widget);
   }
 }
