@@ -11,9 +11,12 @@ package org.obiba.opal.shell.commands;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
+import org.apache.velocity.app.VelocityEngine;
 import org.obiba.opal.core.cfg.ReportTemplate;
 import org.obiba.opal.reporting.service.ReportException;
 import org.obiba.opal.reporting.service.ReportService;
@@ -24,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.ui.velocity.VelocityEngineUtils;
 
 @CommandUsage(description = "Generate a report based on the specified report template.", syntax = "Syntax: report --name TEMPLATE")
 public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCommandOptions> {
@@ -44,6 +48,9 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
 
   @Autowired
   private MailSender mailSender;
+
+  @Autowired
+  private VelocityEngine velocityEngine;
 
   //
   // AbstractOpalRuntimeDependentCommand Methods
@@ -115,9 +122,11 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     SimpleMailMessage message = new SimpleMailMessage();
     message.setFrom("opal-mailer@obiba.org");
     message.setSubject("[Opal] Report: " + reportTemplateName);
+    // message.setText(getEmailNotificationText(reportTemplateName));
 
-    // TODO: Use a Velocity template to create the message content.
-    message.setText("A new report about \"" + reportTemplateName + "\" is available for download.");
+    String text = getEmailNotificationText(reportTemplateName);
+    log.info("DSPATHIS email text:\n\n{}", text);
+    message.setText(text);
 
     // TODO: Send an email to each address in the email notification list (reportTemplate.getEmailNotificationList()).
     message.setTo("opal-admin@study.com");
@@ -127,5 +136,12 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
       getShell().printf("Email notification not sent: %s", ex.getMessage());
       log.error("Email notification not sent: {}", ex.getMessage());
     }
+  }
+
+  private String getEmailNotificationText(String reportTemplateName) {
+    Map<String, String> model = new HashMap<String, String>();
+    model.put("report_template", reportTemplateName);
+
+    return VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, "velocity/opal-reporting/report-email-notification.vm", model);
   }
 }
