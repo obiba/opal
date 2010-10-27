@@ -24,6 +24,7 @@ import org.obiba.opal.shell.commands.options.ReportCommandOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -52,6 +53,10 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
   @Autowired
   private VelocityEngine velocityEngine;
 
+  @Autowired
+  @Value("${org.obiba.opal.public.url}")
+  private String opalPublicUrl;
+
   //
   // AbstractOpalRuntimeDependentCommand Methods
   //
@@ -67,8 +72,10 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
 
     // Render it.
     Date reportDate = new Date();
+    FileObject reportOutput = null;
     try {
-      reportService.render(reportTemplate.getFormat(), reportTemplate.getParameters(), getReportDesign(reportTemplate.getDesign()), getReportOutput(reportTemplateName, reportTemplate.getFormat(), reportDate));
+      reportOutput = getReportOutput(reportTemplateName, reportTemplate.getFormat(), reportDate);
+      reportService.render(reportTemplate.getFormat(), reportTemplate.getParameters(), getReportDesign(reportTemplate.getDesign()), getLocalFile(reportOutput).getPath());
     } catch(ReportException ex) {
       getShell().printf("Error rendering report: '%s'\n", ex.getMessage());
       return 2;
@@ -78,7 +85,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     }
 
     if(!reportTemplate.getEmailNotificationAddresses().isEmpty()) {
-      sendEmailNotification(reportTemplate);
+      sendEmailNotification(reportTemplate, reportOutput);
     }
 
     return 0;
@@ -99,14 +106,14 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     return getLocalFile(reportDesignFile).getPath();
   }
 
-  private String getReportOutput(String reportTemplateName, String reportFormat, Date reportDate) throws FileSystemException {
+  private FileObject getReportOutput(String reportTemplateName, String reportFormat, Date reportDate) throws FileSystemException {
     String reportFileName = getReportFileName(reportTemplateName, reportFormat, reportDate);
 
     FileObject reportDir = getFile("/reports/" + reportTemplateName);
     reportDir.createFolder();
     FileObject reportFile = reportDir.resolveFile(reportFileName);
 
-    return getLocalFile(reportFile).getPath();
+    return reportFile;
   }
 
   private String getReportFileName(String reportTemplateName, String reportFormat, Date reportDate) {
@@ -116,13 +123,13 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     return reportTemplateName + "-" + reportDateText + "." + reportFormat;
   }
 
-  private void sendEmailNotification(ReportTemplate reportTemplate) {
+  private void sendEmailNotification(ReportTemplate reportTemplate, FileObject reportOutput) {
     String reportTemplateName = reportTemplate.getName();
 
     SimpleMailMessage message = new SimpleMailMessage();
     message.setFrom("opal-mailer@obiba.org");
     message.setSubject("[Opal] Report: " + reportTemplateName);
-    message.setText(getEmailNotificationText(reportTemplateName));
+    message.setText(getEmailNotificationText(reportTemplateName, reportOutput));
 
     for(String emailAddress : reportTemplate.getEmailNotificationAddresses()) {
       message.setTo(emailAddress);
@@ -135,9 +142,10 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     }
   }
 
-  private String getEmailNotificationText(String reportTemplateName) {
+  private String getEmailNotificationText(String reportTemplateName, FileObject reportOutput) {
     Map<String, String> model = new HashMap<String, String>();
     model.put("report_template", reportTemplateName);
+    model.put("report_public_link", opalPublicUrl + "/ws/report/public/" + getOpalRuntime().getFileSystem().getObfuscatedPath(reportOutput));
 
     return VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, "velocity/opal-reporting/report-email-notification.vm", model);
   }
