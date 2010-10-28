@@ -76,7 +76,9 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
     void removeLabelListPresenter(Widget widget);
 
-    String getAttributeName();
+    HasText getAttributeName();
+
+    void setNameDropdownList(List<String> labels);
 
   }
 
@@ -96,7 +98,7 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   @Inject
   public AttributeDialogPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
-    validators.add(new RequiredTextValidator(getDisplay().getAttributeNameField(), "AttributeNameRequired"));
+    validators.add(new RequiredTextValidator(getDisplay().getAttributeName(), "AttributeNameRequired"));
     validators.add(new UniqueAttributeNameValidator("AttributeNameAlreadyExists"));
   }
 
@@ -115,11 +117,13 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   protected void onBind() {
     labelListPresenter.setAttributes(attributes);
     labelListPresenter.setAttributeToDisplay(attributeNameToDisplay);
+    labelListPresenter.setDatasourceName(datasourceName);
     labelListPresenter.bind();
     validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLabelRequired"));
     getDisplay().addLabelListPresenter(labelListPresenter.getDisplay().asWidget());
     addEventHandlers();
     addRadioButtonNameEventHandlers();
+    getDisplay().setNameDropdownList(labels);
     resetForm();
   }
 
@@ -241,10 +245,18 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
     for(Map.Entry<String, TextBox> entry : labelMap.entrySet()) {
       AttributeDto attribute = AttributeDto.create();
       attribute.setLocale(entry.getKey());
-      attribute.setName(getDisplay().getAttributeName());
+      attribute.setName(getDisplay().getAttributeName().getText());
       attribute.setValue(entry.getValue().getValue());
       attributes.push(attribute);
     }
     return attributes;
+  }
+
+  public void setDatasourceName(String datasourceName) {
+    this.datasourceName = datasourceName;
+  }
+
+  public void setLabels(List<String> labels) {
+    this.labels = labels;
   }
 }

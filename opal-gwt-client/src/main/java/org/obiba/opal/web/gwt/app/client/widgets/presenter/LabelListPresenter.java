@@ -46,6 +46,8 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
 
   private JsArray<AttributeDto> attributes;
 
+  private String datasourceName;
+
   @Inject
   public LabelListPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
@@ -65,7 +67,7 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
   }
 
   private void getLanguages() {
-    ResourceRequestBuilderFactory.<JsArray<LocaleDto>> newBuilder().forResource("/datasource/opal-data/locales").get().withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<LocaleDto>> newBuilder().forResource("/datasource/" + datasourceName + "/locales").get().withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
       @Override
       public void onResource(Response response, JsArray<LocaleDto> resource) {
         @SuppressWarnings("unchecked")
@@ -115,6 +117,10 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
       return false;
     }
 
+  }
+
+  public void setDatasourceName(String datasourceName) {
+    this.datasourceName = datasourceName;
   }
 
 }

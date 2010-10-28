@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.AttributeDialogPresenter;
 
 import com.google.gwt.core.client.GWT;
@@ -148,12 +150,29 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   }
 
   @Override
-  public String getAttributeName() {
-    if(nameDropdownRadioChoice.getValue()) {
-      return labels.getValue(labels.getSelectedIndex());
-    } else {
-      return attributeName.getText();
-    }
+  public HasText getAttributeName() {
+    return new HasText() {
 
+      @Override
+      public void setText(String arg0) {
+      }
+
+      @Override
+      public String getText() {
+        if(nameDropdownRadioChoice.getValue()) {
+          return labels.getValue(labels.getSelectedIndex());
+        } else {
+          return attributeName.getText();
+        }
+      }
+    };
+  }
+
+  @Override
+  public void setNameDropdownList(List<String> labels) {
+    this.labels.clear();
+    for(String label : labels) {
+      this.labels.addItem(label, label);
+    }
   }
 }
