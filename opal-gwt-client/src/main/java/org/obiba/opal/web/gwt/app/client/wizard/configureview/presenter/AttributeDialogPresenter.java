@@ -28,6 +28,7 @@ import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.AttributeUpdateEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.UpdateType;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 
 import com.google.gwt.core.client.GWT;
@@ -163,9 +164,9 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
         }
         JsArray<AttributeDto> newAttributes = getNewAttributeDtos();
         if(isEdit()) {
-          eventBus.fireEvent(new AttributeUpdateEvent(newAttributes, AttributeUpdateEvent.UpdateType.EDIT));
+          eventBus.fireEvent(new AttributeUpdateEvent(newAttributes, UpdateType.EDIT));
         } else {
-          eventBus.fireEvent(new AttributeUpdateEvent(newAttributes, AttributeUpdateEvent.UpdateType.ADD));
+          eventBus.fireEvent(new AttributeUpdateEvent(newAttributes, UpdateType.ADD));
         }
         getDisplay().hideDialog();
       }

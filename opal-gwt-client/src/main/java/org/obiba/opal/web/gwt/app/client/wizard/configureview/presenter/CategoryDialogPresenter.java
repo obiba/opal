@@ -27,6 +27,7 @@ import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.CategoryUpdateEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.UpdateType;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 
@@ -79,7 +80,7 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
   @Inject
   public CategoryDialogPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
-    validators.add(new RequiredTextValidator(getDisplay().getCategoryName(), "CategoryNameRequired"));
+    validators.add(new RequiredTextValidator(getDisplay().getCategoryName(), "CategoryDialogNameRequired"));
     validators.add(new UniqueCategoryNameValidator(getDisplay().getCategoryName(), "CategoryNameAlreadyExists"));
   }
 
@@ -122,6 +123,7 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
     }
     labelListPresenter.setAttributeToDisplay("label");
     labelListPresenter.bind();
+    validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLabelRequired"));
     setTitle();
     populateForm();
     getDisplay().getInputFieldPanel().clear();
@@ -152,11 +154,11 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
         }
         CategoryDto newCategory = getNewCategoryDto();
         if(isEdit()) {
-          replaceCategory(categoryDto, newCategory);
+          eventBus.fireEvent(new CategoryUpdateEvent(newCategory, categoryDto, UpdateType.EDIT));
         } else {
-          addCategory(categoryDto);
+          eventBus.fireEvent(new CategoryUpdateEvent(newCategory, null, UpdateType.ADD));
         }
-        eventBus.fireEvent(new CategoryUpdateEvent());
+        getDisplay().hideDialog();
       }
     }));
 
@@ -234,21 +236,6 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
 
   private boolean isEdit() {
     return categoryDto != null;
-  }
-
-  private void replaceCategory(CategoryDto originalCategory, CategoryDto newCategory) {
-    categories.set(getCategoriesIndex(originalCategory), newCategory);
-  }
-
-  private int getCategoriesIndex(CategoryDto category) {
-    for(int i = 0; i < categories.length(); i++) {
-      if(categories.get(i).equals(category)) return i;
-    }
-    return -1;
-  }
-
-  private void addCategory(CategoryDto categoryDto) {
-    categories.push(categoryDto);
   }
 
 }

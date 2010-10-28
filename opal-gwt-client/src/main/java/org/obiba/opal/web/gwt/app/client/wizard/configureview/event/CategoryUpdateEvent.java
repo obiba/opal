@@ -9,24 +9,39 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.event;
 
+import org.obiba.opal.web.model.client.magma.CategoryDto;
+
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
+/**
+ * This event contains a {@link CategoryDto} and an {@link UpdateType} to indicate if the CategoryDto is to replace an
+ * existing CategoryDto or to be added to the list of existing CategoryDtos. In the case of replacement, the original
+ * CategoryDto is also provided and gives a way of locating the original category to be replaced.
+ */
 public class CategoryUpdateEvent extends GwtEvent<CategoryUpdateEvent.Handler> {
 
   private static Type<Handler> TYPE;
 
-  public interface Handler extends EventHandler {
+  private CategoryDto newCategory;
 
-    public void onCategoryUpdate(CategoryUpdateEvent event);
+  private CategoryDto originalCategory;
+
+  private UpdateType updateType;
+
+  public CategoryUpdateEvent(CategoryDto newCategory, CategoryDto originalCategory, UpdateType updateType) {
+    this.newCategory = newCategory;
+    this.originalCategory = originalCategory;
+    this.updateType = updateType;
   }
 
   @Override
-  protected void dispatch(Handler arg0) {
+  protected void dispatch(Handler handler) {
+    handler.onCategoryUpdate(this);
   }
 
   @Override
-  public com.google.gwt.event.shared.GwtEvent.Type<Handler> getAssociatedType() {
+  public Type<Handler> getAssociatedType() {
     return TYPE;
   }
 
@@ -34,4 +49,19 @@ public class CategoryUpdateEvent extends GwtEvent<CategoryUpdateEvent.Handler> {
     return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
   }
 
+  public CategoryDto getNewCategory() {
+    return newCategory;
+  }
+
+  public CategoryDto getOriginalCategory() {
+    return originalCategory;
+  }
+
+  public UpdateType getUpdateType() {
+    return updateType;
+  }
+
+  public interface Handler extends EventHandler {
+    public void onCategoryUpdate(CategoryUpdateEvent event);
+  }
 }

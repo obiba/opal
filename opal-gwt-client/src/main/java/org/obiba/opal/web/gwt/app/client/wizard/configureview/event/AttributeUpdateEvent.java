@@ -23,13 +23,6 @@ public class AttributeUpdateEvent extends GwtEvent<AttributeUpdateEvent.Handler>
 
   private static Type<Handler> TYPE;
 
-  public static enum UpdateType {
-    /** Attribute in list intended to be added to existing attributes. */
-    ADD,
-    /** Attributes in list intended to replace existing attributes. */
-    EDIT
-  }
-
   private JsArray<AttributeDto> attributes;
 
   private UpdateType updateType;

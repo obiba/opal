@@ -145,6 +145,8 @@ public interface Translations extends Constants {
 
   @Description("User message map")
   @DefaultStringMapValue({ //
+  "CategoryDialogNameRequired", "A category name is required.", //
+  "CategoryNameAlreadyExists", "The specified category name already exists.", //
   "AttributeNameRequired", "An attribute name is required.", //
   "AttributeNameAlreadyExists", "The specified attribute name already exists.", //
   "BaseLanguageLabelRequired", "The base language field (marked with *) requires a value.", //
