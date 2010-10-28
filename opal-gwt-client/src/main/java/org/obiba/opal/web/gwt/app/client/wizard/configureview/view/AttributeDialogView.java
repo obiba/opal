@@ -133,6 +133,11 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
     nameFieldRadioChoice.setValue(false, true);
   }
 
+  public void selectNameFieldRadioChoice() {
+    nameDropdownRadioChoice.setValue(false, true);
+    nameFieldRadioChoice.setValue(true, true);
+  }
+
   @Override
   public HasText getAttributeNameField() {
     return attributeName;
@@ -174,5 +179,30 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
     for(String label : labels) {
       this.labels.addItem(label, label);
     }
+  }
+
+  @Override
+  public HasText getCaption() {
+    return dialog;
+  }
+
+  @Override
+  public void setAttributeName(String attributeName) {
+    int index = getLabelIndex(attributeName);
+    if(index > 0) {
+      labels.setItemSelected(index, true);
+    } else {
+      setLabelsEnabled(false);
+      setAttributeNameEnabled(true);
+      selectNameFieldRadioChoice();
+      this.attributeName.setText(attributeName);
+    }
+  }
+
+  private int getLabelIndex(String name) {
+    for(int i = 0; i < labels.getItemCount(); i++) {
+      if(labels.getValue(i).equals(name)) return i;
+    }
+    return -1;
   }
 }

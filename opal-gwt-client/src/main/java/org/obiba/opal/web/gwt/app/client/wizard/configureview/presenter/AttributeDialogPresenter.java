@@ -21,6 +21,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -29,6 +30,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.AttributeUpdateEvent;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -78,7 +80,11 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
     HasText getAttributeName();
 
+    void setAttributeName(String attributeName);
+
     void setNameDropdownList(List<String> labels);
+
+    HasText getCaption();
 
   }
 
@@ -91,6 +97,8 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   private List<String> labels;
 
   private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+
+  private Translations translations = GWT.create(Translations.class);
 
   @Inject
   private LabelListPresenter labelListPresenter;
@@ -123,8 +131,18 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
     getDisplay().addLabelListPresenter(labelListPresenter.getDisplay().asWidget());
     addEventHandlers();
     addRadioButtonNameEventHandlers();
-    getDisplay().setNameDropdownList(labels);
     resetForm();
+    getDisplay().setNameDropdownList(labels);
+    if(isEdit()) getDisplay().setAttributeName(attributeNameToDisplay);
+    setTitle();
+  }
+
+  private void setTitle() {
+    if(isEdit()) {
+      getDisplay().getCaption().setText(translations.editAttribute());
+    } else {
+      getDisplay().getCaption().setText(translations.addNewAttribute());
+    }
   }
 
   private void resetForm() {
@@ -258,5 +276,9 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
   public void setLabels(List<String> labels) {
     this.labels = labels;
+  }
+
+  public void setAttributeNameToDisplay(String attributeNameToDisplay) {
+    this.attributeNameToDisplay = attributeNameToDisplay;
   }
 }
