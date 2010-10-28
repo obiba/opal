@@ -116,7 +116,7 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
     labelListPresenter.setAttributes(attributes);
     labelListPresenter.setAttributeToDisplay(attributeNameToDisplay);
     labelListPresenter.bind();
-    validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLableRequired"));
+    validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLabelRequired"));
     getDisplay().addLabelListPresenter(labelListPresenter.getDisplay().asWidget());
     addEventHandlers();
     addRadioButtonNameEventHandlers();
@@ -145,6 +145,7 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
         } else {
           eventBus.fireEvent(new AttributeUpdateEvent(newAttributes, AttributeUpdateEvent.UpdateType.ADD));
         }
+        getDisplay().hideDialog();
       }
     }));
 

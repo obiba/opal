@@ -144,7 +144,11 @@ public interface Translations extends Constants {
   String unitLabel();
 
   @Description("User message map")
-  @DefaultStringMapValue({ "jobCancelled", "Job cancelled.", //
+  @DefaultStringMapValue({ //
+  "AttributeNameRequired", "An attribute name is required.", //
+  "AttributeNameAlreadyExists", "The specified attribute name already exists.", //
+  "BaseLanguageLabelRequired", "The base language field (marked with *) requires a value.", //
+  "jobCancelled", "Job cancelled.", //
   "jobDeleted", "Job deleted.", //
   "completedJobsDeleted", "All completed jobs deleted.", //
   "SetCommandStatus_NotFound", "Job could not be cancelled (not found).", //
