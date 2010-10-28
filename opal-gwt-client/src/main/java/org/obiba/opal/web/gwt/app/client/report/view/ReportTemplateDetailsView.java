@@ -52,6 +52,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
+import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
@@ -90,10 +91,20 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
 
   private MenuBar toolbar;
 
+  private MenuBar actionsMenu;
+
+  private MenuItem remove;
+
+  private MenuItem run;
+
+  private MenuItem update;
+
   SimplePager<FileDto> pager;
 
   @SuppressWarnings("unused")
   private HasActionHandler actionsColumn;
+
+  private ReportTemplateDto reportTemplate;
 
   public ReportTemplateDetailsView() {
     initWidget(uiBinder.createAndBindUi(this));
@@ -101,37 +112,9 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
     initActionToolbar();
   }
 
-  // TODO Implement the action toolbar
   private void initActionToolbar() {
     toolbarPanel.add(toolbar = new MenuBar());
-
-    MenuBar actionsMenu = new MenuBar();
-    actionsMenu.addItem("Remove", new Command() {
-
-      @Override
-      public void execute() {
-
-      }
-    });
-    actionsMenu.addItem("Run", new Command() {
-
-      @Override
-      public void execute() {
-
-      }
-    });
-
-    MenuBar editMenu = new MenuBar();
-    editMenu.addItem("Edit", new Command() {
-
-      @Override
-      public void execute() {
-
-      }
-    });
-
-    toolbar.addItem("Actions", actionsMenu);
-    toolbar.addItem("Edit", editMenu);
+    toolbar.addItem("Actions", actionsMenu = new MenuBar(true));
   }
 
   private void initProducedReportsTable() {
@@ -192,6 +175,7 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
 
   @Override
   public void setReportTemplateDetails(ReportTemplateDto reportTemplate) {
+    this.reportTemplate = reportTemplate;
     design.setText(reportTemplate.getDesign());
     schedule.setText(reportTemplate.getCron());
     format.setText(reportTemplate.getFormat());
@@ -313,13 +297,40 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   }
 
   @Override
+  public ReportTemplateDto getReportTemplateDetails() {
+    return reportTemplate;
+  }
+
+  @Override
   public HandlerRegistration addReportDesignClickHandler(ClickHandler handler) {
     return design.addClickHandler(handler);
   }
 
   @Override
-  public String getReportDesignPath() {
-    return design.getText();
+  public void setRemoveReportTemplateCommand(Command command) {
+    if(remove == null) {
+      actionsMenu.addItem(remove = new MenuItem(translations.removeLabel(), command));
+    } else {
+      remove.setCommand(command);
+    }
+  }
+
+  @Override
+  public void setRunReportCommand(Command command) {
+    if(run == null) {
+      actionsMenu.addItem(run = new MenuItem(translations.runLabel(), command));
+    } else {
+      run.setCommand(command);
+    }
+  }
+
+  @Override
+  public void setUpdateReportTemplateCommand(Command command) {
+    if(update == null) {
+      toolbar.addItem(update = new MenuItem("Edit", command));
+    } else {
+      update.setCommand(command);
+    }
   }
 
 }

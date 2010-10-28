@@ -183,7 +183,8 @@ public interface Translations extends Constants {
   "XMLFileRequired", "An XML file is required.", //
   "XMLFileSuffixInvalid", "Invalid XML file suffix: .xml is expected.", //
   "ZipFileRequired", "An Zip file is required.", //
-  "ZipFileSuffixInvalid", "Invalid Zip file suffix: .zip is expected." })
+  "ZipFileSuffixInvalid", "Invalid Zip file suffix: .zip is expected.",//
+  "ReportTemplateWasNotFound", "The specified report template could not be found." })
   Map<String, String> userMessageMap();
 
   @Description("You must select a file message")
@@ -435,4 +436,8 @@ public interface Translations extends Constants {
   @Description("Report produced date")
   @DefaultStringValue("Produced Date")
   String producedDate();
+
+  @Description("Run label")
+  @DefaultStringValue("Run")
+  String runLabel();
 }

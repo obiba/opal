@@ -20,11 +20,13 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FileDto;
+import org.obiba.opal.web.model.client.opal.ReportCommandOptionsDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.google.gwt.core.client.GWT;
@@ -34,6 +36,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.Command;
 import com.google.inject.Inject;
 
 public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTemplateDetailsPresenter.Display> {
@@ -51,9 +54,15 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
     HandlerRegistration addReportDesignClickHandler(ClickHandler handler);
 
-    String getReportDesignPath();
-
     void setReportTemplateDetails(ReportTemplateDto reportTemplate);
+
+    ReportTemplateDto getReportTemplateDetails();
+
+    void setRemoveReportTemplateCommand(Command command);
+
+    void setRunReportCommand(Command command);
+
+    void setUpdateReportTemplateCommand(Command command);
   }
 
   public interface ActionHandler {
@@ -81,6 +90,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
   protected void onBind() {
     initUiComponents();
     addHandlers();
+    setCommands();
   }
 
   @Override
@@ -120,7 +130,14 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
     }));
 
     super.registerHandler(getDisplay().addReportDesignClickHandler(new ReportDesignClickHandler()));
+    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
 
+  }
+
+  private void setCommands() {
+    getDisplay().setRemoveReportTemplateCommand(new RemoveReportTemplateCommand());
+    getDisplay().setRunReportCommand(new RunReportCommand());
+    getDisplay().setUpdateReportTemplateCommand(new UpdateReportTemplateCommand());
   }
 
   protected void doActionImpl(final FileDto dto, String actionName) {
@@ -161,11 +178,70 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
     eventBus.fireEvent(new FileDownloadEvent(url));
   }
 
+  private class RunReportCommand implements Command {
+
+    @Override
+    public void execute() {
+      ResponseCodeCallback callbackHandler = new CommandResponseCallBack();
+      ReportCommandOptionsDto reportCommandOptions = ReportCommandOptionsDto.create();
+      reportCommandOptions.setName(getDisplay().getReportTemplateDetails().getName());
+      ResourceRequestBuilderFactory.newBuilder().forResource("/shell/report").post().withResourceBody(ReportCommandOptionsDto.stringify(reportCommandOptions)).withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+      eventBus.fireEvent(new NotificationEvent(NotificationType.INFO, "Report Job Launched!", null));
+    }
+
+  }
+
+  private class UpdateReportTemplateCommand implements Command {
+
+    @Override
+    public void execute() {
+      // TODO Implement the edit/update report template dialog.
+      GWT.log("Showing the edit/update report template dialog!");
+    }
+
+  }
+
+  private class RemoveReportTemplateCommand implements Command {
+
+    @Override
+    public void execute() {
+      actionRequiringConfirmation = new Runnable() {
+        public void run() {
+          ResponseCodeCallback callbackHandler = new CommandResponseCallBack();
+          ResourceRequestBuilderFactory.newBuilder().forResource("/report-template/" + getDisplay().getReportTemplateDetails().getName()).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+
+        }
+      };
+      eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "removeReportTemplate", "confirmDeleteReportTemplate"));
+    }
+
+  }
+
+  private class CommandResponseCallBack implements ResponseCodeCallback {
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      if(response.getStatusCode() != Response.SC_OK) {
+        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
+      }
+    }
+  }
+
+  class ConfirmationEventHandler implements ConfirmationEvent.Handler {
+
+    public void onConfirmation(ConfirmationEvent event) {
+      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event.isConfirmed()) {
+        actionRequiringConfirmation.run();
+        actionRequiringConfirmation = null;
+      }
+    }
+  }
+
   private class ReportDesignClickHandler implements ClickHandler {
 
     @Override
     public void onClick(ClickEvent event) {
-      downloadFile(getDisplay().getReportDesignPath());
+      downloadFile(getDisplay().getReportTemplateDetails().getCron());
     }
 
   }
