@@ -16,6 +16,7 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
@@ -105,12 +106,13 @@ public class ReportCommandTest {
     OpalConfiguration opalConfiguration = new OpalConfiguration();
     opalConfiguration.addReportTemplate(reportTemplate);
 
-    OpalFileSystem opalFileSystemMock = OpalFileSystemMockBuilder.newBuilder().resolveFile(reportTemplate.getDesign()).getLocalFile(reportTemplate.getDesign(), "/home/test" + reportTemplate.getDesign()).resolveFile(reportDir).createFolder(reportDir).once().resolveFile(reportDir, reportFileName).getLocalFile(reportDir + "/" + reportFileName, "/home/test" + reportDir + "/" + reportFileName).getObfuscatedPath(reportDir + "/" + reportFileName).build();
+    String localOpalRoot = System.getProperty("user.dir");
+    OpalFileSystem opalFileSystemMock = OpalFileSystemMockBuilder.newBuilder().resolveFile(reportTemplate.getDesign()).getLocalFile(reportTemplate.getDesign(), localOpalRoot + reportTemplate.getDesign().replace('/', File.separatorChar)).resolveFile(reportDir).createFolder(reportDir).once().resolveFile(reportDir, reportFileName).getLocalFile(reportDir + "/" + reportFileName, localOpalRoot + (reportDir + "/" + reportFileName).replace('/', File.separatorChar)).getObfuscatedPath(reportDir + "/" + reportFileName).build();
 
     OpalRuntime opalRuntimeMock = OpalRuntimeMockBuilder.newBuilder().withOpalConfiguration(opalConfiguration).withOpalFileSystem(opalFileSystemMock).build();
 
     ReportService reportServiceMock = createMock(ReportService.class);
-    reportServiceMock.render(reportTemplate.getFormat(), reportTemplate.getParameters(), "/home/test" + reportTemplate.getDesign(), "/home/test" + reportDir + "/" + reportFileName);
+    reportServiceMock.render(reportTemplate.getFormat(), reportTemplate.getParameters(), localOpalRoot + reportTemplate.getDesign().replace('/', File.separatorChar), localOpalRoot + (reportDir + "/" + reportFileName).replace('/', File.separatorChar));
     expectLastCall().once();
 
     MailSender mailSenderMock = createMock(MailSender.class);
