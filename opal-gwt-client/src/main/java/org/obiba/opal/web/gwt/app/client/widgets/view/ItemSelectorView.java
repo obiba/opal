@@ -63,7 +63,10 @@ public class ItemSelectorView extends Composite implements ItemSelectorPresenter
 
       @Override
       public void onClick(ClickEvent event) {
-        addItem(ItemSelectorView.this.itemInputDisplay.getItem());
+        String item = ItemSelectorView.this.itemInputDisplay.getItem();
+        if(item.trim().length() != 0) {
+          addItem(ItemSelectorView.this.itemInputDisplay.getItem());
+        }
       }
     });
     itemGrid.setWidget(itemGrid.getRowCount() - 1, 1, addWidget);
@@ -74,13 +77,12 @@ public class ItemSelectorView extends Composite implements ItemSelectorPresenter
   }
 
   @Override
-  public void addItem(String item) {
+  public void addItem(final String item) {
     // Add a row for the new item.
     itemGrid.resize(itemGrid.getRowCount() + 1, 2);
 
     // Put the item in the new row's first column.
-    final int row = itemGrid.getRowCount() - 1;
-    itemGrid.setText(row, 0, item);
+    itemGrid.setText(itemGrid.getRowCount() - 1, 0, item);
 
     // Put a "remove" button in the second column.
     Image removeWidget = createRemoveWidget();
@@ -88,10 +90,15 @@ public class ItemSelectorView extends Composite implements ItemSelectorPresenter
 
       @Override
       public void onClick(ClickEvent event) {
-        removeItem(row);
+        for(int i = 0; i < itemGrid.getRowCount(); i++) {
+          if(itemGrid.getText(i, 0).equals(item)) {
+            removeItem(i);
+            break;
+          }
+        }
       }
     });
-    itemGrid.setWidget(row, 1, removeWidget);
+    itemGrid.setWidget(itemGrid.getRowCount() - 1, 1, removeWidget);
   }
 
   @Override

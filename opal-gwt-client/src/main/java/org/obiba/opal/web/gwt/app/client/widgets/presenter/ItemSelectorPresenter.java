@@ -17,7 +17,6 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -45,7 +44,6 @@ public class ItemSelectorPresenter extends WidgetPresenter<ItemSelectorPresenter
 
   @Override
   protected void onBind() {
-    GWT.log("DSPATHIS ItemSelectorPresenter.onBind()");
     getDisplay().setItemInputDisplay(new TextBoxItemInputDisplay());
     getDisplay().addItem("item");
     getDisplay().addItem("anotherItem");
