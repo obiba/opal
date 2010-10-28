@@ -108,7 +108,7 @@ public class BasicBirtReportServiceImpl implements ReportService {
     running = false;
   }
 
-  class OutputPurger extends Thread {
+  static class OutputPurger extends Thread {
 
     InputStream inputStream;
 
@@ -118,13 +118,17 @@ public class BasicBirtReportServiceImpl implements ReportService {
 
     public void run() {
       try {
-        InputStreamReader wReader = new InputStreamReader(inputStream);
-        BufferedReader wBuffReader = new BufferedReader(wReader);
+        InputStreamReader isReader = new InputStreamReader(inputStream);
+        BufferedReader bufReader = new BufferedReader(isReader);
 
-        while((wBuffReader.readLine()) != null) {
+        while(true) {
+          String line = bufReader.readLine();
+          if(line == null) {
+            break;
+          }
         }
 
-      } catch(IOException wEx) {
+      } catch(IOException ex) {
       }
     }
   }
