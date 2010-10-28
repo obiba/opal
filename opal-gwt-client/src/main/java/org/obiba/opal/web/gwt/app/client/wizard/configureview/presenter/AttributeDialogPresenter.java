@@ -242,11 +242,12 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
     @Override
     protected boolean hasError() {
-      if(getDisplay().getAttributeName().equals(attributeNameToDisplay)) return false; // Edits can have the same name.
+      // Edits can have the same name.
+      if(getDisplay().getAttributeName().getText().equals(attributeNameToDisplay)) return false;
       for(int i = 0; i < attributes.length(); i++) {
         AttributeDto dto = attributes.get(i);
         // Using the same name as an existing attribute is not permitted.
-        if(getDisplay().getAttributeName().equals(dto.getName())) return true;
+        if(getDisplay().getAttributeName().getText().equals(dto.getName())) return true;
       }
       return false;
     }
@@ -281,5 +282,9 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
   public void setAttributeNameToDisplay(String attributeNameToDisplay) {
     this.attributeNameToDisplay = attributeNameToDisplay;
+  }
+
+  public void setAttributes(JsArray<AttributeDto> attributes) {
+    this.attributes = attributes;
   }
 }
