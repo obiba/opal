@@ -30,6 +30,8 @@ import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.ui.velocity.VelocityEngineUtils;
 
+import com.google.common.annotations.VisibleForTesting;
+
 @CommandUsage(description = "Generate a report based on the specified report template.", syntax = "Syntax: report --name TEMPLATE")
 public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCommandOptions> {
   //
@@ -60,6 +62,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
   //
   // AbstractOpalRuntimeDependentCommand Methods
   //
+
   @Override
   public int execute() {
     // Get the report template.
@@ -71,11 +74,11 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     }
 
     // Render it.
-    Date reportDate = new Date();
+    Date reportDate = getCurrentTime();
     FileObject reportOutput = null;
     try {
       reportOutput = getReportOutput(reportTemplateName, reportTemplate.getFormat(), reportDate);
-      reportService.render(reportTemplate.getFormat(), reportTemplate.getParameters(), getReportDesign(reportTemplate.getDesign()), getLocalFile(reportOutput).getPath());
+      reportService.render(reportTemplate.getFormat(), reportTemplate.getParameters(), getLocalFile(getReportDesign(reportTemplate.getDesign())).getPath(), getLocalFile(reportOutput).getPath());
     } catch(ReportException ex) {
       getShell().printf("Error rendering report: '%s'\n", ex.getMessage());
       return 2;
@@ -95,15 +98,25 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
   // Methods
   //
 
+  public void setReportService(ReportService reportService) {
+    this.reportService = reportService;
+  }
+
+  public void setMailSender(MailSender mailSender) {
+    this.mailSender = mailSender;
+  }
+
+  public void setOpalPublicUrl(String opalPublicUrl) {
+    this.opalPublicUrl = opalPublicUrl;
+  }
+
   @Override
   public String toString() {
     return "report -n " + getOptions().getName();
   }
 
-  private String getReportDesign(String reportDesign) throws FileSystemException {
-    FileObject reportDesignFile = getFile(reportDesign);
-
-    return getLocalFile(reportDesignFile).getPath();
+  private FileObject getReportDesign(String reportDesign) throws FileSystemException {
+    return getFile(reportDesign);
   }
 
   private FileObject getReportOutput(String reportTemplateName, String reportFormat, Date reportDate) throws FileSystemException {
@@ -147,6 +160,17 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     model.put("report_template", reportTemplateName);
     model.put("report_public_link", opalPublicUrl + "/ws/report/public/" + getOpalRuntime().getFileSystem().getObfuscatedPath(reportOutput));
 
+    return getMergedVelocityTemplate(model);
+  }
+
+  @VisibleForTesting
+  String getMergedVelocityTemplate(Map<String, String> model) {
     return VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, "velocity/opal-reporting/report-email-notification.vm", model);
   }
+
+  @VisibleForTesting
+  Date getCurrentTime() {
+    return new Date();
+  }
+
 }
