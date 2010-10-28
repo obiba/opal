@@ -5,6 +5,64 @@
   ui:generateLocales="default">
 
   <g:FlowPanel>
+
+    <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
+
+    <g:HTMLPanel addStyleNames="reportTemplateDetails">
+      <table class="reportTemplateProperties">
+        <tr>
+          <td>
+            <g:Label addStyleNames="key">
+              <ui:msg description="BIRT Report Design label">BIRT Report Design:</ui:msg>
+            </g:Label>
+          </td>
+          <td>
+            <g:Anchor ui:field="design"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <g:Label addStyleNames="key">
+              <ui:msg description="Schedule label">Schedule:</ui:msg>
+            </g:Label>
+          </td>
+          <td>
+            <g:Label ui:field="schedule"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <g:Label addStyleNames="key">
+              <ui:msg description="Format label">Format:</ui:msg>
+            </g:Label>
+          </td>
+          <td>
+            <g:Label ui:field="format"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <g:Label addStyleNames="key">
+              <ui:msg description="Parameters label">Parameters:</ui:msg>
+            </g:Label>
+          </td>
+          <td>
+            <g:Label ui:field="parameters"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <g:Label addStyleNames="key">
+              <ui:msg description="Notification emails label">Notifications Emails:</ui:msg>
+            </g:Label>
+          </td>
+          <td>
+            <g:Label ui:field="emails"/>
+          </td>
+        </tr>
+      </table>
+    </g:HTMLPanel>
+
     <g:Label addStyleNames="title">
       <ui:msg description="Reports title">Reports</ui:msg>
     </g:Label>

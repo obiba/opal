@@ -25,9 +25,13 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FileDto;
+import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -44,6 +48,12 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
     void setProducedReports(JsArray<FileDto> reports);
 
     HasActionHandler getActionColumn();
+
+    HandlerRegistration addReportDesignClickHandler(ClickHandler handler);
+
+    String getReportDesignPath();
+
+    void setReportTemplateDetails(ReportTemplateDto reportTemplate);
   }
 
   public interface ActionHandler {
@@ -103,9 +113,13 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
       @Override
       public void onReportTemplateSelected(ReportTemplateSelectedEvent event) {
-        ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta/reports/" + event.getReportTemplate().getName()).get().withCallback(new ProducedReportsResourceCallback()).withCallback(404, new NoProducedReportsResourceCallback()).send();
+        ReportTemplateDto reportTemplate = event.getReportTemplate();
+        ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta/reports/" + reportTemplate.getName()).get().withCallback(new ProducedReportsResourceCallback()).withCallback(404, new NoProducedReportsResourceCallback()).send();
+        getDisplay().setReportTemplateDetails(reportTemplate);
       }
     }));
+
+    super.registerHandler(getDisplay().addReportDesignClickHandler(new ReportDesignClickHandler()));
 
   }
 
@@ -139,8 +153,21 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
   }
 
   private void downloadFile(final FileDto file) {
-    String url = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")).append("ws/files").append(file.getPath()).toString();
+    downloadFile(file.getPath());
+  }
+
+  private void downloadFile(String filePath) {
+    String url = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")).append("ws/files").append(filePath).toString();
     eventBus.fireEvent(new FileDownloadEvent(url));
+  }
+
+  private class ReportDesignClickHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent event) {
+      downloadFile(getDisplay().getReportDesignPath());
+    }
+
   }
 
   private class NoProducedReportsResourceCallback implements ResponseCodeCallback {

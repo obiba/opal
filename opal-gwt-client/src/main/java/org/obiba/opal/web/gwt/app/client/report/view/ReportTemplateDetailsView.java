@@ -22,6 +22,8 @@ import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsP
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter.HasActionHandler;
 import org.obiba.opal.web.model.client.opal.FileDto;
+import org.obiba.opal.web.model.client.opal.ParameterDto;
+import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.Cell;
@@ -32,8 +34,11 @@ import com.google.gwt.cell.client.HasCell;
 import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -41,7 +46,12 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
@@ -60,6 +70,26 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   @UiField
   CellTable<FileDto> producedReportsTable;
 
+  @UiField
+  Anchor design;
+
+  @UiField
+  Label schedule;
+
+  @UiField
+  Label format;
+
+  @UiField
+  Label parameters;
+
+  @UiField
+  Label emails;
+
+  @UiField
+  FlowPanel toolbarPanel;
+
+  private MenuBar toolbar;
+
   SimplePager<FileDto> pager;
 
   @SuppressWarnings("unused")
@@ -67,10 +97,44 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
 
   public ReportTemplateDetailsView() {
     initWidget(uiBinder.createAndBindUi(this));
-    initTable();
+    initProducedReportsTable();
+    initActionToolbar();
   }
 
-  private void initTable() {
+  // TODO Implement the action toolbar
+  private void initActionToolbar() {
+    toolbarPanel.add(toolbar = new MenuBar());
+
+    MenuBar actionsMenu = new MenuBar();
+    actionsMenu.addItem("Remove", new Command() {
+
+      @Override
+      public void execute() {
+
+      }
+    });
+    actionsMenu.addItem("Run", new Command() {
+
+      @Override
+      public void execute() {
+
+      }
+    });
+
+    MenuBar editMenu = new MenuBar();
+    editMenu.addItem("Edit", new Command() {
+
+      @Override
+      public void execute() {
+
+      }
+    });
+
+    toolbar.addItem("Actions", actionsMenu);
+    toolbar.addItem("Edit", editMenu);
+  }
+
+  private void initProducedReportsTable() {
     producedReportsTable.addColumn(new TextColumn<FileDto>() {
       @Override
       public String getValue(FileDto file) {
@@ -124,6 +188,31 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
     producedReportsTable.setData(0, pageSize, JsArrays.toList(reports, 0, pageSize));
     producedReportsTable.setDataSize(reports.length(), true);
     producedReportsTable.redraw();
+  }
+
+  @Override
+  public void setReportTemplateDetails(ReportTemplateDto reportTemplate) {
+    design.setText(reportTemplate.getDesign());
+    schedule.setText(reportTemplate.getCron());
+    format.setText(reportTemplate.getFormat());
+    parameters.setText(getReportParamsList(reportTemplate.getParametersArray()));
+    emails.setText(getEmailList(reportTemplate.getEmailNotificationArray()));
+  }
+
+  private String getEmailList(JsArrayString emails) {
+    StringBuilder emailList = new StringBuilder();
+    for(int i = 0; i < emails.length(); i++) {
+      emailList.append(emails.get(i) + " ");
+    }
+    return emailList.toString();
+  }
+
+  private String getReportParamsList(JsArray<ParameterDto> params) {
+    StringBuilder paramList = new StringBuilder();
+    for(ParameterDto param : JsArrays.toIterable(params)) {
+      paramList.append(param.getKey() + "=" + param.getValue() + " ");
+    }
+    return paramList.toString();
   }
 
   // TODO Extract the following ActionsColumn and ActionsCell cells class. These should be part of some generic
@@ -221,6 +310,16 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   @Override
   public HasActionHandler getActionColumn() {
     return actionsColumn;
+  }
+
+  @Override
+  public HandlerRegistration addReportDesignClickHandler(ClickHandler handler) {
+    return design.addClickHandler(handler);
+  }
+
+  @Override
+  public String getReportDesignPath() {
+    return design.getText();
   }
 
 }

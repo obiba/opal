@@ -708,4 +708,11 @@ table.producedReports td span {
   cursor:pointer;
 }
 
+.reportTemplateDetails table.reportTemplateProperties {
+  padding:20px;
+}
+
+.reportTemplateDetails div.key {
+  font-weight:bold;
+}
 
