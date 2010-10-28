@@ -132,7 +132,7 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   }
 
   @Override
-  public HasText getAttributeName() {
+  public HasText getAttributeNameField() {
     return attributeName;
   }
 
@@ -145,5 +145,15 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   @Override
   public void removeLabelListPresenter(Widget widget) {
     scrollPanel.remove(widget);
+  }
+
+  @Override
+  public String getAttributeName() {
+    if(nameDropdownRadioChoice.getValue()) {
+      return labels.getValue(labels.getSelectedIndex());
+    } else {
+      return attributeName.getText();
+    }
+
   }
 }

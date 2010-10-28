@@ -9,7 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
@@ -17,7 +20,12 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.AttributeUpdateEvent;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -30,6 +38,7 @@ import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -60,11 +69,13 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
     void selectNameDropdownRadioChoice();
 
-    HasText getAttributeName();
+    HasText getAttributeNameField();
 
     void addLabelListPresenter(Widget widget);
 
     void removeLabelListPresenter(Widget widget);
+
+    String getAttributeName();
 
   }
 
@@ -76,12 +87,16 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
   private List<String> labels;
 
+  private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+
   @Inject
   private LabelListPresenter labelListPresenter;
 
   @Inject
   public AttributeDialogPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
+    validators.add(new RequiredTextValidator(getDisplay().getAttributeNameField(), "AttributeNameRequired"));
+    // validators.add(new UniqueAttributeNameValidator(getDisplay().getAttributeName(), "AttributeNameAlreadyExists"));
   }
 
   @Override
@@ -110,10 +125,27 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
     getDisplay().setLabelsEnabled(true);
     getDisplay().setAttributeNameEnabled(false);
     getDisplay().selectNameDropdownRadioChoice();
-    getDisplay().getAttributeName().setText("");
+    getDisplay().getAttributeNameField().setText("");
   }
 
   private void addEventHandlers() {
+
+    super.registerHandler(getDisplay().getSaveButton().addClickHandler(new ClickHandler() {
+      public void onClick(ClickEvent event) {
+        String errorMessageKey = validate();
+        if(errorMessageKey != null) {
+          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errorMessageKey, null));
+          return;
+        }
+        JsArray<AttributeDto> newAttributes = getNewAttributeDtos();
+        if(isEdit()) {
+          eventBus.fireEvent(new AttributeUpdateEvent(newAttributes, AttributeUpdateEvent.UpdateType.EDIT));
+        } else {
+          eventBus.fireEvent(new AttributeUpdateEvent(newAttributes, AttributeUpdateEvent.UpdateType.ADD));
+        }
+      }
+    }));
+
     super.registerHandler(getDisplay().getCancelButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
         getDisplay().hideDialog();
@@ -159,14 +191,60 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
   @Override
   public Place getPlace() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   protected void onPlaceRequest(PlaceRequest request) {
-    // TODO Auto-generated method stub
-
   }
 
+  String validate() {
+    for(FieldValidator validator : validators) {
+      String errorMessageKey = validator.validate();
+      if(errorMessageKey != null) {
+        return errorMessageKey;
+      }
+    }
+    return null;
+  }
+
+  // public class UniqueAttributeNameValidator extends AbstractFieldValidator {
+  //
+  // private String userProvidedAttributeName;
+  //
+  // public UniqueAttributeNameValidator(String userProvidedAttributeName, String errorMessageKey) {
+  // super(errorMessageKey);
+  // this.userProvidedAttributeName = userProvidedAttributeName;
+  // }
+  //
+  // @Override
+  // protected boolean hasError() {
+  // if(userProvidedAttributeName.equals(attributeNameToDisplay)) return false; // Edits can have the same name.
+  // for(int i = 0; i < attributes.length(); i++) {
+  // AttributeDto dto = attributes.get(i);
+  // // Using the same name as an existing attribute is not permitted.
+  // if(userProvidedAttributeName.equals(dto.getName())) return true;
+  // }
+  // return false;
+  // }
+  //
+  // }
+
+  private boolean isEdit() {
+    return attributeNameToDisplay != null;
+  }
+
+  private JsArray<AttributeDto> getNewAttributeDtos() {
+    @SuppressWarnings("unchecked")
+    JsArray<AttributeDto> attributes = (JsArray<AttributeDto>) JsArray.createArray();
+    Map<String, TextBox> labelMap = labelListPresenter.getDisplay().getLanguageLabelMap();
+    for(Map.Entry<String, TextBox> entry : labelMap.entrySet()) {
+      AttributeDto attribute = AttributeDto.create();
+      attribute.setLocale(entry.getKey());
+      attribute.setName(getDisplay().getAttributeName());
+      attribute.setValue(entry.getValue().getValue());
+      attributes.push(attribute);
+    }
+    return attributes;
+  }
 }
