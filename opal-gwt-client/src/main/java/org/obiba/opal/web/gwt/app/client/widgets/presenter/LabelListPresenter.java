@@ -17,6 +17,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
@@ -98,6 +99,22 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
 
   public void updateFields() {
     getDisplay().displayAttributes(attributeToDisplay, attributes);
+  }
+
+  public class BaseLanguageTextRequiredValidator extends AbstractFieldValidator {
+
+    public BaseLanguageTextRequiredValidator(String errorMessageKey) {
+      super(errorMessageKey);
+    }
+
+    @Override
+    protected boolean hasError() {
+      LocaleDto baseLanguageLocaleDto = getDisplay().getBaseLanguage();
+      String baseLanguageLabelValue = getDisplay().getLanguageLabelMap().get(baseLanguageLocaleDto.getName()).getValue();
+      if(baseLanguageLabelValue == null || baseLanguageLabelValue.equals("")) return true;
+      return false;
+    }
+
   }
 
 }

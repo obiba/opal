@@ -22,6 +22,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
@@ -96,7 +97,7 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   public AttributeDialogPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
     validators.add(new RequiredTextValidator(getDisplay().getAttributeNameField(), "AttributeNameRequired"));
-    // validators.add(new UniqueAttributeNameValidator(getDisplay().getAttributeName(), "AttributeNameAlreadyExists"));
+    validators.add(new UniqueAttributeNameValidator("AttributeNameAlreadyExists"));
   }
 
   @Override
@@ -115,6 +116,7 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
     labelListPresenter.setAttributes(attributes);
     labelListPresenter.setAttributeToDisplay(attributeNameToDisplay);
     labelListPresenter.bind();
+    validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLableRequired"));
     getDisplay().addLabelListPresenter(labelListPresenter.getDisplay().asWidget());
     addEventHandlers();
     addRadioButtonNameEventHandlers();
@@ -208,27 +210,24 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
     return null;
   }
 
-  // public class UniqueAttributeNameValidator extends AbstractFieldValidator {
-  //
-  // private String userProvidedAttributeName;
-  //
-  // public UniqueAttributeNameValidator(String userProvidedAttributeName, String errorMessageKey) {
-  // super(errorMessageKey);
-  // this.userProvidedAttributeName = userProvidedAttributeName;
-  // }
-  //
-  // @Override
-  // protected boolean hasError() {
-  // if(userProvidedAttributeName.equals(attributeNameToDisplay)) return false; // Edits can have the same name.
-  // for(int i = 0; i < attributes.length(); i++) {
-  // AttributeDto dto = attributes.get(i);
-  // // Using the same name as an existing attribute is not permitted.
-  // if(userProvidedAttributeName.equals(dto.getName())) return true;
-  // }
-  // return false;
-  // }
-  //
-  // }
+  public class UniqueAttributeNameValidator extends AbstractFieldValidator {
+
+    public UniqueAttributeNameValidator(String errorMessageKey) {
+      super(errorMessageKey);
+    }
+
+    @Override
+    protected boolean hasError() {
+      if(getDisplay().getAttributeName().equals(attributeNameToDisplay)) return false; // Edits can have the same name.
+      for(int i = 0; i < attributes.length(); i++) {
+        AttributeDto dto = attributes.get(i);
+        // Using the same name as an existing attribute is not permitted.
+        if(getDisplay().getAttributeName().equals(dto.getName())) return true;
+      }
+      return false;
+    }
+
+  }
 
   private boolean isEdit() {
     return attributeNameToDisplay != null;
