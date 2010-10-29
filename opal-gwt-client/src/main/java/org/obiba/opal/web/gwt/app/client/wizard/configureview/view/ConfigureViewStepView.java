@@ -13,8 +13,10 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.Configur
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.DeckPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ConfigureViewStepView extends Composite implements ConfigureViewStepPresenter.Display {
@@ -27,6 +29,8 @@ public class ConfigureViewStepView extends Composite implements ConfigureViewSte
   //
   // Instance Variables
   //
+  @UiField
+  DeckPanel helpPanelDecks;
 
   //
   // Constructors
@@ -56,5 +60,10 @@ public class ConfigureViewStepView extends Composite implements ConfigureViewSte
 
   @UiTemplate("ConfigureViewStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, ConfigureViewStepView> {
+  }
+
+  @Override
+  public DeckPanel getHelpDeck() {
+    return helpPanelDecks;
   }
 }

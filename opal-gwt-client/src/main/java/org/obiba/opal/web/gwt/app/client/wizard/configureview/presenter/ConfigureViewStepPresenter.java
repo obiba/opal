@@ -18,6 +18,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 
+import com.google.gwt.user.client.ui.DeckPanel;
 import com.google.inject.Inject;
 
 public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewStepPresenter.Display> {
@@ -41,6 +42,7 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
   @Override
   protected void onBind() {
     addEventHandlers();
+    getDisplay().getHelpDeck().showWidget(1);
   }
 
   @Override
@@ -77,6 +79,7 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
   //
 
   public interface Display extends WidgetDisplay {
+    DeckPanel getHelpDeck();
   }
 
   class ViewConfigurationRequiredHandler implements ViewConfigurationRequiredEvent.Handler {
