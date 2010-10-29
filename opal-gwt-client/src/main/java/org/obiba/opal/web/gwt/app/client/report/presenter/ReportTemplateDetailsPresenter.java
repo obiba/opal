@@ -209,9 +209,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
       actionRequiringConfirmation = new Runnable() {
         public void run() {
           ResponseCodeCallback callbackHandler = new CommandResponseCallBack();
-          // ResourceRequestBuilderFactory.newBuilder().forResource("/report-template/" +
-          // getDisplay().getReportTemplateDetails().getName()).delete().withCallback(Response.SC_OK,
-          // callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+          ResourceRequestBuilderFactory.newBuilder().forResource("/report-template/" + getDisplay().getReportTemplateDetails().getName()).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
           eventBus.fireEvent(new ReportTemplateDeletedEvent(getDisplay().getReportTemplateDetails()));
         }
       };

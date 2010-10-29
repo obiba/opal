@@ -22,8 +22,10 @@ import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotification
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateListPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresenter;
+import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.report.view.ReportTemplateDetailsView;
 import org.obiba.opal.web.gwt.app.client.report.view.ReportTemplateListView;
+import org.obiba.opal.web.gwt.app.client.report.view.ReportTemplateUpdateDialogView;
 import org.obiba.opal.web.gwt.app.client.report.view.ReportTemplateView;
 import org.obiba.opal.web.gwt.app.client.view.ApplicationView;
 import org.obiba.opal.web.gwt.app.client.view.DataExportView;
@@ -84,6 +86,7 @@ public class OpalGinModule extends AbstractGinModule {
     bind(ReportTemplateListPresenter.Display.class).to(ReportTemplateListView.class).in(Singleton.class);
     bind(ReportTemplateDetailsPresenter.Display.class).to(ReportTemplateDetailsView.class).in(Singleton.class);
     bind(ReportTemplatePresenter.Display.class).to(ReportTemplateView.class).in(Singleton.class);
+    bind(ReportTemplateUpdateDialogPresenter.Display.class).to(ReportTemplateUpdateDialogView.class);
 
     // Concrete classes (such as NavigatorPresenter) don't need to be "bound". Simply define a getter in the
     // OpalGinjector interface and they'll "just work".
