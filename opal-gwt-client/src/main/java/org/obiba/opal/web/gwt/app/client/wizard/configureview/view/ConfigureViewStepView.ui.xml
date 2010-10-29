@@ -10,7 +10,20 @@
     <g:Label><ui:msg description="Configure View Step summary">Provide the settings for the view.</ui:msg></g:Label>
     <g:SimplePanel />
     
-    <g:SimplePanel />
+    <g:TabLayoutPanel barHeight="2" barUnit="EM" width="97%" height="50em" addStyleNames="small-indent">
+      <g:tab>
+        <g:header>Data</g:header>
+        <g:Label>Data</g:Label>
+      </g:tab>
+      <g:tab>
+        <g:header>Variables</g:header>
+        <g:Label>Variables</g:Label>
+      </g:tab>
+      <g:tab>
+        <g:header>Entity</g:header>
+        <g:Label>Entity</g:Label>
+      </g:tab>
+    </g:TabLayoutPanel>
     
     <g:DeckPanel ui:field="helpPanelDecks">
       <g:FlowPanel>
