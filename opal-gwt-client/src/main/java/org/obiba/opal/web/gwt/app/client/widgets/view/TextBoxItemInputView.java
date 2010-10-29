@@ -9,8 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.view;
 
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ItemSelectorPresenter.EnterKeyHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ItemSelectorPresenter.ItemInputDisplay;
 
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -21,6 +25,8 @@ public class TextBoxItemInputView implements ItemInputDisplay {
 
   private TextBox textBox;
 
+  private EnterKeyHandler enterKeyHandler;
+
   //
   // Constructors
   //
@@ -29,6 +35,8 @@ public class TextBoxItemInputView implements ItemInputDisplay {
     textBox = new TextBox();
     textBox.addStyleName("itemInput");
     textBox.addStyleName("textBox");
+
+    addEnterKeyHandler();
   }
 
   //
@@ -45,5 +53,27 @@ public class TextBoxItemInputView implements ItemInputDisplay {
 
   public Widget asWidget() {
     return textBox;
+  }
+
+  public void setEnterKeyHandler(EnterKeyHandler handler) {
+    this.enterKeyHandler = handler;
+  }
+
+  //
+  // Methods
+  //
+
+  private void addEnterKeyHandler() {
+    textBox.addKeyDownHandler(new KeyDownHandler() {
+
+      @Override
+      public void onKeyDown(KeyDownEvent event) {
+        if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+          if(enterKeyHandler != null) {
+            enterKeyHandler.enterKeyPressed();
+          }
+        }
+      }
+    });
   }
 }

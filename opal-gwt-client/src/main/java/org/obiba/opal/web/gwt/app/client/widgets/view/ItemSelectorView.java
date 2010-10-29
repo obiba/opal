@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ItemSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ItemSelectorPresenter.EnterKeyHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ItemSelectorPresenter.ItemInputDisplay;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -64,17 +65,17 @@ public class ItemSelectorView extends Composite implements ItemSelectorPresenter
 
       @Override
       public void onClick(ClickEvent event) {
-        String item = ItemSelectorView.this.itemInputDisplay.getItem();
-        if(item.trim().length() != 0) {
-          addItem(ItemSelectorView.this.itemInputDisplay.getItem());
-        }
+        addItemAndClear();
       }
     });
     itemGrid.setWidget(itemGrid.getRowCount() - 1, 1, addWidget);
 
+    // Put the Grid in a FlowPanel (so that it doesn't expand to fill its parent) and set that as the widget.
     FlowPanel container = new FlowPanel();
     container.add(itemGrid);
     initWidget(container);
+
+    setEnterKeyHandler();
   }
 
   @Override
@@ -148,5 +149,23 @@ public class ItemSelectorView extends Composite implements ItemSelectorPresenter
     removeWidget.addStyleName("button");
 
     return removeWidget;
+  }
+
+  private void addItemAndClear() {
+    String item = itemInputDisplay.getItem();
+    if(item.trim().length() != 0) {
+      addItem(item);
+      itemInputDisplay.clear();
+    }
+  }
+
+  private void setEnterKeyHandler() {
+    itemInputDisplay.setEnterKeyHandler(new EnterKeyHandler() {
+
+      @Override
+      public void enterKeyPressed() {
+        addItemAndClear();
+      }
+    });
   }
 }

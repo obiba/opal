@@ -9,8 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.view;
 
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ItemSelectorPresenter.EnterKeyHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ItemSelectorPresenter.ItemInputDisplay;
 
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -24,6 +28,8 @@ public class KeyValueItemInputView extends Composite implements ItemInputDisplay
   private TextBox keyTextBox;
 
   private TextBox valueTextBox;
+
+  private EnterKeyHandler enterKeyHandler;
 
   //
   // Constructors
@@ -48,8 +54,9 @@ public class KeyValueItemInputView extends Composite implements ItemInputDisplay
     container.addStyleName("keyValue");
     container.add(keyTextBox, keyTextBoxId);
     container.add(valueTextBox, valueTextBoxId);
-
     initWidget(container);
+
+    addEnterKeyHandler();
   }
 
   //
@@ -59,6 +66,8 @@ public class KeyValueItemInputView extends Composite implements ItemInputDisplay
   public void clear() {
     keyTextBox.setText("");
     valueTextBox.setText("");
+
+    keyTextBox.setFocus(true);
   }
 
   public String getItem() {
@@ -70,5 +79,27 @@ public class KeyValueItemInputView extends Composite implements ItemInputDisplay
 
   public Widget asWidget() {
     return this;
+  }
+
+  public void setEnterKeyHandler(EnterKeyHandler handler) {
+    this.enterKeyHandler = handler;
+  }
+
+  //
+  // Methods
+  //
+
+  private void addEnterKeyHandler() {
+    valueTextBox.addKeyDownHandler(new KeyDownHandler() {
+
+      @Override
+      public void onKeyDown(KeyDownEvent event) {
+        if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+          if(enterKeyHandler != null) {
+            enterKeyHandler.enterKeyPressed();
+          }
+        }
+      }
+    });
   }
 }

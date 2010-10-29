@@ -88,5 +88,12 @@ public class ItemSelectorPresenter extends WidgetPresenter<ItemSelectorPresenter
     String getItem();
 
     Widget asWidget();
+
+    void setEnterKeyHandler(EnterKeyHandler handler);
+  }
+
+  public interface EnterKeyHandler {
+
+    void enterKeyPressed();
   }
 }
