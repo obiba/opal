@@ -111,7 +111,7 @@ public class ItemSelectorView extends Composite implements ItemSelectorPresenter
   public List<String> getItems() {
     List<String> items = new ArrayList<String>();
     for(int row = 0; row < itemGrid.getRowCount(); row++) {
-      items.add(itemGrid.getText(0, 0));
+      items.add(itemGrid.getText(row, 0));
     }
 
     return items;
