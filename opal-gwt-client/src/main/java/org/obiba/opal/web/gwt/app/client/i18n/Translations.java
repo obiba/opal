@@ -184,7 +184,8 @@ public interface Translations extends Constants {
   "XMLFileSuffixInvalid", "Invalid XML file suffix: .xml is expected.", //
   "ZipFileRequired", "An Zip file is required.", //
   "ZipFileSuffixInvalid", "Invalid Zip file suffix: .zip is expected.",//
-  "ReportTemplateWasNotFound", "The specified report template could not be found." })
+  "ReportTemplateWasNotFound", "The specified report template could not be found.",//
+  "ReportJobStarted", "Report job has been launched.  You can follow its progress in the job list." })
   Map<String, String> userMessageMap();
 
   @Description("You must select a file message")
@@ -268,7 +269,8 @@ public interface Translations extends Constants {
   "cancelJob", "Cancel Job", //
   "replaceExistingFile", "Replace File", //
   "deleteFile", "Delete File", //
-  "removeDatasource", "Remove Datasource" })
+  "removeDatasource", "Remove Datasource",//
+  "removeReportTemplate", "Remove Report Template" })
   Map<String, String> confirmationTitleMap();
 
   @Description("Confirmation message map")
@@ -276,7 +278,8 @@ public interface Translations extends Constants {
   "confirmCancelJob", "The job will be cancelled. Changes will be rolled back as much as possible: although cancelled, a job might be partially completed.<br /><br />Please confirm that you want cancel this job.", //
   "confirmReplaceExistingFile", "The file that you are uploading already exist in the file system.<br /><br />Please confirm that you want to replace the existing file.", //
   "confirmDeleteFile", "The file will be removed from the file system.<br /><br />Please confirm that you want to delete this file.", //
-  "confirmRemoveDatasource", "Please confirm that you want to remove the current datasource from Opal configuration (datasource content will not be affected)." })
+  "confirmRemoveDatasource", "Please confirm that you want to remove the current datasource from Opal configuration (datasource content will not be affected).",//
+  "confirmDeleteReportTemplate", "Please confirm that you want to remove the current Report Template from Opal configuration (report design and generated reports will not be affected)." })
   Map<String, String> confirmationMessageMap();
 
   @Description("A name is required when creating a new folder")
