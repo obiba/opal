@@ -90,7 +90,7 @@ public class ReportTemplateResource {
   public Response getReportTemplate() {
     ReportTemplate reportTemplate = opalRuntime.getOpalConfiguration().getReportTemplate(name);
     if(reportTemplate == null) {
-      return Response.status(Status.NOT_FOUND).build();
+      return Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ReportTemplateWasNotFound").build()).build();
     } else {
       return Response.ok(Dtos.asDto(reportTemplate)).build();
     }
@@ -100,6 +100,8 @@ public class ReportTemplateResource {
   public Response deleteReportTemplate() {
     ReportTemplate reportTemplateToRemove = opalRuntime.getOpalConfiguration().getReportTemplate(name);
     if(reportTemplateToRemove == null) {
+      // return Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND,
+      // "ReportTemplateWasNotFound").build()).build();
       return Response.status(Status.NOT_FOUND).build();
     } else {
       opalRuntime.getOpalConfiguration().removeReportTemplate(name);

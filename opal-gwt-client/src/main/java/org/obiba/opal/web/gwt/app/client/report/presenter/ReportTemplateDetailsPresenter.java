@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
@@ -185,8 +186,8 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
       ResponseCodeCallback callbackHandler = new CommandResponseCallBack();
       ReportCommandOptionsDto reportCommandOptions = ReportCommandOptionsDto.create();
       reportCommandOptions.setName(getDisplay().getReportTemplateDetails().getName());
-      ResourceRequestBuilderFactory.newBuilder().forResource("/shell/report").post().withResourceBody(ReportCommandOptionsDto.stringify(reportCommandOptions)).withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
-      eventBus.fireEvent(new NotificationEvent(NotificationType.INFO, "Report Job Launched!", null));
+      ResourceRequestBuilderFactory.newBuilder().forResource("/shell/report").post().withResourceBody(ReportCommandOptionsDto.stringify(reportCommandOptions)).withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_CREATED, callbackHandler).send();
+      eventBus.fireEvent(new NotificationEvent(NotificationType.INFO, "ReportJobStarted", null));
     }
 
   }
@@ -196,7 +197,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
     @Override
     public void execute() {
       // TODO Implement the edit/update report template dialog.
-      GWT.log("Showing the edit/update report template dialog!");
+      eventBus.fireEvent(new NotificationEvent(NotificationType.WARNING, "Showing the edit/update report template dialog (not implemented yet)", null));
     }
 
   }
@@ -208,8 +209,10 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
       actionRequiringConfirmation = new Runnable() {
         public void run() {
           ResponseCodeCallback callbackHandler = new CommandResponseCallBack();
-          ResourceRequestBuilderFactory.newBuilder().forResource("/report-template/" + getDisplay().getReportTemplateDetails().getName()).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
-
+          // ResourceRequestBuilderFactory.newBuilder().forResource("/report-template/" +
+          // getDisplay().getReportTemplateDetails().getName()).delete().withCallback(Response.SC_OK,
+          // callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+          eventBus.fireEvent(new ReportTemplateDeletedEvent(getDisplay().getReportTemplateDetails()));
         }
       };
       eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "removeReportTemplate", "confirmDeleteReportTemplate"));
@@ -241,7 +244,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
     @Override
     public void onClick(ClickEvent event) {
-      downloadFile(getDisplay().getReportTemplateDetails().getCron());
+      downloadFile(getDisplay().getReportTemplateDetails().getDesign());
     }
 
   }

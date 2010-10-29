@@ -522,19 +522,19 @@ margin-left:10px;
 		
 }
 
-.navigator .gwt-MenuItem.tools {
+.gwt-MenuItem.tools {
 	background:url("image/20/tools.png") no-repeat scroll left center transparent;
 	height: 20px;
 	width:25px;
 }
 
-.navigator .gwt-MenuItem.add {
+.gwt-MenuItem.add {
 	background:url("image/20/add-item.png") no-repeat scroll left center transparent;
 	height: 20px;
 	width:25px;
 }
 
-.navigator .gwt-MenuItem.edit {
+.gwt-MenuItem.edit {
 	background:url("image/20/edit.png") no-repeat scroll left center transparent;
 	height: 20px;
 	width:25px;
@@ -703,11 +703,11 @@ div.evaluateScriptPanel {
 
 /* Reports UI */ 
 
-table.reportTemplateList {
+.reportTemplateDetails table.reportTemplateList {
   width:100%;
 }
 
-table.producedReports td span {
+.reportTemplateDetails table.producedReports td span {
   padding-right:20px;
   cursor:pointer;
 }
@@ -718,6 +718,65 @@ table.producedReports td span {
 
 .reportTemplateDetails div.key {
   font-weight:bold;
+}
+ 
+.reportTemplateDetails .titlebar {
+	background-color:#ECE5DE;
+	color:#444444;
+    padding-bottom:3px;
+    padding-left:10px;
+    padding-top:3px;
+}
+
+.reportTemplateDetails div.gwt-Label.title {
+	font-weight:bold;
+	font-size:1.2em;
+}
+
+.reportTemplateDetails .toolbar {
+  	background-color:#ECE5DE;
+  	border-bottom:1px solid #B4A291;
+  	padding-bottom:5px;
+  	padding-left:10px;
+  	margin-bottom:5px;
+}
+
+.reportTemplateDetails .toolbar-right img {
+	margin-left: 5px;
+    float: right;
+}
+
+.reportTemplateDetails  .toolbar-left img {
+    margin-right: 5px;
+    float: left;
+}
+
+.reportTemplateDetails  .toolbar img:hover {
+    cursor: pointer;
+}
+
+.reportTemplateDetails .toolbar a:hover {
+    cursor: pointer;
+}
+
+.reportTemplateDetails .gwt-MenuBar {
+	background:transparent;
+	border:0 none;
+}
+
+.reportTemplateDetails .gwt-MenuBar-horizontal .gwt-MenuItem {
+	color:#666666;
+	font-weight:bold;
+	padding:0px;
+	vertical-align:bottom;
+}
+
+.reportTemplateDetails .gwt-MenuBar-horizontal .gwt-MenuItemSeparator {
+	padding-right:5px;
+}
+
+.reportTemplateDetails .gwt-MenuBar-horizontal .gwt-MenuItem-selected {
+		
 }
 
 /* ItemSelector and ItemInputs */

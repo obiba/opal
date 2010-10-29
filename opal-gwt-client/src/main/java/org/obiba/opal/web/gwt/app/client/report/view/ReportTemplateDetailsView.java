@@ -53,6 +53,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
+import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
@@ -106,6 +107,8 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
 
   private ReportTemplateDto reportTemplate;
 
+  private Label reportTemplateName;
+
   public ReportTemplateDetailsView() {
     initWidget(uiBinder.createAndBindUi(this));
     initProducedReportsTable();
@@ -113,8 +116,11 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   }
 
   private void initActionToolbar() {
+    toolbarPanel.add(reportTemplateName = new Label());
+    reportTemplateName.addStyleName("title");
     toolbarPanel.add(toolbar = new MenuBar());
-    toolbar.addItem("Actions", actionsMenu = new MenuBar(true));
+    toolbar.addItem("", actionsMenu = new MenuBar(true)).addStyleName("tools");
+    actionsMenu.addStyleName("tools");
   }
 
   private void initProducedReportsTable() {
@@ -181,6 +187,7 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
     format.setText(reportTemplate.getFormat());
     parameters.setText(getReportParamsList(reportTemplate.getParametersArray()));
     emails.setText(getEmailList(reportTemplate.getEmailNotificationArray()));
+    reportTemplateName.setText(reportTemplate.getName());
   }
 
   private String getEmailList(JsArrayString emails) {
@@ -310,6 +317,7 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   public void setRemoveReportTemplateCommand(Command command) {
     if(remove == null) {
       actionsMenu.addItem(remove = new MenuItem(translations.removeLabel(), command));
+      actionsMenu.addSeparator(new MenuItemSeparator());
     } else {
       remove.setCommand(command);
     }
@@ -327,7 +335,7 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   @Override
   public void setUpdateReportTemplateCommand(Command command) {
     if(update == null) {
-      toolbar.addItem(update = new MenuItem("Edit", command));
+      toolbar.addItem(update = new MenuItem("", command)).addStyleName("edit");
     } else {
       update.setCommand(command);
     }

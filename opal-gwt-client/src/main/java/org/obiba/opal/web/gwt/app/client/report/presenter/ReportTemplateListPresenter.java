@@ -15,6 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -75,6 +76,15 @@ public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateL
 
   private void addHandlers() {
     super.registerHandler(getDisplay().addSelectReportTemplateHandler(new ReportTemplateSelectionChangeHandler()));
+    super.registerHandler(eventBus.addHandler(ReportTemplateDeletedEvent.getType(), new ReportTemplateDeletedHandler()));
+  }
+
+  private class ReportTemplateDeletedHandler implements ReportTemplateDeletedEvent.Handler {
+
+    @Override
+    public void onReportTemplateDeleted(ReportTemplateDeletedEvent event) {
+      initUiComponents();
+    }
 
   }
 
@@ -87,6 +97,7 @@ public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateL
         eventBus.fireEvent(new ReportTemplateSelectedEvent(selectedReportTemplate));
       }
     }
+
   }
 
   private class ReportTemplatesResourceCallback implements ResourceCallback<JsArray<ReportTemplateDto>> {

@@ -4,11 +4,11 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
   ui:generateLocales="default">
 
-  <g:FlowPanel>
+  <g:FlowPanel addStyleNames="reportTemplateDetails">
 
     <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
 
-    <g:HTMLPanel addStyleNames="reportTemplateDetails">
+    <g:HTMLPanel>
       <table class="reportTemplateProperties">
         <tr>
           <td>

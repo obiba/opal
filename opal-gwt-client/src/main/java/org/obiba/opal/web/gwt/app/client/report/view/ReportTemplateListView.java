@@ -65,6 +65,11 @@ public class ReportTemplateListView extends Composite implements ReportTemplateL
     reportTemplateTable.setPageSize(templateCount);
     reportTemplateTable.setDataSize(templateCount, true);
     reportTemplateTable.setData(0, templateCount, JsArrays.toList(templates, 0, templateCount));
+
+    // Select the first element in the list.
+    if(templates.length() > 0) {
+      selectionModel.setSelected(templates.get(0), true);
+    }
   }
 
   private void clearSelection() {
