@@ -41,6 +41,7 @@ public class ItemSelectorView extends Composite implements ItemSelectorPresenter
 
   public ItemSelectorView() {
     itemGrid = new Grid(0, 2);
+    itemGrid.addStyleName("itemSelector");
   }
 
   //
@@ -136,7 +137,7 @@ public class ItemSelectorView extends Composite implements ItemSelectorPresenter
   private Image createAddWidget() {
     Image addWidget = new Image("image/20/list-add.png");
     addWidget.addStyleName("clickable");
-    addWidget.addStyleName("small-indent");
+    addWidget.addStyleName("button");
 
     return addWidget;
   }
@@ -144,7 +145,7 @@ public class ItemSelectorView extends Composite implements ItemSelectorPresenter
   private Image createRemoveWidget() {
     Image removeWidget = new Image("image/20/list-remove.png");
     removeWidget.addStyleName("clickable");
-    removeWidget.addStyleName("small-indent");
+    removeWidget.addStyleName("button");
 
     return removeWidget;
   }

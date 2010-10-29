@@ -17,7 +17,6 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -44,9 +43,6 @@ public class ItemSelectorPresenter extends WidgetPresenter<ItemSelectorPresenter
 
   @Override
   protected void onBind() {
-    getDisplay().setItemInputDisplay(new TextBoxItemInputDisplay());
-    getDisplay().addItem("item");
-    getDisplay().addItem("anotherItem");
   }
 
   @Override
@@ -71,10 +67,6 @@ public class ItemSelectorPresenter extends WidgetPresenter<ItemSelectorPresenter
   }
 
   //
-  // Methods
-  //
-
-  //
   // Inner Classes / Interfaces
   //
 
@@ -96,26 +88,5 @@ public class ItemSelectorPresenter extends WidgetPresenter<ItemSelectorPresenter
     String getItem();
 
     Widget asWidget();
-  }
-
-  public static class TextBoxItemInputDisplay implements ItemInputDisplay {
-
-    private TextBox textBox;
-
-    public TextBoxItemInputDisplay() {
-      textBox = new TextBox();
-    }
-
-    public void clear() {
-      textBox.setText("");
-    }
-
-    public String getItem() {
-      return textBox.getText();
-    }
-
-    public Widget asWidget() {
-      return textBox;
-    }
   }
 }

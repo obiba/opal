@@ -720,3 +720,31 @@ table.producedReports td span {
   font-weight:bold;
 }
 
+/* ItemSelector and ItemInputs */
+
+table.itemSelector {
+  border-spacing: 0;
+}
+
+table.itemSelector tr + tr td {
+  background-color: #E5E5E5;
+}
+
+table.itemSelector .button {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.itemInput {
+  margin-bottom: 2px;
+}
+
+.itemInput.keyValue span + span { /* second span containing the "=" */
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.itemInput.keyValue span + span + span {
+  margin-left: 0;
+  margin-right: 0;
+}
