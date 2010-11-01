@@ -1,6 +1,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
   xmlns:g="urn:import:com.google.gwt.user.client.ui" 
   xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.wizard.configureview.view"
   ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
@@ -10,20 +11,20 @@
     <g:Label><ui:msg description="Configure View Step summary">Provide the settings for the view.</ui:msg></g:Label>
     <g:SimplePanel />
     
-    <g:TabLayoutPanel barHeight="2" barUnit="EM" width="97%" height="50em" addStyleNames="small-indent">
+    <g:TabLayoutPanel barHeight="2" barUnit="EM" width="100%" height="50em" >
       <g:tab>
-        <g:header>Data</g:header>
+        <g:header><ui:msg description="Data label">Data</ui:msg></g:header>
         <g:Label>Data</g:Label>
       </g:tab>
       <g:tab>
-        <g:header>Variables</g:header>
+        <g:header><ui:msg description="Variables label">Variables</ui:msg></g:header>
         <g:Label>Variables</g:Label>
       </g:tab>
       <g:tab>
-        <g:header>Entity</g:header>
-        <g:Label>Entity</g:Label>
+        <g:header><ui:msg description="Entities label">Entities</ui:msg></g:header>
+        <o2:EntitiesTabView />
       </g:tab>
-    </g:TabLayoutPanel>
+    </g:TabLayoutPanel> 
     
     <g:DeckPanel ui:field="helpPanelDecks">
       <g:FlowPanel>
