@@ -28,11 +28,13 @@ import org.obiba.opal.web.model.client.magma.VariableEntityDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
 
 public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPresenter.Display> {
@@ -154,7 +156,6 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
 
     @Override
     public void onClick(ClickEvent event) {
-
       String viewResource = "/datasource/" + table.getDatasourceName() + "/table/" + table.getName();
       String variablesResource = viewResource + "/variables";
       String transientVariableResource = viewResource + "/variable/_transient/values";
@@ -166,20 +167,21 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     }
 
     private void evaluateScript(String variablesResource, String transientVariableResource, String entitiesResource) {
-      String selectedScript = getDisplay().getSelectedScript();
+      String selectedScript = URL.encodeQueryString(getDisplay().getSelectedScript());
       if(selectedScript.isEmpty()) {
+        String script = URL.encodeQueryString(getScript());
         if(evaluationMode == Mode.ENTITY_VALUE) {
-          ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource(transientVariableResource + "?script=" + getScript()).get().withCallback(new EntityValueResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).send();
+          ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource(transientVariableResource + "?script=" + script).get().withCallback(new EntityValueResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
         } else if(evaluationMode == Mode.VARIABLE) {
-          ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(variablesResource + "?script=" + getScript()).get().withCallback(new VariablesResourceCallback(false)).withCallback(400, new InvalidScriptResourceCallBack()).send();
+          ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(variablesResource + "?script=" + script).get().withCallback(new VariablesResourceCallback(false)).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
         } else if(evaluationMode == Mode.ENTITY) {
-          ResourceRequestBuilderFactory.<JsArray<VariableEntityDto>> newBuilder().forResource(entitiesResource + "?script=" + getScript()).get().withCallback(new EntityResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).send();
+          ResourceRequestBuilderFactory.<JsArray<VariableEntityDto>> newBuilder().forResource(entitiesResource + "?script=" + script).get().withCallback(new EntityResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
         }
       } else {
         if(evaluationMode == Mode.ENTITY_VALUE || evaluationMode == Mode.ENTITY) {
-          ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource(transientVariableResource + "?script=" + selectedScript).get().withCallback(new EntityValueResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).send();
+          ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource(transientVariableResource + "?script=" + selectedScript).get().withCallback(new EntityValueResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
         } else if(evaluationMode == Mode.VARIABLE) {
-          ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(variablesResource).get().withCallback(new VariablesResourceCallback(true)).send();
+          ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(variablesResource).get().withCallback(new VariablesResourceCallback(true)).withCallback(500, new InvalidScriptResourceCallBack()).send();
         }
       }
     }
@@ -268,12 +270,8 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     public void onResponseCode(Request request, Response response) {
       getDisplay().clearResults();
       getDisplay().showResults(true);
-
-      // TODO Display error details
-      getDisplay().showErrorMessage(null);
-      // getDisplay().showErrorMessage((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
+      getDisplay().showErrorMessage((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
     }
-
   }
 
   public static class Result {

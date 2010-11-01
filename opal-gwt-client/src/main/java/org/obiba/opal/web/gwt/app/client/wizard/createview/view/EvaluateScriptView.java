@@ -9,14 +9,17 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createview.view;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter.Result;
+import org.obiba.opal.web.model.client.magma.JavaScriptErrorDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -70,14 +73,10 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
 
   @Override
   public void startProcessing() {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
   public void stopProcessing() {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
@@ -178,8 +177,12 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
 
   @Override
   public void showErrorMessage(ClientErrorDto errorDto) {
-    // TODO Get error from Dto and display it
-    testResults.add(new Label("Script error!"));
+    if(errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors) != null) {
+      List<JavaScriptErrorDto> errors = extractJavaScriptErrors(errorDto);
+      for(JavaScriptErrorDto error : errors) {
+        testResults.add(new Label("Error at line " + error.getLineNumber() + ", column " + error.getColumnNumber() + ": " + error.getMessage()));
+      }
+    }
   }
 
   @Override
@@ -190,5 +193,19 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
   @Override
   public void setScript(String script) {
     scriptArea.setText(script);
+  }
+
+  @SuppressWarnings("unchecked")
+  private List<JavaScriptErrorDto> extractJavaScriptErrors(ClientErrorDto errorDto) {
+    List<JavaScriptErrorDto> javaScriptErrors = new ArrayList<JavaScriptErrorDto>();
+
+    JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);
+    if(errors != null) {
+      for(int i = 0; i < errors.length(); i++) {
+        javaScriptErrors.add(errors.get(i));
+      }
+    }
+
+    return javaScriptErrors;
   }
 }
