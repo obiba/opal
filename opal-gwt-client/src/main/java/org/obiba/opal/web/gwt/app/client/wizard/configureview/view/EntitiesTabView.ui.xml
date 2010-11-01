@@ -1,0 +1,12 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
+
+  <g:FlowPanel >
+    <g:Label addStyleNames="inline"><ui:msg description="Selected entities to be viewed label">Select the entities that will be viewed:</ui:msg></g:Label>
+    <g:ListBox addStyleNames="small-indent" />
+    <g:Button ui:field="testScript" addStyleNames="right-aligned">
+      <ui:msg description="Save changes button label">Save Changes</ui:msg>
+    </g:Button>
+    <g:FlowPanel ui:field="scriptPanel" />
+  </g:FlowPanel>
+</ui:UiBinder>
