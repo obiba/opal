@@ -29,22 +29,28 @@ import org.obiba.opal.reporting.service.ReportException;
 import org.obiba.opal.reporting.service.ReportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  *
  */
+@Component
 public class BirtReportServiceImpl implements ReportService {
 
   private static final Logger log = LoggerFactory.getLogger(BirtReportServiceImpl.class);
 
-  final static String OPAL_HOME_SYSTEM_PROPERTY_NAME = "OPAL_HOME";
+  private static final String OPAL_HOME_SYSTEM_PROPERTY_NAME = "OPAL_HOME";
 
-  final static String BIRT_HOME_SYSTEM_PROPERTY_NAME = "BIRT_HOME";
+  private static final String BIRT_HOME_SYSTEM_PROPERTY_NAME = "BIRT_HOME";
 
   private IReportEngine engine;
 
   @Override
   public void render(String format, Map<String, String> parameters, String reportDesign, String reportOutput) throws ReportException {
+    if(isRunning() == false) {
+      throw new ReportException("Report engine not running. Please check startup logs for details.");
+    }
+
     try {
       // Open the report design
       IReportRunnable design = engine.openReportDesign(reportDesign);
@@ -104,8 +110,10 @@ public class BirtReportServiceImpl implements ReportService {
       // make sure BIRT_HOME is set and valid
       File reportEngineHome = new File(System.getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME), "ReportEngine");
 
-      // TODO: check that report engine home exists
-      log.info("reportEngineHome=" + reportEngineHome.getAbsolutePath());
+      if(reportEngineHome.exists() == false) {
+        log.error("Could not find Birt engine distribution in directory '{}'.", System.getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME));
+        return;
+      }
 
       final EngineConfig config = new EngineConfig();
       config.setEngineHome(reportEngineHome.getAbsolutePath());

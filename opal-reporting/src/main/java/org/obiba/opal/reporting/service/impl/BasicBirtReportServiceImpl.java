@@ -20,12 +20,11 @@ import java.util.Map.Entry;
 import org.obiba.opal.reporting.service.ReportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 /**
  *
  */
-@Component
+// @Component
 public class BasicBirtReportServiceImpl implements ReportService {
 
   private static final Logger log = LoggerFactory.getLogger(BasicBirtReportServiceImpl.class);
