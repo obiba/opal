@@ -92,9 +92,9 @@ public class ItemSelectorView extends Composite implements ItemSelectorPresenter
 
       @Override
       public void onClick(ClickEvent event) {
-        for(int i = 0; i < itemGrid.getRowCount(); i++) {
+        for(int i = 1; i < itemGrid.getRowCount(); i++) { // start from 1 to skip the input widget row
           if(itemGrid.getText(i, 0).equals(item)) {
-            removeItem(i);
+            removeItem(i - 1);
             break;
           }
         }
@@ -103,15 +103,32 @@ public class ItemSelectorView extends Composite implements ItemSelectorPresenter
     itemGrid.setWidget(itemGrid.getRowCount() - 1, 1, removeWidget);
   }
 
+  /**
+   * Removes the item at the specified row.
+   * 
+   * @param row row index of item to remove (zero-based)
+   */
   @Override
   public void removeItem(int row) {
-    itemGrid.removeRow(row);
+    itemGrid.removeRow(row + 1); // +1 to skip the input widget row
+  }
+
+  @Override
+  public void clear() {
+    while(itemGrid.getRowCount() > 1) { // 1 is for the input widget
+      removeItem(0);
+    }
+  }
+
+  @Override
+  public int getItemCount() {
+    return Math.max(0, itemGrid.getRowCount() - 1);
   }
 
   @Override
   public List<String> getItems() {
     List<String> items = new ArrayList<String>();
-    for(int row = 0; row < itemGrid.getRowCount(); row++) {
+    for(int row = 1; row < itemGrid.getRowCount(); row++) { // start from 1 to skip the input widget row
       items.add(itemGrid.getText(row, 0));
     }
 

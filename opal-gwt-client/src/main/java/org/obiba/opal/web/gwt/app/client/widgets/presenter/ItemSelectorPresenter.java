@@ -78,6 +78,10 @@ public class ItemSelectorPresenter extends WidgetPresenter<ItemSelectorPresenter
 
     void removeItem(int row);
 
+    void clear();
+
+    int getItemCount();
+
     List<String> getItems();
   }
 
