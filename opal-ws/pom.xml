@@ -28,6 +28,11 @@
           <groupId>commons-httpclient</groupId>
           <artifactId>commons-httpclient</artifactId>
         </exclusion>
+        <!--  Exclude stax-api in favour of the newer version that poi-ooxml pulls in (transitively, via xmlbeans). -->
+        <exclusion>
+          <groupId>javax.xml.stream</groupId>
+          <artifactId>stax-api</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>

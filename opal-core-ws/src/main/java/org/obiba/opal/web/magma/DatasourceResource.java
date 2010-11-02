@@ -28,10 +28,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
 
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
@@ -41,8 +41,8 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
+import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.DatasourceParsingException;
@@ -252,7 +252,6 @@ public class DatasourceResource {
       opalRuntime.writeOpalConfiguration();
       UriBuilder ub = uriInfo.getBaseUriBuilder().path("datasource").path(ds.getName());
       response = Response.created(ub.build()).entity(Dtos.asDto(ds).build());
-      Disposables.silentlyDispose(ds);
     } catch(NoSuchDatasourceFactoryException noSuchDatasourceFactoryEx) {
       response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "UnidentifiedDatasourceFactory").build());
     } catch(DuplicateDatasourceNameException duplicateDsNameEx) {
