@@ -41,28 +41,21 @@
     </dependency>
 
     <!-- BIRT dependencies -->
-
     <dependency>
       <groupId>org.eclipse.birt</groupId>
       <artifactId>birt-coreapi</artifactId>
       <version>${birt.version}</version>
-      <scope>runtime</scope>
     </dependency>
-
     <dependency>
       <groupId>org.eclipse.birt</groupId>
       <artifactId>birt-modelapi</artifactId>
       <version>${birt.version}</version>
-      <scope>runtime</scope>
     </dependency>
-
     <dependency>
       <groupId>org.eclipse.birt</groupId>
       <artifactId>birt-engineapi</artifactId>
       <version>${birt.version}</version>
-      <scope>runtime</scope>
     </dependency>
-
     <dependency>
       <groupId>org.eclipse.birt</groupId>
       <artifactId>birt-report-engine</artifactId>
