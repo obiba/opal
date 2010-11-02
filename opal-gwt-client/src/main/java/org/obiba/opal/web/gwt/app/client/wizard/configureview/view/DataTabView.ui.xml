@@ -1,0 +1,11 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
+
+  <g:FlowPanel >
+    <g:Label addStyleNames="inline"><ui:msg description="Select tables to be viewed label">Select the tables which data will be viewed:</ui:msg></g:Label>
+    <g:Button ui:field="saveChangesButton" addStyleNames="right-aligned">
+      <ui:msg description="Save changes button label">Save Changes</ui:msg>
+    </g:Button>
+    <g:SimplePanel ui:field="tableSelectorPanel" addStyleNames="top-margin"/>
+  </g:FlowPanel>
+</ui:UiBinder>

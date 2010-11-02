@@ -12,11 +12,13 @@ package org.obiba.opal.web.gwt.inject.client;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.AttributeDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.CategoryDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.DataTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.EntitiesTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.SaveErrorsStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.AttributeDialogView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.CategoryDialogView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.ConfigureViewStepView;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.DataTabView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.EntitiesTabView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.SaveErrorsStepView;
 
@@ -34,6 +36,7 @@ public class ConfigureViewWizardModule extends AbstractGinModule {
     bind(SaveErrorsStepPresenter.Display.class).to(SaveErrorsStepView.class).in(Singleton.class);
     bind(AttributeDialogPresenter.Display.class).to(AttributeDialogView.class);
     bind(CategoryDialogPresenter.Display.class).to(CategoryDialogView.class);
+    bind(DataTabPresenter.Display.class).to(DataTabView.class);
     bind(EntitiesTabPresenter.Display.class).to(EntitiesTabView.class);
   }
 }
