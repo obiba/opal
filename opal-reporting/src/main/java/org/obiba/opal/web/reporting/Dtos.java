@@ -33,6 +33,7 @@ public class Dtos {
     for(ParameterDto param : reportTemplateDto.getParametersList()) {
       params.put(param.getKey(), param.getValue());
     }
+    reportTemplate.setParameters(params);
 
     String schedule = reportTemplateDto.getCron();
     if(schedule != null) {
