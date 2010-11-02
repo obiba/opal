@@ -66,7 +66,7 @@ public class ReportTemplatesResourceTest {
     reportTemplate1.setName(name);
     reportTemplate1.setDesign("design");
     reportTemplate1.setFormat("format");
-    Map params = Maps.newHashMap();
+    Map<String, String> params = Maps.newHashMap();
     params.put("param1", "value1");
     params.put("param2", "value2");
     reportTemplate1.setParameters(params);

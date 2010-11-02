@@ -14,6 +14,8 @@ package org.obiba.opal.reporting.service;
  */
 public class ReportException extends Exception {
 
+  private static final long serialVersionUID = -2033207336181207222L;
+
   public ReportException() {
     super();
   }

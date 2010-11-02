@@ -45,6 +45,7 @@ public class BirtReportServiceImpl implements ReportService {
 
   private IReportEngine engine;
 
+  @SuppressWarnings("unchecked")
   @Override
   public void render(String format, Map<String, String> parameters, String reportDesign, String reportOutput) throws ReportException {
     if(isRunning() == false) {

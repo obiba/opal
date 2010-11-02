@@ -35,6 +35,7 @@ import org.springframework.stereotype.Component;
 @Path("/report")
 public class ReportResource {
 
+  @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(ReportResource.class);
 
   private final OpalRuntime opalRuntime;
@@ -52,7 +53,6 @@ public class ReportResource {
   @NotAuthenticated
   public Response getReport(@PathParam("obfuscated-file") String obfuscatedFile) throws FileSystemException {
     OpalFileSystem fileSystem = opalRuntime.getFileSystem();
-    System.out.println("filesystem " + fileSystem);
     FileObject reportFolder = fileSystem.getRoot().resolveFile("/reports");
     FileObject reportFile = fileSystem.resolveFileFromObfuscatedPath(reportFolder, obfuscatedFile);
     if(reportFile == null) {

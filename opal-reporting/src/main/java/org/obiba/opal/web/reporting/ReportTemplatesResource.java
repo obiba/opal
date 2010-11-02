@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 @Path("/report-templates")
 public class ReportTemplatesResource {
 
+  @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(ReportTemplatesResource.class);
 
   private final OpalRuntime opalRuntime;
