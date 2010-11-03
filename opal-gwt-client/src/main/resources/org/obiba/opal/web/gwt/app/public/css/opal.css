@@ -703,7 +703,7 @@ div.evaluateScriptPanel {
 
 /* Reports UI */ 
 
-.reportTemplateDetails table.reportTemplateList {
+table.reportTemplateList {
   width:100%;
 }
 
