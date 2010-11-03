@@ -745,6 +745,7 @@ table.reportTemplateProperties div.key {
 .reportTemplateDetails div.gwt-Label.title {
 	font-weight:bold;
 	font-size:1.2em;
+	padding:0.5em;
 }
 
 .reportTemplateDetails .toolbar {
