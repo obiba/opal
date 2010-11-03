@@ -9,16 +9,29 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.report.view;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ItemSelectorPresenter;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -43,16 +56,28 @@ public class ReportTemplateUpdateDialogView extends Composite implements Display
   TextBox reportTemplateName;
 
   @UiField
-  TextBox designFile;
-
-  @UiField
-  TextBox format;
+  ListBox format;
 
   @UiField
   TextBox schedule;
 
-  // @UiField
-  // Label dialogTitle;
+  @UiField
+  SimplePanel designFilePanel;
+
+  @UiField
+  CheckBox isScheduled;
+
+  @UiField
+  SimplePanel notificationEmailsPanel;
+
+  @UiField
+  SimplePanel reportParametersPanel;
+
+  private ItemSelectorPresenter.Display emailsSelector;
+
+  private ItemSelectorPresenter.Display parametersSelector;
+
+  private FileSelectionPresenter.Display fileSelection;
 
   public ReportTemplateUpdateDialogView() {
     initWidget(uiBinder.createAndBindUi(this));
@@ -102,28 +127,140 @@ public class ReportTemplateUpdateDialogView extends Composite implements Display
   }
 
   @Override
-  public void setDialogTitle(String title) {
-    // dialogTitle.setText(title);
+  public HasText getName() {
+    return reportTemplateName;
   }
 
   @Override
-  public String getName() {
-    return reportTemplateName.getText();
+  public String getDesignFile() {
+    return fileSelection.getFile();
   }
 
   @Override
-  public String getDesign() {
-    return designFile.getText();
+  public List<String> getNotificationEmails() {
+    return emailsSelector.getItems();
   }
 
   @Override
   public String getFormat() {
-    return designFile.getText();
+    return format.getItemText(format.getSelectedIndex());
   }
 
   @Override
-  public String getShedule() {
-    return designFile.getText();
+  public HasText getShedule() {
+    return schedule;
+  }
+
+  @Override
+  public void setDesignFileWidgetDisplay(FileSelectionPresenter.Display display) {
+    designFilePanel.setWidget(display.asWidget());
+    fileSelection = display;
+    fileSelection.setEnabled(true);
+    fileSelection.setFieldWidth("20em");
+  }
+
+  @Override
+  public void setNotificationEmailsWidgetDisplay(ItemSelectorPresenter.Display display) {
+    notificationEmailsPanel.setWidget(display.asWidget());
+    emailsSelector = display;
+  }
+
+  @Override
+  public HandlerRegistration addEnableScheduleClickHandler() {
+    return isScheduled.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        boolean scheduleRequired = ((CheckBox) event.getSource()).getValue();
+        schedule.setEnabled(scheduleRequired);
+        if(!scheduleRequired) {
+          schedule.setText(null);
+        }
+      }
+    });
+  }
+
+  @Override
+  public void setReportParametersWidgetDisplay(ItemSelectorPresenter.Display display) {
+    reportParametersPanel.setWidget(display.asWidget());
+    parametersSelector = display;
+  }
+
+  @Override
+  public List<String> getReportParameters() {
+    return parametersSelector.getItems();
+  }
+
+  @Override
+  public void setName(String name) {
+    reportTemplateName.setText(name != null ? name : "");
+  }
+
+  @Override
+  public void setDesignFile(String designFile) {
+    fileSelection.setFile(designFile != null ? designFile : "");
+  }
+
+  @Override
+  public void setFormat(String format) {
+    int itemCount = this.format.getItemCount();
+    String item;
+    for(int i = 0; i < itemCount; i++) {
+      item = this.format.getItemText(i);
+      if(item.equals(format)) {
+        this.format.setSelectedIndex(i);
+        break;
+      }
+    }
+  }
+
+  @Override
+  public void setSchedule(String schedule) {
+    this.schedule.setText(schedule);
+    if(!schedule.equals("")) {
+      isScheduled.setValue(true);
+      this.schedule.setEnabled(true);
+    } else {
+      isScheduled.setValue(false);
+      this.schedule.setEnabled(false);
+    }
+  }
+
+  @Override
+  public void setNotificationEmails(List<String> emails) {
+    emailsSelector.clear();
+    for(String email : emails) {
+      emailsSelector.addItem(email);
+    }
+  }
+
+  @Override
+  public void setReportParameters(List<String> params) {
+    parametersSelector.clear();
+    for(String param : params) {
+      parametersSelector.addItem(param);
+    }
+  }
+
+  @Override
+  public void setEnabledReportTemplateName(boolean enabled) {
+    reportTemplateName.setEnabled(enabled);
+
+  }
+
+  @Override
+  public void clear() {
+    setSchedule("");
+    setName("");
+    setDesignFile("");
+    setReportParameters(new ArrayList<String>());
+    setNotificationEmails(new ArrayList<String>());
+    setFormat("PDF");
+  }
+
+  @Override
+  public HasValue<Boolean> isScheduled() {
+    return isScheduled;
   }
 
 }

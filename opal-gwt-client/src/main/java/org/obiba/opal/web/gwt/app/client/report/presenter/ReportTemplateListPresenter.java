@@ -15,8 +15,10 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
+import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateUpdatedEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
@@ -36,6 +38,7 @@ public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateL
     ReportTemplateDto getSelectedReportTemplate();
 
     HandlerRegistration addSelectReportTemplateHandler(SelectionChangeHandler handler);
+
   }
 
   @Inject
@@ -77,6 +80,27 @@ public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateL
   private void addHandlers() {
     super.registerHandler(getDisplay().addSelectReportTemplateHandler(new ReportTemplateSelectionChangeHandler()));
     super.registerHandler(eventBus.addHandler(ReportTemplateDeletedEvent.getType(), new ReportTemplateDeletedHandler()));
+    super.registerHandler(eventBus.addHandler(ReportTemplateCreatedEvent.getType(), new ReportTemplateCreatedHandler()));
+    super.registerHandler(eventBus.addHandler(ReportTemplateUpdatedEvent.getType(), new ReportTemplateUpdatedHandler()));
+  }
+
+  private class ReportTemplateCreatedHandler implements ReportTemplateCreatedEvent.Handler {
+
+    @Override
+    public void onReportTemplateCreated(ReportTemplateCreatedEvent event) {
+      initUiComponents();
+    }
+
+  }
+
+  private class ReportTemplateUpdatedHandler implements ReportTemplateUpdatedEvent.Handler {
+
+    @Override
+    public void onReportTemplateUpdated(ReportTemplateUpdatedEvent event) {
+      initUiComponents();
+      eventBus.fireEvent(new ReportTemplateSelectedEvent(event.getReportTemplate()));
+    }
+
   }
 
   private class ReportTemplateDeletedHandler implements ReportTemplateDeletedEvent.Handler {

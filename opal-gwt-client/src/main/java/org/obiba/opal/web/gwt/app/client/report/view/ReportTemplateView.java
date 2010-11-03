@@ -66,7 +66,7 @@ public class ReportTemplateView extends Composite implements ReportTemplatePrese
   }
 
   @Override
-  public void addUpdateReportTemplateClickHandler(ClickHandler handler) {
+  public void addReportTemplateClickHandler(ClickHandler handler) {
     reportTemplateButton.addClickHandler(handler);
   }
 

@@ -5,47 +5,111 @@
   <ui:style>
     .optionsPanelMsg td { margin: 0.5em 0.5em 0.5em 0.5em; }
     .right-aligned { float: right; }
-    .top-margin { margin-top: 0.5em; }
+    .top-margin {
+    margin-top: 0.5em; }
   </ui:style>
 
   <g:DialogBox ui:field="dialog" autoHide="false" modal="true" height="10em" width="35em">
     <g:caption>
-      <!-- <g:Label ui:field="dialogTitle"/> -->Add
+      <!-- <g:Label ui:field="dialogTitle"/> -->
+      Add/Edit Report Template
     </g:caption>
-    <g:DockLayoutPanel unit="EM" height="40em" width="35em">
+    <g:DockLayoutPanel unit="EM" height="25em" width="45em">
       <g:center>
-        <g:VerticalPanel ui:field="inputFieldPanel" addStyleNames="main {style.optionsPanelMsg}">
-          <g:Label>
-            <ui:msg description="Report Template Name label">Name</ui:msg>:
-          </g:Label>
-          <g:TextBox name="reportTemplateName" ui:field="reportTemplateName" visibleLength="40"/>
-          <g:Label>
-            <ui:msg description="BIRT Design File label">BIRT Design File</ui:msg>:
-          </g:Label>
-          <g:TextBox name="designFile" ui:field="designFile" visibleLength="40"/>      
-          <g:Label>
-            <ui:msg description="Report Template Format label">Format</ui:msg>:
-          </g:Label>
-          <g:TextBox name="format" ui:field="format" visibleLength="40"/>    
-          <g:Label>
-            <ui:msg description="Report Schedule label">Schedule</ui:msg>:
-          </g:Label>
-          <g:TextBox name="schedule" ui:field="schedule" visibleLength="40"/>                         
-        </g:VerticalPanel>
+        <g:ScrollPanel>
+          <g:HTMLPanel addStyleNames="main {style.optionsPanelMsg}">
+            <table class="reportTemplateProperties">
+              <tr>
+                <td>
+                  <g:Label>
+                    <ui:msg description="Name label">Name</ui:msg>
+                    :
+                  </g:Label>
+                </td>
+                <td>
+                  <g:TextBox name="reportTemplateName" ui:field="reportTemplateName" visibleLength="40"/>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <g:Label>
+                    <ui:msg description="BIRT Design File label">BIRT Design File</ui:msg>
+                    :
+                  </g:Label>
+                </td>
+                <td>
+                  <g:SimplePanel ui:field="designFilePanel"/>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <g:Label>
+                    <ui:msg description="Format label">Format</ui:msg>
+                    :
+                  </g:Label>
+                </td>
+                <td>
+                  <g:ListBox ui:field="format">
+                    <g:item value="pdf">PDF</g:item>
+                    <g:item value="html">Html</g:item>
+                    <g:item value="excel">Excel</g:item>
+                  </g:ListBox>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <g:Label>
+                    <ui:msg description="Parameters label">Parameters</ui:msg>
+                    :
+                  </g:Label>
+                </td>
+                <td>
+                  <g:SimplePanel ui:field="reportParametersPanel"/>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <g:CheckBox ui:field="isScheduled"/>
+
+                  <g:Label>
+                    <ui:msg description="Schedule label">Schedule</ui:msg>
+                    :
+                  </g:Label>
+                </td>
+                <td>
+                  <g:TextBox enabled="false" name="schedule" ui:field="schedule" visibleLength="40"/>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <g:Label>
+                    <ui:msg description="Notification Emails label">Notification Emails</ui:msg>
+                    :
+                  </g:Label>
+                </td>
+                <td>
+                  <g:SimplePanel ui:field="notificationEmailsPanel"/>
+                </td>
+              </tr>
+            </table>
+
+          </g:HTMLPanel>
+        </g:ScrollPanel>
       </g:center>
       <g:south size="3.25">
         <g:HTMLPanel addStyleNames="footer">
           <span class="{style.right-aligned} {style.top-margin}">
             <g:Button ui:field="updateReportTemplateButton">
-                <ui:msg description="Save button label">Save</ui:msg>
+              <ui:msg description="Save button label">Save</ui:msg>
             </g:Button>
             <g:Button ui:field="cancelButton">
-                <ui:msg description="Cancel button label">Cancel</ui:msg>
+              <ui:msg description="Cancel button label">Cancel</ui:msg>
             </g:Button>
           </span>
         </g:HTMLPanel>
-      </g:south> 
+      </g:south>
     </g:DockLayoutPanel>
+
   </g:DialogBox>
 
 </ui:UiBinder>

@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.report.presenter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -21,17 +24,20 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
+import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FileDto;
+import org.obiba.opal.web.model.client.opal.ParameterDto;
 import org.obiba.opal.web.model.client.opal.ReportCommandOptionsDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -47,6 +53,8 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
   public static final String DOWNLOAD_ACTION = "Download";
 
   private Runnable actionRequiringConfirmation;
+
+  ReportTemplateUpdateDialogPresenter reportTemplateUpdateDialogPresenter;
 
   public interface Display extends WidgetDisplay {
     void setProducedReports(JsArray<FileDto> reports);
@@ -75,8 +83,9 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
   }
 
   @Inject
-  public ReportTemplateDetailsPresenter(final Display display, final EventBus eventBus) {
+  public ReportTemplateDetailsPresenter(final Display display, final EventBus eventBus, ReportTemplateUpdateDialogPresenter reportTemplateUpdateDialogPresenter) {
     super(display, eventBus);
+    this.reportTemplateUpdateDialogPresenter = reportTemplateUpdateDialogPresenter;
   }
 
   @Override
@@ -138,7 +147,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
   private void setCommands() {
     getDisplay().setRemoveReportTemplateCommand(new RemoveReportTemplateCommand());
     getDisplay().setRunReportCommand(new RunReportCommand());
-    getDisplay().setUpdateReportTemplateCommand(new UpdateReportTemplateCommand());
+    getDisplay().setUpdateReportTemplateCommand(new EditReportTemplateCommand());
   }
 
   protected void doActionImpl(final FileDto dto, String actionName) {
@@ -192,14 +201,40 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
   }
 
-  private class UpdateReportTemplateCommand implements Command {
+  private class EditReportTemplateCommand implements Command {
 
     @Override
     public void execute() {
-      // TODO Implement the edit/update report template dialog.
-      eventBus.fireEvent(new NotificationEvent(NotificationType.WARNING, "Showing the edit/update report template dialog (not implemented yet)", null));
+      reportTemplateUpdateDialogPresenter.bind();
+      reportTemplateUpdateDialogPresenter.setDialogMode(Mode.UPDATE);
+      ReportTemplateUpdateDialogPresenter.Display display = reportTemplateUpdateDialogPresenter.getDisplay();
+      ReportTemplateDto reportTemplate = getDisplay().getReportTemplateDetails();
+      display.setDesignFile(reportTemplate.getDesign());
+      display.setFormat(reportTemplate.getFormat());
+      display.setName(reportTemplate.getName());
+      display.setNotificationEmails(asList(reportTemplate.getEmailNotificationArray()));
+      display.setReportParameters(asList(reportTemplate.getParametersArray()));
+      display.setSchedule(reportTemplate.getCron());
+      display.setEnabledReportTemplateName(false);
+      reportTemplateUpdateDialogPresenter.revealDisplay();
     }
 
+  }
+
+  private List<String> asList(JsArray<ParameterDto> parametersArray) {
+    List<String> list = new ArrayList<String>();
+    for(int i = 0; i < parametersArray.length(); i++) {
+      list.add(parametersArray.get(i).getKey() + "=" + parametersArray.get(i).getValue());
+    }
+    return list;
+  }
+
+  private List<String> asList(JsArrayString array) {
+    List<String> list = new ArrayList<String>();
+    for(int i = 0; i < array.length(); i++) {
+      list.add(array.get(i));
+    }
+    return list;
   }
 
   private class RemoveReportTemplateCommand implements Command {

@@ -15,7 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
+import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Mode;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -35,7 +35,7 @@ public class ReportTemplatePresenter extends WidgetPresenter<ReportTemplatePrese
 
     ScrollPanel getReportTemplateListPanel();
 
-    void addUpdateReportTemplateClickHandler(ClickHandler handler);
+    void addReportTemplateClickHandler(ClickHandler handler);
   }
 
   @Inject
@@ -61,7 +61,7 @@ public class ReportTemplatePresenter extends WidgetPresenter<ReportTemplatePrese
   }
 
   private void addHandlers() {
-    getDisplay().addUpdateReportTemplateClickHandler(new UpdateReportTemplateClickHandler(null));
+    getDisplay().addReportTemplateClickHandler(new AddReportTemplateClickHandler());
 
   }
 
@@ -92,18 +92,14 @@ public class ReportTemplatePresenter extends WidgetPresenter<ReportTemplatePrese
   protected void onPlaceRequest(PlaceRequest request) {
   }
 
-  public class UpdateReportTemplateClickHandler implements ClickHandler {
-
-    ReportTemplateDto reportTemplate;
-
-    public UpdateReportTemplateClickHandler(ReportTemplateDto reportTemplate) {
-      super();
-      this.reportTemplate = reportTemplate;
-    }
+  public class AddReportTemplateClickHandler implements ClickHandler {
 
     @Override
     public void onClick(ClickEvent event) {
       reportTemplateUpdateDialogPresenter.bind();
+      reportTemplateUpdateDialogPresenter.setDialogMode(Mode.CREATE);
+      reportTemplateUpdateDialogPresenter.getDisplay().clear();
+      reportTemplateUpdateDialogPresenter.getDisplay().setEnabledReportTemplateName(true);
       reportTemplateUpdateDialogPresenter.revealDisplay();
     }
 
