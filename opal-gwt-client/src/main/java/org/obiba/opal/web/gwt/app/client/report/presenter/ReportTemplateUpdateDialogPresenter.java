@@ -21,7 +21,6 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateUpdatedEvent;
@@ -39,7 +38,6 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.ParameterDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -120,8 +118,6 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
     void clear();
 
   }
-
-  private Translations translations = GWT.create(Translations.class);
 
   @Inject
   public ReportTemplateUpdateDialogPresenter(Display display, EventBus eventBus, FileSelectionPresenter fileSelectionPresenter, ItemSelectorPresenter emailSelectorPresenter, ItemSelectorPresenter parametersSelectorPresenter) {

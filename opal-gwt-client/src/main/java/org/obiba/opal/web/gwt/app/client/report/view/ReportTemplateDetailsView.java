@@ -73,6 +73,9 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   CellTable<FileDto> producedReportsTable;
 
   @UiField
+  FlowPanel producedReports;
+
+  @UiField
   Anchor design;
 
   @UiField
@@ -159,23 +162,29 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   @Override
   public void setProducedReports(final JsArray<FileDto> files) {
 
-    @SuppressWarnings("unchecked")
-    final JsArray<FileDto> reports = files != null ? files : (JsArray<FileDto>) JsArray.createArray();
+    if(files == null || files.length() == 0) {
+      producedReports.setVisible(false);
+    } else {
+      renderProducedReports(files);
+    }
+  }
 
+  private void renderProducedReports(final JsArray<FileDto> files) {
+    producedReports.setVisible(true);
     producedReportsTable.setDelegate(new Delegate<FileDto>() {
 
       @Override
       public void onRangeChanged(ListView<FileDto> listView) {
         int start = listView.getRange().getStart();
         int length = listView.getRange().getLength();
-        listView.setData(start, length, JsArrays.toList(reports, start, length));
+        listView.setData(start, length, JsArrays.toList(files, start, length));
       }
     });
 
     pager.firstPage();
     int pageSize = producedReportsTable.getPageSize();
-    producedReportsTable.setData(0, pageSize, JsArrays.toList(reports, 0, pageSize));
-    producedReportsTable.setDataSize(reports.length(), true);
+    producedReportsTable.setData(0, pageSize, JsArrays.toList(files, 0, pageSize));
+    producedReportsTable.setDataSize(files.length(), true);
     producedReportsTable.redraw();
   }
 

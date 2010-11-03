@@ -81,7 +81,6 @@ public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateL
     super.registerHandler(getDisplay().addSelectReportTemplateHandler(new ReportTemplateSelectionChangeHandler()));
     super.registerHandler(eventBus.addHandler(ReportTemplateDeletedEvent.getType(), new ReportTemplateDeletedHandler()));
     super.registerHandler(eventBus.addHandler(ReportTemplateCreatedEvent.getType(), new ReportTemplateCreatedHandler()));
-    super.registerHandler(eventBus.addHandler(ReportTemplateUpdatedEvent.getType(), new ReportTemplateUpdatedHandler()));
   }
 
   private class ReportTemplateCreatedHandler implements ReportTemplateCreatedEvent.Handler {

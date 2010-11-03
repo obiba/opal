@@ -707,13 +707,17 @@ table.reportTemplateList {
   width:100%;
 }
 
-.reportTemplateDetails table.producedReports td span {
+.reportTemplateDetails .producedReports table td span {
   padding-right:20px;
   cursor:pointer;
 }
 
 .reportTemplateDetails table.reportTemplateProperties {
-  padding:20px;
+  padding:2em;
+}
+
+.producedReports {
+  padding-left:20px;
 }
 
 table.reportTemplateProperties input.text  {

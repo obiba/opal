@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.report.presenter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.customware.gwt.presenter.client.EventBus;
@@ -24,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
+import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
@@ -54,7 +56,9 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
   private Runnable actionRequiringConfirmation;
 
-  ReportTemplateUpdateDialogPresenter reportTemplateUpdateDialogPresenter;
+  private ReportTemplateUpdateDialogPresenter reportTemplateUpdateDialogPresenter;
+
+  private ReportTemplateDto reportTemplate;
 
   public interface Display extends WidgetDisplay {
     void setProducedReports(JsArray<FileDto> reports);
@@ -133,14 +137,21 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
       @Override
       public void onReportTemplateSelected(ReportTemplateSelectedEvent event) {
-        ReportTemplateDto reportTemplate = event.getReportTemplate();
-        ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta/reports/" + reportTemplate.getName()).get().withCallback(new ProducedReportsResourceCallback()).withCallback(404, new NoProducedReportsResourceCallback()).send();
-        getDisplay().setReportTemplateDetails(reportTemplate);
+        refreshReportTemplateDetails(event.getReportTemplate());
+      }
+    }));
+
+    super.registerHandler(eventBus.addHandler(FileDeletedEvent.getType(), new FileDeletedEvent.Handler() {
+
+      @Override
+      public void onFileDeleted(FileDeletedEvent event) {
+        refreshProducedReports(reportTemplate);
       }
     }));
 
     super.registerHandler(getDisplay().addReportDesignClickHandler(new ReportDesignClickHandler()));
     super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    super.registerHandler(eventBus.addHandler(ReportTemplateUpdatedEvent.getType(), new ReportTemplateUpdatedHandler()));
 
   }
 
@@ -186,6 +197,15 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
   private void downloadFile(String filePath) {
     String url = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")).append("ws/files").append(filePath).toString();
     eventBus.fireEvent(new FileDownloadEvent(url));
+  }
+
+  private void refreshProducedReports(ReportTemplateDto reportTemplate) {
+    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta/reports/" + reportTemplate.getName()).get().withCallback(new ProducedReportsResourceCallback()).withCallback(404, new NoProducedReportsResourceCallback()).send();
+  }
+
+  private void refreshReportTemplateDetails(ReportTemplateDto reportTemplate) {
+    String reportTemplateName = reportTemplate.getName();
+    ResourceRequestBuilderFactory.<ReportTemplateDto> newBuilder().forResource("/report-template/" + reportTemplate.getName()).get().withCallback(new ReportTemplateFoundCallBack()).withCallback(Response.SC_NOT_FOUND, new ReportTemplateNotFoundCallBack(reportTemplateName)).send();
   }
 
   private class RunReportCommand implements Command {
@@ -253,14 +273,13 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
   }
 
-  private class CommandResponseCallBack implements ResponseCodeCallback {
+  private class ReportTemplateUpdatedHandler implements ReportTemplateUpdatedEvent.Handler {
 
     @Override
-    public void onResponseCode(Request request, Response response) {
-      if(response.getStatusCode() != Response.SC_OK) {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
-      }
+    public void onReportTemplateUpdated(ReportTemplateUpdatedEvent event) {
+      refreshReportTemplateDetails(event.getReportTemplate());
     }
+
   }
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
@@ -295,6 +314,41 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
     @Override
     public void onResource(Response response, FileDto reportFolder) {
       getDisplay().setProducedReports(reportFolder.getChildrenArray());
+    }
+
+  }
+
+  private class CommandResponseCallBack implements ResponseCodeCallback {
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      if(response.getStatusCode() != Response.SC_OK) {
+        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
+      }
+    }
+  }
+
+  private class ReportTemplateFoundCallBack implements ResourceCallback<ReportTemplateDto> {
+
+    @Override
+    public void onResource(Response response, ReportTemplateDto resource) {
+      reportTemplate = resource;
+      getDisplay().setReportTemplateDetails(reportTemplate);
+      refreshProducedReports(reportTemplate);
+    }
+  }
+
+  private class ReportTemplateNotFoundCallBack implements ResponseCodeCallback {
+
+    private String templateName;
+
+    public ReportTemplateNotFoundCallBack(String reportTemplateName) {
+      this.templateName = reportTemplateName;
+    }
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "ReportTemplateCannotBeFound", Arrays.asList(new String[] { templateName })));
     }
 
   }

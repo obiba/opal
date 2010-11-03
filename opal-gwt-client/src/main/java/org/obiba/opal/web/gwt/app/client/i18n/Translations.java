@@ -88,7 +88,8 @@ public interface Translations extends Constants {
   @Description("Action map")
   @DefaultStringMapValue({ "Log", "Log", //
   "Cancel", "Cancel", //
-  "Delete", "Delete" })
+  "Delete", "Delete", //
+  "Download", "Download" })
   Map<String, String> actionMap();
 
   @Description("Size label")

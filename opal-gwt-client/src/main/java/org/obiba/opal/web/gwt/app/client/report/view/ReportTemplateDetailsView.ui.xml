@@ -1,8 +1,6 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-  xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.user.cellview.client"
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
-  ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <g:FlowPanel addStyleNames="reportTemplateDetails">
 
@@ -63,13 +61,15 @@
       </table>
     </g:HTMLPanel>
 
-    <g:Label addStyleNames="title">
-      <ui:msg description="Reports title">Reports</ui:msg>
-    </g:Label>
-    <g:VerticalPanel width="100%">
-      <g2:CellTable ui:field="producedReportsTable"
-        addStyleNames="producedReports" width="100%"/>
-    </g:VerticalPanel>
+    <g:FlowPanel ui:field="producedReports" addStyleNames="producedReports">
+      <g:Label addStyleNames="title">
+        <ui:msg description="Reports title">Reports</ui:msg>
+      </g:Label>
+      <g:VerticalPanel width="100%">
+        <g2:CellTable ui:field="producedReportsTable" width="100%"/>
+      </g:VerticalPanel>
+    </g:FlowPanel>
+    
   </g:FlowPanel>
 
 </ui:UiBinder>
