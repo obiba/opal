@@ -11,28 +11,27 @@
 
   <g:DialogBox ui:field="dialog" autoHide="false" modal="true" height="10em" width="35em">
     <g:caption>
-      <!-- <g:Label ui:field="dialogTitle"/> -->
-      Add/Edit Report Template
+      <ui:msg description="Report template update dialog title">Add/Edit Report Template</ui:msg>
     </g:caption>
-    <g:DockLayoutPanel unit="EM" height="25em" width="45em">
+    <g:DockLayoutPanel unit="EM" height="30em" width="45em">
       <g:center>
         <g:ScrollPanel>
           <g:HTMLPanel addStyleNames="main {style.optionsPanelMsg}">
             <table class="reportTemplateProperties">
               <tr>
                 <td>
-                  <g:Label>
+                  <g:Label addStyleNames="key">
                     <ui:msg description="Name label">Name</ui:msg>
                     :
                   </g:Label>
                 </td>
                 <td>
-                  <g:TextBox name="reportTemplateName" ui:field="reportTemplateName" visibleLength="40"/>
+                  <g:TextBox addStyleNames="text" name="reportTemplateName" ui:field="reportTemplateName" visibleLength="40"/>
                 </td>
               </tr>
               <tr>
                 <td>
-                  <g:Label>
+                  <g:Label addStyleNames="key">
                     <ui:msg description="BIRT Design File label">BIRT Design File</ui:msg>
                     :
                   </g:Label>
@@ -43,7 +42,7 @@
               </tr>
               <tr>
                 <td>
-                  <g:Label>
+                  <g:Label addStyleNames="key">
                     <ui:msg description="Format label">Format</ui:msg>
                     :
                   </g:Label>
@@ -58,31 +57,30 @@
               </tr>
               <tr>
                 <td>
-                  <g:Label>
+                  <g:Label addStyleNames="key">
                     <ui:msg description="Parameters label">Parameters</ui:msg>
                     :
                   </g:Label>
                 </td>
                 <td>
-                  <g:SimplePanel ui:field="reportParametersPanel"/>
+                  <g:SimplePanel addStyleNames="widget" ui:field="reportParametersPanel"/>
                 </td>
               </tr>
               <tr>
                 <td>
                   <g:CheckBox ui:field="isScheduled"/>
-
-                  <g:Label>
+                  <g:Label addStyleNames="key">
                     <ui:msg description="Schedule label">Schedule</ui:msg>
                     :
                   </g:Label>
                 </td>
                 <td>
-                  <g:TextBox enabled="false" name="schedule" ui:field="schedule" visibleLength="40"/>
+                  <g:TextBox addStyleNames="text" enabled="false" name="schedule" ui:field="schedule" visibleLength="40"/>
                 </td>
               </tr>
               <tr>
                 <td>
-                  <g:Label>
+                  <g:Label addStyleNames="key">
                     <ui:msg description="Notification Emails label">Notification Emails</ui:msg>
                     :
                   </g:Label>

@@ -716,8 +716,18 @@ table.reportTemplateList {
   padding:20px;
 }
 
-.reportTemplateDetails div.key {
+table.reportTemplateProperties input.text  {
+  width:100%;
+}
+
+table.reportTemplateProperties td {
+  vertical-align:top;
+}
+
+table.reportTemplateProperties div.key {
   font-weight:bold;
+  display:inline;
+  vertical-align:top;
 }
  
 .reportTemplateDetails .titlebar {
