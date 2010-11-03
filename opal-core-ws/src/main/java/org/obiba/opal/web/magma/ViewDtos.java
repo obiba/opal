@@ -14,13 +14,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.obiba.magma.Datasource;
-import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.js.views.VariablesClause;
-import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.obiba.magma.support.ValueTableReference;
 import org.obiba.magma.views.JoinTable;
 import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
@@ -74,9 +72,7 @@ public final class ViewDtos {
     List<ValueTable> fromTables = new ArrayList<ValueTable>();
     for(int i = 0; i < viewDto.getFromCount(); i++) {
       String fromTable = viewDto.getFrom(i);
-      MagmaEngineTableResolver tableResolver = MagmaEngineTableResolver.valueOf(fromTable);
-      Datasource ds = MagmaEngine.get().getDatasource(tableResolver.getDatasourceName());
-      ValueTable vt = ds.getValueTable(tableResolver.getTableName());
+      ValueTable vt = new ValueTableReference(fromTable);
       fromTables.add(vt);
     }
     return fromTables;

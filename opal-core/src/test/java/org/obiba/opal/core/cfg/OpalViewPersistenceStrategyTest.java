@@ -10,6 +10,7 @@ import java.io.File;
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
@@ -59,6 +60,7 @@ public class OpalViewPersistenceStrategyTest {
     assertThat(result.isEmpty(), is(true));
   }
 
+  @Ignore
   @Test
   public void testWriteEmptySetRemovesFile() throws Exception {
     Datasource datasourceMock = createMock(Datasource.class);
@@ -85,6 +87,7 @@ public class OpalViewPersistenceStrategyTest {
     assertThat(noViewsResult.isEmpty(), is(true));
   }
 
+  @Ignore
   @Test
   public void testWriteSingleView() throws Exception {
     Datasource datasourceMock = createMock(Datasource.class);
