@@ -185,7 +185,12 @@ public interface Translations extends Constants {
   "ZipFileRequired", "An Zip file is required.", //
   "ZipFileSuffixInvalid", "Invalid Zip file suffix: .zip is expected.",//
   "ReportTemplateWasNotFound", "The specified report template could not be found.",//
-  "ReportJobStarted", "Report job has been launched.  You can follow its progress in the job list." })
+  "ReportJobStarted", "Report job has been launched.  You can follow its progress in the job list.",//
+  "ReportTemplateAlreadyExistForTheSpecifiedName", "A report template already exist with the specified name.",//
+  "BirtReportDesignFileIsRequired", "A BIRT Design File must be selected.",//
+  "CronExpressionIsRequired", "A schedule expression must be specified when the Schedule checkbox is selected.",//
+  "NotificationEmailsAreInvalid", "One or more of the notifications emails specified are invalid.",//
+  "ReportTemplateNameIsRequired", "A name is required for the report template." })
   Map<String, String> userMessageMap();
 
   @Description("You must select a file message")
