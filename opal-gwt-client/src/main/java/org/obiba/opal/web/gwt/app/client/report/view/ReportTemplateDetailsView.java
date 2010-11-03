@@ -76,6 +76,9 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   FlowPanel producedReports;
 
   @UiField
+  FlowPanel reportTemplateDetails;
+
+  @UiField
   Anchor design;
 
   @UiField
@@ -190,6 +193,15 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
 
   @Override
   public void setReportTemplateDetails(ReportTemplateDto reportTemplate) {
+    if(reportTemplate == null) {
+      reportTemplateDetails.setVisible(false);
+    } else {
+      renderReportTemplateDetails(reportTemplate);
+    }
+  }
+
+  private void renderReportTemplateDetails(ReportTemplateDto reportTemplate) {
+    reportTemplateDetails.setVisible(true);
     this.reportTemplate = reportTemplate;
     design.setText(reportTemplate.getDesign());
     schedule.setText(reportTemplate.getCron());

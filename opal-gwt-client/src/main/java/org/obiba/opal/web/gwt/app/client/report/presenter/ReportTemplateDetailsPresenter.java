@@ -122,6 +122,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
   private void initUiComponents() {
     getDisplay().setProducedReports(null);
+    getDisplay().setReportTemplateDetails(null);
   }
 
   private void addHandlers() {
