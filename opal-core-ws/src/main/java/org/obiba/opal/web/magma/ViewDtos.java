@@ -24,8 +24,8 @@ import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.views.JoinTable;
 import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
-import org.obiba.magma.views.WhereClause;
 import org.obiba.magma.views.View.Builder;
+import org.obiba.magma.views.WhereClause;
 import org.obiba.magma.views.support.NoneClause;
 import org.obiba.opal.web.model.Magma.JavaScriptViewDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
@@ -149,7 +149,7 @@ public final class ViewDtos {
 
       viewDtoBuilder.setExtension(JavaScriptViewDto.view, jsDtoBuilder.build());
 
-      return null;
+      return viewDtoBuilder.build();
     }
   }
 
@@ -206,7 +206,7 @@ public final class ViewDtos {
 
       viewDtoBuilder.setExtension(VariableListViewDto.view, listDtoBuilder.build());
 
-      return null;
+      return viewDtoBuilder.build();
     }
   }
 }
