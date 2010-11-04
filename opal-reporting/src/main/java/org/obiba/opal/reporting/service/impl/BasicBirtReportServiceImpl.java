@@ -52,13 +52,13 @@ public class BasicBirtReportServiceImpl implements ReportService {
       // Check for birt failure
       try {
         if(p.waitFor() != 0) {
-          System.err.println("exit value = " + p.exitValue());
+          throw new RuntimeException("BIRT executable reported an error.  Exit value = " + p.exitValue());
         }
       } catch(InterruptedException e) {
-        System.err.println(e);
+        throw new RuntimeException(e);
       }
     } catch(IOException e) {
-      System.err.println(e.getMessage());
+      throw new RuntimeException("BIRT could not be executed.", e);
     }
   }
 
