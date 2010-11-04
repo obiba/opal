@@ -102,10 +102,10 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
 
   class ViewUpdateHandler implements ViewUpdateEvent.Handler {
 
-    private ResponseCodeCallback errorCallback;
+    private ResponseCodeCallback callback;
 
     public ViewUpdateHandler() {
-      errorCallback = createErrorCallback();
+      callback = createResponseCodeCallback();
     }
 
     @Override
@@ -119,16 +119,19 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
       /**/.put()
       /**/.forResource("/datasource/" + viewDto.getDatasourceName() + "/view/" + viewDto.getName())
       /**/.accept("application/x-protobuf+json").withResourceBody(JsonUtil.stringify(viewDto))
-      /**/.withCallback(Response.SC_BAD_REQUEST, errorCallback)
+      /**/.withCallback(Response.SC_OK, callback)
+      /**/.withCallback(Response.SC_BAD_REQUEST, callback)
       /**/.send();
     }
 
-    private ResponseCodeCallback createErrorCallback() {
+    private ResponseCodeCallback createResponseCodeCallback() {
       return new ResponseCodeCallback() {
 
         @Override
         public void onResponseCode(Request request, Response response) {
-          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
+          if(response.getStatusCode() == Response.SC_BAD_REQUEST) {
+            eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
+          }
         }
       };
     }
