@@ -15,12 +15,18 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
-
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.inject.Inject;
 
 public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.Display> {
+
+  public interface Display extends WidgetDisplay {
+    HandlerRegistration addSaveChangesClickHandler(ClickHandler clickHandler);
+
+    void saveChangesEnabled(boolean enabled);
+  }
 
   @Inject
   public EntitiesTabPresenter(final Display display, final EventBus eventBus) {
@@ -29,6 +35,7 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
 
   @Override
   protected void onBind() {
+    getDisplay().saveChangesEnabled(true);
     addEventHandlers();
   }
 
@@ -54,17 +61,13 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
   }
 
   private void addEventHandlers() {
-
+    super.registerHandler(getDisplay().addSaveChangesClickHandler(new SaveChangesClickHandler()));
   }
 
-  public interface Display extends WidgetDisplay {
+  class SaveChangesClickHandler implements ClickHandler {
 
-  }
-
-  class ViewConfigurationRequiredHandler implements ViewConfigurationRequiredEvent.Handler {
-
-    public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
-      eventBus.fireEvent(new WorkbenchChangeEvent(EntitiesTabPresenter.this, false, false));
+    public void onClick(ClickEvent event) {
     }
   }
+
 }

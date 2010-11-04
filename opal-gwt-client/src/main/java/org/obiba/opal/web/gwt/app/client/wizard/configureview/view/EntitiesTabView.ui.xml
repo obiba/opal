@@ -2,12 +2,12 @@
   xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
 
   <g:FlowPanel >
-    <g:Label addStyleNames="inline"><ui:msg description="Selected entities to be viewed label">Select the entities that will be viewed:</ui:msg></g:Label>
+    <g:Label addStyleNames="inline"><ui:msg description="Select entities to be viewed label">Select the entities that will be viewed:</ui:msg></g:Label>
     <g:ListBox addStyleNames="small-indent">
       <g:item value="all"><ui:msg description="All label">all</ui:msg></g:item>
       <g:item value="script"><ui:msg description="Script label">script</ui:msg></g:item>
     </g:ListBox>
-    <g:Button ui:field="testScript" addStyleNames="right-aligned">
+    <g:Button ui:field="saveChangesButton" addStyleNames="right-aligned">
       <ui:msg description="Save changes button label">Save Changes</ui:msg>
     </g:Button>
     <g:FlowPanel ui:field="scriptPanel" />

@@ -12,8 +12,12 @@ package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.EntitiesTabPresenter;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -24,6 +28,9 @@ public class EntitiesTabView extends Composite implements EntitiesTabPresenter.D
   }
 
   private static myUiBinder uiBinder = GWT.create(myUiBinder.class);
+
+  @UiField
+  Button saveChangesButton;
 
   public EntitiesTabView() {
     initWidget(uiBinder.createAndBindUi(this));
@@ -37,6 +44,16 @@ public class EntitiesTabView extends Composite implements EntitiesTabPresenter.D
   }
 
   public void stopProcessing() {
+  }
+
+  @Override
+  public HandlerRegistration addSaveChangesClickHandler(ClickHandler clickHandler) {
+    return saveChangesButton.addClickHandler(clickHandler);
+  }
+
+  @Override
+  public void saveChangesEnabled(boolean enabled) {
+    saveChangesButton.setEnabled(enabled);
   }
 
 }
