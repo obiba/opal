@@ -90,7 +90,7 @@ public class ReportTemplateResource {
   public Response getReportTemplate() {
     ReportTemplate reportTemplate = opalRuntime.getOpalConfiguration().getReportTemplate(name);
     if(reportTemplate == null) {
-      return Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ReportTemplateWasNotFound").build()).build();
+      return Response.status(Status.NOT_FOUND).build();
     } else {
       return Response.ok(Dtos.asDto(reportTemplate)).build();
     }
@@ -100,8 +100,6 @@ public class ReportTemplateResource {
   public Response deleteReportTemplate() {
     ReportTemplate reportTemplateToRemove = opalRuntime.getOpalConfiguration().getReportTemplate(name);
     if(reportTemplateToRemove == null) {
-      // return Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND,
-      // "ReportTemplateWasNotFound").build()).build();
       return Response.status(Status.NOT_FOUND).build();
     } else {
       opalRuntime.getOpalConfiguration().removeReportTemplate(name);
@@ -120,6 +118,7 @@ public class ReportTemplateResource {
       updateOpalConfiguration(reportTemplateDto);
       updateSchedule(reportTemplateDto, isNew);
     } catch(Exception couldNotUpdateTheReportTemplate) {
+      couldNotUpdateTheReportTemplate.printStackTrace();
       return Response.status(Response.Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "CouldNotUpdateTheReportTemplate").build()).build();
     }
 
