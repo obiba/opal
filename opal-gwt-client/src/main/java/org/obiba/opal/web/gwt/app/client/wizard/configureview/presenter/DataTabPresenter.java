@@ -9,19 +9,28 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewUpdateEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.ViewDto;
 
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
 public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> {
@@ -35,6 +44,8 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
 
     void clear();
   }
+
+  private ViewDto viewDto;
 
   @Inject
   private TableListPresenter tableListPresenter;
@@ -61,11 +72,13 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
 
   @Override
   public void revealDisplay() {
-    tableListPresenter.getTables().clear();
   }
 
   @Override
   public void refreshDisplay() {
+    tableListPresenter.getTables().clear();
+    tableListPresenter.getDisplay().clear();
+    setSelectedTables();
   }
 
   @Override
@@ -78,27 +91,48 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
   }
 
   private void addEventHandlers() {
-    super.registerHandler(getDisplay().addSaveChangesClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent arg0) {
-
-      }
-    }));
     super.registerHandler(getDisplay().addSaveChangesClickHandler(new SaveChangesClickHandler()));
-  }
-
-  class ViewConfigurationRequiredHandler implements ViewConfigurationRequiredEvent.Handler {
-
-    public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
-      eventBus.fireEvent(new WorkbenchChangeEvent(DataTabPresenter.this, false, false));
-    }
   }
 
   class SaveChangesClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent event) {
+      viewDto.clearFromArray();
+      viewDto.setFromArray(getSelectedTables());
+      eventBus.fireEvent(new ViewUpdateEvent(viewDto));
     }
   }
 
+  private JsArrayString getSelectedTables() {
+    JsArrayString tables = JavaScriptObject.createArray().cast();
+    for(TableDto tableDto : tableListPresenter.getTables()) {
+      tables.push(tableDto.getDatasourceName() + "." + tableDto.getName());
+    }
+    return tables;
+  }
+
+  private void setSelectedTables() {
+    for(int i = 0; i < viewDto.getFromArray().length(); i++) {
+      String[] parts = viewDto.getFromArray().get(i).split("\\.");
+      ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/datasource/" + parts[0] + "/table/" + parts[1]).get().withCallback(new ResourceCallback<TableDto>() {
+        @Override
+        public void onResource(Response response, TableDto resource) {
+          List<TableDto> tableDtos = new ArrayList<TableDto>(1);
+          tableDtos.add(resource);
+          addTables(tableDtos);
+        }
+      }).send();
+    }
+  }
+
+  private void addTables(List<TableDto> tableDtos) {
+    for(TableDto dto : tableDtos) {
+      tableListPresenter.getDisplay().addTable(dto);
+      tableListPresenter.getTables().add(dto);
+    }
+  }
+
+  public void setViewDto(ViewDto viewDto) {
+    this.viewDto = viewDto;
+  }
 }
