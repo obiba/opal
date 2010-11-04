@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequir
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.support.JsonUtil;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewUpdateEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.ViewDto;
@@ -34,6 +35,13 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
   //
   // Instance Variables
   //
+
+  /**
+   * {@link ViewDto} of view being configured.
+   * 
+   * This is initialized upon a {@link ViewConfigurationRequiredEvent} and updated on every {@link ViewUpdateEvent}.
+   */
+  private ViewDto viewDto;
 
   //
   // Constructors
@@ -94,9 +102,38 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
 
   class ViewConfigurationRequiredHandler implements ViewConfigurationRequiredEvent.Handler {
 
+    private ResourceCallback<ViewDto> callback;
+
+    public ViewConfigurationRequiredHandler() {
+      callback = createResponseCodeCallback();
+    }
+
     @Override
     public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
-      eventBus.fireEvent(new WorkbenchChangeEvent(ConfigureViewStepPresenter.this, false, false));
+      // Get the ViewDto of the view to be configured. Once received, keep a copy of it.
+      // This ViewDto should be communicated to, and shared with, all the *TabPresenters (Data, Variables, Entities).
+      // Whenever a *TabPresenter fires a ViewUpdateEvent to signal changes, the event should contain the updated
+      // ViewDto.
+      ResourceRequestBuilderFactory.<ViewDto> newBuilder()
+      /**/.get()
+      /**/.forResource("/datasource/" + event.getDatasourceName() + "/view/" + event.getViewName())
+      /**/.accept("application/x-protobuf+json")
+      /**/.withCallback(callback)
+      /**/.send();
+    }
+
+    private ResourceCallback<ViewDto> createResponseCodeCallback() {
+      return new ResourceCallback<ViewDto>() {
+
+        @Override
+        public void onResource(Response response, ViewDto viewDto) {
+          // Initialize viewDto.
+          ConfigureViewStepPresenter.this.viewDto = viewDto;
+
+          // Go ahead and display the ConfigureViewStepPresenter.
+          eventBus.fireEvent(new WorkbenchChangeEvent(ConfigureViewStepPresenter.this, false, false));
+        }
+      };
     }
   }
 
@@ -110,7 +147,10 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
 
     @Override
     public void onViewUpdate(ViewUpdateEvent event) {
-      ViewDto viewDto = event.getViewDto();
+      // Keep viewDto current (set it to the one contained in the event).
+      viewDto = event.getViewDto();
+
+      // Go ahead and update the view.
       updateView(viewDto);
     }
 

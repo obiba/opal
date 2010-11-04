@@ -61,7 +61,7 @@ public class ViewConfigurationRequiredEvent extends GwtEvent<ViewConfigurationRe
     return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
   }
 
-  public String getDatsourceName() {
+  public String getDatasourceName() {
     return datasourceName;
   }
 
