@@ -10,7 +10,10 @@
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
@@ -18,6 +21,12 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.ui.HasCollection;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.MatchingTableEntitiesValidator;
+import org.obiba.opal.web.gwt.app.client.validator.MinimumSizeCollectionValidator;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewUpdateEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -96,10 +105,38 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
 
   class SaveChangesClickHandler implements ClickHandler {
 
+    private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+
+    public SaveChangesClickHandler() {
+      super();
+      HasCollection<TableDto> tablesField = new HasCollection<TableDto>() {
+        public Collection<TableDto> getCollection() {
+          return tableListPresenter.getTables();
+        }
+      };
+      validators.add(new MinimumSizeCollectionValidator<TableDto>(tablesField, 1, "TableSelectionRequired"));
+      validators.add(new MatchingTableEntitiesValidator(tablesField));
+    }
+
     public void onClick(ClickEvent event) {
+      String errorMessageKey = validate();
+      if(errorMessageKey != null) {
+        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errorMessageKey, null));
+        return;
+      }
       viewDto.clearFromArray();
       viewDto.setFromArray(getSelectedTables());
       eventBus.fireEvent(new ViewUpdateEvent(viewDto));
+    }
+
+    String validate() {
+      for(FieldValidator validator : validators) {
+        String errorMessageKey = validator.validate();
+        if(errorMessageKey != null) {
+          return errorMessageKey;
+        }
+      }
+      return null;
     }
   }
 
