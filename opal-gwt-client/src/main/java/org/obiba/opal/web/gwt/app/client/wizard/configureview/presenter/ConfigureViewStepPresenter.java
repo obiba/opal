@@ -15,9 +15,18 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.support.JsonUtil;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewUpdateEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.magma.ViewDto;
 
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.DeckPanel;
 import com.google.inject.Inject;
 
@@ -72,6 +81,7 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
 
   private void addEventHandlers() {
     super.registerHandler(eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredHandler()));
+    super.registerHandler(eventBus.addHandler(ViewUpdateEvent.getType(), new ViewUpdateHandler()));
   }
 
   //
@@ -84,8 +94,43 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
 
   class ViewConfigurationRequiredHandler implements ViewConfigurationRequiredEvent.Handler {
 
+    @Override
     public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
       eventBus.fireEvent(new WorkbenchChangeEvent(ConfigureViewStepPresenter.this, false, false));
+    }
+  }
+
+  class ViewUpdateHandler implements ViewUpdateEvent.Handler {
+
+    private ResponseCodeCallback errorCallback;
+
+    public ViewUpdateHandler() {
+      errorCallback = createErrorCallback();
+    }
+
+    @Override
+    public void onViewUpdate(ViewUpdateEvent event) {
+      ViewDto viewDto = event.getViewDto();
+      updateView(viewDto);
+    }
+
+    private void updateView(ViewDto viewDto) {
+      ResourceRequestBuilderFactory.newBuilder()
+      /**/.put()
+      /**/.forResource("/datasource/" + viewDto.getDatasourceName() + "/view/" + viewDto.getName())
+      /**/.accept("application/x-protobuf+json").withResourceBody(JsonUtil.stringify(viewDto))
+      /**/.withCallback(Response.SC_BAD_REQUEST, errorCallback)
+      /**/.send();
+    }
+
+    private ResponseCodeCallback createErrorCallback() {
+      return new ResponseCodeCallback() {
+
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
+        }
+      };
     }
   }
 }
