@@ -17,7 +17,7 @@ import org.obiba.opal.web.model.Magma.ViewDto;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 
-public class ViewResource extends TableResource {
+public class ViewResource extends CommonTable {
   //
   // Constructors
   //

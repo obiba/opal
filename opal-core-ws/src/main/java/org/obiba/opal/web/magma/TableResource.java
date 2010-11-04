@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -31,9 +30,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Response.Status;
 
 import org.mozilla.javascript.Scriptable;
 import org.obiba.core.util.StreamUtil;
@@ -41,11 +40,11 @@ import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
-import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.JavascriptValueSource;
 import org.obiba.magma.js.JavascriptVariableBuilder;
@@ -78,26 +77,15 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-public class TableResource {
-
-  private final ValueTable valueTable;
-
-  private Set<Locale> locales;
+public class TableResource extends CommonTable {
 
   public TableResource(ValueTable valueTable) {
-    this.valueTable = valueTable;
-  }
-
-  public void setLocales(Set<Locale> locales) {
-    this.locales = new LinkedHashSet<Locale>();
-    if(locales != null) {
-      this.locales.addAll(locales);
-    }
+    super(valueTable);
   }
 
   @GET
   public TableDto get(@Context final UriInfo uriInfo) {
-    return Dtos.asDto(valueTable, null).setLink(uriInfo.getPath()).build();
+    return Dtos.asDto(getValueTable(), null).setLink(uriInfo.getPath()).build();
   }
 
   @GET
@@ -105,14 +93,14 @@ public class TableResource {
   @Produces("application/vnd.ms-excel")
   @AuthenticatedByCookie
   public Response getExcelDictionary() throws MagmaRuntimeException, IOException {
-    String destinationName = valueTable.getDatasource().getName() + "." + valueTable.getName() + "-dictionary";
+    String destinationName = getValueTable().getDatasource().getName() + "." + getValueTable().getName() + "-dictionary";
     ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
     ExcelDatasource destinationDatasource = new ExcelDatasource(destinationName, excelOutput);
 
     destinationDatasource.initialise();
     try {
       DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyValues().build();
-      copier.copy(valueTable, destinationDatasource);
+      copier.copy(getValueTable(), destinationDatasource);
     } finally {
       Disposables.silentlyDispose(destinationDatasource);
     }
@@ -148,9 +136,9 @@ public class TableResource {
     }
     ub.path(TableResource.class, "getVariable");
     String tableUri = tableub.build().toString();
-    LinkDto.Builder tableLinkBuilder = LinkDto.newBuilder().setLink(tableUri).setRel(valueTable.getName());
+    LinkDto.Builder tableLinkBuilder = LinkDto.newBuilder().setLink(tableUri).setRel(getValueTable().getName());
 
-    Iterable<Variable> variables = filterVariables(valueTable, script, offset, limit);
+    Iterable<Variable> variables = filterVariables(getValueTable(), script, offset, limit);
     ArrayList<VariableDto> variableDtos = Lists.newArrayList(Iterables.transform(variables, Dtos.asDtoFunc(tableLinkBuilder.build(), ub)));
     sortVariableDtoByName(variableDtos);
 
@@ -170,7 +158,7 @@ public class TableResource {
       throw new InvalidRequestException("IllegalParameterValue", "limit", String.valueOf(limit));
     }
 
-    Iterable<Value> values = queryVariables(valueTable, script, offset, limit);
+    Iterable<Value> values = queryVariables(getValueTable(), script, offset, limit);
     ArrayList<ValueDto> valueDtos = Lists.newArrayList(Iterables.transform(values, new Function<Value, ValueDto>() {
       public ValueDto apply(Value from) {
         return Dtos.asDto(from).build();
@@ -199,10 +187,10 @@ public class TableResource {
     }
     ub.path(TableResource.class, "getVariable");
     String tableUri = tableub.build().toString();
-    LinkDto.Builder tableLinkBuilder = LinkDto.newBuilder().setLink(tableUri).setRel(valueTable.getName());
+    LinkDto.Builder tableLinkBuilder = LinkDto.newBuilder().setLink(tableUri).setRel(getValueTable().getName());
 
     List<Variable> group = Lists.newArrayList();
-    for(Variable var : valueTable.getVariables()) {
+    for(Variable var : getValueTable().getVariables()) {
       String gp = var.getOccurrenceGroup();
       if(gp != null && gp.equals(occurrenceGroup)) {
         group.add(var);
@@ -223,7 +211,7 @@ public class TableResource {
   @GET
   @Path("/entities")
   public Set<VariableEntityDto> getEntities(@QueryParam("script") String script) {
-    Iterable<VariableEntity> entities = filterEntities(valueTable, script);
+    Iterable<VariableEntity> entities = filterEntities(getValueTable(), script);
 
     return ImmutableSet.copyOf(Iterables.transform(entities, new Function<VariableEntity, VariableEntityDto>() {
       @Override
@@ -242,17 +230,17 @@ public class TableResource {
   @GET
   @Path("/valueSet/{identifier}")
   public ValueSetDto getValueSet(@PathParam("identifier") String identifier, @QueryParam("select") String select) {
-    VariableEntity entity = new VariableEntityBean(this.valueTable.getEntityType(), identifier);
-    Iterable<Variable> variables = filterVariables(valueTable, select, 0, null);
+    VariableEntity entity = new VariableEntityBean(this.getValueTable().getEntityType(), identifier);
+    Iterable<Variable> variables = filterVariables(getValueTable(), select, 0, null);
     return getValueSet(entity, variables);
   }
 
   private ValueSetDto getValueSet(VariableEntity entity, Iterable<Variable> variables) {
-    ValueSet valueSet = this.valueTable.getValueSet(entity);
+    ValueSet valueSet = this.getValueTable().getValueSet(entity);
     ValueSetDto.Builder builder = ValueSetDto.newBuilder();
     builder.setEntity(VariableEntityDto.newBuilder().setIdentifier(entity.getIdentifier()));
     for(Variable variable : variables) {
-      Value value = this.valueTable.getValue(variable, valueSet);
+      Value value = this.getValueTable().getValue(variable, valueSet);
       builder.addVariables(variable.getName());
       ValueDto.Builder valueBuilder = ValueDto.newBuilder().setValueType(variable.getValueType().getName()).setIsSequence(value.isSequence());
       if(value.isNull() == false) {
@@ -274,13 +262,13 @@ public class TableResource {
   @GET
   @Path("/valueSets")
   public Collection<ValueSetDto> getValueSets(@QueryParam("select") String select, @QueryParam("where") String where, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("100") int limit) {
-    Iterable<Variable> variables = filterVariables(valueTable, select, 0, null);
+    Iterable<Variable> variables = filterVariables(getValueTable(), select, 0, null);
 
     List<VariableEntity> entities;
     if(where != null) {
-      entities = getFilteredEntities(valueTable, where);
+      entities = getFilteredEntities(getValueTable(), where);
     } else {
-      entities = new ArrayList<VariableEntity>(valueTable.getVariableEntities());
+      entities = new ArrayList<VariableEntity>(getValueTable().getVariableEntities());
     }
     int end = Math.min(offset + limit, entities.size());
 
@@ -297,16 +285,16 @@ public class TableResource {
     JavascriptValueSource jvs = new JavascriptValueSource(ValueType.Factory.forName(valueType), script) {
       @Override
       protected void enterContext(MagmaContext ctx, Scriptable scope) {
-        if(valueTable instanceof ValueTableWrapper) {
-          ctx.push(ValueTable.class, ((ValueTableWrapper) valueTable).getWrappedValueTable());
+        if(getValueTable() instanceof ValueTableWrapper) {
+          ctx.push(ValueTable.class, ((ValueTableWrapper) getValueTable()).getWrappedValueTable());
         } else {
-          ctx.push(ValueTable.class, valueTable);
+          ctx.push(ValueTable.class, getValueTable());
         }
       }
     };
     jvs.initialise();
 
-    List<VariableEntity> entities = new ArrayList<VariableEntity>(valueTable.getVariableEntities());
+    List<VariableEntity> entities = new ArrayList<VariableEntity>(getValueTable().getVariableEntities());
     int end = Math.min(offset + limit, entities.size());
     Iterable<Value> values = jvs.asVectorSource().getValues(new TreeSet<VariableEntity>(entities.subList(offset, end)));
 
@@ -323,7 +311,7 @@ public class TableResource {
 
   @Path("/variable/{variable}")
   public VariableResource getVariable(@PathParam("variable") String name) {
-    return getVariableResource(valueTable.getVariableValueSource(name));
+    return getVariableResource(getValueTable().getVariableValueSource(name));
   }
 
   @GET
@@ -353,14 +341,14 @@ public class TableResource {
   }
 
   VariableValueSource getTransientVariableValueSource(Variable transientVariable) {
-    JavascriptVariableValueSource jvvs = new JavascriptVariableValueSource(transientVariable, valueTable);
+    JavascriptVariableValueSource jvvs = new JavascriptVariableValueSource(transientVariable, getValueTable());
     jvvs.initialise();
 
     return jvvs;
   }
 
   PagingVectorSource getPagingVectorSource(VariableValueSource vvs) {
-    return new DefaultPagingVectorSourceImpl(valueTable, vvs);
+    return new DefaultPagingVectorSourceImpl(getValueTable(), vvs);
   }
 
   private ValueType resolveValueType(String valueTypeName) {
@@ -382,7 +370,7 @@ public class TableResource {
       // @TODO Check if table can be modified and respond with "IllegalTableModification" (it seems like this cannot be
       // done with the current Magma implementation).
 
-      vw = valueTable.getDatasource().createWriter(valueTable.getName(), valueTable.getEntityType()).writeVariables();
+      vw = getValueTable().getDatasource().createWriter(getValueTable().getName(), getValueTable().getEntityType()).writeVariables();
       for(VariableDto variable : variables) {
         vw.writeVariable(Dtos.fromDto(variable));
       }
@@ -398,28 +386,24 @@ public class TableResource {
   @Bean
   @Scope("request")
   public VariableResource getVariableResource(VariableValueSource source) {
-    return new VariableResource(this.valueTable, source);
+    return new VariableResource(this.getValueTable(), source);
   }
 
   @Bean
   @Path("/compare")
   public CompareResource getTableCompare() {
-    return new CompareResource(valueTable);
+    return new CompareResource(getValueTable());
   }
 
   @GET
   @Path("/locales")
   public Iterable<LocaleDto> getLocales(@QueryParam("locale") String displayLocale) {
     List<LocaleDto> localeDtos = new ArrayList<LocaleDto>();
-    for(Locale locale : locales) {
+    for(Locale locale : getLocales()) {
       localeDtos.add(Dtos.asDto(locale, displayLocale != null ? new Locale(displayLocale) : null));
     }
 
     return localeDtos;
-  }
-
-  ValueTable getValueTable() {
-    return valueTable;
   }
 
   private Iterable<Variable> filterVariables(ValueTable valueTable, String script, Integer offset, Integer limit) {
@@ -430,13 +414,13 @@ public class TableResource {
       jsClause.initialise();
 
       filteredVariables = new ArrayList<Variable>();
-      for(Variable variable : valueTable.getVariables()) {
+      for(Variable variable : getValueTable().getVariables()) {
         if(jsClause.select(variable)) {
           filteredVariables.add(variable);
         }
       }
     } else {
-      filteredVariables = Lists.newArrayList(valueTable.getVariables());
+      filteredVariables = Lists.newArrayList(getValueTable().getVariables());
     }
 
     int fromIndex = (offset < filteredVariables.size()) ? offset : filteredVariables.size();
@@ -490,7 +474,7 @@ public class TableResource {
   }
 
   Variable buildTransientVariable(ValueType valueType, boolean repeatable, String script) {
-    Variable.Builder builder = new Variable.Builder("transient", valueType, valueTable.getEntityType()).extend(JavascriptVariableBuilder.class).setScript(script);
+    Variable.Builder builder = new Variable.Builder("transient", valueType, getValueTable().getEntityType()).extend(JavascriptVariableBuilder.class).setScript(script);
 
     if(repeatable) {
       builder.repeatable();
@@ -526,7 +510,4 @@ public class TableResource {
     });
   }
 
-  Set<Locale> getLocales() {
-    return Collections.unmodifiableSet(locales);
-  }
 }
