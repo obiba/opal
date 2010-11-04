@@ -26,15 +26,29 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
+import com.google.gwt.event.logical.shared.BeforeSelectionEvent;
+import com.google.gwt.event.logical.shared.BeforeSelectionHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.DeckPanel;
+import com.google.gwt.user.client.ui.TabLayoutPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewStepPresenter.Display> {
   //
   // Instance Variables
   //
+
+  @Inject
+  private DataTabPresenter dataTabPresenter;
+
+  @Inject
+  private EntitiesTabPresenter entitiesTabPresenter;
+
+  private String datasourceName;
+
+  private String viewName;
 
   /**
    * {@link ViewDto} of view being configured.
@@ -58,8 +72,13 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
 
   @Override
   protected void onBind() {
+    dataTabPresenter.bind();
+    getDisplay().addDataTabWidget(dataTabPresenter.getDisplay().asWidget());
+
+    entitiesTabPresenter.bind();
+    getDisplay().addEntitiesTabWidget(entitiesTabPresenter.getDisplay().asWidget());
     addEventHandlers();
-    getDisplay().getHelpDeck().showWidget(1);
+    getDisplay().getHelpDeck().showWidget(0);
   }
 
   @Override
@@ -68,10 +87,20 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
 
   @Override
   public void revealDisplay() {
+    revealTab();
+  }
+
+  private void revealTab() {
+    // Always reveal data tab first.
+    getDisplay().displayTab(0);
+    refreshDisplay();
   }
 
   @Override
   public void refreshDisplay() {
+    dataTabPresenter.setViewDto(viewDto);
+    dataTabPresenter.refreshDisplay();
+    entitiesTabPresenter.refreshDisplay();
   }
 
   @Override
@@ -90,6 +119,15 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
   private void addEventHandlers() {
     super.registerHandler(eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredHandler()));
     super.registerHandler(eventBus.addHandler(ViewUpdateEvent.getType(), new ViewUpdateHandler()));
+
+    super.registerHandler(getDisplay().getViewTabs().addBeforeSelectionHandler(new BeforeSelectionHandler<Integer>() {
+
+      @Override
+      public void onBeforeSelection(BeforeSelectionEvent<Integer> arg0) {
+        // Widget w = getDisplay().getViewTabs().getWidget(getDisplay().getViewTabs().getSelectedIndex());
+        // Switch help displayed.
+      }
+    }));
   }
 
   //
@@ -98,42 +136,29 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
 
   public interface Display extends WidgetDisplay {
     DeckPanel getHelpDeck();
+
+    void addDataTabWidget(Widget widget);
+
+    void addEntitiesTabWidget(Widget widget);
+
+    TabLayoutPanel getViewTabs();
+
+    void displayTab(int tabNumber);
   }
 
   class ViewConfigurationRequiredHandler implements ViewConfigurationRequiredEvent.Handler {
 
-    private ResourceCallback<ViewDto> callback;
-
-    public ViewConfigurationRequiredHandler() {
-      callback = createResponseCodeCallback();
-    }
-
     @Override
     public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
-      // Get the ViewDto of the view to be configured. Once received, keep a copy of it.
-      // This ViewDto should be communicated to, and shared with, all the *TabPresenters (Data, Variables, Entities).
-      // Whenever a *TabPresenter fires a ViewUpdateEvent to signal changes, the event should contain the updated
-      // ViewDto.
-      ResourceRequestBuilderFactory.<ViewDto> newBuilder()
-      /**/.get()
-      /**/.forResource("/datasource/" + event.getDatasourceName() + "/view/" + event.getViewName())
-      /**/.accept("application/x-protobuf+json")
-      /**/.withCallback(callback)
-      /**/.send();
-    }
-
-    private ResourceCallback<ViewDto> createResponseCodeCallback() {
-      return new ResourceCallback<ViewDto>() {
-
+      datasourceName = event.getDatasourceName();
+      viewName = event.getViewName();
+      ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource("/datasource/" + datasourceName + "/view/" + viewName).get().withCallback(new ResourceCallback<ViewDto>() {
         @Override
-        public void onResource(Response response, ViewDto viewDto) {
-          // Initialize viewDto.
-          ConfigureViewStepPresenter.this.viewDto = viewDto;
-
-          // Go ahead and display the ConfigureViewStepPresenter.
+        public void onResource(Response response, ViewDto resource) {
+          viewDto = resource;
           eventBus.fireEvent(new WorkbenchChangeEvent(ConfigureViewStepPresenter.this, false, false));
         }
-      };
+      }).send();
     }
   }
 
@@ -147,17 +172,14 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
 
     @Override
     public void onViewUpdate(ViewUpdateEvent event) {
-      // Keep viewDto current (set it to the one contained in the event).
-      viewDto = event.getViewDto();
-
-      // Go ahead and update the view.
+      ViewDto viewDto = event.getViewDto();
       updateView(viewDto);
     }
 
     private void updateView(ViewDto viewDto) {
       ResourceRequestBuilderFactory.newBuilder()
       /**/.put()
-      /**/.forResource("/datasource/" + viewDto.getDatasourceName() + "/view/" + viewDto.getName())
+      /**/.forResource("/datasource/" + datasourceName + "/view/" + viewName)
       /**/.accept("application/x-protobuf+json").withResourceBody(JsonUtil.stringify(viewDto))
       /**/.withCallback(Response.SC_OK, callback)
       /**/.withCallback(Response.SC_BAD_REQUEST, callback)
@@ -171,6 +193,9 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
         public void onResponseCode(Request request, Response response) {
           if(response.getStatusCode() == Response.SC_BAD_REQUEST) {
             eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
+          } else {
+            // eventBus.fireEvent(new NotificationEvent(NotificationType.INFO, "That worked!", null));
+            // Send event so save button and asterisk can be cleared.
           }
         }
       };

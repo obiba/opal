@@ -11,10 +11,10 @@
     <g:Label><ui:msg description="Configure View Step summary">Provide the settings for the view.</ui:msg></g:Label>
     <g:SimplePanel />
     
-    <g:TabLayoutPanel barHeight="2" barUnit="EM" width="100%" height="50em" >
+    <g:TabLayoutPanel barHeight="2" barUnit="EM" width="100%" height="50em" ui:field="viewTabs">
       <g:tab>
         <g:header><ui:msg description="Data label">Data</ui:msg></g:header>
-        <g:Label>Data</g:Label>
+        <g:SimplePanel ui:field="dataTabPanel" />
       </g:tab>
       <g:tab>
         <g:header><ui:msg description="Variables label">Variables</ui:msg></g:header>
@@ -22,7 +22,7 @@
       </g:tab>
       <g:tab>
         <g:header><ui:msg description="Entities label">Entities</ui:msg></g:header>
-        <o2:EntitiesTabView />
+        <g:SimplePanel ui:field="entitiesTabPanel" />
       </g:tab>
     </g:TabLayoutPanel> 
     

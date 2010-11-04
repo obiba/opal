@@ -17,6 +17,8 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DeckPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ConfigureViewStepView extends Composite implements ConfigureViewStepPresenter.Display {
@@ -31,6 +33,15 @@ public class ConfigureViewStepView extends Composite implements ConfigureViewSte
   //
   @UiField
   DeckPanel helpPanelDecks;
+
+  @UiField
+  SimplePanel entitiesTabPanel;
+
+  @UiField
+  SimplePanel dataTabPanel;
+
+  @UiField
+  TabLayoutPanel viewTabs;
 
   //
   // Constructors
@@ -65,5 +76,27 @@ public class ConfigureViewStepView extends Composite implements ConfigureViewSte
   @Override
   public DeckPanel getHelpDeck() {
     return helpPanelDecks;
+  }
+
+  @Override
+  public void addEntitiesTabWidget(Widget widget) {
+    entitiesTabPanel.clear();
+    entitiesTabPanel.add(widget);
+  }
+
+  @Override
+  public TabLayoutPanel getViewTabs() {
+    return viewTabs;
+  }
+
+  @Override
+  public void addDataTabWidget(Widget widget) {
+    dataTabPanel.clear();
+    dataTabPanel.add(widget);
+  }
+
+  @Override
+  public void displayTab(int tabNumber) {
+    viewTabs.selectTab(tabNumber);
   }
 }
