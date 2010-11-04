@@ -13,6 +13,7 @@ import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresente
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -66,8 +67,8 @@ public class ReportTemplateView extends Composite implements ReportTemplatePrese
   }
 
   @Override
-  public void addReportTemplateClickHandler(ClickHandler handler) {
-    reportTemplateButton.addClickHandler(handler);
+  public HandlerRegistration addReportTemplateClickHandler(ClickHandler handler) {
+    return reportTemplateButton.addClickHandler(handler);
   }
 
 }
