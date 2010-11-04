@@ -216,8 +216,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
       ResponseCodeCallback callbackHandler = new CommandResponseCallBack();
       ReportCommandOptionsDto reportCommandOptions = ReportCommandOptionsDto.create();
       reportCommandOptions.setName(getDisplay().getReportTemplateDetails().getName());
-      ResourceRequestBuilderFactory.newBuilder().forResource("/shell/report").post().withResourceBody(ReportCommandOptionsDto.stringify(reportCommandOptions)).withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_CREATED, callbackHandler).send();
-      eventBus.fireEvent(new NotificationEvent(NotificationType.INFO, "ReportJobStarted", null));
+      ResourceRequestBuilderFactory.newBuilder().forResource("/shell/report").post().withResourceBody(ReportCommandOptionsDto.stringify(reportCommandOptions)).withCallback(Response.SC_CREATED, callbackHandler).send();
     }
 
   }
@@ -323,8 +322,8 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      if(response.getStatusCode() != Response.SC_OK) {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
+      if(response.getStatusCode() == Response.SC_CREATED) {
+        eventBus.fireEvent(new NotificationEvent(NotificationType.INFO, "ReportJobStarted", null));
       }
     }
   }
