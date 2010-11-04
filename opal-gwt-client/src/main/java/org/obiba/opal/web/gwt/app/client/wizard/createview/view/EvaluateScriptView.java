@@ -26,8 +26,8 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DisclosurePanel;
@@ -35,8 +35,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListView;
-import com.google.gwt.view.client.ListView.Delegate;
 
 public class EvaluateScriptView extends Composite implements EvaluateScriptPresenter.Display {
 
@@ -55,6 +53,12 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
 
   @UiField
   DisclosurePanel resultsPanel;
+
+  @UiField
+  Anchor previousPage;
+
+  @UiField
+  Anchor nextPage;
 
   CellTable<Result> resultTable;
 
@@ -91,10 +95,7 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
 
   @Override
   public void addResults(List<Result> results) {
-    resultTable.setPageSize(10);
-    SimplePager<Result> pager = new SimplePager<Result>(resultTable);
-    populateResultsTable(results, resultTable, pager);
-    testResults.add(pager);
+    populateResultsTable(results, resultTable);
     testResults.add(resultTable);
   }
 
@@ -113,20 +114,8 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
     testResults.add(new Label("Entities: " + count));
   }
 
-  private <T extends Object> void populateResultsTable(final List<T> results, CellTable<T> table, SimplePager<T> pager) {
-
-    table.setDelegate(new Delegate<T>() {
-
-      @Override
-      public void onRangeChanged(ListView<T> listView) {
-        int start = listView.getRange().getStart();
-        int length = listView.getRange().getLength();
-        listView.setData(start, length, results.subList(start, length > results.size() ? results.size() : start + length));
-      }
-
-    });
-
-    pager.firstPage();
+  private <T extends Object> void populateResultsTable(final List<T> results, CellTable<T> table) {
+    table.setData(0, results.size(), results);
     table.setDataSize(results.size(), true);
     table.redraw();
   }
@@ -207,5 +196,21 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
     }
 
     return javaScriptErrors;
+  }
+
+  @Override
+  public HandlerRegistration addNextPageClickHandler(ClickHandler handler) {
+    return nextPage.addClickHandler(handler);
+  }
+
+  @Override
+  public HandlerRegistration addPreviousPageClickHandler(ClickHandler handler) {
+    return previousPage.addClickHandler(handler);
+  }
+
+  @Override
+  public void showPaging(boolean visible) {
+    nextPage.setVisible(visible);
+    previousPage.setVisible(visible);
   }
 }

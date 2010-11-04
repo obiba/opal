@@ -43,6 +43,12 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     VARIABLE, ENTITY, ENTITY_VALUE;
   }
 
+  private static final int pageSize = 20;
+
+  private int currentPage;
+
+  private boolean lastPage;
+
   private TableDto table;
 
   private Mode evaluationMode;
@@ -63,6 +69,10 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
 
     HandlerRegistration addTestScriptClickHandler(ClickHandler handler);
 
+    HandlerRegistration addNextPageClickHandler(ClickHandler handler);
+
+    HandlerRegistration addPreviousPageClickHandler(ClickHandler handler);
+
     void addResults(List<Result> variables);
 
     void clearResults();
@@ -82,6 +92,8 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     void setReadOnly(boolean readOnly);
 
     void showErrorMessage(ClientErrorDto errorDto);
+
+    void showPaging(boolean visible);
 
   }
 
@@ -113,6 +125,8 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
 
   private void addEventHandlers() {
     super.registerHandler(getDisplay().addTestScriptClickHandler(new TestScriptClickHandler()));
+    super.registerHandler(getDisplay().addNextPageClickHandler(new NextPageClickHandler()));
+    super.registerHandler(getDisplay().addPreviousPageClickHandler(new PreviousPageClickHandler()));
   }
 
   public void setReadyOnly(boolean readyOnly) {
@@ -156,35 +170,71 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
 
     @Override
     public void onClick(ClickEvent event) {
-      String viewResource = "/datasource/" + table.getDatasourceName() + "/table/" + table.getName();
-      String variablesResource = viewResource + "/variables";
-      String transientVariableResource = viewResource + "/variable/_transient/values";
-      String entitiesResource = viewResource + "/entities";
-
-      evaluateScript(variablesResource, transientVariableResource, entitiesResource);
-
-      getDisplay().showResults(true);
+      currentPage = 1;
+      lastPage = false;
+      displayCurrentPageResults();
     }
 
-    private void evaluateScript(String variablesResource, String transientVariableResource, String entitiesResource) {
-      String selectedScript = URL.encodeQueryString(getDisplay().getSelectedScript());
-      if(selectedScript.isEmpty()) {
-        String script = URL.encodeQueryString(getScript());
-        if(evaluationMode == Mode.ENTITY_VALUE) {
-          ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource(transientVariableResource + "?script=" + script).get().withCallback(new EntityValueResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
-        } else if(evaluationMode == Mode.VARIABLE) {
-          ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(variablesResource + "?script=" + script).get().withCallback(new VariablesResourceCallback(false)).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
-        } else if(evaluationMode == Mode.ENTITY) {
-          ResourceRequestBuilderFactory.<JsArray<VariableEntityDto>> newBuilder().forResource(entitiesResource + "?script=" + script).get().withCallback(new EntityResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
-        }
-      } else {
-        if(evaluationMode == Mode.ENTITY_VALUE || evaluationMode == Mode.ENTITY) {
-          ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource(transientVariableResource + "?script=" + selectedScript).get().withCallback(new EntityValueResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
-        } else if(evaluationMode == Mode.VARIABLE) {
-          ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(variablesResource + "?script=" + selectedScript).get().withCallback(new VariablesResourceCallback(true)).withCallback(500, new InvalidScriptResourceCallBack()).send();
-        }
+  }
+
+  private void displayCurrentPageResults() {
+
+    int offset = (currentPage - 1) * pageSize;
+    String viewResource = "/datasource/" + table.getDatasourceName() + "/table/" + table.getName();
+    String variablesResource = viewResource + "/variables?limit=" + pageSize + "&offset=" + offset + "&script=";
+    String transientVariableResource = viewResource + "/variable/_transient/values?limit=" + pageSize + "&offset=" + offset + "&script=";
+    String entitiesResource = viewResource + "/entities?script=";
+
+    evaluateScript(variablesResource, transientVariableResource, entitiesResource);
+
+    getDisplay().showResults(true);
+  }
+
+  private void evaluateScript(String variablesResource, String transientVariableResource, String entitiesResource) {
+	getDisplay().showPaging(true);
+	String selectedScript = URL.encodeQueryString(getDisplay().getSelectedScript());
+    if(selectedScript.isEmpty()) {
+      String script = URL.encodeQueryString(getScript());
+      if(evaluationMode == Mode.ENTITY_VALUE) {
+        ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource(transientVariableResource + script).get().withCallback(new EntityValueResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
+      } else if(evaluationMode == Mode.VARIABLE) {
+        ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(variablesResource + script).get().withCallback(new VariablesResourceCallback(false)).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
+      } else if(evaluationMode == Mode.ENTITY) {
+        getDisplay().showPaging(false);
+        ResourceRequestBuilderFactory.<JsArray<VariableEntityDto>> newBuilder().forResource(entitiesResource + script).get().withCallback(new EntityResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
+      }
+    } else {
+      if(evaluationMode == Mode.ENTITY_VALUE || evaluationMode == Mode.ENTITY) {
+        ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource(transientVariableResource + selectedScript).get().withCallback(new EntityValueResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
+      } else if(evaluationMode == Mode.VARIABLE) {
+        ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(variablesResource + selectedScript).get().withCallback(new VariablesResourceCallback(true)).withCallback(500, new InvalidScriptResourceCallBack()).send();
       }
     }
+  }
+
+  public class PreviousPageClickHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent event) {
+      if(currentPage > 1) {
+        lastPage = false;
+        currentPage--;
+      }
+      displayCurrentPageResults();
+    }
+
+  }
+
+  public class NextPageClickHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent event) {
+      if(!lastPage) {
+        currentPage++;
+        displayCurrentPageResults();
+      }
+    }
+
   }
 
   public class VariablesResourceCallback implements ResourceCallback<JsArray<VariableDto>> {
@@ -197,6 +247,11 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
 
     @Override
     public void onResource(Response response, JsArray<VariableDto> variables) {
+
+      if(variables.length() < pageSize) {
+        lastPage = true;
+      }
+
       getDisplay().clearResults();
       getDisplay().initializeResultTable();
       getDisplay().addVariableColumn();
@@ -256,6 +311,9 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
 
     @Override
     public void onResource(Response response, JsArray<ValueDto> values) {
+      if(values.length() < pageSize) {
+        lastPage = true;
+      }
       getDisplay().clearResults();
       getDisplay().initializeResultTable();
       getDisplay().addValueColumn();

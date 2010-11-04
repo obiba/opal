@@ -1,11 +1,15 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-  xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
 
   <g:FlowPanel addStyleNames="evaluateScriptPanel">
     <g:TextArea ui:field="scriptArea" width="100%"/>
     <g:Button ui:field="testScript">
       <ui:msg description="Test script button label">Test</ui:msg>
     </g:Button>
+    <g:FlowPanel>
+      <g:Anchor visible="false" ui:field="previousPage">Previous</g:Anchor>
+      <g:Anchor visible="false" ui:field="nextPage">Next</g:Anchor>
+    </g:FlowPanel>
     <g:DisclosurePanel ui:field="resultsPanel" width="100%" addStyleNames="resultsPanel">
       <g:header>
         <ui:msg description="Results label">Results</ui:msg>
