@@ -201,21 +201,29 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     getDisplay().showPaging(true);
     setPagedItemType(evaluationMode);
     if(selectedScript.isEmpty()) {
-      String script = URL.encodeQueryString(getScript());
-      if(evaluationMode == Mode.ENTITY_VALUE) {
-        ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource(transientVariableResource + script).get().withCallback(new EntityValueResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
-      } else if(evaluationMode == Mode.VARIABLE) {
-        ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(variablesResource + script).get().withCallback(new VariablesResourceCallback(false)).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
-      } else if(evaluationMode == Mode.ENTITY) {
-        getDisplay().showPaging(false);
-        ResourceRequestBuilderFactory.<JsArray<VariableEntityDto>> newBuilder().forResource(entitiesResource + script).get().withCallback(new EntityResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
-      }
+      evaluateCompleteScript(variablesResource, transientVariableResource, entitiesResource);
     } else {
-      if(evaluationMode == Mode.ENTITY_VALUE || evaluationMode == Mode.ENTITY) {
-        ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource(transientVariableResource + selectedScript).get().withCallback(new EntityValueResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
-      } else if(evaluationMode == Mode.VARIABLE) {
-        ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(variablesResource + selectedScript).get().withCallback(new VariablesResourceCallback(true)).withCallback(500, new InvalidScriptResourceCallBack()).send();
-      }
+      evaluateSelectedScript(variablesResource, transientVariableResource, selectedScript);
+    }
+  }
+
+  private void evaluateSelectedScript(String variablesResource, String transientVariableResource, String selectedScript) {
+    if(evaluationMode == Mode.ENTITY_VALUE || evaluationMode == Mode.ENTITY) {
+      ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource(transientVariableResource + selectedScript).get().withCallback(new EntityValueResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
+    } else if(evaluationMode == Mode.VARIABLE) {
+      ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(variablesResource + selectedScript).get().withCallback(new VariablesResourceCallback(true)).withCallback(500, new InvalidScriptResourceCallBack()).send();
+    }
+  }
+
+  private void evaluateCompleteScript(String variablesResource, String transientVariableResource, String entitiesResource) {
+    String script = URL.encodeQueryString(getScript());
+    if(evaluationMode == Mode.ENTITY_VALUE) {
+      ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource(transientVariableResource + script).get().withCallback(new EntityValueResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
+    } else if(evaluationMode == Mode.VARIABLE) {
+      ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(variablesResource + script).get().withCallback(new VariablesResourceCallback(false)).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
+    } else if(evaluationMode == Mode.ENTITY) {
+      getDisplay().showPaging(false);
+      ResourceRequestBuilderFactory.<JsArray<VariableEntityDto>> newBuilder().forResource(entitiesResource + script).get().withCallback(new EntityResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
     }
   }
 
