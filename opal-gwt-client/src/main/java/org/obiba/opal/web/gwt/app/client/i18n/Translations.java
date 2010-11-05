@@ -453,4 +453,12 @@ public interface Translations extends Constants {
   @Description("Run label")
   @DefaultStringValue("Run")
   String runLabel();
+
+  @Description("Paging of label")
+  @DefaultStringValue("of")
+  String ofLabel();
+
+  @Description("Values label")
+  @DefaultStringValue("Values")
+  String valuesLabel();
 }
