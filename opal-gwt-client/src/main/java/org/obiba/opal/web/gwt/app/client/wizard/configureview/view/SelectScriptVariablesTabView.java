@@ -77,8 +77,27 @@ public class SelectScriptVariablesTabView extends Composite implements SelectScr
   }
 
   @Override
+  public void setScript(String script) {
+    scriptWidgetDisplay.setScript(script);
+  }
+
+  @Override
   public String getScript() {
     return scriptWidgetDisplay.getScript();
+  }
+
+  @Override
+  public void setVariablesToView(VariablesToView scriptOrAll) {
+    String valueToSelect = (scriptOrAll.equals(VariablesToView.SCRIPT)) ? "script" : "all";
+
+    for(int i = 0; i < variablesToView.getItemCount(); i++) {
+      if(variablesToView.getValue(i).equals(valueToSelect)) {
+        variablesToView.setSelectedIndex(i);
+        break;
+      }
+    }
+
+    setScriptWidgetVisible(scriptOrAll.equals(VariablesToView.SCRIPT));
   }
 
   @Override

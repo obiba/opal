@@ -183,7 +183,8 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
     private Widget getVariablesTabWidget() {
       Widget variablesTabWidget = null;
 
-      if(viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view) != null) {
+      JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
+      if(jsViewDto != null) {
         selectScriptVariablesTabPresenter.setViewDto(viewDto);
         variablesTabWidget = selectScriptVariablesTabPresenter.getDisplay().asWidget();
       }

@@ -111,6 +111,15 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
     tableDto.setDatasourceName(viewDto.getDatasourceName());
     tableDto.setName(viewDto.getName());
     scriptWidget.setTable(tableDto);
+
+    JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
+    if(jsViewDto.hasSelect()) {
+      getDisplay().setVariablesToView(VariablesToView.SCRIPT);
+      getDisplay().setScript(jsViewDto.getSelect());
+    } else {
+      getDisplay().setVariablesToView(VariablesToView.ALL);
+      getDisplay().setScript("");
+    }
   }
 
   private void addEventHandlers() {
@@ -130,7 +139,11 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
 
     void setScriptWidgetVisible(boolean visible);
 
+    void setScript(String script);
+
     String getScript();
+
+    void setVariablesToView(VariablesToView scriptOrAll);
 
     VariablesToView getVariablesToView();
 
@@ -158,9 +171,13 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
     private void updateViewDto() {
       JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
 
-      String script = getDisplay().getScript().trim();
-      if(script.length() != 0) {
-        jsViewDto.setSelect(script);
+      if(getDisplay().getVariablesToView().equals(VariablesToView.SCRIPT)) {
+        String script = getDisplay().getScript().trim();
+        if(script.length() != 0) {
+          jsViewDto.setSelect(script);
+        } else {
+          jsViewDto.clearSelect();
+        }
       } else {
         jsViewDto.clearSelect();
       }
