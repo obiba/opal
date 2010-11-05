@@ -30,7 +30,7 @@ import org.obiba.opal.web.gwt.app.client.validator.MinimumSizeCollectionValidato
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewUpdateEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -131,7 +131,7 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
       }
       viewDto.clearFromArray();
       viewDto.setFromArray(getSelectedTables());
-      eventBus.fireEvent(new ViewUpdateEvent(viewDto));
+      eventBus.fireEvent(new ViewSaveRequiredEvent(viewDto));
     }
 
     String validate() {

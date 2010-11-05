@@ -15,17 +15,17 @@ import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
 /**
- * Signals a view update.
+ * Signals that a view needs to be saved.
  * 
  * The
  */
-public class ViewUpdateEvent extends GwtEvent<ViewUpdateEvent.Handler> {
+public class ViewSaveRequiredEvent extends GwtEvent<ViewSaveRequiredEvent.Handler> {
 
   private static Type<Handler> TYPE;
 
   private ViewDto viewDto;
 
-  public ViewUpdateEvent(ViewDto viewDto) {
+  public ViewSaveRequiredEvent(ViewDto viewDto) {
     this.viewDto = viewDto;
   }
 
@@ -48,6 +48,6 @@ public class ViewUpdateEvent extends GwtEvent<ViewUpdateEvent.Handler> {
   }
 
   public interface Handler extends EventHandler {
-    public void onViewUpdate(ViewUpdateEvent event);
+    public void onViewUpdate(ViewSaveRequiredEvent event);
   }
 }

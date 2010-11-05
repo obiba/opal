@@ -20,7 +20,7 @@ import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewUpdateEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -57,7 +57,7 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
   /**
    * {@link ViewDto} of view being configured.
    * 
-   * This is initialized upon a {@link ViewConfigurationRequiredEvent} and updated on every {@link ViewUpdateEvent}.
+   * This is initialized upon a {@link ViewConfigurationRequiredEvent} and updated on every {@link ViewSaveRequiredEvent}.
    */
   private ViewDto viewDto;
 
@@ -129,7 +129,7 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
 
   private void addEventHandlers() {
     super.registerHandler(eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredHandler()));
-    super.registerHandler(eventBus.addHandler(ViewUpdateEvent.getType(), new ViewUpdateHandler()));
+    super.registerHandler(eventBus.addHandler(ViewSaveRequiredEvent.getType(), new ViewSaveRequiredHandler()));
 
     super.registerHandler(getDisplay().getViewTabs().addBeforeSelectionHandler(new BeforeSelectionHandler<Integer>() {
 
@@ -194,21 +194,21 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
     }
   }
 
-  class ViewUpdateHandler implements ViewUpdateEvent.Handler {
+  class ViewSaveRequiredHandler implements ViewSaveRequiredEvent.Handler {
 
     private ResponseCodeCallback callback;
 
-    public ViewUpdateHandler() {
+    public ViewSaveRequiredHandler() {
       callback = createResponseCodeCallback();
     }
 
     @Override
-    public void onViewUpdate(ViewUpdateEvent event) {
+    public void onViewUpdate(ViewSaveRequiredEvent event) {
       ViewDto viewDto = event.getViewDto();
-      updateView(viewDto);
+      saveView(viewDto);
     }
 
-    private void updateView(ViewDto viewDto) {
+    private void saveView(ViewDto viewDto) {
       ResourceRequestBuilderFactory.newBuilder()
       /**/.put()
       /**/.forResource("/datasource/" + datasourceName + "/view/" + viewName)
