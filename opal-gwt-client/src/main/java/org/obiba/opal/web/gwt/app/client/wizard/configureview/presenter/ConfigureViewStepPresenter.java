@@ -19,11 +19,11 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
-import org.obiba.opal.web.gwt.app.client.support.JsonUtil;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewUpdateEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.event.logical.shared.BeforeSelectionEvent;
@@ -42,6 +42,9 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
 
   @Inject
   private DataTabPresenter dataTabPresenter;
+
+  @Inject
+  private SelectScriptVariablesTabPresenter selectScriptVariablesTabPresenter;
 
   @Inject
   private EntitiesTabPresenter entitiesTabPresenter;
@@ -75,14 +78,21 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
     dataTabPresenter.bind();
     getDisplay().addDataTabWidget(dataTabPresenter.getDisplay().asWidget());
 
+    selectScriptVariablesTabPresenter.bind();
+
     entitiesTabPresenter.bind();
     getDisplay().addEntitiesTabWidget(entitiesTabPresenter.getDisplay().asWidget());
-    addEventHandlers();
+
     getDisplay().getHelpDeck().showWidget(0);
+
+    addEventHandlers();
   }
 
   @Override
   protected void onUnbind() {
+    dataTabPresenter.unbind();
+    selectScriptVariablesTabPresenter.unbind();
+    entitiesTabPresenter.unbind();
   }
 
   @Override
@@ -123,7 +133,7 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
     super.registerHandler(getDisplay().getViewTabs().addBeforeSelectionHandler(new BeforeSelectionHandler<Integer>() {
 
       @Override
-      public void onBeforeSelection(BeforeSelectionEvent<Integer> arg0) {
+      public void onBeforeSelection(BeforeSelectionEvent<Integer> event) {
         // Widget w = getDisplay().getViewTabs().getWidget(getDisplay().getViewTabs().getSelectedIndex());
         // Switch help displayed.
       }
@@ -139,6 +149,8 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
 
     void addDataTabWidget(Widget widget);
 
+    void addVariablesTabWidget(Widget widget);
+
     void addEntitiesTabWidget(Widget widget);
 
     TabLayoutPanel getViewTabs();
@@ -152,13 +164,29 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
     public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
       datasourceName = event.getDatasourceName();
       viewName = event.getViewName();
+
       ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource("/datasource/" + datasourceName + "/view/" + viewName).get().withCallback(new ResourceCallback<ViewDto>() {
         @Override
         public void onResource(Response response, ViewDto resource) {
           viewDto = resource;
+
+          // Set the variables tab widget according to the received ViewDto type.
+          getDisplay().addVariablesTabWidget(getVariablesTabWidget());
+
           eventBus.fireEvent(new WorkbenchChangeEvent(ConfigureViewStepPresenter.this, false, false));
         }
       }).send();
+    }
+
+    private Widget getVariablesTabWidget() {
+      Widget variablesTabWidget = null;
+
+      if(viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view) != null) {
+        selectScriptVariablesTabPresenter.setViewDto(viewDto);
+        variablesTabWidget = selectScriptVariablesTabPresenter.getDisplay().asWidget();
+      }
+
+      return variablesTabWidget;
     }
   }
 
@@ -180,7 +208,7 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
       ResourceRequestBuilderFactory.newBuilder()
       /**/.put()
       /**/.forResource("/datasource/" + datasourceName + "/view/" + viewName)
-      /**/.accept("application/x-protobuf+json").withResourceBody(JsonUtil.stringify(viewDto))
+      /**/.accept("application/x-protobuf+json").withResourceBody(ViewDto.stringify(viewDto))
       /**/.withCallback(Response.SC_OK, callback)
       /**/.withCallback(Response.SC_BAD_REQUEST, callback)
       /**/.send();

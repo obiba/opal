@@ -18,7 +18,7 @@
       </g:tab>
       <g:tab>
         <g:header><ui:msg description="Variables label">Variables</ui:msg></g:header>
-        <g:Label>Variables</g:Label>
+        <g:SimplePanel ui:field="variablesTabPanel" />
       </g:tab>
       <g:tab>
         <g:header><ui:msg description="Entities label">Entities</ui:msg></g:header>

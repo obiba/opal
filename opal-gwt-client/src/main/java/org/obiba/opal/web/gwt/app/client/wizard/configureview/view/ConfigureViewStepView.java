@@ -41,6 +41,9 @@ public class ConfigureViewStepView extends Composite implements ConfigureViewSte
   SimplePanel dataTabPanel;
 
   @UiField
+  SimplePanel variablesTabPanel;
+
+  @UiField
   TabLayoutPanel viewTabs;
 
   //
@@ -79,12 +82,6 @@ public class ConfigureViewStepView extends Composite implements ConfigureViewSte
   }
 
   @Override
-  public void addEntitiesTabWidget(Widget widget) {
-    entitiesTabPanel.clear();
-    entitiesTabPanel.add(widget);
-  }
-
-  @Override
   public TabLayoutPanel getViewTabs() {
     return viewTabs;
   }
@@ -93,6 +90,18 @@ public class ConfigureViewStepView extends Composite implements ConfigureViewSte
   public void addDataTabWidget(Widget widget) {
     dataTabPanel.clear();
     dataTabPanel.add(widget);
+  }
+
+  @Override
+  public void addVariablesTabWidget(Widget widget) {
+    variablesTabPanel.clear();
+    variablesTabPanel.add(widget);
+  }
+
+  @Override
+  public void addEntitiesTabWidget(Widget widget) {
+    entitiesTabPanel.clear();
+    entitiesTabPanel.add(widget);
   }
 
   @Override
