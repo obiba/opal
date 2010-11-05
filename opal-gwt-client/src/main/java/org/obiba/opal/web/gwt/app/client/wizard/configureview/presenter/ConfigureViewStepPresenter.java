@@ -169,6 +169,8 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
         @Override
         public void onResource(Response response, ViewDto resource) {
           viewDto = resource;
+          viewDto.setDatasourceName(datasourceName);
+          viewDto.setName(viewName);
 
           // Set the variables tab widget according to the received ViewDto type.
           getDisplay().addVariablesTabWidget(getVariablesTabWidget());

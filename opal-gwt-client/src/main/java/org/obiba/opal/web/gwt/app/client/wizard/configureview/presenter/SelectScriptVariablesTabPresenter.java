@@ -18,6 +18,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter.Mode;
+import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
@@ -129,6 +130,8 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
 
     void setScriptWidgetVisible(boolean visible);
 
+    String getScript();
+
     VariablesToView getVariablesToView();
 
     HandlerRegistration addSaveChangesClickHandler(ClickHandler clickHandler);
@@ -153,7 +156,14 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
     }
 
     private void updateViewDto() {
-      // TODO: Apply changes (the script) to viewDto.
+      JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
+
+      String script = getDisplay().getScript().trim();
+      if(script.length() != 0) {
+        jsViewDto.setSelect(script);
+      } else {
+        jsViewDto.clearSelect();
+      }
     }
   }
 
