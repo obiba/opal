@@ -16,12 +16,14 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter.Mode;
 import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -74,7 +76,7 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
     scriptWidget.setEvaluationMode(Mode.VARIABLE);
     getDisplay().setScriptWidget(scriptWidget.getDisplay());
 
-    getDisplay().saveChangesEnabled(true);
+    getDisplay().saveChangesEnabled(false);
 
     addEventHandlers();
   }
@@ -125,7 +127,9 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
 
   private void addEventHandlers() {
     super.registerHandler(getDisplay().addSaveChangesClickHandler(new SaveChangesClickHandler()));
+    super.registerHandler(eventBus.addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
     super.registerHandler(getDisplay().addVariablestoViewChangeHandler(new VariablesToViewChangeHandler()));
+    super.registerHandler(getDisplay().addScriptChangeHandler(new ScriptChangeHandler()));
   }
 
   //
@@ -153,6 +157,8 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
     HandlerRegistration addSaveChangesClickHandler(ClickHandler clickHandler);
 
     HandlerRegistration addVariablestoViewChangeHandler(ChangeHandler changeHandler);
+
+    HandlerRegistration addScriptChangeHandler(ChangeHandler changeHandler);
   }
 
   public enum VariablesToView {
@@ -187,11 +193,29 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
     }
   }
 
+  class ViewSavedHandler implements ViewSavedEvent.Handler {
+
+    @Override
+    public void onViewSaved(ViewSavedEvent event) {
+      getDisplay().saveChangesEnabled(false);
+    }
+  }
+
   class VariablesToViewChangeHandler implements ChangeHandler {
 
     @Override
     public void onChange(ChangeEvent event) {
       getDisplay().setScriptWidgetVisible(getDisplay().getVariablesToView().equals(VariablesToView.SCRIPT));
+      getDisplay().saveChangesEnabled(true);
+    }
+  }
+
+  class ScriptChangeHandler implements ChangeHandler {
+
+    @Override
+    public void onChange(ChangeEvent event) {
+      GWT.log("<scriptChange>");
+      getDisplay().saveChangesEnabled(true);
     }
   }
 }

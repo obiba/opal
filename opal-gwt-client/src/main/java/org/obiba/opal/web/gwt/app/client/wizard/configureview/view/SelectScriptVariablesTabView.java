@@ -121,9 +121,14 @@ public class SelectScriptVariablesTabView extends Composite implements SelectScr
     return saveChangesButton.addClickHandler(clickHandler);
   }
 
-  // @Override
+  @Override
   public HandlerRegistration addVariablestoViewChangeHandler(ChangeHandler changeHandler) {
     return variablesToView.addChangeHandler(changeHandler);
+  }
+
+  @Override
+  public HandlerRegistration addScriptChangeHandler(ChangeHandler changeHandler) {
+    return scriptWidgetDisplay.addScriptChangeHandler(changeHandler);
   }
 
   @Override

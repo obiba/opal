@@ -29,6 +29,7 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -72,6 +73,8 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     HandlerRegistration addNextPageClickHandler(ClickHandler handler);
 
     HandlerRegistration addPreviousPageClickHandler(ClickHandler handler);
+
+    HandlerRegistration addScriptChangeHandler(ChangeHandler handler);
 
     void addResults(List<Result> variables);
 
