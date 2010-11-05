@@ -10,8 +10,13 @@
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.EntitiesTabPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.EntitiesTabPresenter.EntitiesToView;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.SelectScriptVariablesTabPresenter.VariablesToView;
+import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter.Display;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -19,6 +24,8 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class EntitiesTabView extends Composite implements EntitiesTabPresenter.Display {
@@ -30,7 +37,15 @@ public class EntitiesTabView extends Composite implements EntitiesTabPresenter.D
   private static myUiBinder uiBinder = GWT.create(myUiBinder.class);
 
   @UiField
+  ListBox entitiesToView;
+
+  @UiField
   Button saveChangesButton;
+
+  @UiField
+  SimplePanel scriptWidgetPanel;
+
+  private EvaluateScriptPresenter.Display scriptWidgetDisplay;
 
   public EntitiesTabView() {
     initWidget(uiBinder.createAndBindUi(this));
@@ -54,6 +69,52 @@ public class EntitiesTabView extends Composite implements EntitiesTabPresenter.D
   @Override
   public void saveChangesEnabled(boolean enabled) {
     saveChangesButton.setEnabled(enabled);
+  }
+
+  @Override
+  public void setScriptWidget(Display scriptWidgetDisplay) {
+    this.scriptWidgetDisplay = scriptWidgetDisplay;
+    scriptWidgetPanel.add(scriptWidgetDisplay.asWidget());
+  }
+
+  @Override
+  public void setScriptWidgetVisible(boolean visible) {
+    scriptWidgetPanel.setVisible(visible);
+  }
+
+  @Override
+  public void setScript(String script) {
+    scriptWidgetDisplay.setScript(script);
+  }
+
+  @Override
+  public String getScript() {
+    return scriptWidgetDisplay.getScript();
+  }
+
+  @Override
+  public void setEntitiesToView(EntitiesToView scriptOrAll) {
+    String valueToSelect = (scriptOrAll.equals(VariablesToView.SCRIPT)) ? "script" : "all";
+
+    for(int i = 0; i < entitiesToView.getItemCount(); i++) {
+      if(entitiesToView.getValue(i).equals(valueToSelect)) {
+        entitiesToView.setSelectedIndex(i);
+        break;
+      }
+    }
+
+    setScriptWidgetVisible(scriptOrAll.equals(EntitiesToView.SCRIPT));
+  }
+
+  @Override
+  public EntitiesToView getEntitiesToView() {
+    int selectedIndex = entitiesToView.getSelectedIndex();
+    return (entitiesToView.getValue(selectedIndex).equals("script")) ? EntitiesToView.SCRIPT : EntitiesToView.ALL;
+  }
+
+  @Override
+  public HandlerRegistration addEntitiestoViewChangeHandler(ChangeHandler changeHandler) {
+    return entitiesToView.addChangeHandler(changeHandler);
   }
 
 }

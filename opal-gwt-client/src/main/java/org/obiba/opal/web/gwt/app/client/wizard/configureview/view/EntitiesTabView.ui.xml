@@ -3,13 +3,13 @@
 
   <g:FlowPanel >
     <g:Label addStyleNames="inline"><ui:msg description="Select entities to be viewed label">Select the entities that will be viewed:</ui:msg></g:Label>
-    <g:ListBox addStyleNames="small-indent">
-      <g:item value="all"><ui:msg description="All label">all</ui:msg></g:item>
+    <g:ListBox ui:field="entitiesToView" addStyleNames="small-indent">
       <g:item value="script"><ui:msg description="Script label">script</ui:msg></g:item>
+      <g:item value="all"><ui:msg description="All label">all</ui:msg></g:item>
     </g:ListBox>
     <g:Button ui:field="saveChangesButton" addStyleNames="right-aligned">
       <ui:msg description="Save changes button label">Save Changes</ui:msg>
     </g:Button>
-    <g:FlowPanel ui:field="scriptPanel" />
+    <g:SimplePanel ui:field="scriptWidgetPanel" />
   </g:FlowPanel>
 </ui:UiBinder>

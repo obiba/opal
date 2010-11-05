@@ -15,6 +15,15 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewUpdateEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter.Mode;
+import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
+import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.ViewDto;
+
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -23,10 +32,43 @@ import com.google.inject.Inject;
 public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.Display> {
 
   public interface Display extends WidgetDisplay {
-    HandlerRegistration addSaveChangesClickHandler(ClickHandler clickHandler);
 
     void saveChangesEnabled(boolean enabled);
+
+    void setScriptWidget(EvaluateScriptPresenter.Display scriptWidgetDisplay);
+
+    void setScriptWidgetVisible(boolean visible);
+
+    void setScript(String script);
+
+    String getScript();
+
+    void setEntitiesToView(EntitiesToView scriptOrAll);
+
+    EntitiesToView getEntitiesToView();
+
+    HandlerRegistration addSaveChangesClickHandler(ClickHandler clickHandler);
+
+    HandlerRegistration addEntitiestoViewChangeHandler(ChangeHandler changeHandler);
   }
+
+  public enum EntitiesToView {
+    SCRIPT, ALL
+  }
+
+  /**
+   * The {@link ViewDto} of the view being configured.
+   * 
+   * When the tab's save button is pressed, changes are applied to this ViewDto (i.e., to its JavaScriptViewDto
+   * extension).
+   */
+  private ViewDto viewDto;
+
+  /**
+   * Widget for entering, and testing, the "select" script.
+   */
+  @Inject
+  private EvaluateScriptPresenter scriptWidget;
 
   @Inject
   public EntitiesTabPresenter(final Display display, final EventBus eventBus) {
@@ -35,12 +77,17 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
 
   @Override
   protected void onBind() {
+    scriptWidget.bind();
+    scriptWidget.setEvaluationMode(Mode.ENTITY);
+    getDisplay().setScriptWidget(scriptWidget.getDisplay());
+
     getDisplay().saveChangesEnabled(true);
     addEventHandlers();
   }
 
   @Override
   protected void onUnbind() {
+    scriptWidget.unbind();
   }
 
   @Override
@@ -62,11 +109,60 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
 
   private void addEventHandlers() {
     super.registerHandler(getDisplay().addSaveChangesClickHandler(new SaveChangesClickHandler()));
+    super.registerHandler(getDisplay().addEntitiestoViewChangeHandler(new EntitiesToViewChangeHandler()));
   }
 
   class SaveChangesClickHandler implements ClickHandler {
 
+    @Override
     public void onClick(ClickEvent event) {
+      updateViewDto();
+      eventBus.fireEvent(new ViewUpdateEvent(getViewDto()));
+    }
+
+    private ViewDto getViewDto() {
+      return viewDto;
+    }
+
+    private void updateViewDto() {
+      JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
+
+      if(getDisplay().getEntitiesToView().equals(EntitiesToView.SCRIPT)) {
+        String script = getDisplay().getScript().trim();
+        if(script.length() != 0) {
+          jsViewDto.setSelect(script);
+        } else {
+          jsViewDto.clearSelect();
+        }
+      } else {
+        jsViewDto.clearSelect();
+      }
+    }
+  }
+
+  public void setViewDto(ViewDto viewDto) {
+    this.viewDto = viewDto;
+
+    TableDto tableDto = TableDto.create();
+    tableDto.setDatasourceName(viewDto.getDatasourceName());
+    tableDto.setName(viewDto.getName());
+    scriptWidget.setTable(tableDto);
+
+    JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
+    if(jsViewDto.hasSelect()) {
+      getDisplay().setEntitiesToView(EntitiesToView.SCRIPT);
+      getDisplay().setScript(jsViewDto.getSelect());
+    } else {
+      getDisplay().setEntitiesToView(EntitiesToView.ALL);
+      getDisplay().setScript("");
+    }
+  }
+
+  class EntitiesToViewChangeHandler implements ChangeHandler {
+
+    @Override
+    public void onChange(ChangeEvent event) {
+      getDisplay().setScriptWidgetVisible(getDisplay().getEntitiesToView().equals(EntitiesToView.SCRIPT));
     }
   }
 
