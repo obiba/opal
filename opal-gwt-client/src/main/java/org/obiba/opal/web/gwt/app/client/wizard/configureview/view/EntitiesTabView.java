@@ -117,4 +117,9 @@ public class EntitiesTabView extends Composite implements EntitiesTabPresenter.D
     return entitiesToView.addChangeHandler(changeHandler);
   }
 
+  @Override
+  public HandlerRegistration addScriptChangeHandler(ChangeHandler handler) {
+    return scriptWidgetDisplay.addScriptChangeHandler(handler);
+  }
+
 }

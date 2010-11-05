@@ -16,6 +16,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter.Mode;
 import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
@@ -50,6 +51,8 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
     HandlerRegistration addSaveChangesClickHandler(ClickHandler clickHandler);
 
     HandlerRegistration addEntitiestoViewChangeHandler(ChangeHandler changeHandler);
+
+    HandlerRegistration addScriptChangeHandler(ChangeHandler handler);
   }
 
   public enum EntitiesToView {
@@ -96,6 +99,7 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
 
   @Override
   public void refreshDisplay() {
+    getDisplay().saveChangesEnabled(false);
   }
 
   @Override
@@ -110,6 +114,9 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
   private void addEventHandlers() {
     super.registerHandler(getDisplay().addSaveChangesClickHandler(new SaveChangesClickHandler()));
     super.registerHandler(getDisplay().addEntitiestoViewChangeHandler(new EntitiesToViewChangeHandler()));
+    super.registerHandler(getDisplay().addEntitiestoViewChangeHandler(new FormChangedHandler()));
+    super.registerHandler(getDisplay().addScriptChangeHandler(new FormChangedHandler()));
+    super.registerHandler(eventBus.addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
   }
 
   class SaveChangesClickHandler implements ClickHandler {
@@ -164,6 +171,24 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
     public void onChange(ChangeEvent event) {
       getDisplay().setScriptWidgetVisible(getDisplay().getEntitiesToView().equals(EntitiesToView.SCRIPT));
     }
+  }
+
+  class FormChangedHandler implements ChangeHandler {
+
+    @Override
+    public void onChange(ChangeEvent arg0) {
+      getDisplay().saveChangesEnabled(true);
+    }
+
+  }
+
+  class ViewSavedHandler implements ViewSavedEvent.Handler {
+
+    @Override
+    public void onViewSaved(ViewSavedEvent event) {
+      getDisplay().saveChangesEnabled(false);
+    }
+
   }
 
 }
