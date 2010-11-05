@@ -1,0 +1,21 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
+
+  <g:FlowPanel>
+    <g:Label>
+      <ui:msg description="List of Derived Variables label">List of Derived Variables</ui:msg>
+      :
+    </g:Label>
+    <g:Label>
+      <ui:msg description="Go to label">Go to</ui:msg>
+      :
+    </g:Label>
+    <g:SuggestBox ui:field="variablesSuggestBox"/>
+    <g:Anchor ui:field="previous">
+      <img src="image/16/previous.png" align="middle"/>
+    </g:Anchor>
+    <g:Anchor ui:field="next">
+      <img src="image/16/next.png" align="middle"/>
+    </g:Anchor>
+  </g:FlowPanel>
+</ui:UiBinder>

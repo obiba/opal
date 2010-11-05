@@ -25,8 +25,10 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
+import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.http.client.Request;
@@ -46,6 +48,9 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
 
   @Inject
   private SelectScriptVariablesTabPresenter selectScriptVariablesTabPresenter;
+
+  @Inject
+  private VariablesListTabPresenter variablesListTabPresenter;
 
   @Inject
   private EntitiesTabPresenter entitiesTabPresenter;
@@ -81,6 +86,7 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
     getDisplay().addDataTabWidget(dataTabPresenter.getDisplay().asWidget());
 
     selectScriptVariablesTabPresenter.bind();
+    variablesListTabPresenter.bind();
 
     entitiesTabPresenter.bind();
     getDisplay().addEntitiesTabWidget(entitiesTabPresenter.getDisplay().asWidget());
@@ -95,6 +101,7 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
     dataTabPresenter.unbind();
     selectScriptVariablesTabPresenter.unbind();
     entitiesTabPresenter.unbind();
+    variablesListTabPresenter.unbind();
   }
 
   @Override
@@ -187,13 +194,18 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
       Widget variablesTabWidget = null;
 
       JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
+      VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
       if(jsViewDto != null) {
+
         selectScriptVariablesTabPresenter.setViewDto(viewDto);
         variablesTabWidget = selectScriptVariablesTabPresenter.getDisplay().asWidget();
 
         // Set the help widget for the current type of view (remove/insert).
         getDisplay().getHelpDeck().remove(1);
         getDisplay().getHelpDeck().insert(selectScriptVariablesTabPresenter.getDisplay().getHelpWidget(), 1);
+
+      } else if(variableListDto != null) {
+        variablesTabWidget = variablesListTabPresenter.getDisplay().asWidget();
       }
 
       return variablesTabWidget;

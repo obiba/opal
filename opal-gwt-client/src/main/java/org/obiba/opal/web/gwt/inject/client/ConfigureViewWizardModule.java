@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.DataTabP
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.EntitiesTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.SaveErrorsStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.SelectScriptVariablesTabPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.VariablesListTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.AttributeDialogView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.CategoryDialogView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.ConfigureViewStepView;
@@ -23,6 +24,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.DataTabView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.EntitiesTabView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.SaveErrorsStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.SelectScriptVariablesTabView;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.VariablesListTabView;
 
 import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.inject.Singleton;
@@ -41,5 +43,6 @@ public class ConfigureViewWizardModule extends AbstractGinModule {
     bind(DataTabPresenter.Display.class).to(DataTabView.class);
     bind(EntitiesTabPresenter.Display.class).to(EntitiesTabView.class);
     bind(SelectScriptVariablesTabPresenter.Display.class).to(SelectScriptVariablesTabView.class);
+    bind(VariablesListTabPresenter.Display.class).to(VariablesListTabView.class);
   }
 }
