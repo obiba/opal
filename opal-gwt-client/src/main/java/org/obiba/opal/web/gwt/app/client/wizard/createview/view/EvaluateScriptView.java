@@ -31,6 +31,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DisclosurePanel;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -59,6 +60,15 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
 
   @UiField
   Anchor nextPage;
+
+  @UiField
+  Label pageItemType;
+
+  @UiField
+  Label pageLimit;
+
+  @UiField
+  HTMLPanel paging;
 
   CellTable<Result> resultTable;
 
@@ -210,7 +220,22 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
 
   @Override
   public void showPaging(boolean visible) {
-    nextPage.setVisible(visible);
-    previousPage.setVisible(visible);
+    paging.setVisible(visible);
+  }
+
+  @Override
+  public void setPaging(int start, int end) {
+    pageLimit.setText("(" + start + " " + translations.ofLabel() + " " + end + ")");
+  }
+
+  @Override
+  public void setItemTypeVariables() {
+    pageItemType.setText(translations.variablesLabel());
+
+  }
+
+  @Override
+  public void setItemTypeValues() {
+    pageItemType.setText(translations.valuesLabel());
   }
 }

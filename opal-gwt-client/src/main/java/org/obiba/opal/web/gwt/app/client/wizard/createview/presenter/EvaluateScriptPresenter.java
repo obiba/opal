@@ -43,7 +43,7 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     VARIABLE, ENTITY, ENTITY_VALUE;
   }
 
-  private static final int pageSize = 20;
+  private static final int pageSize = 10;
 
   private int currentPage;
 
@@ -93,7 +93,13 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
 
     void showErrorMessage(ClientErrorDto errorDto);
 
-    void showPaging(boolean visible);
+    void setPaging(int i, int j);
+
+    void showPaging(boolean b);
+
+    void setItemTypeVariables();
+
+    void setItemTypeValues();
 
   }
 
@@ -191,8 +197,9 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
   }
 
   private void evaluateScript(String variablesResource, String transientVariableResource, String entitiesResource) {
-	getDisplay().showPaging(true);
-	String selectedScript = URL.encodeQueryString(getDisplay().getSelectedScript());
+    String selectedScript = URL.encodeQueryString(getDisplay().getSelectedScript());
+    getDisplay().showPaging(true);
+    setPagedItemType(evaluationMode);
     if(selectedScript.isEmpty()) {
       String script = URL.encodeQueryString(getScript());
       if(evaluationMode == Mode.ENTITY_VALUE) {
@@ -210,6 +217,22 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
         ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(variablesResource + selectedScript).get().withCallback(new VariablesResourceCallback(true)).withCallback(500, new InvalidScriptResourceCallBack()).send();
       }
     }
+  }
+
+  private void setPagedItemType(Mode evaluationMode) {
+    if(evaluationMode == Mode.ENTITY || evaluationMode == Mode.ENTITY_VALUE) {
+      getDisplay().setItemTypeValues();
+    } else if(evaluationMode == Mode.VARIABLE) {
+      getDisplay().setItemTypeVariables();
+    }
+  }
+
+  private int getCurrentPageEnd(int currentPageSize) {
+    return getCurrentPageStart() + currentPageSize - 1;
+  }
+
+  private int getCurrentPageStart() {
+    return currentPage * pageSize - pageSize + 1;
   }
 
   public class PreviousPageClickHandler implements ClickHandler {
@@ -252,6 +275,7 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
         lastPage = true;
       }
 
+      getDisplay().setPaging(getCurrentPageStart(), getCurrentPageEnd(variables.length()));
       getDisplay().clearResults();
       getDisplay().initializeResultTable();
       getDisplay().addVariableColumn();
@@ -314,6 +338,7 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
       if(values.length() < pageSize) {
         lastPage = true;
       }
+      getDisplay().setPaging(getCurrentPageStart(), getCurrentPageEnd(values.length()));
       getDisplay().clearResults();
       getDisplay().initializeResultTable();
       getDisplay().addValueColumn();

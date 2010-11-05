@@ -701,6 +701,25 @@ div.evaluateScriptPanel {
   margin-left:0px;
 }
 
+.evaluateScriptPanel div.paging {
+  padding-top:10px;
+  padding-bottom:10px;
+}
+
+.evaluateScriptPanel div.pagingInfo {
+  display:inline;
+  float:left;
+}
+
+.evaluateScriptPanel div.pagingInfo .gwt-Label {
+  display:inline;
+}
+
+.evaluateScriptPanel div.pagingActions {
+  display:inline;
+  width:20%;  
+}
+
 /* Reports UI */ 
 
 table.reportTemplateList {

@@ -4,12 +4,18 @@
   <g:FlowPanel addStyleNames="evaluateScriptPanel">
     <g:TextArea ui:field="scriptArea" width="100%"/>
     <g:Button ui:field="testScript">
-      <ui:msg description="Test script button label">Test</ui:msg>
+      <ui:msg description="Test button label">Test</ui:msg>
     </g:Button>
-    <g:FlowPanel>
-      <g:Anchor visible="false" ui:field="previousPage">Previous</g:Anchor>
-      <g:Anchor visible="false" ui:field="nextPage">Next</g:Anchor>
-    </g:FlowPanel>
+    <g:HTMLPanel addStyleNames="paging" visible="false" ui:field="paging">
+      <div class="pagingInfo">
+        <g:Label ui:field="pageItemType"/>
+        <g:Label ui:field="pageLimit"/>
+      </div>
+      <div class="pagingActions">
+        <g:Anchor ui:field="previousPage"><img src="image/16/previous.png" align="middle"/></g:Anchor>
+        <g:Anchor ui:field="nextPage"><img src="image/16/next.png" align="middle"/></g:Anchor>
+      </div>
+    </g:HTMLPanel>
     <g:DisclosurePanel ui:field="resultsPanel" width="100%" addStyleNames="resultsPanel">
       <g:header>
         <ui:msg description="Results label">Results</ui:msg>

@@ -71,7 +71,7 @@ public class OpalGinModule extends AbstractGinModule {
     bind(ConfirmationPresenter.Display.class).to(ConfirmationView.class).in(Singleton.class);
     bind(DatasourceSelectorPresenter.Display.class).to(DatasourceSelectorView.class);
     bind(CreateFolderDialogPresenter.Display.class).to(CreateFolderDialogView.class).in(Singleton.class);
-    bind(EvaluateScriptPresenter.Display.class).to(EvaluateScriptView.class).in(Singleton.class);
+    bind(EvaluateScriptPresenter.Display.class).to(EvaluateScriptView.class);
     bind(ItemSelectorPresenter.Display.class).to(ItemSelectorView.class);
 
     // Concrete classes (such as NavigatorPresenter) don't need to be "bound". Simply define a getter in the
