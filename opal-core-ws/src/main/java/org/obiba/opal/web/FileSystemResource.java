@@ -9,6 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.web;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
@@ -24,7 +29,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Path("/filesystem")
-//TODO We should delete this once the new FileSelection dialog has been integrated in the DataImport UI.
+// TODO We should delete this once the new FileSelection dialog has been integrated in the DataImport UI.
 public class FileSystemResource {
 
   private static final Logger log = LoggerFactory.getLogger(FileSystemResource.class);
@@ -54,19 +59,27 @@ public class FileSystemResource {
     Opal.FileDto.Builder fileBuilder;
 
     // Get the children for the current folder (list of files & folders).
-    FileObject[] children = parentFolder.getChildren();
+    List<FileObject> children = Arrays.asList(parentFolder.getChildren());
+
+    Collections.sort(children, new Comparator<FileObject>() {
+
+      @Override
+      public int compare(FileObject arg0, FileObject arg1) {
+        return arg0.getName().compareTo(arg1.getName());
+      }
+    });
 
     // Loop through all children.
-    for(int i = 0; i < children.length; i++) {
+    for(FileObject child : children) {
 
       // Build a FileDto representing the child.
       fileBuilder = Opal.FileDto.newBuilder();
-      fileBuilder.setName(children[i].getName().getBaseName()).setPath(children[i].getName().getPath());
-      fileBuilder.setType(children[i].getType() == FileType.FILE ? Opal.FileDto.FileType.FILE : Opal.FileDto.FileType.FOLDER);
+      fileBuilder.setName(child.getName().getBaseName()).setPath(child.getName().getPath());
+      fileBuilder.setType(child.getType() == FileType.FILE ? Opal.FileDto.FileType.FILE : Opal.FileDto.FileType.FOLDER);
 
       // If the current child is a folder, add its children recursively.
-      if(children[i].getType() == FileType.FOLDER) {
-        addFiles(fileBuilder, children[i]);
+      if(child.getType() == FileType.FOLDER) {
+        addFiles(fileBuilder, child);
       }
 
       // Add the current child to the parent FileDto (folder).

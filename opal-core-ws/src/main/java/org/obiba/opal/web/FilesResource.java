@@ -21,6 +21,8 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.UUID;
@@ -40,8 +42,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -173,25 +175,33 @@ public class FilesResource {
     Opal.FileDto.Builder fileBuilder;
 
     // Get the children for the current folder (list of files & folders).
-    FileObject[] children = parentFolder.getChildren();
+    List<FileObject> children = Arrays.asList(parentFolder.getChildren());
+
+    Collections.sort(children, new Comparator<FileObject>() {
+
+      @Override
+      public int compare(FileObject arg0, FileObject arg1) {
+        return arg0.getName().compareTo(arg1.getName());
+      }
+    });
 
     // Loop through all children.
-    for(int i = 0; i < children.length; i++) {
+    for(FileObject child : children) {
 
       // Build a FileDto representing the child.
       fileBuilder = Opal.FileDto.newBuilder();
-      fileBuilder.setName(children[i].getName().getBaseName()).setPath(children[i].getName().getPath());
-      fileBuilder.setType(children[i].getType() == FileType.FILE ? Opal.FileDto.FileType.FILE : Opal.FileDto.FileType.FOLDER);
+      fileBuilder.setName(child.getName().getBaseName()).setPath(child.getName().getPath());
+      fileBuilder.setType(child.getType() == FileType.FILE ? Opal.FileDto.FileType.FILE : Opal.FileDto.FileType.FOLDER);
 
       // Set size on files only, not folders.
-      if(children[i].getType() == FileType.FILE) {
-        fileBuilder.setSize(children[i].getContent().getSize());
+      if(child.getType() == FileType.FILE) {
+        fileBuilder.setSize(child.getContent().getSize());
       }
 
-      fileBuilder.setLastModifiedTime(children[i].getContent().getLastModifiedTime());
+      fileBuilder.setLastModifiedTime(child.getContent().getLastModifiedTime());
 
-      if(children[i].getType().hasChildren() && children[i].getChildren().length > 0 && (level - 1) > 0) {
-        addChildren(fileBuilder, children[i], level - 1);
+      if(child.getType().hasChildren() && child.getChildren().length > 0 && (level - 1) > 0) {
+        addChildren(fileBuilder, child, level - 1);
       }
 
       // Add the current child to the parent FileDto (folder).
