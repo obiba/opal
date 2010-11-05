@@ -27,6 +27,7 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
@@ -132,6 +133,8 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
   //
 
   public interface Display extends WidgetDisplay {
+
+    Widget getHelpWidget();
 
     void saveChangesEnabled(boolean enabled);
 

@@ -48,6 +48,8 @@ public class SelectScriptVariablesTabView extends Composite implements SelectScr
 
   private EvaluateScriptPresenter.Display scriptWidgetDisplay;
 
+  private SelectScriptVariablesTabViewHelp helpWidget;
+
   //
   // Constructors
   //
@@ -59,6 +61,14 @@ public class SelectScriptVariablesTabView extends Composite implements SelectScr
   //
   // SelectScriptVariablesTabPresenter.Display Methods
   //
+
+  @Override
+  public Widget getHelpWidget() {
+    if(helpWidget == null) {
+      helpWidget = new SelectScriptVariablesTabViewHelp();
+    }
+    return helpWidget;
+  }
 
   @Override
   public void saveChangesEnabled(boolean enabled) {

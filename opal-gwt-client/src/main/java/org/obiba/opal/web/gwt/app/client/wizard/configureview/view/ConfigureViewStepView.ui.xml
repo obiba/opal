@@ -36,35 +36,13 @@
             </ui:msg>
           </p>
         </g:HTMLPanel>
-     </g:FlowPanel>
-     <g:FlowPanel>
-        <g:HTMLPanel>
-          <g:Label addStyleNames="title"><ui:msg description="Variable filter label">Variable Filter</ui:msg></g:Label>
-          <p>
-            <ui:msg description="Variables filter information for view creation">
-              Some tables are defined for this view (see <em>Data</em> tab). The variables of these tables can be filtered to define the variables view.
-            </ui:msg>
-          <ul>
-            <li>
-              <ui:msg description="All filter information">
-                all: no filter is applied. This allows to define a simple join of tables.
-              </ui:msg>
-            </li>
-            <li>
-              <ui:msg description="Variables script filter information">
-                script: the filter can be defined by a script which will be applied on each variable of the tables. This script must return a boolean (i.e. true/false) value. If true is returned, the variable on which the script is executed is part of the variables view.
-              </ui:msg>
-            </li>
-          </ul>
-          </p>
-        </g:HTMLPanel>
-      </g:FlowPanel>     
-     <g:FlowPanel>
+      </g:FlowPanel>
+      <g:FlowPanel>
         <g:HTMLPanel>
           <g:Label addStyleNames="title"><ui:msg description="Variable filter label">Variable Filter</ui:msg></g:Label>
         </g:HTMLPanel>
       </g:FlowPanel>     
-     <g:FlowPanel>
+      <g:FlowPanel>
         <g:HTMLPanel>
           <g:Label addStyleNames="title"><ui:msg description="Entity filter label">Entity Filter</ui:msg></g:Label>
           <p>

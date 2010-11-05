@@ -19,16 +19,16 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
-import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
-import com.google.gwt.event.logical.shared.BeforeSelectionEvent;
-import com.google.gwt.event.logical.shared.BeforeSelectionHandler;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.DeckPanel;
@@ -57,7 +57,8 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
   /**
    * {@link ViewDto} of view being configured.
    * 
-   * This is initialized upon a {@link ViewConfigurationRequiredEvent} and updated on every {@link ViewSaveRequiredEvent}.
+   * This is initialized upon a {@link ViewConfigurationRequiredEvent} and updated on every
+   * {@link ViewSaveRequiredEvent}.
    */
   private ViewDto viewDto;
 
@@ -131,12 +132,12 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
     super.registerHandler(eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredHandler()));
     super.registerHandler(eventBus.addHandler(ViewSaveRequiredEvent.getType(), new ViewSaveRequiredHandler()));
 
-    super.registerHandler(getDisplay().getViewTabs().addBeforeSelectionHandler(new BeforeSelectionHandler<Integer>() {
+    super.registerHandler(getDisplay().getViewTabs().addSelectionHandler(new SelectionHandler<Integer>() {
 
       @Override
-      public void onBeforeSelection(BeforeSelectionEvent<Integer> event) {
-        // Widget w = getDisplay().getViewTabs().getWidget(getDisplay().getViewTabs().getSelectedIndex());
+      public void onSelection(SelectionEvent<Integer> event) {
         // Switch help displayed.
+        getDisplay().getHelpDeck().showWidget(event.getSelectedItem());
       }
     }));
   }
@@ -188,6 +189,10 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
       if(jsViewDto != null) {
         selectScriptVariablesTabPresenter.setViewDto(viewDto);
         variablesTabWidget = selectScriptVariablesTabPresenter.getDisplay().asWidget();
+
+        // Set the help widget for the current type of view (remove/insert).
+        getDisplay().getHelpDeck().remove(1);
+        getDisplay().getHelpDeck().insert(selectScriptVariablesTabPresenter.getDisplay().getHelpWidget(), 1);
       }
 
       return variablesTabWidget;
