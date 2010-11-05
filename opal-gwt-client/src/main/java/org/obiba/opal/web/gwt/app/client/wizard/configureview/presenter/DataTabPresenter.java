@@ -27,7 +27,9 @@ import org.obiba.opal.web.gwt.app.client.ui.HasCollection;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.MatchingTableEntitiesValidator;
 import org.obiba.opal.web.gwt.app.client.validator.MinimumSizeCollectionValidator;
+import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewUpdateEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -66,7 +68,7 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
 
   @Override
   protected void onBind() {
-    getDisplay().saveChangesEnabled(true);
+    getDisplay().saveChangesEnabled(false);
 
     tableListPresenter.setRemoveButtonConfirmation("deleteTable", "removingTablesFromViewMayAffectVariables");
     tableListPresenter.bind();
@@ -102,6 +104,8 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
 
   private void addEventHandlers() {
     super.registerHandler(getDisplay().addSaveChangesClickHandler(new SaveChangesClickHandler()));
+    super.registerHandler(eventBus.addHandler(TableListUpdateEvent.getType(), new FormChangedHandler()));
+    super.registerHandler(eventBus.addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
   }
 
   class SaveChangesClickHandler implements ClickHandler {
@@ -139,6 +143,24 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
       }
       return null;
     }
+  }
+
+  class FormChangedHandler implements TableListUpdateEvent.Handler {
+
+    @Override
+    public void onTableListUpdate(TableListUpdateEvent event) {
+      getDisplay().saveChangesEnabled(true);
+    }
+
+  }
+
+  class ViewSavedHandler implements ViewSavedEvent.Handler {
+
+    @Override
+    public void onViewSaved(ViewSavedEvent event) {
+      getDisplay().saveChangesEnabled(false);
+    }
+
   }
 
   private JsArrayString getSelectedTables() {

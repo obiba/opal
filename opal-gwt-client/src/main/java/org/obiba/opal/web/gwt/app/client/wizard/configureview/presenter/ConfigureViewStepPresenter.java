@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewUpdateEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -225,8 +226,8 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
           if(response.getStatusCode() == Response.SC_BAD_REQUEST) {
             eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
           } else {
-            // eventBus.fireEvent(new NotificationEvent(NotificationType.INFO, "That worked!", null));
             // Send event so save button and asterisk can be cleared.
+            eventBus.fireEvent(new ViewSavedEvent());
           }
         }
       };
