@@ -21,6 +21,8 @@ import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScr
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -112,6 +114,7 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
 
   private void addEventHandlers() {
     super.registerHandler(getDisplay().addSaveChangesClickHandler(new SaveChangesClickHandler()));
+    super.registerHandler(getDisplay().addVariablestoViewChangeHandler(new VariablesToViewChangeHandler()));
   }
 
   //
@@ -124,11 +127,22 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
 
     void setScriptWidget(EvaluateScriptPresenter.Display scriptWidgetDisplay);
 
+    void setScriptWidgetVisible(boolean visible);
+
+    VariablesToView getVariablesToView();
+
     HandlerRegistration addSaveChangesClickHandler(ClickHandler clickHandler);
+
+    HandlerRegistration addVariablestoViewChangeHandler(ChangeHandler changeHandler);
+  }
+
+  public enum VariablesToView {
+    SCRIPT, ALL
   }
 
   class SaveChangesClickHandler implements ClickHandler {
 
+    @Override
     public void onClick(ClickEvent event) {
       updateViewDto();
       eventBus.fireEvent(new ViewUpdateEvent(getViewDto()));
@@ -139,6 +153,15 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
     }
 
     private void updateViewDto() {
+      // TODO: Apply changes (the script) to viewDto.
+    }
+  }
+
+  class VariablesToViewChangeHandler implements ChangeHandler {
+
+    @Override
+    public void onChange(ChangeEvent event) {
+      getDisplay().setScriptWidgetVisible(getDisplay().getVariablesToView().equals(VariablesToView.SCRIPT));
     }
   }
 }

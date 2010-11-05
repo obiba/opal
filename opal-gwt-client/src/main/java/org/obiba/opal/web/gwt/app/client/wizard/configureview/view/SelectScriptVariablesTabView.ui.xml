@@ -4,8 +4,8 @@
   <g:FlowPanel >
     <g:Label addStyleNames="inline"><ui:msg description="Select tables to be viewed label">Select the variables that will be viewed:</ui:msg></g:Label>
     <g:ListBox ui:field="variablesToView">
-      <g:item>script</g:item>
-      <g:item>all</g:item>
+      <g:item value="script">script</g:item>
+      <g:item value="all">all</g:item>
     </g:ListBox>  
     <g:Button ui:field="saveChangesButton" addStyleNames="right-aligned">
       <ui:msg description="Save changes button label">Save Changes</ui:msg>

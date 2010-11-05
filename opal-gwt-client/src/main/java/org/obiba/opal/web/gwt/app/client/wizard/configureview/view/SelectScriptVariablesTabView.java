@@ -10,9 +10,11 @@
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.SelectScriptVariablesTabPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.SelectScriptVariablesTabPresenter.VariablesToView;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -70,8 +72,24 @@ public class SelectScriptVariablesTabView extends Composite implements SelectScr
   }
 
   @Override
+  public void setScriptWidgetVisible(boolean visible) {
+    scriptWidgetPanel.setVisible(visible);
+  }
+
+  @Override
+  public VariablesToView getVariablesToView() {
+    int selectedIndex = variablesToView.getSelectedIndex();
+    return (variablesToView.getValue(selectedIndex).equals("script")) ? VariablesToView.SCRIPT : VariablesToView.ALL;
+  }
+
+  @Override
   public HandlerRegistration addSaveChangesClickHandler(ClickHandler clickHandler) {
     return saveChangesButton.addClickHandler(clickHandler);
+  }
+
+  // @Override
+  public HandlerRegistration addVariablestoViewChangeHandler(ChangeHandler changeHandler) {
+    return variablesToView.addChangeHandler(changeHandler);
   }
 
   @Override
