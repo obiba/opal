@@ -68,6 +68,7 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
   protected void onBind() {
     getDisplay().saveChangesEnabled(true);
 
+    tableListPresenter.setRemoveButtonConfirmation("deleteTable", "removingTablesFromViewMayAffectVariables");
     tableListPresenter.bind();
     getDisplay().setTableSelector(tableListPresenter.getDisplay());
 

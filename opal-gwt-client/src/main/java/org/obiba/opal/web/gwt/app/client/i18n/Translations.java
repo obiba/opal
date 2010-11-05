@@ -271,7 +271,9 @@ public interface Translations extends Constants {
   String logLabel();
 
   @Description("Confirmation title map")
-  @DefaultStringMapValue({ "clearJobsList", "Clear Jobs List", //
+  @DefaultStringMapValue({ //
+  "deleteTable", "Delete Table", //
+  "clearJobsList", "Clear Jobs List", //
   "cancelJob", "Cancel Job", //
   "replaceExistingFile", "Replace File", //
   "deleteFile", "Delete File", //
@@ -280,7 +282,9 @@ public interface Translations extends Constants {
   Map<String, String> confirmationTitleMap();
 
   @Description("Confirmation message map")
-  @DefaultStringMapValue({ "confirmClearJobsList", "All the completed jobs (succeeded, failed or cancelled) will be removed from the jobs list. Currently running jobs will be unaffected.<br /><br />Please confirm that you want to clear the jobs list.", //
+  @DefaultStringMapValue({ //
+  "removingTablesFromViewMayAffectVariables", "Removing tables from the view will have an impact on which Variables can be defined.", //
+  "confirmClearJobsList", "All the completed jobs (succeeded, failed or cancelled) will be removed from the jobs list. Currently running jobs will be unaffected.<br /><br />Please confirm that you want to clear the jobs list.", //
   "confirmCancelJob", "The job will be cancelled. Changes will be rolled back as much as possible: although cancelled, a job might be partially completed.<br /><br />Please confirm that you want cancel this job.", //
   "confirmReplaceExistingFile", "The file that you are uploading already exist in the file system.<br /><br />Please confirm that you want to replace the existing file.", //
   "confirmDeleteFile", "The file will be removed from the file system.<br /><br />Please confirm that you want to delete this file.", //

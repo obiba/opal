@@ -18,6 +18,8 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionRequiredEvent;
@@ -38,6 +40,12 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
   //
 
   private List<TableDto> tables = new ArrayList<TableDto>();
+
+  private Runnable actionRequiringConfirmation;
+
+  private String confirmationTitleKey;
+
+  private String confirmationMessageKey;
 
   //
   // Constructors
@@ -82,6 +90,16 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
   // Methods
   //
 
+  public void setRemoveButtonConfirmation(String confirmationTitleKey, String confirmationMessageKey) {
+    this.confirmationTitleKey = confirmationTitleKey;
+    this.confirmationMessageKey = confirmationMessageKey;
+  }
+
+  public void clearRemoveButtonConfirmation() {
+    this.confirmationTitleKey = null;
+    this.confirmationMessageKey = null;
+  }
+
   public List<TableDto> getTables() {
     return tables;
   }
@@ -114,22 +132,6 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
       }
     }));
 
-    super.registerHandler(getDisplay().addRemoveClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        List<Integer> selectedIndices = getDisplay().getSelectedIndices();
-        for(int i = selectedIndices.size() - 1; i >= 0; i--) {
-          getTables().remove(selectedIndices.get(i).intValue());
-          getDisplay().removeTable(selectedIndices.get(i));
-        }
-        if(selectedIndices.size() > 0) {
-          getDisplay().unselectAll(selectedIndices.get(0));
-          eventBus.fireEvent(new TableListUpdateEvent(TableListPresenter.this));
-        }
-      }
-    }));
-
     super.registerHandler(getDisplay().addAddClickHandler(new ClickHandler() {
 
       @Override
@@ -138,11 +140,60 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
       }
     }));
 
+    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    if(confirmationTitleKey != null && confirmationMessageKey != null) {
+      super.registerHandler(getDisplay().addRemoveClickHandler(new RemoveWithConfirmationClickHandler()));
+    } else {
+      super.registerHandler(getDisplay().addRemoveClickHandler(new RemoveClickHandler()));
+    }
+  }
+
+  private void removeButtonAction() {
+    List<Integer> selectedIndices = getDisplay().getSelectedIndices();
+    for(int i = selectedIndices.size() - 1; i >= 0; i--) {
+      getTables().remove(selectedIndices.get(i).intValue());
+      getDisplay().removeTable(selectedIndices.get(i));
+    }
+    if(selectedIndices.size() > 0) {
+      getDisplay().unselectAll(selectedIndices.get(0));
+      eventBus.fireEvent(new TableListUpdateEvent(TableListPresenter.this));
+    }
   }
 
   //
   // Inner Classes / Interfaces
   //
+
+  class RemoveClickHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent arg0) {
+      removeButtonAction();
+    }
+  }
+
+  class RemoveWithConfirmationClickHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent arg0) {
+      actionRequiringConfirmation = new Runnable() {
+        public void run() {
+          removeButtonAction();
+        }
+      };
+      eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, confirmationTitleKey, confirmationMessageKey));
+    }
+  }
+
+  class ConfirmationEventHandler implements ConfirmationEvent.Handler {
+
+    public void onConfirmation(ConfirmationEvent event) {
+      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event.isConfirmed()) {
+        actionRequiringConfirmation.run();
+        actionRequiringConfirmation = null;
+      }
+    }
+  }
 
   public interface Display extends WidgetDisplay {
 
