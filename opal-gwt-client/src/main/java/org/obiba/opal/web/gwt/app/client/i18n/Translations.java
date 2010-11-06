@@ -72,7 +72,7 @@ public interface Translations extends Constants {
   String statusLabel();
 
   @Description("Status map")
-  @DefaultStringMapValue({ "NOT_STARTED", "Not Started", //
+  @DefaultStringMapValue( { "NOT_STARTED", "Not Started", //
   "IN_PROGRESS", "In Progress", //
   "SUCCEEDED", "Succeeded", //
   "FAILED", "Failed", //
@@ -86,7 +86,7 @@ public interface Translations extends Constants {
   String actionsLabel();
 
   @Description("Action map")
-  @DefaultStringMapValue({ "Log", "Log", //
+  @DefaultStringMapValue( { "Log", "Log", //
   "Cancel", "Cancel", //
   "Delete", "Delete", //
   "Download", "Download" })
@@ -145,7 +145,7 @@ public interface Translations extends Constants {
   String unitLabel();
 
   @Description("User message map")
-  @DefaultStringMapValue({ //
+  @DefaultStringMapValue( { //
   "CategoryDialogNameRequired", "A category name is required.", //
   "CategoryNameAlreadyExists", "The specified category name already exists.", //
   "AttributeNameRequired", "An attribute name is required.", //
@@ -271,7 +271,7 @@ public interface Translations extends Constants {
   String logLabel();
 
   @Description("Confirmation title map")
-  @DefaultStringMapValue({ //
+  @DefaultStringMapValue( { //
   "deleteTable", "Delete Table", //
   "clearJobsList", "Clear Jobs List", //
   "cancelJob", "Cancel Job", //
@@ -282,7 +282,7 @@ public interface Translations extends Constants {
   Map<String, String> confirmationTitleMap();
 
   @Description("Confirmation message map")
-  @DefaultStringMapValue({ //
+  @DefaultStringMapValue( { //
   "removingTablesFromViewMayAffectVariables", "Removing tables from the view will have an impact on which Variables can be defined.", //
   "confirmClearJobsList", "All the completed jobs (succeeded, failed or cancelled) will be removed from the jobs list. Currently running jobs will be unaffected.<br /><br />Please confirm that you want to clear the jobs list.", //
   "confirmCancelJob", "The job will be cancelled. Changes will be rolled back as much as possible: although cancelled, a job might be partially completed.<br /><br />Please confirm that you want cancel this job.", //
@@ -357,7 +357,7 @@ public interface Translations extends Constants {
   String errorLabel();
 
   @Description("Datasource parsing error map")
-  @DefaultStringMapValue({ "CategoryNameRequired", "Category name required", //
+  @DefaultStringMapValue( { "CategoryNameRequired", "Category name required", //
   "CategoryVariableNameRequired", "Category variable name required", //
   "DuplicateCategoryName", "Duplicate category name", //
   "DuplicateColumns", "Duplicate columns", //
@@ -381,7 +381,7 @@ public interface Translations extends Constants {
   Map<String, String> datasourceParsingErrorMap();
 
   @Description("Datasource comparison error map")
-  @DefaultStringMapValue({ "IncompatibleValueType", "Incompatible value type", //
+  @DefaultStringMapValue( { "IncompatibleValueType", "Incompatible value type", //
   "IncompatibleEntityType", "Incompatible entity type", //
   "VariablePresentInSourceButNotDestination", "Variable exists in source but not in destination" })
   Map<String, String> datasourceComparisonErrorMap();
@@ -461,4 +461,8 @@ public interface Translations extends Constants {
   @Description("Values label")
   @DefaultStringValue("Values")
   String valuesLabel();
+
+  @Description("Script contains errors and was not saved")
+  @DefaultStringValue("The script contains errors and was not saved. Click 'Test' to execute the script and see a detailed report of the errors.")
+  String scriptContainsErrorsAndWasNotSaved();
 }

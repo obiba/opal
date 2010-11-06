@@ -60,6 +60,7 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
   }
 
   public interface Display extends WidgetDisplay {
+
     String getScript();
 
     void setScript(String script);
@@ -103,7 +104,6 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     void setItemTypeVariables();
 
     void setItemTypeValues();
-
   }
 
   @Override
@@ -158,15 +158,19 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     return getDisplay().getScript();
   }
 
+  public void evaluateScript(ResponseCodeCallback responseCodeCallback) {
+    evaluateCompleteScript(getVariablesUri(0), getTransientValuesUri(0), getEntitiesUri(), responseCodeCallback);
+  }
+
   private List<Result> addValueToResults(List<Result> results, JsArray<ValueDto> values) {
     List<Result> resultsWithValues = null;
     if(results == null) {
-      resultsWithValues = new ArrayList<EvaluateScriptPresenter.Result>();
+      resultsWithValues = new ArrayList<Result>();
       for(int i = 0; i < values.length(); i++) {
         resultsWithValues.add(new Result(values.get(i)));
       }
     } else {
-      resultsWithValues = new ArrayList(results);
+      resultsWithValues = new ArrayList<Result>(results);
       int i = 0;
       for(Result result : resultsWithValues) {
         result.setValue(values.get(i++));
@@ -187,16 +191,24 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
   }
 
   private void displayCurrentPageResults() {
-
-    int offset = (currentPage - 1) * pageSize;
-    String viewResource = "/datasource/" + table.getDatasourceName() + "/table/" + table.getName();
-    String variablesResource = viewResource + "/variables?limit=" + pageSize + "&offset=" + offset + "&script=";
-    String transientVariableResource = viewResource + "/variable/_transient/values?limit=" + pageSize + "&offset=" + offset + "&script=";
-    String entitiesResource = viewResource + "/entities?script=";
-
-    evaluateScript(variablesResource, transientVariableResource, entitiesResource);
-
+    evaluateScript(getVariablesUri((currentPage - 1) * pageSize), getTransientValuesUri((currentPage - 1) * pageSize), getEntitiesUri());
     getDisplay().showResults(true);
+  }
+
+  private String getTableUri() {
+    return "/datasource/" + table.getDatasourceName() + "/table/" + table.getName();
+  }
+
+  private String getVariablesUri(int offset) {
+    return getTableUri() + "/variables?limit=" + pageSize + "&offset=" + offset + "&script=";
+  }
+
+  private String getTransientValuesUri(int offset) {
+    return getTableUri() + "/variable/_transient/values?limit=" + pageSize + "&offset=" + offset + "&script=";
+  }
+
+  private String getEntitiesUri() {
+    return getTableUri() + "/entities?script=";
   }
 
   private void evaluateScript(String variablesResource, String transientVariableResource, String entitiesResource) {
@@ -227,6 +239,17 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     } else if(evaluationMode == Mode.ENTITY) {
       getDisplay().showPaging(false);
       ResourceRequestBuilderFactory.<JsArray<VariableEntityDto>> newBuilder().forResource(entitiesResource + script).get().withCallback(new EntityResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
+    }
+  }
+
+  private void evaluateCompleteScript(String variablesResource, String transientVariableResource, String entitiesResource, ResponseCodeCallback responseCodeCallback) {
+    String script = URL.encodeQueryString(getScript());
+    if(evaluationMode == Mode.ENTITY_VALUE) {
+      ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource(transientVariableResource + script).get().withCallback(200, responseCodeCallback).withCallback(400, responseCodeCallback).withCallback(500, responseCodeCallback).accept("application/x-protobuf+json").send();
+    } else if(evaluationMode == Mode.VARIABLE) {
+      ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(variablesResource + script).get().withCallback(200, responseCodeCallback).withCallback(400, responseCodeCallback).withCallback(500, responseCodeCallback).accept("application/x-protobuf+json").send();
+    } else if(evaluationMode == Mode.ENTITY) {
+      ResourceRequestBuilderFactory.<JsArray<VariableEntityDto>> newBuilder().forResource(entitiesResource + script).get().withCallback(200, responseCodeCallback).withCallback(400, responseCodeCallback).withCallback(500, responseCodeCallback).accept("application/x-protobuf+json").send();
     }
   }
 
