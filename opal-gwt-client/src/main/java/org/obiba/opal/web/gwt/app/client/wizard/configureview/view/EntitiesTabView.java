@@ -11,7 +11,6 @@ package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.EntitiesTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.EntitiesTabPresenter.EntitiesToView;
-import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.SelectScriptVariablesTabPresenter.VariablesToView;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter.Display;
 
@@ -94,7 +93,7 @@ public class EntitiesTabView extends Composite implements EntitiesTabPresenter.D
 
   @Override
   public void setEntitiesToView(EntitiesToView scriptOrAll) {
-    String valueToSelect = (scriptOrAll.equals(VariablesToView.SCRIPT)) ? "script" : "all";
+    String valueToSelect = (scriptOrAll.equals(EntitiesToView.SCRIPT)) ? "script" : "all";
 
     for(int i = 0; i < entitiesToView.getItemCount(); i++) {
       if(entitiesToView.getValue(i).equals(valueToSelect)) {
