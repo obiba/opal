@@ -15,6 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
@@ -177,6 +178,7 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
 
     @Override
     public void onChange(ChangeEvent arg0) {
+      eventBus.fireEvent(new ViewSavePendingEvent());
       getDisplay().saveChangesEnabled(true);
     }
 
