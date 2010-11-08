@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
-import java.awt.TextField;
-
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.VariablesListTabPresenter;
 
 import com.google.gwt.core.client.GWT;
@@ -31,6 +29,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 public class VariablesListTabView extends Composite implements VariablesListTabPresenter.Display {
@@ -56,7 +55,7 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   Button removeButton;
 
   @UiField
-  TextField variableName;
+  TextBox variableName;
 
   @UiField
   ListBox entityType;
