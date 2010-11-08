@@ -64,6 +64,20 @@
           </td>
         </tr>
       </table>
-    </g:HTMLPanel>    
+    </g:HTMLPanel>
+    <g:TabLayoutPanel barHeight="2" barUnit="EM" width="100%" height="15em" ui:field="variableDetailTabs">
+      <g:tab>
+        <g:header><ui:msg description="Categories label">Categories</ui:msg></g:header>
+        <g:SimplePanel ui:field="categoriesTabPanel" />
+      </g:tab>
+      <g:tab>
+        <g:header><ui:msg description="Attributes label">Attributes</ui:msg></g:header>
+        <g:SimplePanel ui:field="attributesTabPanel" />
+      </g:tab>
+      <g:tab>
+        <g:header><ui:msg description="Options label">Options</ui:msg></g:header>
+        <g:SimplePanel ui:field="optionsTabPanel" />
+      </g:tab>
+    </g:TabLayoutPanel>     
   </g:FlowPanel>
 </ui:UiBinder>
