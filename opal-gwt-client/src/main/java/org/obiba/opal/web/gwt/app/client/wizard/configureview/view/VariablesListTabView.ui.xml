@@ -29,6 +29,41 @@
       <g:Button ui:field="addButton" addStyleNames="right-aligned">
         <ui:msg description="Add button label">Add</ui:msg>
       </g:Button>
-    </g:FlowPanel> 
+    </g:FlowPanel>
+    <g:HTMLPanel>
+      <table>
+        <tr>
+          <td>
+            <g:Label><ui:msg description="Name label">Name</ui:msg>:</g:Label>
+          </td>
+          <td>
+            <g:TextBox ui:field="userName" width="15em"  />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <g:Label><ui:msg description="Type label">Type</ui:msg>:</g:Label>
+          </td>
+          <td>
+            <g:ListBox ui:field="entityType"/>
+          </td>
+        </tr>
+        <tr>
+          <td/>
+          <td>
+            <g:CheckBox ui:field="repeatableCheckbox" />
+            <g:Label addStyleNames="inline"><ui:msg description="Repeatable label">Repeatable</ui:msg></g:Label>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <g:Label><ui:msg description="Script label">Script</ui:msg>:</g:Label>
+          </td>
+          <td>
+            <g:SimplePanel ui:field="scriptWidgetPanel" addStyleNames="small-top-margin" />
+          </td>
+        </tr>
+      </table>
+    </g:HTMLPanel>    
   </g:FlowPanel>
 </ui:UiBinder>
