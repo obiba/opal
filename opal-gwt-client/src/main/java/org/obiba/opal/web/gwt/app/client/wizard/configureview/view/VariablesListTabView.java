@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
+import java.awt.TextField;
+
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.VariablesListTabPresenter;
 
 import com.google.gwt.core.client.GWT;
@@ -20,10 +22,15 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
+import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class VariablesListTabView extends Composite implements VariablesListTabPresenter.Display {
@@ -38,6 +45,39 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
 
   @UiField
   Anchor next;
+
+  @UiField
+  Button saveChangesButton;
+
+  @UiField
+  Button addButton;
+
+  @UiField
+  Button removeButton;
+
+  @UiField
+  TextField variableName;
+
+  @UiField
+  ListBox entityType;
+
+  @UiField
+  CheckBox repeatableCheckbox;
+
+  @UiField
+  SimplePanel scriptWidgetPanel;
+
+  @UiField
+  TabLayoutPanel variableDetailTabs;
+
+  @UiField
+  SimplePanel categoriesTabPanel;
+
+  @UiField
+  SimplePanel attributesTabPanel;
+
+  @UiField
+  SimplePanel optionsTabPanel;
 
   MultiWordSuggestOracle suggestions;
 
