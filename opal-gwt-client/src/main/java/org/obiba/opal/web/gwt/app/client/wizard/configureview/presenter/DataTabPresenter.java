@@ -29,8 +29,9 @@ import org.obiba.opal.web.gwt.app.client.validator.MatchingTableEntitiesValidato
 import org.obiba.opal.web.gwt.app.client.validator.MinimumSizeCollectionValidator;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -68,8 +69,6 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
 
   @Override
   protected void onBind() {
-    getDisplay().saveChangesEnabled(false);
-
     tableListPresenter.setRemoveButtonConfirmation("deleteTable", "removingTablesFromViewMayAffectVariables");
     tableListPresenter.bind();
     getDisplay().setTableSelector(tableListPresenter.getDisplay());
@@ -88,6 +87,7 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
 
   @Override
   public void refreshDisplay() {
+    getDisplay().saveChangesEnabled(false);
     tableListPresenter.getTables().clear();
     tableListPresenter.getDisplay().clear();
     setSelectedTables();
@@ -149,6 +149,7 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
 
     @Override
     public void onTableListUpdate(TableListUpdateEvent event) {
+      eventBus.fireEvent(new ViewSavePendingEvent());
       getDisplay().saveChangesEnabled(true);
     }
 

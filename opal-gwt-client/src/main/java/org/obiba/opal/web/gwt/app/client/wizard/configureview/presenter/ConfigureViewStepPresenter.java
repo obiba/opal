@@ -19,16 +19,19 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
-import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.BeforeSelectionEvent;
+import com.google.gwt.event.logical.shared.BeforeSelectionHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.http.client.Request;
@@ -66,6 +69,10 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
    * {@link ViewSaveRequiredEvent}.
    */
   private ViewDto viewDto;
+
+  private boolean viewSavePending;
+
+  private Runnable actionRequiringConfirmation;
 
   //
   // Constructors
@@ -148,6 +155,19 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
         getDisplay().getHelpDeck().showWidget(event.getSelectedItem());
       }
     }));
+    super.registerHandler(getDisplay().getViewTabs().addBeforeSelectionHandler(new BeforeSelectionHandler<Integer>() {
+
+      @Override
+      public void onBeforeSelection(BeforeSelectionEvent<Integer> event) {
+        if(viewSavePending) {
+          switchTabWithConfirmation(event.getItem());
+          // Stop this event. If the user still wants to switch tabs we will handle it manually.
+          event.cancel();
+        }
+      }
+    }));
+    super.registerHandler(eventBus.addHandler(ViewSavePendingEvent.getType(), new ViewSavePendingHandler()));
+    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
   }
 
   //
@@ -166,6 +186,15 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
     TabLayoutPanel getViewTabs();
 
     void displayTab(int tabNumber);
+  }
+
+  class ViewSavePendingHandler implements ViewSavePendingEvent.Handler {
+
+    @Override
+    public void onSavePending(ViewSavePendingEvent event) {
+      viewSavePending = true;
+    }
+
   }
 
   class ViewConfigurationRequiredHandler implements ViewConfigurationRequiredEvent.Handler {
@@ -246,9 +275,30 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
           } else {
             // Send event so save button and asterisk can be cleared.
             eventBus.fireEvent(new ViewSavedEvent());
+            viewSavePending = false;
           }
         }
       };
+    }
+  }
+
+  private void switchTabWithConfirmation(final int index) {
+    actionRequiringConfirmation = new Runnable() {
+      public void run() {
+        getDisplay().getViewTabs().selectTab(index, false);
+        getDisplay().getHelpDeck().showWidget(index);
+      }
+    };
+    eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "unsavedChangesTitle", "confirmUnsavedChanges"));
+  }
+
+  private class ConfirmationEventHandler implements ConfirmationEvent.Handler {
+
+    public void onConfirmation(ConfirmationEvent event) {
+      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event.isConfirmed()) {
+        actionRequiringConfirmation.run();
+        actionRequiringConfirmation = null;
+      }
     }
   }
 }
