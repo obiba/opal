@@ -12,20 +12,26 @@ package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.VariablesListTabPresenter;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.SuggestBox;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
 
 public class VariablesListTabView extends Composite implements VariablesListTabPresenter.Display {
 
   private static VariablesListTabViewUiBinder uiBinder = GWT.create(VariablesListTabViewUiBinder.class);
 
-  @UiField
-  SuggestBox variablesSuggestBox;
+  @UiField(provided = true)
+  SuggestBox variableNameSuggestBox;
 
   @UiField
   Anchor previous;
@@ -33,7 +39,10 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   @UiField
   Anchor next;
 
+  MultiWordSuggestOracle suggestions;
+
   public VariablesListTabView() {
+    variableNameSuggestBox = new SuggestBox(suggestions = new MultiWordSuggestOracle());
     initWidget(uiBinder.createAndBindUi(this));
   }
 
@@ -51,8 +60,43 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
 
   }
 
+  @Override
+  public void addVariableNameSuggestion(String variableName) {
+    suggestions.add(variableName);
+  }
+
+  @Override
+  public void clearVariableListSuggestions() {
+    suggestions.clear();
+  }
+
   @UiTemplate("VariablesListTabView.ui.xml")
   interface VariablesListTabViewUiBinder extends UiBinder<Widget, VariablesListTabView> {
+  }
+
+  @Override
+  public HandlerRegistration addPreviousVariableNameClickHandler(ClickHandler handler) {
+    return previous.addClickHandler(handler);
+  }
+
+  @Override
+  public HandlerRegistration addNextVariableNameClickHandler(ClickHandler handler) {
+    return next.addClickHandler(handler);
+  }
+
+  @Override
+  public void setSelectedVariableName(String variableName) {
+    variableNameSuggestBox.setText(variableName);
+  }
+
+  @Override
+  public HandlerRegistration addVariableNameChangedHandler(ValueChangeHandler<String> handler) {
+    return variableNameSuggestBox.addValueChangeHandler(handler);
+  }
+
+  @Override
+  public HandlerRegistration addVariableNameSelectedHandler(SelectionHandler<Suggestion> handler) {
+    return variableNameSuggestBox.addSelectionHandler(handler);
   }
 
 }

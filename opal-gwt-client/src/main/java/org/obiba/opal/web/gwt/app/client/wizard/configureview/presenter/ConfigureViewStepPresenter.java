@@ -235,6 +235,7 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
         getDisplay().getHelpDeck().insert(selectScriptVariablesTabPresenter.getDisplay().getHelpWidget(), 1);
 
       } else if(variableListDto != null) {
+        variablesListTabPresenter.setViewDto(viewDto);
         variablesTabWidget = variablesListTabPresenter.getDisplay().asWidget();
       }
 

@@ -10,7 +10,7 @@
       <ui:msg description="Go to label">Go to</ui:msg>
       :
     </g:Label>
-    <g:SuggestBox ui:field="variablesSuggestBox"/>
+    <g:SuggestBox ui:field="variableNameSuggestBox"/>
     <g:Anchor ui:field="previous">
       <img src="image/16/previous.png" align="middle"/>
     </g:Anchor>
