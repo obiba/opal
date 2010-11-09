@@ -23,6 +23,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -44,6 +45,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -97,7 +99,11 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     HandlerRegistration addRepeatableValueChangeHandler(ValueChangeHandler<Boolean> handler);
 
+    HandlerRegistration addSaveChangesClickHandler(ClickHandler handler);
+
     void setEnabledOccurenceGroup(Boolean enabled);
+
+    HasValue<Boolean> getRepeatable();
 
     void clearOccurrenceGroup();
 
@@ -208,6 +214,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     super.registerHandler(getDisplay().addVariableNameSelectedHandler(new VariableNameSelectedHandler()));
     super.registerHandler(getDisplay().addVariableNameEnterKeyPressed(new VariableNameEnterKeyPressedHandler()));
     super.registerHandler(getDisplay().addRepeatableValueChangeHandler(new RepeatableClickHandler()));
+    super.registerHandler(getDisplay().addSaveChangesClickHandler(new SaveChangesClickHandler()));
 
     super.registerHandler(getDisplay().getDetailTabs().addBeforeSelectionHandler(new BeforeSelectionHandler<Integer>() {
 
@@ -227,7 +234,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   }
 
   private void addValidators() {
-    validators.add(new RequiredTextValidator(getDisplay().getOccurenceGroup(), "OccurrenceGroupIsRequired"));
+    validators.add(new ConditionalValidator(getDisplay().getRepeatable(), new RequiredTextValidator(getDisplay().getOccurenceGroup(), "OccurrenceGroupIsRequired")));
   }
 
   private boolean validate() {
@@ -299,6 +306,17 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       getDisplay().setEnabledOccurenceGroup(enabled);
       if(!enabled) {
         getDisplay().clearOccurrenceGroup();
+      }
+    }
+
+  }
+
+  public class SaveChangesClickHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent event) {
+      if(validate()) {
+        // TODO Save the view
       }
     }
 

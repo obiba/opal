@@ -27,6 +27,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -206,6 +207,16 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   @Override
   public HasText getOccurenceGroup() {
     return occurenceGroup;
+  }
+
+  @Override
+  public HasValue<Boolean> getRepeatable() {
+    return repeatableCheckbox;
+  }
+
+  @Override
+  public HandlerRegistration addSaveChangesClickHandler(ClickHandler handler) {
+    return saveChangesButton.addClickHandler(handler);
   }
 
 }

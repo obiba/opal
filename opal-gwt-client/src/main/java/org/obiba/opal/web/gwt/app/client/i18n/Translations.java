@@ -72,7 +72,7 @@ public interface Translations extends Constants {
   String statusLabel();
 
   @Description("Status map")
-  @DefaultStringMapValue( { "NOT_STARTED", "Not Started", //
+  @DefaultStringMapValue({ "NOT_STARTED", "Not Started", //
   "IN_PROGRESS", "In Progress", //
   "SUCCEEDED", "Succeeded", //
   "FAILED", "Failed", //
@@ -86,7 +86,7 @@ public interface Translations extends Constants {
   String actionsLabel();
 
   @Description("Action map")
-  @DefaultStringMapValue( { "Log", "Log", //
+  @DefaultStringMapValue({ "Log", "Log", //
   "Cancel", "Cancel", //
   "Delete", "Delete", //
   "Edit", "Edit", //
@@ -146,7 +146,7 @@ public interface Translations extends Constants {
   String unitLabel();
 
   @Description("User message map")
-  @DefaultStringMapValue( { //
+  @DefaultStringMapValue({ //
   "CategoryDialogNameRequired", "A category name is required.", //
   "CategoryNameAlreadyExists", "The specified category name already exists.", //
   "AttributeNameRequired", "An attribute name is required.", //
@@ -192,7 +192,8 @@ public interface Translations extends Constants {
   "BirtReportDesignFileIsRequired", "A BIRT Design File must be selected.",//
   "CronExpressionIsRequired", "A schedule expression must be specified when the Schedule checkbox is selected.",//
   "NotificationEmailsAreInvalid", "One or more of the notifications emails specified are invalid.",//
-  "ReportTemplateNameIsRequired", "A name is required for the report template." })
+  "ReportTemplateNameIsRequired", "A name is required for the report template.",//
+  "OccurrenceGroupIsRequired", "An Occurence Group must be specified for Repeatable variables." })
   Map<String, String> userMessageMap();
 
   @Description("You must select a file message")
@@ -360,7 +361,7 @@ public interface Translations extends Constants {
   String errorLabel();
 
   @Description("Datasource parsing error map")
-  @DefaultStringMapValue( { "CategoryNameRequired", "Category name required", //
+  @DefaultStringMapValue({ "CategoryNameRequired", "Category name required", //
   "CategoryVariableNameRequired", "Category variable name required", //
   "DuplicateCategoryName", "Duplicate category name", //
   "DuplicateColumns", "Duplicate columns", //
@@ -384,7 +385,7 @@ public interface Translations extends Constants {
   Map<String, String> datasourceParsingErrorMap();
 
   @Description("Datasource comparison error map")
-  @DefaultStringMapValue( { "IncompatibleValueType", "Incompatible value type", //
+  @DefaultStringMapValue({ "IncompatibleValueType", "Incompatible value type", //
   "IncompatibleEntityType", "Incompatible entity type", //
   "VariablePresentInSourceButNotDestination", "Variable exists in source but not in destination" })
   Map<String, String> datasourceComparisonErrorMap();
