@@ -51,7 +51,16 @@
             </g:Label>
           </td>
           <td>
-            <g:ListBox ui:field="entityType"/>
+            <g:ListBox ui:field="valueType">
+              <g:item value="text"><ui:msg description="Text label">text</ui:msg></g:item>
+              <g:item value="decimal"><ui:msg description="Decimal label">decimal</ui:msg></g:item>            
+              <g:item value="integer"><ui:msg description="Integer label">integer</ui:msg></g:item>            
+              <g:item value="binary"><ui:msg description="Binary label">binary</ui:msg></g:item>            
+              <g:item value="boolean"><ui:msg description="Boolean label">boolean</ui:msg></g:item>
+              <g:item value="datetime"><ui:msg description="Datetime label">datetime</ui:msg></g:item>            
+              <g:item value="date"><ui:msg description="Date label">date</ui:msg></g:item>            
+              <g:item value="locale"><ui:msg description="Locale label">locale</ui:msg></g:item>            
+            </g:ListBox>
           </td>
         </tr>
         <tr>

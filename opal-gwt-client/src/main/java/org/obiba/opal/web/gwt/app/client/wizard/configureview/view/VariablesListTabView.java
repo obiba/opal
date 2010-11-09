@@ -63,7 +63,7 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   TextBox variableName;
 
   @UiField
-  ListBox entityType;
+  ListBox valueType;
 
   @UiField
   CheckBox repeatableCheckbox;
