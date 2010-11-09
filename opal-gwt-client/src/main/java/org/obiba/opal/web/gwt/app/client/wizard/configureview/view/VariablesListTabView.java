@@ -24,6 +24,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -77,7 +78,16 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   SimplePanel attributesTabPanel;
 
   @UiField
-  SimplePanel optionsTabPanel;
+  HTMLPanel optionsTabPanel;
+
+  @UiField
+  TextBox occurenceGroup;
+
+  @UiField
+  TextBox mimeType;
+
+  @UiField
+  TextBox unit;
 
   MultiWordSuggestOracle suggestions;
 
@@ -152,6 +162,21 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   @Override
   public String getSelectedVariableName() {
     return variableNameSuggestBox.getTextBox().getText();
+  }
+
+  @Override
+  public HandlerRegistration addRepeatableValueChangeHandler(ValueChangeHandler<Boolean> handler) {
+    return repeatableCheckbox.addValueChangeHandler(handler);
+  }
+
+  @Override
+  public void setEnabledOccurenceGroup(Boolean enabled) {
+    occurenceGroup.setEnabled(enabled);
+  }
+
+  @Override
+  public void clearOccurrenceGroup() {
+    occurenceGroup.setText("");
   }
 
 }

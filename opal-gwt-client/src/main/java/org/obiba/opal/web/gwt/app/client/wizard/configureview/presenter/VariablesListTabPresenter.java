@@ -30,6 +30,7 @@ import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
@@ -65,6 +66,12 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     HandlerRegistration addVariableNameEnterKeyPressed(KeyDownHandler keyDownHandler);
 
+    HandlerRegistration addRepeatableValueChangeHandler(ValueChangeHandler<Boolean> handler);
+
+    void setEnabledOccurenceGroup(Boolean enabled);
+
+    void clearOccurrenceGroup();
+
   }
 
   @Inject
@@ -76,6 +83,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   protected void onBind() {
     initDisplayComponents();
     addEventHandlers();
+    addValidators();
   }
 
   @Override
@@ -149,6 +157,13 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     super.registerHandler(getDisplay().addNextVariableNameClickHandler(new NextVariableClickHandler()));
     super.registerHandler(getDisplay().addVariableNameSelectedHandler(new VariableNameSelectedHandler()));
     super.registerHandler(getDisplay().addVariableNameEnterKeyPressed(new VariableNameEnterKeyPressedHandler()));
+    super.registerHandler(getDisplay().addRepeatableValueChangeHandler(new RepeatableClickHandler()));
+  }
+
+  private void addValidators() {
+
+    // TODO Auto-generated method stub
+
   }
 
   private class PreviousVariableClickHandler implements ClickHandler {
@@ -190,6 +205,19 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     public void onKeyDown(KeyDownEvent event) {
       if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
         GWT.log("Selection changed to (enter) " + getDisplay().getSelectedVariableName());
+      }
+    }
+
+  }
+
+  public class RepeatableClickHandler implements ValueChangeHandler<Boolean> {
+
+    @Override
+    public void onValueChange(ValueChangeEvent<Boolean> event) {
+      boolean enabled = event.getValue();
+      getDisplay().setEnabledOccurenceGroup(enabled);
+      if(!enabled) {
+        getDisplay().clearOccurrenceGroup();
       }
     }
 

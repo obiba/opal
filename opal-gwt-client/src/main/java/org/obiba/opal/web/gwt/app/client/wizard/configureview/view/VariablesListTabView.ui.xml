@@ -25,7 +25,7 @@
       </g:Anchor>
       <g:Button ui:field="removeButton" addStyleNames="right-aligned indent">
         <ui:msg description="Remove label">Remove</ui:msg>
-      </g:Button>         
+      </g:Button>
       <g:Button ui:field="addButton" addStyleNames="right-aligned">
         <ui:msg description="Add button label">Add</ui:msg>
       </g:Button>
@@ -34,15 +34,21 @@
       <table>
         <tr>
           <td>
-            <g:Label><ui:msg description="Name label">Name</ui:msg>:</g:Label>
+            <g:Label>
+              <ui:msg description="Name label">Name</ui:msg>
+              :
+            </g:Label>
           </td>
           <td>
-            <g:TextBox ui:field="variableName" width="15em"  />
+            <g:TextBox ui:field="variableName" width="15em"/>
           </td>
         </tr>
         <tr>
           <td>
-            <g:Label><ui:msg description="Type label">Type</ui:msg>:</g:Label>
+            <g:Label>
+              <ui:msg description="Type label">Type</ui:msg>
+              :
+            </g:Label>
           </td>
           <td>
             <g:ListBox ui:field="entityType"/>
@@ -51,33 +57,80 @@
         <tr>
           <td/>
           <td>
-            <g:CheckBox ui:field="repeatableCheckbox" />
-            <g:Label addStyleNames="inline"><ui:msg description="Repeatable label">Repeatable</ui:msg></g:Label>
+            <g:CheckBox ui:field="repeatableCheckbox"/>
+            <g:Label addStyleNames="inline">
+              <ui:msg description="Repeatable label">Repeatable</ui:msg>
+            </g:Label>
           </td>
         </tr>
         <tr>
           <td>
-            <g:Label><ui:msg description="Script label">Script</ui:msg>:</g:Label>
+            <g:Label>
+              <ui:msg description="Script label">Script</ui:msg>
+              :
+            </g:Label>
           </td>
           <td>
-            <g:SimplePanel ui:field="scriptWidgetPanel" addStyleNames="small-top-margin" />
+            <g:SimplePanel ui:field="scriptWidgetPanel" addStyleNames="small-top-margin"/>
           </td>
         </tr>
       </table>
     </g:HTMLPanel>
     <g:TabLayoutPanel barHeight="2" barUnit="EM" width="100%" height="15em" ui:field="variableDetailTabs">
       <g:tab>
-        <g:header><ui:msg description="Categories label">Categories</ui:msg></g:header>
-        <g:SimplePanel ui:field="categoriesTabPanel" />
+        <g:header>
+          <ui:msg description="Categories label">Categories</ui:msg>
+        </g:header>
+        <g:SimplePanel ui:field="categoriesTabPanel"/>
       </g:tab>
       <g:tab>
-        <g:header><ui:msg description="Attributes label">Attributes</ui:msg></g:header>
-        <g:SimplePanel ui:field="attributesTabPanel" />
+        <g:header>
+          <ui:msg description="Attributes label">Attributes</ui:msg>
+        </g:header>
+        <g:SimplePanel ui:field="attributesTabPanel"/>
       </g:tab>
       <g:tab>
-        <g:header><ui:msg description="Options label">Options</ui:msg></g:header>
-        <g:SimplePanel ui:field="optionsTabPanel" />
+        <g:header>
+          <ui:msg description="Options label">Options</ui:msg>
+        </g:header>
+        <g:HTMLPanel ui:field="optionsTabPanel">
+          <table>
+            <tr>
+              <td>
+                <g:Label>
+                  <ui:msg description="Occurence group label">Occurence Group</ui:msg>
+                  :
+                </g:Label>
+              </td>
+              <td>
+                <g:TextBox  enabled="false" ui:field="occurenceGroup"/>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <g:Label>
+                  <ui:msg description="Unit label">Unit</ui:msg>
+                  :
+                </g:Label>
+              </td>
+              <td>
+                <g:TextBox ui:field="unit"/>
+              </td>              
+            </tr>
+            <tr>
+              <td>
+                <g:Label>
+                  <ui:msg description="Mime type label">Mime-Type</ui:msg>
+                  :
+                </g:Label>
+              </td>
+              <td>
+                <g:TextBox ui:field="mimeType"/>
+              </td>                
+            </tr>
+          </table>
+        </g:HTMLPanel>
       </g:tab>
-    </g:TabLayoutPanel>     
+    </g:TabLayoutPanel>
   </g:FlowPanel>
 </ui:UiBinder>
