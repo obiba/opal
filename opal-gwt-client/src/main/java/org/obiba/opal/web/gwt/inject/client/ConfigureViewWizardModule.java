@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.inject.client;
 
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.view.LabelListView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.AttributeDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.CategoryDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
@@ -47,5 +49,6 @@ public class ConfigureViewWizardModule extends AbstractGinModule {
     bind(SelectScriptVariablesTabPresenter.Display.class).to(SelectScriptVariablesTabView.class);
     bind(VariablesListTabPresenter.Display.class).to(VariablesListTabView.class);
     bind(LocalizablesPresenter.Display.class).to(LocalizablesView.class);
+    bind(LabelListPresenter.Display.class).to(LabelListView.class);
   }
 }
