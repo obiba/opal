@@ -219,4 +219,9 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
     return saveChangesButton.addClickHandler(handler);
   }
 
+  @Override
+  public HandlerRegistration addAddVariableClickHandler(ClickHandler handler) {
+    return addButton.addClickHandler(handler);
+  }
+
 }

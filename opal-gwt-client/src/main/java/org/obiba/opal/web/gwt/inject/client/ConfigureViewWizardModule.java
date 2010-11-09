@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.inject.client;
 
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.view.LabelListView;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.AddDerivedVariableDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.AttributeDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.CategoryDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
@@ -20,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.Localiza
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.SaveErrorsStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.SelectScriptVariablesTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.VariablesListTabPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.AddDerivedVariableDialogView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.AttributeDialogView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.CategoryDialogView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.ConfigureViewStepView;
@@ -50,5 +52,6 @@ public class ConfigureViewWizardModule extends AbstractGinModule {
     bind(VariablesListTabPresenter.Display.class).to(VariablesListTabView.class);
     bind(LocalizablesPresenter.Display.class).to(LocalizablesView.class);
     bind(LabelListPresenter.Display.class).to(LabelListView.class);
+    bind(AddDerivedVariableDialogPresenter.Display.class).to(AddDerivedVariableDialogView.class);
   }
 }

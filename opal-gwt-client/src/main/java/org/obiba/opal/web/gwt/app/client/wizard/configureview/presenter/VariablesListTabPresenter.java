@@ -67,6 +67,9 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   @Inject
   private AttributesPresenter attributesPresenter;
 
+  @Inject
+  private AddDerivedVariableDialogPresenter addDerivedVariableDialogPresenter;
+
   private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
   public interface Display extends WidgetDisplay {
@@ -101,6 +104,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     HandlerRegistration addSaveChangesClickHandler(ClickHandler handler);
 
+    HandlerRegistration addAddVariableClickHandler(ClickHandler handler);
+
     void setEnabledOccurenceGroup(Boolean enabled);
 
     HasValue<Boolean> getRepeatable();
@@ -126,6 +131,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     attributesPresenter.getDisplay().setAddButtonText("Add New Attribute");
     getDisplay().addAttributesTabWidget(attributesPresenter.getDisplay().asWidget());
 
+    addDerivedVariableDialogPresenter.bind();
+
     initDisplayComponents();
     addEventHandlers();
     addValidators();
@@ -135,6 +142,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   protected void onUnbind() {
     categoriesPresenter.unbind();
     attributesPresenter.unbind();
+    addDerivedVariableDialogPresenter.unbind();
   }
 
   @Override
@@ -219,6 +227,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     super.registerHandler(getDisplay().addVariableNameEnterKeyPressed(new VariableNameEnterKeyPressedHandler()));
     super.registerHandler(getDisplay().addRepeatableValueChangeHandler(new RepeatableClickHandler()));
     super.registerHandler(getDisplay().addSaveChangesClickHandler(new SaveChangesClickHandler()));
+    super.registerHandler(getDisplay().addAddVariableClickHandler(new AddVariableClickHandler()));
 
     super.registerHandler(getDisplay().getDetailTabs().addBeforeSelectionHandler(new BeforeSelectionHandler<Integer>() {
 
@@ -288,6 +297,15 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     public void onSelection(SelectionEvent<Suggestion> event) {
       currentSelectedVariableIndex = getVariableIndex(event.getSelectedItem().getReplacementString());
       updateSelectedVariableName();
+    }
+  }
+
+  private class AddVariableClickHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent event) {
+      addDerivedVariableDialogPresenter.getDisplay().showDialog();
+
     }
   }
 
