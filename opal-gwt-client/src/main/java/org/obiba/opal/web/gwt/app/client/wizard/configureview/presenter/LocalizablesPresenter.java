@@ -181,7 +181,7 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
     }
   }
 
-  class AddButtonClickHandler implements ClickHandler {
+  static class AddButtonClickHandler implements ClickHandler {
 
     @Override
     public void onClick(ClickEvent event) {

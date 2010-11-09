@@ -67,6 +67,14 @@ public class AttributesPresenter extends LocalizablesPresenter {
           public int compareTo(Localizable o) {
             return getName().compareTo(o.getName());
           }
+
+          @Override
+          public boolean equals(Object o) {
+            if(o instanceof Localizable) {
+              return getName().equals(((Localizable) o).getName()) && getLabel().equals(((Localizable) o).getLabel());
+            }
+            return false;
+          }
         });
       }
     }
