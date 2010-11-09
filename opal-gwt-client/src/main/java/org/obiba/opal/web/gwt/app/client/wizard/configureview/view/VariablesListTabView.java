@@ -25,6 +25,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -177,6 +178,11 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   @Override
   public void clearOccurrenceGroup() {
     occurenceGroup.setText("");
+  }
+
+  @Override
+  public HasText getOccurenceGroup() {
+    return occurenceGroup;
   }
 
 }

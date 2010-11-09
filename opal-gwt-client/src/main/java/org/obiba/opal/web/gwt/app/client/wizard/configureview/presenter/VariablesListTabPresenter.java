@@ -9,7 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
@@ -17,7 +20,11 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
@@ -33,6 +40,7 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.inject.Inject;
 
@@ -46,6 +54,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   private List<VariableDto> variables;
 
   private int currentSelectedVariableIndex;
+
+  private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
   public interface Display extends WidgetDisplay {
     void clearVariableNameSuggestions();
@@ -71,6 +81,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     void setEnabledOccurenceGroup(Boolean enabled);
 
     void clearOccurrenceGroup();
+
+    HasText getOccurenceGroup();
 
   }
 
@@ -161,9 +173,25 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   }
 
   private void addValidators() {
+    validators.add(new RequiredTextValidator(getDisplay().getOccurenceGroup(), "OccurrenceGroupIsRequired"));
+  }
 
-    // TODO Auto-generated method stub
+  private boolean validate() {
+    List<String> messages = new ArrayList<String>();
+    String message;
+    for(FieldValidator validator : validators) {
+      message = validator.validate();
+      if(message != null) {
+        messages.add(message);
+      }
+    }
 
+    if(messages.size() > 0) {
+      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, messages, null));
+      return false;
+    } else {
+      return true;
+    }
   }
 
   private class PreviousVariableClickHandler implements ClickHandler {
