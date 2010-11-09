@@ -35,6 +35,9 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.logical.shared.BeforeSelectionEvent;
+import com.google.gwt.event.logical.shared.BeforeSelectionHandler;
+import com.google.gwt.event.logical.shared.HasBeforeSelectionHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -42,6 +45,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
@@ -55,9 +59,24 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
   private int currentSelectedVariableIndex;
 
+  @Inject
+  private CategoriesPresenter categoriesPresenter;
+
+  @Inject
+  private AttributesPresenter attributesPresenter;
+
   private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
   public interface Display extends WidgetDisplay {
+
+    HasBeforeSelectionHandlers<Integer> getDetailTabs();
+
+    void displayDetailTab(int tabNumber);
+
+    void addCategoriesTabWidget(Widget categoriesTabWidget);
+
+    void addAttributesTabWidget(Widget attributesTabWidget);
+
     void clearVariableNameSuggestions();
 
     void addVariableNameSuggestion(String variableName);
@@ -93,6 +112,14 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
   @Override
   protected void onBind() {
+    categoriesPresenter.bind();
+    categoriesPresenter.getDisplay().setAddButtonText("Add New Category");
+    getDisplay().addCategoriesTabWidget(categoriesPresenter.getDisplay().asWidget());
+
+    attributesPresenter.bind();
+    attributesPresenter.getDisplay().setAddButtonText("Add New Attribute");
+    getDisplay().addAttributesTabWidget(attributesPresenter.getDisplay().asWidget());
+
     initDisplayComponents();
     addEventHandlers();
     addValidators();
@@ -100,14 +127,19 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
   @Override
   protected void onUnbind() {
+    categoriesPresenter.unbind();
+    attributesPresenter.unbind();
   }
 
   @Override
   public void revealDisplay() {
+    // Always show the Categories detail tab first.
+    getDisplay().displayDetailTab(0);
   }
 
   @Override
   public void refreshDisplay() {
+
   }
 
   @Override
@@ -162,6 +194,12 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
   public void setViewDto(ViewDto viewDto) {
     this.viewDto = viewDto;
+
+    categoriesPresenter.setViewDto(viewDto);
+    categoriesPresenter.refreshDisplay();
+
+    attributesPresenter.setViewDto(viewDto);
+    attributesPresenter.refreshDisplay();
   }
 
   private void addEventHandlers() {
@@ -170,6 +208,22 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     super.registerHandler(getDisplay().addVariableNameSelectedHandler(new VariableNameSelectedHandler()));
     super.registerHandler(getDisplay().addVariableNameEnterKeyPressed(new VariableNameEnterKeyPressedHandler()));
     super.registerHandler(getDisplay().addRepeatableValueChangeHandler(new RepeatableClickHandler()));
+
+    super.registerHandler(getDisplay().getDetailTabs().addBeforeSelectionHandler(new BeforeSelectionHandler<Integer>() {
+
+      @Override
+      public void onBeforeSelection(BeforeSelectionEvent<Integer> event) {
+        switch(event.getItem()) {
+        case 0:
+          categoriesPresenter.refreshDisplay();
+          break;
+        case 1:
+          attributesPresenter.refreshDisplay();
+          break;
+        }
+        // TODO: case 2 (options tab)
+      }
+    }));
   }
 
   private void addValidators() {
@@ -203,7 +257,6 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       }
       updateSelectedVariableName();
     }
-
   }
 
   private class NextVariableClickHandler implements ClickHandler {
@@ -232,7 +285,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     @Override
     public void onKeyDown(KeyDownEvent event) {
       if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-        GWT.log("Selection changed to (enter) " + getDisplay().getSelectedVariableName());
+        GWT.log("Selection changed to (enter) " + getDisplay().getSelectedVariableName() + ", handler: " + this);
       }
     }
 

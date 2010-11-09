@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.Variable
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.logical.shared.HasBeforeSelectionHandlers;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -109,6 +110,28 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   @Override
   public void stopProcessing() {
 
+  }
+
+  @Override
+  public HasBeforeSelectionHandlers<Integer> getDetailTabs() {
+    return variableDetailTabs;
+  }
+
+  @Override
+  public void displayDetailTab(int tabNumber) {
+    variableDetailTabs.selectTab(tabNumber);
+  }
+
+  @Override
+  public void addCategoriesTabWidget(Widget categoriesTabWidget) {
+    categoriesTabPanel.clear();
+    categoriesTabPanel.add(categoriesTabWidget);
+  }
+
+  @Override
+  public void addAttributesTabWidget(Widget attributesTabWidget) {
+    attributesTabPanel.clear();
+    attributesTabPanel.add(attributesTabWidget);
   }
 
   @Override
