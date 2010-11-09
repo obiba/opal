@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
+import static org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.LocalizablesPresenter.DELETE_ACTION;
+import static org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.LocalizablesPresenter.EDIT_ACTION;
+
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -150,7 +153,7 @@ public class LocalizablesView extends Composite implements LocalizablesPresenter
       }
     }, translations.labelLabel());
 
-    actionsColumn = new ActionsColumn<Localizable>();
+    actionsColumn = new ActionsColumn<Localizable>(EDIT_ACTION, DELETE_ACTION);
     localizablesTable.addColumn((ActionsColumn<Localizable>) actionsColumn, translations.actionsLabel());
   }
 

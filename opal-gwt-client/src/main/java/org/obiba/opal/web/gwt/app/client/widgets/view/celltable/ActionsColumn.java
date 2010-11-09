@@ -9,9 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.view.celltable;
 
-import static org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.LocalizablesPresenter.DELETE_ACTION;
-import static org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.LocalizablesPresenter.EDIT_ACTION;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,8 +42,8 @@ public class ActionsColumn<T> extends Column<T, T> implements HasActionHandler<T
   // Constructors
   //
 
-  public ActionsColumn() {
-    super(new ActionsCell<T>());
+  public ActionsColumn(String... actions) {
+    super(new ActionsCell<T>(actions));
   }
 
   //
@@ -80,11 +77,19 @@ public class ActionsColumn<T> extends Column<T, T> implements HasActionHandler<T
 
     private ActionHandler<T> actionHandler;
 
+    private String[] actions;
+
     //
     // Constructors
     //
 
-    public ActionsCell() {
+    public ActionsCell(String... actions) {
+      if(actions == null || actions.length == 0) {
+        throw new IllegalArgumentException("null or empty actions array");
+      }
+      this.actions = new String[actions.length];
+      System.arraycopy(actions, 0, this.actions, 0, this.actions.length);
+
       hasCellFieldUpdater = new FieldUpdater<T, String>() {
         public void update(int rowIndex, T object, String value) {
           if(actionHandler != null) {
@@ -121,7 +126,7 @@ public class ActionsColumn<T> extends Column<T, T> implements HasActionHandler<T
     }
 
     private void refreshActions(T value) {
-      delegateCell = createCompositeCell(EDIT_ACTION, DELETE_ACTION);
+      delegateCell = createCompositeCell(actions);
     }
 
     private CompositeCell<T> createCompositeCell(String... actionNames) {

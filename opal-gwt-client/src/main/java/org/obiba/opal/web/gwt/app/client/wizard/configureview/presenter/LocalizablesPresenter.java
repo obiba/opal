@@ -25,7 +25,6 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -130,10 +129,8 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
 
   private void doActionImpl(Localizable localizable, String actionName) {
     if(EDIT_ACTION.equals(actionName)) {
-      GWT.log("<edit: " + localizable.getName() + ">");
       editLocalizable(localizable, getDisplay().getSelectedLocale());
     } else if(DELETE_ACTION.equals(actionName)) {
-      GWT.log("<delete: " + localizable.getName() + ">");
       deleteLocalizable(localizable, getDisplay().getSelectedLocale());
     }
     refreshTableData();
