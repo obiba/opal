@@ -114,6 +114,12 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     HasText getOccurenceGroup();
 
+    HandlerRegistration addVariableClickHandler(ClickHandler handler);
+
+    void setNewVariable(VariableDto variableDto);
+
+    VariableDto getVariableDto();
+
   }
 
   @Inject

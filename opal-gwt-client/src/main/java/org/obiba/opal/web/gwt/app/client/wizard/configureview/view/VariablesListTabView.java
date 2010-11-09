@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.VariablesListTabPresenter;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -93,6 +94,8 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   TextBox unit;
 
   MultiWordSuggestOracle suggestions;
+
+  private String entityType;
 
   public VariablesListTabView() {
     variableNameSuggestBox = new SuggestBox(suggestions = new MultiWordSuggestOracle());
@@ -222,6 +225,28 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   @Override
   public HandlerRegistration addAddVariableClickHandler(ClickHandler handler) {
     return addButton.addClickHandler(handler);
+  }
+
+  @Override
+  public HandlerRegistration addVariableClickHandler(ClickHandler handler) {
+    return addButton.addClickHandler(handler);
+  }
+
+  @Override
+  public void setNewVariable(VariableDto variableDto) {
+    variableName.setValue(variableDto.getName());
+    entityType = variableDto.getEntityType();
+
+  }
+
+  @Override
+  public VariableDto getVariableDto() {
+    VariableDto variableDto = VariableDto.create();
+    variableDto.setName(variableName.getValue());
+    variableDto.setIsRepeatable(repeatableCheckbox.getValue());
+    variableDto.setValueType(valueType.getValue(valueType.getSelectedIndex()));
+    variableDto.setEntityType(entityType);
+    return variableDto;
   }
 
 }
