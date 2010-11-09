@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.Category
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.DataTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.EntitiesTabPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.LocalizablesPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.SaveErrorsStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.SelectScriptVariablesTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.VariablesListTabPresenter;
@@ -22,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.CategoryDialo
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.ConfigureViewStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.DataTabView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.EntitiesTabView;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.LocalizablesView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.SaveErrorsStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.SelectScriptVariablesTabView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.VariablesListTabView;
@@ -44,5 +46,6 @@ public class ConfigureViewWizardModule extends AbstractGinModule {
     bind(EntitiesTabPresenter.Display.class).to(EntitiesTabView.class);
     bind(SelectScriptVariablesTabPresenter.Display.class).to(SelectScriptVariablesTabView.class);
     bind(VariablesListTabPresenter.Display.class).to(VariablesListTabView.class);
+    bind(LocalizablesPresenter.Display.class).to(LocalizablesView.class);
   }
 }

@@ -1,0 +1,31 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+  xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
+
+  <ui:style>
+    .localizablesTable {
+      clear: left;
+      width: 100%;
+    }
+
+    .localizablesTable td:hover {
+      cursor: default;
+    }
+    .localizablesTable td + td + td span + span {
+      margin-left: 1em;	
+    }
+    .localizablesTable td + td + td span {
+      text-decoration: underline;	
+    }
+    .localizablesTable td + td + td span:hover {
+      cursor: pointer;
+    }
+  </ui:style>
+  
+  <g:FlowPanel>
+    <g:Button ui:field="addButton" addStyleNames="left-aligned">Add</g:Button>
+    <g:ListBox ui:field="localeListBox" addStyleNames="right-aligned" />
+    <g2:CellTable ui:field="localizablesTable" addStyleNames="small-top-margin {style.localizablesTable}" />  
+  </g:FlowPanel>
+  
+</ui:UiBinder>

@@ -89,6 +89,7 @@ public interface Translations extends Constants {
   @DefaultStringMapValue( { "Log", "Log", //
   "Cancel", "Cancel", //
   "Delete", "Delete", //
+  "Edit", "Edit", //
   "Download", "Download" })
   Map<String, String> actionMap();
 
