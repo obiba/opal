@@ -13,6 +13,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.Variable
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -105,7 +106,7 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   }
 
   @Override
-  public void clearVariableListSuggestions() {
+  public void clearVariableNameSuggestions() {
     suggestions.clear();
   }
 
@@ -124,11 +125,6 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   }
 
   @Override
-  public void setSelectedVariableName(String variableName) {
-    variableNameSuggestBox.setText(variableName);
-  }
-
-  @Override
   public HandlerRegistration addVariableNameChangedHandler(ValueChangeHandler<String> handler) {
     return variableNameSuggestBox.addValueChangeHandler(handler);
   }
@@ -136,6 +132,26 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   @Override
   public HandlerRegistration addVariableNameSelectedHandler(SelectionHandler<Suggestion> handler) {
     return variableNameSuggestBox.addSelectionHandler(handler);
+  }
+
+  @Override
+  public HandlerRegistration addVariableNameEnterKeyPressed(KeyDownHandler handler) {
+    return variableNameSuggestBox.addKeyDownHandler(handler);
+  }
+
+  @Override
+  public void setSelectedVariableName(String variableName, String previousVariableName, String nextVariableName) {
+    variableNameSuggestBox.setText(variableName);
+    previous.setTitle(previousVariableName);
+    next.setTitle(nextVariableName);
+
+    previous.setEnabled(previousVariableName != null);
+    next.setEnabled(nextVariableName != null);
+  }
+
+  @Override
+  public String getSelectedVariableName() {
+    return variableNameSuggestBox.getTextBox().getText();
   }
 
 }

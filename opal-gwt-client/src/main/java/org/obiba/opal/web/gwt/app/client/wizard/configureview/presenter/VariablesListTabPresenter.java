@@ -23,12 +23,13 @@ import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
@@ -46,11 +47,13 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   private int currentSelectedVariableIndex;
 
   public interface Display extends WidgetDisplay {
-    void clearVariableListSuggestions();
+    void clearVariableNameSuggestions();
 
     void addVariableNameSuggestion(String variableName);
 
-    void setSelectedVariableName(String variableName);
+    void setSelectedVariableName(String variableName, String previousVariableName, String nextVariableName);
+
+    String getSelectedVariableName();
 
     HandlerRegistration addPreviousVariableNameClickHandler(ClickHandler handler);
 
@@ -59,6 +62,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     HandlerRegistration addVariableNameChangedHandler(ValueChangeHandler<String> handler);
 
     HandlerRegistration addVariableNameSelectedHandler(SelectionHandler<Suggestion> handler);
+
+    HandlerRegistration addVariableNameEnterKeyPressed(KeyDownHandler keyDownHandler);
 
   }
 
@@ -69,17 +74,6 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
   @Override
   protected void onBind() {
-
-    // test
-    String[] names = new String[] { "avariable1", "avariable2", "rvariable", "zvariable" };
-    JsArray<VariableDto> variablesArray = VariableDto.createArray();
-    for(int i = 0; i < names.length; i++) {
-      VariableDto variable = VariableDto.create();
-      variable.setName(names[i]);
-      variablesArray.push(variable);
-    }
-    variables = JsArrays.toList(variablesArray);
-
     initDisplayComponents();
     addEventHandlers();
   }
@@ -107,18 +101,40 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
   private void initDisplayComponents() {
     VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
-    // variables = JsArrays.toList(variableListDto.getVariablesArray());
+    variables = JsArrays.toList(variableListDto.getVariablesArray());
     refreshVariableSuggestions();
-    getDisplay().setSelectedVariableName("");
+    currentSelectedVariableIndex = -1;
+    getDisplay().setSelectedVariableName(null, null, getNextVariableName());
   }
 
   private void updateSelectedVariableName() {
-    GWT.log("name is " + variables.get(currentSelectedVariableIndex).getName());
-    getDisplay().setSelectedVariableName(!variables.isEmpty() ? variables.get(currentSelectedVariableIndex).getName() : "");
+    if(!variables.isEmpty()) {
+      getDisplay().setSelectedVariableName(getSelectedVariableName(), getPreviousVariableName(), getNextVariableName());
+    }
+  }
+
+  private String getSelectedVariableName() {
+    return variables.get(currentSelectedVariableIndex).getName();
+  }
+
+  private String getPreviousVariableName() {
+    String previousVariable = null;
+    if(currentSelectedVariableIndex > 0) {
+      previousVariable = variables.get(currentSelectedVariableIndex - 1).getName();
+    }
+    return previousVariable;
+  }
+
+  private String getNextVariableName() {
+    String nextVariable = null;
+    if(currentSelectedVariableIndex < variables.size() - 1) {
+      nextVariable = variables.get(currentSelectedVariableIndex + 1).getName();
+    }
+    return nextVariable;
   }
 
   private void refreshVariableSuggestions() {
-    getDisplay().clearVariableListSuggestions();
+    getDisplay().clearVariableNameSuggestions();
     for(VariableDto variableDto : variables) {
       getDisplay().addVariableNameSuggestion(variableDto.getName());
     }
@@ -131,21 +147,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   private void addEventHandlers() {
     super.registerHandler(getDisplay().addPreviousVariableNameClickHandler(new PreviousVariableClickHandler()));
     super.registerHandler(getDisplay().addNextVariableNameClickHandler(new NextVariableClickHandler()));
-    super.registerHandler(getDisplay().addVariableNameChangedHandler(new ValueChangeHandler<String>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<String> event) {
-        GWT.log("Value changed to " + event.getValue());
-
-      }
-    }));
-    super.registerHandler(getDisplay().addVariableNameSelectedHandler(new SelectionHandler<Suggestion>() {
-
-      @Override
-      public void onSelection(SelectionEvent<Suggestion> event) {
-        GWT.log("Selection changed to " + event.getSelectedItem().getDisplayString());
-      }
-    }));
+    super.registerHandler(getDisplay().addVariableNameSelectedHandler(new VariableNameSelectedHandler()));
+    super.registerHandler(getDisplay().addVariableNameEnterKeyPressed(new VariableNameEnterKeyPressedHandler()));
   }
 
   private class PreviousVariableClickHandler implements ClickHandler {
@@ -170,6 +173,37 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       updateSelectedVariableName();
     }
 
+  }
+
+  private class VariableNameSelectedHandler implements SelectionHandler<Suggestion> {
+
+    @Override
+    public void onSelection(SelectionEvent<Suggestion> event) {
+      currentSelectedVariableIndex = getVariableIndex(event.getSelectedItem().getReplacementString());
+      updateSelectedVariableName();
+    }
+  }
+
+  public class VariableNameEnterKeyPressedHandler implements KeyDownHandler {
+
+    @Override
+    public void onKeyDown(KeyDownEvent event) {
+      if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+        GWT.log("Selection changed to (enter) " + getDisplay().getSelectedVariableName());
+      }
+    }
+
+  }
+
+  private int getVariableIndex(String variableName) {
+    int i = 0;
+    for(VariableDto variable : variables) {
+      if(variable.getName().equals(variableName)) {
+        break;
+      }
+      i++;
+    }
+    return i;
   }
 
 }
