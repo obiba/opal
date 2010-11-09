@@ -166,11 +166,29 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
     HandlerRegistration addButtonClickHandler(ClickHandler handler);
   }
 
-  public interface Localizable extends Comparable<Localizable> {
+  public abstract class Localizable implements Comparable<Localizable> {
 
-    public String getName();
+    public abstract String getName();
 
-    public String getLabel();
+    public abstract String getLabel();
+
+    @Override
+    public int compareTo(Localizable o) {
+      return getName().compareTo(o.getName());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if(o instanceof Localizable) {
+        return getName().equals(((Localizable) o).getName()) && getLabel().equals(((Localizable) o).getLabel());
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return (getName() + ":" + getLabel()).hashCode();
+    }
   }
 
   class LocaleChangeHandler implements ChangeHandler {
