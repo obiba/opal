@@ -13,6 +13,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
@@ -22,6 +24,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -30,6 +33,9 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.AttributeUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.UpdateType;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.magma.VariableListViewDto;
+import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -46,10 +52,11 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-/**
- *
- */
 public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPresenter.Display> {
+
+  private ViewDto viewDto;
+
+  private SortedSet<String> uniqueAttributeNamesList;
 
   public interface Display extends WidgetDisplay {
 
@@ -136,6 +143,7 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
     getDisplay().setNameDropdownList(labels);
     if(isEdit()) getDisplay().setAttributeName(attributeNameToDisplay);
     setTitle();
+    uniqueAttributeNamesList = getUniqueAttributeNames();
   }
 
   private void setTitle() {
@@ -272,6 +280,21 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
     return attributes;
   }
 
+  private SortedSet<String> getUniqueAttributeNames() {
+    SortedSet<String> attributeNames = new TreeSet<String>();
+    VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+    for(VariableDto variable : JsArrays.toList(variableListDto.getVariablesArray())) {
+      for(AttributeDto attribute : JsArrays.toList(variable.getAttributesArray())) {
+        attributeNames.add(attribute.getName());
+      }
+    }
+    return attributeNames;
+  }
+
+  private void addAttributeName(String attributeName) {
+    uniqueAttributeNamesList.add(attributeName);
+  }
+
   public void setDatasourceName(String datasourceName) {
     this.datasourceName = datasourceName;
   }
@@ -286,5 +309,9 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
   public void setAttributes(JsArray<AttributeDto> attributes) {
     this.attributes = attributes;
+  }
+
+  public void setViewDto(ViewDto viewDto) {
+    this.viewDto = viewDto;
   }
 }

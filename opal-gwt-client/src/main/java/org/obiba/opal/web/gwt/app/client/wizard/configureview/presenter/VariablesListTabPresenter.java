@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
@@ -28,7 +26,6 @@ import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.Notific
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
@@ -63,8 +60,6 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   private List<VariableDto> variables;
 
   private int currentSelectedVariableIndex;
-
-  private SortedSet<String> uniqueAttributeNamesList;
 
   @Inject
   private CategoriesPresenter categoriesPresenter;
@@ -164,7 +159,6 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
   private void initDisplayComponents() {
     variables = getVariableList();
-    uniqueAttributeNamesList = getUniqueAttributeNames();
     refreshVariableSuggestions();
     currentSelectedVariableIndex = -1;
     getDisplay().setSelectedVariableName(null, null, getNextVariableName());
@@ -263,20 +257,6 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     } else {
       return true;
     }
-  }
-
-  private SortedSet<String> getUniqueAttributeNames() {
-    SortedSet<String> attributeNames = new TreeSet<String>();
-    for(VariableDto variable : getVariableList()) {
-      for(AttributeDto attribute : JsArrays.toList(variable.getAttributesArray())) {
-        attributeNames.add(attribute.getName());
-      }
-    }
-    return attributeNames;
-  }
-
-  private void addAttributeName(String attributeName) {
-    uniqueAttributeNamesList.add(attributeName);
   }
 
   private class PreviousVariableClickHandler implements ClickHandler {
