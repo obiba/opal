@@ -841,3 +841,7 @@ table.itemSelector .button {
   margin-left: 0;
   margin-right: 0;
 }
+
+.addDerivedVariablesDialog input.gwt-TextBox, .addDerivedVariablesDialog input.gwt-SuggestBox {
+  width:250px;
+}
