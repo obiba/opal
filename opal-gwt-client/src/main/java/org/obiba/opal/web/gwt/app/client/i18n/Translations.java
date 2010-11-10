@@ -193,7 +193,9 @@ public interface Translations extends Constants {
   "CronExpressionIsRequired", "A schedule expression must be specified when the Schedule checkbox is selected.",//
   "NotificationEmailsAreInvalid", "One or more of the notifications emails specified are invalid.",//
   "ReportTemplateNameIsRequired", "A name is required for the report template.",//
-  "OccurrenceGroupIsRequired", "An Occurence Group must be specified for Repeatable variables." })
+  "OccurrenceGroupIsRequired", "An Occurence Group must be specified for Repeatable variables.",//
+  "NewVariableNameIsRequired", "A name is required for the new variable to be created.",//
+  "CopyFromVariableNameIsRequired", "You must enter the name of a variable from which the new variable will be created from." })
   Map<String, String> userMessageMap();
 
   @Description("You must select a file message")
