@@ -91,7 +91,7 @@ a:hover {
 	background-color: transparent;
 }
 
-.gwt-MenuBar-vertical .gwt-MenuItem.gwt-MenuItem-selected {
+.gwt-MenuBar-vertical .gwt-MenuItem.gwt-MenuItem-selected .subMenuItem-selected {
 	background-color: #feede0;
 }
 

@@ -30,7 +30,6 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.support.DatasourceParsingException;
 import org.obiba.magma.support.Disposables;
-import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.magma.support.NoSuchDatasourceFactoryException;
 import org.obiba.opal.web.model.Magma;
@@ -38,7 +37,6 @@ import org.obiba.opal.web.model.Magma.DatasourceDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
@@ -50,17 +48,14 @@ public class DatasourcesResource {
   @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(DatasourcesResource.class);
 
-  private final String keysDatasourceName;
-
   private final DatasourceFactoryRegistry datasourceFactoryRegistry;
 
   @Autowired
-  public DatasourcesResource(@Value("${org.obiba.opal.keys.tableReference}") String keysTableReference, DatasourceFactoryRegistry datasourceFactoryRegistry) {
-    keysDatasourceName = MagmaEngineTableResolver.valueOf(keysTableReference).getDatasourceName();
-    this.datasourceFactoryRegistry = datasourceFactoryRegistry;
-    if(keysDatasourceName == null) {
-      throw new IllegalArgumentException("invalid keys table reference");
+  public DatasourcesResource(DatasourceFactoryRegistry datasourceFactoryRegistry) {
+    if(datasourceFactoryRegistry == null) {
+      throw new IllegalArgumentException("datasourceFactoryRegistry cannot be null");
     }
+    this.datasourceFactoryRegistry = datasourceFactoryRegistry;
   }
 
   @GET
@@ -68,9 +63,6 @@ public class DatasourcesResource {
     final List<Magma.DatasourceDto> datasources = Lists.newArrayList();
 
     for(Datasource from : MagmaEngine.get().getDatasources()) {
-      // OPAL-365: Hide the keys datasource.
-      if(from.getName().equals(keysDatasourceName)) continue;
-
       URI dslink = UriBuilder.fromPath("/").path(DatasourceResource.class).build(from.getName());
       Magma.DatasourceDto.Builder ds = Dtos.asDto(from).setLink(dslink.toString());
       datasources.add(ds.build());

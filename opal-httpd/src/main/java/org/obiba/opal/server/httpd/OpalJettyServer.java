@@ -20,6 +20,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.mgt.SecurityManager;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -66,7 +67,7 @@ public class OpalJettyServer implements Service {
   private ConfigurableApplicationContext webApplicationContext;
 
   @Autowired
-  public OpalJettyServer(final ApplicationContext ctx, final SslContextFactory sslContextFactory, final PlatformTransactionManager txmgr, final @Value("${org.obiba.opal.http.port}") Integer httpPort, final @Value("${org.obiba.opal.https.port}") Integer httpsPort) {
+  public OpalJettyServer(final ApplicationContext ctx, final SecurityManager securityMgr, final SslContextFactory sslContextFactory, final PlatformTransactionManager txmgr, final @Value("${org.obiba.opal.http.port}") Integer httpPort, final @Value("${org.obiba.opal.https.port}") Integer httpsPort) {
     Server server = new Server();
     // OPAL-342: We will manually stop the Jetty server instead of relying its shutdown hook
     server.setStopAtShutdown(false);
@@ -95,7 +96,7 @@ public class OpalJettyServer implements Service {
     String url = "file://" + System.getProperty("OPAL_DIST_DIR") + "/webapp";
     handlers.addHandler(createFileHandler(url));
 
-    handlers.addHandler(contextHandler = createServletHandler(ctx, txmgr));
+    handlers.addHandler(contextHandler = createServletHandler(ctx, txmgr, securityMgr));
     server.setHandler(handlers);
 
     this.jettyServer = server;
@@ -140,10 +141,10 @@ public class OpalJettyServer implements Service {
 
   }
 
-  private ServletContextHandler createServletHandler(ApplicationContext ctx, PlatformTransactionManager txmgr) {
+  private ServletContextHandler createServletHandler(ApplicationContext ctx, PlatformTransactionManager txmgr, SecurityManager securityMgr) {
     ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS | ServletContextHandler.NO_SECURITY);
     contextHandler.setContextPath("/");
-    contextHandler.addFilter(new FilterHolder(new AuthenticationFilter()), "/*", FilterMapping.DEFAULT);
+    contextHandler.addFilter(new FilterHolder(new AuthenticationFilter(securityMgr)), "/ws/*", FilterMapping.DEFAULT);
     // contextHandler.addFilter(new FilterHolder(new CrossOriginFilter()), "/*", FilterMapping.DEFAULT);
     contextHandler.addFilter(new FilterHolder(new RequestContextFilter()), "/*", FilterMapping.DEFAULT);
     contextHandler.addFilter(new FilterHolder(new TransactionFilter(txmgr)), "/*", FilterMapping.DEFAULT);

@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
 import junit.framework.Assert;
 
@@ -39,8 +39,8 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
+import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.support.ExcelDatasourceFactory;
 import org.obiba.magma.support.MagmaEngineFactory;
 import org.obiba.magma.views.View;
@@ -79,7 +79,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
   @Test
   public void testDatasourcesGET() {
-    DatasourcesResource resource = new DatasourcesResource("opal-keys.keys", newDatasourceFactoryRegistry());
+    DatasourcesResource resource = new DatasourcesResource(newDatasourceFactoryRegistry());
 
     List<Magma.DatasourceDto> dtos = resource.getDatasources();
     Assert.assertEquals(2, dtos.size());
@@ -169,7 +169,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
   @Test
   public void testDatasourcesPOST() {
-    DatasourcesResource resource = new DatasourcesResource("opal-keys.keys", newDatasourceFactoryRegistry());
+    DatasourcesResource resource = new DatasourcesResource(newDatasourceFactoryRegistry());
 
     UriInfo uriInfoMock = createMock(UriInfo.class);
     expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromUri(BASE_URI));
@@ -196,7 +196,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
   @Test
   public void testDatasourcesPOSTUserDefinedBogus() {
-    DatasourcesResource resource = new DatasourcesResource("opal-keys.keys", newDatasourceFactoryRegistry());
+    DatasourcesResource resource = new DatasourcesResource(newDatasourceFactoryRegistry());
 
     UriInfo uriInfoMock = createMock(UriInfo.class);
     expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromUri(BASE_URI));

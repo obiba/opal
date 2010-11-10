@@ -27,6 +27,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
+import org.obiba.magma.support.VariableEntityBean;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -67,7 +68,7 @@ public class ParticipantsResourceTest extends AbstractMagmaResourceTest {
   //
 
   private ParticipantsResource createParticipantsResource() {
-    return new ParticipantsResource("mockDatasource.keysTable");
+    return new ParticipantsResource();
   }
 
   private void testGetParticipantCount(Set<ValueTable> tables, int expectedCount) {
@@ -114,13 +115,6 @@ public class ParticipantsResourceTest extends AbstractMagmaResourceTest {
   }
 
   private VariableEntity createMockEntity(String identifier) {
-    VariableEntity mockEntity = createMock(VariableEntity.class);
-
-    expect(mockEntity.getType()).andReturn("Participant").anyTimes();
-    expect(mockEntity.getIdentifier()).andReturn(identifier).anyTimes();
-
-    replay(mockEntity);
-
-    return mockEntity;
+    return new VariableEntityBean("Participant", identifier);
   }
 }

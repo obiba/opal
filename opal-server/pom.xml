@@ -17,6 +17,11 @@
       <artifactId>opal-sshd</artifactId>
       <version>${project.version}</version>
     </dependency>
+     <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-reporting</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-httpd</artifactId>
