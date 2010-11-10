@@ -28,8 +28,6 @@ public abstract class AbstractMagmaResourceTest {
 
   public static final String DATASOURCE2 = "datasource2-novalues.xlsx";
 
-  public static final String BASE_URI = "http://localhost:8888/ws";
-
   @BeforeClass
   public static void before() {
     new MagmaEngine();

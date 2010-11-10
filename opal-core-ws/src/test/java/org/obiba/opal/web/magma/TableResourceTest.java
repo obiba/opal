@@ -31,7 +31,6 @@ import javax.ws.rs.core.Response.Status;
 import junit.framework.Assert;
 
 import org.easymock.EasyMock;
-import org.jboss.resteasy.specimpl.UriBuilderImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.obiba.magma.Datasource;
@@ -112,8 +111,6 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
 
     UriInfo uriInfoMock = createMock(UriInfo.class);
     expect(uriInfoMock.getPathSegments()).andReturn(segments);
-    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromUri(BASE_URI));
-    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromUri(BASE_URI));
 
     replay(uriInfoMock);
     replay(segments.toArray());
@@ -135,9 +132,9 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     Assert.assertEquals("RES_WEIGHT", dtos.get(7).getName());
     Assert.assertEquals("RES_WEIGHT.captureMethod", dtos.get(8).getName());
 
-    Assert.assertEquals(BASE_URI + "/datasource/" + DATASOURCE2 + "/table/Weight/variable/InstrumentRun.Contraindication.code", dtos.get(0).getLink());
+    Assert.assertEquals("/datasource/" + DATASOURCE2 + "/table/Weight/variable/InstrumentRun.Contraindication.code", dtos.get(0).getLink());
     Assert.assertEquals("Weight", dtos.get(0).getParentLink().getRel());
-    Assert.assertEquals(BASE_URI + "/datasource/" + DATASOURCE2 + "/table/Weight", dtos.get(0).getParentLink().getLink());
+    Assert.assertEquals("/datasource/" + DATASOURCE2 + "/table/Weight", dtos.get(0).getParentLink().getLink());
 
     Assert.assertEquals(3, dtos.get(8).getCategoriesCount());
     Assert.assertEquals("MANUAL", dtos.get(8).getCategories(0).getName());

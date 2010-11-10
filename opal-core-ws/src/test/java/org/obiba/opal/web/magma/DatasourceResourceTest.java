@@ -104,7 +104,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     expect(opalruntimeMock.getOpalConfiguration()).andReturn(opalConfig);
     opalruntimeMock.writeOpalConfiguration();
-    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromUri(BASE_URI));
+    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromPath("/"));
 
     replay(uriInfoMock, opalruntimeMock);
 
@@ -172,7 +172,6 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     DatasourcesResource resource = new DatasourcesResource(newDatasourceFactoryRegistry());
 
     UriInfo uriInfoMock = createMock(UriInfo.class);
-    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromUri(BASE_URI));
 
     Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder().setExtension(ExcelDatasourceFactoryDto.params, Magma.ExcelDatasourceFactoryDto.newBuilder().setFile(getDatasourcePath(DATASOURCE1)).setReadOnly(true).build()).build();
 
@@ -186,7 +185,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
       Magma.DatasourceDto dto = (Magma.DatasourceDto) entity;
       Assert.assertTrue(MagmaEngine.get().hasTransientDatasource(dto.getName()));
       Assert.assertNotNull(response.getMetadata().get("Location"));
-      Assert.assertEquals("[" + BASE_URI + "/datasource/" + dto.getName() + "]", response.getMetadata().get("Location").toString());
+      Assert.assertEquals("[" + "/datasource/" + dto.getName() + "]", response.getMetadata().get("Location").toString());
     } catch(Exception e) {
       Assert.assertFalse(true);
     }
@@ -199,7 +198,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     DatasourcesResource resource = new DatasourcesResource(newDatasourceFactoryRegistry());
 
     UriInfo uriInfoMock = createMock(UriInfo.class);
-    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromUri(BASE_URI));
+    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromPath("/"));
 
     File file = new File(DATASOURCES_FOLDER, "user-defined-bogus.xls");
     Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder().setExtension(ExcelDatasourceFactoryDto.params, Magma.ExcelDatasourceFactoryDto.newBuilder().setFile(file.getAbsolutePath()).setReadOnly(true).build()).build();
