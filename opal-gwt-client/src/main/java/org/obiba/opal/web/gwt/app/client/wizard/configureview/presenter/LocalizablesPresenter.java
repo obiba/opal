@@ -18,17 +18,20 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.DerivedVariableSelectionEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
@@ -46,7 +49,9 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
   // Instance Variables
   //
 
-  private ViewDto viewDto;
+  protected ViewDto viewDto;
+
+  protected VariableDto variableDto;
 
   //
   // Constructors
@@ -62,12 +67,13 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
 
   @Override
   protected void onBind() {
+    bindDependencies();
     addEventHandlers();
-    refreshDisplay();
   }
 
   @Override
   protected void onUnbind() {
+    unbindDependencies();
   }
 
   @Override
@@ -76,8 +82,11 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
 
   @Override
   public void refreshDisplay() {
-    refreshLocales();
-    refreshTableData();
+    if(viewDto != null) {
+      refreshLocales();
+      refreshTableData();
+      refreshDependencies();
+    }
   }
 
   @Override
@@ -97,6 +106,10 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
     this.viewDto = viewDto;
   }
 
+  public void setVariableDto(VariableDto variableDto) {
+    this.variableDto = variableDto;
+  }
+
   void refreshLocales() {
     ResourceRequestBuilderFactory.<JsArray<LocaleDto>> newBuilder().forResource("/datasource/" + viewDto.getDatasourceName() + "/table/" + viewDto.getName() + "/locales" + "?locale=en").get().withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
 
@@ -111,13 +124,23 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
     List<Localizable> localizables = getLocalizables(getDisplay().getSelectedLocale());
     Collections.sort(localizables);
 
+    GWT.log("localizables count = " + localizables.size());
+
     getDisplay().setTableData(localizables);
   }
 
-  private void addEventHandlers() {
+  protected void addEventHandlers() {
+    // Register common handlers
+    super.registerHandler(eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
+    super.registerHandler(eventBus.addHandler(DerivedVariableSelectionEvent.getType(), new DerivedVariableSelectionEventHandler()));
     super.registerHandler(getDisplay().addLocaleChangeHandler(new LocaleChangeHandler()));
-    super.registerHandler(getDisplay().addButtonClickHandler(new AddButtonClickHandler()));
+    super.registerHandler(getDisplay().addAddButtonClickHandler(getAddButtonClickHandler()));
+    addActionHandler(); // for "Edit" and "Delete" links
 
+    // Register additional handlers provided by subclasses
+  }
+
+  private void addActionHandler() {
     getDisplay().getActionsColumn().setActionHandler(new ActionHandler<Localizable>() {
       public void doAction(Localizable localizable, String actionName) {
         if(actionName != null) {
@@ -135,6 +158,14 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
     }
     refreshTableData();
   }
+
+  protected abstract void bindDependencies();
+
+  protected abstract void unbindDependencies();
+
+  protected abstract void refreshDependencies();
+
+  protected abstract ClickHandler getAddButtonClickHandler();
 
   protected abstract List<Localizable> getLocalizables(String localeName);
 
@@ -160,7 +191,7 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
 
     HandlerRegistration addLocaleChangeHandler(ChangeHandler handler);
 
-    HandlerRegistration addButtonClickHandler(ClickHandler handler);
+    HandlerRegistration addAddButtonClickHandler(ClickHandler handler);
   }
 
   public abstract class Localizable implements Comparable<Localizable> {
@@ -196,11 +227,19 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
     }
   }
 
-  static class AddButtonClickHandler implements ClickHandler {
+  class ViewConfigurationRequiredEventHandler implements ViewConfigurationRequiredEvent.Handler {
 
     @Override
-    public void onClick(ClickEvent event) {
-      // TODO: Show the "add" dialog.
+    public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
+      LocalizablesPresenter.this.setViewDto(event.getView());
+    }
+  }
+
+  class DerivedVariableSelectionEventHandler implements DerivedVariableSelectionEvent.Handler {
+
+    @Override
+    public void onDerivedVariableSelection(DerivedVariableSelectionEvent event) {
+      LocalizablesPresenter.this.setVariableDto(event.getVariable());
     }
   }
 }

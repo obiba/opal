@@ -21,6 +21,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -30,6 +31,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.CategoryUpda
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.UpdateType;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
+import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -48,6 +50,9 @@ import com.google.inject.Inject;
 public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPresenter.Display> {
 
   public interface Display extends WidgetDisplay {
+
+    void clear();
+
     void showDialog();
 
     void hideDialog();
@@ -73,9 +78,13 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
 
   private Translations translations = GWT.create(Translations.class);
 
+  private ViewDto viewDto;
+
   private CategoryDto categoryDto;
 
   private JsArray<CategoryDto> categories;
+
+  private boolean isBound;
 
   @Inject
   public CategoryDialogPresenter(Display display, EventBus eventBus) {
@@ -85,24 +94,23 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
   }
 
   @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
   protected void onBind() {
-    initDisplayComponents();
-    addEventHandlers();
-  }
+    if(!isBound) {
+      initDisplayComponents();
+      addEventHandlers();
 
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
+      isBound = true;
+    }
   }
 
   @Override
   protected void onUnbind() {
-    getDisplay().getInputFieldPanel().remove(labelListPresenter.getDisplay().asWidget());
-    labelListPresenter.unbind();
+    if(isBound) {
+      getDisplay().getInputFieldPanel().remove(labelListPresenter.getDisplay().asWidget());
+      labelListPresenter.unbind();
+
+      isBound = false;
+    }
   }
 
   @Override
@@ -116,13 +124,22 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
     labelListPresenter.revealDisplay();
   }
 
+  @Override
+  public Place getPlace() {
+    return null;
+  }
+
+  @Override
+  protected void onPlaceRequest(PlaceRequest request) {
+  }
+
   protected void initDisplayComponents() {
     labelListPresenter.bind();
     if(categoryDto != null) {
       labelListPresenter.setAttributes(categoryDto.getAttributesArray());
     }
     labelListPresenter.setAttributeToDisplay("label");
-    labelListPresenter.bind();
+
     validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLabelRequired"));
     setTitle();
     populateForm();
@@ -145,6 +162,8 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
   }
 
   private void addEventHandlers() {
+    super.registerHandler(eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
+
     super.registerHandler(getDisplay().getSaveButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
         String errorMessageKey = validate();
@@ -164,6 +183,7 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
 
     super.registerHandler(getDisplay().getCancelButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
+        GWT.log("<hide category dialog>");
         getDisplay().hideDialog();
       }
     }));
@@ -186,12 +206,18 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
     for(Map.Entry<String, TextBox> entry : labelMap.entrySet()) {
       AttributeDto attribute = AttributeDto.create();
       attribute.setLocale(entry.getKey());
-      attribute.setName(entry.getValue().getName());
+      attribute.setName("label");// entry.getValue().getName());
       attribute.setValue(entry.getValue().getValue());
       attributes.push(attribute);
     }
     categoryDto.setAttributesArray(attributes);
     return categoryDto;
+  }
+
+  public void setViewDto(ViewDto viewDto) {
+    this.viewDto = viewDto;
+
+    labelListPresenter.setDatasourceName(this.viewDto.getDatasourceName());
   }
 
   public void setCategoryDto(CategoryDto categoryDto) {
@@ -210,6 +236,14 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
       }
     }
     return null;
+  }
+
+  class ViewConfigurationRequiredEventHandler implements ViewConfigurationRequiredEvent.Handler {
+
+    @Override
+    public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
+      CategoryDialogPresenter.this.setViewDto(event.getView());
+    }
   }
 
   public class UniqueCategoryNameValidator extends AbstractFieldValidator {

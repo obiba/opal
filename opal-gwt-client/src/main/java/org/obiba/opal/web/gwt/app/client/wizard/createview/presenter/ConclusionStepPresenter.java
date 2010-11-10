@@ -18,8 +18,11 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.view.ResourceRequestView;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -135,7 +138,16 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
   class ConfigureViewClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent event) {
-      eventBus.fireEvent(new ViewConfigurationRequiredEvent(datasourceName, viewName));
+      ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource("/datasource/" + datasourceName + "/view/" + viewName).get().withCallback(new ResourceCallback<ViewDto>() {
+
+        @Override
+        public void onResource(Response response, ViewDto viewDto) {
+          viewDto.setDatasourceName(datasourceName);
+          viewDto.setName(viewName);
+
+          eventBus.fireEvent(new ViewConfigurationRequiredEvent(viewDto));
+        }
+      }).send();
     }
   }
 }

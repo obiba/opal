@@ -18,6 +18,8 @@ import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.inject.Inject;
 
 /**
@@ -27,6 +29,11 @@ public class AttributesPresenter extends LocalizablesPresenter {
   //
   // Instance Variables
   //
+
+  @Inject
+  private AttributeDialogPresenter attributeDialogPresenter;
+
+  private ClickHandler addButtonClickHandler;
 
   private VariableDto variableDto;
 
@@ -91,11 +98,51 @@ public class AttributesPresenter extends LocalizablesPresenter {
     variableDto.setAttributesArray(newAttributesArray);
   }
 
+  @Override
+  protected void bindDependencies() {
+    // attributeDialogPresenter.bind();
+  }
+
+  @Override
+  protected void unbindDependencies() {
+    // attributeDialogPresenter.unbind();
+  }
+
+  @Override
+  protected void refreshDependencies() {
+    // attributeDialogPresenter.refreshDisplay();
+  }
+
+  @Override
+  protected ClickHandler getAddButtonClickHandler() {
+    if(addButtonClickHandler == null) {
+      addButtonClickHandler = new AddNewAttributeButtonHandler();
+    }
+    return addButtonClickHandler;
+  }
+
   //
   // Methods
   //
 
   public void setVariableDto(VariableDto variableDto) {
     this.variableDto = variableDto;
+  }
+
+  //
+  // Inner Classes / Interfaces
+  //
+
+  class AddNewAttributeButtonHandler implements ClickHandler {
+    //
+    // ClickHandler Methods
+    //
+
+    @Override
+    public void onClick(ClickEvent event) {
+      // Each time the dialog is closed (hidden), it is unbound. So we need to rebind it each time we display it.
+      attributeDialogPresenter.bind();
+      attributeDialogPresenter.revealDisplay();
+    }
   }
 }

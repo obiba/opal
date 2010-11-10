@@ -34,6 +34,7 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
@@ -240,7 +241,16 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   final class EditCommand implements Command {
     @Override
     public void execute() {
-      eventBus.fireEvent(new ViewConfigurationRequiredEvent(table.getDatasourceName(), table.getName()));
+      ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/view/" + table.getName()).get().withCallback(new ResourceCallback<ViewDto>() {
+
+        @Override
+        public void onResource(Response response, ViewDto viewDto) {
+          viewDto.setDatasourceName(table.getDatasourceName());
+          viewDto.setName(table.getName());
+
+          eventBus.fireEvent(new ViewConfigurationRequiredEvent(viewDto));
+        }
+      }).send();
     }
   }
 

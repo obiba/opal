@@ -17,6 +17,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
@@ -137,6 +138,7 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
   }
 
   private void addEventHandlers() {
+    super.registerHandler(eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
     super.registerHandler(getDisplay().addSaveChangesClickHandler(new SaveChangesClickHandler()));
     super.registerHandler(eventBus.addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
     super.registerHandler(getDisplay().addVariablestoViewChangeHandler(new VariablesToViewChangeHandler()));
@@ -174,6 +176,14 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
 
   public enum VariablesToView {
     SCRIPT, ALL
+  }
+
+  class ViewConfigurationRequiredEventHandler implements ViewConfigurationRequiredEvent.Handler {
+
+    @Override
+    public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
+      SelectScriptVariablesTabPresenter.this.setViewDto(event.getView());
+    }
   }
 
   class SaveChangesClickHandler implements ClickHandler {

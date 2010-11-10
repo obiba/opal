@@ -63,7 +63,6 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
 
   @Override
   protected void onBind() {
-    getLanguages();
   }
 
   private void getLanguages() {
@@ -121,6 +120,8 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
 
   public void setDatasourceName(String datasourceName) {
     this.datasourceName = datasourceName;
+
+    getLanguages();
   }
 
 }

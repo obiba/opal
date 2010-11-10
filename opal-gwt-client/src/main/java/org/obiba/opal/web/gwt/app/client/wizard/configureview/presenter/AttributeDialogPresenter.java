@@ -25,6 +25,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -57,6 +58,8 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   private ViewDto viewDto;
 
   private SortedSet<String> uniqueAttributeNamesList;
+
+  private boolean isBound;
 
   public interface Display extends WidgetDisplay {
 
@@ -96,8 +99,6 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
   }
 
-  private String datasourceName;
-
   private JsArray<AttributeDto> attributes;
 
   private String attributeNameToDisplay;
@@ -131,19 +132,33 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
   @Override
   protected void onBind() {
-    labelListPresenter.setAttributes(attributes);
-    labelListPresenter.setAttributeToDisplay(attributeNameToDisplay);
-    labelListPresenter.setDatasourceName(datasourceName);
-    labelListPresenter.bind();
-    validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLabelRequired"));
-    getDisplay().addLabelListPresenter(labelListPresenter.getDisplay().asWidget());
-    addEventHandlers();
-    addRadioButtonNameEventHandlers();
-    resetForm();
-    getDisplay().setNameDropdownList(labels);
-    if(isEdit()) getDisplay().setAttributeName(attributeNameToDisplay);
-    setTitle();
-    uniqueAttributeNamesList = getUniqueAttributeNames();
+    if(!isBound) {
+      labelListPresenter.setAttributes(attributes);
+      labelListPresenter.setAttributeToDisplay(attributeNameToDisplay);
+      labelListPresenter.bind();
+      validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLabelRequired"));
+      getDisplay().addLabelListPresenter(labelListPresenter.getDisplay().asWidget());
+      addEventHandlers();
+      addRadioButtonNameEventHandlers();
+      resetForm();
+      GWT.log("labels: " + labels);
+      getDisplay().setNameDropdownList(labels);
+      if(isEdit()) getDisplay().setAttributeName(attributeNameToDisplay);
+      setTitle();
+      uniqueAttributeNamesList = getUniqueAttributeNames();
+
+      isBound = true;
+    }
+  }
+
+  @Override
+  protected void onUnbind() {
+    if(isBound) {
+      getDisplay().removeLabelListPresenter(labelListPresenter.getDisplay().asWidget());
+      labelListPresenter.unbind();
+
+      isBound = false;
+    }
   }
 
   private void setTitle() {
@@ -162,6 +177,7 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   }
 
   private void addEventHandlers() {
+    super.registerHandler(eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
 
     super.registerHandler(getDisplay().getSaveButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
@@ -218,12 +234,6 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   }
 
   @Override
-  protected void onUnbind() {
-    getDisplay().removeLabelListPresenter(labelListPresenter.getDisplay().asWidget());
-    labelListPresenter.unbind();
-  }
-
-  @Override
   public Place getPlace() {
     return null;
   }
@@ -240,6 +250,14 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
       }
     }
     return null;
+  }
+
+  class ViewConfigurationRequiredEventHandler implements ViewConfigurationRequiredEvent.Handler {
+
+    @Override
+    public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
+      AttributeDialogPresenter.this.setViewDto(event.getView());
+    }
   }
 
   public class UniqueAttributeNameValidator extends AbstractFieldValidator {
@@ -295,10 +313,6 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
     uniqueAttributeNamesList.add(attributeName);
   }
 
-  public void setDatasourceName(String datasourceName) {
-    this.datasourceName = datasourceName;
-  }
-
   public void setLabels(List<String> labels) {
     this.labels = labels;
   }
@@ -313,5 +327,7 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
   public void setViewDto(ViewDto viewDto) {
     this.viewDto = viewDto;
+
+    labelListPresenter.setDatasourceName(viewDto.getDatasourceName());
   }
 }

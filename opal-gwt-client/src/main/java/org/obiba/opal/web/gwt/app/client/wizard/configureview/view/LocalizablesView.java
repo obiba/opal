@@ -112,7 +112,7 @@ public class LocalizablesView extends Composite implements LocalizablesPresenter
   }
 
   @Override
-  public HandlerRegistration addButtonClickHandler(ClickHandler handler) {
+  public HandlerRegistration addAddButtonClickHandler(ClickHandler handler) {
     return addButton.addClickHandler(handler);
   }
 

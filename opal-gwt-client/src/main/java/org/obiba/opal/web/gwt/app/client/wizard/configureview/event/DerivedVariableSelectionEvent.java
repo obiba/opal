@@ -7,17 +7,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.navigator.event;
+package org.obiba.opal.web.gwt.app.client.wizard.configureview.event;
 
-import org.obiba.opal.web.model.client.magma.ViewDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
 /**
- * An event signalling that an Opal view needs to be configured.
+ * Signals that a derived variable has been selected by the user.
  */
-public class ViewConfigurationRequiredEvent extends GwtEvent<ViewConfigurationRequiredEvent.Handler> {
+public class DerivedVariableSelectionEvent extends GwtEvent<DerivedVariableSelectionEvent.Handler> {
   //
   // Static Variables
   //
@@ -28,14 +28,14 @@ public class ViewConfigurationRequiredEvent extends GwtEvent<ViewConfigurationRe
   // Instance Variables
   //
 
-  private ViewDto view;
+  private VariableDto variable;
 
   //
   // Constructors
   //
 
-  public ViewConfigurationRequiredEvent(ViewDto view) {
-    this.view = view;
+  public DerivedVariableSelectionEvent(VariableDto variable) {
+    this.variable = variable;
   }
 
   //
@@ -44,7 +44,7 @@ public class ViewConfigurationRequiredEvent extends GwtEvent<ViewConfigurationRe
 
   @Override
   protected void dispatch(Handler handler) {
-    handler.onViewConfigurationRequired(this);
+    handler.onDerivedVariableSelection(this);
   }
 
   @Override
@@ -52,16 +52,16 @@ public class ViewConfigurationRequiredEvent extends GwtEvent<ViewConfigurationRe
     return TYPE;
   }
 
-  //
-  // Methods
-  //
-
   public static Type<Handler> getType() {
     return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
   }
 
-  public ViewDto getView() {
-    return view;
+  //
+  // Methods
+  //
+
+  public VariableDto getVariable() {
+    return variable;
   }
 
   //
@@ -70,6 +70,6 @@ public class ViewConfigurationRequiredEvent extends GwtEvent<ViewConfigurationRe
 
   public interface Handler extends EventHandler {
 
-    public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event);
+    public void onDerivedVariableSelection(DerivedVariableSelectionEvent event);
   }
 }

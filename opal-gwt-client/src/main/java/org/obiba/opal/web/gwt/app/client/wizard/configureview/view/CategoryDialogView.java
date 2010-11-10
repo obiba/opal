@@ -66,6 +66,11 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
   }
 
   @Override
+  public void clear() {
+    categoryName.setText("");
+  }
+
+  @Override
   public void showDialog() {
     dialog.center();
     dialog.show();
@@ -92,7 +97,7 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
     return categoryName;
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings( { "rawtypes", "unchecked" })
   @Override
   public HasCloseHandlers getDialog() {
     return dialog;

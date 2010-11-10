@@ -24,7 +24,6 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
@@ -58,10 +57,6 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
 
   @Inject
   private EntitiesTabPresenter entitiesTabPresenter;
-
-  private String datasourceName;
-
-  private String viewName;
 
   /**
    * {@link ViewDto} of view being configured.
@@ -202,22 +197,12 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
 
     @Override
     public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
-      datasourceName = event.getDatasourceName();
-      viewName = event.getViewName();
+      viewDto = event.getView();
 
-      ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource("/datasource/" + datasourceName + "/view/" + viewName).get().withCallback(new ResourceCallback<ViewDto>() {
-        @Override
-        public void onResource(Response response, ViewDto resource) {
-          viewDto = resource;
-          viewDto.setDatasourceName(datasourceName);
-          viewDto.setName(viewName);
+      // Set the variables tab widget according to the received ViewDto type.
+      getDisplay().addVariablesTabWidget(getVariablesTabWidget());
 
-          // Set the variables tab widget according to the received ViewDto type.
-          getDisplay().addVariablesTabWidget(getVariablesTabWidget());
-
-          eventBus.fireEvent(new WorkbenchChangeEvent(ConfigureViewStepPresenter.this, false, false));
-        }
-      }).send();
+      eventBus.fireEvent(new WorkbenchChangeEvent(ConfigureViewStepPresenter.this, false, false));
     }
 
     private Widget getVariablesTabWidget() {
@@ -225,9 +210,8 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
 
       JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
       VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
-      if(jsViewDto != null) {
 
-        selectScriptVariablesTabPresenter.setViewDto(viewDto);
+      if(jsViewDto != null) {
         variablesTabWidget = selectScriptVariablesTabPresenter.getDisplay().asWidget();
 
         // Set the help widget for the current type of view (remove/insert).
@@ -235,7 +219,6 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
         getDisplay().getHelpDeck().insert(selectScriptVariablesTabPresenter.getDisplay().getHelpWidget(), 1);
 
       } else if(variableListDto != null) {
-        variablesListTabPresenter.setViewDto(viewDto);
         variablesTabWidget = variablesListTabPresenter.getDisplay().asWidget();
       }
 
@@ -260,7 +243,7 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
     private void saveView(ViewDto viewDto) {
       ResourceRequestBuilderFactory.newBuilder()
       /**/.put()
-      /**/.forResource("/datasource/" + datasourceName + "/view/" + viewName)
+      /**/.forResource("/datasource/" + viewDto.getDatasourceName() + "/view/" + viewDto.getName())
       /**/.accept("application/x-protobuf+json").withResourceBody(ViewDto.stringify(viewDto))
       /**/.withCallback(Response.SC_OK, callback)
       /**/.withCallback(Response.SC_BAD_REQUEST, callback)
