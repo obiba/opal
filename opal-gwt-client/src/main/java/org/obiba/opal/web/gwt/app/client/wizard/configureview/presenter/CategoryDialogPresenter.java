@@ -183,7 +183,6 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
 
     super.registerHandler(getDisplay().getCancelButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
-        GWT.log("<hide category dialog>");
         getDisplay().hideDialog();
       }
     }));

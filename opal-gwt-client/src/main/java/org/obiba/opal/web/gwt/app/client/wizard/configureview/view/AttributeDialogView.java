@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.AttributeDialogPresenter;
 
 import com.google.gwt.core.client.GWT;
@@ -56,6 +57,8 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   @UiField
   ScrollPanel scrollPanel;
 
+  private LabelListPresenter.Display inputField;
+
   @UiField
   Button saveButton;
 
@@ -78,6 +81,15 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
 
   @Override
   public void stopProcessing() {
+  }
+
+  @Override
+  public void clear() {
+    attributeName.setText("");
+
+    if(inputField != null) {
+      inputField.clearAttributes();
+    }
   }
 
   @Override
@@ -144,14 +156,16 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   }
 
   @Override
-  public void addLabelListPresenter(Widget widget) {
+  public void addInputField(LabelListPresenter.Display inputField) {
     scrollPanel.clear();
-    scrollPanel.add(widget);
+    scrollPanel.add(inputField.asWidget());
+    this.inputField = inputField;
   }
 
   @Override
-  public void removeLabelListPresenter(Widget widget) {
-    scrollPanel.remove(widget);
+  public void removeInputField() {
+    scrollPanel.clear();
+    inputField = null;
   }
 
   @Override

@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -50,20 +51,19 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPresenter.Display> {
 
   private ViewDto viewDto;
 
-  private SortedSet<String> uniqueAttributeNamesList;
-
   private boolean isBound;
 
   public interface Display extends WidgetDisplay {
 
     HasCloseHandlers<DialogBox> getDialog();
+
+    void clear();
 
     void showDialog();
 
@@ -85,9 +85,9 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
     HasText getAttributeNameField();
 
-    void addLabelListPresenter(Widget widget);
+    void addInputField(LabelListPresenter.Display inputField);
 
-    void removeLabelListPresenter(Widget widget);
+    void removeInputField();
 
     HasText getAttributeName();
 
@@ -126,6 +126,7 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
   @Override
   public void revealDisplay() {
+    getDisplay().clear();
     getDisplay().showDialog();
     labelListPresenter.revealDisplay();
   }
@@ -137,15 +138,15 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
       labelListPresenter.setAttributeToDisplay(attributeNameToDisplay);
       labelListPresenter.bind();
       validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLabelRequired"));
-      getDisplay().addLabelListPresenter(labelListPresenter.getDisplay().asWidget());
+      getDisplay().addInputField(labelListPresenter.getDisplay());
       addEventHandlers();
       addRadioButtonNameEventHandlers();
       resetForm();
-      GWT.log("labels: " + labels);
-      getDisplay().setNameDropdownList(labels);
+
+      getDisplay().setNameDropdownList(getUniqueAttributeNames());
+
       if(isEdit()) getDisplay().setAttributeName(attributeNameToDisplay);
       setTitle();
-      uniqueAttributeNamesList = getUniqueAttributeNames();
 
       isBound = true;
     }
@@ -154,7 +155,7 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   @Override
   protected void onUnbind() {
     if(isBound) {
-      getDisplay().removeLabelListPresenter(labelListPresenter.getDisplay().asWidget());
+      getDisplay().removeInputField();
       labelListPresenter.unbind();
 
       isBound = false;
@@ -298,7 +299,7 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
     return attributes;
   }
 
-  private SortedSet<String> getUniqueAttributeNames() {
+  private List<String> getUniqueAttributeNames() {
     SortedSet<String> attributeNames = new TreeSet<String>();
     VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
     for(VariableDto variable : JsArrays.toList(variableListDto.getVariablesArray())) {
@@ -306,15 +307,7 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
         attributeNames.add(attribute.getName());
       }
     }
-    return attributeNames;
-  }
-
-  private void addAttributeName(String attributeName) {
-    uniqueAttributeNamesList.add(attributeName);
-  }
-
-  public void setLabels(List<String> labels) {
-    this.labels = labels;
+    return new ArrayList<String>(attributeNames);
   }
 
   public void setAttributeNameToDisplay(String attributeNameToDisplay) {

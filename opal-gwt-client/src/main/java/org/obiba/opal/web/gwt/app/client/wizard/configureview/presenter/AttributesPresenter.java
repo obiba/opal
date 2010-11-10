@@ -14,6 +14,8 @@ import java.util.List;
 
 import net.customware.gwt.presenter.client.EventBus;
 
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.AttributeUpdateEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.UpdateType;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
@@ -100,17 +102,23 @@ public class AttributesPresenter extends LocalizablesPresenter {
 
   @Override
   protected void bindDependencies() {
-    // attributeDialogPresenter.bind();
+    attributeDialogPresenter.bind();
   }
 
   @Override
   protected void unbindDependencies() {
-    // attributeDialogPresenter.unbind();
+    attributeDialogPresenter.unbind();
   }
 
   @Override
   protected void refreshDependencies() {
-    // attributeDialogPresenter.refreshDisplay();
+    attributeDialogPresenter.refreshDisplay();
+  }
+
+  @Override
+  protected void addEventHandlers() {
+    super.addEventHandlers(); // call superclass method to register common handlers
+    super.registerHandler(eventBus.addHandler(AttributeUpdateEvent.getType(), new AttributeUpdateEventHandler()));
   }
 
   @Override
@@ -143,6 +151,52 @@ public class AttributesPresenter extends LocalizablesPresenter {
       // Each time the dialog is closed (hidden), it is unbound. So we need to rebind it each time we display it.
       attributeDialogPresenter.bind();
       attributeDialogPresenter.revealDisplay();
+    }
+  }
+
+  class AttributeUpdateEventHandler implements AttributeUpdateEvent.Handler {
+
+    @Override
+    public void onAttributeUpdate(AttributeUpdateEvent event) {
+      if(event.getUpdateType().equals(UpdateType.ADD)) {
+        addAttribute(event);
+      } else if(event.getUpdateType().equals(UpdateType.EDIT)) {
+        replaceAttribute(event);
+      }
+      AttributesPresenter.this.refreshTableData();
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addAttribute(AttributeUpdateEvent event) {
+      if(variableDto.getAttributesArray() == null) {
+        variableDto.setAttributesArray((JsArray<AttributeDto>) JsArray.createArray());
+      }
+
+      for(int attributeIndex = 0; attributeIndex < event.getAttributes().length(); attributeIndex++) {
+        AttributeDto newAttribute = event.getAttributes().get(attributeIndex);
+        variableDto.getAttributesArray().push(newAttribute);
+      }
+    }
+
+    private void replaceAttribute(AttributeUpdateEvent event) {
+      for(int attributeIndex = 0; attributeIndex < event.getAttributes().length(); attributeIndex++) {
+        AttributeDto updatedAttribute = event.getAttributes().get(attributeIndex);
+
+        int originalAttributeIndex = findOriginalAttribute(updatedAttribute);
+        if(originalAttributeIndex != -1) {
+          variableDto.getAttributesArray().set(originalAttributeIndex, updatedAttribute);
+        }
+      }
+    }
+
+    private int findOriginalAttribute(AttributeDto updatedAttribute) {
+      for(int attributeIndex = 0; attributeIndex < variableDto.getAttributesArray().length(); attributeIndex++) {
+        AttributeDto attribute = variableDto.getAttributesArray().get(attributeIndex);
+        if(attribute.getName().equals(updatedAttribute.getName()) && attribute.getLocale() != null && attribute.getLocale().equals(updatedAttribute.getLocale())) {
+          return attributeIndex;
+        }
+      }
+      return -1; // not found
     }
   }
 }
