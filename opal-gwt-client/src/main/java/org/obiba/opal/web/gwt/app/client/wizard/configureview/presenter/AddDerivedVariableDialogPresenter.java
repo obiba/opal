@@ -15,11 +15,14 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.VariableAddRequiredEvent;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 
 public class AddDerivedVariableDialogPresenter extends WidgetPresenter<AddDerivedVariableDialogPresenter.Display> {
@@ -35,6 +38,22 @@ public class AddDerivedVariableDialogPresenter extends WidgetPresenter<AddDerive
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
 
     HandlerRegistration addAddVariableClickHandler(ClickHandler handler);
+
+    HandlerRegistration addNewVariableClickHandler(ClickHandler handler);
+
+    HandlerRegistration addCopyFromVariableClickHandler(ClickHandler handler);
+
+    void setEnabledCopyFromVariableName(boolean enabled);
+
+    void setEnabledNewVariableName(boolean enabled);
+
+    HasValue<Boolean> getCopyFromVariable();
+
+    HasValue<Boolean> getNewVariable();
+
+    HasText getNewVariableName();
+
+    HasText getCopyFromVariableName();
 
   }
 
@@ -61,6 +80,8 @@ public class AddDerivedVariableDialogPresenter extends WidgetPresenter<AddDerive
   private void addHandlers() {
     super.registerHandler(getDisplay().addAddVariableClickHandler(new AddVariableClickHandler()));
     super.registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
+    super.registerHandler(getDisplay().addCopyFromVariableClickHandler(new CopyFromVariableClickHandler()));
+    super.registerHandler(getDisplay().addNewVariableClickHandler(new NewVariableClickHandler()));
   }
 
   @Override
@@ -78,6 +99,19 @@ public class AddDerivedVariableDialogPresenter extends WidgetPresenter<AddDerive
 
   }
 
+  private String getVariableName() {
+    if(getDisplay().getCopyFromVariable().getValue()) {
+      return getDisplay().getCopyFromVariableName().getText();
+    } else if(getDisplay().getNewVariable().getValue()) {
+      return getDisplay().getNewVariableName().getText();
+    }
+    return null;
+  }
+
+  private boolean validate() {
+    return true;
+  }
+
   private class CancelClickHandler implements ClickHandler {
 
     @Override
@@ -90,9 +124,34 @@ public class AddDerivedVariableDialogPresenter extends WidgetPresenter<AddDerive
   private class AddVariableClickHandler implements ClickHandler {
 
     @Override
-    public void onClick(ClickEvent arg0) {
+    public void onClick(ClickEvent event) {
+      if(validate()) {
+        getDisplay().hideDialog();
+        eventBus.fireEvent(new VariableAddRequiredEvent(getVariableName()));
+      }
+    }
+  }
 
+  private class NewVariableClickHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent event) {
+      getDisplay().setEnabledNewVariableName(true);
+      getDisplay().setEnabledCopyFromVariableName(false);
+      getDisplay().getCopyFromVariableName().setText("");
     }
 
   }
+
+  private class CopyFromVariableClickHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent event) {
+      getDisplay().setEnabledNewVariableName(false);
+      getDisplay().setEnabledCopyFromVariableName(true);
+      getDisplay().getNewVariableName().setText("");
+    }
+
+  }
+
 }

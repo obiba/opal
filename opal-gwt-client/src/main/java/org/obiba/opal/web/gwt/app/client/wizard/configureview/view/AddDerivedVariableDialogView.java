@@ -20,6 +20,11 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.RadioButton;
+import com.google.gwt.user.client.ui.SuggestBox;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 public class AddDerivedVariableDialogView extends Composite implements AddDerivedVariableDialogPresenter.Display {
@@ -39,7 +44,21 @@ public class AddDerivedVariableDialogView extends Composite implements AddDerive
   @UiField
   Button cancelButton;
 
+  @UiField(provided = true)
+  SuggestBox copyFromVariableName;
+
+  @UiField
+  TextBox newVariableName;
+
+  @UiField
+  RadioButton copyFromVariableRadio;
+
+  @UiField
+  RadioButton newVariableRadio;
+
   public AddDerivedVariableDialogView() {
+    copyFromVariableName = new SuggestBox();
+    copyFromVariableName.getTextBox().setEnabled(false);
     uiBinder.createAndBindUi(this);
   }
 
@@ -75,6 +94,46 @@ public class AddDerivedVariableDialogView extends Composite implements AddDerive
   @Override
   public HandlerRegistration addAddVariableClickHandler(ClickHandler handler) {
     return addButton.addClickHandler(handler);
+  }
+
+  @Override
+  public HandlerRegistration addNewVariableClickHandler(ClickHandler handler) {
+    return newVariableRadio.addClickHandler(handler);
+  }
+
+  @Override
+  public HandlerRegistration addCopyFromVariableClickHandler(ClickHandler handler) {
+    return copyFromVariableRadio.addClickHandler(handler);
+  }
+
+  @Override
+  public void setEnabledCopyFromVariableName(boolean enabled) {
+    copyFromVariableName.getTextBox().setEnabled(enabled);
+  }
+
+  @Override
+  public void setEnabledNewVariableName(boolean enabled) {
+    newVariableName.setEnabled(enabled);
+  }
+
+  @Override
+  public HasText getNewVariableName() {
+    return newVariableName;
+  }
+
+  @Override
+  public HasText getCopyFromVariableName() {
+    return copyFromVariableName;
+  }
+
+  @Override
+  public HasValue<Boolean> getCopyFromVariable() {
+    return copyFromVariableRadio;
+  }
+
+  @Override
+  public HasValue<Boolean> getNewVariable() {
+    return newVariableRadio;
   }
 
 }
