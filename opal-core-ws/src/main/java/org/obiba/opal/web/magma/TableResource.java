@@ -30,9 +30,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
 import org.mozilla.javascript.Scriptable;
 import org.obiba.core.util.StreamUtil;
@@ -40,11 +40,11 @@ import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
+import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.JavascriptValueSource;
 import org.obiba.magma.js.JavascriptVariableBuilder;
@@ -128,8 +128,8 @@ public class TableResource extends CommonTable {
 
     ArrayList<PathSegment> segments = Lists.newArrayList(uriInfo.getPathSegments());
     segments.remove(segments.size() - 1);
-    final UriBuilder ub = uriInfo.getBaseUriBuilder();
-    final UriBuilder tableub = uriInfo.getBaseUriBuilder();
+    final UriBuilder ub = UriBuilder.fromPath("/");
+    final UriBuilder tableub = UriBuilder.fromPath("/");
     for(PathSegment segment : segments) {
       ub.segment(segment.getPath());
       tableub.segment(segment.getPath());
