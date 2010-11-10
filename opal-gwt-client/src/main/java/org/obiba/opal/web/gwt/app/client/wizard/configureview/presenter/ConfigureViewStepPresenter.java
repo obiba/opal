@@ -95,7 +95,7 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
     getDisplay().addEntitiesTabWidget(entitiesTabPresenter.getDisplay().asWidget());
 
     getDisplay().getHelpDeck().showWidget(0);
-
+    viewSavePending = false;
     addEventHandlers();
   }
 

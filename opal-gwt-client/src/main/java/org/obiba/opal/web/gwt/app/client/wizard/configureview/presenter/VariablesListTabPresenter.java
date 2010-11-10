@@ -254,6 +254,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     super.registerHandler(getDisplay().addRemoveVariableClickHandler(new RemoveVariableClickHandler()));
     super.registerHandler(getDisplay().getDetailTabs().addBeforeSelectionHandler(new DetailTabsBeforeSelectionHandler()));
     super.registerHandler(eventBus.addHandler(VariableAddRequiredEvent.getType(), new VariableAddRequiredHandler()));
+    super.registerHandler(eventBus.addHandler(DerivedVariableConfigurationRequiredEvent.getType(), new DerivedVariableConfigurationRequiredHandler()));
   }
 
   private void addValidators() {
@@ -500,7 +501,6 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
           @Override
           public void onResource(Response response, VariableDto variableDto) {
             variableDto.setName(translations.copyOf() + variableDto.getName());
-            getDisplay().setNewVariable(variableDto);
             eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
           }
         })
@@ -522,7 +522,6 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
             @Override
             public void onResource(Response response, TableDto firstTableDto) {
               VariableDto variableDto = createEmptyDerivedVariable(firstTableDto.getEntityType());
-              getDisplay().setNewVariable(variableDto);
               eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
             }
           })
@@ -546,6 +545,15 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     @Override
     public void onClick(ClickEvent event) {
 
+    }
+
+  }
+
+  class DerivedVariableConfigurationRequiredHandler implements DerivedVariableConfigurationRequiredEvent.Handler {
+
+    @Override
+    public void onDerivedVariableConfigurationRequired(DerivedVariableConfigurationRequiredEvent event) {
+      getDisplay().setNewVariable(event.getVariable());
     }
 
   }
