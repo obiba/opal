@@ -45,8 +45,6 @@ public class AttributesPresenter extends LocalizablesPresenter {
 
   private DeleteActionHandler deleteActionHandler;
 
-  private VariableDto variableDto;
-
   private List<String> attributeNames;
 
   //
