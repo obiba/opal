@@ -10,9 +10,12 @@
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.VariablesListTabPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter.Display;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.HasBeforeSelectionHandlers;
@@ -96,6 +99,8 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   MultiWordSuggestOracle suggestions;
 
   private String entityType;
+
+  private EvaluateScriptPresenter.Display scriptWidgetDisplay;
 
   public VariablesListTabView() {
     variableNameSuggestBox = new SuggestBox(suggestions = new MultiWordSuggestOracle());
@@ -252,6 +257,32 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   @Override
   public HandlerRegistration addRemoveVariableClickHandler(ClickHandler handler) {
     return removeButton.addClickHandler(handler);
+  }
+
+  @Override
+  public void setScriptWidget(Display scriptWidgetDisplay) {
+    this.scriptWidgetDisplay = scriptWidgetDisplay;
+    scriptWidgetPanel.add(scriptWidgetDisplay.asWidget());
+  }
+
+  @Override
+  public void setScriptWidgetVisible(boolean visible) {
+    scriptWidgetPanel.setVisible(visible);
+  }
+
+  @Override
+  public void setScript(String script) {
+    scriptWidgetDisplay.setScript(script);
+  }
+
+  @Override
+  public String getScript() {
+    return scriptWidgetDisplay.getScript();
+  }
+
+  @Override
+  public HandlerRegistration addScriptChangeHandler(ChangeHandler changeHandler) {
+    return scriptWidgetDisplay.addScriptChangeHandler(changeHandler);
   }
 
 }

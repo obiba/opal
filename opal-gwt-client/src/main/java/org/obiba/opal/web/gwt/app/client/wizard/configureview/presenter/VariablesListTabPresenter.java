@@ -31,6 +31,8 @@ import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.DerivedVariableConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.VariableAddRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter.Mode;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -41,6 +43,7 @@ import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -99,6 +102,12 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
   private Translations translations = GWT.create(Translations.class);
 
+  /**
+   * Widget for entering, and testing, the "select" script.
+   */
+  @Inject
+  private EvaluateScriptPresenter scriptWidget;
+
   //
   // Constructors
   //
@@ -114,6 +123,10 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
   @Override
   protected void onBind() {
+    scriptWidget.bind();
+    scriptWidget.setEvaluationMode(Mode.ENTITY_VALUE); // TODO not sure about Mode...
+    getDisplay().setScriptWidget(scriptWidget.getDisplay());
+
     categoriesPresenter.bind();
     categoriesPresenter.getDisplay().setAddButtonText("Add New Category");
     getDisplay().addCategoriesTabWidget(categoriesPresenter.getDisplay().asWidget());
@@ -131,6 +144,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
   @Override
   protected void onUnbind() {
+    scriptWidget.unbind();
     categoriesPresenter.unbind();
     attributesPresenter.unbind();
     addDerivedVariableDialogPresenter.unbind();
@@ -162,6 +176,14 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
   public void setViewDto(ViewDto viewDto) {
     this.viewDto = viewDto;
+
+    TableDto tableDto = TableDto.create();
+    tableDto.setDatasourceName(viewDto.getDatasourceName());
+    tableDto.setName(viewDto.getName());
+    scriptWidget.setTable(tableDto);
+    scriptWidget.getDisplay().showResults(false);
+    scriptWidget.getDisplay().clearResults();
+    scriptWidget.getDisplay().showPaging(false);
 
     categoriesPresenter.refreshDisplay();
     attributesPresenter.refreshDisplay();
@@ -321,6 +343,16 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     void setNewVariable(VariableDto variableDto);
 
     VariableDto getVariableDto();
+
+    void setScriptWidget(EvaluateScriptPresenter.Display scriptWidgetDisplay);
+
+    void setScriptWidgetVisible(boolean visible);
+
+    void setScript(String script);
+
+    String getScript();
+
+    HandlerRegistration addScriptChangeHandler(ChangeHandler changeHandler);
   }
 
   class ViewConfigurationRequiredEventHandler implements ViewConfigurationRequiredEvent.Handler {
