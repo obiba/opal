@@ -249,4 +249,9 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
     return variableDto;
   }
 
+  @Override
+  public HandlerRegistration addRemoveVariableClickHandler(ClickHandler handler) {
+    return removeButton.addClickHandler(handler);
+  }
+
 }

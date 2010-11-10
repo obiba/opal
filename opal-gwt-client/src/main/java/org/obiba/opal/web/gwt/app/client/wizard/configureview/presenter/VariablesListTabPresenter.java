@@ -228,6 +228,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     super.registerHandler(getDisplay().addRepeatableValueChangeHandler(new RepeatableClickHandler()));
     super.registerHandler(getDisplay().addSaveChangesClickHandler(new SaveChangesClickHandler()));
     super.registerHandler(getDisplay().addAddVariableClickHandler(new AddVariableClickHandler()));
+    super.registerHandler(getDisplay().addRemoveVariableClickHandler(new RemoveVariableClickHandler()));
     super.registerHandler(getDisplay().getDetailTabs().addBeforeSelectionHandler(new DetailTabsBeforeSelectionHandler()));
     super.registerHandler(eventBus.addHandler(VariableAddRequiredEvent.getType(), new VariableAddRequiredHandler()));
   }
@@ -302,6 +303,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     HandlerRegistration addSaveChangesClickHandler(ClickHandler handler);
 
     HandlerRegistration addAddVariableClickHandler(ClickHandler handler);
+
+    HandlerRegistration addRemoveVariableClickHandler(ClickHandler handler);
 
     void setEnabledOccurenceGroup(Boolean enabled);
 
@@ -473,5 +476,14 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       variableDto.setEntityType(entityType);
       return variableDto;
     }
+  }
+
+  class RemoveVariableClickHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent event) {
+
+    }
+
   }
 }
