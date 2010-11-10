@@ -398,6 +398,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     @Override
     public void onClick(ClickEvent event) {
+      addDerivedVariableDialogPresenter.getDisplay().getNewVariableName().setText("");
+      addDerivedVariableDialogPresenter.getDisplay().getCopyFromVariableName().setText("");
       addDerivedVariableDialogPresenter.getDisplay().showDialog();
 
     }

@@ -22,6 +22,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.TextBox;
@@ -56,8 +57,10 @@ public class AddDerivedVariableDialogView extends Composite implements AddDerive
   @UiField
   RadioButton newVariableRadio;
 
+  MultiWordSuggestOracle suggestions;
+
   public AddDerivedVariableDialogView() {
-    copyFromVariableName = new SuggestBox();
+    copyFromVariableName = new SuggestBox(suggestions = new MultiWordSuggestOracle());
     copyFromVariableName.getTextBox().setEnabled(false);
     uiBinder.createAndBindUi(this);
   }
@@ -136,4 +139,13 @@ public class AddDerivedVariableDialogView extends Composite implements AddDerive
     return newVariableRadio;
   }
 
+  @Override
+  public void addVariableSuggestion(String suggestion) {
+    suggestions.add(suggestion);
+  }
+
+  @Override
+  public void clearVariableSuggestions() {
+    suggestions.clear();
+  }
 }
