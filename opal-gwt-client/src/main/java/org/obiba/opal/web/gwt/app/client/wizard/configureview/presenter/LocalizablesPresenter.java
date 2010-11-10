@@ -113,6 +113,10 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
     this.variableDto = variableDto;
   }
 
+  public VariableDto getVariableDto() {
+    return this.variableDto;
+  }
+
   void refreshLocales() {
     ResourceRequestBuilderFactory.<JsArray<LocaleDto>> newBuilder().forResource("/datasource/" + viewDto.getDatasourceName() + "/table/" + viewDto.getName() + "/locales" + "?locale=en").get().withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
 
