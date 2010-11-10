@@ -30,6 +30,7 @@ import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.DerivedVariableConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.VariableAddRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -39,6 +40,7 @@ import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -414,7 +416,32 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     @Override
     public void onClick(ClickEvent event) {
       if(validate()) {
-        // TODO Save the view
+        VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+        updateView(variableListDto);
+        eventBus.fireEvent(new ViewSaveRequiredEvent(viewDto));
+      }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void updateView(VariableListViewDto variableListViewDto) {
+      VariableDto currentVariableDto = getDisplay().getVariableDto();
+      boolean update = false;
+      JsArray<VariableDto> variables = variableListViewDto.getVariablesArray();
+      if(variables == null) {
+        variables = (JsArray<VariableDto>) JsArray.createArray();
+        variableListViewDto.setVariablesArray(variables);
+      }
+
+      for(int i = 0; i < variables.length(); i++) {
+        VariableDto variableDto = variables.get(i);
+        if(currentVariableDto.getName().equals(variableDto.getName())) {
+          variables.set(i, currentVariableDto); // Update variable.
+          update = true;
+          break;
+        }
+      }
+      if(!update) {
+        variables.push(currentVariableDto); // Add new variable.
       }
     }
 
@@ -441,6 +468,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
           public void onResource(Response response, VariableDto variableDto) {
             variableDto.setName(translations.copyOf() + variableDto.getName());
             getDisplay().setNewVariable(variableDto);
+            eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
           }
         })
         /**/.withCallback(Response.SC_NOT_FOUND, createResponseCodeCallback())
@@ -460,7 +488,9 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
           /**/.withCallback(new ResourceCallback<TableDto>() {
             @Override
             public void onResource(Response response, TableDto firstTableDto) {
-              getDisplay().setNewVariable(createEmptyDerivedVariable(firstTableDto.getEntityType()));
+              VariableDto variableDto = createEmptyDerivedVariable(firstTableDto.getEntityType());
+              getDisplay().setNewVariable(variableDto);
+              eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
             }
           })
           /**/.send();
