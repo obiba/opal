@@ -21,6 +21,8 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.DerivedVariableConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -28,7 +30,6 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -52,6 +53,8 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
   protected ViewDto viewDto;
 
   protected VariableDto variableDto;
+
+  private Runnable actionRequiringConfirmation;
 
   //
   // Constructors
@@ -124,8 +127,6 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
     List<Localizable> localizables = getLocalizables(getDisplay().getSelectedLocale());
     Collections.sort(localizables);
 
-    GWT.log("localizables count = " + localizables.size());
-
     getDisplay().setTableData(localizables);
   }
 
@@ -136,6 +137,7 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
     super.registerHandler(getDisplay().addLocaleChangeHandler(new LocaleChangeHandler()));
     super.registerHandler(getDisplay().addAddButtonClickHandler(getAddButtonClickHandler()));
     addActionHandler(); // for "Edit" and "Delete" links
+    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
 
     // Register additional handlers provided by subclasses
   }
@@ -150,13 +152,21 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
     });
   }
 
-  private void doActionImpl(Localizable localizable, String actionName) {
+  private void doActionImpl(final Localizable localizable, String actionName) {
     if(EDIT_ACTION.equals(actionName)) {
       getEditActionHandler().onEdit(localizable);
     } else if(DELETE_ACTION.equals(actionName)) {
-      getDeleteActionHandler().onDelete(localizable);
+      actionRequiringConfirmation = new Runnable() {
+
+        @Override
+        public void run() {
+          getDeleteActionHandler().onDelete(localizable);
+          refreshTableData();
+        }
+      };
+
+      eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "Confirm Delete", "Delete this item?"));
     }
-    refreshTableData();
   }
 
   protected abstract void bindDependencies();
@@ -250,6 +260,16 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
     @Override
     public void onDerivedVariableConfigurationRequired(DerivedVariableConfigurationRequiredEvent event) {
       LocalizablesPresenter.this.setVariableDto(event.getVariable());
+    }
+  }
+
+  class ConfirmationEventHandler implements ConfirmationEvent.Handler {
+
+    public void onConfirmation(ConfirmationEvent event) {
+      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event.isConfirmed()) {
+        actionRequiringConfirmation.run();
+        actionRequiringConfirmation = null;
+      }
     }
   }
 }
