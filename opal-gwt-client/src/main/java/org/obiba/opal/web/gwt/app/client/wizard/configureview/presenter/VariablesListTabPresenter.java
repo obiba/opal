@@ -21,6 +21,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
@@ -28,6 +29,11 @@ import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.DerivedVariableConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.VariableAddRequiredEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
@@ -46,10 +52,12 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
@@ -86,6 +94,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   private AddDerivedVariableDialogPresenter addDerivedVariableDialogPresenter;
 
   private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+
+  private Translations translations = GWT.create(Translations.class);
 
   //
   // Constructors
@@ -219,6 +229,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     super.registerHandler(getDisplay().addSaveChangesClickHandler(new SaveChangesClickHandler()));
     super.registerHandler(getDisplay().addAddVariableClickHandler(new AddVariableClickHandler()));
     super.registerHandler(getDisplay().getDetailTabs().addBeforeSelectionHandler(new DetailTabsBeforeSelectionHandler()));
+    super.registerHandler(eventBus.addHandler(VariableAddRequiredEvent.getType(), new VariableAddRequiredHandler()));
   }
 
   private void addValidators() {
@@ -404,5 +415,63 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       }
     }
 
+  }
+
+  class VariableAddRequiredHandler implements VariableAddRequiredEvent.Handler {
+
+    private String newDerivedVariableName;
+
+    // View is guaranteed to have one table. We will obtain the entity type from it.
+    private String[] firstTableInViewParts;
+
+    @Override
+    public void onVariableAddRequired(VariableAddRequiredEvent event) {
+      newDerivedVariableName = event.getVariableName();
+      for(int i = 0; i < viewDto.getFromArray().length(); i++) {
+        String[] tableParts = viewDto.getFromArray().get(i).split("\\.");
+        if(i == 0) firstTableInViewParts = tableParts;
+        ResourceRequestBuilderFactory.<VariableDto> newBuilder()
+        /**/.forResource("/datasource/" + tableParts[0] + "/table/" + tableParts[1] + "/variable/" + newDerivedVariableName)
+        /**/.get()
+        /**/.withCallback(new ResourceCallback<VariableDto>() {
+          @Override
+          public void onResource(Response response, VariableDto variableDto) {
+            variableDto.setName(translations.copyOf() + variableDto.getName());
+            getDisplay().setNewVariable(variableDto);
+          }
+        })
+        /**/.withCallback(Response.SC_NOT_FOUND, createResponseCodeCallback())
+        /**/.send();
+
+      }
+    }
+
+    private ResponseCodeCallback createResponseCodeCallback() {
+      return new ResponseCodeCallback() {
+
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          ResourceRequestBuilderFactory.<TableDto> newBuilder()
+          /**/.forResource("/datasource/" + firstTableInViewParts[0] + "/table/" + firstTableInViewParts[1])
+          /**/.get()
+          /**/.withCallback(new ResourceCallback<TableDto>() {
+            @Override
+            public void onResource(Response response, TableDto firstTableDto) {
+              getDisplay().setNewVariable(createEmptyDerivedVariable(firstTableDto.getEntityType()));
+            }
+          })
+          /**/.send();
+
+        }
+
+      };
+    }
+
+    private VariableDto createEmptyDerivedVariable(String entityType) {
+      VariableDto variableDto = VariableDto.create();
+      variableDto.setName(newDerivedVariableName);
+      variableDto.setEntityType(entityType);
+      return variableDto;
+    }
   }
 }

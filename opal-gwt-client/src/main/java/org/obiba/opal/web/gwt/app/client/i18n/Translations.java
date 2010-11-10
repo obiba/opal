@@ -466,6 +466,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Values")
   String valuesLabel();
 
+  @Description("Copy of label")
+  @DefaultStringValue("Copy_of_")
+  String copyOf();
+
   @Description("Script contains errors and was not saved")
   @DefaultStringValue("The script contains errors and was not saved. Click 'Test' to execute the script and see a detailed report of the errors.")
   String scriptContainsErrorsAndWasNotSaved();
