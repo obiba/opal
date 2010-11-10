@@ -137,7 +137,6 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     addDerivedVariableDialogPresenter.bind();
 
-    initDisplayComponents();
     addEventHandlers();
     addValidators();
   }
@@ -158,7 +157,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
   @Override
   public void refreshDisplay() {
-
+    initDisplayComponents();
   }
 
   @Override

@@ -124,6 +124,8 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
     dataTabPresenter.refreshDisplay();
     entitiesTabPresenter.setViewDto(viewDto);
     entitiesTabPresenter.refreshDisplay();
+    variablesListTabPresenter.setViewDto(viewDto);
+    variablesListTabPresenter.refreshDisplay();
   }
 
   @Override
