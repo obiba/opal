@@ -103,4 +103,10 @@ public class LabelListView extends Composite implements LabelListPresenter.Displ
 
   }
 
+  @Override
+  public void clearAttributes() {
+    for(TextBox textBox : languageLabelMap.values()) {
+      textBox.setText("");
+    }
+  }
 }

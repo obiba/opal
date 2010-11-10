@@ -43,7 +43,6 @@ import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.inject.Inject;
 
@@ -57,6 +56,10 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
 
     void hideDialog();
 
+    void addInputField(LabelListPresenter.Display inputField);
+
+    void removeInputField();
+
     HasClickHandlers getSaveButton();
 
     HasClickHandlers getCancelButton();
@@ -66,9 +69,6 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
     HasCloseHandlers<DialogBox> getDialog();
 
     HasText getCaption();
-
-    ScrollPanel getInputFieldPanel();
-
   }
 
   @Inject
@@ -106,7 +106,7 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
   @Override
   protected void onUnbind() {
     if(isBound) {
-      getDisplay().getInputFieldPanel().remove(labelListPresenter.getDisplay().asWidget());
+      getDisplay().removeInputField();
       labelListPresenter.unbind();
 
       isBound = false;
@@ -120,6 +120,7 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
 
   @Override
   public void revealDisplay() {
+    getDisplay().clear();
     getDisplay().showDialog();
     labelListPresenter.revealDisplay();
   }
@@ -143,8 +144,7 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
     validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLabelRequired"));
     setTitle();
     populateForm();
-    getDisplay().getInputFieldPanel().clear();
-    getDisplay().getInputFieldPanel().add(labelListPresenter.getDisplay().asWidget());
+    getDisplay().addInputField(labelListPresenter.getDisplay());
   }
 
   private void setTitle() {

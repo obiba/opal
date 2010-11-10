@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.CategoryDialogPresenter;
 
 import com.google.gwt.core.client.GWT;
@@ -47,6 +48,8 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
   @UiField
   ScrollPanel inputFieldPanel;
 
+  private LabelListPresenter.Display inputField;
+
   public CategoryDialogView() {
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
@@ -68,6 +71,10 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
   @Override
   public void clear() {
     categoryName.setText("");
+
+    if(inputField != null) {
+      inputField.clearAttributes();
+    }
   }
 
   @Override
@@ -97,15 +104,23 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
     return categoryName;
   }
 
-  @SuppressWarnings( { "rawtypes", "unchecked" })
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
   public HasCloseHandlers getDialog() {
     return dialog;
   }
 
   @Override
-  public ScrollPanel getInputFieldPanel() {
-    return inputFieldPanel;
+  public void addInputField(LabelListPresenter.Display inputField) {
+    inputFieldPanel.clear();
+    inputFieldPanel.add(inputField.asWidget());
+    this.inputField = inputField;
+  }
+
+  @Override
+  public void removeInputField() {
+    inputFieldPanel.clear();
+    inputField = null;
   }
 
   @Override

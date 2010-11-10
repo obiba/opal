@@ -40,6 +40,7 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
 
     public void displayAttributes(String attributeName, JsArray<AttributeDto> attributes);
 
+    public void clearAttributes(); // i.e., clear the attribute values
   }
 
   private String attributeToDisplay;
