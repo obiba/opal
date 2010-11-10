@@ -11,13 +11,17 @@ package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import net.customware.gwt.presenter.client.EventBus;
 
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.AttributeUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.UpdateType;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -43,6 +47,8 @@ public class AttributesPresenter extends LocalizablesPresenter {
 
   private VariableDto variableDto;
 
+  private List<String> attributeNames;
+
   //
   // Constructors
   //
@@ -50,6 +56,7 @@ public class AttributesPresenter extends LocalizablesPresenter {
   @Inject
   public AttributesPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
+    attributeNames = getUniqueAttributeNames();
   }
 
   //
@@ -135,6 +142,17 @@ public class AttributesPresenter extends LocalizablesPresenter {
     this.variableDto = variableDto;
   }
 
+  private List<String> getUniqueAttributeNames() {
+    SortedSet<String> attributeNames = new TreeSet<String>();
+    VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+    for(VariableDto variable : JsArrays.toList(variableListDto.getVariablesArray())) {
+      for(AttributeDto attribute : JsArrays.toList(variable.getAttributesArray())) {
+        attributeNames.add(attribute.getName());
+      }
+    }
+    return new ArrayList<String>(attributeNames);
+  }
+
   //
   // Inner Classes / Interfaces
   //
@@ -148,6 +166,7 @@ public class AttributesPresenter extends LocalizablesPresenter {
     public void onClick(ClickEvent event) {
       // Each time the dialog is closed (hidden), it is unbound. So we need to rebind it each time we display it.
       attributeDialogPresenter.bind();
+      attributeDialogPresenter.getDisplay().setNameDropdownList(attributeNames);
       attributeDialogPresenter.revealDisplay();
     }
   }
@@ -160,7 +179,7 @@ public class AttributesPresenter extends LocalizablesPresenter {
 
       // Each time the dialog is closed (hidden), it is unbound. So we need to rebind it each time we display it.
       attributeDialogPresenter.bind();
-
+      attributeDialogPresenter.getDisplay().setNameDropdownList(attributeNames);
       attributeDialogPresenter.revealDisplay();
     }
   }
@@ -206,6 +225,7 @@ public class AttributesPresenter extends LocalizablesPresenter {
       for(int attributeIndex = 0; attributeIndex < event.getAttributes().length(); attributeIndex++) {
         AttributeDto newAttribute = event.getAttributes().get(attributeIndex);
         variableDto.getAttributesArray().push(newAttribute);
+        attributeNames.add(newAttribute.getName());
       }
     }
 

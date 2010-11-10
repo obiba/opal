@@ -9,13 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
@@ -25,7 +22,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
@@ -35,8 +31,6 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.AttributeUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.UpdateType;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
-import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.core.client.GWT;
@@ -144,8 +138,6 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
       addEventHandlers();
       addRadioButtonNameEventHandlers();
       resetForm();
-
-      getDisplay().setNameDropdownList(getUniqueAttributeNames());
 
       if(isEdit()) getDisplay().setAttributeName(attributeNameToDisplay);
       setTitle();
@@ -299,17 +291,6 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
       attributes.push(attribute);
     }
     return attributes;
-  }
-
-  private List<String> getUniqueAttributeNames() {
-    SortedSet<String> attributeNames = new TreeSet<String>();
-    VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
-    for(VariableDto variable : JsArrays.toList(variableListDto.getVariablesArray())) {
-      for(AttributeDto attribute : JsArrays.toList(variable.getAttributesArray())) {
-        attributeNames.add(attribute.getName());
-      }
-    }
-    return new ArrayList<String>(attributeNames);
   }
 
   public void setAttributeNameToDisplay(String attributeNameToDisplay) {
