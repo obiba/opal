@@ -80,7 +80,7 @@ public class DatasourcesResource {
       DatasourceFactory factory = datasourceFactoryRegistry.parse(factoryDto);
       uid = MagmaEngine.get().addTransientDatasource(factory);
       Datasource ds = MagmaEngine.get().getTransientDatasourceInstance(uid);
-      UriBuilder ub = uriInfo.getBaseUriBuilder().path("datasource").path(uid);
+      UriBuilder ub = UriBuilder.fromPath("/").path("datasource").path(uid);
       response = Response.created(ub.build()).entity(Dtos.asDto(ds).build());
       Disposables.silentlyDispose(ds);
     } catch(NoSuchDatasourceFactoryException e) {
