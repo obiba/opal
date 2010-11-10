@@ -21,7 +21,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.DerivedVariableSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.DerivedVariableConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -132,7 +132,7 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
   protected void addEventHandlers() {
     // Register common handlers
     super.registerHandler(eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
-    super.registerHandler(eventBus.addHandler(DerivedVariableSelectionEvent.getType(), new DerivedVariableSelectionEventHandler()));
+    super.registerHandler(eventBus.addHandler(DerivedVariableConfigurationRequiredEvent.getType(), new DerivedVariableConfigurationRequiredEventHandler()));
     super.registerHandler(getDisplay().addLocaleChangeHandler(new LocaleChangeHandler()));
     super.registerHandler(getDisplay().addAddButtonClickHandler(getAddButtonClickHandler()));
     addActionHandler(); // for "Edit" and "Delete" links
@@ -235,10 +235,10 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
     }
   }
 
-  class DerivedVariableSelectionEventHandler implements DerivedVariableSelectionEvent.Handler {
+  class DerivedVariableConfigurationRequiredEventHandler implements DerivedVariableConfigurationRequiredEvent.Handler {
 
     @Override
-    public void onDerivedVariableSelection(DerivedVariableSelectionEvent event) {
+    public void onDerivedVariableConfigurationRequired(DerivedVariableConfigurationRequiredEvent event) {
       LocalizablesPresenter.this.setVariableDto(event.getVariable());
     }
   }

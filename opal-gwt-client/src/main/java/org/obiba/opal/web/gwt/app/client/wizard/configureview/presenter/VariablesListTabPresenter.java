@@ -27,7 +27,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.Notific
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.DerivedVariableSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.DerivedVariableConfigurationRequiredEvent;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
@@ -167,7 +167,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     // announce to the world that this is the VariableDto currently being configured.
     newVariableDto = VariableDto.create();
     newVariableDto.setName("new");
-    eventBus.fireEvent(new DerivedVariableSelectionEvent(newVariableDto));
+    eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(newVariableDto));
   }
 
   private List<VariableDto> getVariableList() {
@@ -178,7 +178,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   private void updateSelectedVariableName() {
     if(!variables.isEmpty()) {
       getDisplay().setSelectedVariableName(getSelectedVariableName(), getPreviousVariableName(), getNextVariableName());
-      eventBus.fireEvent(new DerivedVariableSelectionEvent(variables.get(currentSelectedVariableIndex)));
+      eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(variables.get(currentSelectedVariableIndex)));
     }
   }
 

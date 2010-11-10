@@ -17,7 +17,7 @@ import com.google.gwt.event.shared.GwtEvent;
 /**
  * Signals that a derived variable has been selected by the user.
  */
-public class DerivedVariableSelectionEvent extends GwtEvent<DerivedVariableSelectionEvent.Handler> {
+public class DerivedVariableConfigurationRequiredEvent extends GwtEvent<DerivedVariableConfigurationRequiredEvent.Handler> {
   //
   // Static Variables
   //
@@ -34,7 +34,7 @@ public class DerivedVariableSelectionEvent extends GwtEvent<DerivedVariableSelec
   // Constructors
   //
 
-  public DerivedVariableSelectionEvent(VariableDto variable) {
+  public DerivedVariableConfigurationRequiredEvent(VariableDto variable) {
     this.variable = variable;
   }
 
@@ -44,7 +44,7 @@ public class DerivedVariableSelectionEvent extends GwtEvent<DerivedVariableSelec
 
   @Override
   protected void dispatch(Handler handler) {
-    handler.onDerivedVariableSelection(this);
+    handler.onDerivedVariableConfigurationRequired(this);
   }
 
   @Override
@@ -70,6 +70,6 @@ public class DerivedVariableSelectionEvent extends GwtEvent<DerivedVariableSelec
 
   public interface Handler extends EventHandler {
 
-    public void onDerivedVariableSelection(DerivedVariableSelectionEvent event);
+    public void onDerivedVariableConfigurationRequired(DerivedVariableConfigurationRequiredEvent event);
   }
 }
