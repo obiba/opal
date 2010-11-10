@@ -152,9 +152,9 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
 
   private void doActionImpl(Localizable localizable, String actionName) {
     if(EDIT_ACTION.equals(actionName)) {
-      editLocalizable(localizable, getDisplay().getSelectedLocale());
+      getEditActionHandler().onEdit(localizable);
     } else if(DELETE_ACTION.equals(actionName)) {
-      deleteLocalizable(localizable, getDisplay().getSelectedLocale());
+      getDeleteActionHandler().onDelete(localizable);
     }
     refreshTableData();
   }
@@ -165,13 +165,13 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
 
   protected abstract void refreshDependencies();
 
-  protected abstract ClickHandler getAddButtonClickHandler();
-
   protected abstract List<Localizable> getLocalizables(String localeName);
 
-  protected abstract void editLocalizable(Localizable localizable, String localeName);
+  protected abstract ClickHandler getAddButtonClickHandler();
 
-  protected abstract void deleteLocalizable(Localizable localizable, String localeName);
+  protected abstract EditActionHandler getEditActionHandler();
+
+  protected abstract DeleteActionHandler getDeleteActionHandler();
 
   //
   // Inner Classes / Interfaces
@@ -192,6 +192,16 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
     HandlerRegistration addLocaleChangeHandler(ChangeHandler handler);
 
     HandlerRegistration addAddButtonClickHandler(ClickHandler handler);
+  }
+
+  interface EditActionHandler {
+
+    public void onEdit(Localizable localizable);
+  }
+
+  interface DeleteActionHandler {
+
+    public void onDelete(Localizable localizable);
   }
 
   public abstract class Localizable implements Comparable<Localizable> {

@@ -120,7 +120,9 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
 
   @Override
   public void revealDisplay() {
-    getDisplay().clear();
+    if(!isEdit()) {
+      getDisplay().clear();
+    }
     getDisplay().showDialog();
     labelListPresenter.revealDisplay();
   }

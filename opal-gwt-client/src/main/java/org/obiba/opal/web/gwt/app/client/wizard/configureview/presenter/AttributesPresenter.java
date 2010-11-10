@@ -37,6 +37,10 @@ public class AttributesPresenter extends LocalizablesPresenter {
 
   private ClickHandler addButtonClickHandler;
 
+  private EditActionHandler editActionHandler;
+
+  private DeleteActionHandler deleteActionHandler;
+
   private VariableDto variableDto;
 
   //
@@ -79,28 +83,6 @@ public class AttributesPresenter extends LocalizablesPresenter {
   }
 
   @Override
-  protected void editLocalizable(Localizable localizable, String localeName) {
-    // TODO: Show the "edit attribute" dialog.
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  protected void deleteLocalizable(Localizable localizable, String localeName) {
-    JsArray<AttributeDto> newAttributesArray = (JsArray<AttributeDto>) JsArray.createArray();
-
-    for(int i = 0; i < variableDto.getAttributesArray().length(); i++) {
-      AttributeDto attributeDto = variableDto.getAttributesArray().get(i);
-
-      if(!attributeDto.getName().equals(localizable.getName()) || !attributeDto.getLocale().equals(localeName)) {
-        newAttributesArray.push(attributeDto);
-      }
-    }
-
-    variableDto.clearAttributesArray();
-    variableDto.setAttributesArray(newAttributesArray);
-  }
-
-  @Override
   protected void bindDependencies() {
     attributeDialogPresenter.bind();
   }
@@ -129,6 +111,22 @@ public class AttributesPresenter extends LocalizablesPresenter {
     return addButtonClickHandler;
   }
 
+  @Override
+  protected EditActionHandler getEditActionHandler() {
+    if(editActionHandler == null) {
+      editActionHandler = new EditAttributeHandler();
+    }
+    return editActionHandler;
+  }
+
+  @Override
+  protected DeleteActionHandler getDeleteActionHandler() {
+    if(deleteActionHandler == null) {
+      deleteActionHandler = new DeleteAttributeHandler();
+    }
+    return deleteActionHandler;
+  }
+
   //
   // Methods
   //
@@ -151,6 +149,39 @@ public class AttributesPresenter extends LocalizablesPresenter {
       // Each time the dialog is closed (hidden), it is unbound. So we need to rebind it each time we display it.
       attributeDialogPresenter.bind();
       attributeDialogPresenter.revealDisplay();
+    }
+  }
+
+  class EditAttributeHandler implements EditActionHandler {
+
+    @Override
+    public void onEdit(Localizable localizable) {
+      attributeDialogPresenter.setAttributeNameToDisplay(localizable.getName());
+
+      // Each time the dialog is closed (hidden), it is unbound. So we need to rebind it each time we display it.
+      attributeDialogPresenter.bind();
+
+      attributeDialogPresenter.revealDisplay();
+    }
+  }
+
+  class DeleteAttributeHandler implements DeleteActionHandler {
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void onDelete(Localizable localizable) {
+      JsArray<AttributeDto> updatedAttributesArray = (JsArray<AttributeDto>) JsArray.createArray();
+
+      for(int attributeIndex = 0; attributeIndex < variableDto.getAttributesArray().length(); attributeIndex++) {
+        AttributeDto attributeDto = variableDto.getAttributesArray().get(attributeIndex);
+
+        if(!attributeDto.getName().equals(localizable.getName())) {
+          updatedAttributesArray.push(attributeDto);
+        }
+      }
+
+      variableDto.clearAttributesArray();
+      variableDto.setAttributesArray(updatedAttributesArray);
     }
   }
 

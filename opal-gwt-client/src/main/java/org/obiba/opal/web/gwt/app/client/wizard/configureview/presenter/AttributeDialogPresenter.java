@@ -126,7 +126,9 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
   @Override
   public void revealDisplay() {
-    getDisplay().clear();
+    if(!isEdit()) {
+      getDisplay().clear();
+    }
     getDisplay().showDialog();
     labelListPresenter.revealDisplay();
   }

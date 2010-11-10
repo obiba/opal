@@ -20,7 +20,6 @@ import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -38,6 +37,10 @@ public class CategoriesPresenter extends LocalizablesPresenter {
   private CategoryDialogPresenter categoryDialogPresenter;
 
   private ClickHandler addButtonClickHandler;
+
+  private EditActionHandler editActionHandler;
+
+  private DeleteActionHandler deleteActionHandler;
 
   //
   // Constructors
@@ -62,8 +65,6 @@ public class CategoriesPresenter extends LocalizablesPresenter {
       for(int attributeIndex = 0; attributeIndex < categoryDto.getAttributesArray().length(); attributeIndex++) {
         final AttributeDto attributeDto = categoryDto.getAttributesArray().get(attributeIndex);
 
-        GWT.log(categoryDto.getName() + "[" + attributeDto.getName() + " = " + attributeDto.getValue() + ", locale = " + attributeDto.getLocale() + "]");
-
         if(attributeDto.getName().equals("label") && attributeDto.getLocale().equals(localeName)) {
           localizables.add(new Localizable() {
 
@@ -80,41 +81,10 @@ public class CategoriesPresenter extends LocalizablesPresenter {
 
           break;
         }
-
       }
     }
 
     return localizables;
-  }
-
-  @Override
-  protected void editLocalizable(Localizable localizable, String localeName) {
-    // TODO: Show the "edit category" dialog.
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  protected void deleteLocalizable(Localizable localizable, String localeName) {
-    for(int categoryIndex = 0; categoryIndex < variableDto.getCategoriesArray().length(); categoryIndex++) {
-      CategoryDto categoryDto = variableDto.getCategoriesArray().get(categoryIndex);
-
-      if(categoryDto.getName().equals(localizable.getName())) {
-        JsArray<AttributeDto> newAttributesArray = (JsArray<AttributeDto>) JsArray.createArray();
-
-        for(int attributeIndex = 0; attributeIndex < categoryDto.getAttributesArray().length(); attributeIndex++) {
-          AttributeDto attributeDto = categoryDto.getAttributesArray().get(attributeIndex);
-
-          if(!attributeDto.getName().equals("label") || !attributeDto.getLocale().equals(localeName)) {
-            newAttributesArray.push(attributeDto);
-          }
-        }
-
-        categoryDto.clearAttributesArray();
-        categoryDto.setAttributesArray(newAttributesArray);
-
-        break;
-      }
-    }
   }
 
   @Override
@@ -146,6 +116,22 @@ public class CategoriesPresenter extends LocalizablesPresenter {
     return addButtonClickHandler;
   }
 
+  @Override
+  protected EditActionHandler getEditActionHandler() {
+    if(editActionHandler == null) {
+      editActionHandler = new EditCategoryHandler();
+    }
+    return editActionHandler;
+  }
+
+  @Override
+  protected DeleteActionHandler getDeleteActionHandler() {
+    if(deleteActionHandler == null) {
+      deleteActionHandler = new DeleteCategoryHandler();
+    }
+    return deleteActionHandler;
+  }
+
   //
   // Methods
   //
@@ -165,6 +151,49 @@ public class CategoriesPresenter extends LocalizablesPresenter {
       // Each time the dialog is closed (hidden), it is unbound. So we need to rebind it each time we display it.
       categoryDialogPresenter.bind();
       categoryDialogPresenter.revealDisplay();
+    }
+  }
+
+  class EditCategoryHandler implements EditActionHandler {
+
+    @Override
+    public void onEdit(Localizable localizable) {
+      categoryDialogPresenter.setCategoryDto(findCategoryDto(localizable.getName()));
+
+      // Each time the dialog is closed (hidden), it is unbound. So we need to rebind it each time we display it.
+      categoryDialogPresenter.bind();
+
+      categoryDialogPresenter.revealDisplay();
+    }
+
+    private CategoryDto findCategoryDto(String name) {
+      for(int categoryIndex = 0; categoryIndex < variableDto.getCategoriesArray().length(); categoryIndex++) {
+        CategoryDto categoryDto = variableDto.getCategoriesArray().get(categoryIndex);
+        if(categoryDto.getName().equals(name)) {
+          return categoryDto;
+        }
+      }
+      return null;
+    }
+  }
+
+  class DeleteCategoryHandler implements DeleteActionHandler {
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void onDelete(Localizable localizable) {
+      JsArray<CategoryDto> updatedCategoriesArray = (JsArray<CategoryDto>) JsArray.createArray();
+
+      for(int categoryIndex = 0; categoryIndex < variableDto.getCategoriesArray().length(); categoryIndex++) {
+        CategoryDto categoryDto = variableDto.getCategoriesArray().get(categoryIndex);
+
+        if(!categoryDto.getName().equals(localizable.getName())) {
+          updatedCategoriesArray.push(categoryDto);
+        }
+      }
+
+      variableDto.clearCategoriesArray();
+      variableDto.setCategoriesArray(updatedCategoriesArray);
     }
   }
 
