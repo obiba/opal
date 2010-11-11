@@ -241,9 +241,16 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
 
   @Override
   public void setNewVariable(VariableDto variableDto) {
-    variableName.setValue(variableDto.getName());
+    // Set the entity type (not displayed)
     entityType = variableDto.getEntityType();
 
+    // Set the UI fields.
+    variableName.setValue(variableDto.getName());
+    setValueType(variableDto);
+    repeatableCheckbox.setValue(variableDto.getIsRepeatable());
+    setOccurrenceGroup(variableDto);
+    setUnit(variableDto);
+    setMimeType(variableDto);
   }
 
   @Override
@@ -296,4 +303,35 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
     return scriptWidgetDisplay.addScriptChangeHandler(changeHandler);
   }
 
+  //
+  // Methods
+  //
+
+  private void setValueType(VariableDto variableDto) {
+    for(int i = 0; i < valueType.getItemCount(); i++) {
+      valueType.setItemSelected(i, valueType.getValue(i).equals(variableDto.getValueType()));
+    }
+  }
+
+  private void setOccurrenceGroup(VariableDto variableDto) {
+    if(variableDto.getIsRepeatable()) {
+      occurenceGroup.setEnabled(true);
+
+      if(variableDto.hasOccurrenceGroup()) {
+        occurenceGroup.setText(variableDto.getOccurrenceGroup());
+      }
+    }
+  }
+
+  private void setUnit(VariableDto variableDto) {
+    if(variableDto.hasUnit()) {
+      unit.setText(variableDto.getUnit());
+    }
+  }
+
+  private void setMimeType(VariableDto variableDto) {
+    if(variableDto.hasMimeType()) {
+      mimeType.setText(variableDto.getMimeType());
+    }
+  }
 }
