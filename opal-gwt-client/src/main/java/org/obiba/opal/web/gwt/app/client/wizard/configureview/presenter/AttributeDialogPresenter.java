@@ -49,8 +49,6 @@ import com.google.inject.Inject;
 
 public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPresenter.Display> {
 
-  private ViewDto viewDto;
-
   private boolean isBound;
 
   public interface Display extends WidgetDisplay {
@@ -96,8 +94,6 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   private JsArray<AttributeDto> attributes;
 
   private String attributeNameToDisplay;
-
-  private List<String> labels;
 
   private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
@@ -302,8 +298,6 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   }
 
   public void setViewDto(ViewDto viewDto) {
-    this.viewDto = viewDto;
-
     labelListPresenter.setDatasourceName(viewDto.getDatasourceName());
   }
 }
