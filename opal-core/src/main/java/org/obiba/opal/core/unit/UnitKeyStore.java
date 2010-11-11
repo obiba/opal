@@ -11,6 +11,7 @@ package org.obiba.opal.core.unit;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
@@ -44,6 +45,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PasswordFinder;
@@ -57,6 +59,7 @@ import org.obiba.opal.core.crypt.CachingCallbackHandler;
 import org.obiba.opal.core.crypt.KeyPairNotFoundException;
 import org.obiba.opal.core.crypt.KeyProviderException;
 import org.obiba.opal.core.crypt.KeyProviderSecurityException;
+import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.springframework.util.Assert;
 
 import com.google.common.collect.ImmutableSet;
@@ -348,8 +351,14 @@ public class UnitKeyStore implements KeyProvider {
    * @param certificate certificate in the PEM format
    */
   public void importKey(String alias, FileObject privateKey, FileObject certificate) {
-    Key key = getPrivateKeyFile(privateKey);
-    X509Certificate cert = getCertificateFromFile(certificate);
+    storeKeyEntry(alias, getPrivateKeyFromFile(privateKey), getCertificateFromFile(certificate));
+  }
+
+  public void importKey(String alias, InputStream privateKey, InputStream certificate) throws NoSuchFunctionalUnitException {
+    storeKeyEntry(alias, getPrivateKey(privateKey), getCertificate(certificate));
+  }
+
+  private void storeKeyEntry(String alias, Key key, X509Certificate cert) {
     CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName).prompt(getPasswordFor(alias)).build();
     try {
       store.setKeyEntry(alias, key, getKeyPassword(passwordCallback), new X509Certificate[] { cert });
@@ -360,7 +369,6 @@ public class UnitKeyStore implements KeyProvider {
     } catch(IOException e) {
       throw new RuntimeException(e);
     }
-
   }
 
   /**
@@ -371,7 +379,14 @@ public class UnitKeyStore implements KeyProvider {
    * L=Montreal, ST=Quebec, C=CA)
    */
   public void importKey(String alias, FileObject privateKey, String certificateInfo) {
-    KeyPair keyPair = getKeyPairFromFile(privateKey);
+    makeAndStoreKeyEntry(alias, getKeyPairFromFile(privateKey), certificateInfo);
+  }
+
+  public void importKey(String alias, InputStream privateKey, String certificateInfo) throws NoSuchFunctionalUnitException {
+    makeAndStoreKeyEntry(alias, getKeyPair(privateKey), certificateInfo);
+  }
+
+  private void makeAndStoreKeyEntry(String alias, KeyPair keyPair, String certificateInfo) {
     X509Certificate cert;
     try {
       cert = UnitKeyStore.makeCertificate(keyPair.getPrivate(), keyPair.getPublic(), certificateInfo, chooseSignatureAlgorithm(keyPair.getPrivate().getAlgorithm()));
@@ -384,7 +399,6 @@ public class UnitKeyStore implements KeyProvider {
     } catch(IOException e) {
       throw new RuntimeException(e);
     }
-
   }
 
   private X509Certificate makeCertificate(String algorithm, String certificateInfo, KeyPair keyPair) throws SignatureException, InvalidKeyException, CertificateEncodingException, NoSuchAlgorithmException {
@@ -409,16 +423,26 @@ public class UnitKeyStore implements KeyProvider {
   }
 
   private KeyPair getKeyPairFromFile(FileObject privateKey) {
+    try {
+      return getKeyPair(privateKey.getContent().getInputStream());
+    } catch(FileSystemException e) {
+      throw new RuntimeException(e);
+    } catch(RuntimeException e) {
+      throw new RuntimeException("Failed reading key pair from file: " + privateKey.getName(), e);
+    }
+  }
+
+  private KeyPair getKeyPair(InputStream privateKey) {
     PEMReader pemReader = null;
     try {
-      pemReader = new PEMReader(new InputStreamReader(privateKey.getContent().getInputStream()), new PasswordFinder() {
+      pemReader = new PEMReader(new InputStreamReader(privateKey), new PasswordFinder() {
         public char[] getPassword() {
           return System.console().readPassword("%s:  ", "Password for imported private key");
         }
       });
       Object object = pemReader.readObject();
       if(object == null) {
-        throw new RuntimeException("The file [" + privateKey.getName() + "] does not contain a PEM file.");
+        throw new RuntimeException("No PEM information.");
       } else if(object instanceof KeyPair) {
         return (KeyPair) object;
       }
@@ -432,17 +456,28 @@ public class UnitKeyStore implements KeyProvider {
     }
   }
 
-  private Key getPrivateKeyFile(FileObject privateKey) {
+  private Key getPrivateKeyFromFile(FileObject privateKey) {
+    try {
+      return getPrivateKey(privateKey.getContent().getInputStream());
+    } catch(FileSystemException e) {
+      throw new RuntimeException(e);
+    } catch(RuntimeException e) {
+      throw new RuntimeException("Failed reading private key from file: " + privateKey.getName(), e);
+    }
+  }
+
+  private Key getPrivateKey(InputStream privateKey) {
+
     PEMReader pemReader = null;
     try {
-      pemReader = new PEMReader(new InputStreamReader(privateKey.getContent().getInputStream()), new PasswordFinder() {
+      pemReader = new PEMReader(new InputStreamReader(privateKey), new PasswordFinder() {
         public char[] getPassword() {
           return System.console().readPassword("%s:  ", "Password for imported private key");
         }
       });
       Object pemObject = pemReader.readObject();
       if(pemObject == null) {
-        throw new RuntimeException("The file [" + privateKey.getName() + "] does not contain a PEM file.");
+        throw new RuntimeException("No PEM information.");
       }
       return toPrivateKey(pemObject);
     } catch(IOException e) {
@@ -463,16 +498,28 @@ public class UnitKeyStore implements KeyProvider {
   }
 
   private X509Certificate getCertificateFromFile(FileObject certificate) {
+    try {
+      return getCertificate(certificate.getContent().getInputStream());
+    } catch(FileSystemException e) {
+      throw new RuntimeException(e);
+    } catch(RuntimeException e) {
+      throw new RuntimeException("Failed reading certificate from file: " + certificate.getName(), e);
+    }
+  }
+
+  private X509Certificate getCertificate(InputStream certificate) {
     PEMReader pemReader = null;
     try {
-      pemReader = new PEMReader(new InputStreamReader(certificate.getContent().getInputStream()), new PasswordFinder() {
+      pemReader = new PEMReader(new InputStreamReader(certificate), new PasswordFinder() {
 
         public char[] getPassword() {
           return System.console().readPassword("%s:  ", "Password for imported certificate");
         }
       });
       Object object = pemReader.readObject();
-      if(object instanceof X509Certificate) {
+      if(object == null) {
+        throw new RuntimeException("No PEM information.");
+      } else if(object instanceof X509Certificate) {
         return (X509Certificate) object;
       }
       throw new RuntimeException("Unexpected type [" + object + "]. Expected X509Certificate.");

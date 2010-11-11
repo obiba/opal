@@ -13,21 +13,30 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
 
 import org.bouncycastle.openssl.PEMWriter;
+import org.hsqldb.lib.StringInputStream;
+import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.UnitKeyStore;
+import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.model.Opal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +85,46 @@ public class FunctionalUnitResource {
     return fuBuilder.build();
   }
 
+  @PUT
+  public Response createOrUpdateFunctionalUnit(@Context UriInfo uri, Opal.FunctionalUnitDto unitDto) {
+    if(!unit.equals(unitDto)) {
+      return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "WrongFunctionalUnitArgument").build()).build();
+    }
+
+    ResponseBuilder response = null;
+    try {
+      FunctionalUnit functionalUnit = new FunctionalUnit(unitDto.getName(), unitDto.getKeyVariableName());
+      if(unitDto.hasSelect()) {
+        functionalUnit.setSelect(new JavascriptClause(unitDto.getSelect()));
+      }
+
+      if(opalRuntime.getOpalConfiguration().hasFunctionalUnit(unitDto.getName())) {
+        response = Response.ok();
+      } else {
+        response = Response.created(uri.getAbsolutePath());
+      }
+
+      opalRuntime.getOpalConfiguration().addOrReplaceFunctionalUnit(functionalUnit);
+      opalRuntime.writeOpalConfiguration();
+
+    } catch(RuntimeException e) {
+      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "FunctionalUnitCreationFailed", e).build());
+    }
+
+    return response.build();
+  }
+
+  @DELETE
+  public Response removeUnit() {
+    if(!opalRuntime.getOpalConfiguration().hasFunctionalUnit(unit)) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+    opalRuntime.getOpalConfiguration().removeFunctionalUnit(unit);
+    opalRuntime.writeOpalConfiguration();
+
+    return Response.ok().build();
+  }
+
   @GET
   @Path("/keys")
   public List<Opal.KeyPairDto> getFunctionalUnitKeyPairs() throws KeyStoreException, IOException {
@@ -89,24 +138,20 @@ public class FunctionalUnitResource {
       keyPairs.add(kpBuilder.build());
     }
 
+    sortByName(keyPairs);
     return keyPairs;
   }
 
-  @POST
+  @PUT
   @Path("/key")
   public Response createOrUpdateFunctionalUnitKeyPair(Opal.KeyPairForm kpForm) {
     if(kpForm.hasPrivateForm() && kpForm.hasPublicForm()) {
       unitKeyStoreService.createOrUpdateKey(unit, kpForm.getAlias(), kpForm.getPrivateForm().getAlgo(), kpForm.getPrivateForm().getSize(), getCertificateInfo(kpForm.getPublicForm()));
     } else if(kpForm.hasPrivateImport()) {
       if(kpForm.hasPublicForm()) {
-        throw new UnsupportedOperationException();
-        // TODO
-        // unitKeyStoreService.importKey(unit, kpAdd.getAlias(), kpAdd.getPrivateImport(),
-        // getCertificateInfo(kpAdd.getPublicForm()));
+        unitKeyStoreService.importKey(unit, kpForm.getAlias(), new StringInputStream(kpForm.getPrivateImport()), getCertificateInfo(kpForm.getPublicForm()));
       } else if(kpForm.hasPublicImport()) {
-        throw new UnsupportedOperationException();
-        // TODO
-        // unitKeyStoreService.importKey(unit, kpAdd.getAlias(), kpAdd.getPrivateImport(), kpAdd.getPublicImport());
+        unitKeyStoreService.importKey(unit, kpForm.getAlias(), new StringInputStream(kpForm.getPrivateImport()), new StringInputStream(kpForm.getPublicImport()));
       } else {
         throw new IllegalArgumentException("Missing information about public key for alias: " + kpForm.getAlias());
       }
@@ -146,6 +191,18 @@ public class FunctionalUnitResource {
 
   private String getCertificateInfo(Opal.PublicKeyForm pkForm) {
     return "CN=" + pkForm.getName() + ", OU=" + pkForm.getOrganizationalUnit() + ", O=" + pkForm.getOrganization() + ", L=" + pkForm.getLocality() + ", ST=" + pkForm.getState() + ", C=" + pkForm.getCountry();
+  }
+
+  private void sortByName(List<Opal.KeyPairDto> units) {
+    // sort alphabetically
+    Collections.sort(units, new Comparator<Opal.KeyPairDto>() {
+
+      @Override
+      public int compare(Opal.KeyPairDto d1, Opal.KeyPairDto d2) {
+        return d1.getAlias().compareTo(d2.getAlias());
+      }
+
+    });
   }
 
 }

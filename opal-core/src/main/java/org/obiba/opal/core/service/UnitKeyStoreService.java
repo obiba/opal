@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.core.service;
 
+import java.io.InputStream;
+
 import org.apache.commons.vfs.FileObject;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.UnitKeyStore;
@@ -89,6 +91,16 @@ public interface UnitKeyStoreService {
   public void importKey(String unitName, String alias, FileObject privateKey, FileObject certificate) throws NoSuchFunctionalUnitException;
 
   /**
+   * Import a private key and its associated certificate into the specified keystore at the given alias.
+   * @param unitName
+   * @param alias
+   * @param privateKey
+   * @param certificate
+   * @throws NoSuchFunctionalUnitException
+   */
+  public void importKey(String unitName, String alias, InputStream privateKey, InputStream certificate) throws NoSuchFunctionalUnitException;
+
+  /**
    * Import a private key into the specified keystore and generate an associated certificate at the given alias.
    * @param unitName name of the functional unit
    * @param alias name of the key
@@ -98,5 +110,15 @@ public interface UnitKeyStoreService {
    * @throws NoSuchFunctionalUnitException if no unit exists with the specified name
    */
   public void importKey(String unitName, String alias, FileObject privateKey, String certificateInfo) throws NoSuchFunctionalUnitException;
+
+  /**
+   * Import a private key into the specified keystore and generate an associated certificate at the given alias.
+   * @param unitName
+   * @param alias
+   * @param privateKey
+   * @param certificateInfo
+   * @throws NoSuchFunctionalUnitException
+   */
+  public void importKey(String unitName, String alias, InputStream privateKey, String certificateInfo) throws NoSuchFunctionalUnitException;
 
 }

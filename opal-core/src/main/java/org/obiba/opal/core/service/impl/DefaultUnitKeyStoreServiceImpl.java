@@ -12,6 +12,7 @@ package org.obiba.opal.core.service.impl;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -26,6 +27,7 @@ import org.obiba.opal.core.crypt.CacheablePasswordCallback;
 import org.obiba.opal.core.crypt.CachingCallbackHandler;
 import org.obiba.opal.core.crypt.KeyProviderSecurityException;
 import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
+import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.UnitKeyStore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,6 +141,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     saveUnitKeyStore(unitKeyStore);
   }
 
+  @Override
   public void importKey(String unitName, String alias, FileObject privateKey, FileObject certificate) {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
@@ -151,7 +154,34 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     saveUnitKeyStore(unitKeyStore);
   }
 
+  @Override
+  public void importKey(String unitName, String alias, InputStream privateKey, InputStream certificate) throws NoSuchFunctionalUnitException {
+    Assert.hasText(unitName, "unitName must not be null or empty");
+    Assert.hasText(alias, "alias must not be null or empty");
+    Assert.notNull(privateKey, "privateKey must not be null");
+    Assert.notNull(certificate, "certificate must not be null");
+
+    UnitKeyStore unitKeyStore = getOrCreateUnitKeyStore(unitName);
+    unitKeyStore.importKey(alias, privateKey, certificate);
+
+    saveUnitKeyStore(unitKeyStore);
+  }
+
+  @Override
   public void importKey(String unitName, String alias, FileObject privateKey, String certificateInfo) {
+    Assert.hasText(unitName, "unitName must not be null or empty");
+    Assert.hasText(alias, "alias must not be null or empty");
+    Assert.notNull(privateKey, "privateKey must not be null");
+    Assert.hasText(certificateInfo, "certificateInfo must not be null or empty");
+
+    UnitKeyStore unitKeyStore = getOrCreateUnitKeyStore(unitName);
+    unitKeyStore.importKey(alias, privateKey, certificateInfo);
+
+    saveUnitKeyStore(unitKeyStore);
+  }
+
+  @Override
+  public void importKey(String unitName, String alias, InputStream privateKey, String certificateInfo) throws NoSuchFunctionalUnitException {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(privateKey, "privateKey must not be null");
@@ -235,4 +265,5 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     }
     throw new RuntimeException(ex);
   }
+
 }

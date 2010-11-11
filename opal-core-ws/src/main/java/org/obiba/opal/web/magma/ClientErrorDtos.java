@@ -12,7 +12,6 @@ package org.obiba.opal.web.magma;
 import javax.ws.rs.core.Response.Status;
 
 import org.mozilla.javascript.RhinoException;
-import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.support.DatasourceParsingException;
 import org.obiba.opal.web.model.Magma.DatasourceParsingErrorDto;
 import org.obiba.opal.web.model.Magma.JavaScriptErrorDto;
@@ -27,7 +26,7 @@ public class ClientErrorDtos {
     return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus);
   }
 
-  public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, MagmaRuntimeException e) {
+  public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, RuntimeException e) {
     ClientErrorDto.Builder clientError = getErrorMessage(responseStatus, errorStatus);
     clientError.addArguments(e.getMessage());
     return clientError;
