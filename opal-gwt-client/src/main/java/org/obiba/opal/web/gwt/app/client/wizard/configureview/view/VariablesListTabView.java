@@ -253,11 +253,13 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
     setMimeType(variableDto);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public VariableDto getVariableDto() {
     VariableDto variableDto = VariableDto.create();
     variableDto.setName(variableName.getValue());
     variableDto.setIsRepeatable(repeatableCheckbox.getValue());
+    if(repeatableCheckbox.getValue()) variableDto.setOccurrenceGroup(occurenceGroup.getValue());
     variableDto.setValueType(valueType.getValue(valueType.getSelectedIndex()));
     variableDto.setEntityType(entityType);
     JsArray<AttributeDto> attributes = variableDto.getAttributesArray();
@@ -269,6 +271,8 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
     attributeDto.setName("script");
     attributeDto.setValue(scriptWidgetDisplay.getScript());
     attributes.push(attributeDto);
+    variableDto.setMimeType(mimeType.getValue());
+    variableDto.setUnit(unit.getValue());
     return variableDto;
   }
 
@@ -319,19 +323,27 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
 
       if(variableDto.hasOccurrenceGroup()) {
         occurenceGroup.setText(variableDto.getOccurrenceGroup());
+      } else {
+        occurenceGroup.setText("");
       }
+    } else {
+      occurenceGroup.setText("");
     }
   }
 
   private void setUnit(VariableDto variableDto) {
     if(variableDto.hasUnit()) {
       unit.setText(variableDto.getUnit());
+    } else {
+      unit.setText("");
     }
   }
 
   private void setMimeType(VariableDto variableDto) {
     if(variableDto.hasMimeType()) {
       mimeType.setText(variableDto.getMimeType());
+    } else {
+      mimeType.setText("");
     }
   }
 }
