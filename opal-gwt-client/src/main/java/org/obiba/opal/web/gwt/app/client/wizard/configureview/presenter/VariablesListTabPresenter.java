@@ -28,6 +28,8 @@ import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.Notific
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.DerivedVariableConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.VariableAddRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
@@ -107,6 +109,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
    */
   @Inject
   private EvaluateScriptPresenter scriptWidget;
+
+  private Runnable actionRequiringConfirmation;
 
   //
   // Constructors
@@ -255,6 +259,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     super.registerHandler(getDisplay().getDetailTabs().addBeforeSelectionHandler(new DetailTabsBeforeSelectionHandler()));
     super.registerHandler(eventBus.addHandler(VariableAddRequiredEvent.getType(), new VariableAddRequiredHandler()));
     super.registerHandler(eventBus.addHandler(DerivedVariableConfigurationRequiredEvent.getType(), new DerivedVariableConfigurationRequiredHandler()));
+    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
   }
 
   private void addValidators() {
@@ -572,7 +577,12 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     @Override
     public void onClick(ClickEvent event) {
-
+      actionRequiringConfirmation = new Runnable() {
+        public void run() {
+          deleteCurrentVariable();
+        }
+      };
+      eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "deleteVariableTitle", "confirmVariableDelete"));
     }
 
   }
@@ -584,5 +594,53 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       getDisplay().setNewVariable(event.getVariable());
     }
 
+  }
+
+  private class ConfirmationEventHandler implements ConfirmationEvent.Handler {
+
+    public void onConfirmation(ConfirmationEvent event) {
+      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event.isConfirmed()) {
+        actionRequiringConfirmation.run();
+        actionRequiringConfirmation = null;
+      }
+    }
+  }
+
+  private void deleteCurrentVariable() {
+    String nextVariableName = variableToDisplayAfterCurrentVariableDeleted();
+    VariableListViewDto variableListViewDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+    VariableDto variableToDelete = getDisplay().getVariableDto();
+    @SuppressWarnings("unchecked")
+    JsArray<VariableDto> newVariables = (JsArray<VariableDto>) JsArray.createArray();
+    for(int i = 0; i < variableListViewDto.getVariablesArray().length(); i++) {
+      if(!variableListViewDto.getVariablesArray().get(i).getName().equals(variableToDelete.getName())) {
+        newVariables.push(variableListViewDto.getVariablesArray().get(i));
+      }
+    }
+    variableListViewDto.setVariablesArray(newVariables);
+    variables = JsArrays.toList(newVariables);
+    eventBus.fireEvent(new ViewSaveRequiredEvent(viewDto));
+    updateAndDisplayVariable(nextVariableName);
+  }
+
+  private void updateAndDisplayVariable(String nextVariableName) {
+    if(nextVariableName != null) {
+      currentSelectedVariableIndex = getVariableIndex(nextVariableName);
+      updateSelectedVariableName();
+    } else {
+      currentSelectedVariableIndex = -1;
+      getDisplay().setSelectedVariableName(null, null, getNextVariableName());
+      VariableDto emptyVariableDto = VariableDto.create();
+      emptyVariableDto.setName("");
+      eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(emptyVariableDto));
+    }
+  }
+
+  private String variableToDisplayAfterCurrentVariableDeleted() {
+    String nextVariable = getNextVariableName();
+    if(nextVariable != null) return nextVariable;
+    String previousVariable = getPreviousVariableName();
+    if(previousVariable != null) return previousVariable;
+    return null;
   }
 }
