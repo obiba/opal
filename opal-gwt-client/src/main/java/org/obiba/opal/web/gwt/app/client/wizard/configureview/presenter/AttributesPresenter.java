@@ -132,6 +132,14 @@ public class AttributesPresenter extends LocalizablesPresenter {
     return deleteActionHandler;
   }
 
+  protected String getDeleteConfirmationTitle() {
+    return "deleteAttribute";
+  }
+
+  protected String getDeleteConfirmationMessage() {
+    return "confirmDeleteAttribute";
+  }
+
   //
   // Methods
   //

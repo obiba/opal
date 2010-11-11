@@ -169,7 +169,7 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
         }
       };
 
-      eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "Confirm Delete", "Delete this item?"));
+      eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, getDeleteConfirmationTitle(), getDeleteConfirmationMessage()));
     }
   }
 
@@ -186,6 +186,10 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
   protected abstract EditActionHandler getEditActionHandler();
 
   protected abstract DeleteActionHandler getDeleteActionHandler();
+
+  protected abstract String getDeleteConfirmationTitle();
+
+  protected abstract String getDeleteConfirmationMessage();
 
   //
   // Inner Classes / Interfaces

@@ -132,6 +132,14 @@ public class CategoriesPresenter extends LocalizablesPresenter {
     return deleteActionHandler;
   }
 
+  protected String getDeleteConfirmationTitle() {
+    return "deleteCategory";
+  }
+
+  protected String getDeleteConfirmationMessage() {
+    return "confirmDeleteCategory";
+  }
+
   //
   // Methods
   //

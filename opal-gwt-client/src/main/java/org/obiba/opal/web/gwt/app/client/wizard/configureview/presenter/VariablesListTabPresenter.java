@@ -61,8 +61,8 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.inject.Inject;
 
 /**
@@ -128,11 +128,11 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     getDisplay().setScriptWidget(scriptWidget.getDisplay());
 
     categoriesPresenter.bind();
-    categoriesPresenter.getDisplay().setAddButtonText("Add New Category");
+    categoriesPresenter.getDisplay().setAddButtonText(translations.addNewCategory());
     getDisplay().addCategoriesTabWidget(categoriesPresenter.getDisplay().asWidget());
 
     attributesPresenter.bind();
-    attributesPresenter.getDisplay().setAddButtonText("Add New Attribute");
+    attributesPresenter.getDisplay().setAddButtonText(translations.addNewAttribute());
     getDisplay().addAttributesTabWidget(attributesPresenter.getDisplay().asWidget());
 
     addDerivedVariableDialogPresenter.bind();
