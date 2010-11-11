@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.CategoryDialogPresenter;
 
@@ -32,6 +33,8 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
   }
 
   private static CategoryDialogUiBinder uiBinder = GWT.create(CategoryDialogUiBinder.class);
+
+  private static Translations translations = GWT.create(Translations.class);
 
   @UiField
   DialogBox dialog;
@@ -115,6 +118,7 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
     inputFieldPanel.clear();
     inputFieldPanel.add(inputField.asWidget());
     this.inputField = inputField;
+    this.inputField.setAttributeValueLabel(translations.labelLabel());
   }
 
   @Override
