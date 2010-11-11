@@ -81,6 +81,9 @@ public class FunctionalUnitResource {
     Opal.FunctionalUnitDto.Builder fuBuilder = Opal.FunctionalUnitDto.newBuilder().//
     setName(functionalUnit.getName()). //
     setKeyVariableName(functionalUnit.getKeyVariableName());
+    if(functionalUnit.getSelect() != null && functionalUnit.getSelect() instanceof JavascriptClause) {
+      fuBuilder.setSelect(((JavascriptClause) functionalUnit.getSelect()).getScript());
+    }
 
     return fuBuilder.build();
   }
