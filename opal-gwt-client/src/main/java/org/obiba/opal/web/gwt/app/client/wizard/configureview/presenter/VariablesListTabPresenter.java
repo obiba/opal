@@ -61,8 +61,8 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
@@ -124,7 +124,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   @Override
   protected void onBind() {
     scriptWidget.bind();
-    scriptWidget.setEvaluationMode(Mode.ENTITY_VALUE); // TODO not sure about Mode...
+    scriptWidget.setEvaluationMode(Mode.ENTITY_VALUE);
     getDisplay().setScriptWidget(scriptWidget.getDisplay());
 
     categoriesPresenter.bind();
@@ -447,24 +447,42 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
   class SaveChangesClickHandler implements ClickHandler {
 
+    private VariableListViewDto variableListViewDto;
+
+    private VariableDto currentVariableDto;
+
     @Override
     public void onClick(ClickEvent event) {
       if(validate()) {
-        VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
-        updateView(variableListDto);
+        variableListViewDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+        currentVariableDto = getDisplay().getVariableDto();
+        updateCategories();
+        updateAttributes();
+        updateView(variableListViewDto);
         eventBus.fireEvent(new ViewSaveRequiredEvent(viewDto));
       }
     }
 
-    @SuppressWarnings("unchecked")
-    private void updateView(VariableListViewDto variableListViewDto) {
-      VariableDto currentVariableDto = getDisplay().getVariableDto();
-      boolean update = false;
-      JsArray<VariableDto> variables = variableListViewDto.getVariablesArray();
-      if(variables == null) {
-        variables = (JsArray<VariableDto>) JsArray.createArray();
-        variableListViewDto.setVariablesArray(variables);
+    private void updateCategories() {
+      // Set variable categories, if they exist.
+      if(categoriesPresenter.getVariableDto().getCategoriesArray() != null) {
+        currentVariableDto.setCategoriesArray(categoriesPresenter.getVariableDto().getCategoriesArray());
       }
+    }
+
+    private void updateAttributes() {
+      // Add attributes to current attributes. (The 'script' is stored as an attribute, so one attribute will always
+      // exist.)
+      if(attributesPresenter.getVariableDto().getAttributesArray() != null) {
+        for(int i = 0; i < attributesPresenter.getVariableDto().getAttributesArray().length(); i++) {
+          currentVariableDto.getAttributesArray().push(attributesPresenter.getVariableDto().getAttributesArray().get(i));
+        }
+      }
+    }
+
+    private void updateView(VariableListViewDto variableListViewDto) {
+      boolean update = false;
+      JsArray<VariableDto> variables = createAndGetVariableListFromView();
 
       for(int i = 0; i < variables.length(); i++) {
         VariableDto variableDto = variables.get(i);
@@ -477,6 +495,16 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       if(!update) {
         variables.push(currentVariableDto); // Add new variable.
       }
+    }
+
+    @SuppressWarnings("unchecked")
+    private JsArray<VariableDto> createAndGetVariableListFromView() {
+      JsArray<VariableDto> variables = variableListViewDto.getVariablesArray();
+      if(variables == null) {
+        variables = (JsArray<VariableDto>) JsArray.createArray();
+        variableListViewDto.setVariablesArray(variables);
+      }
+      return variables;
     }
 
   }
