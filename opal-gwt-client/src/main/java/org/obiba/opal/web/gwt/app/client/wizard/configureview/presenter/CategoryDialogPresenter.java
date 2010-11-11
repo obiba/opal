@@ -201,6 +201,7 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
   private CategoryDto getNewCategoryDto() {
     CategoryDto categoryDto = CategoryDto.create();
     categoryDto.setName(getDisplay().getCategoryName().getText());
+    categoryDto.setIsMissing(false);
     @SuppressWarnings("unchecked")
     JsArray<AttributeDto> attributes = (JsArray<AttributeDto>) JsArray.createArray();
     Map<String, TextBox> labelMap = labelListPresenter.getDisplay().getLanguageLabelMap();
