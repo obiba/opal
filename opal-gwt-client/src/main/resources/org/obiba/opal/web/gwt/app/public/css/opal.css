@@ -845,3 +845,15 @@ table.itemSelector .button {
 .addDerivedVariablesDialog input.gwt-TextBox, .addDerivedVariablesDialog input.gwt-SuggestBox {
   width:250px;
 }
+
+/* VariablesListTab */
+
+div.variablesListTabContent .navigationPanel {
+  border-bottom: 1px solid #6F7277;
+  margin-top: 25px;
+  padding-bottom: 10px;
+}
+
+div.variablesListTabContent .form {
+  margin-top: 10px;
+}
