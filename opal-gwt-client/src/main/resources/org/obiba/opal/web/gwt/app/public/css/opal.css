@@ -720,40 +720,27 @@ div.evaluateScriptPanel {
   width:20%;  
 }
 
-/* Reports UI */ 
+/* List-Details UI */
 
-table.reportTemplateList {
+table.selection-list {
   width:100%;
 }
 
-.reportTemplateDetails .producedReports table td span {
-  padding-right:20px;
-  cursor:pointer;
-}
-
-.reportTemplateDetails table.reportTemplateProperties {
-  padding:2em;
-}
-
-.producedReports {
-  padding-left:20px;
-}
-
-table.reportTemplateProperties input.text  {
+table.item-properties input.text  {
   width:100%;
 }
 
-table.reportTemplateProperties td {
+table.item-properties td {
   vertical-align:top;
 }
 
-table.reportTemplateProperties div.key {
-  font-weight:bold;
+table.item-properties div.key {
   display:inline;
   vertical-align:top;
+  color: #444444;
 }
  
-.reportTemplateDetails .titlebar {
+.item-details .titlebar {
 	background-color:#ECE5DE;
 	color:#444444;
     padding-bottom:3px;
@@ -761,13 +748,13 @@ table.reportTemplateProperties div.key {
     padding-top:3px;
 }
 
-.reportTemplateDetails div.gwt-Label.title {
+.item-details div.gwt-Label.title {
 	font-weight:bold;
 	font-size:1.2em;
-	padding:0.5em;
+	color: #444444;
 }
 
-.reportTemplateDetails .toolbar {
+.item-details .toolbar {
   	background-color:#ECE5DE;
   	border-bottom:1px solid #B4A291;
   	padding-bottom:5px;
@@ -775,42 +762,53 @@ table.reportTemplateProperties div.key {
   	margin-bottom:5px;
 }
 
-.reportTemplateDetails .toolbar-right img {
+.item-details .toolbar-right img {
 	margin-left: 5px;
     float: right;
 }
 
-.reportTemplateDetails  .toolbar-left img {
+.item-details  .toolbar-left img {
     margin-right: 5px;
     float: left;
 }
 
-.reportTemplateDetails  .toolbar img:hover {
+.item-details  .toolbar img:hover {
     cursor: pointer;
 }
 
-.reportTemplateDetails .toolbar a:hover {
+.item-details .toolbar a:hover {
     cursor: pointer;
 }
 
-.reportTemplateDetails .gwt-MenuBar {
+.item-details .gwt-MenuBar {
 	background:transparent;
 	border:0 none;
 }
 
-.reportTemplateDetails .gwt-MenuBar-horizontal .gwt-MenuItem {
+.item-details .gwt-MenuBar-horizontal .gwt-MenuItem {
 	color:#666666;
 	font-weight:bold;
 	padding:0px;
 	vertical-align:bottom;
 }
 
-.reportTemplateDetails .gwt-MenuBar-horizontal .gwt-MenuItemSeparator {
+.item-details .gwt-MenuBar-horizontal .gwt-MenuItemSeparator {
 	padding-right:5px;
 }
 
-.reportTemplateDetails .gwt-MenuBar-horizontal .gwt-MenuItem-selected {
+.item-details .gwt-MenuBar-horizontal .gwt-MenuItem-selected {
 		
+}
+
+/* Reports UI */ 
+
+.producedReports table td span {
+  padding-right:20px;
+  cursor:pointer;
+}
+
+.producedReports {
+  padding-left:20px;
 }
 
 /* ItemSelector and ItemInputs */

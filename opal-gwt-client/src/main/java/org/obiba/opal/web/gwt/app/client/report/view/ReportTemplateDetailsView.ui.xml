@@ -2,12 +2,12 @@
   xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <g:FlowPanel ui:field="reportTemplateDetails" addStyleNames="reportTemplateDetails">
+  <g:FlowPanel ui:field="reportTemplateDetails" addStyleNames="item-details">
 
     <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
 
     <g:HTMLPanel>
-      <table class="reportTemplateProperties">
+      <table class="item-properties small-indent">
         <tr>
           <td>
             <g:Label addStyleNames="key">

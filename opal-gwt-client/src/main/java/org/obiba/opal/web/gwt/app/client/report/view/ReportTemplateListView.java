@@ -23,8 +23,8 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionModel.SelectionChangeHandler;
 import com.google.gwt.view.client.SingleSelectionModel;
+import com.google.gwt.view.client.SelectionModel.SelectionChangeHandler;
 
 public class ReportTemplateListView extends Composite implements ReportTemplateListPresenter.Display {
 
@@ -85,7 +85,7 @@ public class ReportTemplateListView extends Composite implements ReportTemplateL
 
   private void initTable() {
 
-    reportTemplateTable.setStyleName("reportTemplateList");
+    reportTemplateTable.setStyleName("selection-list");
     reportTemplateTable.addColumn(new TextColumn<ReportTemplateDto>() {
       @Override
       public String getValue(ReportTemplateDto dto) {
