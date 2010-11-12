@@ -346,4 +346,9 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
       mimeType.setText("");
     }
   }
+
+  @Override
+  public void saveChangesEnabled(boolean enabled) {
+    saveChangesButton.setEnabled(enabled);
+  }
 }

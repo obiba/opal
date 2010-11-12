@@ -32,7 +32,9 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.DerivedVariableConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.VariableAddRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter.Mode;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -45,6 +47,7 @@ import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -190,21 +193,27 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     categoriesPresenter.refreshDisplay();
     attributesPresenter.refreshDisplay();
+    getDisplay().saveChangesEnabled(false);
   }
 
   private void initDisplayComponents() {
     variables = getVariableList();
     refreshVariableSuggestions();
 
-    // Clear variable selection.
-    currentSelectedVariableIndex = -1;
-    getDisplay().setSelectedVariableName(null, null, getNextVariableName());
+    if(variables.size() == 0) {
+      // Clear variable selection.
+      currentSelectedVariableIndex = -1;
+      getDisplay().setSelectedVariableName(null, null, getNextVariableName());
 
-    // Initialize the newVariableDto field (for creation of a new derived variable) and
-    // announce to the world that this is the VariableDto currently being configured.
-    newVariableDto = VariableDto.create();
-    newVariableDto.setName("new");
-    eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(newVariableDto));
+      // Initialize the newVariableDto field (for creation of a new derived variable) and
+      // announce to the world that this is the VariableDto currently being configured.
+      newVariableDto = VariableDto.create();
+      newVariableDto.setName("");
+      eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(newVariableDto));
+    } else {
+      currentSelectedVariableIndex = 0;
+      updateSelectedVariableName();
+    }
   }
 
   private List<VariableDto> getVariableList() {
@@ -260,6 +269,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     super.registerHandler(eventBus.addHandler(VariableAddRequiredEvent.getType(), new VariableAddRequiredHandler()));
     super.registerHandler(eventBus.addHandler(DerivedVariableConfigurationRequiredEvent.getType(), new DerivedVariableConfigurationRequiredHandler()));
     super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    super.registerHandler(getDisplay().addScriptChangeHandler(new FormChangedHandler()));
+    super.registerHandler(eventBus.addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
   }
 
   private void addValidators() {
@@ -358,6 +369,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     String getScript();
 
     HandlerRegistration addScriptChangeHandler(ChangeHandler changeHandler);
+
+    void saveChangesEnabled(boolean enabled);
   }
 
   class ViewConfigurationRequiredEventHandler implements ViewConfigurationRequiredEvent.Handler {
@@ -535,6 +548,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
           public void onResource(Response response, VariableDto variableDto) {
             variableDto.setName(translations.copyOf() + variableDto.getName());
             eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
+            getDisplay().saveChangesEnabled(true);
           }
         })
         /**/.withCallback(Response.SC_NOT_FOUND, createResponseCodeCallback())
@@ -556,6 +570,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
             public void onResource(Response response, TableDto firstTableDto) {
               VariableDto variableDto = createEmptyDerivedVariable(firstTableDto.getEntityType());
               eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
+              getDisplay().saveChangesEnabled(true);
             }
           })
           /**/.send();
@@ -619,7 +634,6 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     }
     variableListViewDto.setVariablesArray(newVariables);
     variables = JsArrays.toList(newVariables);
-    eventBus.fireEvent(new ViewSaveRequiredEvent(viewDto));
     updateAndDisplayVariable(nextVariableName);
   }
 
@@ -627,12 +641,14 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     if(nextVariableName != null) {
       currentSelectedVariableIndex = getVariableIndex(nextVariableName);
       updateSelectedVariableName();
+      getDisplay().saveChangesEnabled(true);
     } else {
       currentSelectedVariableIndex = -1;
       getDisplay().setSelectedVariableName(null, null, getNextVariableName());
       VariableDto emptyVariableDto = VariableDto.create();
       emptyVariableDto.setName("");
       eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(emptyVariableDto));
+      getDisplay().saveChangesEnabled(false);
     }
   }
 
@@ -642,5 +658,24 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     String previousVariable = getPreviousVariableName();
     if(previousVariable != null) return previousVariable;
     return null;
+  }
+
+  class FormChangedHandler implements ChangeHandler {
+
+    @Override
+    public void onChange(ChangeEvent arg0) {
+      eventBus.fireEvent(new ViewSavePendingEvent());
+      getDisplay().saveChangesEnabled(true);
+    }
+
+  }
+
+  class ViewSavedHandler implements ViewSavedEvent.Handler {
+
+    @Override
+    public void onViewSaved(ViewSavedEvent event) {
+      getDisplay().saveChangesEnabled(false);
+    }
+
   }
 }
