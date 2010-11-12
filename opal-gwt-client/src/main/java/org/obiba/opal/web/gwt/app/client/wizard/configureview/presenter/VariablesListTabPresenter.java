@@ -210,9 +210,9 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
       // Initialize the newVariableDto field (for creation of a new derived variable) and
       // announce to the world that this is the VariableDto currently being configured.
-      newVariableDto = VariableDto.create();
-      newVariableDto.setName("");
-      eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(newVariableDto));
+      VariableDto emptyVariableDto = VariableDto.create();
+      emptyVariableDto.setName("");
+      eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(emptyVariableDto));
       getDisplay().removeButtonEnabled(false);
     } else {
       currentSelectedVariableIndex = 0;
@@ -489,6 +489,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
         updateAttributes();
         updateView(variableListViewDto);
         eventBus.fireEvent(new ViewSaveRequiredEvent(viewDto));
+        newVariableDto = currentVariableDto;
       }
     }
 
@@ -699,6 +700,11 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       getDisplay().saveChangesEnabled(false);
       getDisplay().addButtonEnabled(true);
       getDisplay().navigationEnabled(true);
+      if(newVariableDto != null) {
+        currentSelectedVariableIndex = getVariableIndex(newVariableDto.getName());
+        updateSelectedVariableName();
+        newVariableDto = null;
+      }
     }
 
   }
