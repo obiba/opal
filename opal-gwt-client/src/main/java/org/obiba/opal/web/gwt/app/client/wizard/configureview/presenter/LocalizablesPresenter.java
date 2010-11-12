@@ -280,6 +280,7 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
     @Override
     public void onDerivedVariableConfigurationRequired(DerivedVariableConfigurationRequiredEvent event) {
       LocalizablesPresenter.this.setVariableDto(event.getVariable());
+      refreshTableData();
     }
   }
 

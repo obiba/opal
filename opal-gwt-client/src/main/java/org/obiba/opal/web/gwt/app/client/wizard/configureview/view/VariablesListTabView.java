@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.VariablesListTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
@@ -253,6 +255,7 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
     setOccurrenceGroup(variableDto);
     setUnit(variableDto);
     setMimeType(variableDto);
+    setScript(variableDto);
   }
 
   @Override
@@ -269,6 +272,7 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
     attributeDto.setName("script");
     attributeDto.setValue(scriptWidgetDisplay.getScript());
     attributes.push(attributeDto);
+    variableDto.setAttributesArray(attributes);
     variableDto.setMimeType(mimeType.getValue());
     variableDto.setUnit(unit.getValue());
     return variableDto;
@@ -293,6 +297,20 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   @Override
   public void setScript(String script) {
     scriptWidgetDisplay.setScript(script);
+  }
+
+  private void setScript(VariableDto variableDto) {
+    JsArray<AttributeDto> attributes = JsArrays.toSafeArray(variableDto.getAttributesArray());
+    List<AttributeDto> attributeList = JsArrays.toList(attributes);
+    boolean foundScript = false;
+    for(AttributeDto dto : attributeList) {
+      if(dto.getName().equals("script")) {
+        foundScript = true;
+        setScript(dto.getValue());
+        break;
+      }
+    }
+    if(!foundScript) setScript("");
   }
 
   @Override
@@ -325,6 +343,7 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
         occurenceGroup.setText("");
       }
     } else {
+      occurenceGroup.setEnabled(false);
       occurenceGroup.setText("");
     }
   }

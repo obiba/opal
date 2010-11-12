@@ -275,7 +275,8 @@ public interface Translations extends Constants {
   String logLabel();
 
   @Description("Confirmation title map")
-  @DefaultStringMapValue( { //
+  @DefaultStringMapValue({ //
+  "deleteVariableTitle", "Delete Variable", //
   "unsavedChangesTitle", "Unsaved Changes", //
   "deleteTable", "Delete Table", //
   "clearJobsList", "Clear Jobs List", //
@@ -289,7 +290,8 @@ public interface Translations extends Constants {
   Map<String, String> confirmationTitleMap();
 
   @Description("Confirmation message map")
-  @DefaultStringMapValue( { //
+  @DefaultStringMapValue({ //
+  "confirmVariableDelete", "Delete the currently displayed variable?", //
   "confirmUnsavedChanges", "You have unsaved changes. Are you sure you want to move away from this tab?", //
   "removingTablesFromViewMayAffectVariables", "Removing tables from the view will have an impact on which Variables can be defined.", //
   "confirmClearJobsList", "All the completed jobs (succeeded, failed or cancelled) will be removed from the jobs list. Currently running jobs will be unaffected.<br /><br />Please confirm that you want to clear the jobs list.", //
