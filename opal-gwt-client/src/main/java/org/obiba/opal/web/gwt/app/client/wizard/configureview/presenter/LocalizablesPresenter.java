@@ -107,6 +107,8 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
 
   public void setViewDto(ViewDto viewDto) {
     this.viewDto = viewDto;
+
+    afterViewDtoSet();
   }
 
   public void setVariableDto(VariableDto variableDto) {
@@ -171,6 +173,10 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
 
       eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, getDeleteConfirmationTitle(), getDeleteConfirmationMessage()));
     }
+  }
+
+  protected void afterViewDtoSet() {
+    // do nothing by default
   }
 
   protected abstract void bindDependencies();

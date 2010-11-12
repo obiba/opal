@@ -54,7 +54,6 @@ public class AttributesPresenter extends LocalizablesPresenter {
   @Inject
   public AttributesPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
-    attributeNames = getUniqueAttributeNames();
   }
 
   //
@@ -85,6 +84,11 @@ public class AttributesPresenter extends LocalizablesPresenter {
     }
 
     return localizables;
+  }
+
+  @Override
+  protected void afterViewDtoSet() {
+    attributeNames = getUniqueAttributeNames();
   }
 
   @Override
