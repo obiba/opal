@@ -125,6 +125,7 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
     toolbarPanel.add(reportTemplateName = new Label());
     reportTemplateName.addStyleName("title");
     toolbarPanel.add(toolbar = new MenuBar());
+    toolbar.setAutoOpen(true);
     toolbar.addItem("", actionsMenu = new MenuBar(true)).addStyleName("tools");
     actionsMenu.addStyleName("tools");
   }
