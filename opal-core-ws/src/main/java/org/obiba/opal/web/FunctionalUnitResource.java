@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.security.KeyStoreException;
@@ -30,7 +31,6 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import org.bouncycastle.openssl.PEMWriter;
-import org.hsqldb.lib.StringInputStream;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.UnitKeyStoreService;
@@ -152,9 +152,9 @@ public class FunctionalUnitResource {
       unitKeyStoreService.createOrUpdateKey(unit, kpForm.getAlias(), kpForm.getPrivateForm().getAlgo(), kpForm.getPrivateForm().getSize(), getCertificateInfo(kpForm.getPublicForm()));
     } else if(kpForm.hasPrivateImport()) {
       if(kpForm.hasPublicForm()) {
-        unitKeyStoreService.importKey(unit, kpForm.getAlias(), new StringInputStream(kpForm.getPrivateImport()), getCertificateInfo(kpForm.getPublicForm()));
+        unitKeyStoreService.importKey(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()), getCertificateInfo(kpForm.getPublicForm()));
       } else if(kpForm.hasPublicImport()) {
-        unitKeyStoreService.importKey(unit, kpForm.getAlias(), new StringInputStream(kpForm.getPrivateImport()), new StringInputStream(kpForm.getPublicImport()));
+        unitKeyStoreService.importKey(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()), new ByteArrayInputStream(kpForm.getPublicImport().getBytes()));
       } else {
         throw new IllegalArgumentException("Missing information about public key for alias: " + kpForm.getAlias());
       }
