@@ -16,6 +16,7 @@ import java.util.List;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 
 /**
  *
@@ -131,6 +132,21 @@ public class JsArrays {
       }
 
     };
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T extends JavaScriptObject> JsArray<T> toSafeArray(JsArray<T> array) {
+    if(array == null) {
+      return (JsArray<T>) JsArray.createArray();
+    }
+    return array;
+  }
+
+  public static <T extends JavaScriptObject> JsArrayString toSafeArray(JsArrayString array) {
+    if(array == null) {
+      return (JsArrayString) JsArrayString.createArray();
+    }
+    return array;
   }
 
   private static native <T extends JavaScriptObject> T[] reinterpretCast(JsArray<T> value) /*-{ return value; }-*/;

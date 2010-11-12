@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
@@ -93,8 +94,10 @@ public class LabelListView extends Composite implements LabelListPresenter.Displ
 
   @Override
   public void displayAttributes(String attributeName, JsArray<AttributeDto> attributes) {
-    for(int i = 0; i < attributes.length(); i++) {
-      AttributeDto dto = attributes.get(i);
+    JsArray<AttributeDto> nonNullAttributes = JsArrays.toSafeArray(attributes);
+
+    for(int i = 0; i < nonNullAttributes.length(); i++) {
+      AttributeDto dto = nonNullAttributes.get(i);
       if(attributeName != null && attributeName.equals(dto.getName())) {
         if(languageLabelMap.containsKey(dto.getLocale())) {
           TextBox textBox = languageLabelMap.get(dto.getLocale());

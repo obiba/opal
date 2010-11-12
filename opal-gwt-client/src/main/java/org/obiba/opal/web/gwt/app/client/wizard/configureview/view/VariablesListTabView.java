@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.VariablesListTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter.Display;
@@ -254,7 +255,6 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
     setMimeType(variableDto);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public VariableDto getVariableDto() {
     VariableDto variableDto = VariableDto.create();
@@ -263,11 +263,8 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
     if(repeatableCheckbox.getValue()) variableDto.setOccurrenceGroup(occurenceGroup.getValue());
     variableDto.setValueType(valueType.getValue(valueType.getSelectedIndex()));
     variableDto.setEntityType(entityType);
-    JsArray<AttributeDto> attributes = variableDto.getAttributesArray();
-    if(attributes == null) {
-      attributes = (JsArray<AttributeDto>) JsArray.createArray();
-      variableDto.setAttributesArray(attributes);
-    }
+    JsArray<AttributeDto> attributes = JsArrays.toSafeArray(variableDto.getAttributesArray());
+
     AttributeDto attributeDto = AttributeDto.create();
     attributeDto.setName("script");
     attributeDto.setValue(scriptWidgetDisplay.getScript());

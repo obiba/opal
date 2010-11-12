@@ -22,6 +22,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.ui.HasCollection;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -195,5 +196,7 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
 
   public void setViewDto(ViewDto viewDto) {
     this.viewDto = viewDto;
+
+    viewDto.setFromArray(JsArrays.toSafeArray(viewDto.getFromArray()));
   }
 }

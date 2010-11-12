@@ -160,6 +160,11 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
 
     @Override
     public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
+      ViewDto viewDto = event.getView();
+      viewDto.setFromArray(JsArrays.toSafeArray(viewDto.getFromArray()));
+      VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+      variableListDto.setVariablesArray(JsArrays.toSafeArray(variableListDto.getVariablesArray()));
+
       refreshVariableNameSuggestions(event.getView());
     }
 

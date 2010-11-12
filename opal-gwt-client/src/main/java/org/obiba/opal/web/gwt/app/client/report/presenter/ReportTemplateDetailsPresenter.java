@@ -22,6 +22,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
@@ -232,8 +233,8 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
       display.setDesignFile(reportTemplate.getDesign());
       display.setFormat(reportTemplate.getFormat());
       display.setName(reportTemplate.getName());
-      display.setNotificationEmails(asList(reportTemplate.getEmailNotificationArray()));
-      display.setReportParameters(asList(reportTemplate.getParametersArray()));
+      display.setNotificationEmails(asList(JsArrays.toSafeArray(reportTemplate.getEmailNotificationArray())));
+      display.setReportParameters(asList(JsArrays.toSafeArray(reportTemplate.getParametersArray())));
       display.setSchedule(reportTemplate.getCron());
       display.setEnabledReportTemplateName(false);
       reportTemplateUpdateDialogPresenter.revealDisplay();
@@ -313,9 +314,8 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
     @Override
     public void onResource(Response response, FileDto reportFolder) {
-      getDisplay().setProducedReports(reportFolder.getChildrenArray());
+      getDisplay().setProducedReports(JsArrays.toSafeArray(reportFolder.getChildrenArray()));
     }
-
   }
 
   private class CommandResponseCallBack implements ResponseCodeCallback {

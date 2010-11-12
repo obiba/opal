@@ -18,6 +18,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
@@ -108,11 +109,16 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
   public void setViewDto(ViewDto viewDto) {
     this.viewDto = viewDto;
 
+    viewDto.setFromArray(JsArrays.toSafeArray(viewDto.getFromArray()));
+
     afterViewDtoSet();
   }
 
   public void setVariableDto(VariableDto variableDto) {
     this.variableDto = variableDto;
+
+    variableDto.setAttributesArray(JsArrays.toSafeArray(variableDto.getAttributesArray()));
+    variableDto.setCategoriesArray(JsArrays.toSafeArray(variableDto.getCategoriesArray()));
   }
 
   public VariableDto getVariableDto() {
@@ -124,7 +130,7 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
 
       @Override
       public void onResource(Response response, JsArray<LocaleDto> locales) {
-        getDisplay().setLocales(locales);
+        getDisplay().setLocales(JsArrays.toSafeArray(locales));
       }
     }).send();
   }

@@ -183,6 +183,11 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   public void setViewDto(ViewDto viewDto) {
     this.viewDto = viewDto;
 
+    viewDto.setFromArray(JsArrays.toSafeArray(viewDto.getFromArray()));
+
+    VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+    variableListDto.setVariablesArray(JsArrays.toSafeArray(variableListDto.getVariablesArray()));
+
     TableDto tableDto = TableDto.create();
     tableDto.setDatasourceName(viewDto.getDatasourceName());
     tableDto.setName(viewDto.getName());
@@ -630,6 +635,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     @Override
     public void onDerivedVariableConfigurationRequired(DerivedVariableConfigurationRequiredEvent event) {
+
       getDisplay().setNewVariable(event.getVariable());
     }
 

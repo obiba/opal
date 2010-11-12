@@ -88,11 +88,9 @@ public class LocalizablesView extends Composite implements LocalizablesPresenter
   public void setLocales(JsArray<LocaleDto> locales) {
     localeListBox.clear();
 
-    if(locales != null) {
-      for(int i = 0; i < locales.length(); i++) {
-        LocaleDto locale = locales.get(i);
-        localeListBox.addItem(locale.getDisplay(), locale.getName());
-      }
+    for(int i = 0; i < locales.length(); i++) {
+      LocaleDto locale = locales.get(i);
+      localeListBox.addItem(locale.getDisplay(), locale.getName());
     }
   }
 

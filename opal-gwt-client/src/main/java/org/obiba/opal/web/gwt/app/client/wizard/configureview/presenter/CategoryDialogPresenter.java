@@ -21,6 +21,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
@@ -224,6 +225,8 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
 
   public void setCategoryDto(CategoryDto categoryDto) {
     this.categoryDto = categoryDto;
+
+    categoryDto.setAttributesArray(JsArrays.toSafeArray(categoryDto.getAttributesArray()));
   }
 
   public void setCategories(JsArray<CategoryDto> categories) {

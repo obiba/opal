@@ -14,6 +14,7 @@ import java.util.List;
 
 import net.customware.gwt.presenter.client.EventBus;
 
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.CategoryUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.UpdateType;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
@@ -61,6 +62,7 @@ public class CategoriesPresenter extends LocalizablesPresenter {
 
     for(int categoryIndex = 0; categoryIndex < variableDto.getCategoriesArray().length(); categoryIndex++) {
       final CategoryDto categoryDto = variableDto.getCategoriesArray().get(categoryIndex);
+      categoryDto.setAttributesArray(JsArrays.toSafeArray(categoryDto.getAttributesArray()));
 
       for(int attributeIndex = 0; attributeIndex < categoryDto.getAttributesArray().length(); attributeIndex++) {
         final AttributeDto attributeDto = categoryDto.getAttributesArray().get(attributeIndex);

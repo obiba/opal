@@ -206,8 +206,8 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
     design.setText(reportTemplate.getDesign());
     schedule.setText(reportTemplate.getCron());
     format.setText(reportTemplate.getFormat());
-    parameters.setText(getReportParamsList(reportTemplate.getParametersArray()));
-    emails.setText(getEmailList(reportTemplate.getEmailNotificationArray()));
+    parameters.setText(getReportParamsList(JsArrays.toSafeArray(reportTemplate.getParametersArray())));
+    emails.setText(getEmailList(JsArrays.toSafeArray(reportTemplate.getEmailNotificationArray())));
     reportTemplateName.setText(reportTemplate.getName());
   }
 
