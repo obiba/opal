@@ -30,11 +30,15 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListView;
+import com.google.gwt.view.client.ListView.Delegate;
 
 public class LocalizablesView extends Composite implements LocalizablesPresenter.Display {
   //
@@ -57,6 +61,8 @@ public class LocalizablesView extends Composite implements LocalizablesPresenter
 
   @UiField
   CellTable<Localizable> localizablesTable;
+
+  SimplePager<Localizable> pager;
 
   private HasActionHandler<Localizable> actionsColumn;
 
@@ -96,9 +102,23 @@ public class LocalizablesView extends Composite implements LocalizablesPresenter
   }
 
   @Override
-  public void setTableData(List<Localizable> localizables) {
+  public void setTableData(final List<Localizable> localizables) {
+
     localizablesTable.setData(0, localizables.size(), localizables);
+    localizablesTable.setDelegate(new Delegate<Localizable>() {
+
+      @Override
+      public void onRangeChanged(ListView<Localizable> listView) {
+        int start = listView.getRange().getStart();
+        int length = listView.getRange().getLength();
+        listView.setData(start, length, localizables.subList(start, start + length));
+      }
+    });
+
+    pager.setVisible(localizables.size() > localizablesTable.getPageSize());
+    pager.firstPage();
     localizablesTable.setDataSize(localizables.size(), true);
+    localizablesTable.redraw();
   }
 
   @Override
@@ -136,6 +156,15 @@ public class LocalizablesView extends Composite implements LocalizablesPresenter
   private void initTable() {
     localizablesTable.setSelectionEnabled(false);
     addTableColumns();
+    addPager();
+  }
+
+  private void addPager() {
+    localizablesTable.setPageSize(5);
+    pager = new SimplePager<Localizable>(localizablesTable);
+    localizablesTable.setPager(pager);
+    pager.addStyleName("pager");
+    ((FlowPanel) localizablesTable.getParent()).insert(pager, 2);
   }
 
   private void addTableColumns() {

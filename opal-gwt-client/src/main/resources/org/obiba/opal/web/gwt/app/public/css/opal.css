@@ -855,3 +855,7 @@ div.variablesListTabContent .navigationPanel {
 div.variablesListTabContent .form {
   margin-top: 10px;
 }
+
+div.variablesListTabContent .pager {
+  clear: left;
+}
