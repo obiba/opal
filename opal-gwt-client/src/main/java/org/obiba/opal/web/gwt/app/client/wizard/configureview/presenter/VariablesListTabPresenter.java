@@ -197,6 +197,9 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   }
 
   private void initDisplayComponents() {
+    getDisplay().addButtonEnabled(true);
+    getDisplay().navigationEnabled(true);
+
     variables = getVariableList();
     refreshVariableSuggestions();
 
@@ -210,9 +213,11 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       newVariableDto = VariableDto.create();
       newVariableDto.setName("");
       eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(newVariableDto));
+      getDisplay().removeButtonEnabled(false);
     } else {
       currentSelectedVariableIndex = 0;
       updateSelectedVariableName();
+      getDisplay().removeButtonEnabled(true);
     }
   }
 
@@ -371,6 +376,12 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     HandlerRegistration addScriptChangeHandler(ChangeHandler changeHandler);
 
     void saveChangesEnabled(boolean enabled);
+
+    void removeButtonEnabled(boolean enabled);
+
+    void addButtonEnabled(boolean enabled);
+
+    void navigationEnabled(boolean enabled);
   }
 
   class ViewConfigurationRequiredEventHandler implements ViewConfigurationRequiredEvent.Handler {
@@ -549,6 +560,9 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
             variableDto.setName(translations.copyOf() + variableDto.getName());
             eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
             getDisplay().saveChangesEnabled(true);
+            getDisplay().removeButtonEnabled(true);
+            getDisplay().addButtonEnabled(false);
+            getDisplay().navigationEnabled(false);
           }
         })
         /**/.withCallback(Response.SC_NOT_FOUND, createResponseCodeCallback())
@@ -571,6 +585,9 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
               VariableDto variableDto = createEmptyDerivedVariable(firstTableDto.getEntityType());
               eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
               getDisplay().saveChangesEnabled(true);
+              getDisplay().removeButtonEnabled(true);
+              getDisplay().addButtonEnabled(false);
+              getDisplay().navigationEnabled(false);
             }
           })
           /**/.send();
@@ -642,13 +659,18 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       currentSelectedVariableIndex = getVariableIndex(nextVariableName);
       updateSelectedVariableName();
       getDisplay().saveChangesEnabled(true);
+      getDisplay().addButtonEnabled(false);
+      getDisplay().navigationEnabled(false);
     } else {
       currentSelectedVariableIndex = -1;
       getDisplay().setSelectedVariableName(null, null, getNextVariableName());
       VariableDto emptyVariableDto = VariableDto.create();
       emptyVariableDto.setName("");
       eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(emptyVariableDto));
-      getDisplay().saveChangesEnabled(false);
+      getDisplay().saveChangesEnabled(true);
+      getDisplay().removeButtonEnabled(false);
+      getDisplay().addButtonEnabled(false);
+      getDisplay().navigationEnabled(false);
     }
   }
 
@@ -675,6 +697,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     @Override
     public void onViewSaved(ViewSavedEvent event) {
       getDisplay().saveChangesEnabled(false);
+      getDisplay().addButtonEnabled(true);
+      getDisplay().navigationEnabled(true);
     }
 
   }

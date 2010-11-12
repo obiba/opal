@@ -27,6 +27,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -350,5 +351,22 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   @Override
   public void saveChangesEnabled(boolean enabled) {
     saveChangesButton.setEnabled(enabled);
+  }
+
+  @Override
+  public void removeButtonEnabled(boolean enabled) {
+    removeButton.setEnabled(enabled);
+  }
+
+  @Override
+  public void addButtonEnabled(boolean enabled) {
+    addButton.setEnabled(enabled);
+  }
+
+  @Override
+  public void navigationEnabled(boolean enabled) {
+    next.setVisible(enabled);
+    previous.setVisible(enabled);
+    DOM.setElementPropertyBoolean(variableNameSuggestBox.getElement(), "disabled", !enabled);
   }
 }
