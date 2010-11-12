@@ -385,4 +385,9 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
     previous.setVisible(enabled);
     DOM.setElementPropertyBoolean(variableNameSuggestBox.getElement(), "disabled", !enabled);
   }
+
+  @Override
+  public HasText getName() {
+    return variableName;
+  }
 }

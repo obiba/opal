@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
@@ -285,6 +286,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
   private void addValidators() {
     validators.add(new ConditionalValidator(getDisplay().getRepeatable(), new RequiredTextValidator(getDisplay().getOccurenceGroup(), "OccurrenceGroupIsRequired")));
+    validators.add(new RequiredTextValidator(getDisplay().getName(), "NewVariableNameIsRequired"));
+    validators.add(new UniqueVariableNameValidator("VariableNameNotUnique"));
   }
 
   private boolean validate() {
@@ -363,6 +366,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     void clearOccurrenceGroup();
 
     HasText getOccurenceGroup();
+
+    HasText getName();
 
     HandlerRegistration addVariableClickHandler(ClickHandler handler);
 
@@ -718,6 +723,24 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
         newVariableDto = null;
       }
       if(variables.size() > 0) getDisplay().removeButtonEnabled(true);
+    }
+
+  }
+
+  public class UniqueVariableNameValidator extends AbstractFieldValidator {
+
+    public UniqueVariableNameValidator(String errorMessageKey) {
+      super(errorMessageKey);
+    }
+
+    @Override
+    protected boolean hasError() {
+      // Edits can have the same name.
+      if(getDisplay().getName().getText().equals(variables.get(currentSelectedVariableIndex).getName())) return false;
+      for(VariableDto variableDto : variables) {
+        if(getDisplay().getName().getText().equals(variableDto.getName())) return true;
+      }
+      return false;
     }
 
   }

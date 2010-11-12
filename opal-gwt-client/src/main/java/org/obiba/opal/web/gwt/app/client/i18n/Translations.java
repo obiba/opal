@@ -146,7 +146,8 @@ public interface Translations extends Constants {
   String unitLabel();
 
   @Description("User message map")
-  @DefaultStringMapValue( { //
+  @DefaultStringMapValue({ //
+  "VariableNameNotUnique", "The specified variable name already exists.", //
   "CategoryDialogNameRequired", "A category name is required.", //
   "CategoryNameAlreadyExists", "The specified category name already exists.", //
   "AttributeNameRequired", "An attribute name is required.", //
