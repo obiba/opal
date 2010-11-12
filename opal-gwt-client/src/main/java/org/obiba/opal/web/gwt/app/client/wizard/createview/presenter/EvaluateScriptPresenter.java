@@ -18,6 +18,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.wizard.createview.event.ShowEvaluateScriptResultEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -32,6 +33,10 @@ import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
+import com.google.gwt.event.logical.shared.OpenEvent;
+import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -104,6 +109,10 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     void setItemTypeVariables();
 
     void setItemTypeValues();
+
+    HandlerRegistration addResultsOpenHandler(OpenHandler openHandler);
+
+    HandlerRegistration addResultsCloseHandler(CloseHandler closeHandler);
   }
 
   @Override
@@ -136,6 +145,22 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     super.registerHandler(getDisplay().addTestScriptClickHandler(new TestScriptClickHandler()));
     super.registerHandler(getDisplay().addNextPageClickHandler(new NextPageClickHandler()));
     super.registerHandler(getDisplay().addPreviousPageClickHandler(new PreviousPageClickHandler()));
+    super.registerHandler(getDisplay().addResultsOpenHandler(new OpenHandler() {
+
+      @Override
+      public void onOpen(OpenEvent event) {
+        eventBus.fireEvent(new ShowEvaluateScriptResultEvent(true));
+      }
+    }));
+
+    super.registerHandler(getDisplay().addResultsCloseHandler(new CloseHandler() {
+
+      @Override
+      public void onClose(CloseEvent event) {
+        eventBus.fireEvent(new ShowEvaluateScriptResultEvent(false));
+      }
+    }));
+
   }
 
   public void setReadyOnly(boolean readyOnly) {

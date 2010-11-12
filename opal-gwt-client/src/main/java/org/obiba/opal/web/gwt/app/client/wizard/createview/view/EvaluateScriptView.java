@@ -22,6 +22,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.CloseHandler;
+import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -243,5 +245,15 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
   @Override
   public void setItemTypeValues() {
     pageItemType.setText(translations.valuesLabel());
+  }
+
+  @Override
+  public HandlerRegistration addResultsOpenHandler(OpenHandler openHandler) {
+    return resultsPanel.addOpenHandler(openHandler);
+  }
+
+  @Override
+  public HandlerRegistration addResultsCloseHandler(CloseHandler closeHandler) {
+    return resultsPanel.addCloseHandler(closeHandler);
   }
 }

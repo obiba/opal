@@ -23,7 +23,7 @@
       <g:header>
         <ui:msg description="Results label">Results</ui:msg>
       </g:header>
-      <g:VerticalPanel ui:field="testResults" width="100%"/>
+      <g:VerticalPanel ui:field="testResults" width="100%" height="23em"/>
     </g:DisclosurePanel>
   </g:FlowPanel>
 
