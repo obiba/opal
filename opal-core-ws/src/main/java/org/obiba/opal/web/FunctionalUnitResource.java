@@ -90,7 +90,7 @@ public class FunctionalUnitResource {
 
   @PUT
   public Response createOrUpdateFunctionalUnit(@Context UriInfo uri, Opal.FunctionalUnitDto unitDto) {
-    if(!unit.equals(unitDto)) {
+    if(!unit.equals(unitDto.getName())) {
       return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "WrongFunctionalUnitArgument").build()).build();
     }
 
