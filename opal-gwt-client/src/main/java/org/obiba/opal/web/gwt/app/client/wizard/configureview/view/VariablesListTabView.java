@@ -390,4 +390,30 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   public HasText getName() {
     return variableName;
   }
+
+  @Override
+  public HandlerRegistration addNameChangedHandler(ChangeHandler changeHandler) {
+    return variableName.addChangeHandler(changeHandler);
+  }
+
+  @Override
+  public HandlerRegistration addValueTypeChangedHandler(ChangeHandler changeHandler) {
+    return valueType.addChangeHandler(changeHandler);
+  }
+
+  @Override
+  public HandlerRegistration addOccurrenceGroupChangedHandler(ChangeHandler changeHandler) {
+    return occurenceGroup.addChangeHandler(changeHandler);
+  }
+
+  @Override
+  public HandlerRegistration addUnitChangedHandler(ChangeHandler changeHandler) {
+    return unit.addChangeHandler(changeHandler);
+  }
+
+  @Override
+  public HandlerRegistration addMimeTypeChangedHandler(ChangeHandler changeHandler) {
+    return mimeType.addChangeHandler(changeHandler);
+  }
+
 }

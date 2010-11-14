@@ -280,8 +280,14 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     super.registerHandler(eventBus.addHandler(VariableAddRequiredEvent.getType(), new VariableAddRequiredHandler()));
     super.registerHandler(eventBus.addHandler(DerivedVariableConfigurationRequiredEvent.getType(), new DerivedVariableConfigurationRequiredHandler()));
     super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
-    super.registerHandler(getDisplay().addScriptChangeHandler(new FormChangedHandler()));
     super.registerHandler(eventBus.addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
+    super.registerHandler(getDisplay().addNameChangedHandler(new FormChangedHandler()));
+    super.registerHandler(getDisplay().addValueTypeChangedHandler(new FormChangedHandler()));
+    super.registerHandler(getDisplay().addScriptChangeHandler(new FormChangedHandler()));
+    super.registerHandler(getDisplay().addRepeatableValueChangeHandler(new FormChangedHandler()));
+    super.registerHandler(getDisplay().addOccurrenceGroupChangedHandler(new FormChangedHandler()));
+    super.registerHandler(getDisplay().addUnitChangedHandler(new FormChangedHandler()));
+    super.registerHandler(getDisplay().addMimeTypeChangedHandler(new FormChangedHandler()));
   }
 
   private void addValidators() {
@@ -392,6 +398,17 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     void addButtonEnabled(boolean enabled);
 
     void navigationEnabled(boolean enabled);
+
+    HandlerRegistration addNameChangedHandler(ChangeHandler changeHandler);
+
+    HandlerRegistration addValueTypeChangedHandler(ChangeHandler changeHandler);
+
+    HandlerRegistration addOccurrenceGroupChangedHandler(ChangeHandler changeHandler);
+
+    HandlerRegistration addUnitChangedHandler(ChangeHandler changeHandler);
+
+    HandlerRegistration addMimeTypeChangedHandler(ChangeHandler changeHandler);
+
   }
 
   class ViewConfigurationRequiredEventHandler implements ViewConfigurationRequiredEvent.Handler {
@@ -700,12 +717,24 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     return null;
   }
 
-  class FormChangedHandler implements ChangeHandler {
+  class FormChangedHandler implements ChangeHandler, ValueChangeHandler<Boolean> {
 
     @Override
     public void onChange(ChangeEvent arg0) {
+      formChange();
+    }
+
+    @Override
+    public void onValueChange(ValueChangeEvent<Boolean> arg0) {
+      formChange();
+    }
+
+    private void formChange() {
       eventBus.fireEvent(new ViewSavePendingEvent());
       getDisplay().saveChangesEnabled(true);
+      getDisplay().addButtonEnabled(false);
+      getDisplay().navigationEnabled(false);
+      getDisplay().removeButtonEnabled(false);
     }
 
   }
