@@ -24,7 +24,6 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.createview.event.ShowEvaluateScriptResultEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
@@ -215,6 +214,7 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
 
     @Override
     public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
+      viewSavePending = false; // Save is not required when form is initially displayed.
       viewDto = event.getView();
 
       // Set the variables tab widget according to the received ViewDto type.
