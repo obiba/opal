@@ -31,7 +31,10 @@ import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.AttributeUpdateEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.CategoryUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.DerivedVariableConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.LocalizableDeleteEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.VariableAddRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
@@ -288,6 +291,9 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     super.registerHandler(getDisplay().addOccurrenceGroupChangedHandler(new FormChangedHandler()));
     super.registerHandler(getDisplay().addUnitChangedHandler(new FormChangedHandler()));
     super.registerHandler(getDisplay().addMimeTypeChangedHandler(new FormChangedHandler()));
+    super.registerHandler(eventBus.addHandler(CategoryUpdateEvent.getType(), new FormChangedHandler()));
+    super.registerHandler(eventBus.addHandler(AttributeUpdateEvent.getType(), new FormChangedHandler()));
+    super.registerHandler(eventBus.addHandler(LocalizableDeleteEvent.getType(), new FormChangedHandler()));
   }
 
   private void addValidators() {
@@ -717,7 +723,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     return null;
   }
 
-  class FormChangedHandler implements ChangeHandler, ValueChangeHandler<Boolean> {
+  class FormChangedHandler implements ChangeHandler, ValueChangeHandler<Boolean>, AttributeUpdateEvent.Handler, CategoryUpdateEvent.Handler, LocalizableDeleteEvent.Handler {
 
     @Override
     public void onChange(ChangeEvent arg0) {
@@ -735,6 +741,21 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       getDisplay().addButtonEnabled(false);
       getDisplay().navigationEnabled(false);
       getDisplay().removeButtonEnabled(false);
+    }
+
+    @Override
+    public void onAttributeUpdate(AttributeUpdateEvent event) {
+      formChange();
+    }
+
+    @Override
+    public void onCategoryUpdate(CategoryUpdateEvent event) {
+      formChange();
+    }
+
+    @Override
+    public void onLocalizableDelete(LocalizableDeleteEvent event) {
+      formChange();
     }
 
   }

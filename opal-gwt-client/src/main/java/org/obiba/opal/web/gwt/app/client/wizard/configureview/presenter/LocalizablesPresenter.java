@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.DerivedVariableConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.LocalizableDeleteEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -174,6 +175,7 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
         public void run() {
           getDeleteActionHandler().onDelete(localizable);
           refreshTableData();
+          eventBus.fireEvent(new LocalizableDeleteEvent());
         }
       };
 
