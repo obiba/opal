@@ -599,10 +599,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
           public void onResource(Response response, VariableDto variableDto) {
             variableDto.setName(translations.copyOf() + variableDto.getName());
             eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
-            getDisplay().saveChangesEnabled(true);
-            getDisplay().removeButtonEnabled(false);
-            getDisplay().addButtonEnabled(false);
-            getDisplay().navigationEnabled(false);
+            setButtonsWhenAddingVariable();
           }
         })
         /**/.withCallback(Response.SC_NOT_FOUND, createResponseCodeCallback())
@@ -624,10 +621,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
             public void onResource(Response response, TableDto firstTableDto) {
               VariableDto variableDto = createEmptyDerivedVariable(firstTableDto.getEntityType());
               eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
-              getDisplay().saveChangesEnabled(true);
-              getDisplay().removeButtonEnabled(false);
-              getDisplay().addButtonEnabled(false);
-              getDisplay().navigationEnabled(false);
+              setButtonsWhenAddingVariable();
             }
           })
           /**/.send();
@@ -642,6 +636,14 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       variableDto.setName(newDerivedVariableName);
       variableDto.setEntityType(entityType);
       return variableDto;
+    }
+
+    private void setButtonsWhenAddingVariable() {
+      getDisplay().saveChangesEnabled(true);
+      getDisplay().removeButtonEnabled(false);
+      getDisplay().addButtonEnabled(false);
+      getDisplay().navigationEnabled(false);
+      eventBus.fireEvent(new ViewSavePendingEvent());
     }
   }
 
@@ -699,20 +701,18 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     if(nextVariableName != null) {
       currentSelectedVariableIndex = getVariableIndex(nextVariableName);
       updateSelectedVariableName();
-      getDisplay().saveChangesEnabled(true);
-      getDisplay().addButtonEnabled(false);
-      getDisplay().navigationEnabled(false);
     } else {
       currentSelectedVariableIndex = -1;
       getDisplay().setSelectedVariableName(null, null, getNextVariableName());
       VariableDto emptyVariableDto = VariableDto.create();
       emptyVariableDto.setName("");
       eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(emptyVariableDto));
-      getDisplay().saveChangesEnabled(true);
       getDisplay().removeButtonEnabled(false);
-      getDisplay().addButtonEnabled(false);
-      getDisplay().navigationEnabled(false);
     }
+    getDisplay().saveChangesEnabled(true);
+    getDisplay().addButtonEnabled(false);
+    getDisplay().navigationEnabled(false);
+    eventBus.fireEvent(new ViewSavePendingEvent());
   }
 
   private String variableToDisplayAfterCurrentVariableDeleted() {
