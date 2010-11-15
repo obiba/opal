@@ -286,6 +286,7 @@ public interface Translations extends Constants {
   "deleteFile", "Delete File", //
   "removeDatasource", "Remove Datasource",//
   "removeReportTemplate", "Remove Report Template",//
+  "removeFunctionalUnit", "Remove Unit",//
   "deleteCategory", "Delete Category",//
   "deleteAttribute", "Delete Attribute" })
   Map<String, String> confirmationTitleMap();
@@ -301,6 +302,7 @@ public interface Translations extends Constants {
   "confirmDeleteFile", "The file will be removed from the file system.<br /><br />Please confirm that you want to delete this file.", //
   "confirmRemoveDatasource", "Please confirm that you want to remove the current datasource from Opal configuration (datasource content will not be affected).",//
   "confirmDeleteReportTemplate", "Please confirm that you want to remove the current Report Template from Opal configuration (report design and generated reports will not be affected).",//
+  "confirmDeleteFunctionalUnit", "Please confirm that you want to remove the current Unit from Opal configuration. All encrypted material will not be accessible anymore",//
   "confirmDeleteCategory", "Please confirm that you want to remove this category.",//
   "confirmDeleteAttribute", "Please confirm that you want to remove this attribute." })
   Map<String, String> confirmationMessageMap();

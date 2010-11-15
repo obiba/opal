@@ -43,6 +43,9 @@
             </g:MenuItem>            
             <g:MenuItem ui:field="listJobsItem">
               <ui:msg description="Jobs menu item">Jobs</ui:msg>
+            </g:MenuItem>
+            <g:MenuItem ui:field="unitsItem">
+              <ui:msg description="Units menu item">Units</ui:msg>
             </g:MenuItem>           
             <!-- g:MenuItem>
               <ui:msg description="Administration menu item">Administration</ui:msg>

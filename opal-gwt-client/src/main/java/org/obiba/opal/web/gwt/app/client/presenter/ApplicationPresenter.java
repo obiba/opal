@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewCreationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresenter;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourceStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.FormatSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.UploadVariablesStepPresenter;
@@ -75,6 +76,8 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
     MenuItem getReportsItem();
 
+    MenuItem getUnitsItem();
+
     void setCurrentSelection(MenuItem selection);
   }
 
@@ -83,6 +86,9 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
   @Inject
   private Provider<ReportTemplatePresenter> reportTemplatePresenter;
+
+  @Inject
+  private Provider<FunctionalUnitPresenter> functionalUnitPresenter;
 
   @Inject
   private Provider<CreateDatasourceStepPresenter> createDatasourceStepPresenter;
@@ -148,6 +154,17 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
         getDisplay().setCurrentSelection(getDisplay().getReportsItem());
       }
     });
+
+    getDisplay().getUnitsItem().setCommand(new Command() {
+
+      @Override
+      public void execute() {
+        eventBus.fireEvent(new WorkbenchChangeEvent(functionalUnitPresenter.get()));
+        getDisplay().setCurrentSelection(getDisplay().getUnitsItem());
+      }
+    });
+
+    getDisplay().getUnitsItem().setVisible(false);
 
     getDisplay().getNewDatasourceItem().setCommand(new Command() {
 

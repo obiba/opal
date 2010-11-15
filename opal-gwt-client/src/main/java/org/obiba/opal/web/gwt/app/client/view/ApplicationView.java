@@ -88,6 +88,9 @@ public class ApplicationView implements ApplicationPresenter.Display {
   MenuItem reportsItem;
 
   @UiField
+  MenuItem unitsItem;
+
+  @UiField
   Panel workbench;
 
   MenuItem currentSelection;
@@ -195,6 +198,11 @@ public class ApplicationView implements ApplicationPresenter.Display {
   @Override
   public MenuItem getDatasourcesItem() {
     return datasourcesItem;
+  }
+
+  @Override
+  public MenuItem getUnitsItem() {
+    return unitsItem;
   }
 
 }
