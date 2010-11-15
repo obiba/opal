@@ -20,6 +20,7 @@ import java.util.List;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -74,9 +75,9 @@ public class FunctionalUnitResource {
   }
 
   @GET
-  public Opal.FunctionalUnitDto getFunctionalUnit() {
+  public Response getFunctionalUnit() {
     FunctionalUnit functionalUnit = opalRuntime.getFunctionalUnit(unit);
-    if(functionalUnit == null) throw new IllegalArgumentException("Cannot find a functionnal unit with name: " + unit);
+    if(functionalUnit == null) return Response.status(Status.NOT_FOUND).build();
 
     Opal.FunctionalUnitDto.Builder fuBuilder = Opal.FunctionalUnitDto.newBuilder().//
     setName(functionalUnit.getName()). //
@@ -85,7 +86,7 @@ public class FunctionalUnitResource {
       fuBuilder.setSelect(((JavascriptClause) functionalUnit.getSelect()).getScript());
     }
 
-    return fuBuilder.build();
+    return Response.ok(fuBuilder.build()).build();
   }
 
   @PUT
@@ -134,19 +135,22 @@ public class FunctionalUnitResource {
     final List<Opal.KeyPairDto> keyPairs = Lists.newArrayList();
 
     UnitKeyStore keystore = unitKeyStoreService.getUnitKeyStore(unit);
-    for(String alias : keystore.listAliases()) {
-      Opal.KeyPairDto.Builder kpBuilder = Opal.KeyPairDto.newBuilder().setAlias(alias);
+    if(keystore != null) {
+      for(String alias : keystore.listAliases()) {
+        Opal.KeyPairDto.Builder kpBuilder = Opal.KeyPairDto.newBuilder().setAlias(alias);
 
-      kpBuilder.setCertificate(getPEMCertificate(keystore, alias));
-      keyPairs.add(kpBuilder.build());
+        kpBuilder.setCertificate(getPEMCertificate(keystore, alias));
+        keyPairs.add(kpBuilder.build());
+      }
+
+      sortByName(keyPairs);
     }
 
-    sortByName(keyPairs);
     return keyPairs;
   }
 
-  @PUT
-  @Path("/key")
+  @POST
+  @Path("/keys")
   public Response createOrUpdateFunctionalUnitKeyPair(Opal.KeyPairForm kpForm) {
     if(kpForm.hasPrivateForm() && kpForm.hasPublicForm()) {
       unitKeyStoreService.createOrUpdateKey(unit, kpForm.getAlias(), kpForm.getPrivateForm().getAlgo(), kpForm.getPrivateForm().getSize(), getCertificateInfo(kpForm.getPublicForm()));
