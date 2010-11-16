@@ -49,7 +49,7 @@
                       </tr>
                       <tr>
                         <td colspan="2">
-                          <g:CheckBox ui:field="idGenerationAllowed" addStyleNames="key">
+                          <g:CheckBox ui:field="idGenerationAllowed" addStyleNames="key" visible="false">
                             <ui:msg description="Allow Identifiers Generation label">Allow Identifiers generation when importing/exporting data</ui:msg>
                           </g:CheckBox>
                         </td>
