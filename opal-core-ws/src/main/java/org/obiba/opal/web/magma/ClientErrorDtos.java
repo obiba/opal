@@ -26,6 +26,16 @@ public class ClientErrorDtos {
     return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus);
   }
 
+  public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, Exception e) {
+    ClientErrorDto.Builder clientError = getErrorMessage(responseStatus, errorStatus);
+    Throwable cause = e;
+    while(cause.getCause() != null) {
+      cause = cause.getCause();
+    }
+    clientError.addArguments(cause.getMessage());
+    return clientError;
+  }
+
   public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, RuntimeException e) {
     ClientErrorDto.Builder clientError = getErrorMessage(responseStatus, errorStatus);
     clientError.addArguments(e.getMessage());

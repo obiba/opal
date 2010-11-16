@@ -178,6 +178,8 @@ public class FunctionalUnitResource {
       }
     } catch(RuntimeException e) {
       response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "KeyPairCreationFailed", e).build());
+    } catch(Exception e) {
+      response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "KeyPairCreationFailed", e).build());
     }
 
     return response.build();
