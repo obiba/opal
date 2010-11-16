@@ -70,8 +70,8 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
@@ -524,14 +524,29 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     @Override
     public void onClick(ClickEvent event) {
       if(validate()) {
-        variableListViewDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
-        currentVariableDto = getDisplay().getVariableDto();
-        updateCategories();
-        updateAttributes();
-        updateView(variableListViewDto);
-        eventBus.fireEvent(new ViewSaveRequiredEvent(viewDto));
-        newVariableDto = currentVariableDto;
+        scriptWidget.evaluateScript(new ResponseCodeCallback() {
+
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            int statusCode = response.getStatusCode();
+            if(statusCode == Response.SC_OK) {
+              updateViewDto();
+            } else {
+              eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, translations.scriptContainsErrorsAndWasNotSaved(), null));
+            }
+          }
+        });
       }
+    }
+
+    private void updateViewDto() {
+      variableListViewDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+      currentVariableDto = getDisplay().getVariableDto();
+      updateCategories();
+      updateAttributes();
+      updateView(variableListViewDto);
+      eventBus.fireEvent(new ViewSaveRequiredEvent(viewDto));
+      newVariableDto = currentVariableDto;
     }
 
     private void updateCategories() {
