@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.unit.view;
 
 import org.obiba.opal.web.gwt.app.client.unit.presenter.AddKeyPairDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.AddKeyPairDialogPresenter.ValidationHandler;
+import org.obiba.opal.web.gwt.app.client.workbench.view.NumericTextBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 
@@ -67,7 +68,7 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   TextBox algo;
 
   @UiField
-  TextBox size;
+  NumericTextBox size;
 
   @UiField
   RadioButton privateKeyImported;
@@ -161,6 +162,7 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
 
   private void initPrivateKeyStep() {
     privateKeyStep.setStepTitle("Alias and Private Key definition");
+    // size.setMaxConstrained(false);
     privateKeyCreated.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 
       @Override
@@ -237,7 +239,7 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
 
   private void clearPrivateKeyCreateForm() {
     algo.setText("");
-    size.setText("");
+    size.setText("512");
   }
 
   private void clearPrivateKeyImportForm() {

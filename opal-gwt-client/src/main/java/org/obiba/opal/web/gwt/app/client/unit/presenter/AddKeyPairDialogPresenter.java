@@ -22,19 +22,19 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.unit.event.KeyPairCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
-import org.obiba.opal.web.model.client.opal.KeyPairDto;
 import org.obiba.opal.web.model.client.opal.KeyPairForm;
 import org.obiba.opal.web.model.client.opal.PrivateKeyForm;
 import org.obiba.opal.web.model.client.opal.PublicKeyForm;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -180,12 +180,11 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
   }
 
   private void createKeyPair() {
-    AddKeyPairCallBack addKeyPairCallback = new AddKeyPairCallBack();
-    AlreadyExistKeyPairCallBack alreadyExistFunctionalUnitCallback = new AlreadyExistKeyPairCallBack();
-    ResourceRequestBuilderFactory.<KeyPairDto> newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/key/" + getDisplay().getAlias().getText()).get().withCallback(alreadyExistFunctionalUnitCallback).withCallback(Response.SC_NOT_FOUND, addKeyPairCallback).send();
+    KeyPairForm dto = getKeyPairForm();
+    CreateKeyPairCallBack callbackHandler = new CreateKeyPairCallBack(dto);
+    ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/keys").post().withResourceBody(KeyPairForm.stringify(dto)).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
   }
 
-  // TODO
   private KeyPairForm getKeyPairForm() {
     KeyPairForm dto = KeyPairForm.create();
     dto.setAlias(getDisplay().getAlias().getText());
@@ -212,28 +211,7 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
       dto.setPublicImport(getDisplay().getPublicKeyImport().getText());
     }
 
-    GWT.log(KeyPairForm.stringify(dto));
-
     return dto;
-  }
-
-  private class AlreadyExistKeyPairCallBack implements ResourceCallback<KeyPairDto> {
-
-    @Override
-    public void onResource(Response response, KeyPairDto resource) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "KeyPairAlreadyExistForTheSpecifiedName", null));
-    }
-
-  }
-
-  private class AddKeyPairCallBack implements ResponseCodeCallback {
-
-    @Override
-    public void onResponseCode(Request request, Response response) {
-      KeyPairForm dto = getKeyPairForm();
-      CreateKeyPairCallBack callbackHandler = new CreateKeyPairCallBack(dto);
-      ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/keys").post().withResourceBody(KeyPairForm.stringify(dto)).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
-    }
   }
 
   private class CreateKeyPairCallBack implements ResponseCodeCallback {
@@ -246,14 +224,14 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      getDisplay().hideDialog();
-      if(response.getStatusCode() == Response.SC_CREATED) {
-        // TODO
-        // eventBus.fireEvent(new KeyPairCreatedEvent(keyPair));
-      } else {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
-      }
 
+      if(response.getStatusCode() == Response.SC_CREATED) {
+        eventBus.fireEvent(new KeyPairCreatedEvent(functionalUnit, keyPairForm.getAlias()));
+        getDisplay().hideDialog();
+      } else {
+        ClientErrorDto error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, error.getStatus(), null));
+      }
     }
   }
 

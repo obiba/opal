@@ -56,7 +56,7 @@
                           <ui:msg description="Private Key Size label">Size</ui:msg>:
                         </g:Label>
                       </td>
-                      <td><g:TextBox addStyleNames="text full-width" name="size" ui:field="size"/></td>
+                      <td><o:NumericTextBox addStyleNames="text" name="size" ui:field="size"  visibleLength="4" maxConstrained="false"/></td>
                     </tr>
                   </table> 
                 </div>

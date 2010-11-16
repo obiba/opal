@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.Notific
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitSelectedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.unit.event.KeyPairCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
@@ -31,9 +32,11 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.opal.KeyPairDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
@@ -144,6 +147,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
     super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
     super.registerHandler(eventBus.addHandler(FunctionalUnitUpdatedEvent.getType(), new FunctionalUnitUpdatedHandler()));
+    super.registerHandler(eventBus.addHandler(KeyPairCreatedEvent.getType(), new KeyPairCreatedHandler()));
 
   }
 
@@ -165,28 +169,29 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
           deleteKeyPair(dto);
         }
       };
-      eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "deleteFile", "confirmDeleteFile"));
+      eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "deleteKeyPair", "confirmDeleteKeyPair"));
     }
   }
 
-  private void deleteKeyPair(final KeyPairDto file) {
-    // TODO
-    // ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
-    //
-    // @Override
-    // public void onResponseCode(Request request, Response response) {
-    // if(response.getStatusCode() != Response.SC_OK) {
-    // eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
-    // } else {
-    // eventBus.fireEvent(new FileDeletedEvent(file));
-    // }
-    // }
-    // };
-    //
-    // ResourceRequestBuilderFactory.newBuilder().forResource("/files" +
-    // file.getPath()).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN,
-    // callbackHandler).withCallback(Response.SC_INTERNAL_SERVER_ERROR,
-    // callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+  private void deleteKeyPair(final KeyPairDto dto) {
+    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_NOT_FOUND) {
+          refreshKeyPairs(functionalUnit);
+        } else {
+          ClientErrorDto error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, error.getStatus(), null));
+        }
+      }
+
+    };
+
+    ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/key/" + dto.getAlias()).delete() //
+    .withCallback(Response.SC_OK, callbackHandler) //
+    .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
+    .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
   }
 
   private void downloadCertificate(final KeyPairDto dto) {
@@ -199,6 +204,11 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
   private void refreshFunctionalUnitDetails(FunctionalUnitDto functionalUnit) {
     String name = functionalUnit.getName();
     ResourceRequestBuilderFactory.<FunctionalUnitDto> newBuilder().forResource("/functional-unit/" + name).get().withCallback(new FunctionalUnitFoundCallBack()).withCallback(Response.SC_NOT_FOUND, new FunctionalUnitNotFoundCallBack(name)).send();
+    refreshKeyPairs(functionalUnit);
+  }
+
+  private void refreshKeyPairs(FunctionalUnitDto functionalUnit) {
+    String name = functionalUnit.getName();
     ResourceRequestBuilderFactory.<JsArray<KeyPairDto>> newBuilder().forResource("/functional-unit/" + name + "/keys").get().withCallback(new KeyPairsCallback()).withCallback(Response.SC_NOT_FOUND, new FunctionalUnitNotFoundCallBack(name)).send();
   }
 
@@ -317,6 +327,15 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
       eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "FunctionalUnitCannotBeFound", Arrays.asList(new String[] { templateName })));
     }
 
+  }
+
+  private final class KeyPairCreatedHandler implements KeyPairCreatedEvent.Handler {
+    @Override
+    public void onKeyPairCreated(KeyPairCreatedEvent event) {
+      if(event.getFunctionalUnit().getName().equals(functionalUnit.getName())) {
+        refreshKeyPairs(functionalUnit);
+      }
+    }
   }
 
 }
