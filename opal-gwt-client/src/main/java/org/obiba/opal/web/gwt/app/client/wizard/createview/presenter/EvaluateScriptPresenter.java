@@ -72,7 +72,9 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
 
     String getSelectedScript();
 
-    void setSelectedScript(String script);
+    int[] getSelectedScriptRange();
+
+    void setSelectedScriptRange(int[] selectedRange);
 
     HandlerRegistration addTestScriptClickHandler(ClickHandler handler);
 
@@ -211,6 +213,7 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
       currentPage = 1;
       lastPage = false;
       displayCurrentPageResults();
+      getDisplay().setSelectedScriptRange(getDisplay().getSelectedScriptRange());
     }
 
   }

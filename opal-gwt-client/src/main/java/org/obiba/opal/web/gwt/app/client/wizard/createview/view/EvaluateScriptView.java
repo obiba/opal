@@ -138,17 +138,19 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
     table.redraw();
   }
 
-  @Override
   public String getSelectedScript() {
     return scriptArea.getSelectedText();
   }
 
   @Override
-  public void setSelectedScript(String script) {
-    int start = scriptArea.getText().indexOf(script);
-    if(start > -1) {
-      scriptArea.setSelectionRange(start, script.length());
-    }
+  public int[] getSelectedScriptRange() {
+    return new int[] { scriptArea.getCursorPos(), scriptArea.getSelectionLength() };
+  }
+
+  @Override
+  public void setSelectedScriptRange(int[] selected) {
+    scriptArea.setFocus(true);
+    scriptArea.setSelectionRange(selected[0], selected[1]);
   }
 
   @Override
