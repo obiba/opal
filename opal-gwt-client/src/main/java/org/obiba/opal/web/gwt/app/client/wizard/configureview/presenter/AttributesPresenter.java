@@ -187,10 +187,11 @@ public class AttributesPresenter extends LocalizablesPresenter {
 
     @Override
     public void onEdit(Localizable localizable) {
-      attributeDialogPresenter.setAttributeNameToDisplay(localizable.getName());
-
       // Each time the dialog is closed (hidden), it is unbound. So we need to rebind it each time we display it.
       attributeDialogPresenter.bind();
+
+      attributeDialogPresenter.setAttributeNameToDisplay(localizable.getName());
+      attributeDialogPresenter.setAttributes(variableDto.getAttributesArray());
       attributeDialogPresenter.getDisplay().setNameDropdownList(attributeNames);
       attributeDialogPresenter.revealDisplay();
     }

@@ -120,9 +120,6 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   @Override
   public void revealDisplay() {
     initDisplayComponents();
-    if(!isEdit()) {
-      getDisplay().clear();
-    }
     getDisplay().showDialog();
   }
 
@@ -152,6 +149,7 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
   protected void initDisplayComponents() {
     setTitle();
+    resetForm();
     labelListPresenter.setAttributeToDisplay(attributeNameToDisplay);
 
     if(isEdit()) {
@@ -159,7 +157,6 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
       labelListPresenter.setAttributes(attributes);
       labelListPresenter.updateFields();
     } else {
-      resetForm();
       getDisplay().clear();
     }
 

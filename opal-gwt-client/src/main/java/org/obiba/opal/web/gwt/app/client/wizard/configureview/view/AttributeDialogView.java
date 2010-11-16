@@ -207,8 +207,9 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   @Override
   public void setAttributeName(String attributeName) {
     int index = getLabelIndex(attributeName);
-    if(index > 0) {
+    if(index != -1) {
       labels.setItemSelected(index, true);
+      this.attributeName.setText("");
     } else {
       setLabelsEnabled(false);
       setAttributeNameEnabled(true);
