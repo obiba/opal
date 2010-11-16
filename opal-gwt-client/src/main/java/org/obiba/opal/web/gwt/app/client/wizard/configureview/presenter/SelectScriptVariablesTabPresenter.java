@@ -9,6 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -19,6 +24,8 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
@@ -36,6 +43,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -65,6 +73,8 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
 
   private Translations translations = GWT.create(Translations.class);
 
+  private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+
   //
   // Constructors
   //
@@ -88,6 +98,7 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
     getDisplay().saveChangesEnabled(false);
 
     addEventHandlers();
+    addValidators();
   }
 
   @Override
@@ -145,6 +156,28 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
     super.registerHandler(getDisplay().addScriptChangeHandler(new ScriptChangeHandler()));
   }
 
+  private void addValidators() {
+    validators.add(new RequiredTextValidator(getDisplay().getScriptText(), "ScriptIsRequired"));
+  }
+
+  private boolean validate() {
+    List<String> messages = new ArrayList<String>();
+    String message;
+    for(FieldValidator validator : validators) {
+      message = validator.validate();
+      if(message != null) {
+        messages.add(message);
+      }
+    }
+
+    if(messages.size() > 0) {
+      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, messages, null));
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   //
   // Inner Classes / Interfaces
   //
@@ -162,6 +195,8 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
     void setScript(String script);
 
     String getScript();
+
+    HasText getScriptText();
 
     void setVariablesToView(VariablesToView scriptOrAll);
 
@@ -190,25 +225,26 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
 
     @Override
     public void onClick(ClickEvent event) {
-      if(getDisplay().getVariablesToView().equals(VariablesToView.SCRIPT)) {
-        // Test the script. If ok, update the ViewDto.
-        scriptWidget.evaluateScript(new ResponseCodeCallback() {
+      if(validate()) {
+        if(getDisplay().getVariablesToView().equals(VariablesToView.SCRIPT)) {
+          // Test the script. If ok, update the ViewDto.
+          scriptWidget.evaluateScript(new ResponseCodeCallback() {
 
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            int statusCode = response.getStatusCode();
-            if(statusCode == Response.SC_OK) {
-              updateViewDto();
-            } else {
-              eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, translations.scriptContainsErrorsAndWasNotSaved(), null));
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              int statusCode = response.getStatusCode();
+              if(statusCode == Response.SC_OK) {
+                updateViewDto();
+              } else {
+                eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, translations.scriptContainsErrorsAndWasNotSaved(), null));
+              }
             }
-          }
-        });
-      } else {
-        // No script ("all" option selected), so just update the ViewDto.
-        updateViewDto();
+          });
+        } else {
+          // No script ("all" option selected), so just update the ViewDto.
+          updateViewDto();
+        }
       }
-
     }
 
     private ViewDto getViewDto() {

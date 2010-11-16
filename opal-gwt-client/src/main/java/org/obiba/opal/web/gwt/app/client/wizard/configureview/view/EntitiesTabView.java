@@ -23,6 +23,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -119,6 +120,11 @@ public class EntitiesTabView extends Composite implements EntitiesTabPresenter.D
   @Override
   public HandlerRegistration addScriptChangeHandler(ChangeHandler handler) {
     return scriptWidgetDisplay.addScriptChangeHandler(handler);
+  }
+
+  @Override
+  public HasText getScriptText() {
+    return scriptWidgetDisplay.getScriptText();
   }
 
 }

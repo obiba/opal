@@ -35,6 +35,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -257,5 +258,10 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
   @Override
   public HandlerRegistration addResultsCloseHandler(CloseHandler closeHandler) {
     return resultsPanel.addCloseHandler(closeHandler);
+  }
+
+  @Override
+  public HasText getScriptText() {
+    return scriptArea;
   }
 }

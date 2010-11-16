@@ -22,6 +22,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -150,5 +151,10 @@ public class SelectScriptVariablesTabView extends Composite implements SelectScr
 
   @UiTemplate("SelectScriptVariablesTabView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, SelectScriptVariablesTabView> {
+  }
+
+  @Override
+  public HasText getScriptText() {
+    return scriptWidgetDisplay.getScriptText();
   }
 }

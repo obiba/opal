@@ -41,6 +41,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 
 public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPresenter.Display> {
@@ -67,6 +68,8 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
   public interface Display extends WidgetDisplay {
 
     String getScript();
+
+    HasText getScriptText();
 
     void setScript(String script);
 

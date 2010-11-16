@@ -196,6 +196,7 @@ public interface Translations extends Constants {
   "ReportTemplateNameIsRequired", "A name is required for the report template.",//
   "OccurrenceGroupIsRequired", "An Occurence Group must be specified for Repeatable variables.",//
   "NewVariableNameIsRequired", "A name is required for the new variable to be created.",//
+  "ScriptIsRequired", "A script is required.",//
   "CopyFromVariableNameIsRequired", "You must enter the name of a variable from which the new variable will be created from." })
   Map<String, String> userMessageMap();
 

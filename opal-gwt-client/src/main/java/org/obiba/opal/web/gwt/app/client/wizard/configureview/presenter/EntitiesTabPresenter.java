@@ -9,6 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -19,6 +24,8 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
@@ -37,6 +44,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 
 public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.Display> {
@@ -52,6 +60,8 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
     void setScript(String script);
 
     String getScript();
+
+    HasText getScriptText();
 
     void setEntitiesToView(EntitiesToView scriptOrAll);
 
@@ -77,6 +87,8 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
 
   private Translations translations = GWT.create(Translations.class);
 
+  private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+
   /**
    * Widget for entering, and testing, the "select" script.
    */
@@ -96,6 +108,7 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
 
     getDisplay().saveChangesEnabled(true);
     addEventHandlers();
+    addValidators();
   }
 
   @Override
@@ -130,22 +143,46 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
     super.registerHandler(eventBus.addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
   }
 
+  private void addValidators() {
+    validators.add(new RequiredTextValidator(getDisplay().getScriptText(), "ScriptIsRequired"));
+  }
+
+  private boolean validate() {
+    List<String> messages = new ArrayList<String>();
+    String message;
+    for(FieldValidator validator : validators) {
+      message = validator.validate();
+      if(message != null) {
+        messages.add(message);
+      }
+    }
+
+    if(messages.size() > 0) {
+      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, messages, null));
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   class SaveChangesClickHandler implements ClickHandler {
 
     @Override
     public void onClick(ClickEvent event) {
-      scriptWidget.evaluateScript(new ResponseCodeCallback() {
+      if(validate()) {
+        scriptWidget.evaluateScript(new ResponseCodeCallback() {
 
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          int statusCode = response.getStatusCode();
-          if(statusCode == Response.SC_OK) {
-            updateViewDto();
-          } else {
-            eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, translations.scriptContainsErrorsAndWasNotSaved(), null));
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            int statusCode = response.getStatusCode();
+            if(statusCode == Response.SC_OK) {
+              updateViewDto();
+            } else {
+              eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, translations.scriptContainsErrorsAndWasNotSaved(), null));
+            }
           }
-        }
-      });
+        });
+      }
     }
 
     private ViewDto getViewDto() {
