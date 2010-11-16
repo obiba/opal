@@ -72,7 +72,7 @@ public interface Translations extends Constants {
   String statusLabel();
 
   @Description("Status map")
-  @DefaultStringMapValue( { "NOT_STARTED", "Not Started", //
+  @DefaultStringMapValue({ "NOT_STARTED", "Not Started", //
   "IN_PROGRESS", "In Progress", //
   "SUCCEEDED", "Succeeded", //
   "FAILED", "Failed", //
@@ -86,7 +86,7 @@ public interface Translations extends Constants {
   String actionsLabel();
 
   @Description("Action map")
-  @DefaultStringMapValue( { "Log", "Log", //
+  @DefaultStringMapValue({ "Log", "Log", //
   "Cancel", "Cancel", //
   "Delete", "Delete", //
   "Edit", "Edit", //
@@ -288,7 +288,8 @@ public interface Translations extends Constants {
   "removeReportTemplate", "Remove Report Template",//
   "removeFunctionalUnit", "Remove Unit",//
   "deleteCategory", "Delete Category",//
-  "deleteAttribute", "Delete Attribute" })
+  "deleteAttribute", "Delete Attribute",//
+  "removeView", "Remove View" })
   Map<String, String> confirmationTitleMap();
 
   @Description("Confirmation message map")
@@ -304,7 +305,8 @@ public interface Translations extends Constants {
   "confirmDeleteReportTemplate", "Please confirm that you want to remove the current Report Template from Opal configuration (report design and generated reports will not be affected).",//
   "confirmDeleteFunctionalUnit", "Please confirm that you want to remove the current Unit from Opal configuration. All encrypted material will not be accessible anymore",//
   "confirmDeleteCategory", "Please confirm that you want to remove this category.",//
-  "confirmDeleteAttribute", "Please confirm that you want to remove this attribute." })
+  "confirmDeleteAttribute", "Please confirm that you want to remove this attribute.",//
+  "confirmRemoveView", "Please confirm that you want to remove the current view." })
   Map<String, String> confirmationMessageMap();
 
   @Description("A name is required when creating a new folder")
@@ -372,7 +374,7 @@ public interface Translations extends Constants {
   String errorLabel();
 
   @Description("Datasource parsing error map")
-  @DefaultStringMapValue( { "CategoryNameRequired", "Category name required", //
+  @DefaultStringMapValue({ "CategoryNameRequired", "Category name required", //
   "CategoryVariableNameRequired", "Category variable name required", //
   "DuplicateCategoryName", "Duplicate category name", //
   "DuplicateColumns", "Duplicate columns", //
@@ -396,7 +398,7 @@ public interface Translations extends Constants {
   Map<String, String> datasourceParsingErrorMap();
 
   @Description("Datasource comparison error map")
-  @DefaultStringMapValue( { "IncompatibleValueType", "Incompatible value type", //
+  @DefaultStringMapValue({ "IncompatibleValueType", "Incompatible value type", //
   "IncompatibleEntityType", "Incompatible entity type", //
   "VariablePresentInSourceButNotDestination", "Variable exists in source but not in destination" })
   Map<String, String> datasourceComparisonErrorMap();
