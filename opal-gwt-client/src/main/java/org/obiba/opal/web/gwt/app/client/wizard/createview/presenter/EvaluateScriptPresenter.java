@@ -254,7 +254,7 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     if(evaluationMode == Mode.ENTITY_VALUE || evaluationMode == Mode.ENTITY) {
       ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource(transientVariableResource + selectedScript).get().withCallback(new EntityValueResourceCallback()).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
     } else if(evaluationMode == Mode.VARIABLE) {
-      ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(variablesResource + selectedScript).get().withCallback(new VariablesResourceCallback(true)).withCallback(500, new InvalidScriptResourceCallBack()).send();
+      ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(variablesResource + selectedScript).get().withCallback(new VariablesResourceCallback(true)).withCallback(400, new InvalidScriptResourceCallBack()).withCallback(500, new InvalidScriptResourceCallBack()).send();
     }
   }
 
