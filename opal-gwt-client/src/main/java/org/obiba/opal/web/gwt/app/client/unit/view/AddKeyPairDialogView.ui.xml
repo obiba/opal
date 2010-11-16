@@ -18,10 +18,147 @@
     </g:caption>
     <g:FlowPanel>
       <o:WizardStep ui:field="privateKeyStep">
+        <g:HTMLPanel>
+          <table class="full-width">
+            <tr>
+              <td>
+                <g:Label addStyleNames="key">
+                  <ui:msg description="Alias label">Alias</ui:msg>:
+                </g:Label>
+              </td>
+              <td>
+                <g:TextBox addStyleNames="text full-width" name="alias" ui:field="alias"/>
+              </td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <g:Label addStyleNames="key">
+                  <ui:msg description="Private Key label">Private Key</ui:msg>:
+                </g:Label>
+              </td>
+              <td>
+                <g:RadioButton ui:field="privateKeyCreated" name="privateKeyCreated" addStyleNames="key">
+                  <ui:msg description="Private Key Created label">created</ui:msg>
+                </g:RadioButton>
+                <div class="indent">
+                  <table>
+                    <tr>
+                      <td>
+                        <g:Label addStyleNames="key">
+                          <ui:msg description="Private Key Algorithm label">Algorithm</ui:msg>:
+                        </g:Label>
+                      </td>
+                      <td><g:TextBox addStyleNames="text full-width" name="algo" ui:field="algo"/></td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <g:Label addStyleNames="key">
+                          <ui:msg description="Private Key Size label">Size</ui:msg>:
+                        </g:Label>
+                      </td>
+                      <td><g:TextBox addStyleNames="text full-width" name="size" ui:field="size"/></td>
+                    </tr>
+                  </table> 
+                </div>
+                <g:RadioButton ui:field="privateKeyImported" name="privateKeyImported" addStyleNames="key">
+                  <ui:msg description="Private Key Imported label">imported</ui:msg>
+                </g:RadioButton>
+                <div class="indent">
+                  <g:TextArea addStyleNames="text full-width" name="privateKeyPEM" ui:field="privateKeyPEM"/>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </g:HTMLPanel>
       </o:WizardStep>
-      <o:WizardStep ui:field="publicKeyCreateStep">
-      </o:WizardStep>
-      <o:WizardStep ui:field="publicKeyImportOrCreateStep">
+      <o:WizardStep ui:field="publicKeyStep">
+        <g:HTMLPanel>
+          <table class="full-width">
+            <tr>
+              <td valign="top">
+                <g:Label addStyleNames="key">
+                  <ui:msg description="Public Key label">Public Key</ui:msg>:
+                </g:Label>
+              </td>
+              <td>
+                <g:RadioButton ui:field="publicKeyCreated" name="publicKeyCreated" addStyleNames="key">
+                  <ui:msg description="Public Key Created label">created</ui:msg>
+                </g:RadioButton>
+                <g:HTMLPanel ui:field="publicKeyForm" addStyleNames="indent">
+                  <table>
+                    <tr>
+                      <td>
+                        <g:Label addStyleNames="key">
+                          <ui:msg description="First and Last Name label">First and Last Name</ui:msg>:
+                        </g:Label>
+                      </td>
+                      <td>
+                        <g:TextBox addStyleNames="text full-width" name="names" ui:field="names"/>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <g:Label addStyleNames="key">
+                          <ui:msg description="Organizational Unit label">Organizational Unit</ui:msg>:
+                        </g:Label>
+                      </td>
+                      <td>
+                        <g:TextBox addStyleNames="text full-width" name="organizationalUnit" ui:field="organizationalUnit"/>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <g:Label addStyleNames="key">
+                          <ui:msg description="Organizational Name label">Organization Name</ui:msg>:
+                        </g:Label>
+                      </td>
+                      <td>
+                        <g:TextBox addStyleNames="text full-width" name="organizationName" ui:field="organizationName"/>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <g:Label addStyleNames="key">
+                          <ui:msg description="City Name label">City or Locality Name</ui:msg>:
+                        </g:Label>
+                      </td>
+                      <td>
+                        <g:TextBox addStyleNames="text full-width" name="city" ui:field="city"/>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <g:Label addStyleNames="key">
+                          <ui:msg description="State Name label">State or Province Name</ui:msg>:
+                        </g:Label>
+                      </td>
+                      <td>
+                        <g:TextBox addStyleNames="text full-width" name="state" ui:field="state"/>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <g:Label addStyleNames="key">
+                          <ui:msg description="Country Code label">Two Letter Country Code</ui:msg>:
+                        </g:Label>
+                      </td>
+                      <td>
+                        <g:TextBox addStyleNames="text" name="country" ui:field="country" visibleLength="2"/>
+                      </td>
+                    </tr>
+                    
+                  </table>
+                </g:HTMLPanel>
+                <g:RadioButton ui:field="publicKeyImported" name="publicKeyImported" addStyleNames="key">
+                  <ui:msg description="Public Key Imported label">imported</ui:msg>
+                </g:RadioButton>
+                <div class="indent">
+                  <g:TextArea addStyleNames="text full-width" name="publicKeyPEM" ui:field="publicKeyPEM"/>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </g:HTMLPanel>
       </o:WizardStep>
     </g:FlowPanel>
     

@@ -90,7 +90,7 @@ public class WizardDialogBox extends DialogBox {
     initControlStyle(next, "next");
     south.add(previous = new Button("< Previous"));
     initControlStyle(previous, "previous");
-    setPreviousVisible(false);
+    setPreviousEnabled(false);
 
     // main content
     ScrollPanel scroll = new ScrollPanel();

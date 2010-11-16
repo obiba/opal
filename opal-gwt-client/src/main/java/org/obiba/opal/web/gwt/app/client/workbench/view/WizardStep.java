@@ -27,7 +27,7 @@ public class WizardStep extends FlowPanel {
     super();
     addStyleName("step");
     add(this.title = new Label(title));
-    this.title.addStyleName("header");
+    this.title.addStyleName("title-bold");
   }
 
   public void setStepTitle(String text) {

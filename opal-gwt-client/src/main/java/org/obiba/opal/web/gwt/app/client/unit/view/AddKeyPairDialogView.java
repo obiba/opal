@@ -16,16 +16,24 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.RadioButton;
+import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -46,33 +54,219 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   WizardStep privateKeyStep;
 
   @UiField
-  WizardStep publicKeyCreateStep;
+  WizardStep publicKeyStep;
 
   @UiField
-  WizardStep publicKeyImportOrCreateStep;
+  TextBox alias;
+
+  @UiField
+  RadioButton privateKeyCreated;
+
+  @UiField
+  TextBox algo;
+
+  @UiField
+  TextBox size;
+
+  @UiField
+  RadioButton privateKeyImported;
+
+  @UiField
+  TextArea privateKeyPEM;
+
+  @UiField
+  RadioButton publicKeyCreated;
+
+  @UiField
+  HTMLPanel publicKeyForm;
+
+  @UiField
+  TextBox names;
+
+  @UiField
+  TextBox organizationalUnit;
+
+  @UiField
+  TextBox organizationName;
+
+  @UiField
+  TextBox city;
+
+  @UiField
+  TextBox state;
+
+  @UiField
+  TextBox country;
+
+  @UiField
+  RadioButton publicKeyImported;
+
+  @UiField
+  TextArea publicKeyPEM;
 
   public AddKeyPairDialogView() {
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
+    initWizardDialog();
+    initPrivateKeyStep();
+    initPublicKeyStep();
+  }
+
+  private void initWizardDialog() {
+    dialog.setContentSize("38em", "29em");
     dialog.setGlassEnabled(false);
     dialog.hide();
     dialog.addNextClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
-        if(privateKeyStep.isVisible()) {
+        // validate
+        privateKeyStep.setVisible(false);
 
+        publicKeyStep.setVisible(true);
+        publicKeyCreated.setValue(true, true);
+        publicKeyCreated.setVisible(privateKeyImported.getValue());
+        publicKeyImported.setVisible(privateKeyImported.getValue());
+        publicKeyPEM.setVisible(privateKeyImported.getValue());
+        if(privateKeyCreated.getValue()) {
+          publicKeyForm.removeStyleName("indent");
+        } else {
+          publicKeyForm.addStyleName("indent");
+        }
+
+        dialog.setPreviousEnabled(true);
+        dialog.setNextEnabled(false);
+        dialog.setFinishEnabled(true);
+      }
+    });
+    dialog.addPreviousClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent arg0) {
+        privateKeyStep.setVisible(true);
+        publicKeyStep.setVisible(false);
+        dialog.setPreviousEnabled(false);
+        dialog.setNextEnabled(true);
+        dialog.setFinishEnabled(false);
+      }
+    });
+  }
+
+  private void initPrivateKeyStep() {
+    privateKeyStep.setStepTitle("Alias and Private Key definition");
+    privateKeyCreated.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<Boolean> arg0) {
+        privateKeyImported.setValue(!privateKeyCreated.getValue());
+        privateKeyPEM.setEnabled(!privateKeyCreated.getValue());
+        algo.setEnabled(privateKeyCreated.getValue());
+        size.setEnabled(privateKeyCreated.getValue());
+        if(privateKeyCreated.getValue()) {
+          clearPrivateKeyImportForm();
+        } else {
+          clearPrivateKeyCreateForm();
+        }
+      }
+    });
+    privateKeyImported.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent arg0) {
+        privateKeyCreated.setValue(!privateKeyImported.getValue(), true);
+      }
+    });
+    privateKeyPEM.addFocusHandler(new FocusHandler() {
+
+      @Override
+      public void onFocus(FocusEvent arg0) {
+        if(privateKeyPEM.getText().equals("(paste private key in PEM format)")) {
+          privateKeyPEM.setText("");
+          privateKeyPEM.removeStyleName("default-text");
         }
       }
     });
   }
 
+  private void initPublicKeyStep() {
+    publicKeyStep.setStepTitle("Public Certificate definition");
+    publicKeyCreated.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<Boolean> arg0) {
+        publicKeyImported.setValue(!publicKeyCreated.getValue());
+        publicKeyPEM.setEnabled(!publicKeyCreated.getValue());
+        names.setEnabled(publicKeyCreated.getValue());
+        organizationalUnit.setEnabled(publicKeyCreated.getValue());
+        organizationName.setEnabled(publicKeyCreated.getValue());
+        city.setEnabled(publicKeyCreated.getValue());
+        state.setEnabled(publicKeyCreated.getValue());
+        country.setEnabled(publicKeyCreated.getValue());
+        if(publicKeyCreated.getValue()) {
+          clearPublicKeyImportForm();
+        } else {
+          clearPublicKeyCreateForm();
+        }
+      }
+    });
+    publicKeyImported.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent arg0) {
+        publicKeyCreated.setValue(!publicKeyImported.getValue(), true);
+      }
+    });
+    publicKeyPEM.addFocusHandler(new FocusHandler() {
+
+      @Override
+      public void onFocus(FocusEvent arg0) {
+        if(publicKeyPEM.getText().equals("(paste public certificate in PEM format)")) {
+          publicKeyPEM.setText("");
+          publicKeyPEM.removeStyleName("default-text");
+        }
+      }
+    });
+  }
+
+  private void clearPrivateKeyCreateForm() {
+    algo.setText("");
+    size.setText("");
+  }
+
+  private void clearPrivateKeyImportForm() {
+    privateKeyPEM.setText("(paste private key in PEM format)");
+    privateKeyPEM.addStyleName("default-text");
+  }
+
+  private void clearPublicKeyCreateForm() {
+    names.setText("");
+    organizationalUnit.setText("");
+    organizationName.setText("");
+    city.setText("");
+    state.setText("");
+    country.setText("");
+  }
+
+  private void clearPublicKeyImportForm() {
+    publicKeyPEM.setText("(paste public certificate in PEM format)");
+    publicKeyPEM.addStyleName("default-text");
+  }
+
   @Override
   public void clear() {
+    alias.setText("");
+    clearPrivateKeyCreateForm();
+    clearPrivateKeyImportForm();
+    clearPublicKeyCreateForm();
+    clearPublicKeyImportForm();
+
     privateKeyStep.setVisible(true);
-    publicKeyCreateStep.setVisible(false);
-    publicKeyImportOrCreateStep.setVisible(false);
-    dialog.setPreviousVisible(false);
+    privateKeyCreated.setValue(true, true);
+    publicKeyCreated.setValue(true, true);
+    publicKeyStep.setVisible(false);
+
+    dialog.setPreviousEnabled(false);
+    dialog.setNextEnabled(true);
     dialog.setFinishEnabled(false);
   }
 
@@ -84,14 +278,12 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
 
   @Override
   public HasText getAlgorithm() {
-    // TODO Auto-generated method stub
-    return null;
+    return algo;
   }
 
   @Override
   public HasText getAlias() {
-    // TODO Auto-generated method stub
-    return null;
+    return alias;
   }
 
   @Override
@@ -102,14 +294,12 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
 
   @Override
   public HasText getCityName() {
-    // TODO Auto-generated method stub
-    return null;
+    return city;
   }
 
   @Override
   public HasText getCountry() {
-    // TODO Auto-generated method stub
-    return null;
+    return country;
   }
 
   @Override
@@ -119,68 +309,57 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
 
   @Override
   public HasText getFirstAndLastName() {
-    // TODO Auto-generated method stub
-    return null;
+    return names;
   }
 
   @Override
   public HasText getKeySize() {
-    // TODO Auto-generated method stub
-    return null;
+    return size;
   }
 
   @Override
   public HasText getOrganizationName() {
-    // TODO Auto-generated method stub
-    return null;
+    return organizationName;
   }
 
   @Override
   public HasText getOrganizationalUnit() {
-    // TODO Auto-generated method stub
-    return null;
+    return organizationalUnit;
   }
 
   @Override
   public HasText getPrivateKeyImport() {
-    // TODO Auto-generated method stub
-    return null;
+    return privateKeyPEM;
   }
 
   @Override
   public HasText getPublicKeyImport() {
-    // TODO Auto-generated method stub
-    return null;
+    return publicKeyPEM;
   }
 
   @Override
   public HasText getStateName() {
-    // TODO Auto-generated method stub
-    return null;
+    return state;
   }
 
   @Override
   public HasValue<Boolean> isPrivateKeyCreate() {
-    // TODO Auto-generated method stub
-    return null;
+    return privateKeyCreated;
   }
 
   @Override
   public HasValue<Boolean> isPrivateKeyImport() {
-    // TODO Auto-generated method stub
-    return null;
+    return privateKeyImported;
   }
 
   @Override
   public HasValue<Boolean> isPublicKeyCreate() {
-    // TODO Auto-generated method stub
-    return null;
+    return publicKeyCreated;
   }
 
   @Override
   public HasValue<Boolean> isPublicKeyImport() {
-    // TODO Auto-generated method stub
-    return null;
+    return publicKeyImported;
   }
 
   @Override
