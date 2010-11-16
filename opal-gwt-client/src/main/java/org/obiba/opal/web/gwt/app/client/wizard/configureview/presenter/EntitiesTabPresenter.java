@@ -15,21 +15,28 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter.Mode;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
 public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.Display> {
@@ -67,6 +74,8 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
    * When the tab's save button is pressed, changes are applied to this ViewDto.
    */
   private ViewDto viewDto;
+
+  private Translations translations = GWT.create(Translations.class);
 
   /**
    * Widget for entering, and testing, the "select" script.
@@ -113,6 +122,7 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
   }
 
   private void addEventHandlers() {
+    super.registerHandler(eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
     super.registerHandler(getDisplay().addSaveChangesClickHandler(new SaveChangesClickHandler()));
     super.registerHandler(getDisplay().addEntitiestoViewChangeHandler(new EntitiesToViewChangeHandler()));
     super.registerHandler(getDisplay().addEntitiestoViewChangeHandler(new FormChangedHandler()));
@@ -124,8 +134,18 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
 
     @Override
     public void onClick(ClickEvent event) {
-      updateViewDto();
-      eventBus.fireEvent(new ViewSaveRequiredEvent(getViewDto()));
+      scriptWidget.evaluateScript(new ResponseCodeCallback() {
+
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          int statusCode = response.getStatusCode();
+          if(statusCode == Response.SC_OK) {
+            updateViewDto();
+          } else {
+            eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, translations.scriptContainsErrorsAndWasNotSaved(), null));
+          }
+        }
+      });
     }
 
     private ViewDto getViewDto() {
@@ -145,6 +165,7 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
       } else {
         jsViewDto.clearSelect();
       }
+      eventBus.fireEvent(new ViewSaveRequiredEvent(getViewDto()));
     }
   }
 
