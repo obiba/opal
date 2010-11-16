@@ -216,6 +216,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     @Override
     public void execute() {
       addKeyPairDialogPresenter.bind();
+      addKeyPairDialogPresenter.setFunctionalUnit(functionalUnit);
       addKeyPairDialogPresenter.revealDisplay();
     }
 

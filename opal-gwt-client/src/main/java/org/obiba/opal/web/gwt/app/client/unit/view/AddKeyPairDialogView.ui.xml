@@ -38,7 +38,7 @@
               </td>
               <td>
                 <g:RadioButton ui:field="privateKeyCreated" name="privateKeyCreated" addStyleNames="key">
-                  <ui:msg description="Private Key Created label">created</ui:msg>
+                  <ui:msg description="Private Key Create label">create</ui:msg>
                 </g:RadioButton>
                 <div class="indent">
                   <table>
@@ -61,7 +61,7 @@
                   </table> 
                 </div>
                 <g:RadioButton ui:field="privateKeyImported" name="privateKeyImported" addStyleNames="key">
-                  <ui:msg description="Private Key Imported label">imported</ui:msg>
+                  <ui:msg description="Private Key Import label">import</ui:msg>
                 </g:RadioButton>
                 <div class="indent">
                   <g:TextArea addStyleNames="text full-width" name="privateKeyPEM" ui:field="privateKeyPEM"/>
@@ -82,7 +82,7 @@
               </td>
               <td>
                 <g:RadioButton ui:field="publicKeyCreated" name="publicKeyCreated" addStyleNames="key">
-                  <ui:msg description="Public Key Created label">created</ui:msg>
+                  <ui:msg description="Public Key Create label">create</ui:msg>
                 </g:RadioButton>
                 <g:HTMLPanel ui:field="publicKeyForm" addStyleNames="indent">
                   <table>
@@ -150,7 +150,7 @@
                   </table>
                 </g:HTMLPanel>
                 <g:RadioButton ui:field="publicKeyImported" name="publicKeyImported" addStyleNames="key">
-                  <ui:msg description="Public Key Imported label">imported</ui:msg>
+                  <ui:msg description="Public Key Import label">import</ui:msg>
                 </g:RadioButton>
                 <div class="indent">
                   <g:TextArea addStyleNames="text full-width" name="publicKeyPEM" ui:field="publicKeyPEM"/>

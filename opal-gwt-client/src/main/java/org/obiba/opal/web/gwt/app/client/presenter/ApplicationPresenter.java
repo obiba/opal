@@ -164,8 +164,6 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       }
     });
 
-    getDisplay().getUnitsItem().setVisible(false);
-
     getDisplay().getNewDatasourceItem().setCommand(new Command() {
 
       @Override

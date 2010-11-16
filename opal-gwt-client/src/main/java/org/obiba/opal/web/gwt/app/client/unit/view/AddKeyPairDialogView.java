@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.unit.view;
 
 import org.obiba.opal.web.gwt.app.client.unit.presenter.AddKeyPairDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.AddKeyPairDialogPresenter.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 
@@ -104,6 +105,10 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   @UiField
   TextArea publicKeyPEM;
 
+  private ValidationHandler privateKeyValidators;
+
+  private ValidationHandler publicKeyValidators;
+
   public AddKeyPairDialogView() {
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
@@ -121,22 +126,24 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
       @Override
       public void onClick(ClickEvent arg0) {
         // validate
-        privateKeyStep.setVisible(false);
+        if(privateKeyValidators.validate()) {
+          privateKeyStep.setVisible(false);
 
-        publicKeyStep.setVisible(true);
-        publicKeyCreated.setValue(true, true);
-        publicKeyCreated.setVisible(privateKeyImported.getValue());
-        publicKeyImported.setVisible(privateKeyImported.getValue());
-        publicKeyPEM.setVisible(privateKeyImported.getValue());
-        if(privateKeyCreated.getValue()) {
-          publicKeyForm.removeStyleName("indent");
-        } else {
-          publicKeyForm.addStyleName("indent");
+          publicKeyStep.setVisible(true);
+          publicKeyCreated.setValue(true, true);
+          publicKeyCreated.setVisible(privateKeyImported.getValue());
+          publicKeyImported.setVisible(privateKeyImported.getValue());
+          publicKeyPEM.setVisible(privateKeyImported.getValue());
+          if(privateKeyCreated.getValue()) {
+            publicKeyForm.removeStyleName("indent");
+          } else {
+            publicKeyForm.addStyleName("indent");
+          }
+
+          dialog.setPreviousEnabled(true);
+          dialog.setNextEnabled(false);
+          dialog.setFinishEnabled(true);
         }
-
-        dialog.setPreviousEnabled(true);
-        dialog.setNextEnabled(false);
-        dialog.setFinishEnabled(true);
       }
     });
     dialog.addPreviousClickHandler(new ClickHandler() {
@@ -293,7 +300,7 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   }
 
   @Override
-  public HasText getCityName() {
+  public HasText getCity() {
     return city;
   }
 
@@ -338,7 +345,7 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   }
 
   @Override
-  public HasText getStateName() {
+  public HasText getState() {
     return state;
   }
 
@@ -388,13 +395,32 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   }
 
   @Override
-  public HandlerRegistration addFinishClickHandler(ClickHandler handler) {
-    return dialog.addFinishClickHandler(handler);
+  public HandlerRegistration addFinishClickHandler(final ClickHandler handler) {
+    // forward finish event only if the form is valid
+    return dialog.addFinishClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent evt) {
+        if(publicKeyValidators.validate()) {
+          handler.onClick(evt);
+        }
+      }
+    });
   }
 
   @Override
   public HandlerRegistration addCancelClickHandler(ClickHandler handler) {
     return dialog.addCancelClickHandler(handler);
+  }
+
+  @Override
+  public void setPrivateKeyValidationHandler(ValidationHandler validator) {
+    this.privateKeyValidators = validator;
+  }
+
+  @Override
+  public void setPublicKeyValidationHandler(ValidationHandler validator) {
+    this.publicKeyValidators = validator;
   }
 
 }
