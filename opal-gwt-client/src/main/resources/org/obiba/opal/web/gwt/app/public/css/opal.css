@@ -82,6 +82,11 @@ a:hover {
   font-size: 1.3em;
 }
 
+.title-bold {
+  font-weight: bold;
+  color: #444444;
+}
+
 .gwt-MenuBar-horizontal .gwt-MenuItem {
 	padding-top:3px;
 	padding-bottom:5px;
@@ -576,14 +581,15 @@ margin-left:10px;
 
 .navigator .tableList td:first-child  {
       text-decoration: underline;
-    }
-    .navigator .tableList td:first-child:hover {
-      cursor: pointer;
-    }
-    .navigator .tableList .title-bold {
-    	margin-top: 10px;
-    	font-weight: bold;
-    }
+}
+
+.navigator .tableList td:first-child:hover {
+    cursor: pointer;
+}
+
+.navigator .tableList .title-bold {
+    margin-top: 10px;
+}
 
 /* File Explorer Styles */ 
  

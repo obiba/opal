@@ -126,10 +126,10 @@ public class FunctionalUnitListPresenter extends WidgetPresenter<FunctionalUnitL
   private class FunctionalUnitsResourceCallback implements ResourceCallback<JsArray<FunctionalUnitDto>> {
 
     @Override
-    public void onResource(Response response, JsArray<FunctionalUnitDto> templates) {
-      getDisplay().setFunctionalUnits(templates);
+    public void onResource(Response response, JsArray<FunctionalUnitDto> resource) {
+      JsArray<FunctionalUnitDto> units = resource != null ? resource : (JsArray<FunctionalUnitDto>) JsArray.createArray();
+      getDisplay().setFunctionalUnits(units);
     }
-
   }
 
 }

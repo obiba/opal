@@ -120,7 +120,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
   }
 
   private void initUiComponents() {
-    getDisplay().setKeyPairs(null);
+    getDisplay().setKeyPairs((JsArray<KeyPairDto>) JsArray.createArray());
     getDisplay().setFunctionalUnitDetails(null);
     getDisplay().setCurrentCountOfIdentifiers(0);
   }

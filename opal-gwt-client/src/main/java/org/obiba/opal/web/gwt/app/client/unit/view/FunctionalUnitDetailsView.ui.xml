@@ -47,12 +47,10 @@
     </g:HTMLPanel>
 
     <g:FlowPanel ui:field="keyPairs">
-      <g:Label addStyleNames="title">
+      <g:Label addStyleNames="small-indent left-aligned title-bold">
         <ui:msg description="Keystore title">Keystore</ui:msg>
       </g:Label>
-      <g:VerticalPanel width="100%">
-        <g2:CellTable ui:field="keyPairsTable" width="100%"/>
-      </g:VerticalPanel>
+      <g2:CellTable ui:field="keyPairsTable" width="100%" addStyleNames="left-aligned"/>
     </g:FlowPanel>
     
   </g:FlowPanel>

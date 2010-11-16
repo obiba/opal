@@ -42,13 +42,13 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.MenuItemSeparator;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
 import com.google.gwt.view.client.ListView.Delegate;
@@ -141,8 +141,10 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   private void addTablePager() {
     keyPairsTable.setPageSize(10);
     pager = new SimplePager<KeyPairDto>(keyPairsTable);
+    DOM.removeElementAttribute(pager.getElement(), "style");
+    DOM.setStyleAttribute(pager.getElement(), "cssFloat", "right");
     keyPairsTable.setPager(pager);
-    ((VerticalPanel) keyPairsTable.getParent()).insert(pager, 0);
+    ((FlowPanel) keyPairsTable.getParent()).insert(pager, 0);
   }
 
   @Override
@@ -159,15 +161,11 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   }
 
   @Override
-  public void setKeyPairs(final JsArray<KeyPairDto> files) {
-    if(files == null || files.length() == 0) {
-      keyPairs.setVisible(false);
-    } else {
-      renderKeyPairs(files);
-    }
+  public void setKeyPairs(final JsArray<KeyPairDto> keyPairs) {
+    renderKeyPairs(keyPairs);
   }
 
-  private void renderKeyPairs(final JsArray<KeyPairDto> files) {
+  private void renderKeyPairs(final JsArray<KeyPairDto> kpList) {
     keyPairs.setVisible(true);
     keyPairsTable.setDelegate(new Delegate<KeyPairDto>() {
 
@@ -175,14 +173,14 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
       public void onRangeChanged(ListView<KeyPairDto> listView) {
         int start = listView.getRange().getStart();
         int length = listView.getRange().getLength();
-        listView.setData(start, length, JsArrays.toList(files, start, length));
+        listView.setData(start, length, JsArrays.toList(kpList, start, length));
       }
     });
 
     pager.firstPage();
     int pageSize = keyPairsTable.getPageSize();
-    keyPairsTable.setData(0, pageSize, JsArrays.toList(files, 0, pageSize));
-    keyPairsTable.setDataSize(files.length(), true);
+    keyPairsTable.setData(0, pageSize, JsArrays.toList(kpList, 0, pageSize));
+    keyPairsTable.setDataSize(kpList.length(), true);
     keyPairsTable.redraw();
   }
 
