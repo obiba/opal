@@ -26,6 +26,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequir
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
@@ -283,6 +284,7 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
     public void onChange(ChangeEvent event) {
       getDisplay().setScriptWidgetVisible(getDisplay().getVariablesToView().equals(VariablesToView.SCRIPT));
       getDisplay().saveChangesEnabled(true);
+      eventBus.fireEvent(new ViewSavePendingEvent());
     }
   }
 
@@ -291,6 +293,7 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
     @Override
     public void onChange(ChangeEvent event) {
       getDisplay().saveChangesEnabled(true);
+      eventBus.fireEvent(new ViewSavePendingEvent());
     }
   }
 }

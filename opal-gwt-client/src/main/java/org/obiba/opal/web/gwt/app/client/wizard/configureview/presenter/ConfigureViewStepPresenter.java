@@ -20,7 +20,6 @@ import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
-import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
@@ -156,7 +155,7 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
       @Override
       public void onBeforeSelection(BeforeSelectionEvent<Integer> event) {
         if(viewSavePending) {
-          switchTabWithConfirmation(event.getItem());
+          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "cannotSwitchTabBecauseOfUnsavedChanges", null));
           // Stop this event. If the user still wants to switch tabs we will handle it manually.
           event.cancel();
         }
@@ -281,16 +280,6 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
         }
       };
     }
-  }
-
-  private void switchTabWithConfirmation(final int index) {
-    actionRequiringConfirmation = new Runnable() {
-      public void run() {
-        getDisplay().getViewTabs().selectTab(index, false);
-        getDisplay().getHelpDeck().showWidget(index);
-      }
-    };
-    eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "unsavedChangesTitle", "confirmUnsavedChanges"));
   }
 
   private class ConfirmationEventHandler implements ConfirmationEvent.Handler {
