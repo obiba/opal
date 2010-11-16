@@ -300,6 +300,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     validators.add(new ConditionalValidator(getDisplay().getRepeatable(), new RequiredTextValidator(getDisplay().getOccurenceGroup(), "OccurrenceGroupIsRequired")));
     validators.add(new RequiredTextValidator(getDisplay().getName(), "NewVariableNameIsRequired"));
     validators.add(new UniqueVariableNameValidator("VariableNameNotUnique"));
+    validators.add(new RequiredTextValidator(getDisplay().getScriptText(), "ScriptIsRequired"));
   }
 
   private boolean validate() {
@@ -394,6 +395,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     void setScript(String script);
 
     String getScript();
+
+    HasText getScriptText();
 
     HandlerRegistration addScriptChangeHandler(ChangeHandler changeHandler);
 

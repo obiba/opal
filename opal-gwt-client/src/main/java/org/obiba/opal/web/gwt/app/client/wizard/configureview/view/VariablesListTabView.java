@@ -416,4 +416,9 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
     return mimeType.addChangeHandler(changeHandler);
   }
 
+  @Override
+  public HasText getScriptText() {
+    return scriptWidgetDisplay.getScriptText();
+  }
+
 }
