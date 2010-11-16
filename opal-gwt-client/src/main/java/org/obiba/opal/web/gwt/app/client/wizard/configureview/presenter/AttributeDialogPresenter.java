@@ -102,11 +102,14 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   @Inject
   private LabelListPresenter labelListPresenter;
 
+  @SuppressWarnings("unchecked")
   @Inject
   public AttributeDialogPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
     validators.add(new RequiredTextValidator(getDisplay().getAttributeName(), "AttributeNameRequired"));
     validators.add(new UniqueAttributeNameValidator("AttributeNameAlreadyExists"));
+
+    attributes = (JsArray<AttributeDto>) JsArray.createArray();
   }
 
   @Override
@@ -260,8 +263,11 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
     @Override
     protected boolean hasError() {
-      // Edits can have the same name.
-      if(getDisplay().getAttributeName().getText().equals(attributeNameToDisplay)) return false;
+      if(isEdit()) {
+        // Edits can have the same name.
+        if(getDisplay().getAttributeName().getText().equals(attributeNameToDisplay)) return false;
+      }
+
       for(int i = 0; i < attributes.length(); i++) {
         AttributeDto dto = attributes.get(i);
         // Using the same name as an existing attribute is not permitted.
@@ -294,8 +300,15 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
     this.attributeNameToDisplay = attributeNameToDisplay;
   }
 
+  @SuppressWarnings("unchecked")
   public void setAttributes(JsArray<AttributeDto> attributes) {
-    this.attributes = attributes;
+    this.attributes = (JsArray<AttributeDto>) JsArray.createArray();
+
+    if(attributes != null) {
+      for(int attributeIndex = 0; attributeIndex < attributes.length(); attributeIndex++) {
+        this.attributes.push(attributes.get(attributeIndex));
+      }
+    }
   }
 
   public void setViewDto(ViewDto viewDto) {

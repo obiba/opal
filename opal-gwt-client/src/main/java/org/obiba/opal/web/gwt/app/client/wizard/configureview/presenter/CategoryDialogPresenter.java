@@ -87,11 +87,14 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
 
   private boolean isBound;
 
+  @SuppressWarnings("unchecked")
   @Inject
   public CategoryDialogPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
     validators.add(new RequiredTextValidator(getDisplay().getCategoryName(), "CategoryDialogNameRequired"));
     validators.add(new UniqueCategoryNameValidator(getDisplay().getCategoryName(), "CategoryNameAlreadyExists"));
+
+    categories = (JsArray<CategoryDto>) JsArray.createArray();
   }
 
   @Override
@@ -232,8 +235,15 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
     }
   }
 
+  @SuppressWarnings("unchecked")
   public void setCategories(JsArray<CategoryDto> categories) {
-    this.categories = categories;
+    this.categories = (JsArray<CategoryDto>) JsArray.createArray();
+
+    if(categories != null) {
+      for(int categoryIndex = 0; categoryIndex < categories.length(); categoryIndex++) {
+        this.categories.push(categories.get(categoryIndex));
+      }
+    }
   }
 
   String validate() {
@@ -265,7 +275,10 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
 
     @Override
     protected boolean hasError() {
-      if(hasText.getText().equals(categoryDto.getName())) return false; // Edits can have the same name.
+      if(isEdit()) {
+        if(hasText.getText().equals(categoryDto.getName())) return false; // Edits can have the same name.
+      }
+
       for(int i = 0; i < categories.length(); i++) {
         CategoryDto dto = categories.get(i);
         // Using the same name as an existing category is not permitted.
