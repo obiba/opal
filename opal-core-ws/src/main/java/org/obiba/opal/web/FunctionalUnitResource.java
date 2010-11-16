@@ -27,6 +27,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -151,30 +152,53 @@ public class FunctionalUnitResource {
 
   @POST
   @Path("/keys")
-  public Response createOrUpdateFunctionalUnitKeyPair(Opal.KeyPairForm kpForm) {
-    if(kpForm.hasPrivateForm() && kpForm.hasPublicForm()) {
-      unitKeyStoreService.createOrUpdateKey(unit, kpForm.getAlias(), kpForm.getPrivateForm().getAlgo(), kpForm.getPrivateForm().getSize(), getCertificateInfo(kpForm.getPublicForm()));
-    } else if(kpForm.hasPrivateImport()) {
-      if(kpForm.hasPublicForm()) {
-        unitKeyStoreService.importKey(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()), getCertificateInfo(kpForm.getPublicForm()));
-      } else if(kpForm.hasPublicImport()) {
-        unitKeyStoreService.importKey(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()), new ByteArrayInputStream(kpForm.getPublicImport().getBytes()));
-      } else {
-        throw new IllegalArgumentException("Missing information about public key for alias: " + kpForm.getAlias());
-      }
-    } else {
-      throw new IllegalArgumentException("Missing information about private key for alias: " + kpForm.getAlias());
+  public Response createFunctionalUnitKeyPair(Opal.KeyPairForm kpForm) {
+    if(unitKeyStoreService.aliasExists(unit, kpForm.getAlias())) {
+      return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "KeyPairAlreadyExists").build()).build();
     }
 
-    return Response.ok().build();
+    ResponseBuilder response = null;
+    try {
+      if(kpForm.hasPrivateForm() && kpForm.hasPublicForm()) {
+        unitKeyStoreService.createOrUpdateKey(unit, kpForm.getAlias(), kpForm.getPrivateForm().getAlgo(), kpForm.getPrivateForm().getSize(), getCertificateInfo(kpForm.getPublicForm()));
+      } else if(kpForm.hasPrivateImport()) {
+        if(kpForm.hasPublicForm()) {
+          unitKeyStoreService.importKey(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()), getCertificateInfo(kpForm.getPublicForm()));
+        } else if(kpForm.hasPublicImport()) {
+          unitKeyStoreService.importKey(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()), new ByteArrayInputStream(kpForm.getPublicImport().getBytes()));
+        } else {
+          response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "MissingPublicKeyArgument").build());
+        }
+      } else {
+        response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "MissingPrivateKeyArgument").build());
+      }
+
+      if(response == null) {
+        response = Response.created(UriBuilder.fromPath("/").path(FunctionalUnitResource.class).path("/key/" + kpForm.getAlias()).build(unit));
+      }
+    } catch(RuntimeException e) {
+      response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "KeyPairCreationFailed", e).build());
+    }
+
+    return response.build();
   }
 
   @DELETE
   @Path("/key/{alias}")
   public Response deleteFunctionalUnitKeyPair(@PathParam("alias") String alias) {
-    unitKeyStoreService.deleteKey(unit, alias);
+    if(!unitKeyStoreService.aliasExists(unit, alias)) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
 
-    return Response.ok().build();
+    ResponseBuilder response = null;
+    try {
+      unitKeyStoreService.deleteKey(unit, alias);
+      response = Response.ok();
+    } catch(RuntimeException e) {
+      response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DeleteKeyPairFailed", e).build());
+    }
+
+    return response.build();
   }
 
   @GET
