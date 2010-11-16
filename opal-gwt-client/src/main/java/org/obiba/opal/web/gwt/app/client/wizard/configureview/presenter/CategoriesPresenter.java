@@ -21,6 +21,7 @@ import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -162,6 +163,7 @@ public class CategoriesPresenter extends LocalizablesPresenter {
     public void onClick(ClickEvent event) {
       // Each time the dialog is closed (hidden), it is unbound. So we need to rebind it each time we display it.
       categoryDialogPresenter.bind();
+
       categoryDialogPresenter.revealDisplay();
     }
   }
@@ -170,11 +172,10 @@ public class CategoriesPresenter extends LocalizablesPresenter {
 
     @Override
     public void onEdit(Localizable localizable) {
-      categoryDialogPresenter.setCategoryDto(findCategoryDto(localizable.getName()));
-
       // Each time the dialog is closed (hidden), it is unbound. So we need to rebind it each time we display it.
       categoryDialogPresenter.bind();
 
+      categoryDialogPresenter.setCategoryDto(findCategoryDto(localizable.getName()));
       categoryDialogPresenter.revealDisplay();
     }
 
@@ -182,6 +183,7 @@ public class CategoriesPresenter extends LocalizablesPresenter {
       for(int categoryIndex = 0; categoryIndex < variableDto.getCategoriesArray().length(); categoryIndex++) {
         CategoryDto categoryDto = variableDto.getCategoriesArray().get(categoryIndex);
         if(categoryDto.getName().equals(name)) {
+          GWT.log("DSPATHIS found the category!");
           return categoryDto;
         }
       }

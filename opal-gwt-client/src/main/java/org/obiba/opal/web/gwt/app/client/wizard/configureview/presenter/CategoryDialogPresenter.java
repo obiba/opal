@@ -100,7 +100,8 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
   @Override
   protected void onBind() {
     if(!isBound) {
-      initDisplayComponents();
+      labelListPresenter.bind();
+      getDisplay().addInputField(labelListPresenter.getDisplay());
       addEventHandlers();
 
       isBound = true;
@@ -110,9 +111,11 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
   @Override
   protected void onUnbind() {
     if(isBound) {
-      setCategoryDto(null);
-      getDisplay().removeInputField();
       labelListPresenter.unbind();
+      getDisplay().removeInputField();
+
+      // Reset categoryDto to null, otherwise an Edit followed by an Add will look like another Edit.
+      setCategoryDto(null);
 
       isBound = false;
     }
@@ -120,16 +123,12 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
 
   @Override
   public void refreshDisplay() {
-    labelListPresenter.refreshDisplay();
   }
 
   @Override
   public void revealDisplay() {
-    if(!isEdit()) {
-      getDisplay().clear();
-    }
+    initDisplayComponents();
     getDisplay().showDialog();
-    labelListPresenter.revealDisplay();
   }
 
   @Override
@@ -142,29 +141,25 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
   }
 
   protected void initDisplayComponents() {
-    labelListPresenter.bind();
-    if(categoryDto != null) {
-      labelListPresenter.setAttributes(categoryDto.getAttributesArray());
-    }
+    setTitle();
     labelListPresenter.setAttributeToDisplay("label");
 
+    if(isEdit()) {
+      getDisplay().getCategoryName().setText(categoryDto.getName());
+      labelListPresenter.setAttributes(categoryDto.getAttributesArray());
+      labelListPresenter.updateFields();
+    } else {
+      getDisplay().clear();
+    }
+
     validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLabelRequired"));
-    setTitle();
-    populateForm();
-    getDisplay().addInputField(labelListPresenter.getDisplay());
   }
 
   private void setTitle() {
-    if(categoryDto == null) {
-      getDisplay().getCaption().setText(translations.addNewCategory());
-    } else {
+    if(isEdit()) {
       getDisplay().getCaption().setText(translations.editCategory());
-    }
-  }
-
-  private void populateForm() {
-    if(categoryDto != null) {
-      getDisplay().getCategoryName().setText(categoryDto.getName());
+    } else {
+      getDisplay().getCaption().setText(translations.addNewCategory());
     }
   }
 

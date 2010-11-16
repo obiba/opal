@@ -119,27 +119,19 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
   @Override
   public void revealDisplay() {
+    initDisplayComponents();
     if(!isEdit()) {
       getDisplay().clear();
     }
     getDisplay().showDialog();
-    labelListPresenter.revealDisplay();
   }
 
   @Override
   protected void onBind() {
     if(!isBound) {
-      labelListPresenter.setAttributes(attributes);
-      labelListPresenter.setAttributeToDisplay(attributeNameToDisplay);
       labelListPresenter.bind();
-      validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLabelRequired"));
       getDisplay().addInputField(labelListPresenter.getDisplay());
       addEventHandlers();
-      addRadioButtonNameEventHandlers();
-      resetForm();
-
-      if(isEdit()) getDisplay().setAttributeName(attributeNameToDisplay);
-      setTitle();
 
       isBound = true;
     }
@@ -148,12 +140,30 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   @Override
   protected void onUnbind() {
     if(isBound) {
-      setAttributeNameToDisplay(null);
-      getDisplay().removeInputField();
       labelListPresenter.unbind();
+      getDisplay().removeInputField();
+
+      // Reset attributeNameToDisplay to null, otherwise an Edit followed by an Add will look like another Edit.
+      setAttributeNameToDisplay(null);
 
       isBound = false;
     }
+  }
+
+  protected void initDisplayComponents() {
+    setTitle();
+    labelListPresenter.setAttributeToDisplay(attributeNameToDisplay);
+
+    if(isEdit()) {
+      getDisplay().setAttributeName(attributeNameToDisplay);
+      labelListPresenter.setAttributes(attributes);
+      labelListPresenter.updateFields();
+    } else {
+      resetForm();
+      getDisplay().clear();
+    }
+
+    validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLabelRequired"));
   }
 
   private void setTitle() {
@@ -165,9 +175,9 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   }
 
   private void resetForm() {
+    getDisplay().selectNameDropdownRadioChoice();
     getDisplay().setLabelsEnabled(true);
     getDisplay().setAttributeNameEnabled(false);
-    getDisplay().selectNameDropdownRadioChoice();
     getDisplay().getAttributeNameField().setText("");
   }
 
@@ -205,6 +215,7 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
       }
     }));
 
+    addRadioButtonNameEventHandlers();
   }
 
   private void addRadioButtonNameEventHandlers() {

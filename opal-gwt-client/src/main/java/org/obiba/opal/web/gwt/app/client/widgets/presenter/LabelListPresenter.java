@@ -75,7 +75,7 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
         @SuppressWarnings("unchecked")
         JsArray<LocaleDto> languages = (resource != null) ? resource : (JsArray<LocaleDto>) JsArray.createArray();
         getDisplay().setLanguages(languages);
-        getDisplay().displayAttributes(attributeToDisplay, attributes);
+        updateFields();
       }
     }).send();
   }
@@ -102,6 +102,7 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
   }
 
   public void updateFields() {
+    getDisplay().clearAttributes();
     getDisplay().displayAttributes(attributeToDisplay, attributes);
   }
 

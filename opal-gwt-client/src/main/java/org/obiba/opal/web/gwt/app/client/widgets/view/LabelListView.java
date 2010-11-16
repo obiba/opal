@@ -94,18 +94,19 @@ public class LabelListView extends Composite implements LabelListPresenter.Displ
 
   @Override
   public void displayAttributes(String attributeName, JsArray<AttributeDto> attributes) {
-    JsArray<AttributeDto> nonNullAttributes = JsArrays.toSafeArray(attributes);
+    if(attributeName != null) {
+      JsArray<AttributeDto> nonNullAttributes = JsArrays.toSafeArray(attributes);
 
-    for(int i = 0; i < nonNullAttributes.length(); i++) {
-      AttributeDto dto = nonNullAttributes.get(i);
-      if(attributeName != null && attributeName.equals(dto.getName())) {
-        if(languageLabelMap.containsKey(dto.getLocale())) {
-          TextBox textBox = languageLabelMap.get(dto.getLocale());
-          textBox.setValue(dto.getValue());
+      for(int i = 0; i < nonNullAttributes.length(); i++) {
+        AttributeDto dto = nonNullAttributes.get(i);
+        if(attributeName.equals(dto.getName())) {
+          if(languageLabelMap.containsKey(dto.getLocale())) {
+            TextBox textBox = languageLabelMap.get(dto.getLocale());
+            textBox.setValue(dto.getValue());
+          }
         }
       }
     }
-
   }
 
   @Override
