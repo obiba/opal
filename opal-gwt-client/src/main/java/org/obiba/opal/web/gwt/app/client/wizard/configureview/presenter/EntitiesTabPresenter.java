@@ -15,6 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
@@ -63,8 +64,7 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
   /**
    * The {@link ViewDto} of the view being configured.
    * 
-   * When the tab's save button is pressed, changes are applied to this ViewDto (i.e., to its JavaScriptViewDto
-   * extension).
+   * When the tab's save button is pressed, changes are applied to this ViewDto.
    */
   private ViewDto viewDto;
 
@@ -163,6 +163,14 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
     } else {
       getDisplay().setEntitiesToView(EntitiesToView.ALL);
       getDisplay().setScript("");
+    }
+  }
+
+  class ViewConfigurationRequiredEventHandler implements ViewConfigurationRequiredEvent.Handler {
+
+    @Override
+    public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
+      EntitiesTabPresenter.this.setViewDto(event.getView());
     }
   }
 

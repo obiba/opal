@@ -87,11 +87,8 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
 
   @Override
   public void refreshDisplay() {
-    if(viewDto != null) {
-      refreshLocales();
-      refreshTableData();
-      refreshDependencies();
-    }
+    refreshLocales();
+    refreshDependencies();
   }
 
   @Override
@@ -111,8 +108,9 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
     this.viewDto = viewDto;
 
     viewDto.setFromArray(JsArrays.toSafeArray(viewDto.getFromArray()));
-
     afterViewDtoSet();
+
+    refreshDisplay();
   }
 
   public void setVariableDto(VariableDto variableDto) {
@@ -120,6 +118,8 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
 
     variableDto.setAttributesArray(JsArrays.toSafeArray(variableDto.getAttributesArray()));
     variableDto.setCategoriesArray(JsArrays.toSafeArray(variableDto.getCategoriesArray()));
+
+    refreshDisplay();
   }
 
   public VariableDto getVariableDto() {
@@ -127,32 +127,34 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
   }
 
   void refreshLocales() {
-    ResourceRequestBuilderFactory.<JsArray<LocaleDto>> newBuilder().forResource("/datasource/" + viewDto.getDatasourceName() + "/table/" + viewDto.getName() + "/locales" + "?locale=en").get().withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
+    if(viewDto != null) {
+      ResourceRequestBuilderFactory.<JsArray<LocaleDto>> newBuilder().forResource("/datasource/" + viewDto.getDatasourceName() + "/table/" + viewDto.getName() + "/locales" + "?locale=en").get().withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
 
-      @Override
-      public void onResource(Response response, JsArray<LocaleDto> locales) {
-        getDisplay().setLocales(JsArrays.toSafeArray(locales));
-      }
-    }).send();
+        @Override
+        public void onResource(Response response, JsArray<LocaleDto> locales) {
+          getDisplay().setLocales(JsArrays.toSafeArray(locales));
+          refreshTableData();
+        }
+      }).send();
+    }
   }
 
   void refreshTableData() {
-    List<Localizable> localizables = getLocalizables(getDisplay().getSelectedLocale());
-    Collections.sort(localizables);
+    if(variableDto != null) {
+      List<Localizable> localizables = getLocalizables(getDisplay().getSelectedLocale());
+      Collections.sort(localizables);
 
-    getDisplay().setTableData(localizables);
+      getDisplay().setTableData(localizables);
+    }
   }
 
   protected void addEventHandlers() {
-    // Register common handlers
     super.registerHandler(eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
     super.registerHandler(eventBus.addHandler(DerivedVariableConfigurationRequiredEvent.getType(), new DerivedVariableConfigurationRequiredEventHandler()));
     super.registerHandler(getDisplay().addLocaleChangeHandler(new LocaleChangeHandler()));
     super.registerHandler(getDisplay().addAddButtonClickHandler(getAddButtonClickHandler()));
     addActionHandler(); // for "Edit" and "Delete" links
     super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
-
-    // Register additional handlers provided by subclasses
   }
 
   private void addActionHandler() {

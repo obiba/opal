@@ -145,6 +145,7 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   @Override
   protected void onUnbind() {
     if(isBound) {
+      setAttributeNameToDisplay(null);
       getDisplay().removeInputField();
       labelListPresenter.unbind();
 

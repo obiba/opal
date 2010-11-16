@@ -70,8 +70,8 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.inject.Inject;
 
 /**
@@ -162,13 +162,10 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
   @Override
   public void revealDisplay() {
-    // Always show the Categories detail tab first.
-    getDisplay().displayDetailTab(0);
   }
 
   @Override
   public void refreshDisplay() {
-    initDisplayComponents();
   }
 
   @Override
@@ -200,9 +197,12 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     scriptWidget.getDisplay().clearResults();
     scriptWidget.getDisplay().showPaging(false);
 
-    categoriesPresenter.refreshDisplay();
-    attributesPresenter.refreshDisplay();
     getDisplay().saveChangesEnabled(false);
+
+    // Always show the Categories detail tab first.
+    getDisplay().displayDetailTab(0);
+
+    initDisplayComponents();
   }
 
   private void initDisplayComponents() {
@@ -212,16 +212,16 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     variables = getVariableList();
     refreshVariableSuggestions();
 
-    if(variables.size() == 0) {
+    if(variables.isEmpty()) {
       // Clear variable selection.
       currentSelectedVariableIndex = -1;
       getDisplay().setSelectedVariableName(null, null, getNextVariableName());
 
       // Initialize the newVariableDto field (for creation of a new derived variable) and
       // announce to the world that this is the VariableDto currently being configured.
-      VariableDto emptyVariableDto = VariableDto.create();
-      emptyVariableDto.setName("");
-      eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(emptyVariableDto));
+      newVariableDto = VariableDto.create();
+      newVariableDto.setName("");
+      eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(newVariableDto));
       getDisplay().removeButtonEnabled(false);
     } else {
       currentSelectedVariableIndex = 0;
@@ -422,6 +422,14 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     @Override
     public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
       VariablesListTabPresenter.this.setViewDto(event.getView());
+    }
+  }
+
+  class DerivedVariableConfigurationRequiredHandler implements DerivedVariableConfigurationRequiredEvent.Handler {
+
+    @Override
+    public void onDerivedVariableConfigurationRequired(DerivedVariableConfigurationRequiredEvent event) {
+      getDisplay().setNewVariable(event.getVariable());
     }
   }
 
@@ -657,16 +665,6 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
         }
       };
       eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "deleteVariableTitle", "confirmVariableDelete"));
-    }
-
-  }
-
-  class DerivedVariableConfigurationRequiredHandler implements DerivedVariableConfigurationRequiredEvent.Handler {
-
-    @Override
-    public void onDerivedVariableConfigurationRequired(DerivedVariableConfigurationRequiredEvent event) {
-
-      getDisplay().setNewVariable(event.getVariable());
     }
 
   }

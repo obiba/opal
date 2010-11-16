@@ -64,6 +64,8 @@ public class AttributesPresenter extends LocalizablesPresenter {
   protected List<Localizable> getLocalizables(String localeName) {
     List<Localizable> localizables = new ArrayList<Localizable>();
 
+    variableDto.setAttributesArray(JsArrays.toSafeArray(variableDto.getAttributesArray()));
+
     for(int i = 0; i < variableDto.getAttributesArray().length(); i++) {
       final AttributeDto attributeDto = variableDto.getAttributesArray().get(i);
 

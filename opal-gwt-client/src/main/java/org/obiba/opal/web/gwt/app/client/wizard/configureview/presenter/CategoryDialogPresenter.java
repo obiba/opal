@@ -107,6 +107,7 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
   @Override
   protected void onUnbind() {
     if(isBound) {
+      setCategoryDto(null);
       getDisplay().removeInputField();
       labelListPresenter.unbind();
 
@@ -226,7 +227,9 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
   public void setCategoryDto(CategoryDto categoryDto) {
     this.categoryDto = categoryDto;
 
-    categoryDto.setAttributesArray(JsArrays.toSafeArray(categoryDto.getAttributesArray()));
+    if(categoryDto != null) {
+      categoryDto.setAttributesArray(JsArrays.toSafeArray(categoryDto.getAttributesArray()));
+    }
   }
 
   public void setCategories(JsArray<CategoryDto> categories) {

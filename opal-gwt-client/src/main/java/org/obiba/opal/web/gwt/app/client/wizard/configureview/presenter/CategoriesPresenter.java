@@ -60,6 +60,8 @@ public class CategoriesPresenter extends LocalizablesPresenter {
   protected List<Localizable> getLocalizables(String localeName) {
     List<Localizable> localizables = new ArrayList<Localizable>();
 
+    variableDto.setCategoriesArray(JsArrays.toSafeArray(variableDto.getCategoriesArray()));
+
     for(int categoryIndex = 0; categoryIndex < variableDto.getCategoriesArray().length(); categoryIndex++) {
       final CategoryDto categoryDto = variableDto.getCategoriesArray().get(categoryIndex);
       categoryDto.setAttributesArray(JsArrays.toSafeArray(categoryDto.getAttributesArray()));

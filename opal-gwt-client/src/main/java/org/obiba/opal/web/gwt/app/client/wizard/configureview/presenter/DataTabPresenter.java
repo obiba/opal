@@ -23,6 +23,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.ui.HasCollection;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -104,9 +105,18 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
   }
 
   private void addEventHandlers() {
+    super.registerHandler(eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
     super.registerHandler(getDisplay().addSaveChangesClickHandler(new SaveChangesClickHandler()));
     super.registerHandler(eventBus.addHandler(TableListUpdateEvent.getType(), new FormChangedHandler()));
     super.registerHandler(eventBus.addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
+  }
+
+  class ViewConfigurationRequiredEventHandler implements ViewConfigurationRequiredEvent.Handler {
+
+    @Override
+    public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
+      DataTabPresenter.this.setViewDto(event.getView());
+    }
   }
 
   class SaveChangesClickHandler implements ClickHandler {
