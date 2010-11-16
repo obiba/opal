@@ -526,25 +526,32 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     @Override
     public void onClick(ClickEvent event) {
-      if(validate()) {
-        scriptWidget.evaluateScript(new ResponseCodeCallback() {
+      variableListViewDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+      currentVariableDto = getDisplay().getVariableDto();
+      if(isEmptyVariable()) {
+        // This view has no variables. Clear the variable list and save.
+        variableListViewDto.clearVariablesArray();
+        eventBus.fireEvent(new ViewSaveRequiredEvent(viewDto));
+      } else {
+        // Validate current variable and save to variable list.
+        if(validate()) {
+          scriptWidget.evaluateScript(new ResponseCodeCallback() {
 
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            int statusCode = response.getStatusCode();
-            if(statusCode == Response.SC_OK) {
-              updateViewDto();
-            } else {
-              eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, translations.scriptContainsErrorsAndWasNotSaved(), null));
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              int statusCode = response.getStatusCode();
+              if(statusCode == Response.SC_OK) {
+                updateViewDto();
+              } else {
+                eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, translations.scriptContainsErrorsAndWasNotSaved(), null));
+              }
             }
-          }
-        });
+          });
+        }
       }
     }
 
     private void updateViewDto() {
-      variableListViewDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
-      currentVariableDto = getDisplay().getVariableDto();
       updateCategories();
       updateAttributes();
       updateView(variableListViewDto);
