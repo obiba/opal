@@ -39,11 +39,13 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.VariableAddR
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.VariablesListTabView;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter.Mode;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
@@ -569,11 +571,20 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     private void updateAttributes() {
       // Add attributes to current attributes. (The 'script' is stored as an attribute, so one attribute will always
       // exist.)
-      if(attributesPresenter.getVariableDto().getAttributesArray() != null) {
-        for(int i = 0; i < attributesPresenter.getVariableDto().getAttributesArray().length(); i++) {
-          currentVariableDto.getAttributesArray().push(attributesPresenter.getVariableDto().getAttributesArray().get(i));
-        }
+      AttributeDto currentVariableScriptAttribute = getAttributeByName(VariablesListTabView.SCRIPT_NAME, currentVariableDto.getAttributesArray());
+      AttributeDto existingVariableScriptAttribute = getAttributeByName(VariablesListTabView.SCRIPT_NAME, attributesPresenter.getVariableDto().getAttributesArray());
+      if(currentVariableScriptAttribute != null) {
+        existingVariableScriptAttribute.setValue(currentVariableScriptAttribute.getValue());
+      } else {
+        currentVariableDto.getAttributesArray().push(currentVariableScriptAttribute);
       }
+    }
+
+    private AttributeDto getAttributeByName(String attributeName, JsArray<AttributeDto> attributes) {
+      for(int i = 0; i < attributes.length(); i++) {
+        if(attributes.get(i).getName().equals(attributeName)) return attributes.get(i);
+      }
+      return null;
     }
 
     private void updateView(VariableListViewDto variableListViewDto) {

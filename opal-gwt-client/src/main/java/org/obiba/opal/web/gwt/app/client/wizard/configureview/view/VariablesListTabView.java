@@ -49,6 +49,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class VariablesListTabView extends Composite implements VariablesListTabPresenter.Display {
 
+  public static final String SCRIPT_NAME = "script";
+
   private static VariablesListTabViewUiBinder uiBinder = GWT.create(VariablesListTabViewUiBinder.class);
 
   @UiField(provided = true)
@@ -304,7 +306,7 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
     List<AttributeDto> attributeList = JsArrays.toList(attributes);
     boolean foundScript = false;
     for(AttributeDto dto : attributeList) {
-      if(dto.getName().equals("script")) {
+      if(dto.getName().equals(SCRIPT_NAME)) {
         foundScript = true;
         setScript(dto.getValue());
         break;
