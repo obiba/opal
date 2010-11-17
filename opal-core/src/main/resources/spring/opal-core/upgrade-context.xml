@@ -76,7 +76,19 @@
           </property>
         </bean>
         <bean class="org.obiba.runtime.upgrade.InstallStepAdapter">
+          <property name="upgradeStep">
+            <bean class="org.obiba.runtime.upgrade.support.MethodInvokingUpgradeStep">
+              <property name="description" value="Install Key Schema." />
+              <property name="methodOwner" ref="&amp;keySessionFactory" />
+              <property name="methodName" value="createDatabaseSchema" />
+            </bean>
+          </property>
+        </bean>
+        <bean class="org.obiba.runtime.upgrade.InstallStepAdapter">
           <property name="upgradeStep" ref="quartzSchema-1.4.0" />
+        </bean>
+        <bean class="org.obiba.opal.core.runtime.upgrade.CreateParticipantIdentifiersTableStep">
+          <property name="keysSessionFactory" ref="keySessionFactory" />
         </bean>
         <!--  
         <bean id="createSpringBatchSchema" class="org.obiba.runtime.upgrade.InstallStepAdapter">
