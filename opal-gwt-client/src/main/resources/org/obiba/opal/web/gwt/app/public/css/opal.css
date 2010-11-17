@@ -20,6 +20,10 @@ body {
   height: 100%;
 }
 
+a, a:visited, a:hover {
+	color:#000000;
+}
+
 a:hover {
 	cursor: pointer;
 	text-decoration:underline;
@@ -261,7 +265,7 @@ margin-left:10px;
     padding-top: 0.6em;
 }
 
-.topbar a, a:visited, a:hover {
+.topbar a, .topbar a:visited, .topbar a:hover {
 	color:#ffffff;
 }
 
@@ -888,6 +892,18 @@ div.variablesListTabContent .gwt-Label {
 
 /* Wizard */
 
+.wizard .p {
+    padding-top: 10px;
+    padding-bottom: 10px;     
+}
+
+.wizard .step > div.title {
+	font-weight: bold;
+	margin-bottom: 10px;
+  	color: #444444;
+  	font-size: 1em;
+}
+
 .resizable-handle.resizable-se {
 	cursor:se-resize;
     display:block;
@@ -896,7 +912,6 @@ div.variablesListTabContent .gwt-Label {
     position:relative;
     top:2em;
     width:16px;
-    z-index: 1000;
     background-image: url(image/256x240_icons.png);
     background-position:-84px -224px;
 }

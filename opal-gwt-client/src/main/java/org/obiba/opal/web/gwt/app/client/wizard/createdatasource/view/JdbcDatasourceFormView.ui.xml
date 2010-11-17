@@ -5,7 +5,7 @@
   ui:generateLocales="default">
   
   <g:HTMLPanel>
-    <table class="gwt-KeyValue" cellspacing="10">
+    <table class="full-width" cellspacing="10">
           <tbody>
             <tr>
               <td colspan="2">
@@ -25,7 +25,7 @@
                 <g:Label addStyleNames="indent"><ui:msg description="URL label">URL</ui:msg>:</g:Label>          
               </td>
               <td>
-                <g:TextBox ui:field="url" addStyleNames="small-indent" />
+                <g:TextBox ui:field="url" addStyleNames="small-indent not-so-full-width" />
               </td>
             </tr>
             <tr>
@@ -33,7 +33,7 @@
                 <g:Label addStyleNames="indent"><ui:msg description="User Name label">User Name</ui:msg>:</g:Label>          
               </td>
               <td>
-                <g:TextBox ui:field="username" addStyleNames="small-indent" />
+                <g:TextBox ui:field="username" addStyleNames="small-indent not-so-full-width" />
               </td>
             </tr>
             <tr>
@@ -41,7 +41,7 @@
                 <g:Label addStyleNames="indent"><ui:msg description="Password label">Password</ui:msg>:</g:Label>          
               </td>
               <td>
-                <g:PasswordTextBox ui:field="password" addStyleNames="small-indent" />
+                <g:PasswordTextBox ui:field="password" addStyleNames="small-indent not-so-full-width" />
               </td>
             </tr>
             <tr>
@@ -54,7 +54,7 @@
                 <g:Label addStyleNames="indent"><ui:msg description="Created Timestamp Column Name label">Created Timestamp Column Name</ui:msg>:</g:Label>          
               </td>
               <td>
-                <g:TextBox ui:field="defaultCreatedTimestampColumnName" addStyleNames="small-indent" />
+                <g:TextBox ui:field="defaultCreatedTimestampColumnName" addStyleNames="small-indent not-so-full-width" />
               </td>
             </tr>
             <tr>
@@ -62,7 +62,7 @@
                 <g:Label addStyleNames="indent"><ui:msg description="Updated Timestamp Column Name label">Updated Timestamp Column Name</ui:msg>:</g:Label>          
               </td>
               <td>
-                <g:TextBox ui:field="defaultUpdatedTimestampColumnName" addStyleNames="small-indent" />
+                <g:TextBox ui:field="defaultUpdatedTimestampColumnName" addStyleNames="small-indent not-so-full-width" />
               </td>
             </tr>
             <tr>

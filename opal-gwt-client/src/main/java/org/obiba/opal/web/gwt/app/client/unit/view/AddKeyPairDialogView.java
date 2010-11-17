@@ -10,7 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.unit.view;
 
 import org.obiba.opal.web.gwt.app.client.unit.presenter.AddKeyPairDialogPresenter;
-import org.obiba.opal.web.gwt.app.client.unit.presenter.AddKeyPairDialogPresenter.ValidationHandler;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.NumericTextBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;

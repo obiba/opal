@@ -20,17 +20,14 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewCreationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourceStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.FormatSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.UploadVariablesStepPresenter;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -53,8 +50,6 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
     HasClickHandlers getHelp();
 
     MenuItem getDatasourcesItem();
-
-    MenuItem getNewDatasourceItem();
 
     MenuItem getNewViewItem();
 
@@ -91,9 +86,6 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
   private Provider<FunctionalUnitPresenter> functionalUnitPresenter;
 
   @Inject
-  private Provider<CreateDatasourceStepPresenter> createDatasourceStepPresenter;
-
-  @Inject
   private Provider<NavigatorPresenter> navigationPresenter;
 
   @Inject
@@ -117,8 +109,6 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
   private WidgetPresenter<?> workbench;
 
   private boolean unbindPreviousWorkbench;
-
-  private static Translations translations = GWT.create(Translations.class);
 
   /**
    * @param display
@@ -161,15 +151,6 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       public void execute() {
         eventBus.fireEvent(new WorkbenchChangeEvent(functionalUnitPresenter.get()));
         getDisplay().setCurrentSelection(getDisplay().getUnitsItem());
-      }
-    });
-
-    getDisplay().getNewDatasourceItem().setCommand(new Command() {
-
-      @Override
-      public void execute() {
-        eventBus.fireEvent(new WorkbenchChangeEvent(createDatasourceStepPresenter.get()));
-        getDisplay().setCurrentSelection(getDisplay().getDatasourcesItem());
       }
     });
 

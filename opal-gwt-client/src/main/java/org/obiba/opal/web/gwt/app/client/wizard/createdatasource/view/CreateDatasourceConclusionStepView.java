@@ -17,12 +17,9 @@ import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErr
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -37,19 +34,10 @@ public class CreateDatasourceConclusionStepView extends Composite implements Cre
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   @UiField
-  Label summary;
-
-  @UiField
-  Label completed;
-
-  @UiField
   Label failed;
 
   @UiField
   SimplePanel datasourcePanel;
-
-  @UiField
-  Button returnButton;
 
   @UiField
   DatasourceParsingErrorTable datasourceParsingErrorTable;
@@ -58,9 +46,7 @@ public class CreateDatasourceConclusionStepView extends Composite implements Cre
 
   public CreateDatasourceConclusionStepView() {
     initWidget(uiBinder.createAndBindUi(this));
-    completed.setVisible(false);
     failed.setVisible(false);
-    returnButton.setVisible(false);
     datasourceParsingErrorTable.setVisible(false);
   }
 
@@ -78,27 +64,17 @@ public class CreateDatasourceConclusionStepView extends Composite implements Cre
   }
 
   @Override
-  public HandlerRegistration addReturnClickHandler(ClickHandler handler) {
-    return returnButton.addClickHandler(handler);
-  }
-
-  @Override
   public void setDatasourceRequestDisplay(ResourceRequestPresenter.Display resourceRequestDisplay) {
     datasourcePanel.setWidget(resourceRequestDisplay.asWidget());
   }
 
   @Override
   public void setCompleted() {
-    summary.setText(translations.datasourceCreationCompleted());
-    completed.setVisible(true);
-    returnButton.setVisible(true);
   }
 
   @Override
   public void setFailed(ClientErrorDto errorDto) {
-    summary.setText(translations.datasourceCreationFailed());
     failed.setVisible(true);
-    returnButton.setVisible(true);
 
     if(errorDto != null && errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
       datasourceParsingErrorTable.setErrors(errorDto);

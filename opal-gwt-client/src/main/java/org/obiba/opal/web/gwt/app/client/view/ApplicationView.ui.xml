@@ -25,7 +25,6 @@
                 <g:MenuItem>
                   <ui:msg description="New label">New</ui:msg>
                   <g:MenuBar vertical="true">
-                    <g:MenuItem ui:field="newDatasourceItem"><ui:msg description="Datasource label">Datasource</ui:msg></g:MenuItem>
                     <g:MenuItem ui:field="newViewItem"><ui:msg description="View label">View</ui:msg></g:MenuItem>
                   </g:MenuBar>
                 </g:MenuItem>

@@ -20,14 +20,14 @@ import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorView;
 import org.obiba.opal.web.gwt.app.client.navigator.view.TableView;
 import org.obiba.opal.web.gwt.app.client.navigator.view.VariableView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourceConclusionStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourceStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CsvDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.ExcelDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.FsDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.HibernateDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.JdbcDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.CreateDatasourceConclusionStepView;
-import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.CreateDatasourceStepView;
+import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.CreateDatasourceView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.CsvDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.ExcelDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.FsDatasourceFormView;
@@ -46,13 +46,14 @@ public class NavigatorModule extends AbstractGinModule {
   protected void configure() {
     // Bind concrete implementations to interfaces
     bind(NavigatorPresenter.Display.class).to(NavigatorView.class).in(Singleton.class);
+    bind(CreateDatasourcePresenter.Display.class).to(CreateDatasourceView.class).in(Singleton.class);
 
     // Don't bind as singleton because the ApplicationPresenter expects a new instance on every display
     bind(NavigatorTreePresenter.Display.class).to(NavigatorTreeView.class);
     bind(DatasourcePresenter.Display.class).to(DatasourceView.class);
     bind(TablePresenter.Display.class).to(TableView.class);
     bind(VariablePresenter.Display.class).to(VariableView.class);
-    bind(CreateDatasourceStepPresenter.Display.class).to(CreateDatasourceStepView.class);
+
     bind(CreateDatasourceConclusionStepPresenter.Display.class).to(CreateDatasourceConclusionStepView.class);
     bind(HibernateDatasourceFormPresenter.Display.class).to(HibernateDatasourceFormView.class);
     bind(ExcelDatasourceFormPresenter.Display.class).to(ExcelDatasourceFormView.class);

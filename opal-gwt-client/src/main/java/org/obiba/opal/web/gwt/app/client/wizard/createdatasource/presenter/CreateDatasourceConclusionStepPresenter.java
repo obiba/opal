@@ -15,9 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter.ResourceClickHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.view.ResourceRequestView;
@@ -30,42 +28,22 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<CreateDatasourceConclusionStepPresenter.Display> {
 
-  public interface Display extends WidgetDisplay {
-
-    HandlerRegistration addReturnClickHandler(ClickHandler handler);
-
-    void setDatasourceRequestDisplay(ResourceRequestPresenter.Display resourceRequestDisplay);
-
-    void setCompleted();
-
-    void setFailed(ClientErrorDto errorDto);
-  }
-
-  @Inject
-  private Provider<NavigatorPresenter> navigatorPresenter;
-
-  @Inject
-  private Provider<CreateDatasourceStepPresenter> createDatasourceStepPresenter;
-
   private DatasourceDto datasourceDto;
 
-  private WidgetPresenter<?> returnPresenter;
+  private DatasourceCreatedCallback createdCallback;
 
   @Inject
   public CreateDatasourceConclusionStepPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
   }
 
-  public void setDatasourceFactory(DatasourceFactoryDto dto) {
+  public void setDatasourceFactory(final DatasourceFactoryDto dto) {
 
     ResourceRequestPresenter<DatasourceDto> resourceRequestPresenter = new ResourceRequestPresenter<DatasourceDto>(new ResourceRequestView(), eventBus, ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasource/" + dto.getName()).put().withResourceBody(DatasourceFactoryDto.stringify(dto)), new ResponseCodeCallback() {
 
@@ -74,12 +52,21 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
         if(response.getStatusCode() == 201) {
           datasourceDto = (DatasourceDto) JsonUtils.unsafeEval(response.getText());
           getDisplay().setCompleted();
-          returnPresenter = createDatasourceStepPresenter.get();
+          if(createdCallback != null) {
+            createdCallback.onSuccess(dto);
+          }
         } else if(response.getText() != null && response.getText().length() != 0) {
           GWT.log(response.getText());
-          getDisplay().setFailed((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
+          ClientErrorDto error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+          getDisplay().setFailed(error);
+          if(createdCallback != null) {
+            createdCallback.onFailure(dto, error);
+          }
         } else {
           getDisplay().setFailed(null);
+          if(createdCallback != null) {
+            createdCallback.onFailure(dto, null);
+          }
         }
       }
 
@@ -95,7 +82,7 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
 
       @Override
       public void onClick(ClickEvent arg0) {
-        eventBus.fireEvent(new WorkbenchChangeEvent(navigatorPresenter.get()));
+
         if(datasourceDto != null) {
           eventBus.fireEvent(new DatasourceSelectionChangeEvent(datasourceDto));
         }
@@ -110,8 +97,8 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
     resourceRequestPresenter.sendRequest();
   }
 
-  public void setReturnPresenter(WidgetPresenter<?> presenter) {
-    this.returnPresenter = presenter;
+  public void setDatasourceCreatedCallback(DatasourceCreatedCallback createdCallback) {
+    this.createdCallback = createdCallback;
   }
 
   @Override
@@ -121,11 +108,6 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
 
   @Override
   protected void onBind() {
-    addEventHandlers();
-  }
-
-  protected void addEventHandlers() {
-    super.registerHandler(getDisplay().addReturnClickHandler(new ReturnClickHandler()));
   }
 
   @Override
@@ -144,12 +126,24 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
   public void revealDisplay() {
   }
 
-  class ReturnClickHandler implements ClickHandler {
+  //
+  // Interfaces
+  //
 
-    @Override
-    public void onClick(ClickEvent arg0) {
-      eventBus.fireEvent(new WorkbenchChangeEvent(returnPresenter));
-    }
+  public interface Display extends WidgetDisplay {
+
+    void setDatasourceRequestDisplay(ResourceRequestPresenter.Display resourceRequestDisplay);
+
+    void setCompleted();
+
+    void setFailed(ClientErrorDto errorDto);
+  }
+
+  public interface DatasourceCreatedCallback {
+
+    public void onSuccess(DatasourceFactoryDto factory);
+
+    public void onFailure(DatasourceFactoryDto factory, ClientErrorDto error);
 
   }
 

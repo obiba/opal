@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import net.customware.gwt.presenter.client.EventBus;
@@ -21,8 +22,11 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -35,16 +39,14 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasourceStepPresenter.Display> {
+public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourcePresenter.Display> {
   //
   // Instance Variables
   //
-
-  @Inject
-  private Provider<ApplicationPresenter> applicationPresenter;
 
   @Inject
   private Provider<NavigatorPresenter> navigatorPresenter;
@@ -74,7 +76,7 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
   //
 
   @Inject
-  public CreateDatasourceStepPresenter(final Display display, final EventBus eventBus) {
+  public CreateDatasourcePresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
   }
 
@@ -108,19 +110,23 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
     for(DatasourceFormPresenter formPresenter : datasourceFormPresenters) {
       if(formPresenter.isForType(getDisplay().getDatasourceType())) {
         getDisplay().setDatasourceForm(formPresenter);
-        break;
+        return;
       }
     }
+    getDisplay().setDatasourceForm(null);
   }
 
   protected void addEventHandlers() {
     super.registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
+    super.registerHandler(getDisplay().addFinishClickHandler(new FinishClickHandler()));
     super.registerHandler(getDisplay().addCreateClickHandler(new CreateClickHandler()));
     super.registerHandler(getDisplay().addDatasourceTypeChangeHandler(new DatasourceTypeChangeHandler()));
+    getDisplay().setDatasourceSelectionTypeValidationHandler(new DatasourceSelectionTypeValidationHandler(eventBus));
   }
 
   @Override
   public void revealDisplay() {
+    getDisplay().showDialog();
   }
 
   @Override
@@ -153,11 +159,15 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
 
   public interface Display extends WidgetDisplay {
 
-    String getDatasourceName();
+    HasText getDatasourceName();
+
+    void setDatasourceSelectionTypeValidationHandler(ValidationHandler handler);
 
     String getDatasourceType();
 
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
+
+    HandlerRegistration addFinishClickHandler(ClickHandler handler);
 
     HandlerRegistration addCreateClickHandler(ClickHandler handler);
 
@@ -166,12 +176,40 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
     void setDatasourceForm(DatasourceFormPresenter formPresenter);
 
     DatasourceFormPresenter getDatasourceForm();
+
+    void showDialog();
+
+    void hideDialog();
+
+    void setConclusion(CreateDatasourceConclusionStepPresenter presenter);
+  }
+
+  class DatasourceSelectionTypeValidationHandler extends AbstractValidationHandler {
+
+    public DatasourceSelectionTypeValidationHandler(EventBus eventBus) {
+      super(eventBus);
+    }
+
+    @Override
+    protected Set<FieldValidator> getValidators() {
+      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      validators.add(new RequiredTextValidator(getDisplay().getDatasourceName(), "DatasourceNameRequired"));
+      return validators;
+    }
   }
 
   class CancelClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent arg0) {
+      getDisplay().hideDialog();
+    }
+  }
+
+  class FinishClickHandler implements ClickHandler {
+
+    public void onClick(ClickEvent arg0) {
       eventBus.fireEvent(new WorkbenchChangeEvent(navigatorPresenter.get()));
+      getDisplay().hideDialog();
     }
   }
 
@@ -196,7 +234,7 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
     }
 
     private String getDatasourceName() {
-      return getDisplay().getDatasourceName().trim();
+      return getDisplay().getDatasourceName().getText().trim();
     }
 
     private boolean validateDatasourceNameUnicity(final String datasourceName, JsArray<DatasourceDto> datasources) {
@@ -222,8 +260,7 @@ public class CreateDatasourceStepPresenter extends WidgetPresenter<CreateDatasou
 
       CreateDatasourceConclusionStepPresenter presenter = createDatasourceConclusionStepPresenter.get();
       presenter.setDatasourceFactory(dto);
-      presenter.setReturnPresenter(CreateDatasourceStepPresenter.this);
-      eventBus.fireEvent(new WorkbenchChangeEvent(presenter));
+      getDisplay().setConclusion(presenter);
     }
   }
 }

@@ -108,22 +108,6 @@ public class WizardDialogBox extends DialogBox {
     button.addStyleName("small-top-margin");
   }
 
-  public void setFinishVisible(boolean visible) {
-    finish.setVisible(visible);
-  }
-
-  public void setNextVisible(boolean visible) {
-    next.setVisible(visible);
-  }
-
-  public void setPreviousVisible(boolean visible) {
-    previous.setVisible(visible);
-  }
-
-  public void setCancelVisible(boolean visible) {
-    cancel.setVisible(visible);
-  }
-
   public void setFinishEnabled(boolean enabled) {
     finish.setEnabled(enabled);
   }

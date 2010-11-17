@@ -9,9 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.unit.presenter;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import net.customware.gwt.presenter.client.EventBus;
@@ -23,9 +21,11 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.unit.event.KeyPairCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
@@ -101,12 +101,6 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
 
   }
 
-  public interface ValidationHandler {
-
-    public boolean validate();
-
-  }
-
   @Inject
   public AddKeyPairDialogPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
@@ -141,8 +135,8 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
   }
 
   private void addValidators() {
-    getDisplay().setPrivateKeyValidationHandler(new PrivateKeyValidationHandler());
-    getDisplay().setPublicKeyValidationHandler(new PublicKeyValidationHandler());
+    getDisplay().setPrivateKeyValidationHandler(new PrivateKeyValidationHandler(eventBus));
+    getDisplay().setPublicKeyValidationHandler(new PublicKeyValidationHandler(eventBus));
   }
 
   private void addEventHandlers() {
@@ -239,32 +233,11 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
   // Validation
   //
 
-  private abstract class AbstractValidationHandler implements ValidationHandler {
-
-    protected abstract Set<FieldValidator> getValidators();
-
-    @Override
-    public boolean validate() {
-      List<String> messages = new ArrayList<String>();
-      String message;
-      for(FieldValidator validator : getValidators()) {
-        message = validator.validate();
-        if(message != null) {
-          messages.add(message);
-        }
-      }
-
-      if(messages.size() > 0) {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, messages, null));
-        return false;
-      } else {
-        return true;
-      }
-    }
-
-  }
-
   private class PrivateKeyValidationHandler extends AbstractValidationHandler {
+
+    public PrivateKeyValidationHandler(EventBus eventBus) {
+      super(eventBus);
+    }
 
     @Override
     protected Set<FieldValidator> getValidators() {
@@ -279,6 +252,10 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
   }
 
   private class PublicKeyValidationHandler extends AbstractValidationHandler {
+
+    public PublicKeyValidationHandler(EventBus eventBus) {
+      super(eventBus);
+    }
 
     @Override
     protected Set<FieldValidator> getValidators() {

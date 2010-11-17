@@ -5,58 +5,47 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
   
-  <o:WorkbenchLayout>
-    <g:Label><ui:msg description="Create Datasource title">Create Datasource</ui:msg></g:Label>
-    <g:Label><ui:msg description="Create Datasource Step summary">Select the type of datasource to be created with all the corresponding settings.</ui:msg></g:Label>
+  <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="30em" width="40em">
+    <g:caption>
+      <ui:msg description="Create Datasource title">Create Datasource</ui:msg>
+    </g:caption>
     <g:FlowPanel>
-      <g:Button ui:field="cancelButton"><ui:msg description="Cancel button label">Cancel</ui:msg></g:Button>
-      <g:Button ui:field="createButton"><ui:msg description="Create button label">Create</ui:msg></g:Button>
-    </g:FlowPanel>
-    
-    <g:FlowPanel>
-      <g:HTMLPanel>
-        <table class="gwt-KeyValue" cellspacing="10">
-          <tbody>
-            <tr>
-              <td>
-                <g:Label><ui:msg description="Name label">Name</ui:msg>:</g:Label>          
-              </td>
-              <td>
-                <g:TextBox ui:field="datasourceName"/>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <g:Label><ui:msg description="Type label">Type</ui:msg>:</g:Label>          
-              </td>
-              <td>
-                <g:ListBox ui:field="datasourceType" visibleItemCount="1">
-                  <g:item>Opal</g:item>
-                  <g:item>SQL</g:item>
-                  <g:item>XML</g:item>
-                  <g:item>CSV</g:item>
-                  <g:item>Excel</g:item>
-                </g:ListBox>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="2">
-                <g:Label><ui:msg description="Datasource Options label">Datasource type specific options</ui:msg>:</g:Label>          
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td>
-                <g:SimplePanel ui:field="datasourceForm"/>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </g:HTMLPanel>
-    </g:FlowPanel>
-    
-     <g:FlowPanel>
-        <g:HTMLPanel>
+      <o:WizardStep ui:field="selectTypeStep">
+	      <g:HTMLPanel>
+	        <table class="full-width" cellspacing="10">
+	          <tbody>
+	            <tr>
+	              <td>
+	                <g:Label addStyleNames="key"><ui:msg description="Name label">Name</ui:msg>:</g:Label>          
+	              </td>
+	              <td>
+	                <g:TextBox ui:field="datasourceName" addStyleNames="not-so-full-width"/>
+	              </td>
+	            </tr>
+	            <tr>
+	              <td>
+	                <g:Label addStyleNames="key"><ui:msg description="Type label">Type</ui:msg>:</g:Label>          
+	              </td>
+	              <td>
+	                <g:ListBox ui:field="datasourceType" visibleItemCount="1">
+	                  <g:item>Opal</g:item>
+	                  <g:item>SQL</g:item>
+	                  <g:item>XML</g:item>
+	                  <g:item>CSV</g:item>
+	                  <g:item>Excel</g:item>
+	                </g:ListBox>
+	              </td>
+	            </tr>
+	          </tbody>
+	        </table>
+	      </g:HTMLPanel>
+      </o:WizardStep>
+      <o:WizardStep ui:field="datasourceFormStep">
+      </o:WizardStep>
+      <o:WizardStep ui:field="conclusionStep">
+      </o:WizardStep>
+      <!-- Help panel TODO -->
+      <g:HTMLPanel visible="false">
           <g:Label addStyleNames="title"><ui:msg description="Opal Native Datasource creation label">Opal Native</ui:msg></g:Label>
           <p>
             <ui:msg description="Opal Native Datasource creation information">
@@ -96,7 +85,7 @@ Opal is able to increment copies into SQL datasources if timestamp column are gi
           </p>
           
         </g:HTMLPanel>
-     </g:FlowPanel>      
-  </o:WorkbenchLayout>
+    </g:FlowPanel>     
+  </o:WizardDialogBox>
 
 </ui:UiBinder>
