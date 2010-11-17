@@ -14,19 +14,11 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
-import com.google.gwt.event.dom.client.MouseMoveEvent;
-import com.google.gwt.event.dom.client.MouseMoveHandler;
-import com.google.gwt.event.dom.client.MouseUpEvent;
-import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -48,7 +40,7 @@ public class WizardDialogBox extends DialogBox {
 
   private Button cancel;
 
-  private FocusPanel resizeHandle;
+  private ResizeHandle resizeHandle;
 
   private static Translations translations = GWT.create(Translations.class);
 
@@ -92,12 +84,8 @@ public class WizardDialogBox extends DialogBox {
     contentLayout.addSouth(south = new FlowPanel(), 3.25);
     south.addStyleName("footer");
 
-    south.add(resizeHandle = new FocusPanel());
-    resizeHandle.addStyleName("resizable-handle resizable-se");
-    ResizableHandler handler = new ResizableHandler();
-    resizeHandle.addMouseDownHandler(handler);
-    resizeHandle.addMouseMoveHandler(handler);
-    resizeHandle.addMouseUpHandler(handler);
+    south.add(resizeHandle = new ResizeHandle());
+    resizeHandle.makeResizable(contentLayout);
 
     south.add(cancel = new Button("Cancel"));
     initControlStyle(cancel, "cancel");
@@ -197,43 +185,6 @@ public class WizardDialogBox extends DialogBox {
 
   public HandlerRegistration addNextClickHandler(ClickHandler handler) {
     return next.addClickHandler(handler);
-  }
-
-  private class ResizableHandler implements MouseDownHandler, MouseMoveHandler, MouseUpHandler {
-
-    private boolean dragging = false;
-
-    private int dragStartX;
-
-    private int dragStartY;
-
-    @Override
-    public void onMouseDown(MouseDownEvent evt) {
-      // GWT.log("begin drag at x=" + evt.getX() + " y=" + evt.getY());
-      dragging = true;
-      DOM.setCapture(resizeHandle.getElement());
-      dragStartX = evt.getX();
-      dragStartY = evt.getY();
-    }
-
-    @Override
-    public void onMouseMove(MouseMoveEvent evt) {
-      if(dragging) {
-        int width = evt.getX() - dragStartX + contentLayout.getOffsetWidth();
-        contentLayout.setWidth(width + "px");
-        int height = evt.getY() - dragStartY + contentLayout.getOffsetHeight();
-        contentLayout.setHeight(height + "px");
-        // GWT.log("continue drag: height=" + height + " width=" + width);
-      }
-    }
-
-    @Override
-    public void onMouseUp(MouseUpEvent evt) {
-      // GWT.log("end drag at x=" + evt.getX() + " y=" + evt.getY());
-      dragging = false;
-      DOM.releaseCapture(resizeHandle.getElement());
-    }
-
   }
 
 }
