@@ -20,7 +20,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.FocusEvent;
 import com.google.gwt.event.dom.client.FocusHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -279,12 +278,6 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   }
 
   @Override
-  public HasClickHandlers getAddButton() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
   public HasText getAlgorithm() {
     return algo;
   }
@@ -292,12 +285,6 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   @Override
   public HasText getAlias() {
     return alias;
-  }
-
-  @Override
-  public HasClickHandlers getCancelButton() {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   @Override
