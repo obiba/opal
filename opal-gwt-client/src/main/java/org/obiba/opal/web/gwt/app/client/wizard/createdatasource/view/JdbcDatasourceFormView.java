@@ -126,6 +126,7 @@ public class JdbcDatasourceFormView extends Composite implements JdbcDatasourceF
   }
 
   public void setJdbcDrivers(List<JdbcDriverDto> drivers) {
+    driver.clear();
     for(JdbcDriverDto driverDto : drivers) {
       driver.addItem(driverDto.getDriverName(), driverDto.getDriverClass());
     }
