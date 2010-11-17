@@ -152,11 +152,11 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
   }
 
   private void setCommands() {
-    getDisplay().setDownloadIdentifiersCommand(new DownloadIdentifiersCommand());
     getDisplay().setRemoveFunctionalUnitCommand(new RemoveFunctionalUnitCommand());
     getDisplay().setUpdateFunctionalUnitCommand(new EditFunctionalUnitCommand());
     getDisplay().setAddKeyPairCommand(new AddKeyPairCommand());
     // TODO
+    getDisplay().setDownloadIdentifiersCommand(null);
     getDisplay().setAddIdentifiersCommand(null);
   }
 
@@ -210,15 +210,6 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
   private void refreshKeyPairs(FunctionalUnitDto functionalUnit) {
     String name = functionalUnit.getName();
     ResourceRequestBuilderFactory.<JsArray<KeyPairDto>> newBuilder().forResource("/functional-unit/" + name + "/keys").get().withCallback(new KeyPairsCallback()).withCallback(Response.SC_NOT_FOUND, new FunctionalUnitNotFoundCallBack(name)).send();
-  }
-
-  private class DownloadIdentifiersCommand implements Command {
-
-    @Override
-    public void execute() {
-      // TODO
-    }
-
   }
 
   private class AddKeyPairCommand implements Command {
