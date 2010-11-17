@@ -9,9 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -41,8 +38,6 @@ public class WizardDialogBox extends DialogBox {
   private Button cancel;
 
   private ResizeHandle resizeHandle;
-
-  private static Translations translations = GWT.create(Translations.class);
 
   /**
    * 
@@ -80,6 +75,15 @@ public class WizardDialogBox extends DialogBox {
     setSize("45em", "22em");
 
     // controls
+    initControls();
+
+    // main content
+    ScrollPanel scroll = new ScrollPanel();
+    contentLayout.add(scroll);
+    scroll.setWidget(step = new SimplePanel());
+  }
+
+  private void initControls() {
     FlowPanel south;
     contentLayout.addSouth(south = new FlowPanel(), 3.25);
     south.addStyleName("footer");
@@ -96,11 +100,6 @@ public class WizardDialogBox extends DialogBox {
     south.add(previous = new Button("< Previous"));
     initControlStyle(previous, "previous");
     setPreviousEnabled(false);
-
-    // main content
-    ScrollPanel scroll = new ScrollPanel();
-    contentLayout.add(scroll);
-    scroll.setWidget(step = new SimplePanel());
   }
 
   private void initControlStyle(Button button, String style) {
