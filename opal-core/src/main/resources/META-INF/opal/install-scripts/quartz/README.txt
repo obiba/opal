@@ -12,12 +12,14 @@ The original scripts from the Quartz distribution have been modified as follows:
   2. Some scripts have been renamed, for compatibility with the DatabaseProductRegistry class (specifically, with the latter's 
      list of database products in database-products.xml).
      
-     Original script		Renamed as
-     ---------------    	----------
+     Original script			Renamed as
+     ---------------    		----------
      
-     tables_hsqldb*.sql 	tables_hsql*.sql
-     tables_postgres*.sql	tables_pgsql*.sql
-     tables_sqlServer.sql	tables_sqlserver.sql
+     tables_hsqldb*.sql 		tables_hsql*.sql
+     tables_postgres*.sql		tables_pgsql*.sql
+     tables_sqlServer.sql		tables_sqlserver.sql
+     tables_mysql.sql       	tables_mysql_default.sql
+     tables_mysql_innodb.sql 	tables_mysql.sql
      
      
      
