@@ -206,11 +206,16 @@ public class DefaultCommandJobService implements CommandJobService {
     return new ThreadPoolExecutor(10, 10, 0, TimeUnit.MILLISECONDS, jobsNotStarted) {
       @Override
       protected void beforeExecute(Thread t, Runnable r) {
+        log.info("Starting job {}", ((FutureCommandJob) r).commandJob.getId());
         getStartedJobs().add((FutureCommandJob) r);
       }
 
       @Override
       protected void afterExecute(Runnable r, Throwable t) {
+        log.info("CommandJob {} finished executing", ((FutureCommandJob) r).commandJob.getId());
+        if(t != null) {
+          log.warn("CommandJob {} threw an exception: {}", t.getMessage());
+        }
         getStartedJobs().remove(r);
         getTerminatedJobs().add((FutureCommandJob) r);
       }

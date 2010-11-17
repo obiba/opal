@@ -112,10 +112,10 @@ public class CommandJob implements OpalShell, Runnable {
       updateJobStatus(errorCode);
 
       printf("Job completed successfully.");
-    } catch(RuntimeException ex) {
+    } catch(Throwable t) {
       status = Status.FAILED;
-      printf("Job has failed due to the following error :\n%s", ex.getMessage());
-      ex.printStackTrace();
+      printf("Job has failed due to the following error :\n%s", t.getMessage());
+      t.printStackTrace();
     } finally {
       endTime = getCurrentTime();
     }
