@@ -104,6 +104,10 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
           datasourceFormStep.setVisible(false);
           selectTypeStep.setVisible(true);
           dialog.setPreviousEnabled(false);
+        } else if(conclusionStep.isVisible()) {
+          conclusionStep.setVisible(false);
+          datasourceFormStep.setVisible(true);
+          dialog.setNextEnabled(true);
         }
       }
     });
@@ -240,6 +244,8 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
   public void setConclusion(CreateDatasourceConclusionStepPresenter presenter) {
     datasourceFormStep.setVisible(false);
     presenter.bind();
+    conclusionStep.setStepTitle(translations.createDatasourceProcessSummary());
+    conclusionStep.removeStepContent();
     conclusionStep.add(presenter.getDisplay().asWidget());
     conclusionStep.setVisible(true);
     dialog.setPreviousEnabled(false);
@@ -258,6 +264,7 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
       public void onFailure(DatasourceFactoryDto factory, ClientErrorDto error) {
         conclusionStep.setStepTitle(translations.datasourceCreationFailed());
         dialog.setCancelEnabled(true);
+        dialog.setPreviousEnabled(true);
       }
     });
 
