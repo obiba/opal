@@ -53,6 +53,10 @@ a:hover {
 	width: 100%;	
 }
 
+.not-so-full-width {
+	width: 95%;	
+}
+
 .block {
   display: block;
 }

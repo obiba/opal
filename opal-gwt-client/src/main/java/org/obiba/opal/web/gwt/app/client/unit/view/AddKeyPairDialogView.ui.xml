@@ -27,7 +27,7 @@
                 </g:Label>
               </td>
               <td>
-                <g:TextBox addStyleNames="text full-width" name="alias" ui:field="alias"/>
+                <g:TextBox addStyleNames="text not-so-full-width" name="alias" ui:field="alias"/>
               </td>
             </tr>
             <tr>
@@ -48,7 +48,7 @@
                           <ui:msg description="Private Key Algorithm label">Algorithm</ui:msg>:
                         </g:Label>
                       </td>
-                      <td><g:TextBox addStyleNames="text full-width" name="algo" ui:field="algo"/></td>
+                      <td><g:TextBox addStyleNames="text not-so-full-width" name="algo" ui:field="algo"/></td>
                     </tr>
                     <tr>
                       <td>
@@ -64,7 +64,7 @@
                   <ui:msg description="Private Key Import label">import</ui:msg>
                 </g:RadioButton>
                 <div class="indent">
-                  <g:TextArea addStyleNames="text full-width" name="privateKeyPEM" ui:field="privateKeyPEM"/>
+                  <g:TextArea addStyleNames="text not-so-full-width" name="privateKeyPEM" ui:field="privateKeyPEM"/>
                 </div>
               </td>
             </tr>
@@ -85,7 +85,7 @@
                   <ui:msg description="Public Key Create label">create</ui:msg>
                 </g:RadioButton>
                 <g:HTMLPanel ui:field="publicKeyForm" addStyleNames="indent">
-                  <table>
+                  <table class="full-width">
                     <tr>
                       <td>
                         <g:Label addStyleNames="key">
@@ -93,7 +93,7 @@
                         </g:Label>
                       </td>
                       <td>
-                        <g:TextBox addStyleNames="text full-width" name="names" ui:field="names"/>
+                        <g:TextBox addStyleNames="text not-so-full-width" name="names" ui:field="names"/>
                       </td>
                     </tr>
                     <tr>
@@ -103,7 +103,7 @@
                         </g:Label>
                       </td>
                       <td>
-                        <g:TextBox addStyleNames="text full-width" name="organizationalUnit" ui:field="organizationalUnit"/>
+                        <g:TextBox addStyleNames="text not-so-full-width" name="organizationalUnit" ui:field="organizationalUnit"/>
                       </td>
                     </tr>
                     <tr>
@@ -113,7 +113,7 @@
                         </g:Label>
                       </td>
                       <td>
-                        <g:TextBox addStyleNames="text full-width" name="organizationName" ui:field="organizationName"/>
+                        <g:TextBox addStyleNames="text not-so-full-width" name="organizationName" ui:field="organizationName"/>
                       </td>
                     </tr>
                     <tr>
@@ -123,7 +123,7 @@
                         </g:Label>
                       </td>
                       <td>
-                        <g:TextBox addStyleNames="text full-width" name="city" ui:field="city"/>
+                        <g:TextBox addStyleNames="text not-so-full-width" name="city" ui:field="city"/>
                       </td>
                     </tr>
                     <tr>
@@ -133,7 +133,7 @@
                         </g:Label>
                       </td>
                       <td>
-                        <g:TextBox addStyleNames="text full-width" name="state" ui:field="state"/>
+                        <g:TextBox addStyleNames="text not-so-full-width" name="state" ui:field="state"/>
                       </td>
                     </tr>
                     <tr>
@@ -153,7 +153,7 @@
                   <ui:msg description="Public Key Import label">import</ui:msg>
                 </g:RadioButton>
                 <div class="indent">
-                  <g:TextArea addStyleNames="text full-width" name="publicKeyPEM" ui:field="publicKeyPEM"/>
+                  <g:TextArea addStyleNames="text not-so-full-width" name="publicKeyPEM" ui:field="publicKeyPEM"/>
                 </div>
               </td>
             </tr>
