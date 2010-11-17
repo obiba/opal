@@ -241,6 +241,9 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
 
     @Override
     public void onChange(ChangeEvent event) {
+      if(getDisplay().getEntitiesToView() == EntitiesToView.ALL) {
+        getDisplay().setScript("");
+      }
       getDisplay().setScriptWidgetVisible(getDisplay().getEntitiesToView().equals(EntitiesToView.SCRIPT));
     }
   }

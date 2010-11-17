@@ -289,6 +289,9 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
 
     @Override
     public void onChange(ChangeEvent event) {
+      if(getDisplay().getVariablesToView() == VariablesToView.ALL) {
+        getDisplay().setScript("");
+      }
       getDisplay().setScriptWidgetVisible(getDisplay().getVariablesToView().equals(VariablesToView.SCRIPT));
       getDisplay().saveChangesEnabled(true);
       eventBus.fireEvent(new ViewSavePendingEvent());
