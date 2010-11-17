@@ -118,8 +118,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
   private String extractSessionId(HttpServletRequest request) {
     String sessionId = request.getHeader(X_OPAL_AUTH);
-    if(sessionId == null && request.getMethod().equalsIgnoreCase("GET")) {
-      // Extract from the cookie (only used for GET requests)
+    if(sessionId == null && (request.getMethod().equalsIgnoreCase("GET") || request.getMethod().equalsIgnoreCase("POST"))) {
+      // Extract from the cookie (only used for GET or POST requests)
       Cookie cookie = findCookie(request, OPAL_SESSION_ID_COOKIE_NAME);
       if(cookie != null) {
         sessionId = cookie.getValue();
