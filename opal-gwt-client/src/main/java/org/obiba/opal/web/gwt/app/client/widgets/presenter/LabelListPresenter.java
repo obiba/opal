@@ -103,7 +103,10 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
 
   public void updateFields() {
     getDisplay().clearAttributes();
-    getDisplay().displayAttributes(attributeToDisplay, attributes);
+
+    if(attributeToDisplay != null) {
+      getDisplay().displayAttributes(attributeToDisplay, attributes);
+    }
   }
 
   public class BaseLanguageTextRequiredValidator extends AbstractFieldValidator {

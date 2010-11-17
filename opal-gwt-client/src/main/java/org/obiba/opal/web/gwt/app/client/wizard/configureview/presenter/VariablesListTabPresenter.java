@@ -72,8 +72,8 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.inject.Inject;
 
 /**
@@ -286,16 +286,22 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     super.registerHandler(eventBus.addHandler(DerivedVariableConfigurationRequiredEvent.getType(), new DerivedVariableConfigurationRequiredHandler()));
     super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
     super.registerHandler(eventBus.addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
-    super.registerHandler(getDisplay().addNameChangedHandler(new FormChangedHandler()));
-    super.registerHandler(getDisplay().addValueTypeChangedHandler(new FormChangedHandler()));
-    super.registerHandler(getDisplay().addScriptChangeHandler(new FormChangedHandler()));
-    super.registerHandler(getDisplay().addRepeatableValueChangeHandler(new FormChangedHandler()));
-    super.registerHandler(getDisplay().addOccurrenceGroupChangedHandler(new FormChangedHandler()));
-    super.registerHandler(getDisplay().addUnitChangedHandler(new FormChangedHandler()));
-    super.registerHandler(getDisplay().addMimeTypeChangedHandler(new FormChangedHandler()));
-    super.registerHandler(eventBus.addHandler(CategoryUpdateEvent.getType(), new FormChangedHandler()));
-    super.registerHandler(eventBus.addHandler(AttributeUpdateEvent.getType(), new FormChangedHandler()));
-    super.registerHandler(eventBus.addHandler(LocalizableDeleteEvent.getType(), new FormChangedHandler()));
+    registerFormChangedHandler();
+  }
+
+  private void registerFormChangedHandler() {
+    FormChangedHandler formChangedHandler = new FormChangedHandler();
+
+    super.registerHandler(getDisplay().addNameChangedHandler(formChangedHandler));
+    super.registerHandler(getDisplay().addValueTypeChangedHandler(formChangedHandler));
+    super.registerHandler(getDisplay().addScriptChangeHandler(formChangedHandler));
+    super.registerHandler(getDisplay().addRepeatableValueChangeHandler(formChangedHandler));
+    super.registerHandler(getDisplay().addOccurrenceGroupChangedHandler(formChangedHandler));
+    super.registerHandler(getDisplay().addUnitChangedHandler(formChangedHandler));
+    super.registerHandler(getDisplay().addMimeTypeChangedHandler(formChangedHandler));
+    super.registerHandler(eventBus.addHandler(CategoryUpdateEvent.getType(), formChangedHandler));
+    super.registerHandler(eventBus.addHandler(AttributeUpdateEvent.getType(), formChangedHandler));
+    super.registerHandler(eventBus.addHandler(LocalizableDeleteEvent.getType(), formChangedHandler));
   }
 
   private void addValidators() {

@@ -12,13 +12,11 @@ package org.obiba.opal.web.gwt.app.client.widgets.view;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -38,8 +36,6 @@ public class LabelListView extends Composite implements LabelListPresenter.Displ
   private Map<String, TextBox> languageLabelMap = new HashMap<String, TextBox>();
 
   private String attributeValueLabel;
-
-  private Translations translations = GWT.create(Translations.class);
 
   public LabelListView() {
     panel = new FlowPanel();
@@ -94,16 +90,14 @@ public class LabelListView extends Composite implements LabelListPresenter.Displ
 
   @Override
   public void displayAttributes(String attributeName, JsArray<AttributeDto> attributes) {
-    if(attributeName != null) {
-      JsArray<AttributeDto> nonNullAttributes = JsArrays.toSafeArray(attributes);
+    JsArray<AttributeDto> nonNullAttributes = JsArrays.toSafeArray(attributes);
 
-      for(int i = 0; i < nonNullAttributes.length(); i++) {
-        AttributeDto dto = nonNullAttributes.get(i);
-        if(attributeName.equals(dto.getName())) {
-          if(languageLabelMap.containsKey(dto.getLocale())) {
-            TextBox textBox = languageLabelMap.get(dto.getLocale());
-            textBox.setValue(dto.getValue());
-          }
+    for(int i = 0; i < nonNullAttributes.length(); i++) {
+      AttributeDto dto = nonNullAttributes.get(i);
+      if(attributeName.equals(dto.getName())) {
+        if(languageLabelMap.containsKey(dto.getLocale())) {
+          TextBox textBox = languageLabelMap.get(dto.getLocale());
+          textBox.setValue(dto.getValue());
         }
       }
     }
