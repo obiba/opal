@@ -127,4 +127,9 @@ public class EntitiesTabView extends Composite implements EntitiesTabPresenter.D
     return scriptWidgetDisplay.getScriptText();
   }
 
+  @Override
+  public ListBox getEntitiesToViewListBox() {
+    return entitiesToView;
+  }
+
 }

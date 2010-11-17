@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ListBoxItemConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
@@ -45,6 +46,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.inject.Inject;
 
 public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.Display> {
@@ -72,6 +74,8 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
     HandlerRegistration addEntitiestoViewChangeHandler(ChangeHandler changeHandler);
 
     HandlerRegistration addScriptChangeHandler(ChangeHandler handler);
+
+    ListBox getEntitiesToViewListBox();
   }
 
   public enum EntitiesToView {
@@ -145,7 +149,7 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
   }
 
   private void addValidators() {
-    validators.add(new RequiredTextValidator(getDisplay().getScriptText(), "ScriptIsRequired"));
+    validators.add(new ListBoxItemConditionalValidator(getDisplay().getEntitiesToViewListBox(), "script", new RequiredTextValidator(getDisplay().getScriptText(), "ScriptIsRequired")));
   }
 
   private boolean validate() {

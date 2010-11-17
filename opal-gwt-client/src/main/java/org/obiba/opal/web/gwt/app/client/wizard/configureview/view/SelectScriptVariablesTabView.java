@@ -157,4 +157,9 @@ public class SelectScriptVariablesTabView extends Composite implements SelectScr
   public HasText getScriptText() {
     return scriptWidgetDisplay.getScriptText();
   }
+
+  @Override
+  public ListBox getVariablesToViewListBox() {
+    return variablesToView;
+  }
 }
