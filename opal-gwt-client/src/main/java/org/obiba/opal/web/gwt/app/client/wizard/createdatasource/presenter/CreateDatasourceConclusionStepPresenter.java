@@ -44,56 +44,12 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
   }
 
   public void setDatasourceFactory(final DatasourceFactoryDto dto) {
-
-    ResourceRequestPresenter<DatasourceDto> resourceRequestPresenter = new ResourceRequestPresenter<DatasourceDto>(new ResourceRequestView(), eventBus, ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasource/" + dto.getName()).put().withResourceBody(DatasourceFactoryDto.stringify(dto)), new ResponseCodeCallback() {
-
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == 201) {
-          datasourceDto = (DatasourceDto) JsonUtils.unsafeEval(response.getText());
-          getDisplay().setCompleted();
-          if(createdCallback != null) {
-            createdCallback.onSuccess(dto);
-          }
-        } else if(response.getText() != null && response.getText().length() != 0) {
-          GWT.log(response.getText());
-          ClientErrorDto error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-          getDisplay().setFailed(error);
-          if(createdCallback != null) {
-            createdCallback.onFailure(dto, error);
-          }
-        } else {
-          getDisplay().setFailed(null);
-          if(createdCallback != null) {
-            createdCallback.onFailure(dto, null);
-          }
-        }
-      }
-
-    });
+    ResourceRequestPresenter<DatasourceDto> resourceRequestPresenter = new ResourceRequestPresenter<DatasourceDto>(new ResourceRequestView(), eventBus, ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasource/" + dto.getName()).put().withResourceBody(DatasourceFactoryDto.stringify(dto)), new CreateDatasourceResponseCallback(dto));
     resourceRequestPresenter.getDisplay().setResourceName(dto.getName());
-    resourceRequestPresenter.getDisplay().setResourceClickHandler(new ResourceClickHandler() {
-
-      @Override
-      public String getResourceLink() {
-        // TODO Auto-generated method stub
-        return null;
-      }
-
-      @Override
-      public void onClick(ClickEvent arg0) {
-
-        if(datasourceDto != null) {
-          eventBus.fireEvent(new DatasourceSelectionChangeEvent(datasourceDto));
-        }
-      }
-
-    });
+    resourceRequestPresenter.getDisplay().setResourceClickHandler(new DatasourceLinkClickHandler());
     resourceRequestPresenter.setSuccessCodes(201);
     resourceRequestPresenter.setErrorCodes(400, 405, 500);
-
     getDisplay().setDatasourceRequestDisplay(resourceRequestPresenter.getDisplay());
-
     resourceRequestPresenter.sendRequest();
   }
 
@@ -129,6 +85,67 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
   //
   // Interfaces
   //
+
+  /**
+   *
+   */
+  private final class CreateDatasourceResponseCallback implements ResponseCodeCallback {
+    /**
+     * 
+     */
+    private final DatasourceFactoryDto dto;
+
+    /**
+     * @param dto
+     */
+    private CreateDatasourceResponseCallback(DatasourceFactoryDto dto) {
+      this.dto = dto;
+    }
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      boolean success = false;
+      ClientErrorDto error = null;
+      if(response.getStatusCode() == 201) {
+        datasourceDto = (DatasourceDto) JsonUtils.unsafeEval(response.getText());
+        getDisplay().setCompleted();
+        success = true;
+
+      } else if(response.getText() != null && response.getText().length() != 0) {
+        GWT.log(response.getText());
+        error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+        getDisplay().setFailed(error);
+      } else {
+        getDisplay().setFailed(null);
+      }
+
+      if(createdCallback != null) {
+        if(success) createdCallback.onSuccess(dto);
+        else if(error != null) createdCallback.onFailure(dto, error);
+        else
+          createdCallback.onFailure(dto, null);
+      }
+    }
+  }
+
+  /**
+   *
+   */
+  private final class DatasourceLinkClickHandler implements ResourceClickHandler {
+    @Override
+    public String getResourceLink() {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    @Override
+    public void onClick(ClickEvent arg0) {
+
+      if(datasourceDto != null) {
+        eventBus.fireEvent(new DatasourceSelectionChangeEvent(datasourceDto));
+      }
+    }
+  }
 
   public interface Display extends WidgetDisplay {
 
