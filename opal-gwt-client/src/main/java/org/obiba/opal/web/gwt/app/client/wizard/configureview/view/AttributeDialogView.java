@@ -25,10 +25,13 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -46,16 +49,26 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   DialogBox dialog;
 
   @UiField
-  RadioButton nameDropdownRadioChoice;
+  SimplePanel namePanel;
 
   @UiField
-  RadioButton nameFieldRadioChoice;
+  HTMLPanel editableName;
+
+  @UiField
+  RadioButton predefinedAttributeNameRadioButton;
+
+  @UiField
+  RadioButton customAttributeNameRadioButton;
+
+  Label uneditableName;
+
+  private boolean nameEditable;
 
   @UiField
   ListBox labels;
 
   @UiField
-  TextBox attributeName;
+  TextBox customAttributeName;
 
   @UiField
   ScrollPanel scrollPanel;
@@ -71,6 +84,11 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   public AttributeDialogView() {
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
+
+    uneditableName = new Label();
+
+    nameEditable = true;
+    setAttributeNameEditable(nameEditable);
   }
 
   @Override
@@ -88,7 +106,7 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
 
   @Override
   public void clear() {
-    attributeName.setText("");
+    customAttributeName.setText("");
 
     if(inputField != null) {
       inputField.clearAttributes();
@@ -116,20 +134,32 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
     return saveButton;
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings("unchecked")
   @Override
   public HasCloseHandlers getDialog() {
     return dialog;
   }
 
   @Override
-  public HandlerRegistration addNameDropdownRadioChoiceHandler(ClickHandler handler) {
-    return nameDropdownRadioChoice.addClickHandler(handler);
+  public void setAttributeNameEditable(boolean editable) {
+    nameEditable = editable;
+
+    namePanel.clear();
+    if(editable) {
+      namePanel.add(editableName);
+    } else {
+      namePanel.add(uneditableName);
+    }
   }
 
   @Override
-  public HandlerRegistration addNameFieldRadioChoiceHandler(ClickHandler handler) {
-    return nameFieldRadioChoice.addClickHandler(handler);
+  public HandlerRegistration addPredefinedAttributeNameRadioButtonClickHandler(ClickHandler handler) {
+    return predefinedAttributeNameRadioButton.addClickHandler(handler);
+  }
+
+  @Override
+  public HandlerRegistration addCustomAttributeNameRadioButtonClickHandler(ClickHandler handler) {
+    return customAttributeNameRadioButton.addClickHandler(handler);
   }
 
   @Override
@@ -138,24 +168,24 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   }
 
   @Override
-  public void setAttributeNameEnabled(boolean enabled) {
-    attributeName.setEnabled(enabled);
+  public void setCustomAttributeNameEnabled(boolean enabled) {
+    customAttributeName.setEnabled(enabled);
   }
 
   @Override
-  public void selectNameDropdownRadioChoice() {
-    nameDropdownRadioChoice.setValue(true, true);
-    nameFieldRadioChoice.setValue(false, true);
+  public void selectPredefinedAttributeNameRadioButton() {
+    predefinedAttributeNameRadioButton.setValue(true, true);
+    customAttributeNameRadioButton.setValue(false, true);
   }
 
-  public void selectNameFieldRadioChoice() {
-    nameDropdownRadioChoice.setValue(false, true);
-    nameFieldRadioChoice.setValue(true, true);
+  public void selectCustomAttributeNameRadioButton() {
+    predefinedAttributeNameRadioButton.setValue(false, true);
+    customAttributeNameRadioButton.setValue(true, true);
   }
 
   @Override
-  public HasText getAttributeNameField() {
-    return attributeName;
+  public HasText getCustomAttributeName() {
+    return customAttributeName;
   }
 
   @Override
@@ -173,25 +203,6 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   }
 
   @Override
-  public HasText getAttributeName() {
-    return new HasText() {
-
-      @Override
-      public void setText(String arg0) {
-      }
-
-      @Override
-      public String getText() {
-        if(nameDropdownRadioChoice.getValue()) {
-          return labels.getValue(labels.getSelectedIndex());
-        } else {
-          return attributeName.getText();
-        }
-      }
-    };
-  }
-
-  @Override
   public void setNameDropdownList(List<String> labels) {
     this.labels.clear();
     for(String label : labels) {
@@ -205,16 +216,43 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   }
 
   @Override
+  public HasText getAttributeName() {
+    return new HasText() {
+
+      @Override
+      public void setText(String arg0) {
+      }
+
+      @Override
+      public String getText() {
+        if(nameEditable) {
+          if(predefinedAttributeNameRadioButton.getValue()) {
+            return labels.getValue(labels.getSelectedIndex());
+          } else {
+            return customAttributeName.getText();
+          }
+        } else {
+          return uneditableName.getText();
+        }
+      }
+    };
+  }
+
+  @Override
   public void setAttributeName(String attributeName) {
-    int index = getLabelIndex(attributeName);
-    if(index != -1) {
-      labels.setItemSelected(index, true);
-      this.attributeName.setText("");
+    if(nameEditable) {
+      int index = getLabelIndex(attributeName);
+      if(index != -1) {
+        labels.setItemSelected(index, true);
+        this.customAttributeName.setText("");
+      } else {
+        setLabelsEnabled(false);
+        setCustomAttributeNameEnabled(true);
+        selectCustomAttributeNameRadioButton();
+        this.customAttributeName.setText(attributeName);
+      }
     } else {
-      setLabelsEnabled(false);
-      setAttributeNameEnabled(true);
-      selectNameFieldRadioChoice();
-      this.attributeName.setText(attributeName);
+      uneditableName.setText(attributeName);
     }
   }
 

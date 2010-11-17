@@ -65,6 +65,8 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
 
     HasClickHandlers getCancelButton();
 
+    void setCategoryNameEditable(boolean editable);
+
     HasText getCategoryName();
 
     HasCloseHandlers<DialogBox> getDialog();
@@ -145,10 +147,12 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
     labelListPresenter.setAttributeToDisplay("label");
 
     if(isEdit()) {
+      getDisplay().setCategoryNameEditable(false); // don't allow edits of category name
       getDisplay().getCategoryName().setText(categoryDto.getName());
       labelListPresenter.setAttributes(categoryDto.getAttributesArray());
       labelListPresenter.updateFields();
     } else {
+      getDisplay().setCategoryNameEditable(true);
       getDisplay().clear();
     }
 

@@ -878,6 +878,10 @@ div.variablesListTabContent .gwt-Label {
   font-weight:bold;
 }
 
+.categoryDialog .labelPanel {
+  margin-top: 10px;
+}
+
 /* Wizard */
 
 .resizable-handle.resizable-se {

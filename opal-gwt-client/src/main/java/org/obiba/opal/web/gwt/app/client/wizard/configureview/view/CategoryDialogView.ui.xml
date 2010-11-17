@@ -11,20 +11,20 @@
     .top-margin { margin-top: 0.5em; }
   </ui:style>
 
-  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" height="15em" width="35em">
+  <g:DialogBox ui:field="dialog" addStyleNames="categoryDialog" autoHide="false" modal="true" height="15em" width="35em">
     <g:caption>
       <ui:msg description="Add new attribute title" >Add New Attribute</ui:msg>
     </g:caption>
     <g:DockLayoutPanel unit="EM" height="15em" width="35em">
       <g:center>
-        <g:VerticalPanel  addStyleNames="main {style.optionsPanelMsg}">
+        <g:VerticalPanel addStyleNames="main {style.optionsPanelMsg}">
           <g:HorizontalPanel>
             <g:Label>
-              <ui:msg description="Name label">Name</ui:msg>
+              <ui:msg description="Name label">Name</ui:msg>:
             </g:Label>
-            <g:TextBox name="categoryName" ui:field="categoryName" visibleLength="40"/>    
+            <g:SimplePanel ui:field="categoryNamePanel" addStyleNames="small-indent" />
           </g:HorizontalPanel>
-          <g:ScrollPanel ui:field="inputFieldPanel" height="18em"/>
+          <g:ScrollPanel ui:field="inputFieldPanel" addStyleNames="labelPanel" height="18em"/>
         </g:VerticalPanel>
       </g:center>
       <g:south size="3.25">

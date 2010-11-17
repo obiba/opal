@@ -65,17 +65,19 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
     HasClickHandlers getCancelButton();
 
-    HandlerRegistration addNameDropdownRadioChoiceHandler(ClickHandler handler);
+    HandlerRegistration addPredefinedAttributeNameRadioButtonClickHandler(ClickHandler handler);
 
-    HandlerRegistration addNameFieldRadioChoiceHandler(ClickHandler handler);
+    HandlerRegistration addCustomAttributeNameRadioButtonClickHandler(ClickHandler handler);
+
+    void setAttributeNameEditable(boolean editable);
 
     void setLabelsEnabled(boolean enabled);
 
-    void setAttributeNameEnabled(boolean enabled);
+    void setCustomAttributeNameEnabled(boolean enabled);
 
-    void selectNameDropdownRadioChoice();
+    void selectPredefinedAttributeNameRadioButton();
 
-    HasText getAttributeNameField();
+    HasText getCustomAttributeName();
 
     void addInputField(LabelListPresenter.Display inputField);
 
@@ -153,10 +155,12 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
     labelListPresenter.setAttributeToDisplay(attributeNameToDisplay);
 
     if(isEdit()) {
+      getDisplay().setAttributeNameEditable(false); // don't allow edits of attribute name
       getDisplay().setAttributeName(attributeNameToDisplay);
       labelListPresenter.setAttributes(attributes);
       labelListPresenter.updateFields();
     } else {
+      getDisplay().setAttributeNameEditable(true);
       getDisplay().clear();
     }
 
@@ -172,10 +176,10 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   }
 
   private void resetForm() {
-    getDisplay().selectNameDropdownRadioChoice();
+    getDisplay().selectPredefinedAttributeNameRadioButton();
     getDisplay().setLabelsEnabled(true);
-    getDisplay().setAttributeNameEnabled(false);
-    getDisplay().getAttributeNameField().setText("");
+    getDisplay().setCustomAttributeNameEnabled(false);
+    getDisplay().getCustomAttributeName().setText("");
   }
 
   private void addEventHandlers() {
@@ -216,20 +220,20 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   }
 
   private void addRadioButtonNameEventHandlers() {
-    super.registerHandler(getDisplay().addNameDropdownRadioChoiceHandler(new ClickHandler() {
+    super.registerHandler(getDisplay().addPredefinedAttributeNameRadioButtonClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
-        getDisplay().setAttributeNameEnabled(false);
+        getDisplay().setCustomAttributeNameEnabled(false);
         getDisplay().setLabelsEnabled(true);
       }
     }));
 
-    super.registerHandler(getDisplay().addNameFieldRadioChoiceHandler(new ClickHandler() {
+    super.registerHandler(getDisplay().addCustomAttributeNameRadioButtonClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
-        getDisplay().setAttributeNameEnabled(true);
+        getDisplay().setCustomAttributeNameEnabled(true);
         getDisplay().setLabelsEnabled(false);
       }
     }));

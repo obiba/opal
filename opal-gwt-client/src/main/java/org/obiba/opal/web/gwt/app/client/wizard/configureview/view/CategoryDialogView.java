@@ -22,7 +22,9 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -46,7 +48,13 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
   Button cancelButton;
 
   @UiField
+  SimplePanel categoryNamePanel;
+
   TextBox categoryName;
+
+  Label uneditableCategoryName;
+
+  private boolean categoryNameEditable;
 
   @UiField
   ScrollPanel inputFieldPanel;
@@ -56,6 +64,14 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
   public CategoryDialogView() {
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
+
+    categoryName = new TextBox();
+    categoryName.setVisibleLength(40);
+
+    uneditableCategoryName = new Label();
+
+    categoryNameEditable = true;
+    setCategoryNameEditable(categoryNameEditable);
   }
 
   @Override
@@ -74,6 +90,7 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
   @Override
   public void clear() {
     categoryName.setText("");
+    uneditableCategoryName.setText("");
 
     if(inputField != null) {
       inputField.clearAttributes();
@@ -103,11 +120,23 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
   }
 
   @Override
-  public HasText getCategoryName() {
-    return categoryName;
+  public void setCategoryNameEditable(boolean editable) {
+    categoryNameEditable = editable;
+
+    categoryNamePanel.clear();
+    if(editable) {
+      categoryNamePanel.add(categoryName);
+    } else {
+      categoryNamePanel.add(uneditableCategoryName);
+    }
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @Override
+  public HasText getCategoryName() {
+    return categoryNameEditable ? categoryName : uneditableCategoryName;
+  }
+
+  @SuppressWarnings("unchecked")
   @Override
   public HasCloseHandlers getDialog() {
     return dialog;

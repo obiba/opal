@@ -24,22 +24,24 @@
                     <ui:msg description="Name label">Name</ui:msg>:
                   </td>
                   <td>
-	                 <g:HTMLPanel addStyleNames="indent">
-	                   <table>
-	                     <tbody>
-	                       <tr>
-	                         <td>
-	                           <g:RadioButton name="name" ui:field="nameDropdownRadioChoice" checked="true"><ui:msg description="Predefined label">Predefined:</ui:msg></g:RadioButton><g:ListBox ui:field="labels" />
-	                         </td>
-	                       </tr>
-	                       <tr>
-                             <td>
-                               <g:RadioButton name="name" ui:field="nameFieldRadioChoice"><ui:msg description="Custom label">Custom:</ui:msg></g:RadioButton><g:TextBox name="attributeName" ui:field="attributeName" visibleLength="20"/>
-                             </td>
-	                       </tr>
-	                     </tbody>
-	                   </table>
-	                 </g:HTMLPanel>                  
+                     <g:SimplePanel ui:field="namePanel">
+		               <g:HTMLPanel ui:field="editableName" addStyleNames="indent">
+		                 <table>
+		                   <tbody>
+		                     <tr>
+		                       <td>
+		                         <g:RadioButton name="name" ui:field="predefinedAttributeNameRadioButton" checked="true"><ui:msg description="Predefined label">Predefined:</ui:msg></g:RadioButton><g:ListBox ui:field="labels" />
+		                       </td>
+		                     </tr>
+		                     <tr>
+	                           <td>
+	                             <g:RadioButton name="name" ui:field="customAttributeNameRadioButton"><ui:msg description="Custom label">Custom:</ui:msg></g:RadioButton><g:TextBox name="customAttributeName" ui:field="customAttributeName" visibleLength="20"/>
+	                           </td>
+		                     </tr>
+		                   </tbody>
+		                 </table>
+		               </g:HTMLPanel>
+	                 </g:SimplePanel>                  
                   </td>
                 </tr>
               </tbody>
