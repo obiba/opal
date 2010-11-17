@@ -22,6 +22,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -133,6 +134,8 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
   public void setViewDto(ViewDto viewDto) {
     this.viewDto = viewDto;
 
+    viewDto.setFromArray(JsArrays.toSafeArray(viewDto.getFromArray()));
+
     TableDto tableDto = TableDto.create();
     tableDto.setDatasourceName(viewDto.getDatasourceName());
     tableDto.setName(viewDto.getName());
@@ -142,7 +145,7 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
     scriptWidget.getDisplay().showPaging(false);
 
     JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
-    if(jsViewDto.hasSelect()) {
+    if(jsViewDto != null && jsViewDto.hasSelect()) {
       getDisplay().setVariablesToView(VariablesToView.SCRIPT);
       getDisplay().setScript(jsViewDto.getSelect());
     } else {
