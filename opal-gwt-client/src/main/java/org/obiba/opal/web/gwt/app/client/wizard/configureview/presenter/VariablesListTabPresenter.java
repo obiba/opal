@@ -72,8 +72,8 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
@@ -535,6 +535,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     @Override
     public void onClick(ClickEvent event) {
       variableListViewDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+      variableListViewDto.setVariablesArray(JsArrays.toSafeArray(variableListViewDto.getVariablesArray()));
+
       currentVariableDto = getDisplay().getVariableDto();
       if(isEmptyVariable()) {
         // This view has no variables. Clear the variable list and save.
@@ -579,14 +581,14 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       // exist.)
       AttributeDto currentVariableScriptAttribute = getAttributeByName(VariablesListTabView.SCRIPT_NAME, currentVariableDto.getAttributesArray());
       AttributeDto existingVariableScriptAttribute = getAttributeByName(VariablesListTabView.SCRIPT_NAME, attributesPresenter.getVariableDto().getAttributesArray());
-      if(currentVariableScriptAttribute != null) {
+      if(existingVariableScriptAttribute != null) {
         existingVariableScriptAttribute.setValue(currentVariableScriptAttribute.getValue());
-      } else {
-        currentVariableDto.getAttributesArray().push(currentVariableScriptAttribute);
+        currentVariableDto.setAttributesArray(attributesPresenter.getVariableDto().getAttributesArray());
       }
     }
 
     private AttributeDto getAttributeByName(String attributeName, JsArray<AttributeDto> attributes) {
+      if(attributes == null) return null;
       for(int i = 0; i < attributes.length(); i++) {
         if(attributes.get(i).getName().equals(attributeName)) return attributes.get(i);
       }
@@ -595,7 +597,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     private void updateView(VariableListViewDto variableListViewDto) {
       boolean update = false;
-      JsArray<VariableDto> variables = createAndGetVariableListFromView();
+      JsArray<VariableDto> variables = JsArrays.toSafeArray(variableListViewDto.getVariablesArray());
 
       for(int i = 0; i < variables.length(); i++) {
         VariableDto variableDto = variables.get(i);
@@ -614,16 +616,6 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     private boolean isEmptyVariable() {
       return currentVariableDto.getName().equals("") && variableListViewDto.getVariablesArray().length() == 0;
-    }
-
-    @SuppressWarnings("unchecked")
-    private JsArray<VariableDto> createAndGetVariableListFromView() {
-      JsArray<VariableDto> variables = variableListViewDto.getVariablesArray();
-      if(variables == null) {
-        variables = (JsArray<VariableDto>) JsArray.createArray();
-        variableListViewDto.setVariablesArray(variables);
-      }
-      return variables;
     }
 
   }
@@ -825,8 +817,10 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     @Override
     protected boolean hasError() {
-      // Edits can have the same name.
-      if(getDisplay().getName().getText().equals(variables.get(currentSelectedVariableIndex).getName())) return false;
+      if(currentSelectedVariableIndex >= 0) {
+        // Edits can have the same name.
+        if(getDisplay().getName().getText().equals(variables.get(currentSelectedVariableIndex).getName())) return false;
+      }
       for(VariableDto variableDto : variables) {
         if(getDisplay().getName().getText().equals(variableDto.getName())) return true;
       }
