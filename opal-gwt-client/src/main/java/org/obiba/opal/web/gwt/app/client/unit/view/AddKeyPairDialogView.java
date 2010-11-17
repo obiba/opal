@@ -119,7 +119,6 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   }
 
   private void initWizardDialog() {
-    dialog.setContentSize("38em", "29em");
     dialog.setGlassEnabled(false);
     dialog.hide();
     dialog.addNextClickHandler(new ClickHandler() {

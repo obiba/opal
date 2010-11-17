@@ -877,3 +877,18 @@ div.variablesListTabContent td {
 div.variablesListTabContent .gwt-Label {
   font-weight:bold;
 }
+
+/* Wizard */
+
+.resizable-handle.resizable-se {
+	cursor:se-resize;
+    display:block;
+    float:right;
+    height:16px;
+    position:relative;
+    top:2em;
+    width:16px;
+    z-index: 1000;
+    background-image: url(image/256x240_icons.png);
+    background-position:-84px -224px;
+}

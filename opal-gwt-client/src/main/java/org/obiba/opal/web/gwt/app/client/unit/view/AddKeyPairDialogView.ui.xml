@@ -12,7 +12,7 @@
     .top-margin { margin-top: 0.5em; }
   </ui:style>
 
-  <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="10em" width="35em">
+  <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="29em" width="38em">
     <g:caption>
       <ui:msg description="Add Key Pair dialog title">Add Key Pair</ui:msg>
     </g:caption>
