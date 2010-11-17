@@ -37,7 +37,6 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
@@ -57,10 +56,6 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
     void showDialog();
 
     void hideDialog();
-
-    HasClickHandlers getAddButton();
-
-    HasClickHandlers getCancelButton();
 
     HasCloseHandlers<DialogBox> getDialog();
 
@@ -188,7 +183,12 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
   private KeyPairForm getKeyPairForm() {
     KeyPairForm dto = KeyPairForm.create();
     dto.setAlias(getDisplay().getAlias().getText());
+    setPrivateKey(dto);
+    setPublicKey(dto);
+    return dto;
+  }
 
+  private void setPrivateKey(KeyPairForm dto) {
     if(getDisplay().isPrivateKeyCreate().getValue()) {
       PrivateKeyForm pkForm = PrivateKeyForm.create();
       pkForm.setAlgo(getDisplay().getAlgorithm().getText());
@@ -197,7 +197,9 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
     } else {
       dto.setPrivateImport(getDisplay().getPrivateKeyImport().getText());
     }
+  }
 
+  private void setPublicKey(KeyPairForm dto) {
     if(getDisplay().isPublicKeyCreate().getValue()) {
       PublicKeyForm pkForm = PublicKeyForm.create();
       pkForm.setName(getDisplay().getFirstAndLastName().getText());
@@ -210,8 +212,6 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
     } else {
       dto.setPublicImport(getDisplay().getPublicKeyImport().getText());
     }
-
-    return dto;
   }
 
   private class CreateKeyPairCallBack implements ResponseCodeCallback {
