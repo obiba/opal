@@ -15,12 +15,10 @@ import net.customware.gwt.presenter.client.EventBus;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.view.CreateFolderDialogView;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.view.ApplicationView;
-import org.obiba.opal.web.gwt.app.client.view.DataExportView;
 import org.obiba.opal.web.gwt.app.client.view.LoginView;
 import org.obiba.opal.web.gwt.app.client.view.NotificationView;
 import org.obiba.opal.web.gwt.app.client.view.UnhandledResponseNotificationView;
@@ -40,6 +38,8 @@ import org.obiba.opal.web.gwt.app.client.widgets.view.TableListView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.TableSelectorView;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.view.EvaluateScriptView;
+import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.exportdata.view.DataExportView;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 
 import com.google.gwt.inject.client.AbstractGinModule;
@@ -59,11 +59,10 @@ public class OpalGinModule extends AbstractGinModule {
     bind(ApplicationPresenter.Display.class).to(ApplicationView.class).in(Singleton.class);
     bind(LoginPresenter.Display.class).to(LoginView.class).in(Singleton.class);
     bind(UnhandledResponseNotificationPresenter.Display.class).to(UnhandledResponseNotificationView.class).in(Singleton.class);
+    bind(DataExportPresenter.Display.class).to(DataExportView.class).in(Singleton.class);
 
     // Don't bind as singleton because the ApplicationPresenter expects a new instance on every display
-    bind(DataExportPresenter.Display.class).to(DataExportView.class);
     bind(NotificationPresenter.Display.class).to(NotificationView.class);
-
     bind(FileSelectorPresenter.Display.class).to(FileSelectorView.class).in(Singleton.class);
     bind(TableSelectorPresenter.Display.class).to(TableSelectorView.class).in(Singleton.class);
     bind(TableListPresenter.Display.class).to(TableListView.class);

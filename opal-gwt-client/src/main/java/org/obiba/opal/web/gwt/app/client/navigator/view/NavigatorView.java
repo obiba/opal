@@ -40,6 +40,9 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   @UiField
   Button createDatasourceButton;
 
+  @UiField
+  Button exportDataButton;
+
   public NavigatorView() {
     initWidget(uiBinder.createAndBindUi(this));
   }
@@ -73,6 +76,11 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   @Override
   public void addCreateDatasourceClickHandler(ClickHandler handler) {
     createDatasourceButton.addClickHandler(handler);
+  }
+
+  @Override
+  public void addExportDataClickHandler(ClickHandler handler) {
+    exportDataButton.addClickHandler(handler);
   }
 
 }

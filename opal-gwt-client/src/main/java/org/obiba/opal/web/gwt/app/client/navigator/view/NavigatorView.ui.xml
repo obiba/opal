@@ -13,6 +13,9 @@
       <g:Button ui:field="createDatasourceButton">
         <ui:msg description="Create Datasource label">Create Datasource</ui:msg>
       </g:Button>
+      <g:Button ui:field="exportDataButton">
+        <ui:msg description="Data Export label">Export Data</ui:msg>
+      </g:Button>
     </g:FlowPanel>
     <g:SplitLayoutPanel>
       <g:center> 

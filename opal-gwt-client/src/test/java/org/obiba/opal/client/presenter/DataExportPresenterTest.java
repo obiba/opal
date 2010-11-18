@@ -20,14 +20,12 @@ import net.customware.gwt.presenter.client.EventBus;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
-import org.obiba.opal.web.gwt.app.client.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
+import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -75,7 +73,9 @@ public class DataExportPresenterTest extends AbstractGwtTestSetup {
     expect(eventBusMock.addHandler(eq(ConfirmationEvent.getType()), isA(ConfirmationEvent.Handler.class))).andReturn(handlerRegistrationMock).once();
 
     // Make sure that a ClickHandler is added to the Submit button
+    expect(displayMock.addCancelClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
     expect(displayMock.addSubmitClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
+    expect(displayMock.addFinishClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
     expect(displayMock.addJobLinkClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
     expect(tableListDisplayMock.addRemoveClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
     expect(tableListDisplayMock.addAddClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
@@ -87,19 +87,11 @@ public class DataExportPresenterTest extends AbstractGwtTestSetup {
     displayMock.setFileWidgetDisplay(fileSelectionDisplayMock);
     expect(displayMock.addFileFormatChangeHandler((ChangeHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
 
-    // Expects that the presenter makes these calls to the server when it binds itself
-    ResourceRequestBuilder mockRequestBuilder = mockBridge.addMock(ResourceRequestBuilder.class);
-    expect(mockRequestBuilder.forResource("/datasources")).andReturn(mockRequestBuilder).once();
-    expect(mockRequestBuilder.get()).andReturn(mockRequestBuilder).anyTimes();
-    expect(mockRequestBuilder.withCallback((ResourceCallback) EasyMock.anyObject())).andReturn(mockRequestBuilder).anyTimes();
-    expect(mockRequestBuilder.forResource("/functional-units")).andReturn(mockRequestBuilder).once();
-    expect(mockRequestBuilder.send()).andReturn(null).anyTimes();
-
-    replay(eventBusMock, tableListDisplayMock, fileSelectionDisplayMock, displayMock, mockRequestBuilder);
+    replay(eventBusMock, tableListDisplayMock, fileSelectionDisplayMock, displayMock);
 
     exportPresenter.bind();
 
-    verify(eventBusMock, tableListDisplayMock, fileSelectionDisplayMock, displayMock, mockRequestBuilder);
+    verify(eventBusMock, tableListDisplayMock, fileSelectionDisplayMock, displayMock);
 
   }
 }

@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.presenter;
+package org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +15,11 @@ import java.util.List;
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
+import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
@@ -85,24 +87,13 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
     initFileSelectionType();
     fileSelectionPresenter.bind();
+    super.registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
+    super.registerHandler(getDisplay().addFinishClickHandler(new FinishClickHandler()));
     super.registerHandler(getDisplay().addSubmitClickHandler(new SubmitClickHandler()));
-    super.registerHandler(getDisplay().addJobLinkClickHandler(new DataCommonPresenter.JobLinkClickHandler(eventBus, jobListPresenter)));
+    super.registerHandler(getDisplay().addJobLinkClickHandler(new JobLinkClickHandler(eventBus, jobListPresenter)));
     super.registerHandler(getDisplay().addFileFormatChangeHandler(new FileFormatChangeHandler()));
     getDisplay().setFileWidgetDisplay(fileSelectionPresenter.getDisplay());
 
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<DatasourceDto> datasources) {
-        getDisplay().setDatasources(datasources);
-      }
-    }).send();
-
-    ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
-        getDisplay().setUnits(units);
-      }
-    }).send();
   }
 
   private void initFileSelectionType() {
@@ -153,6 +144,31 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   @Override
   public void revealDisplay() {
+    initDatasourcesAndUnitsAndShow();
+  }
+
+  private void initDatasourcesAndUnitsAndShow() {
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+      @Override
+      public void onResource(Response response, JsArray<DatasourceDto> datasources) {
+        if(datasources != null && datasources.length() > 0) {
+          getDisplay().setDatasources(datasources);
+          initUnitsAndShow();
+        } else {
+          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "NoDataToExport", null));
+        }
+      }
+    }).send();
+  }
+
+  private void initUnitsAndShow() {
+    ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
+      @Override
+      public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
+        getDisplay().setUnits(units);
+        getDisplay().showDialog();
+      }
+    }).send();
   }
 
   //
@@ -175,6 +191,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
       if(!errors.isEmpty()) {
         displayMessages(NotificationType.ERROR, errors);
       } else {
+        getDisplay().renderPendingConclusion();
         ResourceRequestBuilderFactory.newBuilder().forResource("/shell/copy").post() //
         .withResourceBody(CopyCommandOptionsDto.stringify(createCopycommandOptions())) //
         .withCallback(400, new ClientFailureResponseCodeCallBack()) //
@@ -210,6 +227,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     @Override
     public void onResponseCode(Request request, Response response) {
       eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
+      getDisplay().renderFailedConclusion();
     }
   }
 
@@ -218,12 +236,72 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     public void onResponseCode(Request request, Response response) {
       String location = response.getHeader("Location");
       String jobId = location.substring(location.lastIndexOf('/') + 1);
-
-      getDisplay().renderConclusionStep(jobId);
+      getDisplay().renderCompletedConclusion(jobId);
     }
   }
 
-  public interface Display extends DataCommonPresenter.Display {
+  static class JobLinkClickHandler implements ClickHandler {
+
+    private final EventBus eventBus;
+
+    private final JobListPresenter jobListPresenter;
+
+    public JobLinkClickHandler(EventBus eventBus, JobListPresenter jobListPresenter) {
+      super();
+      this.eventBus = eventBus;
+      this.jobListPresenter = jobListPresenter;
+    }
+
+    @Override
+    public void onClick(ClickEvent arg0) {
+      eventBus.fireEvent(new WorkbenchChangeEvent(jobListPresenter));
+    }
+  }
+
+  class CancelClickHandler implements ClickHandler {
+
+    public void onClick(ClickEvent arg0) {
+      getDisplay().hideDialog();
+    }
+  }
+
+  class FinishClickHandler implements ClickHandler {
+
+    public void onClick(ClickEvent arg0) {
+      getDisplay().hideDialog();
+    }
+  }
+
+  public interface Display extends WidgetDisplay {
+
+    void showDialog();
+
+    void hideDialog();
+
+    /** Set a collection of Opal datasources retrieved from Opal. */
+    void setDatasources(JsArray<DatasourceDto> datasources);
+
+    /** Get the Opal datasource selected by the user. */
+    String getSelectedDatasource();
+
+    /** Set a collection of Opal units retrieved from Opal. */
+    void setUnits(JsArray<FunctionalUnitDto> units);
+
+    /** Get the Opal unit selected by the user. */
+    String getSelectedUnit();
+
+    /** Get the form submit button. */
+    HandlerRegistration addSubmitClickHandler(ClickHandler handler);
+
+    /** Display the conclusion step */
+    void renderCompletedConclusion(String jobId);
+
+    void renderFailedConclusion();
+
+    void renderPendingConclusion();
+
+    /** Add a handler to the job list */
+    HandlerRegistration addJobLinkClickHandler(ClickHandler handler);
 
     boolean isDestinationFile();
 
@@ -252,6 +330,10 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     void setTableWidgetDisplay(TableListPresenter.Display display);
 
     void setFileWidgetDisplay(FileSelectionPresenter.Display display);
+
+    HandlerRegistration addCancelClickHandler(ClickHandler handler);
+
+    HandlerRegistration addFinishClickHandler(ClickHandler handler);
 
   }
 

@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresente
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.inject.client.OpalGinjector;
 import org.obiba.opal.web.gwt.rest.client.DefaultResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
@@ -61,6 +62,7 @@ public class GwtApp implements EntryPoint {
     initFileDownloadPresenter();
     initFileSelectorPresenter();
     initCreateDatasourcePresenter();
+    initDataExportPresenter();
     initApplicationPresenter();
     initLoginPresenter();
     initTableSelectorPresenter();
@@ -114,6 +116,11 @@ public class GwtApp implements EntryPoint {
 
   private void initCreateDatasourcePresenter() {
     CreateDatasourcePresenter presenter = opalGinjector.getCreateDatasourcePresenter();
+    presenter.bind();
+  }
+
+  private void initDataExportPresenter() {
+    DataExportPresenter presenter = opalGinjector.getDataExportPresenter();
     presenter.bind();
   }
 

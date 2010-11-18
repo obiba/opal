@@ -73,9 +73,6 @@ public class ApplicationView implements ApplicationPresenter.Display {
   MenuItem dataImportItem;
 
   @UiField
-  MenuItem dataExportItem;
-
-  @UiField
   MenuItem listJobsItem;
 
   @UiField
@@ -161,11 +158,6 @@ public class ApplicationView implements ApplicationPresenter.Display {
   @Override
   public Widget asWidget() {
     return dock;
-  }
-
-  @Override
-  public MenuItem getDataExportItem() {
-    return dataExportItem;
   }
 
   @Override

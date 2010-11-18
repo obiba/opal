@@ -31,7 +31,6 @@
                 <g:MenuItem styleName="gwt-MenuItemSeparator"><div class="menuSeparatorInner"></div></g:MenuItem>
                 <g:MenuItem ui:field="importVariablesItem"><ui:msg description="Import variables menu item">Import Variables...</ui:msg></g:MenuItem>
                 <g:MenuItem ui:field="dataImportItem"><ui:msg description="Import menu item">Import Data...</ui:msg></g:MenuItem>
-                <g:MenuItem ui:field="dataExportItem"><ui:msg description="Export menu item">Export Data...</ui:msg></g:MenuItem>
               </g:MenuBar>
             </g:MenuItem>            
             <g:MenuItem ui:field="fileExplorer">

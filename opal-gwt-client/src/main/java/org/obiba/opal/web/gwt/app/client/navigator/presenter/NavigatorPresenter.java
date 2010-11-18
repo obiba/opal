@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChan
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -35,6 +36,8 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     void addCreateDatasourceClickHandler(ClickHandler handler);
 
     HasWidgets getDetailsPanel();
+
+    void addExportDataClickHandler(ClickHandler handler);
   }
 
   @Inject
@@ -50,7 +53,10 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
   private VariablePresenter variablePresenter;
 
   @Inject
-  private Provider<CreateDatasourcePresenter> createDatasourceStepPresenter;
+  private Provider<CreateDatasourcePresenter> createDatasourcePresenter;
+
+  @Inject
+  private Provider<DataExportPresenter> dataExportPresenter;
 
   @Inject
   public NavigatorPresenter(final Display display, final EventBus eventBus) {
@@ -75,7 +81,16 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
 
       @Override
       public void onClick(ClickEvent arg0) {
-        CreateDatasourcePresenter presenter = createDatasourceStepPresenter.get();
+        CreateDatasourcePresenter presenter = createDatasourcePresenter.get();
+        presenter.revealDisplay();
+      }
+    });
+
+    getDisplay().addExportDataClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent arg0) {
+        DataExportPresenter presenter = dataExportPresenter.get();
         presenter.revealDisplay();
       }
     });
