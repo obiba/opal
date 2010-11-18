@@ -72,7 +72,7 @@ public interface Translations extends Constants {
   String statusLabel();
 
   @Description("Status map")
-  @DefaultStringMapValue( { "NOT_STARTED", "Not Started", //
+  @DefaultStringMapValue({ "NOT_STARTED", "Not Started", //
   "IN_PROGRESS", "In Progress", //
   "SUCCEEDED", "Succeeded", //
   "FAILED", "Failed", //
@@ -86,7 +86,7 @@ public interface Translations extends Constants {
   String actionsLabel();
 
   @Description("Action map")
-  @DefaultStringMapValue( { "Log", "Log", //
+  @DefaultStringMapValue({ "Log", "Log", //
   "Cancel", "Cancel", //
   "Delete", "Delete", //
   "Edit", "Edit", //
@@ -146,7 +146,7 @@ public interface Translations extends Constants {
   String unitLabel();
 
   @Description("User message map")
-  @DefaultStringMapValue( { //
+  @DefaultStringMapValue({ //
   "VariableNameNotUnique", "The specified variable name already exists.", //
   "CategoryDialogNameRequired", "A category name is required.", //
   "CategoryNameAlreadyExists", "The specified category name already exists.", //
@@ -198,7 +198,11 @@ public interface Translations extends Constants {
   "NewVariableNameIsRequired", "A name is required for the new variable to be created.",//
   "ScriptIsRequired", "A script is required.",//
   "CopyFromVariableNameIsRequired", "You must enter the name of a variable from which the new variable will be created from.",//
-  "cannotSwitchTabBecauseOfUnsavedChanges", "You have unsaved changes. You need to press Save Changes before you can select another tab." })
+  "cannotSwitchTabBecauseOfUnsavedChanges", "You have unsaved changes. You need to press Save Changes before you can select another tab.",//
+  "UrlRequired", "You must provide the database's URL.",//
+  "UsernameRequired", "You must indicate the user name to be used for the database connection.",//
+  "PasswordRequired", "You must indicate the password to be used for the database connection.", //
+  "MustIndicateWhetherJdbcDatasourceShouldUseMetadataTables", "You must indicate whether meta-data tables are to be used or not." })
   Map<String, String> userMessageMap();
 
   @Description("You must select a file message")
@@ -278,7 +282,7 @@ public interface Translations extends Constants {
   String logLabel();
 
   @Description("Confirmation title map")
-  @DefaultStringMapValue( { //
+  @DefaultStringMapValue({ //
   "deleteVariableTitle", "Delete Variable", //
   "deleteTable", "Delete Table", //
   "clearJobsList", "Clear Jobs List", //
@@ -295,7 +299,7 @@ public interface Translations extends Constants {
   Map<String, String> confirmationTitleMap();
 
   @Description("Confirmation message map")
-  @DefaultStringMapValue( { //
+  @DefaultStringMapValue({ //
   "confirmVariableDelete", "Delete the currently displayed variable?", //
   "removingTablesFromViewMayAffectVariables", "Removing tables from the view will have an impact on which Variables can be defined.", //
   "confirmClearJobsList", "All the completed jobs (succeeded, failed or cancelled) will be removed from the jobs list. Currently running jobs will be unaffected.<br /><br />Please confirm that you want to clear the jobs list.", //
@@ -376,7 +380,7 @@ public interface Translations extends Constants {
   String errorLabel();
 
   @Description("Datasource parsing error map")
-  @DefaultStringMapValue( { "CategoryNameRequired", "Category name required", //
+  @DefaultStringMapValue({ "CategoryNameRequired", "Category name required", //
   "CategoryVariableNameRequired", "Category variable name required", //
   "DuplicateCategoryName", "Duplicate category name", //
   "DuplicateColumns", "Duplicate columns", //
@@ -400,7 +404,7 @@ public interface Translations extends Constants {
   Map<String, String> datasourceParsingErrorMap();
 
   @Description("Datasource comparison error map")
-  @DefaultStringMapValue( { "IncompatibleValueType", "Incompatible value type", //
+  @DefaultStringMapValue({ "IncompatibleValueType", "Incompatible value type", //
   "IncompatibleEntityType", "Incompatible entity type", //
   "VariablePresentInSourceButNotDestination", "Variable exists in source but not in destination" })
   Map<String, String> datasourceComparisonErrorMap();
