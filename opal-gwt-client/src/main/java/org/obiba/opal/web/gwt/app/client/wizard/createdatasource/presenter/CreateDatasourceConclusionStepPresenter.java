@@ -119,12 +119,16 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
         getDisplay().setFailed(null);
       }
 
-      if(createdCallback != null) {
-        if(success) createdCallback.onSuccess(dto);
-        else if(error != null) createdCallback.onFailure(dto, error);
-        else
-          createdCallback.onFailure(dto, null);
-      }
+      callback(success, error);
+    }
+
+    private void callback(boolean success, ClientErrorDto error) {
+      if(createdCallback == null) return;
+
+      if(success) createdCallback.onSuccess(dto);
+      else if(error != null) createdCallback.onFailure(dto, error);
+      else
+        createdCallback.onFailure(dto, null);
     }
   }
 
