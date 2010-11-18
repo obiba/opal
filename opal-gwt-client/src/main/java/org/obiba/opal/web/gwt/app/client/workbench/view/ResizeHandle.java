@@ -16,13 +16,13 @@ import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.UIObject;
 
 /**
  *
  */
-public class ResizeHandle extends FocusPanel {
+public class ResizeHandle extends Label {
 
   private UIObject objectToResize;
 
