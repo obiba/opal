@@ -159,30 +159,39 @@ public class FunctionalUnitResource {
 
     ResponseBuilder response = null;
     try {
-      if(kpForm.hasPrivateForm() && kpForm.hasPublicForm()) {
-        unitKeyStoreService.createOrUpdateKey(unit, kpForm.getAlias(), kpForm.getPrivateForm().getAlgo(), kpForm.getPrivateForm().getSize(), getCertificateInfo(kpForm.getPublicForm()));
-      } else if(kpForm.hasPrivateImport()) {
-        if(kpForm.hasPublicForm()) {
-          unitKeyStoreService.importKey(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()), getCertificateInfo(kpForm.getPublicForm()));
-        } else if(kpForm.hasPublicImport()) {
-          unitKeyStoreService.importKey(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()), new ByteArrayInputStream(kpForm.getPublicImport().getBytes()));
-        } else {
-          response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "MissingPublicKeyArgument").build());
-        }
-      } else {
-        response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "MissingPrivateKeyArgument").build());
-      }
-
+      response = doCreateOrImportKeyPair(kpForm);
       if(response == null) {
         response = Response.created(UriBuilder.fromPath("/").path(FunctionalUnitResource.class).path("/key/" + kpForm.getAlias()).build(unit));
       }
-    } catch(RuntimeException e) {
-      response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "KeyPairCreationFailed", e).build());
     } catch(Exception e) {
       response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "KeyPairCreationFailed", e).build());
     }
 
     return response.build();
+  }
+
+  private ResponseBuilder doCreateOrImportKeyPair(Opal.KeyPairForm kpForm) {
+    ResponseBuilder response = null;
+    if(kpForm.hasPrivateForm() && kpForm.hasPublicForm()) {
+      unitKeyStoreService.createOrUpdateKey(unit, kpForm.getAlias(), kpForm.getPrivateForm().getAlgo(), kpForm.getPrivateForm().getSize(), getCertificateInfo(kpForm.getPublicForm()));
+    } else if(kpForm.hasPrivateImport()) {
+      response = doImportKeyPair(kpForm);
+    } else {
+      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "MissingPrivateKeyArgument").build());
+    }
+    return response;
+  }
+
+  private ResponseBuilder doImportKeyPair(Opal.KeyPairForm kpForm) {
+    ResponseBuilder response = null;
+    if(kpForm.hasPublicForm()) {
+      unitKeyStoreService.importKey(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()), getCertificateInfo(kpForm.getPublicForm()));
+    } else if(kpForm.hasPublicImport()) {
+      unitKeyStoreService.importKey(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()), new ByteArrayInputStream(kpForm.getPublicImport().getBytes()));
+    } else {
+      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "MissingPublicKeyArgument").build());
+    }
+    return response;
   }
 
   @DELETE
