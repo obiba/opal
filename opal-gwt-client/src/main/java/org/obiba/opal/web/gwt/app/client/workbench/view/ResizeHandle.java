@@ -28,8 +28,6 @@ public class ResizeHandle extends Label {
     SOUTH_EAST, SOUTH
   }
 
-  private UIObject objectToResize;
-
   private Direction direction;
 
   public ResizeHandle() {
@@ -57,8 +55,7 @@ public class ResizeHandle extends Label {
   }
 
   public void makeResizable(UIObject objectToResize) {
-    this.objectToResize = objectToResize;
-    MouseResizeHandler handler = new MouseResizeHandler();
+    MouseResizeHandler handler = new MouseResizeHandler(objectToResize);
     addMouseDownHandler(handler);
     addMouseMoveHandler(handler);
     addMouseUpHandler(handler);
@@ -66,11 +63,18 @@ public class ResizeHandle extends Label {
 
   private class MouseResizeHandler implements MouseDownHandler, MouseMoveHandler, MouseUpHandler {
 
+    private UIObject objectToResize;
+
     private boolean dragging = false;
 
     private int dragStartX;
 
     private int dragStartY;
+
+    public MouseResizeHandler(UIObject objectToResize) {
+      super();
+      this.objectToResize = objectToResize;
+    }
 
     @Override
     public void onMouseDown(MouseDownEvent evt) {
