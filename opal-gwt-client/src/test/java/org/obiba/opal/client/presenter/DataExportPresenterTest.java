@@ -20,6 +20,7 @@ import net.customware.gwt.presenter.client.EventBus;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionEvent;
@@ -82,6 +83,8 @@ public class DataExportPresenterTest extends AbstractGwtTestSetup {
 
     expect(fileSelectionDisplayMock.addBrowseClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
 
+    displayMock.setTablesValidator((ValidationHandler) EasyMock.anyObject());
+    displayMock.setDestinationValidator((ValidationHandler) EasyMock.anyObject());
     displayMock.setTableWidgetDisplay(tableListDisplayMock);
     expect(displayMock.getFileFormat()).andReturn("csv");
     displayMock.setFileWidgetDisplay(fileSelectionDisplayMock);
