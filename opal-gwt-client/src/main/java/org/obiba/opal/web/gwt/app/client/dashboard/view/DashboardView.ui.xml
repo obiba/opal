@@ -20,18 +20,18 @@
         <ui:msg description="What to do now label">What to do now:</ui:msg>
     </div>
     <div id="shortcuts" class="large-indent">
-	    <div>
-	      <g:Anchor ui:field="exploreVariablesLink"><img src="image/48/table.png" align="middle"/><ui:msg description="Explore variables link label">Explore Variables</ui:msg></g:Anchor>:
-	      <ui:msg description="Explore variables link description">browse tables and variables.</ui:msg>
-	    </div>
-	    <div>
-	      <g:Anchor ui:field="importDataLink"><img src="image/48/table-import.png" align="middle"/><ui:msg description="Import data link label">Import Data</ui:msg></g:Anchor>:
-	      <ui:msg description="Import data link description">create a job to import data from a file in various formats.</ui:msg>
-	    </div>
-	    <div>
-	      <g:Anchor ui:field="exportDataLink"><img src="image/48/table-export.png" align="middle"/><ui:msg description="Export data link label">Export Data</ui:msg></g:Anchor>:
-	      <ui:msg description="Export data link description">create a job to export data to various destinations (files, databases, etc).</ui:msg>
-	    </div>
+	    <table>
+	      <tr>
+	        <td valign="top"><g:Anchor ui:field="exploreVariablesLink"><img src="image/48/table.png" align="middle"/><ui:msg description="Explore variables link label">Explore Variables</ui:msg></g:Anchor>:</td>
+	        <td>
+		      <ul>
+		        <li><ui:msg description="Explore variables link description">browse tables and variables.</ui:msg></li>
+		        <li><ui:msg description="Import data link description">create a job to import data from a file in various formats.</ui:msg></li>
+		        <li><ui:msg description="Export data link description">create a job to export data to various destinations (files, databases, etc).</ui:msg></li>
+		      </ul>  
+	        </td>
+	      </tr>
+	    </table>
 	    <div>
 	      <g:Anchor ui:field="exploreFilesLink"><img src="image/48/folder.png" align="middle"/><ui:msg description="Manage Files link label">Manage Files</ui:msg></g:Anchor>:
 	      <ui:msg description="Manage Files link description">browse, upload and download files on the server.</ui:msg>

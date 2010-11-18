@@ -77,21 +77,6 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
   }
 
   private void addEventHandlers() {
-    super.registerHandler(getDisplay().getImportDataLink().addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        eventBus.fireEvent(new WorkbenchChangeEvent(formatSelectionStepPresenter.get()));
-      }
-    }));
-
-    super.registerHandler(getDisplay().getExportDataLink().addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        eventBus.fireEvent(new WorkbenchChangeEvent(dataExportPresenter.get()));
-      }
-    }));
 
     super.registerHandler(getDisplay().getExploreVariablesLink().addClickHandler(new ClickHandler() {
 
@@ -150,10 +135,6 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
     void setParticipantCount(int count);
 
     HasClickHandlers getExploreVariablesLink();
-
-    HasClickHandlers getImportDataLink();
-
-    HasClickHandlers getExportDataLink();
 
     HasClickHandlers getExploreFilesLink();
 

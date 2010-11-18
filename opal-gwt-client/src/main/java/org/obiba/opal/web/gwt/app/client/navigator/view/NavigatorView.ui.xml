@@ -13,8 +13,17 @@
       <g:Button ui:field="createDatasourceButton">
         <ui:msg description="Create Datasource label">Create Datasource</ui:msg>
       </g:Button>
+      <g:Button ui:field="importVariablesButton">
+        <ui:msg description="Variables Import label">Import Variables</ui:msg>
+      </g:Button>
+      <g:Button ui:field="importDataButton">
+        <ui:msg description="Data Import label">Import Data</ui:msg>
+      </g:Button>
       <g:Button ui:field="exportDataButton">
         <ui:msg description="Data Export label">Export Data</ui:msg>
+      </g:Button>
+      <g:Button ui:field="addViewButton">
+        <ui:msg description="Add View label">Add View</ui:msg>
       </g:Button>
     </g:FlowPanel>
     <g:SplitLayoutPanel>

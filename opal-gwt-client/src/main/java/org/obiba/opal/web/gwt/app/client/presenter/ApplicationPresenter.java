@@ -21,12 +21,9 @@ import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.event.ViewCreationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.FormatSelectionStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.UploadVariablesStepPresenter;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -51,15 +48,15 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
     MenuItem getDatasourcesItem();
 
-    MenuItem getNewViewItem();
-
-    MenuItem getExploreVariables();
-
-    MenuItem getImportVariables();
+    // MenuItem getNewViewItem();
+    //
+    // MenuItem getExploreVariables();
+    //
+    // MenuItem getImportVariables();
+    //
+    // MenuItem getDataImportItem();
 
     void updateWorkbench(Widget workbench);
-
-    MenuItem getDataImportItem();
 
     MenuItem getListJobsItem();
 
@@ -85,12 +82,6 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
   @Inject
   private Provider<NavigatorPresenter> navigationPresenter;
-
-  @Inject
-  private Provider<UploadVariablesStepPresenter> uploadVariablesStepPresenter;
-
-  @Inject
-  private Provider<FormatSelectionStepPresenter> formatSelectionStepPresenter;
 
   @Inject
   private Provider<JobListPresenter> jobListPresenter;
@@ -149,38 +140,11 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       }
     });
 
-    getDisplay().getNewViewItem().setCommand(new Command() {
-
-      @Override
-      public void execute() {
-        eventBus.fireEvent(new ViewCreationRequiredEvent());
-        getDisplay().setCurrentSelection(getDisplay().getDatasourcesItem());
-      }
-    });
-
-    getDisplay().getExploreVariables().setCommand(new Command() {
+    getDisplay().getDatasourcesItem().setCommand(new Command() {
 
       @Override
       public void execute() {
         eventBus.fireEvent(new WorkbenchChangeEvent(navigationPresenter.get()));
-        getDisplay().setCurrentSelection(getDisplay().getDatasourcesItem());
-      }
-    });
-
-    getDisplay().getImportVariables().setCommand(new Command() {
-
-      @Override
-      public void execute() {
-        eventBus.fireEvent(new WorkbenchChangeEvent(uploadVariablesStepPresenter.get()));
-        getDisplay().setCurrentSelection(getDisplay().getDatasourcesItem());
-      }
-    });
-
-    getDisplay().getDataImportItem().setCommand(new Command() {
-
-      @Override
-      public void execute() {
-        eventBus.fireEvent(new WorkbenchChangeEvent(formatSelectionStepPresenter.get()));
         getDisplay().setCurrentSelection(getDisplay().getDatasourcesItem());
       }
     });

@@ -47,12 +47,6 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   Anchor exploreVariablesLink;
 
   @UiField
-  Anchor importDataLink;
-
-  @UiField
-  Anchor exportDataLink;
-
-  @UiField
   Anchor exploreFilesLink;
 
   @UiField
@@ -96,14 +90,6 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
 
   public Anchor getExploreVariablesLink() {
     return exploreVariablesLink;
-  }
-
-  public Anchor getImportDataLink() {
-    return importDataLink;
-  }
-
-  public Anchor getExportDataLink() {
-    return exportDataLink;
   }
 
   @Override
