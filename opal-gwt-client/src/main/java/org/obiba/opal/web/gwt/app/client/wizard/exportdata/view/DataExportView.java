@@ -130,27 +130,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   private void initWizardDialog() {
     dialog.hide();
     clear();
-    dialog.addPreviousClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent arg0) {
-        if(conclusionStep.isVisible()) {
-          conclusionStep.setVisible(false);
-          unitStep.setVisible(true);
-          dialog.setNextEnabled(true);
-        } else if(unitStep.isVisible()) {
-          unitStep.setVisible(false);
-          destinationStep.setVisible(true);
-        } else if(destinationStep.isVisible()) {
-          destinationStep.setVisible(false);
-          optionsStep.setVisible(true);
-        } else if(optionsStep.isVisible()) {
-          optionsStep.setVisible(false);
-          tablesStep.setVisible(true);
-          dialog.setPreviousEnabled(false);
-        }
-      }
-    });
+    dialog.addPreviousClickHandler(new PreviousClickHandler());
   }
 
   private void initTablesStep() {
@@ -258,27 +238,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
 
   @Override
   public HandlerRegistration addSubmitClickHandler(final ClickHandler submitHandler) {
-    return dialog.addNextClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent evt) {
-        if(tablesStep.isVisible()) {
-          if(!tablesValidator.validate()) return;
-          tablesStep.setVisible(false);
-          optionsStep.setVisible(true);
-          dialog.setPreviousEnabled(true);
-        } else if(optionsStep.isVisible()) {
-          optionsStep.setVisible(false);
-          destinationStep.setVisible(true);
-        } else if(destinationStep.isVisible()) {
-          if(!destinationValidator.validate()) return;
-          destinationStep.setVisible(false);
-          unitStep.setVisible(true);
-        } else if(unitStep.isVisible()) {
-          submitHandler.onClick(evt);
-        }
-      }
-    });
+    return dialog.addNextClickHandler(new NextClickHandler(submitHandler));
   }
 
   @Override
@@ -468,6 +428,84 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   @Override
   public void setDestinationValidator(ValidationHandler handler) {
     this.destinationValidator = handler;
+  }
+
+  private final class NextClickHandler implements ClickHandler {
+
+    private final ClickHandler submitHandler;
+
+    private NextClickHandler(ClickHandler submitHandler) {
+      this.submitHandler = submitHandler;
+    }
+
+    @Override
+    public void onClick(ClickEvent evt) {
+      if(tablesStep.isVisible()) {
+        processTablesStep();
+      } else if(optionsStep.isVisible()) {
+        processOptionsStep();
+      } else if(destinationStep.isVisible()) {
+        processDestinationStep();
+      } else if(unitStep.isVisible()) {
+        submitHandler.onClick(evt);
+      }
+    }
+
+    private void processTablesStep() {
+      if(!tablesValidator.validate()) return;
+      tablesStep.setVisible(false);
+      optionsStep.setVisible(true);
+      dialog.setPreviousEnabled(true);
+    }
+
+    private void processOptionsStep() {
+      optionsStep.setVisible(false);
+      destinationStep.setVisible(true);
+    }
+
+    private void processDestinationStep() {
+      if(!destinationValidator.validate()) return;
+      destinationStep.setVisible(false);
+      unitStep.setVisible(true);
+    }
+  }
+
+  private final class PreviousClickHandler implements ClickHandler {
+    @Override
+    public void onClick(ClickEvent arg0) {
+      if(conclusionStep.isVisible()) {
+        processConclusionStep();
+      } else if(unitStep.isVisible()) {
+        processUnitStep();
+      } else if(destinationStep.isVisible()) {
+        processDestinationStep();
+      } else if(optionsStep.isVisible()) {
+        processOptionsStep();
+      }
+    }
+
+    private void processConclusionStep() {
+      conclusionStep.setVisible(false);
+      unitStep.setVisible(true);
+      dialog.setNextEnabled(true);
+    }
+
+    private void processUnitStep() {
+      unitStep.setVisible(false);
+      destinationStep.setVisible(true);
+    }
+
+    private void processDestinationStep() {
+      destinationStep.setVisible(false);
+      optionsStep.setVisible(true);
+    }
+
+    private void processOptionsStep() {
+      optionsStep.setVisible(false);
+      tablesStep.setVisible(true);
+      dialog.setPreviousEnabled(false);
+    }
+
   }
 
 }
