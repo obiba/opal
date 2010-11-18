@@ -37,49 +37,33 @@ public class NumericTextBox extends TextBox {
         return;
       }
 
-      int keyCode = event.getNativeEvent().getKeyCode();
+      if(processKeyCode(event.getNativeEvent().getKeyCode())) {
+        cancelKey();
+      }
+    }
 
-      boolean processed = false;
-
+    private boolean processKeyCode(int keyCode) {
       switch(keyCode) {
       case KeyCodes.KEY_LEFT:
       case KeyCodes.KEY_RIGHT:
       case KeyCodes.KEY_BACKSPACE:
       case KeyCodes.KEY_DELETE:
-      case KeyCodes.KEY_TAB:
-        if(getText().isEmpty()) {
-          setValue(formatValue(min));
-        }
-        return;
       case KeyCodes.KEY_UP:
-        if(step != 0) {
-          increaseValue(step);
-          processed = true;
-        }
+        increaseValue(step);
         break;
       case KeyCodes.KEY_PAGEUP:
-        if(step != 0) {
-          increaseValue(step * 10);
-          processed = true;
-        }
+        increaseValue(step * 10);
         break;
       case KeyCodes.KEY_DOWN:
-        if(step != 0) {
-          decreaseValue(step);
-          processed = true;
-        }
+        decreaseValue(step);
         break;
       case KeyCodes.KEY_PAGEDOWN:
-        if(step != 0) {
-          decreaseValue(step * 10);
-          processed = true;
-        }
+        decreaseValue(step * 10);
         break;
+      default:
+        return false;
       }
-
-      if(processed) {
-        cancelKey();
-      }
+      return true;
     }
 
   };
@@ -87,35 +71,36 @@ public class NumericTextBox extends TextBox {
   private KeyPressHandler keyPressHandler = new KeyPressHandler() {
     @Override
     public void onKeyPress(KeyPressEvent event) {
-
       if(isReadOnly() || !isEnabled()) {
         return;
       }
 
-      int keyCode = event.getNativeEvent().getKeyCode();
-
-      switch(keyCode) {
+      switch(event.getNativeEvent().getKeyCode()) {
       case KeyCodes.KEY_LEFT:
       case KeyCodes.KEY_RIGHT:
       case KeyCodes.KEY_BACKSPACE:
       case KeyCodes.KEY_DELETE:
-      case KeyCodes.KEY_TAB:
       case KeyCodes.KEY_UP:
+      case KeyCodes.KEY_PAGEUP:
       case KeyCodes.KEY_DOWN:
+      case KeyCodes.KEY_PAGEDOWN:
         return;
       }
 
+      cancelKey();
+      setValue(getNewText(event.getCharCode()), true);
+    }
+
+    private String getNewText(char code) {
       int index = getCursorPos();
       String previousText = getText();
       String newText;
       if(getSelectionLength() > 0) {
-        newText = previousText.substring(0, getCursorPos()) + event.getCharCode() + previousText.substring(getCursorPos() + getSelectionLength(), previousText.length());
+        newText = previousText.substring(0, getCursorPos()) + code + previousText.substring(getCursorPos() + getSelectionLength(), previousText.length());
       } else {
-        newText = previousText.substring(0, index) + event.getCharCode() + previousText.substring(index, previousText.length());
+        newText = previousText.substring(0, index) + code + previousText.substring(index, previousText.length());
       }
-      cancelKey();
-
-      setValue(newText, true);
+      return newText;
     }
   };
 
@@ -172,27 +157,26 @@ public class NumericTextBox extends TextBox {
   }
 
   protected void increaseValue(int step) {
-    if(step != 0) {
-      String value = getText();
-      long newValue = parseValue(value);
-      newValue += step;
-      if(maxConstrained && (newValue > max)) {
-        return;
-      }
-      setValue(formatValue(newValue));
+    if(step == 0) return;
+    String value = getText();
+    long newValue = parseValue(value);
+    newValue += step;
+    if(maxConstrained && (newValue > max)) {
+      return;
     }
+    setValue(formatValue(newValue));
   }
 
   protected void decreaseValue(int step) {
-    if(step != 0) {
-      String value = getText();
-      long newValue = parseValue(value);
-      newValue -= step;
-      if(minConstrained && (newValue < min)) {
-        return;
-      }
-      setValue(formatValue(newValue));
+    if(step == 0) return;
+
+    String value = getText();
+    long newValue = parseValue(value);
+    newValue -= step;
+    if(minConstrained && (newValue < min)) {
+      return;
     }
+    setValue(formatValue(newValue));
   }
 
   /**
