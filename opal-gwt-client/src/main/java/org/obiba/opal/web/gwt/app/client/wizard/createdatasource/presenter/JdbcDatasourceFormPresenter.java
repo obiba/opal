@@ -10,20 +10,17 @@
 package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
-import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredOptionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ValidatableWidgetPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
@@ -40,12 +37,7 @@ import com.google.inject.Inject;
 /**
  *
  */
-public class JdbcDatasourceFormPresenter extends WidgetPresenter<JdbcDatasourceFormPresenter.Display> implements DatasourceFormPresenter {
-  //
-  // Instance Variables
-  //
-
-  private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+public class JdbcDatasourceFormPresenter extends ValidatableWidgetPresenter<JdbcDatasourceFormPresenter.Display> implements DatasourceFormPresenter {
 
   //
   // Constructors
@@ -56,10 +48,10 @@ public class JdbcDatasourceFormPresenter extends WidgetPresenter<JdbcDatasourceF
   public JdbcDatasourceFormPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
 
-    validators.add(new RequiredTextValidator(getDisplay().getUrl(), "UrlRequired"));
-    validators.add(new RequiredTextValidator(getDisplay().getUsername(), "UsernameRequired"));
-    validators.add(new RequiredTextValidator(getDisplay().getPassword(), "PasswordRequired"));
-    validators.add(new RequiredOptionValidator(RequiredOptionValidator.asSet(getDisplay().getUseMetadataTablesOption(), getDisplay().getDoNotUseMetadataTablesOption()), "MustIndicateWhetherJdbcDatasourceShouldUseMetadataTables"));
+    addValidator(new RequiredTextValidator(getDisplay().getUrl(), "UrlRequired"));
+    addValidator(new RequiredTextValidator(getDisplay().getUsername(), "UsernameRequired"));
+    addValidator(new RequiredTextValidator(getDisplay().getPassword(), "PasswordRequired"));
+    addValidator(new RequiredOptionValidator(RequiredOptionValidator.asSet(getDisplay().getUseMetadataTablesOption(), getDisplay().getDoNotUseMetadataTablesOption()), "MustIndicateWhetherJdbcDatasourceShouldUseMetadataTables"));
   }
 
   //
@@ -174,16 +166,8 @@ public class JdbcDatasourceFormPresenter extends WidgetPresenter<JdbcDatasourceF
   }
 
   @Override
-  public boolean validate() {
-    for(FieldValidator validator : validators) {
-      String error = validator.validate();
-      if(error != null) {
-        fireErrorEvent(error);
-        return false;
-      }
-    }
-
-    return true;
+  public boolean validateFormData() {
+    return validate();
   }
 
   private void fireErrorEvent(String error) {

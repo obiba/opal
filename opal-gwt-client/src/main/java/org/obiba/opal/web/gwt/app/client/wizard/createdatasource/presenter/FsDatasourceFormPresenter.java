@@ -104,8 +104,12 @@ public class FsDatasourceFormPresenter extends WidgetPresenter<FsDatasourceFormP
 
   }
 
+  private void fireErrorEvent(String error) {
+    eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, error, null));
+  }
+
   @Override
-  public boolean validate() {
+  public boolean validateFormData() {
     boolean isValid = true;
     String file = fileSelectionPresenter.getSelectedFile();
 
@@ -118,9 +122,5 @@ public class FsDatasourceFormPresenter extends WidgetPresenter<FsDatasourceFormP
     }
 
     return isValid;
-  }
-
-  private void fireErrorEvent(String error) {
-    eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, error, null));
   }
 }

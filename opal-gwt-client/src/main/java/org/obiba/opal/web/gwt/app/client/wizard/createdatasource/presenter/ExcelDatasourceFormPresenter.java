@@ -105,8 +105,12 @@ public class ExcelDatasourceFormPresenter extends WidgetPresenter<ExcelDatasourc
 
   }
 
+  private void fireErrorEvent(String error) {
+    eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, error, null));
+  }
+
   @Override
-  public boolean validate() {
+  public boolean validateFormData() {
     boolean isValid = true;
     String file = fileSelectionPresenter.getSelectedFile();
 
@@ -119,9 +123,5 @@ public class ExcelDatasourceFormPresenter extends WidgetPresenter<ExcelDatasourc
     }
 
     return isValid;
-  }
-
-  private void fireErrorEvent(String error) {
-    eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, error, null));
   }
 }

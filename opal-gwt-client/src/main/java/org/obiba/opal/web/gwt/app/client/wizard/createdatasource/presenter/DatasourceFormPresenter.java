@@ -29,7 +29,7 @@ public interface DatasourceFormPresenter extends Presenter {
    * True if the form data in the form are valid. Responsible for displaying the appropriate error message.
    * @return
    */
-  public boolean validate();
+  public boolean validateFormData();
 
   public interface Display extends WidgetDisplay {
 

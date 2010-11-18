@@ -251,7 +251,7 @@ public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourceP
     }
 
     private boolean validateDatasourceForm() {
-      return getDisplay().getDatasourceForm().validate();
+      return getDisplay().getDatasourceForm().validateFormData();
     }
 
     private void createDatasource() {

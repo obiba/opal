@@ -10,22 +10,19 @@
 package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
-import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RegExValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ValidatableWidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -44,10 +41,7 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 
-/**
- *
- */
-public class CsvDatasourceFormPresenter extends WidgetPresenter<CsvDatasourceFormPresenter.Display> implements DatasourceFormPresenter {
+public class CsvDatasourceFormPresenter extends ValidatableWidgetPresenter<CsvDatasourceFormPresenter.Display> implements DatasourceFormPresenter {
   //
   // Constants
   //
@@ -63,8 +57,6 @@ public class CsvDatasourceFormPresenter extends WidgetPresenter<CsvDatasourceFor
 
   private List<String> availableCharsets = new ArrayList<String>();
 
-  private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
-
   private HasText selectedFile;
 
   private HasValue<Boolean> isSpecificCharsetAvailable;
@@ -77,10 +69,10 @@ public class CsvDatasourceFormPresenter extends WidgetPresenter<CsvDatasourceFor
   public CsvDatasourceFormPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
 
-    validators.add(new RequiredTextValidator(getSelectedFile(), "NoDataFileSelected"));
-    validators.add(new RegExValidator(getDisplay().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
-    validators.add(new ConditionalValidator(getDisplay().isCharsetSpecify(), new RequiredTextValidator(getDisplay().getCharsetSpecifyText(), "SpecificCharsetNotIndicated")));
-    validators.add(new ConditionalValidator(getDisplay().isCharsetSpecify(), new ConditionValidator(isSpecificCharsetAvailable(), "CharsetNotAvailable")));
+    addValidator(new RequiredTextValidator(getSelectedFile(), "NoDataFileSelected"));
+    addValidator(new RegExValidator(getDisplay().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
+    addValidator(new ConditionalValidator(getDisplay().isCharsetSpecify(), new RequiredTextValidator(getDisplay().getCharsetSpecifyText(), "SpecificCharsetNotIndicated")));
+    addValidator(new ConditionalValidator(getDisplay().isCharsetSpecify(), new ConditionValidator(isSpecificCharsetAvailable(), "CharsetNotAvailable")));
   }
 
   //
@@ -279,17 +271,8 @@ public class CsvDatasourceFormPresenter extends WidgetPresenter<CsvDatasourceFor
     HasText getCharsetSpecifyText();
   }
 
-  @Override
-  public boolean validate() {
-    for(FieldValidator validator : validators) {
-      String error = validator.validate();
-      if(error != null) {
-        fireErrorEvent(error);
-        return false;
-      }
-    }
-
-    return true;
+  public boolean validateFormData() {
+    return validate();
   }
 
   private void fireErrorEvent(String error) {
