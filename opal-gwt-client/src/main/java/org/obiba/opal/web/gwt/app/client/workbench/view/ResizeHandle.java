@@ -9,20 +9,26 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.event.dom.client.HasMouseDownHandlers;
+import com.google.gwt.event.dom.client.HasMouseMoveHandlers;
+import com.google.gwt.event.dom.client.HasMouseUpHandlers;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.UIObject;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  *
  */
-public class ResizeHandle extends Label {
+public class ResizeHandle extends Widget implements HasText, HasMouseDownHandlers, HasMouseUpHandlers, HasMouseMoveHandlers {
 
   public enum Direction {
     SOUTH_EAST, SOUTH
@@ -36,6 +42,7 @@ public class ResizeHandle extends Label {
 
   public ResizeHandle(Direction direction) {
     super();
+    setElement(Document.get().createDivElement());
     addStyleName("resizable-handle");
     setResizeDirection(direction);
   }
@@ -55,7 +62,11 @@ public class ResizeHandle extends Label {
   }
 
   public void makeResizable(UIObject objectToResize) {
-    MouseResizeHandler handler = new MouseResizeHandler(objectToResize);
+    makeResizable(objectToResize, 0, 0);
+  }
+
+  public void makeResizable(UIObject objectToResize, int minWidth, int minHeight) {
+    MouseResizeHandler handler = new MouseResizeHandler(objectToResize, minWidth, minHeight);
     addMouseDownHandler(handler);
     addMouseMoveHandler(handler);
     addMouseUpHandler(handler);
@@ -71,9 +82,15 @@ public class ResizeHandle extends Label {
 
     private int dragStartY;
 
-    public MouseResizeHandler(UIObject objectToResize) {
+    private int minWidth;
+
+    private int minHeight;
+
+    public MouseResizeHandler(UIObject objectToResize, int minWidth, int minHeight) {
       super();
       this.objectToResize = objectToResize;
+      this.minWidth = minWidth;
+      this.minHeight = minHeight;
     }
 
     @Override
@@ -90,10 +107,10 @@ public class ResizeHandle extends Label {
       if(dragging) {
         if(direction.equals(Direction.SOUTH_EAST)) {
           int width = evt.getX() - dragStartX + objectToResize.getOffsetWidth();
-          objectToResize.setWidth(width + "px");
+          if(width >= minWidth) objectToResize.setWidth(width + "px");
         }
         int height = evt.getY() - dragStartY + objectToResize.getOffsetHeight();
-        objectToResize.setHeight(height + "px");
+        if(height >= minHeight) objectToResize.setHeight(height + "px");
         // GWT.log("continue drag: height=" + height + " width=" + width);
       }
     }
@@ -105,6 +122,31 @@ public class ResizeHandle extends Label {
       DOM.releaseCapture(ResizeHandle.this.getElement());
     }
 
+  }
+
+  @Override
+  public HandlerRegistration addMouseDownHandler(MouseDownHandler handler) {
+    return addDomHandler(handler, MouseDownEvent.getType());
+  }
+
+  @Override
+  public HandlerRegistration addMouseUpHandler(MouseUpHandler handler) {
+    return addDomHandler(handler, MouseUpEvent.getType());
+  }
+
+  @Override
+  public HandlerRegistration addMouseMoveHandler(MouseMoveHandler handler) {
+    return addDomHandler(handler, MouseMoveEvent.getType());
+  }
+
+  @Override
+  public String getText() {
+    return getElement().getInnerText();
+  }
+
+  @Override
+  public void setText(String text) {
+    getElement().setInnerText(text);
   }
 
 }

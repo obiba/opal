@@ -84,7 +84,7 @@ public class NotificationView extends Composite implements NotificationPresenter
       }
     });
 
-    resizeHandleSouth.makeResizable(contentLayout);
+    resizeHandleSouth.makeResizable(contentLayout, 300, 100);
   }
 
   @Override
