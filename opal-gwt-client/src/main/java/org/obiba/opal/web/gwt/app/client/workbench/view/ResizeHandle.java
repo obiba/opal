@@ -24,11 +24,36 @@ import com.google.gwt.user.client.ui.UIObject;
  */
 public class ResizeHandle extends Label {
 
+  public enum Direction {
+    SOUTH_EAST, SOUTH
+  }
+
   private UIObject objectToResize;
 
+  private Direction direction;
+
   public ResizeHandle() {
+    this(Direction.SOUTH_EAST);
+  }
+
+  public ResizeHandle(Direction direction) {
     super();
-    addStyleName("resizable-handle resizable-se");
+    addStyleName("resizable-handle");
+    setResizeDirection(direction);
+  }
+
+  public void setResizeDirection(Direction direction) {
+    this.direction = direction;
+    removeStyleName("resizable-se");
+    removeStyleName("resizable-s");
+    switch(direction) {
+    case SOUTH_EAST:
+      addStyleName("resizable-se");
+      break;
+    case SOUTH:
+      addStyleName("resizable-s");
+      break;
+    }
   }
 
   public void makeResizable(UIObject objectToResize) {
@@ -59,8 +84,10 @@ public class ResizeHandle extends Label {
     @Override
     public void onMouseMove(MouseMoveEvent evt) {
       if(dragging) {
-        int width = evt.getX() - dragStartX + objectToResize.getOffsetWidth();
-        objectToResize.setWidth(width + "px");
+        if(direction.equals(Direction.SOUTH_EAST)) {
+          int width = evt.getX() - dragStartX + objectToResize.getOffsetWidth();
+          objectToResize.setWidth(width + "px");
+        }
         int height = evt.getY() - dragStartY + objectToResize.getOffsetHeight();
         objectToResize.setHeight(height + "px");
         // GWT.log("continue drag: height=" + height + " width=" + width);

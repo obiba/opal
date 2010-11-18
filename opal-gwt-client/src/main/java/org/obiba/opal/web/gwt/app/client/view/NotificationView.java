@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationCloseHandler;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.view.FadeAnimation.FadedHandler;
+import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -29,6 +30,7 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -57,6 +59,12 @@ public class NotificationView extends Composite implements NotificationPresenter
   @UiField
   Anchor okay;
 
+  @UiField
+  ResizeHandle resizeHandleSouth;
+
+  @UiField
+  DockLayoutPanel contentLayout;
+
   private boolean sticky = true;
 
   private Timer nonStickyTimer;
@@ -64,6 +72,8 @@ public class NotificationView extends Composite implements NotificationPresenter
   public NotificationView() {
     uiBinder.createAndBindUi(this);
 
+    // Error dialog is initially hidden.
+    dialog.hide();
     dialog.setGlassEnabled(false);
 
     messagePanel.setSpacing(5);
@@ -74,12 +84,13 @@ public class NotificationView extends Composite implements NotificationPresenter
       }
     });
 
-    // Error dialog is initially hidden.
-    dialog.hide();
+    resizeHandleSouth.makeResizable(contentLayout);
   }
 
   @Override
   public void showPopup() {
+    // reset the dimensions in the eventuallity of a resize
+    contentLayout.setSize("300px", "100px");
     dialog.setPopupPosition(Window.getClientWidth() - 350, 50);
     FadeAnimation.create(dialog.getElement()).from(0).to(0.85).start();
     dialog.show();

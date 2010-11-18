@@ -916,3 +916,8 @@ div.variablesListTabContent .gwt-Label {
     background-image: url(image/256x240_icons.png);
     background-position:-84px -224px;
 }
+
+.resizable-handle.resizable-s {
+	cursor:s-resize;
+    display:block;
+}

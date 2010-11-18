@@ -1,14 +1,23 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" 
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
 
   <ui:style>
     .inline { display: inline; }
     .right-aligned { float: right; }
     .top-margin { margin: 0.5em; }
+    .resizable-s {
+      font-size: 12px;
+      text-align: center;
+    }
   </ui:style>
 
   <g:PopupPanel ui:field="dialog" autoHideEnabled="true" modal="true" animationEnabled="false" addStyleNames="notification">
-    <g:DockLayoutPanel unit="PX" height="80px" width="300px">
+    <g:DockLayoutPanel ui:field="contentLayout" unit="PX" height="100px" width="300px">
       <g:north size="20">
         <g:HTMLPanel addStyleNames="header {style.top-margin}">
           <g:Label ui:field="caption" addStyleNames="{style.inline}"><ui:msg description="Error dialog title">Errors</ui:msg></g:Label>
@@ -22,7 +31,9 @@
           <g:VerticalPanel width="100%" ui:field="messagePanel" addStyleNames="main"/>
         </g:ScrollPanel>
       </g:center>
-       
+      <g:south size="9">
+        <o:ResizeHandle ui:field="resizeHandleSouth" resizeDirection="SOUTH" addStyleNames="{style.resizable-s}">=</o:ResizeHandle>
+      </g:south>     
     </g:DockLayoutPanel> 
   </g:PopupPanel>
 
