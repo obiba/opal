@@ -423,4 +423,29 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
     return scriptWidgetDisplay.getScriptText();
   }
 
+  @Override
+  public void formEnable(boolean enabled) {
+    navigationEnabled(enabled);
+    variableName.setEnabled(enabled);
+    saveChangesButton.setEnabled(enabled);
+    removeButton.setEnabled(enabled);
+    addButton.setEnabled(true); // Regardless of form state the add button is enabled.
+    valueType.setEnabled(enabled);
+    repeatableCheckbox.setEnabled(enabled);
+    scriptWidgetDisplay.formEnable(enabled);
+    occurenceGroup.setEnabled(enabled);
+    unit.setEnabled(enabled);
+    mimeType.setEnabled(enabled);
+  }
+
+  @Override
+  public void formClear() {
+    variableName.setText("");
+    repeatableCheckbox.setValue(false);
+    scriptWidgetDisplay.formClear();
+    occurenceGroup.setText("");
+    occurenceGroup.setEnabled(false); // Occurrence group is only enabled when repeatableCheckbox is true.
+    unit.setText("");
+    mimeType.setText("");
+  }
 }

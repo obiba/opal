@@ -191,4 +191,11 @@ public class LocalizablesView extends Composite implements LocalizablesPresenter
   @UiTemplate("LocalizablesView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, LocalizablesView> {
   }
+
+  @Override
+  public void formEnable(boolean enabled) {
+    addButton.setEnabled(enabled);
+    localeListBox.setEnabled(enabled);
+  }
+
 }

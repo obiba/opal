@@ -94,11 +94,12 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
   private ViewDto viewDto;
 
-  private VariableDto newVariableDto;
-
   private List<VariableDto> variables;
 
   private int currentSelectedVariableIndex;
+
+  /** Temporarily track last variable saved so it can be displayed when the form is refreshed. */
+  private String recentlySavedVariableName;
 
   @Inject
   private CategoriesPresenter categoriesPresenter;
@@ -219,12 +220,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       currentSelectedVariableIndex = -1;
       getDisplay().setSelectedVariableName(null, null, getNextVariableName());
 
-      // Initialize the newVariableDto field (for creation of a new derived variable) and
-      // announce to the world that this is the VariableDto currently being configured.
-      newVariableDto = VariableDto.create();
-      newVariableDto.setName("");
-      eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(newVariableDto));
-      getDisplay().removeButtonEnabled(false);
+      formEnabled(false);
     } else {
       currentSelectedVariableIndex = 0;
       updateSelectedVariableName();
@@ -426,6 +422,10 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     HandlerRegistration addMimeTypeChangedHandler(ChangeHandler changeHandler);
 
+    void formEnable(boolean enabled);
+
+    void formClear();
+
   }
 
   class ViewConfigurationRequiredEventHandler implements ViewConfigurationRequiredEvent.Handler {
@@ -440,6 +440,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     @Override
     public void onDerivedVariableConfigurationRequired(DerivedVariableConfigurationRequiredEvent event) {
+      formEnabled(true);
       getDisplay().setNewVariable(event.getVariable());
     }
   }
@@ -565,8 +566,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       updateCategories();
       updateAttributes();
       updateView(variableListViewDto);
+      recentlySavedVariableName = currentVariableDto.getName(); // Must note this before form is refreshed.
       eventBus.fireEvent(new ViewSaveRequiredEvent(viewDto));
-      newVariableDto = currentVariableDto;
     }
 
     private void updateCategories() {
@@ -736,10 +737,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     } else {
       currentSelectedVariableIndex = -1;
       getDisplay().setSelectedVariableName(null, null, getNextVariableName());
-      VariableDto emptyVariableDto = VariableDto.create();
-      emptyVariableDto.setName("");
-      eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(emptyVariableDto));
-      getDisplay().removeButtonEnabled(false);
+      formClear();
+      formEnabled(false);
     }
     getDisplay().saveChangesEnabled(true);
     getDisplay().addButtonEnabled(false);
@@ -799,10 +798,10 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       getDisplay().saveChangesEnabled(false);
       getDisplay().addButtonEnabled(true);
       getDisplay().navigationEnabled(true);
-      if(newVariableDto != null) {
-        currentSelectedVariableIndex = getVariableIndex(newVariableDto.getName());
+      if(recentlySavedVariableName != null) {
+        currentSelectedVariableIndex = getVariableIndex(recentlySavedVariableName);
         updateSelectedVariableName();
-        newVariableDto = null;
+        recentlySavedVariableName = null;
       }
       if(variables.size() > 0) getDisplay().removeButtonEnabled(true);
     }
@@ -827,5 +826,23 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       return false;
     }
 
+  }
+
+  /**
+   * Enables or disables the variable list form. The "Add" variable button is always enabled regardless of state.
+   */
+  private void formEnabled(boolean enabled) {
+    getDisplay().formEnable(enabled);
+    categoriesPresenter.getDisplay().formEnable(enabled);
+    attributesPresenter.getDisplay().formEnable(enabled);
+  }
+
+  /**
+   * Clears the variable list form.
+   */
+  private void formClear() {
+    getDisplay().formClear();
+    categoriesPresenter.formClear();
+    attributesPresenter.formClear();
   }
 }

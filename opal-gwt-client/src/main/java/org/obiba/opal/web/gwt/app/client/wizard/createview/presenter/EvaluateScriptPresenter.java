@@ -118,6 +118,10 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     HandlerRegistration addResultsOpenHandler(OpenHandler openHandler);
 
     HandlerRegistration addResultsCloseHandler(CloseHandler closeHandler);
+
+    void formEnable(boolean enabled);
+
+    void formClear();
   }
 
   @Override

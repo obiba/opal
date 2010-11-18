@@ -265,4 +265,16 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
   public HasText getScriptText() {
     return scriptArea;
   }
+
+  @Override
+  public void formEnable(boolean enabled) {
+    scriptArea.setEnabled(enabled);
+    testScript.setEnabled(enabled);
+  }
+
+  @Override
+  public void formClear() {
+    scriptArea.setText("");
+    clearResults();
+  }
 }

@@ -189,6 +189,11 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
     // do nothing by default
   }
 
+  public void formClear() {
+    setVariableDto(VariableDto.create());
+    refreshTableData();
+  }
+
   protected abstract void bindDependencies();
 
   protected abstract void unbindDependencies();
@@ -226,6 +231,9 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
     HandlerRegistration addLocaleChangeHandler(ChangeHandler handler);
 
     HandlerRegistration addAddButtonClickHandler(ClickHandler handler);
+
+    void formEnable(boolean enabled);
+
   }
 
   interface EditActionHandler {
