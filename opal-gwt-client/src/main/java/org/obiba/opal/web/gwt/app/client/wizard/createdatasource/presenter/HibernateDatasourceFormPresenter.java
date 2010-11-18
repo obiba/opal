@@ -12,8 +12,8 @@ package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter;
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
+import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.validator.ValidatableWidgetPresenter;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.HibernateDatasourceFactoryDto;
 
@@ -22,7 +22,7 @@ import com.google.inject.Inject;
 /**
  *
  */
-public class HibernateDatasourceFormPresenter extends ValidatableWidgetPresenter<DatasourceFormPresenter.Display> implements DatasourceFormPresenter {
+public class HibernateDatasourceFormPresenter extends WidgetPresenter<DatasourceFormPresenter.Display> implements DatasourceFormPresenter {
 
   @Inject
   public HibernateDatasourceFormPresenter(final Display display, final EventBus eventBus) {
@@ -80,8 +80,13 @@ public class HibernateDatasourceFormPresenter extends ValidatableWidgetPresenter
 
   }
 
+  @Override
   public boolean validateFormData() {
-    return validate();
+    return true;
+  }
+
+  @Override
+  public void clearForm() {
   }
 
 }

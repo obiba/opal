@@ -173,4 +173,12 @@ public class JdbcDatasourceFormPresenter extends ValidatableWidgetPresenter<Jdbc
   private void fireErrorEvent(String error) {
     eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, error, null));
   }
+
+  @Override
+  public void clearForm() {
+    getDisplay().getUrl().setText("");
+    getDisplay().getUsername().setText("");
+    getDisplay().getPassword().setText("");
+    getDisplay().getUseMetadataTablesOption().setValue(null);
+  }
 }

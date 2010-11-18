@@ -278,4 +278,10 @@ public class CsvDatasourceFormPresenter extends ValidatableWidgetPresenter<CsvDa
   private void fireErrorEvent(String error) {
     eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, error, null));
   }
+
+  @Override
+  public void clearForm() {
+    csvFileSelectionPresenter.getDisplay().setFile("");
+    getDisplay().isDefaultCharacterSet().setValue(true);
+  }
 }

@@ -123,4 +123,9 @@ public class FsDatasourceFormPresenter extends WidgetPresenter<FsDatasourceFormP
 
     return isValid;
   }
+
+  @Override
+  public void clearForm() {
+    fileSelectionPresenter.getDisplay().setFile("");
+  }
 }

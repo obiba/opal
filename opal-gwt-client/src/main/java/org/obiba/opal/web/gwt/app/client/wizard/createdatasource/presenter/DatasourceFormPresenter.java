@@ -31,6 +31,8 @@ public interface DatasourceFormPresenter extends Presenter {
    */
   public boolean validateFormData();
 
+  public void clearForm();
+
   public interface Display extends WidgetDisplay {
 
   }

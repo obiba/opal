@@ -124,4 +124,9 @@ public class ExcelDatasourceFormPresenter extends WidgetPresenter<ExcelDatasourc
 
     return isValid;
   }
+
+  @Override
+  public void clearForm() {
+    fileSelectionPresenter.getDisplay().setFile("");
+  }
 }
