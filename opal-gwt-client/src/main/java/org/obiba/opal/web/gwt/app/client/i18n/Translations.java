@@ -202,7 +202,11 @@ public interface Translations extends Constants {
   "UrlRequired", "You must provide the database's URL.",//
   "UsernameRequired", "You must indicate the user name to be used for the database connection.",//
   "PasswordRequired", "You must indicate the password to be used for the database connection.", //
-  "MustIndicateWhetherJdbcDatasourceShouldUseMetadataTables", "You must indicate whether meta-data tables are to be used or not." })
+  "MustIndicateWhetherJdbcDatasourceShouldUseMetadataTables", "You must indicate whether meta-data tables are to be used or not.",//
+  "RowMustBePositiveInteger", "Row must be a positive integer (greater than or equal to 1).",//
+  "SpecificCharsetNotIndicated", "You have selected to use a specific character set but have not indicated which one.",//
+  "NoDataFileSelected", "You must select a data file.",//
+  "CharsetNotAvailable", "The character set you have specified is not available." })
   Map<String, String> userMessageMap();
 
   @Description("You must select a file message")
