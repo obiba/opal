@@ -35,6 +35,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScr
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.core.client.GWT;
@@ -195,19 +196,32 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
     }
 
     private void updateViewDto() {
-      JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
-
       if(getDisplay().getEntitiesToView().equals(EntitiesToView.SCRIPT)) {
         String script = getDisplay().getScript().trim();
-        if(script.length() != 0) {
-          jsViewDto.setSelect(script);
-        } else {
-          jsViewDto.clearSelect();
-        }
-      } else {
-        jsViewDto.clearSelect();
+        updateEntitiesScript(script);
+      } else { // ALL
+        updateEntitiesScript("");
       }
       eventBus.fireEvent(new ViewSaveRequiredEvent(getViewDto()));
+    }
+
+    private void updateEntitiesScript(String script) {
+      JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
+      VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+
+      if(jsViewDto != null) {
+        if(script.length() != 0) {
+          jsViewDto.setWhere(script);
+        } else {
+          jsViewDto.clearWhere();
+        }
+      } else { // derived variables view
+        if(script.length() != 0) {
+          variableListDto.setWhere(script);
+        } else {
+          variableListDto.clearWhere();
+        }
+      }
     }
   }
 
@@ -220,12 +234,24 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
     scriptWidget.setTable(tableDto);
 
     JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
-    if(jsViewDto.hasSelect()) {
-      getDisplay().setEntitiesToView(EntitiesToView.SCRIPT);
-      getDisplay().setScript(jsViewDto.getSelect());
-    } else {
-      getDisplay().setEntitiesToView(EntitiesToView.ALL);
-      getDisplay().setScript("");
+    VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+
+    if(jsViewDto != null) {
+      if(jsViewDto.hasWhere()) {
+        getDisplay().setEntitiesToView(EntitiesToView.SCRIPT);
+        getDisplay().setScript(jsViewDto.getWhere());
+      } else {
+        getDisplay().setEntitiesToView(EntitiesToView.ALL);
+        getDisplay().setScript("");
+      }
+    } else { // derived variables view
+      if(variableListDto.hasWhere()) {
+        getDisplay().setEntitiesToView(EntitiesToView.SCRIPT);
+        getDisplay().setScript(variableListDto.getWhere());
+      } else {
+        getDisplay().setEntitiesToView(EntitiesToView.ALL);
+        getDisplay().setScript("");
+      }
     }
   }
 
