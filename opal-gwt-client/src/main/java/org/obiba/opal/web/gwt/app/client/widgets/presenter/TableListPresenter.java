@@ -104,6 +104,11 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
     return tables;
   }
 
+  public void clear() {
+    tables.clear();
+    getDisplay().clear();
+  }
+
   private void addEventHandlers() {
     super.registerHandler(eventBus.addHandler(TableSelectionEvent.getType(), new TableSelectionEvent.Handler() {
 

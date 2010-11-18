@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
@@ -93,6 +94,8 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     super.registerHandler(getDisplay().addJobLinkClickHandler(new JobLinkClickHandler(eventBus, jobListPresenter)));
     super.registerHandler(getDisplay().addFileFormatChangeHandler(new FileFormatChangeHandler()));
     getDisplay().setFileWidgetDisplay(fileSelectionPresenter.getDisplay());
+    getDisplay().setTablesValidator(new TablesValidator());
+    getDisplay().setDestinationValidator(new DestinationValidator());
 
   }
 
@@ -102,32 +105,6 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     } else {
       fileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE);
     }
-  }
-
-  private void displayMessages(NotificationType type, List<String> messages) {
-    eventBus.fireEvent(new NotificationEvent(type, messages, null));
-  }
-
-  private List<String> formValidationErrors() {
-    List<String> result = new ArrayList<String>();
-    if(tableListPresenter.getTables().size() == 0) {
-      result.add("At least one table must be selected for export.");
-    }
-    if(getDisplay().isDestinationFile()) {
-      String filename = getDisplay().getOutFile();
-      if(filename == null || filename.equals("")) {
-        result.add("File name cannot be empty.");
-      }
-      if(getDisplay().getFileFormat().equalsIgnoreCase("csv") && fileSelectionPresenter.getFileTypeSelected() != null && fileSelectionPresenter.getFileTypeSelected().equals(FileSelectionType.FILE)) {
-        if(getDisplay().isWithVariables()) {
-          result.add("Variables and data cannot be exported in the same CSV file. Select a directory instead or do not export variables.");
-        }
-        if(tableListPresenter.getTables().size() > 1) {
-          result.add("Several tables cannot be exported in the same CSV file. Select a directory instead or export only one table.");
-        }
-      }
-    }
-    return result;
   }
 
   @Override
@@ -144,6 +121,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   @Override
   public void revealDisplay() {
+    // tableListPresenter.clear();
     initDatasourcesAndUnitsAndShow();
   }
 
@@ -175,6 +153,51 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   // Interfaces and classes
   //
 
+  private final class DestinationValidator implements ValidationHandler {
+    @Override
+    public boolean validate() {
+      List<String> errors = formValidationErrors();
+      if(errors.size() > 0) {
+        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errors, null));
+        return false;
+      }
+      return true;
+    }
+
+    private List<String> formValidationErrors() {
+      List<String> result = new ArrayList<String>();
+
+      if(getDisplay().isDestinationFile()) {
+        String filename = getDisplay().getOutFile();
+        if(filename == null || filename.equals("")) {
+          result.add("DestinationFileIsMissing");
+        }
+        if(getDisplay().getFileFormat().equalsIgnoreCase("csv") && fileSelectionPresenter.getFileTypeSelected() != null && fileSelectionPresenter.getFileTypeSelected().equals(FileSelectionType.FILE)) {
+          if(getDisplay().isWithVariables()) {
+            result.add("SelectCSVDirectoryOrDoNotExportVariables");
+            // result.add("Variables and data cannot be exported in the same CSV file. Select a directory instead or do not export variables.");
+          }
+          if(tableListPresenter.getTables().size() > 1) {
+            result.add("SelectCSVDirectoryOrExportOneTable");
+            // result.add("Several tables cannot be exported in the same CSV file. Select a directory instead or export only one table.");
+          }
+        }
+      }
+      return result;
+    }
+  }
+
+  private final class TablesValidator implements ValidationHandler {
+    @Override
+    public boolean validate() {
+      if(tableListPresenter.getTables().size() == 0) {
+        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "ExportDataMissingTables", null));
+        return false;
+      }
+      return true;
+    }
+  }
+
   class FileFormatChangeHandler implements ChangeHandler {
     @Override
     public void onChange(ChangeEvent arg0) {
@@ -187,16 +210,11 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
     @Override
     public void onClick(ClickEvent event) {
-      List<String> errors = formValidationErrors();
-      if(!errors.isEmpty()) {
-        displayMessages(NotificationType.ERROR, errors);
-      } else {
-        getDisplay().renderPendingConclusion();
-        ResourceRequestBuilderFactory.newBuilder().forResource("/shell/copy").post() //
-        .withResourceBody(CopyCommandOptionsDto.stringify(createCopycommandOptions())) //
-        .withCallback(400, new ClientFailureResponseCodeCallBack()) //
-        .withCallback(201, new SuccessResponseCodeCallBack()).send();
-      }
+      getDisplay().renderPendingConclusion();
+      ResourceRequestBuilderFactory.newBuilder().forResource("/shell/copy").post() //
+      .withResourceBody(CopyCommandOptionsDto.stringify(createCopycommandOptions())) //
+      .withCallback(400, new ClientFailureResponseCodeCallBack()) //
+      .withCallback(201, new SuccessResponseCodeCallBack()).send();
     }
 
     private CopyCommandOptionsDto createCopycommandOptions() {
@@ -277,6 +295,10 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     void showDialog();
 
     void hideDialog();
+
+    void setTablesValidator(ValidationHandler validationHandler);
+
+    void setDestinationValidator(ValidationHandler handler);
 
     /** Set a collection of Opal datasources retrieved from Opal. */
     void setDatasources(JsArray<DatasourceDto> datasources);

@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard.exportdata.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
@@ -108,6 +109,12 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
 
   private FileSelectionPresenter.Display fileSelection;
 
+  private TableListPresenter.Display tablesList;
+
+  private ValidationHandler tablesValidator;
+
+  private ValidationHandler destinationValidator;
+
   public DataExportView() {
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
@@ -190,10 +197,6 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
         fileFormat.setEnabled(true);
       }
     });
-
-    destinationFile.setValue(true);
-    datasources.setEnabled(false);
-
     opalId.addClickHandler(new ClickHandler() {
 
       @Override
@@ -208,10 +211,6 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
         units.setEnabled(true);
       }
     });
-    opalId.setValue(true);
-    units.setEnabled(false);
-    incremental.setValue(true);
-    withVariables.setValue(true);
   }
 
   @Override
@@ -264,6 +263,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
       @Override
       public void onClick(ClickEvent evt) {
         if(tablesStep.isVisible()) {
+          if(!tablesValidator.validate()) return;
           tablesStep.setVisible(false);
           optionsStep.setVisible(true);
           dialog.setPreviousEnabled(true);
@@ -271,6 +271,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
           optionsStep.setVisible(false);
           destinationStep.setVisible(true);
         } else if(destinationStep.isVisible()) {
+          if(!destinationValidator.validate()) return;
           destinationStep.setVisible(false);
           unitStep.setVisible(true);
         } else if(unitStep.isVisible()) {
@@ -342,6 +343,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
 
   @Override
   public void setTableWidgetDisplay(TableListPresenter.Display display) {
+    tablesList = display;
     display.setListWidth("28em");
     tablesPanel.setWidget(display.asWidget());
   }
@@ -355,7 +357,6 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
     fileFormat.setEnabled(true);
   }
 
-  @Override
   public HandlerRegistration addFileFormatChangeHandler(ChangeHandler handler) {
     return fileFormat.addChangeHandler(handler);
   }
@@ -401,15 +402,52 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   }
 
   private void clear() {
+    clearWizardDialog();
+    clearTablesStep();
+    clearOptionsStep();
+    clearDestinationStep();
+    clearUnitStep();
+  }
+
+  private void clearWizardDialog() {
     tablesStep.setVisible(true);
     optionsStep.setVisible(false);
     destinationStep.setVisible(false);
     unitStep.setVisible(false);
     conclusionStep.setVisible(false);
+
     dialog.setPreviousEnabled(false);
     dialog.setNextEnabled(true);
     dialog.setFinishEnabled(false);
     dialog.setCancelEnabled(true);
+  }
+
+  private void clearTablesStep() {
+    // TODO
+    // if(tablesList != null) tablesList.clear();
+  }
+
+  private void clearOptionsStep() {
+    incremental.setValue(true, true);
+    withVariables.setValue(true, true);
+    useAlias.setValue(false);
+  }
+
+  private void clearDestinationStep() {
+    destinationFile.setValue(true);
+    fileFormat.setEnabled(true);
+    if(fileSelection != null) {
+      fileSelection.setEnabled(true);
+      fileSelection.clearFile();
+    }
+    destinationDataSource.setValue(false);
+    datasources.setEnabled(false);
+  }
+
+  private void clearUnitStep() {
+    opalId.setValue(true);
+    unitId.setValue(false);
+    units.setEnabled(false);
   }
 
   @Override
@@ -420,6 +458,16 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   @Override
   public HandlerRegistration addFinishClickHandler(ClickHandler handler) {
     return dialog.addFinishClickHandler(handler);
+  }
+
+  @Override
+  public void setTablesValidator(ValidationHandler handler) {
+    this.tablesValidator = handler;
+  }
+
+  @Override
+  public void setDestinationValidator(ValidationHandler handler) {
+    this.destinationValidator = handler;
   }
 
 }
