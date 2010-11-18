@@ -104,15 +104,16 @@ public class ResizeHandle extends Widget implements HasText, HasMouseDownHandler
 
     @Override
     public void onMouseMove(MouseMoveEvent evt) {
-      if(dragging) {
-        if(direction.equals(Direction.SOUTH_EAST)) {
-          int width = evt.getX() - dragStartX + objectToResize.getOffsetWidth();
-          if(width >= minWidth) objectToResize.setWidth(width + "px");
-        }
-        int height = evt.getY() - dragStartY + objectToResize.getOffsetHeight();
-        if(height >= minHeight) objectToResize.setHeight(height + "px");
-        // GWT.log("continue drag: height=" + height + " width=" + width);
+      if(!dragging) return;
+
+      int height = evt.getY() - dragStartY + objectToResize.getOffsetHeight();
+      if(height >= minHeight) objectToResize.setHeight(height + "px");
+
+      if(direction.equals(Direction.SOUTH_EAST)) {
+        int width = evt.getX() - dragStartX + objectToResize.getOffsetWidth();
+        if(width >= minWidth) objectToResize.setWidth(width + "px");
       }
+      // GWT.log("continue drag: height=" + height + " width=" + width);
     }
 
     @Override
