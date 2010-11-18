@@ -139,7 +139,12 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
       @Override
       public void onReportTemplateSelected(ReportTemplateSelectedEvent event) {
-        refreshReportTemplateDetails(event.getReportTemplate());
+        ReportTemplateDto reportTemplate = event.getReportTemplate();
+        if(reportTemplate != null) {
+          refreshReportTemplateDetails(reportTemplate);
+        } else {
+          getDisplay().setReportTemplateDetails(null);
+        }
       }
     }));
 
@@ -264,9 +269,8 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
     public void execute() {
       actionRequiringConfirmation = new Runnable() {
         public void run() {
-          ResponseCodeCallback callbackHandler = new CommandResponseCallBack();
-          ResourceRequestBuilderFactory.newBuilder().forResource("/report-template/" + getDisplay().getReportTemplateDetails().getName()).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
-          eventBus.fireEvent(new ReportTemplateDeletedEvent(getDisplay().getReportTemplateDetails()));
+          String reportTemplateName = getDisplay().getReportTemplateDetails().getName();
+          ResourceRequestBuilderFactory.newBuilder().forResource("/report-template/" + reportTemplateName).delete().withCallback(Response.SC_OK, new RemoveReportTemplateResponseCallBack()).withCallback(Response.SC_NOT_FOUND, new ReportTemplateNotFoundCallBack(reportTemplateName)).send();
         }
       };
       eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "removeReportTemplate", "confirmDeleteReportTemplate"));
@@ -349,6 +353,15 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
     @Override
     public void onResponseCode(Request request, Response response) {
       eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "ReportTemplateCannotBeFound", Arrays.asList(new String[] { templateName })));
+    }
+
+  }
+
+  private class RemoveReportTemplateResponseCallBack implements ResponseCodeCallback {
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      eventBus.fireEvent(new ReportTemplateDeletedEvent(getDisplay().getReportTemplateDetails()));
     }
 
   }

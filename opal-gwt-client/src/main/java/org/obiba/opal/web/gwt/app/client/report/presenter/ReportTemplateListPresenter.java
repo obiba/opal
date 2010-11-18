@@ -115,10 +115,7 @@ public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateL
 
     @Override
     public void onSelectionChange(SelectionChangeEvent event) {
-      ReportTemplateDto selectedReportTemplate = getDisplay().getSelectedReportTemplate();
-      if(selectedReportTemplate != null) {
-        eventBus.fireEvent(new ReportTemplateSelectedEvent(selectedReportTemplate));
-      }
+      eventBus.fireEvent(new ReportTemplateSelectedEvent(getDisplay().getSelectedReportTemplate()));
     }
 
   }
