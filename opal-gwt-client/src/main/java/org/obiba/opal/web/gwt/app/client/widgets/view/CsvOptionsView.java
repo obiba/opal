@@ -140,6 +140,21 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
   public void stopProcessing() {
   }
 
+  @Override
+  public void resetFieldSeparator() {
+    field.setSelectedIndex(0);
+
+  }
+
+  @Override
+  public void resetQuote() {
+    quote.setSelectedIndex(0);
+  }
+
+  public void resetCommonCharset() {
+    charsetCommonListBox.setSelectedIndex(0);
+  }
+
   //
   // Methods
   //
@@ -157,4 +172,5 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
   interface ViewUiBinder extends UiBinder<Widget, CsvOptionsView> {
 
   }
+
 }

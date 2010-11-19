@@ -16,8 +16,6 @@ import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RegExValidator;
@@ -269,19 +267,29 @@ public class CsvDatasourceFormPresenter extends ValidatableWidgetPresenter<CsvDa
     HasValue<Boolean> isCharsetSpecify();
 
     HasText getCharsetSpecifyText();
+
+    void resetQuote();
+
+    void resetFieldSeparator();
+
+    void resetCommonCharset();
+
   }
 
   public boolean validateFormData() {
     return validate();
   }
 
-  private void fireErrorEvent(String error) {
-    eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, error, null));
-  }
-
   @Override
   public void clearForm() {
     csvFileSelectionPresenter.getDisplay().setFile("");
+    getDisplay().getCharsetSpecifyText().setText("");
+    getDisplay().getRowText().setText("1");
+    getDisplay().resetFieldSeparator();
+    getDisplay().resetQuote();
+    getDisplay().isCharsetSpecify().setValue(false);
     getDisplay().isDefaultCharacterSet().setValue(true);
+    getDisplay().isCharsetCommonList().setValue(false);
+    getDisplay().resetCommonCharset();
   }
 }

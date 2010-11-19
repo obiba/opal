@@ -38,4 +38,10 @@ public interface CsvOptionsDisplay extends WidgetDisplay {
   HasValue<Boolean> isCharsetSpecify();
 
   HasText getCharsetSpecifyText();
+
+  void resetFieldSeparator();
+
+  void resetQuote();
+
+  void resetCommonCharset();
 }

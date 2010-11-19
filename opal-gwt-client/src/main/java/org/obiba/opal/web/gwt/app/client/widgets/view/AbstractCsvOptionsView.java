@@ -76,6 +76,21 @@ public abstract class AbstractCsvOptionsView extends Composite implements CsvOpt
   }
 
   @Override
+  public void resetFieldSeparator() {
+    getCsvOptions().resetFieldSeparator();
+  }
+
+  @Override
+  public void resetQuote() {
+    getCsvOptions().resetQuote();
+  }
+
+  @Override
+  public void resetCommonCharset() {
+    getCsvOptions().resetCommonCharset();
+  }
+
+  @Override
   public Widget asWidget() {
     return this;
   }
