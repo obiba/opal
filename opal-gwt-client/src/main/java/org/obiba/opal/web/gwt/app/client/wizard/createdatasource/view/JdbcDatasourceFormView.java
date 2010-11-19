@@ -85,13 +85,14 @@ public class JdbcDatasourceFormView extends Composite implements JdbcDatasourceF
       }
 
       public void setText(String text) {
-        if(text != null) {
+        if(text != null && driver.getItemCount() > 0) {
           for(int i = 0; i < driver.getItemCount(); i++) {
             if(driver.getValue(i).equals(text)) {
               driver.setSelectedIndex(i);
               break;
             }
           }
+          driver.setSelectedIndex(0);
         }
       }
     };

@@ -126,10 +126,10 @@ public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourceP
 
   @Override
   public void revealDisplay() {
-    getDisplay().showDialog();
     for(DatasourceFormPresenter formPresenter : datasourceFormPresenters) {
       formPresenter.clearForm();
     }
+    getDisplay().showDialog();
   }
 
   @Override

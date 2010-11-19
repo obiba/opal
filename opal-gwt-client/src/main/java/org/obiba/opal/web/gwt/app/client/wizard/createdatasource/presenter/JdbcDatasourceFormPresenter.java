@@ -173,6 +173,10 @@ public class JdbcDatasourceFormPresenter extends ValidatableWidgetPresenter<Jdbc
     getDisplay().getUrl().setText("");
     getDisplay().getUsername().setText("");
     getDisplay().getPassword().setText("");
+    getDisplay().getDefaultCreatedTimestampColumnName().setText("");
+    getDisplay().getDefaultUpdatedTimestampColumnName().setText("");
+    getDisplay().getDoNotUseMetadataTablesOption().setValue(false);
     getDisplay().getUseMetadataTablesOption().setValue(false);
+    getDisplay().getDriver().setText("");
   }
 }
