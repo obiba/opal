@@ -203,7 +203,6 @@ public class WizardDialogBox extends DialogBox {
   public void setHelpTooltip(Widget w, String width, String height) {
     if(helpTooltip == null) {
       helpTooltip = new Tooltip();
-      setHelpEnabled(true);
       help.addClickHandler(new ClickHandler() {
 
         @Override
@@ -214,6 +213,7 @@ public class WizardDialogBox extends DialogBox {
         }
       });
     }
+    help.setEnabled(true);
     helpTooltip.clear();
     helpTooltip.add(w);
     this.helpTooltipWidth = width;

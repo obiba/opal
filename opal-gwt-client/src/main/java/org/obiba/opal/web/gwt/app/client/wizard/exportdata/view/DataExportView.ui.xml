@@ -62,8 +62,7 @@
 		<g:Anchor ui:field="jobLink" addStyleNames="large-indent">Job ID</g:Anchor>
 	  </o:WizardStep>
 	  
-	  <!-- Help TODO -->
-	  <g:HTMLPanel visible="false">
+	  <g:HTMLPanel ui:field="destinationHelpPanel">
        <g:Label addStyleNames="title"><ui:msg description="File destination label">File Destination</ui:msg></g:Label>
         
        <p><ui:msg description="File destination information">The data can be exported in file. The file will be outputed on the server side in a directory you will have selected. Once successfully exported, you will download the resulting output from the [Opal file system]. Depending on the file format selected, some limits applies:</ui:msg></p>
@@ -91,6 +90,9 @@
            <ui:msg description="File destination information xml">This format does not lost information. Resulting file set is available as a Zip file.</ui:msg>
          </li>
        </ul>
+     </g:HTMLPanel>
+     
+     <g:HTMLPanel ui:field="unitHelpPanel">
        <g:Label addStyleNames="title"><ui:msg description="Participant Identifier label">Participant Identifier</ui:msg></g:Label>
        <p><ui:msg description="Participant Identifier information">Different strategies can be applied with the exported participant identifiers:</ui:msg></p>
        <ul>
@@ -98,7 +100,7 @@
          <li><ui:msg description="Participant Identifier information unit">Switch the participant identifier to one that is specific to destination unit. To achieve that, select a 'unit' that has been predefined in your Opal system.</ui:msg></li>
        </ul>
      </g:HTMLPanel>
-       
+     
     </g:FlowPanel>
     
   </o:WizardDialogBox>

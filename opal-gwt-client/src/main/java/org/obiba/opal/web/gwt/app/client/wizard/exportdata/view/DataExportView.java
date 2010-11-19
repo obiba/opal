@@ -32,6 +32,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -107,6 +108,12 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   @UiField
   RadioButton unitId;
 
+  @UiField
+  HTMLPanel destinationHelpPanel;
+
+  @UiField
+  HTMLPanel unitHelpPanel;
+
   private FileSelectionPresenter.Display fileSelection;
 
   private TableListPresenter.Display tablesList;
@@ -159,6 +166,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   }
 
   private void initWidgets() {
+    destinationHelpPanel.removeFromParent();
     destinationDataSource.addClickHandler(new ClickHandler() {
 
       @Override
@@ -184,6 +192,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
         units.setEnabled(false);
       }
     });
+    unitHelpPanel.removeFromParent();
     unitId.addClickHandler(new ClickHandler() {
 
       @Override
@@ -383,7 +392,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   }
 
   private void clearTablesStep() {
-    // TODO
+    // TODO does not work
     // if(tablesList != null) tablesList.clear();
   }
 
@@ -448,6 +457,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
         processDestinationStep();
       } else if(unitStep.isVisible()) {
         submitHandler.onClick(evt);
+        dialog.setHelpEnabled(false);
       }
     }
 
@@ -456,17 +466,20 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
       tablesStep.setVisible(false);
       optionsStep.setVisible(true);
       dialog.setPreviousEnabled(true);
+      dialog.setHelpEnabled(false);
     }
 
     private void processOptionsStep() {
       optionsStep.setVisible(false);
       destinationStep.setVisible(true);
+      dialog.setHelpTooltip(destinationHelpPanel);
     }
 
     private void processDestinationStep() {
       if(!destinationValidator.validate()) return;
       destinationStep.setVisible(false);
       unitStep.setVisible(true);
+      dialog.setHelpTooltip(unitHelpPanel);
     }
   }
 
@@ -487,23 +500,27 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
     private void processConclusionStep() {
       conclusionStep.setVisible(false);
       unitStep.setVisible(true);
+      dialog.setHelpTooltip(unitHelpPanel);
       dialog.setNextEnabled(true);
     }
 
     private void processUnitStep() {
       unitStep.setVisible(false);
       destinationStep.setVisible(true);
+      dialog.setHelpTooltip(destinationHelpPanel);
     }
 
     private void processDestinationStep() {
       destinationStep.setVisible(false);
       optionsStep.setVisible(true);
+      dialog.setHelpEnabled(false);
     }
 
     private void processOptionsStep() {
       optionsStep.setVisible(false);
       tablesStep.setVisible(true);
       dialog.setPreviousEnabled(false);
+      dialog.setHelpEnabled(false);
     }
 
   }
