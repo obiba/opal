@@ -448,6 +448,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     @Override
     public void onDerivedVariableConfigurationRequired(DerivedVariableConfigurationRequiredEvent event) {
       formEnabled(true);
+      getDisplay().saveChangesEnabled(false);
       getDisplay().setNewVariable(event.getVariable());
     }
   }
@@ -573,7 +574,6 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       updateCategories();
       updateAttributes();
       updateView(variableListViewDto);
-      // recentlySavedVariableName = currentVariableDto.getName(); // Must note this before form is refreshed.
       displayedVariableName = currentVariableDto.getName(); // Must note this before form is refreshed.
       eventBus.fireEvent(new ViewSaveRequiredEvent(viewDto));
     }
