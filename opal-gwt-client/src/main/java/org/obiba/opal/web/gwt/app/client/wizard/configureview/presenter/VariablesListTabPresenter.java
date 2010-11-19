@@ -220,6 +220,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       currentSelectedVariableIndex = -1;
       getDisplay().setSelectedVariableName(null, null, getNextVariableName());
 
+      formClear();
       formEnabled(false);
     } else {
       currentSelectedVariableIndex = 0;
@@ -578,13 +579,16 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     }
 
     private void updateAttributes() {
-      // Add attributes to current attributes. (The 'script' is stored as an attribute, so one attribute will always
-      // exist.)
       AttributeDto currentVariableScriptAttribute = getAttributeByName(VariablesListTabView.SCRIPT_NAME, currentVariableDto.getAttributesArray());
       AttributeDto existingVariableScriptAttribute = getAttributeByName(VariablesListTabView.SCRIPT_NAME, attributesPresenter.getVariableDto().getAttributesArray());
       if(existingVariableScriptAttribute != null) {
+        // Duplicate 'script' attribute exists. Overwrite the existing 'script' attribute.
         existingVariableScriptAttribute.setValue(currentVariableScriptAttribute.getValue());
         currentVariableDto.setAttributesArray(attributesPresenter.getVariableDto().getAttributesArray());
+      } else {
+        // No duplicate 'script' attribute. Add the 'script' attribute.
+        currentVariableDto.setAttributesArray(attributesPresenter.getVariableDto().getAttributesArray());
+        currentVariableDto.getAttributesArray().push(currentVariableScriptAttribute);
       }
     }
 
