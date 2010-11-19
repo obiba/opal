@@ -17,7 +17,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -42,6 +41,12 @@ public class WizardDialogBox extends DialogBox {
   private Button help;
 
   private ResizeHandle resizeHandle;
+
+  private Tooltip helpTooltip;
+
+  private String helpTooltipWidth;
+
+  private String helpTooltipHeight;
 
   /**
    * 
@@ -116,26 +121,17 @@ public class WizardDialogBox extends DialogBox {
     help.addStyleName("help");
     help.addStyleName("left-aligned");
     help.addStyleName("small-top-margin");
-    help.setVisible(false);
-    help.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent evt) {
-        Tooltip tt = new Tooltip();
-        tt.setPopupPosition(evt.getNativeEvent().getClientX() + 20, evt.getNativeEvent().getClientY() - 100);
-        tt.setSize("200px", "200px");
-        tt.add(new Label("pouet"));
-        tt.setCaption("Coucou");
-        tt.setAnimationEnabled(true);
-        tt.show();
-      }
-    });
+    help.setEnabled(false);
   }
 
   private void initControlStyle(Button button, String style) {
     button.addStyleName(style);
     button.addStyleName("right-aligned");
     button.addStyleName("small-top-margin");
+  }
+
+  public void setHelpEnabled(boolean enabled) {
+    help.setEnabled(enabled);
   }
 
   public void setFinishEnabled(boolean enabled) {
@@ -198,6 +194,30 @@ public class WizardDialogBox extends DialogBox {
 
   public HandlerRegistration addNextClickHandler(ClickHandler handler) {
     return next.addClickHandler(handler);
+  }
+
+  public void setHelpTooltip(Widget w) {
+    setHelpTooltip(w, "300px", "300px");
+  }
+
+  public void setHelpTooltip(Widget w, String width, String height) {
+    if(helpTooltip == null) {
+      helpTooltip = new Tooltip();
+      setHelpEnabled(true);
+      help.addClickHandler(new ClickHandler() {
+
+        @Override
+        public void onClick(ClickEvent evt) {
+          helpTooltip.setPopupPosition(evt.getNativeEvent().getClientX() + 20, evt.getNativeEvent().getClientY() - 300);
+          helpTooltip.setSize(helpTooltipWidth, helpTooltipHeight);
+          helpTooltip.show();
+        }
+      });
+    }
+    helpTooltip.clear();
+    helpTooltip.add(w);
+    this.helpTooltipWidth = width;
+    this.helpTooltipHeight = height;
   }
 
 }

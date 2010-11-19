@@ -66,7 +66,7 @@ public class Tooltip extends Composite implements HasWidgets {
 
   private int opacity = 1;
 
-  private boolean animated;
+  private boolean animated = true;
 
   public Tooltip() {
     uiBinder.createAndBindUi(this);

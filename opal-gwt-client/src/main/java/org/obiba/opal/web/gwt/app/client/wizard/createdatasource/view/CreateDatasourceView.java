@@ -30,6 +30,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
@@ -66,6 +67,9 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
   @UiField
   ListBox datasourceType;
 
+  @UiField
+  HTMLPanel helpPanel;
+
   private DatasourceFormPresenter datasourceFormPresenter;
 
   private ValidationHandler selectTypeValidator;
@@ -86,6 +90,7 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
   private void initWizardDialog() {
     dialog.setGlassEnabled(false);
     dialog.hide();
+    dialog.setHelpTooltip(helpPanel);
   }
 
   private void initSelectTypeStep() {

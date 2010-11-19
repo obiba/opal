@@ -45,7 +45,7 @@
       <o:WizardStep ui:field="conclusionStep">
       </o:WizardStep>
       <!-- Help panel TODO -->
-      <g:HTMLPanel visible="false">
+      <g:HTMLPanel ui:field="helpPanel">
           <g:Label addStyleNames="title"><ui:msg description="Opal Native Datasource creation label">Opal Native</ui:msg></g:Label>
           <p>
             <ui:msg description="Opal Native Datasource creation information">
@@ -85,6 +85,7 @@ Opal is able to increment copies into SQL datasources if timestamp column are gi
           </p>
           
         </g:HTMLPanel>
+      
     </g:FlowPanel>     
   </o:WizardDialogBox>
 

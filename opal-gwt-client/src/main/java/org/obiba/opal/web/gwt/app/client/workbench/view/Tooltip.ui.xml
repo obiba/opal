@@ -6,16 +6,12 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
-  <ui:style>
-    .right-aligned { float: right; }
-  </ui:style>
-
   <g:PopupPanel ui:field="dialog" autoHideEnabled="true" modal="true" animationEnabled="false" addStyleNames="tooltip">
     <g:DockLayoutPanel ui:field="contentLayout" unit="PX" height="100px" width="300px">
       <g:north size="20">
         <g:HTMLPanel addStyleNames="header">
-          <g:InlineLabel ui:field="caption"><ui:msg description="Error dialog title">Errors</ui:msg></g:InlineLabel>
-          <span class="{style.right-aligned}">
+          <g:InlineLabel ui:field="caption"><ui:msg description="Information label">Information</ui:msg></g:InlineLabel>
+          <span style="float: right;">
             <g:Anchor ui:field="okay">x</g:Anchor>
           </span>
         </g:HTMLPanel>
