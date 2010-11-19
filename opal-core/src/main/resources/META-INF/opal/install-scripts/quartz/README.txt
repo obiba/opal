@@ -21,5 +21,7 @@ The original scripts from the Quartz distribution have been modified as follows:
      tables_mysql.sql       	tables_mysql_default.sql
      tables_mysql_innodb.sql 	tables_mysql.sql
      
-     
+  3. The original tables_mysql_innodb.sql script (renamed "tables_mysql.sql") was causing a "Query was empty" error when executed
+     by the Opal Upgrade Manager. The script was replaced by the original tables_mysql.sql script (MyISAM) modified to create InnoDB
+     tables instead ("TYPE InnoDB;" was appended to each CREATE TABLE statement).     
      
