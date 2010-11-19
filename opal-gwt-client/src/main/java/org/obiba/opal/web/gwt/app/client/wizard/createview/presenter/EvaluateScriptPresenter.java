@@ -227,7 +227,6 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
 
   private void displayCurrentPageResults() {
     evaluateScript(getVariablesUri((currentPage - 1) * pageSize), getTransientValuesUri((currentPage - 1) * pageSize), getEntitiesUri());
-    getDisplay().showResults(true);
   }
 
   private String getTableUri() {
@@ -356,9 +355,8 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
         ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName() + "/variables/query?script=" + selectedScript).get().withCallback(new VariableValueResourceCallback(results)).withCallback(400, new InvalidScriptResourceCallBack()).send();
       } else {
         getDisplay().addResults(results);
+        getDisplay().showResults(true);
       }
-
-      getDisplay().showResults(true);
 
     }
 
@@ -386,6 +384,7 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
       getDisplay().clearResults();
       getDisplay().addValueColumn();
       getDisplay().addResults(addValueToResults(results, values));
+      getDisplay().showResults(true);
     }
 
   }
@@ -396,6 +395,7 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     public void onResource(Response response, JsArray<VariableEntityDto> resource) {
       getDisplay().clearResults();
       getDisplay().setTestEntityCount(resource.length());
+      getDisplay().showResults(true);
     }
 
   }
@@ -412,6 +412,7 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
       getDisplay().initializeResultTable();
       getDisplay().addValueColumn();
       getDisplay().addResults(addValueToResults(null, values));
+      getDisplay().showResults(true);
     }
 
   }
