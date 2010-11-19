@@ -81,7 +81,7 @@ public class Tooltip extends Composite implements HasWidgets {
       }
     });
 
-    resizeHandle.makeResizable(contentLayout, 50, 50);
+    resizeHandle.makeResizable(contentLayout, 100, 100);
   }
 
   public void setPopupPosition(int left, int top) {
