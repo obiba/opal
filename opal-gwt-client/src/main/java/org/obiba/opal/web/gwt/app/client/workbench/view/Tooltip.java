@@ -64,7 +64,7 @@ public class Tooltip extends Composite implements HasWidgets {
 
   private Timer nonStickyTimer;
 
-  private int opacity = 1;
+  private double opacity = 0.9;
 
   private boolean animated = true;
 
@@ -118,7 +118,7 @@ public class Tooltip extends Composite implements HasWidgets {
     contentLayout.setHeight(height);
   }
 
-  public void setOpacity(int opacity) {
+  public void setOpacity(double opacity) {
     this.opacity = opacity;
   }
 
