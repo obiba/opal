@@ -168,4 +168,8 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
 
   }
 
+  public DatasourceDto getDatasource() {
+    return datasourceDto;
+  }
+
 }

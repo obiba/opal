@@ -20,8 +20,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
+import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -41,7 +40,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourcePresenter.Display> {
   //
@@ -49,10 +47,7 @@ public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourceP
   //
 
   @Inject
-  private Provider<NavigatorPresenter> navigatorPresenter;
-
-  @Inject
-  private Provider<CreateDatasourceConclusionStepPresenter> createDatasourceConclusionStepPresenter;
+  private CreateDatasourceConclusionStepPresenter createDatasourceConclusionStepPresenter;
 
   @Inject
   private HibernateDatasourceFormPresenter hibernateDatasourceFormPresenter;
@@ -86,12 +81,14 @@ public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourceP
 
   @Override
   protected void onBind() {
+    createDatasourceConclusionStepPresenter.bind();
     addEventHandlers();
     registerDatasourceFormPresenters();
   }
 
   @Override
   protected void onUnbind() {
+    createDatasourceConclusionStepPresenter.unbind();
     datasourceFormPresenters.clear();
   }
 
@@ -211,7 +208,7 @@ public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourceP
   class FinishClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent arg0) {
-      eventBus.fireEvent(new WorkbenchChangeEvent(navigatorPresenter.get()));
+      eventBus.fireEvent(new DatasourceSelectionChangeEvent(createDatasourceConclusionStepPresenter.getDatasource()));
       getDisplay().hideDialog();
     }
   }
@@ -261,9 +258,8 @@ public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourceP
       DatasourceFactoryDto dto = getDisplay().getDatasourceForm().getDatasourceFactory();
       dto.setName(getDatasourceName());
 
-      CreateDatasourceConclusionStepPresenter presenter = createDatasourceConclusionStepPresenter.get();
-      presenter.setDatasourceFactory(dto);
-      getDisplay().setConclusion(presenter);
+      createDatasourceConclusionStepPresenter.setDatasourceFactory(dto);
+      getDisplay().setConclusion(createDatasourceConclusionStepPresenter);
     }
   }
 }
