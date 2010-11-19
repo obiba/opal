@@ -143,6 +143,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   private void initTablesStep() {
     tablesStep.setVisible(true);
     tablesStep.setStepTitle(translations.dataExportInstructions());
+    dialog.setHelpEnabled(false);
   }
 
   private void initOptionsStep() {
@@ -379,10 +380,6 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   }
 
   private void clearWizardDialog() {
-    tablesStep.setVisible(true);
-    optionsStep.setVisible(false);
-    destinationStep.setVisible(false);
-    unitStep.setVisible(false);
     conclusionStep.setVisible(false);
 
     dialog.setPreviousEnabled(false);
@@ -392,17 +389,21 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   }
 
   private void clearTablesStep() {
+    tablesStep.setVisible(true);
+    dialog.setHelpEnabled(false);
     // TODO does not work
     // if(tablesList != null) tablesList.clear();
   }
 
   private void clearOptionsStep() {
+    optionsStep.setVisible(false);
     incremental.setValue(true, true);
     withVariables.setValue(true, true);
     useAlias.setValue(false);
   }
 
   private void clearDestinationStep() {
+    destinationStep.setVisible(false);
     destinationFile.setValue(true);
     fileFormat.setEnabled(true);
     if(fileSelection != null) {
@@ -414,6 +415,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   }
 
   private void clearUnitStep() {
+    unitStep.setVisible(false);
     opalId.setValue(true);
     unitId.setValue(false);
     units.setEnabled(false);
