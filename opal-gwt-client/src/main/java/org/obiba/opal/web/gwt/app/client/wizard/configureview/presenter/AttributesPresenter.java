@@ -178,6 +178,7 @@ public class AttributesPresenter extends LocalizablesPresenter {
     public void onClick(ClickEvent event) {
       // Each time the dialog is closed (hidden), it is unbound. So we need to rebind it each time we display it.
       attributeDialogPresenter.bind();
+      if(attributeNames == null) attributeNames = getUniqueAttributeNames();
       attributeDialogPresenter.getDisplay().setNameDropdownList(attributeNames);
       attributeDialogPresenter.revealDisplay();
     }
