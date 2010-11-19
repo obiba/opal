@@ -10,12 +10,14 @@
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -36,6 +38,8 @@ public class WizardDialogBox extends DialogBox {
   private Button previous;
 
   private Button cancel;
+
+  private Button help;
 
   private ResizeHandle resizeHandle;
 
@@ -91,6 +95,11 @@ public class WizardDialogBox extends DialogBox {
     south.add(resizeHandle = new ResizeHandle());
     resizeHandle.makeResizable(contentLayout);
 
+    initNavigationControls(south);
+    initHelpControl(south);
+  }
+
+  private void initNavigationControls(FlowPanel south) {
     south.add(cancel = new Button("Cancel"));
     initControlStyle(cancel, "cancel");
     south.add(finish = new Button("Finish"));
@@ -100,6 +109,27 @@ public class WizardDialogBox extends DialogBox {
     south.add(previous = new Button("< Previous"));
     initControlStyle(previous, "previous");
     setPreviousEnabled(false);
+  }
+
+  private void initHelpControl(FlowPanel south) {
+    south.add(help = new Button("Help"));
+    help.addStyleName("help");
+    help.addStyleName("left-aligned");
+    help.addStyleName("small-top-margin");
+    help.setVisible(false);
+    help.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent evt) {
+        Tooltip tt = new Tooltip();
+        tt.setPopupPosition(evt.getNativeEvent().getClientX() + 20, evt.getNativeEvent().getClientY() - 100);
+        tt.setSize("200px", "200px");
+        tt.add(new Label("pouet"));
+        tt.setCaption("Coucou");
+        tt.setAnimationEnabled(true);
+        tt.show();
+      }
+    });
   }
 
   private void initControlStyle(Button button, String style) {
