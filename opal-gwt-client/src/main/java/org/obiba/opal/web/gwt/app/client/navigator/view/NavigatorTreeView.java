@@ -133,4 +133,15 @@ public class NavigatorTreeView implements NavigatorTreePresenter.Display {
     return selected.getParentItem().getText().equals(datasourceName) && selected.getText().equals(tableName);
   }
 
+  @Override
+  public boolean hasDatasource(String datasourceName) {
+    for(int i = 0; i < tree.getItemCount(); i++) {
+      TreeItem dsItem = tree.getItem(i);
+      if(dsItem.getText().equals(datasourceName)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 }

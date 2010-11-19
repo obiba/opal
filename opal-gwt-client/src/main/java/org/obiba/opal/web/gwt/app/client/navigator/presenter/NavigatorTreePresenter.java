@@ -68,7 +68,9 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
 
       @Override
       public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
-        getDisplay().selectDatasource(event.getSelection().getName());
+        if(!getDisplay().hasDatasource(event.getSelection().getName())) updateTree(event.getSelection().getName());
+        else
+          getDisplay().selectDatasource(event.getSelection().getName());
       }
 
     }));
@@ -84,15 +86,15 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
 
   @Override
   public void refreshDisplay() {
-    updateTree();
+    updateTree(null);
   }
 
   @Override
   public void revealDisplay() {
-    updateTree();
+    updateTree(null);
   }
 
-  private void updateTree() {
+  private void updateTree(final String datasourceName) {
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
       public void onResource(Response response, JsArray<DatasourceDto> datasources) {
@@ -100,7 +102,9 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
           ArrayList<TreeItem> items = new ArrayList<TreeItem>(datasources.length());
           addDatasources(datasources, items);
           getDisplay().setItems(items);
-          getDisplay().selectFirstDatasource();
+          if(datasourceName != null) getDisplay().selectDatasource(datasourceName);
+          else
+            getDisplay().selectFirstDatasource();
         }
       }
 
@@ -198,6 +202,8 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
     void selectTable(String datasourceName, String tableName);
 
     void selectDatasource(String datasourceName);
+
+    boolean hasDatasource(String datasourceName);
 
   }
 }
