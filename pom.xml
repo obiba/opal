@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -249,7 +250,7 @@
             <artifactId>commons-logging</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>       
+      </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-test</artifactId>
@@ -446,6 +447,13 @@
         <scope>runtime</scope>
       </dependency>
 
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jul-to-slf4j</artifactId>
+        <version>${slf4j.version}</version>
+        <scope>runtime</scope>
+      </dependency>
+
       <!-- Unit test libraries -->
       <dependency>
         <groupId>junit</groupId>
@@ -550,7 +558,7 @@
         <artifactId>quartz</artifactId>
         <version>${quartz.version}</version>
       </dependency>
-            
+
     </dependencies>
   </dependencyManagement>
 
@@ -699,13 +707,13 @@
         <enabled>true</enabled>
       </snapshots>
     </repository>
-    
+
     <!-- Repository added to fix OPAL-679. Caysed by usage of "first 2.1M2 jars" (yes, there are many!) -->
     <repository>
       <id>gwt2.1m2</id>
       <url>http://google-web-toolkit.googlecode.com/svn/2.1.0.M2/gwt/maven/</url>
     </repository>
-  
+
   </repositories>
 
   <distributionManagement>
@@ -738,7 +746,7 @@
     <magma.version>1.2-SNAPSHOT</magma.version>
     <spring.version>3.0.2.RELEASE</spring.version>
     <spring-batch.version>2.0.3.RELEASE</spring-batch.version>
-    <slf4j.version>1.5.10</slf4j.version>
+    <slf4j.version>1.5.11</slf4j.version>
     <jta.version>1.0.1B</jta.version>
     <jpa.version>1.0</jpa.version>
     <hsqldb.version>1.8.0.7</hsqldb.version>

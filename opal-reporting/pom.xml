@@ -42,25 +42,33 @@
 
     <!-- BIRT dependencies -->
     <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.eclipse.birt</groupId>
       <artifactId>birt-coreapi</artifactId>
       <version>${birt.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.birt</groupId>
       <artifactId>birt-modelapi</artifactId>
       <version>${birt.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.birt</groupId>
       <artifactId>birt-engineapi</artifactId>
       <version>${birt.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.birt</groupId>
       <artifactId>birt-report-engine</artifactId>
       <version>${birt.version}</version>
-      <scope>runtime</scope>
+      <scope>provided</scope>
       <type>zip</type>
     </dependency>
   </dependencies>
@@ -72,6 +80,25 @@
         <filtering>true</filtering>
       </resource>
     </resources>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptors>
+            <descriptor>src/main/assembly/opal-reporting.xml</descriptor>
+          </descriptors>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase> <!-- append to the packaging phase. -->
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 
   <properties>

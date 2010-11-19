@@ -18,11 +18,16 @@ import java.util.List;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.web.model.Commands.Message;
 import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Contains a command and the state of its execution.
  */
 public class CommandJob implements OpalShell, Runnable {
+
+  private static final Logger log = LoggerFactory.getLogger(CommandJob.class);
+
   //
   // Constants
   //
@@ -111,23 +116,32 @@ public class CommandJob implements OpalShell, Runnable {
 
       updateJobStatus(errorCode);
 
-      printf("Job completed successfully.");
+      switch(status) {
+      case CANCELED:
+        printf("Job was canceled.");
+        break;
+      case FAILED:
+        printf("Job failed.");
+        break;
+      case SUCCEEDED:
+        printf("Job completed successfully.");
+        break;
+      }
     } catch(Throwable t) {
       status = Status.FAILED;
       printf("Job has failed due to the following error :\n%s", t.getMessage());
-      t.printStackTrace();
+      log.warn("Job threw an unexpected exception during execution.", t);
     } finally {
       endTime = getCurrentTime();
     }
   }
 
   private void updateJobStatus(int errorCode) {
-
     // Update the status. Set to SUCCEEDED/FAILED, based on the error code, unless the status was changed to
     // CANCEL_PENDING (i.e., job was interrupted); in that case set it to CANCELED.
-    if(status.equals(Status.IN_PROGRESS)) {
+    if(status == Status.IN_PROGRESS) {
       status = (errorCode == 0) ? Status.SUCCEEDED : Status.FAILED;
-    } else if(status.equals(Status.CANCEL_PENDING)) {
+    } else if(status == Status.CANCEL_PENDING) {
       status = Status.CANCELED;
     } else {
       // Should never get here!

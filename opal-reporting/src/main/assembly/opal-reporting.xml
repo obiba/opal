@@ -1,0 +1,36 @@
+<assembly>
+  <id>dist</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <dependencySets>
+
+    <!-- Unpack BIRT Report Engine distribution -->
+    <dependencySet>
+      <includes>
+        <include>org.eclipse.birt:birt-report-engine:*</include>
+      </includes>
+      <scope>provided</scope>
+      <unpack>true</unpack>
+    </dependencySet>
+
+    <!-- Configure BIRT with default jdbc drivers -->
+    <dependencySet>
+      <outputDirectory>birt-runtime-2_6_1/ReportEngine/plugins/org.eclipse.birt.report.data.oda.jdbc_2.6.1.v20100909/drivers</outputDirectory>
+      <includes>
+        <include>mysql:mysql-connector-java:*</include>
+      </includes>
+    </dependencySet>
+
+    <dependencySet>
+      <outputDirectory>birt-runtime-2_6_1/ReportEngine/lib</outputDirectory>
+      <includes>
+        <include>org.obiba.opal:opal-reporting:jar</include>
+        <include>org.slf4j:jul-to-slf4j:jar</include>
+      </includes>
+      <scope>provided</scope>
+    </dependencySet>
+
+  </dependencySets>
+</assembly>
