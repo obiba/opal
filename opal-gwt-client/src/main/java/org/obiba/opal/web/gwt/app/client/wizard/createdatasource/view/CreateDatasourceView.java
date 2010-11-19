@@ -108,6 +108,7 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
         if(datasourceFormStep.isVisible()) {
           datasourceFormStep.setVisible(false);
           selectTypeStep.setVisible(true);
+          dialog.setHelpEnabled(true);
           dialog.setPreviousEnabled(false);
         } else if(conclusionStep.isVisible()) {
           conclusionStep.setVisible(false);
@@ -165,12 +166,12 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
       @Override
       public void onClick(ClickEvent evt) {
         if(selectTypeStep.isVisible()) {
-          if(selectTypeValidator.validate()) {
-            selectTypeStep.setVisible(false);
-            if(hasDatasourceForm()) {
-              datasourceFormStep.setVisible(true);
-              dialog.setPreviousEnabled(true);
-            }
+          if(!selectTypeValidator.validate()) return;
+          selectTypeStep.setVisible(false);
+          dialog.setHelpEnabled(false);
+          if(hasDatasourceForm()) {
+            datasourceFormStep.setVisible(true);
+            dialog.setPreviousEnabled(true);
           }
         } else if(datasourceFormStep.isVisible()) {
           handler.onClick(evt);
