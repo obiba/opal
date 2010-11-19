@@ -250,7 +250,6 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
   @Override
   public void setConclusion(CreateDatasourceConclusionStepPresenter presenter) {
     datasourceFormStep.setVisible(false);
-    presenter.bind();
     conclusionStep.setStepTitle(translations.createDatasourceProcessSummary());
     conclusionStep.removeStepContent();
     conclusionStep.add(presenter.getDisplay().asWidget());
