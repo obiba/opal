@@ -121,7 +121,6 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
   @Override
   public void clearResults() {
     testResults.clear();
-    resultsPanel.setOpen(false);
   }
 
   @Override
