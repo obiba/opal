@@ -40,7 +40,6 @@ public class EmbeddedBirtEngine implements BirtEngine {
 
   private IReportEngine engine;
 
-  @SuppressWarnings("unchecked")
   @Override
   public void render(String format, Map<String, String> parameters, String reportDesign, String reportOutput) throws BirtEngineException {
     if(isRunning() == false) {
@@ -52,39 +51,13 @@ public class EmbeddedBirtEngine implements BirtEngine {
       IReportRunnable design = engine.openReportDesign(reportDesign);
 
       // Create task to run and render the report,
-      IRunAndRenderTask task = engine.createRunAndRenderTask(design);
+      IRunAndRenderTask task = createTask(design, parameters, format, reportOutput);
 
-      // Set parameter values and validate
-      if(parameters != null) {
-        for(Entry<String, String> entry : parameters.entrySet()) {
-          task.setParameterValue(entry.getKey(), entry.getValue());
-        }
+      try {
+        runAndValidateTask(task);
+      } finally {
+        task.close();
       }
-      task.validateParameters();
-
-      RenderOption options = getOptions(format);
-      options.setOutputFileName(reportOutput);
-      task.setRenderOption(options);
-
-      // Run and render report
-      task.run();
-
-      // To get the errors after running, we must call getErrors() BEFORE task.close().
-
-      BirtEngineException error = null;
-      switch(task.getStatus()) {
-      case IEngineTask.STATUS_FAILED:
-        List<EngineException> errors = task.getErrors();
-        List<String> msgs = new ArrayList<String>();
-        for(EngineException e : errors) {
-          msgs.add(e.getLocalizedMessage());
-        }
-        error = new BirtEngineException(msgs);
-      default:
-      }
-
-      task.close();
-      if(error != null) throw error;
     } catch(EngineException e) {
       throw new BirtEngineException(e.getLocalizedMessage());
     }
@@ -133,20 +106,59 @@ public class EmbeddedBirtEngine implements BirtEngine {
     }
   }
 
-  private RenderOption getOptions(String format) {
+  private IRunAndRenderTask createTask(IReportRunnable design, Map<String, String> parameters, String format, String reportOutput) {
+    IRunAndRenderTask task = engine.createRunAndRenderTask(design);
+
+    // Set parameter values and validate
+    if(parameters != null) {
+      for(Entry<String, String> entry : parameters.entrySet()) {
+        task.setParameterValue(entry.getKey(), entry.getValue());
+      }
+    }
+
+    if(task.validateParameters() == false) {
+      // TODO: what do we do with invalid parameters?
+    }
+
+    task.setRenderOption(getOptions(format, reportOutput));
+    return task;
+  }
+
+  private RenderOption getOptions(String format, String reportOutput) {
+    RenderOption options;
     if(format.equalsIgnoreCase("html")) {
       // Setup rendering to HTML
-      HTMLRenderOption options = new HTMLRenderOption();
-      options.setOutputFormat("html");
+      HTMLRenderOption html = new HTMLRenderOption();
+      html.setOutputFormat("html");
       // Setting this to true removes html and body tags
-      options.setEmbeddable(false);
-      return options;
+      html.setEmbeddable(false);
+      options = html;
     } else if(format.equalsIgnoreCase("pdf")) {
-      PDFRenderOption options = new PDFRenderOption();
-      options.setOutputFormat(format);
-      return options;
+      PDFRenderOption pdf = new PDFRenderOption();
+      pdf.setOutputFormat(format);
+      options = pdf;
     } else {
       throw new IllegalArgumentException("Unexpected report format: " + format);
+    }
+    options.setOutputFileName(reportOutput);
+    return options;
+  }
+
+  @SuppressWarnings("unchecked")
+  private void runAndValidateTask(IRunAndRenderTask task) throws EngineException, BirtEngineException {
+    // Run and render report
+    task.run();
+
+    // To get the errors after running, we must call getErrors() BEFORE task.close().
+    switch(task.getStatus()) {
+    case IEngineTask.STATUS_FAILED:
+      List<EngineException> errors = task.getErrors();
+      List<String> msgs = new ArrayList<String>();
+      for(EngineException e : errors) {
+        msgs.add(e.getLocalizedMessage());
+      }
+      throw new BirtEngineException(msgs);
+    default:
     }
   }
 

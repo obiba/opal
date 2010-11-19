@@ -55,32 +55,18 @@ public class BirtReportServiceImpl implements ReportService {
   public void start() {
     if(isRunning()) return;
     log.info("Starting BIRT Report Engine.");
-    try {
-      // make sure BIRT_HOME is set and valid
-      File reportEngineHome = new File(System.getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME), "ReportEngine").getAbsoluteFile();
 
-      if(reportEngineHome.exists() == false) {
-        log.error("Could not find Birt engine distribution in directory '{}'.", System.getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME));
-        return;
-      }
+    // make sure BIRT_HOME is set and valid
+    File reportEngineHome = new File(System.getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME), "ReportEngine").getAbsoluteFile();
 
-      File libDir = new File(reportEngineHome, "lib");
-      ClassLoader classLoader = createClassLoader(libDir);
-      Class<?> c = classLoader.loadClass("org.obiba.opal.reporting.service.birt.bootstrap.EmbeddedBirtEngine");
-
-      this.engine = (BirtEngine) c.newInstance();
-      this.engine.start();
-      log.info("Sucessfully started BIRT Report Engine.");
-    } catch(ClassNotFoundException e) {
-      log.debug("Cannot find embedded service class", e);
-      throw new RuntimeException(e);
-    } catch(InstantiationException e) {
-      log.debug("Cannot instantiate embedded service class", e);
-      throw new RuntimeException(e);
-    } catch(IllegalAccessException e) {
-      log.debug("Cannot instantiate embedded service class", e);
-      throw new RuntimeException(e);
+    if(reportEngineHome.exists() == false) {
+      log.error("Could not find Birt engine distribution in directory '{}'.", System.getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME));
+      return;
     }
+
+    this.engine = instantiateEngine(reportEngineHome);
+    this.engine.start();
+    log.info("Sucessfully started BIRT Report Engine.");
   }
 
   @Override
@@ -95,6 +81,24 @@ public class BirtReportServiceImpl implements ReportService {
       log.warn("Error stoping BIRT", t);
     } finally {
       engine = null;
+    }
+  }
+
+  private BirtEngine instantiateEngine(File birtHome) {
+    try {
+      File libDir = new File(birtHome, "lib");
+      ClassLoader classLoader = createClassLoader(libDir);
+      Class<?> c = classLoader.loadClass("org.obiba.opal.reporting.service.birt.bootstrap.EmbeddedBirtEngine");
+      return (BirtEngine) c.newInstance();
+    } catch(ClassNotFoundException e) {
+      log.debug("Cannot find embedded service class", e);
+      throw new RuntimeException(e);
+    } catch(InstantiationException e) {
+      log.debug("Cannot instantiate embedded service class", e);
+      throw new RuntimeException(e);
+    } catch(IllegalAccessException e) {
+      log.debug("Cannot instantiate embedded service class", e);
+      throw new RuntimeException(e);
     }
   }
 
