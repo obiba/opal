@@ -94,12 +94,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
   private ViewDto viewDto;
 
-  private List<VariableDto> variables;
-
-  private int currentSelectedVariableIndex;
-
-  /** Temporarily track last variable saved so it can be displayed when the form is refreshed. */
-  private String recentlySavedVariableName;
+  /** The name of the variable currently displayed. */
+  private String displayedVariableName;
 
   @Inject
   private CategoriesPresenter categoriesPresenter;
@@ -212,58 +208,68 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     getDisplay().addButtonEnabled(true);
     getDisplay().navigationEnabled(true);
 
-    variables = getVariableList();
+    displayedVariableName = getVariableList().isEmpty() ? null : getVariableList().get(0).getName();
     refreshVariableSuggestions();
 
-    if(variables.isEmpty()) {
+    if(getVariableList().isEmpty()) {
       // Clear variable selection.
-      currentSelectedVariableIndex = -1;
       getDisplay().setSelectedVariableName(null, null, getNextVariableName());
-
       formClear();
       formEnabled(false);
     } else {
-      currentSelectedVariableIndex = 0;
       updateSelectedVariableName();
       getDisplay().removeButtonEnabled(true);
     }
   }
 
+  /**
+   * Returns an up-to-date list of variables.
+   */
   private List<VariableDto> getVariableList() {
     VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
     return JsArrays.toList(variableListDto.getVariablesArray());
   }
 
   private void updateSelectedVariableName() {
-    if(!variables.isEmpty()) {
-      getDisplay().setSelectedVariableName(getSelectedVariableName(), getPreviousVariableName(), getNextVariableName());
-      eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(variables.get(currentSelectedVariableIndex)));
+    if(!getVariableList().isEmpty()) {
+      getDisplay().setSelectedVariableName(displayedVariableName, getPreviousVariableName(), getNextVariableName());
+      eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(getVariableList().get(getVariableIndex(displayedVariableName))));
     }
-  }
-
-  private String getSelectedVariableName() {
-    return variables.get(currentSelectedVariableIndex).getName();
   }
 
   private String getPreviousVariableName() {
-    String previousVariable = null;
-    if(currentSelectedVariableIndex > 0) {
-      previousVariable = variables.get(currentSelectedVariableIndex - 1).getName();
+    if(getVariableList().isEmpty()) {
+      return null;
+    } else {
+      if(displayedVariableName == null) return getVariableList().get(0).getName();
+      int index = getVariableIndex(displayedVariableName);
+      index--;
+      if(index >= 0) {
+        return getVariableList().get(index).getName();
+      } else {
+        return null; // At the beginning of the list.
+      }
     }
-    return previousVariable;
   }
 
   private String getNextVariableName() {
-    String nextVariable = null;
-    if(currentSelectedVariableIndex < variables.size() - 1) {
-      nextVariable = variables.get(currentSelectedVariableIndex + 1).getName();
+    if(getVariableList().isEmpty()) {
+      return null;
+    } else {
+      if(displayedVariableName == null) return getVariableList().get(0).getName();
+      int index = getVariableIndex(displayedVariableName);
+      index++;
+      if(index < getVariableList().size()) {
+        return getVariableList().get(index).getName();
+      } else {
+        return null; // At the end of the list.
+      }
     }
-    return nextVariable;
   }
 
   private void refreshVariableSuggestions() {
     getDisplay().clearVariableNameSuggestions();
-    for(VariableDto variableDto : variables) {
+    for(VariableDto variableDto : getVariableList()) {
       getDisplay().addVariableNameSuggestion(variableDto.getName());
     }
   }
@@ -327,14 +333,14 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   }
 
   private int getVariableIndex(String variableName) {
-    int i = 0;
-    for(VariableDto variable : variables) {
-      if(variable.getName().equals(variableName)) {
+    int result = -1;
+    for(int i = 0; i < getVariableList().size(); i++) {
+      if(getVariableList().get(i).getName().equals(variableName)) {
+        result = i;
         break;
       }
-      i++;
     }
-    return i;
+    return result;
   }
 
   //
@@ -450,8 +456,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     @Override
     public void onClick(ClickEvent event) {
-      if(currentSelectedVariableIndex > 0) {
-        currentSelectedVariableIndex--;
+      if(getPreviousVariableName() != null) {
+        displayedVariableName = getPreviousVariableName();
       }
       updateSelectedVariableName();
     }
@@ -461,8 +467,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     @Override
     public void onClick(ClickEvent event) {
-      if(currentSelectedVariableIndex < variables.size() - 1) {
-        currentSelectedVariableIndex++;
+      if(getNextVariableName() != null) {
+        displayedVariableName = getNextVariableName();
       }
       updateSelectedVariableName();
     }
@@ -473,7 +479,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     @Override
     public void onSelection(SelectionEvent<Suggestion> event) {
-      currentSelectedVariableIndex = getVariableIndex(event.getSelectedItem().getReplacementString());
+      displayedVariableName = event.getSelectedItem().getReplacementString();
       updateSelectedVariableName();
     }
   }
@@ -567,7 +573,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       updateCategories();
       updateAttributes();
       updateView(variableListViewDto);
-      recentlySavedVariableName = currentVariableDto.getName(); // Must note this before form is refreshed.
+      // recentlySavedVariableName = currentVariableDto.getName(); // Must note this before form is refreshed.
+      displayedVariableName = currentVariableDto.getName(); // Must note this before form is refreshed.
       eventBus.fireEvent(new ViewSaveRequiredEvent(viewDto));
     }
 
@@ -729,17 +736,16 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
         newVariables.push(variableListViewDto.getVariablesArray().get(i));
       }
     }
-    variableListViewDto.setVariablesArray(newVariables);
-    variables = JsArrays.toList(newVariables);
+    variableListViewDto.setVariablesArray(newVariables); // Updates the viewDto.
     updateAndDisplayVariable(nextVariableName);
   }
 
   private void updateAndDisplayVariable(String nextVariableName) {
     if(nextVariableName != null) {
-      currentSelectedVariableIndex = getVariableIndex(nextVariableName);
+      displayedVariableName = nextVariableName;
       updateSelectedVariableName();
     } else {
-      currentSelectedVariableIndex = -1;
+      displayedVariableName = null;
       getDisplay().setSelectedVariableName(null, null, getNextVariableName());
       formClear();
       formEnabled(false);
@@ -802,12 +808,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       getDisplay().saveChangesEnabled(false);
       getDisplay().addButtonEnabled(true);
       getDisplay().navigationEnabled(true);
-      if(recentlySavedVariableName != null) {
-        currentSelectedVariableIndex = getVariableIndex(recentlySavedVariableName);
-        updateSelectedVariableName();
-        recentlySavedVariableName = null;
-      }
-      if(variables.size() > 0) getDisplay().removeButtonEnabled(true);
+      updateSelectedVariableName();
+      if(getVariableList().size() > 0) getDisplay().removeButtonEnabled(true);
     }
 
   }
@@ -820,11 +822,11 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     @Override
     protected boolean hasError() {
-      if(currentSelectedVariableIndex >= 0) {
+      if(displayedVariableName != null) {
         // Edits can have the same name.
-        if(getDisplay().getName().getText().equals(variables.get(currentSelectedVariableIndex).getName())) return false;
+        if(getDisplay().getName().getText().equals(displayedVariableName)) return false;
       }
-      for(VariableDto variableDto : variables) {
+      for(VariableDto variableDto : getVariableList()) {
         if(getDisplay().getName().getText().equals(variableDto.getName())) return true;
       }
       return false;
