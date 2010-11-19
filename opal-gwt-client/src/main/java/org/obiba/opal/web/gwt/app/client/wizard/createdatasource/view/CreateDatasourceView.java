@@ -127,6 +127,7 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
   private void clear() {
     datasourceName.setText("");
     selectTypeStep.setVisible(true);
+    dialog.setHelpEnabled(true);
 
     datasourceFormStep.setVisible(false);
 
