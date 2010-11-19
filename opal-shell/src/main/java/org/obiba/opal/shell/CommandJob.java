@@ -115,37 +115,13 @@ public class CommandJob implements OpalShell, Runnable {
       }
 
       updateJobStatus(errorCode);
-
-      switch(status) {
-      case CANCELED:
-        printf("Job was canceled.");
-        break;
-      case FAILED:
-        printf("Job failed.");
-        break;
-      case SUCCEEDED:
-        printf("Job completed successfully.");
-        break;
-      }
+      printCompletion();
     } catch(Throwable t) {
       status = Status.FAILED;
       printf("Job has failed due to the following error :\n%s", t.getMessage());
       log.warn("Job threw an unexpected exception during execution.", t);
     } finally {
       endTime = getCurrentTime();
-    }
-  }
-
-  private void updateJobStatus(int errorCode) {
-    // Update the status. Set to SUCCEEDED/FAILED, based on the error code, unless the status was changed to
-    // CANCEL_PENDING (i.e., job was interrupted); in that case set it to CANCELED.
-    if(status == Status.IN_PROGRESS) {
-      status = (errorCode == 0) ? Status.SUCCEEDED : Status.FAILED;
-    } else if(status == Status.CANCEL_PENDING) {
-      status = Status.CANCELED;
-    } else {
-      // Should never get here!
-      throw new IllegalStateException("Unexpected CommandJob status: " + status);
     }
   }
 
@@ -221,5 +197,32 @@ public class CommandJob implements OpalShell, Runnable {
     if(date == null) return null;
     SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_PATTERN);
     return dateFormat.format(date);
+  }
+
+  private void updateJobStatus(int errorCode) {
+    // Update the status. Set to SUCCEEDED/FAILED, based on the error code, unless the status was changed to
+    // CANCEL_PENDING (i.e., job was interrupted); in that case set it to CANCELED.
+    if(status == Status.IN_PROGRESS) {
+      status = (errorCode == 0) ? Status.SUCCEEDED : Status.FAILED;
+    } else if(status == Status.CANCEL_PENDING) {
+      status = Status.CANCELED;
+    } else {
+      // Should never get here!
+      throw new IllegalStateException("Unexpected CommandJob status: " + status);
+    }
+  }
+
+  private void printCompletion() {
+    switch(status) {
+    case CANCELED:
+      printf("Job was canceled.");
+      break;
+    case FAILED:
+      printf("Job failed.");
+      break;
+    case SUCCEEDED:
+      printf("Job completed successfully.");
+      break;
+    }
   }
 }
