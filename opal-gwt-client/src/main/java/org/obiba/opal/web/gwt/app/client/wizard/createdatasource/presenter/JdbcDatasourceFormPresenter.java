@@ -16,8 +16,6 @@ import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredOptionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidatableWidgetPresenter;
@@ -170,15 +168,11 @@ public class JdbcDatasourceFormPresenter extends ValidatableWidgetPresenter<Jdbc
     return validate();
   }
 
-  private void fireErrorEvent(String error) {
-    eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, error, null));
-  }
-
   @Override
   public void clearForm() {
     getDisplay().getUrl().setText("");
     getDisplay().getUsername().setText("");
     getDisplay().getPassword().setText("");
-    getDisplay().getUseMetadataTablesOption().setValue(null);
+    getDisplay().getUseMetadataTablesOption().setValue(false);
   }
 }

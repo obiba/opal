@@ -69,7 +69,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
   private VariablePresenter variablePresenter;
 
   @Inject
-  private Provider<CreateDatasourcePresenter> createDatasourcePresenter;
+  private CreateDatasourcePresenter createDatasourcePresenter;
 
   @Inject
   private Provider<DataExportPresenter> dataExportPresenter;
@@ -90,6 +90,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     datasourcePresenter.bind();
     tablePresenter.bind();
     variablePresenter.bind();
+    createDatasourcePresenter.bind();
 
     getDisplay().setTreeDisplay(navigatorTreePresenter.getDisplay());
 
@@ -97,8 +98,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
 
       @Override
       public void onClick(ClickEvent arg0) {
-        CreateDatasourcePresenter presenter = createDatasourcePresenter.get();
-        presenter.revealDisplay();
+        createDatasourcePresenter.revealDisplay();
       }
     });
 
@@ -176,6 +176,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     datasourcePresenter.unbind();
     tablePresenter.unbind();
     variablePresenter.unbind();
+    createDatasourcePresenter.unbind();
   }
 
   @Override
