@@ -129,6 +129,7 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
   public void refreshDisplay() {
     getDisplay().saveChangesEnabled(false);
     scriptWidget.getDisplay().clearResults();
+    scriptWidget.getDisplay().showResults(false);
   }
 
   @Override
