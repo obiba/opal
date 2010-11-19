@@ -24,7 +24,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.inject.Inject;
 
-public class FormatSelectionStepPresenter extends WidgetPresenter<FormatSelectionStepPresenter.Display> {
+public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Display> {
 
   public interface Display extends WidgetDisplay {
 
@@ -43,7 +43,7 @@ public class FormatSelectionStepPresenter extends WidgetPresenter<FormatSelectio
   private ImportData importData;
 
   @Inject
-  public FormatSelectionStepPresenter(final Display display, final EventBus eventBus) {
+  public DataImportPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
   }
 

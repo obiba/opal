@@ -44,7 +44,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.CsvFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DestinationSelectionStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.FormatSelectionStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.IdentityArchiveStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.XmlFormatStepPresenter;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
@@ -99,7 +99,7 @@ public interface OpalGinjector extends Ginjector {
 
   CreateFolderDialogPresenter getCreateFolderDialogPresenter();
 
-  FormatSelectionStepPresenter getFormatSelectionStepPresenter();
+  DataImportPresenter getDataImportPresenter();
 
   CsvFormatStepPresenter getCsvFormatStepPresenter();
 

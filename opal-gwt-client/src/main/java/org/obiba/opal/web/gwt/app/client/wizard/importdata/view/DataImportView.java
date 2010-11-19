@@ -11,7 +11,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.FormatSelectionStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -24,10 +24,10 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 
-public class FormatSelectionStepView extends Composite implements FormatSelectionStepPresenter.Display {
+public class DataImportView extends Composite implements DataImportPresenter.Display {
 
-  @UiTemplate("FormatSelectionStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, FormatSelectionStepView> {
+  @UiTemplate("DataImportView.ui.xml")
+  interface ViewUiBinder extends UiBinder<Widget, DataImportView> {
   }
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
@@ -40,7 +40,7 @@ public class FormatSelectionStepView extends Composite implements FormatSelectio
   @UiField
   ListBox formatListBox;
 
-  public FormatSelectionStepView() {
+  public DataImportView() {
     initWidget(uiBinder.createAndBindUi(this));
     populateFormatListBox();
   }

@@ -34,7 +34,7 @@ public class ValidationReportStepPresenter extends WidgetPresenter<ValidationRep
 
   // Provider used here to break a circular dependency.
   @Inject
-  private Provider<FormatSelectionStepPresenter> formatSelectionStepPresenter;
+  private Provider<DataImportPresenter> formatSelectionStepPresenter;
 
   //
   // Constructors

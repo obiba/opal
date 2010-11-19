@@ -13,14 +13,14 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.CsvFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DestinationSelectionStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.FormatSelectionStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.IdentityArchiveStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ValidationReportStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.XmlFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.ConclusionStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.CsvFormatStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.DestinationSelectionStepView;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.FormatSelectionStepView;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.DataImportView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.IdentityArchiveStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.ValidationReportStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.XmlFormatStepView;
@@ -37,7 +37,7 @@ public class ImportModule extends AbstractGinModule {
   protected void configure() {
     bind(ImportData.class).in(Singleton.class);
 
-    bind(FormatSelectionStepPresenter.Display.class).to(FormatSelectionStepView.class).in(Singleton.class);
+    bind(DataImportPresenter.Display.class).to(DataImportView.class).in(Singleton.class);
     bind(CsvFormatStepPresenter.Display.class).to(CsvFormatStepView.class).in(Singleton.class);
     bind(DestinationSelectionStepPresenter.Display.class).to(DestinationSelectionStepView.class).in(Singleton.class);
     bind(XmlFormatStepPresenter.Display.class).to(XmlFormatStepView.class).in(Singleton.class);

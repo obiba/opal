@@ -22,7 +22,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChange
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewCreationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.FormatSelectionStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.UploadVariablesStepPresenter;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -54,7 +54,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
   private Provider<UploadVariablesStepPresenter> importVariablesPresenter;
 
   @Inject
-  private Provider<FormatSelectionStepPresenter> importDataPresenter;
+  private Provider<DataImportPresenter> importDataPresenter;
 
   @Inject
   private NavigatorTreePresenter navigatorTreePresenter;
