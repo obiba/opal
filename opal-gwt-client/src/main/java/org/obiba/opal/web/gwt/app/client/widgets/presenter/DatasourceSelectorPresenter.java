@@ -62,7 +62,8 @@ public class DatasourceSelectorPresenter extends WidgetPresenter<DatasourceSelec
   public void refreshDisplay() {
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
 
-      public void onResource(Response response, JsArray<DatasourceDto> datasources) {
+      public void onResource(Response response, JsArray<DatasourceDto> resource) {
+        JsArray<DatasourceDto> datasources = resource != null ? resource : (JsArray<DatasourceDto>) JsArray.createArray();
         getDisplay().setDatasources(datasources);
 
         if(datasourcesRefreshedCallback != null) {
@@ -89,6 +90,10 @@ public class DatasourceSelectorPresenter extends WidgetPresenter<DatasourceSelec
     return getDisplay().getSelection();
   }
 
+  public DatasourceDto getSelectionDto() {
+    return getDisplay().getSelectionDto();
+  }
+
   public void setSelection(String datasourceName) {
     getDisplay().setSelection(datasourceName);
   }
@@ -112,6 +117,8 @@ public class DatasourceSelectorPresenter extends WidgetPresenter<DatasourceSelec
     void setSelection(String datasourceName);
 
     String getSelection();
+
+    DatasourceDto getSelectionDto();
   }
 
   public interface DatasourcesRefreshedCallback {

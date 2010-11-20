@@ -5,66 +5,58 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
   
-  <o:WorkbenchLayout>
-    <g:Label><ui:msg description="Create View title">Create View</ui:msg></g:Label>
-    <g:Label><ui:msg description="Create View Step summary">Select the datasource to which to attach the view and provide view settings.</ui:msg></g:Label>
+  <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="30em" width="40em">
+    <g:caption>
+      <ui:msg description="Create View title">Create View</ui:msg>
+    </g:caption>
     <g:FlowPanel>
-      <g:Button ui:field="cancelButton"><ui:msg description="Cancel button label">Cancel</ui:msg></g:Button>
-      <g:Button ui:field="createButton"><ui:msg description="Create button label">Create</ui:msg></g:Button>
-    </g:FlowPanel>
+      <o:WizardStep ui:field="selectTypeStep">
+      
+<!--      <ui:msg description="Create View Step summary">Select the datasource to which to attach the view and provide view settings.</ui:msg>-->
     
-    <g:FlowPanel>
-      <g:HTMLPanel>
-        <table class="gwt-KeyValue" cellspacing="10">
-          <tbody>
-            <tr>
-              <td style="vertical-align: top">
-                <g:Label><ui:msg description="Datasource label">Datasource</ui:msg>:</g:Label>           
-              </td>
-              <td>
-                <g:FlowPanel>
-                  <g:RadioButton name="datasourceGroup" ui:field="selectExistingDatasourceRadioButton"><ui:msg description="Select an existing datasource label">Select an existing datasource:</ui:msg></g:RadioButton>
-                  <g:SimplePanel addStyleNames="inline small-indent" ui:field="datasourceSelectorPanel" />
-                </g:FlowPanel>
-                <g:FlowPanel addStyleNames="small-top-margin">
-                  <g:RadioButton name="datasourceGroup" ui:field="createNewDatasourceRadioButton"><ui:msg description="Create a new datasource label">Create a new datasource:</ui:msg></g:RadioButton>
-                  <g:TextBox ui:field="createNewDatasourceTextBox" addStyleNames="small-indent" />
-                </g:FlowPanel>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <g:Label><ui:msg description="Name of the view label">Name of the view</ui:msg>:</g:Label>          
-              </td>
-              <td>
-                <g:TextBox ui:field="viewNameTextBox" />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <g:Label><ui:msg description="Tables label">Tables</ui:msg>:</g:Label>        
-              </td>
-              <td>
-                <g:SimplePanel ui:field="tableSelectorPanel" />
-              </td>
-            </tr>
-            <tr>
-              <td style="vertical-align: top">
-                <g:Label><ui:msg description="Variables label">Variables</ui:msg>:</g:Label>           
-              </td>
-              <td>
-                <g:Label><ui:msg description="Select how the variables will be defined label">Select how the variables will be defined:</ui:msg></g:Label>
-                <g:RadioButton name="variablesGroup" ui:field="applyingGlobalVariableFilterRadioButton" addStyleNames="block small-top-margin"><ui:msg description="Apply a global filter on the selected tables label">Apply a global filter on the selected tables</ui:msg></g:RadioButton>
-                <g:RadioButton name="variablesGroup" ui:field="addingVariablesOneByOneRadioButton" addStyleNames="block small-top-margin"><ui:msg description="Add each variable one by one label">Add each variable one by one</ui:msg></g:RadioButton>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </g:HTMLPanel>
-    </g:FlowPanel>
-    
-     <g:FlowPanel>
-        <g:HTMLPanel>
+	      <g:HTMLPanel>
+	        <table class="full-width" cellspacing="10">
+	          <tbody>
+	            <tr>
+	              <td style="vertical-align: top">
+	                <g:Label><ui:msg description="Datasource label">Datasource</ui:msg>:</g:Label>           
+	              </td>
+	              <td>
+	                <g:SimplePanel addStyleNames="inline" ui:field="datasourceSelectorPanel" />
+	              </td>
+	            </tr>
+	            <tr>
+	              <td>
+	                <g:Label><ui:msg description="Name of the view label">Name of the view</ui:msg>:</g:Label>          
+	              </td>
+	              <td>
+	                <g:TextBox ui:field="viewNameTextBox" addStyleNames="not-so-full-width"/>
+	              </td>
+	            </tr>
+	            <tr>
+	              <td valign="top">
+	                <g:Label><ui:msg description="Tables label">Tables</ui:msg>:</g:Label>        
+	              </td>
+	              <td>
+	                <g:SimplePanel ui:field="tableSelectorPanel" />
+	              </td>
+	            </tr>
+	            <tr>
+	              <td style="vertical-align: top">
+	                <g:Label><ui:msg description="Variables label">Variables</ui:msg>:</g:Label>           
+	              </td>
+	              <td>
+	                <g:Label><ui:msg description="Select how the variables will be defined label">Select how the variables will be defined:</ui:msg></g:Label>
+	                <g:RadioButton name="variablesGroup" ui:field="applyingGlobalVariableFilterRadioButton" addStyleNames="block small-top-margin"><ui:msg description="Apply a global filter on the selected tables label">Apply a global filter on the selected tables</ui:msg></g:RadioButton>
+	                <g:RadioButton name="variablesGroup" ui:field="addingVariablesOneByOneRadioButton" addStyleNames="block small-top-margin"><ui:msg description="Add each variable one by one label">Add each variable one by one</ui:msg></g:RadioButton>
+	              </td>
+	            </tr>
+	          </tbody>
+	        </table>
+	      </g:HTMLPanel>
+      </o:WizardStep>
+
+        <g:HTMLPanel ui:field="helpPanel">
           <g:Label addStyleNames="title"><ui:msg description="Datasource label">Datasource</ui:msg></g:Label>
           <p>
             <ui:msg description="Datasource information for view creation">
@@ -109,6 +101,6 @@
           </p>
         </g:HTMLPanel>
      </g:FlowPanel>      
-  </o:WorkbenchLayout>
+  </o:WizardDialogBox>
 
 </ui:UiBinder>

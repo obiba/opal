@@ -27,6 +27,8 @@ public class DatasourceSelectorView extends Composite implements DatasourceSelec
 
   private ListBox datasourceListBox;
 
+  private JsArray<DatasourceDto> datasources;
+
   //
   // Constructors
   //
@@ -46,6 +48,7 @@ public class DatasourceSelectorView extends Composite implements DatasourceSelec
 
   public void setDatasources(JsArray<DatasourceDto> datasources) {
     datasourceListBox.clear();
+    this.datasources = datasources;
 
     for(int i = 0; i < datasources.length(); i++) {
       datasourceListBox.addItem(datasources.get(i).getName());
@@ -71,6 +74,12 @@ public class DatasourceSelectorView extends Composite implements DatasourceSelec
   public String getSelection() {
     int selectedIndex = datasourceListBox.getSelectedIndex();
     return selectedIndex != -1 ? datasourceListBox.getValue(selectedIndex) : null;
+  }
+
+  @Override
+  public DatasourceDto getSelectionDto() {
+    int selectedIndex = datasourceListBox.getSelectedIndex();
+    return selectedIndex != -1 ? datasources.get(selectedIndex) : null;
   }
 
   public Widget asWidget() {

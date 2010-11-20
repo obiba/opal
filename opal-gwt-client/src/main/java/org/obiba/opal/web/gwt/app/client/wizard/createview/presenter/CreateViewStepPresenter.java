@@ -19,16 +19,12 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewCreationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
-import org.obiba.opal.web.gwt.app.client.support.ClientErrorDtos;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.HasCollection;
-import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.DisallowedCharactersValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.MatchingTableEntitiesValidator;
@@ -36,17 +32,17 @@ import org.obiba.opal.web.gwt.app.client.validator.MinimumSizeCollectionValidato
 import org.obiba.opal.web.gwt.app.client.validator.RequiredOptionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter.DatasourcesRefreshedCallback;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter.DatasourcesRefreshedCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
-import org.obiba.opal.web.model.client.magma.HibernateDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -55,7 +51,6 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPresenter.Display> {
   //
@@ -63,19 +58,10 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   //
 
   @Inject
-  private Provider<ApplicationPresenter> applicationPresenter;
-
-  @Inject
-  private Provider<DashboardPresenter> dashboardPresenter;
-
-  @Inject
   private DatasourceSelectorPresenter datasourceSelectorPresenter;
 
   @Inject
   private TableListPresenter tableListPresenter;
-
-  @Inject
-  private ConclusionStepPresenter conclusionStepPresenter;
 
   private String datasourceName;
 
@@ -99,7 +85,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
       public void onDatasourcesRefreshed() {
         if(datasourceName != null) {
-          getDisplay().getExistingDatasourceName().setText(datasourceName);
+          getDisplay().getDatasourceName().setText(datasourceName);
         }
       }
     });
@@ -121,8 +107,6 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     super.registerHandler(eventBus.addHandler(ViewCreationRequiredEvent.getType(), new ViewCreationRequiredHandler()));
     super.registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
     super.registerHandler(getDisplay().addCreateClickHandler(new CreateClickHandler()));
-    super.registerHandler(getDisplay().addSelectExistingDatasourceClickHandler(new SelectExistingDatasourceClickHandler()));
-    super.registerHandler(getDisplay().addCreateNewDatasourceClickHandler(new CreateNewDatasourceClickHandler()));
   }
 
   @Override
@@ -131,15 +115,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     tableListPresenter.getTables().clear();
 
     getDisplay().clear();
-    if(datasourceName != null) {
-      getDisplay().getAttachToExistingDatasourceOption().setValue(true);
-      getDisplay().setAttachToExistingDatasourceOptionEnabled(false);
-
-      getDisplay().getAttachToNewDatasourceOption().setValue(false);
-      getDisplay().setAttachToNewDatasourceOptionEnabled(false);
-
-      getDisplay().setDatasourceSelectorEnabled(false);
-    }
+    getDisplay().showDialog();
   }
 
   @Override
@@ -170,23 +146,9 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
     void setDatasourceSelector(DatasourceSelectorPresenter.Display datasourceSelector);
 
-    void setDatasourceSelectorEnabled(boolean enabled);
-
-    void setNewDatasourceInputEnabled(boolean enabled);
-
     void setTableSelector(TableListPresenter.Display tableSelector);
 
-    HasValue<Boolean> getAttachToExistingDatasourceOption();
-
-    void setAttachToExistingDatasourceOptionEnabled(boolean enabled);
-
-    HasValue<Boolean> getAttachToNewDatasourceOption();
-
-    void setAttachToNewDatasourceOptionEnabled(boolean enabled);
-
-    HasText getExistingDatasourceName();
-
-    HasText getNewDatasourceName();
+    HasText getDatasourceName();
 
     HasText getViewName();
 
@@ -198,25 +160,47 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
     HandlerRegistration addCreateClickHandler(ClickHandler handler);
 
-    HandlerRegistration addSelectExistingDatasourceClickHandler(ClickHandler handler);
+    void showDialog();
 
-    HandlerRegistration addCreateNewDatasourceClickHandler(ClickHandler handler);
+    void hideDialog();
   }
 
   class ViewCreationRequiredHandler implements ViewCreationRequiredEvent.Handler {
 
     public void onViewCreationRequired(ViewCreationRequiredEvent event) {
       datasourceName = event.getDatasourceName();
-      eventBus.fireEvent(new WorkbenchChangeEvent(CreateViewStepPresenter.this, false, false));
+      revealDisplay();
     }
   }
 
   class CancelClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent event) {
-      eventBus.fireEvent(new WorkbenchChangeEvent(dashboardPresenter.get()));
-      ApplicationPresenter.Display appDisplay = applicationPresenter.get().getDisplay();
-      appDisplay.setCurrentSelection(appDisplay.getDashboardItem());
+      getDisplay().hideDialog();
+    }
+  }
+
+  private class FailedCallback implements ResponseCodeCallback {
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      String msg = "UnknownError";
+      if(response.getText() != null && response.getText().length() != 0) {
+        try {
+          ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+          msg = errorDto.getStatus();
+        } catch(Exception e) {
+
+        }
+      }
+      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, msg, null));
+    }
+  }
+
+  private class CompletedCallback implements ResponseCodeCallback {
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      eventBus.fireEvent(new DatasourceSelectionChangeEvent(datasourceSelectorPresenter.getSelectionDto()));
+      getDisplay().hideDialog();
     }
   }
 
@@ -226,9 +210,6 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
     @SuppressWarnings("unchecked")
     public CreateClickHandler() {
-      validators.add(new RequiredOptionValidator(RequiredOptionValidator.asSet(getDisplay().getAttachToExistingDatasourceOption(), getDisplay().getAttachToNewDatasourceOption()), "ViewMustBeAttachedToExistingOrNewDatasource"));
-      validators.add(new ConditionalValidator(getDisplay().getAttachToNewDatasourceOption(), new RequiredTextValidator(getDisplay().getNewDatasourceName(), "DatasourceNameRequired")));
-      validators.add(new ConditionalValidator(getDisplay().getAttachToNewDatasourceOption(), new DisallowedCharactersValidator(getDisplay().getNewDatasourceName(), new char[] { '.', ':' }, "DatasourceNameDisallowedChars")));
       validators.add(new RequiredTextValidator(getDisplay().getViewName(), "ViewNameRequired"));
       validators.add(new DisallowedCharactersValidator(getDisplay().getViewName(), new char[] { '.', ':' }, "ViewNameDisallowedChars"));
 
@@ -248,12 +229,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
         eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errorMessageKey, null));
         return;
       }
-
-      if(getDisplay().getAttachToNewDatasourceOption().getValue()) {
-        createNewDatasourceAndView();
-      } else {
-        createView();
-      }
+      createView();
     }
 
     String validate() {
@@ -266,30 +242,10 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
       return null;
     }
 
-    void createNewDatasourceAndView() {
-      DatasourceFactoryDto dsFactoryDto = DatasourceFactoryDto.create();
-      dsFactoryDto.setName(getDisplay().getNewDatasourceName().getText());
-      HibernateDatasourceFactoryDto hibFactoryDto = HibernateDatasourceFactoryDto.create();
-      dsFactoryDto.setExtension(HibernateDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, hibFactoryDto);
-
-      ResponseCodeCallback responseCodeCallback = new ResponseCodeCallback() {
-
-        public void onResponseCode(Request request, Response response) {
-          if(response.getStatusCode() == 201) {
-            createView();
-          } else {
-            String errorMessage = ClientErrorDtos.getStatus(response.getText());
-            eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errorMessage, null));
-          }
-        }
-      };
-      ResourceRequestBuilderFactory.newBuilder().put().forResource("/datasource/" + getDisplay().getNewDatasourceName()).accept("application/x-protobuf+json").withResourceBody(stringify(dsFactoryDto)).withCallback(201, responseCodeCallback).withCallback(400, responseCodeCallback).send();
-    }
-
     void createView() {
       // Get the view name and datasource name.
       String viewName = getDisplay().getViewName().getText();
-      String datasourceName = getDisplay().getAttachToExistingDatasourceOption().getValue() ? getDisplay().getExistingDatasourceName().getText() : getDisplay().getNewDatasourceName().getText();
+      String datasourceName = getDisplay().getDatasourceName().getText();
 
       // Build the ViewDto for the request.
       ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().fromTables(tableListPresenter.getTables());
@@ -300,30 +256,21 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
       }
       ViewDto viewDto = viewDtoBuilder.build();
 
+      CompletedCallback completed = new CompletedCallback();
+      FailedCallback failed = new FailedCallback();
+
       // Create the resource request (the builder).
-      ResourceRequestBuilder<JavaScriptObject> resourceRequestBuilder = ResourceRequestBuilderFactory.newBuilder().put().forResource("/datasource/" + datasourceName + "/view/" + viewName).accept("application/x-protobuf+json").withResourceBody(stringify(viewDto));
+      ResourceRequestBuilder<JavaScriptObject> resourceRequestBuilder = ResourceRequestBuilderFactory.newBuilder().put()//
+      .forResource("/datasource/" + datasourceName + "/view/" + viewName)//
+      .accept("application/x-protobuf+json").withResourceBody(stringify(viewDto))//
+      .withCallback(Response.SC_CREATED, completed)//
+      .withCallback(Response.SC_OK, completed)//
+      .withCallback(Response.SC_BAD_REQUEST, failed)//
+      .withCallback(Response.SC_NOT_FOUND, failed)//
+      .withCallback(Response.SC_METHOD_NOT_ALLOWED, failed)//
+      .withCallback(Response.SC_INTERNAL_SERVER_ERROR, failed);
 
-      // Update the Conclusion step then fire a WorkbenchChangeEvent to move to that step.
-      conclusionStepPresenter.setResourceRequest(datasourceName, viewName, "/datasource/" + datasourceName + "/view/" + viewName, resourceRequestBuilder);
-      conclusionStepPresenter.showConfigureViewWidgets(false);
-      conclusionStepPresenter.sendResourceRequest();
-      eventBus.fireEvent(new WorkbenchChangeEvent(conclusionStepPresenter));
-    }
-  }
-
-  class SelectExistingDatasourceClickHandler implements ClickHandler {
-
-    public void onClick(ClickEvent event) {
-      getDisplay().setDatasourceSelectorEnabled(true);
-      getDisplay().setNewDatasourceInputEnabled(false);
-    }
-  }
-
-  class CreateNewDatasourceClickHandler implements ClickHandler {
-
-    public void onClick(ClickEvent event) {
-      getDisplay().setDatasourceSelectorEnabled(false);
-      getDisplay().setNewDatasourceInputEnabled(true);
+      resourceRequestBuilder.send();
     }
   }
 

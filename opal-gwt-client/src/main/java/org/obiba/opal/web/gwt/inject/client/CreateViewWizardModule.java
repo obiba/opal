@@ -9,9 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.inject.client;
 
-import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.ConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.createview.view.ConclusionStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.view.CreateViewStepView;
 
 import com.google.gwt.inject.client.AbstractGinModule;
@@ -25,7 +23,6 @@ public class CreateViewWizardModule extends AbstractGinModule {
   @Override
   protected void configure() {
     bind(CreateViewStepPresenter.Display.class).to(CreateViewStepView.class).in(Singleton.class);
-    bind(ConclusionStepPresenter.Display.class).to(ConclusionStepView.class).in(Singleton.class);
   }
 
 }
