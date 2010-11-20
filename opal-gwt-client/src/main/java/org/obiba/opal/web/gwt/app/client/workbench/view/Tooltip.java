@@ -64,7 +64,7 @@ public class Tooltip extends Composite implements HasWidgets {
 
   private Timer nonStickyTimer;
 
-  private double opacity = 0.9;
+  private double opacity = 0.95;
 
   private boolean animated = true;
 
