@@ -10,8 +10,11 @@
 package org.obiba.opal.web.gwt.app.client.wizard.createview.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepResetHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
@@ -51,7 +54,19 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   WizardStep selectTypeStep;
 
   @UiField
-  HTMLPanel helpPanel;
+  WizardStep tablesStep;
+
+  @UiField
+  WizardStep variablesStep;
+
+  @UiField
+  WizardStep entitiesStep;
+
+  @UiField
+  HTMLPanel selectTypeHelp;
+
+  @UiField
+  HTMLPanel tablesHelp;
 
   @UiField
   SimplePanel datasourceSelectorPanel;
@@ -72,6 +87,8 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
 
   private TableListPresenter.Display tableSelector;
 
+  private WizardStepChain stepChain;
+
   //
   // Constructors
   //
@@ -80,20 +97,43 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
     initWizardDialog();
-    initSelectTypeStep();
   }
 
   private void initWizardDialog() {
-    dialog.setGlassEnabled(false);
-    dialog.hide();
-    dialog.setHelpTooltip(helpPanel);
-    dialog.setNextEnabled(false);
-    dialog.setFinishEnabled(true);
-  }
+    stepChain = WizardStepChain.Builder.create(dialog)//
+    .append(selectTypeStep, selectTypeHelp)//
+    .title(translations.editViewTypeStep())//
+    .onValidate(new ValidationHandler() {
 
-  private void initSelectTypeStep() {
-    selectTypeStep.setStepTitle(translations.createDatasourceStepSummary());
+      @Override
+      public boolean validate() {
+        // TODO presenter to provide a check of view name with notification error
+        return true;
+      }
+    })//
+    .onReset(new WizardStepResetHandler() {
 
+      @Override
+      public void onReset() {
+        if(datasourceSelector != null) datasourceSelector.selectFirst();
+        viewNameTextBox.setText("");
+        applyingGlobalVariableFilterRadioButton.setValue(true);
+        addingVariablesOneByOneRadioButton.setValue(false);
+      }
+    })//
+    .append(tablesStep, tablesHelp)//
+    .title(translations.editViewTablesStep())//
+    .onReset(new WizardStepResetHandler() {
+
+      @Override
+      public void onReset() {
+        if(tableSelector != null) tableSelector.clear();
+      }
+    }).append(variablesStep)//
+    .title(translations.editViewVariablesStep())//
+    .append(entitiesStep)//
+    .title(translations.editViewEntitiesStep())//
+    .onNext().onPrevious().build();
   }
 
   //
@@ -101,19 +141,7 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   //
 
   public void clear() {
-    selectTypeStep.setVisible(true);
-    dialog.setHelpTooltip(helpPanel);
-
-    datasourceSelector.selectFirst();
-
-    viewNameTextBox.setText("");
-
-    if(tableSelector != null) {
-      tableSelector.clear();
-    }
-
-    applyingGlobalVariableFilterRadioButton.setValue(true);
-    addingVariablesOneByOneRadioButton.setValue(false);
+    stepChain.reset();
   }
 
   public void setDatasourceSelector(DatasourceSelectorPresenter.Display datasourceSelector) {

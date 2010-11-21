@@ -528,4 +528,21 @@ public interface Translations extends Constants {
   @Description("Create Datasource Process summary")
   @DefaultStringValue("The datasource is in the process of being created.")
   String createDatasourceProcessSummary();
+
+  @Description("Edit View Type Step")
+  @DefaultStringValue("Select the datasource to which the view will be attached.")
+  String editViewTypeStep();
+
+  @Description("Edit View Tables Step")
+  @DefaultStringValue("Select the tables to be included in the view.")
+  String editViewTablesStep();
+
+  @Description("Edit View Variables Step")
+  @DefaultStringValue("Select the variables that will be viewed.")
+  String editViewVariablesStep();
+
+  @Description("Edit View Entities Step")
+  @DefaultStringValue("Select the entities that will be viewed.")
+  String editViewEntitiesStep();
+
 }

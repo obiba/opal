@@ -34,19 +34,13 @@
 	              </td>
 	            </tr>
 	            <tr>
-	              <td valign="top">
-	                <g:Label><ui:msg description="Tables label">Tables</ui:msg>:</g:Label>        
-	              </td>
-	              <td>
-	                <g:SimplePanel ui:field="tableSelectorPanel" />
+	              <td colspan="2">
+	                <g:Label><ui:msg description="Select how the variables will be defined label">Select how the variables will be defined:</ui:msg></g:Label>
 	              </td>
 	            </tr>
 	            <tr>
-	              <td style="vertical-align: top">
-	                <g:Label><ui:msg description="Variables label">Variables</ui:msg>:</g:Label>           
-	              </td>
+	              <td></td>
 	              <td>
-	                <g:Label><ui:msg description="Select how the variables will be defined label">Select how the variables will be defined:</ui:msg></g:Label>
 	                <g:RadioButton name="variablesGroup" ui:field="applyingGlobalVariableFilterRadioButton" addStyleNames="block small-top-margin"><ui:msg description="Apply a global filter on the selected tables label">Apply a global filter on the selected tables</ui:msg></g:RadioButton>
 	                <g:RadioButton name="variablesGroup" ui:field="addingVariablesOneByOneRadioButton" addStyleNames="block small-top-margin"><ui:msg description="Add each variable one by one label">Add each variable one by one</ui:msg></g:RadioButton>
 	              </td>
@@ -55,51 +49,79 @@
 	        </table>
 	      </g:HTMLPanel>
       </o:WizardStep>
-
-        <g:HTMLPanel ui:field="helpPanel">
-          <g:Label addStyleNames="title"><ui:msg description="Datasource label">Datasource</ui:msg></g:Label>
-          <p>
-            <ui:msg description="Datasource information for view creation">
-            A view is always attached to a datasource. This datasource can be an existing one (any of kind) or can 
-            be created for that purpose.
-            </ui:msg>
-          </p>
-          
-          <g:Label addStyleNames="title"><ui:msg description="Name label">Name</ui:msg></g:Label>
-          <p>
-            <ui:msg description="Name information for view creation">
-            The view name is required and should not include special characters such as ':'.
-            </ui:msg>
-          </p>
-          
-          <g:Label addStyleNames="title"><ui:msg description="Tables label">Tables</ui:msg></g:Label>
-          <p>
-            <ui:msg description="Tables information for view creation">
-            The view is always built on top of one or more tables.
-            The view can define a subset of the tables' entities, a subset of the tables' variables, 
-            or can define variables derived from the tables' variables.
-            </ui:msg>
-          </p>
-          
-          <g:Label addStyleNames="title"><ui:msg description="Variables label">Variables</ui:msg></g:Label>
-          <p>
-            <ui:msg description="Variables information for view creation">
-            There are different ways of specifying the variables of a view:
-            </ui:msg>
-          <ul>
-            <li>
-              <ui:msg description="Derived variables information for view creation">
-              list of derived variables: some variables can be enumerated and for each of them a script will be executed on demand to get the values.
-              </ui:msg>
-            </li>
-            <li>
-              <ui:msg description="Selection of variables information for view creation">
-              selection of variables: variables are filtered using a script.
-              </ui:msg>
-            </li>
-          </ul>
-          </p>
-        </g:HTMLPanel>
+      
+      <o:WizardStep ui:field="tablesStep">
+         <g:HTMLPanel>
+	        <table class="full-width" cellspacing="10">
+	          <tbody>
+	            <tr>
+	              <td valign="top">
+	                <g:Label><ui:msg description="Tables label">Tables</ui:msg>:</g:Label>        
+	              </td>
+	              <td>
+	                <g:SimplePanel ui:field="tableSelectorPanel" />
+	              </td>
+	            </tr>
+	          </tbody>
+	        </table>
+	      </g:HTMLPanel>
+      </o:WizardStep>
+      <o:WizardStep ui:field="variablesStep">
+        
+      </o:WizardStep>
+      <o:WizardStep ui:field="entitiesStep">
+        
+      </o:WizardStep>
+      
+       <g:HTMLPanel ui:field="selectTypeHelp">
+         <g:Label addStyleNames="title"><ui:msg description="Datasource label">Datasource</ui:msg></g:Label>
+         <p>
+           <ui:msg description="Datasource information for view creation">
+           A view is always attached to a datasource. This datasource can be an existing one (any of kind) or can 
+           be created for that purpose.
+           </ui:msg>
+         </p>
+         
+         <g:Label addStyleNames="title"><ui:msg description="Name label">Name</ui:msg></g:Label>
+         <p>
+           <ui:msg description="Name information for view creation">
+           The view name is required and should not include special characters such as ':'.
+           </ui:msg>
+         </p>
+         
+         <g:Label addStyleNames="title"><ui:msg description="Variables label">Variables</ui:msg></g:Label>
+         <p>
+           <ui:msg description="Variables information for view creation">
+           There are different ways of specifying the variables of a view:
+           </ui:msg>
+         <ul>
+           <li>
+             <ui:msg description="Derived variables information for view creation">
+             list of derived variables: some variables can be enumerated and for each of them a script will be executed on demand to get the values.
+             </ui:msg>
+           </li>
+           <li>
+             <ui:msg description="Selection of variables information for view creation">
+             selection of variables: variables are filtered using a script.
+             </ui:msg>
+           </li>
+         </ul>
+         </p>
+       </g:HTMLPanel>
+       
+       <g:HTMLPanel ui:field="tablesHelp">
+         
+         <g:Label addStyleNames="title"><ui:msg description="Tables label">Tables</ui:msg></g:Label>
+         <p>
+           <ui:msg description="Tables information for view creation">
+           The view is always built on top of one or more tables.
+           The view can define a subset of the tables' entities, a subset of the tables' variables, 
+           or can define variables derived from the tables' variables.
+           </ui:msg>
+         </p>
+         
+       </g:HTMLPanel>
+       
      </g:FlowPanel>      
   </o:WizardDialogBox>
 
