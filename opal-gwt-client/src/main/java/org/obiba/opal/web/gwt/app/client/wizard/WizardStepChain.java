@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.wizard;
 
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.WidgetProvider;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 
@@ -104,6 +105,11 @@ public class WizardStepChain {
 
     public Builder title(String text) {
       currentStepCtrl.getStep().setStepTitle(text);
+      return this;
+    }
+
+    public Builder help(WidgetProvider provider) {
+      currentStepCtrl.setHelpProvider(provider);
       return this;
     }
 

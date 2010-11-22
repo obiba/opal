@@ -21,7 +21,7 @@ class WizardStepControllerImpl implements WizardStepController {
 
   private WizardStep step;
 
-  private Widget help;
+  private WidgetProvider help;
 
   private WizardStepController next;
 
@@ -33,11 +33,12 @@ class WizardStepControllerImpl implements WizardStepController {
 
   private boolean canFinish = false;
 
-  WizardStepControllerImpl(WizardStep step, Widget help) {
+  WizardStepControllerImpl(WizardStep step, final Widget help) {
     super();
     this.step = step;
-    this.help = help;
-    if(help != null) help.removeFromParent();
+    if(help != null) {
+      this.help = new WidgetProviderImpl(help);
+    }
   }
 
   void setNext(WizardStepController next) {
@@ -56,13 +57,17 @@ class WizardStepControllerImpl implements WizardStepController {
     this.reset = reset;
   }
 
+  public void setHelpProvider(WidgetProvider provider) {
+    this.help = provider;
+  }
+
   public void setCanFinish(boolean canFinish) {
     this.canFinish = canFinish;
   }
 
   @Override
   public Widget getHelp() {
-    return help;
+    return help != null ? help.getWidget() : null;
   }
 
   @Override
@@ -122,6 +127,23 @@ class WizardStepControllerImpl implements WizardStepController {
   @Override
   public boolean canFinish() {
     return canFinish;
+  }
+
+  private class WidgetProviderImpl implements WidgetProvider {
+
+    private Widget w;
+
+    public WidgetProviderImpl(Widget w) {
+      super();
+      this.w = w;
+      w.removeFromParent();
+    }
+
+    @Override
+    public Widget getWidget() {
+      return w;
+    }
+
   }
 
 }
