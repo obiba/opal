@@ -14,9 +14,7 @@ import java.util.Set;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.obiba.magma.Datasource;
-import org.obiba.magma.DatasourceTransformer;
 import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.js.MagmaJsExtension;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.magma.views.ViewPersistenceStrategy;
@@ -219,8 +217,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
   }
 
   private void initViewManager() {
-    if(!(getViewManager() instanceof DatasourceTransformer)) throw new MagmaRuntimeException("Expected ViewManager to be an instanceof DatasourceTransformer.");
-    MagmaEngine.get().addDatasourceTransformer((DatasourceTransformer) getViewManager());
+    MagmaEngine.get().addDecorator(getViewManager());
   }
 
   private void initServices() {
