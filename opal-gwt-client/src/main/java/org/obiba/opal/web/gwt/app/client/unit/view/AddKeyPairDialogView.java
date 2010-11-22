@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.unit.view;
 
 import org.obiba.opal.web.gwt.app.client.unit.presenter.AddKeyPairDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.workbench.view.NumericTextBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
@@ -109,6 +110,8 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
 
   private ValidationHandler publicKeyValidators;
 
+  private WizardStepChain stepChain;
+
   public AddKeyPairDialogView() {
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
@@ -118,18 +121,26 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   }
 
   private void initWizardDialog() {
-    dialog.setGlassEnabled(false);
-    dialog.hide();
+    stepChain = WizardStepChain.Builder.create(dialog)//
+    .append(privateKeyStep)//
+    .title("Alias and Private Key definition")// TODO
+    .onValidate(new ValidationHandler() {
+
+      @Override
+      public boolean validate() {
+        return privateKeyValidators.validate();
+      }
+    }).append(publicKeyStep)//
+    .title("Public Certificate definition")// TODO
+    .onPrevious().build();
+
     dialog.addNextClickHandler(new ClickHandler() {
 
       @Override
-      public void onClick(ClickEvent arg0) {
-        // validate
-        if(privateKeyValidators.validate()) {
-          privateKeyStep.setVisible(false);
-
-          publicKeyStep.setVisible(true);
-          publicKeyCreated.setValue(true, true);
+      public void onClick(ClickEvent evt) {
+        stepChain.onNext();
+        // update public key form according to private key form selections
+        if(publicKeyStep.isVisible()) {
           publicKeyCreated.setVisible(privateKeyImported.getValue());
           publicKeyImported.setVisible(privateKeyImported.getValue());
           publicKeyPEM.setVisible(privateKeyImported.getValue());
@@ -138,28 +149,13 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
           } else {
             publicKeyForm.addStyleName("indent");
           }
-
-          dialog.setPreviousEnabled(true);
-          dialog.setNextEnabled(false);
-          dialog.setFinishEnabled(true);
         }
       }
     });
-    dialog.addPreviousClickHandler(new ClickHandler() {
 
-      @Override
-      public void onClick(ClickEvent arg0) {
-        privateKeyStep.setVisible(true);
-        publicKeyStep.setVisible(false);
-        dialog.setPreviousEnabled(false);
-        dialog.setNextEnabled(true);
-        dialog.setFinishEnabled(false);
-      }
-    });
   }
 
   private void initPrivateKeyStep() {
-    privateKeyStep.setStepTitle("Alias and Private Key definition");
     // size.setMaxConstrained(false);
     privateKeyCreated.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 
@@ -196,7 +192,6 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   }
 
   private void initPublicKeyStep() {
-    publicKeyStep.setStepTitle("Public Certificate definition");
     publicKeyCreated.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 
       @Override
@@ -241,7 +236,7 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   }
 
   private void clearPrivateKeyImportForm() {
-    privateKeyPEM.setText("(paste private key in PEM format)");
+    privateKeyPEM.setText("(paste private key in PEM format)"); // TODO translate
     privateKeyPEM.addStyleName("default-text");
   }
 
@@ -255,7 +250,7 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   }
 
   private void clearPublicKeyImportForm() {
-    publicKeyPEM.setText("(paste public certificate in PEM format)");
+    publicKeyPEM.setText("(paste public certificate in PEM format)"); // TODO translate
     publicKeyPEM.addStyleName("default-text");
   }
 
@@ -271,10 +266,6 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
     privateKeyCreated.setValue(true, true);
     publicKeyCreated.setValue(true, true);
     publicKeyStep.setVisible(false);
-
-    dialog.setPreviousEnabled(false);
-    dialog.setNextEnabled(true);
-    dialog.setFinishEnabled(false);
   }
 
   @Override
@@ -359,6 +350,7 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
 
   @Override
   public void showDialog() {
+    stepChain.reset();
     clear();
     dialog.center();
     dialog.show();

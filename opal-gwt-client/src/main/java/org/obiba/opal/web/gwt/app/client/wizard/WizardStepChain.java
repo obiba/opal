@@ -165,7 +165,7 @@ public class WizardStepChain {
 
         @Override
         public void onClick(ClickEvent arg0) {
-          chain.wizard.hide();
+          if(chain.current.validate()) chain.wizard.hide();
         }
       });
     }
