@@ -345,13 +345,14 @@ margin-left:10px;
 }
     
 .workbench .top .control {
-    padding: 0.5em;
+    /*padding: 0.5em;*/
     float: left;
 }
     
 .workbench .top .control button {
     margin-left: 10px;
     font-size: 0.9em;
+    padding:2px 5px;
 }
 
 .workbench .main {

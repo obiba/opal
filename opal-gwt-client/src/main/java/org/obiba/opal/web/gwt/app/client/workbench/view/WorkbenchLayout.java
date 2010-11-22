@@ -143,7 +143,8 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
   public void setSummaryWidget(Widget w) {
     children.add(w);
     summaryWidget = w;
-    topHeader.add(summaryWidget);
+    summaryWidget.removeFromParent();
+    // topHeader.add(summaryWidget);
   }
 
   public void setControlWidget(Widget w) {

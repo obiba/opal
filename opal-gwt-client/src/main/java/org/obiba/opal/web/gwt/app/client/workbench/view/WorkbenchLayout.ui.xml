@@ -2,7 +2,7 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <g:DockLayoutPanel ui:field="workbench" addStyleNames="workbench">
-    <g:north size="50">
+    <g:north size="35">
       <g:FlowPanel addStyleNames="top">
         <g:FlowPanel ui:field="topHeader" addStyleNames="header"/>
         <g:SimplePanel ui:field="controlContent" addStyleNames="control" />
