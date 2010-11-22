@@ -220,4 +220,9 @@ public class WizardDialogBox extends DialogBox {
     this.helpTooltipHeight = height;
   }
 
+  public void setProgress(boolean progress) {
+    if(progress) addStyleName("progress");
+    else
+      removeStyleName("progress");
+  }
 }

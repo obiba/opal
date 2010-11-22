@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepResetHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourceConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceFormPresenter;
@@ -74,6 +76,8 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
 
   private ValidationHandler selectTypeValidator;
 
+  private WizardStepChain stepChain;
+
   //
   // Constructors
   //
@@ -82,68 +86,39 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
     initWizardDialog();
-    initSelectTypeStep();
-    initDatasourceFormStep();
-    initConclusionStep();
   }
 
   private void initWizardDialog() {
-    dialog.setGlassEnabled(false);
-    dialog.hide();
-    dialog.setHelpTooltip(helpPanel);
-  }
-
-  private void initSelectTypeStep() {
-    selectTypeStep.setStepTitle(translations.createDatasourceStepSummary());
-    dialog.setNextEnabled(true);
-  }
-
-  private void initDatasourceFormStep() {
-    datasourceFormStep.setStepTitle(translations.datasourceOptionsLabel());
-    dialog.setNextEnabled(false);
-    dialog.addPreviousClickHandler(new ClickHandler() {
+    stepChain = WizardStepChain.Builder.create(dialog)//
+    .append(selectTypeStep, helpPanel)//
+    .title(translations.createDatasourceStepSummary())//
+    .onValidate(new ValidationHandler() {
 
       @Override
-      public void onClick(ClickEvent arg0) {
-        if(datasourceFormStep.isVisible()) {
-          datasourceFormStep.setVisible(false);
-          selectTypeStep.setVisible(true);
-          dialog.setHelpEnabled(true);
-          dialog.setPreviousEnabled(false);
-        } else if(conclusionStep.isVisible()) {
-          conclusionStep.setVisible(false);
-          datasourceFormStep.setVisible(true);
-          dialog.setNextEnabled(true);
-        }
+      public boolean validate() {
+        return selectTypeValidator.validate();
       }
-    });
-  }
+    })//
+    .onReset(new WizardStepResetHandler() {
 
-  private void initConclusionStep() {
-    conclusionStep.setStepTitle(translations.createDatasourceProcessSummary());
-    conclusionStep.setVisible(false);
-  }
+      @Override
+      public void onReset() {
+        datasourceName.setText("");
+      }
+    })//
+    .append(datasourceFormStep)//
+    .title(translations.datasourceOptionsLabel())//
+    .append(conclusionStep)//
+    .title(translations.createDatasourceProcessSummary())//
+    .onReset(new WizardStepResetHandler() {
 
-  private void clear() {
-    datasourceName.setText("");
-    selectTypeStep.setVisible(true);
-    dialog.setHelpEnabled(true);
-
-    datasourceFormStep.setVisible(false);
-
-    conclusionStep.setStepTitle(translations.createDatasourceProcessSummary());
-    conclusionStep.setVisible(false);
-    conclusionStep.removeStepContent();
-
-    dialog.setNextEnabled(true);
-    dialog.setPreviousEnabled(false);
-    dialog.setFinishEnabled(false);
-    dialog.setCancelEnabled(true);
-
-  }
-
-  private boolean hasDatasourceForm() {
-    return datasourceFormPresenter != null;
+      @Override
+      public void onReset() {
+        conclusionStep.setTitle(translations.createDatasourceProcessSummary());
+        conclusionStep.removeStepContent();
+      }
+    })//
+    .onPrevious().build();
   }
 
   //
@@ -166,17 +141,11 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
 
       @Override
       public void onClick(ClickEvent evt) {
-        if(selectTypeStep.isVisible()) {
-          if(!selectTypeValidator.validate()) return;
-          selectTypeStep.setVisible(false);
-          dialog.setHelpEnabled(false);
-          if(hasDatasourceForm()) {
-            datasourceFormStep.setVisible(true);
-            dialog.setPreviousEnabled(true);
-          }
-        } else if(datasourceFormStep.isVisible()) {
+        if(datasourceFormStep.isVisible()) {
+          // asynchronous next, see setConclusion()
           handler.onClick(evt);
-        }
+        } else
+          stepChain.onNext();
       }
     });
   }
@@ -209,7 +178,7 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
 
   @Override
   public void showDialog() {
-    clear();
+    stepChain.reset();
     dialog.center();
     dialog.show();
   }
@@ -249,13 +218,12 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
 
   @Override
   public void setConclusion(CreateDatasourceConclusionStepPresenter presenter) {
-    datasourceFormStep.setVisible(false);
-    conclusionStep.setStepTitle(translations.createDatasourceProcessSummary());
+    dialog.setProgress(true);
     conclusionStep.removeStepContent();
+    presenter.reset();
     conclusionStep.add(presenter.getDisplay().asWidget());
-    conclusionStep.setVisible(true);
+    stepChain.onNext();
     dialog.setPreviousEnabled(false);
-    dialog.setNextEnabled(false);
     dialog.setCancelEnabled(false);
     dialog.setFinishEnabled(false);
     presenter.setDatasourceCreatedCallback(new DatasourceCreatedCallback() {
@@ -264,6 +232,7 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
       public void onSuccess(DatasourceFactoryDto factory) {
         conclusionStep.setStepTitle(translations.datasourceCreationCompleted());
         dialog.setFinishEnabled(true);
+        dialog.setProgress(false);
       }
 
       @Override
@@ -271,6 +240,7 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
         conclusionStep.setStepTitle(translations.datasourceCreationFailed());
         dialog.setCancelEnabled(true);
         dialog.setPreviousEnabled(true);
+        dialog.setProgress(false);
       }
     });
 

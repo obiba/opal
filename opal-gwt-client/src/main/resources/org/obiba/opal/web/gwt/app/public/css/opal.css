@@ -931,6 +931,10 @@ div.variablesListTabContent .gwt-Label {
 	margin-left: 10px;
 }
 
+.wizard.progress, .wizard.progress gwt-Button {
+	cursor: progress;
+}
+
 /* Tooltip */
 
 .tooltip {

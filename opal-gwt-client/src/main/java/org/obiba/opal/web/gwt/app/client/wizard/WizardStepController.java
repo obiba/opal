@@ -34,4 +34,6 @@ public interface WizardStepController {
 
   public boolean validate();
 
+  public boolean canFinish();
+
 }

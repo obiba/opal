@@ -53,6 +53,10 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
     resourceRequestPresenter.sendRequest();
   }
 
+  public void reset() {
+    getDisplay().reset();
+  }
+
   public void setDatasourceCreatedCallback(DatasourceCreatedCallback createdCallback) {
     this.createdCallback = createdCallback;
   }
@@ -158,6 +162,8 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
     void setCompleted();
 
     void setFailed(ClientErrorDto errorDto);
+
+    void reset();
   }
 
   public interface DatasourceCreatedCallback {

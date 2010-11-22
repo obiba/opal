@@ -82,4 +82,10 @@ public class CreateDatasourceConclusionStepView extends Composite implements Cre
     }
   }
 
+  @Override
+  public void reset() {
+    datasourceParsingErrorTable.setVisible(false);
+    failed.setVisible(false);
+  }
+
 }

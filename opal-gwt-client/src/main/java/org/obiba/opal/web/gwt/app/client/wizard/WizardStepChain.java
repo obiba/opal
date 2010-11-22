@@ -49,12 +49,13 @@ public class WizardStepChain {
     // forward reset request
     current.reset();
     apply();
+    wizard.setCancelEnabled(true);
   }
 
   private void apply() {
     wizard.setNextEnabled(current.hasNext());
     wizard.setPreviousEnabled(current.hasPrevious());
-    wizard.setFinishEnabled(!current.hasNext());
+    wizard.setFinishEnabled(current.canFinish() || !current.hasNext());
     Widget help = current.getHelp();
     wizard.setHelpEnabled(help != null);
     if(help != null) {
@@ -105,6 +106,11 @@ public class WizardStepChain {
       return this;
     }
 
+    public Builder canFinish() {
+      currentStepCtrl.setCanFinish(true);
+      return this;
+    }
+
     public Builder onValidate(ValidationHandler validator) {
       currentStepCtrl.setValidator(validator);
       return this;
@@ -125,7 +131,9 @@ public class WizardStepChain {
 
         @Override
         public void onClick(ClickEvent arg0) {
+          chain.wizard.setProgress(true);
           chain.onNext();
+          chain.wizard.setProgress(false);
         }
       });
     }
@@ -140,7 +148,9 @@ public class WizardStepChain {
 
         @Override
         public void onClick(ClickEvent arg0) {
+          chain.wizard.setProgress(true);
           chain.onPrevious();
+          chain.wizard.setProgress(false);
         }
       });
     }
