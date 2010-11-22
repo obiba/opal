@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
-import org.obiba.opal.web.gwt.app.client.wizard.WizardStepResetHandler;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourceConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceFormPresenter;
@@ -99,7 +99,7 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
         return selectTypeValidator.validate();
       }
     })//
-    .onReset(new WizardStepResetHandler() {
+    .onReset(new ResetHandler() {
 
       @Override
       public void onReset() {
@@ -110,7 +110,7 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
     .title(translations.datasourceOptionsLabel())//
     .append(conclusionStep)//
     .title(translations.createDatasourceProcessSummary())//
-    .onReset(new WizardStepResetHandler() {
+    .onReset(new ResetHandler() {
 
       @Override
       public void onReset() {

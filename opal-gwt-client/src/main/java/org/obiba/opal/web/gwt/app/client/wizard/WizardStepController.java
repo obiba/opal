@@ -36,4 +36,16 @@ public interface WizardStepController {
 
   public boolean canFinish();
 
+  public interface WidgetProvider {
+
+    public Widget getWidget();
+
+  }
+
+  public interface ResetHandler {
+
+    public void onReset();
+
+  }
+
 }

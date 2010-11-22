@@ -14,7 +14,7 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
-import org.obiba.opal.web.gwt.app.client.wizard.WizardStepResetHandler;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
@@ -111,7 +111,7 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
         return true;
       }
     })//
-    .onReset(new WizardStepResetHandler() {
+    .onReset(new ResetHandler() {
 
       @Override
       public void onReset() {
@@ -123,7 +123,7 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
     })//
     .append(tablesStep, tablesHelp)//
     .title(translations.editViewTablesStep())//
-    .onReset(new WizardStepResetHandler() {
+    .onReset(new ResetHandler() {
 
       @Override
       public void onReset() {

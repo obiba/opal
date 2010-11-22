@@ -29,7 +29,7 @@ class WizardStepControllerImpl implements WizardStepController {
 
   private ValidationHandler validator;
 
-  private WizardStepResetHandler reset;
+  private ResetHandler reset;
 
   private boolean canFinish = false;
 
@@ -52,7 +52,7 @@ class WizardStepControllerImpl implements WizardStepController {
     this.validator = validator;
   }
 
-  void setReset(WizardStepResetHandler reset) {
+  void setReset(ResetHandler reset) {
     this.reset = reset;
   }
 

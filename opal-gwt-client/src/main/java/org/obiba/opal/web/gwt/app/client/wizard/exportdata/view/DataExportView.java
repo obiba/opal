@@ -14,7 +14,7 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
-import org.obiba.opal.web.gwt.app.client.wizard.WizardStepResetHandler;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
@@ -144,7 +144,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
         return tablesValidator.validate();
       }
     })//
-    .onReset(new WizardStepResetHandler() {
+    .onReset(new ResetHandler() {
 
       @Override
       public void onReset() {
@@ -153,7 +153,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
     })//
     .append(optionsStep)//
     .title(translations.dataExportOptions())//
-    .onReset(new WizardStepResetHandler() {
+    .onReset(new ResetHandler() {
 
       @Override
       public void onReset() {
@@ -169,7 +169,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
         return destinationValidator.validate();
       }
     })//
-    .onReset(new WizardStepResetHandler() {
+    .onReset(new ResetHandler() {
 
       @Override
       public void onReset() {
@@ -178,7 +178,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
     })//
     .append(unitStep, unitHelpPanel)//
     .title(translations.dataExportUnit())//
-    .onReset(new WizardStepResetHandler() {
+    .onReset(new ResetHandler() {
 
       @Override
       public void onReset() {

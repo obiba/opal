@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard;
 
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 
@@ -116,7 +117,7 @@ public class WizardStepChain {
       return this;
     }
 
-    public Builder onReset(WizardStepResetHandler handler) {
+    public Builder onReset(ResetHandler handler) {
       currentStepCtrl.setReset(handler);
       return this;
     }
