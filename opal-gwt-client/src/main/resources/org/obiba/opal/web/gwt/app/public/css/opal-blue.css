@@ -1,0 +1,28 @@
+.gwt-TabLayoutPanel .gwt-TabLayoutPanelTab.gwt-TabLayoutPanelTab-selected {
+	background-color: #2A6EA1;
+}
+
+.login > table {
+	 border-color: #2A6EA1;
+}
+
+.topbar {
+	background-color: #2A6EA1;
+}
+
+.top .gwt-MenuBar-horizontal .gwt-MenuItem.selected {
+	background-color: #2A6EA1;
+}
+
+.top .gwt-MenuBar-horizontal .gwt-MenuItem.gwt-MenuItem-selected {
+	background-color: #bfd3e3;
+}
+
+.main-content {
+	border-color: #2A6EA1;
+}
+
+.workbench .top {
+    background-color:#bfd3e3;
+    color:#444444;
+}

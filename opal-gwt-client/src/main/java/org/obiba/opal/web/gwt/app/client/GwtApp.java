@@ -58,6 +58,7 @@ public class GwtApp implements EntryPoint {
     }, opalGinjector.getRequestCredentials());
 
     OpalResources.INSTANCE.css().ensureInjected();
+    // OpalResources.INSTANCE.cssBlue().ensureInjected();
     initFileDownloadPresenter();
     initFileSelectorPresenter();
     initDataExportPresenter();
