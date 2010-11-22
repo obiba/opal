@@ -109,6 +109,7 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
   protected void onBind() {
     scriptWidget.bind();
     scriptWidget.setEvaluationMode(Mode.ENTITY);
+    scriptWidget.setTableIsView(true);
     getDisplay().setScriptWidget(scriptWidget.getDisplay());
 
     getDisplay().saveChangesEnabled(true);

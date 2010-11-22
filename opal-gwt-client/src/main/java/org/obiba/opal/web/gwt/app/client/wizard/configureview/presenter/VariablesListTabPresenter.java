@@ -72,8 +72,8 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.inject.Inject;
 
 /**
@@ -135,6 +135,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   protected void onBind() {
     scriptWidget.bind();
     scriptWidget.setEvaluationMode(Mode.ENTITY_VALUE);
+    scriptWidget.setTableIsView(true);
     getDisplay().setScriptWidget(scriptWidget.getDisplay());
 
     categoriesPresenter.bind();

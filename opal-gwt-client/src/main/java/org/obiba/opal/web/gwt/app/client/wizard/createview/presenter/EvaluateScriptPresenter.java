@@ -60,6 +60,8 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
 
   private Mode evaluationMode;
 
+  private boolean tableIsView;
+
   @Inject
   public EvaluateScriptPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
@@ -180,6 +182,10 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     this.table = table;
   }
 
+  public void setTableIsView(boolean tableIsView) {
+    this.tableIsView = tableIsView;
+  }
+
   public void setEvaluationMode(Mode evaluationMode) {
     this.evaluationMode = evaluationMode;
   }
@@ -230,7 +236,16 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
   }
 
   private String getTableUri() {
-    return "/datasource/" + table.getDatasourceName() + "/table/" + table.getName();
+    String tableUri = null;
+
+    // OPAL-879: If the table is a view, scripts should be evaluated against the view's "from" table.
+    if(tableIsView) {
+      tableUri = "/datasource/" + table.getDatasourceName() + "/view/" + table.getName() + "/from";
+    } else {
+      tableUri = "/datasource/" + table.getDatasourceName() + "/table/" + table.getName();
+    }
+
+    return tableUri;
   }
 
   private String getVariablesUri(int offset) {

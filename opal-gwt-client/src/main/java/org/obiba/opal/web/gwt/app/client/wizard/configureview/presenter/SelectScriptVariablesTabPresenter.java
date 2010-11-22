@@ -97,6 +97,7 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
   protected void onBind() {
     scriptWidget.bind();
     scriptWidget.setEvaluationMode(Mode.VARIABLE);
+    scriptWidget.setTableIsView(true);
     getDisplay().setScriptWidget(scriptWidget.getDisplay());
 
     getDisplay().saveChangesEnabled(false);
