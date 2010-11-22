@@ -13,6 +13,8 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepResetHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
@@ -122,52 +124,73 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
 
   private ValidationHandler destinationValidator;
 
+  private WizardStepChain stepChain;
+
   public DataExportView() {
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
     initWidgets();
     initWizardDialog();
-    initTablesStep();
-    initDestinationStep();
-    initOptionsStep();
-    initUnitStep();
-    initConclusionStep();
   }
 
   private void initWizardDialog() {
-    dialog.hide();
-    clear();
-    dialog.addPreviousClickHandler(new PreviousClickHandler());
-  }
+    stepChain = WizardStepChain.Builder.create(dialog)//
+    .append(tablesStep)//
+    .title(translations.dataExportInstructions())//
+    .onValidate(new ValidationHandler() {
 
-  private void initTablesStep() {
-    tablesStep.setVisible(true);
-    tablesStep.setStepTitle(translations.dataExportInstructions());
-    dialog.setHelpEnabled(false);
-  }
+      @Override
+      public boolean validate() {
+        return tablesValidator.validate();
+      }
+    })//
+    .onReset(new WizardStepResetHandler() {
 
-  private void initOptionsStep() {
-    optionsStep.setVisible(false);
-    optionsStep.setStepTitle(translations.dataExportOptions());
-  }
+      @Override
+      public void onReset() {
+        clearTablesStep();
+      }
+    })//
+    .append(optionsStep)//
+    .title(translations.dataExportOptions())//
+    .onReset(new WizardStepResetHandler() {
 
-  private void initDestinationStep() {
-    destinationStep.setVisible(false);
-    destinationStep.setStepTitle(translations.dataExportDestination());
-  }
+      @Override
+      public void onReset() {
+        clearOptionsStep();
+      }
+    })//
+    .append(destinationStep, destinationHelpPanel)//
+    .title(translations.dataExportDestination())//
+    .onValidate(new ValidationHandler() {
 
-  private void initUnitStep() {
-    unitStep.setVisible(false);
-    unitStep.setStepTitle(translations.dataExportUnit());
-  }
+      @Override
+      public boolean validate() {
+        return destinationValidator.validate();
+      }
+    })//
+    .onReset(new WizardStepResetHandler() {
 
-  private void initConclusionStep() {
-    conclusionStep.setVisible(false);
-    conclusionStep.setStepTitle(translations.dataExportPendingConclusion());
+      @Override
+      public void onReset() {
+        clearDestinationStep();
+      }
+    })//
+    .append(unitStep, unitHelpPanel)//
+    .title(translations.dataExportUnit())//
+    .onReset(new WizardStepResetHandler() {
+
+      @Override
+      public void onReset() {
+        clearUnitStep();
+      }
+    })//
+    .append(conclusionStep)//
+    .title(translations.dataExportPendingConclusion())//
+    .onPrevious().build();
   }
 
   private void initWidgets() {
-    destinationHelpPanel.removeFromParent();
     destinationDataSource.addClickHandler(new ClickHandler() {
 
       @Override
@@ -193,7 +216,6 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
         units.setEnabled(false);
       }
     });
-    unitHelpPanel.removeFromParent();
     unitId.addClickHandler(new ClickHandler() {
 
       @Override
@@ -248,7 +270,16 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
 
   @Override
   public HandlerRegistration addSubmitClickHandler(final ClickHandler submitHandler) {
-    return dialog.addNextClickHandler(new NextClickHandler(submitHandler));
+    return dialog.addNextClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent evt) {
+        if(unitStep.isVisible()) {
+          submitHandler.onClick(evt);
+        } else
+          stepChain.onNext();
+      }
+    });
   }
 
   @Override
@@ -333,18 +364,18 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
 
   @Override
   public void renderPendingConclusion() {
-    // TODO Auto-generated method stub
     conclusionStep.setStepTitle(translations.dataExportPendingConclusion());
-    unitStep.setVisible(false);
-    conclusionStep.setVisible(true);
+    jobLink.setText("");
+    dialog.setProgress(true);
+    stepChain.onNext();
     dialog.setCancelEnabled(false);
     dialog.setPreviousEnabled(false);
-    dialog.setNextEnabled(false);
-    jobLink.setText("");
+    dialog.setFinishEnabled(false);
   }
 
   @Override
   public void renderCompletedConclusion(String jobId) {
+    dialog.setProgress(false);
     conclusionStep.setStepTitle(translations.dataExportCompletedConclusion());
     // TODO
     jobLink.setText(translations.jobLabel() + " #" + jobId);
@@ -353,6 +384,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
 
   @Override
   public void renderFailedConclusion() {
+    dialog.setProgress(false);
     conclusionStep.setStepTitle(translations.dataExportFailedConclusion());
     // TODO
     dialog.setCancelEnabled(true);
@@ -366,26 +398,9 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
 
   @Override
   public void showDialog() {
-    clear();
+    stepChain.reset();
     dialog.center();
     dialog.show();
-  }
-
-  private void clear() {
-    clearWizardDialog();
-    clearTablesStep();
-    clearOptionsStep();
-    clearDestinationStep();
-    clearUnitStep();
-  }
-
-  private void clearWizardDialog() {
-    conclusionStep.setVisible(false);
-
-    dialog.setPreviousEnabled(false);
-    dialog.setNextEnabled(true);
-    dialog.setFinishEnabled(false);
-    dialog.setCancelEnabled(true);
   }
 
   private void clearTablesStep() {
@@ -396,14 +411,12 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   }
 
   private void clearOptionsStep() {
-    optionsStep.setVisible(false);
     incremental.setValue(true, true);
     withVariables.setValue(true, true);
     useAlias.setValue(false);
   }
 
   private void clearDestinationStep() {
-    destinationStep.setVisible(false);
     destinationFile.setValue(true);
     fileFormat.setEnabled(true);
     if(fileSelection != null) {
@@ -415,7 +428,6 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   }
 
   private void clearUnitStep() {
-    unitStep.setVisible(false);
     opalId.setValue(true);
     unitId.setValue(false);
     units.setEnabled(false);
@@ -439,92 +451,6 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   @Override
   public void setDestinationValidator(ValidationHandler handler) {
     this.destinationValidator = handler;
-  }
-
-  private final class NextClickHandler implements ClickHandler {
-
-    private final ClickHandler submitHandler;
-
-    private NextClickHandler(ClickHandler submitHandler) {
-      this.submitHandler = submitHandler;
-    }
-
-    @Override
-    public void onClick(ClickEvent evt) {
-      if(tablesStep.isVisible()) {
-        processTablesStep();
-      } else if(optionsStep.isVisible()) {
-        processOptionsStep();
-      } else if(destinationStep.isVisible()) {
-        processDestinationStep();
-      } else if(unitStep.isVisible()) {
-        submitHandler.onClick(evt);
-        dialog.setHelpEnabled(false);
-      }
-    }
-
-    private void processTablesStep() {
-      if(!tablesValidator.validate()) return;
-      tablesStep.setVisible(false);
-      optionsStep.setVisible(true);
-      dialog.setPreviousEnabled(true);
-      dialog.setHelpEnabled(false);
-    }
-
-    private void processOptionsStep() {
-      optionsStep.setVisible(false);
-      destinationStep.setVisible(true);
-      dialog.setHelpTooltip(destinationHelpPanel);
-    }
-
-    private void processDestinationStep() {
-      if(!destinationValidator.validate()) return;
-      destinationStep.setVisible(false);
-      unitStep.setVisible(true);
-      dialog.setHelpTooltip(unitHelpPanel);
-    }
-  }
-
-  private final class PreviousClickHandler implements ClickHandler {
-    @Override
-    public void onClick(ClickEvent arg0) {
-      if(conclusionStep.isVisible()) {
-        processConclusionStep();
-      } else if(unitStep.isVisible()) {
-        processUnitStep();
-      } else if(destinationStep.isVisible()) {
-        processDestinationStep();
-      } else if(optionsStep.isVisible()) {
-        processOptionsStep();
-      }
-    }
-
-    private void processConclusionStep() {
-      conclusionStep.setVisible(false);
-      unitStep.setVisible(true);
-      dialog.setHelpTooltip(unitHelpPanel);
-      dialog.setNextEnabled(true);
-    }
-
-    private void processUnitStep() {
-      unitStep.setVisible(false);
-      destinationStep.setVisible(true);
-      dialog.setHelpTooltip(destinationHelpPanel);
-    }
-
-    private void processDestinationStep() {
-      destinationStep.setVisible(false);
-      optionsStep.setVisible(true);
-      dialog.setHelpEnabled(false);
-    }
-
-    private void processOptionsStep() {
-      optionsStep.setVisible(false);
-      tablesStep.setVisible(true);
-      dialog.setPreviousEnabled(false);
-      dialog.setHelpEnabled(false);
-    }
-
   }
 
 }
