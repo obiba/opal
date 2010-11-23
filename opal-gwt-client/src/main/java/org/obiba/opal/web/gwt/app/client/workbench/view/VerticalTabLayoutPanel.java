@@ -58,6 +58,8 @@ public class VerticalTabLayoutPanel extends FlowPanel {
       contents.add(w);
       if(contents.size() == 1) {
         content.setWidget(w);
+      } else {
+        w.removeFromParent();
       }
     } else {
       throw new IllegalArgumentException("Alternate list of HasClickHandlers and Widget is expected.");
