@@ -131,17 +131,6 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
     }));
   }
 
-  private void initPreviouslyProvidedIdentifier() {
-    if(isIdentifierAlreadyProvided()) {
-      if(importData.getUnit() != null && !importData.getUnit().equals("")) getDisplay().setSelectedUnit(importData.getUnit());
-      getDisplay().setIdentifierAsIs(importData.isIdentifierAsIs());
-      getDisplay().setIdentifierSharedWithUnit(importData.isIdentifierSharedWithUnit());
-      getDisplay().setIdentityEnabled(false);
-    } else {
-      getDisplay().setIdentityEnabled(true);
-    }
-  }
-
   private boolean isIdentifierAlreadyProvided() {
     return importData.isIdentifierAsIs() || importData.isIdentifierSharedWithUnit();
   }
@@ -184,7 +173,6 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
       @Override
       public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
         getDisplay().setUnits(units);
-        initPreviouslyProvidedIdentifier();
       }
     }).send();
   }

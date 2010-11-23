@@ -8,7 +8,7 @@
   <!--    <ui:msg description="Identity archive summary">Provide the following additional information</ui:msg>-->
     <g:FlowPanel>
       <g:HTMLPanel ui:field="step">
-        <table class="gwt-KeyValue" cellspacing="10">
+        <table class="full-width" cellspacing="10">
           <tbody>
             <tr>
               <td style="vertical-align:top">
@@ -17,13 +17,19 @@
             </tr>
             <tr>
               <td>
-                <g:RadioButton name="identifierGroup" ui:field="identifierAsIs" checked="true"><ui:msg description="Leave identifier as-is label">be used as-is</ui:msg></g:RadioButton>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <g:RadioButton name="identifierGroup" ui:field="identifierSharedWithUnit"><ui:msg description="Share identifier with unit label">be considered as idenfiers shared with unit</ui:msg></g:RadioButton>
-                <g:ListBox ui:field="units" enabled="false"/>
+                <table class="full-width" cellspacing="10">
+                  <tr>
+                    <td>
+                      <g:RadioButton name="identifierGroup" ui:field="identifierAsIs" checked="true"><ui:msg description="Leave identifier as-is label">be used as-is</ui:msg></g:RadioButton>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <g:RadioButton name="identifierGroup" ui:field="identifierSharedWithUnit"><ui:msg description="Share identifier with unit label">be considered as idenfiers shared with unit</ui:msg></g:RadioButton>
+                      <g:ListBox ui:field="units" enabled="false"/>      
+                    </td>
+                  </tr>
+                </table>
               </td>
             </tr>
             <tr>
@@ -33,13 +39,19 @@
             </tr>
             <tr>
               <td>
-                <g:RadioButton name="archiveGroup" ui:field="archiveLeave" checked="true"><ui:msg description="Leave file label">leave it where it is</ui:msg></g:RadioButton>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <g:RadioButton name="archiveGroup" ui:field="archiveMove"><ui:msg description="Move file label">move it to another folder</ui:msg></g:RadioButton>
-                <g:SimplePanel ui:field="archivePanel" />
+                <table class="full-width" cellspacing="10">
+                  <tr>
+                    <td>
+                      <g:RadioButton name="archiveGroup" ui:field="archiveLeave" checked="true"><ui:msg description="Leave file label">leave it where it is</ui:msg></g:RadioButton>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <g:RadioButton name="archiveGroup" ui:field="archiveMove"><ui:msg description="Move file label">move it to another folder</ui:msg>:</g:RadioButton>
+                      <g:SimplePanel ui:field="archivePanel" addStyleNames="small-top-margin indent"/>
+                    </td>
+                  </tr>
+                </table>
               </td>
             </tr>
           </tbody>
