@@ -58,6 +58,7 @@ public class VerticalTabLayoutPanel extends FlowPanel {
       contents.add(w);
       if(contents.size() == 1) {
         content.setWidget(w);
+        active = 0;
       } else {
         w.removeFromParent();
       }
@@ -94,18 +95,26 @@ public class VerticalTabLayoutPanel extends FlowPanel {
   }
 
   public void setActive(int index) {
-    items.get(active).removeStyleName("active");
+    if(active != -1) items.get(active).removeStyleName("active");
     items.get(index).addStyleName("active");
     content.setWidget(contents.get(index));
+    active = index;
   }
 
   public void removeTab(int index) {
     items.remove(index);
+    menu.remove(index);
+
     contents.remove(index);
-    if(active == index) {
-      setActive(index);
+    if(contents.size() == 0) {
+      content.clear();
+      active = -1;
     } else if(active > index) {
       active--;
+    } else if(active > contents.size() - 1) {
+      setActive(contents.size() - 1);
+    } else if(active == index) {
+      setActive(index);
     }
   }
 
