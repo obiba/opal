@@ -78,6 +78,9 @@ public class FileSelectorView extends DialogBox implements Display {
   Button createFolderButton;
 
   @UiField
+  Button uploadButton;
+
+  @UiField
   Button selectButton;
 
   @UiField
@@ -138,6 +141,11 @@ public class FileSelectorView extends DialogBox implements Display {
     createFolderPanel.setVisible(visible);
   }
 
+  @Override
+  public void setDisplaysUploadFile(boolean visible) {
+    uploadButton.setVisible(visible);
+  }
+
   public HasWidgets getFileSystemTreePanel() {
     return fileSystemTreePanel;
   }
@@ -190,5 +198,10 @@ public class FileSelectorView extends DialogBox implements Display {
 
   @UiTemplate("FileSelectorView.ui.xml")
   interface FileSelectorViewUiBinder extends UiBinder<DockLayoutPanel, FileSelectorView> {
+  }
+
+  @Override
+  public HandlerRegistration addUploadButtonHandler(ClickHandler handler) {
+    return uploadButton.addClickHandler(handler);
   }
 }

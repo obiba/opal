@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.FileSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
@@ -41,6 +42,7 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  *
@@ -55,6 +57,9 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
   FolderDetailsPresenter folderDetailsPresenter;
 
+  @Inject
+  Provider<FileUploadDialogPresenter> fileUploadDialogPresenterProvider;
+
   private Object fileSelectionSource;
 
   private FileSelectionType fileSelectionType = FileSelectionType.FILE;
@@ -64,6 +69,8 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   String selectedFolder;
 
   private List<SelectionResolver> selectionResolverChain;
+
+  public FileDto selectedFolderDto;
 
   //
   // Constructors
@@ -120,6 +127,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     folderDetailsPresenter.getDisplay().setDisplaysFiles(displaysFiles());
     getDisplay().setNewFilePanelVisible(allowsFileCreation());
     getDisplay().setNewFolderPanelVisible(allowsFolderCreation());
+    getDisplay().setDisplaysUploadFile(displaysFiles());
 
     getDisplay().showDialog();
   }
@@ -169,6 +177,16 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     addSelectButtonHandler();
     addCancelButtonHandler();
     addCreateFolderButtonHandler();
+    super.registerHandler(getDisplay().addUploadButtonHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        FileUploadDialogPresenter presenter = fileUploadDialogPresenterProvider.get();
+        presenter.setCurrentFolder(selectedFolderDto);
+        presenter.bind();
+        presenter.revealDisplay();
+      }
+    }));
   }
 
   private void addFileSelectionHandler() {
@@ -241,6 +259,8 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
     void showDialog();
 
+    void setDisplaysUploadFile(boolean displaysFiles);
+
     void hideDialog();
 
     void setTreeDisplay(FileSystemTreePresenter.Display treeDisplay);
@@ -254,6 +274,8 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     HasWidgets getFileSystemTreePanel();
 
     HasWidgets getFolderDetailsPanel();
+
+    HandlerRegistration addUploadButtonHandler(ClickHandler handler);
 
     HandlerRegistration addSelectButtonHandler(ClickHandler handler);
 
@@ -294,15 +316,16 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   class FolderSelectionHandler implements FileSystemTreeFolderSelectionChangeEvent.Handler, FolderSelectionChangeEvent.Handler {
 
     public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
-      handleFolderSelection(event.getFolder().getPath());
+      handleFolderSelection(event.getFolder());
     }
 
     public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
-      handleFolderSelection(event.getFolder().getPath());
+      handleFolderSelection(event.getFolder());
     }
 
-    private void handleFolderSelection(String folderPath) {
-      selectedFolder = folderPath;
+    private void handleFolderSelection(FileDto folder) {
+      selectedFolderDto = folder;
+      selectedFolder = folder.getPath();
       selectedFile = null;
     }
   }

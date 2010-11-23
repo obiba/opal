@@ -25,10 +25,9 @@
       <g:FlowPanel addStyleNames="main">
       
       <g:HTMLPanel ui:field="namePanel" addStyleNames="{style.top-margin} {style.bottom-margin} {style.left-margin} {style.right-margin}">
-        <g:Label addStyleNames="{style.inline}">
+        <g:InlineLabel>
           <ui:msg description="Name label">Name</ui:msg>
-        </g:Label>
-        <g:Label addStyleNames="{style.inline}">:</g:Label> 
+        </g:InlineLabel>: 
         <g:TextBox ui:field="newFileName" addStyleNames="{style.name-input}" />
       </g:HTMLPanel>
         
@@ -48,12 +47,15 @@
     <g:south size="3.25">
       <g:HTMLPanel addStyleNames="footer">
         <span class="{style.left-aligned} {style.top-margin}">
-          <g:HTMLPanel ui:field="createFolderPanel">
+          <g:HTMLPanel ui:field="createFolderPanel" addStyleNames="{style.inline}">
             <g:TextBox ui:field="createFolderName" />
             <g:Button ui:field="createFolderButton">
               <ui:msg description="Create Folder button label">Create Folder</ui:msg>
             </g:Button>
           </g:HTMLPanel>
+          <g:Button ui:field="uploadButton">
+            <ui:msg description="Upload File label">Upload</ui:msg>
+          </g:Button>
         </span>
         <span class="{style.right-aligned} {style.top-margin} {style.left-margin} {style.right-margin}">
           <g:Button ui:field="selectButton">
