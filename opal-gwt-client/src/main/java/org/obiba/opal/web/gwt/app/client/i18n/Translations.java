@@ -170,6 +170,7 @@ public interface Translations extends Constants {
   "datasourceMustBeSelected", "You must select a datasource.", //
   "fileReadError", "The file could not be read.", //
   "ViewNameRequired", "You must provide a name for the view.", //
+  "ViewAlreadyExists", "A view with the same name already exists.", //
   "TableSelectionRequired", "You must select at least one table.", //
   "TableEntityTypesDoNotMatch", "The selected tables must all have the same entity type.", //
   "VariableDefinitionMethodRequired", "You must indicate how the view's variables are to be defined.", //

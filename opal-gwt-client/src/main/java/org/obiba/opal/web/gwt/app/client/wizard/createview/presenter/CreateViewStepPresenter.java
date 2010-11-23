@@ -136,6 +136,57 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   // Methods
   //
 
+  private void createViewIfDoesNotExist() {
+    // Get the view name and datasource name.
+    String viewName = getDisplay().getViewName().getText();
+    String datasourceName = getDisplay().getDatasourceName().getText();
+
+    ViewFoundDoNotCreateCallback doNotCreate = new ViewFoundDoNotCreateCallback();
+    ViewNotFoundCreateCallback create = new ViewNotFoundCreateCallback();
+
+    // Create the resource request (the builder).
+    ResourceRequestBuilder<JavaScriptObject> resourceRequestBuilder = ResourceRequestBuilderFactory.newBuilder()//
+    .get()//
+    .forResource("/datasource/" + datasourceName + "/view/" + viewName)//
+    .accept("application/x-protobuf+json")//
+    .withCallback(Response.SC_OK, doNotCreate)//
+    .withCallback(Response.SC_NOT_FOUND, create);
+
+    resourceRequestBuilder.send();
+  }
+
+  private void createView() {
+    // Get the view name and datasource name.
+    String viewName = getDisplay().getViewName().getText();
+    String datasourceName = getDisplay().getDatasourceName().getText();
+
+    // Build the ViewDto for the request.
+    ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().fromTables(tableListPresenter.getTables());
+    if(getDisplay().getApplyGlobalVariableFilterOption().getValue()) {
+      viewDtoBuilder.defaultJavaScriptView();
+    } else if(getDisplay().getAddVariablesOneByOneOption().getValue()) {
+      viewDtoBuilder.defaultVariableListView();
+    }
+    ViewDto viewDto = viewDtoBuilder.build();
+
+    CompletedCallback completed = new CompletedCallback();
+    FailedCallback failed = new FailedCallback();
+
+    // Create the resource request (the builder).
+    ResourceRequestBuilder<JavaScriptObject> resourceRequestBuilder = ResourceRequestBuilderFactory.newBuilder()//
+    .put()//
+    .forResource("/datasource/" + datasourceName + "/view/" + viewName)//
+    .accept("application/x-protobuf+json").withResourceBody(ViewDto.stringify(viewDto))//
+    .withCallback(Response.SC_CREATED, completed)//
+    .withCallback(Response.SC_OK, completed)//
+    .withCallback(Response.SC_BAD_REQUEST, failed)//
+    .withCallback(Response.SC_NOT_FOUND, failed)//
+    .withCallback(Response.SC_METHOD_NOT_ALLOWED, failed)//
+    .withCallback(Response.SC_INTERNAL_SERVER_ERROR, failed);
+
+    resourceRequestBuilder.send();
+  }
+
   //
   // Inner Classes / Interfaces
   //
@@ -229,7 +280,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
         eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errorMessageKey, null));
         return;
       }
-      createView();
+      createViewIfDoesNotExist();
     }
 
     String validate() {
@@ -241,41 +292,21 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
       }
       return null;
     }
+  }
 
-    void createView() {
-      // Get the view name and datasource name.
-      String viewName = getDisplay().getViewName().getText();
-      String datasourceName = getDisplay().getDatasourceName().getText();
+  class ViewFoundDoNotCreateCallback implements ResponseCodeCallback {
 
-      // Build the ViewDto for the request.
-      ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().fromTables(tableListPresenter.getTables());
-      if(getDisplay().getApplyGlobalVariableFilterOption().getValue()) {
-        viewDtoBuilder.defaultJavaScriptView();
-      } else if(getDisplay().getAddVariablesOneByOneOption().getValue()) {
-        viewDtoBuilder.defaultVariableListView();
-      }
-      ViewDto viewDto = viewDtoBuilder.build();
-
-      CompletedCallback completed = new CompletedCallback();
-      FailedCallback failed = new FailedCallback();
-
-      // Create the resource request (the builder).
-      ResourceRequestBuilder<JavaScriptObject> resourceRequestBuilder = ResourceRequestBuilderFactory.newBuilder().put()//
-      .forResource("/datasource/" + datasourceName + "/view/" + viewName)//
-      .accept("application/x-protobuf+json").withResourceBody(stringify(viewDto))//
-      .withCallback(Response.SC_CREATED, completed)//
-      .withCallback(Response.SC_OK, completed)//
-      .withCallback(Response.SC_BAD_REQUEST, failed)//
-      .withCallback(Response.SC_NOT_FOUND, failed)//
-      .withCallback(Response.SC_METHOD_NOT_ALLOWED, failed)//
-      .withCallback(Response.SC_INTERNAL_SERVER_ERROR, failed);
-
-      resourceRequestBuilder.send();
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "ViewAlreadyExists", null));
     }
   }
 
-  public static native String stringify(JavaScriptObject obj)
-  /*-{
-  return $wnd.JSON.stringify(obj);
-  }-*/;
+  class ViewNotFoundCreateCallback implements ResponseCodeCallback {
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      createView();
+    }
+  }
 }
