@@ -81,6 +81,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
       reportService.render(reportTemplate.getFormat(), reportTemplate.getParameters(), getLocalFile(getReportDesign(reportTemplate.getDesign())).getPath(), getLocalFile(reportOutput).getPath());
     } catch(ReportException ex) {
       getShell().printf("Error rendering report: '%s'\n", ex.getMessage());
+      deleteFileSilently(reportOutput);
       return 2;
     } catch(FileSystemException ex) {
       getShell().printf("Invalid report output destination: '/reports/%s/%s'", reportTemplateName, getReportFileName(reportTemplateName, reportTemplate.getFormat(), reportDate));
@@ -134,6 +135,16 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     String reportDateText = dateFormat.format(reportDate);
 
     return reportTemplateName + "-" + reportDateText + "." + reportFormat;
+  }
+
+  private void deleteFileSilently(FileObject file) {
+    try {
+      if(file.exists()) {
+        file.delete();
+      }
+    } catch(FileSystemException ex) {
+      log.error("Could not delete file: {}", file.getName().getPath());
+    }
   }
 
   private void sendEmailNotification(ReportTemplate reportTemplate, FileObject reportOutput) {
