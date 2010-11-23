@@ -426,7 +426,6 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   @Override
   public void formEnable(boolean enabled) {
     navigationEnabled(enabled);
-    variableName.setEnabled(enabled);
     saveChangesButton.setEnabled(enabled);
     removeButton.setEnabled(enabled);
     addButton.setEnabled(true); // Regardless of form state the add button is enabled.
@@ -447,5 +446,11 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
     occurenceGroup.setEnabled(false); // Occurrence group is only enabled when repeatableCheckbox is true.
     unit.setText("");
     mimeType.setText("");
+  }
+
+  @Override
+  public void variableNameEnabled(boolean enabled) {
+    variableName.setEnabled(enabled);
+
   }
 }

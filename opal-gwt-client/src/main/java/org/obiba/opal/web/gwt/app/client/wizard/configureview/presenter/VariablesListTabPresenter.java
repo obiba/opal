@@ -72,8 +72,8 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
@@ -420,6 +420,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     void navigationEnabled(boolean enabled);
 
+    void variableNameEnabled(boolean enabled);
+
     HandlerRegistration addNameChangedHandler(ChangeHandler changeHandler);
 
     HandlerRegistration addValueTypeChangedHandler(ChangeHandler changeHandler);
@@ -643,6 +645,15 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     @Override
     public void onVariableAddRequired(VariableAddRequiredEvent event) {
       newDerivedVariableName = event.getVariableName();
+      if(isNewDerivedVariableNameSameAsExistingDerivedVariableName()) {
+        newDerivedVariableIsCopyOfExistingDerivedVariable();
+      } else {
+        checkIfNewDerivedVariableNameSameAsExistingVariableName();
+      }
+      getDisplay().variableNameEnabled(true);
+    }
+
+    private void checkIfNewDerivedVariableNameSameAsExistingVariableName() {
       for(int i = 0; i < viewDto.getFromArray().length(); i++) {
         String[] tableParts = viewDto.getFromArray().get(i).split("\\.");
         if(i == 0) firstTableInViewParts = tableParts;
@@ -657,13 +668,13 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
             setButtonsWhenAddingVariable();
           }
         })
-        /**/.withCallback(Response.SC_NOT_FOUND, createResponseCodeCallback())
+        /**/.withCallback(Response.SC_NOT_FOUND, newDerivedVariableResponseCodeCallback())
         /**/.send();
 
       }
     }
 
-    private ResponseCodeCallback createResponseCodeCallback() {
+    private ResponseCodeCallback newDerivedVariableResponseCodeCallback() {
       return new ResponseCodeCallback() {
 
         @Override
@@ -684,6 +695,41 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
         }
 
       };
+    }
+
+    private void newDerivedVariableIsCopyOfExistingDerivedVariable() {
+      ResourceRequestBuilderFactory.<ViewDto> newBuilder()
+      /**/.forResource("/datasource/" + viewDto.getDatasourceName() + "/view/" + viewDto.getName())
+      /**/.get()
+      /**/.withCallback(new ResourceCallback<ViewDto>() {
+
+        List<VariableDto> variablesList;
+
+        @Override
+        public void onResource(Response response, ViewDto viewDto) {
+          VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+          variablesList = JsArrays.toList(variableListDto.getVariablesArray());
+          VariableDto variableDto = getVariableDto();
+          variableDto.setName(translations.copyOf() + variableDto.getName());
+          eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
+          setButtonsWhenAddingVariable();
+        }
+
+        private VariableDto getVariableDto() {
+          VariableDto result = null;
+          for(VariableDto variableDto : variablesList) {
+            if(newDerivedVariableName.equals(variableDto.getName())) result = variableDto;
+          }
+          return result;
+        }
+      }).send();
+    }
+
+    private boolean isNewDerivedVariableNameSameAsExistingDerivedVariableName() {
+      for(VariableDto variableDto : getVariableList()) {
+        if(newDerivedVariableName.equals(variableDto.getName())) return true;
+      }
+      return false;
     }
 
     private VariableDto createEmptyDerivedVariable(String entityType) {
@@ -809,6 +855,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       getDisplay().saveChangesEnabled(false);
       getDisplay().addButtonEnabled(true);
       getDisplay().navigationEnabled(true);
+      getDisplay().variableNameEnabled(false);
       updateSelectedVariableName();
       if(getVariableList().size() > 0) getDisplay().removeButtonEnabled(true);
     }

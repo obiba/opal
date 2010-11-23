@@ -45,7 +45,7 @@
             </g:Label>
           </td>
           <td>
-            <g:TextBox ui:field="variableName" width="15em"/>
+            <g:TextBox ui:field="variableName" width="15em" enabled="false"/>
           </td>
         </tr>
         <tr>
