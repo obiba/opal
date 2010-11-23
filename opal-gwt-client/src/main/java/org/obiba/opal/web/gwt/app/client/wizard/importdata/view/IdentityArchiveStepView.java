@@ -21,8 +21,8 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -35,9 +35,6 @@ public class IdentityArchiveStepView extends Composite implements IdentityArchiv
   }
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  @UiField
-  Button nextButton;
 
   @UiField
   RadioButton identifierAsIs;
@@ -57,6 +54,9 @@ public class IdentityArchiveStepView extends Composite implements IdentityArchiv
   @UiField
   SimplePanel archivePanel;
 
+  @UiField
+  HTMLPanel help;
+
   private FileSelectionPresenter.Display archiveSelection;
 
   public IdentityArchiveStepView() {
@@ -74,11 +74,6 @@ public class IdentityArchiveStepView extends Composite implements IdentityArchiv
 
   @Override
   public void stopProcessing() {
-  }
-
-  @Override
-  public HandlerRegistration addNextClickHandler(ClickHandler handler) {
-    return nextButton.addClickHandler(handler);
   }
 
   @Override
@@ -178,6 +173,11 @@ public class IdentityArchiveStepView extends Composite implements IdentityArchiv
         break;
       }
     }
+  }
+
+  @Override
+  public Widget getStepHelp() {
+    return help;
   }
 
 }

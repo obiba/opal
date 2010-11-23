@@ -19,8 +19,6 @@ import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 
@@ -37,12 +35,6 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
   //
   // Instance Variables
   //
-
-  @Inject
-  private Provider<DataImportPresenter> formatSelectionStepPresenter;
-
-  @Inject
-  private Provider<DataExportPresenter> dataExportPresenter;
 
   @Inject
   private Provider<NavigatorPresenter> navigationPresenter;

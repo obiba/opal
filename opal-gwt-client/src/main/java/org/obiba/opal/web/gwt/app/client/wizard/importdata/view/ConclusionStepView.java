@@ -9,7 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ConclusionStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ConclusionStepPresenter.TableCompareError;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -18,9 +22,8 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ConclusionStepView extends Composite implements ConclusionStepPresenter.Display {
@@ -32,10 +35,13 @@ public class ConclusionStepView extends Composite implements ConclusionStepPrese
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   @UiField
+  Label jobLabel;
+
+  @UiField
   Anchor jobLink;
 
   @UiField
-  Button returnButton;
+  ValidationReportStepView validationReportPanel;
 
   public ConclusionStepView() {
     initWidget(uiBinder.createAndBindUi(this));
@@ -55,18 +61,32 @@ public class ConclusionStepView extends Composite implements ConclusionStepPrese
   }
 
   @Override
-  public HandlerRegistration addReturnClickHandler(ClickHandler handler) {
-    return returnButton.addClickHandler(handler);
-  }
-
-  @Override
   public HandlerRegistration addJobLinkClickHandler(ClickHandler handler) {
     return jobLink.addClickHandler(handler);
   }
 
   @Override
-  public HasText getJobLinkText() {
-    return jobLink;
+  public void showJobId(String text) {
+    jobLink.setText(text);
+    jobLabel.setVisible(true);
+    jobLink.setVisible(true);
+  }
+
+  @Override
+  public void showTableCompareErrors(final List<TableCompareError> errors) {
+    validationReportPanel.showTableCompareErrors(errors);
+  }
+
+  @Override
+  public void showDatasourceParsingErrors(ClientErrorDto errorDto) {
+    validationReportPanel.showDatasourceParsingErrors(errorDto);
+  }
+
+  @Override
+  public void hideErrors() {
+    jobLabel.setVisible(false);
+    jobLink.setVisible(false);
+    validationReportPanel.hideErrors();
   }
 
 }

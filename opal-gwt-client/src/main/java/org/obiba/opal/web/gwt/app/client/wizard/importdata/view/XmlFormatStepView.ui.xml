@@ -6,38 +6,28 @@
   ui:generateLocales="default">
 
   
-  <o:WorkbenchLayout>
-    <g:Label><ui:msg description="Data import title">Import Data</ui:msg></g:Label>
-    <g:Label><ui:msg description="Xml format summary">Enter additional information for the importation of data in the Opal XML format</ui:msg></g:Label>
-    <g:Button ui:field="nextButton"><ui:msg description="Next button label">Next</ui:msg></g:Button>
+<!--    <g:Label><ui:msg description="Xml format summary">Enter additional information for the importation of data in the Opal XML format</ui:msg></g:Label>-->
     <g:FlowPanel>
       <g:HTMLPanel>
-        <table class="gwt-KeyValue" cellspacing="10">
+        <table class="full-width" cellspacing="10">
           <tbody>
             <tr>
-              <td style="vertical-align:top">
-                <ui:msg description="Select data file label">Select data file</ui:msg>
-                <g:SimplePanel ui:field="selectXmlFilePanel" />          
+              <td>
+                <ui:msg description="Select data file label">Select data file</ui:msg>:
               </td>
-            </tr>
-            <tr>
-              <td style="vertical-align:top">
-                <ui:msg description="Unit label">Unit</ui:msg>
-                <g:ListBox ui:field="units" />
+              <td>
+                <g:SimplePanel ui:field="selectXmlFilePanel" />
               </td>
             </tr>
           </tbody>
         </table>
       </g:HTMLPanel>
-    </g:FlowPanel>
-    
-     <g:FlowPanel>
-        <g:HTMLPanel>
-          <g:Label addStyleNames="title"><ui:msg description="Data File label">Data File</ui:msg></g:Label>
-          <p><ui:msg description="Xml data file information">The Opal XML file to use must be on the server. Use the file explorer to upload it if it's not already there.</ui:msg></p>    
-        </g:HTMLPanel>
-     </g:FlowPanel>    
-    
-  </o:WorkbenchLayout>
+      
+      <g:HTMLPanel ui:field="help">
+        <g:Label addStyleNames="title"><ui:msg description="Data File label">Data File</ui:msg></g:Label>
+        <p><ui:msg description="Xml data file information">The Opal XML file to use must be on the server. Use the file explorer to upload it if it's not already there.</ui:msg></p>    
+      </g:HTMLPanel>
+      
+   </g:FlowPanel>
   
 </ui:UiBinder>

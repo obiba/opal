@@ -40,11 +40,10 @@ import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.JdbcD
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.view.EvaluateScriptView;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.CsvFormatStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DestinationSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DestinationSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.IdentityArchiveStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.XmlFormatStepPresenter;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
@@ -106,8 +105,6 @@ public interface OpalGinjector extends Ginjector {
   XmlFormatStepPresenter getXmlFormatStepPresenter();
 
   DestinationSelectionStepPresenter getDestinationSelectionStepPresenter();
-
-  ImportData getImportData();
 
   IdentityArchiveStepPresenter getIdentityArchiveStepPresenter();
 

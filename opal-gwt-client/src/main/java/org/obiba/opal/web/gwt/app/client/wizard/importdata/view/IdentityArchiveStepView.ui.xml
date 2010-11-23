@@ -5,13 +5,9 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
-  
-  <o:WorkbenchLayout>
-    <g:Label><ui:msg description="Data import title">Import Data</ui:msg></g:Label>
-    <g:Label><ui:msg description="Identity archive summary">Provide the following additional information</ui:msg></g:Label>
-    <g:Button ui:field="nextButton"><ui:msg description="Next button label">Next</ui:msg></g:Button>
+  <!--    <ui:msg description="Identity archive summary">Provide the following additional information</ui:msg>-->
     <g:FlowPanel>
-      <g:HTMLPanel>
+      <g:HTMLPanel ui:field="step">
         <table class="gwt-KeyValue" cellspacing="10">
           <tbody>
             <tr>
@@ -27,7 +23,7 @@
             <tr>
               <td>
                 <g:RadioButton name="identifierGroup" ui:field="identifierSharedWithUnit"><ui:msg description="Share identifier with unit label">be considered as idenfiers shared with unit</ui:msg></g:RadioButton>
-                <g:ListBox ui:field="units" />
+                <g:ListBox ui:field="units" enabled="false"/>
               </td>
             </tr>
             <tr>
@@ -49,10 +45,8 @@
           </tbody>
         </table>
       </g:HTMLPanel>
-    </g:FlowPanel>
     
-     <g:FlowPanel>
-        <g:HTMLPanel>
+      <g:HTMLPanel ui:field="help">
           <g:Label addStyleNames="title"><ui:msg description="Participant Identifier label">Participant Identifier</ui:msg></g:Label>
           <p><ui:msg description="Unique identifier information">The unique identifiers in the imported file(s) can</ui:msg></p>
           <ul>
@@ -61,9 +55,8 @@
           </ul>
           <g:Label addStyleNames="title"><ui:msg description="Archive label">Archive</ui:msg></g:Label>
           <p><ui:msg description="Select archive directory information">If you wish, you can select a directory on the server side where the data file will be stored once successfully imported.</ui:msg></p>
-        </g:HTMLPanel>
-     </g:FlowPanel>    
-    
-  </o:WorkbenchLayout>
+      </g:HTMLPanel>
+      
+    </g:FlowPanel>    
   
 </ui:UiBinder>

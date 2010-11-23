@@ -48,14 +48,6 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
     MenuItem getDatasourcesItem();
 
-    // MenuItem getNewViewItem();
-    //
-    // MenuItem getExploreVariables();
-    //
-    // MenuItem getImportVariables();
-    //
-    // MenuItem getDataImportItem();
-
     void updateWorkbench(Widget workbench);
 
     MenuItem getListJobsItem();

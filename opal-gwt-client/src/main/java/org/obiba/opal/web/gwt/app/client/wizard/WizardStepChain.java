@@ -52,6 +52,7 @@ public class WizardStepChain {
     current.reset();
     apply();
     wizard.setCancelEnabled(true);
+    wizard.setProgress(false);
   }
 
   private void apply() {

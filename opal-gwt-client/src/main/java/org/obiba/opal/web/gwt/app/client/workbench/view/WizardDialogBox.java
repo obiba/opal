@@ -213,11 +213,13 @@ public class WizardDialogBox extends DialogBox {
         }
       });
     }
-    help.setEnabled(true);
+    help.setEnabled(w != null);
     helpTooltip.clear();
-    helpTooltip.add(w);
-    this.helpTooltipWidth = width;
-    this.helpTooltipHeight = height;
+    if(w != null) {
+      helpTooltip.add(w);
+      this.helpTooltipWidth = width;
+      this.helpTooltipHeight = height;
+    }
   }
 
   public void setProgress(boolean progress) {

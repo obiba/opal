@@ -19,12 +19,9 @@ import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style.Visibility;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -36,9 +33,6 @@ public class DestinationSelectionStepView extends Composite implements Destinati
   }
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  @UiField
-  Button nextButton;
 
   @UiField
   ListBox datasetListBox;
@@ -77,11 +71,6 @@ public class DestinationSelectionStepView extends Composite implements Destinati
 
   @Override
   public void stopProcessing() {
-  }
-
-  @Override
-  public HandlerRegistration addNextClickHandler(ClickHandler handler) {
-    return nextButton.addClickHandler(handler);
   }
 
   @Override
@@ -134,5 +123,11 @@ public class DestinationSelectionStepView extends Composite implements Destinati
   public void showTables() {
     tableListBoxLabel.getStyle().setVisibility(Visibility.VISIBLE);
     tableListBox.setVisible(true);
+  }
+
+  @Override
+  public Widget getStepHelp() {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

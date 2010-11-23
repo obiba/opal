@@ -6,15 +6,10 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
-  <o:WorkbenchLayout withInfo="false">
-    <g:Label><ui:msg description="Data import title">Import Data</ui:msg></g:Label>
-    <g:Label><ui:msg description="Validation Report Step summary">Some formatting errors have been detected. You should fix them before importing variables.</ui:msg></g:Label>
-    <g:Button ui:field="cancelButton"><ui:msg description="Cancel button label">Cancel</ui:msg></g:Button>
-    
-    <g:FlowPanel>
-      <g2:CellTable width="100%" ui:field="parsingTable" />
-      <g2:CellTable width="100%" ui:field="validationTable" />
-    </g:FlowPanel> 
-  </o:WorkbenchLayout>
+   <g:FlowPanel>
+     <g:Label ui:field="validationLabel" visible="false"><ui:msg description="Validation Report Step summary">Some formatting errors have been detected. You should fix them before importing variables.</ui:msg></g:Label>
+     <g2:CellTable width="100%" ui:field="validationTable" visible="false"/>
+     <o:DatasourceParsingErrorTable width="100%" ui:field="parsingErrorTable" visible="false"/>
+   </g:FlowPanel> 
 
 </ui:UiBinder>

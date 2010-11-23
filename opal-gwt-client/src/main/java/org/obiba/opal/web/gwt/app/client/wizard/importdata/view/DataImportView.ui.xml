@@ -5,39 +5,52 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
-  
-  <o:WorkbenchLayout>
-    <g:Label><ui:msg description="Data import title">Import Data</ui:msg></g:Label>
-    <g:Label><ui:msg description="Data import format selection summary">Select the type of data you wish to import</ui:msg></g:Label>
-    <g:Button ui:field="nextButton"><ui:msg description="Next button label">Next</ui:msg></g:Button>
+  <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="30em" width="40em">
+    <g:caption>
+      <ui:msg description="Data import title">Import Data</ui:msg>
+    </g:caption>
+       
     <g:FlowPanel>
-      <g:HTMLPanel>
-        <table class="gwt-KeyValue" cellspacing="10">
-          <tbody>
-            <tr>
-              <td style="vertical-align:top">
-                <ui:msg description="Data format label">Data Format:</ui:msg>                
-              </td>
-              <td>
-                <g:ListBox ui:field='formatListBox' visibleItemCount='1'/>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </g:HTMLPanel>
-    </g:FlowPanel>
-    
-     <g:FlowPanel>
+      <o:WizardStep ui:field="formatSelectionStep">
         <g:HTMLPanel>
-          <g:Label addStyleNames="title"><ui:msg description="Data format label">Data Format</ui:msg></g:Label>
-          <p><ui:msg description="Number of formats information">There are two data file formats currently supported:</ui:msg></p>    
-          <ul>
-            <li><ui:msg description="CSV format information">CSV: first column contain the participant identifiers and variables are identified by subsequent column names. The variable dictionary can be specified in a later step.</ui:msg></li>
-            <li><ui:msg description="Opal XML information">Opal XML: usually this format is used by Onyx when exporting data. Comes with its own variable dictionary.</ui:msg></li>
-          </ul>
+          <table cellspacing="10">
+            <tbody>
+              <tr>
+                <td>
+                  <ui:msg description="Data format label">Data Format:</ui:msg>                
+                </td>
+                <td>
+                  <g:ListBox ui:field='formatListBox' visibleItemCount='1'/>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </g:HTMLPanel>
-     </g:FlowPanel>    
+      </o:WizardStep>
     
-  </o:WorkbenchLayout>
+      <o:WizardStep ui:field="destinationSelectionStep"/>
+      
+      <o:WizardStep ui:field="formatStep"/>
+      
+      <o:WizardStep ui:field="identityArchiveStep"/>
+      
+      <o:WizardStep ui:field="conclusionStep"/>
+      
+      <g:HTMLPanel ui:field="formatSelectionHelp">
+        <p><ui:msg description="Number of formats information">There are two data file formats currently supported:</ui:msg></p>    
+        <ul>
+          <li><ui:msg description="CSV format information">CSV: first column contain the participant identifiers and variables are identified by subsequent column names. The variable dictionary can be specified in a later step.</ui:msg></li>
+          <li><ui:msg description="Opal XML information">Opal XML: usually this format is used by Onyx when exporting data. Comes with its own variable dictionary.</ui:msg></li>
+        </ul>
+      </g:HTMLPanel>
+      
+      <g:HTMLPanel ui:field="destinationSelectionHelp">
+        <g:Label addStyleNames="title"><ui:msg description="Destination label">Destination</ui:msg></g:Label>
+        <p><ui:msg description="Destination information">Select the destination. This is where the data from your file will be written to.<p/>Opal will validate that the variables in the source are compatible with the ones in the destination before starting the process.</ui:msg></p>    
+      </g:HTMLPanel>
+        
+    </g:FlowPanel> 
+    
+  </o:WizardDialogBox>
   
 </ui:UiBinder>

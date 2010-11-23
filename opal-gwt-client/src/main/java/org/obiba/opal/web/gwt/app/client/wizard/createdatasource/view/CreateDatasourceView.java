@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.Datas
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourceConclusionStepPresenter.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
@@ -229,7 +230,7 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
     presenter.setDatasourceCreatedCallback(new DatasourceCreatedCallback() {
 
       @Override
-      public void onSuccess(DatasourceFactoryDto factory) {
+      public void onSuccess(DatasourceFactoryDto factory, DatasourceDto datasource) {
         conclusionStep.setStepTitle(translations.datasourceCreationCompleted());
         dialog.setFinishEnabled(true);
         dialog.setProgress(false);

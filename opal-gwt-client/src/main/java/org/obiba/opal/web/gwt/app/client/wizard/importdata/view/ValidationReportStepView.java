@@ -12,25 +12,23 @@ package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ValidationReportStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DestinationSelectionStepPresenter.CsvValidationError;
-import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ConclusionStepPresenter.TableCompareError;
+import org.obiba.opal.web.gwt.app.client.workbench.view.DatasourceParsingErrorTable;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
 import com.google.gwt.view.client.ListView.Delegate;
 
-public class ValidationReportStepView extends Composite implements ValidationReportStepPresenter.Display {
+public class ValidationReportStepView extends Composite {
   //
   // Static Variables
   //
@@ -44,13 +42,13 @@ public class ValidationReportStepView extends Composite implements ValidationRep
   //
 
   @UiField
-  Button cancelButton;
+  CellTable<TableCompareError> validationTable;
 
   @UiField
-  CellTable<DatasourceParsingErrorDto> parsingTable;
+  DatasourceParsingErrorTable parsingErrorTable;
 
   @UiField
-  CellTable<CsvValidationError> validationTable;
+  Label validationLabel;
 
   //
   // Constructors
@@ -62,37 +60,16 @@ public class ValidationReportStepView extends Composite implements ValidationRep
   }
 
   //
-  // UploadVariablesStepPresenter.Display Methods
+  // Methods
   //
 
-  public HandlerRegistration addCancelClickHandler(ClickHandler handler) {
-    return cancelButton.addClickHandler(handler);
-  }
-
-  public void setParsingErrors(final List<DatasourceParsingErrorDto> errors) {
-    validationTable.setVisible(false);
-    parsingTable.setVisible(true);
-    parsingTable.setDelegate(new Delegate<DatasourceParsingErrorDto>() {
-
-      public void onRangeChanged(ListView<DatasourceParsingErrorDto> listView) {
-        int start = listView.getRange().getStart();
-        int length = listView.getRange().getLength();
-        listView.setData(start, length, errors);
-      }
-    });
-
-    parsingTable.setData(0, parsingTable.getPageSize(), errors);
-    parsingTable.setDataSize(errors.size(), true);
-    parsingTable.redraw();
-  }
-
-  public void setValidationErrors(final List<CsvValidationError> errors) {
-    parsingTable.setVisible(false);
+  public void showTableCompareErrors(final List<TableCompareError> errors) {
+    validationLabel.setVisible(true);
     validationTable.setVisible(true);
-    validationTable.setDelegate(new Delegate<CsvValidationError>() {
+    validationTable.setDelegate(new Delegate<TableCompareError>() {
 
       @Override
-      public void onRangeChanged(ListView<CsvValidationError> listView) {
+      public void onRangeChanged(ListView<TableCompareError> listView) {
         int start = listView.getRange().getStart();
         int length = listView.getRange().getLength();
         listView.setData(start, length, errors);
@@ -104,51 +81,36 @@ public class ValidationReportStepView extends Composite implements ValidationRep
     validationTable.redraw();
   }
 
-  public Widget asWidget() {
-    return this;
+  public void showDatasourceParsingErrors(ClientErrorDto errorDto) {
+    parsingErrorTable.setVisible(true);
+    parsingErrorTable.setErrors(errorDto);
   }
 
-  public void startProcessing() {
+  public void hideErrors() {
+    validationLabel.setVisible(false);
+    validationTable.setVisible(false);
+    parsingErrorTable.setVisible(false);
   }
-
-  public void stopProcessing() {
-  }
-
-  //
-  // Methods
-  //
 
   private void initTable() {
-    parsingTable.setSelectionEnabled(false);
-    addParsingTableColumns();
     validationTable.setSelectionEnabled(false);
     addValidationColumns();
   }
 
-  private void addParsingTableColumns() {
-
-    parsingTable.addColumn(new TextColumn<DatasourceParsingErrorDto>() {
-      @Override
-      public String getValue(DatasourceParsingErrorDto dto) {
-        return translations.datasourceParsingErrorMap().get(dto.getKey());
-      }
-    }, translations.errorLabel());
-  }
-
   private void addValidationColumns() {
-    validationTable.addColumn(new TextColumn<CsvValidationError>() {
+    validationTable.addColumn(new TextColumn<TableCompareError>() {
 
       @Override
-      public String getValue(CsvValidationError error) {
+      public String getValue(TableCompareError error) {
         return error.getColumn();
       }
 
     }, "variable");
 
-    validationTable.addColumn(new TextColumn<CsvValidationError>() {
+    validationTable.addColumn(new TextColumn<TableCompareError>() {
 
       @Override
-      public String getValue(CsvValidationError error) {
+      public String getValue(TableCompareError error) {
         return error.getErrorMessageKey();
       }
 

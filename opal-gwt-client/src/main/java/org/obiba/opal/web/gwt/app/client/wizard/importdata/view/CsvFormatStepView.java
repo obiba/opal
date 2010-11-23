@@ -14,12 +14,10 @@ import org.obiba.opal.web.gwt.app.client.widgets.view.CsvOptionsView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.CsvFormatStepPresenter;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class CsvFormatStepView extends AbstractCsvOptionsView implements CsvFormatStepPresenter.Display {
@@ -34,10 +32,10 @@ public class CsvFormatStepView extends AbstractCsvOptionsView implements CsvForm
   //
 
   @UiField
-  Button nextButton;
+  CsvOptionsView csvOptions;
 
   @UiField
-  CsvOptionsView csvOptions;
+  HTMLPanel help;
 
   //
   // Constructors
@@ -61,13 +59,9 @@ public class CsvFormatStepView extends AbstractCsvOptionsView implements CsvForm
   //
 
   @Override
-  public HandlerRegistration addNextClickHandler(ClickHandler handler) {
-    return nextButton.addClickHandler(handler);
-  }
-
-  @Override
-  public void setNextEnabled(boolean enabled) {
-    nextButton.setEnabled(enabled);
+  public Widget getStepHelp() {
+    help.removeFromParent();
+    return help;
   }
 
   //
@@ -77,4 +71,5 @@ public class CsvFormatStepView extends AbstractCsvOptionsView implements CsvForm
   @UiTemplate("CsvFormatStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, CsvFormatStepView> {
   }
+
 }

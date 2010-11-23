@@ -129,7 +129,7 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
     private void callback(boolean success, ClientErrorDto error) {
       if(createdCallback == null) return;
 
-      if(success) createdCallback.onSuccess(dto);
+      if(success) createdCallback.onSuccess(dto, datasourceDto);
       else if(error != null) createdCallback.onFailure(dto, error);
       else
         createdCallback.onFailure(dto, null);
@@ -168,7 +168,7 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
 
   public interface DatasourceCreatedCallback {
 
-    public void onSuccess(DatasourceFactoryDto factory);
+    public void onSuccess(DatasourceFactoryDto factory, DatasourceDto datasource);
 
     public void onFailure(DatasourceFactoryDto factory, ClientErrorDto error);
 

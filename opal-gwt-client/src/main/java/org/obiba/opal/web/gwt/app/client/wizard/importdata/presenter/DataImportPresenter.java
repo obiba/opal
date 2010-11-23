@@ -15,23 +15,19 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Display> {
-
-  public interface Display extends WidgetDisplay {
-
-    HandlerRegistration addNextClickHandler(ClickHandler handler);
-
-    ImportFormat getImportFormat();
-  }
 
   @Inject
   private CsvFormatStepPresenter csvFormatStepPresenter;
@@ -40,7 +36,15 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
   private XmlFormatStepPresenter xmlFormatStepPresenter;
 
   @Inject
-  private ImportData importData;
+  private DestinationSelectionStepPresenter destinationSelectionStepPresenter;
+
+  @Inject
+  private IdentityArchiveStepPresenter identityArchiveStepPresenter;
+
+  @Inject
+  private ConclusionStepPresenter conclusionStepPresenter;
+
+  private DataImportFormatStepPresenter formatStepPresenter;
 
   @Inject
   public DataImportPresenter(final Display display, final EventBus eventBus) {
@@ -54,11 +58,74 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
 
   @Override
   protected void onBind() {
+    csvFormatStepPresenter.bind();
+    xmlFormatStepPresenter.bind();
+    destinationSelectionStepPresenter.bind();
+    identityArchiveStepPresenter.bind();
+    conclusionStepPresenter.bind();
+
+    getDisplay().setDestinationSelectionDisplay(destinationSelectionStepPresenter.getDisplay());
+    getDisplay().setIdentityArchiveStepDisplay(identityArchiveStepPresenter.getDisplay());
+
     addEventHandlers();
   }
 
   protected void addEventHandlers() {
-    super.registerHandler(getDisplay().addNextClickHandler(new NextClickHandler()));
+    super.registerHandler(getDisplay().addCancelClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent arg0) {
+        getDisplay().hideDialog();
+      }
+    }));
+    super.registerHandler(getDisplay().addFinishClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent arg0) {
+        getDisplay().hideDialog();
+      }
+    }));
+    super.registerHandler(getDisplay().addImportClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent arg0) {
+        ImportData importData = formatStepPresenter.getImportData();
+        identityArchiveStepPresenter.updateImportData(importData);
+        destinationSelectionStepPresenter.updateImportData(importData);
+        conclusionStepPresenter.launchImport(importData);
+        getDisplay().renderConclusion(conclusionStepPresenter);
+      }
+    }));
+
+    super.registerHandler(getDisplay().addFormatChangeHandler(new ChangeHandler() {
+
+      @Override
+      public void onChange(ChangeEvent evt) {
+        updateFormatStepDisplay();
+      }
+    }));
+    getDisplay().setFormatStepValidator(new ValidationHandler() {
+
+      @Override
+      public boolean validate() {
+        return formatStepPresenter.validate();
+      }
+    });
+
+  }
+
+  private void updateFormatStepDisplay() {
+    destinationSelectionStepPresenter.setImportFormat(getDisplay().getImportFormat());
+    if(getDisplay().getImportFormat().equals(ImportFormat.CSV)) {
+      this.formatStepPresenter = csvFormatStepPresenter;
+      getDisplay().setFormatStepDisplay(csvFormatStepPresenter.getDisplay());
+    } else if(getDisplay().getImportFormat().equals(ImportFormat.XML)) {
+      this.formatStepPresenter = xmlFormatStepPresenter;
+      getDisplay().setFormatStepDisplay(xmlFormatStepPresenter.getDisplay());
+    } else {
+      this.formatStepPresenter = null;
+      throw new IllegalStateException("Unknown format: " + getDisplay().getImportFormat());
+    }
   }
 
   @Override
@@ -67,6 +134,9 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
 
   @Override
   protected void onUnbind() {
+    csvFormatStepPresenter.unbind();
+    xmlFormatStepPresenter.unbind();
+    destinationSelectionStepPresenter.unbind();
   }
 
   @Override
@@ -75,21 +145,90 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
 
   @Override
   public void revealDisplay() {
+    updateFormatStepDisplay();
+    getDisplay().showDialog();
   }
 
-  class NextClickHandler implements ClickHandler {
+  //
+  // Inner classes
+  //
 
-    @Override
-    public void onClick(ClickEvent event) {
-      importData.clear();
-      importData.setFormat(display.getImportFormat());
-      if(display.getImportFormat().equals(ImportFormat.CSV)) {
-        eventBus.fireEvent(new WorkbenchChangeEvent(csvFormatStepPresenter));
-      }
-      if(display.getImportFormat().equals(ImportFormat.XML)) {
-        eventBus.fireEvent(new WorkbenchChangeEvent(xmlFormatStepPresenter));
-      }
-    }
+  //
+  // Interfaces
+  //
+
+  public interface Display extends WidgetDisplay {
+
+    void showDialog();
+
+    void hideDialog();
+
+    HandlerRegistration addNextClickHandler(ClickHandler handler);
+
+    ImportFormat getImportFormat();
+
+    HandlerRegistration addCancelClickHandler(ClickHandler handler);
+
+    HandlerRegistration addFinishClickHandler(ClickHandler handler);
+
+    //
+    // Format selection step
+    //
+
+    HandlerRegistration addFormatChangeHandler(ChangeHandler handler);
+
+    //
+    // Format step
+    //
+
+    void setFormatStepDisplay(DataImportStepDisplay display);
+
+    void setFormatStepValidator(ValidationHandler handler);
+
+    //
+    // Destination selection step
+    //
+
+    void setDestinationSelectionDisplay(DataImportStepDisplay display);
+
+    //
+    // Identity / Archive step
+    //
+
+    void setIdentityArchiveStepDisplay(DataImportStepDisplay display);
+
+    //
+    // Conclusion step
+    //
+
+    public void renderConclusion(ConclusionStepPresenter presenter);
+
+    HandlerRegistration addImportClickHandler(ClickHandler handler);
+
+  }
+
+  public interface DataImportFormatStepPresenter {
+
+    /**
+     * Get the import data as collected.
+     * @return
+     */
+    public ImportData getImportData();
+
+    /**
+     * Validate the import data were correctly provided, and send notification error messages if any.
+     * @return
+     */
+    public boolean validate();
+
+  }
+
+  public interface DataImportStepDisplay {
+
+    public Widget asWidget();
+
+    public Widget getStepHelp();
+
   }
 
 }

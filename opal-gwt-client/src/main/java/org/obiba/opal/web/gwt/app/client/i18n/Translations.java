@@ -184,9 +184,10 @@ public interface Translations extends Constants {
   "InternalError", "An internal error has occurred. Please contact technical support.", //
   "DatasourceNameDisallowedChars", "Datasource names cannot contain colon or period characters.", //
   "ViewNameDisallowedChars", "View names cannot contain colon or period characters.", //
+  "CSVFileRequired", "A CSV file is required.", //
   "XMLFileRequired", "An XML file is required.", //
   "XMLFileSuffixInvalid", "Invalid XML file suffix: .xml is expected.", //
-  "ZipFileRequired", "An Zip file is required.", //
+  "ZipFileRequired", "A Zip file is required.", //
   "ZipFileSuffixInvalid", "Invalid Zip file suffix: .zip is expected.",//
   "ReportTemplateWasNotFound", "The specified report template could not be found.",//
   "ReportJobStarted", "Report job has been launched.  You can follow its progress in the job list.",//
@@ -385,7 +386,7 @@ public interface Translations extends Constants {
   String rowMustBePositiveMessage();
 
   @Description("Charset must not be null message")
-  @DefaultStringValue("The character set must not be null or empty.")
+  @DefaultStringValue("The character set must not be empty.")
   String charsetMustNotBeNullMessage();
 
   @Description("Charset does not exist message")
