@@ -19,8 +19,15 @@ import com.google.gwt.user.client.ui.Widget;
  *
  */
 public class ListItem extends ComplexPanel implements HasText {
+
   public ListItem() {
+    super();
     setElement(Document.get().createLIElement());
+  }
+
+  public ListItem(Widget w) {
+    this();
+    add(w);
   }
 
   public void add(Widget w) {
