@@ -99,9 +99,11 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     expect(eventBusMock.addHandler(eq(FileSelectionRequiredEvent.getType()), isA(FileSelectionRequiredEvent.Handler.class))).andReturn(null).once();
     expect(eventBusMock.addHandler(eq(FileSystemTreeFolderSelectionChangeEvent.getType()), isA(FileSystemTreeFolderSelectionChangeEvent.Handler.class))).andReturn(null).once();
     expect(eventBusMock.addHandler(eq(FolderSelectionChangeEvent.getType()), isA(FolderSelectionChangeEvent.Handler.class))).andReturn(null).once();
+
     expect(displayMock.addSelectButtonHandler((ClickHandler) anyObject())).andReturn(null).once();
     expect(displayMock.addCancelButtonHandler((ClickHandler) anyObject())).andReturn(null).once();
     expect(displayMock.addCreateFolderButtonHandler((ClickHandler) anyObject())).andReturn(null).once();
+    expect(displayMock.addUploadButtonHandler((ClickHandler) anyObject())).andReturn(null).once();
     expect(folderDetailsPresenter.getDisplay().addFileSelectionHandler((FileSelectionHandler) anyObject())).andReturn(null).once();
 
     replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
@@ -138,6 +140,9 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     expectLastCall().once();
 
     displayMock.showDialog();
+    expectLastCall().once();
+
+    displayMock.setDisplaysUploadFile(true);
     expectLastCall().once();
 
     replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
