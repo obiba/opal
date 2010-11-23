@@ -121,16 +121,22 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
         addingVariablesOneByOneRadioButton.setValue(false);
       }
     })//
+
     .append(tablesStep, tablesHelp)//
     .title(translations.editViewTablesStep())//
+    .canFinish()//
     .onReset(new ResetHandler() {
 
       @Override
       public void onReset() {
         if(tableSelector != null) tableSelector.clear();
       }
-    }).append(variablesStep)//
+    })//
+
+    .append(variablesStep)//
     .title(translations.editViewVariablesStep())//
+    .canFinish()//
+
     .append(entitiesStep)//
     .title(translations.editViewEntitiesStep())//
     .onNext().onPrevious().build();
