@@ -108,7 +108,6 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
 
   SimplePager<FileDto> pager;
 
-  @SuppressWarnings("unused")
   private HasActionHandler actionsColumn;
 
   private ReportTemplateDto reportTemplate;
@@ -165,12 +164,7 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
 
   @Override
   public void setProducedReports(final JsArray<FileDto> files) {
-
-    if(files == null || files.length() == 0) {
-      producedReports.setVisible(false);
-    } else {
-      renderProducedReports(files);
-    }
+    renderProducedReports(files);
   }
 
   private void renderProducedReports(final JsArray<FileDto> files) {

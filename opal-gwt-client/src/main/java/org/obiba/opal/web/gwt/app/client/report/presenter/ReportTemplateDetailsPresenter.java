@@ -121,8 +121,9 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
   protected void onPlaceRequest(PlaceRequest request) {
   }
 
+  @SuppressWarnings("unchecked")
   private void initUiComponents() {
-    getDisplay().setProducedReports(null);
+    getDisplay().setProducedReports((JsArray<FileDto>) JsArray.createArray());
     getDisplay().setReportTemplateDetails(null);
   }
 
@@ -308,9 +309,10 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
   private class NoProducedReportsResourceCallback implements ResponseCodeCallback {
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onResponseCode(Request request, Response response) {
-      getDisplay().setProducedReports(null);
+      getDisplay().setProducedReports((JsArray<FileDto>) JsArray.createArray());
     }
   }
 
