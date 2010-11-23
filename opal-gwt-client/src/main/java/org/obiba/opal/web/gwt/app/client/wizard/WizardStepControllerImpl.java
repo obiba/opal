@@ -129,7 +129,7 @@ class WizardStepControllerImpl implements WizardStepController {
     return canFinish;
   }
 
-  private class WidgetProviderImpl implements WidgetProvider {
+  private static class WidgetProviderImpl implements WidgetProvider {
 
     private Widget w;
 
