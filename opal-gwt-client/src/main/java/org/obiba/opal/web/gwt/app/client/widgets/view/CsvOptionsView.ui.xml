@@ -5,77 +5,82 @@
   ui:generateLocales="default">
 
   <g:HTMLPanel>
-    <table class="gwt-KeyValue" cellspacing="10">
+    <table class="full-width" cellspacing="10">
       <tbody>
         <tr>
-          <td style="vertical-align:top">
-            <ui:msg description="Select data file label">Select data file</ui:msg>
-            <g:SimplePanel ui:field="selectCsvFilePanel" />          
+          <td>
+            <ui:msg description="Select data file label">Select data file</ui:msg>:
+          </td>
+            <g:SimplePanel ui:field="selectCsvFilePanel" />
+          <td>
           </td>
         </tr>
         <tr>
-          <td>
+          <td colspan="2">
             <ui:msg description="Csv format options label">Csv Format Options:</ui:msg>                
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <ui:msg description="From row label">From Row:</ui:msg>
-            <g:TextBox ui:field="row" />            
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <ui:msg description="Separators label">Separators:</ui:msg>
-            <ui:msg description="Field label">Field</ui:msg>:
-            <g:ListBox ui:field="field">
-              <g:item>,</g:item>
-              <g:item>;</g:item>
-              <g:item>:</g:item>
-              <g:item value='\t'>tab</g:item>
-            </g:ListBox>          
-            <ui:msg description="Quote label">Quote</ui:msg>:
-            <g:ListBox ui:field="quote">
-              <g:item>"</g:item>
-              <g:item>'</g:item>
-            </g:ListBox>          
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <ui:msg description="Character set label">Character Set:</ui:msg>                
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <g:RadioButton name="charsetGroup" ui:field="charsetDefault" checked="true"><ui:msg description="Use default charset label">use Opal's default value (<span ui:field='defaultCharset' />)</ui:msg></g:RadioButton>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <g:RadioButton name="charsetGroup" ui:field="charsetCommonList"><ui:msg description="Choose from a list of common charsets label">select from list of common character sets</ui:msg></g:RadioButton>
-            <g:ListBox ui:field='charsetCommonListBox' visibleItemCount='1'>
-              <g:item>ISO-8859-1</g:item>
-              <g:item>ISO-8859-2</g:item>
-              <g:item>ISO-8859-3</g:item>
-              <g:item>ISO-8859-4</g:item>
-              <g:item>ISO-8859-5</g:item>
-              <g:item>ISO-8859-6</g:item>
-              <g:item>ISO-8859-7</g:item>
-              <g:item>ISO-8859-8</g:item>
-              <g:item>ISO-8859-9</g:item>
-              <g:item>ISO-8859-13</g:item>
-              <g:item>ISO-8859-15</g:item>
-              <g:item>UTF-8</g:item>
-              <g:item>UTF-16</g:item>
-              <g:item>UTF-32</g:item>
-            </g:ListBox>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <g:RadioButton name="charsetGroup" ui:field="charsetSpecify"><ui:msg description="Enter a specific charset label">select a specific one</ui:msg></g:RadioButton>
-            <g:TextBox ui:field="charsetSpecifyTextBox" />             
+          
+            <table class="indent" cellspacing="10">
+              <tr>
+		          <td>
+		            <ui:msg description="From row label">From Row:</ui:msg>
+		            <g:TextBox ui:field="row" />            
+		          </td>
+		        </tr>
+		        <tr>
+		          <td>
+		            <ui:msg description="Separators label">Separators:</ui:msg>
+		            <ui:msg description="Field label">Field</ui:msg>:
+		            <g:ListBox ui:field="field">
+		              <g:item>,</g:item>
+		              <g:item>;</g:item>
+		              <g:item>:</g:item>
+		              <g:item value='\t'>tab</g:item>
+		            </g:ListBox>          
+		            <ui:msg description="Quote label">Quote</ui:msg>:
+		            <g:ListBox ui:field="quote">
+		              <g:item>"</g:item>
+		              <g:item>'</g:item>
+		            </g:ListBox>          
+		          </td>
+		        </tr>
+		        <tr>
+		          <td>
+		            <ui:msg description="Character set label">Character Set:</ui:msg>                
+		          </td>
+		        </tr>
+		        <tr>
+		          <td>
+		            <g:RadioButton name="charsetGroup" ui:field="charsetDefault" checked="true"><ui:msg description="Use default charset label">use Opal's default value (<span ui:field='defaultCharset' />)</ui:msg></g:RadioButton>
+		          </td>
+		        </tr>
+		        <tr>
+		          <td>
+		            <g:RadioButton name="charsetGroup" ui:field="charsetCommonList"><ui:msg description="Choose from a list of common charsets label">select from list of common character sets</ui:msg></g:RadioButton>
+		            <g:ListBox ui:field='charsetCommonListBox' visibleItemCount='1'>
+		              <g:item>ISO-8859-1</g:item>
+		              <g:item>ISO-8859-2</g:item>
+		              <g:item>ISO-8859-3</g:item>
+		              <g:item>ISO-8859-4</g:item>
+		              <g:item>ISO-8859-5</g:item>
+		              <g:item>ISO-8859-6</g:item>
+		              <g:item>ISO-8859-7</g:item>
+		              <g:item>ISO-8859-8</g:item>
+		              <g:item>ISO-8859-9</g:item>
+		              <g:item>ISO-8859-13</g:item>
+		              <g:item>ISO-8859-15</g:item>
+		              <g:item>UTF-8</g:item>
+		              <g:item>UTF-16</g:item>
+		              <g:item>UTF-32</g:item>
+		            </g:ListBox>
+		          </td>
+		        </tr>
+		        <tr>
+		          <td>
+		            <g:RadioButton name="charsetGroup" ui:field="charsetSpecify"><ui:msg description="Enter a specific charset label">select a specific one</ui:msg></g:RadioButton>
+		            <g:TextBox ui:field="charsetSpecifyTextBox" />             
+		          </td>
+		        </tr> 
+            </table>
           </td>
         </tr>
       </tbody>
