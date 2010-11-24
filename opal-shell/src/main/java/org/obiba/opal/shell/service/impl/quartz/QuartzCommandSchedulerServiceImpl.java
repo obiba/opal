@@ -48,6 +48,7 @@ public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerServic
 
   public void addCommand(String name, String group, Command<?> command) {
     JobDetail jobDetail = new JobDetail(name, group, QuartzCommandJob.class);
+    jobDetail.setDurability(true); // OPAL-917
     jobDetail.getJobDataMap().put("command", command.toString());
 
     try {
