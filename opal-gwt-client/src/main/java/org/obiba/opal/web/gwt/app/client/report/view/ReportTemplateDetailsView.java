@@ -164,6 +164,7 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
 
   @Override
   public void setProducedReports(final JsArray<FileDto> files) {
+    pager.setVisible(files.length() != 0); // OPAL-901
     renderProducedReports(files);
   }
 

@@ -51,9 +51,9 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
+import com.google.gwt.view.client.ListView.Delegate;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
-import com.google.gwt.view.client.ListView.Delegate;
 
 /**
  *
@@ -109,6 +109,7 @@ public class JobListView extends Composite implements Display {
       }
     });
 
+    pager.setVisible(rows.length() != 0); // OPAL-901
     pager.firstPage();
     table.setData(0, table.getPageSize(), JsArrays.toList(rows, 0, table.getPageSize()));
     table.setDataSize(rows.length(), true);
