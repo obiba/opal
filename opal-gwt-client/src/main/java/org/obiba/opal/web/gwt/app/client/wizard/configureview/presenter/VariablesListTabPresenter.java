@@ -560,6 +560,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
         // Validate current variable and save to variable list.
         if(validate()) {
           scriptWidget.evaluateScript(new ResponseCodeCallback() {
+            
             @Override
             public void onResponseCode(Request request, Response response) {
               int statusCode = response.getStatusCode();
