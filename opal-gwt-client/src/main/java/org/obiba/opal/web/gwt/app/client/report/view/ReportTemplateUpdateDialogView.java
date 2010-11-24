@@ -25,12 +25,12 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -65,13 +65,16 @@ public class ReportTemplateUpdateDialogView extends Composite implements Display
   SimplePanel designFilePanel;
 
   @UiField
-  CheckBox isScheduled;
-
-  @UiField
   SimplePanel notificationEmailsPanel;
 
   @UiField
   SimplePanel reportParametersPanel;
+
+  @UiField
+  RadioButton runManuallyRadio;
+
+  @UiField
+  RadioButton scheduleRadio;
 
   private ItemSelectorPresenter.Display emailsSelector;
 
@@ -167,17 +170,9 @@ public class ReportTemplateUpdateDialogView extends Composite implements Display
 
   @Override
   public HandlerRegistration addEnableScheduleClickHandler() {
-    return isScheduled.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        boolean scheduleRequired = ((CheckBox) event.getSource()).getValue();
-        schedule.setEnabled(scheduleRequired);
-        if(!scheduleRequired) {
-          schedule.setText(null);
-        }
-      }
-    });
+    ScheduleSelectionClickHandler handler = new ScheduleSelectionClickHandler();
+    runManuallyRadio.addClickHandler(handler);
+    return scheduleRadio.addClickHandler(handler);
   }
 
   @Override
@@ -218,10 +213,12 @@ public class ReportTemplateUpdateDialogView extends Composite implements Display
   public void setSchedule(String schedule) {
     this.schedule.setText(schedule);
     if(!schedule.equals("")) {
-      isScheduled.setValue(true);
+      scheduleRadio.setValue(true);
+      runManuallyRadio.setValue(false);
       this.schedule.setEnabled(true);
     } else {
-      isScheduled.setValue(false);
+      scheduleRadio.setValue(false);
+      runManuallyRadio.setValue(true);
       this.schedule.setEnabled(false);
     }
   }
@@ -260,7 +257,21 @@ public class ReportTemplateUpdateDialogView extends Composite implements Display
 
   @Override
   public HasValue<Boolean> isScheduled() {
-    return isScheduled;
+    return scheduleRadio;
+  }
+
+  private class ScheduleSelectionClickHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent event) {
+      boolean scheduleRequired = scheduleRadio.getValue();
+      schedule.setEnabled(scheduleRequired);
+      runManuallyRadio.setValue(!scheduleRequired);
+      scheduleRadio.setValue(scheduleRequired);
+      if(!scheduleRequired) {
+        schedule.setText(null);
+      }
+    }
   }
 
 }

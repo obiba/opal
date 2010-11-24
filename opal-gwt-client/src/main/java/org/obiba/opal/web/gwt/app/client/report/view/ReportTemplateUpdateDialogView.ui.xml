@@ -26,7 +26,8 @@
                   </g:Label>
                 </td>
                 <td>
-                  <g:TextBox addStyleNames="text" name="reportTemplateName" ui:field="reportTemplateName" visibleLength="40"/>
+                  <g:TextBox addStyleNames="text" name="reportTemplateName" ui:field="reportTemplateName"
+                    visibleLength="40"/>
                 </td>
               </tr>
               <tr>
@@ -68,14 +69,21 @@
               </tr>
               <tr>
                 <td>
-                  <g:CheckBox ui:field="isScheduled"/>
-                  <g:Label addStyleNames="key">
+                  <g:RadioButton name="schedule" ui:field="runManuallyRadio" checked="true">
+                    <ui:msg description="Run manually label">Run manually</ui:msg>
+                  </g:RadioButton>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <g:RadioButton name="schedule" ui:field="scheduleRadio" checked="false">
                     <ui:msg description="Schedule label">Schedule</ui:msg>
                     :
-                  </g:Label>
+                  </g:RadioButton>
                 </td>
                 <td>
-                  <g:TextBox addStyleNames="text" enabled="false" name="schedule" ui:field="schedule" visibleLength="40"/>
+                  <g:TextBox addStyleNames="text" name="schedule" ui:field="schedule"
+                    visibleLength="40"/>
                 </td>
               </tr>
               <tr>
