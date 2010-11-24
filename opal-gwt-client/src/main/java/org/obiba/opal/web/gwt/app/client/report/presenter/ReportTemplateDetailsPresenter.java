@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateDeletedEvent;
+import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateListReceivedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Mode;
@@ -62,6 +63,9 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
   private ReportTemplateDto reportTemplate;
 
   public interface Display extends WidgetDisplay {
+
+    void setReportTemplatesAvailable(boolean available);
+
     void setProducedReports(JsArray<FileDto> reports);
 
     HasActionHandler getActionColumn();
@@ -160,7 +164,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
     super.registerHandler(getDisplay().addReportDesignClickHandler(new ReportDesignClickHandler()));
     super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
     super.registerHandler(eventBus.addHandler(ReportTemplateUpdatedEvent.getType(), new ReportTemplateUpdatedHandler()));
-
+    super.registerHandler(eventBus.addHandler(ReportTemplateListReceivedEvent.getType(), new ReportTemplateListReceivedEventHandler()));
   }
 
   private void setCommands() {
@@ -368,4 +372,11 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
   }
 
+  class ReportTemplateListReceivedEventHandler implements ReportTemplateListReceivedEvent.Handler {
+
+    @Override
+    public void onReportTemplateListReceived(ReportTemplateListReceivedEvent event) {
+      getDisplay().setReportTemplatesAvailable(event.getReportTemplates().length() != 0);
+    }
+  }
 }

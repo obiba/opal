@@ -4,9 +4,13 @@
 
   <g:FlowPanel ui:field="reportTemplateDetails" addStyleNames="item-details">
 
+    <g:Label ui:field="noReportTemplatesLabel">
+      <ui:msg description="No report templates">No report templates</ui:msg>
+    </g:Label>
+    
     <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
 
-    <g:HTMLPanel>
+    <g:HTMLPanel ui:field="reportTemplatePanel">
       <table class="item-properties small-indent">
         <tr>
           <td>

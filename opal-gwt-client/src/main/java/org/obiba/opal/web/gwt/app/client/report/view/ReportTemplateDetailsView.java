@@ -50,6 +50,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
@@ -70,10 +71,16 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   private static Translations translations = GWT.create(Translations.class);
 
   @UiField
-  CellTable<FileDto> producedReportsTable;
+  Label noReportTemplatesLabel;
+
+  @UiField
+  HTMLPanel reportTemplatePanel;
 
   @UiField
   FlowPanel producedReports;
+
+  @UiField
+  CellTable<FileDto> producedReportsTable;
 
   @UiField
   FlowPanel reportTemplateDetails;
@@ -163,6 +170,15 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   }
 
   @Override
+  public void setReportTemplatesAvailable(boolean available) {
+    toolbarPanel.setVisible(available);
+    reportTemplatePanel.setVisible(available);
+    producedReports.setVisible(available);
+
+    noReportTemplatesLabel.setVisible(available == false);
+  }
+
+  @Override
   public void setProducedReports(final JsArray<FileDto> files) {
     pager.setVisible(files.length() != 0); // OPAL-901
     renderProducedReports(files);
@@ -189,9 +205,7 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
 
   @Override
   public void setReportTemplateDetails(ReportTemplateDto reportTemplate) {
-    if(reportTemplate == null) {
-      reportTemplateDetails.setVisible(false);
-    } else {
+    if(reportTemplate != null) {
       renderReportTemplateDetails(reportTemplate);
     }
   }
