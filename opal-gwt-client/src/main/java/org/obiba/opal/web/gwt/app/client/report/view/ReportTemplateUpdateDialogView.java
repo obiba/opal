@@ -17,7 +17,6 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresente
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ItemSelectorPresenter;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -169,10 +168,13 @@ public class ReportTemplateUpdateDialogView extends Composite implements Display
   }
 
   @Override
-  public HandlerRegistration addEnableScheduleClickHandler() {
-    ScheduleSelectionClickHandler handler = new ScheduleSelectionClickHandler();
-    runManuallyRadio.addClickHandler(handler);
-    return scheduleRadio.addClickHandler(handler);
+  public HandlerRegistration addEnableScheduleClickHandler(ClickHandler handler) {
+    return schedule.addClickHandler(handler);
+  }
+
+  @Override
+  public HandlerRegistration addDisableScheduleClickHandler(ClickHandler handler) {
+    return runManuallyRadio.addClickHandler(handler);
   }
 
   @Override
@@ -215,11 +217,9 @@ public class ReportTemplateUpdateDialogView extends Composite implements Display
     if(!schedule.equals("")) {
       scheduleRadio.setValue(true);
       runManuallyRadio.setValue(false);
-      this.schedule.setEnabled(true);
     } else {
       scheduleRadio.setValue(false);
       runManuallyRadio.setValue(true);
-      this.schedule.setEnabled(false);
     }
   }
 
@@ -258,20 +258,6 @@ public class ReportTemplateUpdateDialogView extends Composite implements Display
   @Override
   public HasValue<Boolean> isScheduled() {
     return scheduleRadio;
-  }
-
-  private class ScheduleSelectionClickHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent event) {
-      boolean scheduleRequired = scheduleRadio.getValue();
-      schedule.setEnabled(scheduleRequired);
-      runManuallyRadio.setValue(!scheduleRequired);
-      scheduleRadio.setValue(scheduleRequired);
-      if(!scheduleRequired) {
-        schedule.setText(null);
-      }
-    }
   }
 
 }

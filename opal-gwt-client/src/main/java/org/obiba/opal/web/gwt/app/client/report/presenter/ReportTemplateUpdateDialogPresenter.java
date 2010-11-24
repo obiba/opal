@@ -105,7 +105,9 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
 
     List<String> getReportParameters();
 
-    HandlerRegistration addEnableScheduleClickHandler();
+    HandlerRegistration addDisableScheduleClickHandler(ClickHandler handler);
+
+    HandlerRegistration addEnableScheduleClickHandler(ClickHandler handler);
 
     void setDesignFileWidgetDisplay(FileSelectionPresenter.Display display);
 
@@ -217,7 +219,8 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
       }
     }));
 
-    super.registerHandler(getDisplay().addEnableScheduleClickHandler());
+    super.registerHandler(getDisplay().addEnableScheduleClickHandler(new EnableScheduleClickHandler()));
+    super.registerHandler(getDisplay().addDisableScheduleClickHandler(new DisableScheduleClickHandler()));
 
   }
 
@@ -322,6 +325,22 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
       }
     }
 
+  }
+
+  private class EnableScheduleClickHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent event) {
+      getDisplay().isScheduled().setValue(true);
+    }
+  }
+
+  private class DisableScheduleClickHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent event) {
+      getDisplay().getShedule().setText("");
+    }
   }
 
   private class CreateOrUpdateReportTemplateCallBack implements ResponseCodeCallback {
