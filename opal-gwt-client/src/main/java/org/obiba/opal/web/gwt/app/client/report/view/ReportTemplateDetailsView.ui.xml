@@ -4,7 +4,7 @@
 
   <g:FlowPanel ui:field="reportTemplateDetails" addStyleNames="item-details">
 
-    <g:Label ui:field="noReportTemplatesLabel">
+    <g:Label ui:field="noReportTemplatesLabel" addStyleNames="small-top-margin small-indent">
       <ui:msg description="No report templates">No report templates</ui:msg>
     </g:Label>
     
