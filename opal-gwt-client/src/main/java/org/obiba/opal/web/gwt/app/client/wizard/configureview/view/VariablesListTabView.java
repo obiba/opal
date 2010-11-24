@@ -427,6 +427,7 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   public void formEnable(boolean enabled) {
     navigationEnabled(enabled);
     saveChangesButton.setEnabled(enabled);
+    variableName.setEnabled(enabled);
     removeButton.setEnabled(enabled);
     addButton.setEnabled(true); // Regardless of form state the add button is enabled.
     valueType.setEnabled(enabled);

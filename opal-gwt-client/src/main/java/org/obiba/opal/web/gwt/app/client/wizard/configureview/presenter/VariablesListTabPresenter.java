@@ -97,6 +97,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   /** The name of the variable currently displayed. */
   private String displayedVariableName;
 
+  private boolean addVariable;
+
   @Inject
   private CategoriesPresenter categoriesPresenter;
 
@@ -576,7 +578,10 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     private void updateViewDto() {
       updateCategories();
       updateAttributes();
-      updateView(variableListViewDto);
+      if(!addVariable) {
+        deleteVariable(displayedVariableName); // The current variable is deleted for update and delete operations only.
+      }
+      updateVariable();
       displayedVariableName = currentVariableDto.getName(); // Must note this before form is refreshed.
       eventBus.fireEvent(new ViewSaveRequiredEvent(viewDto));
     }
@@ -610,27 +615,21 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       return null;
     }
 
-    private void updateView(VariableListViewDto variableListViewDto) {
-      boolean update = false;
-      JsArray<VariableDto> variables = JsArrays.toSafeArray(variableListViewDto.getVariablesArray());
-
-      for(int i = 0; i < variables.length(); i++) {
-        VariableDto variableDto = variables.get(i);
-        if(currentVariableDto.getName().equals(variableDto.getName())) {
-          variables.set(i, currentVariableDto); // Update variable.
-          update = true;
-          break;
-        }
-      }
-      if(!update) {
-        if(!isEmptyVariable()) {
-          variables.push(currentVariableDto); // Add new variable.
-        }
-      }
-    }
-
     private boolean isEmptyVariable() {
       return currentVariableDto.getName().equals("") && variableListViewDto.getVariablesArray().length() == 0;
+    }
+
+    private void updateVariable() {
+      variableListViewDto.getVariablesArray().push(currentVariableDto);
+    }
+
+    private void deleteVariable(String variableName) {
+      @SuppressWarnings("unchecked")
+      JsArray<VariableDto> result = (JsArray<VariableDto>) JsArray.createArray();
+      for(int i = 0; i < variableListViewDto.getVariablesArray().length(); i++) {
+        if(!variableName.equals(variableListViewDto.getVariablesArray().get(i).getName())) result.push(variableListViewDto.getVariablesArray().get(i));
+      }
+      variableListViewDto.setVariablesArray(result);
     }
 
   }
@@ -650,7 +649,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       } else {
         checkIfNewDerivedVariableNameSameAsExistingVariableName();
       }
-      getDisplay().variableNameEnabled(true);
+      addVariable = true;
     }
 
     private void checkIfNewDerivedVariableNameSameAsExistingVariableName() {
@@ -852,10 +851,10 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     @Override
     public void onViewSaved(ViewSavedEvent event) {
+      addVariable = false;
       getDisplay().saveChangesEnabled(false);
       getDisplay().addButtonEnabled(true);
       getDisplay().navigationEnabled(true);
-      getDisplay().variableNameEnabled(false);
       updateSelectedVariableName();
       if(getVariableList().size() > 0) getDisplay().removeButtonEnabled(true);
     }
