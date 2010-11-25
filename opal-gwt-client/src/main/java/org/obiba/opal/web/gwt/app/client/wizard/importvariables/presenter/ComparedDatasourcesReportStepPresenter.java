@@ -26,16 +26,11 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<ComparedDatasourcesReportStepPresenter.Display> {
-
-  private String sourceDatasourceName;
 
   private String targetDatasourceName;
 
@@ -50,26 +45,6 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
     super(display, eventBus);
   }
 
-  public interface Display extends WidgetDisplay {
-
-    enum ComparisonResult {
-      CREATION, MODIFICATION, CONFLICT
-    }
-
-    HandlerRegistration addIgnoreAllModificationsHandler(ClickHandler ignoreAllModificationsClickHandler);
-
-    void addTableCompareTab(TableCompareDto tableCompareData, ComparisonResult comparisonResult);
-
-    void clearDisplay();
-
-    void setEnabledIgnoreAllModifications(boolean enabled);
-
-    boolean ignoreAllModifications();
-
-    Widget getStepHelp();
-
-  }
-
   @Override
   public Place getPlace() {
     return null;
@@ -77,11 +52,9 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
   @Override
   protected void onBind() {
-    addEventHandlers();
   }
 
   public void compare(String sourceDatasourceName, String targetDatasourceName) {
-    this.sourceDatasourceName = sourceDatasourceName;
     this.targetDatasourceName = targetDatasourceName;
     getDisplay().clearDisplay();
 
@@ -109,8 +82,8 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
   }
 
-  private void addEventHandlers() {
-    registerHandler(getDisplay().addIgnoreAllModificationsHandler(new IgnoreAllModificationsClickHandler()));
+  public boolean hasChangesToApply() {
+    return !conflictsExist || getDisplay().ignoreAllModifications();
   }
 
   @Override
@@ -178,16 +151,30 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
     }
   }
 
-  class IgnoreAllModificationsClickHandler implements ClickHandler {
-
-    public void onClick(ClickEvent event) {
-      // TODO getDisplay().setEnabledSaveButton(!conflictsExist || getDisplay().ignoreAllModifications());
-    }
-  }
-
   public static native String stringify(JavaScriptObject obj)
   /*-{
   return $wnd.JSON.stringify(obj);
   }-*/;
+
+  //
+  // Interfaces
+  //
+  public interface Display extends WidgetDisplay {
+
+    enum ComparisonResult {
+      CREATION, MODIFICATION, CONFLICT
+    }
+
+    void addTableCompareTab(TableCompareDto tableCompareData, ComparisonResult comparisonResult);
+
+    void clearDisplay();
+
+    void setEnabledIgnoreAllModifications(boolean enabled);
+
+    boolean ignoreAllModifications();
+
+    Widget getStepHelp();
+
+  }
 
 }

@@ -22,8 +22,6 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -75,11 +73,6 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   //
   // UploadVariablesStepPresenter.Display Methods
   //
-
-  @Override
-  public HandlerRegistration addIgnoreAllModificationsHandler(ClickHandler handler) {
-    return ignoreAllModifications.addClickHandler(handler);
-  }
 
   @Override
   public void clearDisplay() {
