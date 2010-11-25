@@ -35,6 +35,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -86,6 +87,10 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   public void addTableCompareTab(TableCompareDto tableCompareData, ComparisonResult comparisonResult) {
 
     FlowPanel tableComparePanel = new FlowPanel();
+
+    Label tableName = new Label(tableCompareData.getCompared().getName());
+    tableName.addStyleName("title");
+    tableComparePanel.add(tableName);
 
     HorizontalTabLayout variableChangesPanel = initVariableChangesPanel(tableCompareData, tableComparePanel);
 

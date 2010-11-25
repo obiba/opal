@@ -658,6 +658,10 @@ a.table.modification, a.table.modification:visited, a.table.modification:hover {
 	padding-left:20px;
 }
 
+.tableChangesPanel.vertical-tabs > .content {
+  padding: 10px;
+}
+
 div.variableChanges {
   height:100%;
 }
@@ -685,11 +689,12 @@ div.ignoreAllModifications > span > label {
 }
 
 div.variableChangesSummaryPanel > div {
-  margin:5px;
+  margin-bottom:5px;
+  margin-top:5px;
 }
 
 div.variableChanges {
-  margin:10px;
+  margin-top:10px;
 }
 
 div.gwt-TabLayoutPanel.tableChangesPanel div.gwt-TabLayoutPanelTabs {
