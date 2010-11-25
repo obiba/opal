@@ -304,7 +304,7 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
 
   }
 
-  public class TableCompareError {
+  public static class TableCompareError {
 
     private final String column;
 
