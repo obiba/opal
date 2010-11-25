@@ -18,6 +18,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceCreatedCallback;
@@ -106,7 +107,10 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
   protected void addEventHandlers() {
     super.registerHandler(getDisplay().addDownloadExcelTemplateClickHandler(new DownloadExcelTemplateClickHandler()));
     super.registerHandler(getDisplay().addFileSelectedClickHandler(new FileSelectedHandler()));
+    getDisplay().setFileSelectionValidator(new FileSelectionValidator());
     getDisplay().addImportClickHandler(new ImportHandler());
+    getDisplay().setImportableValidator(new ImportableValidator());
+
   }
 
   @Override
@@ -135,9 +139,44 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
   // Inner Classes / Interfaces
   //
 
+  private final class ImportableValidator implements ValidationHandler {
+    @Override
+    public boolean validate() {
+      if(!comparedDatasourcesReportPresenter.canBeSubmitted()) {
+        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "NotIgnoredConlicts", null));
+        return false;
+      }
+
+      conclusionPresenter.clearResourceRequests();
+      comparedDatasourcesReportPresenter.addUpdateVariablesResourceRequests(conclusionPresenter);
+      if(conclusionPresenter.getResourceRequestCount() == 0) {
+        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "NoVariablesToBeImported", null));
+        return false;
+      }
+
+      return true;
+    }
+  }
+
+  private final class FileSelectionValidator implements ValidationHandler {
+    @Override
+    public boolean validate() {
+      if(getDisplay().getSelectedFile().length() > 0 && (getDisplay().getSelectedFile().endsWith(".xls") || getDisplay().getSelectedFile().endsWith(".xlsx"))) {
+        return true;
+      } else {
+        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "ExcelFileRequired", null));
+        return false;
+      }
+    }
+  }
+
   public interface Display extends WidgetDisplay {
 
     void setFileSelectionDisplay(FileSelectionPresenter.Display display);
+
+    void setFileSelectionValidator(ValidationHandler handler);
+
+    void setImportableValidator(ValidationHandler handler);
 
     void setComparedDatasourcesReportDisplay(ComparedDatasourcesReportStepPresenter.Display display);
 
@@ -225,12 +264,9 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
   class ImportHandler implements ClickHandler {
 
     public void onClick(ClickEvent event) {
-      conclusionPresenter.clearResourceRequests();
-      comparedDatasourcesReportPresenter.addUpdateVariablesResourceRequests(conclusionPresenter);
-      if(conclusionPresenter.getResourceRequestCount() != 0) {
-        conclusionPresenter.sendResourceRequests();
-      }
+      conclusionPresenter.sendResourceRequests();
     }
 
   }
+
 }

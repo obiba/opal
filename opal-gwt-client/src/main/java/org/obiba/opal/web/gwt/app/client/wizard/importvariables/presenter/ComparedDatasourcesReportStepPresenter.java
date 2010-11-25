@@ -74,7 +74,6 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
             modificationsExist = true;
           }
         }
-        // TODO getDisplay().setEnabledSaveButton(!conflictsExist);
         getDisplay().setEnabledIgnoreAllModifications(conflictsExist || modificationsExist);
       }
 
@@ -82,7 +81,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
   }
 
-  public boolean hasChangesToApply() {
+  public boolean canBeSubmitted() {
     return !conflictsExist || getDisplay().ignoreAllModifications();
   }
 

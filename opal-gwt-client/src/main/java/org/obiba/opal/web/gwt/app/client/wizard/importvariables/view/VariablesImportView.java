@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importvariables.view;
 
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
@@ -95,6 +96,10 @@ public class VariablesImportView extends Composite implements VariablesImportPre
 
   private ClickHandler importHandler;
 
+  private ValidationHandler fileSelectionValidator;
+
+  private ValidationHandler importableValidator;
+
   //
   // Constructors
   //
@@ -135,15 +140,19 @@ public class VariablesImportView extends Composite implements VariablesImportPre
       @Override
       public void onClick(ClickEvent evt) {
         if(fileSelectionStep.isVisible()) {
-          fileSelectedHandler.onClick(evt);
-          dialog.setProgress(true);
-          dialog.setNextEnabled(false);
-          dialog.setCancelEnabled(false);
+          if(fileSelectionValidator.validate()) {
+            fileSelectedHandler.onClick(evt);
+            dialog.setProgress(true);
+            dialog.setNextEnabled(false);
+            dialog.setCancelEnabled(false);
+          }
         } else if(compareStep.isVisible()) {
-          importHandler.onClick(evt);
-          stepChain.onNext();
-          dialog.setPreviousEnabled(false);
-          dialog.setCancelEnabled(false);
+          if(importableValidator.validate()) {
+            importHandler.onClick(evt);
+            stepChain.onNext();
+            dialog.setPreviousEnabled(false);
+            dialog.setCancelEnabled(false);
+          }
         } else
           stepChain.onNext();
       }
@@ -152,9 +161,8 @@ public class VariablesImportView extends Composite implements VariablesImportPre
   }
 
   private void showErrors(ClientErrorDto errorDto) {
-    failed.setVisible(true);
-
     if(errorDto != null && errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
+      failed.setVisible(true);
       datasourceParsingErrorTable.setErrors(errorDto);
       datasourceParsingErrorTable.setVisible(true);
     }
@@ -210,6 +218,22 @@ public class VariablesImportView extends Composite implements VariablesImportPre
   public HandlerRegistration addFileSelectedClickHandler(ClickHandler handler) {
     this.fileSelectedHandler = handler;
     return stepChain.getNextHandlerRegistration();
+  }
+
+  @Override
+  public HandlerRegistration addImportClickHandler(ClickHandler handler) {
+    this.importHandler = handler;
+    return stepChain.getNextHandlerRegistration();
+  }
+
+  @Override
+  public void setFileSelectionValidator(ValidationHandler handler) {
+    this.fileSelectionValidator = handler;
+  }
+
+  @Override
+  public void setImportableValidator(ValidationHandler handler) {
+    this.importableValidator = handler;
   }
 
   @Override
@@ -272,12 +296,6 @@ public class VariablesImportView extends Composite implements VariablesImportPre
 
   @UiTemplate("VariablesImportView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, VariablesImportView> {
-  }
-
-  @Override
-  public HandlerRegistration addImportClickHandler(ClickHandler handler) {
-    this.importHandler = handler;
-    return stepChain.getNextHandlerRegistration();
   }
 
 }
