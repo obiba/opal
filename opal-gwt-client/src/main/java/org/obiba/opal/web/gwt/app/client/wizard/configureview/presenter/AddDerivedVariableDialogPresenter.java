@@ -128,7 +128,7 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
     return null;
   }
 
-  private void refreshVariableNameSuggestions(ViewDto viewDto) {
+  void refreshVariableNameSuggestions(ViewDto viewDto) {
     getDisplay().clearVariableSuggestions();
 
     // Add the derived variables to the suggestions.

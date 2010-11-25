@@ -858,6 +858,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       getDisplay().navigationEnabled(true);
       updateSelectedVariableName();
       if(getVariableList().size() > 0) getDisplay().removeButtonEnabled(true);
+      addDerivedVariableDialogPresenter.refreshVariableNameSuggestions(viewDto);
     }
 
   }
