@@ -15,6 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -68,7 +69,13 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
       public void onResource(Response response, JsArray<DatasourceDto> resource) {
-        datasources = resource != null ? resource : (JsArray<DatasourceDto>) JsArray.createArray();
+        datasources = JsArrays.toSafeArray(resource);
+
+        for(int i = 0; i < datasources.length(); i++) {
+          DatasourceDto d = datasources.get(i);
+          d.setTableArray(JsArrays.toSafeArray(d.getTableArray()));
+          d.setViewArray(JsArrays.toSafeArray(d.getViewArray()));
+        }
       }
     }).send();
   }
@@ -80,6 +87,10 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
     } else {
       selectableDatasources = datasources;
     }
+
+    // OPAL-902
+    selectableDatasources = removeDatasourcesWithOnlyViews(selectableDatasources);
+
     getDisplay().setDatasources(selectableDatasources);
     hideShowTables();
   }
@@ -89,7 +100,21 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
     JsArray<DatasourceDto> result = (JsArray<DatasourceDto>) JsArray.createArray();
     for(int i = 0; i < datasources.length(); i++) {
       DatasourceDto d = datasources.get(i);
-      if(d.getTableArray() != null && d.getTableArray().length() > 0) {
+
+      if(d.getTableArray().length() > 0) {
+        result.push(d);
+      }
+    }
+    return result;
+  }
+
+  private JsArray<DatasourceDto> removeDatasourcesWithOnlyViews(JsArray<DatasourceDto> datasources) {
+    @SuppressWarnings("unchecked")
+    JsArray<DatasourceDto> result = (JsArray<DatasourceDto>) JsArray.createArray();
+    for(int i = 0; i < datasources.length(); i++) {
+      DatasourceDto d = datasources.get(i);
+
+      if(d.getTableArray().length() > d.getViewArray().length()) {
         result.push(d);
       }
     }

@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DestinationSelectionStepPresenter;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 
@@ -98,21 +101,6 @@ public class DestinationSelectionStepView extends Composite implements Destinati
     return this.tableListBox.getItemCount() > 0;
   }
 
-  private void displayTablesFor(String datasourceName) {
-    this.tableListBox.clear();
-    for(int i = 0; i < datasources.length(); i++) {
-      DatasourceDto datasource = datasources.get(i);
-      if(datasource.getName().equals(datasourceName)) {
-        JsArrayString tables = datasource.getTableArray();
-        for(int j = 0; j < tables.length(); j++) {
-          this.tableListBox.addItem(tables.get(j), tables.get(j));
-        }
-        break;
-      }
-    }
-
-  }
-
   @Override
   public void hideTables() {
     tableListBoxLabel.getStyle().setVisibility(Visibility.HIDDEN);
@@ -129,5 +117,38 @@ public class DestinationSelectionStepView extends Composite implements Destinati
   public Widget getStepHelp() {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  private void displayTablesFor(String datasourceName) {
+    tableListBox.clear();
+
+    DatasourceDto datasource = getDatasource(datasourceName);
+    if(datasource != null) {
+      List<String> tables = toList(datasource.getTableArray());
+      List<String> views = toList(datasource.getViewArray());
+      tables.removeAll(views);
+
+      for(String tableName : tables) {
+        tableListBox.addItem(tableName, tableName);
+      }
+    }
+  }
+
+  private DatasourceDto getDatasource(String datasourceName) {
+    for(int i = 0; i < datasources.length(); i++) {
+      DatasourceDto datasource = datasources.get(i);
+      if(datasource.getName().equals(datasourceName)) {
+        return datasource;
+      }
+    }
+    return null;
+  }
+
+  private List<String> toList(JsArrayString jsArrayString) {
+    List<String> list = new ArrayList<String>();
+    for(int i = 0; i < jsArrayString.length(); i++) {
+      list.add(jsArrayString.get(i));
+    }
+    return list;
   }
 }
