@@ -367,10 +367,6 @@ margin-left:10px;
      padding: 10px;
 }
 
-.workbench .main a, .workbench .main a:visited, .workbench .main a:hover {
-     color:#000000;
-}
-
 .workbench .information .header {
 	color:#444444;
 	font-weight:bold;
@@ -968,4 +964,70 @@ div.variablesListTabContent .gwt-Label {
 
 .tooltip .footer {
 	background-color: #888888;
+}
+
+/* Vertical tabs */
+
+ul.vertical {
+  float:left;
+  margin-right:-0.083em;
+  position:relative;
+  width:11em;
+}
+
+ul.tabs {
+  list-style-type:none;
+  margin:0;
+  padding:0;
+  z-index:5;
+}
+
+ul.vertical li {
+  margin:-0.083em 0 0;
+}
+
+ul.tabs li {
+  border:0.083em solid #BBBBBB;
+  display:block;
+  margin:-0.083em -0.083em 0 0;
+  padding:0;
+}
+
+ul.tabs li.active {
+  background-color:#FFFFFF;
+}
+
+ul.vertical li.first {
+  margin-top:1em;
+}
+
+ul.vertical li.active {
+  background-color:#FFFFFF;
+  border-right:medium none;
+  margin-left:-0.5em;
+}
+
+ul.tabs li a, ul.tabs li a:visited, ul.tabs li a:hover {
+  background-color:#F0F0F0;
+  color:#535353;
+  display:block;
+  font-weight:700;
+  text-decoration:none;
+  overflow:hidden;
+  padding:0.4em 0.5em 0.2em;
+  white-space:nowrap;
+}
+
+ul.tabs li.active a {
+  background:none repeat scroll 0 0 #FFFFFF;
+  color:#000000;
+}
+
+.vertical-tabs .content {
+  -moz-border-radius:0.4em 0.4em 0.4em 0.4em;
+  background-color:#FFFFFF;
+  border:1px solid #BBBBBB;
+  min-height:100px;
+  position:relative;
+  overflow-x:auto;
 }
