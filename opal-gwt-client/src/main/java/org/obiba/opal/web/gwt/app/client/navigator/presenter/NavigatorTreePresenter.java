@@ -19,12 +19,14 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
@@ -71,6 +73,15 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
         if(!getDisplay().hasDatasource(event.getSelection().getName())) updateTree(event.getSelection().getName());
         else
           getDisplay().selectDatasource(event.getSelection().getName());
+      }
+
+    }));
+
+    super.registerHandler(eventBus.addHandler(DatasourceUpdatedEvent.getType(), new DatasourceUpdatedEvent.Handler() {
+
+      @Override
+      public void onDatasourceUpdated(DatasourceUpdatedEvent event) {
+        updateTree(event.getSelection().getName());
       }
 
     }));
