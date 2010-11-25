@@ -240,7 +240,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
 
   //
   // DataExport Display
-  // 
+  //
 
   @Override
   public String getSelectedDatasource() {
@@ -406,8 +406,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   private void clearTablesStep() {
     tablesStep.setVisible(true);
     dialog.setHelpEnabled(false);
-    // TODO does not work
-    // if(tablesList != null) tablesList.clear();
+    if(tablesList != null) tablesList.clear();
   }
 
   private void clearOptionsStep() {
