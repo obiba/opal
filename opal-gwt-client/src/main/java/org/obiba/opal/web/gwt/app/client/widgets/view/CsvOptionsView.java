@@ -15,6 +15,8 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresente
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -80,6 +82,26 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
   public CsvOptionsView() {
     initWidget(uiBinder.createAndBindUi(this));
     populateField();
+
+    final ValueChangeHandler<Boolean> valueChangeHandler = new ValueChangeHandler<Boolean>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<Boolean> event) {
+        if(event.getValue() == true) {
+          if(event.getSource().equals(charsetCommonList)) {
+            charsetCommonListBox.setEnabled(true);
+            charsetSpecifyTextBox.setEnabled(false);
+            charsetSpecifyTextBox.setText("");
+          } else if(event.getSource().equals(charsetSpecify)) {
+            charsetSpecifyTextBox.setEnabled(true);
+            charsetCommonListBox.setEnabled(false);
+          }
+        }
+      }
+    };
+
+    charsetCommonList.addValueChangeHandler(valueChangeHandler);
+    charsetSpecify.addValueChangeHandler(valueChangeHandler);
   }
 
   //
@@ -151,8 +173,30 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
     quote.setSelectedIndex(0);
   }
 
+  @Override
   public void resetCommonCharset() {
     charsetCommonListBox.setSelectedIndex(0);
+  }
+
+  @Override
+  public void clear() {
+    if(fileSelection != null) {
+      fileSelection.clearFile();
+    }
+
+    row.setText("1");
+    resetFieldSeparator();
+    resetQuote();
+
+    charsetDefault.setValue(true);
+
+    charsetCommonList.setValue(false);
+    charsetCommonListBox.setEnabled(false);
+    charsetCommonListBox.setSelectedIndex(0);
+
+    charsetSpecify.setValue(false);
+    charsetSpecifyTextBox.setEnabled(false);
+    charsetSpecifyTextBox.setText("");
   }
 
   //
@@ -170,7 +214,5 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
 
   @UiTemplate("CsvOptionsView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, CsvOptionsView> {
-
   }
-
 }

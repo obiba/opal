@@ -54,6 +54,14 @@ public class CsvDatasourceFormView extends AbstractCsvOptionsView implements Csv
   }
 
   //
+  // CsvDatasourceFormPresenter.Display Methods
+  //
+
+  public void clearForm() {
+    getCsvOptions().clear();
+  }
+
+  //
   // Inner Classes / Interfaces
   //
 

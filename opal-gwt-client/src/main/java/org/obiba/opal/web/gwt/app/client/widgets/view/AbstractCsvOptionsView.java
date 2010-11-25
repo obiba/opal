@@ -91,6 +91,11 @@ public abstract class AbstractCsvOptionsView extends Composite implements CsvOpt
   }
 
   @Override
+  public void clear() {
+    getCsvOptions().clear();
+  }
+
+  @Override
   public Widget asWidget() {
     return this;
   }

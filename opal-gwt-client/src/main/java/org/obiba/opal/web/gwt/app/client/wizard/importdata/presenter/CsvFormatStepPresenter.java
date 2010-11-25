@@ -134,6 +134,10 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
     }).send();
   }
 
+  public void clear() {
+    getDisplay().clear();
+  }
+
   //
   // Display methods
   //
@@ -169,7 +173,7 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
 
   //
   // Inner classes
-  // 
+  //
 
   public interface Display extends CsvOptionsDisplay, DataImportPresenter.DataImportStepDisplay {
 

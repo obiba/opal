@@ -56,7 +56,7 @@
 		        <tr>
 		          <td>
 		            <g:RadioButton name="charsetGroup" ui:field="charsetCommonList"><ui:msg description="Choose from a list of common charsets label">select from list of common character sets</ui:msg></g:RadioButton>
-		            <g:ListBox ui:field='charsetCommonListBox' visibleItemCount='1'>
+		            <g:ListBox ui:field='charsetCommonListBox' visibleItemCount='1' enabled="false">
 		              <g:item>ISO-8859-1</g:item>
 		              <g:item>ISO-8859-2</g:item>
 		              <g:item>ISO-8859-3</g:item>
@@ -77,7 +77,7 @@
 		        <tr>
 		          <td>
 		            <g:RadioButton name="charsetGroup" ui:field="charsetSpecify"><ui:msg description="Enter a specific charset label">select a specific one</ui:msg></g:RadioButton>
-		            <g:TextBox ui:field="charsetSpecifyTextBox" />             
+		            <g:TextBox ui:field="charsetSpecifyTextBox" enabled="false" />             
 		          </td>
 		        </tr> 
             </table>

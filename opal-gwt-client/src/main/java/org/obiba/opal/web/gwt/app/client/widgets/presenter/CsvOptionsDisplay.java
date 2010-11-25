@@ -44,4 +44,6 @@ public interface CsvOptionsDisplay extends WidgetDisplay {
   void resetQuote();
 
   void resetCommonCharset();
+
+  void clear();
 }

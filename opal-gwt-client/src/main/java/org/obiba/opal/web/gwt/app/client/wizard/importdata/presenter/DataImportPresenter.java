@@ -117,6 +117,7 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
   private void updateFormatStepDisplay() {
     destinationSelectionStepPresenter.setImportFormat(getDisplay().getImportFormat());
     if(getDisplay().getImportFormat().equals(ImportFormat.CSV)) {
+      csvFormatStepPresenter.clear();
       this.formatStepPresenter = csvFormatStepPresenter;
       getDisplay().setFormatStepDisplay(csvFormatStepPresenter.getDisplay());
     } else if(getDisplay().getImportFormat().equals(ImportFormat.XML)) {

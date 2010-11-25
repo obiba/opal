@@ -274,6 +274,7 @@ public class CsvDatasourceFormPresenter extends ValidatableWidgetPresenter<CsvDa
 
     void resetCommonCharset();
 
+    void clearForm();
   }
 
   public boolean validateFormData() {
@@ -282,14 +283,6 @@ public class CsvDatasourceFormPresenter extends ValidatableWidgetPresenter<CsvDa
 
   @Override
   public void clearForm() {
-    csvFileSelectionPresenter.getDisplay().setFile("");
-    getDisplay().getCharsetSpecifyText().setText("");
-    getDisplay().getRowText().setText("1");
-    getDisplay().resetFieldSeparator();
-    getDisplay().resetQuote();
-    getDisplay().isCharsetSpecify().setValue(false);
-    getDisplay().isDefaultCharacterSet().setValue(true);
-    getDisplay().isCharsetCommonList().setValue(false);
-    getDisplay().resetCommonCharset();
+    getDisplay().clearForm();
   }
 }
