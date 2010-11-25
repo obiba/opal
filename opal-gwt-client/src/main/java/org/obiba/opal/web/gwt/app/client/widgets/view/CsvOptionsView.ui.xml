@@ -1,5 +1,6 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
   ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
@@ -23,7 +24,7 @@
               <tr>
 		          <td>
 		            <ui:msg description="From row label">From Row:</ui:msg>
-		            <g:TextBox ui:field="row" />            
+		            <o:NumericTextBox ui:field="row" />            
 		          </td>
 		        </tr>
 		        <tr>
