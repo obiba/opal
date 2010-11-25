@@ -118,6 +118,8 @@ public class VariablesImportView extends Composite implements VariablesImportPre
 
       @Override
       public void onReset() {
+        fileSelection.clearFile();
+        datasources.setSelectedIndex(0);
         hideErrors();
       }
     })//
