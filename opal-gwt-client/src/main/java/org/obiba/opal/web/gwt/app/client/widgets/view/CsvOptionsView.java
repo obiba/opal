@@ -83,23 +83,8 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
     initWidget(uiBinder.createAndBindUi(this));
     populateField();
 
-    final ValueChangeHandler<Boolean> valueChangeHandler = new ValueChangeHandler<Boolean>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<Boolean> event) {
-        if(event.getValue() == true) {
-          if(event.getSource().equals(charsetCommonList)) {
-            charsetCommonListBox.setEnabled(true);
-            charsetSpecifyTextBox.setEnabled(false);
-            charsetSpecifyTextBox.setText("");
-          } else if(event.getSource().equals(charsetSpecify)) {
-            charsetSpecifyTextBox.setEnabled(true);
-            charsetCommonListBox.setEnabled(false);
-          }
-        }
-      }
-    };
-
+    final ValueChangeHandler<Boolean> valueChangeHandler = new CharsetValueChangeHandler();
+    charsetDefault.addValueChangeHandler(valueChangeHandler);
     charsetCommonList.addValueChangeHandler(valueChangeHandler);
     charsetSpecify.addValueChangeHandler(valueChangeHandler);
   }
@@ -214,5 +199,26 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
 
   @UiTemplate("CsvOptionsView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, CsvOptionsView> {
+  }
+
+  class CharsetValueChangeHandler implements ValueChangeHandler<Boolean> {
+
+    @Override
+    public void onValueChange(ValueChangeEvent<Boolean> event) {
+      if(event.getValue() == true) {
+        if(event.getSource().equals(charsetDefault)) {
+          charsetCommonListBox.setEnabled(false);
+          charsetSpecifyTextBox.setEnabled(false);
+          charsetSpecifyTextBox.setText("");
+        } else if(event.getSource().equals(charsetCommonList)) {
+          charsetCommonListBox.setEnabled(true);
+          charsetSpecifyTextBox.setEnabled(false);
+          charsetSpecifyTextBox.setText("");
+        } else if(event.getSource().equals(charsetSpecify)) {
+          charsetSpecifyTextBox.setEnabled(true);
+          charsetCommonListBox.setEnabled(false);
+        }
+      }
+    }
   }
 }
