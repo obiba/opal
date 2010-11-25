@@ -560,7 +560,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
         // Validate current variable and save to variable list.
         if(validate()) {
           scriptWidget.evaluateScript(new ResponseCodeCallback() {
-            
+
             @Override
             public void onResponseCode(Request request, Response response) {
               int statusCode = response.getStatusCode();
@@ -654,9 +654,10 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     }
 
     private void checkIfNewDerivedVariableNameSameAsExistingVariableName() {
+      firstTableInViewParts = viewDto.getFromArray().get(0).split("\\.");
+      setEmptyDerivedVariable();
       for(int i = 0; i < viewDto.getFromArray().length(); i++) {
         String[] tableParts = viewDto.getFromArray().get(i).split("\\.");
-        if(i == 0) firstTableInViewParts = tableParts;
         ResourceRequestBuilderFactory.<VariableDto> newBuilder()
         /**/.forResource("/datasource/" + tableParts[0] + "/table/" + tableParts[1] + "/variable/" + newDerivedVariableName)
         /**/.get()
@@ -668,32 +669,32 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
             setButtonsWhenAddingVariable();
           }
         })
-        /**/.withCallback(Response.SC_NOT_FOUND, newDerivedVariableResponseCodeCallback())
+        /**/.withCallback(Response.SC_NOT_FOUND, doNothingResponseCodeCallback())
         /**/.send();
-
       }
     }
 
-    private ResponseCodeCallback newDerivedVariableResponseCodeCallback() {
-      return new ResponseCodeCallback() {
+    private void setEmptyDerivedVariable() {
+      ResourceRequestBuilderFactory.<TableDto> newBuilder()
+      /**/.forResource("/datasource/" + firstTableInViewParts[0] + "/table/" + firstTableInViewParts[1])
+      /**/.get()
+      /**/.withCallback(new ResourceCallback<TableDto>() {
+        @Override
+        public void onResource(Response response, TableDto firstTableDto) {
+          VariableDto variableDto = createEmptyDerivedVariable(firstTableDto.getEntityType());
+          eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
+          setButtonsWhenAddingVariable();
+        }
+      })
+      /**/.send();
+    }
 
+    private ResponseCodeCallback doNothingResponseCodeCallback() {
+      return new ResponseCodeCallback() {
         @Override
         public void onResponseCode(Request request, Response response) {
-          ResourceRequestBuilderFactory.<TableDto> newBuilder()
-          /**/.forResource("/datasource/" + firstTableInViewParts[0] + "/table/" + firstTableInViewParts[1])
-          /**/.get()
-          /**/.withCallback(new ResourceCallback<TableDto>() {
-            @Override
-            public void onResource(Response response, TableDto firstTableDto) {
-              VariableDto variableDto = createEmptyDerivedVariable(firstTableDto.getEntityType());
-              eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
-              setButtonsWhenAddingVariable();
-            }
-          })
-          /**/.send();
-
+          // Do nothing.
         }
-
       };
     }
 
