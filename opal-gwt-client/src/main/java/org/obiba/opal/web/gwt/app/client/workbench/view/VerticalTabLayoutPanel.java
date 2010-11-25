@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.app.client.workbench.view;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -96,7 +95,6 @@ public class VerticalTabLayoutPanel extends FlowPanel {
   }
 
   public void add(Widget w, HasClickHandlers item) {
-    GWT.log("add(w,item)" + item);
     add((Widget) item);
     add(w);
   }
@@ -123,6 +121,15 @@ public class VerticalTabLayoutPanel extends FlowPanel {
     } else if(active == index) {
       setActive(index);
     }
+  }
+
+  @Override
+  public void clear() {
+    menu.clear();
+    content.clear();
+    items.clear();
+    contents.clear();
+    active = -1;
   }
 
 }

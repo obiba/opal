@@ -972,7 +972,7 @@ ul.vertical {
   float:left;
   margin-right:-0.083em;
   position:relative;
-  width:11em;
+  min-width:8em;
 }
 
 ul.tabs {
@@ -989,7 +989,7 @@ ul.vertical li {
 ul.tabs li {
   border:0.083em solid #BBBBBB;
   display:block;
-  margin:-0.083em -0.083em 0 0;
+  margin:-0.083em -0.07em 0 0;
   padding:0;
 }
 
