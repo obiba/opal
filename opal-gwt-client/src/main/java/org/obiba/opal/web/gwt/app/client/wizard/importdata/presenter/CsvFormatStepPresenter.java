@@ -41,8 +41,6 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
 
   private String defaultCharset;
 
-  private ImportData importData;
-
   @Inject
   private FileSelectionPresenter csvFileSelectionPresenter;
 
