@@ -10,21 +10,18 @@
 package org.obiba.opal.web.gwt.app.client.wizard.importvariables.view;
 
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ImportVariablesStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ConclusionStepPresenter;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
-public class ImportVariablesStepView extends Composite implements ImportVariablesStepPresenter.Display {
+public class ConclusionStepView extends Composite implements ConclusionStepPresenter.Display {
   //
   // Static Variables
   //
@@ -41,14 +38,11 @@ public class ImportVariablesStepView extends Composite implements ImportVariable
   @UiField
   FlowPanel tableListPanel;
 
-  @UiField
-  Button returnButton;
-
   //
   // Constructors
   //
 
-  public ImportVariablesStepView() {
+  public ConclusionStepView() {
     initWidget(uiBinder.createAndBindUi(this));
   }
 
@@ -64,14 +58,6 @@ public class ImportVariablesStepView extends Composite implements ImportVariable
   public void addResourceRequest(Display resourceRequestDisplay) {
     tableListLabel.setVisible(true);
     tableListPanel.add(resourceRequestDisplay.asWidget());
-  }
-
-  public void setReturnButtonEnabled(boolean enabled) {
-    returnButton.setEnabled(enabled);
-  }
-
-  public HandlerRegistration addReturnClickHandler(ClickHandler handler) {
-    return returnButton.addClickHandler(handler);
   }
 
   public Widget asWidget() {
@@ -92,7 +78,7 @@ public class ImportVariablesStepView extends Composite implements ImportVariable
   // Inner Classes / Interfaces
   //
 
-  @UiTemplate("ImportVariablesStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, ImportVariablesStepView> {
+  @UiTemplate("ConclusionStepView.ui.xml")
+  interface ViewUiBinder extends UiBinder<Widget, ConclusionStepView> {
   }
 }

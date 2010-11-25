@@ -31,6 +31,14 @@ public class WizardStepChain {
 
   private WizardStepController current;
 
+  private HandlerRegistration nextHandlerRegistration;
+
+  private HandlerRegistration previousHandlerRegistration;
+
+  private HandlerRegistration cancelHandlerRegistration;
+
+  private HandlerRegistration finishHandlerRegistration;
+
   private WizardStepChain() {
   }
 
@@ -64,6 +72,22 @@ public class WizardStepChain {
     if(help != null) {
       wizard.setHelpTooltip(help);
     }
+  }
+
+  public HandlerRegistration getNextHandlerRegistration() {
+    return nextHandlerRegistration;
+  }
+
+  public HandlerRegistration getPreviousHandlerRegistration() {
+    return previousHandlerRegistration;
+  }
+
+  public HandlerRegistration getFinishHandlerRegistration() {
+    return finishHandlerRegistration;
+  }
+
+  public HandlerRegistration getCancelHandlerRegistration() {
+    return cancelHandlerRegistration;
   }
 
   public static class Builder {
@@ -131,6 +155,7 @@ public class WizardStepChain {
 
     public Builder onNext(ClickHandler handler) {
       registration = chain.wizard.addNextClickHandler(handler);
+      chain.nextHandlerRegistration = registration;
       return this;
     }
 
@@ -148,6 +173,7 @@ public class WizardStepChain {
 
     public Builder onPrevious(ClickHandler handler) {
       registration = chain.wizard.addPreviousClickHandler(handler);
+      chain.previousHandlerRegistration = registration;
       return this;
     }
 
@@ -165,6 +191,7 @@ public class WizardStepChain {
 
     public Builder onFinish(ClickHandler handler) {
       registration = chain.wizard.addFinishClickHandler(handler);
+      chain.finishHandlerRegistration = registration;
       return this;
     }
 
@@ -180,6 +207,7 @@ public class WizardStepChain {
 
     public Builder onCancel(ClickHandler handler) {
       registration = chain.wizard.addCancelClickHandler(handler);
+      chain.cancelHandlerRegistration = registration;
       return this;
     }
 

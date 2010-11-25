@@ -15,7 +15,6 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter.Display.ComparisonResult;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
@@ -31,15 +30,10 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<ComparedDatasourcesReportStepPresenter.Display> {
-
-  @Inject
-  private UploadVariablesStepPresenter uploadVariablesStepPresenter;
-
-  @Inject
-  private ImportVariablesStepPresenter importVariablesStepPresenter;
 
   private String sourceDatasourceName;
 
@@ -62,21 +56,17 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
       CREATION, MODIFICATION, CONFLICT
     }
 
-    HandlerRegistration addSaveClickHandler(ClickHandler handler);
-
-    HandlerRegistration addCancelClickHandler(ClickHandler handler);
-
     HandlerRegistration addIgnoreAllModificationsHandler(ClickHandler ignoreAllModificationsClickHandler);
 
     void addTableCompareTab(TableCompareDto tableCompareData, ComparisonResult comparisonResult);
 
     void clearDisplay();
 
-    void setEnabledSaveButton(boolean enabled);
-
     void setEnabledIgnoreAllModifications(boolean enabled);
 
     boolean ignoreAllModifications();
+
+    Widget getStepHelp();
 
   }
 
@@ -88,11 +78,13 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   @Override
   protected void onBind() {
     addEventHandlers();
-    initComparedDatasourceReport();
   }
 
-  private void initComparedDatasourceReport() {
+  public void compare(String sourceDatasourceName, String targetDatasourceName) {
+    this.sourceDatasourceName = sourceDatasourceName;
+    this.targetDatasourceName = targetDatasourceName;
     getDisplay().clearDisplay();
+
     ResourceRequestBuilderFactory.<DatasourceCompareDto> newBuilder().forResource("/datasource/" + sourceDatasourceName + "/compare/" + targetDatasourceName).get().withCallback(new ResourceCallback<DatasourceCompareDto>() {
 
       @Override
@@ -109,7 +101,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
             modificationsExist = true;
           }
         }
-        getDisplay().setEnabledSaveButton(!conflictsExist);
+        // TODO getDisplay().setEnabledSaveButton(!conflictsExist);
         getDisplay().setEnabledIgnoreAllModifications(conflictsExist || modificationsExist);
       }
 
@@ -118,8 +110,6 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   }
 
   private void addEventHandlers() {
-    registerHandler(getDisplay().addSaveClickHandler(new SaveClickHandler()));
-    registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
     registerHandler(getDisplay().addIgnoreAllModificationsHandler(new IgnoreAllModificationsClickHandler()));
   }
 
@@ -149,16 +139,8 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
     }
   }
 
-  public void setSourceDatasourceName(String sourceDatasourceName) {
-    this.sourceDatasourceName = sourceDatasourceName;
-  }
-
-  public void setTargetDatasourceName(String targetDatasourceName) {
-    this.targetDatasourceName = targetDatasourceName;
-  }
-
   @SuppressWarnings("unchecked")
-  private void addUpdateVariablesResourceRequests() {
+  public void addUpdateVariablesResourceRequests(ConclusionStepPresenter conclusionStepPresenter) {
     for(int tableIndex = 0; tableIndex < comparedTables.length(); tableIndex++) {
       TableCompareDto tableCompareDto = comparedTables.get(tableIndex);
       JsArray<VariableDto> newVariables = (JsArray<VariableDto>) (tableCompareDto.getNewVariablesArray() != null ? tableCompareDto.getNewVariablesArray() : JsArray.createArray());
@@ -171,7 +153,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
       }
 
       if(variablesToStringify.length() > 0) {
-        importVariablesStepPresenter.addResourceRequest(tableCompareDto.getCompared().getName(), "/datasource/" + targetDatasourceName + "/table/" + tableCompareDto.getCompared().getName(), createResourceRequestBuilder(tableCompareDto.getCompared(), !tableCompareDto.hasWithTable(), variablesToStringify));
+        conclusionStepPresenter.addResourceRequest(tableCompareDto.getCompared().getName(), "/datasource/" + targetDatasourceName + "/table/" + tableCompareDto.getCompared().getName(), createResourceRequestBuilder(tableCompareDto.getCompared(), !tableCompareDto.hasWithTable(), variablesToStringify));
       }
     }
   }
@@ -196,30 +178,10 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
     }
   }
 
-  class SaveClickHandler implements ClickHandler {
-
-    public void onClick(ClickEvent event) {
-      importVariablesStepPresenter.clearResourceRequests();
-      addUpdateVariablesResourceRequests();
-      if(importVariablesStepPresenter.getResourceRequestCount() != 0) {
-        importVariablesStepPresenter.setReturnButtonEnabled(false);
-        importVariablesStepPresenter.sendResourceRequests();
-      }
-      eventBus.fireEvent(new WorkbenchChangeEvent(importVariablesStepPresenter));
-    }
-  }
-
-  class CancelClickHandler implements ClickHandler {
-
-    public void onClick(ClickEvent event) {
-      eventBus.fireEvent(new WorkbenchChangeEvent(uploadVariablesStepPresenter));
-    }
-  }
-
   class IgnoreAllModificationsClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent event) {
-      getDisplay().setEnabledSaveButton(!conflictsExist || getDisplay().ignoreAllModifications());
+      // TODO getDisplay().setEnabledSaveButton(!conflictsExist || getDisplay().ignoreAllModifications());
     }
   }
 

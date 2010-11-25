@@ -15,7 +15,6 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
@@ -23,7 +22,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.ViewCreationRequiredEve
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.UploadVariablesStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -51,7 +50,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
   }
 
   @Inject
-  private Provider<UploadVariablesStepPresenter> importVariablesPresenter;
+  private VariablesImportPresenter variablesImportPresenter;
 
   @Inject
   private DataImportPresenter dataImportPresenter;
@@ -91,6 +90,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     tablePresenter.bind();
     variablePresenter.bind();
     dataImportPresenter.bind();
+    variablesImportPresenter.bind();
     createDatasourcePresenter.bind();
 
     getDisplay().setTreeDisplay(navigatorTreePresenter.getDisplay());
@@ -115,7 +115,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
 
       @Override
       public void onClick(ClickEvent arg0) {
-        eventBus.fireEvent(new WorkbenchChangeEvent(importVariablesPresenter.get()));
+        variablesImportPresenter.revealDisplay();
       }
     });
 

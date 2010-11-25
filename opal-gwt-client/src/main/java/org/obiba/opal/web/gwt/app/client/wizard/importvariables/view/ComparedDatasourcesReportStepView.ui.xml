@@ -5,27 +5,16 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
-  <o:WorkbenchLayout>
-    <g:Label><ui:msg description="Import Variables title">Import Variables</ui:msg></g:Label>
-    <g:Label><ui:msg description="Compared Datasources Report summary">Review the modifications before applying them</ui:msg></g:Label>
-    <g:FlowPanel>
-      <g:Button ui:field="cancelButton"><ui:msg description="Cancel button label">Cancel</ui:msg></g:Button>    
-      <g:Button ui:field="saveButton"><ui:msg description="Save button label">Save</ui:msg></g:Button>
-    </g:FlowPanel>
+  <g:FlowPanel>
+    <g:HTMLPanel addStyleNames="ignoreAllModifications">
+      <g:CheckBox ui:field="ignoreAllModifications"><ui:msg description="Ignore all modifications label">Ignore all modifications</ui:msg></g:CheckBox>
+    </g:HTMLPanel>
+    <g:TabLayoutPanel ui:field="tableChangesPanel" barUnit='EM' barHeight='2' addStyleNames="tableChangesPanel"/>
     
-    <g:FlowPanel>
-      <g:HTMLPanel addStyleNames="ignoreAllModifications">
-        <g:CheckBox ui:field="ignoreAllModifications"><ui:msg description="Ignore all modifications label">Ignore all modifications</ui:msg></g:CheckBox>
-      </g:HTMLPanel>
-      <g:TabLayoutPanel ui:field="tableChangesPanel" barUnit='EM' barHeight='6' addStyleNames="tableChangesPanel"/>
-    </g:FlowPanel>
-    
-     <g:FlowPanel>
-        <g:HTMLPanel>
-          <g:Label addStyleNames="title"><ui:msg description="Variables creation modification review label">Variable Creation/Modification Review</ui:msg></g:Label>
-          <p><ui:msg description="Variables creation modification review information"><p>Review the modifications before they are applied to the datasource.</p><p>Affected tables are displayed to the left.  For each of them, a report shows which variables are going to be created and which are going to be modified.</p><p>Modifications to variables can be ignored by ticking checkbox above the report. This will affect all tables.</p></ui:msg></p>
-        </g:HTMLPanel>
-     </g:FlowPanel>      
-  </o:WorkbenchLayout>
-
+    <g:HTMLPanel ui:field="help">
+      <g:Label addStyleNames="title"><ui:msg description="Variables creation modification review label">Variable Creation/Modification Review</ui:msg></g:Label>
+      <p><ui:msg description="Variables creation modification review information"><p>Review the modifications before they are applied to the datasource.</p><p>Affected tables are displayed to the left.  For each of them, a report shows which variables are going to be created and which are going to be modified.</p><p>Modifications to variables can be ignored by ticking checkbox above the report. This will affect all tables.</p></ui:msg></p>
+    </g:HTMLPanel>
+  </g:FlowPanel>      
+  
 </ui:UiBinder>

@@ -31,19 +31,18 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-public class ImportVariablesStepPresenter extends WidgetPresenter<ImportVariablesStepPresenter.Display> {
+public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPresenter.Display> {
   //
   // Instance Variables
   //
 
   @Inject
-  private Provider<UploadVariablesStepPresenter> uploadVariablesStepPresenter;
+  private Provider<VariablesImportPresenter> uploadVariablesStepPresenter;
 
   /**
    * Resource requests.
@@ -60,7 +59,7 @@ public class ImportVariablesStepPresenter extends WidgetPresenter<ImportVariable
   //
 
   @Inject
-  public ImportVariablesStepPresenter(final Display display, final EventBus eventBus) {
+  public ConclusionStepPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
 
     resourceRequests = new LinkedHashSet<ResourceRequestPresenter<? extends JavaScriptObject>>();
@@ -72,15 +71,10 @@ public class ImportVariablesStepPresenter extends WidgetPresenter<ImportVariable
 
   @Override
   protected void onBind() {
-    addEventHandlers();
   }
 
   @Override
   protected void onUnbind() {
-  }
-
-  protected void addEventHandlers() {
-    super.registerHandler(getDisplay().addReturnClickHandler(new ReturnClickHandler()));
   }
 
   @Override
@@ -132,10 +126,6 @@ public class ImportVariablesStepPresenter extends WidgetPresenter<ImportVariable
     }
   }
 
-  public void setReturnButtonEnabled(boolean enabled) {
-    getDisplay().setReturnButtonEnabled(enabled);
-  }
-
   //
   // Inner Classes / Interfaces
   //
@@ -145,10 +135,6 @@ public class ImportVariablesStepPresenter extends WidgetPresenter<ImportVariable
     void clearResourceRequests();
 
     void addResourceRequest(ResourceRequestPresenter.Display resourceRequestDisplay);
-
-    void setReturnButtonEnabled(boolean enabled);
-
-    HandlerRegistration addReturnClickHandler(ClickHandler handler);
   }
 
   class ReturnClickHandler implements ClickHandler {
@@ -164,7 +150,7 @@ public class ImportVariablesStepPresenter extends WidgetPresenter<ImportVariable
       resourceRequestsCompleted++;
 
       if(resourceRequestsCompleted == resourceRequests.size()) {
-        getDisplay().setReturnButtonEnabled(true);
+        // TODO enable finish getDisplay().setReturnButtonEnabled(true);
       }
     }
   }

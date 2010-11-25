@@ -30,11 +30,11 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -56,16 +56,13 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   //
 
   @UiField
-  Button saveButton;
-
-  @UiField
-  Button cancelButton;
-
-  @UiField
   TabLayoutPanel tableChangesPanel;
 
   @UiField
   CheckBox ignoreAllModifications;
+
+  @UiField
+  HTMLPanel help;
 
   //
   // Constructors
@@ -80,16 +77,6 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   //
 
   @Override
-  public HandlerRegistration addSaveClickHandler(ClickHandler handler) {
-    return saveButton.addClickHandler(handler);
-  }
-
-  @Override
-  public HandlerRegistration addCancelClickHandler(ClickHandler handler) {
-    return cancelButton.addClickHandler(handler);
-  }
-
-  @Override
   public HandlerRegistration addIgnoreAllModificationsHandler(ClickHandler handler) {
     return ignoreAllModifications.addClickHandler(handler);
   }
@@ -97,7 +84,6 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   @Override
   public void clearDisplay() {
     tableChangesPanel.clear();
-    saveButton.setEnabled(false);
     ignoreAllModifications.setValue(false);
     ignoreAllModifications.setEnabled(false);
   }
@@ -112,11 +98,6 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     tableComparePanel.add(variableChangesPanel);
     tableChangesPanel.add(tableComparePanel, getTableCompareTabHeader(tableCompareData, comparisonResult));
     tableChangesPanel.setHeight("730px");
-  }
-
-  @Override
-  public void setEnabledSaveButton(boolean enabled) {
-    saveButton.setEnabled(enabled);
   }
 
   @Override
@@ -352,6 +333,11 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
 
   @UiTemplate("ComparedDatasourcesReportStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, ComparedDatasourcesReportStepView> {
+  }
+
+  @Override
+  public Widget getStepHelp() {
+    return help;
   }
 
 }

@@ -166,14 +166,6 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
     void reset();
   }
 
-  public interface DatasourceCreatedCallback {
-
-    public void onSuccess(DatasourceFactoryDto factory, DatasourceDto datasource);
-
-    public void onFailure(DatasourceFactoryDto factory, ClientErrorDto error);
-
-  }
-
   public DatasourceDto getDatasource() {
     return datasourceDto;
   }

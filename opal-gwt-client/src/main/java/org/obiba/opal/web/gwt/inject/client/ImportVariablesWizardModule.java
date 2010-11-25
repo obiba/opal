@@ -10,15 +10,11 @@
 package org.obiba.opal.web.gwt.inject.client;
 
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ImportVariablesStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.SelectDestinationDatasourceStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.UploadVariablesStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ValidationReportStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ConclusionStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.view.ComparedDatasourcesReportStepView;
-import org.obiba.opal.web.gwt.app.client.wizard.importvariables.view.ImportVariablesStepView;
-import org.obiba.opal.web.gwt.app.client.wizard.importvariables.view.SelectDestinationDatasourceStepView;
-import org.obiba.opal.web.gwt.app.client.wizard.importvariables.view.UploadVariablesStepView;
-import org.obiba.opal.web.gwt.app.client.wizard.importvariables.view.ValidationReportStepView;
+import org.obiba.opal.web.gwt.app.client.wizard.importvariables.view.ConclusionStepView;
+import org.obiba.opal.web.gwt.app.client.wizard.importvariables.view.VariablesImportView;
 
 import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.inject.Singleton;
@@ -30,11 +26,9 @@ public class ImportVariablesWizardModule extends AbstractGinModule {
 
   @Override
   protected void configure() {
-    bind(UploadVariablesStepPresenter.Display.class).to(UploadVariablesStepView.class).in(Singleton.class);
-    bind(SelectDestinationDatasourceStepPresenter.Display.class).to(SelectDestinationDatasourceStepView.class).in(Singleton.class);
-    bind(ValidationReportStepPresenter.Display.class).to(ValidationReportStepView.class).in(Singleton.class);
+    bind(VariablesImportPresenter.Display.class).to(VariablesImportView.class).in(Singleton.class);
     bind(ComparedDatasourcesReportStepPresenter.Display.class).to(ComparedDatasourcesReportStepView.class).in(Singleton.class);
-    bind(ImportVariablesStepPresenter.Display.class).to(ImportVariablesStepView.class).in(Singleton.class);
+    bind(ConclusionStepPresenter.Display.class).to(ConclusionStepView.class).in(Singleton.class);
   }
 
 }

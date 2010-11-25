@@ -9,9 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -19,15 +16,16 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
+import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
-import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto;
 import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -40,11 +38,9 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.inject.Inject;
 
-public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariablesStepPresenter.Display> {
+public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPresenter.Display> {
   //
   // Constants
   //
@@ -56,17 +52,20 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
   //
 
   @Inject
-  private SelectDestinationDatasourceStepPresenter destinationDatasourceStepPresenter;
+  private ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter;
 
   @Inject
-  private ValidationReportStepPresenter validationReportStepPresenter;
+  private ConclusionStepPresenter conclusionPresenter;
+
+  @Inject
+  private FileSelectionPresenter fileSelectionPresenter;
 
   //
   // Constructors
   //
 
   @Inject
-  public UploadVariablesStepPresenter(final Display display, final EventBus eventBus) {
+  public VariablesImportPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
   }
 
@@ -76,6 +75,17 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
 
   @Override
   protected void onBind() {
+    comparedDatasourcesReportPresenter.bind();
+    getDisplay().setComparedDatasourcesReportDisplay(comparedDatasourcesReportPresenter.getDisplay());
+
+    fileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
+    fileSelectionPresenter.bind();
+    getDisplay().setFileSelectionDisplay(fileSelectionPresenter.getDisplay());
+
+    conclusionPresenter.bind();
+    getDisplay().setConclusionDisplay(conclusionPresenter.getDisplay());
+
+    initDatasources();
     addEventHandlers();
   }
 
@@ -83,15 +93,25 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
   protected void onUnbind() {
   }
 
+  private void initDatasources() {
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+      @Override
+      public void onResource(Response response, JsArray<DatasourceDto> resource) {
+        JsArray<DatasourceDto> datasources = resource != null ? resource : (JsArray<DatasourceDto>) JsArray.createArray();
+        getDisplay().setDatasources(datasources);
+      }
+    }).send();
+  }
+
   protected void addEventHandlers() {
-    super.registerHandler(getDisplay().addNextClickHandler(new NextClickHandler()));
     super.registerHandler(getDisplay().addDownloadExcelTemplateClickHandler(new DownloadExcelTemplateClickHandler()));
-    super.registerHandler(getDisplay().addUploadCompleteHandler(new UploadCompleteHandler()));
+    super.registerHandler(getDisplay().addFileSelectedClickHandler(new FileSelectedHandler()));
+    getDisplay().addImportClickHandler(new ImportHandler());
   }
 
   @Override
   public void revealDisplay() {
-    getDisplay().clear();
+    getDisplay().showDialog();
   }
 
   @Override
@@ -117,25 +137,32 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
 
   public interface Display extends WidgetDisplay {
 
-    HandlerRegistration addNextClickHandler(ClickHandler handler);
+    void setFileSelectionDisplay(FileSelectionPresenter.Display display);
+
+    void setComparedDatasourcesReportDisplay(ComparedDatasourcesReportStepPresenter.Display display);
 
     HandlerRegistration addDownloadExcelTemplateClickHandler(ClickHandler handler);
 
-    HandlerRegistration addUploadCompleteHandler(FormPanel.SubmitCompleteHandler handler);
+    HandlerRegistration addFileSelectedClickHandler(ClickHandler handler);
 
-    void clear();
+    String getSelectedFile();
 
-    String getVariablesFilename();
+    DatasourceCreatedCallback getDatasourceCreatedCallback();
 
-    void uploadVariablesFile();
+    void hideErrors();
 
-  }
+    void hideDialog();
 
-  class NextClickHandler implements ClickHandler {
+    void showDialog();
 
-    public void onClick(ClickEvent event) {
-      getDisplay().uploadVariablesFile();
-    }
+    String getSelectedDatasource();
+
+    void setDatasources(JsArray<DatasourceDto> datasources);
+
+    void setConclusionDisplay(ConclusionStepPresenter.Display display);
+
+    HandlerRegistration addImportClickHandler(ClickHandler handler);
+
   }
 
   class DownloadExcelTemplateClickHandler implements ClickHandler {
@@ -150,18 +177,20 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
     }
   }
 
-  class UploadCompleteHandler implements FormPanel.SubmitCompleteHandler {
+  class FileSelectedHandler implements ClickHandler {
 
-    public void onSubmitComplete(SubmitCompleteEvent event) {
+    @Override
+    public void onClick(ClickEvent arg0) {
+      getDisplay().hideErrors();
 
-      String tmpFilePath = event.getResults();
+      final DatasourceFactoryDto factory = createDatasourceFactoryDto(getDisplay().getSelectedFile());
 
       ResourceCallback<DatasourceDto> callback = new ResourceCallback<DatasourceDto>() {
 
         public void onResource(Response response, DatasourceDto resource) {
           if(response.getStatusCode() == 201) {
-            destinationDatasourceStepPresenter.setSourceDatasourceName(((DatasourceDto) resource).getName());
-            eventBus.fireEvent(new WorkbenchChangeEvent(destinationDatasourceStepPresenter));
+            comparedDatasourcesReportPresenter.compare(((DatasourceDto) resource).getName(), getDisplay().getSelectedDatasource());
+            getDisplay().getDatasourceCreatedCallback().onSuccess(factory, resource);
           }
         }
       };
@@ -171,17 +200,14 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
         public void onResponseCode(Request request, Response response) {
           final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
 
-          if(errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
-            validationReportStepPresenter.getDisplay().setErrors(extractDatasourceParsingErrors(errorDto));
-            eventBus.fireEvent(new WorkbenchChangeEvent(validationReportStepPresenter));
-          } else {
+          if(errorDto.getExtension(ClientErrorDtoExtensions.errors) == null) {
             eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "fileReadError", null));
           }
+          getDisplay().getDatasourceCreatedCallback().onFailure(factory, errorDto);
         }
       };
 
-      DatasourceFactoryDto dto = createDatasourceFactoryDto(tmpFilePath);
-      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasources").post().withResourceBody(DatasourceFactoryDto.stringify(dto)).withCallback(callback).withCallback(400, errorCallback).withCallback(500, errorCallback).send();
+      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasources").post().withResourceBody(DatasourceFactoryDto.stringify(factory)).withCallback(callback).withCallback(400, errorCallback).withCallback(500, errorCallback).send();
     }
 
     private DatasourceFactoryDto createDatasourceFactoryDto(String tmpFilePath) {
@@ -194,19 +220,17 @@ public class UploadVariablesStepPresenter extends WidgetPresenter<UploadVariable
 
       return dto;
     }
+  }
 
-    @SuppressWarnings("unchecked")
-    private List<DatasourceParsingErrorDto> extractDatasourceParsingErrors(ClientErrorDto dto) {
-      List<DatasourceParsingErrorDto> datasourceParsingErrors = new ArrayList<DatasourceParsingErrorDto>();
+  class ImportHandler implements ClickHandler {
 
-      JsArray<DatasourceParsingErrorDto> errors = (JsArray<DatasourceParsingErrorDto>) dto.getExtension(ClientErrorDtoExtensions.errors);
-      if(errors != null) {
-        for(int i = 0; i < errors.length(); i++) {
-          datasourceParsingErrors.add(errors.get(i));
-        }
+    public void onClick(ClickEvent event) {
+      conclusionPresenter.clearResourceRequests();
+      comparedDatasourcesReportPresenter.addUpdateVariablesResourceRequests(conclusionPresenter);
+      if(conclusionPresenter.getResourceRequestCount() != 0) {
+        conclusionPresenter.sendResourceRequests();
       }
-
-      return datasourceParsingErrors;
     }
+
   }
 }
