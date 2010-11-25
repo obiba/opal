@@ -23,9 +23,9 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  *
  */
-public class VerticalTabLayoutPanel extends FlowPanel {
+public class AbstractTabLayout extends FlowPanel {
 
-  private UList menu;
+  protected UList menu;
 
   private SimplePanel content;
 
@@ -35,16 +35,20 @@ public class VerticalTabLayoutPanel extends FlowPanel {
 
   private int active = 0;
 
-  public VerticalTabLayoutPanel() {
+  protected AbstractTabLayout() {
     super();
-    addStyleName("vertical-tabs");
-    super.add(menu = new UList());
-    menu.addStyleName("vertical tabs");
+    menu = new UList();
+    super.add(getMenu());
+    menu.addStyleName("tabs");
     super.add(content = new SimplePanel());
     content.addStyleName("content");
 
     items = new ArrayList<ListItem>();
     contents = new ArrayList<Widget>();
+  }
+
+  protected Widget getMenu() {
+    return menu;
   }
 
   @Override

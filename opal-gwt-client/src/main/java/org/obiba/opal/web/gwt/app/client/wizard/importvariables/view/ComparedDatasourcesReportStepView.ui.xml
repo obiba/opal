@@ -9,7 +9,7 @@
     <g:HTMLPanel addStyleNames="ignoreAllModifications">
       <g:CheckBox ui:field="ignoreAllModifications"><ui:msg description="Ignore all modifications label">Ignore all modifications</ui:msg></g:CheckBox>
     </g:HTMLPanel>
-    <g:TabLayoutPanel ui:field="tableChangesPanel" barUnit='EM' barHeight='2' addStyleNames="tableChangesPanel"/>
+    <o:VerticalTabLayout ui:field="tableChangesPanel" addStyleNames="tableChangesPanel"/>
     
     <g:HTMLPanel ui:field="help">
       <g:Label addStyleNames="title"><ui:msg description="Variables creation modification review label">Variable Creation/Modification Review</ui:msg></g:Label>

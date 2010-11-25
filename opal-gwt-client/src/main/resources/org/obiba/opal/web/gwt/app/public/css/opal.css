@@ -632,22 +632,30 @@ table.folder-details td:first-child span:hover {
 
 /* Import variables */ 
 
-div.tableComparison-conflict {
-	background:transparent url(image/20/error.png) no-repeat scroll left center;
-	height:18px;
-	padding-left:25px;
+.tableChangesPanel .tabs li {
+	padding-left:10px;
 }
 
-div.tableComparison-creation {
-	background:transparent url(image/20/list-add.png) no-repeat scroll left center;
-	height:18px;
-	padding-left:25px;
+.tableChangesPanel .tabs.horizontal li {
+	padding-left:0;
 }
 
-div.tableComparison-modification {
-	background:transparent url(image/20/edit.png) no-repeat scroll left center;
+a.table.conflict, a.table.conflict:visited, a.table.conflict:hover {
+	background:transparent url(image/16/error.png) no-repeat scroll left center;
 	height:18px;
-	padding-left:25px;
+	padding-left:20px;
+}
+
+a.table.creation, a.table.creation:visited, a.table.creation:hover {
+	background:transparent url(image/16/list-add.png) no-repeat scroll left center;
+	height:18px;
+	padding-left:20px;
+}
+
+a.table.modification, a.table.modification:visited, a.table.modification:hover {
+	background:transparent url(image/16/edit.png) no-repeat scroll left center;
+	height:18px;
+	padding-left:20px;
 }
 
 div.variableChanges {
@@ -669,22 +677,19 @@ div.variableChangesPager tr > td {
 }
 
 div.ignoreAllModifications {
-  padding:10px 10px 2px;
+  padding:0px 10px 10px;
 }
 
 div.ignoreAllModifications > span > label {
   padding-left:10px;
-  font-weight:bold;
 }
 
 div.variableChangesSummaryPanel > div {
-  font-weight:bold;
   margin:5px;
 }
 
 div.variableChanges {
   margin:10px;
-  height:550px;
 }
 
 div.gwt-TabLayoutPanel.tableChangesPanel div.gwt-TabLayoutPanelTabs {
@@ -966,7 +971,7 @@ div.variablesListTabContent .gwt-Label {
 	background-color: #888888;
 }
 
-/* Vertical tabs */
+/* Vertical/Horizontal tabs */
 
 ul.vertical {
   float:left;
@@ -987,14 +992,32 @@ ul.vertical li {
 }
 
 ul.tabs li {
+  background-color:#F0F0F0;
   border:0.083em solid #BBBBBB;
   display:block;
   margin:-0.083em -0.07em 0 0;
   padding:0;
 }
 
+ul.tabs.horizontal li {
+  margin-left: 0.8em;
+  float: left;
+  border-bottom:none;
+  padding-bottom:0.3em;
+  padding-left:0.4em;
+  padding-right:0.4em;
+}
+
+ul.tabs li a {
+  color:#535353;
+}
+
 ul.tabs li.active {
   background-color:#FFFFFF;
+}
+
+ul.tabs li.active a {
+  color:#000000;
 }
 
 ul.vertical li.first {
@@ -1008,8 +1031,6 @@ ul.vertical li.active {
 }
 
 ul.tabs li a, ul.tabs li a:visited, ul.tabs li a:hover {
-  background-color:#F0F0F0;
-  color:#535353;
   display:block;
   font-weight:700;
   text-decoration:none;
@@ -1018,16 +1039,18 @@ ul.tabs li a, ul.tabs li a:visited, ul.tabs li a:hover {
   white-space:nowrap;
 }
 
-ul.tabs li.active a {
-  background:none repeat scroll 0 0 #FFFFFF;
-  color:#000000;
-}
-
-.vertical-tabs .content {
+.vertical-tabs > .content, .horizontal-tabs > .content {
   -moz-border-radius:0.4em 0.4em 0.4em 0.4em;
   background-color:#FFFFFF;
   border:1px solid #BBBBBB;
-  min-height:100px;
   position:relative;
   overflow-x:auto;
+}
+
+.vertical-tabs > .content {
+  min-height:100px;
+}
+
+.horizontal-tabs > .content {
+  clear: left;
 }

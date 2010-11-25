@@ -12,6 +12,8 @@ package org.obiba.opal.web.gwt.app.client.wizard.importvariables.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
+import org.obiba.opal.web.gwt.app.client.workbench.view.VerticalTabLayout;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.ConflictDto;
 import org.obiba.opal.web.model.client.magma.TableCompareDto;
@@ -21,20 +23,19 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
@@ -54,7 +55,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   //
 
   @UiField
-  TabLayoutPanel tableChangesPanel;
+  VerticalTabLayout tableChangesPanel;
 
   @UiField
   CheckBox ignoreAllModifications;
@@ -86,11 +87,11 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
 
     FlowPanel tableComparePanel = new FlowPanel();
 
-    TabLayoutPanel variableChangesPanel = initVariableChangesPanel(tableCompareData, tableComparePanel);
+    HorizontalTabLayout variableChangesPanel = initVariableChangesPanel(tableCompareData, tableComparePanel);
 
     tableComparePanel.add(variableChangesPanel);
     tableChangesPanel.add(tableComparePanel, getTableCompareTabHeader(tableCompareData, comparisonResult));
-    tableChangesPanel.setHeight("730px");
+    // tableChangesPanel.setHeight("730px");
   }
 
   @Override
@@ -103,24 +104,22 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     ignoreAllModifications.setEnabled(enabled);
   }
 
-  private FlowPanel getTableCompareTabHeader(TableCompareDto tableCompareData, ComparisonResult comparisonResult) {
-    FlowPanel tabHeader = new FlowPanel();
+  private Anchor getTableCompareTabHeader(TableCompareDto tableCompareData, ComparisonResult comparisonResult) {
+    Anchor tabHeader = new Anchor(tableCompareData.getCompared().getName());
     if(comparisonResult == ComparisonResult.CONFLICT) {
-      tabHeader.addStyleName("tableComparison-conflict");
+      tabHeader.addStyleName("table conflict");
     } else if(comparisonResult == ComparisonResult.CREATION) {
-      tabHeader.addStyleName("tableComparison-creation");
+      tabHeader.addStyleName("table creation");
     } else {
-      tabHeader.addStyleName("tableComparison-modification");
+      tabHeader.addStyleName("table modification");
     }
-
-    tabHeader.add(new HTML(tableCompareData.getCompared().getName()));
     return tabHeader;
   }
 
   @SuppressWarnings("unchecked")
-  private TabLayoutPanel initVariableChangesPanel(TableCompareDto tableCompareData, FlowPanel tableComparePanel) {
-    TabLayoutPanel variableChangesPanel = new TabLayoutPanel(3, Unit.EM);
-    variableChangesPanel.setStyleName("variableChanges");
+  private HorizontalTabLayout initVariableChangesPanel(TableCompareDto tableCompareData, FlowPanel tableComparePanel) {
+    HorizontalTabLayout variableChangesPanel = new HorizontalTabLayout();
+    variableChangesPanel.addStyleName("variableChanges");
 
     JsArray<VariableDto> newVariables = getNullAsEmptyArray(tableCompareData.getNewVariablesArray());
     JsArray<VariableDto> modifiedVariables = getNullAsEmptyArray(tableCompareData.getExistingVariablesArray());
@@ -148,7 +147,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
 
   private void addVariableChangesSummary(FlowPanel tableComparePanel, JsArray<VariableDto> newVariables, JsArray<VariableDto> modifiedVariables, JsArray<ConflictDto> conflicts) {
     FlowPanel variableChangesSummaryPanel = new FlowPanel();
-    variableChangesSummaryPanel.setStyleName("variableChangesSummaryPanel");
+    variableChangesSummaryPanel.addStyleName("variableChangesSummaryPanel");
     int conflictsCount[] = getConflictsCounts(conflicts);
     variableChangesSummaryPanel.add(new HTML(getNewVariablesCountLabel(newVariables, conflictsCount)));
     variableChangesSummaryPanel.add(new HTML(getModifiedVariablesCountLabel(modifiedVariables, conflictsCount)));
@@ -177,20 +176,20 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     return conflictsCount;
   }
 
-  private void addConflictsTab(JsArray<ConflictDto> conflicts, TabLayoutPanel variableChangesPanel) {
+  private void addConflictsTab(JsArray<ConflictDto> conflicts, HorizontalTabLayout variableChangesPanel) {
     CellTable<ConflictDto> variableConflictsDetails = setupColumnsForConflicts();
     SimplePager<ConflictDto> variableConflictsPager = prepareVariableChangesTab(variableChangesPanel, translations.conflictedVariablesLabel(), variableConflictsDetails);
     populateVariableChangesTable(conflicts, variableConflictsDetails, variableConflictsPager);
   }
 
-  private void addVariablesTab(JsArray<VariableDto> variables, TabLayoutPanel variableChangesPanel, String tabTitle) {
+  private void addVariablesTab(JsArray<VariableDto> variables, HorizontalTabLayout variableChangesPanel, String tabTitle) {
     CellTable<VariableDto> variablesDetails = setupColumnsForVariables();
     SimplePager<VariableDto> variableDetailsPager = prepareVariableChangesTab(variableChangesPanel, tabTitle, variablesDetails);
     populateVariableChangesTable(variables, variablesDetails, variableDetailsPager);
   }
 
-  private <T extends JavaScriptObject> SimplePager<T> prepareVariableChangesTab(TabLayoutPanel variableChangesTabPanel, String tabTitle, CellTable<T> variableChangesTable) {
-    variableChangesTable.setStyleName("variableChangesDetails");
+  private <T extends JavaScriptObject> SimplePager<T> prepareVariableChangesTab(HorizontalTabLayout variableChangesTabPanel, String tabTitle, CellTable<T> variableChangesTable) {
+    variableChangesTable.addStyleName("variableChangesDetails");
     ScrollPanel variableChangesDetails = new ScrollPanel();
     VerticalPanel variableChangesDetailsVert = new VerticalPanel();
     variableChangesDetailsVert.setWidth("100%");
@@ -198,7 +197,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     variableChangesTable.setPager(pager);
     variableChangesDetailsVert.add(initVariableChangesPager(variableChangesTable, pager));
     variableChangesDetailsVert.add(variableChangesTable);
-    variableChangesDetailsVert.setStyleName("variableChangesDetailsVert");
+    variableChangesDetailsVert.addStyleName("variableChangesDetailsVert");
     variableChangesDetails.add(variableChangesDetailsVert);
     variableChangesTabPanel.add(variableChangesDetails, tabTitle);
     return pager;
@@ -207,7 +206,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   FlowPanel initVariableChangesPager(CellTable<? extends JavaScriptObject> table, SimplePager<? extends JavaScriptObject> pager) {
     table.setPageSize(18);
     FlowPanel pagerPanel = new FlowPanel();
-    pagerPanel.setStyleName("variableChangesPager");
+    pagerPanel.addStyleName("variableChangesPager");
     pagerPanel.add(pager);
     return pagerPanel;
   }
