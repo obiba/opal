@@ -5,7 +5,7 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
-  <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="18em" width="35em">
+  <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="30em" width="40em">
     <g:caption>
       <ui:msg description="Data export title">Export Data</ui:msg>
     </g:caption>
