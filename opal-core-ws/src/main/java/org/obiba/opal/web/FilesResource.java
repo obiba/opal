@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -17,10 +18,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -270,47 +267,29 @@ public class FilesResource {
   }
 
   private void writeUploadedFileToFileSystem(FileItem uploadedFile, FileObject fileToWriteTo) {
-
     OutputStream localFileStream = null;
     InputStream uploadedFileStream = null;
-    ReadableByteChannel inputChannel = null;
-    WritableByteChannel outputChannel = null;
-
     try {
 
-      inputChannel = Channels.newChannel(uploadedFileStream = uploadedFile.getInputStream());
-      outputChannel = Channels.newChannel(localFileStream = fileToWriteTo.getContent().getOutputStream());
+      // OPAL-919: We need to wrap the OutputStream returned by commons-vfs into another OutputStream
+      // to force a call to flush() on every call to write() in order to prevent the system from running out of memory
+      // when copying large files.
+      localFileStream = new BufferedOutputStream(fileToWriteTo.getContent().getOutputStream()) {
+        public synchronized void write(byte[] b, int off, int len) throws IOException {
+          flush();
+          super.write(b, off, len);
+        };
 
-      channelCopy(inputChannel, outputChannel);
-
+      };
+      uploadedFileStream = uploadedFile.getInputStream();
+      StreamUtil.copy(uploadedFileStream, localFileStream);
     } catch(IOException couldNotWriteUploadedFile) {
       throw new RuntimeException("Could not write uploaded file to Opal file system", couldNotWriteUploadedFile);
     } finally {
       StreamUtil.silentSafeClose(localFileStream);
       StreamUtil.silentSafeClose(uploadedFileStream);
+    }
 
-      StreamUtil.silentSafeClose(inputChannel);
-      StreamUtil.silentSafeClose(outputChannel);
-    }
-  }
-
-  public static void channelCopy(final ReadableByteChannel src, final WritableByteChannel dest) throws IOException {
-    final ByteBuffer buffer = ByteBuffer.allocateDirect(16 * 1024);
-    while(src.read(buffer) != -1) {
-      // prepare the buffer to be drained
-      buffer.flip();
-      // write to the channel, may block
-      dest.write(buffer);
-      // If partial transfer, shift remainder down
-      // If buffer is empty, same as doing clear()
-      buffer.compact();
-    }
-    // EOF will leave buffer in fill state
-    buffer.flip();
-    // make sure the buffer is fully drained.
-    while(buffer.hasRemaining()) {
-      dest.write(buffer);
-    }
   }
 
   @DELETE
