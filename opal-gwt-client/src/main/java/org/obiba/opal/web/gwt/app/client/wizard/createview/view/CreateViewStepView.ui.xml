@@ -66,11 +66,8 @@
 	        </table>
 	      </g:HTMLPanel>
       </o:WizardStep>
-      <o:WizardStep ui:field="variablesStep">
-        
-      </o:WizardStep>
-      <o:WizardStep ui:field="entitiesStep">
-        
+      
+      <o:WizardStep ui:field="conclusionStep">
       </o:WizardStep>
       
        <g:HTMLPanel ui:field="selectTypeHelp">

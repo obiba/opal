@@ -32,8 +32,8 @@ import org.obiba.opal.web.gwt.app.client.validator.MinimumSizeCollectionValidato
 import org.obiba.opal.web.gwt.app.client.validator.RequiredOptionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter.DatasourcesRefreshedCallback;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter.DatasourcesRefreshedCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -214,6 +214,10 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     void showDialog();
 
     void hideDialog();
+
+    void renderFailedConclusion(String msg);
+
+    void renderCompletedConclusion();
   }
 
   class ViewCreationRequiredHandler implements ViewCreationRequiredEvent.Handler {
@@ -244,6 +248,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
         }
       }
       eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, msg, null));
+      getDisplay().renderFailedConclusion(msg);
     }
   }
 
@@ -251,7 +256,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     @Override
     public void onResponseCode(Request request, Response response) {
       eventBus.fireEvent(new DatasourceUpdatedEvent(datasourceSelectorPresenter.getSelectionDto()));
-      getDisplay().hideDialog();
+      getDisplay().renderCompletedConclusion();
     }
   }
 

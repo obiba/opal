@@ -20,6 +20,7 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -57,10 +58,7 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   WizardStep tablesStep;
 
   @UiField
-  WizardStep variablesStep;
-
-  @UiField
-  WizardStep entitiesStep;
+  WizardStep conclusionStep;
 
   @UiField
   HTMLPanel selectTypeHelp;
@@ -88,6 +86,8 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   private TableListPresenter.Display tableSelector;
 
   private WizardStepChain stepChain;
+
+  private ClickHandler createHandler;
 
   //
   // Constructors
@@ -124,7 +124,6 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
 
     .append(tablesStep, tablesHelp)//
     .title(translations.editViewTablesStep())//
-    .canFinish()//
     .onReset(new ResetHandler() {
 
       @Override
@@ -133,13 +132,28 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
       }
     })//
 
-    .append(variablesStep)//
-    .title(translations.editViewVariablesStep())//
-    .canFinish()//
+    .append(conclusionStep)//
+    .onReset(new ResetHandler() {
 
-    .append(entitiesStep)//
-    .title(translations.editViewEntitiesStep())//
-    .onNext().onPrevious().build();
+      @Override
+      public void onReset() {
+        conclusionStep.setStepTitle("View is being created ..."); // TODO
+      }
+    })
+
+    .onNext(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent evt) {
+        if(tablesStep.isVisible()) {
+          dialog.setFinishEnabled(false);
+          dialog.setCancelEnabled(false);
+          createHandler.onClick(evt);
+        }
+        stepChain.onNext();
+      }
+    })//
+    .onPrevious().onFinish().build();
   }
 
   //
@@ -190,7 +204,8 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   }
 
   public HandlerRegistration addCreateClickHandler(final ClickHandler handler) {
-    return dialog.addFinishClickHandler(handler);
+    this.createHandler = handler;
+    return stepChain.getNextHandlerRegistration();
   }
 
   public HasValue<Boolean> getApplyGlobalVariableFilterOption() {
@@ -229,6 +244,18 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
 
   @UiTemplate("CreateViewStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, CreateViewStepView> {
+  }
+
+  @Override
+  public void renderCompletedConclusion() {
+    dialog.setFinishEnabled(true);
+    conclusionStep.setStepTitle("View successfully created.");
+  }
+
+  @Override
+  public void renderFailedConclusion(String msg) {
+    dialog.setCancelEnabled(true);
+    conclusionStep.setStepTitle("View creation failed.");
   }
 
 }
