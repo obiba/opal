@@ -9,12 +9,16 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter.Display.ComparisonResult;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
@@ -34,7 +38,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
   private String targetDatasourceName;
 
-  private JsArray<TableCompareDto> comparedTables;
+  private TableCompareDto[] comparedTables;
 
   private boolean conflictsExist;
 
@@ -62,10 +66,12 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
       @Override
       public void onResource(Response response, DatasourceCompareDto resource) {
-        comparedTables = resource.getTableComparisonsArray();
+        comparedTables = JsArrays.toArray(resource.getTableComparisonsArray());
+
+        sortComparedTables();
+
         conflictsExist = false;
-        for(int i = 0; i < comparedTables.length(); i++) {
-          TableCompareDto tableComparison = comparedTables.get(i);
+        for(TableCompareDto tableComparison : comparedTables) {
           ComparisonResult comparisonResult = getTableComparisonResult(tableComparison);
           getDisplay().addTableCompareTab(tableComparison, comparisonResult);
           if(comparisonResult == ComparisonResult.CONFLICT) {
@@ -75,6 +81,15 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
           }
         }
         getDisplay().setEnabledIgnoreAllModifications(conflictsExist || modificationsExist);
+      }
+
+      private void sortComparedTables() {
+        Arrays.sort(comparedTables, new Comparator<TableCompareDto>() {
+          @Override
+          public int compare(TableCompareDto table1, TableCompareDto table2) {
+            return table1.getCompared().getName().compareTo(table2.getCompared().getName());
+          }
+        });
       }
 
     }).send();
@@ -113,8 +128,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
   @SuppressWarnings("unchecked")
   public void addUpdateVariablesResourceRequests(ConclusionStepPresenter conclusionStepPresenter) {
-    for(int tableIndex = 0; tableIndex < comparedTables.length(); tableIndex++) {
-      TableCompareDto tableCompareDto = comparedTables.get(tableIndex);
+    for(TableCompareDto tableCompareDto : comparedTables) {
       JsArray<VariableDto> newVariables = (JsArray<VariableDto>) (tableCompareDto.getNewVariablesArray() != null ? tableCompareDto.getNewVariablesArray() : JsArray.createArray());
       JsArray<VariableDto> existingVariables = (JsArray<VariableDto>) (tableCompareDto.getExistingVariablesArray() != null ? tableCompareDto.getExistingVariablesArray() : JsArray.createArray());
 
