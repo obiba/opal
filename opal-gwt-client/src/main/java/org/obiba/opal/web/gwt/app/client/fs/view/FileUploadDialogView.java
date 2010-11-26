@@ -21,11 +21,11 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 
 public class FileUploadDialogView extends Composite implements Display {
 
@@ -109,6 +109,7 @@ public class FileUploadDialogView extends Composite implements Display {
 
   @Override
   public void submit(String url) {
+    dialog.setVisible(false);
     this.form.setAction(url);
     this.form.submit();
   }
