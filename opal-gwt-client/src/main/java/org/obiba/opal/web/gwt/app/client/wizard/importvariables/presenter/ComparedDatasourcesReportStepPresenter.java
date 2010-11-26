@@ -139,6 +139,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
       }
 
       if(variablesToStringify.length() > 0) {
+        conclusionStepPresenter.setTargetDatasourceName(targetDatasourceName);
         conclusionStepPresenter.addResourceRequest(tableCompareDto.getCompared().getName(), "/datasource/" + targetDatasourceName + "/table/" + tableCompareDto.getCompared().getName(), createResourceRequestBuilder(tableCompareDto.getCompared(), !tableCompareDto.hasWithTable(), variablesToStringify));
       }
     }

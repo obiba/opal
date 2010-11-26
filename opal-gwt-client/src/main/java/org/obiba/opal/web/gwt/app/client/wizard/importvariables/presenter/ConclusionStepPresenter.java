@@ -19,6 +19,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter.ResourceClickHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.view.ResourceRequestView;
@@ -26,6 +27,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.JavaScriptObject;
@@ -53,6 +55,8 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
    * Number of resource requests completed (successfully or with an error).
    */
   private int resourceRequestsCompleted;
+
+  private String targetDatasourceName;
 
   //
   // Constructors
@@ -126,6 +130,10 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
     }
   }
 
+  public void setTargetDatasourceName(String targetDatasourceName) {
+    this.targetDatasourceName = targetDatasourceName;
+  }
+
   //
   // Inner Classes / Interfaces
   //
@@ -151,7 +159,23 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
 
       if(resourceRequestsCompleted == resourceRequests.size()) {
         // TODO enable finish getDisplay().setReturnButtonEnabled(true);
+        ;
+
+        // OPAL-927: Refresh target datasource.
+        refreshTargetDatasource();
       }
+    }
+
+    private void refreshTargetDatasource() {
+      final ResourceCallback<DatasourceDto> resourceCallback = new ResourceCallback<DatasourceDto>() {
+
+        @Override
+        public void onResource(Response response, DatasourceDto resource) {
+          eventBus.fireEvent(new DatasourceUpdatedEvent(resource));
+        }
+      };
+
+      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().get().forResource("/datasource/" + targetDatasourceName).accept("application/x-protobuf+json").withCallback(resourceCallback).send();
     }
   }
 
