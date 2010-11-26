@@ -148,6 +148,7 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
         if(tablesStep.isVisible()) {
           dialog.setFinishEnabled(false);
           dialog.setCancelEnabled(false);
+          dialog.setPreviousEnabled(false);
           createHandler.onClick(evt);
         }
         stepChain.onNext();
@@ -255,6 +256,7 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   @Override
   public void renderFailedConclusion(String msg) {
     dialog.setCancelEnabled(true);
+    dialog.setPreviousEnabled(true);
     conclusionStep.setStepTitle("View creation failed.");
   }
 
