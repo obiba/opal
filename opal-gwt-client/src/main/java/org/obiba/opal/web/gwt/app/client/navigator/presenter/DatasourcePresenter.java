@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingTableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewCreationRequiredEvent;
@@ -81,7 +82,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     getDisplay().setPreviousCommand(new PreviousCommand());
     super.registerHandler(eventBus.addHandler(SiblingTableSelectionEvent.getType(), new SiblingTableSelectionHandler()));
     super.getDisplay().setTableNameFieldUpdater(new TableNameFieldUpdater());
-
+    super.registerHandler(eventBus.addHandler(DatasourceUpdatedEvent.getType(), new DatasourceUpdatedEventHandler()));
   }
 
   @Override
@@ -138,6 +139,8 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
     } else if(tableDto != null) {
       selectTable(tableDto.getName());
+    } else {
+      updateTable(null);
     }
   }
 
@@ -401,6 +404,16 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
           }
           break;
         }
+      }
+    }
+  }
+
+  class DatasourceUpdatedEventHandler implements DatasourceUpdatedEvent.Handler {
+
+    @Override
+    public void onDatasourceUpdated(DatasourceUpdatedEvent event) {
+      if(event.getSelection().getName().equals(datasourceName)) {
+        displayDatasource(event.getSelection());
       }
     }
   }
