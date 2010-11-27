@@ -69,7 +69,8 @@ public class AttributesPresenter extends LocalizablesPresenter {
     for(int i = 0; i < variableDto.getAttributesArray().length(); i++) {
       final AttributeDto attributeDto = variableDto.getAttributesArray().get(i);
 
-      if(attributeDto.getLocale().equals(localeName)) {
+      // Add attributes that belong to this locale as well as attributes without a locale.
+      if(attributeDto.getLocale().equals(localeName) || isAttributeWithNoLocale(attributeDto)) {
         localizables.add(new Localizable() {
 
           @Override
@@ -86,6 +87,10 @@ public class AttributesPresenter extends LocalizablesPresenter {
     }
 
     return localizables;
+  }
+
+  private boolean isAttributeWithNoLocale(AttributeDto attributeDto) {
+    return (!attributeDto.hasLocale() || attributeDto.getLocale().equals("")) && attributeDto.hasValue();
   }
 
   @Override
