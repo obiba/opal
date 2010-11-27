@@ -299,11 +299,17 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
     JsArray<AttributeDto> attributes = (JsArray<AttributeDto>) JsArray.createArray();
     Map<String, TextBox> labelMap = labelListPresenter.getDisplay().getLanguageLabelMap();
     for(Map.Entry<String, TextBox> entry : labelMap.entrySet()) {
-      AttributeDto attribute = AttributeDto.create();
-      attribute.setLocale(entry.getKey());
-      attribute.setName(getDisplay().getAttributeName().getText());
-      attribute.setValue(entry.getValue().getValue());
-      attributes.push(attribute);
+      if(entry.getValue().getValue() != null && !entry.getValue().getValue().equals("")) {
+        AttributeDto attribute = AttributeDto.create();
+        if(entry.getKey() == null || entry.getKey().equals("")) {
+          attribute.clearLocale();
+        } else {
+          attribute.setLocale(entry.getKey());
+        }
+        attribute.setName(getDisplay().getAttributeName().getText());
+        attribute.setValue(entry.getValue().getValue());
+        attributes.push(attribute);
+      }
     }
     return attributes;
   }
