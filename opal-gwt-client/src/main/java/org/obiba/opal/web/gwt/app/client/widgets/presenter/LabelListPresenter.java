@@ -74,6 +74,12 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
       public void onResource(Response response, JsArray<LocaleDto> resource) {
         @SuppressWarnings("unchecked")
         JsArray<LocaleDto> languages = (resource != null) ? resource : (JsArray<LocaleDto>) JsArray.createArray();
+
+        // Add the 'no locale' locale to the list of locales.
+        LocaleDto noLocaleDto = LocaleDto.create();
+        noLocaleDto.setName("");
+        languages.push(noLocaleDto);
+
         getDisplay().setLanguages(languages);
         updateFields();
       }
@@ -119,6 +125,11 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
     protected boolean hasError() {
       LocaleDto baseLanguageLocaleDto = getDisplay().getBaseLanguage();
       String baseLanguageLabelValue = getDisplay().getLanguageLabelMap().get(baseLanguageLocaleDto.getName()).getValue();
+
+      // Base language not required when no locale value is provided.
+      String noLocaleValue = getDisplay().getLanguageLabelMap().get("").getValue();
+      if(noLocaleValue != null && !noLocaleValue.equals("")) return false;
+
       if(baseLanguageLabelValue == null || baseLanguageLabelValue.equals("")) return true;
       return false;
     }
