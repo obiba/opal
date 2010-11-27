@@ -71,9 +71,12 @@ public class LabelListView extends Composite implements LabelListPresenter.Displ
 
   private String getLabelText(String language, int index) {
     StringBuilder sb = new StringBuilder();
-    sb.append(attributeValueLabel).append(" (");
-    sb.append(language).append(")");
-    if(index == 0) sb.append("*");
+    sb.append(attributeValueLabel);
+    if(!language.equals("")) {
+      sb.append(" (");
+      sb.append(language).append(")");
+      if(index == 0) sb.append("*");
+    }
     sb.append(":");
     return sb.toString();
   }
