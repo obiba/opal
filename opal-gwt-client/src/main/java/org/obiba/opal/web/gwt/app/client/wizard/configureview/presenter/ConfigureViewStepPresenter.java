@@ -201,11 +201,12 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
       viewSavePending = false; // Save is not required when form is initially displayed.
       viewDto = event.getView();
 
+      refreshDisplay();
+
       // Set the variables tab widget according to the received ViewDto type.
       getDisplay().addVariablesTabWidget(getVariablesTabWidget());
 
       getDisplay().showDialog();
-      // eventBus.fireEvent(new WorkbenchChangeEvent(ConfigureViewStepPresenter.this, false, false));
     }
 
     private Widget getVariablesTabWidget() {
