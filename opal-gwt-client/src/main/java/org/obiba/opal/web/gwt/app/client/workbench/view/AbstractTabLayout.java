@@ -15,15 +15,23 @@ import java.util.List;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.logical.shared.BeforeSelectionEvent;
+import com.google.gwt.event.logical.shared.BeforeSelectionHandler;
+import com.google.gwt.event.logical.shared.HasBeforeSelectionHandlers;
+import com.google.gwt.event.logical.shared.HasSelectionHandlers;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.IndexedPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
  *
  */
-public class AbstractTabLayout extends FlowPanel {
+public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSelectionHandlers<Integer>, HasBeforeSelectionHandlers<Integer> {
 
   protected UList menu;
 
@@ -33,7 +41,7 @@ public class AbstractTabLayout extends FlowPanel {
 
   private List<Widget> contents;
 
-  private int active = 0;
+  private int selectedIndex = 0;
 
   protected AbstractTabLayout() {
     super();
@@ -63,7 +71,7 @@ public class AbstractTabLayout extends FlowPanel {
       contents.add(w);
       if(contents.size() == 1) {
         content.setWidget(w);
-        active = 0;
+        selectedIndex = 0;
       } else {
         w.removeFromParent();
       }
@@ -82,11 +90,8 @@ public class AbstractTabLayout extends FlowPanel {
     item.addClickHandler(new ClickHandler() {
 
       @Override
-      public void onClick(ClickEvent arg0) {
-        items.get(active).removeStyleName("active");
-        active = index;
-        items.get(active).addStyleName("active");
-        content.setWidget(contents.get(index));
+      public void onClick(ClickEvent evt) {
+        selectTab(index);
       }
     });
     if(items.size() == 1) {
@@ -103,28 +108,11 @@ public class AbstractTabLayout extends FlowPanel {
     add(w);
   }
 
-  public void setActive(int index) {
-    if(active != -1) items.get(active).removeStyleName("active");
+  private void setSelectedIndex(int index) {
+    if(selectedIndex != -1) items.get(selectedIndex).removeStyleName("active");
     items.get(index).addStyleName("active");
     content.setWidget(contents.get(index));
-    active = index;
-  }
-
-  public void removeTab(int index) {
-    items.remove(index);
-    menu.remove(index);
-
-    contents.remove(index);
-    if(contents.size() == 0) {
-      content.clear();
-      active = -1;
-    } else if(active > index) {
-      active--;
-    } else if(active > contents.size() - 1) {
-      setActive(contents.size() - 1);
-    } else if(active == index) {
-      setActive(index);
-    }
+    selectedIndex = index;
   }
 
   @Override
@@ -133,7 +121,133 @@ public class AbstractTabLayout extends FlowPanel {
     content.clear();
     items.clear();
     contents.clear();
-    active = -1;
+    selectedIndex = -1;
+  }
+
+  private void checkIndex(int index) {
+    assert (index >= 0) && (index < contents.size()) : "Index out of bounds";
+  }
+
+  /**
+   * Programmatically selects the specified tab and fires events.
+   * 
+   * @param child the child whose tab is to be selected
+   */
+  public void selectTab(Widget child) {
+    selectTab(getWidgetIndex(child));
+  }
+
+  /**
+   * Programmatically selects the specified tab.
+   * 
+   * @param child the child whose tab is to be selected
+   * @param fireEvents true to fire events, false not to
+   */
+  public void selectTab(Widget child, boolean fireEvents) {
+    selectTab(getWidgetIndex(child), fireEvents);
+  }
+
+  /**
+   * Programmatically selects the specified tab and fires events.
+   * 
+   * @param index the index of the tab to be selected
+   */
+  public void selectTab(int index) {
+    selectTab(index, true);
+  }
+
+  /**
+   * Programmatically selects the specified tab.
+   * 
+   * @param index the index of the tab to be selected
+   * @param fireEvents true to fire events, false not to
+   */
+  public void selectTab(int index, boolean fireEvents) {
+    checkIndex(index);
+    if(index == selectedIndex) {
+      return;
+    }
+
+    // Fire the before selection event, giving the recipients a chance to
+    // cancel the selection.
+    if(fireEvents) {
+      BeforeSelectionEvent<Integer> event = BeforeSelectionEvent.fire(this, index);
+      if((event != null) && event.isCanceled()) {
+        return;
+      }
+    }
+
+    // Update the tabs being selected and unselected.
+    setSelectedIndex(index);
+
+    // Fire the selection event.
+    if(fireEvents) {
+      SelectionEvent.fire(this, index);
+    }
+
+  }
+
+  public int getSelectedIndex() {
+    return selectedIndex;
+  }
+
+  //
+  // IndexedPanel
+  //
+
+  @Override
+  public Widget getWidget(int index) {
+    return contents.get(index);
+  }
+
+  @Override
+  public int getWidgetCount() {
+    return contents.size();
+  }
+
+  @Override
+  public int getWidgetIndex(Widget child) {
+    return contents.indexOf(child);
+  }
+
+  @Override
+  public boolean remove(int index) {
+    if(index < 0 || index >= contents.size()) return false;
+
+    items.remove(index);
+    menu.remove(index);
+    contents.remove(index);
+
+    if(contents.size() == 0) {
+      content.clear();
+      selectedIndex = -1;
+    } else if(selectedIndex > index) {
+      selectedIndex--;
+    } else if(selectedIndex > contents.size() - 1) {
+      setSelectedIndex(contents.size() - 1);
+    } else if(selectedIndex == index) {
+      setSelectedIndex(index);
+    }
+
+    return true;
+  }
+
+  //
+  // HasBeforeSelectionHandlers<Integer>
+  //
+
+  @Override
+  public HandlerRegistration addBeforeSelectionHandler(BeforeSelectionHandler<Integer> handler) {
+    return addHandler(handler, BeforeSelectionEvent.getType());
+  }
+
+  //
+  // HasSelectionHandlers<Integer>
+  //
+
+  @Override
+  public HandlerRegistration addSelectionHandler(SelectionHandler<Integer> handler) {
+    return addHandler(handler, SelectionEvent.getType());
   }
 
 }

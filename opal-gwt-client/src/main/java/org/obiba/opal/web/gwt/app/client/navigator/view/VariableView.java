@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.navigator.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
@@ -29,12 +30,12 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
@@ -94,10 +95,10 @@ public class VariableView extends Composite implements VariablePresenter.Display
   Label label;
 
   @UiField
-  TabLayoutPanel tabs;
+  HorizontalTabLayout tabs;
 
   @UiField
-  Label categoryTableTitle;
+  Anchor categoryTableTitle;
 
   @UiField
   CellTable<CategoryDto> categoryTable;
@@ -105,7 +106,7 @@ public class VariableView extends Composite implements VariablePresenter.Display
   SimplePager<CategoryDto> categoryTablePager;
 
   @UiField
-  Label attributeTableTitle;
+  Anchor attributeTableTitle;
 
   @UiField
   CellTable<AttributeDto> attributeTable;

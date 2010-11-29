@@ -658,10 +658,6 @@ a.table.modification, a.table.modification:visited, a.table.modification:hover {
 	padding-left:20px;
 }
 
-.tableChangesPanel.vertical-tabs > .content {
-  padding: 10px;
-}
-
 div.variableChanges {
   height:100%;
 }
@@ -1050,6 +1046,7 @@ ul.tabs li a, ul.tabs li a:visited, ul.tabs li a:hover {
   border:1px solid #BBBBBB;
   position:relative;
   overflow-x:auto;
+  padding: 10px;
 }
 
 .vertical-tabs > .content {
