@@ -6,59 +6,82 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
   
-  <o:WorkbenchLayout withInfo="true">
-    <g:Label><ui:msg description="Configure View title">Configure View</ui:msg></g:Label>
-    <g:Label><ui:msg description="Configure View Step summary">Provide the settings for the view.</ui:msg></g:Label>
-    <g:SimplePanel />
-    
-    <o:HorizontalTabLayout ui:field="viewTabs">
-        <g:Anchor><ui:msg description="Data label">Data</ui:msg></g:Anchor>
-        <g:SimplePanel ui:field="dataTabPanel" />
-        <g:Anchor><ui:msg description="Variables label">Variables</ui:msg></g:Anchor>
-        <g:SimplePanel ui:field="variablesTabPanel" />
-        <g:Anchor><ui:msg description="Entities label">Entities</ui:msg></g:Anchor>
-        <g:SimplePanel ui:field="entitiesTabPanel" />
-    </o:HorizontalTabLayout> 
-    
-    <g:DeckPanel ui:field="helpPanelDecks">
-      <g:FlowPanel>
-        <g:HTMLPanel>
-          <g:Label addStyleNames="title"><ui:msg description="Data label">Data</ui:msg></g:Label>
-          <p>
-            <ui:msg description="Data information for view creation">
-              The view is always built on top of one or several tables. The view can define a subset of their entities, a subset of their variables or variables derived from their variables.
-            </ui:msg>
-          </p>
-        </g:HTMLPanel>
+   <ui:style>
+    .content-margin { margin: 0.5em; }
+  </ui:style>
+  
+  <g:DialogBox ui:field="dialog" autoHide="false" modal="true">
+    <g:caption><ui:msg description="Configure View title">Configure View</ui:msg></g:caption>
+	 <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="30em" width="40em">
+    <g:center>
+		<g:ScrollPanel>
+			<g:FlowPanel addStyleNames="{style.content-margin}">
+			    <o:HorizontalTabLayout ui:field="viewTabs"  addStyleNames="small-top-margin">
+			        <g:Anchor><ui:msg description="Data label">Data</ui:msg></g:Anchor>
+			        <g:SimplePanel ui:field="dataTabPanel" />
+			        <g:Anchor><ui:msg description="Variables label">Variables</ui:msg></g:Anchor>
+			        <g:SimplePanel ui:field="variablesTabPanel" />
+			        <g:Anchor><ui:msg description="Entities label">Entities</ui:msg></g:Anchor>
+			        <g:SimplePanel ui:field="entitiesTabPanel" />
+			    </o:HorizontalTabLayout> 
+			    
+			    <g:DeckPanel ui:field="helpPanelDecks">
+			      <g:FlowPanel>
+			        <g:HTMLPanel>
+			          <g:Label addStyleNames="title"><ui:msg description="Data label">Data</ui:msg></g:Label>
+			          <p>
+			            <ui:msg description="Data information for view creation">
+			              The view is always built on top of one or several tables. The view can define a subset of their entities, a subset of their variables or variables derived from their variables.
+			            </ui:msg>
+			          </p>
+			        </g:HTMLPanel>
+			      </g:FlowPanel>
+			      <g:FlowPanel>
+			        <g:HTMLPanel>
+			          <g:Label addStyleNames="title"><ui:msg description="Variable filter label">Variable Filter</ui:msg></g:Label>
+			        </g:HTMLPanel>
+			      </g:FlowPanel>     
+			      <g:FlowPanel>
+			        <g:HTMLPanel>
+			          <g:Label addStyleNames="title"><ui:msg description="Entity filter label">Entity Filter</ui:msg></g:Label>
+			          <p>
+			            <ui:msg description="Entity filter information for view creation">
+			              Some tables are defined for this view (see <em>Data</em> tab). The entities of these tables can be filtered to define the entities view.
+			            </ui:msg>
+			          <ul>
+			            <li>
+			              <ui:msg description="All filter information">
+			                all: no filter is applied. This allows to define a simple join of tables.
+			              </ui:msg>
+			            </li>
+			            <li>
+			              <ui:msg description="Entity script filter information">
+			                script: the filter can be defined by a script which will be applied on each entity of the tables. This script must return a boolean (i.e. true/false) value. If true is returned, the entity on which the script is executed is part of the entities view.
+			              </ui:msg>
+			            </li>
+			          </ul>
+			          </p>
+			        </g:HTMLPanel>
+			      </g:FlowPanel>     
+			    </g:DeckPanel>
+		    </g:FlowPanel>
+	    </g:ScrollPanel>
+	          
+    </g:center>
+    <g:south size="3.25">
+      <g:FlowPanel addStyleNames="footer">
+        
+          <o:ResizeHandle ui:field="resizeHandle"></o:ResizeHandle>
+          <g:Button ui:field="close" addStyleNames="right-aligned small-top-margin">
+            <ui:msg description="Close label">Close</ui:msg>
+          </g:Button>
+          <g:Button ui:field="help" addStyleNames="left-aligned small-top-margin small-indent">
+            <ui:msg description="Help label">Help</ui:msg>
+          </g:Button>
       </g:FlowPanel>
-      <g:FlowPanel>
-        <g:HTMLPanel>
-          <g:Label addStyleNames="title"><ui:msg description="Variable filter label">Variable Filter</ui:msg></g:Label>
-        </g:HTMLPanel>
-      </g:FlowPanel>     
-      <g:FlowPanel>
-        <g:HTMLPanel>
-          <g:Label addStyleNames="title"><ui:msg description="Entity filter label">Entity Filter</ui:msg></g:Label>
-          <p>
-            <ui:msg description="Entity filter information for view creation">
-              Some tables are defined for this view (see <em>Data</em> tab). The entities of these tables can be filtered to define the entities view.
-            </ui:msg>
-          <ul>
-            <li>
-              <ui:msg description="All filter information">
-                all: no filter is applied. This allows to define a simple join of tables.
-              </ui:msg>
-            </li>
-            <li>
-              <ui:msg description="Entity script filter information">
-                script: the filter can be defined by a script which will be applied on each entity of the tables. This script must return a boolean (i.e. true/false) value. If true is returned, the entity on which the script is executed is part of the entities view.
-              </ui:msg>
-            </li>
-          </ul>
-          </p>
-        </g:HTMLPanel>
-      </g:FlowPanel>     
-    </g:DeckPanel>
-  </o:WorkbenchLayout>
+    </g:south> 
+  </g:DockLayoutPanel>
+    
+  </g:DialogBox>
 
 </ui:UiBinder>

@@ -912,6 +912,10 @@ div.variablesListTabContent .gwt-Label {
     display:block;
 }
 
+.resizable-handle {
+	top:2em;
+}
+
 /* Wizard */
 
 .wizard .p {
@@ -924,10 +928,6 @@ div.variablesListTabContent .gwt-Label {
 	margin-bottom: 10px;
   	color: #444444;
   	font-size: 1em;
-}
-
-.wizard .resizable-handle.resizable-se {
-    top:2em;
 }
 
 .wizard .footer .help {
@@ -970,6 +970,10 @@ div.variablesListTabContent .gwt-Label {
 
 .tooltip .footer {
 	background-color: #888888;
+}
+
+.tooltip .resizable-handle.resizable-se {
+    top:0em;
 }
 
 /* Vertical/Horizontal tabs */

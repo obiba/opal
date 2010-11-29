@@ -16,7 +16,6 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
@@ -180,6 +179,10 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
     HorizontalTabLayout getViewTabs();
 
     void displayTab(int tabNumber);
+
+    void showDialog();
+
+    void hideDialog();
   }
 
   class ViewSavePendingHandler implements ViewSavePendingEvent.Handler {
@@ -201,7 +204,8 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
       // Set the variables tab widget according to the received ViewDto type.
       getDisplay().addVariablesTabWidget(getVariablesTabWidget());
 
-      eventBus.fireEvent(new WorkbenchChangeEvent(ConfigureViewStepPresenter.this, false, false));
+      getDisplay().showDialog();
+      // eventBus.fireEvent(new WorkbenchChangeEvent(ConfigureViewStepPresenter.this, false, false));
     }
 
     private Widget getVariablesTabWidget() {
