@@ -152,11 +152,12 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
   }
 
   private void setCommands() {
+    // TODO
+    getDisplay().setDownloadIdentifiersCommand(null);
     getDisplay().setRemoveFunctionalUnitCommand(new RemoveFunctionalUnitCommand());
     getDisplay().setUpdateFunctionalUnitCommand(new EditFunctionalUnitCommand());
     getDisplay().setAddKeyPairCommand(new AddKeyPairCommand());
     // TODO
-    getDisplay().setDownloadIdentifiersCommand(null);
     getDisplay().setAddIdentifiersCommand(null);
   }
 
