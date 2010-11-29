@@ -69,26 +69,32 @@ public class CategoriesPresenter extends LocalizablesPresenter {
       for(int attributeIndex = 0; attributeIndex < categoryDto.getAttributesArray().length(); attributeIndex++) {
         final AttributeDto attributeDto = categoryDto.getAttributesArray().get(attributeIndex);
 
-        if(attributeDto.getName().equals("label") && attributeDto.getLocale().equals(localeName)) {
-          localizables.add(new Localizable() {
+        if(attributeDto.getName().equals("label")) {
+          if(attributeDto.getLocale().equals(localeName) || isAttributeWithNoLocale(attributeDto)) {
+            localizables.add(new Localizable() {
 
-            @Override
-            public String getName() {
-              return categoryDto.getName();
-            }
+              @Override
+              public String getName() {
+                return categoryDto.getName();
+              }
 
-            @Override
-            public String getLabel() {
-              return attributeDto.getValue();
-            }
-          });
+              @Override
+              public String getLabel() {
+                return attributeDto.getValue();
+              }
+            });
 
-          break;
+            // break;
+          }
         }
       }
     }
 
     return localizables;
+  }
+
+  private boolean isAttributeWithNoLocale(AttributeDto attributeDto) {
+    return (!attributeDto.hasLocale() || attributeDto.getLocale().equals("")) && attributeDto.hasValue();
   }
 
   @Override
