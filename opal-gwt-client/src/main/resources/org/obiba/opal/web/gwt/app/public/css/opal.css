@@ -886,10 +886,6 @@ div.variablesListTabContent td {
   vertical-align:top;
 }
 
-div.variablesListTabContent .gwt-Label {
-  font-weight:bold;
-}
-
 .categoryDialog .labelPanel {
   margin-top: 10px;
 }
@@ -1060,3 +1056,14 @@ ul.tabs li a, ul.tabs li a:visited, ul.tabs li a:hover {
 .horizontal-tabs > .content {
   clear: left;
 }
+
+/* SuggestBoxPopup */
+
+.suggestPopupTop, .suggestPopupMiddleLeft, .suggestPopupMiddleRight, .suggestPopupBottom {
+	display: none;
+}
+
+.suggestPopupMiddleCenter {
+	border: 1px solid #BBBBBB;	
+}
+
