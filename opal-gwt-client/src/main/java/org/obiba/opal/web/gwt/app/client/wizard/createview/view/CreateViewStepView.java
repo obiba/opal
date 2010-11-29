@@ -87,7 +87,9 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
 
   private WizardStepChain stepChain;
 
-  private ClickHandler createHandler;
+  private ValidationHandler selectTypeValidator;
+
+  private ValidationHandler tablesValidator;
 
   //
   // Constructors
@@ -101,14 +103,14 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
 
   private void initWizardDialog() {
     stepChain = WizardStepChain.Builder.create(dialog)//
+
     .append(selectTypeStep, selectTypeHelp)//
     .title(translations.editViewTypeStep())//
     .onValidate(new ValidationHandler() {
 
       @Override
       public boolean validate() {
-        // TODO presenter to provide a check of view name with notification error
-        return true;
+        return selectTypeValidator.validate();
       }
     })//
     .onReset(new ResetHandler() {
@@ -141,30 +143,18 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
       }
     })
 
-    .onNext(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent evt) {
-        if(tablesStep.isVisible()) {
-          dialog.setFinishEnabled(false);
-          dialog.setCancelEnabled(false);
-          dialog.setPreviousEnabled(false);
-          createHandler.onClick(evt);
-        }
-        stepChain.onNext();
-      }
-    })//
-    .onPrevious().onFinish().build();
+    .onNext().onPrevious().onClose().build();
   }
 
   //
   // CreateViewStepPresenter.Display Methods
   //
-
+  @Override
   public void clear() {
     stepChain.reset();
   }
 
+  @Override
   public void setDatasourceSelector(DatasourceSelectorPresenter.Display datasourceSelector) {
     this.datasourceSelector = datasourceSelector;
     datasourceSelectorPanel.add(datasourceSelector.asWidget());
@@ -174,15 +164,18 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
     datasourceSelector.setEnabled(enabled);
   }
 
+  @Override
   public void setTableSelector(TableListPresenter.Display tableSelector) {
     this.tableSelector = tableSelector;
     tableSelectorPanel.add(tableSelector.asWidget());
   }
 
+  @Override
   public HasText getViewName() {
     return viewNameTextBox;
   }
 
+  @Override
   public HasText getDatasourceName() {
     final String selectedDatasourceName = datasourceSelector.getSelection();
 
@@ -200,13 +193,31 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
     };
   }
 
-  public HandlerRegistration addCancelClickHandler(ClickHandler handler) {
+  @Override
+  public void setSelectTypeValidator(ValidationHandler validator) {
+    this.selectTypeValidator = validator;
+  }
+
+  @Override
+  public void setTablesValidator(ValidationHandler validator) {
+    this.tablesValidator = validator;
+  }
+
+  @Override
+  public HandlerRegistration addCancelHandler(ClickHandler handler) {
     return dialog.addCancelClickHandler(handler);
   }
 
-  public HandlerRegistration addCreateClickHandler(final ClickHandler handler) {
-    this.createHandler = handler;
-    return stepChain.getNextHandlerRegistration();
+  public HandlerRegistration addCreateHandler(final ClickHandler handler) {
+    return dialog.addFinishClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent evt) {
+        if(tablesValidator.validate()) {
+          handler.onClick(evt);
+        }
+      }
+    });
   }
 
   public HasValue<Boolean> getApplyGlobalVariableFilterOption() {
@@ -248,16 +259,37 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   }
 
   @Override
+  public void renderPendingConclusion() {
+    stepChain.onNext();
+    conclusionStep.setStepTitle("View is being created..."); // TODO localization
+    dialog.setCancelEnabled(false);
+    dialog.setCloseEnabled(false);
+    dialog.setProgress(true);
+  }
+
+  @Override
   public void renderCompletedConclusion() {
-    dialog.setFinishEnabled(true);
-    conclusionStep.setStepTitle("View successfully created.");
+    dialog.setProgress(false);
+    dialog.setCloseEnabled(true);
+    conclusionStep.setStepTitle("View successfully created."); // TODO localization
   }
 
   @Override
   public void renderFailedConclusion(String msg) {
+    dialog.setProgress(false);
     dialog.setCancelEnabled(true);
-    dialog.setPreviousEnabled(true);
-    conclusionStep.setStepTitle("View creation failed.");
+    conclusionStep.setStepTitle("View creation failed."); // TODO localization
+  }
+
+  @Override
+  public HandlerRegistration addCloseHandler(final ClickHandler handler) {
+    return dialog.addCloseClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent evt) {
+        handler.onClick(evt);
+      }
+    });
   }
 
 }

@@ -25,12 +25,14 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.ViewCreationRequiredEve
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.HasCollection;
+import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.DisallowedCharactersValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.MatchingTableEntitiesValidator;
 import org.obiba.opal.web.gwt.app.client.validator.MinimumSizeCollectionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredOptionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter.DatasourcesRefreshedCallback;
@@ -105,8 +107,11 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
   protected void addEventHandlers() {
     super.registerHandler(eventBus.addHandler(ViewCreationRequiredEvent.getType(), new ViewCreationRequiredHandler()));
-    super.registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
-    super.registerHandler(getDisplay().addCreateClickHandler(new CreateClickHandler()));
+    super.registerHandler(getDisplay().addCancelHandler(new CancelHandler()));
+    super.registerHandler(getDisplay().addCreateHandler(new CreateHandler()));
+    super.registerHandler(getDisplay().addCloseHandler(new CloseHandler()));
+    getDisplay().setTablesValidator(new TablesValidator());
+    getDisplay().setSelectTypeValidator(new SelectTypeValidator());
   }
 
   @Override
@@ -156,6 +161,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   }
 
   private void createView() {
+    getDisplay().renderPendingConclusion();
     // Get the view name and datasource name.
     String viewName = getDisplay().getViewName().getText();
     String datasourceName = getDisplay().getDatasourceName().getText();
@@ -207,17 +213,26 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
     HasValue<Boolean> getAddVariablesOneByOneOption();
 
-    HandlerRegistration addCancelClickHandler(ClickHandler handler);
+    void setSelectTypeValidator(ValidationHandler validator);
 
-    HandlerRegistration addCreateClickHandler(ClickHandler handler);
+    void setTablesValidator(ValidationHandler validator);
+
+    HandlerRegistration addCancelHandler(ClickHandler handler);
+
+    HandlerRegistration addCreateHandler(ClickHandler handler);
+
+    HandlerRegistration addCloseHandler(ClickHandler handler);
 
     void showDialog();
 
     void hideDialog();
 
+    void renderPendingConclusion();
+
     void renderFailedConclusion(String msg);
 
     void renderCompletedConclusion();
+
   }
 
   class ViewCreationRequiredHandler implements ViewCreationRequiredEvent.Handler {
@@ -228,9 +243,17 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     }
   }
 
-  class CancelClickHandler implements ClickHandler {
+  class CancelHandler implements ClickHandler {
 
     public void onClick(ClickEvent event) {
+      getDisplay().hideDialog();
+    }
+  }
+
+  final class CloseHandler implements ClickHandler {
+    @Override
+    public void onClick(ClickEvent evt) {
+      eventBus.fireEvent(new DatasourceUpdatedEvent(datasourceSelectorPresenter.getSelectionDto()));
       getDisplay().hideDialog();
     }
   }
@@ -255,20 +278,38 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   private class CompletedCallback implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      eventBus.fireEvent(new DatasourceUpdatedEvent(datasourceSelectorPresenter.getSelectionDto()));
       getDisplay().renderCompletedConclusion();
     }
   }
 
-  class CreateClickHandler implements ClickHandler {
+  class SelectTypeValidator extends AbstractValidationHandler {
 
-    private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+    public SelectTypeValidator() {
+      super(eventBus);
+    }
 
-    @SuppressWarnings("unchecked")
-    public CreateClickHandler() {
+    @Override
+    protected Set<FieldValidator> getValidators() {
+      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+
       validators.add(new RequiredTextValidator(getDisplay().getViewName(), "ViewNameRequired"));
       validators.add(new DisallowedCharactersValidator(getDisplay().getViewName(), new char[] { '.', ':' }, "ViewNameDisallowedChars"));
+      validators.add(new RequiredOptionValidator(RequiredOptionValidator.asSet(getDisplay().getApplyGlobalVariableFilterOption(), getDisplay().getAddVariablesOneByOneOption()), "VariableDefinitionMethodRequired"));
 
+      return validators;
+    }
+
+  }
+
+  class TablesValidator extends AbstractValidationHandler {
+
+    public TablesValidator() {
+      super(eventBus);
+    }
+
+    @Override
+    protected Set<FieldValidator> getValidators() {
+      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
       HasCollection<TableDto> tablesField = new HasCollection<TableDto>() {
         public Collection<TableDto> getCollection() {
           return tableListPresenter.getTables();
@@ -276,26 +317,15 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
       };
       validators.add(new MinimumSizeCollectionValidator<TableDto>(tablesField, 1, "TableSelectionRequired"));
       validators.add(new MatchingTableEntitiesValidator(tablesField));
-      validators.add(new RequiredOptionValidator(RequiredOptionValidator.asSet(getDisplay().getApplyGlobalVariableFilterOption(), getDisplay().getAddVariablesOneByOneOption()), "VariableDefinitionMethodRequired"));
+      return validators;
     }
+
+  }
+
+  class CreateHandler implements ClickHandler {
 
     public void onClick(ClickEvent event) {
-      String errorMessageKey = validate();
-      if(errorMessageKey != null) {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errorMessageKey, null));
-        return;
-      }
       createViewIfDoesNotExist();
-    }
-
-    String validate() {
-      for(FieldValidator validator : validators) {
-        String errorMessageKey = validator.validate();
-        if(errorMessageKey != null) {
-          return errorMessageKey;
-        }
-      }
-      return null;
     }
   }
 

@@ -37,6 +37,8 @@ public class WizardStepChain {
 
   private HandlerRegistration cancelHandlerRegistration;
 
+  private HandlerRegistration closeHandlerRegistration;
+
   private HandlerRegistration finishHandlerRegistration;
 
   private WizardStepChain() {
@@ -55,18 +57,20 @@ public class WizardStepChain {
   }
 
   public void reset() {
+    wizard.setCancelEnabled(true);
+    wizard.setProgress(false);
+    wizard.setCloseVisible(false);
     current = first;
     // forward reset request
     current.reset();
     apply();
-    wizard.setCancelEnabled(true);
-    wizard.setProgress(false);
   }
 
   private void apply() {
-    wizard.setNextEnabled(current.hasNext());
+    wizard.setNextEnabled(current.hasNext() && !current.canFinish());
     wizard.setPreviousEnabled(current.hasPrevious());
-    wizard.setFinishEnabled(current.canFinish() || !current.hasNext());
+    wizard.setFinishEnabled(current.canFinish());
+    wizard.setCloseVisible(!current.hasNext());
     Widget help = current.getHelp();
     wizard.setHelpEnabled(help != null);
     if(help != null) {
@@ -88,6 +92,10 @@ public class WizardStepChain {
 
   public HandlerRegistration getCancelHandlerRegistration() {
     return cancelHandlerRegistration;
+  }
+
+  public HandlerRegistration getCloseHandlerRegistration() {
+    return closeHandlerRegistration;
   }
 
   public static class Builder {
@@ -135,11 +143,6 @@ public class WizardStepChain {
 
     public Builder help(WidgetProvider provider) {
       currentStepCtrl.setHelpProvider(provider);
-      return this;
-    }
-
-    public Builder canFinish() {
-      currentStepCtrl.setCanFinish(true);
       return this;
     }
 
@@ -203,6 +206,22 @@ public class WizardStepChain {
           if(chain.current.validate()) chain.wizard.hide();
         }
       });
+    }
+
+    public Builder onClose() {
+      return onClose(new ClickHandler() {
+
+        @Override
+        public void onClick(ClickEvent arg0) {
+          if(chain.current.validate()) chain.wizard.hide();
+        }
+      });
+    }
+
+    public Builder onClose(ClickHandler handler) {
+      registration = chain.wizard.addCloseClickHandler(handler);
+      chain.closeHandlerRegistration = registration;
+      return this;
     }
 
     public Builder onCancel(ClickHandler handler) {

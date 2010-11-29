@@ -91,6 +91,7 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
 
   private void initWizardDialog() {
     stepChain = WizardStepChain.Builder.create(dialog)//
+
     .append(selectTypeStep, helpPanel)//
     .title(translations.createDatasourceStepSummary())//
     .onValidate(new ValidationHandler() {
@@ -108,19 +109,14 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
         datasourceType.setSelectedIndex(0);
       }
     })//
+
     .append(datasourceFormStep)//
     .title(translations.datasourceOptionsLabel())//
+
     .append(conclusionStep)//
     .title(translations.createDatasourceProcessSummary())//
-    .onReset(new ResetHandler() {
 
-      @Override
-      public void onReset() {
-        conclusionStep.setTitle(translations.createDatasourceProcessSummary());
-        conclusionStep.removeStepContent();
-      }
-    })//
-    .onPrevious().build();
+    .onNext().onPrevious().build();
   }
 
   //
@@ -134,20 +130,17 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
 
   @Override
   public HandlerRegistration addFinishClickHandler(ClickHandler handler) {
-    return dialog.addFinishClickHandler(handler);
+    return dialog.addCloseClickHandler(handler);
   }
 
   @Override
   public HandlerRegistration addCreateClickHandler(final ClickHandler handler) {
-    return dialog.addNextClickHandler(new ClickHandler() {
+    return dialog.addFinishClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent evt) {
-        if(datasourceFormStep.isVisible()) {
-          // asynchronous next, see setConclusion()
-          handler.onClick(evt);
-        } else
-          stepChain.onNext();
+        // asynchronous next, see setConclusion()
+        handler.onClick(evt);
       }
     });
   }
@@ -222,18 +215,18 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
   public void setConclusion(CreateDatasourceConclusionStepPresenter presenter) {
     dialog.setProgress(true);
     conclusionStep.removeStepContent();
+    conclusionStep.setTitle(translations.createDatasourceProcessSummary());
     presenter.reset();
     conclusionStep.add(presenter.getDisplay().asWidget());
     stepChain.onNext();
-    dialog.setPreviousEnabled(false);
     dialog.setCancelEnabled(false);
-    dialog.setFinishEnabled(false);
+    dialog.setCloseEnabled(false);
     presenter.setDatasourceCreatedCallback(new DatasourceCreatedCallback() {
 
       @Override
       public void onSuccess(DatasourceFactoryDto factory, DatasourceDto datasource) {
         conclusionStep.setStepTitle(translations.datasourceCreationCompleted());
-        dialog.setFinishEnabled(true);
+        dialog.setCloseEnabled(true);
         dialog.setProgress(false);
       }
 
@@ -241,7 +234,6 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
       public void onFailure(DatasourceFactoryDto factory, ClientErrorDto error) {
         conclusionStep.setStepTitle(translations.datasourceCreationFailed());
         dialog.setCancelEnabled(true);
-        dialog.setPreviousEnabled(true);
         dialog.setProgress(false);
       }
     });

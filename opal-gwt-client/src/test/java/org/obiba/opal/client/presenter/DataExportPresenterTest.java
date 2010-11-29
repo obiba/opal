@@ -76,7 +76,7 @@ public class DataExportPresenterTest extends AbstractGwtTestSetup {
     // Make sure that a ClickHandler is added to the Submit button
     expect(displayMock.addCancelClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
     expect(displayMock.addSubmitClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
-    expect(displayMock.addFinishClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
+    expect(displayMock.addCloseClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
     expect(displayMock.addJobLinkClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
     expect(tableListDisplayMock.addRemoveClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
     expect(tableListDisplayMock.addAddClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);

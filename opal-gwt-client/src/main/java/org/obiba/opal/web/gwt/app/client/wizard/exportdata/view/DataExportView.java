@@ -187,7 +187,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
     })//
     .append(conclusionStep)//
     .title(translations.dataExportPendingConclusion())//
-    .onPrevious().build();
+    .onNext().onPrevious().build();
   }
 
   private void initWidgets() {
@@ -270,14 +270,11 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
 
   @Override
   public HandlerRegistration addSubmitClickHandler(final ClickHandler submitHandler) {
-    return dialog.addNextClickHandler(new ClickHandler() {
+    return dialog.addFinishClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent evt) {
-        if(unitStep.isVisible()) {
-          submitHandler.onClick(evt);
-        } else
-          stepChain.onNext();
+        submitHandler.onClick(evt);
       }
     });
   }
@@ -438,8 +435,8 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   }
 
   @Override
-  public HandlerRegistration addFinishClickHandler(ClickHandler handler) {
-    return dialog.addFinishClickHandler(handler);
+  public HandlerRegistration addCloseClickHandler(ClickHandler handler) {
+    return dialog.addCloseClickHandler(handler);
   }
 
   @Override

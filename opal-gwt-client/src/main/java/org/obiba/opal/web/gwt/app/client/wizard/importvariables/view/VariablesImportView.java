@@ -92,10 +92,6 @@ public class VariablesImportView extends Composite implements VariablesImportPre
 
   private ComparedDatasourcesReportStepPresenter.Display compareDisplay;
 
-  private ClickHandler fileSelectedHandler;
-
-  private ClickHandler importHandler;
-
   private ValidationHandler fileSelectionValidator;
 
   private ValidationHandler importableValidator;
@@ -113,7 +109,7 @@ public class VariablesImportView extends Composite implements VariablesImportPre
   private void initWizardDialog() {
     stepChain = WizardStepChain.Builder.create(dialog)//
     .append(fileSelectionStep, fileSelectionHelp)//
-    .title("Select the variables file to use for creating or updating tables.")// TODO
+    .title("Select the variables file to use for creating or updating tables.")// TODO localization
     .onReset(new ResetHandler() {
 
       @Override
@@ -125,7 +121,7 @@ public class VariablesImportView extends Composite implements VariablesImportPre
     })//
 
     .append(compareStep)//
-    .title("Review the modifications before applying them.")// TODO
+    .title("Review the modifications before applying them.")// TODO localization
     .help(new WidgetProvider() {
 
       @Override
@@ -135,31 +131,9 @@ public class VariablesImportView extends Composite implements VariablesImportPre
     })//
 
     .append(conclusionStep)//
-    .title("Importing variables...")// TODO
+    .title("Importing variables...")// TODO localization
 
-    .onNext(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent evt) {
-        if(fileSelectionStep.isVisible()) {
-          if(fileSelectionValidator.validate()) {
-            fileSelectedHandler.onClick(evt);
-            dialog.setProgress(true);
-            dialog.setNextEnabled(false);
-            dialog.setCancelEnabled(false);
-          }
-        } else if(compareStep.isVisible()) {
-          if(importableValidator.validate()) {
-            importHandler.onClick(evt);
-            stepChain.onNext();
-            dialog.setPreviousEnabled(false);
-            dialog.setCancelEnabled(false);
-          }
-        } else
-          stepChain.onNext();
-      }
-    })//
-    .onPrevious().onFinish().onCancel().build();
+    .onPrevious().onCancel().onClose().build();
   }
 
   private void showErrors(ClientErrorDto errorDto) {
@@ -217,15 +191,37 @@ public class VariablesImportView extends Composite implements VariablesImportPre
   }
 
   @Override
-  public HandlerRegistration addFileSelectedClickHandler(ClickHandler handler) {
-    this.fileSelectedHandler = handler;
-    return stepChain.getNextHandlerRegistration();
+  public HandlerRegistration addFileSelectedClickHandler(final ClickHandler handler) {
+    return dialog.addNextClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent evt) {
+        if(fileSelectionStep.isVisible()) {
+          if(fileSelectionValidator.validate()) {
+            handler.onClick(evt);
+            dialog.setProgress(true);
+            dialog.setNextEnabled(false);
+            dialog.setCancelEnabled(false);
+          }
+        } else
+          stepChain.onNext();
+      }
+    });
   }
 
   @Override
-  public HandlerRegistration addImportClickHandler(ClickHandler handler) {
-    this.importHandler = handler;
-    return stepChain.getNextHandlerRegistration();
+  public HandlerRegistration addImportClickHandler(final ClickHandler handler) {
+    return dialog.addFinishClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent evt) {
+        if(importableValidator.validate()) {
+          handler.onClick(evt);
+          stepChain.onNext();
+          dialog.setCancelEnabled(false);
+        }
+      }
+    });
   }
 
   @Override

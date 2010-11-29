@@ -126,7 +126,7 @@ class WizardStepControllerImpl implements WizardStepController {
 
   @Override
   public boolean canFinish() {
-    return canFinish;
+    return canFinish || (next != null && !next.hasNext());
   }
 
   private static class WidgetProviderImpl implements WidgetProvider {

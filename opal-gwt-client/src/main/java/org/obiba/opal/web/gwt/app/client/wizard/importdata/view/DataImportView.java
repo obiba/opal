@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
-import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.WidgetProvider;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
@@ -124,14 +123,8 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
     .title("Select the destination (where you wish to write the data to).")// TODO
 
     .append(conclusionStep)//
-    .onReset(new ResetHandler() {
 
-      @Override
-      public void onReset() {
-        conclusionStep.setStepTitle("Data to import are being validated..."); // TODO
-      }
-    })//
-    .onPrevious().build();
+    .onNext().onPrevious().build();
 
   }
 
@@ -170,8 +163,8 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
   }
 
   @Override
-  public HandlerRegistration addFinishClickHandler(ClickHandler handler) {
-    return dialog.addFinishClickHandler(handler);
+  public HandlerRegistration addCloseClickHandler(ClickHandler handler) {
+    return dialog.addCloseClickHandler(handler);
   }
 
   @Override
@@ -218,15 +211,12 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
 
   @Override
   public HandlerRegistration addImportClickHandler(final ClickHandler handler) {
-    return dialog.addNextClickHandler(new ClickHandler() {
+    return dialog.addFinishClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent evt) {
-        if(destinationSelectionStep.isVisible()) {
-          // asynchronous next, see setConclusion()
-          handler.onClick(evt);
-        } else
-          stepChain.onNext();
+        // asynchronous next, see setConclusion()
+        handler.onClick(evt);
       }
     });
   }
@@ -237,24 +227,23 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
     conclusionStep.removeStepContent();
     presenter.reset();
     conclusionStep.add(presenter.getDisplay().asWidget());
+    conclusionStep.setStepTitle("Data to import are being validated..."); // TODO localization
     stepChain.onNext();
-    dialog.setPreviousEnabled(false);
     dialog.setCancelEnabled(false);
-    dialog.setFinishEnabled(false);
+    dialog.setCloseEnabled(false);
     presenter.setTransientDatasourceCreatedCallback(new DatasourceCreatedCallback() {
 
       @Override
       public void onSuccess(DatasourceFactoryDto factory, DatasourceDto datasource) {
-        conclusionStep.setStepTitle("Data import validation completed.");
-        dialog.setFinishEnabled(true);
+        conclusionStep.setStepTitle("Data import validation completed."); // TODO localization
+        dialog.setCloseEnabled(true);
         dialog.setProgress(false);
       }
 
       @Override
       public void onFailure(DatasourceFactoryDto factory, ClientErrorDto error) {
-        conclusionStep.setStepTitle("Data import validation failed.");
+        conclusionStep.setStepTitle("Data import validation failed."); // TODO localization
         dialog.setCancelEnabled(true);
-        dialog.setPreviousEnabled(true);
         dialog.setProgress(false);
       }
     });

@@ -89,7 +89,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     initFileSelectionType();
     fileSelectionPresenter.bind();
     super.registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
-    super.registerHandler(getDisplay().addFinishClickHandler(new FinishClickHandler()));
+    super.registerHandler(getDisplay().addCloseClickHandler(new FinishClickHandler()));
     super.registerHandler(getDisplay().addSubmitClickHandler(new SubmitClickHandler()));
     super.registerHandler(getDisplay().addJobLinkClickHandler(new JobLinkClickHandler(eventBus, jobListPresenter)));
     super.registerHandler(getDisplay().addFileFormatChangeHandler(new FileFormatChangeHandler()));
@@ -355,7 +355,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
 
-    HandlerRegistration addFinishClickHandler(ClickHandler handler);
+    HandlerRegistration addCloseClickHandler(ClickHandler handler);
 
   }
 

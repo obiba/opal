@@ -40,6 +40,8 @@ public class WizardDialogBox extends DialogBox {
 
   private Button help;
 
+  private Button close;
+
   private ResizeHandle resizeHandle;
 
   private Tooltip helpTooltip;
@@ -105,13 +107,16 @@ public class WizardDialogBox extends DialogBox {
   }
 
   private void initNavigationControls(FlowPanel south) {
-    south.add(cancel = new Button("Cancel"));
+    south.add(cancel = new Button("Cancel")); // TODO localization
     initControlStyle(cancel, "cancel");
-    south.add(finish = new Button("Finish"));
+    south.add(close = new Button("Close")); // TODO localization
+    initControlStyle(close, "close");
+    close.setVisible(false);
+    south.add(finish = new Button("Finish")); // TODO localization
     initControlStyle(finish, "finish");
-    south.add(next = new Button("Next >"));
+    south.add(next = new Button("Next >")); // TODO localization
     initControlStyle(next, "next");
-    south.add(previous = new Button("< Previous"));
+    south.add(previous = new Button("< Previous")); // TODO localization
     initControlStyle(previous, "previous");
     setPreviousEnabled(false);
   }
@@ -148,6 +153,17 @@ public class WizardDialogBox extends DialogBox {
 
   public void setCancelEnabled(boolean enabled) {
     cancel.setEnabled(enabled);
+  }
+
+  public void setCloseEnabled(boolean enabled) {
+    close.setEnabled(enabled);
+  }
+
+  public void setCloseVisible(boolean visible) {
+    close.setVisible(visible);
+    finish.setVisible(!visible);
+    next.setVisible(!visible);
+    previous.setVisible(!visible);
   }
 
   @Override
@@ -194,6 +210,10 @@ public class WizardDialogBox extends DialogBox {
 
   public HandlerRegistration addNextClickHandler(ClickHandler handler) {
     return next.addClickHandler(handler);
+  }
+
+  public HandlerRegistration addCloseClickHandler(ClickHandler handler) {
+    return close.addClickHandler(handler);
   }
 
   public void setHelpTooltip(Widget w) {

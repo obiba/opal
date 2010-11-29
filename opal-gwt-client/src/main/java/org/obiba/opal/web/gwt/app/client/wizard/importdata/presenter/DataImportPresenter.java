@@ -78,7 +78,7 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
         getDisplay().hideDialog();
       }
     }));
-    super.registerHandler(getDisplay().addFinishClickHandler(new ClickHandler() {
+    super.registerHandler(getDisplay().addCloseClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
@@ -170,7 +170,7 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
 
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
 
-    HandlerRegistration addFinishClickHandler(ClickHandler handler);
+    HandlerRegistration addCloseClickHandler(ClickHandler clickHandler);
 
     //
     // Format selection step
