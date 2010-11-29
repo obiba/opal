@@ -35,7 +35,7 @@
 		                     </tr>
 		                     <tr>
 	                           <td>
-	                             <g:RadioButton name="name" ui:field="customAttributeNameRadioButton"><ui:msg description="Custom label">Custom:</ui:msg></g:RadioButton><g:TextBox name="customAttributeName" ui:field="customAttributeName" visibleLength="20"/>
+	                             <g:RadioButton name="name" ui:field="customAttributeNameRadioButton"><ui:msg description="Custom label">Custom:</ui:msg></g:RadioButton><g:TextBox name="customAttributeName" ui:field="customAttributeName" visibleLength="26"/>
 	                           </td>
 		                     </tr>
 		                   </tbody>
