@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -18,7 +19,6 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DeckPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ConfigureViewStepView extends Composite implements ConfigureViewStepPresenter.Display {
@@ -44,7 +44,7 @@ public class ConfigureViewStepView extends Composite implements ConfigureViewSte
   SimplePanel variablesTabPanel;
 
   @UiField
-  TabLayoutPanel viewTabs;
+  HorizontalTabLayout viewTabs;
 
   //
   // Constructors
@@ -82,7 +82,7 @@ public class ConfigureViewStepView extends Composite implements ConfigureViewSte
   }
 
   @Override
-  public TabLayoutPanel getViewTabs() {
+  public HorizontalTabLayout getViewTabs() {
     return viewTabs;
   }
 

@@ -506,8 +506,8 @@ public interface Translations extends Constants {
   String runLabel();
 
   @Description("Paging of label")
-  @DefaultStringValue("of")
-  String ofLabel();
+  @DefaultStringValue("to")
+  String toLabel();
 
   @Description("Values label")
   @DefaultStringValue("Values")

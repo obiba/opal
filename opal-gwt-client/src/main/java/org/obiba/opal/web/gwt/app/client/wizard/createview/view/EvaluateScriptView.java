@@ -236,7 +236,7 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
 
   @Override
   public void setPaging(int start, int end) {
-    pageLimit.setText("(" + start + " " + translations.ofLabel() + " " + end + ")");
+    pageLimit.setText("(" + start + " " + translations.toLabel() + " " + end + ")");
   }
 
   @Override

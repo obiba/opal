@@ -24,6 +24,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePend
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.event.ShowEvaluateScriptResultEvent;
+import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
@@ -37,7 +38,6 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.DeckPanel;
-import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -193,7 +193,7 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
 
     void addEntitiesTabWidget(Widget widget);
 
-    TabLayoutPanel getViewTabs();
+    HorizontalTabLayout getViewTabs();
 
     void displayTab(int tabNumber);
   }
