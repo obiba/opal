@@ -23,7 +23,6 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.createview.event.ShowEvaluateScriptResultEvent;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -163,19 +162,6 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
     }));
     super.registerHandler(eventBus.addHandler(ViewSavePendingEvent.getType(), new ViewSavePendingHandler()));
     super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
-
-    super.registerHandler(eventBus.addHandler(ShowEvaluateScriptResultEvent.getType(), new ShowEvaluateScriptResultEvent.Handler() {
-
-      @Override
-      public void onShowEvaluateScriptResultEvent(ShowEvaluateScriptResultEvent event) {
-        if(event.isResultsShown()) {
-          getDisplay().setViewTabsHeight("80em");
-        } else {
-          getDisplay().setViewTabsHeight("50em");
-        }
-      }
-    }));
-
   }
 
   //
@@ -184,8 +170,6 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
 
   public interface Display extends WidgetDisplay {
     DeckPanel getHelpDeck();
-
-    void setViewTabsHeight(String height);
 
     void addDataTabWidget(Widget widget);
 

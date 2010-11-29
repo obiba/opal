@@ -109,9 +109,4 @@ public class ConfigureViewStepView extends Composite implements ConfigureViewSte
     viewTabs.selectTab(tabNumber);
   }
 
-  @Override
-  public void setViewTabsHeight(String height) {
-    viewTabs.setHeight(height);
-  }
-
 }
