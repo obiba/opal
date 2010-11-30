@@ -22,8 +22,8 @@ import org.obiba.magma.support.ValueTableReference;
 import org.obiba.magma.views.JoinTable;
 import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
-import org.obiba.magma.views.View.Builder;
 import org.obiba.magma.views.WhereClause;
+import org.obiba.magma.views.View.Builder;
 import org.obiba.magma.views.support.NoneClause;
 import org.obiba.opal.web.model.Magma.JavaScriptViewDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
@@ -124,6 +124,8 @@ public final class ViewDtos {
 
     public ViewDto asDto(View view) {
       ViewDto.Builder viewDtoBuilder = ViewDto.newBuilder();
+      viewDtoBuilder.setDatasourceName(view.getDatasource().getName());
+      viewDtoBuilder.setName(view.getName());
 
       ValueTable from = view.getWrappedValueTable();
       if(from instanceof JoinTable) {
@@ -181,6 +183,8 @@ public final class ViewDtos {
 
     public ViewDto asDto(View view) {
       ViewDto.Builder viewDtoBuilder = ViewDto.newBuilder();
+      viewDtoBuilder.setDatasourceName(view.getDatasource().getName());
+      viewDtoBuilder.setName(view.getName());
 
       ValueTable from = view.getWrappedValueTable();
       if(from instanceof JoinTable) {
