@@ -15,6 +15,7 @@
     </g:caption>
     <g:DockLayoutPanel unit="EM" height="18em" width="35em">
       <g:center>
+      <g:ScrollPanel>
         <g:VerticalPanel  addStyleNames="main {style.optionsPanelMsg}">
           <g:HTMLPanel height="5.5em">
             <table class="gwt-KeyValue" cellspacing="10">
@@ -35,7 +36,7 @@
 		                     </tr>
 		                     <tr>
 	                           <td>
-	                             <g:RadioButton name="name" ui:field="customAttributeNameRadioButton"><ui:msg description="Custom label">Custom:</ui:msg></g:RadioButton><g:TextBox name="customAttributeName" ui:field="customAttributeName" visibleLength="26"/>
+	                             <g:RadioButton name="name" ui:field="customAttributeNameRadioButton"><ui:msg description="Custom label">Custom:</ui:msg></g:RadioButton><g:TextBox name="customAttributeName" ui:field="customAttributeName" visibleLength="24"/>
 	                           </td>
 		                     </tr>
 		                   </tbody>
@@ -47,8 +48,9 @@
               </tbody>
             </table>
           </g:HTMLPanel>
-          <g:ScrollPanel ui:field="scrollPanel" height="8em"/>
+          <g:SimplePanel ui:field="simplePanel"/>
         </g:VerticalPanel>
+        </g:ScrollPanel>
       </g:center>
       <g:south size="3.25">
         <g:HTMLPanel addStyleNames="footer">

@@ -17,6 +17,7 @@
     </g:caption>
     <g:DockLayoutPanel unit="EM" height="15em" width="35em">
       <g:center>
+        <g:ScrollPanel>
         <g:VerticalPanel addStyleNames="main {style.optionsPanelMsg}">
           <g:HorizontalPanel>
             <g:Label>
@@ -24,8 +25,9 @@
             </g:Label>
             <g:SimplePanel ui:field="categoryNamePanel" addStyleNames="small-indent" />
           </g:HorizontalPanel>
-          <g:ScrollPanel ui:field="inputFieldPanel" addStyleNames="labelPanel" height="8em"/>
+          <g:SimplePanel ui:field="simplePanel" addStyleNames="labelPanel"/>
         </g:VerticalPanel>
+        </g:ScrollPanel>
       </g:center>
       <g:south size="3.25">
         <g:HTMLPanel addStyleNames="footer">

@@ -30,7 +30,6 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RadioButton;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -71,7 +70,7 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   TextBox customAttributeName;
 
   @UiField
-  ScrollPanel scrollPanel;
+  SimplePanel simplePanel;
 
   private LabelListPresenter.Display inputField;
 
@@ -190,15 +189,15 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
 
   @Override
   public void addInputField(LabelListPresenter.Display inputField) {
-    scrollPanel.clear();
-    scrollPanel.add(inputField.asWidget());
+    simplePanel.clear();
+    simplePanel.add(inputField.asWidget());
     this.inputField = inputField;
     this.inputField.setAttributeValueLabel(translations.valueLabel());
   }
 
   @Override
   public void removeInputField() {
-    scrollPanel.clear();
+    simplePanel.clear();
     inputField = null;
   }
 

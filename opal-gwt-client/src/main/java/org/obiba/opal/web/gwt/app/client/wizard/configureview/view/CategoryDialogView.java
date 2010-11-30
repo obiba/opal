@@ -23,7 +23,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -57,7 +56,7 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
   private boolean categoryNameEditable;
 
   @UiField
-  ScrollPanel inputFieldPanel;
+  SimplePanel simplePanel;
 
   private LabelListPresenter.Display inputField;
 
@@ -66,7 +65,7 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
     uiBinder.createAndBindUi(this);
 
     categoryName = new TextBox();
-    categoryName.setVisibleLength(40);
+    categoryName.setVisibleLength(38);
 
     uneditableCategoryName = new Label();
 
@@ -144,15 +143,15 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
 
   @Override
   public void addInputField(LabelListPresenter.Display inputField) {
-    inputFieldPanel.clear();
-    inputFieldPanel.add(inputField.asWidget());
+    simplePanel.clear();
+    simplePanel.add(inputField.asWidget());
     this.inputField = inputField;
     this.inputField.setAttributeValueLabel(translations.labelLabel());
   }
 
   @Override
   public void removeInputField() {
-    inputFieldPanel.clear();
+    simplePanel.clear();
     inputField = null;
   }
 
