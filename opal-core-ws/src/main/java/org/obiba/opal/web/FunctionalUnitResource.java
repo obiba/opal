@@ -16,6 +16,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -48,6 +49,7 @@ import org.obiba.opal.core.unit.UnitKeyStore;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.TableResource;
 import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.model.Magma.ValueSetDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -177,10 +179,19 @@ public class FunctionalUnitResource {
   @Path("/entities/identifiers")
   @Produces("text/plain")
   public Response getIdentifiers() {
+    ValueTable keysTable = MagmaEngine.get().getDatasource(keysDatasourceName).getValueTable(keysTableName);
+    TableResource tableResource = new TableResource(keysTable);
+
+    FunctionalUnit functionalUnit = opalRuntime.getFunctionalUnit(unit);
+    if(functionalUnit == null) throw new IllegalArgumentException("No such unit: " + unit);
+
     ByteArrayOutputStream ids = new ByteArrayOutputStream();
     PrintWriter writer = new PrintWriter(ids);
-    for(VariableEntityDto entity : getEntities()) {
-      writer.append(entity.getIdentifier()).append("\n");
+    if(keysTable.hasVariable(functionalUnit.getKeyVariableName())) {
+      Collection<ValueSetDto> values = tableResource.getValueSets("name().value()=='" + functionalUnit.getKeyVariableName() + "'", "$('" + functionalUnit.getKeyVariableName() + "').isNull().not()", 0, Integer.MAX_VALUE);
+      for(ValueSetDto value : values) {
+        if(value.getVariablesCount() == 1) writer.append(value.getValues(0).getValue()).append("\n");
+      }
     }
     writer.close();
 
