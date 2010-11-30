@@ -32,6 +32,10 @@ import com.google.inject.Inject;
  *
  */
 public class AttributesPresenter extends LocalizablesPresenter {
+
+  /** The attribute name 'label'. Attribute names are not localised. */
+  private static final String LABEL = "label";
+
   //
   // Instance Variables
   //
@@ -167,6 +171,7 @@ public class AttributesPresenter extends LocalizablesPresenter {
         attributeNames.add(attribute.getName());
       }
     }
+    attributeNames.add(LABEL); // The attribute name 'label' will always be available.
     return new ArrayList<String>(attributeNames);
   }
 
