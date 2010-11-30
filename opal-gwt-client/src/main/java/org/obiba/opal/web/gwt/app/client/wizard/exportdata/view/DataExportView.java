@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.exportdata.view;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
@@ -248,10 +250,10 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   }
 
   @Override
-  public void setDatasources(JsArray<DatasourceDto> datasources) {
+  public void setDatasources(List<DatasourceDto> datasources) {
     this.datasources.clear();
-    for(int i = 0; i < datasources.length(); i++) {
-      this.datasources.addItem(datasources.get(i).getName(), datasources.get(i).getName());
+    for(DatasourceDto datasource : datasources) {
+      this.datasources.addItem(datasource.getName(), datasource.getName());
     }
   }
 

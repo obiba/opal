@@ -10,7 +10,9 @@
 package org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
@@ -21,11 +23,13 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -93,6 +97,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     super.registerHandler(getDisplay().addSubmitClickHandler(new SubmitClickHandler()));
     super.registerHandler(getDisplay().addJobLinkClickHandler(new JobLinkClickHandler(eventBus, jobListPresenter)));
     super.registerHandler(getDisplay().addFileFormatChangeHandler(new FileFormatChangeHandler()));
+    super.registerHandler(eventBus.addHandler(TableListUpdateEvent.getType(), new TablesToExportChangedHandler()));
     getDisplay().setFileWidgetDisplay(fileSelectionPresenter.getDisplay());
     getDisplay().setTablesValidator(new TablesValidator());
     getDisplay().setDestinationValidator(new DestinationValidator());
@@ -121,17 +126,17 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   @Override
   public void revealDisplay() {
-    // tableListPresenter.clear();
-    initDatasourcesAndUnitsAndShow();
+    tableListPresenter.clear();
+    getDisplay().showDialog();
   }
 
-  private void initDatasourcesAndUnitsAndShow() {
+  private void initDatasourcesAndUnits() {
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
       public void onResource(Response response, JsArray<DatasourceDto> datasources) {
         if(datasources != null && datasources.length() > 0) {
-          getDisplay().setDatasources(datasources);
-          initUnitsAndShow();
+          getDisplay().setDatasources(filterDatasources(datasources));
+          initUnits();
         } else {
           eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "NoDataToExport", null));
         }
@@ -139,12 +144,31 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     }).send();
   }
 
-  private void initUnitsAndShow() {
+  private List<DatasourceDto> filterDatasources(JsArray<DatasourceDto> datasources) {
+
+    List<DatasourceDto> filteredDatasources = new ArrayList<DatasourceDto>();
+    Set<String> originDatasourceName = getOriginDatasourceNames();
+    for(DatasourceDto datasource : JsArrays.toList(datasources)) {
+      if(!originDatasourceName.contains(datasource.getName())) {
+        filteredDatasources.add(datasource);
+      }
+    }
+    return filteredDatasources;
+  }
+
+  private Set<String> getOriginDatasourceNames() {
+    Set<String> originDatasourceNames = new HashSet<String>();
+    for(TableDto table : tableListPresenter.getTables()) {
+      originDatasourceNames.add(table.getDatasourceName());
+    }
+    return originDatasourceNames;
+  }
+
+  private void initUnits() {
     ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
       @Override
       public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
         getDisplay().setUnits(units);
-        getDisplay().showDialog();
       }
     }).send();
   }
@@ -290,6 +314,14 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     }
   }
 
+  public class TablesToExportChangedHandler implements TableListUpdateEvent.Handler {
+
+    @Override
+    public void onTableListUpdate(TableListUpdateEvent event) {
+      initDatasourcesAndUnits();
+    }
+  }
+
   public interface Display extends WidgetDisplay {
 
     void showDialog();
@@ -301,7 +333,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     void setDestinationValidator(ValidationHandler handler);
 
     /** Set a collection of Opal datasources retrieved from Opal. */
-    void setDatasources(JsArray<DatasourceDto> datasources);
+    void setDatasources(List<DatasourceDto> datasources);
 
     /** Get the Opal datasource selected by the user. */
     String getSelectedDatasource();
