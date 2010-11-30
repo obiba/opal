@@ -26,6 +26,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
@@ -80,6 +81,9 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
 
   @UiField
   RadioButton addingVariablesOneByOneRadioButton;
+
+  @UiField
+  Anchor configureLink;
 
   private DatasourceSelectorPresenter.Display datasourceSelector;
 
@@ -141,6 +145,7 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
       @Override
       public void onReset() {
         conclusionStep.setStepTitle("View is being created ..."); // TODO
+        configureLink.setVisible(false);
       }
     })
 
@@ -209,6 +214,7 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
     return dialog.addCancelClickHandler(handler);
   }
 
+  @Override
   public HandlerRegistration addCreateHandler(final ClickHandler handler) {
     return dialog.addFinishClickHandler(new ClickHandler() {
 
@@ -221,10 +227,17 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
     });
   }
 
+  @Override
+  public HandlerRegistration addConfigureHandler(ClickHandler handler) {
+    return configureLink.addClickHandler(handler);
+  }
+
+  @Override
   public HasValue<Boolean> getApplyGlobalVariableFilterOption() {
     return applyingGlobalVariableFilterRadioButton;
   }
 
+  @Override
   public HasValue<Boolean> getAddVariablesOneByOneOption() {
     return addingVariablesOneByOneRadioButton;
   }
@@ -241,13 +254,16 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
     dialog.hide();
   }
 
+  @Override
   public Widget asWidget() {
     return this;
   }
 
+  @Override
   public void startProcessing() {
   }
 
+  @Override
   public void stopProcessing() {
   }
 
@@ -273,6 +289,7 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
     dialog.setProgress(false);
     dialog.setCloseEnabled(true);
     conclusionStep.setStepTitle("View successfully created."); // TODO localization
+    configureLink.setVisible(true);
   }
 
   @Override

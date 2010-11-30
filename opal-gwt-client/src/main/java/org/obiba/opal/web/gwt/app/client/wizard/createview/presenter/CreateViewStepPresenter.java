@@ -21,6 +21,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewCreationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
@@ -36,6 +37,7 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter.DatasourcesRefreshedCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -110,6 +112,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     super.registerHandler(getDisplay().addCancelHandler(new CancelHandler()));
     super.registerHandler(getDisplay().addCreateHandler(new CreateHandler()));
     super.registerHandler(getDisplay().addCloseHandler(new CloseHandler()));
+    super.registerHandler(getDisplay().addConfigureHandler(new ConfigureHandler()));
     getDisplay().setTablesValidator(new TablesValidator());
     getDisplay().setSelectTypeValidator(new SelectTypeValidator());
   }
@@ -150,14 +153,15 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     ViewNotFoundCreateCallback create = new ViewNotFoundCreateCallback();
 
     // Create the resource request (the builder).
-    ResourceRequestBuilder<JavaScriptObject> resourceRequestBuilder = ResourceRequestBuilderFactory.newBuilder()//
+    getViewRequest(datasourceName, viewName).withCallback(Response.SC_OK, doNotCreate)//
+    .withCallback(Response.SC_NOT_FOUND, create).send();
+  }
+
+  private ResourceRequestBuilder<ViewDto> getViewRequest(String datasourceName, String viewName) {
+    return ResourceRequestBuilderFactory.<ViewDto> newBuilder()//
     .get()//
     .forResource("/datasource/" + datasourceName + "/view/" + viewName)//
-    .accept("application/x-protobuf+json")//
-    .withCallback(Response.SC_OK, doNotCreate)//
-    .withCallback(Response.SC_NOT_FOUND, create);
-
-    resourceRequestBuilder.send();
+    .accept("application/x-protobuf+json");
   }
 
   private void createView() {
@@ -233,6 +237,8 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
     void renderCompletedConclusion();
 
+    HandlerRegistration addConfigureHandler(ClickHandler handler);
+
   }
 
   class ViewCreationRequiredHandler implements ViewCreationRequiredEvent.Handler {
@@ -255,6 +261,25 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     public void onClick(ClickEvent evt) {
       eventBus.fireEvent(new DatasourceUpdatedEvent(datasourceSelectorPresenter.getSelectionDto()));
       getDisplay().hideDialog();
+    }
+  }
+
+  final class ConfigureHandler implements ClickHandler {
+    @Override
+    public void onClick(ClickEvent evt) {
+      // eventBus.fireEvent(new DatasourceUpdatedEvent(datasourceSelectorPresenter.getSelectionDto()));
+
+      // Get the new view dto
+      getViewRequest(getDisplay().getDatasourceName().getText(), getDisplay().getViewName().getText())//
+      .withCallback(new ResourceCallback<ViewDto>() {
+
+        @Override
+        public void onResource(Response response, ViewDto resource) {
+          getDisplay().hideDialog();
+          eventBus.fireEvent(new ViewConfigurationRequiredEvent(resource));
+        }
+      }).send();
+
     }
   }
 
