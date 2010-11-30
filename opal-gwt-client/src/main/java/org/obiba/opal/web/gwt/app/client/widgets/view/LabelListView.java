@@ -12,11 +12,13 @@ package org.obiba.opal.web.gwt.app.client.widgets.view;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -36,6 +38,8 @@ public class LabelListView extends Composite implements LabelListPresenter.Displ
   private Map<String, TextBox> languageLabelMap = new HashMap<String, TextBox>();
 
   private String attributeValueLabel;
+
+  private Translations translations = GWT.create(Translations.class);
 
   public LabelListView() {
     panel = new FlowPanel();
@@ -72,11 +76,15 @@ public class LabelListView extends Composite implements LabelListPresenter.Displ
   private String getLabelText(String language, int index) {
     StringBuilder sb = new StringBuilder();
     sb.append(attributeValueLabel);
-    if(!language.equals("")) {
-      sb.append(" (");
-      sb.append(language).append(")");
-      if(index == 0) sb.append("*");
+    sb.append(" (");
+    if(language.equals("")) {
+      sb.append(translations.noLocale());
+    } else {
+      sb.append(language);
     }
+    sb.append(")");
+    if(index == 0) sb.append("*");
+
     sb.append(":");
     return sb.toString();
   }

@@ -549,4 +549,8 @@ public interface Translations extends Constants {
   @DefaultStringValue("Select the entities that will be viewed.")
   String editViewEntitiesStep();
 
+  @Description("No locale label")
+  @DefaultStringValue("no locale")
+  String noLocale();
+
 }
