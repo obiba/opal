@@ -109,7 +109,7 @@ public class FunctionalUnitDatasource extends AbstractTransformingDatasourceWrap
     return wrappedDatasource;
   }
 
-  private final class FunctionalUnitValueTable extends AbstractTransformingValueTableWrapper {
+  private static class FunctionalUnitValueTable extends AbstractTransformingValueTableWrapper {
 
     private ValueTable wrappedTable;
 
@@ -133,7 +133,7 @@ public class FunctionalUnitDatasource extends AbstractTransformingDatasourceWrap
 
   }
 
-  private final class FunctionalUnitValueTableWritter implements ValueTableWriter {
+  private static class FunctionalUnitValueTableWritter implements ValueTableWriter {
 
     private ValueTableWriter wrapped;
 
