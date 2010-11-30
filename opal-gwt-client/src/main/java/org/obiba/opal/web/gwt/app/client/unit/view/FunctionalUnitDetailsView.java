@@ -96,7 +96,9 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
 
   private MenuItem keyPair;
 
-  private MenuItem identifiers;
+  private MenuItem generateIdentifiers;
+
+  private MenuItem importIdentifiers;
 
   private MenuItem update;
 
@@ -321,7 +323,7 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   @Override
   public void setDownloadIdentifiersCommand(Command command) {
     if(downloadIds == null) {
-      actionsMenu.addItem(downloadIds = new MenuItem("Download Identifiers", command));
+      actionsMenu.addItem(downloadIds = new MenuItem("Download Identifiers", command)); // TODO localization
       actionsMenu.addSeparator(new MenuItemSeparator());
     } else {
       downloadIds.setCommand(command);
@@ -340,18 +342,28 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   @Override
   public void setAddKeyPairCommand(Command command) {
     if(keyPair == null) {
-      addMenu.addItem(keyPair = new MenuItem("Key Pair", command));
+      addMenu.addItem(keyPair = new MenuItem("Key Pair", command)); // TODO localization
     } else {
       keyPair.setCommand(command);
     }
   }
 
   @Override
-  public void setAddIdentifiersCommand(Command command) {
-    if(identifiers == null) {
-      addMenu.addItem(identifiers = new MenuItem("Identifiers", command));
+  public void setGenerateIdentifiersCommand(Command command) {
+    if(generateIdentifiers == null) {
+      addMenu.addSeparator(new MenuItemSeparator());
+      addMenu.addItem(generateIdentifiers = new MenuItem("Generate Identifiers", command)); // TODO localization
     } else {
-      identifiers.setCommand(command);
+      generateIdentifiers.setCommand(command);
+    }
+  }
+
+  @Override
+  public void setImportIdentifiersCommand(Command command) {
+    if(importIdentifiers == null) {
+      addMenu.addItem(importIdentifiers = new MenuItem("Import Identifiers", command)); // TODO localization
+    } else {
+      importIdentifiers.setCommand(command);
     }
   }
 

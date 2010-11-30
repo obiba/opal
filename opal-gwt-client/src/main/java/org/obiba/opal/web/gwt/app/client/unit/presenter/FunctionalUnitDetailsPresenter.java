@@ -75,7 +75,9 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
     void setAddKeyPairCommand(Command command);
 
-    void setAddIdentifiersCommand(Command command);
+    void setGenerateIdentifiersCommand(Command command);
+
+    void setImportIdentifiersCommand(Command command);
 
   }
 
@@ -155,10 +157,13 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
   private void setCommands() {
     getDisplay().setDownloadIdentifiersCommand(new DownloadIdentifiersCommand());
     getDisplay().setRemoveFunctionalUnitCommand(new RemoveFunctionalUnitCommand());
-    getDisplay().setUpdateFunctionalUnitCommand(new EditFunctionalUnitCommand());
+
     getDisplay().setAddKeyPairCommand(new AddKeyPairCommand());
     // TODO add identifiers
-    getDisplay().setAddIdentifiersCommand(null);
+    getDisplay().setGenerateIdentifiersCommand(null);
+    getDisplay().setImportIdentifiersCommand(null);
+
+    getDisplay().setUpdateFunctionalUnitCommand(new EditFunctionalUnitCommand());
   }
 
   private void updateCurrentCountOfIdentifiers() {
