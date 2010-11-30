@@ -16,6 +16,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSetChangeEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -55,7 +56,7 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
 
   public void setImportFormat(ImportFormat importFormat) {
     this.importFormat = importFormat;
-    updateDatasources();
+    updateSelectableDatasources();
   }
 
   @Override
@@ -65,7 +66,16 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
 
   @Override
   protected void onBind() {
+    refreshDatasources();
 
+    eventBus.addHandler(DatasourceSetChangeEvent.getType(), new DatasourceSetChangeEventHandler());
+  }
+
+  @Override
+  protected void onUnbind() {
+  }
+
+  private void refreshDatasources() {
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
       public void onResource(Response response, JsArray<DatasourceDto> resource) {
@@ -80,16 +90,16 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
     }).send();
   }
 
-  private void updateDatasources() {
+  private void updateSelectableDatasources() {
     JsArray<DatasourceDto> selectableDatasources;
     if(ImportFormat.CSV.equals(importFormat)) {
       selectableDatasources = removeDatasourcesWithoutTables(datasources);
+
+      // OPAL-902
+      selectableDatasources = removeDatasourcesWithOnlyViews(selectableDatasources);
     } else {
       selectableDatasources = datasources;
     }
-
-    // OPAL-902
-    selectableDatasources = removeDatasourcesWithOnlyViews(selectableDatasources);
 
     getDisplay().setDatasources(selectableDatasources);
     hideShowTables();
@@ -134,10 +144,6 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
   }
 
   @Override
-  protected void onUnbind() {
-  }
-
-  @Override
   public void refreshDisplay() {
   }
 
@@ -153,4 +159,11 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
       importData.setDestinationTableName(null);
   }
 
+  class DatasourceSetChangeEventHandler implements DatasourceSetChangeEvent.Handler {
+
+    @Override
+    public void onDatasourceSetChanged(DatasourceSetChangeEvent event) {
+      refreshDatasources();
+    }
+  }
 }
