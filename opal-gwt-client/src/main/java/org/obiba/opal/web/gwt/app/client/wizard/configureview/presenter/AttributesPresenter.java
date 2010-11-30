@@ -249,24 +249,30 @@ public class AttributesPresenter extends LocalizablesPresenter {
     }
 
     private void replaceAttribute(AttributeUpdateEvent event) {
+      deleteAttributeListByName(event.getAttributes());
       for(int attributeIndex = 0; attributeIndex < event.getAttributes().length(); attributeIndex++) {
         AttributeDto updatedAttribute = event.getAttributes().get(attributeIndex);
-
-        int originalAttributeIndex = findOriginalAttribute(updatedAttribute);
-        if(originalAttributeIndex != -1) {
-          variableDto.getAttributesArray().set(originalAttributeIndex, updatedAttribute);
-        }
+        variableDto.getAttributesArray().push(updatedAttribute);
       }
     }
 
-    private int findOriginalAttribute(AttributeDto updatedAttribute) {
+    private void deleteAttributeListByName(JsArray<AttributeDto> attributeDtos) {
+      for(int i = 0; i < attributeDtos.length(); i++) {
+        deleteAttributeByName(attributeDtos.get(i));
+      }
+    }
+
+    private void deleteAttributeByName(AttributeDto attributeDto) {
+      @SuppressWarnings("unchecked")
+      JsArray<AttributeDto> result = (JsArray<AttributeDto>) JsArray.createArray();
       for(int attributeIndex = 0; attributeIndex < variableDto.getAttributesArray().length(); attributeIndex++) {
         AttributeDto attribute = variableDto.getAttributesArray().get(attributeIndex);
-        if(attribute.getName().equals(updatedAttribute.getName()) && attribute.getLocale() != null && attribute.getLocale().equals(updatedAttribute.getLocale())) {
-          return attributeIndex;
+        if(!attribute.getName().equals(attributeDto.getName())) {
+          result.push(attribute);
         }
       }
-      return -1; // not found
+      variableDto.clearAttributesArray();
+      variableDto.setAttributesArray(result);
     }
   }
 }
