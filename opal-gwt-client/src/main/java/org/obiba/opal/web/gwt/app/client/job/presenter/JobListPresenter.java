@@ -86,6 +86,7 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
   @Override
   protected void onBind() {
     super.registerHandler(getDisplay().addClearButtonHandler(new ClearButtonHandler()));
+    super.registerHandler(getDisplay().addRefreshButtonHandler(new RefreshButtonHandler()));
     super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
   }
 
@@ -196,6 +197,8 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
     HasActionHandler getActionsColumn();
 
     HandlerRegistration addClearButtonHandler(ClickHandler handler);
+
+    HandlerRegistration addRefreshButtonHandler(ClickHandler handler);
   }
 
   public interface HasActionHandler {
@@ -212,6 +215,13 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
 
     public void onClick(ClickEvent event) {
       deleteCompletedJobs();
+    }
+  }
+
+  class RefreshButtonHandler implements ClickHandler {
+
+    public void onClick(ClickEvent event) {
+      updateTable();
     }
   }
 

@@ -51,9 +51,9 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
-import com.google.gwt.view.client.ListView.Delegate;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
+import com.google.gwt.view.client.ListView.Delegate;
 
 /**
  *
@@ -68,6 +68,9 @@ public class JobListView extends Composite implements Display {
 
   @UiField
   CellTable<CommandStateDto> table;
+
+  @UiField
+  Button refreshButton;
 
   @UiField
   Button clearButton;
@@ -126,6 +129,11 @@ public class JobListView extends Composite implements Display {
 
   public HandlerRegistration addClearButtonHandler(ClickHandler handler) {
     return clearButton.addClickHandler(handler);
+  }
+
+  @Override
+  public HandlerRegistration addRefreshButtonHandler(ClickHandler handler) {
+    return refreshButton.addClickHandler(handler);
   }
 
   //
