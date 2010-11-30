@@ -23,6 +23,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.FunctionalUnitDto;
@@ -31,11 +32,15 @@ public class FunctionalUnitsResourceTest {
 
   private OpalRuntime opalRuntimeMock;
 
+  private UnitKeyStoreService unitKeyStoreServiceMock;
+
   private Set<FunctionalUnit> functionalUnits;
 
   @Before
   public void setUp() {
     opalRuntimeMock = createMock(OpalRuntime.class);
+
+    unitKeyStoreServiceMock = createMock(UnitKeyStoreService.class);
 
     functionalUnits = new HashSet<FunctionalUnit>();
     functionalUnits.add(new FunctionalUnit("unit1", "key1"));
@@ -51,7 +56,7 @@ public class FunctionalUnitsResourceTest {
 
     replay(opalRuntimeMock);
 
-    FunctionalUnitsResource functionalUnitsResource = new FunctionalUnitsResource(opalRuntimeMock);
+    FunctionalUnitsResource functionalUnitsResource = new FunctionalUnitsResource(opalRuntimeMock, unitKeyStoreServiceMock);
     List<Opal.FunctionalUnitDto> functionalUnitDtoList = functionalUnitsResource.getFunctionalUnits();
     Assert.assertTrue(functionalUnitDtoList.size() == 3);
 

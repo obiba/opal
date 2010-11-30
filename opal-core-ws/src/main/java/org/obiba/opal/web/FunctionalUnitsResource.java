@@ -23,6 +23,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.model.Opal;
@@ -41,10 +42,13 @@ public class FunctionalUnitsResource {
 
   private OpalRuntime opalRuntime;
 
+  private final UnitKeyStoreService unitKeyStoreService;
+
   @Autowired
-  public FunctionalUnitsResource(OpalRuntime opalRuntime) {
+  public FunctionalUnitsResource(OpalRuntime opalRuntime, UnitKeyStoreService unitKeyStoreService) {
     super();
     this.opalRuntime = opalRuntime;
+    this.unitKeyStoreService = unitKeyStoreService;
   }
 
   @GET
@@ -73,6 +77,8 @@ public class FunctionalUnitsResource {
       if(unit.hasSelect()) {
         functionalUnit.setSelect(new JavascriptClause(unit.getSelect()));
       }
+      functionalUnit.setUnitKeyStoreService(unitKeyStoreService);
+
       opalRuntime.getOpalConfiguration().addOrReplaceFunctionalUnit(functionalUnit);
       opalRuntime.writeOpalConfiguration();
       response = Response.created(UriBuilder.fromPath("/").path(FunctionalUnitResource.class).build(unit.getName()));

@@ -10,13 +10,16 @@
 package org.obiba.opal.web;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -24,6 +27,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -33,19 +37,26 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import org.bouncycastle.openssl.PEMWriter;
+import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.ValueTable;
 import org.obiba.magma.js.views.JavascriptClause;
+import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.UnitKeyStore;
 import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.magma.TableResource;
 import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.model.Magma.VariableEntityDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 @Component
@@ -59,20 +70,26 @@ public class FunctionalUnitResource {
 
   private final UnitKeyStoreService unitKeyStoreService;
 
+  private final String keysDatasourceName;
+
+  private final String keysTableName;
+
   @PathParam("unit")
   private String unit;
 
   @Autowired
-  public FunctionalUnitResource(OpalRuntime opalRuntime, UnitKeyStoreService unitKeyStoreService) {
+  public FunctionalUnitResource(OpalRuntime opalRuntime, UnitKeyStoreService unitKeyStoreService, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference) {
     this.opalRuntime = opalRuntime;
     this.unitKeyStoreService = unitKeyStoreService;
-  }
-
-  // For testing
-  public FunctionalUnitResource(OpalRuntime opalRuntime, UnitKeyStoreService unitKeyStoreService, String unit) {
-    this.opalRuntime = opalRuntime;
-    this.unitKeyStoreService = unitKeyStoreService;
-    this.unit = unit;
+    MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(keysTableReference);
+    this.keysDatasourceName = resolver.getDatasourceName();
+    if(keysDatasourceName == null) {
+      throw new IllegalArgumentException("invalid keys table reference");
+    }
+    this.keysTableName = resolver.getTableName();
+    if(keysTableName == null) {
+      throw new IllegalArgumentException("invalid keys table reference");
+    }
   }
 
   @GET
@@ -102,6 +119,7 @@ public class FunctionalUnitResource {
       if(unitDto.hasSelect()) {
         functionalUnit.setSelect(new JavascriptClause(unitDto.getSelect()));
       }
+      functionalUnit.setUnitKeyStoreService(unitKeyStoreService);
 
       if(opalRuntime.getOpalConfiguration().hasFunctionalUnit(unitDto.getName())) {
         response = Response.ok();
@@ -128,6 +146,45 @@ public class FunctionalUnitResource {
     opalRuntime.writeOpalConfiguration();
 
     return Response.ok().build();
+  }
+
+  @GET
+  @Path("/entities")
+  public Set<VariableEntityDto> getEntities() {
+    ValueTable keysTable = MagmaEngine.get().getDatasource(keysDatasourceName).getValueTable(keysTableName);
+    TableResource tableResource = new TableResource(keysTable);
+
+    FunctionalUnit functionalUnit = opalRuntime.getFunctionalUnit(unit);
+    if(functionalUnit == null) throw new IllegalArgumentException("No such unit: " + unit);
+
+    Set<VariableEntityDto> entities;
+    if(keysTable.hasVariable(functionalUnit.getKeyVariableName())) {
+      entities = tableResource.getEntities("$('" + functionalUnit.getKeyVariableName() + "').isNull().not()");
+    } else {
+      entities = new ImmutableSet.Builder<VariableEntityDto>().build();
+    }
+
+    return entities;
+  }
+
+  @GET
+  @Path("/entities/count")
+  public Response getEntitiesCount() {
+    return Response.ok(String.valueOf(getEntities().size())).build();
+  }
+
+  @GET
+  @Path("/entities/identifiers")
+  @Produces("text/plain")
+  public Response getIdentifiers() {
+    ByteArrayOutputStream ids = new ByteArrayOutputStream();
+    PrintWriter writer = new PrintWriter(ids);
+    for(VariableEntityDto entity : getEntities()) {
+      writer.append(entity.getIdentifier()).append("\n");
+    }
+    writer.close();
+
+    return Response.ok(ids.toByteArray(), MediaType.TEXT_PLAIN).header("Content-Disposition", "attachment; filename=\"" + unit + "-identifiers.txt\"").build();
   }
 
   @GET
