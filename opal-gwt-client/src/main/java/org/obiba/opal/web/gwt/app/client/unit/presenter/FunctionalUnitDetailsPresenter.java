@@ -71,7 +71,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
     void setUpdateFunctionalUnitCommand(Command command);
 
-    void setCurrentCountOfIdentifiers(int count);
+    void setCurrentCountOfIdentifiers(String count);
 
     void setAddKeyPairCommand(Command command);
 
@@ -96,10 +96,12 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
   @Override
   public void refreshDisplay() {
+    updateCurrentCountOfIdentifiers();
   }
 
   @Override
   public void revealDisplay() {
+    updateCurrentCountOfIdentifiers();
   }
 
   @Override
@@ -125,7 +127,6 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
   private void initUiComponents() {
     getDisplay().setKeyPairs((JsArray<KeyPairDto>) JsArray.createArray());
     getDisplay().setFunctionalUnitDetails(null);
-    getDisplay().setCurrentCountOfIdentifiers(0);
   }
 
   private void addHandlers() {
@@ -152,21 +153,33 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
   }
 
   private void setCommands() {
-    getDisplay().setDownloadIdentifiersCommand(new Command() {
-
-      @Override
-      public void execute() {
-        String url = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")) //
-        .append("ws/functional-unit/").append(functionalUnit.getName()) //
-        .append("/entities/identifiers").toString();
-        eventBus.fireEvent(new FileDownloadEvent(url));
-      }
-    });
+    getDisplay().setDownloadIdentifiersCommand(new DownloadIdentifiersCommand());
     getDisplay().setRemoveFunctionalUnitCommand(new RemoveFunctionalUnitCommand());
     getDisplay().setUpdateFunctionalUnitCommand(new EditFunctionalUnitCommand());
     getDisplay().setAddKeyPairCommand(new AddKeyPairCommand());
-    // TODO
+    // TODO add identifiers
     getDisplay().setAddIdentifiersCommand(null);
+  }
+
+  private void updateCurrentCountOfIdentifiers() {
+    getDisplay().setCurrentCountOfIdentifiers("");
+    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        if(response.getStatusCode() == Response.SC_OK) {
+          getDisplay().setCurrentCountOfIdentifiers(response.getText());
+        } else {
+          getDisplay().setCurrentCountOfIdentifiers("");
+        }
+      }
+
+    };
+
+    ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/entities/count").get()//
+    .withCallback(Response.SC_OK, callbackHandler) //
+    .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
+    .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
   }
 
   protected void doActionImpl(final KeyPairDto dto, String actionName) {
@@ -230,6 +243,16 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
       addKeyPairDialogPresenter.revealDisplay();
     }
 
+  }
+
+  private final class DownloadIdentifiersCommand implements Command {
+    @Override
+    public void execute() {
+      String url = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")) //
+      .append("ws/functional-unit/").append(functionalUnit.getName()) //
+      .append("/entities/identifiers").toString();
+      eventBus.fireEvent(new FileDownloadEvent(url));
+    }
   }
 
   private class EditFunctionalUnitCommand implements Command {
@@ -299,8 +322,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     public void onResource(Response response, FunctionalUnitDto resource) {
       functionalUnit = resource;
       getDisplay().setFunctionalUnitDetails(functionalUnit);
-      // TODO
-      getDisplay().setCurrentCountOfIdentifiers(0);
+      updateCurrentCountOfIdentifiers();
     }
   }
 

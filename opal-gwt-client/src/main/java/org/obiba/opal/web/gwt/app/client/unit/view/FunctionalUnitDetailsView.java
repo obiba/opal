@@ -194,8 +194,8 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   }
 
   @Override
-  public void setCurrentCountOfIdentifiers(int count) {
-    this.currentCountOfIdentifiers.setText(Integer.toString(count));
+  public void setCurrentCountOfIdentifiers(String count) {
+    this.currentCountOfIdentifiers.setText(count);
   }
 
   private void renderFunctionalUnitDetails(FunctionalUnitDto functionalUnit) {
