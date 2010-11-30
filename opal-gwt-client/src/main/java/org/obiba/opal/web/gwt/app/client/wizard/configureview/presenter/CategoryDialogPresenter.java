@@ -93,9 +93,6 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
   @Inject
   public CategoryDialogPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
-    validators.add(new RequiredTextValidator(getDisplay().getCategoryName(), "CategoryDialogNameRequired"));
-    validators.add(new UniqueCategoryNameValidator(getDisplay().getCategoryName(), "CategoryNameAlreadyExists"));
-
     categories = (JsArray<CategoryDto>) JsArray.createArray();
   }
 
@@ -157,6 +154,8 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
     }
 
     validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLabelRequired"));
+    validators.add(new RequiredTextValidator(getDisplay().getCategoryName(), "CategoryDialogNameRequired"));
+    validators.add(new UniqueCategoryNameValidator(getDisplay().getCategoryName(), "CategoryNameAlreadyExists"));
   }
 
   private void setTitle() {
