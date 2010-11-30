@@ -15,7 +15,6 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.core.unit.FunctionalUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -50,12 +49,13 @@ public class FunctionalUnitDatasourceManager implements DatasourceTransformer {
 
   @Override
   public Datasource transform(Datasource datasource) {
-    FunctionalUnit unit = null;
     // TODO search for unit given a datasource name
-    if(unit != null) {
-      return new FunctionalUnitDatasource(txTemplate, unit, datasource, lookupKeysTable(), participantIdentifier);
-    } else
-      return datasource;
+    // FunctionalUnit unit = null;
+    // if(unit != null) {
+    // return new FunctionalUnitDatasource(txTemplate, unit, datasource, lookupKeysTable(), participantIdentifier);
+    // } else
+    // return datasource;
+    return datasource;
   }
 
   private ValueTable lookupKeysTable() {

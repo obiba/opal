@@ -63,6 +63,7 @@ public class FunctionalUnitDatasource extends AbstractTransformingDatasourceWrap
 
     this.entityMap = new OpalPrivateVariableEntityMap(keysTable, keyVariable, identifierGeneratorOrDefault);
     this.mappingFunction = new VariableEntityMappingFunction();
+    this.keysTable = keysTable;
   }
 
   @Override
@@ -108,7 +109,7 @@ public class FunctionalUnitDatasource extends AbstractTransformingDatasourceWrap
     return wrappedDatasource;
   }
 
-  private class FunctionalUnitValueTable extends AbstractTransformingValueTableWrapper {
+  private final class FunctionalUnitValueTable extends AbstractTransformingValueTableWrapper {
 
     private ValueTable wrappedTable;
 
@@ -132,7 +133,7 @@ public class FunctionalUnitDatasource extends AbstractTransformingDatasourceWrap
 
   }
 
-  private class FunctionalUnitValueTableWritter implements ValueTableWriter {
+  private final class FunctionalUnitValueTableWritter implements ValueTableWriter {
 
     private ValueTableWriter wrapped;
 
