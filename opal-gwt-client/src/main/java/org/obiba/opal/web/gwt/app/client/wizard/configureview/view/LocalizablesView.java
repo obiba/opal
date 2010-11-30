@@ -176,7 +176,7 @@ public class LocalizablesView extends Composite implements LocalizablesPresenter
     localizablesTable.addColumn(new TextColumn<Localizable>() {
       @Override
       public String getValue(Localizable object) {
-        return "(" + getSelectedLocale() + ") " + object.getLabel();
+        return object.getLabel();
       }
     }, translations.labelLabel());
 
