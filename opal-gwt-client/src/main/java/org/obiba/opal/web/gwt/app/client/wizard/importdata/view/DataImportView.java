@@ -123,6 +123,7 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
     .title("Select the destination (where you wish to write the data to).")// TODO
 
     .append(conclusionStep)//
+    .conclusion()//
 
     .onNext().onPrevious().build();
 

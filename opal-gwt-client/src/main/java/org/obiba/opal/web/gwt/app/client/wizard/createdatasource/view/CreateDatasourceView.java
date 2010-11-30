@@ -115,6 +115,7 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
 
     .append(conclusionStep)//
     .title(translations.createDatasourceProcessSummary())//
+    .conclusion()//
 
     .onNext().onPrevious().build();
   }

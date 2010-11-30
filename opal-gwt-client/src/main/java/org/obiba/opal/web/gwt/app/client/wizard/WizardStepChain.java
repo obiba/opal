@@ -67,10 +67,10 @@ public class WizardStepChain {
   }
 
   private void apply() {
-    wizard.setNextEnabled(current.hasNext() && !current.canFinish());
+    wizard.setNextEnabled(current.hasNext() && !current.isFinish());
     wizard.setPreviousEnabled(current.hasPrevious());
-    wizard.setFinishEnabled(current.canFinish());
-    wizard.setCloseVisible(!current.hasNext());
+    wizard.setFinishEnabled(current.isFinish());
+    wizard.setCloseVisible(current.isConclusion());
     Widget help = current.getHelp();
     wizard.setHelpEnabled(help != null);
     if(help != null) {
@@ -111,18 +111,36 @@ public class WizardStepChain {
       chain.wizard = wizard;
     }
 
+    /**
+     * Create a step chain for the wizard.
+     * @param wizard
+     * @return
+     */
     public static Builder create(WizardDialogBox wizard) {
       return create(wizard, true);
     }
 
+    /**
+     * Create a step chain for the wizard, with optional glass rendering.
+     * @param wizard
+     * @param glass
+     * @return
+     */
     public static Builder create(WizardDialogBox wizard, boolean glass) {
       wizard.setGlassEnabled(glass);
       return new Builder(wizard);
     }
 
+    /**
+     * Append a step with its help.
+     * @param step
+     * @param help
+     * @return
+     */
     public Builder append(WizardStep step, Widget help) {
       WizardStepControllerImpl stepCtrl = new WizardStepControllerImpl(step, help);
       if(currentStepCtrl != null) {
+        if(currentStepCtrl.isConclusion()) throw new IllegalArgumentException("Cannot have a step after conclusion.");
         currentStepCtrl.setNext(stepCtrl);
         stepCtrl.setPrevious(currentStepCtrl);
       } else {
@@ -132,36 +150,80 @@ public class WizardStepChain {
       return this;
     }
 
+    /**
+     * Append a step, without help.
+     * @param step
+     * @return
+     */
     public Builder append(WizardStep step) {
       return append(step, null);
     }
 
+    /**
+     * Set the title of the last appended step.
+     * @param text
+     * @return
+     */
     public Builder title(String text) {
       currentStepCtrl.getStep().setStepTitle(text);
       return this;
     }
 
+    /**
+     * Set a provider of help for the last appended step.
+     * @param provider
+     * @return
+     */
     public Builder help(WidgetProvider provider) {
       currentStepCtrl.setHelpProvider(provider);
       return this;
     }
 
+    /**
+     * Set if the last appended step is a conclusion: when entering this step the navigation buttons
+     * (next/previous/finish) will be hidden and close/cancel will be available.
+     * @return
+     */
+    public Builder conclusion() {
+      currentStepCtrl.setConclusion(true);
+      return this;
+    }
+
+    /**
+     * Callback that validates the current step before switching to the next step.
+     * @param validator
+     * @return
+     */
     public Builder onValidate(ValidationHandler validator) {
       currentStepCtrl.setValidator(validator);
       return this;
     }
 
+    /**
+     * Callback to ask for the step to reset its display.
+     * @param handler
+     * @return
+     */
     public Builder onReset(ResetHandler handler) {
       currentStepCtrl.setReset(handler);
       return this;
     }
 
+    /**
+     * Set a specific handler to be called when next is clicked.
+     * @param handler
+     * @return
+     */
     public Builder onNext(ClickHandler handler) {
       registration = chain.wizard.addNextClickHandler(handler);
       chain.nextHandlerRegistration = registration;
       return this;
     }
 
+    /**
+     * Set a default handler to be called when next is clicked: current step is validated and next step is requested.
+     * @return
+     */
     public Builder onNext() {
       return onNext(new ClickHandler() {
 
@@ -174,12 +236,21 @@ public class WizardStepChain {
       });
     }
 
+    /**
+     * Set a specific handler to be called when previous is clicked.
+     * @param handler
+     * @return
+     */
     public Builder onPrevious(ClickHandler handler) {
       registration = chain.wizard.addPreviousClickHandler(handler);
       chain.previousHandlerRegistration = registration;
       return this;
     }
 
+    /**
+     * Set a default handler to be called when previous is clicked: previous step is requested.
+     * @return
+     */
     public Builder onPrevious() {
       return onPrevious(new ClickHandler() {
 
@@ -192,12 +263,21 @@ public class WizardStepChain {
       });
     }
 
+    /**
+     * Set a specific handler to be called when finish is clicked.
+     * @param handler
+     * @return
+     */
     public Builder onFinish(ClickHandler handler) {
       registration = chain.wizard.addFinishClickHandler(handler);
       chain.finishHandlerRegistration = registration;
       return this;
     }
 
+    /**
+     * Set a default handler to be called when finish is clicked: validate the current step and hide.
+     * @return
+     */
     public Builder onFinish() {
       return onFinish(new ClickHandler() {
 
@@ -208,6 +288,10 @@ public class WizardStepChain {
       });
     }
 
+    /**
+     * Set a default handler to be called when close is clicked: validate the current step and hide.
+     * @return
+     */
     public Builder onClose() {
       return onClose(new ClickHandler() {
 
@@ -218,18 +302,32 @@ public class WizardStepChain {
       });
     }
 
+    /**
+     * Set a specific handler to be called when close is clicked.
+     * @param handler
+     * @return
+     */
     public Builder onClose(ClickHandler handler) {
       registration = chain.wizard.addCloseClickHandler(handler);
       chain.closeHandlerRegistration = registration;
       return this;
     }
 
+    /**
+     * Set a specific handler to be called when cancel is clicked.
+     * @param handler
+     * @return
+     */
     public Builder onCancel(ClickHandler handler) {
       registration = chain.wizard.addCancelClickHandler(handler);
       chain.cancelHandlerRegistration = registration;
       return this;
     }
 
+    /**
+     * Set a default handler to be called when cancel is clicked: just hide.
+     * @return
+     */
     public Builder onCancel() {
       return onCancel(new ClickHandler() {
 
@@ -240,10 +338,18 @@ public class WizardStepChain {
       });
     }
 
+    /**
+     * Get the last registration handler after a click handler was added.
+     * @return
+     */
     public HandlerRegistration getRegistrationHandler() {
       return registration;
     }
 
+    /**
+     * Build the chain of steps.
+     * @return
+     */
     public WizardStepChain build() {
       return chain;
     }

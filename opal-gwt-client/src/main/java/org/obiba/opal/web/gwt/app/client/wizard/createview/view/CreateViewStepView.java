@@ -135,6 +135,7 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
     })//
 
     .append(conclusionStep)//
+    .conclusion()//
     .onReset(new ResetHandler() {
 
       @Override

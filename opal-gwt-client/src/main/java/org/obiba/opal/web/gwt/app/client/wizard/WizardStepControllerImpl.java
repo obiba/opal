@@ -31,7 +31,9 @@ class WizardStepControllerImpl implements WizardStepController {
 
   private ResetHandler reset;
 
-  private boolean canFinish = false;
+  private boolean finish = false;
+
+  private boolean conclusion = false;
 
   WizardStepControllerImpl(WizardStep step, final Widget help) {
     super();
@@ -61,8 +63,12 @@ class WizardStepControllerImpl implements WizardStepController {
     this.help = provider;
   }
 
-  public void setCanFinish(boolean canFinish) {
-    this.canFinish = canFinish;
+  public void setFinish(boolean finish) {
+    this.finish = finish;
+  }
+
+  public void setConclusion(boolean conclusion) {
+    this.conclusion = conclusion;
   }
 
   @Override
@@ -125,8 +131,13 @@ class WizardStepControllerImpl implements WizardStepController {
   }
 
   @Override
-  public boolean canFinish() {
-    return canFinish || (next != null && !next.hasNext());
+  public boolean isFinish() {
+    return finish || (next != null && next.isConclusion()) || (next == null);
+  }
+
+  @Override
+  public boolean isConclusion() {
+    return conclusion;
   }
 
   private static class WidgetProviderImpl implements WidgetProvider {

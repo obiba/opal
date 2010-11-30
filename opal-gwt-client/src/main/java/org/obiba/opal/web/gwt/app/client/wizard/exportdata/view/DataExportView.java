@@ -189,6 +189,8 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
     })//
     .append(conclusionStep)//
     .title(translations.dataExportPendingConclusion())//
+    .conclusion()//
+
     .onNext().onPrevious().build();
   }
 
