@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
@@ -72,6 +73,7 @@ public class DataExportPresenterTest extends AbstractGwtTestSetup {
     expect(eventBusMock.addHandler(eq(TableSelectionEvent.getType()), isA(TableSelectionEvent.Handler.class))).andReturn(handlerRegistrationMock).once();
     expect(eventBusMock.addHandler(eq(FileSelectionEvent.getType()), isA(FileSelectionEvent.Handler.class))).andReturn(handlerRegistrationMock).once();
     expect(eventBusMock.addHandler(eq(ConfirmationEvent.getType()), isA(ConfirmationEvent.Handler.class))).andReturn(handlerRegistrationMock).once();
+    expect(eventBusMock.addHandler(eq(TableListUpdateEvent.getType()), isA(TableListUpdateEvent.Handler.class))).andReturn(handlerRegistrationMock).once();
 
     // Make sure that a ClickHandler is added to the Submit button
     expect(displayMock.addCancelClickHandler((ClickHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).atLeastOnce();
