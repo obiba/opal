@@ -267,7 +267,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   final class ConfigureHandler implements ClickHandler {
     @Override
     public void onClick(ClickEvent evt) {
-      // eventBus.fireEvent(new DatasourceUpdatedEvent(datasourceSelectorPresenter.getSelectionDto()));
+      eventBus.fireEvent(new DatasourceUpdatedEvent(datasourceSelectorPresenter.getSelectionDto()));
 
       // Get the new view dto
       getViewRequest(getDisplay().getDatasourceName().getText(), getDisplay().getViewName().getText())//
