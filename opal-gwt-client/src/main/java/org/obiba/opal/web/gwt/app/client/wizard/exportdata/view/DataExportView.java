@@ -37,6 +37,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -289,8 +290,8 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   }
 
   @Override
-  public boolean isDestinationFile() {
-    return destinationFile.getValue();
+  public HasValue<Boolean> getDestinationFile() {
+    return destinationFile;
   }
 
   @Override
@@ -453,4 +454,19 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
     this.destinationValidator = handler;
   }
 
+  @Override
+  public void setVisibleCopyToDatasourceOption(boolean visible) {
+    destinationDataSource.setVisible(visible);
+    destinationFile.setVisible(visible);
+    datasources.setVisible(visible);
+  }
+
+  @Override
+  public void setFileExportationEnabled(boolean enabled) {
+    fileFormat.setEnabled(enabled);
+    fileSelection.setEnabled(enabled);
+    destinationFile.setValue(enabled);
+    destinationDataSource.setValue(!enabled);
+    datasources.setEnabled(!enabled);
+  }
 }

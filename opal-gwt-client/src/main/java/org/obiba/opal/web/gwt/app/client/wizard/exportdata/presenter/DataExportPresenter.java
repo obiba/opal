@@ -38,6 +38,7 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.CopyCommandOptionsDto;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -48,6 +49,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 
 public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Display> {
@@ -83,7 +85,6 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   @Override
   protected void onBind() {
-    initDisplayComponents();
   }
 
   protected void initDisplayComponents() {
@@ -118,6 +119,8 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   @Override
   protected void onUnbind() {
+    tableListPresenter.unbind();
+    fileSelectionPresenter.unbind();
   }
 
   @Override
@@ -126,7 +129,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   @Override
   public void revealDisplay() {
-    tableListPresenter.clear();
+    initDisplayComponents();
     getDisplay().showDialog();
   }
 
@@ -135,7 +138,14 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
       @Override
       public void onResource(Response response, JsArray<DatasourceDto> datasources) {
         if(datasources != null && datasources.length() > 0) {
-          getDisplay().setDatasources(filterDatasources(datasources));
+          List<DatasourceDto> datasourceList = filterDatasources(datasources);
+          if(datasourceList.size() > 0) {
+            getDisplay().setVisibleCopyToDatasourceOption(true);
+            getDisplay().setDatasources(datasourceList);
+          } else {
+            getDisplay().setVisibleCopyToDatasourceOption(false);
+            getDisplay().setFileExportationEnabled(true);
+          }
           initUnits();
         } else {
           eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "NoDataToExport", null));
@@ -191,7 +201,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     private List<String> formValidationErrors() {
       List<String> result = new ArrayList<String>();
 
-      if(getDisplay().isDestinationFile()) {
+      if(getDisplay().getDestinationFile().getValue()) {
         String filename = getDisplay().getOutFile();
         if(filename == null || filename.equals("")) {
           result.add("DestinationFileIsMissing");
@@ -304,6 +314,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
     public void onClick(ClickEvent arg0) {
       getDisplay().hideDialog();
+      unbind();
     }
   }
 
@@ -311,6 +322,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
     public void onClick(ClickEvent arg0) {
       getDisplay().hideDialog();
+      unbind();
     }
   }
 
@@ -325,6 +337,12 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   public interface Display extends WidgetDisplay {
 
     void showDialog();
+
+    void setFileExportationEnabled(boolean enabled);
+
+    HasValue<Boolean> getDestinationFile();
+
+    void setVisibleCopyToDatasourceOption(boolean visible);
 
     void hideDialog();
 
@@ -356,8 +374,6 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
     /** Add a handler to the job list */
     HandlerRegistration addJobLinkClickHandler(ClickHandler handler);
-
-    boolean isDestinationFile();
 
     String getOutFile();
 
