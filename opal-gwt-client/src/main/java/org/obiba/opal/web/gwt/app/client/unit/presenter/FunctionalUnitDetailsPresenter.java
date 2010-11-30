@@ -152,8 +152,16 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
   }
 
   private void setCommands() {
-    // TODO
-    getDisplay().setDownloadIdentifiersCommand(null);
+    getDisplay().setDownloadIdentifiersCommand(new Command() {
+
+      @Override
+      public void execute() {
+        String url = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")) //
+        .append("ws/functional-unit/").append(functionalUnit.getName()) //
+        .append("/entities/identifiers").toString();
+        eventBus.fireEvent(new FileDownloadEvent(url));
+      }
+    });
     getDisplay().setRemoveFunctionalUnitCommand(new RemoveFunctionalUnitCommand());
     getDisplay().setUpdateFunctionalUnitCommand(new EditFunctionalUnitCommand());
     getDisplay().setAddKeyPairCommand(new AddKeyPairCommand());
