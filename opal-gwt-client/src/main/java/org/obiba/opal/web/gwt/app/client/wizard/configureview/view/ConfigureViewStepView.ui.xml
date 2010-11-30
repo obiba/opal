@@ -10,7 +10,7 @@
     .content-margin { margin: 0.5em; }
   </ui:style>
   
-  <g:DialogBox ui:field="dialog" autoHide="false" modal="true">
+  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
     <g:caption><ui:msg description="Configure View title">Configure View</ui:msg></g:caption>
 	 <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="30em" width="40em">
     <g:center>
