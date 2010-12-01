@@ -146,6 +146,7 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
 
   @Override
   public void revealDisplay() {
+    destinationSelectionStepPresenter.refreshDisplay(); // to refresh the datasources
     updateFormatStepDisplay();
     getDisplay().showDialog();
   }

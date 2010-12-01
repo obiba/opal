@@ -16,7 +16,6 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSetChangeEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -67,8 +66,6 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
   @Override
   protected void onBind() {
     refreshDatasources();
-
-    eventBus.addHandler(DatasourceSetChangeEvent.getType(), new DatasourceSetChangeEventHandler());
   }
 
   @Override
@@ -145,6 +142,7 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
 
   @Override
   public void refreshDisplay() {
+    refreshDatasources();
   }
 
   @Override
@@ -157,13 +155,5 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
       importData.setDestinationTableName(getDisplay().getSelectedTable());
     } else
       importData.setDestinationTableName(null);
-  }
-
-  class DatasourceSetChangeEventHandler implements DatasourceSetChangeEvent.Handler {
-
-    @Override
-    public void onDatasourceSetChanged(DatasourceSetChangeEvent event) {
-      refreshDatasources();
-    }
   }
 }

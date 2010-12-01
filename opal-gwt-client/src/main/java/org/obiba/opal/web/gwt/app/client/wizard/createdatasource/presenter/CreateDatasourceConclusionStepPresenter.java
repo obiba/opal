@@ -16,7 +16,6 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSetChangeEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter.ResourceClickHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.view.ResourceRequestView;
@@ -115,8 +114,6 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
         datasourceDto = (DatasourceDto) JsonUtils.unsafeEval(response.getText());
         getDisplay().setCompleted();
         success = true;
-
-        eventBus.fireEvent(new DatasourceSetChangeEvent());
       } else if(response.getText() != null && response.getText().length() != 0) {
         GWT.log(response.getText());
         error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
