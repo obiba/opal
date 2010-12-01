@@ -20,8 +20,6 @@ import org.obiba.magma.transform.BijectiveFunction;
 import org.obiba.magma.views.AbstractTransformingValueTableWrapper;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.service.impl.OpalPrivateVariableEntityMap;
-import org.obiba.opal.core.unit.FunctionalUnit;
-import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  *
@@ -29,8 +27,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 public class FunctionalUnitDatasource extends AbstractTransformingDatasourceWrapper {
 
   private Datasource wrappedDatasource;
-
-  private FunctionalUnit unit;
 
   private final PrivateVariableEntityMap entityMap;
 
@@ -40,13 +36,12 @@ public class FunctionalUnitDatasource extends AbstractTransformingDatasourceWrap
 
   private ValueTable keysTable;
 
-  public FunctionalUnitDatasource(TransactionTemplate txTemplate, FunctionalUnit unit, Datasource wrapped, ValueTable keysTable, IParticipantIdentifier identifierGenerator) {
+  public FunctionalUnitDatasource(Datasource wrapped, String keyVariableName, ValueTable keysTable, IParticipantIdentifier identifierGenerator) {
     super();
     this.wrappedDatasource = wrapped;
-    this.unit = unit;
     this.allowIdentifierGeneration = identifierGenerator != null;
 
-    Variable keyVariable = keysTable.getVariable(unit.getKeyVariableName());
+    Variable keyVariable = keysTable.getVariable(keyVariableName);
     IParticipantIdentifier identifierGeneratorOrDefault = null;
     if(allowIdentifierGeneration) {
       identifierGeneratorOrDefault = identifierGenerator;

@@ -28,8 +28,6 @@ import org.springframework.transaction.support.TransactionTemplate;
  */
 public class FunctionalUnitDatasourceManager implements Decorator<Datasource> {
 
-  private final TransactionTemplate txTemplate;
-
   private final OpalRuntime opalRuntime;
 
   private final IParticipantIdentifier participantIdentifier;
@@ -42,12 +40,10 @@ public class FunctionalUnitDatasourceManager implements Decorator<Datasource> {
   @Autowired
   public FunctionalUnitDatasourceManager(TransactionTemplate txTemplate, OpalRuntime opalRuntime, IParticipantIdentifier participantIdentifier, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference) {
     super();
-    if(txTemplate == null) throw new IllegalArgumentException("txManager cannot be null");
     if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
     if(participantIdentifier == null) throw new IllegalArgumentException("participantIdentifier cannot be null");
     if(keysTableReference == null) throw new IllegalArgumentException("keysTableReference cannot be null");
 
-    this.txTemplate = txTemplate;
     this.opalRuntime = opalRuntime;
     this.participantIdentifier = participantIdentifier;
     this.keysTableReference = keysTableReference;
@@ -55,14 +51,19 @@ public class FunctionalUnitDatasourceManager implements Decorator<Datasource> {
 
   @Override
   public Datasource decorate(Datasource datasource) {
+    // FIXME too soon for DatasourceResource:250, the factory is not registered yet!
     for(DatasourceFactory factory : opalRuntime.getOpalConfiguration().getMagmaEngineFactory().factories()) {
       if(factory.getName().equals(datasource.getName())) {
         // TODO get associated unit if defined
         // FunctionalUnit unit = opalRuntime.getFunctionalUnit(unitName);
         // if(unit != null) {
-        // return new FunctionalUnitDatasource(txTemplate, unit, datasource, lookupKeysTable(), participantIdentifier);
+        // FunctionalUnitDatasource fuDs = new FunctionalUnitDatasource(datasource, unit.getKeyVariableName(),
+        // lookupKeysTable(),
+        // participantIdentifier);
+        // functionalUnitDatasourcesMap.put(datasource.getName(), fuDs);
+        // return fuDs;
         // }
-        // else break;
+        // else return datasource; // not a unit dependent datasource
       }
     }
     return datasource;
