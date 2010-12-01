@@ -90,11 +90,12 @@ public class DataExportPresenterTest extends AbstractGwtTestSetup {
     displayMock.setTableWidgetDisplay(tableListDisplayMock);
     expect(displayMock.getFileFormat()).andReturn("csv");
     displayMock.setFileWidgetDisplay(fileSelectionDisplayMock);
+    displayMock.showDialog();
     expect(displayMock.addFileFormatChangeHandler((ChangeHandler) EasyMock.anyObject())).andReturn(handlerRegistrationMock);
 
     replay(eventBusMock, tableListDisplayMock, fileSelectionDisplayMock, displayMock);
 
-    exportPresenter.bind();
+    exportPresenter.revealDisplay();
 
     verify(eventBusMock, tableListDisplayMock, fileSelectionDisplayMock, displayMock);
 
