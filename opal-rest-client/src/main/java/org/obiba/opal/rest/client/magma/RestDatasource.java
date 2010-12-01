@@ -30,7 +30,7 @@ public class RestDatasource extends AbstractDatasource {
   public RestDatasource(String name, OpalJavaClient opalClient, String remoteDatasource) {
     super(name, "rest");
     this.opalClient = opalClient;
-    this.datasourceURI = opalClient.buildURI("datasource",remoteDatasource);
+    this.datasourceURI = opalClient.newUri().segment("datasource",remoteDatasource).build();
   }
 
   @Override
@@ -95,11 +95,11 @@ public class RestDatasource extends AbstractDatasource {
   }
 
   URI newReference(String... segments) {
-    return opalClient.buildURI(this.datasourceURI, segments);
+    return buildURI(this.datasourceURI, segments);
   }
 
   URI buildURI(final URI root, String... segments) {
-    return opalClient.buildURI(root, segments);
+    return opalClient.newUri(root).segment(segments).build();
   }
 
 }

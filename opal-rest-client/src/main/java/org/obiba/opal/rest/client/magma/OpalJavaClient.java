@@ -1,10 +1,12 @@
 package org.obiba.opal.rest.client.magma;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.http.HttpMessage;
@@ -19,10 +21,7 @@ import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
-import org.obiba.magma.MagmaRuntimeException;
-import org.obiba.magma.lang.Closeables;
 
-import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Message;
 
 /**
@@ -48,25 +47,29 @@ public class OpalJavaClient {
     DefaultHttpClient httpClient = new DefaultHttpClient();
     httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
     httpClient.getParams().setParameter("http.protocol.handle-authentication", Boolean.TRUE);
-    httpClient.getParams().setParameter("http.auth.target-scheme-pref", ImmutableList.of(OpalAuthScheme.NAME));
+    httpClient.getParams().setParameter("http.auth.target-scheme-pref", Collections.singletonList(OpalAuthScheme.NAME));
     httpClient.getAuthSchemes().register(OpalAuthScheme.NAME, new OpalAuthScheme.Factory());
     ctx = new BasicHttpContext();
-    ctx.setAttribute(ClientContext.AUTH_SCHEME_PREF, ImmutableList.of(OpalAuthScheme.NAME));
+    ctx.setAttribute(ClientContext.AUTH_SCHEME_PREF, Collections.singletonList(OpalAuthScheme.NAME));
     ctx.setAttribute(ClientContext.COOKIE_STORE, cs = new BasicCookieStore());
     this.client = httpClient;
   }
-
-  public URI buildURI(String... segments) {
-    return buildURI(this.opalURI, segments);
+  
+  public UriBuilder newUri() {
+    return new UriBuilder(this.opalURI);
   }
 
-  public URI buildURI(final URI root, String... segments) {
-    URI uri = root;
-    for(String segment : segments) {
-      segment = segment.endsWith("/") ? segment : segment + "/";
-      uri = uri.resolve(segment);
+  public UriBuilder newUri(URI root) {
+    String rootPath = root.getPath();
+    if(rootPath.endsWith("/") == false) {
+      try {
+        return new UriBuilder(new URI(root.getScheme(), root.getHost(), rootPath + "/",root.getQuery(), root.getFragment()));
+      } catch(URISyntaxException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
     }
-    return uri;
+    return new UriBuilder(root);
   }
 
   @SuppressWarnings("unchecked")
@@ -74,7 +77,7 @@ public class OpalJavaClient {
     ArrayList<T> resources = new ArrayList<T>();
     InputStream is = null;
     Message.Builder messageBuilder = builder;
-    
+
     try {
       HttpResponse response = get(uri);
       is = response.getEntity().getContent();
@@ -86,9 +89,10 @@ public class OpalJavaClient {
       }
       return resources;
     } catch(IOException e) {
-      throw new MagmaRuntimeException(e);
+      e.printStackTrace();
+      throw new RuntimeException(e);
     } finally {
-      Closeables.closeQuietly(is);
+      closeQuietly(is);
     }
   }
 
@@ -100,9 +104,10 @@ public class OpalJavaClient {
       is = response.getEntity().getContent();
       return (T) builder.mergeFrom(is).build();
     } catch(IOException e) {
-      throw new MagmaRuntimeException(e);
+      e.printStackTrace();
+      throw new RuntimeException(e);
     } finally {
-      Closeables.closeQuietly(is);
+      closeQuietly(is);
     }
   }
 
@@ -118,6 +123,14 @@ public class OpalJavaClient {
       if(c.getName().equalsIgnoreCase("opalsid")) {
         msg.addHeader(OpalAuthScheme.NAME, c.getValue());
       }
+    }
+  }
+
+  private void closeQuietly(Closeable closable) {
+    if(closable == null) return;
+    try {
+      closable.close();
+    } catch(Throwable t) {
     }
   }
 
