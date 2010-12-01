@@ -199,8 +199,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testGetLocales_WhenNoDisplayLocaleSpecifiedReturnsLocaleDtosWithDisplayFieldUnset() {
     // Setup
-    TableResource sut = new TableResource(null);
-    sut.setLocales(ImmutableSet.of(new Locale("en"), new Locale("fr")));
+    TableResource sut = new TableResource(null, ImmutableSet.of(new Locale("en"), new Locale("fr")));
 
     // Exercise
     Iterable<LocaleDto> localeDtos = sut.getLocales(null);
@@ -216,8 +215,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testGetLocales_WhenDisplayLocaleIsEnglishReturnsLocaleDtosWithDisplayFieldInEnglish() {
     // Setup
-    TableResource sut = new TableResource(null);
-    sut.setLocales(ImmutableSet.of(new Locale("en"), new Locale("fr")));
+    TableResource sut = new TableResource(null, ImmutableSet.of(new Locale("en"), new Locale("fr")));
 
     // Exercise
     Iterable<LocaleDto> localeDtos = sut.getLocales("en");
@@ -238,8 +236,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testGetLocales_WhenDisplayLocaleIsFrenchReturnsLocaleDtosWithDisplayFieldInFrench() {
     // Setup
-    TableResource sut = new TableResource(null);
-    sut.setLocales(ImmutableSet.of(new Locale("en"), new Locale("fr")));
+    TableResource sut = new TableResource(null, ImmutableSet.of(new Locale("en"), new Locale("fr")));
 
     // Exercise
     Iterable<LocaleDto> localeDtos = sut.getLocales("fr");

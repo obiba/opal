@@ -7,21 +7,16 @@ import java.util.Set;
 
 import org.obiba.magma.ValueTable;
 
-public abstract class CommonTable {
+abstract class AbstractValueTableResource {
 
   private final ValueTable valueTable;
 
-  private Set<Locale> locales;
+  private final Set<Locale> locales;
 
-  public CommonTable(ValueTable valueTable) {
+  public AbstractValueTableResource(ValueTable valueTable, Set<Locale> locales) {
     this.valueTable = valueTable;
-  }
-
-  public void setLocales(Set<Locale> locales) {
     this.locales = new LinkedHashSet<Locale>();
-    if(locales != null) {
-      this.locales.addAll(locales);
-    }
+    this.locales.addAll(locales);
   }
 
   ValueTable getValueTable() {

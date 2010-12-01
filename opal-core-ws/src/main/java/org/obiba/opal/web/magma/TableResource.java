@@ -77,10 +77,14 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-public class TableResource extends CommonTable {
+public class TableResource extends AbstractValueTableResource {
+
+  public TableResource(ValueTable valueTable, Set<Locale> locales) {
+    super(valueTable, locales);
+  }
 
   public TableResource(ValueTable valueTable) {
-    super(valueTable);
+    this(valueTable, Collections.<Locale> emptySet());
   }
 
   @GET

@@ -195,17 +195,13 @@ public class DatasourceResource {
   @Bean
   @Scope("request")
   public TableResource getTableResource(ValueTable table) {
-    TableResource tableResource = new TableResource(table);
-    tableResource.setLocales(getLocales());
-    return tableResource;
+    return new TableResource(table, getLocales());
   }
 
   @Bean
   @Scope("request")
   public ViewResource getViewResource(View view) {
-    ViewResource viewResource = new ViewResource(view);
-    viewResource.setLocales(getLocales());
-    return viewResource;
+    return new ViewResource(view, getLocales());
   }
 
   @POST

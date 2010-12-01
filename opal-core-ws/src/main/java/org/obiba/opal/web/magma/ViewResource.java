@@ -9,21 +9,30 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Set;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 
 import org.obiba.magma.views.View;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 
-public class ViewResource extends CommonTable {
+public class ViewResource extends AbstractValueTableResource {
   //
   // Constructors
   //
 
+  public ViewResource(View view, Set<Locale> locales) {
+    super(view, locales);
+  }
+
   public ViewResource(View view) {
-    super(view);
+    this(view, Collections.<Locale> emptySet());
   }
 
   //
@@ -32,15 +41,23 @@ public class ViewResource extends CommonTable {
 
   @GET
   public ViewDto getView() {
-    return ViewDtos.asDto((View) getValueTable());
+    return ViewDtos.asDto(asView());
+  }
+
+  @GET
+  @Produces("application/xml")
+  public View getViewInstance() {
+    return asView();
   }
 
   @Path("/from")
   @Bean
   @Scope("request")
   public TableResource getFrom() {
-    TableResource tableResource = new TableResource(((View) getValueTable()).getWrappedValueTable());
-    tableResource.setLocales(getLocales());
-    return tableResource;
+    return new TableResource(asView().getWrappedValueTable(), getLocales());
+  }
+
+  protected View asView() {
+    return (View) getValueTable();
   }
 }
