@@ -9,8 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.core.magma;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.obiba.magma.Datasource;
-import org.obiba.magma.DatasourceTransformer;
+import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.Decorator;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
@@ -22,7 +26,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 /**
  *
  */
-public class FunctionalUnitDatasourceManager implements DatasourceTransformer {
+public class FunctionalUnitDatasourceManager implements Decorator<Datasource> {
 
   private final TransactionTemplate txTemplate;
 
@@ -32,6 +36,8 @@ public class FunctionalUnitDatasourceManager implements DatasourceTransformer {
 
   /** Configured through org.obiba.opal.keys.tableReference */
   private final String keysTableReference;
+
+  private Map<String, FunctionalUnitDatasource> functionalUnitDatasourcesMap = new HashMap<String, FunctionalUnitDatasource>();
 
   @Autowired
   public FunctionalUnitDatasourceManager(TransactionTemplate txTemplate, OpalRuntime opalRuntime, IParticipantIdentifier participantIdentifier, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference) {
@@ -48,14 +54,29 @@ public class FunctionalUnitDatasourceManager implements DatasourceTransformer {
   }
 
   @Override
-  public Datasource transform(Datasource datasource) {
-    // TODO search for unit given a datasource name
-    // FunctionalUnit unit = null;
-    // if(unit != null) {
-    // return new FunctionalUnitDatasource(txTemplate, unit, datasource, lookupKeysTable(), participantIdentifier);
-    // } else
-    // return datasource;
+  public Datasource decorate(Datasource datasource) {
+    for(DatasourceFactory factory : opalRuntime.getOpalConfiguration().getMagmaEngineFactory().factories()) {
+      if(factory.getName().equals(datasource.getName())) {
+        // TODO get associated unit if defined
+        // FunctionalUnit unit = opalRuntime.getFunctionalUnit(unitName);
+        // if(unit != null) {
+        // return new FunctionalUnitDatasource(txTemplate, unit, datasource, lookupKeysTable(), participantIdentifier);
+        // }
+        // else break;
+      }
+    }
     return datasource;
+  }
+
+  /**
+   * Synchronizes the private identifiers with Opal identifiers.
+   * @param datasource
+   */
+  public void mapIdentifiers(String datasource) {
+    FunctionalUnitDatasource ds = functionalUnitDatasourcesMap.get(datasource);
+    if(ds != null) {
+      ds.mapIdentifiers();
+    }
   }
 
   private ValueTable lookupKeysTable() {

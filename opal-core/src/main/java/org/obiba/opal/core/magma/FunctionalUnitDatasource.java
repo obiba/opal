@@ -30,9 +30,7 @@ public class FunctionalUnitDatasource extends AbstractTransformingDatasourceWrap
 
   private Datasource wrappedDatasource;
 
-  private final TransactionTemplate txTemplate;
-
-  private final FunctionalUnit unit;
+  private FunctionalUnit unit;
 
   private final PrivateVariableEntityMap entityMap;
 
@@ -44,7 +42,6 @@ public class FunctionalUnitDatasource extends AbstractTransformingDatasourceWrap
 
   public FunctionalUnitDatasource(TransactionTemplate txTemplate, FunctionalUnit unit, Datasource wrapped, ValueTable keysTable, IParticipantIdentifier identifierGenerator) {
     super();
-    this.txTemplate = txTemplate;
     this.wrappedDatasource = wrapped;
     this.unit = unit;
     this.allowIdentifierGeneration = identifierGenerator != null;
@@ -66,15 +63,8 @@ public class FunctionalUnitDatasource extends AbstractTransformingDatasourceWrap
     this.keysTable = keysTable;
   }
 
-  @Override
-  public void initialise() {
-    // TODO set the encryption strategy if applicable
-    super.initialise();
-    // At datasource init, make sure variable entities exist in identifiers table by creating them (if allowed)
-    mapIdentifiers();
-  }
-
-  private void mapIdentifiers() {
+  // make sure variable entities exist in identifiers table by creating them (if allowed)
+  void mapIdentifiers() {
     // TODO make it transactional, lock key table etc... see DefaultImportService
     for(ValueTable wrappedTable : wrappedDatasource.getValueTables()) {
       if(wrappedTable.isForEntityType(keysTable.getEntityType())) {
