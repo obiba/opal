@@ -149,14 +149,12 @@ public class DefaultOpalRuntime implements OpalRuntime {
     synchronized(syncFs) {
       while(opalFileSystem == null) {
         try {
-          log.info("Waiting for opalFileSystem...");
           syncFs.wait();
         } catch(InterruptedException ex) {
           ;
         }
       }
     }
-    log.info("Returning opalFileSystem");
     return opalFileSystem;
   }
 
