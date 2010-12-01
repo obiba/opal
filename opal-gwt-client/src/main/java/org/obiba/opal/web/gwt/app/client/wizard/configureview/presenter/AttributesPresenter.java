@@ -175,6 +175,13 @@ public class AttributesPresenter extends LocalizablesPresenter {
     return new ArrayList<String>(attributeNames);
   }
 
+  /** Adds and sorts unique attribute names. */
+  private void addUniqueAttributeName(String attributeName) {
+    SortedSet<String> attributeNameSet = new TreeSet<String>(attributeNames);
+    attributeNameSet.add(attributeName);
+    attributeNames = new ArrayList<String>(attributeNameSet);
+  }
+
   //
   // Inner Classes / Interfaces
   //
@@ -249,7 +256,7 @@ public class AttributesPresenter extends LocalizablesPresenter {
       for(int attributeIndex = 0; attributeIndex < event.getAttributes().length(); attributeIndex++) {
         AttributeDto newAttribute = event.getAttributes().get(attributeIndex);
         variableDto.getAttributesArray().push(newAttribute);
-        attributeNames.add(newAttribute.getName());
+        addUniqueAttributeName(newAttribute.getName());
       }
     }
 
