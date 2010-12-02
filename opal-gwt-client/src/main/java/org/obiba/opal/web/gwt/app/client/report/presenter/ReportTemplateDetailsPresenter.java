@@ -49,6 +49,7 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTemplateDetailsPresenter.Display> {
 
@@ -58,7 +59,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
   private Runnable actionRequiringConfirmation;
 
-  private ReportTemplateUpdateDialogPresenter reportTemplateUpdateDialogPresenter;
+  private Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenterProvider;
 
   private ReportTemplateDto reportTemplate;
 
@@ -92,9 +93,9 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
   }
 
   @Inject
-  public ReportTemplateDetailsPresenter(final Display display, final EventBus eventBus, ReportTemplateUpdateDialogPresenter reportTemplateUpdateDialogPresenter) {
+  public ReportTemplateDetailsPresenter(final Display display, final EventBus eventBus, Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenterProvider) {
     super(display, eventBus);
-    this.reportTemplateUpdateDialogPresenter = reportTemplateUpdateDialogPresenter;
+    this.reportTemplateUpdateDialogPresenterProvider = reportTemplateUpdateDialogPresenterProvider;
   }
 
   @Override
@@ -236,9 +237,10 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
     @Override
     public void execute() {
-      reportTemplateUpdateDialogPresenter.bind();
-      reportTemplateUpdateDialogPresenter.setDialogMode(Mode.UPDATE);
-      ReportTemplateUpdateDialogPresenter.Display display = reportTemplateUpdateDialogPresenter.getDisplay();
+      ReportTemplateUpdateDialogPresenter presenter = reportTemplateUpdateDialogPresenterProvider.get();
+      presenter.bind();
+      presenter.setDialogMode(Mode.UPDATE);
+      ReportTemplateUpdateDialogPresenter.Display display = presenter.getDisplay();
       ReportTemplateDto reportTemplate = getDisplay().getReportTemplateDetails();
       display.setDesignFile(reportTemplate.getDesign());
       display.setFormat(reportTemplate.getFormat());
@@ -247,7 +249,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
       display.setReportParameters(asList(JsArrays.toSafeArray(reportTemplate.getParametersArray())));
       display.setSchedule(reportTemplate.getCron());
       display.setEnabledReportTemplateName(false);
-      reportTemplateUpdateDialogPresenter.revealDisplay();
+      presenter.revealDisplay();
     }
 
   }

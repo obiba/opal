@@ -51,6 +51,7 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportTemplateUpdateDialogPresenter.Display> {
 
@@ -120,10 +121,10 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
   }
 
   @Inject
-  public ReportTemplateUpdateDialogPresenter(Display display, EventBus eventBus, FileSelectionPresenter fileSelectionPresenter, ItemSelectorPresenter emailSelectorPresenter, ItemSelectorPresenter parametersSelectorPresenter) {
+  public ReportTemplateUpdateDialogPresenter(Display display, EventBus eventBus, Provider<FileSelectionPresenter> fileSelectionPresenterProvider, Provider<ItemSelectorPresenter> emailSelectorPresenterProvider, ItemSelectorPresenter parametersSelectorPresenter) {
     super(display, eventBus);
-    this.fileSelectionPresenter = fileSelectionPresenter;
-    this.emailSelectorPresenter = emailSelectorPresenter;
+    this.fileSelectionPresenter = fileSelectionPresenterProvider.get();
+    this.emailSelectorPresenter = emailSelectorPresenterProvider.get();
     this.parametersSelectorPresenter = parametersSelectorPresenter;
     parametersSelectorPresenter.getDisplay().setItemInputDisplay(new KeyValueItemInputView());
     emailSelectorPresenter.getDisplay().setItemInputDisplay(new TextBoxItemInputView());
