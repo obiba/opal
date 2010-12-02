@@ -371,6 +371,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Export to Excel file")
   String exportToExcelTitle();
 
+  @Description("Download View XML menu item")
+  @DefaultStringValue("Download View XML")
+  String downloadViewXML();
+
   @Description("Csv label")
   @DefaultStringValue("CSV")
   String csvLabel();

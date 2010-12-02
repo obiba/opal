@@ -40,7 +40,7 @@ import com.google.common.collect.Lists;
 /**
  * Utilities for manipulating Magma Dto instances
  */
-final class Dtos {
+public final class Dtos {
 
   public static final Function<Value, ValueDto> valueAsDtoFunc = new Function<Value, ValueDto>() {
 

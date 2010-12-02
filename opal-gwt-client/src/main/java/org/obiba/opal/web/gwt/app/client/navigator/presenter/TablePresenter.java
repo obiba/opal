@@ -115,9 +115,11 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       getDisplay().setNextName(next);
 
       if(tableIsView()) {
+        getDisplay().setDownloadViewCommand(new DownloadViewCommand());
         getDisplay().setRemoveCommand(new RemoveCommand());
         getDisplay().setEditCommand(new EditCommand());
       } else {
+        getDisplay().setDownloadViewCommand(null);
         getDisplay().setRemoveCommand(null);
         getDisplay().setEditCommand(null);
       }
@@ -170,7 +172,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       }
     };
 
-    ResourceRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/view/" + table.getName()).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler).withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+    ResourceRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler).withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
   }
 
   private boolean tableIsView() {
@@ -212,6 +214,14 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     @Override
     public void execute() {
       downloadMetadata();
+    }
+  }
+
+  final class DownloadViewCommand implements Command {
+    @Override
+    public void execute() {
+      String downloadUrl = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "ws")).append(table.getViewLink()).append("/xml").toString();
+      eventBus.fireEvent(new FileDownloadEvent(downloadUrl));
     }
   }
 
@@ -267,7 +277,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     @Override
     public void onResource(Response response, JsArray<VariableDto> resource) {
       if(this.table.getLink().equals(TablePresenter.this.table.getLink())) {
-        variables = (resource != null) ? resource : (JsArray<VariableDto>) JsArray.createArray();
+        variables = (resource != null) ? resource : JsArray.createArray().<JsArray<VariableDto>> cast();
         getDisplay().renderRows(variables);
         getDisplay().afterRenderRows();
       }
@@ -319,6 +329,10 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
     void setVariableSelection(VariableDto variable, int index);
 
+    /**
+     * @param downloadViewCommand
+     */
+
     void beforeRenderRows();
 
     void renderRows(JsArray<VariableDto> rows);
@@ -334,6 +348,8 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     void setEntityType(String text);
 
     void setExcelDownloadCommand(Command cmd);
+
+    void setDownloadViewCommand(Command cmd);
 
     void setParentCommand(Command cmd);
 

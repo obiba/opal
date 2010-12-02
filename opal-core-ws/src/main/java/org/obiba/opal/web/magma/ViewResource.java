@@ -16,38 +16,37 @@ import java.util.Set;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
 
 import org.obiba.magma.views.View;
+import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 
 public class ViewResource extends AbstractValueTableResource {
-  //
-  // Constructors
-  //
 
-  public ViewResource(View view, Set<Locale> locales) {
+  private ViewDtos viewDtos;
+
+  public ViewResource(View view, ViewDtos viewDtos, Set<Locale> locales) {
     super(view, locales);
+    this.viewDtos = viewDtos;
   }
 
-  public ViewResource(View view) {
-    this(view, Collections.<Locale> emptySet());
+  public ViewResource(View view, ViewDtos viewDtos) {
+    this(view, viewDtos, Collections.<Locale> emptySet());
   }
-
-  //
-  // Methods
-  //
 
   @GET
   public ViewDto getView() {
-    return ViewDtos.asDto(asView());
+    return viewDtos.asDto(asView());
   }
 
   @GET
+  @Path("/xml")
   @Produces("application/xml")
-  public View getViewInstance() {
-    return asView();
+  public Response downloadViewDefinition() {
+    return Response.ok(asView(), "application/xml").header("Content-Disposition", "attachment; filename=\"" + getValueTable().getName() + ".xml\"").build();
   }
 
   @Path("/from")

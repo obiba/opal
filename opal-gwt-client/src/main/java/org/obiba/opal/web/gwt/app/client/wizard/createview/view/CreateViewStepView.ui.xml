@@ -43,6 +43,8 @@
 	              <td>
 	                <g:RadioButton name="variablesGroup" ui:field="applyingGlobalVariableFilterRadioButton" addStyleNames="block small-top-margin"><ui:msg description="Apply a global filter on the selected tables label">Apply a global filter on the selected tables</ui:msg></g:RadioButton>
 	                <g:RadioButton name="variablesGroup" ui:field="addingVariablesOneByOneRadioButton" addStyleNames="block small-top-margin"><ui:msg description="Add each variable one by one label">Add each variable one by one</ui:msg></g:RadioButton>
+                    <g:RadioButton name="variablesGroup" ui:field="useAnExistingView" addStyleNames="block small-top-margin"><ui:msg description="Use an existing view">Use an existing view</ui:msg></g:RadioButton>
+                    <g:SimplePanel ui:field="fileSelectionPanel" addStyleNames="block indent"/>
 	              </td>
 	            </tr>
 	          </tbody>
@@ -94,13 +96,18 @@
            </ui:msg>
          <ul>
            <li>
+             <ui:msg description="Selection of variables information for view creation">
+             selection of variables: variables are filtered using a script.
+             </ui:msg>
+           </li>
+           <li>
              <ui:msg description="Derived variables information for view creation">
              list of derived variables: some variables can be enumerated and for each of them a script will be executed on demand to get the values.
              </ui:msg>
            </li>
            <li>
-             <ui:msg description="Selection of variables information for view creation">
-             selection of variables: variables are filtered using a script.
+             <ui:msg description="Use an existing view definition for view creation">
+             existing view definition: read a view definition from a file.
              </ui:msg>
            </li>
          </ul>

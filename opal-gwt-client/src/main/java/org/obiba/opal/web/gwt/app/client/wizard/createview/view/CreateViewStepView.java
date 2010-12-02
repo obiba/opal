@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.createview.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
@@ -22,6 +23,8 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -83,11 +86,19 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   RadioButton addingVariablesOneByOneRadioButton;
 
   @UiField
+  RadioButton useAnExistingView;
+
+  @UiField
+  SimplePanel fileSelectionPanel;
+
+  @UiField
   Anchor configureLink;
 
   private DatasourceSelectorPresenter.Display datasourceSelector;
 
   private TableListPresenter.Display tableSelector;
+
+  private FileSelectionPresenter.Display fileSelection;
 
   private WizardStepChain stepChain;
 
@@ -103,6 +114,16 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
     initWizardDialog();
+
+    ValueChangeHandler<Boolean> handler = new ValueChangeHandler<Boolean>() {
+      @Override
+      public void onValueChange(ValueChangeEvent<Boolean> event) {
+        fileSelection.setEnabled(useAnExistingView.getValue());
+      }
+    };
+    applyingGlobalVariableFilterRadioButton.addValueChangeHandler(handler);
+    addingVariablesOneByOneRadioButton.addValueChangeHandler(handler);
+    useAnExistingView.addValueChangeHandler(handler);
   }
 
   private void initWizardDialog() {
@@ -124,7 +145,7 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
         if(datasourceSelector != null) datasourceSelector.selectFirst();
         viewNameTextBox.setText("");
         applyingGlobalVariableFilterRadioButton.setValue(true);
-        addingVariablesOneByOneRadioButton.setValue(false);
+        ValueChangeEvent.fire(applyingGlobalVariableFilterRadioButton, true);
       }
     })//
 
@@ -174,6 +195,13 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   public void setTableSelector(TableListPresenter.Display tableSelector) {
     this.tableSelector = tableSelector;
     tableSelectorPanel.add(tableSelector.asWidget());
+  }
+
+  @Override
+  public void setFileSelectionDisplay(FileSelectionPresenter.Display display) {
+    fileSelectionPanel.setWidget(display.asWidget());
+    fileSelection = display;
+    fileSelection.setFieldWidth("20em");
   }
 
   @Override
@@ -240,6 +268,11 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   @Override
   public HasValue<Boolean> getAddVariablesOneByOneOption() {
     return addingVariablesOneByOneRadioButton;
+  }
+
+  @Override
+  public HasValue<Boolean> getFileViewOption() {
+    return this.useAnExistingView;
   }
 
   @Override

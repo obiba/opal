@@ -19,6 +19,10 @@ import java.util.Locale;
 import org.junit.Test;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.views.View;
+import org.obiba.opal.web.magma.view.JavaScriptViewDtoExtension;
+import org.obiba.opal.web.magma.view.VariableListViewDtoExtension;
+import org.obiba.opal.web.magma.view.ViewDtoExtension;
+import org.obiba.opal.web.magma.view.ViewDtos;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -36,7 +40,7 @@ public class ViewResourceTest {
     View view = new View();
 
     // Exercise
-    ViewResource sut = new ViewResource(view);
+    ViewResource sut = new ViewResource(view, newViewDtos());
 
     // Verify
     assertEquals(view, sut.getValueTable());
@@ -49,7 +53,7 @@ public class ViewResourceTest {
     expect(fromTableMock.getName()).andReturn("fromTable").atLeastOnce();
 
     View view = new View("testView", fromTableMock);
-    ViewResource sut = new ViewResource(view, ImmutableSet.of(new Locale("en")));
+    ViewResource sut = new ViewResource(view, newViewDtos(), ImmutableSet.of(new Locale("en")));
 
     replay(fromTableMock);
 
@@ -58,5 +62,9 @@ public class ViewResourceTest {
 
     // Verify state
     assertEquals("fromTable", fromTableResource.getValueTable().getName());
+  }
+
+  private ViewDtos newViewDtos() {
+    return new ViewDtos(ImmutableSet.<ViewDtoExtension> of(new JavaScriptViewDtoExtension(), new VariableListViewDtoExtension()));
   }
 }

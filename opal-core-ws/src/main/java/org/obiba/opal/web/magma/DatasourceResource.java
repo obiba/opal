@@ -51,6 +51,7 @@ import org.obiba.magma.views.View;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.magma.support.NoSuchDatasourceFactoryException;
+import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
@@ -71,34 +72,43 @@ public class DatasourceResource {
   @PathParam("name")
   private String name;
 
+  private final DatasourceFactoryRegistry datasourceFactoryRegistry;
+
+  private final OpalRuntime opalRuntime;
+
+  private final ViewDtos viewDtos;
+
   private Datasource transientDatasourceInstance;
 
-  DatasourceFactoryRegistry datasourceFactoryRegistry;
-
-  private OpalRuntime opalRuntime;
-
   @Autowired
-  private @Value("${org.obiba.opal.languages}")
-  String localesProperty;
+  @Value("${org.obiba.opal.languages}")
+  private String localesProperty;
 
   private Set<Locale> locales;
 
   @Autowired
-  public DatasourceResource(DatasourceFactoryRegistry datasourceFactoryRegistry, OpalRuntime opalRuntime) {
+  public DatasourceResource(DatasourceFactoryRegistry datasourceFactoryRegistry, OpalRuntime opalRuntime, ViewDtos viewDtos) {
     super();
+    if(datasourceFactoryRegistry == null) throw new IllegalArgumentException("datasourceFactoryRegistry cannot be null");
+    if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
+    if(viewDtos == null) throw new IllegalArgumentException("viewDtos cannot be null");
+
     this.datasourceFactoryRegistry = datasourceFactoryRegistry;
     this.opalRuntime = opalRuntime;
+    this.viewDtos = viewDtos;
   }
 
   // Used for testing
-  public DatasourceResource(String name) {
-    this.name = name;
+  DatasourceResource(String name) {
+    this(null, null, null, name);
   }
 
-  public DatasourceResource(DatasourceFactoryRegistry datasourceFactoryRegistry, OpalRuntime opalRuntime, String name) {
-    this.name = name;
+  // Used for testing
+  DatasourceResource(DatasourceFactoryRegistry datasourceFactoryRegistry, OpalRuntime opalRuntime, ViewDtos viewDtos, String name) {
     this.datasourceFactoryRegistry = datasourceFactoryRegistry;
     this.opalRuntime = opalRuntime;
+    this.viewDtos = viewDtos;
+    this.name = name;
   }
 
   @PreDestroy
@@ -107,10 +117,6 @@ public class DatasourceResource {
       Disposables.silentlyDispose(transientDatasourceInstance);
       transientDatasourceInstance = null;
     }
-  }
-
-  public void setOpalRuntime(OpalRuntime opalRuntime) {
-    this.opalRuntime = opalRuntime;
   }
 
   public void setLocalesProperty(String localesProperty) {
@@ -201,7 +207,7 @@ public class DatasourceResource {
   @Bean
   @Scope("request")
   public ViewResource getViewResource(View view) {
-    return new ViewResource(view, getLocales());
+    return new ViewResource(view, viewDtos, getLocales());
   }
 
   @POST
@@ -267,7 +273,7 @@ public class DatasourceResource {
     if(datasourceHasTable(viewName) && !datasourceHasView(viewName)) {
       return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists").build()).build();
     }
-    opalRuntime.getViewManager().addView(getDatasource().getName(), ViewDtos.fromDto(viewName, viewDto));
+    opalRuntime.getViewManager().addView(getDatasource().getName(), viewDtos.fromDto(viewName, viewDto));
 
     return Response.ok().build();
   }

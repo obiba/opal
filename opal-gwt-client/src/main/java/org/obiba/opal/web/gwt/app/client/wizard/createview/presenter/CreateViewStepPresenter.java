@@ -25,7 +25,9 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequir
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.HasCollection;
+import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
+import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.DisallowedCharactersValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.MatchingTableEntitiesValidator;
@@ -34,14 +36,17 @@ import org.obiba.opal.web.gwt.app.client.validator.RequiredOptionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter.DatasourcesRefreshedCallback;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.magma.FileViewDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -67,6 +72,9 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
   @Inject
   private TableListPresenter tableListPresenter;
+
+  @Inject
+  private FileSelectionPresenter fileSelectionPresenter;
 
   private String datasourceName;
 
@@ -99,6 +107,10 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     tableListPresenter.bind();
     getDisplay().setTableSelector(tableListPresenter.getDisplay());
 
+    fileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
+    fileSelectionPresenter.bind();
+    getDisplay().setFileSelectionDisplay(fileSelectionPresenter.getDisplay());
+
     addEventHandlers();
   }
 
@@ -108,6 +120,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     datasourceSelectorPresenter.setDatasourcesRefreshedCallback(null);
 
     tableListPresenter.unbind();
+    fileSelectionPresenter.unbind();
   }
 
   protected void addEventHandlers() {
@@ -192,6 +205,10 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
       viewDtoBuilder.defaultJavaScriptView();
     } else if(getDisplay().getAddVariablesOneByOneOption().getValue()) {
       viewDtoBuilder.defaultVariableListView();
+    } else if(getDisplay().getFileViewOption().getValue()) {
+      FileViewDto fileView = FileViewDto.create();
+      fileView.setFilename(fileSelectionPresenter.getSelectedFile());
+      viewDtoBuilder.fileView(fileView);
     }
     ViewDto viewDto = viewDtoBuilder.build();
 
@@ -225,6 +242,8 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
     void setTableSelector(TableListPresenter.Display tableSelector);
 
+    void setFileSelectionDisplay(FileSelectionPresenter.Display display);
+
     HasText getDatasourceName();
 
     HasText getViewName();
@@ -232,6 +251,8 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     HasValue<Boolean> getApplyGlobalVariableFilterOption();
 
     HasValue<Boolean> getAddVariablesOneByOneOption();
+
+    HasValue<Boolean> getFileViewOption();
 
     void setSelectTypeValidator(ValidationHandler validator);
 
@@ -327,11 +348,10 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
       validators.add(new RequiredTextValidator(getDisplay().getViewName(), "ViewNameRequired"));
       validators.add(new DisallowedCharactersValidator(getDisplay().getViewName(), new char[] { '.', ':' }, "ViewNameDisallowedChars"));
-      validators.add(new RequiredOptionValidator(RequiredOptionValidator.asSet(getDisplay().getApplyGlobalVariableFilterOption(), getDisplay().getAddVariablesOneByOneOption()), "VariableDefinitionMethodRequired"));
-
+      validators.add(new RequiredOptionValidator(RequiredOptionValidator.asSet(getDisplay().getApplyGlobalVariableFilterOption(), getDisplay().getAddVariablesOneByOneOption(), getDisplay().getFileViewOption()), "VariableDefinitionMethodRequired"));
+      validators.add(new ConditionalValidator(getDisplay().getFileViewOption(), new RequiredFileSelectionValidator()));
       return validators;
     }
-
   }
 
   class TablesValidator extends AbstractValidationHandler {
@@ -376,5 +396,18 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     public void onResponseCode(Request request, Response response) {
       createView();
     }
+  }
+
+  class RequiredFileSelectionValidator extends AbstractFieldValidator {
+
+    public RequiredFileSelectionValidator() {
+      super("XMLFileRequired");
+    }
+
+    @Override
+    protected boolean hasError() {
+      return fileSelectionPresenter.getSelectedFile() == null || fileSelectionPresenter.getSelectedFile().isEmpty();
+    }
+
   }
 }

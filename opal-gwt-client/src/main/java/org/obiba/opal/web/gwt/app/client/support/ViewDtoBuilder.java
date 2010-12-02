@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.support;
 
 import java.util.List;
 
+import org.obiba.opal.web.model.client.magma.FileViewDto;
 import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
@@ -54,6 +55,12 @@ public class ViewDtoBuilder {
   public ViewDtoBuilder defaultVariableListView() {
     VariableListViewDto listDto = VariableListViewDto.create();
     viewDto.setExtension(VariableListViewDto.ViewDtoExtensions.view, listDto);
+
+    return this;
+  }
+
+  public ViewDtoBuilder fileView(FileViewDto dto) {
+    viewDto.setExtension(FileViewDto.ViewDtoExtensions.view, dto);
 
     return this;
   }

@@ -186,6 +186,16 @@ message OutlierRemovingViewDto {
   }
 }
 
+message FileViewDto {
+  required string filename = 1;
+  // Eventually:
+  // required string type = 2; (excel, xml, etc.)
+  extend ViewDto {
+    optional FileViewDto view = 1003;
+  }
+}
+
+
 message JavaScriptErrorDto {
   required string message = 1;      // RhinoException.details()
   required string sourceName = 2;   // RhinoException.sourceName()
