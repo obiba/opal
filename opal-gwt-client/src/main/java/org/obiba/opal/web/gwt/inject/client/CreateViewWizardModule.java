@@ -13,7 +13,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewS
 import org.obiba.opal.web.gwt.app.client.wizard.createview.view.CreateViewStepView;
 
 import com.google.gwt.inject.client.AbstractGinModule;
-import com.google.inject.Singleton;
 
 /**
  * Bind concrete implementations to interfaces within the Create View wizard.
@@ -22,7 +21,6 @@ public class CreateViewWizardModule extends AbstractGinModule {
 
   @Override
   protected void configure() {
-    bind(CreateViewStepPresenter.Display.class).to(CreateViewStepView.class).in(Singleton.class);
+    bind(CreateViewStepPresenter.Display.class).to(CreateViewStepView.class);
   }
-
 }

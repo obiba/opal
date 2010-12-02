@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorTreePresen
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -83,28 +84,28 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   }
 
   @Override
-  public void addCreateDatasourceClickHandler(ClickHandler handler) {
-    createDatasourceButton.addClickHandler(handler);
+  public HandlerRegistration addCreateDatasourceClickHandler(ClickHandler handler) {
+    return createDatasourceButton.addClickHandler(handler);
   }
 
   @Override
-  public void addExportDataClickHandler(ClickHandler handler) {
-    exportDataButton.addClickHandler(handler);
+  public HandlerRegistration addExportDataClickHandler(ClickHandler handler) {
+    return exportDataButton.addClickHandler(handler);
   }
 
   @Override
-  public void addImportDataClickHandler(ClickHandler handler) {
-    importDataButton.addClickHandler(handler);
+  public HandlerRegistration addImportDataClickHandler(ClickHandler handler) {
+    return importDataButton.addClickHandler(handler);
   }
 
   @Override
-  public void addImportVariablesClickHandler(ClickHandler handler) {
-    importVariablesButton.addClickHandler(handler);
+  public HandlerRegistration addImportVariablesClickHandler(ClickHandler handler) {
+    return importVariablesButton.addClickHandler(handler);
   }
 
   @Override
-  public void addAddViewClickHandler(ClickHandler handler) {
-    addViewButton.addClickHandler(handler);
+  public HandlerRegistration addAddViewClickHandler(ClickHandler handler) {
+    return addViewButton.addClickHandler(handler);
   }
 
 }

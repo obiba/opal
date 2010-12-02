@@ -18,14 +18,16 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.ViewCreationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -36,17 +38,17 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
 
     void setTreeDisplay(NavigatorTreePresenter.Display treeDisplay);
 
-    void addCreateDatasourceClickHandler(ClickHandler handler);
+    HandlerRegistration addCreateDatasourceClickHandler(ClickHandler handler);
 
     HasWidgets getDetailsPanel();
 
-    void addExportDataClickHandler(ClickHandler handler);
+    HandlerRegistration addExportDataClickHandler(ClickHandler handler);
 
-    void addImportDataClickHandler(ClickHandler handler);
+    HandlerRegistration addImportDataClickHandler(ClickHandler handler);
 
-    void addImportVariablesClickHandler(ClickHandler handler);
+    HandlerRegistration addImportVariablesClickHandler(ClickHandler handler);
 
-    void addAddViewClickHandler(ClickHandler handler);
+    HandlerRegistration addAddViewClickHandler(ClickHandler handler);
   }
 
   @Inject
@@ -95,45 +97,45 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
 
     getDisplay().setTreeDisplay(navigatorTreePresenter.getDisplay());
 
-    getDisplay().addCreateDatasourceClickHandler(new ClickHandler() {
+    super.registerHandler(getDisplay().addCreateDatasourceClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
         createDatasourcePresenter.revealDisplay();
       }
-    });
+    }));
 
-    getDisplay().addExportDataClickHandler(new ClickHandler() {
+    super.registerHandler(getDisplay().addExportDataClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
         dataExportPresenter.get().revealDisplay();
       }
-    });
+    }));
 
-    getDisplay().addImportVariablesClickHandler(new ClickHandler() {
+    super.registerHandler(getDisplay().addImportVariablesClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
         variablesImportPresenter.revealDisplay();
       }
-    });
+    }));
 
-    getDisplay().addImportDataClickHandler(new ClickHandler() {
+    super.registerHandler(getDisplay().addImportDataClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
         dataImportPresenter.revealDisplay();
       }
-    });
+    }));
 
-    getDisplay().addAddViewClickHandler(new ClickHandler() {
+    super.registerHandler(getDisplay().addAddViewClickHandler(new ClickHandler() {
 
       @Override
-      public void onClick(ClickEvent arg0) {
-        eventBus.fireEvent(new ViewCreationRequiredEvent());
+      public void onClick(ClickEvent event) {
+        eventBus.fireEvent(new WizardRequiredEvent(WizardType.CREATE_VIEW));
       }
-    });
+    }));
 
     super.registerHandler(eventBus.addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionChangeEvent.Handler() {
 

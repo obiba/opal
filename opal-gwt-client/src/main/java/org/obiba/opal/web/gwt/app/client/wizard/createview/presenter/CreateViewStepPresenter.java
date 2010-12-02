@@ -22,7 +22,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.ViewCreationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.HasCollection;
@@ -104,11 +103,12 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   @Override
   protected void onUnbind() {
     datasourceSelectorPresenter.unbind();
+    datasourceSelectorPresenter.setDatasourcesRefreshedCallback(null);
+
     tableListPresenter.unbind();
   }
 
   protected void addEventHandlers() {
-    super.registerHandler(eventBus.addHandler(ViewCreationRequiredEvent.getType(), new ViewCreationRequiredHandler()));
     super.registerHandler(getDisplay().addCancelHandler(new CancelHandler()));
     super.registerHandler(getDisplay().addCreateHandler(new CreateHandler()));
     super.registerHandler(getDisplay().addCloseHandler(new CloseHandler()));
@@ -239,14 +239,6 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
     HandlerRegistration addConfigureHandler(ClickHandler handler);
 
-  }
-
-  class ViewCreationRequiredHandler implements ViewCreationRequiredEvent.Handler {
-
-    public void onViewCreationRequired(ViewCreationRequiredEvent event) {
-      datasourceName = event.getDatasourceName();
-      revealDisplay();
-    }
   }
 
   class CancelHandler implements ClickHandler {

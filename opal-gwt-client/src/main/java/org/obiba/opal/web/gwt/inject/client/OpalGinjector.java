@@ -31,6 +31,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresente
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardManager;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.ExcelDatasourceFormPresenter;
@@ -130,4 +131,6 @@ public interface OpalGinjector extends Ginjector {
   CreateDatasourcePresenter getCreateDatasourcePresenter();
 
   DataExportPresenter getDataExportPresenter();
+
+  WizardManager getWizardManager();
 }
