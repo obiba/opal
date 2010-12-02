@@ -19,7 +19,6 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChan
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
-import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -60,16 +59,8 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
   private VariablePresenter variablePresenter;
 
   @Inject
-  private CreateDatasourcePresenter createDatasourcePresenter;
-
-  @Inject
   public NavigatorPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
   }
 
   @Override
@@ -78,7 +69,6 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     datasourcePresenter.bind();
     tablePresenter.bind();
     variablePresenter.bind();
-    createDatasourcePresenter.bind();
 
     getDisplay().setTreeDisplay(navigatorTreePresenter.getDisplay());
 
@@ -86,7 +76,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
 
       @Override
       public void onClick(ClickEvent event) {
-        createDatasourcePresenter.revealDisplay();
+        eventBus.fireEvent(new WizardRequiredEvent(WizardType.CREATE_DATASOURCE));
       }
     }));
 
@@ -148,22 +138,12 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     }));
   }
 
-  private void displayDetails(WidgetDisplay detailsDisplay) {
-    getDisplay().getDetailsPanel().clear();
-    getDisplay().getDetailsPanel().add(detailsDisplay.asWidget());
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
   @Override
   protected void onUnbind() {
     navigatorTreePresenter.unbind();
     datasourcePresenter.unbind();
     tablePresenter.unbind();
     variablePresenter.unbind();
-    createDatasourcePresenter.unbind();
   }
 
   @Override
@@ -176,4 +156,17 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     navigatorTreePresenter.revealDisplay();
   }
 
+  private void displayDetails(WidgetDisplay detailsDisplay) {
+    getDisplay().getDetailsPanel().clear();
+    getDisplay().getDetailsPanel().add(detailsDisplay.asWidget());
+  }
+
+  @Override
+  public Place getPlace() {
+    return null;
+  }
+
+  @Override
+  protected void onPlaceRequest(PlaceRequest request) {
+  }
 }

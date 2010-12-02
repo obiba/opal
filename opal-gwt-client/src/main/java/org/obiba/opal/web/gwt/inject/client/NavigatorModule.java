@@ -46,7 +46,7 @@ public class NavigatorModule extends AbstractGinModule {
   protected void configure() {
     // Bind concrete implementations to interfaces
     bind(NavigatorPresenter.Display.class).to(NavigatorView.class).in(Singleton.class);
-    bind(CreateDatasourcePresenter.Display.class).to(CreateDatasourceView.class).in(Singleton.class);
+    bind(CreateDatasourcePresenter.Display.class).to(CreateDatasourceView.class);
 
     // Don't bind as singleton because the ApplicationPresenter expects a new instance on every display
     bind(NavigatorTreePresenter.Display.class).to(NavigatorTreeView.class);

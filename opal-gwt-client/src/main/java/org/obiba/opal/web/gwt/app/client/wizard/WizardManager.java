@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.wizard;
 
 import net.customware.gwt.presenter.client.EventBus;
 
+import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
@@ -29,6 +30,9 @@ public class WizardManager {
   //
 
   private final EventBus eventBus;
+
+  @Inject
+  private Provider<CreateDatasourcePresenter> createDatasourceWizard;
 
   @Inject
   private Provider<CreateViewStepPresenter> createViewWizard;
@@ -72,6 +76,9 @@ public class WizardManager {
       unbindLastWizard();
 
       switch(event.getWizardType()) {
+      case CREATE_DATASOURCE:
+        bindAndDisplayWizard(createDatasourceWizard.get(), event);
+        break;
       case CREATE_VIEW:
         bindAndDisplayWizard(createViewWizard.get(), event);
         break;

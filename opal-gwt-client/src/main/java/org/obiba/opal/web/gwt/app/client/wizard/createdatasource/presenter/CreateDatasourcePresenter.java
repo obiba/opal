@@ -26,6 +26,8 @@ import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
+import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
+import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -41,7 +43,7 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 
-public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourcePresenter.Display> {
+public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourcePresenter.Display> implements Wizard {
   //
   // Instance Variables
   //
@@ -143,8 +145,12 @@ public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourceP
   }
 
   //
-  // Methods
+  // Wizard Methods
   //
+
+  public void onWizardRequired(WizardRequiredEvent event) {
+    // nothing to do
+  }
 
   //
   // Inner Classes / Interfaces
