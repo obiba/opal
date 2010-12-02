@@ -75,7 +75,6 @@
 
     <!-- Unpack BIRT Report Engine distribution -->
     <dependencySet>
-      <outputDirectory>.</outputDirectory>
       <includes>
         <include>org.obiba.opal:opal-reporting:zip:dist</include>
       </includes>

@@ -33,6 +33,15 @@
     </dependencySet>
 
     <dependencySet>
+      <outputDirectory>update-site</outputDirectory>
+      <includes>
+        <include>org.obiba.opal.birt:opal-oda:*</include>
+      </includes>
+      <scope>provided</scope>
+      <unpack>true</unpack>
+    </dependencySet>
+    
+    <dependencySet>
       <outputDirectory>birt-runtime-2_6_1/ReportEngine/lib</outputDirectory>
       <includes>
         <include>org.obiba.opal:opal-reporting:jar</include>

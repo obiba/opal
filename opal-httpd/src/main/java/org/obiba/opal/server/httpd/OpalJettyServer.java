@@ -93,8 +93,9 @@ public class OpalJettyServer implements Service {
     HandlerList handlers = new HandlerList();
 
     // Add a file handler that points to the Opal GWT client directory
-    String url = "file://" + System.getProperty("OPAL_DIST_DIR") + "/webapp";
-    handlers.addHandler(createFileHandler(url));
+    handlers.addHandler(createFileHandler("/webapp"));
+    // Add a file handler that points to the Opal BIRT extension update-site
+    handlers.addHandler(createFileHandler("/update-site"));
 
     handlers.addHandler(contextHandler = createServletHandler(ctx, txmgr, securityMgr));
     server.setHandler(handlers);
@@ -159,13 +160,13 @@ public class OpalJettyServer implements Service {
     return contextHandler;
   }
 
-  private Handler createFileHandler(String fileUrl) {
-    log.info("Created a file handler for the following URL : {}", fileUrl);
-
+  private Handler createFileHandler(String directory) {
+    String fileUrl = "file://" + System.getProperty("OPAL_DIST_DIR") + directory;
     ResourceHandler resourceHandler = new ResourceHandler();
     try {
       resourceHandler.setBaseResource(new FileResource(new URL(fileUrl)));
       resourceHandler.setAliases(true);
+      log.info("Created a file handler for the following URL : {}", fileUrl);
     } catch(MalformedURLException e) {
       throw new RuntimeException(e);
     } catch(IOException e) {
