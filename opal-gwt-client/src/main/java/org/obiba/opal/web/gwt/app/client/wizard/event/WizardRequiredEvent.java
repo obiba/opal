@@ -32,12 +32,21 @@ public class WizardRequiredEvent extends GwtEvent<WizardRequiredEvent.Handler> {
 
   private final WizardType wizardType;
 
+  private Object[] eventParameters;
+
   //
   // Constructors
   //
 
-  public WizardRequiredEvent(WizardType type) {
+  public WizardRequiredEvent(WizardType type, Object... eventParameters) {
     wizardType = type;
+
+    if(eventParameters != null) {
+      this.eventParameters = new Object[eventParameters.length];
+      System.arraycopy(eventParameters, 0, this.eventParameters, 0, eventParameters.length);
+    } else {
+      this.eventParameters = new Object[0]; // return an empty array rather than null
+    }
   }
 
   //
@@ -64,6 +73,13 @@ public class WizardRequiredEvent extends GwtEvent<WizardRequiredEvent.Handler> {
 
   public WizardType getWizardType() {
     return wizardType;
+  }
+
+  public Object[] getEventParameters() {
+    Object[] eventParametersCopy = new Object[this.eventParameters.length];
+    System.arraycopy(this.eventParameters, 0, eventParametersCopy, 0, this.eventParameters.length);
+
+    return eventParametersCopy;
   }
 
   //

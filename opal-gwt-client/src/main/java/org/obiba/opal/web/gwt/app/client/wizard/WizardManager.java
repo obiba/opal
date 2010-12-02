@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard;
 
-import net.customware.gwt.presenter.client.BasicPresenter;
 import net.customware.gwt.presenter.client.EventBus;
 
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
@@ -31,7 +30,7 @@ public class WizardManager {
   @Inject
   private Provider<CreateViewStepPresenter> createViewWizard;
 
-  private BasicPresenter<?> lastBoundWizard;
+  private Wizard lastBoundWizard;
 
   //
   // Constructors
@@ -62,14 +61,15 @@ public class WizardManager {
 
       switch(event.getWizardType()) {
       case CREATE_VIEW:
-        bindAndDisplayWizard(createViewWizard.get());
+        bindAndDisplayWizard(createViewWizard.get(), event);
         break;
       default:
         throw new UnsupportedOperationException("wizard type not supported (" + event.getWizardType() + ")");
       }
     }
 
-    private void bindAndDisplayWizard(BasicPresenter<?> wizard) {
+    private void bindAndDisplayWizard(Wizard wizard, WizardRequiredEvent event) {
+      wizard.onWizardRequired(event);
       wizard.bind();
       lastBoundWizard = wizard;
       wizard.revealDisplay();

@@ -36,6 +36,8 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter.DatasourcesRefreshedCallback;
+import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
+import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -55,7 +57,7 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 
-public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPresenter.Display> {
+public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPresenter.Display> implements Wizard {
   //
   // Instance Variables
   //
@@ -138,6 +140,20 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
   @Override
   protected void onPlaceRequest(PlaceRequest request) {
+  }
+
+  //
+  // Wizard Methods
+  //
+
+  public void onWizardRequired(WizardRequiredEvent event) {
+    if(event.getEventParameters().length != 0) {
+      if(event.getEventParameters()[0] instanceof String) {
+        datasourceName = (String) event.getEventParameters()[0];
+      } else {
+        throw new IllegalArgumentException("unexpected event parameter type (expected String)");
+      }
+    }
   }
 
   //
