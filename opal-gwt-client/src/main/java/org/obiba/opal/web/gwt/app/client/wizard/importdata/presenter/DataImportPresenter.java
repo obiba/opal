@@ -16,6 +16,8 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
+import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
+import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 
@@ -27,7 +29,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Display> {
+public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Display> implements Wizard {
 
   @Inject
   private CsvFormatStepPresenter csvFormatStepPresenter;
@@ -149,6 +151,14 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
     destinationSelectionStepPresenter.refreshDisplay(); // to refresh the datasources
     updateFormatStepDisplay();
     getDisplay().showDialog();
+  }
+
+  //
+  // Wizard Methods
+  //
+
+  public void onWizardRequired(WizardRequiredEvent event) {
+    // nothing to do
   }
 
   //

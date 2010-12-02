@@ -22,7 +22,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -53,9 +52,6 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
 
   @Inject
   private VariablesImportPresenter variablesImportPresenter;
-
-  @Inject
-  private DataImportPresenter dataImportPresenter;
 
   @Inject
   private NavigatorTreePresenter navigatorTreePresenter;
@@ -91,7 +87,6 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     datasourcePresenter.bind();
     tablePresenter.bind();
     variablePresenter.bind();
-    dataImportPresenter.bind();
     variablesImportPresenter.bind();
     createDatasourcePresenter.bind();
 
@@ -124,8 +119,8 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     super.registerHandler(getDisplay().addImportDataClickHandler(new ClickHandler() {
 
       @Override
-      public void onClick(ClickEvent arg0) {
-        dataImportPresenter.revealDisplay();
+      public void onClick(ClickEvent event) {
+        eventBus.fireEvent(new WizardRequiredEvent(WizardType.IMPORT_DATA));
       }
     }));
 
@@ -178,7 +173,6 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     datasourcePresenter.unbind();
     tablePresenter.unbind();
     variablePresenter.unbind();
-    dataImportPresenter.unbind();
     createDatasourcePresenter.unbind();
   }
 

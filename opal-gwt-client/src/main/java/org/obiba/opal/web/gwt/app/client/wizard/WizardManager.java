@@ -13,6 +13,7 @@ import net.customware.gwt.presenter.client.EventBus;
 
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -29,6 +30,9 @@ public class WizardManager {
 
   @Inject
   private Provider<CreateViewStepPresenter> createViewWizard;
+
+  @Inject
+  private Provider<DataImportPresenter> dataImportWizard;
 
   private Wizard lastBoundWizard;
 
@@ -62,6 +66,9 @@ public class WizardManager {
       switch(event.getWizardType()) {
       case CREATE_VIEW:
         bindAndDisplayWizard(createViewWizard.get(), event);
+        break;
+      case IMPORT_DATA:
+        bindAndDisplayWizard(dataImportWizard.get(), event);
         break;
       default:
         throw new UnsupportedOperationException("wizard type not supported (" + event.getWizardType() + ")");

@@ -23,7 +23,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.IdentityArchiveS
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.XmlFormatStepView;
 
 import com.google.gwt.inject.client.AbstractGinModule;
-import com.google.inject.Singleton;
 
 /**
  * Bind concrete implementations to interfaces within the import wizard.
@@ -32,12 +31,11 @@ public class ImportModule extends AbstractGinModule {
 
   @Override
   protected void configure() {
-    bind(DataImportPresenter.Display.class).to(DataImportView.class).in(Singleton.class);
-    bind(CsvFormatStepPresenter.Display.class).to(CsvFormatStepView.class).in(Singleton.class);
-    bind(DestinationSelectionStepPresenter.Display.class).to(DestinationSelectionStepView.class).in(Singleton.class);
-    bind(XmlFormatStepPresenter.Display.class).to(XmlFormatStepView.class).in(Singleton.class);
-    bind(IdentityArchiveStepPresenter.Display.class).to(IdentityArchiveStepView.class).in(Singleton.class);
-    bind(ConclusionStepPresenter.Display.class).to(ConclusionStepView.class).in(Singleton.class);
+    bind(DataImportPresenter.Display.class).to(DataImportView.class);
+    bind(CsvFormatStepPresenter.Display.class).to(CsvFormatStepView.class);
+    bind(DestinationSelectionStepPresenter.Display.class).to(DestinationSelectionStepView.class);
+    bind(XmlFormatStepPresenter.Display.class).to(XmlFormatStepView.class);
+    bind(IdentityArchiveStepPresenter.Display.class).to(IdentityArchiveStepView.class);
+    bind(ConclusionStepPresenter.Display.class).to(ConclusionStepView.class);
   }
-
 }
