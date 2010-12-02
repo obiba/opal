@@ -30,6 +30,8 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
+import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -38,7 +40,6 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.CopyCommandOptionsDto;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -52,7 +53,7 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 
-public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Display> {
+public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Display> implements Wizard {
 
   @Inject
   private TableListPresenter tableListPresenter;
@@ -181,6 +182,14 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
         getDisplay().setUnits(units);
       }
     }).send();
+  }
+
+  //
+  // Wizard Methods
+  //
+
+  public void onWizardRequired(WizardRequiredEvent event) {
+    // nothing to do
   }
 
   //

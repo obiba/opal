@@ -21,7 +21,6 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChange
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -29,7 +28,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Display> {
 
@@ -69,9 +67,6 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
   private CreateDatasourcePresenter createDatasourcePresenter;
 
   @Inject
-  private Provider<DataExportPresenter> dataExportPresenter;
-
-  @Inject
   public NavigatorPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
   }
@@ -95,23 +90,15 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     super.registerHandler(getDisplay().addCreateDatasourceClickHandler(new ClickHandler() {
 
       @Override
-      public void onClick(ClickEvent arg0) {
+      public void onClick(ClickEvent event) {
         createDatasourcePresenter.revealDisplay();
-      }
-    }));
-
-    super.registerHandler(getDisplay().addExportDataClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent arg0) {
-        dataExportPresenter.get().revealDisplay();
       }
     }));
 
     super.registerHandler(getDisplay().addImportVariablesClickHandler(new ClickHandler() {
 
       @Override
-      public void onClick(ClickEvent arg0) {
+      public void onClick(ClickEvent event) {
         variablesImportPresenter.revealDisplay();
       }
     }));
@@ -121,6 +108,14 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
       @Override
       public void onClick(ClickEvent event) {
         eventBus.fireEvent(new WizardRequiredEvent(WizardType.IMPORT_DATA));
+      }
+    }));
+
+    super.registerHandler(getDisplay().addExportDataClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        eventBus.fireEvent(new WizardRequiredEvent(WizardType.EXPORT_DATA));
       }
     }));
 

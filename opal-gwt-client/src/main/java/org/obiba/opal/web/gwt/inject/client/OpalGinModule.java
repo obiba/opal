@@ -38,8 +38,6 @@ import org.obiba.opal.web.gwt.app.client.widgets.view.TableListView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.TableSelectorView;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.view.EvaluateScriptView;
-import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.exportdata.view.DataExportView;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 
 import com.google.gwt.inject.client.AbstractGinModule;
@@ -59,7 +57,6 @@ public class OpalGinModule extends AbstractGinModule {
     bind(ApplicationPresenter.Display.class).to(ApplicationView.class).in(Singleton.class);
     bind(LoginPresenter.Display.class).to(LoginView.class).in(Singleton.class);
     bind(UnhandledResponseNotificationPresenter.Display.class).to(UnhandledResponseNotificationView.class).in(Singleton.class);
-    bind(DataExportPresenter.Display.class).to(DataExportView.class).in(Singleton.class);
 
     // Don't bind as singleton because the ApplicationPresenter expects a new instance on every display
     bind(NotificationPresenter.Display.class).to(NotificationView.class);
