@@ -64,6 +64,12 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   @UiField
   HTMLPanel help;
 
+  @UiField
+  HTMLPanel processingText;
+
+  @UiField
+  FlowPanel compareResults;
+
   //
   // Constructors
   //
@@ -335,6 +341,16 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   @Override
   public Widget getStepHelp() {
     return help;
+  }
+
+  @Override
+  public void showProcessing(boolean processingShown) {
+    processingText.setVisible(processingShown);
+  }
+
+  @Override
+  public void showResults(boolean resultsShown) {
+    compareResults.setVisible(resultsShown);
   }
 
 }

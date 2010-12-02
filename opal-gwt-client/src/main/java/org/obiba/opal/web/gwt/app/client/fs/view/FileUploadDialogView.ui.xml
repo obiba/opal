@@ -19,7 +19,7 @@
       <!-- The width here have to match EXACTLY the one on DialogBox above -->
       <g:DockLayoutPanel unit="EM" height="12em" width="35em">
         <g:north size="2">
-          <g:HTMLPanel ui:field="uploadingText" visible="false" addStyleNames="uploadingText">
+          <g:HTMLPanel ui:field="uploadingText" visible="false" addStyleNames="processingText">
             <g:Label><ui:msg description="Uploading label">Uploading file...</ui:msg></g:Label>
             <img src="image/in-progress.gif"/>
           </g:HTMLPanel>

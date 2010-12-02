@@ -59,6 +59,8 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   }
 
   public void compare(String sourceDatasourceName, String targetDatasourceName) {
+    getDisplay().showProcessing(true);
+    getDisplay().showResults(false);
     this.targetDatasourceName = targetDatasourceName;
     getDisplay().clearDisplay();
 
@@ -66,6 +68,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
       @Override
       public void onResource(Response response, DatasourceCompareDto resource) {
+
         comparedTables = JsArrays.toArray(resource.getTableComparisonsArray());
 
         sortComparedTables();
@@ -81,6 +84,8 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
           }
         }
         getDisplay().setEnabledIgnoreAllModifications(conflictsExist || modificationsExist);
+        getDisplay().showProcessing(false);
+        getDisplay().showResults(true);
       }
 
       private void sortComparedTables() {
@@ -180,6 +185,10 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
     }
 
     void addTableCompareTab(TableCompareDto tableCompareData, ComparisonResult comparisonResult);
+
+    void showProcessing(boolean processingShown);
+
+    void showResults(boolean resultsShown);
 
     void clearDisplay();
 

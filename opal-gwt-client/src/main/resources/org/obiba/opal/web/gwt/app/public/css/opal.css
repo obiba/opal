@@ -623,7 +623,7 @@ table.folder-details td:first-child span:hover {
 	padding-left:20px;
 }
 
-.uploadingText .gwt-Label {
+.processingText .gwt-Label {
   display:inline;
   padding:1em;
   font-weight:bold;
