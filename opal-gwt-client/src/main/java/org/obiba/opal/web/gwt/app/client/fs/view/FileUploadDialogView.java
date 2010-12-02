@@ -22,6 +22,7 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -55,6 +56,9 @@ public class FileUploadDialogView extends Composite implements Display {
 
   @UiField
   VerticalPanel inputFieldPanel;
+
+  @UiField
+  HTMLPanel uploadingText;
 
   public FileUploadDialogView() {
     initWidget(uiBinder.createAndBindUi(this));
@@ -109,7 +113,10 @@ public class FileUploadDialogView extends Composite implements Display {
 
   @Override
   public void submit(String url) {
-    dialog.setVisible(false);
+    inputFieldPanel.setVisible(false);
+    uploadingText.setVisible(true);
+    cancelButton.setEnabled(false);
+    uploadButton.setEnabled(false);
     this.form.setAction(url);
     this.form.submit();
   }

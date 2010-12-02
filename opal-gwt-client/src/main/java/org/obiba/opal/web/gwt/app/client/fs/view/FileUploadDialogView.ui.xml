@@ -15,34 +15,42 @@
     <g:caption>
       <ui:msg description="Upload file dialog title">File Upload</ui:msg>
     </g:caption>
-    <!-- The width here have to match EXACTLY the one on DialogBox above -->
-    <g:DockLayoutPanel unit="EM" height="10em" width="35em">
-      <g:center>
-        <g:VerticalPanel ui:field="inputFieldPanel" addStyleNames="main {style.optionsPanelMsg}">
-          <g:HorizontalPanel>
-            <g:Label>
-              <ui:msg description="Select file to upload label">Select the file to be uploaded in directory:</ui:msg>
-            </g:Label>
-            <g:Label ui:field="remoteFolderName" addStyleNames="small-indent {style.remoteFolderName}" />
-          </g:HorizontalPanel>
-          <g:FormPanel encoding="multipart/form-data" method="POST" ui:field="form">
-            <g:FileUpload name="fileToUpload" ui:field="fileToUpload" />
-          </g:FormPanel>
-        </g:VerticalPanel>
-      </g:center>
-      <g:south size="3.25">
-        <g:HTMLPanel addStyleNames="footer">
-          <span class="{style.right-aligned} {style.top-margin}">
-            <g:Button ui:field="uploadButton">
+    <g:FlowPanel height="12em" width="35em">
+      <!-- The width here have to match EXACTLY the one on DialogBox above -->
+      <g:DockLayoutPanel unit="EM" height="12em" width="35em">
+        <g:north size="2">
+          <g:HTMLPanel ui:field="uploadingText" visible="false" addStyleNames="uploadingText">
+            <g:Label><ui:msg description="Uploading label">Uploading file...</ui:msg></g:Label>
+            <img src="image/in-progress.gif"/>
+          </g:HTMLPanel>
+        </g:north>
+        <g:center>
+          <g:VerticalPanel ui:field="inputFieldPanel" addStyleNames="main {style.optionsPanelMsg}">
+            <g:HorizontalPanel>
+              <g:Label>
+                <ui:msg description="Select file to upload label">Select the file to be uploaded in directory:</ui:msg>
+              </g:Label>
+              <g:Label ui:field="remoteFolderName" addStyleNames="small-indent {style.remoteFolderName}"/>
+            </g:HorizontalPanel>
+            <g:FormPanel encoding="multipart/form-data" method="POST" ui:field="form">
+              <g:FileUpload name="fileToUpload" ui:field="fileToUpload"/>
+            </g:FormPanel>
+          </g:VerticalPanel>
+        </g:center>
+        <g:south size="3.25">
+          <g:HTMLPanel addStyleNames="footer">
+            <span class="{style.right-aligned} {style.top-margin}">
+              <g:Button ui:field="uploadButton">
                 <ui:msg description="Upload button label">Upload</ui:msg>
-            </g:Button>
-            <g:Button ui:field="cancelButton">
+              </g:Button>
+              <g:Button ui:field="cancelButton">
                 <ui:msg description="Cancel button label">Cancel</ui:msg>
-            </g:Button>
-          </span>
-        </g:HTMLPanel>
-      </g:south> 
-    </g:DockLayoutPanel>
+              </g:Button>
+            </span>
+          </g:HTMLPanel>
+        </g:south>
+      </g:DockLayoutPanel>
+    </g:FlowPanel>
   </g:DialogBox>
 
 </ui:UiBinder>

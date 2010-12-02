@@ -623,6 +623,12 @@ table.folder-details td:first-child span:hover {
 	padding-left:20px;
 }
 
+.uploadingText .gwt-Label {
+  display:inline;
+  padding:1em;
+  font-weight:bold;
+}
+
 /* Menu bar */ 
 
 .gwt-MenuBar .gwt-MenuItem {
