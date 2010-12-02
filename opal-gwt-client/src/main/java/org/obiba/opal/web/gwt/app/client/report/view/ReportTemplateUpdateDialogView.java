@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.report.view;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Display;
@@ -243,16 +242,6 @@ public class ReportTemplateUpdateDialogView extends Composite implements Display
   public void setEnabledReportTemplateName(boolean enabled) {
     reportTemplateName.setEnabled(enabled);
 
-  }
-
-  @Override
-  public void clear() {
-    setSchedule("");
-    setName("");
-    setDesignFile("");
-    setReportParameters(new ArrayList<String>());
-    setNotificationEmails(new ArrayList<String>());
-    setFormat("PDF");
   }
 
   @Override

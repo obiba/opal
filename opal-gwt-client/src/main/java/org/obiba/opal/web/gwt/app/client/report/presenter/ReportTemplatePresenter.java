@@ -23,6 +23,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class ReportTemplatePresenter extends WidgetPresenter<ReportTemplatePresenter.Display> {
 
@@ -30,7 +31,7 @@ public class ReportTemplatePresenter extends WidgetPresenter<ReportTemplatePrese
 
   ReportTemplateListPresenter reportTemplateListPresenter;
 
-  ReportTemplateUpdateDialogPresenter reportTemplateUpdateDialogPresenter;
+  Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenterProvider;
 
   public interface Display extends WidgetDisplay {
     ScrollPanel getReportTemplateDetailsPanel();
@@ -41,11 +42,11 @@ public class ReportTemplatePresenter extends WidgetPresenter<ReportTemplatePrese
   }
 
   @Inject
-  public ReportTemplatePresenter(final Display display, final EventBus eventBus, ReportTemplateDetailsPresenter reportTemplateDetailsPresenter, ReportTemplateListPresenter reportTemplateListPresenter, ReportTemplateUpdateDialogPresenter reportTemplateUpdateDialogPresenter) {
+  public ReportTemplatePresenter(final Display display, final EventBus eventBus, ReportTemplateDetailsPresenter reportTemplateDetailsPresenter, ReportTemplateListPresenter reportTemplateListPresenter, Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenter) {
     super(display, eventBus);
     this.reportTemplateDetailsPresenter = reportTemplateDetailsPresenter;
     this.reportTemplateListPresenter = reportTemplateListPresenter;
-    this.reportTemplateUpdateDialogPresenter = reportTemplateUpdateDialogPresenter;
+    this.reportTemplateUpdateDialogPresenterProvider = reportTemplateUpdateDialogPresenter;
   }
 
   @Override
@@ -97,11 +98,11 @@ public class ReportTemplatePresenter extends WidgetPresenter<ReportTemplatePrese
 
     @Override
     public void onClick(ClickEvent event) {
-      reportTemplateUpdateDialogPresenter.bind();
-      reportTemplateUpdateDialogPresenter.setDialogMode(Mode.CREATE);
-      reportTemplateUpdateDialogPresenter.getDisplay().clear();
-      reportTemplateUpdateDialogPresenter.getDisplay().setEnabledReportTemplateName(true);
-      reportTemplateUpdateDialogPresenter.revealDisplay();
+      ReportTemplateUpdateDialogPresenter presenter = reportTemplateUpdateDialogPresenterProvider.get();
+      presenter.bind();
+      presenter.setDialogMode(Mode.CREATE);
+      presenter.getDisplay().setEnabledReportTemplateName(true);
+      presenter.revealDisplay();
     }
 
   }

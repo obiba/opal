@@ -25,10 +25,13 @@ public class ReportsModule extends AbstractGinModule {
 
   @Override
   protected void configure() {
+    bind(ReportTemplateListPresenter.class).in(Singleton.class);
     bind(ReportTemplateListPresenter.Display.class).to(ReportTemplateListView.class).in(Singleton.class);
+    bind(ReportTemplateDetailsPresenter.class).in(Singleton.class);
     bind(ReportTemplateDetailsPresenter.Display.class).to(ReportTemplateDetailsView.class).in(Singleton.class);
+    bind(ReportTemplatePresenter.class).in(Singleton.class);
     bind(ReportTemplatePresenter.Display.class).to(ReportTemplateView.class).in(Singleton.class);
-    bind(ReportTemplateUpdateDialogPresenter.Display.class).to(ReportTemplateUpdateDialogView.class).in(Singleton.class);
+    bind(ReportTemplateUpdateDialogPresenter.Display.class).to(ReportTemplateUpdateDialogView.class);
   }
 
 }

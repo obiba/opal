@@ -117,8 +117,6 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
 
     void setEnabledReportTemplateName(boolean enabled);
 
-    void clear();
-
   }
 
   @Inject
