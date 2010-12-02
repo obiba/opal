@@ -55,7 +55,6 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
 
   public void setImportFormat(ImportFormat importFormat) {
     this.importFormat = importFormat;
-    updateSelectableDatasources();
   }
 
   @Override
@@ -83,6 +82,8 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
           d.setTableArray(JsArrays.toSafeArray(d.getTableArray()));
           d.setViewArray(JsArrays.toSafeArray(d.getViewArray()));
         }
+
+        updateSelectableDatasources();
       }
     }).send();
   }
