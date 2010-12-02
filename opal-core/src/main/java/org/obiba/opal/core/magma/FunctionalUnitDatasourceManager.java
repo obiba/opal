@@ -55,7 +55,7 @@ public class FunctionalUnitDatasourceManager implements Decorator<Datasource> {
     for(DatasourceFactory factory : opalRuntime.getOpalConfiguration().getMagmaEngineFactory().factories()) {
       if(factory.getName().equals(datasource.getName())) {
         // TODO get associated unit if defined
-        // FunctionalUnit unit = opalRuntime.getFunctionalUnit(unitName);
+        // FunctionalUnit unit = opalRuntime.getFunctionalUnit(factory.getUnit());
         // if(unit != null) {
         // FunctionalUnitDatasource fuDs = new FunctionalUnitDatasource(datasource, unit.getKeyVariableName(),
         // lookupKeysTable(),
