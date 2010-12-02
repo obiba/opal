@@ -21,7 +21,6 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChange
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -47,9 +46,6 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
 
     HandlerRegistration addAddViewClickHandler(ClickHandler handler);
   }
-
-  @Inject
-  private VariablesImportPresenter variablesImportPresenter;
 
   @Inject
   private NavigatorTreePresenter navigatorTreePresenter;
@@ -82,7 +78,6 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     datasourcePresenter.bind();
     tablePresenter.bind();
     variablePresenter.bind();
-    variablesImportPresenter.bind();
     createDatasourcePresenter.bind();
 
     getDisplay().setTreeDisplay(navigatorTreePresenter.getDisplay());
@@ -99,7 +94,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
 
       @Override
       public void onClick(ClickEvent event) {
-        variablesImportPresenter.revealDisplay();
+        eventBus.fireEvent(new WizardRequiredEvent(WizardType.IMPORT_VARIABLES));
       }
     }));
 

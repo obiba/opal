@@ -21,14 +21,16 @@ import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.Notific
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
+import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceCreatedCallback;
+import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
-import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
+import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
@@ -41,7 +43,7 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
-public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPresenter.Display> {
+public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPresenter.Display> implements Wizard {
   //
   // Constants
   //
@@ -132,8 +134,12 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
   }
 
   //
-  // Methods
+  // Wizard Methods
   //
+
+  public void onWizardRequired(WizardRequiredEvent event) {
+    // nothing to do
+  }
 
   //
   // Inner Classes / Interfaces

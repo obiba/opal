@@ -13,5 +13,5 @@ package org.obiba.opal.web.gwt.app.client.wizard;
  *
  */
 public enum WizardType {
-  CREATE_VIEW, IMPORT_DATA, EXPORT_DATA
+  CREATE_VIEW, IMPORT_VARIABLES, IMPORT_DATA, EXPORT_DATA
 }

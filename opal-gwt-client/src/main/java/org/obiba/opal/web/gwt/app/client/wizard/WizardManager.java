@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewS
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -31,6 +32,9 @@ public class WizardManager {
 
   @Inject
   private Provider<CreateViewStepPresenter> createViewWizard;
+
+  @Inject
+  private Provider<VariablesImportPresenter> variablesImportWizard;
 
   @Inject
   private Provider<DataImportPresenter> dataImportWizard;
@@ -70,6 +74,9 @@ public class WizardManager {
       switch(event.getWizardType()) {
       case CREATE_VIEW:
         bindAndDisplayWizard(createViewWizard.get(), event);
+        break;
+      case IMPORT_VARIABLES:
+        bindAndDisplayWizard(variablesImportWizard.get(), event);
         break;
       case IMPORT_DATA:
         bindAndDisplayWizard(dataImportWizard.get(), event);

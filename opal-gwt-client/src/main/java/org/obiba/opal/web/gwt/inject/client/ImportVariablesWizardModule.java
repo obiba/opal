@@ -17,7 +17,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.importvariables.view.ConclusionS
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.view.VariablesImportView;
 
 import com.google.gwt.inject.client.AbstractGinModule;
-import com.google.inject.Singleton;
 
 /**
  * Bind concrete implementations to interfaces within the Import Variables wizard.
@@ -26,9 +25,8 @@ public class ImportVariablesWizardModule extends AbstractGinModule {
 
   @Override
   protected void configure() {
-    bind(VariablesImportPresenter.Display.class).to(VariablesImportView.class).in(Singleton.class);
-    bind(ComparedDatasourcesReportStepPresenter.Display.class).to(ComparedDatasourcesReportStepView.class).in(Singleton.class);
-    bind(ConclusionStepPresenter.Display.class).to(ConclusionStepView.class).in(Singleton.class);
+    bind(VariablesImportPresenter.Display.class).to(VariablesImportView.class);
+    bind(ComparedDatasourcesReportStepPresenter.Display.class).to(ComparedDatasourcesReportStepView.class);
+    bind(ConclusionStepPresenter.Display.class).to(ConclusionStepView.class);
   }
-
 }
