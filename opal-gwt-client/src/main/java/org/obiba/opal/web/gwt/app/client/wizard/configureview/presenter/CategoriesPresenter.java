@@ -168,7 +168,7 @@ public class CategoriesPresenter extends LocalizablesPresenter {
     public void onClick(ClickEvent event) {
       // Each time the dialog is closed (hidden), it is unbound. So we need to rebind it each time we display it.
       categoryDialogPresenter.bind();
-
+      categoryDialogPresenter.setCategories(variableDto.getCategoriesArray());
       categoryDialogPresenter.revealDisplay();
     }
   }

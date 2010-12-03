@@ -197,6 +197,7 @@ public class AttributesPresenter extends LocalizablesPresenter {
       attributeDialogPresenter.bind();
       if(attributeNames == null) attributeNames = getUniqueAttributeNames();
       attributeDialogPresenter.getDisplay().setNameDropdownList(attributeNames);
+      attributeDialogPresenter.setAttributes(variableDto.getAttributesArray());
       attributeDialogPresenter.revealDisplay();
     }
   }
