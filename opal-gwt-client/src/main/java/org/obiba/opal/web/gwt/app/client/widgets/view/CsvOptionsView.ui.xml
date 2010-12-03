@@ -12,8 +12,8 @@
           <td>
             <ui:msg description="Select data file label">Select data file</ui:msg>:
           </td>
-            <g:SimplePanel ui:field="selectCsvFilePanel" />
           <td>
+            <g:SimplePanel ui:field="selectCsvFilePanel" />
           </td>
         </tr>
         <tr>
