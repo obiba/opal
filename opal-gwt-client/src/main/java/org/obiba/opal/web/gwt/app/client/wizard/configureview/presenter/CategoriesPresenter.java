@@ -25,6 +25,7 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  *
@@ -35,7 +36,7 @@ public class CategoriesPresenter extends LocalizablesPresenter {
   //
 
   @Inject
-  private CategoryDialogPresenter categoryDialogPresenter;
+  private Provider<CategoryDialogPresenter> categoryDialogPresenterProvider;
 
   private ClickHandler addButtonClickHandler;
 
@@ -99,17 +100,14 @@ public class CategoriesPresenter extends LocalizablesPresenter {
 
   @Override
   protected void bindDependencies() {
-    categoryDialogPresenter.bind();
   }
 
   @Override
   protected void unbindDependencies() {
-    categoryDialogPresenter.unbind();
   }
 
   @Override
   protected void refreshDependencies() {
-    categoryDialogPresenter.refreshDisplay();
   }
 
   @Override
@@ -167,7 +165,9 @@ public class CategoriesPresenter extends LocalizablesPresenter {
     @Override
     public void onClick(ClickEvent event) {
       // Each time the dialog is closed (hidden), it is unbound. So we need to rebind it each time we display it.
+      CategoryDialogPresenter categoryDialogPresenter = categoryDialogPresenterProvider.get();
       categoryDialogPresenter.bind();
+      categoryDialogPresenter.setViewDto(viewDto);
       categoryDialogPresenter.setCategories(variableDto.getCategoriesArray());
       categoryDialogPresenter.revealDisplay();
     }
@@ -178,8 +178,9 @@ public class CategoriesPresenter extends LocalizablesPresenter {
     @Override
     public void onEdit(Localizable localizable) {
       // Each time the dialog is closed (hidden), it is unbound. So we need to rebind it each time we display it.
+      CategoryDialogPresenter categoryDialogPresenter = categoryDialogPresenterProvider.get();
       categoryDialogPresenter.bind();
-
+      categoryDialogPresenter.setViewDto(viewDto);
       categoryDialogPresenter.setCategoryDto(findCategoryDto(localizable.getName()));
       categoryDialogPresenter.revealDisplay();
     }

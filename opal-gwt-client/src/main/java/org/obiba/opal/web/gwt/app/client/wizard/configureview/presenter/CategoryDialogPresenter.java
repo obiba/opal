@@ -87,8 +87,6 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
 
   private JsArray<CategoryDto> categories;
 
-  private boolean isBound;
-
   @SuppressWarnings("unchecked")
   @Inject
   public CategoryDialogPresenter(Display display, EventBus eventBus) {
@@ -98,26 +96,24 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
 
   @Override
   protected void onBind() {
-    if(!isBound) {
-      labelListPresenter.bind();
-      getDisplay().addInputField(labelListPresenter.getDisplay());
-      addEventHandlers();
+    labelListPresenter.bind();
+    getDisplay().addInputField(labelListPresenter.getDisplay());
+    addEventHandlers();
 
-      isBound = true;
-    }
+    validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLabelRequired"));
+    validators.add(new RequiredTextValidator(getDisplay().getCategoryName(), "CategoryDialogNameRequired"));
+    validators.add(new UniqueCategoryNameValidator(getDisplay().getCategoryName(), "CategoryNameAlreadyExists"));
   }
 
   @Override
   protected void onUnbind() {
-    if(isBound) {
-      labelListPresenter.unbind();
-      getDisplay().removeInputField();
+    labelListPresenter.unbind();
+    getDisplay().removeInputField();
 
-      // Reset categoryDto to null, otherwise an Edit followed by an Add will look like another Edit.
-      setCategoryDto(null);
+    // Reset categoryDto to null, otherwise an Edit followed by an Add will look like another Edit.
+    setCategoryDto(null);
 
-      isBound = false;
-    }
+    validators.clear();
   }
 
   @Override
@@ -152,10 +148,6 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
       getDisplay().setCategoryNameEditable(true);
       getDisplay().clear();
     }
-
-    validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLabelRequired"));
-    validators.add(new RequiredTextValidator(getDisplay().getCategoryName(), "CategoryDialogNameRequired"));
-    validators.add(new UniqueCategoryNameValidator(getDisplay().getCategoryName(), "CategoryNameAlreadyExists"));
   }
 
   private void setTitle() {
@@ -192,12 +184,12 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
       }
     }));
 
-    getDisplay().getDialog().addCloseHandler(new CloseHandler<DialogBox>() {
+    super.registerHandler(getDisplay().getDialog().addCloseHandler(new CloseHandler<DialogBox>() {
       @Override
       public void onClose(CloseEvent<DialogBox> event) {
         unbind();
       }
-    });
+    }));
 
   }
 
