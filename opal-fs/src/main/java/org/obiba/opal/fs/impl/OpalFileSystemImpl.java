@@ -34,6 +34,7 @@ public class OpalFileSystemImpl implements OpalFileSystem {
     Assert.hasText(root, "You must specify a root directory for the Opal File System.");
 
     try {
+      log.info("Setting up Opal filesystem rooted at '{}'", root);
       FileSystemManager fsm = VFS.getManager();
       FileObject vfsRoot = fsm.resolveFile(root);
       nativeRootURL = vfsRoot.getURL().toString() + "/";
@@ -58,10 +59,6 @@ public class OpalFileSystemImpl implements OpalFileSystem {
       if(isLocalFile(virtualFile)) {
         String virtualFileURL = virtualFile.getURL().toString();
         String nativeFileURL = virtualFileURL.replace(root.getURL().toString(), nativeRootURL);
-
-        log.info("nativeRootURL: {}", nativeRootURL);
-        log.info("nativeFileURL: {}", nativeFileURL);
-
         File file = new File(nativeFileURL.replaceFirst("[a-zA-Z]*[0-9]?://", ""));
         return file;
       } else {
@@ -169,19 +166,17 @@ public class OpalFileSystemImpl implements OpalFileSystem {
   }
 
   private FileObject searchFolder(FileObject folder, String obfuscatedPath) throws FileSystemException {
-
     FileObject matchingFile = null;
     for(FileObject file : folder.getChildren()) {
-
       if(file.getType().equals(FileType.FOLDER) && file.getChildren().length > 0) {
         matchingFile = searchFolder(file, obfuscatedPath);
+        if(matchingFile != null) break;
+      } else {
+        if(getObfuscatedPath(file).equals(obfuscatedPath)) {
+          matchingFile = file;
+          break;
+        }
       }
-
-      if(obfuscate(file.getName().getPath()).equals(obfuscatedPath)) {
-        matchingFile = file;
-        break;
-      }
-
     }
 
     return matchingFile;
