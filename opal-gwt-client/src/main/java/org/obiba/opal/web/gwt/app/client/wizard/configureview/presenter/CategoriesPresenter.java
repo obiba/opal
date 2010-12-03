@@ -164,7 +164,6 @@ public class CategoriesPresenter extends LocalizablesPresenter {
 
     @Override
     public void onClick(ClickEvent event) {
-      // Each time the dialog is closed (hidden), it is unbound. So we need to rebind it each time we display it.
       CategoryDialogPresenter categoryDialogPresenter = categoryDialogPresenterProvider.get();
       categoryDialogPresenter.bind();
       categoryDialogPresenter.setViewDto(viewDto);
@@ -177,7 +176,6 @@ public class CategoriesPresenter extends LocalizablesPresenter {
 
     @Override
     public void onEdit(Localizable localizable) {
-      // Each time the dialog is closed (hidden), it is unbound. So we need to rebind it each time we display it.
       CategoryDialogPresenter categoryDialogPresenter = categoryDialogPresenterProvider.get();
       categoryDialogPresenter.bind();
       categoryDialogPresenter.setViewDto(viewDto);

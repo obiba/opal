@@ -22,7 +22,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -159,8 +158,6 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
   }
 
   private void addEventHandlers() {
-    super.registerHandler(eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
-
     super.registerHandler(getDisplay().getSaveButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
         String errorMessageKey = validate();
@@ -250,14 +247,6 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
       }
     }
     return null;
-  }
-
-  class ViewConfigurationRequiredEventHandler implements ViewConfigurationRequiredEvent.Handler {
-
-    @Override
-    public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
-      CategoryDialogPresenter.this.setViewDto(event.getView());
-    }
   }
 
   public class UniqueCategoryNameValidator extends AbstractFieldValidator {

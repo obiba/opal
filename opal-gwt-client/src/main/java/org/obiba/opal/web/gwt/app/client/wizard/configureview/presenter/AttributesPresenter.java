@@ -27,6 +27,7 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  *
@@ -41,7 +42,7 @@ public class AttributesPresenter extends LocalizablesPresenter {
   //
 
   @Inject
-  private AttributeDialogPresenter attributeDialogPresenter;
+  private Provider<AttributeDialogPresenter> attributeDialogPresenterProvider;
 
   private ClickHandler addButtonClickHandler;
 
@@ -104,17 +105,14 @@ public class AttributesPresenter extends LocalizablesPresenter {
 
   @Override
   protected void bindDependencies() {
-    attributeDialogPresenter.bind();
   }
 
   @Override
   protected void unbindDependencies() {
-    attributeDialogPresenter.unbind();
   }
 
   @Override
   protected void refreshDependencies() {
-    attributeDialogPresenter.refreshDisplay();
   }
 
   @Override
@@ -193,8 +191,9 @@ public class AttributesPresenter extends LocalizablesPresenter {
 
     @Override
     public void onClick(ClickEvent event) {
-      // Each time the dialog is closed (hidden), it is unbound. So we need to rebind it each time we display it.
+      AttributeDialogPresenter attributeDialogPresenter = attributeDialogPresenterProvider.get();
       attributeDialogPresenter.bind();
+      attributeDialogPresenter.setViewDto(viewDto);
       if(attributeNames == null) attributeNames = getUniqueAttributeNames();
       attributeDialogPresenter.getDisplay().setNameDropdownList(attributeNames);
       attributeDialogPresenter.setAttributes(variableDto.getAttributesArray());
@@ -206,9 +205,9 @@ public class AttributesPresenter extends LocalizablesPresenter {
 
     @Override
     public void onEdit(Localizable localizable) {
-      // Each time the dialog is closed (hidden), it is unbound. So we need to rebind it each time we display it.
+      AttributeDialogPresenter attributeDialogPresenter = attributeDialogPresenterProvider.get();
       attributeDialogPresenter.bind();
-
+      attributeDialogPresenter.setViewDto(viewDto);
       attributeDialogPresenter.setAttributeNameToDisplay(localizable.getName());
       attributeDialogPresenter.setAttributes(variableDto.getAttributesArray());
       attributeDialogPresenter.getDisplay().setNameDropdownList(attributeNames);

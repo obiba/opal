@@ -22,7 +22,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -48,8 +47,6 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.inject.Inject;
 
 public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPresenter.Display> {
-
-  private boolean isBound;
 
   public interface Display extends WidgetDisplay {
 
@@ -108,8 +105,6 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   @Inject
   public AttributeDialogPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
-    validators.add(new RequiredTextValidator(getDisplay().getAttributeName(), "AttributeNameRequired"));
-    validators.add(new UniqueAttributeNameValidator("AttributeNameAlreadyExists"));
 
     attributes = (JsArray<AttributeDto>) JsArray.createArray();
   }
@@ -127,26 +122,24 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
   @Override
   protected void onBind() {
-    if(!isBound) {
-      labelListPresenter.bind();
-      getDisplay().addInputField(labelListPresenter.getDisplay());
-      addEventHandlers();
+    labelListPresenter.bind();
+    getDisplay().addInputField(labelListPresenter.getDisplay());
+    addEventHandlers();
 
-      isBound = true;
-    }
+    validators.add(new RequiredTextValidator(getDisplay().getAttributeName(), "AttributeNameRequired"));
+    validators.add(new UniqueAttributeNameValidator("AttributeNameAlreadyExists"));
+    validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLabelRequired"));
   }
 
   @Override
   protected void onUnbind() {
-    if(isBound) {
-      labelListPresenter.unbind();
-      getDisplay().removeInputField();
+    labelListPresenter.unbind();
+    getDisplay().removeInputField();
 
-      // Reset attributeNameToDisplay to null, otherwise an Edit followed by an Add will look like another Edit.
-      setAttributeNameToDisplay(null);
+    // Reset attributeNameToDisplay to null, otherwise an Edit followed by an Add will look like another Edit.
+    setAttributeNameToDisplay(null);
 
-      isBound = false;
-    }
+    validators.clear();
   }
 
   protected void initDisplayComponents() {
@@ -163,8 +156,6 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
       getDisplay().setAttributeNameEditable(true);
       getDisplay().clear();
     }
-
-    validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLabelRequired"));
   }
 
   private void setTitle() {
@@ -183,8 +174,6 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   }
 
   private void addEventHandlers() {
-    super.registerHandler(eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
-
     super.registerHandler(getDisplay().getSaveButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
         String errorMessageKey = validate();
@@ -257,14 +246,6 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
       }
     }
     return null;
-  }
-
-  class ViewConfigurationRequiredEventHandler implements ViewConfigurationRequiredEvent.Handler {
-
-    @Override
-    public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
-      AttributeDialogPresenter.this.setViewDto(event.getView());
-    }
   }
 
   public class UniqueAttributeNameValidator extends AbstractFieldValidator {
