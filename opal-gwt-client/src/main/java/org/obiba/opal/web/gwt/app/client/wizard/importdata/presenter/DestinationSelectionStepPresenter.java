@@ -55,6 +55,7 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
 
   public void setImportFormat(ImportFormat importFormat) {
     this.importFormat = importFormat;
+    hideShowTables();
   }
 
   @Override
@@ -100,7 +101,6 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
     }
 
     getDisplay().setDatasources(selectableDatasources);
-    hideShowTables();
   }
 
   private JsArray<DatasourceDto> removeDatasourcesWithoutTables(JsArray<DatasourceDto> datasources) {
