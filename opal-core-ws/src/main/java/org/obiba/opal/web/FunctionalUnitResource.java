@@ -16,11 +16,13 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -38,18 +40,18 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import org.bouncycastle.openssl.PEMWriter;
-import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.VariableEntity;
+import org.obiba.magma.VectorSource;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.UnitKeyStore;
 import org.obiba.opal.web.magma.ClientErrorDtos;
-import org.obiba.opal.web.magma.TableResource;
 import org.obiba.opal.web.model.Opal;
-import org.obiba.opal.web.model.Magma.ValueSetDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +60,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 @Component
@@ -72,9 +73,7 @@ public class FunctionalUnitResource {
 
   private final UnitKeyStoreService unitKeyStoreService;
 
-  private final String keysDatasourceName;
-
-  private final String keysTableName;
+  private final String keysTableReference;
 
   @PathParam("unit")
   private String unit;
@@ -83,21 +82,12 @@ public class FunctionalUnitResource {
   public FunctionalUnitResource(OpalRuntime opalRuntime, UnitKeyStoreService unitKeyStoreService, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference) {
     this.opalRuntime = opalRuntime;
     this.unitKeyStoreService = unitKeyStoreService;
-    MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(keysTableReference);
-    this.keysDatasourceName = resolver.getDatasourceName();
-    if(keysDatasourceName == null) {
-      throw new IllegalArgumentException("invalid keys table reference");
-    }
-    this.keysTableName = resolver.getTableName();
-    if(keysTableName == null) {
-      throw new IllegalArgumentException("invalid keys table reference");
-    }
+    this.keysTableReference = keysTableReference;
   }
 
   @GET
   public Response getFunctionalUnit() {
-    FunctionalUnit functionalUnit = opalRuntime.getFunctionalUnit(unit);
-    if(functionalUnit == null) return Response.status(Status.NOT_FOUND).build();
+    FunctionalUnit functionalUnit = resolveFunctionalUnit();
 
     Opal.FunctionalUnitDto.Builder fuBuilder = Opal.FunctionalUnitDto.newBuilder().//
     setName(functionalUnit.getName()). //
@@ -153,19 +143,15 @@ public class FunctionalUnitResource {
   @GET
   @Path("/entities")
   public Set<VariableEntityDto> getEntities() {
-    ValueTable keysTable = MagmaEngine.get().getDatasource(keysDatasourceName).getValueTable(keysTableName);
-    TableResource tableResource = new TableResource(keysTable);
+    final Set<VariableEntityDto> entities = new TreeSet<VariableEntityDto>();
+    readUnitIdentifiers(new VectorCallback() {
 
-    FunctionalUnit functionalUnit = opalRuntime.getFunctionalUnit(unit);
-    if(functionalUnit == null) throw new IllegalArgumentException("No such unit: " + unit);
+      @Override
+      public void onValue(VariableEntity entity, org.obiba.magma.Value value) {
+        entities.add(VariableEntityDto.newBuilder().setIdentifier(entity.getIdentifier()).build());
+      }
 
-    Set<VariableEntityDto> entities;
-    if(keysTable.hasVariable(functionalUnit.getKeyVariableName())) {
-      entities = tableResource.getEntities("$('" + functionalUnit.getKeyVariableName() + "').isNull().not()");
-    } else {
-      entities = new ImmutableSet.Builder<VariableEntityDto>().build();
-    }
-
+    });
     return entities;
   }
 
@@ -179,22 +165,18 @@ public class FunctionalUnitResource {
   @Path("/entities/identifiers")
   @Produces("text/plain")
   public Response getIdentifiers() {
-    ValueTable keysTable = MagmaEngine.get().getDatasource(keysDatasourceName).getValueTable(keysTableName);
-    TableResource tableResource = new TableResource(keysTable);
-
-    FunctionalUnit functionalUnit = opalRuntime.getFunctionalUnit(unit);
-    if(functionalUnit == null) throw new IllegalArgumentException("No such unit: " + unit);
-
     ByteArrayOutputStream ids = new ByteArrayOutputStream();
-    PrintWriter writer = new PrintWriter(ids);
-    if(keysTable.hasVariable(functionalUnit.getKeyVariableName())) {
-      Collection<ValueSetDto> values = tableResource.getValueSets("name().value()=='" + functionalUnit.getKeyVariableName() + "'", "$('" + functionalUnit.getKeyVariableName() + "').isNull().not()", 0, Integer.MAX_VALUE);
-      for(ValueSetDto value : values) {
-        if(value.getVariablesCount() == 1) writer.append(value.getValues(0).getValue()).append("\n");
-      }
-    }
-    writer.close();
+    final PrintWriter writer = new PrintWriter(ids);
+    readUnitIdentifiers(new VectorCallback() {
 
+      @Override
+      public void onValue(VariableEntity entity, org.obiba.magma.Value value) {
+        writer.append(value.toString()).append("\n");
+      }
+
+    });
+
+    writer.close();
     return Response.ok(ids.toByteArray(), MediaType.TEXT_PLAIN).header("Content-Disposition", "attachment; filename=\"" + unit + "-identifiers.txt\"").build();
   }
 
@@ -313,6 +295,33 @@ public class FunctionalUnitResource {
       }
 
     });
+  }
+
+  private void readUnitIdentifiers(final VectorCallback callback) {
+    ValueTable keysTable = getKeysTable();
+    FunctionalUnit functionalUnit = resolveFunctionalUnit();
+    if(keysTable.hasVariable(functionalUnit.getKeyVariableName())) {
+      SortedSet<VariableEntity> entities = new TreeSet<VariableEntity>(keysTable.getVariableEntities());
+      Iterator<VariableEntity> iter = entities.iterator();
+      VectorSource vector = getKeysTable().getVariableValueSource(functionalUnit.getKeyVariableName()).asVectorSource();
+      for(org.obiba.magma.Value value : vector.getValues(entities)) {
+        callback.onValue(iter.next(), value);
+      }
+    }
+  }
+
+  private FunctionalUnit resolveFunctionalUnit() {
+    FunctionalUnit functionalUnit = opalRuntime.getFunctionalUnit(unit);
+    if(functionalUnit == null) throw new NoSuchFunctionalUnitException(unit);
+    return functionalUnit;
+  }
+
+  private ValueTable getKeysTable() {
+    return MagmaEngineTableResolver.valueOf(keysTableReference).resolveTable();
+  }
+
+  private interface VectorCallback {
+    public void onValue(VariableEntity entity, org.obiba.magma.Value value);
   }
 
 }

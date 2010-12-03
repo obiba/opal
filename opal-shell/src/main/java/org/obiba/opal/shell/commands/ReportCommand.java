@@ -59,6 +59,10 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
   @Value("${org.obiba.opal.public.url}")
   private String opalPublicUrl;
 
+  @Autowired
+  @Value("${org.obiba.opal.smtp.from}")
+  private String fromAddress;
+
   //
   // AbstractOpalRuntimeDependentCommand Methods
   //
@@ -151,7 +155,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     String reportTemplateName = reportTemplate.getName();
 
     SimpleMailMessage message = new SimpleMailMessage();
-    message.setFrom("opal-mailer@obiba.org");
+    message.setFrom(fromAddress);
     message.setSubject("[Opal] Report: " + reportTemplateName);
     message.setText(getEmailNotificationText(reportTemplateName, reportOutput));
 
