@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -207,7 +208,7 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
     void setConclusionDisplay(ConclusionStepPresenter.Display display);
 
     HandlerRegistration addImportClickHandler(ClickHandler handler);
-
+    
   }
 
   class DownloadExcelTemplateClickHandler implements ClickHandler {
@@ -234,8 +235,7 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
 
         public void onResource(Response response, DatasourceDto resource) {
           if(response.getStatusCode() == 201) {
-            comparedDatasourcesReportPresenter.compare(((DatasourceDto) resource).getName(), getDisplay().getSelectedDatasource());
-            getDisplay().getDatasourceCreatedCallback().onSuccess(factory, resource);
+            comparedDatasourcesReportPresenter.compare(((DatasourceDto) resource).getName(), getDisplay().getSelectedDatasource(), getDisplay(), factory, resource);
           }
         }
       };

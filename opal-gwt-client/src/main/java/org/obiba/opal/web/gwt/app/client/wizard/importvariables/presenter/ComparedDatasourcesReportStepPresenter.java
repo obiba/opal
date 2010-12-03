@@ -24,10 +24,13 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.DatasourceCompareDto;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
+import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.TableCompareDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
@@ -58,9 +61,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   protected void onBind() {
   }
 
-  public void compare(String sourceDatasourceName, String targetDatasourceName) {
-    getDisplay().showProcessing(true);
-    getDisplay().showResults(false);
+  public void compare(String sourceDatasourceName, String targetDatasourceName, final org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter.Display display, final DatasourceFactoryDto factory, final DatasourceDto datasourceResource) {
     this.targetDatasourceName = targetDatasourceName;
     getDisplay().clearDisplay();
 
@@ -68,7 +69,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
       @Override
       public void onResource(Response response, DatasourceCompareDto resource) {
-
+        
         comparedTables = JsArrays.toArray(resource.getTableComparisonsArray());
 
         sortComparedTables();
@@ -84,8 +85,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
           }
         }
         getDisplay().setEnabledIgnoreAllModifications(conflictsExist || modificationsExist);
-        getDisplay().showProcessing(false);
-        getDisplay().showResults(true);
+        display.getDatasourceCreatedCallback().onSuccess(factory, datasourceResource);
       }
 
       private void sortComparedTables() {
@@ -185,10 +185,6 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
     }
 
     void addTableCompareTab(TableCompareDto tableCompareData, ComparisonResult comparisonResult);
-
-    void showProcessing(boolean processingShown);
-
-    void showResults(boolean resultsShown);
 
     void clearDisplay();
 

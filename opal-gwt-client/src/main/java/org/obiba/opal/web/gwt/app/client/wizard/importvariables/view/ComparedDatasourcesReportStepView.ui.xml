@@ -6,25 +6,15 @@
   ui:generateLocales="default">
 
   <g:FlowPanel>
-
-    <g:HTMLPanel ui:field="processingText" addStyleNames="processingText">
-      <g:Label>
-        <ui:msg description="Processing label">Processing data...</ui:msg>
-      </g:Label>
-      <img src="image/in-progress.gif"/>
+    <g:HTMLPanel addStyleNames="ignoreAllModifications">
+      <g:CheckBox ui:field="ignoreAllModifications"><ui:msg description="Ignore all modifications label">Ignore all modifications</ui:msg></g:CheckBox>
     </g:HTMLPanel>
-  
-    <g:FlowPanel ui:field="compareResults">
-      <g:HTMLPanel addStyleNames="ignoreAllModifications">
-        <g:CheckBox ui:field="ignoreAllModifications"><ui:msg description="Ignore all modifications label">Ignore all modifications</ui:msg></g:CheckBox>
-      </g:HTMLPanel>
-      <o:VerticalTabLayout ui:field="tableChangesPanel" addStyleNames="tableChangesPanel"/>
-      
-      <g:HTMLPanel ui:field="help">
-        <g:Label addStyleNames="title"><ui:msg description="Variables creation modification review label">Variable Creation/Modification Review</ui:msg></g:Label>
-        <p><ui:msg description="Variables creation modification review information"><p>Review the modifications before they are applied to the datasource.</p><p>Affected tables are displayed to the left.  For each of them, a report shows which variables are going to be created and which are going to be modified.</p><p>Modifications to variables can be ignored by ticking checkbox above the report. This will affect all tables.</p></ui:msg></p>
-      </g:HTMLPanel>
-    </g:FlowPanel>
+    <o:VerticalTabLayout ui:field="tableChangesPanel" addStyleNames="tableChangesPanel"/>
+    
+    <g:HTMLPanel ui:field="help">
+      <g:Label addStyleNames="title"><ui:msg description="Variables creation modification review label">Variable Creation/Modification Review</ui:msg></g:Label>
+      <p><ui:msg description="Variables creation modification review information"><p>Review the modifications before they are applied to the datasource.</p><p>Affected tables are displayed to the left.  For each of them, a report shows which variables are going to be created and which are going to be modified.</p><p>Modifications to variables can be ignored by ticking checkbox above the report. This will affect all tables.</p></ui:msg></p>
+    </g:HTMLPanel>
   </g:FlowPanel>      
   
 </ui:UiBinder>
