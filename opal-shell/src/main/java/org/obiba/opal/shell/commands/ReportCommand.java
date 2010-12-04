@@ -115,6 +115,10 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     this.opalPublicUrl = opalPublicUrl;
   }
 
+  public void setFromAddress(String fromAddress) {
+    this.fromAddress = fromAddress;
+  }
+
   @Override
   public String toString() {
     return "report -n " + getOptions().getName();

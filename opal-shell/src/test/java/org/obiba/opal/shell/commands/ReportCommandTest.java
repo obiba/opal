@@ -44,6 +44,9 @@ import com.google.common.collect.ImmutableSet;
  * Unit tests for {@link ReportCommand}.
  */
 public class ReportCommandTest {
+
+  private static final String FROM = "opal-mailer@obiba.org";
+
   //
   // Test Methods
   //
@@ -131,6 +134,7 @@ public class ReportCommandTest {
     sut.setReportService(reportServiceMock);
     sut.setMailSender(mailSenderMock);
     sut.setOpalPublicUrl(opalPublicUrl);
+    sut.setFromAddress(FROM);
 
     int errorCode = sut.execute();
 
@@ -181,7 +185,7 @@ public class ReportCommandTest {
 
   private SimpleMailMessage createEmailNotification(String reportTemplateName, String reportObfuscatedPath, String emailAddress) {
     SimpleMailMessage msg = new SimpleMailMessage();
-    msg.setFrom("opal-mailer@obiba.org");
+    msg.setFrom(FROM);
     msg.setTo(emailAddress);
     msg.setSubject("[Opal] Report: " + reportTemplateName);
     msg.setText(reportTemplateName + "," + reportObfuscatedPath);
