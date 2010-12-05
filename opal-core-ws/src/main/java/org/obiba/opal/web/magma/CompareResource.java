@@ -23,6 +23,8 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchVariableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
+import org.obiba.magma.datasource.csv.CsvDatasource;
+import org.obiba.magma.datasource.csv.CsvValueTable;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.web.model.Magma.ConflictDto;
 import org.obiba.opal.web.model.Magma.DatasourceCompareDto;
@@ -41,6 +43,8 @@ public class CompareResource {
   private static final String INCOMPATIBLE_ENTITY_TYPE = "IncompatibleEntityType";
 
   private static final String INCOMPATIBLE_VALUE_TYPE = "IncompatibleValueType";
+
+  private static final String CSV_VARIABLE_MISSING = "CsvVariableMissing";
 
   //
   // Instance Variables
@@ -152,6 +156,8 @@ public class CompareResource {
       dtoBuilder.setWithTable(Dtos.asDto(with, null));
     }
 
+    conflicts.addAll(getMissingCsvVariableConficts(compared));
+
     conflicts.addAll(getConflicts(compared, with, existingVariables, false));
     conflicts.addAll(getConflicts(compared, with, newVariables, true));
     dtoBuilder.addAllConflicts(conflicts);
@@ -165,8 +171,17 @@ public class CompareResource {
     for(Variable v : getUnconflicting(existingVariables, conflicts)) {
       dtoBuilder.addExistingVariables(Dtos.asDto(v));
     }
-
     return dtoBuilder.build();
+  }
+
+  private Set<ConflictDto> getMissingCsvVariableConficts(ValueTable compared) {
+    Set<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(5000);
+    if(compared.getDatasource().getType().equals(CsvDatasource.TYPE)) {
+      for(Variable missingVariable : ((CsvValueTable) compared).getMissingVariables()) {
+        conflicts.add(createConflictDto(Dtos.asDto(missingVariable).setIsNewVariable(true).build(), CSV_VARIABLE_MISSING));
+      }
+    }
+    return conflicts;
   }
 
   private Set<ConflictDto> getConflicts(ValueTable compared, ValueTable with, Set<Variable> variables, boolean newVariable) {

@@ -438,6 +438,7 @@ public interface Translations extends Constants {
   @Description("Datasource comparison error map")
   @DefaultStringMapValue( { "IncompatibleValueType", "Incompatible value type", //
   "IncompatibleEntityType", "Incompatible entity type", //
+  "CsvVariableMissing", "Variable name exists in csv data file, but no Variable associated with this name exists in the destination table", //
   "VariablePresentInSourceButNotDestination", "Variable exists in source but not in destination" })
   Map<String, String> datasourceComparisonErrorMap();
 
