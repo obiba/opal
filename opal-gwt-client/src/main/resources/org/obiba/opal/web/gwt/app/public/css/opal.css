@@ -108,6 +108,10 @@ a:hover {
 	background-color: #feede0;
 }
 
+.gwt-MenuBarPopup {
+    z-index: 1000;
+}
+
 .gwt-TabLayoutPanel .gwt-TabLayoutPanelTab {
 	background:none repeat scroll 0 0 #888888;
 	color: #ffffff;
