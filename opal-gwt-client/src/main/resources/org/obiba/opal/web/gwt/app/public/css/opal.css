@@ -1009,10 +1009,19 @@ ul.tabs li {
 ul.tabs.horizontal li {
   margin-left: 0.8em;
   float: left;
-  border-bottom:none;
+  border-bottom: none;
   padding-bottom:0.3em;
   padding-left:0.4em;
   padding-right:0.4em;
+  -moz-border-radius-topleft: 0.5em; -webkit-border-top-left-radius: 0.5em; 
+  -moz-border-radius-topright: 0.5em; -webkit-border-top-right-radius: 0.5em;
+  position: relative;
+  top: 1px;
+}
+ 
+ul.tabs.horizontal li.active {
+  z-index: 1000;
+  border-bottom-color: #FFFFFF;
 }
 
 ul.tabs li a {
