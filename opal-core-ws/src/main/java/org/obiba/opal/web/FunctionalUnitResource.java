@@ -306,7 +306,10 @@ public class FunctionalUnitResource {
       Iterator<VariableEntity> iter = entities.iterator();
       VectorSource vector = getKeysTable().getVariableValueSource(functionalUnit.getKeyVariableName()).asVectorSource();
       for(org.obiba.magma.Value value : vector.getValues(entities)) {
-        callback.onValue(iter.next(), value);
+        // entities of the unit are the ones that have a non null for the unit identifier variable
+        if(!value.isNull()) {
+          callback.onValue(iter.next(), value);
+        }
       }
     }
   }
