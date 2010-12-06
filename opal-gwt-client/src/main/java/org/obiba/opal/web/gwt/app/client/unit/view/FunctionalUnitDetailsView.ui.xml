@@ -1,6 +1,10 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" 
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
 
   <g:FlowPanel ui:field="functionalUnitDetails" addStyleNames="item-details">
 
@@ -46,12 +50,15 @@
       </table>
     </g:HTMLPanel>
 
-    <g:FlowPanel ui:field="keyPairs">
-      <g:Label addStyleNames="small-indent left-aligned title-bold">
-        <ui:msg description="Keystore title">Keystore</ui:msg>
-      </g:Label>
-      <g2:CellTable ui:field="keyPairsTable" width="100%" addStyleNames="left-aligned"/>
-    </g:FlowPanel>
+   <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
+        
+	    <g:Anchor><ui:msg description="Keystore title">Keystore</ui:msg></g:Anchor>
+        <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_RIGHT">
+          <g2:CellTable ui:field="keyPairsTable" width="100%" addStyleNames="left-aligned"/>
+        </g:VerticalPanel>
+    
+     </o:HorizontalTabLayout>
+
     
   </g:FlowPanel>
 

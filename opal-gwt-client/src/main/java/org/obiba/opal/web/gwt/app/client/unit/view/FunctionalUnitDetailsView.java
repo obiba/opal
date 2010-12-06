@@ -49,6 +49,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.MenuItemSeparator;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
 import com.google.gwt.view.client.ListView.Delegate;
@@ -65,9 +66,6 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
 
   @UiField
   CellTable<KeyPairDto> keyPairsTable;
-
-  @UiField
-  FlowPanel keyPairs;
 
   @UiField
   FlowPanel functionalUnitDetails;
@@ -148,7 +146,7 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
     DOM.removeElementAttribute(pager.getElement(), "style");
     DOM.setStyleAttribute(pager.getElement(), "cssFloat", "right");
     keyPairsTable.setPager(pager);
-    ((FlowPanel) keyPairsTable.getParent()).insert(pager, 0);
+    ((VerticalPanel) keyPairsTable.getParent()).insert(pager, 0);
   }
 
   @Override
@@ -170,7 +168,6 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   }
 
   private void renderKeyPairs(final JsArray<KeyPairDto> kpList) {
-    keyPairs.setVisible(true);
     keyPairsTable.setDelegate(new Delegate<KeyPairDto>() {
 
       @Override
