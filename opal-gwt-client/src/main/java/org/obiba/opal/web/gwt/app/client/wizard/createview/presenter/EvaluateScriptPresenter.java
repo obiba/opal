@@ -195,7 +195,8 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
   }
 
   public String getScript() {
-    return getDisplay().getScript();
+    String script = getDisplay().getScript();
+    return script.trim().equals("") ? "true" : script;
   }
 
   public void evaluateScript(ResponseCodeCallback responseCodeCallback) {
