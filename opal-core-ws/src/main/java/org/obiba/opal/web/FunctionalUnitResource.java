@@ -60,6 +60,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 @Component
@@ -143,16 +144,16 @@ public class FunctionalUnitResource {
   @GET
   @Path("/entities")
   public Set<VariableEntityDto> getEntities() {
-    final Set<VariableEntityDto> entities = new TreeSet<VariableEntityDto>();
+    final ImmutableSet.Builder<VariableEntityDto> entities = ImmutableSet.<VariableEntityDto> builder();
     readUnitIdentifiers(new VectorCallback() {
 
       @Override
       public void onValue(VariableEntity entity, org.obiba.magma.Value value) {
-        entities.add(VariableEntityDto.newBuilder().setIdentifier(entity.getIdentifier()).build());
+        entities.add(VariableEntityDto.newBuilder().setIdentifier(entity.getIdentifier()).setEntityType(entity.getType()).build());
       }
 
     });
-    return entities;
+    return entities.build();
   }
 
   @GET
