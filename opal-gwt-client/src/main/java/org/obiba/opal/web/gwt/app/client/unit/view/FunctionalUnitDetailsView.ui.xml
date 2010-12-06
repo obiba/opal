@@ -15,16 +15,6 @@
         <tr>
           <td>
             <g:Label addStyleNames="key">
-              <ui:msg description="Identifier Variable label">Identifier Variable:</ui:msg>
-            </g:Label>
-          </td>
-          <td>
-            <g:Label ui:field="keyVariableName"/>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <g:Label addStyleNames="key">
               <ui:msg description="Identifier Variables Filter label">Identifier Variables Filter:</ui:msg>
             </g:Label>
           </td>
@@ -50,16 +40,13 @@
       </table>
     </g:HTMLPanel>
 
-   <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
-        
-	    <g:Anchor><ui:msg description="Keystore title">Keystore</ui:msg></g:Anchor>
-        <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_RIGHT">
-          <g2:CellTable ui:field="keyPairsTable" width="100%" addStyleNames="left-aligned"/>
-        </g:VerticalPanel>
-    
-     </o:HorizontalTabLayout>
+    <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
+	  <g:Anchor><ui:msg description="Keystore title">Keystore</ui:msg></g:Anchor>
+      <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_RIGHT">
+        <g2:CellTable ui:field="keyPairsTable" width="100%" addStyleNames="left-aligned"/>
+      </g:VerticalPanel>
+    </o:HorizontalTabLayout>
 
-    
   </g:FlowPanel>
 
 </ui:UiBinder>

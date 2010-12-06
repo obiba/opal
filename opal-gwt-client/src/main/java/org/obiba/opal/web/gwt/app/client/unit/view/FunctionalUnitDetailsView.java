@@ -71,9 +71,6 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   FlowPanel functionalUnitDetails;
 
   @UiField
-  Label keyVariableName;
-
-  @UiField
   Label select;
 
   @UiField
@@ -202,7 +199,6 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   private void renderFunctionalUnitDetails(FunctionalUnitDto functionalUnit) {
     functionalUnitDetails.setVisible(true);
     this.functionalUnit = functionalUnit;
-    keyVariableName.setText(functionalUnit.getKeyVariableName());
     select.setText(functionalUnit.getSelect());
     functionalUnitName.setText(functionalUnit.getName());
 
@@ -350,7 +346,7 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   @Override
   public void setAddKeyPairCommand(Command command) {
     if(keyPair == null) {
-      addMenu.addItem(keyPair = new MenuItem("Key Pair", command)); // TODO localization
+      addMenu.addItem(keyPair = new MenuItem("Add Key Pair", command)); // TODO localization
     } else {
       keyPair.setCommand(command);
     }
