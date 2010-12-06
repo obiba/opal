@@ -94,6 +94,8 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
 
   private MenuItem downloadIds;
 
+  private MenuItem exportIds;
+
   private MenuItem keyPair;
 
   private MenuItem generateIdentifiers;
@@ -324,9 +326,18 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   public void setDownloadIdentifiersCommand(Command command) {
     if(downloadIds == null) {
       actionsMenu.addItem(downloadIds = new MenuItem("Download Identifiers", command)); // TODO localization
-      actionsMenu.addSeparator(new MenuItemSeparator());
     } else {
       downloadIds.setCommand(command);
+    }
+  }
+
+  @Override
+  public void setExportIdentifiersCommand(Command command) {
+    if(exportIds == null) {
+      actionsMenu.addItem(exportIds = new MenuItem("Export Identifiers to Excel", command)); // TODO localization
+      actionsMenu.addSeparator(new MenuItemSeparator());
+    } else {
+      exportIds.setCommand(command);
     }
   }
 
