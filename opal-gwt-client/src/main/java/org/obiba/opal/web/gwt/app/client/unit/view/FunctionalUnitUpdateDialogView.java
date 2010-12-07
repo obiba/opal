@@ -13,8 +13,6 @@ import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDial
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -26,8 +24,6 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -56,43 +52,12 @@ public class FunctionalUnitUpdateDialogView extends Composite implements Display
   TextArea select;
 
   @UiField
-  RadioButton providedPolicy;
-
-  @UiField
-  TextBox keyVariableName;
-
-  @UiField
-  CheckBox idGenerationAllowed;
-
-  @UiField
-  RadioButton computedPolicy;
-
-  @UiField
   CheckBox selectEnabled;
 
   public FunctionalUnitUpdateDialogView() {
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
-    dialog.setGlassEnabled(false);
     dialog.hide();
-    providedPolicy.setValue(true);
-    providedPolicy.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<Boolean> arg0) {
-        keyVariableName.setEnabled(providedPolicy.getValue());
-        idGenerationAllowed.setEnabled(providedPolicy.getValue());
-        computedPolicy.setValue(!providedPolicy.getValue());
-      }
-
-    });
-    computedPolicy.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent arg0) {
-        providedPolicy.setValue(!computedPolicy.getValue(), true);
-      }
-    });
     selectEnabled.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 
       @Override
@@ -166,19 +131,7 @@ public class FunctionalUnitUpdateDialogView extends Composite implements Display
   @Override
   public void clear() {
     setName("");
-    setKeyVariableName("");
     setSelect("");
-    idGenerationAllowed.setValue(false);
-  }
-
-  @Override
-  public HasValue<Boolean> isIdGenerationAllowed() {
-    return idGenerationAllowed;
-  }
-
-  @Override
-  public void setKeyVariableName(String keyVariableName) {
-    this.keyVariableName.setText(keyVariableName);
   }
 
   @Override
@@ -200,18 +153,8 @@ public class FunctionalUnitUpdateDialogView extends Composite implements Display
   }
 
   @Override
-  public HasText getKeyVariableName() {
-    return keyVariableName;
-  }
-
-  @Override
   public HasText getSelect() {
     return select;
-  }
-
-  @Override
-  public HasValue<Boolean> isIdProvided() {
-    return providedPolicy;
   }
 
 }

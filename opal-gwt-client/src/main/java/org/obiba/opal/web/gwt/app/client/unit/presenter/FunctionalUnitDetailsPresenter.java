@@ -282,7 +282,6 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
       FunctionalUnitUpdateDialogPresenter.Display display = functionalUnitUpdateDialogPresenter.getDisplay();
       FunctionalUnitDto functionalUnit = getDisplay().getFunctionalUnitDetails();
       display.setName(functionalUnit.getName());
-      display.setKeyVariableName(functionalUnit.getKeyVariableName());
       display.setSelect(functionalUnit.getSelect());
       functionalUnitUpdateDialogPresenter.revealDisplay();
     }

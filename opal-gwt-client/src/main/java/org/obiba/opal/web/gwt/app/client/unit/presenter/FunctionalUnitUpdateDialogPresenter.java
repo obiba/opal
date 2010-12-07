@@ -24,7 +24,6 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FolderCreationEvent;
@@ -43,7 +42,6 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 
 public class FunctionalUnitUpdateDialogPresenter extends WidgetPresenter<FunctionalUnitUpdateDialogPresenter.Display> {
@@ -71,17 +69,9 @@ public class FunctionalUnitUpdateDialogPresenter extends WidgetPresenter<Functio
 
     void setName(String name);
 
-    void setKeyVariableName(String keyVariableName);
-
     void setSelect(String select);
 
     HasText getName();
-
-    HasValue<Boolean> isIdProvided();
-
-    HasText getKeyVariableName();
-
-    HasValue<Boolean> isIdGenerationAllowed();
 
     HasText getSelect();
 
@@ -109,7 +99,6 @@ public class FunctionalUnitUpdateDialogPresenter extends WidgetPresenter<Functio
 
   private void addValidators() {
     validators.add(new RequiredTextValidator(getDisplay().getName(), "FunctionalUnitNameIsRequired"));
-    validators.add(new ConditionalValidator(getDisplay().isIdProvided(), new RequiredTextValidator(getDisplay().getKeyVariableName(), "FunctionalUnitKeyVariableNameIsRequired")));
   }
 
   @Override
@@ -208,7 +197,7 @@ public class FunctionalUnitUpdateDialogPresenter extends WidgetPresenter<Functio
   private FunctionalUnitDto getFunctionalUnitDto() {
     FunctionalUnitDto functionalUnit = FunctionalUnitDto.create();
     functionalUnit.setName(getDisplay().getName().getText());
-    functionalUnit.setKeyVariableName(getDisplay().getKeyVariableName().getText());
+    functionalUnit.setKeyVariableName(getDisplay().getName().getText());
     if(getDisplay().getSelect().getText().trim().length() > 0) {
       functionalUnit.setKeyVariableName(getDisplay().getSelect().getText());
     }

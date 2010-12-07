@@ -166,7 +166,7 @@ a:hover {
 
 /* DialogBox */
 
-.gwt-DialogBox {
+.gwt-DialogBox, .gwt-PopupPanelGlass {
     z-index: 1000;
 }
 

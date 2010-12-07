@@ -8,15 +8,15 @@
     .top-margin { margin-top: 0.5em; }
   </ui:style>
 
-  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" height="10em" width="35em">
+  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
     <g:caption>
       <ui:msg description="Functional Unit update dialog title">Add/Edit Unit</ui:msg>
     </g:caption>
-    <g:DockLayoutPanel unit="EM" height="22em" width="45em">
+    <g:DockLayoutPanel unit="EM" height="15em" width="35em">
       <g:center>
         <g:ScrollPanel>
           <g:HTMLPanel addStyleNames="main {style.optionsPanelMsg}">
-            <table class="functionalUnitProperties">
+            <table class="functionalUnitProperties full-width">
               <tr>
                 <td>
                   <g:Label addStyleNames="key">
@@ -24,41 +24,7 @@
                   </g:Label>
                 </td>
                 <td>
-                  <g:TextBox addStyleNames="text full-width" name="functionalUnitName" ui:field="functionalUnitName"/>
-                </td>
-              </tr>
-              <tr>
-                <td valign="top">
-                  <g:Label addStyleNames="key">
-                    <ui:msg description="Identifier Policy label">Identifier Policy:</ui:msg>
-                  </g:Label>
-                </td>
-                <td>
-                  <g:RadioButton ui:field="providedPolicy" name="providedPolicy" addStyleNames="key">
-                    <ui:msg description="Identifier Provided Policy label">provided</ui:msg>
-                  </g:RadioButton>
-                  <div class="indent">
-                    <table>
-                      <tr>
-                        <td>
-                          <g:Label addStyleNames="key">
-                            <ui:msg description="Identifier Variable label">Identifier Variable:</ui:msg>
-                          </g:Label>
-                        </td>
-                        <td><g:TextBox addStyleNames="text full-width" name="keyVariableName" ui:field="keyVariableName"/></td>
-                      </tr>
-                      <tr>
-                        <td colspan="2">
-                          <g:CheckBox ui:field="idGenerationAllowed" addStyleNames="key" visible="false">
-                            <ui:msg description="Allow Identifiers Generation label">Allow Identifiers generation when importing/exporting data</ui:msg>
-                          </g:CheckBox>
-                        </td>
-                      </tr>
-                    </table> 
-                  </div>
-                  <g:RadioButton ui:field="computedPolicy" name="computedPolicy" addStyleNames="key">
-                    <ui:msg description="Identifier Computed Policy label">computed</ui:msg>
-                  </g:RadioButton>
+                  <g:TextBox addStyleNames="text not-so-full-width" name="functionalUnitName" ui:field="functionalUnitName"/>
                 </td>
               </tr>
               <tr>
@@ -68,7 +34,7 @@
                   </g:CheckBox>
                 </td>
                 <td>
-                  <g:TextArea addStyleNames="text full-width" name="select" ui:field="select"/>
+                  <g:TextArea addStyleNames="text not-so-full-width" name="select" ui:field="select"/>
                 </td>
               </tr>
             </table>
