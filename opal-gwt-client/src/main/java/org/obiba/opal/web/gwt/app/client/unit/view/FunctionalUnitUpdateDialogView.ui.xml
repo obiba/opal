@@ -9,9 +9,6 @@
   </ui:style>
 
   <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
-    <g:caption>
-      <ui:msg description="Functional Unit update dialog title">Add/Edit Unit</ui:msg>
-    </g:caption>
     <g:DockLayoutPanel unit="EM" height="15em" width="35em">
       <g:center>
         <g:ScrollPanel>

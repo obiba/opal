@@ -558,4 +558,12 @@ public interface Translations extends Constants {
   @DefaultStringValue("no locale")
   String noLocale();
 
+  @Description("Add Unit label")
+  @DefaultStringValue("Add Unit")
+  String addUnit();
+
+  @Description("Edit Unit label")
+  @DefaultStringValue("Edit Unit")
+  String editUnit();
+
 }

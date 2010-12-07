@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.unit.view;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
 
@@ -35,6 +36,8 @@ public class FunctionalUnitUpdateDialogView extends Composite implements Display
   }
 
   private static FunctionalUnitUpdateDialogUiBinder uiBinder = GWT.create(FunctionalUnitUpdateDialogUiBinder.class);
+
+  private static Translations translations = GWT.create(Translations.class);
 
   @UiField
   DialogBox dialog;
@@ -150,6 +153,11 @@ public class FunctionalUnitUpdateDialogView extends Composite implements Display
   @Override
   public void setDialogMode(Mode dialogMode) {
     functionalUnitName.setEnabled(Mode.CREATE.equals(dialogMode));
+    if(Mode.CREATE.equals(dialogMode)) {
+      dialog.setText(translations.addUnit());
+    } else {
+      dialog.setText(translations.editUnit());
+    }
   }
 
   @Override
