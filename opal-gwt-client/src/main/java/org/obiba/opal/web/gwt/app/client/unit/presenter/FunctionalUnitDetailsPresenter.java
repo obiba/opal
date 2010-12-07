@@ -158,7 +158,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
   private void setCommands() {
     getDisplay().setDownloadIdentifiersCommand(new DownloadIdentifiersCommand());
-    getDisplay().setExportIdentifiersCommand(null); // TODO
+    getDisplay().setExportIdentifiersCommand(new ExportIdentifiersCommand()); // TODO
     getDisplay().setRemoveFunctionalUnitCommand(new RemoveFunctionalUnitCommand());
 
     getDisplay().setAddKeyPairCommand(new AddKeyPairCommand());
@@ -259,6 +259,16 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
       String url = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")) //
       .append("ws/functional-unit/").append(functionalUnit.getName()) //
       .append("/entities/identifiers").toString();
+      eventBus.fireEvent(new FileDownloadEvent(url));
+    }
+  }
+
+  private final class ExportIdentifiersCommand implements Command {
+    @Override
+    public void execute() {
+      String url = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")) //
+      .append("ws/functional-unit/").append(functionalUnit.getName()) //
+      .append("/entities/excel").toString();
       eventBus.fireEvent(new FileDownloadEvent(url));
     }
   }

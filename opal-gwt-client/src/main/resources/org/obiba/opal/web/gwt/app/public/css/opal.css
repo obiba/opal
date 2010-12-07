@@ -166,6 +166,10 @@ a:hover {
 
 /* DialogBox */
 
+.gwt-DialogBox {
+    z-index: 1000;
+}
+
 .gwt-DialogBox .Caption {
 	border-top:5px solid #DDDDDD;
 }

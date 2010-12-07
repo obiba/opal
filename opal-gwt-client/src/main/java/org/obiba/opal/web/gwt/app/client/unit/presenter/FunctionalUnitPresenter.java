@@ -15,8 +15,10 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -37,6 +39,8 @@ public class FunctionalUnitPresenter extends WidgetPresenter<FunctionalUnitPrese
     ScrollPanel getFunctionalUnitListPanel();
 
     HandlerRegistration addFunctionalUnitClickHandler(ClickHandler handler);
+
+    HandlerRegistration addExportIdentifiersClickHandler(ClickHandler handler);
   }
 
   @Inject
@@ -63,6 +67,7 @@ public class FunctionalUnitPresenter extends WidgetPresenter<FunctionalUnitPrese
 
   private void addHandlers() {
     super.registerHandler(getDisplay().addFunctionalUnitClickHandler(new AddFunctionalUnitClickHandler()));
+    super.registerHandler(getDisplay().addExportIdentifiersClickHandler(new ExportIdentifiersClickHandler()));
   }
 
   protected void initDisplayComponents() {
@@ -101,6 +106,17 @@ public class FunctionalUnitPresenter extends WidgetPresenter<FunctionalUnitPrese
       functionalUnitUpdateDialogPresenter.getDisplay().clear();
       // functionalUnitUpdateDialogPresenter.getDisplay().setEnabledFunctionalUnitName(true);
       functionalUnitUpdateDialogPresenter.revealDisplay();
+    }
+
+  }
+
+  public class ExportIdentifiersClickHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent event) {
+      String url = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")) //
+      .append("ws/functional-units/entities/excel").toString();
+      eventBus.fireEvent(new FileDownloadEvent(url));
     }
 
   }
