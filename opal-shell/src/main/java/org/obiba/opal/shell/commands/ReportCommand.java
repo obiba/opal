@@ -31,6 +31,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.ui.velocity.VelocityEngineUtils;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 
 @CommandUsage(description = "Generate a report based on the specified report template.", syntax = "Syntax: report --name TEMPLATE")
 public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCommandOptions> {
@@ -41,6 +42,8 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
   private static final Logger log = LoggerFactory.getLogger(ReportCommand.class);
 
   private static final String DATE_FORMAT_PATTERN = "yyyyMMdd_HHmm";
+
+  private static final Map<String, String> formatFileExtension = ImmutableMap.of("HTML", "html", "PDF", "pdf", "EXCEL", "xls");
 
   //
   // Instance Variables
@@ -141,8 +144,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
   private String getReportFileName(String reportTemplateName, String reportFormat, Date reportDate) {
     SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_PATTERN);
     String reportDateText = dateFormat.format(reportDate);
-
-    return reportTemplateName + "-" + reportDateText + "." + reportFormat;
+    return String.format("%s-%s.%s", reportTemplateName, reportDateText, formatFileExtension.get(reportFormat.toUpperCase()));
   }
 
   private void deleteFileSilently(FileObject file) {

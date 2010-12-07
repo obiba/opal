@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.birt.core.framework.Platform;
+import org.eclipse.birt.report.engine.api.EXCELRenderOption;
 import org.eclipse.birt.report.engine.api.EngineConfig;
 import org.eclipse.birt.report.engine.api.EngineException;
 import org.eclipse.birt.report.engine.api.HTMLRenderOption;
@@ -137,6 +138,10 @@ public class EmbeddedBirtEngine implements BirtEngine {
       PDFRenderOption pdf = new PDFRenderOption();
       pdf.setOutputFormat(format);
       options = pdf;
+    } else if(format.equalsIgnoreCase("excel")) {
+      EXCELRenderOption xls = new EXCELRenderOption();
+      xls.setOutputFormat("xls");
+      options = xls;
     } else {
       throw new IllegalArgumentException("Unexpected report format: " + format);
     }
