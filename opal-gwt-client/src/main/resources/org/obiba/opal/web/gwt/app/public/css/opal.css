@@ -753,6 +753,12 @@ div.evaluateScriptPanel {
   width:20%;  
 }
 
+/* Key values */
+
+.key, .nowrap {
+  white-space: nowrap;
+}
+
 /* List-Details UI */
 
 table.selection-list {
@@ -783,8 +789,9 @@ table.item-properties div.key {
 
 .item-details div.gwt-Label.title {
 	font-weight:bold;
-	font-size:1.2em;
+	font-size:1.3em;
 	color: #444444;
+	padding-top: 0.1em;
 }
 
 .item-details .toolbar {
@@ -861,6 +868,7 @@ table.itemSelector .button {
 
 .itemInput {
   margin-bottom: 2px;
+  white-space: nowrap;  
 }
 
 .itemInput.keyValue span + span { /* second span containing the "=" */

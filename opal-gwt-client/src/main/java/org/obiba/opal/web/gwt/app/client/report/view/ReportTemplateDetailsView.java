@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.ParameterDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
@@ -51,6 +52,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
@@ -77,10 +79,15 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   HTMLPanel reportTemplatePanel;
 
   @UiField
-  FlowPanel producedReports;
+  HorizontalTabLayout tabs;
+
+  // FlowPanel producedReports;
 
   @UiField
   CellTable<FileDto> producedReportsTable;
+
+  @UiField
+  InlineLabel noReports;
 
   @UiField
   FlowPanel reportTemplateDetails;
@@ -173,7 +180,7 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   public void setReportTemplatesAvailable(boolean available) {
     toolbarPanel.setVisible(available);
     reportTemplatePanel.setVisible(available);
-    producedReports.setVisible(available);
+    tabs.setVisible(available);
 
     noReportTemplatesLabel.setVisible(available == false);
   }
@@ -185,7 +192,7 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   }
 
   private void renderProducedReports(final JsArray<FileDto> files) {
-    producedReports.setVisible(true);
+    tabs.setVisible(true);
     producedReportsTable.setDelegate(new Delegate<FileDto>() {
 
       @Override
@@ -201,6 +208,10 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
     producedReportsTable.setData(0, pageSize, JsArrays.toList(files, 0, pageSize));
     producedReportsTable.setDataSize(files.length(), true);
     producedReportsTable.redraw();
+
+    producedReportsTable.setVisible(files.length() > 0);
+    pager.setVisible(files.length() > 0);
+    noReports.setVisible(files.length() == 0);
   }
 
   @Override

@@ -14,6 +14,7 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ItemSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -25,6 +26,7 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.ListBox;
@@ -43,6 +45,12 @@ public class ReportTemplateUpdateDialogView extends Composite implements Display
 
   @UiField
   DialogBox dialog;
+
+  @UiField
+  DockLayoutPanel contentLayout;
+
+  @UiField
+  ResizeHandle resizeHandle;
 
   @UiField
   Button updateReportTemplateButton;
@@ -83,7 +91,7 @@ public class ReportTemplateUpdateDialogView extends Composite implements Display
   public ReportTemplateUpdateDialogView() {
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
-    dialog.setGlassEnabled(false);
+    resizeHandle.makeResizable(contentLayout);
     dialog.hide();
   }
 
