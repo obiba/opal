@@ -359,7 +359,6 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   public void setRemoveReportTemplateCommand(Command command) {
     if(remove == null) {
       actionsMenu.addItem(remove = new MenuItem(translations.removeLabel(), command));
-      actionsMenu.addSeparator(new MenuItemSeparator());
     } else {
       remove.setCommand(command);
     }
@@ -369,6 +368,7 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   public void setRunReportCommand(Command command) {
     if(run == null) {
       actionsMenu.addItem(run = new MenuItem(translations.runLabel(), command));
+      actionsMenu.addSeparator(new MenuItemSeparator());
     } else {
       run.setCommand(command);
     }

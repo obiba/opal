@@ -169,8 +169,8 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
   }
 
   private void setCommands() {
-    getDisplay().setRemoveReportTemplateCommand(new RemoveReportTemplateCommand());
     getDisplay().setRunReportCommand(new RunReportCommand());
+    getDisplay().setRemoveReportTemplateCommand(new RemoveReportTemplateCommand());
     getDisplay().setUpdateReportTemplateCommand(new EditReportTemplateCommand());
   }
 
