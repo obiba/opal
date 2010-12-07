@@ -15,7 +15,7 @@
         <tr>
           <td>
             <g:Label addStyleNames="key">
-              <ui:msg description="Identifier Variables Filter label">Identifier Variables Filter:</ui:msg>
+              <ui:msg description="Identifier Variables Filter label">Identifier Variables Filter</ui:msg>:
             </g:Label>
           </td>
           <td>
@@ -30,7 +30,7 @@
         <tr>
           <td>
             <g:Label addStyleNames="key">
-              <ui:msg description="Current Count of Identifiers label">Current Count of Identifiers:</ui:msg>
+              <ui:msg description="Current Count of Identifiers label">Current Count of Identifiers</ui:msg>:
             </g:Label>
           </td>
           <td>
@@ -43,6 +43,7 @@
     <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
 	  <g:Anchor><ui:msg description="Keystore title">Keystore</ui:msg></g:Anchor>
       <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_RIGHT">
+        <g:InlineLabel ui:field="noKeyPairs"><ui:msg description="No Key Pairs label">No Key Pairs</ui:msg></g:InlineLabel>
         <g2:CellTable ui:field="keyPairsTable" width="100%" addStyleNames="left-aligned"/>
       </g:VerticalPanel>
     </o:HorizontalTabLayout>
