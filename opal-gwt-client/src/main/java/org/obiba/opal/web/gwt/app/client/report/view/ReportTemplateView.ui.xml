@@ -7,7 +7,7 @@
 
   
   <o:WorkbenchLayout withInfo="false">
-    <g:Label><ui:msg description="Report Templates title">Report Templates</ui:msg></g:Label>
+    <g:Label><ui:msg description="Reports title">Reports</ui:msg></g:Label>
     <g:Label></g:Label>
     <g:FlowPanel>
       <g:Button ui:field="reportTemplateButton">
