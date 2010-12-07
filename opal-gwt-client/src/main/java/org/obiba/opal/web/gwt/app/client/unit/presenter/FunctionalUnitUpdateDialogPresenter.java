@@ -208,7 +208,7 @@ public class FunctionalUnitUpdateDialogPresenter extends WidgetPresenter<Functio
 
     @Override
     public void onResource(Response response, FunctionalUnitDto resource) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "FunctionalUnitAlreadyExistForTheSpecifiedName", null));
+      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "FunctionalUnitAlreadyExistWithTheSpecifiedName", null));
     }
 
   }

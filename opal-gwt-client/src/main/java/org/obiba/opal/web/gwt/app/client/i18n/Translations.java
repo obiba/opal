@@ -210,7 +210,21 @@ public interface Translations extends Constants {
   "NoDataFileSelected", "You must select a data file.",//
   "CharsetNotAvailable", "The character set you have specified is not available.",//
   "NotIgnoredConlicts", "Some conflicts were detected. Ignore modifications before applying changes.",//
-  "NoVariablesToBeImported", "No variables are to be imported." })
+  "NoVariablesToBeImported", "No variables are to be imported.",//
+  "FunctionalUnitAlreadyExistWithTheSpecifiedName", "A unit with the same name already exists.",//
+  "FunctionalUnitNameIsRequired", "Unit name is required.",//
+  "KeyPairAliasIsRequired", "Alias is required",//
+  "KeyPairAlgorithmIsRequired", "Algorithm is required.",//
+  "KeyPairKeySizeIsRequired", "Size is required.",//
+  "KeyPairPrivateKeyPEMIsRequired", "Private Key in PEM format is required.", //
+  "KeyPairFirstAndLastNameIsRequired", "First and Last Name is required.",//
+  "KeyPairOrganizationalUnitIsRequired", "Organizational Unit is required.",//
+  "KeyPairOrganizationNameIsRequired", "Organization Name is required.",//
+  "KeyPairCityNameIsRequired", "City or Locality Name is required.",//
+  "KeyPairStateNameIsRequired", "State or Province Name is required.",//
+  "KeyPairCountryCodeIsRequired", "Country Code is required.",//
+  "KeyPairPublicKeyPEMIsRequired", "Public Key in PEM format is required."//
+  })
   Map<String, String> userMessageMap();
 
   @Description("You must select a file message")
