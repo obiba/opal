@@ -560,14 +560,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Select the tables to be included in the view.")
   String editViewTablesStep();
 
-  @Description("Edit View Variables Step")
-  @DefaultStringValue("Select the variables that will be viewed.")
-  String editViewVariablesStep();
-
-  @Description("Edit View Entities Step")
-  @DefaultStringValue("Select the entities that will be viewed.")
-  String editViewEntitiesStep();
-
   @Description("No locale label")
   @DefaultStringValue("no locale")
   String noLocale();
