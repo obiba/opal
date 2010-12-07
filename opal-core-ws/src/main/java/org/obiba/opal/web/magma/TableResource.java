@@ -15,9 +15,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.ws.rs.DefaultValue;
@@ -55,6 +57,7 @@ import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.ValueTableWrapper;
 import org.obiba.magma.support.VariableEntityBean;
+import org.obiba.magma.type.BooleanType;
 import org.obiba.opal.web.magma.support.DefaultPagingVectorSourceImpl;
 import org.obiba.opal.web.magma.support.InvalidRequestException;
 import org.obiba.opal.web.magma.support.PagingVectorSource;
@@ -72,6 +75,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -270,7 +274,7 @@ public class TableResource extends AbstractValueTableResource {
 
     List<VariableEntity> entities;
     if(where != null) {
-      entities = getFilteredEntities(getValueTable(), where);
+      entities = ImmutableList.copyOf(getFilteredEntities(getValueTable(), where));
     } else {
       entities = new ArrayList<VariableEntity>(getValueTable().getVariableEntities());
     }
@@ -286,17 +290,7 @@ public class TableResource extends AbstractValueTableResource {
   @GET
   @Path("/eval")
   public Collection<ValueDto> eval(@QueryParam("valueType") String valueType, @QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("10") int limit) {
-    JavascriptValueSource jvs = new JavascriptValueSource(ValueType.Factory.forName(valueType), script) {
-      @Override
-      protected void enterContext(MagmaContext ctx, Scriptable scope) {
-        if(getValueTable() instanceof ValueTableWrapper) {
-          ctx.push(ValueTable.class, ((ValueTableWrapper) getValueTable()).getWrappedValueTable());
-        } else {
-          ctx.push(ValueTable.class, getValueTable());
-        }
-      }
-    };
-    jvs.initialise();
+    JavascriptValueSource jvs = newJavaScriptValueSource(ValueType.Factory.forName(valueType), script);
 
     List<VariableEntity> entities = new ArrayList<VariableEntity>(getValueTable().getVariableEntities());
     int end = Math.min(offset + limit, entities.size());
@@ -459,22 +453,38 @@ public class TableResource extends AbstractValueTableResource {
     return getFilteredEntities(valueTable, script);
   }
 
-  private List<VariableEntity> getFilteredEntities(ValueTable valueTable, String script) {
+  private Iterable<VariableEntity> getFilteredEntities(ValueTable valueTable, String script) {
     if(script == null) {
       throw new IllegalArgumentException("Entities filter script cannot be null.");
     }
 
-    JavascriptClause jsClause = new JavascriptClause(script);
-    jsClause.initialise();
+    JavascriptValueSource jvs = newJavaScriptValueSource(BooleanType.get(), script);
 
-    List<VariableEntity> filteredEntities = new ArrayList<VariableEntity>();
-    for(ValueSet valueSet : valueTable.getValueSets()) {
-      if(jsClause.where(valueSet)) {
-        filteredEntities.add(valueSet.getVariableEntity());
+    final SortedSet<VariableEntity> entities = new TreeSet<VariableEntity>(valueTable.getVariableEntities());
+    final Iterator<Value> values = jvs.asVectorSource().getValues(entities).iterator();
+
+    return Iterables.filter(entities, new Predicate<VariableEntity>() {
+
+      @Override
+      public boolean apply(VariableEntity input) {
+        return values.next().getValue() == Boolean.TRUE;
       }
-    }
+    });
+  }
 
-    return filteredEntities;
+  private JavascriptValueSource newJavaScriptValueSource(ValueType valueType, String script) {
+    JavascriptValueSource jvs = new JavascriptValueSource(valueType, script) {
+      @Override
+      protected void enterContext(MagmaContext ctx, Scriptable scope) {
+        if(getValueTable() instanceof ValueTableWrapper) {
+          ctx.push(ValueTable.class, ((ValueTableWrapper) getValueTable()).getWrappedValueTable());
+        } else {
+          ctx.push(ValueTable.class, getValueTable());
+        }
+      }
+    };
+    jvs.initialise();
+    return jvs;
   }
 
   Variable buildTransientVariable(ValueType valueType, boolean repeatable, String script) {
