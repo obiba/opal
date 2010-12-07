@@ -139,6 +139,7 @@ a:hover {
 .gwt-PopupPanel {
 	border:5px solid #DDDDDD;
 	-moz-border-radius: 0.5em; -webkit-border-radius: 0.5em;
+	z-index: 1000;
 }
 
 .notification {
