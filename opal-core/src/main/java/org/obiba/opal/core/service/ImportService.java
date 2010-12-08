@@ -13,6 +13,7 @@ import java.io.IOException;
 
 import org.apache.commons.vfs.FileObject;
 import org.obiba.magma.NoSuchDatasourceException;
+import org.obiba.magma.NoSuchValueTableException;
 
 /**
  * Service for import-related operations.
@@ -53,13 +54,22 @@ public interface ImportService {
    * 
    * @param unitName functional unit name
    * @param sourceDatasourceName name of the source datasource
+   * @throws NoSuchFunctionalUnitException if the specified functional unit does not exist
+   * @throws NoSuchDatasourceException if the specified source datasource does not exist
+   * @throws NoSuchValueTableException if the specified source datasource does not contain an identifiers table (i.e., a
+   * table with the same name as <code>org.obiba.opal.keys.tableReference</code>)
+   * @throws IOException on any I/O error
    */
-  public void importIdentifiers(String unitName, String sourceDatasourceName);
+  public void importIdentifiers(String unitName, String sourceDatasourceName) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, IOException;
 
   /**
    * Import identifiers of the provided datasource into Opal identifiers datasource, as values of the key table.
    * 
    * @param sourceDatasourceName name of the source datasource
+   * @throws NoSuchDatasourceException if the specified datasource does not exist
+   * @throws NoSuchValueTableException if the specified source datasource does not contain an identifiers table (i.e., a
+   * table with the same name as <code>org.obiba.opal.keys.tableReference</code>)
+   * @throws IOException on any I/O error
    */
-  public void importIdentifiers(String sourceDatasourceName);
+  public void importIdentifiers(String sourceDatasourceName) throws NoSuchDatasourceException, NoSuchValueTableException, IOException;
 }

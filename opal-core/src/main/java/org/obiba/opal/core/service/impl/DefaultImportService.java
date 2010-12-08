@@ -21,6 +21,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.NoSuchDatasourceException;
+import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
@@ -176,9 +177,25 @@ public class DefaultImportService implements ImportService {
   }
 
   @Override
-  public void importIdentifiers(String sourceDatasourceName) {
-    // TODO: Implement DefaultImportService.importIdentifiers(sourceDatasourceName)
-    throw new UnsupportedOperationException("not implemented");
+  public void importIdentifiers(String sourceDatasourceName) throws NoSuchDatasourceException, NoSuchValueTableException, IOException {
+    Datasource sourceDatasource = getDatasourceOrTransientDatasource(sourceDatasourceName);
+    ValueTable sourceKeysTable = sourceDatasource.getValueTable(getKeysTableName());
+
+    if(sourceKeysTable.getEntityType().equals(keysTableEntityType)) {
+      throw new IllegalArgumentException("source identifiers table has unexpected entity type '" + sourceKeysTable.getEntityType() + "' (expected '" + keysTableEntityType + "')");
+    }
+
+    DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(sourceKeysTable, MagmaEngine.get().getDatasource(getKeysDatasourceName()));
+  }
+
+  private String getKeysDatasourceName() {
+    MagmaEngineReferenceResolver tableResolver = MagmaEngineTableResolver.valueOf(keysTableReference);
+    return tableResolver.getTableName();
+  }
+
+  private String getKeysTableName() {
+    MagmaEngineReferenceResolver tableResolver = MagmaEngineTableResolver.valueOf(keysTableReference);
+    return tableResolver.getTableName();
   }
 
   private Datasource getDatasourceOrTransientDatasource(String datasourceName) {
