@@ -28,4 +28,8 @@ public interface OpalResources extends ClientBundle {
   @Source("org/obiba/opal/web/gwt/app/public/css/opal-blue.css")
   public CssResource cssBlue();
 
+  @NotStrict
+  @Source("org/obiba/opal/web/gwt/app/public/css/opal-mongo.css")
+  public CssResource cssMongo();
+
 }
