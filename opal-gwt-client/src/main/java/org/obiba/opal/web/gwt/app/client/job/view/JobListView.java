@@ -48,7 +48,8 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.InlineLabel;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
 import com.google.gwt.view.client.SelectionModel;
@@ -65,6 +66,9 @@ public class JobListView extends Composite implements Display {
   }
 
   private static JobListViewUiBinder uiBinder = GWT.create(JobListViewUiBinder.class);
+
+  @UiField
+  InlineLabel noJobs;
 
   @UiField
   CellTable<CommandStateDto> table;
@@ -117,6 +121,10 @@ public class JobListView extends Composite implements Display {
     table.setData(0, table.getPageSize(), JsArrays.toList(rows, 0, table.getPageSize()));
     table.setDataSize(rows.length(), true);
     table.redraw();
+
+    pager.setVisible(rows.length() > 0);
+    table.setVisible(rows.length() > 0);
+    noJobs.setVisible(rows.length() == 0);
   }
 
   public void showClearJobsButton(boolean show) {
@@ -216,7 +224,7 @@ public class JobListView extends Composite implements Display {
     table.setPageSize(50);
     pager = new SimplePager<CommandStateDto>(table);
     table.setPager(pager);
-    ((FlowPanel) table.getParent()).insert(pager, 0);
+    ((VerticalPanel) table.getParent()).insert(pager, 0);
     DOM.removeElementAttribute(pager.getElement(), "style");
     DOM.setStyleAttribute(pager.getElement(), "cssFloat", "right");
   }
