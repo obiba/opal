@@ -6,11 +6,6 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
-  <ui:style>
-    .title { font-size: small; }
-    .title-light { color: gray; font-size: small; }
-  </ui:style>
-
   <g:VerticalPanel width="100%" addStyleNames="navigator">
      <g:FlowPanel addStyleNames="titlebar">
        <g:Label addStyleNames="title" ui:field="tableName">Table Name</g:Label>
@@ -19,10 +14,30 @@
       
      <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
      
-     <g:HorizontalPanel addStyleNames="small-indent">
-       <g:Label addStyleNames="{style.title-light}"><ui:msg description="Entity type label">Entity Type</ui:msg>:</g:Label>
-       <g:Label addStyleNames="small-indent {style.title}" ui:field="entityType">Entity Name</g:Label>
-     </g:HorizontalPanel>
+     <g:HTMLPanel>
+      <table class="item-properties small-indent">
+        <tr>
+          <td>
+            <g:Label addStyleNames="key">
+              <ui:msg description="Entity type label">Entity Type</ui:msg>:
+            </g:Label>
+          </td>
+          <td>
+            <g:Label ui:field="entityType"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <g:Label addStyleNames="key">
+              <ui:msg description="Current Entity Count label">Current Number of Entity</ui:msg>:
+            </g:Label>
+          </td>
+          <td>
+            <g:Label ui:field="entityCount"/>
+          </td>
+        </tr>
+      </table>
+    </g:HTMLPanel>
      
      <o:HorizontalTabLayout addStyleNames="small-indent top-margin not-so-full-width">
 	  <g:Anchor><ui:msg description="Variables label">Variables</ui:msg></g:Anchor>

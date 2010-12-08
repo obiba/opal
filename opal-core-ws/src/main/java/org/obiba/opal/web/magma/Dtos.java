@@ -176,7 +176,9 @@ public final class Dtos {
   }
 
   public static DatasourceDto.Builder asDto(Datasource datasource) {
-    Magma.DatasourceDto.Builder builder = Magma.DatasourceDto.newBuilder().setName(datasource.getName());
+    Magma.DatasourceDto.Builder builder = Magma.DatasourceDto.newBuilder()//
+    .setName(datasource.getName())//
+    .setType(datasource.getType());
 
     final List<String> tableNames = Lists.newArrayList();
     final List<String> viewNames = Lists.newArrayList();

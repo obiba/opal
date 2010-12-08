@@ -107,9 +107,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     if(table == null || !isCurrentTable(tableDto)) {
       table = tableDto;
       getDisplay().clear();
-      getDisplay().setTableName(tableDto.getName());
-      getDisplay().setTableIsView(tableIsView());
-      getDisplay().setEntityType(tableDto.getEntityType());
+      getDisplay().setTable(tableDto);
       getDisplay().setParentName(tableDto.getDatasourceName());
       getDisplay().setPreviousName(previous);
       getDisplay().setNextName(next);
@@ -341,11 +339,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
     void clear();
 
-    void setTableName(String name);
-
-    void setTableIsView(boolean tableIsView);
-
-    void setEntityType(String text);
+    void setTable(TableDto dto);
 
     void setExcelDownloadCommand(Command cmd);
 

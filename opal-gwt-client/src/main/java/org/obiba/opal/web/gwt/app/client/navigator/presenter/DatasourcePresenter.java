@@ -121,7 +121,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   private void displayDatasource(final DatasourceDto datasourceDto, final TableDto tableDto) {
     if(datasourceName == null || !isCurrentDatasource(datasourceDto)) {
       datasourceName = datasourceDto.getName();
-      getDisplay().setDatasourceName(datasourceName);
+      getDisplay().setDatasource(datasourceDto);
       updateTable(tableDto != null ? tableDto.getName() : null);
 
       // make sure the list of datasources is initialized before looking for siblings
@@ -429,7 +429,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
     void afterRenderRows();
 
-    void setDatasourceName(String name);
+    void setDatasource(DatasourceDto dto);
 
     void setPreviousName(String name);
 

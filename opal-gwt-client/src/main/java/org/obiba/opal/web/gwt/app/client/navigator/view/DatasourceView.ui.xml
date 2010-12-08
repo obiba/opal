@@ -13,7 +13,22 @@
      </g:FlowPanel>
       
      <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
-                    
+                                  
+     <g:HTMLPanel>
+      <table class="item-properties small-indent">
+        <tr>
+          <td>
+            <g:Label addStyleNames="key">
+              <ui:msg description="Type label">Type</ui:msg>:
+            </g:Label>
+          </td>
+          <td>
+            <g:Label ui:field="datasourceType"/>
+          </td>
+        </tr>
+      </table>
+    </g:HTMLPanel>
+                        
      <o:HorizontalTabLayout addStyleNames="small-indent top-margin not-so-full-width">
 	  <g:Anchor><ui:msg description="Tables label">Tables</ui:msg></g:Anchor>
       <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_RIGHT">

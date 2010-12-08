@@ -13,6 +13,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.cell.client.ClickableTextCell;
@@ -50,6 +51,9 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
   @UiField
   Label datasourceName;
+
+  @UiField
+  Label datasourceType;
 
   @UiField
   InlineLabel noTables;
@@ -180,8 +184,9 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   }
 
   @Override
-  public void setDatasourceName(String name) {
-    datasourceName.setText(name);
+  public void setDatasource(DatasourceDto dto) {
+    datasourceName.setText(dto.getName());
+    datasourceType.setText(dto.getType()); // TODO translate
   }
 
   @Override

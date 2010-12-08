@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.cell.client.ClickableTextCell;
@@ -65,6 +66,9 @@ public class TableView extends Composite implements TablePresenter.Display {
 
   @UiField
   Label entityType;
+
+  @UiField
+  Label entityCount;
 
   @UiField
   InlineLabel noVariables;
@@ -208,18 +212,15 @@ public class TableView extends Composite implements TablePresenter.Display {
   }
 
   @Override
-  public void setTableName(String name) {
-    tableName.setText(name);
-  }
+  public void setTable(TableDto dto) {
+    tableName.setText(dto.getName());
 
-  public void setTableIsView(boolean tableIsView) {
-    String tableOrViewText = tableIsView ? translations.viewLabel() : translations.tableLabel();
+    String tableOrViewText = dto.hasViewLink() ? translations.viewLabel() : translations.tableLabel();
     tableOrView.setText("(" + tableOrViewText + ")");
-  }
 
-  @Override
-  public void setEntityType(String text) {
-    entityType.setText(text);
+    entityType.setText(dto.getEntityType());
+
+    entityCount.setText(Integer.toString(dto.getValueSetCount()));
   }
 
   @Override

@@ -27,8 +27,8 @@ public class JsonFormatTest {
   public void test_DtoContainsNonAsciiCharacters() throws ParseException {
     String testValue = "ªºÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâäãåæçèéêëìíî";
 
-    String json = JsonFormat.printToString(DatasourceDto.newBuilder().setName(testValue).build());
-    Assert.assertThat(json, is("{\"name\": \"" + testValue + "\"}"));
+    String json = JsonFormat.printToString(DatasourceDto.newBuilder().setName(testValue).setType("type").build());
+    Assert.assertThat(json, is("{\"name\": \"" + testValue + "\",\"type\": \"type\"}"));
 
     // Make sure we can read it back
     DatasourceDto.Builder builder = DatasourceDto.newBuilder();

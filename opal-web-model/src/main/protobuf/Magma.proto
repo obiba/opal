@@ -93,6 +93,7 @@ message DatasourceDto {
   optional string link = 2;
   repeated string table = 3;
   repeated string view = 4;
+  required string type = 5;
 }
 
 message TableDto {
