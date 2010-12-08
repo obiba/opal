@@ -126,6 +126,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Entity Type")
   String entityTypeLabel();
 
+  @Description("Entity type column label")
+  @DefaultStringValue("Entity Type column")
+  String entityTypeColumnLabel();
+
   @Description("Tables label")
   @DefaultStringValue("Tables")
   String tablesLabel();

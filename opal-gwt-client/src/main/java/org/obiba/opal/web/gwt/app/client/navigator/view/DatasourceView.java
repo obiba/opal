@@ -96,7 +96,7 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
       public String getValue(TableDto object) {
         return object.getEntityType();
       }
-    }, translations.entityTypeLabel());
+    }, translations.entityTypeColumnLabel());
 
     table.addColumn(new TextColumn<TableDto>() {
 

@@ -7,7 +7,7 @@
 
   
   <o:WorkbenchLayout withInfo="false">
-    <g:Label><ui:msg description="Variable explorer title">Variable Explorer</ui:msg></g:Label>
+    <g:Label><ui:msg description="Datasources label">Datasources</ui:msg></g:Label>
     <g:Label></g:Label>
     <g:FlowPanel>
       <g:Button ui:field="createDatasourceButton">
