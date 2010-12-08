@@ -66,6 +66,8 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   private String datasourceName;
 
+  private TableDto table;
+
   /**
    * @param display
    * @param eventBus
@@ -88,8 +90,12 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   @Override
   protected void onBind() {
+    initDisplayComponents();
+    tableListPresenter.clear();
     if(datasourceName != null) {
       tableListPresenter.selectDatasourceTables(datasourceName);
+    } else if(table != null) {
+      tableListPresenter.selectTable(table);
     }
   }
 
@@ -128,6 +134,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     tableListPresenter.unbind();
     fileSelectionPresenter.unbind();
     datasourceName = null;
+    table = null;
   }
 
   @Override
@@ -136,7 +143,6 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   @Override
   public void revealDisplay() {
-    initDisplayComponents();
     getDisplay().showDialog();
   }
 
@@ -198,6 +204,8 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     if(event.getEventParameters().length != 0) {
       if(event.getEventParameters()[0] instanceof String) {
         datasourceName = (String) event.getEventParameters()[0];
+      } else if(event.getEventParameters()[0] instanceof TableDto) {
+        table = (TableDto) event.getEventParameters()[0];
       } else {
         throw new IllegalArgumentException("unexpected event parameter type (expected String)");
       }

@@ -28,6 +28,8 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingTableSelectionEv
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
+import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -75,6 +77,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     super.registerHandler(eventBus.addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
     super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new RemoveViewConfirmationEventHandler()));
     getDisplay().setExcelDownloadCommand(new ExcelDownloadCommand());
+    getDisplay().setExportDataCommand(new ExportDataCommand());
     getDisplay().setParentCommand(new ParentCommand());
     getDisplay().setPreviousCommand(new PreviousCommand());
     getDisplay().setNextCommand(new NextCommand());
@@ -215,6 +218,13 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     }
   }
 
+  final class ExportDataCommand implements Command {
+    @Override
+    public void execute() {
+      eventBus.fireEvent(new WizardRequiredEvent(WizardType.EXPORT_DATA, table));
+    }
+  }
+
   final class DownloadViewCommand implements Command {
     @Override
     public void execute() {
@@ -342,6 +352,8 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     void setTable(TableDto dto);
 
     void setExcelDownloadCommand(Command cmd);
+
+    void setExportDataCommand(Command cmd);
 
     void setDownloadViewCommand(Command cmd);
 

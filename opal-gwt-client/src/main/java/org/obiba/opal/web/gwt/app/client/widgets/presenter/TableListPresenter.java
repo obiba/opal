@@ -71,6 +71,7 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
 
   @Override
   protected void onUnbind() {
+    clear();
   }
 
   @Override
@@ -118,7 +119,13 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
     }).send();
   }
 
+  public void selectTable(TableDto table) {
+    updateTables(table);
+  }
+
   private boolean updateTables(TableDto selectedTable) {
+    if(selectedTable == null) return false;
+
     boolean updated = false;
     boolean found = false;
     for(TableDto table : getTables()) {
