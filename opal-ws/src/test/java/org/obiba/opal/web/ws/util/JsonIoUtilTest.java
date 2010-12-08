@@ -96,7 +96,7 @@ public class JsonIoUtilTest {
   private Collection<DatasourceDto> createDtos(String... names) {
     ArrayList<DatasourceDto> dtos = new ArrayList<DatasourceDto>(names.length);
     for(String name : names) {
-      dtos.add(DatasourceDto.newBuilder().setName(name).setLink("http://localhost/" + name).build());
+      dtos.add(DatasourceDto.newBuilder().setName(name).setType("type").setLink("http://localhost/" + name).build());
     }
     return dtos;
   }
@@ -128,7 +128,7 @@ public class JsonIoUtilTest {
     sb.append('[');
     for(int i = 0; i < names.length; i++) {
       if(i > 0) sb.append(',');
-      sb.append("{\"name\": \"").append(names[i]).append("\",\"link\": \"").append("http://localhost/").append(names[i]).append("\"}");
+      sb.append("{\"name\": \"").append(names[i]).append("\",\"link\": \"").append("http://localhost/").append(names[i]).append("\",\"type\": \"type\"}");
     }
     sb.append(']');
     return sb.toString();
