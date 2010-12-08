@@ -184,7 +184,7 @@ a:hover {
 }
 
 .gwt-DialogBox .dialogContent .footer {
-	background-color:#ECE5DE;
+	background-color:#F3F4EB;
 	border-top:1px solid #B4A291;
 }
 
@@ -310,6 +310,7 @@ margin-left:10px;
 .footbar {
 	font-size:0.9em;
 	margin-left: 50px;
+	padding-top: 0.2em;
 }
 
 .footbar .gwt-Label {
@@ -480,7 +481,7 @@ margin-left:10px;
 }
 
 .navigator .titlebar {
-	background-color:#ECE5DE;
+	background-color:#F3F4EB;
 	color:#444444;
     padding-bottom:3px;
     padding-left:10px;
@@ -497,7 +498,7 @@ margin-left:10px;
 }
 
 .navigator .toolbar {
-  	background-color:#ECE5DE;
+  	background-color:#F3F4EB;
   	border-bottom:1px solid #B4A291;
   	padding-bottom:5px;
   	padding-left:10px;
@@ -780,7 +781,7 @@ table.item-properties div.key {
 }
  
 .item-details .titlebar {
-	background-color:#ECE5DE;
+	background-color:#F3F4EB;
 	color:#444444;
     padding-bottom:3px;
     padding-left:10px;
@@ -795,7 +796,7 @@ table.item-properties div.key {
 }
 
 .item-details .toolbar {
-  	background-color:#ECE5DE;
+  	background-color:#F3F4EB;
   	border-bottom:1px solid #B4A291;
   	padding-bottom:5px;
   	padding-left:10px;

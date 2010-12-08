@@ -44,7 +44,7 @@
         </g:layer>
       </g:LayoutPanel>
     </g:center>
-    <g:south size="1.2">
+    <g:south size="1.5">
       <g:FlowPanel addStyleNames="footbar">
         <g:Label>copyright</g:Label>
         <g:Anchor ui:field="obiba">obiba.org</g:Anchor>

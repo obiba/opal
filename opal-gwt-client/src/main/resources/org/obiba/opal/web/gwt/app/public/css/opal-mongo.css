@@ -1,13 +1,20 @@
-.gwt-TabLayoutPanel .gwt-TabLayoutPanelTab.gwt-TabLayoutPanelTab-selected {
-	background-color: #402817;
+/* Mongo Style */
+
+.login {
+	color: #402817;
 }
 
 .login > table {
-	 border-color: #402817;
+	border-color: #402817;
+	background-color: #F3F4EB;
 }
 
 .topbar {
 	background-color: #402817;
+}
+
+.topbar a, .topbar a:hover {
+	color: #AA814D;
 }
 
 .top .gwt-MenuBar-horizontal {
@@ -15,7 +22,7 @@
     background-color: #F6F4CD;
 }
 
-.top .gwt-MenuBar-horizontal .gwt-MenuItem.selected {
+.top .gwt-MenuBar-horizontal .gwt-MenuItem.selected, .top .gwt-MenuBar-horizontal .gwt-MenuItem.gwt-MenuItem-selected.selected {
 	background-color: #402817;
 }
 
@@ -26,16 +33,26 @@
 .main-content {
 	border: none;
 	margin: 0 0 0;
+	-moz-border-radius: 0em; -webkit-border-radius: 0em;
 }
 
 .workbench .top {
     background-color:#F6F4CD;
-    color:#444444;
+    color:#402817;
+}
+
+.gwt-TabLayoutPanel .gwt-TabLayoutPanelTab.gwt-TabLayoutPanelTab-selected {
+	background-color: #402817;
 }
 
 .footbar {
   border-top: 1px solid #B4A291;
   margin-left: 0px;
   padding-left: 1em;
-  background: #ECE5DE;
+  background: #F3F4EB;
+  color: #402817;
+}
+
+.footbar a {
+	color: #402817;
 }
