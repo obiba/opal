@@ -42,7 +42,7 @@ public class TableListView extends Composite implements TableListPresenter.Displ
 
   private static final String TABLE_LIST_WIDTH = "25em";
 
-  private static final int VISIBLE_COUNT = 5;
+  private static final int VISIBLE_COUNT = 10;
 
   private static TableListViewUiBinder uiBinder = GWT.create(TableListViewUiBinder.class);
 

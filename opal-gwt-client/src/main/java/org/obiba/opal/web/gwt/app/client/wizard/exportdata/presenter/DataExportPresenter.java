@@ -28,8 +28,8 @@ import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.Notific
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -64,6 +64,8 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   @Inject
   private JobListPresenter jobListPresenter;
 
+  private String datasourceName;
+
   /**
    * @param display
    * @param eventBus
@@ -86,6 +88,9 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   @Override
   protected void onBind() {
+    if(datasourceName != null) {
+      tableListPresenter.selectDatasourceTables(datasourceName);
+    }
   }
 
   protected void initDisplayComponents() {
@@ -122,6 +127,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   protected void onUnbind() {
     tableListPresenter.unbind();
     fileSelectionPresenter.unbind();
+    datasourceName = null;
   }
 
   @Override
@@ -189,7 +195,13 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   //
 
   public void onWizardRequired(WizardRequiredEvent event) {
-    // nothing to do
+    if(event.getEventParameters().length != 0) {
+      if(event.getEventParameters()[0] instanceof String) {
+        datasourceName = (String) event.getEventParameters()[0];
+      } else {
+        throw new IllegalArgumentException("unexpected event parameter type (expected String)");
+      }
+    }
   }
 
   //

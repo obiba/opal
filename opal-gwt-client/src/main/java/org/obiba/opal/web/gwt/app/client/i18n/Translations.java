@@ -485,6 +485,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("View")
   String viewLabel();
 
+  @Description("Add View label")
+  @DefaultStringValue("Add View")
+  String addViewLabel();
+
   @Description("Create Datasource Completed summary")
   @DefaultStringValue("The datasource was successfully created.")
   String datasourceCreationCompleted();
@@ -640,4 +644,8 @@ public interface Translations extends Constants {
   @Description("Paste Public Key PEM label")
   @DefaultStringValue("(paste public certificate in PEM format)")
   String pastePublicKeyPEM();
+
+  @Description("Data export title")
+  @DefaultStringValue("Export Data")
+  String exportData();
 }

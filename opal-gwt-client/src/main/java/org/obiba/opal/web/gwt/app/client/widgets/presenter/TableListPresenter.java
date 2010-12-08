@@ -23,11 +23,15 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionRequiredEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
 /**
@@ -100,6 +104,37 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
     this.confirmationMessageKey = null;
   }
 
+  public void selectDatasourceTables(String datasourceName) {
+    ResourceRequestBuilderFactory.<JsArray<TableDto>> newBuilder().forResource("/datasource/" + datasourceName + "/tables").get().withCallback(new ResourceCallback<JsArray<TableDto>>() {
+      @Override
+      public void onResource(Response response, JsArray<TableDto> resource) {
+        if(resource != null) {
+          for(int i = 0; i < resource.length(); i++) {
+            updateTables(resource.get(i));
+          }
+        }
+      }
+
+    }).send();
+  }
+
+  private boolean updateTables(TableDto selectedTable) {
+    boolean updated = false;
+    boolean found = false;
+    for(TableDto table : getTables()) {
+      if(table.getName().equals(selectedTable.getName()) && table.getDatasourceName().equals(selectedTable.getDatasourceName())) {
+        found = true;
+        break;
+      }
+    }
+    if(!found) {
+      getTables().add(selectedTable);
+      getDisplay().addTable(selectedTable);
+      updated = true;
+    }
+    return updated;
+  }
+
   public List<TableDto> getTables() {
     return tables;
   }
@@ -117,16 +152,7 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
         if(TableListPresenter.this.equals(event.getSource())) {
           boolean updated = false;
           for(TableDto selectedTable : event.getSelectedTables()) {
-            boolean found = false;
-            for(TableDto table : getTables()) {
-              if(table.getName().equals(selectedTable.getName()) && table.getDatasourceName().equals(selectedTable.getDatasourceName())) {
-                found = true;
-                break;
-              }
-            }
-            if(!found) {
-              getTables().add(selectedTable);
-              getDisplay().addTable(selectedTable);
+            if(updateTables(selectedTable)) {
               updated = true;
             }
           }
@@ -221,4 +247,5 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
     public void unselectAll(int first);
 
   }
+
 }

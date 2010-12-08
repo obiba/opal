@@ -48,7 +48,7 @@ public class TableSelectorView extends DialogBox implements TableSelectorPresent
 
   private static final String DIALOG_HEIGHT_SINGLE = "12em";
 
-  private static final String DIALOG_WIDTH = "30em";
+  private static final String DIALOG_WIDTH = "35em";
 
   private static final String TABLE_LIST_WIDTH = "20em";
 

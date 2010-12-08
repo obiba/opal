@@ -155,7 +155,7 @@ public class NavigatorMenuBar extends MenuBar {
 
   public void setAddViewCommand(Command cmd) {
     if(addViewItem == null) {
-      addViewItem = new MenuItem(translations.viewLabel(), cmd);
+      addViewItem = new MenuItem(translations.addViewLabel(), cmd);
       getAddMenu().addItem(addViewItem);
     } else {
       addViewItem.setCommand(cmd);

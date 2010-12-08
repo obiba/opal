@@ -236,4 +236,9 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
     tableNameColumn.setFieldUpdater(updater);
   }
 
+  @Override
+  public void setExportDataCommand(Command cmd) {
+    toolbar.getToolsMenu().addItem(new MenuItem(translations.exportData(), cmd));
+  }
+
 }
