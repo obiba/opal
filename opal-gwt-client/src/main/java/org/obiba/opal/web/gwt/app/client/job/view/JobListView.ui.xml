@@ -7,7 +7,7 @@
   ui:generateLocales="default">
 
   <o:WorkbenchLayout withInfo="false">
-    <g:Label><ui:msg description="Jobs list title">Jobs List</ui:msg></g:Label>
+    <g:Label><ui:msg description="Jobs label">Jobs</ui:msg></g:Label>
     <g:Label></g:Label>
     <g:FlowPanel>
       <g:Button ui:field="refreshButton"><ui:msg description="Refresh jobs list">Refresh</ui:msg></g:Button>
