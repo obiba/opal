@@ -11,7 +11,7 @@
            
      <g:FlowPanel addStyleNames="tableList">
        <g:Label ui:field="tablesTableTitle" addStyleNames="small-indent left-aligned title-bold"><ui:msg description="Tables label">Tables</ui:msg></g:Label>
-       <g2:CellTable width="100%" ui:field="table" addStyleNames="left-aligned" />
+       <g2:CellTable width="100%" ui:field="table" addStyleNames="left-aligned gwt-CellTable" />
      </g:FlowPanel>
      
      <g:Image ui:field="loading" url="image/loading.gif" addStyleNames="loading"/>

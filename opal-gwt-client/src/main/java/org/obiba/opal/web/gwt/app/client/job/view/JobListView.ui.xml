@@ -7,22 +7,6 @@
   ui:generateLocales="default">
 
   <ui:style>
-    .jobList td + td {
-      color: black;
-      text-decoration: none;
-    }
-    .jobList td + td:hover {
-      cursor: default;
-    }
-    .jobList td + td + td + td + td + td + td span + span {
-      margin-left: 1em;	
-    }
-    .jobList td + td + td + td + td + td + td span {
-      text-decoration: underline;	
-    }
-    .jobList td + td + td + td + td + td + td span:hover {
-      cursor: pointer;
-    }
     .jobList.center {
       margin-top: 1em;
     }
@@ -42,7 +26,7 @@
       <g:Button ui:field="clearButton"><ui:msg description="Clear jobs list">Clear</ui:msg></g:Button>
     </g:FlowPanel>
     <g:FlowPanel addStyleNames="{style.jobList} {style.center}">
-      <g2:CellTable width="100%" ui:field="table" addStyleNames="{style.jobList} {style.clear-image}" />
+      <g2:CellTable width="100%" ui:field="table" addStyleNames="gwt-CellTable {style.jobList} {style.clear-image}" />
     </g:FlowPanel>
   </o:WorkbenchLayout>  
   

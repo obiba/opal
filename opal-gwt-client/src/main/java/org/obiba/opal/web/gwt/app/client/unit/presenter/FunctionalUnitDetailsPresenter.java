@@ -46,7 +46,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
   public static final String DELETE_ACTION = "Delete";
 
-  public static final String DOWNLOAD_ACTION = "Download";
+  public static final String DOWNLOAD_ACTION = "DownloadCertificate";
 
   private Runnable actionRequiringConfirmation;
 

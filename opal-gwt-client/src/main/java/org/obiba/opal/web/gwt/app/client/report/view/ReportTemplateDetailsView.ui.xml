@@ -73,7 +73,7 @@
 	  <g:Anchor><ui:msg description="Reports title">Reports</ui:msg></g:Anchor>
       <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_RIGHT">
         <g:InlineLabel ui:field="noReports"><ui:msg description="No Reports label">No Reports</ui:msg></g:InlineLabel>
-        <g2:CellTable ui:field="producedReportsTable" width="100%"/>
+        <g2:CellTable ui:field="producedReportsTable" width="100%" addStyleNames="left-aligned gwt-CellTable"/>
       </g:VerticalPanel>
     </o:HorizontalTabLayout>
     

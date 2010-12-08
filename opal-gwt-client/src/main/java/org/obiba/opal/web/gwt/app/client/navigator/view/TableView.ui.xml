@@ -22,7 +22,7 @@
      
      <g:FlowPanel addStyleNames="tableList">
        <g:Label ui:field="variablesTableTitle" addStyleNames="small-indent left-aligned title-bold"><ui:msg description="Variables label">Variables</ui:msg></g:Label>
-       <g2:CellTable width="100%" ui:field="table" addStyleNames="left-aligned" />
+       <g2:CellTable width="100%" ui:field="table" addStyleNames="left-aligned gwt-CellTable" />
      </g:FlowPanel>
      
      <g:Image ui:field="loading" url="image/loading.gif" addStyleNames="loading"/>

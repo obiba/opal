@@ -90,7 +90,8 @@ public interface Translations extends Constants {
   "Cancel", "Cancel", //
   "Delete", "Delete", //
   "Edit", "Edit", //
-  "Download", "Download" })
+  "Download", "Download", //
+  "DownloadCertificate", "Download Certificate" })
   Map<String, String> actionMap();
 
   @Description("Size label")

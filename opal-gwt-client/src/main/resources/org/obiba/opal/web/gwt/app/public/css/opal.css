@@ -203,15 +203,14 @@ a:hover {
 	color: #000000;
 }
 
-/* .GEO005SGB {
-	background-color:#DEBB9D;
-	color: #000000;
+.gwt-CellTable {
 }
 
-.GEO005SP {
-	border-bottom:1px solid #6F7277;
-	font-weight: normal;
-}*/
+.gwt-CellTable td span {
+	margin-right: 0.5em;
+	cursor: pointer;
+	text-decoration: underline;
+}
 
 /* Login */
 

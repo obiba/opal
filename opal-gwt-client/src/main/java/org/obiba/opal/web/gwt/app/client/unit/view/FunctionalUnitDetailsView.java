@@ -278,6 +278,7 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
         public void render(String value, Object viewData, StringBuilder sb) {
           super.render(translations.actionMap().get(value), viewData, sb);
         }
+
       };
 
       for(final String actionName : actionNames) {
