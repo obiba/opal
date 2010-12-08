@@ -1,6 +1,10 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:g2="urn:import:com.google.gwt.user.cellview.client"
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
 
   <ui:style>
     .title { font-size: small; }
@@ -20,12 +24,14 @@
        <g:Label addStyleNames="small-indent {style.title}" ui:field="entityType">Entity Name</g:Label>
      </g:HorizontalPanel>
      
-     <g:FlowPanel addStyleNames="tableList">
-       <g:Label ui:field="variablesTableTitle" addStyleNames="small-indent left-aligned title-bold"><ui:msg description="Variables label">Variables</ui:msg></g:Label>
-       <g2:CellTable width="100%" ui:field="table" addStyleNames="left-aligned gwt-CellTable" />
-     </g:FlowPanel>
-     
-     <g:Image ui:field="loading" url="image/loading.gif" addStyleNames="loading"/>
+     <o:HorizontalTabLayout addStyleNames="small-indent top-margin not-so-full-width">
+	  <g:Anchor><ui:msg description="Variables label">Variables</ui:msg></g:Anchor>
+      <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_RIGHT">
+        <g:InlineLabel ui:field="noVariables"><ui:msg description="No Variables label">No Variables</ui:msg></g:InlineLabel>
+        <g2:CellTable ui:field="table" width="100%" addStyleNames="left-aligned gwt-CellTable tableList"/>
+        <g:Image ui:field="loading" url="image/loading.gif" addStyleNames="loading"/>
+      </g:VerticalPanel>
+     </o:HorizontalTabLayout>
      
   </g:VerticalPanel>
 

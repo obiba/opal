@@ -31,8 +31,10 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuItem;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
 import com.google.gwt.view.client.SelectionModel;
@@ -50,7 +52,7 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   Label datasourceName;
 
   @UiField
-  Label tablesTableTitle;
+  InlineLabel noTables;
 
   @UiField
   CellTable<TableDto> table;
@@ -109,7 +111,7 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
     table.setPageSize(50);
     pager = new SimplePager<TableDto>(table);
     table.setPager(pager);
-    FlowPanel p = ((FlowPanel) table.getParent());
+    VerticalPanel p = ((VerticalPanel) table.getParent());
     p.insert(pager, 0);
     DOM.removeElementAttribute(pager.getElement(), "style");
     DOM.setStyleAttribute(pager.getElement(), "cssFloat", "right");
@@ -144,13 +146,15 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   public void beforeRenderRows() {
     pager.setVisible(false);
     table.setVisible(false);
+    noTables.setVisible(false);
     loading.setVisible(true);
   }
 
   @Override
   public void afterRenderRows() {
-    pager.setVisible(true);
-    table.setVisible(true);
+    pager.setVisible(table.getDataSize() > 0);
+    table.setVisible(table.getDataSize() > 0);
+    noTables.setVisible(table.getDataSize() == 0);
     loading.setVisible(false);
   }
 

@@ -34,6 +34,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -116,6 +117,12 @@ public class VariableView extends Composite implements VariablePresenter.Display
   @UiField
   Panel summary;
 
+  @UiField
+  InlineLabel noCategories;
+
+  @UiField
+  InlineLabel noAttributes;
+
   //
   // Constructors
   //
@@ -151,6 +158,10 @@ public class VariableView extends Composite implements VariablePresenter.Display
     categoryTable.setData(0, categoryTable.getPageSize(), JsArrays.toList(categoryRows, 0, categoryTable.getPageSize()));
     categoryTable.setDataSize(categoryRows.length(), true);
     categoryTable.redraw();
+
+    categoryTablePager.setVisible(categoryRows.length() > 0);
+    categoryTable.setVisible(categoryRows.length() > 0);
+    noCategories.setVisible(categoryRows.length() == 0);
   }
 
   @SuppressWarnings("unchecked")
@@ -175,6 +186,10 @@ public class VariableView extends Composite implements VariablePresenter.Display
     attributeTable.redraw();
 
     label.setText(getAttributeValue(attributeRows, LABEL_ATTRIBUTE_NAME));
+
+    attributeTablePager.setVisible(attributeRows.length() > 0);
+    attributeTable.setVisible(attributeRows.length() > 0);
+    noAttributes.setVisible(attributeRows.length() == 0);
   }
 
   @Override

@@ -33,6 +33,7 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.InsertPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuItem;
@@ -63,10 +64,10 @@ public class TableView extends Composite implements TablePresenter.Display {
   Label tableOrView;
 
   @UiField
-  Label variablesTableTitle;
+  Label entityType;
 
   @UiField
-  Label entityType;
+  InlineLabel noVariables;
 
   @UiField
   CellTable<VariableDto> table;
@@ -151,8 +152,9 @@ public class TableView extends Composite implements TablePresenter.Display {
 
   @Override
   public void afterRenderRows() {
-    pager.setVisible(true);
-    table.setVisible(true);
+    pager.setVisible(table.getDataSize() > 0);
+    table.setVisible(table.getDataSize() > 0);
+    noVariables.setVisible(table.getDataSize() == 0);
     loading.setVisible(false);
   }
 
