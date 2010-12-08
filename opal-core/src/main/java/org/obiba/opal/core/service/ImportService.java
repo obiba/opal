@@ -47,4 +47,19 @@ public interface ImportService {
    */
   public void importData(String unitName, String sourceDatasourceName, String destinationDatasourceName) throws NoSuchFunctionalUnitException, NonExistentVariableEntitiesException, IOException, InterruptedException;
 
+  /**
+   * Import identifiers of the provided datasource into Opal identifiers datasource, as values of the unit key variable
+   * name.
+   * 
+   * @param unitName functional unit name
+   * @param sourceDatasourceName name of the source datasource
+   */
+  public void importIdentifiers(String unitName, String sourceDatasourceName);
+
+  /**
+   * Import identifiers of the provided datasource into Opal identifiers datasource, as values of the key table.
+   * 
+   * @param sourceDatasourceName name of the source datasource
+   */
+  public void importIdentifiers(String sourceDatasourceName);
 }

@@ -24,28 +24,28 @@ import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.Variable;
-import org.obiba.magma.VariableEntity;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
+import org.obiba.magma.Variable;
+import org.obiba.magma.VariableEntity;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.DatasourceCopier;
-import org.obiba.magma.support.MagmaEngineReferenceResolver;
-import org.obiba.magma.support.MagmaEngineTableResolver;
-import org.obiba.magma.support.MultithreadedDatasourceCopier;
 import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListener;
 import org.obiba.magma.support.DatasourceCopier.MultiplexingStrategy;
 import org.obiba.magma.support.DatasourceCopier.VariableTransformer;
+import org.obiba.magma.support.MagmaEngineReferenceResolver;
+import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.obiba.magma.support.MultithreadedDatasourceCopier;
 import org.obiba.magma.type.BooleanType;
 import org.obiba.magma.type.TextType;
 import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.magma.FunctionalUnitView;
-import org.obiba.opal.core.magma.PrivateVariableEntityMap;
 import org.obiba.opal.core.magma.FunctionalUnitView.Policy;
+import org.obiba.opal.core.magma.PrivateVariableEntityMap;
 import org.obiba.opal.core.magma.concurrent.LockingActionTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ImportService;
@@ -112,6 +112,7 @@ public class DefaultImportService implements ImportService {
   // ImportService Methods
   //
 
+  @Override
   public void importData(String unitName, String datasourceName, FileObject file) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException, InterruptedException {
     // OPAL-170 Dispatch the variables in tables corresponding to Onyx stage attribute value.
     importData(unitName, datasourceName, file, STAGE_ATTRIBUTE_NAME);
@@ -166,6 +167,18 @@ public class DefaultImportService implements ImportService {
     } finally {
       sourceDatasource.dispose();
     }
+  }
+
+  @Override
+  public void importIdentifiers(String unitName, String sourceDatasourceName) {
+    // TODO: Implement DefaultImportService.importIdentifiers(unitName, sourceDatasourceName)
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  @Override
+  public void importIdentifiers(String sourceDatasourceName) {
+    // TODO: Implement DefaultImportService.importIdentifiers(sourceDatasourceName)
+    throw new UnsupportedOperationException("not implemented");
   }
 
   private Datasource getDatasourceOrTransientDatasource(String datasourceName) {
