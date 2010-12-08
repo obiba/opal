@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.unit.view;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.AddKeyPairDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
@@ -48,6 +49,8 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   }
 
   private static AddKeyPairDialogUiBinder uiBinder = GWT.create(AddKeyPairDialogUiBinder.class);
+
+  private static Translations translations = GWT.create(Translations.class);
 
   @UiField
   WizardDialogBox dialog;
@@ -123,7 +126,7 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   private void initWizardDialog() {
     stepChain = WizardStepChain.Builder.create(dialog)//
     .append(privateKeyStep)//
-    .title("Alias and Private Key definition")// TODO
+    .title(translations.privateKeyStep())//
     .onValidate(new ValidationHandler() {
 
       @Override
@@ -131,7 +134,7 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
         return privateKeyValidators.validate();
       }
     }).append(publicKeyStep)//
-    .title("Public Certificate definition")// TODO
+    .title(translations.publicKeyStep())// 
     .onPrevious().build();
 
     dialog.addNextClickHandler(new ClickHandler() {
@@ -183,7 +186,7 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
 
       @Override
       public void onFocus(FocusEvent arg0) {
-        if(privateKeyPEM.getText().equals("(paste private key in PEM format)")) {
+        if(privateKeyPEM.getText().equals(translations.pastePrivateKeyPEM())) {
           privateKeyPEM.setText("");
           privateKeyPEM.removeStyleName("default-text");
         }
@@ -222,7 +225,7 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
 
       @Override
       public void onFocus(FocusEvent arg0) {
-        if(publicKeyPEM.getText().equals("(paste public certificate in PEM format)")) {
+        if(publicKeyPEM.getText().equals(translations.pastePublicKeyPEM())) {
           publicKeyPEM.setText("");
           publicKeyPEM.removeStyleName("default-text");
         }
@@ -236,7 +239,7 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   }
 
   private void clearPrivateKeyImportForm() {
-    privateKeyPEM.setText("(paste private key in PEM format)"); // TODO translate
+    privateKeyPEM.setText(translations.pastePrivateKeyPEM());
     privateKeyPEM.addStyleName("default-text");
   }
 
@@ -250,7 +253,7 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   }
 
   private void clearPublicKeyImportForm() {
-    publicKeyPEM.setText("(paste public certificate in PEM format)"); // TODO translate
+    publicKeyPEM.setText(translations.pastePublicKeyPEM());
     publicKeyPEM.addStyleName("default-text");
   }
 

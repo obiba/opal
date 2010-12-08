@@ -114,7 +114,7 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
 
   public FunctionalUnitDetailsView() {
     initWidget(uiBinder.createAndBindUi(this));
-    initProducedReportsTable();
+    initKeystoreTable();
     initActionToolbar();
   }
 
@@ -128,13 +128,13 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
     toolbar.addItem("", addMenu = new MenuBar(true)).addStyleName("add");
   }
 
-  private void initProducedReportsTable() {
+  private void initKeystoreTable() {
     keyPairsTable.addColumn(new TextColumn<KeyPairDto>() {
       @Override
       public String getValue(KeyPairDto keyPair) {
         return keyPair.getAlias();
       }
-    }, translations.producedDate());
+    }, translations.aliasLabel());
 
     actionsColumn = new ActionsColumn();
     keyPairsTable.addColumn((ActionsColumn) actionsColumn, translations.actionsLabel());

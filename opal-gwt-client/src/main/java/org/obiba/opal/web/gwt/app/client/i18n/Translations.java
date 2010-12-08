@@ -591,4 +591,48 @@ public interface Translations extends Constants {
   @Description("Import Unit Identifiers label")
   @DefaultStringValue("Import Identifiers")
   String importUnitIdentifiers();
+
+  @Description("Alias label")
+  @DefaultStringValue("Name")
+  String aliasLabel();
+
+  @Description("Private Key Step label")
+  @DefaultStringValue("Provide a name for the Encryption Key Pair and the Private Key definition.")
+  String privateKeyStep();
+
+  @Description("Public Key Step label")
+  @DefaultStringValue("Provide the Public Certificate definition.")
+  String publicKeyStep();
+
+  @Description("Cancel label")
+  @DefaultStringValue("Cancel")
+  String cancelLabel();
+
+  @Description("Close label")
+  @DefaultStringValue("Close")
+  String closeLabel();
+
+  @Description("Finish label")
+  @DefaultStringValue("Finish")
+  String finishLabel();
+
+  @Description("Next label")
+  @DefaultStringValue("Next >")
+  String nextLabel();
+
+  @Description("Previous label")
+  @DefaultStringValue("< Previous")
+  String previousLabel();
+
+  @Description("Help label")
+  @DefaultStringValue("Help")
+  String helpLabel();
+
+  @Description("Paste Private Key PEM label")
+  @DefaultStringValue("(paste private key in PEM format)")
+  String pastePrivateKeyPEM();
+
+  @Description("Paste Public Key PEM label")
+  @DefaultStringValue("(paste public certificate in PEM format)")
+  String pastePublicKeyPEM();
 }

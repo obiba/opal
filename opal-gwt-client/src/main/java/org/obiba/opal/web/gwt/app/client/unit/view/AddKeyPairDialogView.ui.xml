@@ -23,7 +23,7 @@
             <tr>
               <td>
                 <g:Label addStyleNames="key">
-                  <ui:msg description="Alias label">Alias</ui:msg>:
+                  <ui:msg description="Alias label">Name</ui:msg>:
                 </g:Label>
               </td>
               <td>
@@ -38,7 +38,7 @@
               </td>
               <td>
                 <g:RadioButton ui:field="privateKeyCreated" name="privateKeyCreated" addStyleNames="key">
-                  <ui:msg description="Private Key Create label">create</ui:msg>
+                  <ui:msg description="Private Key Create label">create a new private key</ui:msg>
                 </g:RadioButton>
                 <div class="indent">
                   <table>
@@ -61,7 +61,7 @@
                   </table> 
                 </div>
                 <g:RadioButton ui:field="privateKeyImported" name="privateKeyImported" addStyleNames="key">
-                  <ui:msg description="Private Key Import label">import</ui:msg>
+                  <ui:msg description="Private Key Import label">import a private key</ui:msg>
                 </g:RadioButton>
                 <div class="indent">
                   <g:TextArea addStyleNames="text not-so-full-width" name="privateKeyPEM" ui:field="privateKeyPEM"/>
@@ -82,7 +82,7 @@
               </td>
               <td>
                 <g:RadioButton ui:field="publicKeyCreated" name="publicKeyCreated" addStyleNames="key">
-                  <ui:msg description="Public Key Create label">create</ui:msg>
+                  <ui:msg description="Public Key Create label">create a new public certificate</ui:msg>
                 </g:RadioButton>
                 <g:HTMLPanel ui:field="publicKeyForm" addStyleNames="indent">
                   <table class="full-width">
@@ -150,7 +150,7 @@
                   </table>
                 </g:HTMLPanel>
                 <g:RadioButton ui:field="publicKeyImported" name="publicKeyImported" addStyleNames="key">
-                  <ui:msg description="Public Key Import label">import</ui:msg>
+                  <ui:msg description="Public Key Import label">import a public certificate</ui:msg>
                 </g:RadioButton>
                 <div class="indent">
                   <g:TextArea addStyleNames="text not-so-full-width" name="publicKeyPEM" ui:field="publicKeyPEM"/>

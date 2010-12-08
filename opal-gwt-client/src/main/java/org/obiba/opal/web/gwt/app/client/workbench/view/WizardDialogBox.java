@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -25,6 +28,8 @@ import com.google.gwt.user.client.ui.Widget;
  *
  */
 public class WizardDialogBox extends DialogBox {
+
+  private static Translations translations = GWT.create(Translations.class);
 
   private DockLayoutPanel contentLayout;
 
@@ -107,22 +112,22 @@ public class WizardDialogBox extends DialogBox {
   }
 
   private void initNavigationControls(FlowPanel south) {
-    south.add(cancel = new Button("Cancel")); // TODO localization
+    south.add(cancel = new Button(translations.cancelLabel()));
     initControlStyle(cancel, "cancel");
-    south.add(close = new Button("Close")); // TODO localization
+    south.add(close = new Button(translations.closeLabel()));
     initControlStyle(close, "close");
     close.setVisible(false);
-    south.add(finish = new Button("Finish")); // TODO localization
+    south.add(finish = new Button(translations.finishLabel()));
     initControlStyle(finish, "finish");
-    south.add(next = new Button("Next >")); // TODO localization
+    south.add(next = new Button(translations.nextLabel()));
     initControlStyle(next, "next");
-    south.add(previous = new Button("< Previous")); // TODO localization
+    south.add(previous = new Button(translations.previousLabel()));
     initControlStyle(previous, "previous");
     setPreviousEnabled(false);
   }
 
   private void initHelpControl(FlowPanel south) {
-    south.add(help = new Button("Help"));
+    south.add(help = new Button(translations.helpLabel()));
     help.addStyleName("help");
     help.addStyleName("left-aligned");
     help.addStyleName("small-top-margin");
