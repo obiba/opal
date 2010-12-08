@@ -20,11 +20,16 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
 
+import org.obiba.magma.Datasource;
+import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
+import org.obiba.magma.NoSuchDatasourceException;
+import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.views.JavascriptClause;
@@ -33,10 +38,13 @@ import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
+import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Opal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,13 +64,19 @@ public class FunctionalUnitsResource {
 
   private final UnitKeyStoreService unitKeyStoreService;
 
+  private final ImportService importService;
+
+  private final DatasourceFactoryRegistry datasourceFactoryRegistry;
+
   private final String keysTableReference;
 
   @Autowired
-  public FunctionalUnitsResource(OpalRuntime opalRuntime, UnitKeyStoreService unitKeyStoreService, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference) {
+  public FunctionalUnitsResource(OpalRuntime opalRuntime, UnitKeyStoreService unitKeyStoreService, ImportService importService, DatasourceFactoryRegistry datasourceFactoryRegistry, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference) {
     super();
     this.opalRuntime = opalRuntime;
     this.unitKeyStoreService = unitKeyStoreService;
+    this.importService = importService;
+    this.datasourceFactoryRegistry = datasourceFactoryRegistry;
     this.keysTableReference = keysTableReference;
   }
 
@@ -134,9 +148,39 @@ public class FunctionalUnitsResource {
     }
   }
 
+  @POST
+  @Path("/entities")
+  public Response importIdentifiers(DatasourceFactoryDto datasourceFactoryDto) {
+    Response response = null;
+
+    Datasource sourceDatasource = createTransientDatasource(datasourceFactoryDto);
+
+    try {
+      importService.importIdentifiers(sourceDatasource.getName());
+      response = Response.ok().build();
+    } catch(NoSuchDatasourceException ex) {
+      return Response.status(Status.NOT_FOUND).entity(ex.getMessage()).build();
+    } catch(NoSuchValueTableException ex) {
+      return Response.status(Status.NOT_FOUND).entity(ex.getMessage()).build();
+    } catch(IOException ex) {
+      Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex).build());
+    } finally {
+      Disposables.silentlyDispose(sourceDatasource);
+    }
+
+    return response;
+  }
+
   //
   // Private methods
   //
+
+  private Datasource createTransientDatasource(DatasourceFactoryDto datasourceFactoryDto) {
+    DatasourceFactory factory = datasourceFactoryRegistry.parse(datasourceFactoryDto);
+    String uid = MagmaEngine.get().addTransientDatasource(factory);
+
+    return MagmaEngine.get().getTransientDatasourceInstance(uid);
+  }
 
   private void sortByName(List<Opal.FunctionalUnitDto> units) {
     // sort alphabetically

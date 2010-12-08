@@ -181,7 +181,7 @@ public class DefaultImportService implements ImportService {
     Datasource sourceDatasource = getDatasourceOrTransientDatasource(sourceDatasourceName);
     ValueTable sourceKeysTable = sourceDatasource.getValueTable(getKeysTableName());
 
-    if(sourceKeysTable.getEntityType().equals(keysTableEntityType)) {
+    if(sourceKeysTable.getEntityType().equals(keysTableEntityType) == false) {
       throw new IllegalArgumentException("source identifiers table has unexpected entity type '" + sourceKeysTable.getEntityType() + "' (expected '" + keysTableEntityType + "')");
     }
 
@@ -190,7 +190,7 @@ public class DefaultImportService implements ImportService {
 
   private String getKeysDatasourceName() {
     MagmaEngineReferenceResolver tableResolver = MagmaEngineTableResolver.valueOf(keysTableReference);
-    return tableResolver.getTableName();
+    return tableResolver.getDatasourceName();
   }
 
   private String getKeysTableName() {
