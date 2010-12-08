@@ -12,14 +12,14 @@
     .top-margin { margin-top: 0.5em; }
   </ui:style>
 
-  <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="29em" width="38em">
+  <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="35em" width="45em">
     <g:caption>
       <ui:msg description="Add Key Pair dialog title">Add Key Pair</ui:msg>
     </g:caption>
     <g:FlowPanel>
       <o:WizardStep ui:field="privateKeyStep">
         <g:HTMLPanel>
-          <table class="full-width">
+          <table class="full-width" cellspacing="10">
             <tr>
               <td>
                 <g:Label addStyleNames="key">
@@ -41,7 +41,7 @@
                   <ui:msg description="Private Key Create label">create a new private key</ui:msg>
                 </g:RadioButton>
                 <div class="indent">
-                  <table>
+                  <table cellspacing="10">
                     <tr>
                       <td>
                         <g:Label addStyleNames="key">
@@ -73,7 +73,7 @@
       </o:WizardStep>
       <o:WizardStep ui:field="publicKeyStep">
         <g:HTMLPanel>
-          <table class="full-width">
+          <table class="full-width" cellspacing="10">
             <tr>
               <td valign="top">
                 <g:Label addStyleNames="key">
@@ -85,7 +85,7 @@
                   <ui:msg description="Public Key Create label">create a new public certificate</ui:msg>
                 </g:RadioButton>
                 <g:HTMLPanel ui:field="publicKeyForm" addStyleNames="indent">
-                  <table class="full-width">
+                  <table class="full-width" cellspacing="10">
                     <tr>
                       <td>
                         <g:Label addStyleNames="key">
