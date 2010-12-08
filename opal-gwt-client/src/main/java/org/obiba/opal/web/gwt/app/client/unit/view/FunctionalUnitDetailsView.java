@@ -326,7 +326,7 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   @Override
   public void setDownloadIdentifiersCommand(Command command) {
     if(downloadIds == null) {
-      actionsMenu.addItem(downloadIds = new MenuItem("Download Identifiers", command)); // TODO localization
+      actionsMenu.addItem(downloadIds = new MenuItem(translations.downloadUnitIdentifiers(), command));
     } else {
       downloadIds.setCommand(command);
     }
@@ -335,7 +335,7 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   @Override
   public void setExportIdentifiersCommand(Command command) {
     if(exportIds == null) {
-      actionsMenu.addItem(exportIds = new MenuItem("Export Identifiers to Excel", command)); // TODO localization
+      actionsMenu.addItem(exportIds = new MenuItem(translations.exportUnitIdentifiersToExcel(), command));
       actionsMenu.addSeparator(new MenuItemSeparator());
     } else {
       exportIds.setCommand(command);
@@ -354,7 +354,7 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   @Override
   public void setAddKeyPairCommand(Command command) {
     if(keyPair == null) {
-      addMenu.addItem(keyPair = new MenuItem("Add Key Pair", command)); // TODO localization
+      addMenu.addItem(keyPair = new MenuItem(translations.addKeyPair(), command));
     } else {
       keyPair.setCommand(command);
     }
@@ -364,7 +364,7 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   public void setGenerateIdentifiersCommand(Command command) {
     if(generateIdentifiers == null) {
       addMenu.addSeparator(new MenuItemSeparator());
-      addMenu.addItem(generateIdentifiers = new MenuItem("Generate Identifiers", command)); // TODO localization
+      addMenu.addItem(generateIdentifiers = new MenuItem(translations.generateUnitIdentifiers(), command));
     } else {
       generateIdentifiers.setCommand(command);
     }
@@ -373,7 +373,7 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   @Override
   public void setImportIdentifiersCommand(Command command) {
     if(importIdentifiers == null) {
-      addMenu.addItem(importIdentifiers = new MenuItem("Import Identifiers", command)); // TODO localization
+      addMenu.addItem(importIdentifiers = new MenuItem(translations.importUnitIdentifiers(), command));
     } else {
       importIdentifiers.setCommand(command);
     }

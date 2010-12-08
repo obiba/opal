@@ -572,4 +572,23 @@ public interface Translations extends Constants {
   @DefaultStringValue("Edit Unit")
   String editUnit();
 
+  @Description("Download Identifiers label")
+  @DefaultStringValue("Download Identifiers")
+  String downloadUnitIdentifiers();
+
+  @Description("Export Identifiers to Excel label")
+  @DefaultStringValue("Export Identifiers to Excel")
+  String exportUnitIdentifiersToExcel();
+
+  @Description("Add Key Pair label")
+  @DefaultStringValue("Add Encryption Keys")
+  String addKeyPair();
+
+  @Description("Generate Identifiers label")
+  @DefaultStringValue("Generate Identifiers")
+  String generateUnitIdentifiers();
+
+  @Description("Import Unit Identifiers label")
+  @DefaultStringValue("Import Identifiers")
+  String importUnitIdentifiers();
 }
