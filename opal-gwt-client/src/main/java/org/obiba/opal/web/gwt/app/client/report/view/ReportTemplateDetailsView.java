@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.ParameterDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
@@ -76,6 +77,9 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
 
   @UiField
   HTMLPanel reportTemplatePanel;
+
+  @UiField
+  HorizontalTabLayout tabs;
 
   @UiField
   CellTable<FileDto> producedReportsTable;
@@ -174,7 +178,7 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   public void setReportTemplatesAvailable(boolean available) {
     toolbarPanel.setVisible(available);
     reportTemplatePanel.setVisible(available);
-
+    tabs.setVisible(available);
     noReportTemplatesLabel.setVisible(available == false);
   }
 

@@ -69,7 +69,7 @@
       </table>
     </g:HTMLPanel>
     
-    <o:HorizontalTabLayout addStyleNames="small-indent top-margin not-so-full-width">
+    <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
 	  <g:Anchor><ui:msg description="Reports title">Reports</ui:msg></g:Anchor>
       <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_RIGHT">
         <g:InlineLabel ui:field="noReports"><ui:msg description="No Reports label">No Reports</ui:msg></g:InlineLabel>
