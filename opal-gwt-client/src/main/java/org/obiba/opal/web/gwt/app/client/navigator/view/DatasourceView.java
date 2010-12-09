@@ -77,6 +77,8 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
   private Translations translations = GWT.create(Translations.class);
 
+  private MenuItem exportDataItem;
+
   public DatasourceView() {
     initWidget(uiBinder.createAndBindUi(this));
     toolbarPanel.add(toolbar = new NavigatorMenuBar());
@@ -158,6 +160,7 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   public void afterRenderRows() {
     pager.setVisible(table.getDataSize() > 0);
     table.setVisible(table.getDataSize() > 0);
+    exportDataItem.setVisible(table.getDataSize() > 0);
     noTables.setVisible(table.getDataSize() == 0);
     loading.setVisible(false);
   }
@@ -238,7 +241,7 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
   @Override
   public void setExportDataCommand(Command cmd) {
-    toolbar.getToolsMenu().addItem(new MenuItem(translations.exportData(), cmd));
+    toolbar.getToolsMenu().addItem(exportDataItem = new MenuItem(translations.exportData(), cmd));
   }
 
 }

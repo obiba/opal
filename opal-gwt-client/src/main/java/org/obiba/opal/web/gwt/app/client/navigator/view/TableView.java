@@ -91,6 +91,8 @@ public class TableView extends Composite implements TablePresenter.Display {
 
   private MenuItemSeparator removeItemSeparator;
 
+  private MenuItem exportDataItem;
+
   public TableView() {
     initWidget(uiBinder.createAndBindUi(this));
     toolbarPanel.add(toolbar = new NavigatorMenuBar());
@@ -158,6 +160,7 @@ public class TableView extends Composite implements TablePresenter.Display {
   public void afterRenderRows() {
     pager.setVisible(table.getDataSize() > 0);
     table.setVisible(table.getDataSize() > 0);
+    exportDataItem.setVisible(table.getDataSize() > 0);
     noVariables.setVisible(table.getDataSize() == 0);
     loading.setVisible(false);
   }
@@ -230,7 +233,7 @@ public class TableView extends Composite implements TablePresenter.Display {
 
   @Override
   public void setExportDataCommand(Command cmd) {
-    toolbar.getToolsMenu().addItem(new MenuItem(translations.exportData(), cmd));
+    toolbar.getToolsMenu().addItem(exportDataItem = new MenuItem(translations.exportData(), cmd));
   }
 
   @Override
