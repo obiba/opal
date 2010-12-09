@@ -18,7 +18,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitSelectedEvent;
-import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
@@ -92,21 +91,12 @@ public class FunctionalUnitListPresenter extends WidgetPresenter<FunctionalUnitL
 
   }
 
-  private class FunctionalUnitUpdatedHandler implements FunctionalUnitUpdatedEvent.Handler {
-
-    @Override
-    public void onFunctionalUnitUpdated(FunctionalUnitUpdatedEvent event) {
-      initUiComponents();
-      eventBus.fireEvent(new FunctionalUnitSelectedEvent(event.getFunctionalUnit()));
-    }
-
-  }
-
   private class FunctionalUnitDeletedHandler implements FunctionalUnitDeletedEvent.Handler {
 
     @Override
     public void onFunctionalUnitDeleted(FunctionalUnitDeletedEvent event) {
       initUiComponents();
+      eventBus.fireEvent(new FunctionalUnitSelectedEvent(null));
     }
 
   }
@@ -116,9 +106,7 @@ public class FunctionalUnitListPresenter extends WidgetPresenter<FunctionalUnitL
     @Override
     public void onSelectionChange(SelectionChangeEvent event) {
       FunctionalUnitDto selectedFunctionalUnit = getDisplay().getSelectedFunctionalUnit();
-      if(selectedFunctionalUnit != null) {
-        eventBus.fireEvent(new FunctionalUnitSelectedEvent(selectedFunctionalUnit));
-      }
+      eventBus.fireEvent(new FunctionalUnitSelectedEvent(selectedFunctionalUnit));
     }
 
   }

@@ -7,10 +7,14 @@
   ui:generateLocales="default">
 
   <g:FlowPanel ui:field="functionalUnitDetails" addStyleNames="item-details">
+  
+    <g:Label ui:field="noUnit" addStyleNames="small-top-margin small-indent" visible="false">
+      <ui:msg description="No Unit">No Unit</ui:msg>
+    </g:Label>
 
     <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
 
-    <g:HTMLPanel>
+    <g:HTMLPanel ui:field="propertiesPanel">
       <table class="item-properties small-indent">
         <tr>
           <td>
@@ -25,8 +29,8 @@
       </table>
     </g:HTMLPanel>
 
-    <g:HTMLPanel>
-      <table class="item-properties small-indent">
+    <g:HTMLPanel ui:field="statusPanel">
+      <table class="item-properties small-indent small-top-margin">
         <tr>
           <td>
             <g:Label addStyleNames="key">

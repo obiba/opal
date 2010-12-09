@@ -81,6 +81,8 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
     void setImportIdentifiersCommand(Command command);
 
+    void setAvailable(boolean available);
+
   }
 
   public interface ActionHandler {
@@ -130,7 +132,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
   private void initUiComponents() {
     getDisplay().setKeyPairs((JsArray<KeyPairDto>) JsArray.createArray());
-    getDisplay().setFunctionalUnitDetails(null);
+    getDisplay().setAvailable(false);
   }
 
   private void addHandlers() {
@@ -232,9 +234,13 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
   }
 
   private void refreshFunctionalUnitDetails(FunctionalUnitDto functionalUnit) {
-    String name = functionalUnit.getName();
-    ResourceRequestBuilderFactory.<FunctionalUnitDto> newBuilder().forResource("/functional-unit/" + name).get().withCallback(new FunctionalUnitFoundCallBack()).withCallback(Response.SC_NOT_FOUND, new FunctionalUnitNotFoundCallBack(name)).send();
-    refreshKeyPairs(functionalUnit);
+    if(functionalUnit == null) {
+      getDisplay().setAvailable(false);
+    } else {
+      String name = functionalUnit.getName();
+      ResourceRequestBuilderFactory.<FunctionalUnitDto> newBuilder().forResource("/functional-unit/" + name).get().withCallback(new FunctionalUnitFoundCallBack()).withCallback(Response.SC_NOT_FOUND, new FunctionalUnitNotFoundCallBack(name)).send();
+      refreshKeyPairs(functionalUnit);
+    }
   }
 
   private void refreshKeyPairs(FunctionalUnitDto functionalUnit) {

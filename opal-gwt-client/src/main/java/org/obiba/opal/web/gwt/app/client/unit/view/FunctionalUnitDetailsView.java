@@ -20,6 +20,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitDetailsPresenter.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitDetailsPresenter.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.opal.KeyPairDto;
 
@@ -50,6 +51,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.MenuItemSeparator;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
@@ -64,6 +66,12 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   private static FunctionalUnitDetailsViewUiBinder uiBinder = GWT.create(FunctionalUnitDetailsViewUiBinder.class);
 
   private static Translations translations = GWT.create(Translations.class);
+
+  @UiField
+  Label noUnit;
+
+  @UiField
+  HorizontalTabLayout tabs;
 
   @UiField
   CellTable<KeyPairDto> keyPairsTable;
@@ -82,6 +90,12 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
 
   @UiField
   FlowPanel toolbarPanel;
+
+  @UiField
+  Panel propertiesPanel;
+
+  @UiField
+  Panel statusPanel;
 
   private MenuBar toolbar;
 
@@ -192,9 +206,8 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
 
   @Override
   public void setFunctionalUnitDetails(FunctionalUnitDto functionalUnit) {
-    if(functionalUnit == null) {
-      functionalUnitDetails.setVisible(false);
-    } else {
+    setAvailable(functionalUnit != null);
+    if(functionalUnit != null) {
       renderFunctionalUnitDetails(functionalUnit);
     }
   }
@@ -378,6 +391,15 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
     } else {
       importIdentifiers.setCommand(command);
     }
+  }
+
+  @Override
+  public void setAvailable(boolean available) {
+    noUnit.setVisible(!available);
+    tabs.setVisible(available);
+    toolbarPanel.setVisible(available);
+    propertiesPanel.setVisible(available);
+    statusPanel.setVisible(available);
   }
 
 }

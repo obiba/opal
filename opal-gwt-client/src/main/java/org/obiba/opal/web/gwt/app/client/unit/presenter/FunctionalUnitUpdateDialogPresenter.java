@@ -185,8 +185,6 @@ public class FunctionalUnitUpdateDialogPresenter extends WidgetPresenter<Functio
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == 201) {
           eventBus.fireEvent(new FolderCreationEvent(unitFolderPath));
-        } else {
-          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
         }
       }
     };
