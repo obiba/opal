@@ -26,6 +26,11 @@
             <g:Label ui:field="entityType"/>
           </td>
         </tr>
+      </table>
+    </g:HTMLPanel>
+    
+    <g:HTMLPanel>
+      <table class="item-properties small-indent small-top-margin">
         <tr>
           <td>
             <g:Label addStyleNames="key">

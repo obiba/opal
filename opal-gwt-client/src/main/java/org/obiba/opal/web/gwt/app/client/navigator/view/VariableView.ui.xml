@@ -86,7 +86,7 @@
     </g:HTMLPanel>
 
     <g:HTMLPanel>
-      <table class="item-properties small-indent">
+      <table class="item-properties small-indent small-top-margin">
         <tr>
           <td>
             <g:Label addStyleNames="key">
