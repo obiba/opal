@@ -3,26 +3,22 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
   
   <ui:style>
-    .full-border { 
-    	border: #BBBBBB 1px solid; 
-    	height: 20em;
-    }
-    .top-border { 
-    	border-top: #BBBBBB 1px solid;
-    }
     .inline { display: inline; }
     .left-aligned { float: left; }
     .right-aligned { float: right; }
-    .left-margin { margin-left: 5px; }
-    .right-margin { margin-right: 5px; }
-    .top-margin { margin-top: 0.5em; }
-    .bottom-margin { margin-bottom: 5px; }
+    .left-margin { padding-left: 5px; }
+    .right-margin { padding-right: 5px; }
+    .top-margin { padding-top: 0.5em; }
+    .bottom-margin { 
+      padding-bottom: 5px;
+      border-bottom: #BBBBBB 1px solid;
+    }
     .name-input { width: 90%; }
   </ui:style>
   
   <g:DockLayoutPanel unit="EM">
     <g:center>
-      <g:FlowPanel addStyleNames="main">
+      <g:FlowPanel>
       
       <g:HTMLPanel ui:field="namePanel" addStyleNames="{style.top-margin} {style.bottom-margin} {style.left-margin} {style.right-margin}">
         <g:InlineLabel>
@@ -31,7 +27,7 @@
         <g:TextBox ui:field="newFileName" addStyleNames="{style.name-input}" />
       </g:HTMLPanel>
         
-      <g:SplitLayoutPanel ui:field="splitLayoutPanel" addStyleNames="{style.full-border} {style.top-margin} {style.left-margin} {style.right-margin}">
+      <g:SplitLayoutPanel ui:field="splitLayoutPanel" height="100%">
         <g:west size="200">
           <g:ScrollPanel ui:field="fileSystemTreePanel">
           </g:ScrollPanel>
