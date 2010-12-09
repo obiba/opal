@@ -7,27 +7,16 @@
   
   <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="30em" width="40em">
     <g:caption>
-      <ui:msg description="Create View title">Create View</ui:msg>
+      <ui:msg description="Add View label">Add View</ui:msg>
     </g:caption>
     <g:FlowPanel>
       <o:WizardStep ui:field="selectTypeStep">
-      
-<!--      <ui:msg description="Create View Step summary">Select the datasource to which to attach the view and provide view settings.</ui:msg>-->
-    
-	      <g:HTMLPanel>
+        <g:HTMLPanel>
 	        <table class="full-width" cellspacing="10">
 	          <tbody>
 	            <tr>
-	              <td style="vertical-align: top">
-	                <g:Label><ui:msg description="Datasource label">Datasource</ui:msg>:</g:Label>           
-	              </td>
 	              <td>
-	                <g:SimplePanel addStyleNames="inline" ui:field="datasourceSelectorPanel" />
-	              </td>
-	            </tr>
-	            <tr>
-	              <td>
-	                <g:Label><ui:msg description="Name of the view label">Name of the view</ui:msg>:</g:Label>          
+	                <g:Label addStyleNames="key"><ui:msg description="Name label">Name</ui:msg>:</g:Label>         
 	              </td>
 	              <td>
 	                <g:TextBox ui:field="viewNameTextBox" addStyleNames="not-so-full-width"/>
@@ -70,7 +59,7 @@
       </o:WizardStep>
       
       <o:WizardStep ui:field="conclusionStep">
-        <g:Anchor ui:field="configureLink" addStyleNames="small-indent"><ui:msg description="Configure View link">You can now configure the view.</ui:msg></g:Anchor>
+        <g:Button ui:field="configureLink" addStyleNames="small-indent"><ui:msg description="Configure View link">You can now configure the view.</ui:msg></g:Button>
       </o:WizardStep>
       
        <g:HTMLPanel ui:field="selectTypeHelp">

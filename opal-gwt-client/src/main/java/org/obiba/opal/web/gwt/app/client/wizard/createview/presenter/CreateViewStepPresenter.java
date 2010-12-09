@@ -35,10 +35,8 @@ import org.obiba.opal.web.gwt.app.client.validator.MinimumSizeCollectionValidato
 import org.obiba.opal.web.gwt.app.client.validator.RequiredOptionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter.DatasourcesRefreshedCallback;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
@@ -46,6 +44,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.FileViewDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
@@ -68,15 +67,14 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   //
 
   @Inject
-  private DatasourceSelectorPresenter datasourceSelectorPresenter;
-
-  @Inject
   private TableListPresenter tableListPresenter;
 
   @Inject
   private FileSelectionPresenter fileSelectionPresenter;
 
   private String datasourceName;
+
+  private DatasourceDto datasourceDto;
 
   //
   // Constructors
@@ -93,17 +91,6 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
   @Override
   protected void onBind() {
-    datasourceSelectorPresenter.bind();
-    datasourceSelectorPresenter.setDatasourcesRefreshedCallback(new DatasourcesRefreshedCallback() {
-
-      public void onDatasourcesRefreshed() {
-        if(datasourceName != null) {
-          getDisplay().getDatasourceName().setText(datasourceName);
-        }
-      }
-    });
-    getDisplay().setDatasourceSelector(datasourceSelectorPresenter.getDisplay());
-
     tableListPresenter.bind();
     getDisplay().setTableSelector(tableListPresenter.getDisplay());
 
@@ -116,9 +103,6 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
   @Override
   protected void onUnbind() {
-    datasourceSelectorPresenter.unbind();
-    datasourceSelectorPresenter.setDatasourcesRefreshedCallback(null);
-
     tableListPresenter.unbind();
     fileSelectionPresenter.unbind();
   }
@@ -134,7 +118,6 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
   @Override
   public void revealDisplay() {
-    datasourceSelectorPresenter.refreshDisplay();
     tableListPresenter.getTables().clear();
 
     getDisplay().clear();
@@ -143,7 +126,6 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
   @Override
   public void refreshDisplay() {
-    datasourceSelectorPresenter.refreshDisplay();
   }
 
   @Override
@@ -163,9 +145,18 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     if(event.getEventParameters().length != 0) {
       if(event.getEventParameters()[0] instanceof String) {
         datasourceName = (String) event.getEventParameters()[0];
+        ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasource/" + datasourceName).get().withCallback(new ResourceCallback<DatasourceDto>() {
+
+          @Override
+          public void onResource(Response response, DatasourceDto resource) {
+            datasourceDto = resource;
+          }
+        }).send();
       } else {
         throw new IllegalArgumentException("unexpected event parameter type (expected String)");
       }
+    } else {
+      throw new IllegalArgumentException("Datasource name is expected as first wizard argument.");
     }
   }
 
@@ -176,7 +167,6 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   private void createViewIfDoesNotExist() {
     // Get the view name and datasource name.
     String viewName = getDisplay().getViewName().getText();
-    String datasourceName = getDisplay().getDatasourceName().getText();
 
     ViewFoundDoNotCreateCallback doNotCreate = new ViewFoundDoNotCreateCallback();
     ViewNotFoundCreateCallback create = new ViewNotFoundCreateCallback();
@@ -197,7 +187,6 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     getDisplay().renderPendingConclusion();
     // Get the view name and datasource name.
     String viewName = getDisplay().getViewName().getText();
-    String datasourceName = getDisplay().getDatasourceName().getText();
 
     // Build the ViewDto for the request.
     ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().fromTables(tableListPresenter.getTables());
@@ -238,13 +227,9 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
     void clear();
 
-    void setDatasourceSelector(DatasourceSelectorPresenter.Display datasourceSelector);
-
     void setTableSelector(TableListPresenter.Display tableSelector);
 
     void setFileSelectionDisplay(FileSelectionPresenter.Display display);
-
-    HasText getDatasourceName();
 
     HasText getViewName();
 
@@ -288,7 +273,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   final class CloseHandler implements ClickHandler {
     @Override
     public void onClick(ClickEvent evt) {
-      eventBus.fireEvent(new DatasourceUpdatedEvent(datasourceSelectorPresenter.getSelectionDto()));
+      eventBus.fireEvent(new DatasourceUpdatedEvent(datasourceDto));
       getDisplay().hideDialog();
     }
   }
@@ -296,10 +281,10 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   final class ConfigureHandler implements ClickHandler {
     @Override
     public void onClick(ClickEvent evt) {
-      eventBus.fireEvent(new DatasourceUpdatedEvent(datasourceSelectorPresenter.getSelectionDto()));
+      eventBus.fireEvent(new DatasourceUpdatedEvent(datasourceDto));
 
       // Get the new view dto
-      getViewRequest(getDisplay().getDatasourceName().getText(), getDisplay().getViewName().getText())//
+      getViewRequest(datasourceName, getDisplay().getViewName().getText())//
       .withCallback(new ResourceCallback<ViewDto>() {
 
         @Override

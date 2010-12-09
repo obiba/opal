@@ -11,7 +11,6 @@ package org.obiba.opal.web.gwt.app.client.wizard.createview.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
@@ -29,7 +28,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
@@ -71,9 +70,6 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   HTMLPanel tablesHelp;
 
   @UiField
-  SimplePanel datasourceSelectorPanel;
-
-  @UiField
   SimplePanel tableSelectorPanel;
 
   @UiField
@@ -92,9 +88,7 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   SimplePanel fileSelectionPanel;
 
   @UiField
-  Anchor configureLink;
-
-  private DatasourceSelectorPresenter.Display datasourceSelector;
+  Button configureLink;
 
   private TableListPresenter.Display tableSelector;
 
@@ -142,7 +136,6 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
 
       @Override
       public void onReset() {
-        if(datasourceSelector != null) datasourceSelector.selectFirst();
         viewNameTextBox.setText("");
         applyingGlobalVariableFilterRadioButton.setValue(true);
         ValueChangeEvent.fire(applyingGlobalVariableFilterRadioButton, true);
@@ -165,7 +158,7 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
 
       @Override
       public void onReset() {
-        conclusionStep.setStepTitle("View is being created ..."); // TODO
+        conclusionStep.setStepTitle(translations.addViewPending()); //
         configureLink.setVisible(false);
       }
     })
@@ -179,16 +172,6 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   @Override
   public void clear() {
     stepChain.reset();
-  }
-
-  @Override
-  public void setDatasourceSelector(DatasourceSelectorPresenter.Display datasourceSelector) {
-    this.datasourceSelector = datasourceSelector;
-    datasourceSelectorPanel.add(datasourceSelector.asWidget());
-  }
-
-  public void setDatasourceSelectorEnabled(boolean enabled) {
-    datasourceSelector.setEnabled(enabled);
   }
 
   @Override
@@ -207,24 +190,6 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   @Override
   public HasText getViewName() {
     return viewNameTextBox;
-  }
-
-  @Override
-  public HasText getDatasourceName() {
-    final String selectedDatasourceName = datasourceSelector.getSelection();
-
-    return new HasText() {
-
-      public String getText() {
-        return selectedDatasourceName;
-      }
-
-      public void setText(String text) {
-        if(text != null) {
-          datasourceSelector.setSelection(text);
-        }
-      }
-    };
   }
 
   @Override
@@ -311,7 +276,7 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   @Override
   public void renderPendingConclusion() {
     stepChain.onNext();
-    conclusionStep.setStepTitle("View is being created..."); // TODO localization
+    conclusionStep.setStepTitle(translations.addViewPending());
     dialog.setCancelEnabled(false);
     dialog.setCloseEnabled(false);
     dialog.setProgress(true);
@@ -321,7 +286,7 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   public void renderCompletedConclusion() {
     dialog.setProgress(false);
     dialog.setCloseEnabled(true);
-    conclusionStep.setStepTitle("View successfully created."); // TODO localization
+    conclusionStep.setStepTitle(translations.addViewSuccess());
     configureLink.setVisible(true);
   }
 
@@ -329,7 +294,7 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   public void renderFailedConclusion(String msg) {
     dialog.setProgress(false);
     dialog.setCancelEnabled(true);
-    conclusionStep.setStepTitle("View creation failed."); // TODO localization
+    conclusionStep.setStepTitle(translations.addViewFailed());
   }
 
   @Override

@@ -566,7 +566,7 @@ public interface Translations extends Constants {
   String createDatasourceProcessSummary();
 
   @Description("Edit View Type Step")
-  @DefaultStringValue("Select the datasource to which the view will be attached.")
+  @DefaultStringValue("Define the type of view to be added.")
   String editViewTypeStep();
 
   @Description("Edit View Tables Step")
@@ -660,4 +660,17 @@ public interface Translations extends Constants {
   @Description("Variables Import Compare Step")
   @DefaultStringValue("Review the modifications before applying them.")
   String variablesImportCompareStep();
+
+  @Description("Add View Pending")
+  @DefaultStringValue("View is being created ...")
+  String addViewPending();
+
+  @Description("Add View Success")
+  @DefaultStringValue("View successfully created.")
+  String addViewSuccess();
+
+  @Description("Add View Failed")
+  @DefaultStringValue("View creation failed.")
+  String addViewFailed();
+
 }
