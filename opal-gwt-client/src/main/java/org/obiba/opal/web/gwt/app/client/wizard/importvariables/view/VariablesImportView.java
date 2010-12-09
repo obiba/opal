@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importvariables.view;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter.Display;
@@ -38,6 +39,7 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -49,6 +51,8 @@ public class VariablesImportView extends Composite implements VariablesImportPre
   //
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+
+  private static Translations translations = GWT.create(Translations.class);
 
   //
   // Instance Variables
@@ -84,6 +88,9 @@ public class VariablesImportView extends Composite implements VariablesImportPre
   @UiField
   ListBox datasources;
 
+  @UiField
+  InlineLabel destinationLabel;
+
   private FileSelectionPresenter.Display fileSelection;
 
   private WizardStepChain stepChain;
@@ -109,7 +116,7 @@ public class VariablesImportView extends Composite implements VariablesImportPre
   private void initWizardDialog() {
     stepChain = WizardStepChain.Builder.create(dialog)//
     .append(fileSelectionStep, fileSelectionHelp)//
-    .title("Select the variables file to use for creating or updating tables.")// TODO localization
+    .title(translations.variablesImportFileSelectionStep())// 
     .onReset(new ResetHandler() {
 
       @Override
@@ -121,7 +128,7 @@ public class VariablesImportView extends Composite implements VariablesImportPre
     })//
 
     .append(compareStep)//
-    .title("Review the modifications before applying them.")// TODO localization
+    .title(translations.variablesImportCompareStep())// 
     .help(new WidgetProvider() {
 
       @Override
@@ -160,7 +167,8 @@ public class VariablesImportView extends Composite implements VariablesImportPre
     for(int i = 0; i < datasources.length(); i++) {
       this.datasources.addItem(datasources.get(i).getName());
     }
-
+    this.datasources.setVisible(datasources.length() > 1);
+    destinationLabel.setVisible(datasources.length() > 1);
   }
 
   public HandlerRegistration addDownloadExcelTemplateClickHandler(ClickHandler handler) {

@@ -40,10 +40,6 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     HandlerRegistration addExportDataClickHandler(ClickHandler handler);
 
     HandlerRegistration addImportDataClickHandler(ClickHandler handler);
-
-    HandlerRegistration addImportVariablesClickHandler(ClickHandler handler);
-
-    HandlerRegistration addAddViewClickHandler(ClickHandler handler);
   }
 
   @Inject
@@ -80,14 +76,6 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
       }
     }));
 
-    super.registerHandler(getDisplay().addImportVariablesClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        eventBus.fireEvent(new WizardRequiredEvent(WizardType.IMPORT_VARIABLES));
-      }
-    }));
-
     super.registerHandler(getDisplay().addImportDataClickHandler(new ClickHandler() {
 
       @Override
@@ -101,14 +89,6 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
       @Override
       public void onClick(ClickEvent event) {
         eventBus.fireEvent(new WizardRequiredEvent(WizardType.EXPORT_DATA));
-      }
-    }));
-
-    super.registerHandler(getDisplay().addAddViewClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        eventBus.fireEvent(new WizardRequiredEvent(WizardType.CREATE_VIEW));
       }
     }));
 

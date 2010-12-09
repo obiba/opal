@@ -48,6 +48,8 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
 
   private DataImportFormatStepPresenter formatStepPresenter;
 
+  private String datasourceName;
+
   @Inject
   public DataImportPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
@@ -60,6 +62,10 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
 
   @Override
   protected void onBind() {
+    if(datasourceName != null) {
+      destinationSelectionStepPresenter.setDestinationDatasource(datasourceName);
+    }
+
     csvFormatStepPresenter.bind();
     xmlFormatStepPresenter.bind();
     destinationSelectionStepPresenter.bind();
@@ -140,6 +146,7 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
     csvFormatStepPresenter.unbind();
     xmlFormatStepPresenter.unbind();
     destinationSelectionStepPresenter.unbind();
+    datasourceName = null;
   }
 
   @Override
@@ -158,7 +165,13 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
   //
 
   public void onWizardRequired(WizardRequiredEvent event) {
-    // nothing to do
+    if(event.getEventParameters().length != 0) {
+      if(event.getEventParameters()[0] instanceof String) {
+        datasourceName = (String) event.getEventParameters()[0];
+      } else {
+        throw new IllegalArgumentException("unexpected event parameter type (expected String)");
+      }
+    }
   }
 
   //

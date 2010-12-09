@@ -7,7 +7,7 @@
 
   <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="40em" width="50em">
     <g:caption>
-      <ui:msg description="Import Variables title">Import Variables</ui:msg>
+      <ui:msg description="Add Update Tables label">Add/Update Tables</ui:msg>
     </g:caption>
 
 <!--    <ui:msg description="Upload Variables Step summary">Select the variables file to use for creating or updating tables</ui:msg>-->
@@ -18,8 +18,14 @@
 	        <table class="full-width" cellspacing="10">
 	          <tbody>
 	            <tr>
+	              <td colspan="2">
+	                <ui:msg description="Supported variables file format information">The following file format is supported for describing the variables:</ui:msg>
+                    <g:Button ui:field="downloadExcelTemplateButton" addStyleNames="small-indent"><ui:msg description="Download Opal Variables Template button label">Download Opal Variables Template</ui:msg></g:Button>
+	              </td>
+	            </tr>
+	            <tr>
                   <td>
-                    <ui:msg description="Destination Datasource label">Destination Datasource</ui:msg>:                
+                    <g:InlineLabel ui:field="destinationLabel" addStyleNames="key"><ui:msg description="Destination Datasource label">Destination Datasource</ui:msg>:</g:InlineLabel>
                   </td>
                   <td>
                      <g:ListBox ui:field="datasources" name="datasources" />
@@ -27,7 +33,7 @@
                 </tr>
 	            <tr>
 	              <td>
-	                <ui:msg description="Variables File label">Variables File</ui:msg>:                
+	                <g:InlineLabel addStyleNames="key"><ui:msg description="Variables File label">Variables File</ui:msg>:</g:InlineLabel>                
 	              </td>
 	              <td>
 	                <g:SimplePanel ui:field="fileSelectionPanel" />
@@ -46,8 +52,6 @@
     
        <g:HTMLPanel ui:field="fileSelectionHelp">
           <g:Label addStyleNames="title"><ui:msg description="Variables File label">Variables File</ui:msg></g:Label>
-          <p><ui:msg description="Supported variables file format information">The following file format is supported for describing the variables:</ui:msg></p>
-          <p><g:Button ui:field="downloadExcelTemplateButton"><ui:msg description="Download Opal Variables Template button label">Download Opal Variables Template</ui:msg></g:Button></p>
           <p>
             <ui:msg description="Opal Variables Template note">Note: Certain defaults apply, as follows:</ui:msg></p>
               <ul>

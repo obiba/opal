@@ -22,7 +22,6 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
-import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -30,8 +29,8 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
-import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
@@ -64,6 +63,8 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
   @Inject
   private FileSelectionPresenter fileSelectionPresenter;
 
+  private String datasourceName;
+
   //
   // Constructors
   //
@@ -95,16 +96,30 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
 
   @Override
   protected void onUnbind() {
+    datasourceName = null;
   }
 
   private void initDatasources() {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<DatasourceDto> resource) {
-        JsArray<DatasourceDto> datasources = resource != null ? resource : (JsArray<DatasourceDto>) JsArray.createArray();
-        getDisplay().setDatasources(datasources);
-      }
-    }).send();
+    if(datasourceName != null) {
+      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasource/" + datasourceName).get().withCallback(new ResourceCallback<DatasourceDto>() {
+        @Override
+        public void onResource(Response response, DatasourceDto resource) {
+          JsArray<DatasourceDto> datasources = (JsArray<DatasourceDto>) JsArray.createArray();
+          if(resource != null) {
+            datasources.push(resource);
+          }
+          getDisplay().setDatasources(datasources);
+        }
+      }).send();
+    } else {
+      ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+        @Override
+        public void onResource(Response response, JsArray<DatasourceDto> resource) {
+          JsArray<DatasourceDto> datasources = resource != null ? resource : (JsArray<DatasourceDto>) JsArray.createArray();
+          getDisplay().setDatasources(datasources);
+        }
+      }).send();
+    }
   }
 
   protected void addEventHandlers() {
@@ -139,7 +154,13 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
   //
 
   public void onWizardRequired(WizardRequiredEvent event) {
-    // nothing to do
+    if(event.getEventParameters().length != 0) {
+      if(event.getEventParameters()[0] instanceof String) {
+        datasourceName = (String) event.getEventParameters()[0];
+      } else {
+        throw new IllegalArgumentException("unexpected event parameter type (expected String)");
+      }
+    }
   }
 
   //
@@ -208,7 +229,7 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
     void setConclusionDisplay(ConclusionStepPresenter.Display display);
 
     HandlerRegistration addImportClickHandler(ClickHandler handler);
-    
+
   }
 
   class DownloadExcelTemplateClickHandler implements ClickHandler {

@@ -60,6 +60,7 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
 
     displayMock.setExcelDownloadCommand((Command) EasyMock.anyObject());
     displayMock.setExportDataCommand((Command) EasyMock.anyObject());
+    displayMock.setAddUpdateTablesCommand((Command) EasyMock.anyObject());
     displayMock.setRemoveDatasourceCommand((Command) EasyMock.anyObject());
     displayMock.setAddViewCommand((Command) EasyMock.anyObject());
     displayMock.setNextCommand((Command) EasyMock.anyObject());

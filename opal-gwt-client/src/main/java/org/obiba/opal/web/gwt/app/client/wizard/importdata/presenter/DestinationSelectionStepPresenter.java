@@ -44,6 +44,8 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
 
   }
 
+  private String destinationDatasourceName;
+
   private ImportFormat importFormat;
 
   JsArray<DatasourceDto> datasources;
@@ -156,5 +158,9 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
       importData.setDestinationTableName(getDisplay().getSelectedTable());
     } else
       importData.setDestinationTableName(null);
+  }
+
+  public void setDestinationDatasource(String datasourceName) {
+    this.destinationDatasourceName = datasourceName;
   }
 }

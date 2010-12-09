@@ -489,6 +489,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add View")
   String addViewLabel();
 
+  @Description("Add Update Tables label")
+  @DefaultStringValue("Add/Update Tables")
+  String addUpdateTablesLabel();
+
   @Description("Create Datasource Completed summary")
   @DefaultStringValue("The datasource was successfully created.")
   String datasourceCreationCompleted();
@@ -648,4 +652,12 @@ public interface Translations extends Constants {
   @Description("Data export title")
   @DefaultStringValue("Export Data")
   String exportData();
+
+  @Description("Variables Import File Selection Step")
+  @DefaultStringValue("Select the variables file for batch edition of tables and variables.")
+  String variablesImportFileSelectionStep();
+
+  @Description("Variables Import Compare Step")
+  @DefaultStringValue("Review the modifications before applying them.")
+  String variablesImportCompareStep();
 }

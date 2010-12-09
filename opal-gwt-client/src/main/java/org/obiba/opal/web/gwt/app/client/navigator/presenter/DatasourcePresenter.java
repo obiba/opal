@@ -78,6 +78,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
     getDisplay().setExcelDownloadCommand(new ExcelDownloadCommand());
     getDisplay().setExportDataCommand(new ExportDataCommand());
+    getDisplay().setAddUpdateTablesCommand(new AddUpdateTablesCommand());
     getDisplay().setRemoveDatasourceCommand(new RemoveDatasourceCommand());
     getDisplay().setAddViewCommand(new AddViewCommand());
     getDisplay().setNextCommand(new NextCommand());
@@ -304,6 +305,13 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     }
   }
 
+  final class AddUpdateTablesCommand implements Command {
+    @Override
+    public void execute() {
+      eventBus.fireEvent(new WizardRequiredEvent(WizardType.IMPORT_VARIABLES, datasourceName));
+    }
+  }
+
   private final class TablesResourceCallback implements ResourceCallback<JsArray<TableDto>> {
 
     private final String datasourceName;
@@ -447,6 +455,8 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
     void setExportDataCommand(Command cmd);
 
+    void setAddUpdateTablesCommand(Command cmd);
+
     void setRemoveDatasourceCommand(Command cmd);
 
     void setAddViewCommand(Command cmd);
@@ -456,5 +466,6 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     void setPreviousCommand(Command cmd);
 
     void setTableNameFieldUpdater(FieldUpdater<TableDto, String> updater);
+
   }
 }

@@ -31,9 +31,13 @@ public class NavigatorMenuBar extends MenuBar {
 
   private MenuItem excelDownloadItem;
 
+  private MenuItem exportDataItem;
+
   private MenuItem downloadViewItem;
 
   private MenuItem addViewItem;
+
+  private MenuItem addUpdateTablesItem;
 
   private MenuBar addMenu;
 
@@ -137,6 +141,15 @@ public class NavigatorMenuBar extends MenuBar {
     }
   }
 
+  public void setExportDataCommand(Command cmd) {
+    if(exportDataItem == null) {
+      exportDataItem = new MenuItem(translations.exportData(), cmd);
+      getToolsMenu().addItem(exportDataItem);
+    } else {
+      exportDataItem.setCommand(cmd);
+    }
+  }
+
   public void setDownloadViewCommand(Command cmd) {
     if(downloadViewItem == null) {
       downloadViewItem = new MenuItem(translations.downloadViewXML(), cmd);
@@ -159,6 +172,15 @@ public class NavigatorMenuBar extends MenuBar {
       getAddMenu().addItem(addViewItem);
     } else {
       addViewItem.setCommand(cmd);
+    }
+  }
+
+  public void setAddUpdateTablesCommand(Command cmd) {
+    if(addUpdateTablesItem == null) {
+      addUpdateTablesItem = new MenuItem(translations.addUpdateTablesLabel(), cmd);
+      getAddMenu().addItem(addUpdateTablesItem);
+    } else {
+      addUpdateTablesItem.setCommand(cmd);
     }
   }
 
@@ -186,4 +208,9 @@ public class NavigatorMenuBar extends MenuBar {
     }
   }
 
+  public void setExportDataItemVisible(boolean visible) {
+    if(exportDataItem != null) {
+      exportDataItem.setVisible(visible);
+    }
+  }
 }
