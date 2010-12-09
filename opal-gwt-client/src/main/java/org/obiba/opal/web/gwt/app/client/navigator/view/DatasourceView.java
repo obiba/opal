@@ -187,7 +187,7 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   @Override
   public void setDatasource(DatasourceDto dto) {
     datasourceName.setText(dto.getName());
-    datasourceType.setText(dto.getType()); // TODO translate
+    datasourceType.setText(translations.datasourceTypeMap().get(dto.getType()));
   }
 
   @Override
