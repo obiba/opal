@@ -347,6 +347,7 @@ margin-left:10px;
 .workbench .top .header {
     float: left;
     margin-right:20px;
+    margin-top: 2px;
 }
 
 .workbench .top .header .title {
