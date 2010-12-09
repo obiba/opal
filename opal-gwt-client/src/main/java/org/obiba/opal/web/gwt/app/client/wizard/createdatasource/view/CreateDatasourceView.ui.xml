@@ -5,7 +5,7 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
   
-  <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="30em" width="40em">
+  <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="30em" width="42em">
     <g:caption>
       <ui:msg description="Create Datasource title">Create Datasource</ui:msg>
     </g:caption>

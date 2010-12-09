@@ -5,7 +5,7 @@
   ui:generateLocales="default">
   
   <g:HTMLPanel>
-    <table class="full-width" cellspacing="10">
+    <table class="full-width" cellspacing="5">
           <tbody>
             <tr>
               <td colspan="2">
@@ -14,7 +14,7 @@
             </tr>
             <tr>
               <td>
-                <g:Label addStyleNames="indent"><ui:msg description="Driver label">Driver</ui:msg>:</g:Label>          
+                <g:Label addStyleNames="indent key"><ui:msg description="Driver label">Driver</ui:msg>:</g:Label>          
               </td>
               <td>
                 <g:ListBox ui:field="driver" visibleItemCount="1" addStyleNames="small-indent" />
@@ -22,7 +22,7 @@
             </tr>
             <tr>
               <td>
-                <g:Label addStyleNames="indent"><ui:msg description="URL label">URL</ui:msg>:</g:Label>          
+                <g:Label addStyleNames="indent key"><ui:msg description="URL label">URL</ui:msg>:</g:Label>          
               </td>
               <td>
                 <g:TextBox ui:field="url" addStyleNames="small-indent not-so-full-width" />
@@ -30,7 +30,7 @@
             </tr>
             <tr>
               <td>
-                <g:Label addStyleNames="indent"><ui:msg description="User Name label">User Name</ui:msg>:</g:Label>          
+                <g:Label addStyleNames="indent key"><ui:msg description="User Name label">User Name</ui:msg>:</g:Label>          
               </td>
               <td>
                 <g:TextBox ui:field="username" addStyleNames="small-indent not-so-full-width" />
@@ -38,7 +38,7 @@
             </tr>
             <tr>
               <td>
-                <g:Label addStyleNames="indent"><ui:msg description="Password label">Password</ui:msg>:</g:Label>          
+                <g:Label addStyleNames="indent key"><ui:msg description="Password label">Password</ui:msg>:</g:Label>          
               </td>
               <td>
                 <g:PasswordTextBox ui:field="password" addStyleNames="small-indent not-so-full-width" />
@@ -46,32 +46,43 @@
             </tr>
             <tr>
               <td colspan="2">
-                <ui:msg description="Table Parameters label">Table Parameters</ui:msg>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <g:Label addStyleNames="indent"><ui:msg description="Created Timestamp Column Name label">Created Timestamp Column Name</ui:msg>:</g:Label>          
-              </td>
-              <td>
-                <g:TextBox ui:field="defaultCreatedTimestampColumnName" addStyleNames="small-indent not-so-full-width" />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <g:Label addStyleNames="indent"><ui:msg description="Updated Timestamp Column Name label">Updated Timestamp Column Name</ui:msg>:</g:Label>          
-              </td>
-              <td>
-                <g:TextBox ui:field="defaultUpdatedTimestampColumnName" addStyleNames="small-indent not-so-full-width" />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <g:Label addStyleNames="indent"><ui:msg description="Include meta-data tables label">Include meta-data tables</ui:msg>:</g:Label>          
-              </td>
-              <td>
-                <g:RadioButton name="includeMetaDataTablesGroup" ui:field="useMetadataTablesOption" addStyleNames="small-indent"><ui:msg description="Yes label">Yes</ui:msg></g:RadioButton>
-                <g:RadioButton name="includeMetaDataTablesGroup" ui:field="doNotUseMetadataTablesOption" addStyleNames="small-indent"><ui:msg description="No label">No</ui:msg></g:RadioButton>
+                <g:DisclosurePanel>
+                  <g:header><ui:msg description="Advanced Options label">Advanced Options</ui:msg></g:header>
+                  <g:HTMLPanel>
+			        <table cellspacing="5">
+			          <tbody>
+			            <tr>
+			              <td colspan="2"><ui:msg description="Additional Columns Names label">Additional Columns Names:</ui:msg></td>
+			            </tr>
+			            <tr>
+			              <td>
+			                <g:Label addStyleNames="indent key"><ui:msg description="Created Timestamp Column Name label">Created Timestamp Column Name</ui:msg>:</g:Label>          
+			              </td>
+			              <td>
+			                <g:TextBox ui:field="defaultCreatedTimestampColumnName" addStyleNames="small-indent" />
+			              </td>
+			            </tr>
+			            <tr>
+			              <td>
+			                <g:Label addStyleNames="indent key"><ui:msg description="Updated Timestamp Column Name label">Updated Timestamp Column Name</ui:msg>:</g:Label>          
+			              </td>
+			              <td>
+			                <g:TextBox ui:field="defaultUpdatedTimestampColumnName" addStyleNames="small-indent" />
+			              </td>
+			            </tr>
+			            <tr>
+			              <td>
+			                <g:Label addStyleNames="key"><ui:msg description="Include meta-data tables label">Include meta-data tables</ui:msg>:</g:Label>          
+			              </td>
+			              <td>
+			                <g:RadioButton name="includeMetaDataTablesGroup" ui:field="useMetadataTablesOption" addStyleNames="small-indent"><ui:msg description="Yes label">Yes</ui:msg></g:RadioButton>
+			                <g:RadioButton name="includeMetaDataTablesGroup" ui:field="doNotUseMetadataTablesOption" addStyleNames="small-indent"><ui:msg description="No label">No</ui:msg></g:RadioButton>
+			              </td>
+			            </tr> 
+			          </tbody>
+			        </table>
+			      </g:HTMLPanel>
+                </g:DisclosurePanel>
               </td>
             </tr>
           </tbody>
