@@ -80,7 +80,7 @@ public class ExcelDatasourceFormPresenter extends WidgetPresenter<ExcelDatasourc
 
   @Override
   public boolean isForType(String type) {
-    return type.equalsIgnoreCase("Excel");
+    return type.equalsIgnoreCase("excel");
   }
 
   @Override

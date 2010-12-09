@@ -87,6 +87,9 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
     initWizardDialog();
+    for(int i = 0; i < datasourceType.getItemCount(); i++) {
+      datasourceType.setItemText(i, translations.datasourceTypeMap().get(datasourceType.getValue(i)));
+    }
   }
 
   private void initWizardDialog() {
@@ -191,7 +194,7 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
 
   @Override
   public String getDatasourceType() {
-    return datasourceType.getItemText(datasourceType.getSelectedIndex());
+    return datasourceType.getValue(datasourceType.getSelectedIndex());
   }
 
   @Override

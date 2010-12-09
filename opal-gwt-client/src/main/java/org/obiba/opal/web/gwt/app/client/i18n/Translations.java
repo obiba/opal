@@ -554,11 +554,11 @@ public interface Translations extends Constants {
   String scriptContainsErrorsAndWasNotSaved();
 
   @Description("Create Datasource Step summary")
-  @DefaultStringValue("Select the type of datasource to be created with all the corresponding settings.")
+  @DefaultStringValue("Select the type of datasource to be created.")
   String createDatasourceStepSummary();
 
   @Description("Datasource Options label")
-  @DefaultStringValue("Datasource type specific options")
+  @DefaultStringValue("Provide datasource type specific options.")
   String datasourceOptionsLabel();
 
   @Description("Create Datasource Process summary")
@@ -672,5 +672,13 @@ public interface Translations extends Constants {
   @Description("Add View Failed")
   @DefaultStringValue("View creation failed.")
   String addViewFailed();
+
+  @Description("Datasource Type map")
+  @DefaultStringMapValue( { "hibernate", "Opal SQL", //
+  "jdbc", "Custom SQL", //
+  "fs", "XML", //
+  "csv", "CSV", //
+  "excel", "Excel" })
+  Map<String, String> datasourceTypeMap();
 
 }

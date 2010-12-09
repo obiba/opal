@@ -65,7 +65,7 @@ public class HibernateDatasourceFormPresenter extends WidgetPresenter<Datasource
 
   @Override
   public boolean isForType(String type) {
-    return type.equalsIgnoreCase("Opal");
+    return type.equalsIgnoreCase("hibernate");
   }
 
   @Override

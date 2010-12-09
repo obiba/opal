@@ -28,11 +28,11 @@
 	              </td>
 	              <td>
 	                <g:ListBox ui:field="datasourceType" visibleItemCount="1">
-	                  <g:item>Opal</g:item>
-	                  <g:item>SQL</g:item>
-	                  <g:item>XML</g:item>
-	                  <g:item>CSV</g:item>
-	                  <g:item>Excel</g:item>
+	                  <g:item value="hibernate"></g:item>
+	                  <g:item value="jdbc"></g:item>
+<!--	                  <g:item value="jdbc"></g:item>-->
+<!--	                  <g:item value="csv"></g:item>-->
+<!--	                  <g:item value="excel"></g:item>-->
 	                </g:ListBox>
 	              </td>
 	            </tr>

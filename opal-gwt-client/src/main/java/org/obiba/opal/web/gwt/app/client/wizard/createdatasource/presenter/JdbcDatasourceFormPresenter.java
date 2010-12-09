@@ -101,7 +101,7 @@ public class JdbcDatasourceFormPresenter extends ValidatableWidgetPresenter<Jdbc
   }
 
   public boolean isForType(String type) {
-    return type.equalsIgnoreCase("SQL");
+    return type.equalsIgnoreCase("jdbc");
   }
 
   //

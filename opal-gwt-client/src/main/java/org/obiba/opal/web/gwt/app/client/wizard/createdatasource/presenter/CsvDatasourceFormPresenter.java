@@ -124,7 +124,7 @@ public class CsvDatasourceFormPresenter extends ValidatableWidgetPresenter<CsvDa
   }
 
   public boolean isForType(String type) {
-    return type.equalsIgnoreCase("CSV");
+    return type.equalsIgnoreCase("csv");
   }
 
   //

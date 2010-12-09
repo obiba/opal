@@ -79,7 +79,7 @@ public class FsDatasourceFormPresenter extends WidgetPresenter<FsDatasourceFormP
 
   @Override
   public boolean isForType(String type) {
-    return type.equalsIgnoreCase("XML");
+    return type.equalsIgnoreCase("fs");
   }
 
   @Override
