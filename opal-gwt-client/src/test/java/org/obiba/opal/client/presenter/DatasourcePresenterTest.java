@@ -59,6 +59,7 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
     expect(eventBusMock.addHandler((Type<DatasourceUpdatedEvent.Handler>) EasyMock.anyObject(), (DatasourceUpdatedEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
 
     displayMock.setExcelDownloadCommand((Command) EasyMock.anyObject());
+    displayMock.setExportDataCommand((Command) EasyMock.anyObject());
     displayMock.setRemoveDatasourceCommand((Command) EasyMock.anyObject());
     displayMock.setAddViewCommand((Command) EasyMock.anyObject());
     displayMock.setNextCommand((Command) EasyMock.anyObject());
