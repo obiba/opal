@@ -119,8 +119,16 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
     }).send();
   }
 
-  public void selectTable(TableDto table) {
-    updateTables(table);
+  public void selectTable(final TableDto table) {
+    ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName()).get().withCallback(new ResourceCallback<TableDto>() {
+      @Override
+      public void onResource(Response response, TableDto resource) {
+        if(resource != null) {
+          updateTables(resource);
+        }
+      }
+
+    }).send();
   }
 
   private boolean updateTables(TableDto selectedTable) {

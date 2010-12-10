@@ -138,7 +138,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   @Override
   public void revealDisplay() {
     initUnits();
-    getDisplay().showDialog(table != null);
+    getDisplay().showDialog();
   }
 
   private void initUnits() {
@@ -311,7 +311,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   public interface Display extends WidgetDisplay {
 
-    void showDialog(boolean skipTableSelection);
+    void showDialog();
 
     void hideDialog();
 

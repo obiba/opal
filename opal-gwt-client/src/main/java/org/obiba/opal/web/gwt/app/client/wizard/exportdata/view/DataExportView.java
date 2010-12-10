@@ -308,11 +308,8 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   }
 
   @Override
-  public void showDialog(boolean skipTableSelection) {
+  public void showDialog() {
     stepChain.reset();
-    if(skipTableSelection) {
-      stepChain.onNext();
-    }
     dialog.center();
     dialog.show();
   }
