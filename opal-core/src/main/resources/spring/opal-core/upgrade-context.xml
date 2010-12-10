@@ -108,11 +108,34 @@
     <property name="upgradeSteps">
       <list>
         <bean id="opal-schemaUpgrade-1.1" parent="updateOpalSchema">
-          <property name="appliesTo" value="1.1" />  
+          <property name="appliesTo" value="1.1" />
         </bean>
         <ref bean="opal-dataUpgrade-1.1" />
         <ref bean="opal-viewsUpgrade-1.4.0" />
         <ref bean="quartzSchema-1.4.0" />
+        <!-- Drop audit log tables -->
+        <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
+          <property name="description" value="Drop Audit log tables" />
+          <property name="dataSource" ref="opalDataSource" />
+          <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/1.4.0/" />
+          <property name="scriptBasename" value="drop-audit-tables" />
+          <property name="appliesTo" value="1.4.0" />
+        </bean>
+        <!-- Upgrade hibernate-datasource schema -->
+        <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
+          <property name="description" value="Alter Opal's Datasource schema." />
+          <property name="dataSource" ref="opalDataSource" />
+          <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/1.4.0/" />
+          <property name="scriptBasename" value="hibernate-datasource" />
+          <property name="appliesTo" value="1.4.0" />
+        </bean>
+        <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
+          <property name="description" value="Alter Opal's Identifier schema." />
+          <property name="dataSource" ref="keyDataSource" />
+          <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/1.4.0/" />
+          <property name="scriptBasename" value="hibernate-datasource" />
+          <property name="appliesTo" value="1.4.0" />
+        </bean>
       </list>
     </property>
 
@@ -122,34 +145,35 @@
       </list>
     </property>
   </bean>
-    
+
   <bean id="updateOpalSchema" class="org.obiba.runtime.upgrade.support.MethodInvokingUpgradeStep" abstract="true">
     <property name="description" value="Update Opal Schema." />
     <property name="methodOwner" ref="&amp;opalSessionFactory" />
     <property name="methodName" value="updateDatabaseSchema" />
   </bean>
-              
+
   <bean id="opal-dataUpgrade-1.1" class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
     <property name="dataSource" ref="opalDataSource" />
     <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/" />
     <property name="scriptBasename" value="opal-dataUpgrade-1.1" />
-    <property name="description" value="Copy 'DEFAULT_STUDY_ID' keystore from study_key_store to unit_key_store, then drop study_key_store."/>
-    <property name="appliesTo" value="1.1" />     
+    <property name="description"
+      value="Copy 'DEFAULT_STUDY_ID' keystore from study_key_store to unit_key_store, then drop study_key_store." />
+    <property name="appliesTo" value="1.1" />
   </bean>
-  
+
   <bean id="opal-viewsUpgrade-1.4.0" class="org.obiba.opal.core.runtime.upgrade.ViewsUpgrade_1_4_0">
     <property name="description" value="Update action table 'type' field." />
     <property name="appliesTo" value="1.4.0" />
     <property name="configFile" value="${OPAL_HOME}/conf/opal-config.xml" />
-  </bean>  
-  
+  </bean>
+
   <!--  The "1.4.0" here refers to the "appliesTo" Opal version, not the version of Quartz! -->
   <bean id="quartzSchema-1.4.0" class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
     <property name="description" value="Install Quartz Schema." />
     <property name="dataSource" ref="opalDataSource" />
     <property name="scriptPath" value="classpath:/META-INF/opal/install-scripts/quartz/" />
-    <property name="scriptBasename" value="tables"/>
+    <property name="scriptBasename" value="tables" />
     <property name="appliesTo" value="1.4.0" />
   </bean>
-  
+
 </beans>

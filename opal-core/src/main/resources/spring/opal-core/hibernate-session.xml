@@ -61,7 +61,6 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         <property name="additionalClasses">
           <list>
             <bean factory-bean="datasourceClasses" factory-method="getAnnotatedTypes" />
-            <bean factory-bean="auditClasses" factory-method="getAnnotatedTypes" />
           </list>
         </property>
       </bean>

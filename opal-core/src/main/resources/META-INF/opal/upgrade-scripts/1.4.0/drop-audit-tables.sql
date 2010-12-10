@@ -1,0 +1,1 @@
+DROP TABLE variable_entity_audit_event_details, variable_entity_audit_event, variable_entity_audit_log;
