@@ -142,6 +142,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Variables")
   String variablesLabel();
 
+  @Description("Entities Count label")
+  @DefaultStringValue("#Entities")
+  String entitiesCountLabel();
+
   @Description("Variable label")
   @DefaultStringValue("Variable")
   String variableLabel();

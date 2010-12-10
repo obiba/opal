@@ -110,6 +110,14 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
       }
     }, translations.variablesLabel());
 
+    table.addColumn(new TextColumn<TableDto>() {
+
+      @Override
+      public String getValue(TableDto object) {
+        return Integer.toString(object.getValueSetCount());
+      }
+    }, translations.entitiesCountLabel());
+
     table.setSelectionEnabled(true);
     table.setSelectionModel(selectionModel);
     table.setPageSize(50);
