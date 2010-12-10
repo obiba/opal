@@ -56,7 +56,7 @@ public class FunctionalUnitsResourceTest {
 
     replay(opalRuntimeMock);
 
-    FunctionalUnitsResource functionalUnitsResource = new FunctionalUnitsResource(opalRuntimeMock, unitKeyStoreServiceMock, "opal-keys.keys");
+    FunctionalUnitsResource functionalUnitsResource = new FunctionalUnitsResource(opalRuntimeMock, unitKeyStoreServiceMock, null, null, "opal-keys.keys");
     List<Opal.FunctionalUnitDto> functionalUnitDtoList = functionalUnitsResource.getFunctionalUnits();
     Assert.assertTrue(functionalUnitDtoList.size() == 3);
 
