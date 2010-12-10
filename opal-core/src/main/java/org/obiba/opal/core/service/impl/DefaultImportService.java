@@ -21,32 +21,31 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.NoSuchDatasourceException;
-import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.ValueTableWriter.ValueSetWriter;
-import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
+import org.obiba.magma.ValueTableWriter.ValueSetWriter;
+import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.DatasourceCopier;
-import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListener;
-import org.obiba.magma.support.DatasourceCopier.MultiplexingStrategy;
-import org.obiba.magma.support.DatasourceCopier.VariableTransformer;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
+import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListener;
+import org.obiba.magma.support.DatasourceCopier.MultiplexingStrategy;
+import org.obiba.magma.support.DatasourceCopier.VariableTransformer;
 import org.obiba.magma.type.BooleanType;
 import org.obiba.magma.type.TextType;
 import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.magma.FunctionalUnitView;
-import org.obiba.opal.core.magma.FunctionalUnitView.Policy;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
+import org.obiba.opal.core.magma.FunctionalUnitView.Policy;
 import org.obiba.opal.core.magma.concurrent.LockingActionTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ImportService;
@@ -171,13 +170,30 @@ public class DefaultImportService implements ImportService {
   }
 
   @Override
-  public void importIdentifiers(String unitName, String sourceDatasourceName) {
-    // TODO: Implement DefaultImportService.importIdentifiers(unitName, sourceDatasourceName)
-    throw new UnsupportedOperationException("not implemented");
+  public void importIdentifiers(String unitName, String sourceDatasourceName) throws IOException {
+    Assert.hasText(unitName, "unitName is null or empty");
+    Assert.hasText(sourceDatasourceName, "sourceDatasourceName is null or empty");
+
+    FunctionalUnit unit = opalRuntime.getFunctionalUnit(unitName);
+    if(unit == null) {
+      throw new NoSuchFunctionalUnitException(unitName);
+    }
+
+    Datasource sourceDatasource = getDatasourceOrTransientDatasource(sourceDatasourceName);
+    String keysTableName = getKeysTableName();
+
+    for(ValueTable vt : sourceDatasource.getValueTables()) {
+      if(vt.getEntityType().equals(keysTableEntityType)) {
+        ValueTable sourceKeysTable = createPrivateView(keysTableName, vt, unit);
+        DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(sourceKeysTable, MagmaEngine.get().getDatasource(getKeysDatasourceName()));
+      }
+    }
   }
 
   @Override
-  public void importIdentifiers(String sourceDatasourceName) throws NoSuchDatasourceException, NoSuchValueTableException, IOException {
+  public void importIdentifiers(String sourceDatasourceName) throws IOException {
+    Assert.hasText(sourceDatasourceName, "sourceDatasourceName is null or empty");
+
     Datasource sourceDatasource = getDatasourceOrTransientDatasource(sourceDatasourceName);
     ValueTable sourceKeysTable = sourceDatasource.getValueTable(getKeysTableName());
 
@@ -377,22 +393,27 @@ public class DefaultImportService implements ImportService {
   /**
    * Creates a {@link View} of the participant table's "private" variables (i.e., identifiers).
    * 
+   * @param viewName
    * @param participantTable
    * @return
    */
-  private View createPrivateView(ValueTable participantTable, FunctionalUnit unit) {
+  private View createPrivateView(String viewName, ValueTable participantTable, FunctionalUnit unit) {
     if(unit.getSelect() != null) {
-      final View privateView = View.Builder.newView(participantTable.getName(), participantTable).select(unit.getSelect()).build();
+      final View privateView = View.Builder.newView(viewName, participantTable).select(unit.getSelect()).build();
       privateView.initialise();
       return privateView;
     } else {
-      final View privateView = View.Builder.newView(participantTable.getName(), participantTable).select(new SelectClause() {
+      final View privateView = View.Builder.newView(viewName, participantTable).select(new SelectClause() {
         public boolean select(Variable variable) {
           return isIdentifierVariable(variable);
         }
       }).build();
       return privateView;
     }
+  }
+
+  private View createPrivateView(ValueTable participantTable, FunctionalUnit unit) {
+    return createPrivateView(participantTable.getName(), participantTable, unit);
   }
 
   /**
