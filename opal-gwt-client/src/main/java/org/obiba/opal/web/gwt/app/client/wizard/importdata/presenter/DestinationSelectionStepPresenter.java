@@ -66,7 +66,6 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
 
   @Override
   protected void onBind() {
-    refreshDatasources();
   }
 
   @Override
@@ -157,9 +156,5 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
       importData.setDestinationTableName(getDisplay().getSelectedTable());
     } else
       importData.setDestinationTableName(null);
-  }
-
-  public void setDestinationDatasource(String datasourceName) {
-    // TODO
   }
 }
