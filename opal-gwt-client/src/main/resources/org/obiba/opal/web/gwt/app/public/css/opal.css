@@ -727,12 +727,15 @@ div.variableChangesSummaryPanel > div > em {
 /* Script test UI */ 
 
 div.evaluateScriptPanel {
-  width:100%;
-  text-align:right;
+  
+}
+
+.evaluateScriptPanel textarea {
+  height: 10em;
 }
 
 .resultsPanel {
-  width:100%;
+  
 }
 
 .resultsPanel table.content {
