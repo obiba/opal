@@ -501,7 +501,7 @@ public class DefaultImportService implements ImportService {
   }
 
   private boolean isIdentifierVariable(Variable variable) {
-    return variable.hasAttribute("identifier") && (variable.getAttribute("identifier").getValue().equals(BooleanType.get().trueValue()) || variable.getAttribute("identifier").getValue().equals(TextType.get().valueOf("true")));
+    return variable.hasAttribute("identifier") && (variable.getAttribute("identifier").getValue().equals(BooleanType.get().trueValue()) || variable.getAttribute("identifier").getValue().toString().toLowerCase().equals("true"));
   }
 
   private boolean isIdentifierVariableForUnit(Variable variable, FunctionalUnit unit) {
