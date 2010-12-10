@@ -35,6 +35,7 @@ import org.eclipse.jetty.util.resource.FileResource;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.server.httpd.security.AuthenticationFilter;
 import org.obiba.opal.server.ssl.SslContextFactory;
+import org.obiba.runtime.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,11 +65,15 @@ public class OpalJettyServer implements Service {
 
   private final ServletContextHandler contextHandler;
 
+  @Autowired
+  private Version opalVersion;
+
   private ConfigurableApplicationContext webApplicationContext;
 
   @Autowired
   public OpalJettyServer(final ApplicationContext ctx, final SecurityManager securityMgr, final SslContextFactory sslContextFactory, final PlatformTransactionManager txmgr, final @Value("${org.obiba.opal.http.port}") Integer httpPort, final @Value("${org.obiba.opal.https.port}") Integer httpsPort) {
     Server server = new Server();
+    server.setSendServerVersion(false);
     // OPAL-342: We will manually stop the Jetty server instead of relying its shutdown hook
     server.setStopAtShutdown(false);
 
@@ -145,6 +150,7 @@ public class OpalJettyServer implements Service {
   private ServletContextHandler createServletHandler(ApplicationContext ctx, PlatformTransactionManager txmgr, SecurityManager securityMgr) {
     ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS | ServletContextHandler.NO_SECURITY);
     contextHandler.setContextPath("/");
+    contextHandler.addFilter(new FilterHolder(new OpalVersionFilter()), "/*", FilterMapping.DEFAULT);
     contextHandler.addFilter(new FilterHolder(new AuthenticationFilter(securityMgr)), "/ws/*", FilterMapping.DEFAULT);
     // contextHandler.addFilter(new FilterHolder(new CrossOriginFilter()), "/*", FilterMapping.DEFAULT);
     contextHandler.addFilter(new FilterHolder(new RequestContextFilter()), "/*", FilterMapping.DEFAULT);
@@ -175,6 +181,22 @@ public class OpalJettyServer implements Service {
       throw new RuntimeException(e);
     }
     return resourceHandler;
+  }
+
+  public class OpalVersionFilter extends OncePerRequestFilter {
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+      try {
+        if(opalVersion != null) {
+          response.addHeader("X-Opal-Version", opalVersion.toString());
+        }
+      } catch(RuntimeException e) {
+      }
+
+      filterChain.doFilter(request, response);
+    }
+
   }
 
   public static class TransactionFilter extends OncePerRequestFilter {
