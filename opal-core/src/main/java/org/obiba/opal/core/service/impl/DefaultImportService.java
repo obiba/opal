@@ -203,7 +203,10 @@ public class DefaultImportService implements ImportService {
     Assert.hasText(sourceDatasourceName, "sourceDatasourceName is null or empty");
 
     Datasource sourceDatasource = getDatasourceOrTransientDatasource(sourceDatasourceName);
-    ValueTable sourceKeysTable = sourceDatasource.getValueTable(getKeysTableName());
+    if(sourceDatasource.getValueTables().size() == 0) {
+      throw new IllegalArgumentException("source identifiers datasource is empty (no tables)");
+    }
+    ValueTable sourceKeysTable = (sourceDatasource.getValueTables().size() > 1) ? sourceDatasource.getValueTable(getKeysTableName()) : sourceDatasource.getValueTables().iterator().next();
 
     if(sourceKeysTable.getEntityType().equals(keysTableEntityType) == false) {
       throw new IllegalArgumentException("source identifiers table has unexpected entity type '" + sourceKeysTable.getEntityType() + "' (expected '" + keysTableEntityType + "')");
