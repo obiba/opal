@@ -222,7 +222,7 @@ public class WizardDialogBox extends DialogBox {
   }
 
   public void setHelpTooltip(Widget w) {
-    setHelpTooltip(w, "300px", "300px");
+    setHelpTooltip(w, "400px", "400px");
   }
 
   public void setHelpTooltip(Widget w, String width, String height) {
@@ -232,7 +232,7 @@ public class WizardDialogBox extends DialogBox {
 
         @Override
         public void onClick(ClickEvent evt) {
-          helpTooltip.setPopupPosition(evt.getNativeEvent().getClientX() + 20, evt.getNativeEvent().getClientY() - 300);
+          helpTooltip.setPopupPosition(evt.getNativeEvent().getClientX() + 20, evt.getNativeEvent().getClientY() - 400);
           helpTooltip.setSize(helpTooltipWidth, helpTooltipHeight);
           helpTooltip.show();
         }

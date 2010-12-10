@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.exportdata.view;
 
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
@@ -20,7 +18,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandle
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
-import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
 import com.google.gwt.core.client.GWT;
@@ -33,11 +30,9 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -66,16 +61,10 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   WizardStep destinationStep;
 
   @UiField
-  WizardStep optionsStep;
-
-  @UiField
   WizardStep unitStep;
 
   @UiField
   WizardStep conclusionStep;
-
-  @UiField
-  ListBox datasources;
 
   @UiField
   ListBox units;
@@ -91,21 +80,6 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
 
   @UiField
   ListBox fileFormat;
-
-  @UiField
-  RadioButton destinationDataSource;
-
-  @UiField
-  RadioButton destinationFile;
-
-  @UiField
-  CheckBox incremental;
-
-  @UiField
-  CheckBox withVariables;
-
-  @UiField
-  CheckBox useAlias;
 
   @UiField
   RadioButton opalId;
@@ -154,15 +128,6 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
         clearTablesStep();
       }
     })//
-    .append(optionsStep)//
-    .title(translations.dataExportOptions())//
-    .onReset(new ResetHandler() {
-
-      @Override
-      public void onReset() {
-        clearOptionsStep();
-      }
-    })//
     .append(destinationStep, destinationHelpPanel)//
     .title(translations.dataExportDestination())//
     .onValidate(new ValidationHandler() {
@@ -196,24 +161,6 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   }
 
   private void initWidgets() {
-    destinationDataSource.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        datasources.setEnabled(true);
-        fileSelection.setEnabled(false);
-        fileFormat.setEnabled(false);
-      }
-    });
-    destinationFile.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        datasources.setEnabled(false);
-        fileSelection.setEnabled(true);
-        fileFormat.setEnabled(true);
-      }
-    });
     opalId.addClickHandler(new ClickHandler() {
 
       @Override
@@ -248,19 +195,6 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   //
 
   @Override
-  public String getSelectedDatasource() {
-    return this.datasources.getValue(this.datasources.getSelectedIndex());
-  }
-
-  @Override
-  public void setDatasources(List<DatasourceDto> datasources) {
-    this.datasources.clear();
-    for(DatasourceDto datasource : datasources) {
-      this.datasources.addItem(datasource.getName(), datasource.getName());
-    }
-  }
-
-  @Override
   public String getSelectedUnit() {
     return this.units.getValue(this.units.getSelectedIndex());
   }
@@ -290,48 +224,23 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   }
 
   @Override
-  public HasValue<Boolean> getDestinationFile() {
-    return destinationFile;
-  }
-
-  @Override
-  public HandlerRegistration addDestinationFileClickHandler(ClickHandler handler) {
-    return destinationFile.addClickHandler(handler);
-  }
-
-  @Override
-  public HandlerRegistration addDestinationDatasourceClickHandler(ClickHandler handler) {
-    return destinationDataSource.addClickHandler(handler);
-  }
-
-  @Override
-  public HandlerRegistration addWithVariablesClickHandler(ClickHandler handler) {
-    return withVariables.addClickHandler(handler);
-  }
-
-  @Override
   public boolean isIncremental() {
-    return incremental.getValue();
+    return false;
   }
 
   @Override
   public boolean isUseAlias() {
-    return useAlias.getValue();
+    return false;
   }
 
   @Override
   public boolean isWithVariables() {
-    return withVariables.getValue();
+    return true;
   }
 
   @Override
   public boolean isUnitId() {
     return unitId.getValue();
-  }
-
-  @Override
-  public boolean isDestinationDataSource() {
-    return destinationDataSource.getValue();
   }
 
   @Override
@@ -399,8 +308,11 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   }
 
   @Override
-  public void showDialog() {
+  public void showDialog(boolean skipTableSelection) {
     stepChain.reset();
+    if(skipTableSelection) {
+      stepChain.onNext();
+    }
     dialog.center();
     dialog.show();
   }
@@ -411,21 +323,12 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
     if(tablesList != null) tablesList.clear();
   }
 
-  private void clearOptionsStep() {
-    incremental.setValue(true, true);
-    withVariables.setValue(true, true);
-    useAlias.setValue(false);
-  }
-
   private void clearDestinationStep() {
-    destinationFile.setValue(true);
     fileFormat.setEnabled(true);
     if(fileSelection != null) {
       fileSelection.setEnabled(true);
       fileSelection.clearFile();
     }
-    destinationDataSource.setValue(false);
-    datasources.setEnabled(false);
   }
 
   private void clearUnitStep() {
@@ -454,19 +357,4 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
     this.destinationValidator = handler;
   }
 
-  @Override
-  public void setVisibleCopyToDatasourceOption(boolean visible) {
-    destinationDataSource.setVisible(visible);
-    destinationFile.setVisible(visible);
-    datasources.setVisible(visible);
-  }
-
-  @Override
-  public void setFileExportationEnabled(boolean enabled) {
-    fileFormat.setEnabled(enabled);
-    fileSelection.setEnabled(enabled);
-    destinationFile.setValue(enabled);
-    destinationDataSource.setValue(!enabled);
-    datasources.setEnabled(!enabled);
-  }
 }

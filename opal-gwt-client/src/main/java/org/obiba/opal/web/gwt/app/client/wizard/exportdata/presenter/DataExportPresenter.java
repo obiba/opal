@@ -10,9 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
@@ -23,7 +21,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
@@ -35,7 +32,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.CopyCommandOptionsDto;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
@@ -50,7 +46,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 
 public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Display> implements Wizard {
@@ -114,12 +109,11 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     getDisplay().setFileWidgetDisplay(fileSelectionPresenter.getDisplay());
     getDisplay().setTablesValidator(new TablesValidator());
     getDisplay().setDestinationValidator(new DestinationValidator());
-
   }
 
   private void initFileSelectionType() {
     if(getDisplay().getFileFormat().equalsIgnoreCase("csv")) {
-      fileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE_OR_FOLDER);
+      fileSelectionPresenter.setFileSelectionType(FileSelectionType.FOLDER);
     } else {
       fileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE);
     }
@@ -143,48 +137,8 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   @Override
   public void revealDisplay() {
-    getDisplay().showDialog();
-  }
-
-  private void initDatasourcesAndUnits() {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<DatasourceDto> datasources) {
-        if(datasources != null && datasources.length() > 0) {
-          List<DatasourceDto> datasourceList = filterDatasources(datasources);
-          if(datasourceList.size() > 0) {
-            getDisplay().setVisibleCopyToDatasourceOption(true);
-            getDisplay().setDatasources(datasourceList);
-          } else {
-            getDisplay().setVisibleCopyToDatasourceOption(false);
-            getDisplay().setFileExportationEnabled(true);
-          }
-          initUnits();
-        } else {
-          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "NoDataToExport", null));
-        }
-      }
-    }).send();
-  }
-
-  private List<DatasourceDto> filterDatasources(JsArray<DatasourceDto> datasources) {
-
-    List<DatasourceDto> filteredDatasources = new ArrayList<DatasourceDto>();
-    Set<String> originDatasourceName = getOriginDatasourceNames();
-    for(DatasourceDto datasource : JsArrays.toList(datasources)) {
-      if(!originDatasourceName.contains(datasource.getName())) {
-        filteredDatasources.add(datasource);
-      }
-    }
-    return filteredDatasources;
-  }
-
-  private Set<String> getOriginDatasourceNames() {
-    Set<String> originDatasourceNames = new HashSet<String>();
-    for(TableDto table : tableListPresenter.getTables()) {
-      originDatasourceNames.add(table.getDatasourceName());
-    }
-    return originDatasourceNames;
+    initUnits();
+    getDisplay().showDialog(table != null);
   }
 
   private void initUnits() {
@@ -230,21 +184,13 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     private List<String> formValidationErrors() {
       List<String> result = new ArrayList<String>();
 
-      if(getDisplay().getDestinationFile().getValue()) {
-        String filename = getDisplay().getOutFile();
-        if(filename == null || filename.equals("")) {
-          result.add("DestinationFileIsMissing");
-        }
-        if(getDisplay().getFileFormat().equalsIgnoreCase("csv") && fileSelectionPresenter.getFileTypeSelected() != null && fileSelectionPresenter.getFileTypeSelected().equals(FileSelectionType.FILE)) {
-          if(getDisplay().isWithVariables()) {
-            result.add("SelectCSVDirectoryOrDoNotExportVariables");
-            // result.add("Variables and data cannot be exported in the same CSV file. Select a directory instead or do not export variables.");
-          }
-          if(tableListPresenter.getTables().size() > 1) {
-            result.add("SelectCSVDirectoryOrExportOneTable");
-            // result.add("Several tables cannot be exported in the same CSV file. Select a directory instead or export only one table.");
-          }
-        }
+      String filename = getDisplay().getOutFile();
+      if(filename == null || filename.equals("")) {
+        result.add("DestinationFileIsMissing");
+      } else if(getDisplay().getFileFormat().equalsIgnoreCase("excel") && (!filename.endsWith(".xls") || !filename.endsWith(".xlsx"))) {
+        result.add("ExcelFileSuffixInvalid");
+      } else if(getDisplay().getFileFormat().equalsIgnoreCase("xml") && !filename.endsWith(".zip")) {
+        result.add("ZipFileSuffixInvalid");
       }
       return result;
     }
@@ -284,17 +230,17 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
       CopyCommandOptionsDto dto = CopyCommandOptionsDto.create();
 
       JsArrayString selectedTables = JavaScriptObject.createArray().cast();
-      for(TableDto table : tableListPresenter.getTables()) {
+      if(table != null) {
         selectedTables.push(table.getDatasourceName() + "." + table.getName());
+      } else {
+        for(TableDto table : tableListPresenter.getTables()) {
+          selectedTables.push(table.getDatasourceName() + "." + table.getName());
+        }
       }
 
       dto.setTablesArray(selectedTables);
-      if(getDisplay().isDestinationDataSource()) {
-        dto.setDestination(getDisplay().getSelectedDatasource());
-      } else {
-        dto.setFormat(getDisplay().getFileFormat());
-        dto.setOut(getDisplay().getOutFile());
-      }
+      dto.setFormat(getDisplay().getFileFormat());
+      dto.setOut(getDisplay().getOutFile());
       dto.setNonIncremental(!getDisplay().isIncremental());
       dto.setNoVariables(!getDisplay().isWithVariables());
       if(getDisplay().isUseAlias()) dto.setTransform("attribute('alias').isNull().value ? name() : attribute('alias')");
@@ -359,31 +305,19 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
     @Override
     public void onTableListUpdate(TableListUpdateEvent event) {
-      initDatasourcesAndUnits();
+      initUnits();
     }
   }
 
   public interface Display extends WidgetDisplay {
 
-    void showDialog();
-
-    void setFileExportationEnabled(boolean enabled);
-
-    HasValue<Boolean> getDestinationFile();
-
-    void setVisibleCopyToDatasourceOption(boolean visible);
+    void showDialog(boolean skipTableSelection);
 
     void hideDialog();
 
     void setTablesValidator(ValidationHandler validationHandler);
 
     void setDestinationValidator(ValidationHandler handler);
-
-    /** Set a collection of Opal datasources retrieved from Opal. */
-    void setDatasources(List<DatasourceDto> datasources);
-
-    /** Get the Opal datasource selected by the user. */
-    String getSelectedDatasource();
 
     /** Set a collection of Opal units retrieved from Opal. */
     void setUnits(JsArray<FunctionalUnitDto> units);
@@ -408,13 +342,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
     String getFileFormat();
 
-    HandlerRegistration addDestinationFileClickHandler(ClickHandler handler);
-
-    HandlerRegistration addDestinationDatasourceClickHandler(ClickHandler handler);
-
     HandlerRegistration addFileFormatChangeHandler(ChangeHandler handler);
-
-    HandlerRegistration addWithVariablesClickHandler(ClickHandler handler);
 
     boolean isIncremental();
 
@@ -423,8 +351,6 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     boolean isUseAlias();
 
     boolean isUnitId();
-
-    boolean isDestinationDataSource();
 
     void setTableWidgetDisplay(TableListPresenter.Display display);
 

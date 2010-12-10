@@ -228,7 +228,8 @@ public interface Translations extends Constants {
   "KeyPairCityNameIsRequired", "City or Locality Name is required.",//
   "KeyPairStateNameIsRequired", "State or Province Name is required.",//
   "KeyPairCountryCodeIsRequired", "Country Code is required.",//
-  "KeyPairPublicKeyPEMIsRequired", "Public Key in PEM format is required."//
+  "KeyPairPublicKeyPEMIsRequired", "Public Key in PEM format is required.",//
+  "DestinationFileIsMissing", "Destination File is required."//
   })
   Map<String, String> userMessageMap();
 

@@ -15,23 +15,14 @@
         <g:SimplePanel ui:field="tablesPanel" />
       </o:WizardStep>
       
-      <o:WizardStep ui:field="optionsStep">
-        <g:VerticalPanel>
-	        <g:CheckBox ui:field="incremental"><ui:msg description="Incremental checkbox label">incremental</ui:msg></g:CheckBox>
-	        <g:CheckBox ui:field="withVariables"><ui:msg description="With variables checkbox label">with variables</ui:msg></g:CheckBox>
-	        <g:CheckBox ui:field="useAlias"><ui:msg description="Use alias to rename variable checkbox label">use 'alias' attribute to rename variable</ui:msg></g:CheckBox>
-        </g:VerticalPanel>
-      </o:WizardStep>
-      
       <o:WizardStep ui:field="destinationStep">
-        <g:RadioButton name="destination" ui:field="destinationFile"><ui:msg description="Copy data to file">Copy data to file:</ui:msg></g:RadioButton>
-        <g:HTMLPanel addStyleNames="indent">
-          <table>
+        <g:HTMLPanel>
+          <table cellspacing="10">
 	         <tbody>
 	           <tr>
 	             <td><g:Label><ui:msg description="File format field">Format:</ui:msg></g:Label></td>
 	             <td><g:ListBox ui:field="fileFormat">
-	               <g:item value="csv">CSV (csv)</g:item>
+	               <g:item value="csv">CSV</g:item>
 	               <g:item value="excel">Excel (xls,xlsx)</g:item>
 	               <g:item value="xml">XML (zip)</g:item>
 	             </g:ListBox></td>
@@ -43,18 +34,28 @@
 	         </tbody>
           </table>
         </g:HTMLPanel>
-        <g:RadioButton name="destination" ui:field="destinationDataSource"><ui:msg description="Copy data to datasource">Copy data to datasource:</ui:msg></g:RadioButton>
-	    <g:ListBox ui:field="datasources" addStyleNames="small-indent"/>
       </o:WizardStep>
       
       <o:WizardStep ui:field="unitStep">
-        <g:VerticalPanel>
-	      <g:RadioButton name="idGroup" ui:field="opalId"><ui:msg description="Use opal id radio button label">use Opal ID</ui:msg></g:RadioButton>
-	      <g:FlowPanel>
-	        <g:RadioButton name="idGroup" ui:field="unitId"><ui:msg description="Unit id dropdown label">use Unit ID:</ui:msg></g:RadioButton>
-	        <g:ListBox ui:field="units" addStyleNames="small-indent"/>
-	      </g:FlowPanel>
-        </g:VerticalPanel>
+        <g:HTMLPanel>
+          <table cellspacing="10">
+	         <tbody>
+	           <tr>
+	             <td>
+	               <g:RadioButton name="idGroup" ui:field="opalId"><ui:msg description="Use opal id radio button label">use Opal ID</ui:msg></g:RadioButton>
+	             </td>
+	           </tr>
+	           <tr>
+	             <td>
+	               <g:FlowPanel>
+	                 <g:RadioButton name="idGroup" ui:field="unitId"><ui:msg description="Unit id dropdown label">use Unit ID:</ui:msg></g:RadioButton>
+	                 <g:ListBox ui:field="units" addStyleNames="small-indent"/>
+	               </g:FlowPanel>
+	             </td>
+	           </tr>
+	         </tbody>
+	       </table>
+	     </g:HTMLPanel>
       </o:WizardStep>
       
 	  <o:WizardStep ui:field="conclusionStep">
