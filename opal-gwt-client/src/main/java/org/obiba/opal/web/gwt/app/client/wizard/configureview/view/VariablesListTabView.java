@@ -104,6 +104,9 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   @UiField
   TextBox unit;
 
+  @UiField
+  HTMLPanel form;
+
   MultiWordSuggestOracle suggestions;
 
   private String entityType;
@@ -427,6 +430,10 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   public void formEnable(boolean enabled) {
     navigationEnabled(enabled);
     saveChangesButton.setEnabled(enabled);
+
+    form.setVisible(enabled);
+    variableDetailTabs.setVisible(enabled);
+
     variableName.setEnabled(enabled);
     removeButton.setEnabled(enabled);
     addButton.setEnabled(true); // Regardless of form state the add button is enabled.

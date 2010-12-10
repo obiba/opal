@@ -897,13 +897,13 @@ table.itemSelector .button {
 /* VariablesListTab */
 
 div.variablesListTabContent .navigationPanel {
-  border-bottom: 1px solid #6F7277;
   margin-top: 25px;
   padding-bottom: 10px;
 }
 
 div.variablesListTabContent .form {
-  margin-top: 10px;
+  border-top: 1px solid #6F7277;
+  padding-top: 10px;
 }
 
 div.variablesListTabContent .pager {
@@ -912,10 +912,6 @@ div.variablesListTabContent .pager {
 
 div.variablesListTabContent .form table {
   width:95%;
-}
-
-div.variablesListTabContent td {
-  vertical-align:top;
 }
 
 .categoryDialog .labelPanel {

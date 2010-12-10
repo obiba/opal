@@ -9,8 +9,7 @@
   <g:FlowPanel addStyleNames="variablesListTabContent">
     <g:FlowPanel>
       <g:Label addStyleNames="inline">
-        <ui:msg description="List of derived variables label">List of derived variables</ui:msg>
-        :
+        <ui:msg description="List of derived variables label">List of derived variables</ui:msg>:
       </g:Label>
       <g:Button ui:field="saveChangesButton" addStyleNames="right-aligned">
         <ui:msg description="Save changes button label">Save Changes</ui:msg>
@@ -36,7 +35,7 @@
       </g:Button>
     </g:FlowPanel>
     
-    <g:HTMLPanel addStyleNames="form">      
+    <g:HTMLPanel ui:field="form" addStyleNames="form">      
       <table>
         <tr>
           <td>
@@ -70,10 +69,9 @@
         <tr>
           <td/>
           <td>
-            <g:CheckBox ui:field="repeatableCheckbox"/>
-            <g:Label addStyleNames="inline">
+            <g:CheckBox ui:field="repeatableCheckbox">
               <ui:msg description="Repeatable label">Repeatable</ui:msg>
-            </g:Label>
+            </g:CheckBox>
           </td>
         </tr>
       </table>
