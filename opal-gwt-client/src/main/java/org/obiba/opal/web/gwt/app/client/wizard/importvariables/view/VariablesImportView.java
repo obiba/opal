@@ -138,7 +138,7 @@ public class VariablesImportView extends Composite implements VariablesImportPre
     })//
 
     .append(conclusionStep)//
-    .title("Importing variables...")// TODO localization
+    .title(translations.variablesImportPending())//
     .conclusion()//
 
     .onPrevious().onCancel().onClose().build();

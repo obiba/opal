@@ -288,7 +288,6 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   public void renderCompletedConclusion(String jobId) {
     dialog.setProgress(false);
     conclusionStep.setStepTitle(translations.dataExportCompletedConclusion());
-    // TODO
     jobLink.setText(translations.jobLabel() + " #" + jobId);
     dialog.setFinishEnabled(true);
   }
@@ -297,7 +296,6 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   public void renderFailedConclusion() {
     dialog.setProgress(false);
     conclusionStep.setStepTitle(translations.dataExportFailedConclusion());
-    // TODO
     dialog.setCancelEnabled(true);
     dialog.setPreviousEnabled(true);
   }

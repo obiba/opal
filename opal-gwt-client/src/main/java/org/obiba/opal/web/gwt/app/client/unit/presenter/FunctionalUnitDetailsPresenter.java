@@ -160,7 +160,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
   private void setCommands() {
     getDisplay().setDownloadIdentifiersCommand(new DownloadIdentifiersCommand());
-    getDisplay().setExportIdentifiersCommand(new ExportIdentifiersCommand()); // TODO
+    getDisplay().setExportIdentifiersCommand(new ExportIdentifiersCommand());
     getDisplay().setRemoveFunctionalUnitCommand(new RemoveFunctionalUnitCommand());
 
     getDisplay().setAddKeyPairCommand(new AddKeyPairCommand());

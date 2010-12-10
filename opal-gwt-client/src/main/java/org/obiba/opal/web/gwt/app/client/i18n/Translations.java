@@ -688,6 +688,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Review the modifications before applying them.")
   String variablesImportCompareStep();
 
+  @Description("Variables Import Pending")
+  @DefaultStringValue("Importing Variables...")
+  String variablesImportPending();
+
   @Description("Add View Pending")
   @DefaultStringValue("View is being created ...")
   String addViewPending();
