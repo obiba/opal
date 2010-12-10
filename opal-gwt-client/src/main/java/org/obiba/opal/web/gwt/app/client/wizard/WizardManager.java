@@ -14,6 +14,7 @@ import java.util.Map;
 
 import net.customware.gwt.presenter.client.EventBus;
 
+import org.obiba.opal.web.gwt.app.client.wizard.copydata.presenter.DataCopyPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
@@ -50,6 +51,9 @@ public class WizardManager {
   @Inject
   private Provider<DataExportPresenter> dataExportWizardProvider;
 
+  @Inject
+  private Provider<DataCopyPresenter> dataCopyWizardProvider;
+
   private Map<WizardType, Provider<? extends Wizard>> wizardProviders;
 
   private Wizard lastBoundWizard;
@@ -76,6 +80,7 @@ public class WizardManager {
     wizardProviders.put(WizardType.IMPORT_VARIABLES, variablesImportWizardProvider);
     wizardProviders.put(WizardType.IMPORT_DATA, dataImportWizardProvider);
     wizardProviders.put(WizardType.EXPORT_DATA, dataExportWizardProvider);
+    wizardProviders.put(WizardType.COPY_DATA, dataCopyWizardProvider);
 
     handlerRegistration = eventBus.addHandler(WizardRequiredEvent.getType(), new WizardRequiredEventHandler());
   }

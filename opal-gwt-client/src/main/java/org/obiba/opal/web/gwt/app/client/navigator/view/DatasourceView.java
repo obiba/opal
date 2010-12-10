@@ -243,6 +243,11 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   }
 
   @Override
+  public void setCopyDataCommand(Command cmd) {
+    toolbar.setCopyDataCommand(cmd);
+  }
+
+  @Override
   public void setAddUpdateTablesCommand(Command cmd) {
     toolbar.setAddUpdateTablesCommand(cmd);
   }

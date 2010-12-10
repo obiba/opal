@@ -213,6 +213,7 @@ public interface Translations extends Constants {
   "RowMustBePositiveInteger", "Row must be a positive integer (greater than or equal to 1).",//
   "SpecificCharsetNotIndicated", "You have selected to use a specific character set but have not indicated which one.",//
   "NoDataFileSelected", "You must select a data file.",//
+  "NoDataToCopy", "No data to copy to the current destination.",//
   "CharsetNotAvailable", "The character set you have specified is not available.",//
   "NotIgnoredConlicts", "Some conflicts were detected. Ignore modifications before applying changes.",//
   "NoVariablesToBeImported", "No variables are to be imported.",//
@@ -351,6 +352,26 @@ public interface Translations extends Constants {
   @Description("Dot names are not permitted")
   @DefaultStringValue("The names '.' and '..' are not permitted.")
   String dotNamesAreInvalid();
+
+  @Description("Data copy instructions")
+  @DefaultStringValue("Select the tables to be copied.")
+  String dataCopyInstructions();
+
+  @Description("Data copy pending conclusion")
+  @DefaultStringValue("Data copy job is being launched.")
+  String dataCopyPendingConclusion();
+
+  @Description("Data copy completed conclusion")
+  @DefaultStringValue("Data copy job was successfully launched.")
+  String dataCopyCompletedConclusion();
+
+  @Description("Data copy failed conclusion")
+  @DefaultStringValue("Data copy job launch failed.")
+  String dataCopyFailedConclusion();
+
+  @Description("Data copy destination")
+  @DefaultStringValue("Select the destination of the copy.")
+  String dataCopyDestination();
 
   @Description("Data export instructions")
   @DefaultStringValue("Select the tables to be exported.")
@@ -654,6 +675,10 @@ public interface Translations extends Constants {
   @Description("Data export title")
   @DefaultStringValue("Export Data")
   String exportData();
+
+  @Description("Data copy title")
+  @DefaultStringValue("Copy Data")
+  String copyData();
 
   @Description("Variables Import File Selection Step")
   @DefaultStringValue("Select the variables file for batch edition of tables and variables.")

@@ -78,6 +78,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new RemoveViewConfirmationEventHandler()));
     getDisplay().setExcelDownloadCommand(new ExcelDownloadCommand());
     getDisplay().setExportDataCommand(new ExportDataCommand());
+    getDisplay().setCopyDataCommand(new CopyDataCommand());
     getDisplay().setParentCommand(new ParentCommand());
     getDisplay().setPreviousCommand(new PreviousCommand());
     getDisplay().setNextCommand(new NextCommand());
@@ -222,6 +223,13 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     @Override
     public void execute() {
       eventBus.fireEvent(new WizardRequiredEvent(WizardType.EXPORT_DATA, table));
+    }
+  }
+
+  final class CopyDataCommand implements Command {
+    @Override
+    public void execute() {
+      eventBus.fireEvent(new WizardRequiredEvent(WizardType.COPY_DATA, table));
     }
   }
 
@@ -374,6 +382,8 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     void setNextName(String name);
 
     void setVariableNameFieldUpdater(FieldUpdater<VariableDto, String> updater);
+
+    void setCopyDataCommand(Command cmd);
   }
 
 }

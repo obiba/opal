@@ -78,6 +78,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
     getDisplay().setExcelDownloadCommand(new ExcelDownloadCommand());
     getDisplay().setExportDataCommand(new ExportDataCommand());
+    getDisplay().setCopyDataCommand(new CopyDataCommand());
     getDisplay().setAddUpdateTablesCommand(new AddUpdateTablesCommand());
     getDisplay().setRemoveDatasourceCommand(new RemoveDatasourceCommand());
     getDisplay().setAddViewCommand(new AddViewCommand());
@@ -305,6 +306,13 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     }
   }
 
+  final class CopyDataCommand implements Command {
+    @Override
+    public void execute() {
+      eventBus.fireEvent(new WizardRequiredEvent(WizardType.COPY_DATA, datasourceName));
+    }
+  }
+
   final class AddUpdateTablesCommand implements Command {
     @Override
     public void execute() {
@@ -466,6 +474,8 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     void setPreviousCommand(Command cmd);
 
     void setTableNameFieldUpdater(FieldUpdater<TableDto, String> updater);
+
+    void setCopyDataCommand(Command cmd);
 
   }
 }

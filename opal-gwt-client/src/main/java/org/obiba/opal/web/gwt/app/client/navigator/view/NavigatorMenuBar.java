@@ -33,6 +33,8 @@ public class NavigatorMenuBar extends MenuBar {
 
   private MenuItem exportDataItem;
 
+  private MenuItem copyDataItem;
+
   private MenuItem downloadViewItem;
 
   private MenuItem addViewItem;
@@ -147,6 +149,15 @@ public class NavigatorMenuBar extends MenuBar {
       getToolsMenu().addItem(exportDataItem);
     } else {
       exportDataItem.setCommand(cmd);
+    }
+  }
+
+  public void setCopyDataCommand(Command cmd) {
+    if(copyDataItem == null) {
+      copyDataItem = new MenuItem(translations.copyData(), cmd);
+      getToolsMenu().addItem(copyDataItem);
+    } else {
+      copyDataItem.setCommand(cmd);
     }
   }
 

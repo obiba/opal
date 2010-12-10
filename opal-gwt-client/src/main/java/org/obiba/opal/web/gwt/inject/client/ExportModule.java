@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.inject.client;
 
+import org.obiba.opal.web.gwt.app.client.wizard.copydata.presenter.DataCopyPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.copydata.view.DataCopyView;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.view.DataExportView;
 
@@ -22,5 +24,6 @@ public class ExportModule extends AbstractGinModule {
   @Override
   protected void configure() {
     bind(DataExportPresenter.Display.class).to(DataExportView.class);
+    bind(DataCopyPresenter.Display.class).to(DataCopyView.class);
   }
 }

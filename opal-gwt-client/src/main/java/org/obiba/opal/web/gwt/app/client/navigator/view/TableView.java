@@ -235,6 +235,11 @@ public class TableView extends Composite implements TablePresenter.Display {
   }
 
   @Override
+  public void setCopyDataCommand(Command cmd) {
+    toolbar.setCopyDataCommand(cmd);
+  }
+
+  @Override
   public void setDownloadViewCommand(Command cmd) {
     if(cmd != null) {
       toolbar.setDownloadViewCommand(cmd);
