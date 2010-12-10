@@ -20,9 +20,9 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
@@ -44,8 +44,8 @@ import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
-import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -159,11 +159,11 @@ public class FunctionalUnitsResource {
       importService.importIdentifiers(sourceDatasource.getName());
       response = Response.ok().build();
     } catch(NoSuchDatasourceException ex) {
-      return Response.status(Status.NOT_FOUND).entity(ex.getMessage()).build();
+      response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
     } catch(NoSuchValueTableException ex) {
-      return Response.status(Status.NOT_FOUND).entity(ex.getMessage()).build();
+      response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
     } catch(IOException ex) {
-      Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex).build());
+      response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex).build()).build();
     } finally {
       Disposables.silentlyDispose(sourceDatasource);
     }
