@@ -40,7 +40,12 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import org.bouncycastle.openssl.PEMWriter;
+import org.obiba.magma.Datasource;
+import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
+import org.obiba.magma.NoSuchDatasourceException;
+import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VectorSource;
@@ -52,12 +57,15 @@ import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.UnitKeyStore;
 import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,15 +88,21 @@ public class FunctionalUnitResource {
 
   private final UnitKeyStoreService unitKeyStoreService;
 
+  private final ImportService importService;
+
+  private final DatasourceFactoryRegistry datasourceFactoryRegistry;
+
   private final String keysTableReference;
 
   @PathParam("unit")
   private String unit;
 
   @Autowired
-  public FunctionalUnitResource(OpalRuntime opalRuntime, UnitKeyStoreService unitKeyStoreService, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference) {
+  public FunctionalUnitResource(OpalRuntime opalRuntime, UnitKeyStoreService unitKeyStoreService, ImportService importService, DatasourceFactoryRegistry datasourceFactoryRegistry, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference) {
     this.opalRuntime = opalRuntime;
     this.unitKeyStoreService = unitKeyStoreService;
+    this.importService = importService;
+    this.datasourceFactoryRegistry = datasourceFactoryRegistry;
     this.keysTableReference = keysTableReference;
   }
 
@@ -229,6 +243,31 @@ public class FunctionalUnitResource {
     }
   }
 
+  @POST
+  @Path("/entities")
+  public Response importIdentifiers(DatasourceFactoryDto datasourceFactoryDto) {
+    Response response = null;
+
+    Datasource sourceDatasource = createTransientDatasource(datasourceFactoryDto);
+
+    try {
+      importService.importIdentifiers(unit, sourceDatasource.getName());
+      response = Response.ok().build();
+    } catch(NoSuchFunctionalUnitException ex) {
+      response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "FunctionalUnitNotFound", ex).build()).build();
+    } catch(NoSuchDatasourceException ex) {
+      response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
+    } catch(NoSuchValueTableException ex) {
+      response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
+    } catch(IOException ex) {
+      response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex).build()).build();
+    } finally {
+      Disposables.silentlyDispose(sourceDatasource);
+    }
+
+    return response;
+  }
+
   //
   // Keystore
   //
@@ -326,6 +365,13 @@ public class FunctionalUnitResource {
   //
   // Private methods
   // 
+
+  private Datasource createTransientDatasource(DatasourceFactoryDto datasourceFactoryDto) {
+    DatasourceFactory factory = datasourceFactoryRegistry.parse(datasourceFactoryDto);
+    String uid = MagmaEngine.get().addTransientDatasource(factory);
+
+    return MagmaEngine.get().getTransientDatasourceInstance(uid);
+  }
 
   private Set<VariableEntityDto> getEntitiesSet() {
     final ImmutableSet.Builder<VariableEntityDto> entities = ImmutableSet.<VariableEntityDto> builder();
