@@ -708,4 +708,32 @@ public interface Translations extends Constants {
   "excel", "Excel" })
   Map<String, String> datasourceTypeMap();
 
+  @Description("Data Import Format Step")
+  @DefaultStringValue("Select the format of data you wish to import.")
+  String dataImportFormatStep();
+
+  @Description("Data Import File Step")
+  @DefaultStringValue("Select the file to be imported.")
+  String dataImportFileStep();
+
+  @Description("Data Import Unit Step")
+  @DefaultStringValue("Specify how the participant are identified.")
+  String dataImportUnitStep();
+
+  @Description("Data Import Destination Step")
+  @DefaultStringValue("Select the destination of the import.")
+  String dataImportDestinationStep();
+
+  @Description("Data Import Pending Validation")
+  @DefaultStringValue("Data to import are being validated...")
+  String dataImportPendingValidation();
+
+  @Description("Data Import Completed Validation")
+  @DefaultStringValue("Data import validation completed.")
+  String dataImportCompletedValidation();
+
+  @Description("Data Import Failed Validation")
+  @DefaultStringValue("Data import validation failed.")
+  String dataImportFailedValidation();
+
 }

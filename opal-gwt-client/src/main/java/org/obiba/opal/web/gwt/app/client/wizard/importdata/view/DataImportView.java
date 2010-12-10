@@ -91,7 +91,7 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
   private void initWizardDialog() {
     stepChain = WizardStepChain.Builder.create(dialog)//
     .append(formatSelectionStep, formatSelectionHelp)//
-    .title("Select the type of data you wish to import.")// TODO
+    .title(translations.dataImportFormatStep())// 
 
     .append(formatStep)//
     .help(new WidgetProvider() {
@@ -107,10 +107,10 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
       public boolean validate() {
         return formatStepValidator.validate();
       }
-    }).title("Select the file to be imported.")// TODO
+    }).title(translations.dataImportFileStep())// 
 
     .append(identityArchiveStep)//
-    .title("Provide the following additional information.")// TODO
+    .title(translations.dataImportUnitStep())// 
     .help(new WidgetProvider() {
 
       @Override
@@ -120,7 +120,7 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
     }) //
 
     .append(destinationSelectionStep, destinationSelectionHelp)//
-    .title("Select the destination (where you wish to write the data to).")// TODO
+    .title(translations.dataImportDestinationStep())// 
 
     .append(conclusionStep)//
     .conclusion()//
@@ -228,7 +228,7 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
     conclusionStep.removeStepContent();
     presenter.reset();
     conclusionStep.add(presenter.getDisplay().asWidget());
-    conclusionStep.setStepTitle("Data to import are being validated..."); // TODO localization
+    conclusionStep.setStepTitle(translations.dataImportPendingValidation());
     stepChain.onNext();
     dialog.setCancelEnabled(false);
     dialog.setCloseEnabled(false);
@@ -236,14 +236,14 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
 
       @Override
       public void onSuccess(DatasourceFactoryDto factory, DatasourceDto datasource) {
-        conclusionStep.setStepTitle("Data import validation completed."); // TODO localization
+        conclusionStep.setStepTitle(translations.dataImportCompletedValidation());
         dialog.setCloseEnabled(true);
         dialog.setProgress(false);
       }
 
       @Override
       public void onFailure(DatasourceFactoryDto factory, ClientErrorDto error) {
-        conclusionStep.setStepTitle("Data import validation failed."); // TODO localization
+        conclusionStep.setStepTitle(translations.dataImportFailedValidation());
         dialog.setCancelEnabled(true);
         dialog.setProgress(false);
       }
