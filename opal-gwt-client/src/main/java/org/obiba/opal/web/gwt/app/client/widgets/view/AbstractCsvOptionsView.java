@@ -91,6 +91,11 @@ public abstract class AbstractCsvOptionsView extends Composite implements CsvOpt
   }
 
   @Override
+  public String getSelectedCharacterSet() {
+    return getCsvOptions().getSelectedCharacterSet();
+  }
+
+  @Override
   public void clear() {
     getCsvOptions().clear();
   }

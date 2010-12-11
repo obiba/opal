@@ -39,6 +39,9 @@ public interface CsvOptionsDisplay extends WidgetDisplay {
 
   HasText getCharsetSpecifyText();
 
+  /** Returns the character set selected by the user. */
+  String getSelectedCharacterSet();
+
   void resetFieldSeparator();
 
   void resetQuote();

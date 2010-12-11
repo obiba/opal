@@ -414,6 +414,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Data import job is launched.")
   String dataImportInstructionsConclusion();
 
+  @Description("Identifier import pending conclusion")
+  @DefaultStringValue("Identifier import job is being launched.")
+  String identifierImportPendingConclusion();
+
   @Description("Export to Excel icon title")
   @DefaultStringValue("Export to Excel file")
   String exportToExcelTitle();

@@ -18,23 +18,35 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
+import org.obiba.opal.web.gwt.app.client.widgets.view.CsvOptionsView;
 import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ConclusionStepPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
+import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
@@ -58,6 +70,8 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
     HandlerRegistration addCloseClickHandler(ClickHandler handler);
 
     HandlerRegistration addPreviousClickHandler(ClickHandler handler);
+
+    HandlerRegistration addFinishClickHandler(ClickHandler handler);
 
     void setFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
 
@@ -85,6 +99,10 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
     /** Display the CSV format options in the Format Options Step. */
     void setCsvFormatOptions();
 
+    void renderPendingConclusion();
+
+    CsvOptionsView getCsvOptions();
+
   }
 
   @Inject
@@ -92,6 +110,8 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
 
   @Inject
   private FileSelectionPresenter csvOptionsFileSelectionPresenter;
+
+  private ImportData importData;
 
   @Override
   public void onWizardRequired(WizardRequiredEvent event) {
@@ -156,6 +176,13 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
         update();
       }
     }));
+    super.registerHandler(getDisplay().addFinishClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent arg0) {
+        finish();
+      }
+    }));
   }
 
   private void update() {
@@ -190,6 +217,51 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
         getDisplay().setUnits(units);
       }
     }).send();
+  }
+
+  private void finish() {
+    getDisplay().renderPendingConclusion();
+    populateImportData();
+    createTransientDatasource();
+  }
+
+  private void populateImportData() {
+    importData = new ImportData();
+    importData.setFormat(getDisplay().getImportFormat());
+    importData.setDestinationDatasourceName("opal-keys");
+    importData.setDestinationTableName("keys");
+    importData.setCsvFile(csvOptionsFileSelectionPresenter.getSelectedFile());
+    importData.setXmlFile(fileSelectionPresenter.getSelectedFile());
+    importData.setUnit(getDisplay().getSelectedUnit());
+    importData.setCharacterSet(getDisplay().getCsvOptions().getSelectedCharacterSet());
+    importData.setRow(Integer.parseInt(getDisplay().getCsvOptions().getRowText().getText()));
+    importData.setQuote(getDisplay().getCsvOptions().getQuote());
+    importData.setField(getDisplay().getCsvOptions().getFieldSeparator());
+  }
+
+  private void createTransientDatasource() {
+
+    final DatasourceFactoryDto factory = ConclusionStepPresenter.createDatasourceFactoryDto(importData);
+
+    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+      public void onResponseCode(Request request, Response response) {
+        if(response.getStatusCode() == 201) {
+          DatasourceDto datasourceDto = (DatasourceDto) JsonUtils.unsafeEval(response.getText());
+          // Success. Call identifier import web service.
+        } else {
+          final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+          if(errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
+            // Error creating datasource
+            // getDisplay().showDatasourceParsingErrors(errorDto);
+          } else {
+            eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "fileReadError", null));
+          }
+        }
+      }
+    };
+
+    ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource("/datasources").post().withResourceBody(DatasourceFactoryDto.stringify(factory)).withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler).send();
   }
 
 }

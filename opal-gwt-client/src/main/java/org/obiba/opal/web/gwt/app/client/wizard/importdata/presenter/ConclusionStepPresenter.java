@@ -35,10 +35,10 @@ import org.obiba.opal.web.model.client.magma.CsvDatasourceTableBundleDto;
 import org.obiba.opal.web.model.client.magma.DatasourceCompareDto;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.magma.FsDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.TableCompareDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.opal.ImportCommandOptionsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
@@ -126,7 +126,7 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
     ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource("/datasources").post().withResourceBody(DatasourceFactoryDto.stringify(factory)).withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler).send();
   }
 
-  private DatasourceFactoryDto createDatasourceFactoryDto(ImportData importData) {
+  public static DatasourceFactoryDto createDatasourceFactoryDto(ImportData importData) {
     if(importData.getImportFormat().equals(ImportFormat.CSV)) {
       return createCSVDatasourceFactoryDto(importData);
     } else if(importData.getImportFormat().equals(ImportFormat.XML)) {
@@ -135,7 +135,7 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
       throw new IllegalArgumentException("Import data format not supported: " + importData.getImportFormat());
   }
 
-  private DatasourceFactoryDto createCSVDatasourceFactoryDto(ImportData importData) {
+  private static DatasourceFactoryDto createCSVDatasourceFactoryDto(ImportData importData) {
 
     CsvDatasourceTableBundleDto csvDatasourceTableBundleDto = CsvDatasourceTableBundleDto.create();
     csvDatasourceTableBundleDto.setName(importData.getDestinationTableName());
@@ -159,7 +159,7 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
     return dto;
   }
 
-  private DatasourceFactoryDto createXMLDatasourceFactoryDto(ImportData importData) {
+  private static DatasourceFactoryDto createXMLDatasourceFactoryDto(ImportData importData) {
 
     FsDatasourceFactoryDto fsDatasourceFactoryDto = FsDatasourceFactoryDto.create();
     fsDatasourceFactoryDto.setFile(importData.getXmlFile());

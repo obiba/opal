@@ -135,6 +135,19 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
     return charsetSpecifyTextBox;
   }
 
+  @Override
+  public String getSelectedCharacterSet() {
+    String charset = null;
+    if(isDefaultCharacterSet().getValue()) {
+      charset = this.defaultCharset.getInnerText();
+    } else if(isCharsetCommonList().getValue()) {
+      charset = getCharsetCommonList();
+    } else if(isCharsetSpecify().getValue()) {
+      charset = getCharsetSpecifyText().getText();
+    }
+    return charset;
+  }
+
   public Widget asWidget() {
     return this;
   }

@@ -169,6 +169,11 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   }
 
   @Override
+  public HandlerRegistration addFinishClickHandler(ClickHandler handler) {
+    return dialog.addFinishClickHandler(handler);
+  }
+
+  @Override
   public void setFileSelectorWidgetDisplay(Display display) {
     selectFilePanel.setWidget(display.asWidget());
     fileSelection = display;
@@ -235,4 +240,20 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
     csvFormatOptionsStep.setStepTitle(translations.csvFormatOptionsStep());
     csvFormatOptionsStep.add(csvOptions);
   }
+
+  @Override
+  public void renderPendingConclusion() {
+    conclusionStep.setStepTitle(translations.identifierImportPendingConclusion());
+    dialog.setProgress(true);
+    stepChain.onNext();
+    dialog.setCancelEnabled(false);
+    dialog.setPreviousEnabled(false);
+    dialog.setFinishEnabled(false);
+  }
+
+  @Override
+  public CsvOptionsView getCsvOptions() {
+    return csvOptions;
+  }
+
 }
