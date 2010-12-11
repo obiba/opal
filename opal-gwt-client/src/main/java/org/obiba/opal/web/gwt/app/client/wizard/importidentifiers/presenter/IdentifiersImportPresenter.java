@@ -35,7 +35,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ConclusionS
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
@@ -100,6 +99,10 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
     void setCsvFormatOptions();
 
     void renderPendingConclusion();
+
+    void renderCompletedConclusion();
+
+    void renderFailedConclusion();
 
     CsvOptionsView getCsvOptions();
 
@@ -245,14 +248,12 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
       public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == 201) {
-          DatasourceDto datasourceDto = (DatasourceDto) JsonUtils.unsafeEval(response.getText());
-          // Success.
+        if(response.getStatusCode() == 200) {
+          getDisplay().renderCompletedConclusion();
         } else {
           final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
           if(errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
-            // Error
-            // getDisplay().showDatasourceParsingErrors(errorDto);
+            getDisplay().renderFailedConclusion();
           } else {
             eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "fileReadError", null));
           }
@@ -262,7 +263,7 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
 
     String unit = "";
     if(getDisplay().isIdentifiersPlusData()) unit = "/" + getDisplay().getSelectedUnit();
-    ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource("/functional-unit" + unit + "/entities").post().withResourceBody(DatasourceFactoryDto.stringify(factory)).withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler).send();
+    ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource("/functional-unit" + unit + "/entities").post().withResourceBody(DatasourceFactoryDto.stringify(factory)).withCallback(200, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler).send();
 
   }
 

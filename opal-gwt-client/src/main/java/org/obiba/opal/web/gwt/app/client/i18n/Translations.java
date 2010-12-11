@@ -418,6 +418,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Identifier import job is being launched.")
   String identifierImportPendingConclusion();
 
+  @Description("Identifier import completed conclusion")
+  @DefaultStringValue("Identifier import job completed successfully.")
+  String identifierImportCompletedConclusion();
+
+  @Description("Identifier import failed conclusion")
+  @DefaultStringValue("Identifier import job failed.")
+  String identifierImportFailedConclusion();
+
   @Description("Export to Excel icon title")
   @DefaultStringValue("Export to Excel file")
   String exportToExcelTitle();

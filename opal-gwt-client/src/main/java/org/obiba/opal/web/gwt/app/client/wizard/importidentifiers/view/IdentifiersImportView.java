@@ -252,6 +252,21 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   }
 
   @Override
+  public void renderCompletedConclusion() {
+    dialog.setProgress(false);
+    conclusionStep.setStepTitle(translations.identifierImportCompletedConclusion());
+    dialog.setFinishEnabled(true);
+  }
+
+  @Override
+  public void renderFailedConclusion() {
+    dialog.setProgress(false);
+    conclusionStep.setStepTitle(translations.identifierImportFailedConclusion());
+    dialog.setCancelEnabled(true);
+    dialog.setPreviousEnabled(true);
+  }
+
+  @Override
   public CsvOptionsView getCsvOptions() {
     return csvOptions;
   }
