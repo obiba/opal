@@ -85,7 +85,9 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
 
   private WizardStepChain stepChain;
 
-  private ValidationHandler stepValidationHandler;
+  private ValidationHandler fileValidationHandler;
+
+  private ValidationHandler csvValidationHandler;
 
   public IdentifiersImportView() {
     initWidget(uiBinder.createAndBindUi(this));
@@ -107,12 +109,20 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
 
       @Override
       public boolean validate() {
-        return stepValidationHandler.validate();
+        return fileValidationHandler.validate();
       }
     })//
 
     .append(csvFormatOptionsStep)//
     .title("csv option step")//
+    .onValidate(new ValidationHandler() {
+
+      @Override
+      public boolean validate() {
+        return csvValidationHandler.validate();
+      }
+    })//
+
     .append(selectFileContentStep)//
     .title("Select file content step")//
 
@@ -186,8 +196,8 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   }
 
   @Override
-  public void setStepValidator(ValidationHandler handler) {
-    stepValidationHandler = handler;
+  public void setFileValidator(ValidationHandler handler) {
+    fileValidationHandler = handler;
   }
 
   @Override
@@ -274,6 +284,11 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   @Override
   public void setDefaultCharset(String defaultCharset) {
     csvOptions.setDefaultCharset(defaultCharset);
+  }
+
+  @Override
+  public void setCsvValidator(ValidationHandler handler) {
+    csvValidationHandler = handler;
   }
 
 }
