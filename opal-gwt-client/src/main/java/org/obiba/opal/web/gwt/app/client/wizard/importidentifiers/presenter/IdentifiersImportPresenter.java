@@ -41,6 +41,7 @@ import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -106,6 +107,8 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
 
     CsvOptionsView getCsvOptions();
 
+    void setDefaultCharset(String defaultCharset);
+
   }
 
   @Inject
@@ -132,6 +135,9 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
 
   @Override
   protected void onBind() {
+    getDefaultCharset();
+    getAvailableCharsets();
+
     fileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
     fileSelectionPresenter.bind();
     getDisplay().setFileSelectorWidgetDisplay(fileSelectionPresenter.getDisplay());
@@ -261,10 +267,33 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
       }
     };
 
-    String unit = "";
+    String unit = "s"; // "functional-units" (plural) when the file doesn't contain data.
     if(getDisplay().isIdentifiersPlusData()) unit = "/" + getDisplay().getSelectedUnit();
     ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource("/functional-unit" + unit + "/entities").post().withResourceBody(DatasourceFactoryDto.stringify(factory)).withCallback(200, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler).send();
 
+  }
+
+  public void getDefaultCharset() {
+    ResourceRequestBuilderFactory.<JsArrayString> newBuilder().forResource("/files/charsets/default").get().withCallback(new ResourceCallback<JsArrayString>() {
+
+      @Override
+      public void onResource(Response response, JsArrayString resource) {
+        String charset = resource.get(0);
+        getDisplay().setDefaultCharset(charset);
+      }
+    }).send();
+
+  }
+
+  public void getAvailableCharsets() {
+    ResourceRequestBuilderFactory.<JsArrayString> newBuilder().forResource("/files/charsets/available").get().withCallback(new ResourceCallback<JsArrayString>() {
+      @Override
+      public void onResource(Response response, JsArrayString datasources) {
+        for(int i = 0; i < datasources.length(); i++) {
+          // availableCharsets.add(datasources.get(i));
+        }
+      }
+    }).send();
   }
 
 }

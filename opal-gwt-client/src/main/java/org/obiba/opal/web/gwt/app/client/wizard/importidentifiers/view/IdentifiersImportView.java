@@ -271,4 +271,9 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
     return csvOptions;
   }
 
+  @Override
+  public void setDefaultCharset(String defaultCharset) {
+    csvOptions.setDefaultCharset(defaultCharset);
+  }
+
 }
