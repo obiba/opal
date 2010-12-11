@@ -222,7 +222,7 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
   private void finish() {
     getDisplay().renderPendingConclusion();
     populateImportData();
-    createTransientDatasource();
+    importIdentifiers();
   }
 
   private void populateImportData() {
@@ -239,8 +239,7 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
     importData.setField(getDisplay().getCsvOptions().getFieldSeparator());
   }
 
-  private void createTransientDatasource() {
-
+  private void importIdentifiers() {
     final DatasourceFactoryDto factory = ConclusionStepPresenter.createDatasourceFactoryDto(importData);
 
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
@@ -248,11 +247,11 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == 201) {
           DatasourceDto datasourceDto = (DatasourceDto) JsonUtils.unsafeEval(response.getText());
-          // Success. Call identifier import web service.
+          // Success.
         } else {
           final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
           if(errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
-            // Error creating datasource
+            // Error
             // getDisplay().showDatasourceParsingErrors(errorDto);
           } else {
             eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "fileReadError", null));
@@ -261,7 +260,10 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
       }
     };
 
-    ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource("/datasources").post().withResourceBody(DatasourceFactoryDto.stringify(factory)).withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler).send();
+    String unit = "";
+    if(getDisplay().isIdentifiersPlusData()) unit = "/" + getDisplay().getSelectedUnit();
+    ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource("/functional-unit" + unit + "/entities").post().withResourceBody(DatasourceFactoryDto.stringify(factory)).withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler).send();
+
   }
 
 }
