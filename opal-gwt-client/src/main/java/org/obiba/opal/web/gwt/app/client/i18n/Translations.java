@@ -218,6 +218,7 @@ public interface Translations extends Constants {
   "SpecificCharsetNotIndicated", "You have selected to use a specific character set but have not indicated which one.",//
   "NoDataFileSelected", "You must select a data file.",//
   "NoDataToCopy", "No data to copy to the current destination.",//
+  "NoFileSelected", "You must select a file.",//
   "CharsetNotAvailable", "The character set you have specified is not available.",//
   "NotIgnoredConlicts", "Some conflicts were detected. Ignore modifications before applying changes.",//
   "NoVariablesToBeImported", "No variables are to be imported.",//
@@ -425,9 +426,17 @@ public interface Translations extends Constants {
   @DefaultStringValue("CSV")
   String csvLabel();
 
+  @Description("Excel label")
+  @DefaultStringValue("Excel")
+  String excelLabel();
+
   @Description("Opal XML label")
   @DefaultStringValue("Opal XML")
   String opalXmlLabel();
+
+  @Description("Select file and data format label")
+  @DefaultStringValue("Select a file and data format")
+  String selectFileAndDataFormatLabel();
 
   @Description("Row must be integer message")
   @DefaultStringValue("Row must be an integer.")
@@ -707,6 +716,14 @@ public interface Translations extends Constants {
   @Description("Add View Failed")
   @DefaultStringValue("View creation failed.")
   String addViewFailed();
+
+  @Description("No format options step")
+  @DefaultStringValue("No format options are available for the selected file format")
+  String noFormatOptionsStep();
+
+  @Description("CSV format options step")
+  @DefaultStringValue("CSV format options step")
+  String csvFormatOptionsStep();
 
   @Description("Datasource Type map")
   @DefaultStringMapValue( { "hibernate", "Opal SQL", //

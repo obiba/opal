@@ -19,6 +19,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -109,6 +110,11 @@ public class FileSelectionView extends Composite implements FileSelectionPresent
   @Override
   public boolean isEnabled() {
     return browseButton.isEnabled();
+  }
+
+  @Override
+  public HasText getFileText() {
+    return fileField;
   }
 
 }

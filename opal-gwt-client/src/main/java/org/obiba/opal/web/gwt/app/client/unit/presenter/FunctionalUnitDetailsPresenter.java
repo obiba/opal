@@ -27,6 +27,8 @@ import org.obiba.opal.web.gwt.app.client.unit.event.KeyPairCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
+import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -166,7 +168,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     getDisplay().setAddKeyPairCommand(new AddKeyPairCommand());
     // TODO add identifiers
     // getDisplay().setGenerateIdentifiersCommand(null);
-    getDisplay().setImportIdentifiersCommand(null);
+    getDisplay().setImportIdentifiersCommand(new ImportIdentifiersCommand());
 
     getDisplay().setUpdateFunctionalUnitCommand(new EditFunctionalUnitCommand());
   }
@@ -306,6 +308,15 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
         }
       };
       eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "removeFunctionalUnit", "confirmDeleteFunctionalUnit"));
+    }
+
+  }
+
+  private class ImportIdentifiersCommand implements Command {
+
+    @Override
+    public void execute() {
+      eventBus.fireEvent(new WizardRequiredEvent(WizardType.IMPORT_IDENTIFIERS));
     }
 
   }

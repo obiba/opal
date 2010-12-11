@@ -20,6 +20,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewS
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importidentifiers.presenter.IdentifiersImportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter;
 
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -52,6 +53,9 @@ public class WizardManager {
   private Provider<DataExportPresenter> dataExportWizardProvider;
 
   @Inject
+  private Provider<IdentifiersImportPresenter> identifiersImportWizardProvider;
+  
+  @Inject
   private Provider<DataCopyPresenter> dataCopyWizardProvider;
 
   private Map<WizardType, Provider<? extends Wizard>> wizardProviders;
@@ -80,6 +84,7 @@ public class WizardManager {
     wizardProviders.put(WizardType.IMPORT_VARIABLES, variablesImportWizardProvider);
     wizardProviders.put(WizardType.IMPORT_DATA, dataImportWizardProvider);
     wizardProviders.put(WizardType.EXPORT_DATA, dataExportWizardProvider);
+    wizardProviders.put(WizardType.IMPORT_IDENTIFIERS, identifiersImportWizardProvider);
     wizardProviders.put(WizardType.COPY_DATA, dataCopyWizardProvider);
 
     handlerRegistration = eventBus.addHandler(WizardRequiredEvent.getType(), new WizardRequiredEventHandler());

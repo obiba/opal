@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 
 /**
@@ -75,7 +76,7 @@ public class FileSelectionPresenter extends WidgetPresenter<FileSelectionPresent
 
   //
   // Methods
-  // 
+  //
 
   public String getSelectedFile() {
     return getDisplay().getFile();
@@ -130,6 +131,8 @@ public class FileSelectionPresenter extends WidgetPresenter<FileSelectionPresent
     HandlerRegistration addBrowseClickHandler(ClickHandler handler);
 
     String getFile();
+
+    HasText getFileText();
 
     void setFile(String text);
 
