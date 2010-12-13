@@ -187,7 +187,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
       String filename = getDisplay().getOutFile();
       if(filename == null || filename.equals("")) {
         result.add("DestinationFileIsMissing");
-      } else if(getDisplay().getFileFormat().equalsIgnoreCase("excel") && (!filename.endsWith(".xls") || !filename.endsWith(".xlsx"))) {
+      } else if(getDisplay().getFileFormat().equalsIgnoreCase("excel") && !filename.endsWith(".xls") && !filename.endsWith(".xlsx")) {
         result.add("ExcelFileSuffixInvalid");
       } else if(getDisplay().getFileFormat().equalsIgnoreCase("xml") && !filename.endsWith(".zip")) {
         result.add("ZipFileSuffixInvalid");
