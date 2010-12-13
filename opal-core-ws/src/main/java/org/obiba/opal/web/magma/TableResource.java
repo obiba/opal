@@ -245,16 +245,10 @@ public class TableResource extends AbstractValueTableResource {
 
   private ValueSetDto getValueSet(VariableEntity entity, Iterable<Variable> variables) {
     ValueSet valueSet = this.getValueTable().getValueSet(entity);
-    ValueSetDto.Builder builder = ValueSetDto.newBuilder();
-    builder.setEntity(VariableEntityDto.newBuilder().setIdentifier(entity.getIdentifier()));
+    ValueSetDto.Builder builder = ValueSetDto.newBuilder().setEntity(VariableEntityDto.newBuilder().setIdentifier(entity.getIdentifier()));
     for(Variable variable : variables) {
       Value value = this.getValueTable().getValue(variable, valueSet);
-      builder.addVariables(variable.getName());
-      ValueDto.Builder valueBuilder = ValueDto.newBuilder().setValueType(variable.getValueType().getName()).setIsSequence(value.isSequence());
-      if(value.isNull() == false) {
-        valueBuilder.setValue(value.toString());
-      }
-      builder.addValues(valueBuilder);
+      builder.addVariables(variable.getName()).addValues(Dtos.asDto(value));
     }
     return builder.build();
   }
