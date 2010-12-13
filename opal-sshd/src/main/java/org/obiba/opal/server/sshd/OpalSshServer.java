@@ -9,11 +9,16 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.sshd.SshServer;
 import org.apache.sshd.common.Factory;
+import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.server.Command;
 import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
+import org.apache.sshd.server.FileSystemFactory;
+import org.apache.sshd.server.FileSystemView;
 import org.apache.sshd.server.PasswordAuthenticator;
 import org.apache.sshd.server.session.ServerSession;
+import org.apache.sshd.server.sftp.SftpSubsystem;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.OpalShell;
@@ -27,6 +32,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.ImmutableList;
+
 @Component
 public class OpalSshServer implements Service {
 
@@ -39,6 +46,9 @@ public class OpalSshServer implements Service {
   private final OpalShellHolder opalShellHolder;
 
   private final OpalShellFactory shellFactory;
+
+  @Autowired
+  private OpalRuntime opalRuntime;
 
   private boolean isRunning = false;
 
@@ -66,11 +76,19 @@ public class OpalSshServer implements Service {
           // Sessions don't expire automatically
           SecurityUtils.getSubject().getSession().setTimeout(-1);
         } catch(AuthenticationException ae) {
-
+          return false;
         }
         return SecurityUtils.getSubject().isAuthenticated();
       }
     });
+    sshd.setFileSystemFactory(new FileSystemFactory() {
+
+      @Override
+      public FileSystemView createFileSystemView(String userName) {
+        return new OpalFileSystemView(opalRuntime, userName);
+      }
+    });
+    sshd.setSubsystemFactories(ImmutableList.<NamedFactory<Command>> of(new SftpSubsystem.Factory()));
   }
 
   @Override
