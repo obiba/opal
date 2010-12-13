@@ -17,6 +17,8 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
+import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -41,6 +43,8 @@ public class FunctionalUnitPresenter extends WidgetPresenter<FunctionalUnitPrese
     HandlerRegistration addFunctionalUnitClickHandler(ClickHandler handler);
 
     HandlerRegistration addExportIdentifiersClickHandler(ClickHandler handler);
+
+    HandlerRegistration addImportIdentifiersClickHandler(ClickHandler handler);
   }
 
   @Inject
@@ -68,6 +72,13 @@ public class FunctionalUnitPresenter extends WidgetPresenter<FunctionalUnitPrese
   private void addHandlers() {
     super.registerHandler(getDisplay().addFunctionalUnitClickHandler(new AddFunctionalUnitClickHandler()));
     super.registerHandler(getDisplay().addExportIdentifiersClickHandler(new ExportIdentifiersClickHandler()));
+    super.registerHandler(getDisplay().addImportIdentifiersClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent arg0) {
+        eventBus.fireEvent(new WizardRequiredEvent(WizardType.IMPORT_IDENTIFIERS));
+      }
+    }));
   }
 
   protected void initDisplayComponents() {

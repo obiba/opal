@@ -54,13 +54,15 @@ public interface ImportService {
    * 
    * @param unitName functional unit name
    * @param sourceDatasourceName name of the source datasource
+   * @param select an option script for select variables representing identifiers. If not specified unit select clause
+   * is used if this one is defined.
    * @throws NoSuchFunctionalUnitException if the specified functional unit does not exist
    * @throws NoSuchDatasourceException if the specified source datasource does not exist
    * @throws NoSuchValueTableException if the specified source datasource does not contain an identifiers table (i.e., a
    * table with the same name as <code>org.obiba.opal.keys.tableReference</code>)
    * @throws IOException on any I/O error
    */
-  public void importIdentifiers(String unitName, String sourceDatasourceName) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, IOException;
+  public void importIdentifiers(String unitName, String sourceDatasourceName, String select) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, IOException;
 
   /**
    * Import identifiers of the provided datasource into Opal identifiers datasource, as values of the key table.

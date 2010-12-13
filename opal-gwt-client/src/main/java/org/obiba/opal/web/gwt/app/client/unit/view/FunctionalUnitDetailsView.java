@@ -113,7 +113,9 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
 
   private MenuItem generateIdentifiers;
 
-  private MenuItem importIdentifiers;
+  private MenuItem importIdentifiersFromData;
+
+  private MenuItem importIdentifiersMapping;
 
   private MenuItem update;
 
@@ -385,11 +387,20 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   }
 
   @Override
-  public void setImportIdentifiersCommand(Command command) {
-    if(importIdentifiers == null) {
-      addMenu.addItem(importIdentifiers = new MenuItem(translations.importUnitIdentifiers(), command));
+  public void setImportIdentifiersFromDataCommand(Command command) {
+    if(importIdentifiersFromData == null) {
+      addMenu.addItem(importIdentifiersFromData = new MenuItem(translations.importUnitIdentifiersFromData(), command));
     } else {
-      importIdentifiers.setCommand(command);
+      importIdentifiersFromData.setCommand(command);
+    }
+  }
+
+  @Override
+  public void setImportIdentifiersMappingCommand(Command command) {
+    if(importIdentifiersMapping == null) {
+      addMenu.addItem(importIdentifiersMapping = new MenuItem(translations.importMappedUnitIdentifiers(), command));
+    } else {
+      importIdentifiersMapping.setCommand(command);
     }
   }
 

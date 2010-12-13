@@ -28,7 +28,6 @@ import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RegExValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.widgets.view.CsvOptionsView;
@@ -42,10 +41,8 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
-import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -60,6 +57,10 @@ import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 
 public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImportPresenter.Display> implements Wizard {
+
+  public enum IdentifiersImportMode {
+    DATA, MAP, BULK
+  }
 
   @Inject
   public IdentifiersImportPresenter(final Display display, final EventBus eventBus) {
@@ -87,21 +88,11 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
 
     HasText getSelectedFile();
 
-    void setFileValidator(ValidationHandler handler);
-
-    void setCsvValidator(ValidationHandler handler);
-
     boolean isIdentifiersOnly();
 
     boolean isIdentifiersPlusData();
 
-    void setUnits(JsArray<FunctionalUnitDto> units);
-
-    String getSelectedUnit();
-
     ImportFormat getImportFormat();
-
-    boolean isCsvFormatOptionsStep();
 
     /** Display no format options in the Format Options Step. The format chosen has no options. */
     void setNoFormatOptions();
@@ -131,13 +122,33 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
 
   private List<String> availableCharsets = new ArrayList<String>();
 
+  private String unitName;
+
+  private IdentifiersImportMode mode;
+
   @Override
   public void onWizardRequired(WizardRequiredEvent event) {
+    if(event.getEventParameters().length > 1) {
+      if(event.getEventParameters()[0] instanceof String) {
+        unitName = (String) event.getEventParameters()[0];
+      } else {
+        throw new IllegalArgumentException("unexpected event parameter type (expected String)");
+      }
+
+      if(event.getEventParameters()[1] instanceof IdentifiersImportMode) {
+        mode = (IdentifiersImportMode) event.getEventParameters()[1];
+      } else {
+        throw new IllegalArgumentException("unexpected event parameter type (expected Mode)");
+      }
+
+    } else {
+      unitName = null;
+      mode = IdentifiersImportMode.BULK;
+    }
   }
 
   @Override
   public void revealDisplay() {
-    initUnits();
     getDisplay().showDialog();
   }
 
@@ -175,8 +186,6 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
   }
 
   private void addEventHandlers() {
-    getDisplay().setFileValidator(new FileValidator());
-    getDisplay().setCsvValidator(new CsvValidator());
     super.registerHandler(getDisplay().addCancelClickHandler(new ClickHandler() {
 
       @Override
@@ -202,7 +211,10 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
 
       @Override
       public void onClick(ClickEvent arg0) {
-        finish();
+        FileValidator validator = new FileValidator();
+        if(validator.validate()) {
+          finish();
+        }
       }
     }));
   }
@@ -227,38 +239,18 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
     @Override
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
-      validators.add(new RequiredTextValidator(getDisplay().getSelectedFile(), "NoFileSelected"));
-      return validators;
-    }
-  }
 
-  class CsvValidator extends AbstractValidationHandler {
-
-    public CsvValidator() {
-      super(eventBus);
-    }
-
-    @Override
-    protected Set<FieldValidator> getValidators() {
-      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
       if(getDisplay().getImportFormat().equals(ImportFormat.CSV)) {
-        validators.add(new RequiredTextValidator(getSelectedCsvFile(), "NoDataFileSelected"));
+        validators.add(new RequiredTextValidator(getSelectedCsvFile(), "NoFileSelected"));
         validators.add(new RegExValidator(getDisplay().getCsvOptions().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
         validators.add(new ConditionalValidator(getDisplay().getCsvOptions().isCharsetSpecify(), new RequiredTextValidator(getDisplay().getCsvOptions().getCharsetSpecifyText(), "SpecificCharsetNotIndicated")));
         validators.add(new ConditionalValidator(getDisplay().getCsvOptions().isCharsetSpecify(), new ConditionValidator(isSpecificCharsetAvailable(), "CharsetNotAvailable")));
+      } else {
+        validators.add(new RequiredTextValidator(getDisplay().getSelectedFile(), "NoFileSelected"));
       }
 
       return validators;
     }
-  }
-
-  public void initUnits() {
-    ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
-        getDisplay().setUnits(units);
-      }
-    }).send();
   }
 
   private void finish() {
@@ -270,11 +262,11 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
   private void populateImportData() {
     importData = new ImportData();
     importData.setFormat(getDisplay().getImportFormat());
-    importData.setDestinationDatasourceName("opal-keys");
-    importData.setDestinationTableName("keys");
+    importData.setDestinationDatasourceName(null); // no ref table
+    importData.setDestinationTableName("keys"); // TODO GET!
     importData.setCsvFile(csvOptionsFileSelectionPresenter.getSelectedFile());
     importData.setXmlFile(fileSelectionPresenter.getSelectedFile());
-    importData.setUnit(getDisplay().getSelectedUnit());
+    importData.setUnit(unitName);
     importData.setCharacterSet(getDisplay().getCsvOptions().getSelectedCharacterSet());
     importData.setRow(Integer.parseInt(getDisplay().getCsvOptions().getRowText().getText()));
     importData.setQuote(getDisplay().getCsvOptions().getQuote());
@@ -300,10 +292,21 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
       }
     };
 
-    String unit = "s"; // "functional-units" (plural) when the file doesn't contain data.
-    if(getDisplay().isIdentifiersPlusData()) unit = "/" + getDisplay().getSelectedUnit();
-    ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource("/functional-unit" + unit + "/entities").post().withResourceBody(DatasourceFactoryDto.stringify(factory)).withCallback(200, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler).send();
+    String path = null;
+    if(mode.equals(IdentifiersImportMode.BULK)) {
+      path = "/functional-units/entities";
+    } else {
+      path = "/functional-unit/" + unitName + "/entities";
+      if(mode.equals(IdentifiersImportMode.MAP)) {
+        path += "?select=true";
+      }
+    }
 
+    ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource(path).post()//
+    .withResourceBody(DatasourceFactoryDto.stringify(factory))//
+    .withCallback(200, callbackHandler)//
+    .withCallback(400, callbackHandler)//
+    .withCallback(500, callbackHandler).send();
   }
 
   public void getDefaultCharset() {

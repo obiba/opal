@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.wizard.importidentifiers.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.widgets.view.CsvOptionsView;
@@ -19,19 +18,17 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.gwt.app.client.wizard.importidentifiers.presenter.IdentifiersImportPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
-import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -49,7 +46,7 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   WizardDialogBox dialog;
 
   @UiField
-  WizardStep fileAndformatSelectionStep;
+  WizardStep formatSelectionStep;
 
   @UiField
   SimplePanel selectFilePanel;
@@ -58,22 +55,13 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   ListBox formatListBox;
 
   @UiField
-  WizardStep csvFormatOptionsStep;
+  WizardStep formatStep;
+
+  @UiField
+  HTMLPanel xmlOptions;
 
   @UiField
   CsvOptionsView csvOptions;
-
-  @UiField
-  WizardStep selectFileContentStep;
-
-  @UiField
-  RadioButton identifiersOnly;
-
-  @UiField
-  RadioButton identifiersPlusData;
-
-  @UiField
-  ListBox units;
 
   @UiField
   WizardStep conclusionStep;
@@ -84,10 +72,6 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   private FileSelectionPresenter.Display fileSelection;
 
   private WizardStepChain stepChain;
-
-  private ValidationHandler fileValidationHandler;
-
-  private ValidationHandler csvValidationHandler;
 
   public IdentifiersImportView() {
     initWidget(uiBinder.createAndBindUi(this));
@@ -103,28 +87,11 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
 
   private void initWizardDialog() {
     stepChain = WizardStepChain.Builder.create(dialog)//
-    .append(fileAndformatSelectionStep)//
+    .append(formatSelectionStep)//
     .title(translations.selectFileAndDataFormatLabel())//
-    .onValidate(new ValidationHandler() {
 
-      @Override
-      public boolean validate() {
-        return fileValidationHandler.validate();
-      }
-    })//
-
-    .append(csvFormatOptionsStep)//
-    .title("csv option step")//
-    .onValidate(new ValidationHandler() {
-
-      @Override
-      public boolean validate() {
-        return csvValidationHandler.validate();
-      }
-    })//
-
-    .append(selectFileContentStep)//
-    .title("Select file content step")//
+    .append(formatStep)//
+    .title(translations.dataImportFileStep())//
 
     .append(conclusionStep)//
     .conclusion()//
@@ -196,31 +163,13 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   }
 
   @Override
-  public void setFileValidator(ValidationHandler handler) {
-    fileValidationHandler = handler;
-  }
-
-  @Override
   public boolean isIdentifiersOnly() {
-    return identifiersOnly.getValue();
+    return false;
   }
 
   @Override
   public boolean isIdentifiersPlusData() {
-    return identifiersPlusData.getValue();
-  }
-
-  @Override
-  public void setUnits(JsArray<FunctionalUnitDto> units) {
-    this.units.clear();
-    for(int i = 0; i < units.length(); i++) {
-      this.units.addItem(units.get(i).getName());
-    }
-  }
-
-  @Override
-  public String getSelectedUnit() {
-    return units.getItemText(units.getSelectedIndex());
+    return true;
   }
 
   @Override
@@ -234,21 +183,15 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   }
 
   @Override
-  public boolean isCsvFormatOptionsStep() {
-    return false;
-  }
-
-  @Override
   public void setNoFormatOptions() {
-    csvFormatOptionsStep.removeStepContent();
-    csvFormatOptionsStep.setStepTitle(translations.noFormatOptionsStep());
+    xmlOptions.setVisible(true);
+    csvOptions.setVisible(false);
   }
 
   @Override
   public void setCsvFormatOptions() {
-    csvFormatOptionsStep.removeStepContent();
-    csvFormatOptionsStep.setStepTitle(translations.csvFormatOptionsStep());
-    csvFormatOptionsStep.add(csvOptions);
+    xmlOptions.setVisible(false);
+    csvOptions.setVisible(true);
   }
 
   @Override
@@ -284,11 +227,6 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   @Override
   public void setDefaultCharset(String defaultCharset) {
     csvOptions.setDefaultCharset(defaultCharset);
-  }
-
-  @Override
-  public void setCsvValidator(ValidationHandler handler) {
-    csvValidationHandler = handler;
   }
 
 }

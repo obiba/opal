@@ -649,9 +649,13 @@ public interface Translations extends Constants {
   @DefaultStringValue("Generate Identifiers")
   String generateUnitIdentifiers();
 
-  @Description("Import Unit Identifiers label")
-  @DefaultStringValue("Import Identifiers")
-  String importUnitIdentifiers();
+  @Description("Import Unit Identifiers From Data label")
+  @DefaultStringValue("Import Identifiers from Data File")
+  String importUnitIdentifiersFromData();
+
+  @Description("Import Mapped Unit Identifiers label")
+  @DefaultStringValue("Add/Update Identifiers Mapping")
+  String importMappedUnitIdentifiers();
 
   @Description("Alias label")
   @DefaultStringValue("Name")

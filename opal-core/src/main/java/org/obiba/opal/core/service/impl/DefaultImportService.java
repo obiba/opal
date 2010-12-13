@@ -24,28 +24,29 @@ import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.ValueTableWriter.ValueSetWriter;
-import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
+import org.obiba.magma.ValueTableWriter.ValueSetWriter;
+import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
+import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.DatasourceCopier;
-import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListener;
-import org.obiba.magma.support.DatasourceCopier.MultiplexingStrategy;
-import org.obiba.magma.support.DatasourceCopier.VariableTransformer;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
+import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListener;
+import org.obiba.magma.support.DatasourceCopier.MultiplexingStrategy;
+import org.obiba.magma.support.DatasourceCopier.VariableTransformer;
 import org.obiba.magma.type.BooleanType;
 import org.obiba.magma.type.TextType;
 import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.magma.FunctionalUnitView;
-import org.obiba.opal.core.magma.FunctionalUnitView.Policy;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
+import org.obiba.opal.core.magma.FunctionalUnitView.Policy;
 import org.obiba.opal.core.magma.concurrent.LockingActionTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ImportService;
@@ -170,7 +171,7 @@ public class DefaultImportService implements ImportService {
   }
 
   @Override
-  public void importIdentifiers(String unitName, String sourceDatasourceName) throws IOException {
+  public void importIdentifiers(String unitName, String sourceDatasourceName, String select) throws IOException {
     Assert.hasText(unitName, "unitName is null or empty");
     Assert.hasText(sourceDatasourceName, "sourceDatasourceName is null or empty");
 
@@ -183,10 +184,9 @@ public class DefaultImportService implements ImportService {
 
     for(ValueTable vt : sourceDatasource.getValueTables()) {
       if(vt.getEntityType().equals(keysTableEntityType)) {
-        ValueTable sourceKeysTable = createPrivateView(vt, unit);
+        ValueTable sourceKeysTable = createPrivateView(vt, unit, select);
         Variable unitKeyVariable = prepareKeysTable(sourceKeysTable, unit.getKeyVariableName());
         PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(lookupKeysTable(), unitKeyVariable, participantIdentifier);
-
         for(VariableEntity privateEntity : sourceKeysTable.getVariableEntities()) {
           VariableEntity publicEntity = entityMap.publicEntity(privateEntity);
           if(publicEntity == null) {
@@ -212,7 +212,7 @@ public class DefaultImportService implements ImportService {
       throw new IllegalArgumentException("source identifiers table has unexpected entity type '" + sourceKeysTable.getEntityType() + "' (expected '" + keysTableEntityType + "')");
     }
 
-    DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(sourceKeysTable, MagmaEngine.get().getDatasource(getKeysDatasourceName()));
+    DatasourceCopier.Builder.newCopier().withLoggingListener().build().copy(sourceKeysTable, MagmaEngine.get().getDatasource(getKeysDatasourceName()));
   }
 
   private String getKeysDatasourceName() {
@@ -347,7 +347,7 @@ public class DefaultImportService implements ImportService {
 
   private void copyParticipants(ValueTable participantTable, Datasource source, Datasource destination, FunctionalUnit unit, final String dispatchAttribute) throws IOException {
     final String keyVariableName = unit.getKeyVariableName();
-    final View privateView = createPrivateView(participantTable, unit);
+    final View privateView = createPrivateView(participantTable, unit, null);
     final Variable keyVariable = prepareKeysTable(privateView, keyVariableName);
 
     final FunctionalUnitView publicView = createPublicView(participantTable, unit);
@@ -408,8 +408,12 @@ public class DefaultImportService implements ImportService {
    * @param participantTable
    * @return
    */
-  private View createPrivateView(String viewName, ValueTable participantTable, FunctionalUnit unit) {
-    if(unit.getSelect() != null) {
+  private View createPrivateView(String viewName, ValueTable participantTable, FunctionalUnit unit, String select) {
+    if(select != null) {
+      final View privateView = View.Builder.newView(viewName, participantTable).select(new JavascriptClause(select)).build();
+      privateView.initialise();
+      return privateView;
+    } else if(unit.getSelect() != null) {
       final View privateView = View.Builder.newView(viewName, participantTable).select(unit.getSelect()).build();
       privateView.initialise();
       return privateView;
@@ -423,8 +427,8 @@ public class DefaultImportService implements ImportService {
     }
   }
 
-  private View createPrivateView(ValueTable participantTable, FunctionalUnit unit) {
-    return createPrivateView(participantTable.getName(), participantTable, unit);
+  private View createPrivateView(ValueTable participantTable, FunctionalUnit unit, String select) {
+    return createPrivateView(participantTable.getName(), participantTable, unit, select);
   }
 
   /**

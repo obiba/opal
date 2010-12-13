@@ -29,6 +29,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.importidentifiers.presenter.IdentifiersImportPresenter.IdentifiersImportMode;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -81,7 +82,9 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
     void setGenerateIdentifiersCommand(Command command);
 
-    void setImportIdentifiersCommand(Command command);
+    void setImportIdentifiersMappingCommand(Command command);
+
+    void setImportIdentifiersFromDataCommand(Command command);
 
     void setAvailable(boolean available);
 
@@ -168,7 +171,8 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     getDisplay().setAddKeyPairCommand(new AddKeyPairCommand());
     // TODO add identifiers
     // getDisplay().setGenerateIdentifiersCommand(null);
-    getDisplay().setImportIdentifiersCommand(new ImportIdentifiersCommand());
+    getDisplay().setImportIdentifiersMappingCommand(new ImportIdentifiersCommand(IdentifiersImportMode.MAP));
+    getDisplay().setImportIdentifiersFromDataCommand(new ImportIdentifiersCommand(IdentifiersImportMode.DATA));
 
     getDisplay().setUpdateFunctionalUnitCommand(new EditFunctionalUnitCommand());
   }
@@ -314,9 +318,15 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
   private class ImportIdentifiersCommand implements Command {
 
+    private IdentifiersImportMode mode;
+
+    public ImportIdentifiersCommand(IdentifiersImportMode mode) {
+      this.mode = mode;
+    }
+
     @Override
     public void execute() {
-      eventBus.fireEvent(new WizardRequiredEvent(WizardType.IMPORT_IDENTIFIERS));
+      eventBus.fireEvent(new WizardRequiredEvent(WizardType.IMPORT_IDENTIFIERS, functionalUnit.getName(), mode));
     }
 
   }

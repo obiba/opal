@@ -35,10 +35,10 @@ import org.obiba.opal.web.model.client.magma.CsvDatasourceTableBundleDto;
 import org.obiba.opal.web.model.client.magma.DatasourceCompareDto;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
-import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.magma.FsDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.TableCompareDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.opal.ImportCommandOptionsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
@@ -140,7 +140,9 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
     CsvDatasourceTableBundleDto csvDatasourceTableBundleDto = CsvDatasourceTableBundleDto.create();
     csvDatasourceTableBundleDto.setName(importData.getDestinationTableName());
     csvDatasourceTableBundleDto.setData(importData.getCsvFile());
-    csvDatasourceTableBundleDto.setRefTable(importData.getDestinationDatasourceName() + "." + importData.getDestinationTableName());
+    if(importData.getDestinationDatasourceName() != null) {
+      csvDatasourceTableBundleDto.setRefTable(importData.getDestinationDatasourceName() + "." + importData.getDestinationTableName());
+    }
 
     @SuppressWarnings("unchecked")
     JsArray<CsvDatasourceTableBundleDto> tables = (JsArray<CsvDatasourceTableBundleDto>) JsArray.createArray();

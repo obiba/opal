@@ -12,18 +12,10 @@
     </g:caption>
        
     <g:FlowPanel>
-      <o:WizardStep ui:field="fileAndformatSelectionStep">
+      <o:WizardStep ui:field="formatSelectionStep">
         <g:HTMLPanel>
           <table cellspacing="10">
-            <tbody>           
-              <tr>
-                <td>
-                  <ui:msg description="File label">File</ui:msg>:
-                </td>
-                <td>
-                  <g:SimplePanel ui:field="selectFilePanel" />
-                </td>
-              </tr>            
+            <tbody>    
               <tr>
                 <td>
                   <ui:msg description="Format label">Format</ui:msg>:          
@@ -35,35 +27,31 @@
             </tbody>
           </table>
         </g:HTMLPanel>
-      </o:WizardStep>      
-      
-      <o:WizardStep ui:field="csvFormatOptionsStep">
-        <w:CsvOptionsView ui:field="csvOptions" />
       </o:WizardStep>
-            
-      <o:WizardStep ui:field="selectFileContentStep">
-        <g:HTMLPanel>
-          <table class="full-width" cellspacing="10">
-            <tbody>
-              <tr>
-                <td>
-                  <g:RadioButton name="contentGroup" ui:field="identifiersOnly" checked="true"><ui:msg description="Identifiers only label">identifiers only</ui:msg></g:RadioButton>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <g:RadioButton name="contentGroup" ui:field="identifiersPlusData"><ui:msg description="Data with identifiers from unit label">data with identifiers from unit</ui:msg></g:RadioButton>:
-                  <g:ListBox ui:field='units' visibleItemCount='1' />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </g:HTMLPanel>      
+      
+      <o:WizardStep ui:field="formatStep">
+        <g:FlowPanel>
+          <g:HTMLPanel ui:field="xmlOptions">
+            <table cellspacing="10" class="full-width">
+              <tbody>           
+                <tr>
+                  <td>
+                    <ui:msg description="File label">File</ui:msg>:
+                  </td>
+                  <td>
+                    <g:SimplePanel ui:field="selectFilePanel" />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </g:HTMLPanel>
+          <w:CsvOptionsView ui:field="csvOptions" />
+        </g:FlowPanel>
       </o:WizardStep>
       
       <o:WizardStep ui:field="conclusionStep">
         <g:SimplePanel ui:field="conclusionPanel" />
-      </o:WizardStep>      
+      </o:WizardStep>
       
     </g:FlowPanel>
     

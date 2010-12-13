@@ -31,6 +31,9 @@ public class FunctionalUnitView extends Composite implements FunctionalUnitPrese
   Button exportButton;
 
   @UiField
+  Button importButton;
+
+  @UiField
   ScrollPanel functionalUnitDetailsPanel;
 
   @UiField
@@ -77,6 +80,11 @@ public class FunctionalUnitView extends Composite implements FunctionalUnitPrese
   @Override
   public HandlerRegistration addExportIdentifiersClickHandler(ClickHandler handler) {
     return exportButton.addClickHandler(handler);
+  }
+
+  @Override
+  public HandlerRegistration addImportIdentifiersClickHandler(ClickHandler handler) {
+    return importButton.addClickHandler(handler);
   }
 
 }
