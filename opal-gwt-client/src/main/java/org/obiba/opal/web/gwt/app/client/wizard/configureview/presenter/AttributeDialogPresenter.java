@@ -117,6 +117,11 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   @Override
   public void revealDisplay() {
     initDisplayComponents();
+
+    validators.add(new RequiredTextValidator(getDisplay().getAttributeName(), "AttributeNameRequired"));
+    validators.add(new UniqueAttributeNameValidator("AttributeNameAlreadyExists"));
+    validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLabelRequired"));
+
     getDisplay().showDialog();
   }
 
@@ -125,10 +130,6 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
     labelListPresenter.bind();
     getDisplay().addInputField(labelListPresenter.getDisplay());
     addEventHandlers();
-
-    validators.add(new RequiredTextValidator(getDisplay().getAttributeName(), "AttributeNameRequired"));
-    validators.add(new UniqueAttributeNameValidator("AttributeNameAlreadyExists"));
-    validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLabelRequired"));
   }
 
   @Override

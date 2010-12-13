@@ -98,10 +98,6 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
     labelListPresenter.bind();
     getDisplay().addInputField(labelListPresenter.getDisplay());
     addEventHandlers();
-
-    validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLabelRequired"));
-    validators.add(new RequiredTextValidator(getDisplay().getCategoryName(), "CategoryDialogNameRequired"));
-    validators.add(new UniqueCategoryNameValidator(getDisplay().getCategoryName(), "CategoryNameAlreadyExists"));
   }
 
   @Override
@@ -122,6 +118,11 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
   @Override
   public void revealDisplay() {
     initDisplayComponents();
+
+    validators.add(new RequiredTextValidator(getDisplay().getCategoryName(), "CategoryDialogNameRequired"));
+    validators.add(new UniqueCategoryNameValidator(getDisplay().getCategoryName(), "CategoryNameAlreadyExists"));
+    validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLabelRequired"));
+
     getDisplay().showDialog();
   }
 
