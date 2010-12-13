@@ -31,12 +31,16 @@ import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableWriter;
+import org.obiba.magma.Variable;
+import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
@@ -114,12 +118,41 @@ public class FunctionalUnitsResource {
 
       opalRuntime.getOpalConfiguration().addOrReplaceFunctionalUnit(functionalUnit);
       opalRuntime.writeOpalConfiguration();
-      response = Response.created(UriBuilder.fromPath("/").path(FunctionalUnitResource.class).build(unit.getName()));
+
+      try {
+        prepareKeysTable(unit);
+        response = Response.created(UriBuilder.fromPath("/").path(FunctionalUnitResource.class).build(unit.getName()));
+      } catch(IOException e) {
+        opalRuntime.getOpalConfiguration().removeFunctionalUnit(unit.getName());
+        response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "FunctionalUnitCreationFailed", e).build());
+      }
+
     } catch(RuntimeException e) {
       response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "FunctionalUnitCreationFailed", e).build());
     }
 
     return response.build();
+  }
+
+  private void prepareKeysTable(Opal.FunctionalUnitDto unit) throws IOException {
+    // add unit key variable in identifiers table
+    ValueTable keysTable = getKeysTable();
+    if(!keysTable.hasVariable(unit.getKeyVariableName())) {
+      Variable keyVariable = Variable.Builder.newVariable(unit.getKeyVariableName(), TextType.get(), keysTable.getEntityType()).build();
+
+      ValueTableWriter writer = keysTable.getDatasource().createWriter(keysTable.getName(), keysTable.getEntityType());
+      try {
+        VariableWriter vw = writer.writeVariables();
+        try {
+          // Create private variables
+          vw.writeVariable(keyVariable);
+        } finally {
+          vw.close();
+        }
+      } finally {
+        writer.close();
+      }
+    }
   }
 
   //
