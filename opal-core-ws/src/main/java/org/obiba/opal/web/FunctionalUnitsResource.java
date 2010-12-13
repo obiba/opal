@@ -47,6 +47,7 @@ import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.magma.TableResource;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
@@ -158,6 +159,11 @@ public class FunctionalUnitsResource {
   //
   // Entities
   //
+
+  @Path("/entities/table")
+  public TableResource getEntitiesTable() {
+    return new TableResource(getKeysTable());
+  }
 
   @GET
   @Path("/entities/excel")
