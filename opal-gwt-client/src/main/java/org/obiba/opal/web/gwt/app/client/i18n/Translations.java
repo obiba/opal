@@ -634,11 +634,11 @@ public interface Translations extends Constants {
   String editUnit();
 
   @Description("Download Identifiers label")
-  @DefaultStringValue("Download Identifiers")
+  @DefaultStringValue("Export Identifiers")
   String downloadUnitIdentifiers();
 
   @Description("Export Identifiers to Excel label")
-  @DefaultStringValue("Export Identifiers to Excel")
+  @DefaultStringValue("Export Identifiers Mapping")
   String exportUnitIdentifiersToExcel();
 
   @Description("Add Key Pair label")

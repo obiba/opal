@@ -14,7 +14,7 @@
         <ui:msg description="Add Functional Unit label">Add Unit</ui:msg>
       </g:Button>
       <g:Button ui:field="exportButton">
-        <ui:msg description="Export Identifiers label">Export Identifiers</ui:msg>
+        <ui:msg description="Export All Identifiers label">Export All Identifiers</ui:msg>
       </g:Button>
     </g:FlowPanel>
     <g:SplitLayoutPanel>
