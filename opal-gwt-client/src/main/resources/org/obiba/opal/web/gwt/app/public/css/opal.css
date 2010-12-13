@@ -29,6 +29,10 @@ a:hover {
 	text-decoration:underline;
 }
 
+textarea {
+  min-height: 10em;
+}
+
 .clickable:hover {
   cursor: pointer;
 }
@@ -728,10 +732,6 @@ div.variableChangesSummaryPanel > div > em {
 
 div.evaluateScriptPanel {
   
-}
-
-.evaluateScriptPanel textarea {
-  height: 10em;
 }
 
 .resultsPanel {
