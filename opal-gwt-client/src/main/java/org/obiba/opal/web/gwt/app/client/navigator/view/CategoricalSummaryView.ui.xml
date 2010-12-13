@@ -11,10 +11,10 @@
   <g:HTMLPanel>
     <table>
       <tr>
+        <td class="{style.title-light}"><ui:msg description="N (number of observations)">N</ui:msg>:</td>
+        <td><g:Label addStyleNames="small-indent {style.title}" ui:field="obs">N</g:Label></td>
         <td class="{style.title-light}"><ui:msg description="Mode">Mode</ui:msg>:</td>
         <td><g:Label addStyleNames="small-indent {style.title}" ui:field="mode">mode</g:Label></td>
-        <td></td>
-        <td></td>
       </tr>
     </table>
     <div id="plot-container">

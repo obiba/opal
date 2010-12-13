@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
-import org.obiba.opal.web.gwt.plot.client.JqPlot;
 import org.obiba.opal.web.gwt.plot.client.FrequencyPlot;
+import org.obiba.opal.web.gwt.plot.client.JqPlot;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 
@@ -34,6 +34,9 @@ public class CategoricalSummaryView extends Composite {
   private static CategoricalSummaryViewUiBinder uiBinder = GWT.create(CategoricalSummaryViewUiBinder.class);
 
   @UiField
+  Label obs;
+
+  @UiField
   Label mode;
 
   final HTMLPanel widget;
@@ -43,6 +46,7 @@ public class CategoricalSummaryView extends Composite {
   public CategoricalSummaryView(CategoricalSummaryDto categorical) {
     widget = uiBinder.createAndBindUi(this);
     initWidget(widget);
+    obs.setText("" + categorical.getN());
     mode.setText(categorical.getMode());
 
     if(categorical.getFrequenciesArray() != null) {

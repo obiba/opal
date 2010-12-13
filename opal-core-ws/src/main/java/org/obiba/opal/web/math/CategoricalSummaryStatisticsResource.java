@@ -58,7 +58,7 @@ public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatist
       }
       builder.addFrequencies(FrequencyDto.newBuilder().setValue(value).setFreq(freq.getCount(value)).setPct(freq.getPct(value)));
     }
-    builder.setMode(mode);
+    builder.setMode(mode).setN(freq.getSumFreq());
     return SummaryStatisticsDto.newBuilder().setResource(getVariable().getName()).setExtension(CategoricalSummaryDto.categorical, builder.build()).build();
   }
 

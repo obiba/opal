@@ -11,7 +11,8 @@ message SummaryStatisticsDto {
 message CategoricalSummaryDto {
 
   required string mode = 1;
-  repeated FrequencyDto frequencies = 2;
+  required int64 n = 2;
+  repeated FrequencyDto frequencies = 3;
 
   extend SummaryStatisticsDto {
     optional CategoricalSummaryDto categorical = 1000;
