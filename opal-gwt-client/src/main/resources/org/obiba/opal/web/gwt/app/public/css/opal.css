@@ -143,6 +143,10 @@ textarea {
 	background-color: #B4A291;
 }
 
+.gwt-SuggestBoxPopup {
+	z-index: 10000;
+}
+
 /* Popup */ 
 
 .gwt-PopupPanel {
