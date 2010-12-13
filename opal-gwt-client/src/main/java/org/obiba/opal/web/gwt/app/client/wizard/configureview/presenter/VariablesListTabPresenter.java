@@ -235,6 +235,9 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
   private void updateSelectedVariableName() {
     if(!getVariableList().isEmpty()) {
+      // OPAL-965: Clear script results when navigating to a different variable.
+      scriptWidget.getDisplay().clearResults();
+
       getDisplay().setSelectedVariableName(displayedVariableName, getPreviousVariableName(), getNextVariableName());
       eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(getVariableList().get(getVariableIndex(displayedVariableName))));
     }
