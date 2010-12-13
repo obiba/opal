@@ -56,7 +56,7 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
   public void setImportFormat(ImportFormat importFormat) {
     this.importFormat = importFormat;
     hideShowTables();
-    updateSelectableDatasources();
+    refreshDatasources();
   }
 
   @Override
