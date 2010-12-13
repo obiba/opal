@@ -40,6 +40,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
@@ -126,6 +127,8 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
 
   private IdentifiersImportMode mode;
 
+  protected TableDto identifiersTable;
+
   @Override
   public void onWizardRequired(WizardRequiredEvent event) {
     if(event.getEventParameters().length > 1) {
@@ -158,6 +161,7 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
 
   @Override
   protected void onBind() {
+    getIdentifiersTable();
     getDefaultCharset();
     getAvailableCharsets();
 
@@ -183,6 +187,18 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
 
   @Override
   protected void onPlaceRequest(PlaceRequest request) {
+  }
+
+  private void getIdentifiersTable() {
+    ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/functional-units/entities/table").get().withCallback(new ResourceCallback<TableDto>() {
+
+      @Override
+      public void onResource(Response response, TableDto resource) {
+        if(resource != null) {
+          identifiersTable = resource;
+        }
+      }
+    }).send();
   }
 
   private void addEventHandlers() {
@@ -263,7 +279,7 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
     importData = new ImportData();
     importData.setFormat(getDisplay().getImportFormat());
     importData.setDestinationDatasourceName(null); // no ref table
-    importData.setDestinationTableName("keys"); // TODO GET!
+    importData.setDestinationTableName(identifiersTable.getName());
     importData.setCsvFile(csvOptionsFileSelectionPresenter.getSelectedFile());
     importData.setXmlFile(fileSelectionPresenter.getSelectedFile());
     importData.setUnit(unitName);
