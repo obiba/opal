@@ -414,6 +414,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Data import job is launched.")
   String dataImportInstructionsConclusion();
 
+  @Description("Identifiers Import File Step")
+  @DefaultStringValue("Select the file of identifiers to be imported.")
+  String identifiersImportFileStep();
+
   @Description("Identifier import pending conclusion")
   @DefaultStringValue("Identifier import job is being launched.")
   String identifierImportPendingConclusion();
@@ -776,5 +780,13 @@ public interface Translations extends Constants {
   @Description("Data Import Failed Validation")
   @DefaultStringValue("Data import validation failed.")
   String dataImportFailedValidation();
+
+  @Description("Import Unit Identifiers Instructions")
+  @DefaultStringValue("First column MUST be identifiers from unit")
+  String importUnitIdentifiersInstructions();
+
+  @Description("Import Opal Identifiers Instructions")
+  @DefaultStringValue("First column MUST be Opal identifiers.")
+  String importOpalIdentifiersInstructions();
 
 }

@@ -87,6 +87,7 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
 
     void setDefaultCharset(String defaultCharset);
 
+    void setUnitName(String unitName);
   }
 
   @Inject
@@ -112,6 +113,7 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
     } else {
       unitName = null;
     }
+    getDisplay().setUnitName(unitName);
   }
 
   @Override

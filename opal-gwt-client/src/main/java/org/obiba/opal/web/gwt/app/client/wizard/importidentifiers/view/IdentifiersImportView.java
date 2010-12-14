@@ -24,6 +24,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -42,6 +43,9 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
 
   @UiField
   WizardStep formatStep;
+
+  @UiField
+  Label instructions;
 
   @UiField
   CsvOptionsView csvOptions;
@@ -68,13 +72,12 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
     stepChain = WizardStepChain.Builder.create(dialog)//
 
     .append(formatStep)//
-    .title(translations.dataImportFileStep())//
+    .title(translations.identifiersImportFileStep())//
 
     .append(conclusionStep)//
     .conclusion()//
 
     .onNext().onPrevious().build();
-
   }
 
   @Override
@@ -155,6 +158,15 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   @Override
   public void setDefaultCharset(String defaultCharset) {
     csvOptions.setDefaultCharset(defaultCharset);
+  }
+
+  @Override
+  public void setUnitName(String unitName) {
+    if(unitName != null) {
+      instructions.setText(translations.importUnitIdentifiersInstructions() + ": " + unitName);
+    } else {
+      instructions.setText(translations.importOpalIdentifiersInstructions());
+    }
   }
 
 }

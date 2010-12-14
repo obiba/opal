@@ -99,6 +99,10 @@ textarea {
   color: #444444;
 }
 
+.instructions {
+	font-style: italic;
+}
+
 .gwt-MenuBar-horizontal .gwt-MenuItem {
 	padding-top:3px;
 	padding-bottom:5px;
