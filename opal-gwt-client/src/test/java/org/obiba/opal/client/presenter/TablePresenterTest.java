@@ -26,6 +26,7 @@ import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.gwt.user.client.Command;
@@ -54,6 +55,7 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     expect(eventBusMock.addHandler((Type<SiblingVariableSelectionEvent.Handler>) EasyMock.anyObject(), (SiblingVariableSelectionEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
     expect(eventBusMock.addHandler((Type<ConfirmationEvent.Handler>) EasyMock.anyObject(), (ConfirmationEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
 
+    expect(displayMock.addVariableSuggestionHandler((ValueChangeHandler<String>) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
     displayMock.setNextCommand((Command) EasyMock.anyObject());
     displayMock.setPreviousCommand((Command) EasyMock.anyObject());
     displayMock.setParentCommand((Command) EasyMock.anyObject());
