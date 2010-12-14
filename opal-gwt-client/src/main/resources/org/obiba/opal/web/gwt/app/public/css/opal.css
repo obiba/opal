@@ -14,10 +14,13 @@
 body {
   text-align: left;
   background: url(image/background_tile.png) repeat;
-  font-family: arial, verdana, sans-serif;
-  font-size:12px;
   overflow: hidden;
   height: 100%;
+}
+
+body, table td, select {
+  font-family: arial, verdana, sans-serif;
+  font-size:12px;	
 }
 
 a, a:visited, a:hover {

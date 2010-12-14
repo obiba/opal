@@ -19,6 +19,8 @@ import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
+import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresenter;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 
@@ -44,6 +46,12 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
 
   @Inject
   private Provider<JobListPresenter> jobListPresenter;
+
+  @Inject
+  private Provider<ReportTemplatePresenter> reportTemplatePresenter;
+
+  @Inject
+  private Provider<FunctionalUnitPresenter> functionalUnitPresenter;
 
   //
   // Constructors
@@ -93,6 +101,23 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
         eventBus.fireEvent(new WorkbenchChangeEvent(jobListPresenter.get()));
       }
     }));
+
+    super.registerHandler(getDisplay().getReportsLink().addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        eventBus.fireEvent(new WorkbenchChangeEvent(reportTemplatePresenter.get()));
+      }
+    }));
+
+    super.registerHandler(getDisplay().getUnitsLink().addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        eventBus.fireEvent(new WorkbenchChangeEvent(functionalUnitPresenter.get()));
+      }
+    }));
+
   }
 
   @Override
@@ -126,11 +151,15 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
   public interface Display extends WidgetDisplay {
     void setParticipantCount(int count);
 
+    HasClickHandlers getUnitsLink();
+
     HasClickHandlers getExploreVariablesLink();
 
     HasClickHandlers getExploreFilesLink();
 
     HasClickHandlers getJobListLink();
+
+    HasClickHandlers getReportsLink();
 
   }
 

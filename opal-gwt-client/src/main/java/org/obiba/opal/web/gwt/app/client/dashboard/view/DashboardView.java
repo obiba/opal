@@ -52,6 +52,12 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   @UiField
   Anchor jobsLink;
 
+  @UiField
+  Anchor reportsLink;
+
+  @UiField
+  Anchor unitsLink;
+
   //
   // Instance Variables
   //
@@ -100,6 +106,16 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   @Override
   public HasClickHandlers getJobListLink() {
     return jobsLink;
+  }
+
+  @Override
+  public HasClickHandlers getReportsLink() {
+    return reportsLink;
+  }
+
+  @Override
+  public HasClickHandlers getUnitsLink() {
+    return unitsLink;
   }
 
   //
