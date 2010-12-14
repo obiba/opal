@@ -124,7 +124,7 @@ public class FunctionalUnitPresenter extends WidgetPresenter<FunctionalUnitPrese
     @Override
     public void onClick(ClickEvent event) {
       String url = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")) //
-      .append("ws/functional-units/entities/excel").toString();
+      .append("ws/functional-units/entities/csv").toString();
       eventBus.fireEvent(new FileDownloadEvent(url));
     }
 
