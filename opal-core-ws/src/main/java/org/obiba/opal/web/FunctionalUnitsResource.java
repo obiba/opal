@@ -201,7 +201,9 @@ public class FunctionalUnitsResource {
       copyEntities(destinationDatasource);
 
       ByteArrayOutputStream bos = copyFile(output);
-      output.delete();
+      if(!output.delete()) {
+        // do nothing
+      }
 
       return Response.ok(bos.toByteArray(), "text/csv").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".csv\"").build();
     } catch(NoSuchFunctionalUnitException e) {
