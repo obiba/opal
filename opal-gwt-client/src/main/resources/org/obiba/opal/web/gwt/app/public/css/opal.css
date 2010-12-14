@@ -541,6 +541,12 @@ margin-left:10px;
     cursor: pointer;
 }
 
+.navigator .toolbar .gwt-SuggestBox {
+	background: url("image/16/search.png") no-repeat scroll left center #ffffff;
+	border: 1px solid #bbbbbb;
+	padding-left: 20px;
+}
+
 .navigator .gwt-MenuBar {
 	background:transparent;
 	border:0 none;
