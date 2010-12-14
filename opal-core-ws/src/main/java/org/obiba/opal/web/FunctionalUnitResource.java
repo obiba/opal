@@ -11,7 +11,6 @@ package org.obiba.opal.web;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -51,7 +50,6 @@ import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VectorSource;
-import org.obiba.magma.datasource.csv.CsvDatasource;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.DatasourceCopier;
@@ -210,6 +208,11 @@ public class FunctionalUnitResource {
           writer.append(value.toString()).append("\n");
         }
 
+        @Override
+        public void onNullValue(VariableEntity entity) {
+
+        }
+
       });
 
       writer.close();
@@ -241,17 +244,25 @@ public class FunctionalUnitResource {
   @Produces("text/csv")
   public Response getCSVIdentifiers() throws MagmaRuntimeException, IOException {
     try {
-      String destinationName = unit + "-identifiers";
-      CsvDatasource destinationDatasource = new CsvDatasource(destinationName);
-      File output = File.createTempFile("ids-", ".csv");
-      destinationDatasource.addValueTable(getKeysTable().getName(), null, output);
+      ByteArrayOutputStream ids = new ByteArrayOutputStream();
+      final PrintWriter writer = new PrintWriter(ids);
+      writer.append("Opal").append(',').append(unit).append('\n');
+      readUnitIdentifiers(new VectorCallback() {
 
-      copyEntities(destinationDatasource);
+        @Override
+        public void onValue(VariableEntity entity, org.obiba.magma.Value value) {
+          writer.append(entity.getIdentifier()).append(',').append(value.toString()).append('\n');
+        }
 
-      ByteArrayOutputStream bos = FunctionalUnitsResource.copyFile(output);
-      output.delete();
+        @Override
+        public void onNullValue(VariableEntity entity) {
+          writer.append(entity.getIdentifier()).append(",\n");
+        }
 
-      return Response.ok(bos.toByteArray(), "text/csv").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".csv\"").build();
+      });
+
+      writer.close();
+      return Response.ok(ids.toByteArray(), "text/csv").header("Content-Disposition", "attachment; filename=\"" + unit + "-identifiers.csv\"").build();
     } catch(NoSuchFunctionalUnitException e) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -413,6 +424,11 @@ public class FunctionalUnitResource {
         entities.add(VariableEntityDto.newBuilder().setIdentifier(entity.getIdentifier()).setEntityType(entity.getType()).build());
       }
 
+      @Override
+      public void onNullValue(VariableEntity entity) {
+
+      }
+
     });
     return entities.build();
   }
@@ -453,8 +469,11 @@ public class FunctionalUnitResource {
       VectorSource vector = getKeysTable().getVariableValueSource(functionalUnit.getKeyVariableName()).asVectorSource();
       for(org.obiba.magma.Value value : vector.getValues(entities)) {
         // entities of the unit are the ones that have a non null for the unit identifier variable
+        VariableEntity entity = iter.next();
         if(!value.isNull()) {
-          callback.onValue(iter.next(), value);
+          callback.onValue(entity, value);
+        } else {
+          callback.onNullValue(entity);
         }
       }
     }
@@ -472,6 +491,8 @@ public class FunctionalUnitResource {
 
   private interface VectorCallback {
     public void onValue(VariableEntity entity, org.obiba.magma.Value value);
+
+    public void onNullValue(VariableEntity entity);
   }
 
 }

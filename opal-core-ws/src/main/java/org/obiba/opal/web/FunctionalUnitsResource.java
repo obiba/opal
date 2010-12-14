@@ -209,7 +209,7 @@ public class FunctionalUnitsResource {
     }
   }
 
-  static ByteArrayOutputStream copyFile(File file) throws IOException {
+  private ByteArrayOutputStream copyFile(File file) throws IOException {
     InputStream fis = new FileInputStream(file);
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     byte[] buf = new byte[1024];
