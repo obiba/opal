@@ -10,7 +10,9 @@
 package org.obiba.opal.web;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -34,6 +36,7 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
+import org.obiba.magma.datasource.csv.CsvDatasource;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.DatasourceCopier;
@@ -58,6 +61,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
+
+import de.schlichtherle.io.FileInputStream;
 
 @Component
 @Path("/functional-units")
@@ -174,16 +179,58 @@ public class FunctionalUnitsResource {
       ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
       ExcelDatasource destinationDatasource = new ExcelDatasource(destinationName, excelOutput);
 
-      Initialisables.initialise(destinationDatasource);
-      try {
-        DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyMetadata().build();
-        copier.copy(getKeysTable(), destinationDatasource);
-      } finally {
-        Disposables.silentlyDispose(destinationDatasource);
-      }
+      copyEntities(destinationDatasource);
+
       return Response.ok(excelOutput.toByteArray(), "application/vnd.ms-excel").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".xlsx\"").build();
     } catch(NoSuchFunctionalUnitException e) {
       return Response.status(Status.NOT_FOUND).build();
+    }
+  }
+
+  @GET
+  @Path("/entities/csv")
+  @Produces("text/csv")
+  public Response getCSVIdentifiers() throws MagmaRuntimeException, IOException {
+    try {
+      String destinationName = getKeysDatasourceName();
+
+      CsvDatasource destinationDatasource = new CsvDatasource(destinationName);
+      File output = File.createTempFile("ids-", ".csv");
+      destinationDatasource.addValueTable(getKeysTable().getName(), null, output);
+
+      copyEntities(destinationDatasource);
+
+      ByteArrayOutputStream bos = copyFile(output);
+      output.delete();
+
+      return Response.ok(bos.toByteArray(), "text/csv").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".csv\"").build();
+    } catch(NoSuchFunctionalUnitException e) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+  }
+
+  static ByteArrayOutputStream copyFile(File file) throws IOException {
+    InputStream fis = new FileInputStream(file);
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    byte[] buf = new byte[1024];
+    for(int readNum; (readNum = fis.read(buf)) != -1;) {
+      bos.write(buf, 0, readNum);
+    }
+
+    bos.flush();
+    bos.close();
+    fis.close();
+
+    return bos;
+  }
+
+  private void copyEntities(Datasource destinationDatasource) throws IOException {
+    Initialisables.initialise(destinationDatasource);
+    try {
+      DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyMetadata().build();
+      copier.copy(getKeysTable(), destinationDatasource);
+    } finally {
+      Disposables.silentlyDispose(destinationDatasource);
     }
   }
 

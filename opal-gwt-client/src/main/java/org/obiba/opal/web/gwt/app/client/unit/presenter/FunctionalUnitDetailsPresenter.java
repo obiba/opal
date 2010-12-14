@@ -278,7 +278,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     public void execute() {
       String url = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")) //
       .append("ws/functional-unit/").append(functionalUnit.getName()) //
-      .append("/entities/excel").toString();
+      .append("/entities/csv").toString();
       eventBus.fireEvent(new FileDownloadEvent(url));
     }
   }

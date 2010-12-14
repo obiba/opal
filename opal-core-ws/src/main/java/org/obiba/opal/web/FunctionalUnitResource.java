@@ -11,6 +11,7 @@ package org.obiba.opal.web;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -50,6 +51,7 @@ import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VectorSource;
+import org.obiba.magma.datasource.csv.CsvDatasource;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.DatasourceCopier;
@@ -222,25 +224,53 @@ public class FunctionalUnitResource {
   @Produces("application/vnd.ms-excel")
   public Response getExcelIdentifiers() throws MagmaRuntimeException, IOException {
     try {
-      FunctionalUnit functionalUnit = resolveFunctionalUnit();
       String destinationName = unit + "-identifiers";
       ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
       ExcelDatasource destinationDatasource = new ExcelDatasource(destinationName, excelOutput);
 
-      Initialisables.initialise(destinationDatasource);
-      try {
-        DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyMetadata().build();
-        ValueTable keysTable = getKeysTable();
-        View keysView = new View(keysTable.getName(), keysTable);
-        keysView.setSelectClause(new JavascriptClause("name().value()=='" + functionalUnit.getKeyVariableName() + "'"));
-        Initialisables.initialise(keysView);
-        copier.copy(keysView, destinationDatasource);
-      } finally {
-        Disposables.silentlyDispose(destinationDatasource);
-      }
+      copyEntities(destinationDatasource);
+
       return Response.ok(excelOutput.toByteArray(), "application/vnd.ms-excel").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".xlsx\"").build();
     } catch(NoSuchFunctionalUnitException e) {
       return Response.status(Status.NOT_FOUND).build();
+    }
+  }
+
+  @GET
+  @Path("/entities/csv")
+  @Produces("text/csv")
+  public Response getCSVIdentifiers() throws MagmaRuntimeException, IOException {
+    try {
+      String destinationName = unit + "-identifiers";
+      CsvDatasource destinationDatasource = new CsvDatasource(destinationName);
+      File output = File.createTempFile("ids-", ".csv");
+      destinationDatasource.addValueTable(getKeysTable().getName(), null, output);
+
+      copyEntities(destinationDatasource);
+
+      ByteArrayOutputStream bos = FunctionalUnitsResource.copyFile(output);
+      output.delete();
+
+      return Response.ok(bos.toByteArray(), "text/csv").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".csv\"").build();
+    } catch(NoSuchFunctionalUnitException e) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+  }
+
+  private void copyEntities(Datasource destinationDatasource) throws IOException {
+
+    FunctionalUnit functionalUnit = resolveFunctionalUnit();
+
+    Initialisables.initialise(destinationDatasource);
+    try {
+      DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyMetadata().build();
+      ValueTable keysTable = getKeysTable();
+      View keysView = new View(keysTable.getName(), keysTable);
+      keysView.setSelectClause(new JavascriptClause("name().value()=='" + functionalUnit.getKeyVariableName() + "'"));
+      Initialisables.initialise(keysView);
+      copier.copy(keysView, destinationDatasource);
+    } finally {
+      Disposables.silentlyDispose(destinationDatasource);
     }
   }
 
