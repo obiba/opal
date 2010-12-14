@@ -9,15 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
-import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.VectorSource;
@@ -30,6 +26,8 @@ import org.obiba.opal.web.math.ContinuousSummaryStatisticsResource;
 import org.obiba.opal.web.math.DefaultSummaryStatisticsResource;
 import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
+
+import com.google.common.collect.Iterables;
 
 public class VariableResource {
 
@@ -55,14 +53,7 @@ public class VariableResource {
     if(limit < 0) {
       throw new InvalidRequestException("IllegalParameterValue", "limit", String.valueOf(limit));
     }
-
-    Iterable<Value> values = getPagingVectorSource().getValues(offset, limit);
-
-    List<ValueDto> valueDtos = new ArrayList<ValueDto>();
-    for(Value value : values) {
-      valueDtos.add(Dtos.asDto(value).build());
-    }
-    return valueDtos;
+    return Iterables.transform(getPagingVectorSource().getValues(offset, limit), Dtos.valueAsDtoFunc);
   }
 
   @Path("/summary")
@@ -77,6 +68,10 @@ public class VariableResource {
       }
     }
     return new DefaultSummaryStatisticsResource(this.valueTable, this.vvs.getVariable(), this.vvs.asVectorSource());
+  }
+
+  VariableValueSource getVariableValueSource() {
+    return vvs;
   }
 
   PagingVectorSource getPagingVectorSource() {

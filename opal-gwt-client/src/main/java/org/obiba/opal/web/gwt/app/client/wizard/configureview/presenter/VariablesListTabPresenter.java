@@ -31,6 +31,8 @@ import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.SummaryRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.AttributeUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.CategoryUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.DerivedVariableConfigurationRequiredEvent;
@@ -46,6 +48,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
+import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
@@ -70,10 +73,11 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.inject.Inject;
 
 /**
@@ -84,9 +88,10 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   // Constants
   //
 
-  private static final int ATTRIBUTES_TAB_INDEX = 1;
-
-  private static final int CATEGORIES_TAB_INDEX = 0;
+  private static enum Tabs {
+    /* These should be in the same order as in the UI */
+    SCRIPT, CATEGORIES, ATTRIBUTES, OPTIONS, SUMMARY;
+  }
 
   //
   // Instance Variables
@@ -104,6 +109,9 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
   @Inject
   private AttributesPresenter attributesPresenter;
+
+  @Inject
+  private SummaryTabPresenter summaryPresenter;
 
   @Inject
   private AddDerivedVariableDialogPresenter addDerivedVariableDialogPresenter;
@@ -148,6 +156,9 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     attributesPresenter.getDisplay().setAddButtonText(translations.addNewAttribute());
     getDisplay().addAttributesTabWidget(attributesPresenter.getDisplay().asWidget());
 
+    summaryPresenter.bind();
+    getDisplay().addSummaryTabWidget(summaryPresenter.getDisplay().asWidget());
+
     addDerivedVariableDialogPresenter.bind();
 
     addEventHandlers();
@@ -160,6 +171,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     categoriesPresenter.unbind();
     attributesPresenter.unbind();
     addDerivedVariableDialogPresenter.unbind();
+    summaryPresenter.unbind();
   }
 
   @Override
@@ -349,6 +361,10 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     return result;
   }
 
+  private boolean isTabSelected(Tabs tab) {
+    return getDisplay().getSelectedTab() == tab.ordinal();
+  }
+
   //
   // Inner Classes / Interfaces
   //
@@ -359,9 +375,13 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     void displayDetailTab(int tabNumber);
 
+    int getSelectedTab();
+
     void addCategoriesTabWidget(Widget categoriesTabWidget);
 
     void addAttributesTabWidget(Widget attributesTabWidget);
+
+    void addSummaryTabWidget(Widget summaryTabWidget);
 
     void clearVariableNameSuggestions();
 
@@ -458,6 +478,10 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       formEnabled(true);
       getDisplay().saveChangesEnabled(false);
       getDisplay().setNewVariable(event.getVariable());
+      updateSummaryLink(false);
+      if(isTabSelected(Tabs.SUMMARY)) {
+        summaryPresenter.refreshDisplay();
+      }
     }
   }
 
@@ -467,8 +491,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     public void onClick(ClickEvent event) {
       if(getPreviousVariableName() != null) {
         displayedVariableName = getPreviousVariableName();
+        updateSelectedVariableName();
       }
-      updateSelectedVariableName();
     }
   }
 
@@ -478,8 +502,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     public void onClick(ClickEvent event) {
       if(getNextVariableName() != null) {
         displayedVariableName = getNextVariableName();
+        updateSelectedVariableName();
       }
-      updateSelectedVariableName();
     }
 
   }
@@ -532,12 +556,15 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     @Override
     public void onBeforeSelection(BeforeSelectionEvent<Integer> event) {
-      switch(event.getItem()) {
-      case CATEGORIES_TAB_INDEX:
+      switch(Tabs.values()[event.getItem()]) {
+      case CATEGORIES:
         categoriesPresenter.refreshDisplay();
         break;
-      case ATTRIBUTES_TAB_INDEX:
+      case ATTRIBUTES:
         attributesPresenter.refreshDisplay();
+        break;
+      case SUMMARY:
+        summaryPresenter.refreshDisplay();
         break;
       }
     }
@@ -807,6 +834,26 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     eventBus.fireEvent(new ViewSavePendingEvent());
   }
 
+  private void updateSummaryLink(boolean hasChanges) {
+
+    // TODO: this link should be built from VariableDto.getLink() but it's not initialised in ViewResource
+    String summaryLink = "/datasource/" + viewDto.getDatasourceName() + "/table/" + viewDto.getName() + "/variable/" + this.displayedVariableName + "/summary";
+    if(hasChanges) {
+
+      // TODO: it would probably be simpler to add a VariableDto to the body instead of putting everything on the URL
+      summaryLink = "/datasource/" + viewDto.getDatasourceName() + "/view/" + viewDto.getName() + "/from/variable/_transient/summary?valueType=" + getDisplay().getVariableDto().getValueType() + "&script=" + URL.encodeQueryString(scriptWidget.getScript());
+
+      if(categoriesPresenter.getVariableDto().getCategoriesArray() != null) {
+        JsArray<CategoryDto> cats = categoriesPresenter.getVariableDto().getCategoriesArray();
+        for(int i = 0; i < cats.length(); i++) {
+          summaryLink += "&category=" + URL.encodeQueryString(cats.get(i).getName());
+        }
+      }
+    }
+    eventBus.fireEvent(new SummaryRequiredEvent(summaryLink));
+
+  }
+
   private String variableToDisplayAfterCurrentVariableDeleted() {
     String nextVariable = getNextVariableName();
     if(nextVariable != null) return nextVariable;
@@ -820,6 +867,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     @Override
     public void onChange(ChangeEvent arg0) {
       formChange();
+
     }
 
     @Override
@@ -833,6 +881,11 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       getDisplay().addButtonEnabled(false);
       getDisplay().navigationEnabled(false);
       getDisplay().removeButtonEnabled(false);
+
+      updateSummaryLink(true);
+      if(isTabSelected(Tabs.SUMMARY)) {
+        summaryPresenter.refreshDisplay();
+      }
     }
 
     @Override

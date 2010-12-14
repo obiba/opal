@@ -33,23 +33,21 @@ import junit.framework.Assert;
 import org.easymock.EasyMock;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.obiba.magma.Category;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
-import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.type.TextType;
-import org.obiba.opal.web.magma.support.PagingVectorSource;
 import org.obiba.opal.web.model.Magma;
-import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Opal.LocaleDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
@@ -265,61 +263,30 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     replay(mockTable);
 
     // Exercise
-    Variable variable = sut.buildTransientVariable(TextType.get(), false, script);
+    VariableResource variableResource = sut.getTransient(TextType.get().getName(), false, script, ImmutableList.<String> of("CAT1", "CAT2"));
 
     // Verify behaviour
     verify(mockTable);
+
+    Variable variable = variableResource.getVariableValueSource().getVariable();
 
     // Verify state
     assertNotNull(variable);
     assertEquals("Participant", variable.getEntityType());
     assertEquals(TextType.get(), variable.getValueType());
     assertEquals(false, variable.isRepeatable());
-    assertEquals(variable.getAttribute("script").getValue().getValue(), script);
+    assertEquals(script, variable.getAttributeStringValue("script"));
+    assertTrue(hasCategory(variable, "CAT1"));
+    assertTrue(hasCategory(variable, "CAT2"));
+
   }
 
-  @Test
-  public void getTransientValues() {
-    // Setup
-    ValueTable mockTable = createMock(ValueTable.class);
-    expect(mockTable.getEntityType()).andReturn("Participant").atLeastOnce();
-
-    int offset = 0;
-    int limit = 3;
-    Iterable<Value> values = createTextValues("value1", "value2", "value3");
-    final PagingVectorSource mockPagingVectorSource = createMock(PagingVectorSource.class);
-    expect(mockPagingVectorSource.getValues(offset, limit)).andReturn(values).atLeastOnce();
-
-    TableResource sut = new TableResource(mockTable) {
-
-      @Override
-      PagingVectorSource getPagingVectorSource(VariableValueSource vvs) {
-        return mockPagingVectorSource;
+  private boolean hasCategory(Variable variable, String category) {
+    for(Category c : variable.getCategories()) {
+      if(c.getName().equals(category)) {
+        return true;
       }
-    };
-
-    replay(mockTable, mockPagingVectorSource);
-
-    // Exercise
-    Iterable<ValueDto> valueDtos = sut.getTransientValues(0, 3, TextType.get().getName(), false, "$('someVar')");
-
-    // Verify
-    assertNotNull(valueDtos);
-    assertEquals(limit, ImmutableSet.copyOf(valueDtos).size());
-
-    int i = 0;
-    for(ValueDto valueDto : valueDtos) {
-      assertEquals(TextType.get().getName(), valueDto.getValueType());
-      assertEquals("value" + (++i), valueDto.getValue());
     }
-  }
-
-  private Iterable<Value> createTextValues(String... textValues) {
-    List<Value> values = new ArrayList<Value>();
-    for(String textValue : textValues) {
-      values.add(TextType.get().valueOf(textValue));
-    }
-
-    return values;
+    return false;
   }
 }

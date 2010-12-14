@@ -27,6 +27,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPre
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ItemSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.view.ConfirmationView;
@@ -34,6 +35,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.view.DatasourceSelectorView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.FileSelectionView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.FileSelectorView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.ItemSelectorView;
+import org.obiba.opal.web.gwt.app.client.widgets.view.SummaryTabView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.TableListView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.TableSelectorView;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
@@ -69,6 +71,8 @@ public class OpalGinModule extends AbstractGinModule {
     bind(CreateFolderDialogPresenter.Display.class).to(CreateFolderDialogView.class).in(Singleton.class);
     bind(EvaluateScriptPresenter.Display.class).to(EvaluateScriptView.class);
     bind(ItemSelectorPresenter.Display.class).to(ItemSelectorView.class);
+
+    bind(SummaryTabPresenter.Display.class).to(SummaryTabView.class);
 
     // Concrete classes (such as NavigatorPresenter) don't need to be "bound". Simply define a getter in the
     // OpalGinjector interface and they'll "just work".

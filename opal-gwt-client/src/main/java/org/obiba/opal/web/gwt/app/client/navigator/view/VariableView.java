@@ -15,9 +15,6 @@ import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
-import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
-import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
-import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -33,7 +30,6 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
@@ -211,23 +207,8 @@ public class VariableView extends Composite implements VariablePresenter.Display
   }
 
   @Override
-  public void requestingSummary() {
-    summary.clear();
-    summary.add(new Image("image/loading.gif"));
-  }
-
-  @Override
-  public void renderSummary(SummaryStatisticsDto dto) {
-    summary.clear();
-    if(dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous) != null) {
-      ContinuousSummaryDto continuous = dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous).cast();
-      summary.add(new ContinuousSummaryView(continuous));
-    } else if(dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical) != null) {
-      CategoricalSummaryDto categorical = dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
-      summary.add(new CategoricalSummaryView(categorical));
-    } else {
-      summary.add(new Label(translations.noDataAvailableLabel()));
-    }
+  public void setSummaryTabWidget(Widget widget) {
+    summary.add(widget);
   }
 
   public Widget asWidget() {

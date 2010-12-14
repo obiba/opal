@@ -283,22 +283,13 @@ public class TableResource extends AbstractValueTableResource {
 
   @GET
   @Path("/eval")
-  public Collection<ValueDto> eval(@QueryParam("valueType") String valueType, @QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("10") int limit) {
+  public Iterable<ValueDto> eval(@QueryParam("valueType") String valueType, @QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("10") int limit) {
     JavascriptValueSource jvs = newJavaScriptValueSource(ValueType.Factory.forName(valueType), script);
 
     List<VariableEntity> entities = new ArrayList<VariableEntity>(getValueTable().getVariableEntities());
     int end = Math.min(offset + limit, entities.size());
     Iterable<Value> values = jvs.asVectorSource().getValues(new TreeSet<VariableEntity>(entities.subList(offset, end)));
-
-    ImmutableList.Builder<ValueDto> dtos = ImmutableList.builder();
-    for(Value value : values) {
-      ValueDto.Builder valueBuilder = ValueDto.newBuilder().setValueType(jvs.getValueType().getName()).setIsSequence(value.isSequence());
-      if(value.isNull() == false) {
-        valueBuilder.setValue(value.toString());
-      }
-      dtos.add(valueBuilder.build());
-    }
-    return dtos.build();
+    return Iterables.transform(values, Dtos.valueAsDtoFunc);
   }
 
   @Path("/variable/{variable}")
@@ -306,30 +297,11 @@ public class TableResource extends AbstractValueTableResource {
     return getVariableResource(getValueTable().getVariableValueSource(name));
   }
 
-  @GET
-  @Path("/variable/_transient/values")
-  public Iterable<ValueDto> getTransientValues(@QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") @DefaultValue("10") Integer limit, @QueryParam("valueType") @DefaultValue("text") String valueTypeName, @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String script) {
-    if(offset < 0) {
-      throw new InvalidRequestException("IllegalParameterValue", "offset", String.valueOf(limit));
-    }
-    if(limit < 0) {
-      throw new InvalidRequestException("IllegalParameterValue", "limit", String.valueOf(limit));
-    }
-    if(script == null) {
-      throw new InvalidRequestException("RequiredParameter", "script");
-    }
-
-    Variable transientVariable = buildTransientVariable(resolveValueType(valueTypeName), repeatable, script);
+  @Path("/variable/_transient")
+  public VariableResource getTransient(@QueryParam("valueType") @DefaultValue("text") String valueTypeName, @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String script, @QueryParam("category") List<String> categories) {
+    Variable transientVariable = buildTransientVariable(resolveValueType(valueTypeName), repeatable, script, categories == null ? ImmutableList.<String> of() : categories);
     VariableValueSource vvs = getTransientVariableValueSource(transientVariable);
-
-    Iterable<Value> values = getPagingVectorSource(vvs).getValues(offset, limit);
-
-    List<ValueDto> valueDtos = new ArrayList<ValueDto>();
-    for(Value value : values) {
-      valueDtos.add(Dtos.asDto(value).build());
-    }
-
-    return valueDtos;
+    return getVariableResource(vvs);
   }
 
   VariableValueSource getTransientVariableValueSource(Variable transientVariable) {
@@ -481,12 +453,13 @@ public class TableResource extends AbstractValueTableResource {
     return jvs;
   }
 
-  Variable buildTransientVariable(ValueType valueType, boolean repeatable, String script) {
+  Variable buildTransientVariable(ValueType valueType, boolean repeatable, String script, List<String> categories) {
     Variable.Builder builder = new Variable.Builder("transient", valueType, getValueTable().getEntityType()).extend(JavascriptVariableBuilder.class).setScript(script);
 
     if(repeatable) {
       builder.repeatable();
     }
+    builder.addCategories(categories.toArray(new String[] {}));
 
     return builder.build();
   }

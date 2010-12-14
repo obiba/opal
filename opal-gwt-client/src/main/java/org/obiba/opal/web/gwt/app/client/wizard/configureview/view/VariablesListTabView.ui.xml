@@ -122,6 +122,9 @@
             </tr>
           </table>
         </g:HTMLPanel>
+  
+        <g:Anchor><ui:msg description="Summary tab title">Summary</ui:msg></g:Anchor>
+        <g:SimplePanel ui:field="summaryTabPanel" width="100%" />
         
     </o:HorizontalTabLayout>
   </g:FlowPanel>

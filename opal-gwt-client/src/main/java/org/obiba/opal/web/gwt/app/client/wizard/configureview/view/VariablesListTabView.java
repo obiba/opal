@@ -93,6 +93,9 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   SimplePanel attributesTabPanel;
 
   @UiField
+  SimplePanel summaryTabPanel;
+
+  @UiField
   HTMLPanel optionsTabPanel;
 
   @UiField
@@ -143,6 +146,11 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   }
 
   @Override
+  public int getSelectedTab() {
+    return variableDetailTabs.getSelectedIndex();
+  }
+
+  @Override
   public void addCategoriesTabWidget(Widget categoriesTabWidget) {
     categoriesTabPanel.clear();
     categoriesTabPanel.add(categoriesTabWidget);
@@ -152,6 +160,12 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   public void addAttributesTabWidget(Widget attributesTabWidget) {
     attributesTabPanel.clear();
     attributesTabPanel.add(attributesTabWidget);
+  }
+
+  @Override
+  public void addSummaryTabWidget(Widget summaryTabWidget) {
+    summaryTabPanel.clear();
+    summaryTabPanel.add(summaryTabWidget);
   }
 
   @Override
