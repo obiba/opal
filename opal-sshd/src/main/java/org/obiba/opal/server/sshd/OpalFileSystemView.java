@@ -76,6 +76,12 @@ public class OpalFileSystemView implements FileSystemView {
       return isRoot() ? this : super.getParentFile();
     }
 
+    /* Overriden to make findbugs happy. The super implementation is fine. */
+    @Override
+    public boolean equals(Object obj) {
+      return super.equals(obj);
+    }
+
     private boolean isRoot() {
       return isRoot;
     }
@@ -96,7 +102,11 @@ public class OpalFileSystemView implements FileSystemView {
     @Override
     public InputStream createInputStream(long offset) throws IOException {
       InputStream is = this.file.getContent().getInputStream();
-      is.skip(offset);
+      long skipped = is.skip(offset);
+      if(skipped != offset) {
+        is.close();
+        throw new IOException("could not skip to " + offset);
+      }
       return is;
     }
 

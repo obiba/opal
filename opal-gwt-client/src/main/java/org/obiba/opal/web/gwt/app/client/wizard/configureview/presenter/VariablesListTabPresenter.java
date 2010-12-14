@@ -837,20 +837,20 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   private void updateSummaryLink(boolean hasChanges) {
 
     // TODO: this link should be built from VariableDto.getLink() but it's not initialised in ViewResource
-    String summaryLink = "/datasource/" + viewDto.getDatasourceName() + "/table/" + viewDto.getName() + "/variable/" + this.displayedVariableName + "/summary";
+    StringBuilder summaryLink = new StringBuilder("/datasource/" + viewDto.getDatasourceName() + "/table/" + viewDto.getName() + "/variable/" + this.displayedVariableName + "/summary");
     if(hasChanges) {
 
       // TODO: it would probably be simpler to add a VariableDto to the body instead of putting everything on the URL
-      summaryLink = "/datasource/" + viewDto.getDatasourceName() + "/view/" + viewDto.getName() + "/from/variable/_transient/summary?valueType=" + getDisplay().getVariableDto().getValueType() + "&script=" + URL.encodeQueryString(scriptWidget.getScript());
+      summaryLink = new StringBuilder("/datasource/" + viewDto.getDatasourceName() + "/view/" + viewDto.getName() + "/from/variable/_transient/summary?valueType=" + getDisplay().getVariableDto().getValueType() + "&script=" + URL.encodeQueryString(scriptWidget.getScript()));
 
       if(categoriesPresenter.getVariableDto().getCategoriesArray() != null) {
         JsArray<CategoryDto> cats = categoriesPresenter.getVariableDto().getCategoriesArray();
         for(int i = 0; i < cats.length(); i++) {
-          summaryLink += "&category=" + URL.encodeQueryString(cats.get(i).getName());
+          summaryLink.append("&category=" + URL.encodeQueryString(cats.get(i).getName()));
         }
       }
     }
-    eventBus.fireEvent(new SummaryRequiredEvent(summaryLink));
+    eventBus.fireEvent(new SummaryRequiredEvent(summaryLink.toString()));
 
   }
 
