@@ -36,6 +36,8 @@ public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateL
   public interface Display extends WidgetDisplay {
     void setReportTemplates(JsArray<ReportTemplateDto> templates);
 
+    void select(ReportTemplateDto reportTemplateDto);
+
     ReportTemplateDto getSelectedReportTemplate();
 
     HandlerRegistration addSelectReportTemplateHandler(SelectionChangeHandler handler);
@@ -88,10 +90,16 @@ public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateL
   private class ReportTemplateCreatedHandler implements ReportTemplateCreatedEvent.Handler {
 
     @Override
-    public void onReportTemplateCreated(ReportTemplateCreatedEvent event) {
-      initUiComponents();
-    }
+    public void onReportTemplateCreated(final ReportTemplateCreatedEvent event) {
+      ResourceRequestBuilderFactory.<JsArray<ReportTemplateDto>> newBuilder().forResource("/report-templates").get().withCallback(new ResourceCallback<JsArray<ReportTemplateDto>>() {
 
+        @Override
+        public void onResource(Response response, JsArray<ReportTemplateDto> templates) {
+          getDisplay().setReportTemplates(templates);
+          getDisplay().select(event.getReportTemplate());
+        }
+      }).send();
+    }
   }
 
   private class ReportTemplateDeletedHandler implements ReportTemplateDeletedEvent.Handler {

@@ -72,6 +72,23 @@ public class ReportTemplateListView extends Composite implements ReportTemplateL
     }
   }
 
+  @Override
+  public void select(ReportTemplateDto reportTemplateDto) {
+    // Clear current selection.
+    ReportTemplateDto currentSelection = selectionModel.getSelectedObject();
+    if(currentSelection != null) {
+      selectionModel.setSelected(currentSelection, false);
+    }
+
+    // Find and select specified template.
+    for(ReportTemplateDto r : reportTemplateTable.getDisplayedItems()) {
+      if(r.getName().equals(reportTemplateDto.getName())) {
+        selectionModel.setSelected(r, true);
+        break;
+      }
+    }
+  }
+
   private void clearSelection() {
     if(getSelectedReportTemplate() != null) {
       selectionModel.setSelected(getSelectedReportTemplate(), false);
