@@ -10,7 +10,7 @@
       <tbody>
         <tr>
           <td>
-            <ui:msg description="Select data file label">Select data file</ui:msg>:
+            <ui:msg description="File label">File</ui:msg>:
           </td>
           <td>
             <g:SimplePanel ui:field="selectCsvFilePanel" />
