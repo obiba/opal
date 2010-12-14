@@ -16,28 +16,17 @@
     </g:caption>
     <g:DockLayoutPanel unit="EM" height="8em" width="30em">
       <g:center>
-        <g:HTMLPanel addStyleNames="indent">
+        <g:HTMLPanel addStyleNames="indent small-top-margin">
           <table>
             <tbody>
               <tr>
                 <td>
-                  <g:RadioButton name="variableType" ui:field="newVariableRadio" checked="true">
-                    <ui:msg description="New label">New</ui:msg>
-                    :
-                  </g:RadioButton>
+                  <g:Label>
+                    <ui:msg description="Name label">Name</ui:msg>:
+                  </g:Label>
                 </td>
                 <td>
-                  <g:TextBox ui:field="newVariableName"/>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <g:RadioButton name="variableType" ui:field="copyFromVariableRadio">
-                    <ui:msg description="Copy from label">Copy from</ui:msg>:
-                  </g:RadioButton>
-                </td>
-                <td>
-                  <g:SuggestBox ui:field="copyFromVariableName"/>
+                  <g:SuggestBox ui:field="variableNameSuggestBox" />
                 </td>
               </tr>
             </tbody>

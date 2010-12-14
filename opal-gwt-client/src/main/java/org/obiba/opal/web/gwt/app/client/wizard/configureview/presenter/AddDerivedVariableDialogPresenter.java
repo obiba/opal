@@ -16,7 +16,6 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidatableWidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.VariableAddRequiredEvent;
@@ -33,7 +32,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 
 public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresenter<AddDerivedVariableDialogPresenter.Display> {
@@ -44,30 +42,15 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
 
     void hideDialog();
 
-    HandlerRegistration addCancelClickHandler(ClickHandler handler);
-
-    HandlerRegistration addAddVariableClickHandler(ClickHandler handler);
-
-    HandlerRegistration addNewVariableClickHandler(ClickHandler handler);
-
-    HandlerRegistration addCopyFromVariableClickHandler(ClickHandler handler);
-
-    void setEnabledCopyFromVariableName(boolean enabled);
-
-    void setEnabledNewVariableName(boolean enabled);
-
-    HasValue<Boolean> getCopyFromVariable();
-
-    HasValue<Boolean> getNewVariable();
-
-    HasText getNewVariableName();
-
-    HasText getCopyFromVariableName();
-
     void addVariableSuggestion(String suggestion);
 
     void clearVariableSuggestions();
 
+    HasText getVariableName();
+
+    HandlerRegistration addCancelClickHandler(ClickHandler handler);
+
+    HandlerRegistration addAddVariableClickHandler(ClickHandler handler);
   }
 
   @Inject
@@ -92,15 +75,12 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
   }
 
   private void addValidators() {
-    addValidator(new ConditionalValidator(getDisplay().getNewVariable(), new RequiredTextValidator(getDisplay().getNewVariableName(), "NewVariableNameIsRequired")));
-    addValidator(new ConditionalValidator(getDisplay().getCopyFromVariable(), new RequiredTextValidator(getDisplay().getCopyFromVariableName(), "CopyFromVariableNameIsRequired")));
+    addValidator(new RequiredTextValidator(getDisplay().getVariableName(), "CopyFromVariableNameIsRequired"));
   }
 
   private void addHandlers() {
     super.registerHandler(getDisplay().addAddVariableClickHandler(new AddVariableClickHandler()));
     super.registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
-    super.registerHandler(getDisplay().addCopyFromVariableClickHandler(new CopyFromVariableClickHandler()));
-    super.registerHandler(getDisplay().addNewVariableClickHandler(new NewVariableClickHandler()));
     super.registerHandler(eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredHandler()));
   }
 
@@ -120,12 +100,7 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
   }
 
   private String getVariableName() {
-    if(getDisplay().getCopyFromVariable().getValue()) {
-      return getDisplay().getCopyFromVariableName().getText();
-    } else if(getDisplay().getNewVariable().getValue()) {
-      return getDisplay().getNewVariableName().getText();
-    }
-    return null;
+    return getDisplay().getVariableName().getText();
   }
 
   void refreshVariableNameSuggestions(ViewDto viewDto) {
@@ -189,27 +164,4 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
       }
     }
   }
-
-  private class NewVariableClickHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent event) {
-      getDisplay().setEnabledNewVariableName(true);
-      getDisplay().setEnabledCopyFromVariableName(false);
-      getDisplay().getCopyFromVariableName().setText("");
-    }
-
-  }
-
-  private class CopyFromVariableClickHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent event) {
-      getDisplay().setEnabledNewVariableName(false);
-      getDisplay().setEnabledCopyFromVariableName(true);
-      getDisplay().getNewVariableName().setText("");
-    }
-
-  }
-
 }

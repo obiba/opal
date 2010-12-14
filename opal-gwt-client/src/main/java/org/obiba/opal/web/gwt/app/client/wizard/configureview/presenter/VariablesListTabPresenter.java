@@ -76,8 +76,8 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
@@ -520,10 +520,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     @Override
     public void onClick(ClickEvent event) {
-      addDerivedVariableDialogPresenter.getDisplay().getNewVariableName().setText("");
-      addDerivedVariableDialogPresenter.getDisplay().getCopyFromVariableName().setText("");
+      addDerivedVariableDialogPresenter.getDisplay().getVariableName().setText("");
       addDerivedVariableDialogPresenter.getDisplay().showDialog();
-
     }
   }
 
