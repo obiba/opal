@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -32,13 +33,21 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
 
   private VariablePresenter.Display displayMock;
 
+  private SummaryTabPresenter.Display summaryTabMock;
+
   private VariablePresenter variablePresenter;
 
   @Before
   public void setUp() {
     displayMock = createMock(VariablePresenter.Display.class);
+    summaryTabMock = createMock(SummaryTabPresenter.Display.class);
     eventBusMock = createMock(EventBus.class);
-    variablePresenter = new VariablePresenter(displayMock, eventBusMock);
+    variablePresenter = new VariablePresenter(displayMock, eventBusMock, new SummaryTabPresenter(summaryTabMock, eventBusMock) {
+      @Override
+      public void bind() {
+        // noop for testing
+      }
+    });
   }
 
   @SuppressWarnings("unchecked")
@@ -51,11 +60,13 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
     displayMock.setPreviousCommand((Command) EasyMock.anyObject());
     displayMock.setParentCommand((Command) EasyMock.anyObject());
     displayMock.setSummaryTabCommand((Command) EasyMock.anyObject());
+    displayMock.setSummaryTabWidget(summaryTabMock);
 
-    replay(displayMock, eventBusMock);
+    replay(displayMock, eventBusMock, summaryTabMock);
+
     variablePresenter.bind();
 
-    verify(displayMock, eventBusMock);
+    verify(displayMock, eventBusMock, summaryTabMock);
   }
 
 }

@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
+import net.customware.gwt.presenter.client.widget.WidgetDisplay;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
@@ -207,8 +209,8 @@ public class VariableView extends Composite implements VariablePresenter.Display
   }
 
   @Override
-  public void setSummaryTabWidget(Widget widget) {
-    summary.add(widget);
+  public void setSummaryTabWidget(WidgetDisplay widget) {
+    summary.add(widget.asWidget());
   }
 
   public Widget asWidget() {

@@ -31,7 +31,6 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
@@ -39,10 +38,9 @@ import com.google.inject.Inject;
  */
 public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display> {
 
-  private VariableDto variable;
+  private final SummaryTabPresenter summaryTabPresenter;
 
-  @Inject
-  private SummaryTabPresenter summaryTabPresenter;
+  private VariableDto variable;
 
   //
   // Constructors
@@ -53,8 +51,9 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
    * @param eventBus
    */
   @Inject
-  public VariablePresenter(Display display, EventBus eventBus) {
+  public VariablePresenter(Display display, EventBus eventBus, SummaryTabPresenter summaryTabPresenter) {
     super(display, eventBus);
+    this.summaryTabPresenter = summaryTabPresenter;
   }
 
   @Override
@@ -70,7 +69,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     getDisplay().setNextCommand(new NextCommand());
     getDisplay().setPreviousCommand(new PreviousCommand());
     getDisplay().setSummaryTabCommand(new SummaryCommand());
-    getDisplay().setSummaryTabWidget(summaryTabPresenter.getDisplay().asWidget());
+    getDisplay().setSummaryTabWidget(summaryTabPresenter.getDisplay());
   }
 
   @Override
@@ -222,6 +221,6 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
     boolean isSummaryTabSelected();
 
-    void setSummaryTabWidget(Widget widget);
+    void setSummaryTabWidget(WidgetDisplay widget);
   }
 }
