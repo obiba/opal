@@ -251,12 +251,12 @@ public class FunctionalUnitResource {
 
         @Override
         public void onValue(VariableEntity entity, org.obiba.magma.Value value) {
-          writer.append(entity.getIdentifier()).append(',').append(value.toString()).append('\n');
+          writer.append("\"").append(entity.getIdentifier()).append("\",\"").append(value.toString()).append("\"\n");
         }
 
         @Override
         public void onNullValue(VariableEntity entity) {
-          writer.append(entity.getIdentifier()).append(",\n");
+          writer.append("\"").append(entity.getIdentifier()).append("\",\n");
         }
 
       });
