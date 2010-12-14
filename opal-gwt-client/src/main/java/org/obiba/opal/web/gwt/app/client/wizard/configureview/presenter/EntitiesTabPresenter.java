@@ -25,8 +25,6 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.ListBoxItemConditionalValidator;
-import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
@@ -114,7 +112,6 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
 
     getDisplay().saveChangesEnabled(true);
     addEventHandlers();
-    addValidators();
   }
 
   @Override
@@ -149,10 +146,6 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
     super.registerHandler(getDisplay().addEntitiestoViewChangeHandler(new FormChangedHandler()));
     super.registerHandler(getDisplay().addScriptChangeHandler(new FormChangedHandler()));
     super.registerHandler(eventBus.addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
-  }
-
-  private void addValidators() {
-    validators.add(new ListBoxItemConditionalValidator(getDisplay().getEntitiesToViewListBox(), "script", new RequiredTextValidator(getDisplay().getScriptText(), "ScriptIsRequired")));
   }
 
   private boolean validate() {

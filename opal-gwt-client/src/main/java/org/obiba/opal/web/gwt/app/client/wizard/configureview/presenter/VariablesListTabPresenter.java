@@ -329,7 +329,6 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     validators.add(new ConditionalValidator(getDisplay().getRepeatable(), new RequiredTextValidator(getDisplay().getOccurenceGroup(), "OccurrenceGroupIsRequired")));
     validators.add(new RequiredTextValidator(getDisplay().getName(), "NewVariableNameIsRequired"));
     validators.add(new UniqueVariableNameValidator("VariableNameNotUnique"));
-    validators.add(new RequiredTextValidator(getDisplay().getScriptText(), "ScriptIsRequired"));
   }
 
   private boolean validate() {

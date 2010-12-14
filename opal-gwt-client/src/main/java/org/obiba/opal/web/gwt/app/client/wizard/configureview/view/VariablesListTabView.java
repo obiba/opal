@@ -43,9 +43,9 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.SuggestBox;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 
 public class VariablesListTabView extends Composite implements VariablesListTabPresenter.Display {
 
@@ -285,16 +285,22 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
     if(repeatableCheckbox.getValue()) variableDto.setOccurrenceGroup(occurenceGroup.getValue());
     variableDto.setValueType(valueType.getValue(valueType.getSelectedIndex()));
     variableDto.setEntityType(entityType);
-    JsArray<AttributeDto> attributes = JsArrays.toSafeArray(variableDto.getAttributesArray());
-
-    AttributeDto attributeDto = AttributeDto.create();
-    attributeDto.setName("script");
-    attributeDto.setValue(scriptWidgetDisplay.getScript());
-    attributes.push(attributeDto);
-    variableDto.setAttributesArray(attributes);
+    setScriptAttribute(variableDto);
     variableDto.setMimeType(mimeType.getValue());
     variableDto.setUnit(unit.getValue());
     return variableDto;
+  }
+
+  private void setScriptAttribute(VariableDto variableDto) {
+    String script = scriptWidgetDisplay.getScript();
+
+    AttributeDto attributeDto = AttributeDto.create();
+    attributeDto.setName("script");
+    attributeDto.setValue(script.trim().length() != 0 ? script : "true"); // OPAL-891
+
+    JsArray<AttributeDto> attributes = JsArrays.toSafeArray(variableDto.getAttributesArray());
+    attributes.push(attributeDto);
+    variableDto.setAttributesArray(attributes);
   }
 
   @Override
