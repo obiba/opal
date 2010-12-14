@@ -11,7 +11,9 @@ package org.obiba.opal.core.service.impl;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ThreadFactory;
 
@@ -26,6 +28,7 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
+import org.obiba.magma.VectorSource;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
@@ -167,6 +170,31 @@ public class DefaultImportService implements ImportService {
       copyValueTables(sourceDatasource, destinationDatasource, unit, STAGE_ATTRIBUTE_NAME);
     } finally {
       sourceDatasource.dispose();
+    }
+  }
+
+  public void importIdentifiers(String unitName, IParticipantIdentifier pIdentifier) {
+    Assert.hasText(unitName, "unitName is null or empty");
+    IParticipantIdentifier participantIdentifier = pIdentifier != null ? pIdentifier : this.participantIdentifier;
+
+    FunctionalUnit unit = opalRuntime.getFunctionalUnit(unitName);
+    if(unit == null) {
+      throw new NoSuchFunctionalUnitException(unitName);
+    }
+
+    ValueTable keysTable = lookupKeysTable();
+    if(keysTable.hasVariable(unit.getKeyVariableName())) {
+      PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(keysTable, keysTable.getVariable(unit.getKeyVariableName()), participantIdentifier);
+      SortedSet<VariableEntity> entities = new TreeSet<VariableEntity>(keysTable.getVariableEntities());
+      Iterator<VariableEntity> iter = entities.iterator();
+      VectorSource vector = keysTable.getVariableValueSource(unit.getKeyVariableName()).asVectorSource();
+      for(org.obiba.magma.Value value : vector.getValues(entities)) {
+        // entities of the unit are the ones that have a non null for the unit identifier variable
+        VariableEntity entity = iter.next();
+        if(value.isNull()) {
+          entityMap.createPrivateEntity(entity);
+        }
+      }
     }
   }
 

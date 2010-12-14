@@ -167,10 +167,10 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     getDisplay().setExportIdentifiersCommand(new ExportIdentifiersCommand());
     getDisplay().setRemoveFunctionalUnitCommand(new RemoveFunctionalUnitCommand());
 
-    getDisplay().setAddKeyPairCommand(new AddKeyPairCommand());
-    // TODO add identifiers
-    // getDisplay().setGenerateIdentifiersCommand(null);
+    getDisplay().setGenerateIdentifiersCommand(new GenerateIdentifiersCommand());
     getDisplay().setImportIdentifiersMappingCommand(new ImportIdentifiersCommand());
+
+    getDisplay().setAddKeyPairCommand(new AddKeyPairCommand());
 
     getDisplay().setUpdateFunctionalUnitCommand(new EditFunctionalUnitCommand());
   }
@@ -261,6 +261,28 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
       addKeyPairDialogPresenter.revealDisplay();
     }
 
+  }
+
+  private final class GenerateIdentifiersCommand implements Command {
+    @Override
+    public void execute() {
+      ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          if(response.getStatusCode() != Response.SC_OK) {
+            eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "IdentifiersGenerationFailed", null));
+          }
+          refreshDisplay();
+        }
+
+      };
+
+      ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/entities/identifiers").post()//
+      .withCallback(Response.SC_OK, callbackHandler) //
+      .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
+      .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+    }
   }
 
   private final class DownloadIdentifiersCommand implements Command {

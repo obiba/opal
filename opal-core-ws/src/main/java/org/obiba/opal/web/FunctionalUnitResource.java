@@ -57,6 +57,7 @@ import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.views.View;
+import org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
@@ -305,6 +306,30 @@ public class FunctionalUnitResource {
       response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex).build()).build();
     } finally {
       Disposables.silentlyDispose(sourceDatasource);
+    }
+
+    return response;
+  }
+
+  @POST
+  @Path("/entities/identifiers")
+  public Response importIdentifiers(@QueryParam("size") Integer size, @QueryParam("zeros") Boolean zeros) {
+    Response response = null;
+
+    try {
+      DefaultParticipantIdentifierImpl pId = new DefaultParticipantIdentifierImpl();
+      if(size != null) pId.setKeySize(size);
+      if(zeros != null) pId.setAllowStartWithZero(zeros);
+      importService.importIdentifiers(unit, pId);
+      response = Response.ok().build();
+    } catch(NoSuchFunctionalUnitException ex) {
+      response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "FunctionalUnitNotFound", ex).build()).build();
+    } catch(NoSuchDatasourceException ex) {
+      response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
+    } catch(NoSuchValueTableException ex) {
+      response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
+    } catch(MagmaRuntimeException ex) {
+      response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "ImportIdentifiersError", ex).build()).build();
     }
 
     return response;

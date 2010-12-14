@@ -16,10 +16,10 @@ import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
+import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
@@ -64,6 +64,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
   // PrivateVariableEntityMap Methods
   //
 
+  @Override
   public VariableEntity publicEntity(VariableEntity privateEntity) {
     if(privateEntity == null) throw new IllegalArgumentException("privateEntity cannot be null");
     VariableEntity entity = publicToPrivate.inverse().get(privateEntity);
@@ -71,6 +72,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     return entity;
   }
 
+  @Override
   public VariableEntity privateEntity(VariableEntity publicEntity) {
     if(publicEntity == null) throw new IllegalArgumentException("publicEntity cannot be null");
     VariableEntity entity = publicToPrivate.get(publicEntity);
@@ -78,6 +80,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     return entity;
   }
 
+  @Override
   public boolean hasPrivateEntity(VariableEntity privateEntity) {
     if(privateEntity == null) throw new IllegalArgumentException("privateEntity cannot be null");
     return publicToPrivate.inverse().containsKey(privateEntity);
@@ -89,6 +92,27 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     return publicToPrivate.containsKey(publicEntity);
   }
 
+  @Override
+  public VariableEntity createPrivateEntity(VariableEntity publicEntity) {
+    if(publicEntity == null) throw new IllegalArgumentException("privateEntity cannot be null");
+    ValueTable keyTable = getKeyValueTable();
+    for(int i = 0; i < 100; i++) {
+      VariableEntity privateEntity = entityFor(participantIdentifier.generateParticipantIdentifier());
+      if(publicToPrivate.inverse().containsKey(privateEntity) == false) {
+        try {
+          writeEntities(keyTable, publicEntity, privateEntity);
+          log.debug("{}<-->({}) added", publicEntity.getIdentifier(), privateEntity.getIdentifier());
+          publicToPrivate.put(entityFor(publicEntity.getIdentifier()), privateEntity);
+        } catch(IOException e) {
+          throw new MagmaRuntimeException(e);
+        }
+        return privateEntity;
+      }
+    }
+    throw new IllegalStateException("Unable to generate a unique private entity for the owner [" + ownerVariable + "] and public entity [" + publicEntity.getIdentifier() + "]. " + "One hundred attempts made.");
+  }
+
+  @Override
   public VariableEntity createPublicEntity(VariableEntity privateEntity) {
     if(privateEntity == null) throw new IllegalArgumentException("privateEntity cannot be null");
     ValueTable keyTable = getKeyValueTable();
@@ -96,12 +120,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
       VariableEntity publicEntity = entityFor(participantIdentifier.generateParticipantIdentifier());
       if(publicToPrivate.containsKey(publicEntity) == false) {
         try {
-          ValueTableWriter vtw = keyTable.getDatasource().createWriter(keyTable.getName(), keyTable.getEntityType());
-          ValueSetWriter vsw = vtw.writeValueSet(publicEntity);
-          vsw.writeValue(this.ownerVariable, TextType.get().valueOf(privateEntity.getIdentifier()));
-          vsw.close();
-          vtw.close();
-          log.debug("{}<-->({}) added", publicEntity.getIdentifier(), privateEntity.getIdentifier());
+          writeEntities(keyTable, publicEntity, privateEntity);
           publicToPrivate.put(publicEntity, entityFor(privateEntity.getIdentifier()));
         } catch(IOException e) {
           throw new MagmaRuntimeException(e);
@@ -110,6 +129,15 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
       }
     }
     throw new IllegalStateException("Unable to generate a unique public entity for the owner [" + ownerVariable + "] and private entity [" + privateEntity.getIdentifier() + "]. " + "One hundred attempts made.");
+  }
+
+  private void writeEntities(ValueTable keyTable, VariableEntity publicEntity, VariableEntity privateEntity) throws IOException {
+    ValueTableWriter vtw = keyTable.getDatasource().createWriter(keyTable.getName(), keyTable.getEntityType());
+    ValueSetWriter vsw = vtw.writeValueSet(publicEntity);
+    vsw.writeValue(this.ownerVariable, TextType.get().valueOf(privateEntity.getIdentifier()));
+    vsw.close();
+    vtw.close();
+    log.debug("{}<-->({}) added", publicEntity.getIdentifier(), privateEntity.getIdentifier());
   }
 
   private ValueTable getKeyValueTable() {

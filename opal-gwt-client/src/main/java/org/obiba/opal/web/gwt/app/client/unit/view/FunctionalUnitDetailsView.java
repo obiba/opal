@@ -379,7 +379,6 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   @Override
   public void setGenerateIdentifiersCommand(Command command) {
     if(generateIdentifiers == null) {
-      addMenu.addSeparator(new MenuItemSeparator());
       addMenu.addItem(generateIdentifiers = new MenuItem(translations.generateUnitIdentifiers(), command));
     } else {
       generateIdentifiers.setCommand(command);
