@@ -787,6 +787,7 @@ div.evaluateScriptPanel {
 
 table.selection-list {
   width:100%;
+  cursor: pointer;
 }
 
 table.item-properties input.text  {
