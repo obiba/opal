@@ -41,6 +41,9 @@ import org.obiba.opal.web.model.client.magma.ViewDto;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
@@ -83,7 +86,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     getDisplay().setPreviousCommand(new PreviousCommand());
     getDisplay().setNextCommand(new NextCommand());
     super.getDisplay().setVariableNameFieldUpdater(new VariableNameFieldUpdater());
-
+    super.registerHandler(getDisplay().addVariableSuggestionHandler(new VariableSuggestionHandler()));
   }
 
   @Override
@@ -184,6 +187,22 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   //
   // Interfaces and classes
   //
+
+  private final class VariableSuggestionHandler implements ValueChangeHandler<String> {
+    @Override
+    public void onValueChange(ValueChangeEvent<String> evt) {
+      // look for the variable and fire selection
+      for(int i = 0; i < variables.length(); i++) {
+        if(variables.get(i).getName().equals(evt.getValue())) {
+          VariableDto selection = variables.get(i);
+          eventBus.fireEvent(new VariableSelectionChangeEvent(selection, getPreviousVariable(i), getNextVariable(i)));
+          getDisplay().setVariableSelection(selection, i);
+          getDisplay().clearVariableSuggestion();
+          break;
+        }
+      }
+    }
+  }
 
   final class NextCommand implements Command {
     @Override
@@ -295,6 +314,9 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       if(this.table.getLink().equals(TablePresenter.this.table.getLink())) {
         variables = (resource != null) ? resource : JsArray.createArray().<JsArray<VariableDto>> cast();
         getDisplay().renderRows(variables);
+        for(int i = 0; i < variables.length(); i++) {
+          getDisplay().addVariableSuggestion(variables.get(i).getName());
+        }
         getDisplay().afterRenderRows();
       }
     }
@@ -345,10 +367,6 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
     void setVariableSelection(VariableDto variable, int index);
 
-    /**
-     * @param downloadViewCommand
-     */
-
     void beforeRenderRows();
 
     void renderRows(JsArray<VariableDto> rows);
@@ -384,6 +402,12 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     void setVariableNameFieldUpdater(FieldUpdater<VariableDto, String> updater);
 
     void setCopyDataCommand(Command cmd);
+
+    void addVariableSuggestion(String suggestion);
+
+    HandlerRegistration addVariableSuggestionHandler(ValueChangeHandler<String> handler);
+
+    void clearVariableSuggestion();
   }
 
 }

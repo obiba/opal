@@ -22,6 +22,8 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -39,6 +41,8 @@ import com.google.gwt.user.client.ui.InsertPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.MenuItemSeparator;
+import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
+import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListView;
 import com.google.gwt.view.client.SelectionModel;
@@ -76,6 +80,11 @@ public class TableView extends Composite implements TablePresenter.Display {
   @UiField
   CellTable<VariableDto> table;
 
+  @UiField(provided = true)
+  SuggestBox variableNameSuggestBox;
+
+  MultiWordSuggestOracle suggestions;
+
   SelectionModel<VariableDto> selectionModel = new SingleSelectionModel<VariableDto>();
 
   SimplePager<VariableDto> pager;
@@ -92,6 +101,7 @@ public class TableView extends Composite implements TablePresenter.Display {
   private MenuItemSeparator removeItemSeparator;
 
   public TableView() {
+    variableNameSuggestBox = new SuggestBox(suggestions = new MultiWordSuggestOracle());
     initWidget(uiBinder.createAndBindUi(this));
     toolbarPanel.add(toolbar = new NavigatorMenuBar());
     addTableColumns();
@@ -152,6 +162,8 @@ public class TableView extends Composite implements TablePresenter.Display {
     pager.setVisible(false);
     table.setVisible(false);
     loading.setVisible(true);
+    suggestions.clear();
+    variableNameSuggestBox.setText("");
   }
 
   @Override
@@ -308,4 +320,20 @@ public class TableView extends Composite implements TablePresenter.Display {
   public void setVariableNameFieldUpdater(FieldUpdater<VariableDto, String> updater) {
     variableNameColumn.setFieldUpdater(updater);
   }
+
+  @Override
+  public void addVariableSuggestion(String suggestion) {
+    suggestions.add(suggestion);
+  }
+
+  @Override
+  public HandlerRegistration addVariableSuggestionHandler(ValueChangeHandler<String> handler) {
+    return variableNameSuggestBox.addValueChangeHandler(handler);
+  }
+
+  @Override
+  public void clearVariableSuggestion() {
+    variableNameSuggestBox.setText("");
+  }
+
 }

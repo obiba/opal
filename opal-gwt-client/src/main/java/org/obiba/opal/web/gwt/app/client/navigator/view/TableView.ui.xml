@@ -12,7 +12,9 @@
        <g:Label addStyleNames="small-indent" ui:field="tableOrView">(View)</g:Label>
      </g:FlowPanel>
       
-     <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
+     <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left">
+       <g:SuggestBox ui:field="variableNameSuggestBox" addStyleNames="right-aligned"/>
+     </g:FlowPanel>
      
      <g:HTMLPanel>
       <table class="item-properties small-indent">
