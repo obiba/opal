@@ -26,6 +26,11 @@
 	           <tr>
 	             <td colspan="2"><g:CheckBox ui:field="incremental"><ui:msg description="Incremental checkbox label">incremental</ui:msg></g:CheckBox></td>
 	           </tr>
+	           <tr>
+	             <td colspan="2">
+	               <g:CheckBox ui:field="useAlias"><ui:msg description="Use alias to rename variable checkbox label">use 'alias' attribute to rename variables</ui:msg></g:CheckBox>
+	             </td>
+	           </tr>
 	         </tbody>
           </table>
         </g:HTMLPanel>

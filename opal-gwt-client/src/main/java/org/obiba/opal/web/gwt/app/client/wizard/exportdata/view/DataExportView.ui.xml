@@ -31,6 +31,11 @@
 	             <td><g:Label><ui:msg description="File field">File:</ui:msg></g:Label></td>
 	             <td><g:SimplePanel ui:field="filePanel"/></td>
 	           </tr>
+	           <tr>
+	             <td colspan="2">
+	               <g:CheckBox ui:field="useAlias"><ui:msg description="Use alias to rename variable checkbox label">use 'alias' attribute to rename variables</ui:msg></g:CheckBox>
+	             </td>
+	           </tr>
 	         </tbody>
           </table>
         </g:HTMLPanel>

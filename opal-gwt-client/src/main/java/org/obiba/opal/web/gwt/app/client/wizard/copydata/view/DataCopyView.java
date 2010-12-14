@@ -77,6 +77,9 @@ public class DataCopyView extends Composite implements DataCopyPresenter.Display
   @UiField
   HTMLPanel destinationHelpPanel;
 
+  @UiField
+  CheckBox useAlias;
+
   private TableListPresenter.Display tablesList;
 
   private ValidationHandler tablesValidator;
@@ -268,6 +271,11 @@ public class DataCopyView extends Composite implements DataCopyPresenter.Display
   @Override
   public void setDestinationValidator(ValidationHandler handler) {
     this.destinationValidator = handler;
+  }
+
+  @Override
+  public boolean isUseAlias() {
+    return useAlias.getValue();
   }
 
 }

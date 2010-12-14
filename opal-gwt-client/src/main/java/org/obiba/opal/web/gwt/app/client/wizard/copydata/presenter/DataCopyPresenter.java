@@ -243,6 +243,7 @@ public class DataCopyPresenter extends WidgetPresenter<DataCopyPresenter.Display
       dto.setDestination(getDisplay().getSelectedDatasource());
       dto.setNonIncremental(!getDisplay().isIncremental());
       dto.setNoVariables(!getDisplay().isWithVariables());
+      if(getDisplay().isUseAlias()) dto.setTransform("attribute('alias').isNull().value ? name() : attribute('alias')");
 
       return dto;
     }
@@ -339,6 +340,8 @@ public class DataCopyPresenter extends WidgetPresenter<DataCopyPresenter.Display
     boolean isIncremental();
 
     boolean isWithVariables();
+
+    boolean isUseAlias();
 
     void setTableWidgetDisplay(TableListPresenter.Display display);
 

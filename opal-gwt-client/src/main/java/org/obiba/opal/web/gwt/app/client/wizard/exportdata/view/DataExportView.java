@@ -30,6 +30,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -92,6 +93,9 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
 
   @UiField
   HTMLPanel unitHelpPanel;
+
+  @UiField
+  CheckBox useAlias;
 
   private FileSelectionPresenter.Display fileSelection;
 
@@ -230,7 +234,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
 
   @Override
   public boolean isUseAlias() {
-    return false;
+    return useAlias.getValue();
   }
 
   @Override
