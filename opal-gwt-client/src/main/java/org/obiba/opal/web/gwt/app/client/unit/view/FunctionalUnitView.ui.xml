@@ -17,7 +17,7 @@
         <ui:msg description="Export All Identifiers label">Export All Identifiers</ui:msg>
       </g:Button>
       <g:Button ui:field="importButton">
-        <ui:msg description="Import Identifiers label">Import Identifiers</ui:msg>
+        <ui:msg description="Import Identifiers label">Add/Update Identifiers</ui:msg>
       </g:Button>
     </g:FlowPanel>
     <g:SplitLayoutPanel>

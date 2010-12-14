@@ -59,10 +59,6 @@ import com.google.inject.Inject;
 
 public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImportPresenter.Display> implements Wizard {
 
-  public enum IdentifiersImportMode {
-    DATA, MAP, BULK
-  }
-
   @Inject
   public IdentifiersImportPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
@@ -73,33 +69,13 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
 
     void hideDialog();
 
-    HandlerRegistration addNextClickHandler(ClickHandler handler);
-
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
 
     HandlerRegistration addCloseClickHandler(ClickHandler handler);
 
-    HandlerRegistration addPreviousClickHandler(ClickHandler handler);
-
     HandlerRegistration addFinishClickHandler(ClickHandler handler);
 
-    void setFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
-
     void setCsvOptionsFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
-
-    HasText getSelectedFile();
-
-    boolean isIdentifiersOnly();
-
-    boolean isIdentifiersPlusData();
-
-    ImportFormat getImportFormat();
-
-    /** Display no format options in the Format Options Step. The format chosen has no options. */
-    void setNoFormatOptions();
-
-    /** Display the CSV format options in the Format Options Step. */
-    void setCsvFormatOptions();
 
     void renderPendingConclusion();
 
@@ -114,9 +90,6 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
   }
 
   @Inject
-  private FileSelectionPresenter fileSelectionPresenter;
-
-  @Inject
   private FileSelectionPresenter csvOptionsFileSelectionPresenter;
 
   private ImportData importData;
@@ -125,28 +98,19 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
 
   private String unitName;
 
-  private IdentifiersImportMode mode;
-
   protected TableDto identifiersTable;
 
   @Override
   public void onWizardRequired(WizardRequiredEvent event) {
-    if(event.getEventParameters().length > 1) {
+    if(event.getEventParameters().length != 0) {
       if(event.getEventParameters()[0] instanceof String) {
         unitName = (String) event.getEventParameters()[0];
       } else {
         throw new IllegalArgumentException("unexpected event parameter type (expected String)");
       }
 
-      if(event.getEventParameters()[1] instanceof IdentifiersImportMode) {
-        mode = (IdentifiersImportMode) event.getEventParameters()[1];
-      } else {
-        throw new IllegalArgumentException("unexpected event parameter type (expected Mode)");
-      }
-
     } else {
       unitName = null;
-      mode = IdentifiersImportMode.BULK;
     }
   }
 
@@ -164,10 +128,6 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
     getIdentifiersTable();
     getDefaultCharset();
     getAvailableCharsets();
-
-    fileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
-    fileSelectionPresenter.bind();
-    getDisplay().setFileSelectorWidgetDisplay(fileSelectionPresenter.getDisplay());
 
     csvOptionsFileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
     csvOptionsFileSelectionPresenter.bind();
@@ -216,13 +176,7 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
         getDisplay().hideDialog();
       }
     }));
-    super.registerHandler(getDisplay().addNextClickHandler(new ClickHandler() {
 
-      @Override
-      public void onClick(ClickEvent arg0) {
-        update();
-      }
-    }));
     super.registerHandler(getDisplay().addFinishClickHandler(new ClickHandler() {
 
       @Override
@@ -235,17 +189,6 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
     }));
   }
 
-  private void update() {
-    if(fileSelectionPresenter.getSelectedFile() != null && !fileSelectionPresenter.getSelectedFile().equals("")) {
-      csvOptionsFileSelectionPresenter.setSelectedFile(fileSelectionPresenter.getSelectedFile());
-    }
-    if(getDisplay().getImportFormat().equals(ImportFormat.CSV)) {
-      getDisplay().setCsvFormatOptions();
-    } else {
-      getDisplay().setNoFormatOptions();
-    }
-  }
-
   class FileValidator extends AbstractValidationHandler {
 
     public FileValidator() {
@@ -256,14 +199,10 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
-      if(getDisplay().getImportFormat().equals(ImportFormat.CSV)) {
-        validators.add(new RequiredTextValidator(getSelectedCsvFile(), "NoFileSelected"));
-        validators.add(new RegExValidator(getDisplay().getCsvOptions().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
-        validators.add(new ConditionalValidator(getDisplay().getCsvOptions().isCharsetSpecify(), new RequiredTextValidator(getDisplay().getCsvOptions().getCharsetSpecifyText(), "SpecificCharsetNotIndicated")));
-        validators.add(new ConditionalValidator(getDisplay().getCsvOptions().isCharsetSpecify(), new ConditionValidator(isSpecificCharsetAvailable(), "CharsetNotAvailable")));
-      } else {
-        validators.add(new RequiredTextValidator(getDisplay().getSelectedFile(), "NoFileSelected"));
-      }
+      validators.add(new RegExValidator(getSelectedCsvFile(), ".csv$", "CSVFileRequired"));
+      validators.add(new RegExValidator(getDisplay().getCsvOptions().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
+      validators.add(new ConditionalValidator(getDisplay().getCsvOptions().isCharsetSpecify(), new RequiredTextValidator(getDisplay().getCsvOptions().getCharsetSpecifyText(), "SpecificCharsetNotIndicated")));
+      validators.add(new ConditionalValidator(getDisplay().getCsvOptions().isCharsetSpecify(), new ConditionValidator(isSpecificCharsetAvailable(), "CharsetNotAvailable")));
 
       return validators;
     }
@@ -277,11 +216,10 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
 
   private void populateImportData() {
     importData = new ImportData();
-    importData.setFormat(getDisplay().getImportFormat());
+    importData.setFormat(ImportFormat.CSV);
     importData.setDestinationDatasourceName(null); // no ref table
     importData.setDestinationTableName(identifiersTable.getName());
     importData.setCsvFile(csvOptionsFileSelectionPresenter.getSelectedFile());
-    importData.setXmlFile(fileSelectionPresenter.getSelectedFile());
     importData.setUnit(unitName);
     importData.setCharacterSet(getDisplay().getCsvOptions().getSelectedCharacterSet());
     importData.setRow(Integer.parseInt(getDisplay().getCsvOptions().getRowText().getText()));
@@ -309,13 +247,11 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
     };
 
     String path = null;
-    if(mode.equals(IdentifiersImportMode.BULK)) {
+    if(unitName == null) {
       path = "/functional-units/entities";
     } else {
-      path = "/functional-unit/" + unitName + "/entities";
-      if(mode.equals(IdentifiersImportMode.MAP)) {
-        path += "?select=true";
-      }
+      // all data are identifiers
+      path = "/functional-unit/" + unitName + "/entities?select=true";
     }
 
     ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource(path).post()//

@@ -10,11 +10,9 @@
 package org.obiba.opal.web.gwt.app.client.wizard.importidentifiers.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.widgets.view.CsvOptionsView;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.gwt.app.client.wizard.importidentifiers.presenter.IdentifiersImportPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
@@ -26,9 +24,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -46,19 +41,7 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   WizardDialogBox dialog;
 
   @UiField
-  WizardStep formatSelectionStep;
-
-  @UiField
-  SimplePanel selectFilePanel;
-
-  @UiField
-  ListBox formatListBox;
-
-  @UiField
   WizardStep formatStep;
-
-  @UiField
-  HTMLPanel xmlOptions;
 
   @UiField
   CsvOptionsView csvOptions;
@@ -68,8 +51,6 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
 
   @UiField
   SimplePanel conclusionPanel;
-
-  private FileSelectionPresenter.Display fileSelection;
 
   private WizardStepChain stepChain;
 
@@ -81,14 +62,10 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   }
 
   private void initWidgets() {
-    formatListBox.addItem(translations.csvLabel(), ImportFormat.CSV.name());
-    formatListBox.addItem(translations.opalXmlLabel(), ImportFormat.XML.name());
   }
 
   private void initWizardDialog() {
     stepChain = WizardStepChain.Builder.create(dialog)//
-    .append(formatSelectionStep)//
-    .title(translations.selectFileAndDataFormatLabel())//
 
     .append(formatStep)//
     .title(translations.dataImportFileStep())//
@@ -126,16 +103,6 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   }
 
   @Override
-  public HandlerRegistration addNextClickHandler(ClickHandler handler) {
-    return dialog.addNextClickHandler(handler);
-  }
-
-  @Override
-  public HandlerRegistration addPreviousClickHandler(ClickHandler handler) {
-    return dialog.addPreviousClickHandler(handler);
-  }
-
-  @Override
   public HandlerRegistration addCancelClickHandler(ClickHandler handler) {
     return dialog.addCancelClickHandler(handler);
   }
@@ -151,47 +118,8 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   }
 
   @Override
-  public void setFileSelectorWidgetDisplay(Display display) {
-    selectFilePanel.setWidget(display.asWidget());
-    fileSelection = display;
-    fileSelection.setFieldWidth("20em");
-  }
-
-  @Override
-  public HasText getSelectedFile() {
-    return fileSelection.getFileText();
-  }
-
-  @Override
-  public boolean isIdentifiersOnly() {
-    return false;
-  }
-
-  @Override
-  public boolean isIdentifiersPlusData() {
-    return true;
-  }
-
-  @Override
   public void setCsvOptionsFileSelectorWidgetDisplay(Display display) {
     csvOptions.setCsvFileSelectorWidgetDisplay(display);
-  }
-
-  @Override
-  public ImportFormat getImportFormat() {
-    return ImportFormat.valueOf(formatListBox.getValue(formatListBox.getSelectedIndex()));
-  }
-
-  @Override
-  public void setNoFormatOptions() {
-    xmlOptions.setVisible(true);
-    csvOptions.setVisible(false);
-  }
-
-  @Override
-  public void setCsvFormatOptions() {
-    xmlOptions.setVisible(false);
-    csvOptions.setVisible(true);
   }
 
   @Override

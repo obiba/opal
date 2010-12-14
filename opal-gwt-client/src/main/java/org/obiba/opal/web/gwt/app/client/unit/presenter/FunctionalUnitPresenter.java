@@ -72,13 +72,7 @@ public class FunctionalUnitPresenter extends WidgetPresenter<FunctionalUnitPrese
   private void addHandlers() {
     super.registerHandler(getDisplay().addFunctionalUnitClickHandler(new AddFunctionalUnitClickHandler()));
     super.registerHandler(getDisplay().addExportIdentifiersClickHandler(new ExportIdentifiersClickHandler()));
-    super.registerHandler(getDisplay().addImportIdentifiersClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent arg0) {
-        eventBus.fireEvent(new WizardRequiredEvent(WizardType.IMPORT_IDENTIFIERS));
-      }
-    }));
+    super.registerHandler(getDisplay().addImportIdentifiersClickHandler(new ImportIdentifiersClickHandler()));
   }
 
   protected void initDisplayComponents() {
@@ -108,6 +102,10 @@ public class FunctionalUnitPresenter extends WidgetPresenter<FunctionalUnitPrese
   protected void onPlaceRequest(PlaceRequest request) {
   }
 
+  //
+  // Inner classes
+  //
+
   public class AddFunctionalUnitClickHandler implements ClickHandler {
 
     @Override
@@ -130,6 +128,13 @@ public class FunctionalUnitPresenter extends WidgetPresenter<FunctionalUnitPrese
       eventBus.fireEvent(new FileDownloadEvent(url));
     }
 
+  }
+
+  private final class ImportIdentifiersClickHandler implements ClickHandler {
+    @Override
+    public void onClick(ClickEvent arg0) {
+      eventBus.fireEvent(new WizardRequiredEvent(WizardType.IMPORT_IDENTIFIERS));
+    }
   }
 
 }
