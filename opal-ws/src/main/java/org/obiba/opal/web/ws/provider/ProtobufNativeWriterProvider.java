@@ -50,7 +50,7 @@ public class ProtobufNativeWriterProvider implements MessageBodyWriter<Object> {
   @SuppressWarnings( { "unchecked", "PMD.ExcessiveParameterList" })
   public void writeTo(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
     if(isWrapped(type, genericType, annotations, mediaType)) {
-      for(Message m : (Collection<Message>) t) {
+      for(Message m : (Iterable<Message>) t) {
         m.writeDelimitedTo(entityStream);
       }
     } else {
@@ -59,7 +59,7 @@ public class ProtobufNativeWriterProvider implements MessageBodyWriter<Object> {
   }
 
   protected boolean isWrapped(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-    if((Collection.class.isAssignableFrom(type) || type.isArray()) && genericType != null) {
+    if((Iterable.class.isAssignableFrom(type) || type.isArray()) && genericType != null) {
       Class<?> baseType = Types.getCollectionBaseType(type, genericType);
       if(baseType == null) return false;
       return Message.class.isAssignableFrom(baseType) && !IgnoredMediaTypes.ignored(baseType, annotations, mediaType);

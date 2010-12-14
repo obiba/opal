@@ -14,7 +14,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.Collection;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -56,7 +55,7 @@ public class ProtobufJsonWriterProvider implements MessageBodyWriter<Object> {
     OutputStreamWriter output = new OutputStreamWriter(entityStream, "UTF-8");
     if(isWrapped(type, genericType, annotations, mediaType)) {
       // JsonFormat does not provide a printList method
-      JsonIoUtil.printCollection((Collection<Message>) t, output);
+      JsonIoUtil.printCollection((Iterable<Message>) t, output);
     } else {
       JsonFormat.print((Message) t, output);
     }
@@ -64,7 +63,7 @@ public class ProtobufJsonWriterProvider implements MessageBodyWriter<Object> {
   }
 
   protected boolean isWrapped(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-    if((Collection.class.isAssignableFrom(type) || type.isArray()) && genericType != null) {
+    if((Iterable.class.isAssignableFrom(type) || type.isArray()) && genericType != null) {
       Class<?> baseType = Types.getCollectionBaseType(type, genericType);
       if(baseType == null) return false;
       return Message.class.isAssignableFrom(baseType) && !IgnoredMediaTypes.ignored(baseType, annotations, mediaType);

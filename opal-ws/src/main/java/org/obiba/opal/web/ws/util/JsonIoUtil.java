@@ -3,7 +3,6 @@ package org.obiba.opal.web.ws.util;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Collection;
 
 import com.google.protobuf.ExtensionRegistry;
 import com.google.protobuf.JsonFormat;
@@ -52,7 +51,7 @@ public final class JsonIoUtil {
     return messages;
   }
 
-  public static void printCollection(final Collection<? extends Message> messages, final Appendable appendable) throws IOException {
+  public static void printCollection(final Iterable<? extends Message> messages, final Appendable appendable) throws IOException {
     if(messages == null) throw new IllegalArgumentException("messages cannot be null");
     if(appendable == null) throw new IllegalArgumentException("messages cannot be null");
 
