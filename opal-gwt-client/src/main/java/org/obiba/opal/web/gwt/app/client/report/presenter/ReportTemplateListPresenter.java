@@ -95,7 +95,7 @@ public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateL
 
         @Override
         public void onResource(Response response, JsArray<ReportTemplateDto> templates) {
-          getDisplay().setReportTemplates(templates);
+          getDisplay().setReportTemplates(JsArrays.toSafeArray(templates));
           getDisplay().select(event.getReportTemplate());
         }
       }).send();
