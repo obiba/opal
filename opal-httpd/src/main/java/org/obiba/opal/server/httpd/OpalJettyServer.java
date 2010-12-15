@@ -167,7 +167,7 @@ public class OpalJettyServer implements Service {
   }
 
   private Handler createFileHandler(String directory) {
-    String fileUrl = "file://" + System.getProperty("OPAL_DIST_DIR") + directory;
+    String fileUrl = "file://" + System.getProperty("OPAL_DIST") + directory;
     ResourceHandler resourceHandler = new ResourceHandler();
     try {
       resourceHandler.setBaseResource(new FileResource(new URL(fileUrl)));

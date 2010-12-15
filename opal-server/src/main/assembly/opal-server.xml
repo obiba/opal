@@ -33,25 +33,6 @@
       </includes>
     </fileSet>
 
-    <fileSet>
-      <directory>src/main/bootstrap</directory>
-      <outputDirectory>bootstrap</outputDirectory>
-      <excludes>
-        <exclude>yajsw/bat/*.*</exclude>
-      </excludes>
-      <includes>
-        <include>**/*.*</include>
-      </includes>
-    </fileSet>
-
-    <fileSet>
-      <directory>src/main/bootstrap/yajsw/bat</directory>
-      <outputDirectory>bootstrap/yajsw/bat</outputDirectory>
-      <fileMode>0755</fileMode>
-      <includes>
-        <include>**/*.*</include>
-      </includes>
-    </fileSet>
   </fileSets>
   <dependencySets>
 

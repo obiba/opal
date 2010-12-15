@@ -52,37 +52,42 @@ public class OpalServer {
     }
   }
 
-  final void startAndWait() throws IOException {
+  final void boot() {
     if(ctx.isActive()) {
-      try {
-        ctx.getBean(OpalRuntime.class).start();
-
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-          public void run() {
-            shutdown();
-          }
-        });
-
-        System.out.println("Opal Server successfully started.");
-        System.in.read();
-        shutdown();
-      } finally {
-        ctx.destroy();
-      }
+      ctx.getBean(OpalRuntime.class).start();
+      System.out.println("Opal Server successfully started.");
     }
   }
 
   final void shutdown() {
     System.out.println("Opal Server shuting down.");
-    ctx.getBean(OpalRuntime.class).stop();
+    try {
+      ctx.getBean(OpalRuntime.class).stop();
+    } finally {
+      ctx.close();
+    }
   }
 
-  public static void main(String[] args) throws IOException {
-    try {
-      new OpalServer(CliFactory.parseArguments(OpalServerOptions.class, args)).startAndWait();
-    } catch(ArgumentValidationException e) {
-      System.out.println(String.format("%s", e.getMessage()));
+  private static void checkSystemProperty(String... properties) {
+    for(String property : properties) {
+      if(System.getProperty(property) == null) {
+        throw new IllegalStateException("System property \"" + property + "\" must be defined.");
+      }
     }
+  }
+
+  public static void main(String[] args) throws ArgumentValidationException, IOException {
+    checkSystemProperty("OPAL_HOME", "OPAL_DIST");
+
+    final OpalServer opal = new OpalServer(CliFactory.parseArguments(OpalServerOptions.class, args));
+    opal.boot();
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      public void run() {
+        opal.shutdown();
+      }
+    });
+    System.out.println("Opal is attached to this console. Press ctrl-c to stop.");
+    // We can exit the main thread because other non-daemon threads will keep the JVM alive
   }
 
 }
