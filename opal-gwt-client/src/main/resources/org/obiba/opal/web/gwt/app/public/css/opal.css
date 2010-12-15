@@ -991,8 +991,12 @@ div.variablesListTabContent .form table {
 
 /* Tooltip */
 
-.tooltip {
+.tooltip, .tooltip a, .tooltip a:visited, .tooltip a:hover {
 	color: #ffffff;
+}
+
+.tooltip a {
+	text-decoration: underline;
 }
 
 .tooltip.gwt-PopupPanel {

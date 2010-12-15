@@ -82,8 +82,101 @@
                 <td>
                   <g:TextBox addStyleNames="text" name="schedule" ui:field="schedule"
                     visibleLength="40"/>
-                  <o:HelpImage imageSize="16">
-                    <g:Label><ui:msg description="Schedule label">Schedule</ui:msg></g:Label>
+                  <o:HelpImage imageSize="16" tooltipWidth="400px">
+                    <g:HTMLPanel>
+                      <g:Label addStyleNames="title"><ui:msg description="Schedule Expression label">Schedule Expression</ui:msg></g:Label>
+                      <p>
+                        <ui:msg description="Schedule Expression information">
+                        A schedule expression is a string comprised of 6 or 7 fields separated by white space. Fields can contain any of the allowed values, along with various combinations of the allowed special characters for that field.
+                        </ui:msg>
+                      </p>
+                      <p>
+                        Full documentation is available as a <g:Anchor ui:field="cronLink">Quartz Scheduler Tutorial</g:Anchor>.
+                      </p>
+                      <table cellspacing="1" cellpadding="3">
+					    <tbody>
+					        <tr>
+					            <th>Field Name</th>
+					            <th>Mandatory</th>
+					            <th>Allowed Values</th>
+					            <th>Allowed Special Characters</th>
+					        </tr>
+					        <tr>
+					            <td>Seconds</td>
+					            <td>YES</td>
+					            <td>0-59</td>
+					            <td>, - * /</td>
+					        </tr>
+					        <tr>
+					            <td>Minutes</td>
+					            <td>YES</td>
+					            <td>0-59</td>
+					            <td>, - * /</td>
+					        </tr>
+					        <tr>
+					            <td>Hours</td>
+					            <td>YES</td>
+					            <td>0-23</td>
+					            <td>, - * /</td>
+					        </tr>
+					        <tr>
+					            <td>Day of month</td>
+					            <td>YES</td>
+					            <td>1-31</td>
+					            <td>, - * ? / L W</td>
+					        </tr>
+					        <tr>
+					            <td>Month</td>
+					            <td>YES</td>
+					            <td>1-12 or JAN-DEC</td>
+					            <td>, - * /</td>
+					        </tr>
+					        <tr>
+					            <td>Day of week</td>
+					            <td>YES</td>
+					            <td>1-7 or SUN-SAT</td>
+					            <td>, - * ? / L #</td>
+					        </tr>
+					        <tr>
+					            <td>Year</td>
+					            <td>NO</td>
+					            <td>empty, 1970-2099</td>
+					            <td>, - * /</td>
+					        </tr>
+					    </tbody>
+					  </table>
+			            <p>
+			              Common schedule expressions examples:
+			            </p>
+			            <table cellspacing="1" cellpadding="3">
+						    <tbody>
+						        <tr>
+						            <th>Expression</th>
+						            <th>Meaning</th>
+						        </tr>
+						        <tr>
+						            <td class="nowrap"><tt>0 15 10 ? * *</tt></td>
+						            <td>Fire at 10:15am every day</td>
+						        </tr>
+						        <tr>
+						            <td class="nowrap"><tt>0 15 10 ? * MON-FRI</tt></td>
+						            <td>Fire at 10:15am every Monday, Tuesday, Wednesday, Thursday and Friday</td>
+						        </tr>
+						        <tr>
+						            <td class="nowrap"><tt>0 15 10 15 * ?</tt></td>
+						            <td>Fire at 10:15am on the 15th day of every month</td>
+						        </tr>
+						        <tr>
+						            <td class="nowrap"><tt>0 10,44 14 ? 3 WED</tt></td>
+						            <td>Fire at 2:10pm and at 2:44pm every Wednesday in the month of March.</td>
+						        </tr>
+						        <tr>
+						            <td class="nowrap"><tt>0 15 10 ? * 6#3</tt></td>
+						            <td>Fire at 10:15am on the third Friday of every month</td>
+						        </tr>
+						    </tbody>
+						</table>
+                    </g:HTMLPanel>
                   </o:HelpImage>
                 </td>
               </tr>
@@ -98,7 +191,6 @@
                 </td>
               </tr>
             </table>
-
           </g:HTMLPanel>
         </g:ScrollPanel>
       </g:center>

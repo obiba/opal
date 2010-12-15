@@ -17,12 +17,15 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.ItemSelectorPresenter
 import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
@@ -82,6 +85,9 @@ public class ReportTemplateUpdateDialogView extends Composite implements Display
   @UiField
   RadioButton scheduleRadio;
 
+  @UiField
+  Anchor cronLink;
+
   private ItemSelectorPresenter.Display emailsSelector;
 
   private ItemSelectorPresenter.Display parametersSelector;
@@ -93,6 +99,13 @@ public class ReportTemplateUpdateDialogView extends Composite implements Display
     uiBinder.createAndBindUi(this);
     resizeHandle.makeResizable(contentLayout);
     dialog.hide();
+    cronLink.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent arg0) {
+        Window.open("http://www.quartz-scheduler.org/docs/tutorials/crontrigger.html", "_blank", null);
+      }
+    });
   }
 
   @Override
