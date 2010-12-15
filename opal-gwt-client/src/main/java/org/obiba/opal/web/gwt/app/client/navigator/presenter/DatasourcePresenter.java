@@ -26,6 +26,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.Notific
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -87,6 +88,9 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     super.registerHandler(eventBus.addHandler(SiblingTableSelectionEvent.getType(), new SiblingTableSelectionHandler()));
     super.getDisplay().setTableNameFieldUpdater(new TableNameFieldUpdater());
     super.registerHandler(eventBus.addHandler(DatasourceUpdatedEvent.getType(), new DatasourceUpdatedEventHandler()));
+
+    // OPAL-975
+    super.registerHandler(eventBus.addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
   }
 
   @Override
@@ -440,6 +444,21 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
       if(event.getSelection().getName().equals(datasourceName)) {
         displayDatasource(event.getSelection());
       }
+    }
+  }
+
+  // OPAL-975
+  class ViewSavedEventHandler implements ViewSavedEvent.Handler {
+
+    @Override
+    public void onViewSaved(ViewSavedEvent event) {
+      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasource/" + datasourceName).get().withCallback(new ResourceCallback<DatasourceDto>() {
+
+        @Override
+        public void onResource(Response response, DatasourceDto resource) {
+          displayDatasource(resource, null);
+        }
+      }).send();
     }
   }
 

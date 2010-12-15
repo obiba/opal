@@ -20,15 +20,16 @@ import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingTableSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingTableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingTableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -55,6 +56,10 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   private JsArray<VariableDto> variables;
 
   private TableDto table;
+
+  private String previous;
+
+  private String next;
 
   @Inject
   private Provider<NavigatorPresenter> navigationPresenter;
@@ -87,6 +92,9 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     getDisplay().setNextCommand(new NextCommand());
     super.getDisplay().setVariableNameFieldUpdater(new VariableNameFieldUpdater());
     super.registerHandler(getDisplay().addVariableSuggestionHandler(new VariableSuggestionHandler()));
+
+    // OPAL-975
+    super.registerHandler(eventBus.addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
   }
 
   @Override
@@ -111,26 +119,27 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   }
 
   private void updateDisplay(TableDto tableDto, String previous, String next) {
-    if(table == null || !isCurrentTable(tableDto)) {
-      table = tableDto;
-      getDisplay().clear();
-      getDisplay().setTable(tableDto);
-      getDisplay().setParentName(tableDto.getDatasourceName());
-      getDisplay().setPreviousName(previous);
-      getDisplay().setNextName(next);
+    this.previous = previous;
+    this.next = next;
 
-      if(tableIsView()) {
-        getDisplay().setDownloadViewCommand(new DownloadViewCommand());
-        getDisplay().setRemoveCommand(new RemoveCommand());
-        getDisplay().setEditCommand(new EditCommand());
-      } else {
-        getDisplay().setDownloadViewCommand(null);
-        getDisplay().setRemoveCommand(null);
-        getDisplay().setEditCommand(null);
-      }
+    table = tableDto;
+    getDisplay().clear();
+    getDisplay().setTable(tableDto);
+    getDisplay().setParentName(tableDto.getDatasourceName());
+    getDisplay().setPreviousName(previous);
+    getDisplay().setNextName(next);
 
-      updateVariables();
+    if(tableIsView()) {
+      getDisplay().setDownloadViewCommand(new DownloadViewCommand());
+      getDisplay().setRemoveCommand(new RemoveCommand());
+      getDisplay().setEditCommand(new EditCommand());
+    } else {
+      getDisplay().setDownloadViewCommand(null);
+      getDisplay().setRemoveCommand(null);
+      getDisplay().setEditCommand(null);
     }
+
+    updateVariables();
   }
 
   private boolean isCurrentTable(TableDto tableDto) {
@@ -325,7 +334,8 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   class TableSelectionChangeHandler implements TableSelectionChangeEvent.Handler {
     @Override
     public void onTableSelectionChanged(TableSelectionChangeEvent event) {
-      updateDisplay(event.getSelection(), event.getPrevious(), event.getNext());
+      table = event.getSelection();
+      updateDisplay(table, event.getPrevious(), event.getNext());
     }
   }
 
@@ -360,6 +370,17 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
       getDisplay().setVariableSelection(siblingSelection, siblingIndex);
       eventBus.fireEvent(new VariableSelectionChangeEvent(siblingSelection, getPreviousVariable(siblingIndex), getNextVariable(siblingIndex)));
+    }
+  }
+
+  // OPAL-975
+  class ViewSavedEventHandler implements ViewSavedEvent.Handler {
+
+    @Override
+    public void onViewSaved(ViewSavedEvent event) {
+      if(table != null) {
+        updateDisplay(table, previous, next);
+      }
     }
   }
 
