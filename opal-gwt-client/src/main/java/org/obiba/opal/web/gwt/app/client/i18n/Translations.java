@@ -237,7 +237,8 @@ public interface Translations extends Constants {
   "KeyPairPublicKeyPEMIsRequired", "Public Key in PEM format is required.",//
   "DestinationFileIsMissing", "Destination File is required.", //
   "ExportDataMissingTables", "At least one table is required.",//
-  "IdentifiersGenerationFailed", "Identifiers Generation has failed."//
+  "IdentifiersGenerationCompleted", "Identifiers generation completed.",//
+  "IdentifiersGenerationFailed", "Identifiers generation has failed."//
   })
   Map<String, String> userMessageMap();
 

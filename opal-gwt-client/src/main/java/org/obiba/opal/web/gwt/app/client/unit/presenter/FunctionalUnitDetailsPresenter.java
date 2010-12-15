@@ -270,7 +270,9 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
         @Override
         public void onResponseCode(Request request, Response response) {
-          if(response.getStatusCode() != Response.SC_OK) {
+          if(response.getStatusCode() == Response.SC_OK) {
+            eventBus.fireEvent(new NotificationEvent(NotificationType.INFO, "IdentifiersGenerationCompleted", Arrays.asList(functionalUnit.getName())).nonSticky());
+          } else {
             eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "IdentifiersGenerationFailed", null));
           }
           refreshDisplay();
