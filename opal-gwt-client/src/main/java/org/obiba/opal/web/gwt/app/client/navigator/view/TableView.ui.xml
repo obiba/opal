@@ -50,7 +50,7 @@
 	  <g:Anchor><ui:msg description="Variables label">Variables</ui:msg></g:Anchor>
       <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_RIGHT">
         <g:InlineLabel ui:field="noVariables"><ui:msg description="No Variables label">No Variables</ui:msg></g:InlineLabel>
-        <g2:CellTable ui:field="table" width="100%" addStyleNames="left-aligned gwt-CellTable tableList"/>
+        <o:Table ui:field="table" width="100%" addStyleNames="left-aligned gwt-CellTable tableList"/>
         <g:Image ui:field="loading" url="image/loading.gif" addStyleNames="loading"/>
       </g:VerticalPanel>
      </o:HorizontalTabLayout>

@@ -1,5 +1,6 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"  
   xmlns:g2="urn:import:com.google.gwt.user.cellview.client">
 
   <ui:style>
@@ -25,7 +26,7 @@
   <g:FlowPanel>
     <g:Button ui:field="addButton" addStyleNames="left-aligned">Add</g:Button>
     <g:ListBox ui:field="localeListBox" addStyleNames="right-aligned" />
-    <g2:CellTable ui:field="localizablesTable" addStyleNames="small-top-margin {style.localizablesTable}" />  
+    <o:Table ui:field="localizablesTable" addStyleNames="small-top-margin {style.localizablesTable}" />  
   </g:FlowPanel>
   
 </ui:UiBinder>

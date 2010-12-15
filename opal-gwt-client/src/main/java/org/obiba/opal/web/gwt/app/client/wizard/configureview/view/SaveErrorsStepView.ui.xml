@@ -12,7 +12,7 @@
     <g:Button ui:field="backButton"><ui:msg description="Back button label">Back</ui:msg></g:Button>
     
     <g:FlowPanel>
-      <g2:CellTable width="100%" ui:field="errorsTable" />
+      <o:Table width="100%" ui:field="errorsTable" />
     </g:FlowPanel>          
   </o:WorkbenchLayout>
 

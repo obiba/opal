@@ -222,10 +222,7 @@ img.help {
 
 /* CellTable */
 
-.tableList .selected {
-	background-color:#DEBB9D;
-	color: #000000;
-}
+
 
 .gwt-CellTable {
 }

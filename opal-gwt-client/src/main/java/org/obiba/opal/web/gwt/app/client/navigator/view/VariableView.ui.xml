@@ -105,13 +105,13 @@
 	    <g:Anchor ui:field="categoryTableTitle" />
         <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_RIGHT">
           <g:InlineLabel ui:field="noCategories"><ui:msg description="No Categories label">No Categories</ui:msg></g:InlineLabel>
-          <g2:CellTable width="100%" ui:field="categoryTable" />
+          <o:Table width="100%" ui:field="categoryTable" />
         </g:VerticalPanel>
     
 	    <g:Anchor ui:field="attributeTableTitle" />
         <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_RIGHT">
           <g:InlineLabel ui:field="noAttributes"><ui:msg description="No Attributes label">No Attributes</ui:msg></g:InlineLabel>
-          <g2:CellTable width="100%" ui:field="attributeTable" />
+          <o:Table width="100%" ui:field="attributeTable" />
         </g:VerticalPanel>
          
 	    <g:Anchor><ui:msg description="Summary tab title">Summary</ui:msg></g:Anchor>

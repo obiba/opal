@@ -166,6 +166,7 @@ public class JobListView extends Composite implements Display {
   //
 
   private void initTable() {
+
     table.setSelectionEnabled(false);
     table.setSelectionModel(selectionModel);
 

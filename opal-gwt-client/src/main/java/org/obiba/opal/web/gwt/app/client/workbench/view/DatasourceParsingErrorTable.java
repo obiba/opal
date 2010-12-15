@@ -21,14 +21,13 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.view.client.ListView;
 
 /**
  *
  */
-public class DatasourceParsingErrorTable extends CellTable<DatasourceParsingErrorDto> {
+public class DatasourceParsingErrorTable extends Table<DatasourceParsingErrorDto> {
   //
   // Static Variables
   //

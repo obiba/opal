@@ -13,6 +13,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
+import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.gwt.app.client.workbench.view.VerticalTabLayout;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.ConflictDto;
@@ -235,7 +236,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   }
 
   private CellTable<ConflictDto> setupColumnsForConflicts() {
-    CellTable<ConflictDto> table = new CellTable<ConflictDto>();
+    CellTable<ConflictDto> table = new Table<ConflictDto>();
     table.addColumn(new TextColumn<ConflictDto>() {
       @Override
       public String getValue(ConflictDto conflict) {
@@ -261,7 +262,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
 
   private CellTable<VariableDto> setupColumnsForVariables() {
 
-    CellTable<VariableDto> table = new CellTable<VariableDto>();
+    CellTable<VariableDto> table = new Table<VariableDto>();
     table.addColumn(new TextColumn<VariableDto>() {
       @Override
       public String getValue(VariableDto variable) {

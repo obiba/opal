@@ -1,0 +1,39 @@
+.evenRow{}
+.lastColumnFooter{}
+.firstColumnFooter{}
+.lastColumnHeader{}
+.loading{}
+
+.oddRow{
+	 background-color: #F3F7FB;
+}
+
+.header {
+	background-color: #F3F4EB;
+	padding: 4px 15px;
+	border-top: 1px solid #B4A291;
+	border-bottom: 1px solid #B4A291;
+	color: #333333;
+}
+
+.firstColumnHeader{}
+.selectedRow{
+	background-color: #847261;
+    color: white;
+    height: auto;
+    overflow: auto;
+}
+.footer{}
+.hoveredRow{}
+.cellTable{}
+
+.cell{
+	padding: 4px 15px;
+}
+
+.firstColumn{}
+.lastColumn{}
+
+.selectedRow .firstColumn {
+	font-weight: bold;
+}

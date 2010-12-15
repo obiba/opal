@@ -22,7 +22,7 @@
 		  <g:Anchor><ui:msg description="Jobs label">Jobs</ui:msg></g:Anchor>
 	      <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_RIGHT">
 	        <g:InlineLabel ui:field="noJobs"><ui:msg description="No Jobs label">No Jobs</ui:msg></g:InlineLabel>
-	        <g2:CellTable ui:field="table" width="100%" addStyleNames="left-aligned gwt-CellTable"/>
+	        <o:Table ui:field="table" width="100%" addStyleNames="left-aligned gwt-CellTable"/>
 	      </g:VerticalPanel>
 	    </o:HorizontalTabLayout>
     </g:FlowPanel>

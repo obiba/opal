@@ -15,6 +15,7 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter.Result;
+import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.model.client.magma.JavaScriptErrorDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
@@ -156,7 +157,7 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
 
   @Override
   public void initializeResultTable() {
-    resultTable = new CellTable<EvaluateScriptPresenter.Result>();
+    resultTable = new Table<EvaluateScriptPresenter.Result>();
     resultTable.setWidth("100%");
   }
 
