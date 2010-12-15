@@ -337,9 +337,9 @@ public class VariableView extends Composite implements VariablePresenter.Display
   private String getAttributeValue(JsArray<AttributeDto> attributes, String name) {
     AttributeDto attribute = null;
 
-    attributes = JsArrays.toSafeArray(attributes);
-    for(int i = 0; i < attributes.length(); i++) {
-      AttributeDto att = attributes.get(i);
+    JsArray<AttributeDto> notNull = JsArrays.toSafeArray(attributes);
+    for(int i = 0; i < notNull.length(); i++) {
+      AttributeDto att = notNull.get(i);
       if(att.getName().equals(name)) {
         if(!att.hasLocale()) {
           attribute = att;
