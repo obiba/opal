@@ -37,3 +37,7 @@
 .selectedRow .firstColumn {
 	font-weight: bold;
 }
+
+.folder-details .header {
+	border-top: none;
+}

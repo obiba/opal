@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.resources.client.CssResource.NotStrict;
 import com.google.gwt.user.cellview.client.CellTable;
 
 /**
@@ -20,6 +21,7 @@ public class Table<T> extends CellTable<T> {
   private static final int DEFAULT_PAGESIZE = 15;
 
   public interface TableResources extends CellTable.Resources {
+    @NotStrict
     @Source("org/obiba/opal/web/gwt/app/public/css/opal-CellTable.css")
     CellTable.Style cellTableStyle();
   }
