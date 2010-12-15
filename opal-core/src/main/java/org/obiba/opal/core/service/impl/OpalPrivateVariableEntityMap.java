@@ -10,6 +10,9 @@
 package org.obiba.opal.core.service.impl;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.Value;
@@ -19,6 +22,7 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
+import org.obiba.magma.VectorSource;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.type.TextType;
@@ -152,6 +156,15 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     log.info("Constructing participant identifier cache");
     ValueTable keyTable = getKeyValueTable();
     VariableValueSource ownerVariableSource = keyTable.getVariableValueSource(ownerVariable.getName());
+    if(ownerVariableSource.asVectorSource() != null) {
+      constructCacheFromVector(keyTable, ownerVariableSource.asVectorSource());
+    } else {
+      constructCacheFromTable(keyTable, ownerVariableSource);
+    }
+    log.info("Done");
+  }
+
+  private void constructCacheFromTable(ValueTable keyTable, VariableValueSource ownerVariableSource) {
     for(ValueSet valueSet : keyTable.getValueSets()) {
       Value value = ownerVariableSource.getValue(valueSet);
       // OPAL-619: The value could be null, in which case don't cache it. Whenever new participant
@@ -165,7 +178,17 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
         publicToPrivate.put(entityFor(valueSet.getVariableEntity().getIdentifier()), entityFor(value.toString()));
       }
     }
-    log.info("Done");
   }
 
+  private void constructCacheFromVector(ValueTable keyTable, VectorSource vs) {
+    SortedSet<VariableEntity> entities = new TreeSet<VariableEntity>(keyTable.getVariableEntities());
+    Iterator<Value> values = vs.getValues(entities).iterator();
+    for(VariableEntity opalEntity : entities) {
+      Value value = values.next();
+      if(!value.isNull()) {
+        log.debug("{}<-->({}) cached", opalEntity.getIdentifier(), value.toString());
+        publicToPrivate.put(entityFor(opalEntity.getIdentifier()), entityFor(value.toString()));
+      }
+    }
+  }
 }
