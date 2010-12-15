@@ -18,11 +18,7 @@ import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -48,8 +44,6 @@ import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.VariableEntity;
-import org.obiba.magma.VectorSource;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.DatasourceCopier;
@@ -63,8 +57,11 @@ import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
+import org.obiba.opal.core.unit.FunctionalUnitIdentifiers;
 import org.obiba.opal.core.unit.UnitKeyStore;
+import org.obiba.opal.core.unit.FunctionalUnitIdentifiers.UnitIdentifier;
 import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
@@ -76,7 +73,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 @Component
@@ -177,96 +174,67 @@ public class FunctionalUnitResource {
 
   @GET
   @Path("/entities")
-  public Response getEntities() {
-    try {
-      return Response.ok().entity(getEntitiesSet()).build();
-    } catch(NoSuchFunctionalUnitException e) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
+  public Iterable<VariableEntityDto> getEntities() {
+    return getUnitEntities();
   }
 
   @GET
   @Path("/entities/count")
-  public Response getEntitiesCount() {
-    try {
-      return Response.ok(String.valueOf(getEntitiesSet().size())).build();
-    } catch(NoSuchFunctionalUnitException e) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
+  public String getEntitiesCount() {
+    return String.valueOf(Iterables.size(getUnitEntities()));
   }
 
   @GET
   @Path("/entities/identifiers")
   @Produces("text/plain")
   public Response getIdentifiers() {
-    try {
-      ByteArrayOutputStream ids = new ByteArrayOutputStream();
-      final PrintWriter writer = new PrintWriter(ids);
-      readUnitIdentifiers(new VectorCallback() {
+    ByteArrayOutputStream ids = new ByteArrayOutputStream();
+    final PrintWriter writer = new PrintWriter(ids);
+    readUnitIdentifiers(new VectorCallback() {
 
-        @Override
-        public void onValue(VariableEntity entity, org.obiba.magma.Value value) {
-          writer.append(value.toString()).append("\n");
-        }
+      @Override
+      public void onValue(UnitIdentifier unitIdentifier) {
+        writer.append(unitIdentifier.getUnitIdentifier()).append("\n");
+      }
 
-        @Override
-        public void onNullValue(VariableEntity entity) {
+    });
 
-        }
-
-      });
-
-      writer.close();
-      return Response.ok(ids.toByteArray(), MediaType.TEXT_PLAIN).header("Content-Disposition", "attachment; filename=\"" + unit + "-identifiers.txt\"").build();
-    } catch(NoSuchFunctionalUnitException e) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
+    writer.close();
+    return Response.ok(ids.toByteArray(), MediaType.TEXT_PLAIN).header("Content-Disposition", "attachment; filename=\"" + unit + "-identifiers.txt\"").build();
   }
 
   @GET
   @Path("/entities/excel")
   @Produces("application/vnd.ms-excel")
   public Response getExcelIdentifiers() throws MagmaRuntimeException, IOException {
-    try {
-      String destinationName = unit + "-identifiers";
-      ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
-      ExcelDatasource destinationDatasource = new ExcelDatasource(destinationName, excelOutput);
+    String destinationName = unit + "-identifiers";
+    ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
+    ExcelDatasource destinationDatasource = new ExcelDatasource(destinationName, excelOutput);
 
-      copyEntities(destinationDatasource);
+    copyEntities(destinationDatasource);
 
-      return Response.ok(excelOutput.toByteArray(), "application/vnd.ms-excel").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".xlsx\"").build();
-    } catch(NoSuchFunctionalUnitException e) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
+    return Response.ok(excelOutput.toByteArray(), "application/vnd.ms-excel").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".xlsx\"").build();
   }
 
   @GET
   @Path("/entities/csv")
   @Produces("text/csv")
   public Response getCSVIdentifiers() throws MagmaRuntimeException, IOException {
-    try {
-      ByteArrayOutputStream ids = new ByteArrayOutputStream();
-      final PrintWriter writer = new PrintWriter(ids);
-      writer.append("Opal").append(',').append(unit).append('\n');
-      readUnitIdentifiers(new VectorCallback() {
+    ByteArrayOutputStream ids = new ByteArrayOutputStream();
+    final PrintWriter writer = new PrintWriter(ids);
+    writer.append("Opal").append(',').append(unit).append('\n');
+    readUnitIdentifiers(new VectorCallback() {
 
-        @Override
-        public void onValue(VariableEntity entity, org.obiba.magma.Value value) {
-          writer.append("\"").append(entity.getIdentifier()).append("\",\"").append(value.toString()).append("\"\n");
-        }
+      @Override
+      public void onValue(UnitIdentifier unitIdentifier) {
+        writer.append("\"").append(unitIdentifier.getOpalIdentifier()).append("\",")//
+        .append(unitIdentifier.hasUnitIdentifier() ? "\"" + unitIdentifier.getUnitIdentifier() + "\"" : "").append("\n");
+      }
 
-        @Override
-        public void onNullValue(VariableEntity entity) {
-          writer.append("\"").append(entity.getIdentifier()).append("\",\n");
-        }
+    });
 
-      });
-
-      writer.close();
-      return Response.ok(ids.toByteArray(), "text/csv").header("Content-Disposition", "attachment; filename=\"" + unit + "-identifiers.csv\"").build();
-    } catch(NoSuchFunctionalUnitException e) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
+    writer.close();
+    return Response.ok(ids.toByteArray(), "text/csv").header("Content-Disposition", "attachment; filename=\"" + unit + "-identifiers.csv\"").build();
   }
 
   private void copyEntities(Datasource destinationDatasource) throws IOException {
@@ -379,30 +347,6 @@ public class FunctionalUnitResource {
     return response.build();
   }
 
-  private ResponseBuilder doCreateOrImportKeyPair(Opal.KeyPairForm kpForm) {
-    ResponseBuilder response = null;
-    if(kpForm.hasPrivateForm() && kpForm.hasPublicForm()) {
-      unitKeyStoreService.createOrUpdateKey(unit, kpForm.getAlias(), kpForm.getPrivateForm().getAlgo(), kpForm.getPrivateForm().getSize(), getCertificateInfo(kpForm.getPublicForm()));
-    } else if(kpForm.hasPrivateImport()) {
-      response = doImportKeyPair(kpForm);
-    } else {
-      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "MissingPrivateKeyArgument").build());
-    }
-    return response;
-  }
-
-  private ResponseBuilder doImportKeyPair(Opal.KeyPairForm kpForm) {
-    ResponseBuilder response = null;
-    if(kpForm.hasPublicForm()) {
-      unitKeyStoreService.importKey(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()), getCertificateInfo(kpForm.getPublicForm()));
-    } else if(kpForm.hasPublicImport()) {
-      unitKeyStoreService.importKey(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()), new ByteArrayInputStream(kpForm.getPublicImport().getBytes()));
-    } else {
-      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "MissingPublicKeyArgument").build());
-    }
-    return response;
-  }
-
   @DELETE
   @Path("/key/{alias}")
   public Response deleteFunctionalUnitKeyPair(@PathParam("alias") String alias) {
@@ -433,6 +377,30 @@ public class FunctionalUnitResource {
   // Private methods
   // 
 
+  private ResponseBuilder doCreateOrImportKeyPair(Opal.KeyPairForm kpForm) {
+    ResponseBuilder response = null;
+    if(kpForm.hasPrivateForm() && kpForm.hasPublicForm()) {
+      unitKeyStoreService.createOrUpdateKey(unit, kpForm.getAlias(), kpForm.getPrivateForm().getAlgo(), kpForm.getPrivateForm().getSize(), getCertificateInfo(kpForm.getPublicForm()));
+    } else if(kpForm.hasPrivateImport()) {
+      response = doImportKeyPair(kpForm);
+    } else {
+      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "MissingPrivateKeyArgument").build());
+    }
+    return response;
+  }
+
+  private ResponseBuilder doImportKeyPair(Opal.KeyPairForm kpForm) {
+    ResponseBuilder response = null;
+    if(kpForm.hasPublicForm()) {
+      unitKeyStoreService.importKey(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()), getCertificateInfo(kpForm.getPublicForm()));
+    } else if(kpForm.hasPublicImport()) {
+      unitKeyStoreService.importKey(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()), new ByteArrayInputStream(kpForm.getPublicImport().getBytes()));
+    } else {
+      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "MissingPublicKeyArgument").build());
+    }
+    return response;
+  }
+
   private Datasource createTransientDatasource(DatasourceFactoryDto datasourceFactoryDto) {
     DatasourceFactory factory = datasourceFactoryRegistry.parse(datasourceFactoryDto);
     String uid = MagmaEngine.get().addTransientDatasource(factory);
@@ -440,22 +408,8 @@ public class FunctionalUnitResource {
     return MagmaEngine.get().getTransientDatasourceInstance(uid);
   }
 
-  private Set<VariableEntityDto> getEntitiesSet() {
-    final ImmutableSet.Builder<VariableEntityDto> entities = ImmutableSet.<VariableEntityDto> builder();
-    readUnitIdentifiers(new VectorCallback() {
-
-      @Override
-      public void onValue(VariableEntity entity, org.obiba.magma.Value value) {
-        entities.add(VariableEntityDto.newBuilder().setIdentifier(entity.getIdentifier()).setEntityType(entity.getType()).build());
-      }
-
-      @Override
-      public void onNullValue(VariableEntity entity) {
-
-      }
-
-    });
-    return entities.build();
+  private Iterable<VariableEntityDto> getUnitEntities() {
+    return Iterables.transform(new FunctionalUnitIdentifiers(getKeysTable(), resolveFunctionalUnit()).getUnitEntities(), Dtos.variableEntityAsDtoFunc);
   }
 
   private String getPEMCertificate(UnitKeyStore keystore, String alias) throws KeyStoreException, IOException {
@@ -489,17 +443,9 @@ public class FunctionalUnitResource {
     ValueTable keysTable = getKeysTable();
     FunctionalUnit functionalUnit = resolveFunctionalUnit();
     if(keysTable.hasVariable(functionalUnit.getKeyVariableName())) {
-      SortedSet<VariableEntity> entities = new TreeSet<VariableEntity>(keysTable.getVariableEntities());
-      Iterator<VariableEntity> iter = entities.iterator();
-      VectorSource vector = getKeysTable().getVariableValueSource(functionalUnit.getKeyVariableName()).asVectorSource();
-      for(org.obiba.magma.Value value : vector.getValues(entities)) {
+      for(UnitIdentifier unitId : new FunctionalUnitIdentifiers(keysTable, functionalUnit)) {
         // entities of the unit are the ones that have a non null for the unit identifier variable
-        VariableEntity entity = iter.next();
-        if(!value.isNull()) {
-          callback.onValue(entity, value);
-        } else {
-          callback.onNullValue(entity);
-        }
+        callback.onValue(unitId);
       }
     }
   }
@@ -515,9 +461,9 @@ public class FunctionalUnitResource {
   }
 
   private interface VectorCallback {
-    public void onValue(VariableEntity entity, org.obiba.magma.Value value);
 
-    public void onNullValue(VariableEntity entity);
+    public void onValue(UnitIdentifier unitIdentifier);
+
   }
 
 }

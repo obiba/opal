@@ -22,6 +22,7 @@ import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
+import org.obiba.magma.VariableEntity;
 import org.obiba.magma.views.View;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.AttributeDto;
@@ -31,6 +32,7 @@ import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
+import org.obiba.opal.web.model.Magma.VariableEntityDto;
 import org.obiba.opal.web.model.Opal.LocaleDto;
 
 import com.google.common.base.Function;
@@ -46,6 +48,15 @@ public final class Dtos {
 
     @Override
     public ValueDto apply(Value from) {
+      return asDto(from).build();
+    }
+
+  };
+
+  public static final Function<VariableEntity, VariableEntityDto> variableEntityAsDtoFunc = new Function<VariableEntity, VariableEntityDto>() {
+
+    @Override
+    public VariableEntityDto apply(VariableEntity from) {
       return asDto(from).build();
     }
 
@@ -202,6 +213,10 @@ public final class Dtos {
       valueBuilder.setValue(value.toString());
     }
     return valueBuilder;
+  }
+
+  public static VariableEntityDto.Builder asDto(VariableEntity from) {
+    return VariableEntityDto.newBuilder().setIdentifier(from.getIdentifier()).setEntityType(from.getType());
   }
 
   public static LocaleDto asDto(Locale locale, Locale displayLocale) {

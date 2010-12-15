@@ -11,9 +11,7 @@ package org.obiba.opal.core.service.impl;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Iterator;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ThreadFactory;
 
@@ -28,7 +26,6 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
-import org.obiba.magma.VectorSource;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
@@ -55,6 +52,8 @@ import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
+import org.obiba.opal.core.unit.FunctionalUnitIdentifiers;
+import org.obiba.opal.core.unit.FunctionalUnitIdentifiers.UnitIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -183,19 +182,22 @@ public class DefaultImportService implements ImportService {
     }
 
     ValueTable keysTable = lookupKeysTable();
-    if(keysTable.hasVariable(unit.getKeyVariableName())) {
-      PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(keysTable, keysTable.getVariable(unit.getKeyVariableName()), participantIdentifier);
-      SortedSet<VariableEntity> entities = new TreeSet<VariableEntity>(keysTable.getVariableEntities());
-      Iterator<VariableEntity> iter = entities.iterator();
-      VectorSource vector = keysTable.getVariableValueSource(unit.getKeyVariableName()).asVectorSource();
-      for(org.obiba.magma.Value value : vector.getValues(entities)) {
-        // entities of the unit are the ones that have a non null for the unit identifier variable
-        VariableEntity entity = iter.next();
-        if(value.isNull()) {
-          entityMap.createPrivateEntity(entity);
-        }
+    if(keysTable.hasVariable(unit.getKeyVariableName()) == false) {
+      try {
+        prepareKeysTable(null, unit.getKeyVariableName());
+      } catch(IOException e) {
+        throw new RuntimeException(e);
       }
     }
+    PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(keysTable, keysTable.getVariable(unit.getKeyVariableName()), participantIdentifier);
+
+    for(UnitIdentifier unitId : new FunctionalUnitIdentifiers(keysTable, unit)) {
+      // Create a private entity for each missing unitIdentifier
+      if(unitId.hasUnitIdentifier() == false) {
+        entityMap.createPrivateEntity(unitId.getOpalEntity());
+      }
+    }
+
   }
 
   @Override
@@ -240,7 +242,8 @@ public class DefaultImportService implements ImportService {
       throw new IllegalArgumentException("source identifiers table has unexpected entity type '" + sourceKeysTable.getEntityType() + "' (expected '" + keysTableEntityType + "')");
     }
 
-    DatasourceCopier.Builder.newCopier().withLoggingListener().build().copy(sourceKeysTable, MagmaEngine.get().getDatasource(getKeysDatasourceName()));
+    // Don't copy null values otherwise, we'll delete existing mappings
+    DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(sourceKeysTable, MagmaEngine.get().getDatasource(getKeysDatasourceName()));
   }
 
   private String getKeysDatasourceName() {
@@ -488,7 +491,7 @@ public class DefaultImportService implements ImportService {
    */
   private Variable prepareKeysTable(ValueTable privateView, String keyVariableName) throws IOException {
 
-    Variable keyVariable = Variable.Builder.newVariable(keyVariableName, TextType.get(), privateView.getEntityType()).build();
+    Variable keyVariable = Variable.Builder.newVariable(keyVariableName, TextType.get(), keysTableEntityType).build();
 
     ValueTableWriter writer = writeToKeysTable();
     try {
@@ -496,7 +499,9 @@ public class DefaultImportService implements ImportService {
       try {
         // Create private variables
         vw.writeVariable(keyVariable);
-        DatasourceCopier.Builder.newCopier().dontCopyValues().build().copy(privateView, lookupKeysTable().getName(), vw);
+        if(privateView != null) {
+          DatasourceCopier.Builder.newCopier().dontCopyValues().build().copy(privateView, lookupKeysTable().getName(), vw);
+        }
       } finally {
         vw.close();
       }
