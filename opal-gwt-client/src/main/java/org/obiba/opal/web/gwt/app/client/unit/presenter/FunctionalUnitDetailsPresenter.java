@@ -58,6 +58,8 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
   private FunctionalUnitDto functionalUnit;
 
+  private Request countIdentifiersRequest;
+
   public interface Display extends WidgetDisplay {
     void setKeyPairs(JsArray<KeyPairDto> keyPairs);
 
@@ -176,6 +178,10 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
   }
 
   private void updateCurrentCountOfIdentifiers() {
+    if(countIdentifiersRequest != null && countIdentifiersRequest.isPending()) {
+      countIdentifiersRequest.cancel();
+      countIdentifiersRequest = null;
+    }
     getDisplay().setCurrentCountOfIdentifiers("");
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
@@ -190,7 +196,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
     };
 
-    ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/entities/count").get()//
+    countIdentifiersRequest = ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/entities/count").get()//
     .withCallback(Response.SC_OK, callbackHandler) //
     .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
     .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
