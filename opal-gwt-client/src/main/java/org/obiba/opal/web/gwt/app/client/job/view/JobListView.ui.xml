@@ -12,6 +12,7 @@
     <g:FlowPanel>
       <g:Button ui:field="refreshButton"><ui:msg description="Refresh jobs list">Refresh</ui:msg></g:Button>
       <g:Button ui:field="clearButton"><ui:msg description="Clear jobs list">Clear</ui:msg></g:Button>
+      <o:HelpImage page="Working+with+Jobs"></o:HelpImage>
     </g:FlowPanel>
     
     <g:FlowPanel>

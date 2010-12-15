@@ -19,6 +19,7 @@
       <g:Button ui:field="exportDataButton">
         <ui:msg description="Data Export label">Export Data</ui:msg>
       </g:Button>
+      <o:HelpImage page="Working+with+Datasources"></o:HelpImage>
     </g:FlowPanel>
     <g:SplitLayoutPanel>
       <g:center> 

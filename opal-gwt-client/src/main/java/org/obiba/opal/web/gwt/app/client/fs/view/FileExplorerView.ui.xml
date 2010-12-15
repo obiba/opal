@@ -22,6 +22,7 @@
       <g:Button ui:field="fileDeleteButton">
         <ui:msg description="Delete File label">Delete</ui:msg>
       </g:Button>
+      <o:HelpImage page="Working+with+Files"></o:HelpImage>
     </g:FlowPanel>
     <g:SplitLayoutPanel>
         <g:west size="200">

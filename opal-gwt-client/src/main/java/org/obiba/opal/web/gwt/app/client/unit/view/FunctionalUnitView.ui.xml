@@ -19,6 +19,7 @@
       <g:Button ui:field="importButton">
         <ui:msg description="Import Identifiers label">Add/Update Identifiers</ui:msg>
       </g:Button>
+      <o:HelpImage page="Working+with+Units"></o:HelpImage>
     </g:FlowPanel>
     <g:SplitLayoutPanel>
       <g:center> 

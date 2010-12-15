@@ -29,7 +29,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -169,7 +168,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
     getDisplay().getHelp().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        Window.open("http://wiki.obiba.org/confluence/display/OPALDOC/Opal+User+Guide", "_blank", null);
+        HelpUtil.openPage();
       }
     });
 

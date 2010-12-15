@@ -13,6 +13,7 @@
       <g:Button ui:field="reportTemplateButton">
         <ui:msg description="Add Report Template label">Add Report Template</ui:msg>
       </g:Button>
+      <o:HelpImage page="Generating+Reports"></o:HelpImage>
     </g:FlowPanel>
     <g:SplitLayoutPanel>
       <g:center> 

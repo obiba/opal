@@ -375,14 +375,18 @@ margin-left:0.8em;
 }
     
 .workbench .top .control {
-    /*padding: 0.5em;*/
-    float: left;
+    margin-right: 0.8em;   
 }
     
 .workbench .top .control button {
     margin-left: 0.8em;
     font-size: 0.9em;
     padding:0.2em 0.4em;
+}
+
+.workbench .top .control .help {
+    cursor: pointer;
+    float: right;
 }
 
 .workbench .main {

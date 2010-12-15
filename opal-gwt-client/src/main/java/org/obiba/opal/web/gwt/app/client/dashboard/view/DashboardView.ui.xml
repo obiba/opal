@@ -8,7 +8,9 @@
   <o:WorkbenchLayout withInfo="false">
     <g:Label><ui:msg description="Dashboard title" >Study Dashboard</ui:msg></g:Label>
     <g:Label></g:Label>
-    <g:FlowPanel></g:FlowPanel>
+    <g:FlowPanel>
+      <o:HelpImage page="Opal+Web+Application+User+Guide"></o:HelpImage>
+    </g:FlowPanel>
   <g:HTMLPanel addStyleNames="dashboard">
     <div>
       <g:Label>
