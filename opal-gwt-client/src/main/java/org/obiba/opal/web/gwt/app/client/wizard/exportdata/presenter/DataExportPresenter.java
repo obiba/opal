@@ -63,6 +63,8 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   private TableDto table;
 
+  protected String identifierEntityType;
+
   /**
    * @param display
    * @param eventBus
@@ -148,6 +150,12 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
         getDisplay().setUnits(units);
       }
     }).send();
+    ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/functional-units/entities/table").get().withCallback(new ResourceCallback<TableDto>() {
+      @Override
+      public void onResource(Response response, TableDto resource) {
+        identifierEntityType = resource.getEntityType();
+      }
+    }).send();
   }
 
   //
@@ -202,6 +210,15 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
       if(tableListPresenter.getTables().size() == 0) {
         eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "ExportDataMissingTables", null));
         return false;
+      } else {
+        boolean identifierEntityTable = false;
+        for(TableDto dto : tableListPresenter.getTables()) {
+          if(dto.getEntityType().equals(identifierEntityType)) {
+            identifierEntityTable = true;
+            break;
+          }
+        }
+        getDisplay().renderUnitSelection(identifierEntityTable);
       }
       return true;
     }
@@ -312,6 +329,8 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   public interface Display extends WidgetDisplay {
 
     void showDialog();
+
+    void renderUnitSelection(boolean identifierEntityTable);
 
     void hideDialog();
 

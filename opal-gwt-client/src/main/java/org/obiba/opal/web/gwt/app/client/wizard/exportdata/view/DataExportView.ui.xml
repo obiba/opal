@@ -42,7 +42,9 @@
       </o:WizardStep>
       
       <o:WizardStep ui:field="unitStep">
-        <g:HTMLPanel>
+        <g:FlowPanel>
+        <g:Label ui:field="noUnitSelection" visible="false" addStyleNames="indent"><ui:msg description="Not Applicable label">Not Applicable.</ui:msg></g:Label>
+        <g:HTMLPanel ui:field="unitSelection">
           <table cellspacing="10">
 	         <tbody>
 	           <tr>
@@ -61,6 +63,7 @@
 	         </tbody>
 	       </table>
 	     </g:HTMLPanel>
+	     </g:FlowPanel>
       </o:WizardStep>
       
 	  <o:WizardStep ui:field="conclusionStep">

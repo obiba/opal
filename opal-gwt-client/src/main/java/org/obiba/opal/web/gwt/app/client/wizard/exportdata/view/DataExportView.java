@@ -34,6 +34,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -96,6 +97,12 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
 
   @UiField
   CheckBox useAlias;
+
+  @UiField
+  HTMLPanel unitSelection;
+
+  @UiField
+  Label noUnitSelection;
 
   private FileSelectionPresenter.Display fileSelection;
 
@@ -354,6 +361,12 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   @Override
   public void setDestinationValidator(ValidationHandler handler) {
     this.destinationValidator = handler;
+  }
+
+  @Override
+  public void renderUnitSelection(boolean identifierEntityTable) {
+    noUnitSelection.setVisible(!identifierEntityTable);
+    unitSelection.setVisible(identifierEntityTable);
   }
 
 }
