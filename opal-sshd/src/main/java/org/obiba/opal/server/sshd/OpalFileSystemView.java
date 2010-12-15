@@ -82,6 +82,11 @@ public class OpalFileSystemView implements FileSystemView {
       return super.equals(obj);
     }
 
+    @Override
+    public int hashCode() {
+      return super.getAbsolutePath().hashCode();
+    }
+
     private boolean isRoot() {
       return isRoot;
     }
@@ -91,6 +96,7 @@ public class OpalFileSystemView implements FileSystemView {
    * Implementation on top of FileObject. Not used because some methods are not implemented correctly (getOutputStream,
    * truncate)
    */
+  @SuppressWarnings("unused")
   private class FileObjectSshFile implements SshFile {
 
     private final FileObject file;
@@ -229,6 +235,7 @@ public class OpalFileSystemView implements FileSystemView {
           Collections.sort(children, new Comparator<FileObject>() {
 
             @Override
+            @SuppressWarnings("unchecked")
             public int compare(FileObject lhs, FileObject rhs) {
               return lhs.getName().compareTo(rhs.getName());
             }
