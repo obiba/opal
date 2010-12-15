@@ -49,15 +49,15 @@ textarea {
 }
 
 .small-indent {
-	margin-left: 10px;
+	margin-left: 0.8em;
 }
 
 .indent {
-	margin-left: 20px;
+	margin-left: 1.6em;
 }
 
 .large-indent {
-	margin-left: 30px;
+	margin-left: 2.4em;
 }
 
 .full-width {
@@ -77,15 +77,15 @@ textarea {
 }
 
 .small-top-margin {
-  margin-top: 10px;
+  margin-top: 0.4em;
 }
 
 .top-margin {
-  margin-top: 20px;
+  margin-top: 0.8em;
 }
 
 .large-top-margin {
-  margin-top: 30px;
+  margin-top: 1.2em;
 }
 
 .loading {
@@ -108,7 +108,7 @@ textarea {
 
 .gwt-MenuBar-horizontal .gwt-MenuItem {
 	padding-top:3px;
-	padding-bottom:5px;
+	padding-bottom:0.4em;
 }
 
 .gwt-MenuBar-horizontal .gwt-MenuItemSeparator {
@@ -157,13 +157,13 @@ textarea {
 /* Popup */ 
 
 .gwt-PopupPanel {
-	border:5px solid #DDDDDD;
+	border:0.4em solid #DDDDDD;
 	-moz-border-radius: 0.5em; -webkit-border-radius: 0.5em;
 	z-index: 10000;
 }
 
 .notification {
-	border:5px solid #222222;
+	border:0.4em solid #222222;
 	background-color: #222222;
 	opacity: 0.9;
 	color:#ffffff;
@@ -192,7 +192,7 @@ textarea {
 }
 
 .gwt-DialogBox .Caption {
-	border-top:5px solid #DDDDDD;
+	border-top:0.4em solid #DDDDDD;
 }
 
 .gwt-DialogBox .dialogMiddleCenter {
@@ -200,7 +200,7 @@ textarea {
 }
 
 .gwt-DialogBox .dialogContent .main {
-	padding:10px;
+	padding:0.8em;
 }
 
 .gwt-DialogBox .dialogContent .footer {
@@ -209,11 +209,11 @@ textarea {
 }
 
 .gwt-DialogBox .dialogContent .footer .gwt-Button {
-	margin-right:10px;
+	margin-right:0.8em;
 }
 
 .gwt-DialogBox .dialogContent .footer span {
-	margin-left:10px;
+	margin-left:0.8em;
 }
 
 /* CellTable */
@@ -275,7 +275,7 @@ textarea {
 display:inline;
 font-size:1.5em;
 font-weight:bold;
-margin-left:10px;
+margin-left:0.8em;
 }
 
 .topbar a:hover {
@@ -283,12 +283,12 @@ margin-left:10px;
 }
 
 .topbar img {
-	margin-left: 10px;
+	margin-left: 0.8em;
 	padding-top: 0.3em;
 }
 
 .topbar a {
-    margin-right: 10px;
+    margin-right: 0.8em;
     float: right;
     padding-top: 0.6em;
 }
@@ -298,7 +298,7 @@ margin-left:10px;
 }
 
 .top .gwt-MenuBar table {
-	border-spacing:10px 0;
+	border-spacing:0.8em 0;
 }
 
 .top .gwt-MenuBar-horizontal {
@@ -328,13 +328,13 @@ margin-left:10px;
 
 .footbar {
 	font-size:0.9em;
-	margin-left: 50px;
+	margin-left: 4em;
 	padding-top: 0.2em;
 }
 
 .footbar .gwt-Label {
 	display: inline;
-	margin-right: 5px;
+	margin-right: 0.4em;
 }
 
 .footbar a {
@@ -345,7 +345,7 @@ margin-left:10px;
 
 .main-content {
 	background-color: #ffffff;
-	margin:10px 50px 0px 50px;
+	margin:0.8em 4em 0px 4em;
 	border:3px solid #C65F00;
 }
 
@@ -361,7 +361,7 @@ margin-left:10px;
 
 .workbench .top .header {
     float: left;
-    margin-right:20px;
+    margin-right:1.6em;
     margin-top: 2px;
 }
 
@@ -380,9 +380,9 @@ margin-left:10px;
 }
     
 .workbench .top .control button {
-    margin-left: 10px;
+    margin-left: 0.8em;
     font-size: 0.9em;
-    padding:2px 5px;
+    padding:2px 0.4em;
 }
 
 .workbench .main {
@@ -394,7 +394,7 @@ margin-left:10px;
 }
 
 .workbench .main .p {
-     padding: 10px;
+     padding: 0.8em;
 }
 
 .workbench .information .header {
@@ -406,23 +406,23 @@ margin-left:10px;
 }
 
 .workbench .information .header .gwt-Label {
-	padding-left:5px;
-	padding-top:5px;
+	padding-left:0.4em;
+	padding-top:0.4em;
 }
 
 .workbench .information .header img {
   cursor:pointer;
-  padding-top: 5px;
-  margin-right: 5px;
+  padding-top: 0.4em;
+  margin-right: 0.4em;
 }
 
 .workbench .information .header .gwt-MenuItem {
   cursor:default;
-  padding-top: 5px;
+  padding-top: 0.4em;
 }
 
 .workbench .information .content {
-  margin: 5px;
+  margin: 0.4em;
 }
 
 .workbench .information .title {
@@ -441,7 +441,7 @@ margin-left:10px;
 }
 
 .dashboard div {
-  margin-top:10px;
+  margin-top:1em;
 }
 
 .dashboard .gwt-Label {
@@ -458,7 +458,7 @@ margin-left:10px;
 }
 
 .dashboard #shortcuts a img {
-  margin-right: 10px;
+  margin-right: 0.8em;
 }
 
 .dashboard #shortcuts a {
@@ -504,7 +504,7 @@ margin-left:10px;
 	background-color:#F3F4EB;
 	color:#444444;
     padding-bottom:3px;
-    padding-left:10px;
+    padding-left:0.8em;
     padding-top:3px;
 }
 
@@ -520,19 +520,19 @@ margin-left:10px;
 .navigator .toolbar {
   	background-color:#F3F4EB;
   	border-bottom:1px solid #BBBBBB;
-  	padding-bottom:5px;
-  	padding-left:10px;
-  	padding-right: 10px;
-  	margin-bottom:5px;
+  	padding-bottom:0.4em;
+  	padding-left:0.8em;
+  	padding-right: 0.8em;
+  	margin-bottom:0.4em;
 }
 
 .navigator .toolbar-right img {
-	margin-left: 5px;
+	margin-left: 0.4em;
     float: right;
 }
 
 .navigator  .toolbar-left img {
-    margin-right: 5px;
+    margin-right: 0.4em;
     float: left;
 }
 
@@ -563,7 +563,7 @@ margin-left:10px;
 }
 
 .navigator .gwt-MenuBar-horizontal .gwt-MenuItemSeparator {
-	padding-right:5px;
+	padding-right:0.4em;
 }
 
 .navigator .gwt-MenuBar-horizontal .gwt-MenuItem-selected {
@@ -631,7 +631,7 @@ margin-left:10px;
 }
 
 .navigator .tableList .title-bold {
-    margin-top: 10px;
+    margin-top: 1em;
 }
 
 /* File Explorer Styles */ 
@@ -676,7 +676,7 @@ table.folder-details td:first-child span:hover {
 /* Import variables */ 
 
 .tableChangesPanel .tabs li {
-	padding-left:10px;
+	padding-left:0.8em;
 }
 
 .tableChangesPanel .tabs.horizontal li {
@@ -720,20 +720,20 @@ div.variableChangesPager tr > td {
 }
 
 div.ignoreAllModifications {
-  padding:0px 10px 10px;
+  padding:0px 0.8em 0.8em;
 }
 
 div.ignoreAllModifications > span > label {
-  padding-left:10px;
+  padding-left:0.8em;
 }
 
 div.variableChangesSummaryPanel > div {
-  margin-bottom:5px;
-  margin-top:5px;
+  margin-bottom:0.4em;
+  margin-top:0.4em;
 }
 
 div.variableChanges {
-  margin-top:10px;
+  margin-top:0.8em;
 }
 
 div.gwt-TabLayoutPanel.tableChangesPanel div.gwt-TabLayoutPanelTabs {
@@ -742,7 +742,7 @@ div.gwt-TabLayoutPanel.tableChangesPanel div.gwt-TabLayoutPanelTabs {
 
 div.variableChangesSummaryPanel > div > em {
   font-style:normal; 
-  margin:5px;
+  margin:0.4em;
   color:red;
 }
 
@@ -762,8 +762,8 @@ div.evaluateScriptPanel {
 }
 
 .evaluateScriptPanel div.paging {
-  padding-top:10px;
-  padding-bottom:10px;
+  padding-top:0.8em;
+  padding-bottom:0.8em;
 }
 
 .evaluateScriptPanel div.pagingInfo {
@@ -811,7 +811,7 @@ table.item-properties div.key {
 	background-color:#F3F4EB;
 	color:#444444;
     padding-bottom:3px;
-    padding-left:10px;
+    padding-left:0.8em;
     padding-top:3px;
 }
 
@@ -825,18 +825,18 @@ table.item-properties div.key {
 .item-details .toolbar {
   	background-color:#F3F4EB;
   	border-bottom:1px solid #BBBBBB;
-  	padding-bottom:5px;
-  	padding-left:10px;
-  	margin-bottom:5px;
+  	padding-bottom:0.4em;
+  	padding-left:0.8em;
+  	margin-bottom:0.4em;
 }
 
 .item-details .toolbar-right img {
-	margin-left: 5px;
+	margin-left: 0.4em;
     float: right;
 }
 
 .item-details  .toolbar-left img {
-    margin-right: 5px;
+    margin-right: 0.4em;
     float: left;
 }
 
@@ -861,7 +861,7 @@ table.item-properties div.key {
 }
 
 .item-details .gwt-MenuBar-horizontal .gwt-MenuItemSeparator {
-	padding-right:5px;
+	padding-right:0.4em;
 }
 
 .item-details .gwt-MenuBar-horizontal .gwt-MenuItem-selected {
@@ -871,12 +871,12 @@ table.item-properties div.key {
 /* Reports UI */ 
 
 .producedReports table td span {
-  padding-right:20px;
+  padding-right:1.6em;
   cursor:pointer;
 }
 
 .producedReports {
-  padding-left:20px;
+  padding-left:1.6em;
 }
 
 /* ItemSelector and ItemInputs */
@@ -890,8 +890,8 @@ table.itemSelector tr + tr td {
 }
 
 table.itemSelector .button {
-  margin-left: 5px;
-  margin-right: 5px;
+  margin-left: 0.4em;
+  margin-right: 0.4em;
 }
 
 .itemInput {
@@ -900,8 +900,8 @@ table.itemSelector .button {
 }
 
 .itemInput.keyValue span + span { /* second span containing the "=" */
-  margin-left: 10px;
-  margin-right: 10px;
+  margin-left: 0.8em;
+  margin-right: 0.8em;
 }
 
 .itemInput.keyValue span + span + span {
@@ -916,13 +916,13 @@ table.itemSelector .button {
 /* VariablesListTab */
 
 div.variablesListTabContent .navigationPanel {
-  margin-top: 25px;
-  padding-bottom: 10px;
+  margin-top: 2em;
+  padding-bottom: 0.8em;
 }
 
 div.variablesListTabContent .form {
   border-top: 1px solid #6F7277;
-  padding-top: 10px;
+  padding-top: 0.8em;
 }
 
 div.variablesListTabContent .pager {
@@ -934,7 +934,7 @@ div.variablesListTabContent .form table {
 }
 
 .categoryDialog .labelPanel {
-  margin-top: 10px;
+  margin-top: 0.8em;
 }
 
 /* Resize Handles */
@@ -962,19 +962,19 @@ div.variablesListTabContent .form table {
 /* Wizard */
 
 .wizard .p {
-    padding-top: 10px;
-    padding-bottom: 10px;     
+    padding-top: 0.8em;
+    padding-bottom: 0.8em;     
 }
 
 .wizard .step > div.title {
 	font-weight: bold;
-	margin-bottom: 10px;
+	margin-bottom: 0.8em;
   	color: #444444;
   	font-size: 1em;
 }
 
 .wizard .footer .help {
-	margin-left: 10px;
+	margin-left: 0.8em;
 }
 
 .wizard.progress, .wizard.progress .gwt-Button {
@@ -996,8 +996,8 @@ div.variablesListTabContent .form table {
 .tooltip .header {
 	background-color: #666666;
 	font-weight: bold;
-	padding-left: 5px;
-	padding-right: 5px;
+	padding-left: 0.4em;
+	padding-right: 0.4em;
 	padding-top: 2px;
 }
 
@@ -1008,7 +1008,7 @@ div.variablesListTabContent .form table {
 
 .tooltip .content {
 	background-color: #888888;
-	padding: 5px 5px 0 5px;
+	padding: 0.4em 0.4em 0 0.4em;
 }
 
 .tooltip .footer {
@@ -1102,7 +1102,7 @@ ul.tabs li a, ul.tabs li a:visited, ul.tabs li a:hover {
   border:1px solid #BBBBBB;
   position:relative;
   overflow-x:auto;
-  padding: 10px;
+  padding: 0.8em;
 }
 
 .vertical-tabs > .content {
