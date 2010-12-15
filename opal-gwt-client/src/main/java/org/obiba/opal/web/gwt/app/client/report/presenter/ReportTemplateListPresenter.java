@@ -32,25 +32,27 @@ import com.google.gwt.view.client.SelectionModel.SelectionChangeHandler;
 import com.google.inject.Inject;
 
 public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateListPresenter.Display> {
-
-  public interface Display extends WidgetDisplay {
-    void setReportTemplates(JsArray<ReportTemplateDto> templates);
-
-    void select(ReportTemplateDto reportTemplateDto);
-
-    ReportTemplateDto getSelectedReportTemplate();
-
-    HandlerRegistration addSelectReportTemplateHandler(SelectionChangeHandler handler);
-
-  }
+  //
+  // Constructors
+  //
 
   @Inject
   public ReportTemplateListPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
   }
 
+  //
+  // WidgetPresenter Methods
+  //
+
   @Override
-  public void refreshDisplay() {
+  protected void onBind() {
+    refreshReportTemplates(null);
+    addHandlers();
+  }
+
+  @Override
+  protected void onUnbind() {
   }
 
   @Override
@@ -58,13 +60,8 @@ public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateL
   }
 
   @Override
-  protected void onBind() {
-    initUiComponents();
-    addHandlers();
-  }
-
-  @Override
-  protected void onUnbind() {
+  public void refreshDisplay() {
+    refreshReportTemplates(getDisplay().getSelectedReportTemplate());
   }
 
   @Override
@@ -76,63 +73,78 @@ public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateL
   protected void onPlaceRequest(PlaceRequest request) {
   }
 
-  private void initUiComponents() {
-    ResourceRequestBuilderFactory.<JsArray<ReportTemplateDto>> newBuilder().forResource("/report-templates").get().withCallback(new ReportTemplatesResourceCallback()).send();
+  //
+  // Methods
+  //
+
+  private void refreshReportTemplates(ReportTemplateDto templateToSelect) {
+    ResourceRequestBuilderFactory.<JsArray<ReportTemplateDto>> newBuilder().forResource("/report-templates").get().withCallback(new ReportTemplatesResourceCallback(templateToSelect)).send();
   }
 
   private void addHandlers() {
-    super.registerHandler(getDisplay().addSelectReportTemplateHandler(new ReportTemplateSelectionChangeHandler()));
-    super.registerHandler(eventBus.addHandler(ReportTemplateDeletedEvent.getType(), new ReportTemplateDeletedHandler()));
     super.registerHandler(eventBus.addHandler(ReportTemplateCreatedEvent.getType(), new ReportTemplateCreatedHandler()));
-    super.registerHandler(eventBus.addHandler(ReportTemplateListReceivedEvent.getType(), new ReportTemplateListReceivedEventHandler()));
+    super.registerHandler(eventBus.addHandler(ReportTemplateDeletedEvent.getType(), new ReportTemplateDeletedHandler()));
+    super.registerHandler(getDisplay().addSelectReportTemplateHandler(new ReportTemplateSelectionChangeHandler()));
   }
 
-  private class ReportTemplateCreatedHandler implements ReportTemplateCreatedEvent.Handler {
+  //
+  // Inner Classes / Interfaces
+  //
+
+  public interface Display extends WidgetDisplay {
+
+    void setReportTemplates(JsArray<ReportTemplateDto> templates);
+
+    void select(ReportTemplateDto reportTemplateDto);
+
+    ReportTemplateDto getSelectedReportTemplate();
+
+    HandlerRegistration addSelectReportTemplateHandler(SelectionChangeHandler handler);
+  }
+
+  class ReportTemplateCreatedHandler implements ReportTemplateCreatedEvent.Handler {
 
     @Override
     public void onReportTemplateCreated(final ReportTemplateCreatedEvent event) {
-      ResourceRequestBuilderFactory.<JsArray<ReportTemplateDto>> newBuilder().forResource("/report-templates").get().withCallback(new ResourceCallback<JsArray<ReportTemplateDto>>() {
-
-        @Override
-        public void onResource(Response response, JsArray<ReportTemplateDto> templates) {
-          getDisplay().setReportTemplates(JsArrays.toSafeArray(templates));
-          getDisplay().select(event.getReportTemplate());
-        }
-      }).send();
+      refreshReportTemplates(event.getReportTemplate());
     }
   }
 
-  private class ReportTemplateDeletedHandler implements ReportTemplateDeletedEvent.Handler {
+  class ReportTemplateDeletedHandler implements ReportTemplateDeletedEvent.Handler {
 
     @Override
     public void onReportTemplateDeleted(ReportTemplateDeletedEvent event) {
-      initUiComponents();
+      refreshReportTemplates(null);
     }
-
   }
 
-  private class ReportTemplateSelectionChangeHandler implements SelectionChangeHandler {
+  class ReportTemplateSelectionChangeHandler implements SelectionChangeHandler {
 
     @Override
     public void onSelectionChange(SelectionChangeEvent event) {
       eventBus.fireEvent(new ReportTemplateSelectedEvent(getDisplay().getSelectedReportTemplate()));
     }
-
   }
 
-  private class ReportTemplatesResourceCallback implements ResourceCallback<JsArray<ReportTemplateDto>> {
+  class ReportTemplatesResourceCallback implements ResourceCallback<JsArray<ReportTemplateDto>> {
+
+    private ReportTemplateDto templateToSelect;
+
+    ReportTemplatesResourceCallback(ReportTemplateDto templateToSelect) {
+      this.templateToSelect = templateToSelect;
+    }
 
     @Override
     public void onResource(Response response, JsArray<ReportTemplateDto> templates) {
-      eventBus.fireEvent(new ReportTemplateListReceivedEvent(JsArrays.toSafeArray(templates)));
-    }
-  }
+      JsArray<ReportTemplateDto> nonNullTemplates = JsArrays.toSafeArray(templates);
 
-  class ReportTemplateListReceivedEventHandler implements ReportTemplateListReceivedEvent.Handler {
+      getDisplay().setReportTemplates(nonNullTemplates);
 
-    @Override
-    public void onReportTemplateListReceived(ReportTemplateListReceivedEvent event) {
-      getDisplay().setReportTemplates(event.getReportTemplates());
+      if(templateToSelect != null) {
+        getDisplay().select(templateToSelect);
+      }
+
+      eventBus.fireEvent(new ReportTemplateListReceivedEvent(nonNullTemplates));
     }
   }
 }
