@@ -107,7 +107,7 @@ textarea {
 }
 
 .gwt-MenuBar-horizontal .gwt-MenuItem {
-	padding-top:3px;
+	padding-top:0.2em;
 	padding-bottom:0.4em;
 }
 
@@ -241,7 +241,7 @@ textarea {
 }
 
 .login > table {
-	 border: 3px solid #c65f00;
+	 border: 0.2em solid #c65f00;
 	 background-color: #ffffff;	 
 	 -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em;
 	 padding: 1em;
@@ -346,7 +346,7 @@ margin-left:0.8em;
 .main-content {
 	background-color: #ffffff;
 	margin:0.8em 4em 0px 4em;
-	border:3px solid #C65F00;
+	border:0.2em solid #C65F00;
 }
 
 /* Workbench */
@@ -362,7 +362,7 @@ margin-left:0.8em;
 .workbench .top .header {
     float: left;
     margin-right:1.6em;
-    margin-top: 2px;
+    margin-top: 0.2em;
 }
 
 .workbench .top .header .title {
@@ -382,7 +382,7 @@ margin-left:0.8em;
 .workbench .top .control button {
     margin-left: 0.8em;
     font-size: 0.9em;
-    padding:2px 0.4em;
+    padding:0.2em 0.4em;
 }
 
 .workbench .main {
@@ -503,9 +503,9 @@ margin-left:0.8em;
 .navigator .titlebar {
 	background-color:#F3F4EB;
 	color:#444444;
-    padding-bottom:3px;
+    padding-bottom:0.2em;
     padding-left:0.8em;
-    padding-top:3px;
+    padding-top:0.2em;
 }
 
 .navigator .titlebar div {
@@ -810,9 +810,9 @@ table.item-properties div.key {
 .item-details .titlebar {
 	background-color:#F3F4EB;
 	color:#444444;
-    padding-bottom:3px;
+    padding-bottom:0.2em;
     padding-left:0.8em;
-    padding-top:3px;
+    padding-top:0.2em;
 }
 
 .item-details div.gwt-Label.title {
@@ -895,7 +895,7 @@ table.itemSelector .button {
 }
 
 .itemInput {
-  margin-bottom: 2px;
+  margin-bottom: 0.2em;
   white-space: nowrap;  
 }
 
@@ -988,7 +988,7 @@ div.variablesListTabContent .form table {
 }
 
 .tooltip.gwt-PopupPanel {
-	border:3px solid #444444;
+	border:0.2em solid #444444;
 	-moz-border-radius: 0 0 0 0;
 	padding: 0;
 }
@@ -998,7 +998,7 @@ div.variablesListTabContent .form table {
 	font-weight: bold;
 	padding-left: 0.4em;
 	padding-right: 0.4em;
-	padding-top: 2px;
+	padding-top: 0.2em;
 }
 
 .tooltip .header a, .tooltip .header a:visited, .tooltip .header a:hover {
