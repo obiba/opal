@@ -25,8 +25,7 @@
               <tr>
                 <td>
                   <g:Label addStyleNames="key">
-                    <ui:msg description="Name label">Name</ui:msg>
-                    :
+                    <ui:msg description="Name label">Name</ui:msg>:
                   </g:Label>
                 </td>
                 <td>
@@ -36,8 +35,7 @@
               <tr>
                 <td>
                   <g:Label addStyleNames="key">
-                    <ui:msg description="BIRT Design File label">BIRT Design File</ui:msg>
-                    :
+                    <ui:msg description="BIRT Design File label">BIRT Design File</ui:msg>:
                   </g:Label>
                 </td>
                 <td>
@@ -47,8 +45,7 @@
               <tr>
                 <td>
                   <g:Label addStyleNames="key">
-                    <ui:msg description="Format label">Format</ui:msg>
-                    :
+                    <ui:msg description="Format label">Format</ui:msg>:
                   </g:Label>
                 </td>
                 <td>
@@ -62,8 +59,7 @@
               <tr>
                 <td>
                   <g:Label addStyleNames="key">
-                    <ui:msg description="Parameters label">Parameters</ui:msg>
-                    :
+                    <ui:msg description="Parameters label">Parameters</ui:msg>:
                   </g:Label>
                 </td>
                 <td>
@@ -80,20 +76,21 @@
               <tr>
                 <td>
                   <g:RadioButton name="schedule" ui:field="scheduleRadio" checked="false" addStyleNames="key">
-                    <ui:msg description="Schedule label">Schedule</ui:msg>
-                    :
+                    <ui:msg description="Schedule label">Schedule</ui:msg>:
                   </g:RadioButton>
                 </td>
                 <td>
                   <g:TextBox addStyleNames="text" name="schedule" ui:field="schedule"
                     visibleLength="40"/>
+                  <o:HelpImage imageSize="16">
+                    <g:Label><ui:msg description="Schedule label">Schedule</ui:msg></g:Label>
+                  </o:HelpImage>
                 </td>
               </tr>
               <tr>
                 <td>
                   <g:Label addStyleNames="key">
-                    <ui:msg description="Notification Emails label">Notification Emails</ui:msg>
-                    :
+                    <ui:msg description="Notification Emails label">Notification Emails</ui:msg>:
                   </g:Label>
                 </td>
                 <td>

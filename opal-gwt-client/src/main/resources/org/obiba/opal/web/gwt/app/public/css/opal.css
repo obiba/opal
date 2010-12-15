@@ -106,6 +106,10 @@ textarea {
 	font-style: italic;
 }
 
+img.help {
+    vertical-align: text-bottom;
+}
+
 .gwt-MenuBar-horizontal .gwt-MenuItem {
 	padding-top:0.2em;
 	padding-bottom:0.4em;
