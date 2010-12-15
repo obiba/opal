@@ -56,6 +56,11 @@ public class BirtReportServiceImpl implements ReportService {
     if(isRunning()) return;
     log.info("Starting BIRT Report Engine.");
 
+    if(System.getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME) == null) {
+      log.error("System property '" + BIRT_HOME_SYSTEM_PROPERTY_NAME + "' is not defined. Cannot start reporting engine.");
+      return;
+    }
+
     // make sure BIRT_HOME is set and valid
     File reportEngineHome = new File(System.getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME), "ReportEngine").getAbsoluteFile();
 
