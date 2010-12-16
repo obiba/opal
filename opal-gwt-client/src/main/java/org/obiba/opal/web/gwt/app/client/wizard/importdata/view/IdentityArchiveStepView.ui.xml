@@ -11,47 +11,36 @@
         <table class="full-width" cellspacing="10">
           <tbody>
             <tr>
-              <td style="vertical-align:top">
-                <ui:msg description="Participant identifier in files label">The participant identifiers in the file(s) should:</ui:msg>
+              <td>
+                <g:InlineLabel ui:field="noUnitLabel"><ui:msg description="Participant Opal identifiers in file label">The participant identifiers in the file will be used as-is (no unit is defined).</ui:msg></g:InlineLabel>
+                <g:InlineLabel ui:field="unitLabel"><ui:msg description="Participant identifier in files label">The participant identifiers in the file(s) should:</ui:msg></g:InlineLabel>
               </td>
             </tr>
             <tr>
               <td>
-                <table class="full-width" cellspacing="10">
-                  <tr>
-                    <td>
-                      <g:RadioButton name="identifierGroup" ui:field="identifierAsIs" checked="true"><ui:msg description="Leave identifier as-is label">be used as-is</ui:msg></g:RadioButton>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <g:RadioButton name="identifierGroup" ui:field="identifierSharedWithUnit"><ui:msg description="Share identifier with unit label">be considered as idenfiers shared with unit</ui:msg></g:RadioButton>
-                      <g:ListBox ui:field="units" enabled="false"/>      
-                    </td>
-                  </tr>
-                </table>
+                <g:RadioButton name="identifierGroup" ui:field="identifierAsIs" checked="true" addStyleNames="small-indent"><ui:msg description="Leave identifier as-is label">be used as-is</ui:msg></g:RadioButton>
               </td>
             </tr>
             <tr>
-              <td style="vertical-align:top">
+              <td>
+                <g:RadioButton name="identifierGroup" ui:field="identifierSharedWithUnit" addStyleNames="small-indent"><ui:msg description="Share identifier with unit label">be considered as idenfiers shared with unit</ui:msg></g:RadioButton>
+                <g:ListBox ui:field="units" enabled="false"/>      
+              </td>
+            </tr>
+            <tr>
+              <td>
                 <ui:msg description="Archive files label">Once a file has been successfully imported:</ui:msg>
               </td>
             </tr>
             <tr>
               <td>
-                <table class="full-width" cellspacing="10">
-                  <tr>
-                    <td>
-                      <g:RadioButton name="archiveGroup" ui:field="archiveLeave" checked="true"><ui:msg description="Leave file label">leave it where it is</ui:msg></g:RadioButton>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <g:RadioButton name="archiveGroup" ui:field="archiveMove"><ui:msg description="Move file label">move it to another folder</ui:msg>:</g:RadioButton>
-                      <g:SimplePanel ui:field="archivePanel" addStyleNames="small-top-margin indent"/>
-                    </td>
-                  </tr>
-                </table>
+                <g:RadioButton name="archiveGroup" ui:field="archiveLeave" checked="true" addStyleNames="small-indent"><ui:msg description="Leave file label">leave it where it is</ui:msg></g:RadioButton>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <g:RadioButton name="archiveGroup" ui:field="archiveMove" addStyleNames="small-indent"><ui:msg description="Move file label">move it to another folder</ui:msg>:</g:RadioButton>
+                <g:SimplePanel ui:field="archivePanel" addStyleNames="small-top-margin indent"/>
               </td>
             </tr>
           </tbody>
