@@ -1,12 +1,10 @@
-.evenRow{}
+
 .lastColumnFooter{}
 .firstColumnFooter{}
 .lastColumnHeader{}
 .loading{}
 
-.oddRow{
-	 background-color: #F3F7FB;
-}
+
 
 .header {
 	background-color: #F3F4EB;
@@ -17,14 +15,32 @@
 }
 
 .firstColumnHeader{}
-.selectedRow{
-	background-color: #847261;
-    color: white;
-    height: auto;
-    overflow: auto;
-}
+
 .footer{}
+
+.oddRow{
+	background-color: #EEEEEE;
+}
+
+.oddRow .firstColumn  {
+	background-color: #DDDDDD;
+}
+
+.evenRow{
+	background-color: #FFFFFF;
+}
+
+.evenRow .firstColumn {
+	background-color: #EEEEEE;
+}
+
 .hoveredRow{}
+
+.selectedRow, .selectedRow .firstColumn {
+	background-color: #B1B1B1;
+    color: #ffffff;
+}
+
 .cellTable{}
 
 .cell{
@@ -34,9 +50,7 @@
 .firstColumn{}
 .lastColumn{}
 
-.selectedRow .firstColumn {
-	font-weight: bold;
-}
+
 
 .folder-details .header {
 	border-top: none;
