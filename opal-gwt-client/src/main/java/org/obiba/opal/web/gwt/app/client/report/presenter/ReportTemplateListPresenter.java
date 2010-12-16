@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.report.presenter;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import net.customware.gwt.presenter.client.EventBus;
@@ -92,16 +92,20 @@ public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateL
   }
 
   private JsArray<ReportTemplateDto> sortReportTemplates(JsArray<ReportTemplateDto> templates) {
-    List<ComparableReportTemplateDto> templateList = new ArrayList<ComparableReportTemplateDto>();
-    for(int i = 0; i < templates.length(); i++) {
-      templateList.add(new ComparableReportTemplateDto(templates.get(i)));
-    }
-    Collections.sort(templateList);
+    List<ReportTemplateDto> templateList = JsArrays.toList(templates);
+
+    Collections.sort(templateList, new Comparator<ReportTemplateDto>() {
+
+      @Override
+      public int compare(ReportTemplateDto first, ReportTemplateDto second) {
+        return first.getName().compareTo(second.getName());
+      }
+    });
 
     @SuppressWarnings("unchecked")
     JsArray<ReportTemplateDto> sortedTemplates = (JsArray<ReportTemplateDto>) JsArray.createArray();
-    for(ComparableReportTemplateDto c : templateList) {
-      sortedTemplates.push(c.getWrappedTemplate());
+    for(ReportTemplateDto template : templateList) {
+      sortedTemplates.push(template);
     }
 
     return sortedTemplates;
@@ -120,39 +124,6 @@ public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateL
     ReportTemplateDto getSelectedReportTemplate();
 
     HandlerRegistration addSelectReportTemplateHandler(SelectionChangeHandler handler);
-  }
-
-  class ComparableReportTemplateDto implements Comparable<ComparableReportTemplateDto> {
-    //
-    // Instance Variables
-    //
-
-    private ReportTemplateDto template;
-
-    //
-    // Constructors
-    //
-
-    ComparableReportTemplateDto(ReportTemplateDto template) {
-      this.template = template;
-    }
-
-    //
-    // Comparable Methods
-    //
-
-    @Override
-    public int compareTo(ComparableReportTemplateDto o) {
-      return template.getName().compareTo(o.getWrappedTemplate().getName());
-    }
-
-    //
-    // Methods
-    //
-
-    ReportTemplateDto getWrappedTemplate() {
-      return template;
-    }
   }
 
   class ReportTemplateCreatedHandler implements ReportTemplateCreatedEvent.Handler {
