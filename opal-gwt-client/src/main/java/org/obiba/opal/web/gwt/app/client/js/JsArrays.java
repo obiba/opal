@@ -90,6 +90,12 @@ public class JsArrays {
       }
 
       @Override
+      public T set(int index, T item) {
+        array.set(index, item);
+        return item;
+      }
+
+      @Override
       public int size() {
         return array.length();
       }
