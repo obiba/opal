@@ -50,8 +50,16 @@
 .firstColumn{}
 .lastColumn{}
 
-
+/* Specific tables */
 
 .folder-details .header {
 	border-top: none;
+}
+
+.selection-list .evenRow .firstColumn, .selection-list .oddRow .firstColumn {
+	background-color: #ffffff;
+}
+
+.selection-list .selectedRow .firstColumn {
+	background-color: #B1B1B1;
 }
