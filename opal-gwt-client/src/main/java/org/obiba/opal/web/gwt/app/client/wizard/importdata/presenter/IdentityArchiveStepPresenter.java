@@ -107,7 +107,11 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
   public void updateImportData(ImportData importData) {
     importData.setIdentifierAsIs(getDisplay().isIdentifierAsIs());
     importData.setIdentifierSharedWithUnit(getDisplay().isIdentifierSharedWithUnit());
-    importData.setUnit(getDisplay().getSelectedUnit());
+    if(getDisplay().isIdentifierSharedWithUnit()) {
+      importData.setUnit(getDisplay().getSelectedUnit());
+    } else {
+      importData.setUnit(null);
+    }
 
     importData.setArchiveLeave(getDisplay().isArchiveLeave());
     importData.setArchiveMove(getDisplay().isArchiveMove());
