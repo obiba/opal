@@ -23,6 +23,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -35,6 +36,12 @@ public class IdentityArchiveStepView extends Composite implements IdentityArchiv
   }
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+
+  @UiField
+  InlineLabel noUnitLabel;
+
+  @UiField
+  InlineLabel unitLabel;
 
   @UiField
   RadioButton identifierAsIs;
@@ -78,12 +85,12 @@ public class IdentityArchiveStepView extends Composite implements IdentityArchiv
 
   @Override
   public boolean isIdentifierAsIs() {
-    return identifierAsIs.getValue();
+    return units.getItemCount() == 0 || identifierAsIs.getValue();
   }
 
   @Override
   public boolean isIdentifierSharedWithUnit() {
-    return identifierSharedWithUnit.getValue();
+    return units.getItemCount() > 0 && identifierSharedWithUnit.getValue();
   }
 
   @Override
@@ -93,6 +100,11 @@ public class IdentityArchiveStepView extends Composite implements IdentityArchiv
       this.units.addItem(units.get(i).getName());
     }
     this.units.setEnabled(isIdentifierSharedWithUnit());
+    noUnitLabel.setVisible(units.length() == 0);
+    unitLabel.setVisible(units.length() > 0);
+    this.units.setVisible(units.length() > 0);
+    identifierAsIs.setVisible(units.length() > 0);
+    identifierSharedWithUnit.setVisible(units.length() > 0);
   }
 
   @Override
