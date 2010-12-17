@@ -130,16 +130,17 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
     conclusionStep.setStepTitle(translations.identifierImportPendingConclusion());
     dialog.setProgress(true);
     stepChain.onNext();
+    dialog.setProgress(true);
+    dialog.setCloseEnabled(false);
     dialog.setCancelEnabled(false);
-    dialog.setPreviousEnabled(false);
-    dialog.setFinishEnabled(false);
   }
 
   @Override
   public void renderCompletedConclusion() {
     dialog.setProgress(false);
     conclusionStep.setStepTitle(translations.identifierImportCompletedConclusion());
-    dialog.setFinishEnabled(true);
+    dialog.setCloseEnabled(true);
+    dialog.setProgress(false);
   }
 
   @Override
@@ -147,7 +148,7 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
     dialog.setProgress(false);
     conclusionStep.setStepTitle(translations.identifierImportFailedConclusion());
     dialog.setCancelEnabled(true);
-    dialog.setPreviousEnabled(true);
+    dialog.setProgress(false);
   }
 
   @Override
