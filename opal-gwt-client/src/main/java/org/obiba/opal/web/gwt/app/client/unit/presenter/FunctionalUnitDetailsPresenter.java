@@ -334,9 +334,8 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     public void execute() {
       actionRequiringConfirmation = new Runnable() {
         public void run() {
-          ResponseCodeCallback callbackHandler = new CommandResponseCallBack();
+          ResponseCodeCallback callbackHandler = new FunctionalUnitDeleteCallback();
           ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName()).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
-          eventBus.fireEvent(new FunctionalUnitDeletedEvent(getDisplay().getFunctionalUnitDetails()));
         }
       };
       eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "removeFunctionalUnit", "confirmDeleteFunctionalUnit"));
@@ -372,12 +371,12 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     }
   }
 
-  private class CommandResponseCallBack implements ResponseCodeCallback {
+  private class FunctionalUnitDeleteCallback implements ResponseCodeCallback {
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      if(response.getStatusCode() == Response.SC_CREATED) {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.INFO, "ReportJobStarted", null));
+      if(response.getStatusCode() == Response.SC_OK) { // unit was deleted
+        eventBus.fireEvent(new FunctionalUnitDeletedEvent(getDisplay().getFunctionalUnitDetails()));
       }
     }
   }

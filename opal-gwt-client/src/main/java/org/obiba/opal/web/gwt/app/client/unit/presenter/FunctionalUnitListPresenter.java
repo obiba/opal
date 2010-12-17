@@ -15,6 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitSelectedEvent;
@@ -47,6 +48,7 @@ public class FunctionalUnitListPresenter extends WidgetPresenter<FunctionalUnitL
 
   @Override
   public void refreshDisplay() {
+    refreshFunctionalUnits();
   }
 
   @Override
@@ -55,7 +57,7 @@ public class FunctionalUnitListPresenter extends WidgetPresenter<FunctionalUnitL
 
   @Override
   protected void onBind() {
-    initUiComponents();
+    refreshFunctionalUnits();
     addHandlers();
   }
 
@@ -72,7 +74,7 @@ public class FunctionalUnitListPresenter extends WidgetPresenter<FunctionalUnitL
   protected void onPlaceRequest(PlaceRequest request) {
   }
 
-  private void initUiComponents() {
+  private void refreshFunctionalUnits() {
     ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new FunctionalUnitsResourceCallback()).send();
   }
 
@@ -86,7 +88,7 @@ public class FunctionalUnitListPresenter extends WidgetPresenter<FunctionalUnitL
 
     @Override
     public void onFunctionalUnitCreated(FunctionalUnitCreatedEvent event) {
-      initUiComponents();
+      refreshFunctionalUnits();
     }
 
   }
@@ -95,8 +97,7 @@ public class FunctionalUnitListPresenter extends WidgetPresenter<FunctionalUnitL
 
     @Override
     public void onFunctionalUnitDeleted(FunctionalUnitDeletedEvent event) {
-      initUiComponents();
-      eventBus.fireEvent(new FunctionalUnitSelectedEvent(null));
+      refreshFunctionalUnits();
     }
 
   }
@@ -115,7 +116,7 @@ public class FunctionalUnitListPresenter extends WidgetPresenter<FunctionalUnitL
 
     @Override
     public void onResource(Response response, JsArray<FunctionalUnitDto> resource) {
-      JsArray<FunctionalUnitDto> units = resource != null ? resource : (JsArray<FunctionalUnitDto>) JsArray.createArray();
+      JsArray<FunctionalUnitDto> units = JsArrays.toSafeArray(resource);
       getDisplay().setFunctionalUnits(units);
     }
   }
