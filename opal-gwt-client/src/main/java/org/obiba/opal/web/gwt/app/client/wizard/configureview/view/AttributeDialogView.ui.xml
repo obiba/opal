@@ -16,50 +16,41 @@
     <g:DockLayoutPanel unit="EM" height="18em" width="35em">
       <g:center>
       <g:ScrollPanel>
-        <g:VerticalPanel  addStyleNames="main {style.optionsPanelMsg}">
-          <g:HTMLPanel height="5.5em">
+        <g:HTMLPanel addStyleNames="main {style.optionsPanelMsg}">
             <table class="gwt-KeyValue" cellspacing="10">
               <tbody>
                 <tr>
-                  <td>
+                  <td valign="top">
                     <ui:msg description="Name label">Name</ui:msg>:
                   </td>
                   <td>
-                     <g:SimplePanel ui:field="namePanel">
-		               <g:HTMLPanel ui:field="editableName" addStyleNames="indent">
-		                 <table>
-		                   <tbody>
-		                     <tr>
-		                       <td>
-		                         <g:RadioButton name="name" ui:field="predefinedAttributeNameRadioButton" checked="true"><ui:msg description="Predefined label">Predefined:</ui:msg></g:RadioButton><g:ListBox ui:field="labels" />
-		                       </td>
-		                     </tr>
-		                     <tr>
-	                           <td>
-	                             <g:RadioButton name="name" ui:field="customAttributeNameRadioButton"><ui:msg description="Custom label">Custom:</ui:msg></g:RadioButton><g:TextBox name="customAttributeName" ui:field="customAttributeName" visibleLength="24"/>
-	                           </td>
-		                     </tr>
-		                   </tbody>
-		                 </table>
-		               </g:HTMLPanel>
-	                 </g:SimplePanel>                  
+                    <g:InlineLabel ui:field="uneditableName"></g:InlineLabel>
+                    <g:FlowPanel ui:field="editableName">
+                      <g:FlowPanel>
+		                <g:RadioButton name="name" ui:field="predefinedAttributeNameRadioButton" checked="true"><ui:msg description="Predefined label">Predefined:</ui:msg></g:RadioButton><g:ListBox ui:field="labels" addStyleNames="small-indent"/>
+		              </g:FlowPanel>
+		              <g:FlowPanel addStyleNames="top-margin">
+		                <g:RadioButton name="name" ui:field="customAttributeNameRadioButton"><ui:msg description="Custom label">Custom:</ui:msg></g:RadioButton><g:TextBox name="customAttributeName" ui:field="customAttributeName" visibleLength="24"  addStyleNames="small-indent"/>
+		              </g:FlowPanel>           
+		            </g:FlowPanel>                  
                   </td>
+                </tr>
+                <tr>
+                  <td colspan="2"><g:SimplePanel ui:field="simplePanel"/></td>
                 </tr>
               </tbody>
             </table>
           </g:HTMLPanel>
-          <g:SimplePanel ui:field="simplePanel"/>
-        </g:VerticalPanel>
         </g:ScrollPanel>
       </g:center>
       <g:south size="3.25">
         <g:HTMLPanel addStyleNames="footer">
           <span class="{style.right-aligned} {style.top-margin}">
-            <g:Button ui:field="cancelButton">
-                <ui:msg description="Cancel button label">Cancel</ui:msg>
-            </g:Button>
             <g:Button ui:field="saveButton">
                 <ui:msg description="Save button label">Save</ui:msg>
+            </g:Button>
+            <g:Button ui:field="cancelButton">
+                <ui:msg description="Cancel button label">Cancel</ui:msg>
             </g:Button>
           </span>
         </g:HTMLPanel>

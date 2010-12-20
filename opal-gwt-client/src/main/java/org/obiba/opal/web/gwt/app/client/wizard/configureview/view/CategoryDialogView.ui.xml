@@ -18,25 +18,27 @@
     <g:DockLayoutPanel unit="EM" height="15em" width="35em">
       <g:center>
         <g:ScrollPanel>
-        <g:VerticalPanel addStyleNames="main {style.optionsPanelMsg}">
-          <g:HorizontalPanel>
-            <g:Label>
-              <ui:msg description="Name label">Name</ui:msg>:
-            </g:Label>
-            <g:SimplePanel ui:field="categoryNamePanel" addStyleNames="small-indent" />
-          </g:HorizontalPanel>
-          <g:SimplePanel ui:field="simplePanel" addStyleNames="labelPanel"/>
-        </g:VerticalPanel>
+          <g:HTMLPanel addStyleNames="main {style.optionsPanelMsg}">
+            <table>
+              <tr>
+                <td><ui:msg description="Name label">Name</ui:msg>:</td>
+                <td><g:SimplePanel ui:field="categoryNamePanel" addStyleNames="small-indent" /></td>
+              </tr>
+              <tr>
+                <td colspan="2"><g:SimplePanel ui:field="simplePanel" addStyleNames="labelPanel"/></td>
+              </tr>
+            </table>
+          </g:HTMLPanel>
         </g:ScrollPanel>
       </g:center>
       <g:south size="3.25">
         <g:HTMLPanel addStyleNames="footer">
           <span class="{style.right-aligned} {style.top-margin}">
-            <g:Button ui:field="cancelButton">
-                <ui:msg description="Cancel button label">Cancel</ui:msg>
-            </g:Button>
             <g:Button ui:field="saveButton">
                 <ui:msg description="Save button label">Save</ui:msg>
+            </g:Button>
+            <g:Button ui:field="cancelButton">
+                <ui:msg description="Cancel button label">Cancel</ui:msg>
             </g:Button>
           </span>
         </g:HTMLPanel>
