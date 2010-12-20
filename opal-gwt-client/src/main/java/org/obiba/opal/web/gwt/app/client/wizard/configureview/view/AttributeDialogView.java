@@ -184,7 +184,7 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
     simplePanel.clear();
     simplePanel.add(inputField.asWidget());
     this.inputField = inputField;
-    this.inputField.setAttributeValueLabel(translations.valueLabel());
+    this.inputField.setAttributeValueLabel("");
   }
 
   @Override

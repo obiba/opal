@@ -9,6 +9,7 @@
     .optionsPanelMsg td { margin: 0.5em 0.5em 0.5em 0.5em; }
     .right-aligned { float: right; }
     .top-margin { margin-top: 0.5em; }
+    .inline {diplay: inline;}
   </ui:style>
 
   <g:DialogBox ui:field="dialog" addStyleNames="categoryDialog" autoHide="false" modal="true" height="15em" width="35em">
@@ -19,13 +20,17 @@
       <g:center>
         <g:ScrollPanel>
           <g:HTMLPanel addStyleNames="main {style.optionsPanelMsg}">
-            <table>
+            <table class="gwt-KeyValue" cellspacing="10">
               <tr>
                 <td><ui:msg description="Name label">Name</ui:msg>:</td>
-                <td><g:SimplePanel ui:field="categoryNamePanel" addStyleNames="small-indent" /></td>
+                <td>
+                  <g:InlineLabel ui:field="uneditableCategoryName"></g:InlineLabel>
+                  <g:TextBox ui:field="categoryName"/>
+                </td>
               </tr>
               <tr>
-                <td colspan="2"><g:SimplePanel ui:field="simplePanel" addStyleNames="labelPanel"/></td>
+                <td valign="top"><ui:msg description="Label label">Label</ui:msg>:</td>
+                <td><g:SimplePanel ui:field="simplePanel"/></td>
               </tr>
             </table>
           </g:HTMLPanel>
