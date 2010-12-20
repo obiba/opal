@@ -54,7 +54,7 @@ public class VariableView extends Composite implements VariablePresenter.Display
 
   private static final String LABEL_ATTRIBUTE_NAME = "label";
 
-  private static final Integer SUMMARY_TAB_INDEX = 2;
+  private static final Integer SUMMARY_TAB_INDEX = 3;
 
   private static VariableViewUiBinder uiBinder = GWT.create(VariableViewUiBinder.class);
 
