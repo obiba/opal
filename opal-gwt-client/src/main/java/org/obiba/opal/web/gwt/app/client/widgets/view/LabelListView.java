@@ -64,10 +64,13 @@ public class LabelListView extends Composite implements LabelListPresenter.Displ
     panel.clear();
     languageLabelMap.clear();
     grid = new Grid(languages.length(), 2);
+    grid.addStyleName("full-width");
     for(int i = 0; i < languages.length(); i++) {
       if(i == 0) baseLanguage = languages.get(0);
       grid.setWidget(i, 0, new Label(getLabelText(languages.get(i).getName(), i)));
-      languageLabelMap.put(languages.get(i).getName(), new TextBox());
+      TextBox box;
+      languageLabelMap.put(languages.get(i).getName(), box = new TextBox());
+      box.addStyleName("not-so-full-width");
       grid.setWidget(i, 1, languageLabelMap.get(languages.get(i).getName()));
     }
     panel.add(grid);

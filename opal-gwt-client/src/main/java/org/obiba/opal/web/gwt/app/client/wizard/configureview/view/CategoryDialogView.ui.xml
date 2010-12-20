@@ -16,16 +16,16 @@
     <g:caption>
       <ui:msg description="Add new attribute title" >Add New Attribute</ui:msg>
     </g:caption>
-    <g:DockLayoutPanel unit="EM" height="15em" width="35em">
+    <g:DockLayoutPanel unit="EM" height="16em" width="35em">
       <g:center>
         <g:ScrollPanel>
           <g:HTMLPanel addStyleNames="main {style.optionsPanelMsg}">
-            <table class="gwt-KeyValue" cellspacing="10">
+            <table class="gwt-KeyValue full-width" cellspacing="10">
               <tr>
                 <td><ui:msg description="Name label">Name</ui:msg>:</td>
                 <td>
                   <g:InlineLabel ui:field="uneditableCategoryName"></g:InlineLabel>
-                  <g:TextBox ui:field="categoryName"/>
+                  <g:TextBox ui:field="categoryName" addStyleNames="not-so-full-width"/>
                 </td>
               </tr>
               <tr>

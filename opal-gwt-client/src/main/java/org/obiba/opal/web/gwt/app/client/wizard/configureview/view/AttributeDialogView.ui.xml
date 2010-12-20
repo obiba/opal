@@ -17,7 +17,7 @@
       <g:center>
       <g:ScrollPanel>
         <g:HTMLPanel addStyleNames="main {style.optionsPanelMsg}">
-            <table class="gwt-KeyValue" cellspacing="10">
+            <table class="gwt-KeyValue full-width" cellspacing="10">
               <tbody>
                 <tr>
                   <td valign="top"><ui:msg description="Name label">Name</ui:msg>:</td>
