@@ -100,6 +100,9 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
   @Override
   public void refreshDisplay() {
+    if(reportTemplate != null) {
+      refreshProducedReports(reportTemplate);
+    }
   }
 
   @Override
@@ -115,6 +118,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
   @Override
   protected void onUnbind() {
+    reportTemplate = null;
   }
 
   @Override

@@ -17,7 +17,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Mode;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -39,6 +38,8 @@ public class ReportTemplatePresenter extends WidgetPresenter<ReportTemplatePrese
     ScrollPanel getReportTemplateListPanel();
 
     HandlerRegistration addReportTemplateClickHandler(ClickHandler handler);
+
+    HandlerRegistration refreshClickHandler(ClickHandler handler);
   }
 
   @Inject
@@ -65,6 +66,13 @@ public class ReportTemplatePresenter extends WidgetPresenter<ReportTemplatePrese
 
   private void addHandlers() {
     super.registerHandler(getDisplay().addReportTemplateClickHandler(new AddReportTemplateClickHandler()));
+    super.registerHandler(getDisplay().refreshClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent arg0) {
+        reportTemplateDetailsPresenter.refreshDisplay();
+      }
+    }));
   }
 
   protected void initDisplayComponents() {
