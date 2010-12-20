@@ -493,21 +493,12 @@ margin-left:0.8em;
 	font-family: monospace;
 }
 
-/*.gwt-Tree .selected {
-	background-color: #bb5500;	
-}
-
-.gwt-Tree .magma-datasource.selected div {
-	background-color: #ffffff;	
-}
-
-.gwt-Tree .magma-datasource.selected div.gwt-TreeItem-selected {
-	background-color: #bb5500;	
-}*/
-
 .gwt-Tree .gwt-TreeItem-selected {
 	font-weight: bold;
-	/*color: #ffffff;*/
+}
+
+.navigator {
+	padding-bottom: 0.8em;
 }
 
 .navigator .titlebar {
