@@ -925,6 +925,10 @@ div.variablesListTabContent .navigationPanel {
   padding-bottom: 0.8em;
 }
 
+div.variablesListTabContent .navigationPanel img {
+  vertical-align: text-bottom;
+}
+
 div.variablesListTabContent .form {
   border-top: 1px solid #6F7277;
   padding-top: 0.8em;

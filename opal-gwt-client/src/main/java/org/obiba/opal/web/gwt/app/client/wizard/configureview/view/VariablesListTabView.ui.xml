@@ -22,10 +22,10 @@
       </g:Label>
       <g:SuggestBox ui:field="variableNameSuggestBox" addStyleNames="small-indent"/>
       <g:Anchor ui:field="previous">
-        <img src="image/16/previous.png" align="middle"/>
+        <img src="image/16/previous.png"/>
       </g:Anchor>
       <g:Anchor ui:field="next">
-        <img src="image/16/next.png" align="middle"/>
+        <img src="image/16/next.png"/>
       </g:Anchor>
       <g:Button ui:field="removeButton" addStyleNames="right-aligned indent">
         <ui:msg description="Remove label">Remove</ui:msg>

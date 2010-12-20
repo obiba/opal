@@ -75,7 +75,7 @@ public class AttributesPresenter extends LocalizablesPresenter {
       final AttributeDto attributeDto = variableDto.getAttributesArray().get(i);
 
       // Add attributes that belong to this locale as well as attributes without a locale.
-      if(attributeDto.getLocale().equals(localeName) || isAttributeWithNoLocale(attributeDto)) {
+      if(!attributeDto.getName().equals("script") && (attributeDto.getLocale().equals(localeName) || isAttributeWithNoLocale(attributeDto))) {
         localizables.add(new Localizable() {
 
           @Override
