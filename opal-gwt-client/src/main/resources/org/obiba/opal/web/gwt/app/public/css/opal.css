@@ -919,6 +919,7 @@ table.itemSelector .button {
 div.variablesListTabContent .navigationPanel {
   margin-top: 2em;
   padding-bottom: 0.8em;
+  display: inline;
 }
 
 div.variablesListTabContent .navigationPanel img {
@@ -928,6 +929,7 @@ div.variablesListTabContent .navigationPanel img {
 div.variablesListTabContent .form {
   border-top: 1px solid #6F7277;
   padding-top: 0.8em;
+  margin-top: 0.8em;
 }
 
 div.variablesListTabContent .pager {

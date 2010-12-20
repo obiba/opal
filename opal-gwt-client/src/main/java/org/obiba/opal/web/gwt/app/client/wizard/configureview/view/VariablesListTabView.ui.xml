@@ -11,27 +11,23 @@
       <g:Label addStyleNames="inline">
         <ui:msg description="List of derived variables label">List of derived variables</ui:msg>:
       </g:Label>
+      <g:FlowPanel addStyleNames="navigationPanel">
+        <g:SuggestBox ui:field="variableNameSuggestBox" addStyleNames="small-indent"/>
+        <g:Anchor ui:field="previous">
+          <img src="image/16/previous.png"/>
+        </g:Anchor>
+        <g:Anchor ui:field="next">
+          <img src="image/16/next.png"/>
+        </g:Anchor>
+        <g:Button ui:field="addButton" addStyleNames="small-indent">
+          <ui:msg description="Add button label">Add</ui:msg>
+        </g:Button>
+        <g:Button ui:field="removeButton" addStyleNames="small-indent">
+          <ui:msg description="Remove label">Remove</ui:msg>
+        </g:Button>
+      </g:FlowPanel>
       <g:Button ui:field="saveChangesButton" addStyleNames="right-aligned">
         <ui:msg description="Save changes button label">Save Changes</ui:msg>
-      </g:Button>
-    </g:FlowPanel>
-    
-    <g:FlowPanel addStyleNames="navigationPanel">
-      <g:Label addStyleNames="inline">
-        <ui:msg description="Go to label">Go to</ui:msg>:
-      </g:Label>
-      <g:SuggestBox ui:field="variableNameSuggestBox" addStyleNames="small-indent"/>
-      <g:Anchor ui:field="previous">
-        <img src="image/16/previous.png"/>
-      </g:Anchor>
-      <g:Anchor ui:field="next">
-        <img src="image/16/next.png"/>
-      </g:Anchor>
-      <g:Button ui:field="removeButton" addStyleNames="right-aligned indent">
-        <ui:msg description="Remove label">Remove</ui:msg>
-      </g:Button>
-      <g:Button ui:field="addButton" addStyleNames="right-aligned">
-        <ui:msg description="Add button label">Add</ui:msg>
       </g:Button>
     </g:FlowPanel>
     
