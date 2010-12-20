@@ -121,6 +121,15 @@ public class VariableView extends Composite implements VariablePresenter.Display
   @UiField
   InlineLabel noAttributes;
 
+  @UiField
+  Label script;
+
+  @UiField
+  InlineLabel noScript;
+
+  @UiField
+  InlineLabel notDerived;
+
   //
   // Constructors
   //
@@ -399,6 +408,14 @@ public class VariableView extends Composite implements VariablePresenter.Display
         return object.getValue();
       }
     }, translations.valueLabel());
+  }
+
+  @Override
+  public void setDerivedVariable(boolean derived, String value) {
+    notDerived.setVisible(!derived);
+    noScript.setVisible(derived && value.length() == 0);
+    script.setVisible(derived && value.length() > 0);
+    script.setText(value);
   }
 
 }

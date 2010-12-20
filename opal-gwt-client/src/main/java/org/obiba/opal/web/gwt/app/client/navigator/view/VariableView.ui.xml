@@ -101,12 +101,18 @@
     </g:HTMLPanel>
 
      <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
-        
-	    <g:Anchor ui:field="categoryTableTitle" />
+        <g:Anchor ui:field="categoryTableTitle" />
         <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_RIGHT">
           <g:InlineLabel ui:field="noCategories"><ui:msg description="No Categories label">No Categories</ui:msg></g:InlineLabel>
           <o:Table width="100%" ui:field="categoryTable" />
         </g:VerticalPanel>
+    
+        <g:Anchor><ui:msg description="Script label">Script</ui:msg></g:Anchor>
+        <g:FlowPanel>
+          <g:InlineLabel ui:field="notDerived"><ui:msg description="Not Derived Variable label">Not a Derived Variable</ui:msg></g:InlineLabel>
+          <g:InlineLabel ui:field="noScript"><ui:msg description="No Script label">No Script</ui:msg></g:InlineLabel>
+          <g:Label ui:field="script" addStyleNames="script"></g:Label>
+        </g:FlowPanel>
     
 	    <g:Anchor ui:field="attributeTableTitle" />
         <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_RIGHT">

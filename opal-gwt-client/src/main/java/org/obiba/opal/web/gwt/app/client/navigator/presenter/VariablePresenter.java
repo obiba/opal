@@ -15,6 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
@@ -27,6 +28,8 @@ import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.magma.VariableListViewDto;
+import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
@@ -110,6 +113,8 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
       getDisplay().renderCategoryRows(variableDto.getCategoriesArray());
       getDisplay().renderAttributeRows(variableDto.getAttributesArray());
+
+      ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource(variable.getParentLink().getLink()).get().withCallback(new TableCallback()).send();
     }
   }
 
@@ -127,6 +132,34 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   //
   // Interfaces and classes
   //
+
+  private final class TableCallback implements ResourceCallback<TableDto> {
+    @Override
+    public void onResource(Response response, TableDto resource) {
+      if(resource != null && resource.hasViewLink()) {
+        ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource(resource.getViewLink()).get().withCallback(new ViewCallback()).send();
+      } else {
+        getDisplay().setDerivedVariable(false, "");
+      }
+    }
+  }
+
+  private final class ViewCallback implements ResourceCallback<ViewDto> {
+    @Override
+    public void onResource(Response response, ViewDto resource) {
+      if(resource != null && resource.getExtension(VariableListViewDto.ViewDtoExtensions.view) != null) {
+        getDisplay().setDerivedVariable(true, "");
+        for(AttributeDto attr : JsArrays.toIterable(variable.getAttributesArray())) {
+          if(attr.getName().equals("script")) {
+            getDisplay().setDerivedVariable(true, attr.getValue());
+            break;
+          }
+        }
+      } else {
+        getDisplay().setDerivedVariable(false, "");
+      }
+    }
+  }
 
   /**
    *
@@ -188,6 +221,8 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   public interface Display extends WidgetDisplay {
 
     void setVariableName(String name);
+
+    void setDerivedVariable(boolean derived, String script);
 
     void setEntityType(String text);
 
