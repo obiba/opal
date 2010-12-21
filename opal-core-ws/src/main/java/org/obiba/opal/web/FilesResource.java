@@ -43,8 +43,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -103,7 +103,7 @@ public class FilesResource {
     if(!file.exists()) {
       return getPathNotExistResponse(path);
     } else if(file.getType() == FileType.FILE) {
-      return Response.status(NOT_IMPLEMENTED).entity("Details are only available for folder content.  The specified path points to a file : " + path).build();
+      return getFileDetails(file);
     } else {
       return getFolderDetails(file);
     }
@@ -151,6 +151,23 @@ public class FilesResource {
     compressFolder(compressedFolder, folder);
 
     return Response.ok(compressedFolder, MediaType.valueOf(mimeType)).header("Content-Disposition", getContentDispositionOfAttachment(compressedFolder.getName())).build();
+  }
+
+  private Response getFileDetails(FileObject file) throws FileSystemException {
+    Opal.FileDto.Builder fileBuilder;
+
+    fileBuilder = Opal.FileDto.newBuilder();
+    fileBuilder.setName(file.getName().getBaseName()).setPath(file.getName().getPath());
+    fileBuilder.setType(file.getType() == FileType.FILE ? Opal.FileDto.FileType.FILE : Opal.FileDto.FileType.FOLDER);
+
+    // Set size on files only, not folders.
+    if(file.getType() == FileType.FILE) {
+      fileBuilder.setSize(file.getContent().getSize());
+    }
+
+    fileBuilder.setLastModifiedTime(file.getContent().getLastModifiedTime());
+
+    return Response.ok(fileBuilder.build()).build();
   }
 
   private Response getFolderDetails(FileObject folder) throws FileSystemException {
