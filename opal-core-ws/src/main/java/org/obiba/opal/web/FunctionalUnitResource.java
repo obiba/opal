@@ -222,7 +222,7 @@ public class FunctionalUnitResource {
   public Response getCSVIdentifiers() throws MagmaRuntimeException, IOException {
     ByteArrayOutputStream ids = new ByteArrayOutputStream();
     final PrintWriter writer = new PrintWriter(ids);
-    writer.append("Opal").append(',').append(unit).append('\n');
+    writer.append('"').append(FunctionalUnit.OPAL_INSTANCE).append("\",\"").append(unit).append("\"\n");
     readUnitIdentifiers(new VectorCallback() {
 
       @Override

@@ -10,12 +10,14 @@
 package org.obiba.opal.web;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.TreeSet;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -35,8 +37,8 @@ import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
+import org.obiba.magma.VariableEntity;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
-import org.obiba.magma.datasource.csv.CsvDatasource;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.DatasourceCopier;
@@ -49,6 +51,8 @@ import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
+import org.obiba.opal.core.unit.FunctionalUnitIdentifiers;
+import org.obiba.opal.core.unit.FunctionalUnitIdentifiers.UnitIdentifier;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.TableResource;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
@@ -61,8 +65,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
-
-import de.schlichtherle.io.FileInputStream;
 
 @Component
 @Path("/functional-units")
@@ -194,36 +196,62 @@ public class FunctionalUnitsResource {
     try {
       String destinationName = getKeysDatasourceName();
 
-      CsvDatasource destinationDatasource = new CsvDatasource(destinationName);
-      File output = File.createTempFile("ids-", ".csv");
-      destinationDatasource.addValueTable(getKeysTable().getName(), null, output);
-
-      copyEntities(destinationDatasource);
-
-      ByteArrayOutputStream bos = copyFile(output);
-      if(!output.delete()) {
-        // do nothing
+      ByteArrayOutputStream ids = new ByteArrayOutputStream();
+      PrintWriter writer = new PrintWriter(ids);
+      List<Iterator<UnitIdentifier>> unitIdIters = writeIdentifiersHeader(writer);
+      // value sets
+      if(unitIdIters.size() > 0) {
+        writeUnitIdentifiers(writer, unitIdIters);
+      } else {
+        writeOpalIdentifiers(writer);
       }
+      writer.close();
 
-      return Response.ok(bos.toByteArray(), "text/csv").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".csv\"").build();
+      return Response.ok(ids.toByteArray(), "text/csv").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".csv\"").build();
     } catch(NoSuchFunctionalUnitException e) {
       return Response.status(Status.NOT_FOUND).build();
     }
   }
 
-  private ByteArrayOutputStream copyFile(File file) throws IOException {
-    InputStream fis = new FileInputStream(file);
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    byte[] buf = new byte[1024];
-    for(int readNum; (readNum = fis.read(buf)) != -1;) {
-      bos.write(buf, 0, readNum);
+  private List<Iterator<UnitIdentifier>> writeIdentifiersHeader(PrintWriter writer) {
+    ValueTable keysTable = getKeysTable();
+    List<Iterator<UnitIdentifier>> unitIdIters = new ArrayList<Iterator<UnitIdentifier>>();
+
+    // header
+    writer.append('"').append(FunctionalUnit.OPAL_INSTANCE).append('"');
+    for(FunctionalUnit functionalUnit : opalRuntime.getFunctionalUnits()) {
+      if(keysTable.hasVariable(functionalUnit.getKeyVariableName())) {
+        unitIdIters.add(new FunctionalUnitIdentifiers(keysTable, functionalUnit).iterator());
+        writer.append(",\"").append(functionalUnit.getName()).append('"');
+      }
     }
+    writer.append('\n');
 
-    bos.flush();
-    bos.close();
-    fis.close();
+    return unitIdIters;
+  }
 
-    return bos;
+  private void writeUnitIdentifiers(PrintWriter writer, List<Iterator<UnitIdentifier>> unitIdIters) {
+    while(unitIdIters.get(0).hasNext()) {
+      // opal and unit identifiers
+      boolean opalIdWritten = false;
+      for(Iterator<UnitIdentifier> unitIdsIter : unitIdIters) {
+        UnitIdentifier unitIdentifier = unitIdsIter.next();
+        if(!opalIdWritten) {
+          writer.append('\"').append(unitIdentifier.getOpalIdentifier()).append('\"');
+          opalIdWritten = true;
+        }
+        writer.append(',').append(unitIdentifier.hasUnitIdentifier() ? "\"" + unitIdentifier.getUnitIdentifier() + "\"" : "");
+      }
+      writer.append('\n');
+    }
+  }
+
+  private void writeOpalIdentifiers(PrintWriter writer) {
+    // no unit: list of opal ids
+    TreeSet<VariableEntity> opalEntities = new TreeSet<VariableEntity>(getKeysTable().getVariableEntities());
+    for(VariableEntity entity : opalEntities) {
+      writer.append('\"').append(entity.getIdentifier()).append("\"\n");
+    }
   }
 
   private void copyEntities(Datasource destinationDatasource) throws IOException {
