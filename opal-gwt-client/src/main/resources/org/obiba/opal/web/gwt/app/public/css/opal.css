@@ -207,6 +207,10 @@ img.help {
 	padding:0.8em;
 }
 
+.gwt-DialogBox .dialogContent .main .p {
+	line-height: 1.6em;
+}
+
 .gwt-DialogBox .dialogContent .footer {
 	background-color:#F3F4EB;
 	border-top:1px solid #B4A291;

@@ -9,7 +9,7 @@
   
   <g:DockLayoutPanel unit="EM">
     <g:center>
-      <g:HTML ui:field="message" addStyleNames="main">Confirmation message.</g:HTML>
+      <g:HTML ui:field="message" addStyleNames="main p">Confirmation message.</g:HTML>
     </g:center>
     <g:south size="3.25">
       <g:HTMLPanel addStyleNames="footer">
