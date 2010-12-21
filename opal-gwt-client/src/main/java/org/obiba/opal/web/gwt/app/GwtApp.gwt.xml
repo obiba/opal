@@ -28,6 +28,9 @@
   <!-- Opal Ploting Module -->
   <inherits name='org.obiba.opal.web.gwt.plot.Plots' />
 
+  <!-- Syntax Highlighting -->
+  <inherits name='org.obiba.opal.web.gwt.prettify.Prettify'/>
+
   <!-- Specify the app entry point class. -->
   <entry-point class='org.obiba.opal.web.gwt.app.client.GwtApp' />
   

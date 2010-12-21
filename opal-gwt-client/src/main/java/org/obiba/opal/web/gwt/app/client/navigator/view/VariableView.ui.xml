@@ -2,6 +2,7 @@
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:g2="urn:import:com.google.gwt.user.cellview.client" 
   xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  xmlns:pretty="urn:import:org.obiba.opal.web.gwt.prettify.client"
   ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
@@ -111,7 +112,7 @@
         <g:FlowPanel>
           <g:InlineLabel ui:field="notDerived"><ui:msg description="Not Derived Variable label">Not a Derived Variable</ui:msg></g:InlineLabel>
           <g:InlineLabel ui:field="noScript"><ui:msg description="No Script label">No Script</ui:msg></g:InlineLabel>
-          <g:Label ui:field="script" addStyleNames="script"></g:Label>
+          <pretty:PrettyPrintLabel ui:field="script"/>
         </g:FlowPanel>
     
 	    <g:Anchor ui:field="attributeTableTitle" />

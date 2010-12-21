@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
+import org.obiba.opal.web.gwt.prettify.client.PrettyPrintLabel;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 
@@ -122,7 +123,7 @@ public class VariableView extends Composite implements VariablePresenter.Display
   InlineLabel noAttributes;
 
   @UiField
-  Label script;
+  PrettyPrintLabel script;
 
   @UiField
   InlineLabel noScript;
