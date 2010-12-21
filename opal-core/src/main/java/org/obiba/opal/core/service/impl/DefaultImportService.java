@@ -172,7 +172,7 @@ public class DefaultImportService implements ImportService {
     }
   }
 
-  public void importIdentifiers(String unitName, IParticipantIdentifier pIdentifier) {
+  public int importIdentifiers(String unitName, IParticipantIdentifier pIdentifier) {
     Assert.hasText(unitName, "unitName is null or empty");
     IParticipantIdentifier participantIdentifier = pIdentifier != null ? pIdentifier : this.participantIdentifier;
 
@@ -180,6 +180,8 @@ public class DefaultImportService implements ImportService {
     if(unit == null) {
       throw new NoSuchFunctionalUnitException(unitName);
     }
+
+    int count = 0;
 
     ValueTable keysTable = lookupKeysTable();
     if(keysTable.hasVariable(unit.getKeyVariableName()) == false) {
@@ -195,9 +197,11 @@ public class DefaultImportService implements ImportService {
       // Create a private entity for each missing unitIdentifier
       if(unitId.hasUnitIdentifier() == false) {
         entityMap.createPrivateEntity(unitId.getOpalEntity());
+        count++;
       }
     }
 
+    return count;
   }
 
   @Override

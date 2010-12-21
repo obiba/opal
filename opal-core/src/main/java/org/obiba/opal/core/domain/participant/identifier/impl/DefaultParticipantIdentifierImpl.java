@@ -26,6 +26,8 @@ public final class DefaultParticipantIdentifierImpl implements IParticipantIdent
 
   private boolean allowStartWithZero = false;
 
+  private String prefix;
+
   public void setKeySize(int keySize) {
     this.keySize = keySize;
   }
@@ -42,12 +44,29 @@ public final class DefaultParticipantIdentifierImpl implements IParticipantIdent
     return allowStartWithZero;
   }
 
+  public void setPrefix(String prefix) {
+    this.prefix = prefix;
+  }
+
+  public String getPrefix() {
+    return prefix;
+  }
+
+  private int getPrefixLength() {
+    return prefix != null ? prefix.length() : 0;
+  }
+
   public String generateParticipantIdentifier() {
     if(keySize < 1) {
       throw new IllegalStateException("keySize must be at least 1: " + keySize);
     }
 
-    StringBuilder sb = new StringBuilder(keySize);
+    StringBuilder sb = new StringBuilder(keySize + getPrefixLength());
+
+    if(getPrefixLength() > 0) {
+      sb.append(prefix);
+    }
+
     if(allowStartWithZero == false) {
       // Generate a random number between 0 and 8, then add 1.
       sb.append(generator.nextInt(9) + 1);
@@ -58,6 +77,7 @@ public final class DefaultParticipantIdentifierImpl implements IParticipantIdent
     for(int i = 1; i < keySize; i++) {
       sb.append(generator.nextInt(10));
     }
+
     return sb.toString();
   }
 

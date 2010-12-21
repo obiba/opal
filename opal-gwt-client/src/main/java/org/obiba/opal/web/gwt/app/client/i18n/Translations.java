@@ -238,6 +238,7 @@ public interface Translations extends Constants {
   "DestinationFileIsMissing", "Destination File is required.", //
   "ExportDataMissingTables", "At least one table is required.",//
   "IdentifiersGenerationCompleted", "Identifiers generation completed.",//
+  "NoIdentifiersGenerated", "No Identifiers generated.",//
   "IdentifiersGenerationFailed", "Identifiers generation has failed.",//
   "IdentifiersGenerationPending", "An Identifiers generation task is currently running."//
   })

@@ -301,9 +301,18 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
         @Override
         public void onResponseCode(Request request, Response response) {
           if(response.getStatusCode() == Response.SC_OK) {
-            eventBus.fireEvent(new NotificationEvent(NotificationType.INFO, "IdentifiersGenerationCompleted", Arrays.asList(functionalUnit.getName())).nonSticky());
+            int count = 0;
+            try {
+              count = Integer.parseInt(response.getText());
+            } catch(NumberFormatException e) {
+            }
+            if(count > 0) {
+              eventBus.fireEvent(new NotificationEvent(NotificationType.INFO, "IdentifiersGenerationCompleted", Arrays.asList(functionalUnit.getName(), response.getText())).nonSticky());
+            } else {
+              eventBus.fireEvent(new NotificationEvent(NotificationType.INFO, "NoIdentifiersGenerated", Arrays.asList(functionalUnit.getName())).nonSticky());
+            }
           } else {
-            eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "IdentifiersGenerationFailed", null));
+            eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "IdentifiersGenerationFailed", Arrays.asList(functionalUnit.getName())));
           }
           generateConfirmation = null;
           refreshDisplay();

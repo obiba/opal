@@ -281,15 +281,16 @@ public class FunctionalUnitResource {
 
   @POST
   @Path("/entities/identifiers")
-  public Response importIdentifiers(@QueryParam("size") Integer size, @QueryParam("zeros") Boolean zeros) {
+  public Response importIdentifiers(@QueryParam("size") Integer size, @QueryParam("zeros") Boolean zeros, @QueryParam("prefix") String prefix) {
     Response response = null;
 
     try {
       DefaultParticipantIdentifierImpl pId = new DefaultParticipantIdentifierImpl();
       if(size != null) pId.setKeySize(size);
       if(zeros != null) pId.setAllowStartWithZero(zeros);
-      importService.importIdentifiers(unit, pId);
-      response = Response.ok().build();
+      if(prefix != null) pId.setPrefix(prefix);
+      int count = importService.importIdentifiers(unit, pId);
+      response = Response.ok().entity(Integer.toString(count)).build();
     } catch(NoSuchFunctionalUnitException ex) {
       response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "FunctionalUnitNotFound", ex).build()).build();
     } catch(NoSuchDatasourceException ex) {

@@ -53,8 +53,9 @@ public interface ImportService {
    * Import identifiers using the given participant identifiers provider.
    * @param unitName
    * @param pIdentifier
+   * @return the number of identifiers added
    */
-  public void importIdentifiers(String unitName, IParticipantIdentifier pIdentifier);
+  public int importIdentifiers(String unitName, IParticipantIdentifier pIdentifier);
 
   /**
    * Import identifiers of the provided datasource into Opal identifiers datasource, as values of the unit key variable
