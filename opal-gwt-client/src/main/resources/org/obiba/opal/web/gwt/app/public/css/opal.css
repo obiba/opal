@@ -1108,7 +1108,7 @@ ul.tabs li a, ul.tabs li a:visited, ul.tabs li a:hover {
 }
 
 .vertical-tabs > .content, .horizontal-tabs > .content {
-  -moz-border-radius:0.4em 0.4em 0.4em 0.4em;
+  -moz-border-radius: 0.4em; -webkit-border-radius: 0.4em;
   background-color:#FFFFFF;
   border:1px solid #BBBBBB;
   position:relative;
