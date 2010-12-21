@@ -163,7 +163,6 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
     super.registerHandler(eventBus.addHandler(FunctionalUnitUpdatedEvent.getType(), new FunctionalUnitUpdatedHandler()));
     super.registerHandler(eventBus.addHandler(KeyPairCreatedEvent.getType(), new KeyPairCreatedHandler()));
-
   }
 
   private void setCommands() {
@@ -391,8 +390,12 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
       if(removeConfirmation != null && event.getSource().equals(removeConfirmation) && event.isConfirmed()) {
         removeConfirmation.run();
         removeConfirmation = null;
-      } else if(generateConfirmation != null && event.getSource().equals(generateConfirmation) && event.isConfirmed()) {
-        generateConfirmation.run();
+      } else if(generateConfirmation != null && event.getSource().equals(generateConfirmation)) {
+        if(event.isConfirmed()) {
+          generateConfirmation.run();
+        } else {
+          generateConfirmation = null;
+        }
       }
     }
   }
