@@ -39,11 +39,8 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
-import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.views.JavascriptClause;
-import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
-import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.runtime.OpalRuntime;
@@ -173,23 +170,6 @@ public class FunctionalUnitsResource {
   }
 
   @GET
-  @Path("/entities/excel")
-  @Produces("application/vnd.ms-excel")
-  public Response getExcelIdentifiers() throws MagmaRuntimeException, IOException {
-    try {
-      String destinationName = getKeysDatasourceName();
-      ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
-      ExcelDatasource destinationDatasource = new ExcelDatasource(destinationName, excelOutput);
-
-      copyEntities(destinationDatasource);
-
-      return Response.ok(excelOutput.toByteArray(), "application/vnd.ms-excel").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".xlsx\"").build();
-    } catch(NoSuchFunctionalUnitException e) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-  }
-
-  @GET
   @Path("/entities/csv")
   @Produces("text/csv")
   public Response getCSVIdentifiers() throws MagmaRuntimeException, IOException {
@@ -251,16 +231,6 @@ public class FunctionalUnitsResource {
     TreeSet<VariableEntity> opalEntities = new TreeSet<VariableEntity>(getKeysTable().getVariableEntities());
     for(VariableEntity entity : opalEntities) {
       writer.append('\"').append(entity.getIdentifier()).append("\"\n");
-    }
-  }
-
-  private void copyEntities(Datasource destinationDatasource) throws IOException {
-    Initialisables.initialise(destinationDatasource);
-    try {
-      DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyMetadata().build();
-      copier.copy(getKeysTable(), destinationDatasource);
-    } finally {
-      Disposables.silentlyDispose(destinationDatasource);
     }
   }
 

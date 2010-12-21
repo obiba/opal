@@ -44,7 +44,6 @@ import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
@@ -201,19 +200,6 @@ public class FunctionalUnitResource {
 
     writer.close();
     return Response.ok(ids.toByteArray(), MediaType.TEXT_PLAIN).header("Content-Disposition", "attachment; filename=\"" + unit + "-identifiers.txt\"").build();
-  }
-
-  @GET
-  @Path("/entities/excel")
-  @Produces("application/vnd.ms-excel")
-  public Response getExcelIdentifiers() throws MagmaRuntimeException, IOException {
-    String destinationName = unit + "-identifiers";
-    ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
-    ExcelDatasource destinationDatasource = new ExcelDatasource(destinationName, excelOutput);
-
-    copyEntities(destinationDatasource);
-
-    return Response.ok(excelOutput.toByteArray(), "application/vnd.ms-excel").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".xlsx\"").build();
   }
 
   @GET
