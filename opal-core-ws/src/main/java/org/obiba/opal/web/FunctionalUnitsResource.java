@@ -10,6 +10,7 @@
 package org.obiba.opal.web;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -22,12 +23,15 @@ import java.util.TreeSet;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
@@ -55,13 +59,18 @@ import org.obiba.opal.web.magma.TableResource;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.Opal.FunctionalUnitDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import au.com.bytecode.opencsv.CSVReader;
+
 import com.google.common.collect.Lists;
+
+import de.schlichtherle.io.FileReader;
 
 @Component
 @Path("/functional-units")
@@ -257,9 +266,78 @@ public class FunctionalUnitsResource {
     return response;
   }
 
+  @GET
+  @Path("/entities/identifiers/map/{path:.*}/units")
+  public List<FunctionalUnitDto> getUnitsFromIdentifiersMap(@PathParam("path") String path) throws IOException {
+    // check the headers
+
+    File mapFile = resolveLocalFile(path);
+    CSVReader reader = new CSVReader(new FileReader(mapFile.getPath()));
+
+    // find the units
+    List<FunctionalUnitDto> unitDtos = new ArrayList<FunctionalUnitDto>();
+    for(FunctionalUnit functionalUnit : getUnitsFromIdentifiersMap(reader)) {
+      Opal.FunctionalUnitDto.Builder fuBuilder = Opal.FunctionalUnitDto.newBuilder().//
+      setName(functionalUnit.getName()). //
+      setKeyVariableName(functionalUnit.getKeyVariableName());
+      unitDtos.add(fuBuilder.build());
+    }
+
+    return unitDtos;
+  }
+
+  @POST
+  @Path("/entities/identifiers/map/{path:.*}/unit/{unit}")
+  public Response mapIdentifiers(@PathParam("path") String path, @PathParam("unit") String unit) throws IOException {
+    Response response = null;
+
+    // the file is expected to be of CSV format
+    File mapFile = resolveLocalFile(path);
+    CSVReader reader = new CSVReader(new FileReader(mapFile.getPath()));
+    List<FunctionalUnit> units = getUnitsFromIdentifiersMap(reader);
+
+    // master unit is the one that drives the mapping (not necessarily the first one)
+    int masterIndex = getUnitIndex(unit, units);
+    if(masterIndex == -1) {
+      throw new NoSuchFunctionalUnitException(unit);
+    }
+
+    return response;
+  }
+
   //
   // Private methods
   //
+
+  private int getUnitIndex(String unit, List<FunctionalUnit> units) {
+    int idx = -1;
+    for(int i = 0; i < units.size(); i++) {
+      if(units.get(i).getName().equals(unit)) {
+        idx = i;
+        break;
+      }
+    }
+    return idx;
+  }
+
+  private List<FunctionalUnit> getUnitsFromIdentifiersMap(CSVReader reader) throws IOException {
+    String[] unitsHeader = reader.readNext();
+
+    // find the units
+    List<FunctionalUnit> units = new ArrayList<FunctionalUnit>();
+    for(int i = 0; i < unitsHeader.length; i++) {
+      String unit = unitsHeader[i];
+      FunctionalUnit functionalUnit;
+      if(unit.equals(FunctionalUnit.OPAL_INSTANCE)) {
+        functionalUnit = new FunctionalUnit(FunctionalUnit.OPAL_INSTANCE, FunctionalUnit.OPAL_INSTANCE);
+      } else {
+        functionalUnit = resolveFunctionalUnit(unit);
+      }
+
+      units.add(functionalUnit);
+    }
+    return units;
+  }
 
   private Datasource createTransientDatasource(DatasourceFactoryDto datasourceFactoryDto) {
     DatasourceFactory factory = datasourceFactoryRegistry.parse(datasourceFactoryDto);
@@ -286,6 +364,25 @@ public class FunctionalUnitsResource {
 
   private String getKeysDatasourceName() {
     return MagmaEngineTableResolver.valueOf(keysTableReference).getDatasourceName();
+  }
+
+  protected File resolveLocalFile(String path) {
+    try {
+      // note: does not ensure that file exists
+      return opalRuntime.getFileSystem().getLocalFile(resolveFileInFileSystem(path));
+    } catch(FileSystemException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
+  protected FileObject resolveFileInFileSystem(String path) throws FileSystemException {
+    return opalRuntime.getFileSystem().getRoot().resolveFile(path);
+  }
+
+  private FunctionalUnit resolveFunctionalUnit(String unit) {
+    FunctionalUnit functionalUnit = opalRuntime.getFunctionalUnit(unit);
+    if(functionalUnit == null) throw new NoSuchFunctionalUnitException(unit);
+    return functionalUnit;
   }
 
 }
