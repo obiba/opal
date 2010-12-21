@@ -110,21 +110,17 @@ public class FunctionalUnitResource {
   //
 
   @GET
-  public Response getFunctionalUnit() {
-    try {
-      FunctionalUnit functionalUnit = resolveFunctionalUnit();
+  public Opal.FunctionalUnitDto getFunctionalUnit() {
+    FunctionalUnit functionalUnit = resolveFunctionalUnit();
 
-      Opal.FunctionalUnitDto.Builder fuBuilder = Opal.FunctionalUnitDto.newBuilder().//
-      setName(functionalUnit.getName()). //
-      setKeyVariableName(functionalUnit.getKeyVariableName());
-      if(functionalUnit.getSelect() != null && functionalUnit.getSelect() instanceof JavascriptClause) {
-        fuBuilder.setSelect(((JavascriptClause) functionalUnit.getSelect()).getScript());
-      }
-
-      return Response.ok(fuBuilder.build()).build();
-    } catch(NoSuchFunctionalUnitException e) {
-      return Response.status(Status.NOT_FOUND).build();
+    Opal.FunctionalUnitDto.Builder fuBuilder = Opal.FunctionalUnitDto.newBuilder().//
+    setName(functionalUnit.getName()). //
+    setKeyVariableName(functionalUnit.getKeyVariableName());
+    if(functionalUnit.getSelect() != null && functionalUnit.getSelect() instanceof JavascriptClause) {
+      fuBuilder.setSelect(((JavascriptClause) functionalUnit.getSelect()).getScript());
     }
+
+    return fuBuilder.build();
   }
 
   @PUT
@@ -165,6 +161,8 @@ public class FunctionalUnitResource {
     opalRuntime.getOpalConfiguration().removeFunctionalUnit(unit);
     opalRuntime.writeOpalConfiguration();
 
+    // TODO: delete the units variable in the keys table
+
     return Response.ok().build();
   }
 
@@ -194,7 +192,9 @@ public class FunctionalUnitResource {
 
       @Override
       public void onValue(UnitIdentifier unitIdentifier) {
-        writer.append(unitIdentifier.getUnitIdentifier()).append("\n");
+        if(unitIdentifier.hasUnitIdentifier()) {
+          writer.append(unitIdentifier.getUnitIdentifier()).append("\n");
+        }
       }
 
     });
@@ -235,23 +235,6 @@ public class FunctionalUnitResource {
 
     writer.close();
     return Response.ok(ids.toByteArray(), "text/csv").header("Content-Disposition", "attachment; filename=\"" + unit + "-identifiers.csv\"").build();
-  }
-
-  private void copyEntities(Datasource destinationDatasource) throws IOException {
-
-    FunctionalUnit functionalUnit = resolveFunctionalUnit();
-
-    Initialisables.initialise(destinationDatasource);
-    try {
-      DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyMetadata().build();
-      ValueTable keysTable = getKeysTable();
-      View keysView = new View(keysTable.getName(), keysTable);
-      keysView.setSelectClause(new JavascriptClause("name().value()=='" + functionalUnit.getKeyVariableName() + "'"));
-      Initialisables.initialise(keysView);
-      copier.copy(keysView, destinationDatasource);
-    } finally {
-      Disposables.silentlyDispose(destinationDatasource);
-    }
   }
 
   @POST
@@ -377,6 +360,23 @@ public class FunctionalUnitResource {
   //
   // Private methods
   // 
+
+  private void copyEntities(Datasource destinationDatasource) throws IOException {
+
+    FunctionalUnit functionalUnit = resolveFunctionalUnit();
+
+    Initialisables.initialise(destinationDatasource);
+    try {
+      DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyMetadata().build();
+      ValueTable keysTable = getKeysTable();
+      View keysView = new View(keysTable.getName(), keysTable);
+      keysView.setSelectClause(new JavascriptClause("name().value()=='" + functionalUnit.getKeyVariableName() + "'"));
+      Initialisables.initialise(keysView);
+      copier.copy(keysView, destinationDatasource);
+    } finally {
+      Disposables.silentlyDispose(destinationDatasource);
+    }
+  }
 
   private ResponseBuilder doCreateOrImportKeyPair(Opal.KeyPairForm kpForm) {
     ResponseBuilder response = null;
