@@ -22,7 +22,7 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -44,6 +44,7 @@ import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.view.client.ListView;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -327,8 +328,8 @@ public class TableView extends Composite implements TablePresenter.Display {
   }
 
   @Override
-  public HandlerRegistration addVariableSuggestionHandler(ValueChangeHandler<String> handler) {
-    return variableNameSuggestBox.addValueChangeHandler(handler);
+  public HandlerRegistration addVariableSuggestionHandler(SelectionHandler<Suggestion> handler) {
+    return variableNameSuggestBox.addSelectionHandler(handler);
   }
 
   @Override

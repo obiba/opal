@@ -25,9 +25,9 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -48,10 +48,7 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   DialogBox dialog;
 
   @UiField
-  SimplePanel namePanel;
-
-  @UiField
-  HTMLPanel editableName;
+  FlowPanel editableName;
 
   @UiField
   RadioButton predefinedAttributeNameRadioButton;
@@ -59,7 +56,8 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   @UiField
   RadioButton customAttributeNameRadioButton;
 
-  Label uneditableName;
+  @UiField
+  InlineLabel uneditableName;
 
   private boolean nameEditable;
 
@@ -83,8 +81,6 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   public AttributeDialogView() {
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
-
-    uneditableName = new Label();
 
     nameEditable = true;
     setAttributeNameEditable(nameEditable);
@@ -143,12 +139,8 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   public void setAttributeNameEditable(boolean editable) {
     nameEditable = editable;
 
-    namePanel.clear();
-    if(editable) {
-      namePanel.add(editableName);
-    } else {
-      namePanel.add(uneditableName);
-    }
+    uneditableName.setVisible(!editable);
+    editableName.setVisible(editable);
   }
 
   @Override
@@ -192,7 +184,7 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
     simplePanel.clear();
     simplePanel.add(inputField.asWidget());
     this.inputField = inputField;
-    this.inputField.setAttributeValueLabel(translations.valueLabel());
+    this.inputField.setAttributeValueLabel("");
   }
 
   @Override

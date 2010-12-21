@@ -20,11 +20,11 @@ import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingTableSelectionEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingTableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingTableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
@@ -42,12 +42,13 @@ import org.obiba.opal.web.model.client.magma.ViewDto;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -197,12 +198,14 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   // Interfaces and classes
   //
 
-  private final class VariableSuggestionHandler implements ValueChangeHandler<String> {
+  private final class VariableSuggestionHandler implements SelectionHandler<Suggestion> {
+
     @Override
-    public void onValueChange(ValueChangeEvent<String> evt) {
+    public void onSelection(SelectionEvent<Suggestion> evt) {
+      String value = evt.getSelectedItem().getReplacementString();
       // look for the variable and fire selection
       for(int i = 0; i < variables.length(); i++) {
-        if(variables.get(i).getName().equals(evt.getValue())) {
+        if(variables.get(i).getName().equals(value)) {
           VariableDto selection = variables.get(i);
           eventBus.fireEvent(new VariableSelectionChangeEvent(selection, getPreviousVariable(i), getNextVariable(i)));
           getDisplay().setVariableSelection(selection, i);
@@ -426,7 +429,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
     void addVariableSuggestion(String suggestion);
 
-    HandlerRegistration addVariableSuggestionHandler(ValueChangeHandler<String> handler);
+    HandlerRegistration addVariableSuggestionHandler(SelectionHandler<Suggestion> handler);
 
     void clearVariableSuggestion();
   }

@@ -6,7 +6,7 @@
 
   <g:FlowPanel>
     <g:Label addStyleNames="inline"><ui:msg description="Select tables to be viewed label">Select the variables that will be viewed:</ui:msg></g:Label>
-    <g:ListBox ui:field="variablesToView">
+    <g:ListBox ui:field="variablesToView" addStyleNames="small-indent">
       <g:item value="all"><ui:msg description="All label">all</ui:msg></g:item>
       <g:item value="script"><ui:msg description="Script label">script</ui:msg></g:item>
     </g:ListBox>  

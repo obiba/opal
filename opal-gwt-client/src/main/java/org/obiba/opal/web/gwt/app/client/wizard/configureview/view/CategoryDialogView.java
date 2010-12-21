@@ -22,7 +22,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -47,11 +47,10 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
   Button cancelButton;
 
   @UiField
-  SimplePanel categoryNamePanel;
-
   TextBox categoryName;
 
-  Label uneditableCategoryName;
+  @UiField
+  InlineLabel uneditableCategoryName;
 
   private boolean categoryNameEditable;
 
@@ -63,11 +62,6 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
   public CategoryDialogView() {
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
-
-    categoryName = new TextBox();
-    categoryName.setVisibleLength(38);
-
-    uneditableCategoryName = new Label();
 
     categoryNameEditable = true;
     setCategoryNameEditable(categoryNameEditable);
@@ -122,12 +116,8 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
   public void setCategoryNameEditable(boolean editable) {
     categoryNameEditable = editable;
 
-    categoryNamePanel.clear();
-    if(editable) {
-      categoryNamePanel.add(categoryName);
-    } else {
-      categoryNamePanel.add(uneditableCategoryName);
-    }
+    uneditableCategoryName.setVisible(!editable);
+    categoryName.setVisible(editable);
   }
 
   @Override
@@ -146,7 +136,7 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
     simplePanel.clear();
     simplePanel.add(inputField.asWidget());
     this.inputField = inputField;
-    this.inputField.setAttributeValueLabel(translations.labelLabel());
+    this.inputField.setAttributeValueLabel("");
   }
 
   @Override

@@ -28,6 +28,9 @@ public class ReportTemplateView extends Composite implements ReportTemplatePrese
   Button reportTemplateButton;
 
   @UiField
+  Button refreshButton;
+
+  @UiField
   ScrollPanel reportTemplateDetailsPanel;
 
   @UiField
@@ -69,6 +72,11 @@ public class ReportTemplateView extends Composite implements ReportTemplatePrese
   @Override
   public HandlerRegistration addReportTemplateClickHandler(ClickHandler handler) {
     return reportTemplateButton.addClickHandler(handler);
+  }
+
+  @Override
+  public HandlerRegistration refreshClickHandler(ClickHandler handler) {
+    return refreshButton.addClickHandler(handler);
   }
 
 }

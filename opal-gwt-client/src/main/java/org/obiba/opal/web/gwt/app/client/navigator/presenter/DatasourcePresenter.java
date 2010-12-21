@@ -174,8 +174,10 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   }
 
   private void selectTable(String tableName) {
-    int index = getTableIndex(tableName);
-    getDisplay().setTableSelection(tables.get(index), index);
+    if(tableName != null) {
+      int index = getTableIndex(tableName);
+      getDisplay().setTableSelection(tables.get(index), index);
+    }
   }
 
   private void updateTable(final String tableName) {

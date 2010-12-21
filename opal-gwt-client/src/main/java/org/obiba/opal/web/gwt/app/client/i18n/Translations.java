@@ -238,7 +238,8 @@ public interface Translations extends Constants {
   "DestinationFileIsMissing", "Destination File is required.", //
   "ExportDataMissingTables", "At least one table is required.",//
   "IdentifiersGenerationCompleted", "Identifiers generation completed.",//
-  "IdentifiersGenerationFailed", "Identifiers generation has failed."//
+  "IdentifiersGenerationFailed", "Identifiers generation has failed.",//
+  "IdentifiersGenerationPending", "An Identifiers generation task is currently running."//
   })
   Map<String, String> userMessageMap();
 
@@ -330,6 +331,7 @@ public interface Translations extends Constants {
   "removeDatasource", "Remove Datasource",//
   "removeReportTemplate", "Remove Report Template",//
   "removeFunctionalUnit", "Remove Unit",//
+  "generateFunctionalUnitIdentifiers", "Generate Unit Identifiers",//
   "deleteCategory", "Delete Category",//
   "deleteAttribute", "Delete Attribute",//
   "removeView", "Remove View" })
@@ -349,7 +351,8 @@ public interface Translations extends Constants {
   "confirmDeleteFunctionalUnit", "Please confirm that you want to remove the current Unit from Opal configuration. All encrypted material will not be accessible anymore",//
   "confirmDeleteCategory", "Please confirm that you want to remove this category.",//
   "confirmDeleteAttribute", "Please confirm that you want to remove this attribute.",//
-  "confirmRemoveView", "Please confirm that you want to remove the current view." })
+  "confirmRemoveView", "Please confirm that you want to remove the current view.",//
+  "confirmGenerateFunctionalUnitIdentifiers", "Please confirm that you want to generate an identifier for each existing participant without identifier in the current unit." })
   Map<String, String> confirmationMessageMap();
 
   @Description("A name is required when creating a new folder")

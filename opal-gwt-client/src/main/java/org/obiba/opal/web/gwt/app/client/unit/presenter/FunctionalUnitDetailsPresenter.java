@@ -50,7 +50,9 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
   public static final String DOWNLOAD_ACTION = "DownloadCertificate";
 
-  private Runnable actionRequiringConfirmation;
+  private Runnable removeConfirmation;
+
+  private GenerateConfirmationRunnable generateConfirmation;
 
   private FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter;
 
@@ -206,12 +208,12 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     if(actionName.equals(DOWNLOAD_ACTION)) {
       downloadCertificate(dto);
     } else if(actionName.equals(DELETE_ACTION)) {
-      actionRequiringConfirmation = new Runnable() {
+      removeConfirmation = new Runnable() {
         public void run() {
           deleteKeyPair(dto);
         }
       };
-      eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "deleteKeyPair", "confirmDeleteKeyPair"));
+      eventBus.fireEvent(new ConfirmationRequiredEvent(removeConfirmation, "deleteKeyPair", "confirmDeleteKeyPair"));
     }
   }
 
@@ -270,26 +272,15 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
   }
 
   private final class GenerateIdentifiersCommand implements Command {
+
     @Override
     public void execute() {
-      ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
-
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          if(response.getStatusCode() == Response.SC_OK) {
-            eventBus.fireEvent(new NotificationEvent(NotificationType.INFO, "IdentifiersGenerationCompleted", Arrays.asList(functionalUnit.getName())).nonSticky());
-          } else {
-            eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "IdentifiersGenerationFailed", null));
-          }
-          refreshDisplay();
-        }
-
-      };
-
-      ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/entities/identifiers").post()//
-      .withCallback(Response.SC_OK, callbackHandler) //
-      .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
-      .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+      if(generateConfirmation != null) {
+        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "IdentifiersGenerationPending", null));
+      } else {
+        generateConfirmation = new GenerateConfirmationRunnable();
+        eventBus.fireEvent(new ConfirmationRequiredEvent(generateConfirmation, "generateFunctionalUnitIdentifiers", "confirmGenerateFunctionalUnitIdentifiers"));
+      }
     }
   }
 
@@ -300,6 +291,30 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
       .append("ws/functional-unit/").append(functionalUnit.getName()) //
       .append("/entities/identifiers").toString();
       eventBus.fireEvent(new FileDownloadEvent(url));
+    }
+  }
+
+  private final class GenerateConfirmationRunnable implements Runnable {
+    public void run() {
+      ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          if(response.getStatusCode() == Response.SC_OK) {
+            eventBus.fireEvent(new NotificationEvent(NotificationType.INFO, "IdentifiersGenerationCompleted", Arrays.asList(functionalUnit.getName())).nonSticky());
+          } else {
+            eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "IdentifiersGenerationFailed", null));
+          }
+          generateConfirmation = null;
+          refreshDisplay();
+        }
+
+      };
+
+      ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/entities/identifiers").post()//
+      .withCallback(Response.SC_OK, callbackHandler) //
+      .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
+      .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
     }
   }
 
@@ -332,13 +347,13 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
     @Override
     public void execute() {
-      actionRequiringConfirmation = new Runnable() {
+      removeConfirmation = new Runnable() {
         public void run() {
           ResponseCodeCallback callbackHandler = new FunctionalUnitDeleteCallback();
           ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName()).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
         }
       };
-      eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "removeFunctionalUnit", "confirmDeleteFunctionalUnit"));
+      eventBus.fireEvent(new ConfirmationRequiredEvent(removeConfirmation, "removeFunctionalUnit", "confirmDeleteFunctionalUnit"));
     }
 
   }
@@ -364,9 +379,11 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
     public void onConfirmation(ConfirmationEvent event) {
-      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event.isConfirmed()) {
-        actionRequiringConfirmation.run();
-        actionRequiringConfirmation = null;
+      if(removeConfirmation != null && event.getSource().equals(removeConfirmation) && event.isConfirmed()) {
+        removeConfirmation.run();
+        removeConfirmation = null;
+      } else if(generateConfirmation != null && event.getSource().equals(generateConfirmation) && event.isConfirmed()) {
+        generateConfirmation.run();
       }
     }
   }
