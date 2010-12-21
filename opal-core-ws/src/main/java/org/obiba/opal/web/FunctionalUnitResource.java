@@ -45,11 +45,8 @@ import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.js.views.JavascriptClause;
-import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
-import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MagmaEngineTableResolver;
-import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ImportService;
@@ -346,23 +343,6 @@ public class FunctionalUnitResource {
   //
   // Private methods
   // 
-
-  private void copyEntities(Datasource destinationDatasource) throws IOException {
-
-    FunctionalUnit functionalUnit = resolveFunctionalUnit();
-
-    Initialisables.initialise(destinationDatasource);
-    try {
-      DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyMetadata().build();
-      ValueTable keysTable = getKeysTable();
-      View keysView = new View(keysTable.getName(), keysTable);
-      keysView.setSelectClause(new JavascriptClause("name().value()=='" + functionalUnit.getKeyVariableName() + "'"));
-      Initialisables.initialise(keysView);
-      copier.copy(keysView, destinationDatasource);
-    } finally {
-      Disposables.silentlyDispose(destinationDatasource);
-    }
-  }
 
   private ResponseBuilder doCreateOrImportKeyPair(Opal.KeyPairForm kpForm) {
     ResponseBuilder response = null;
