@@ -104,6 +104,9 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   @UiField
   Label noUnitSelection;
 
+  @UiField
+  Label noUnitLabel;
+
   private FileSelectionPresenter.Display fileSelection;
 
   private TableListPresenter.Display tablesList;
@@ -216,6 +219,8 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
     for(int i = 0; i < units.length(); i++) {
       this.units.addItem(units.get(i).getName());
     }
+    noUnitLabel.setVisible(units.length() == 0);
+    unitSelection.setVisible(units.length() > 0);
   }
 
   @Override
@@ -366,7 +371,8 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   @Override
   public void renderUnitSelection(boolean identifierEntityTable) {
     noUnitSelection.setVisible(!identifierEntityTable);
-    unitSelection.setVisible(identifierEntityTable);
+    unitSelection.setVisible(identifierEntityTable && units.getItemCount() > 0);
+    noUnitLabel.setVisible(identifierEntityTable && units.getItemCount() == 0);
   }
 
 }

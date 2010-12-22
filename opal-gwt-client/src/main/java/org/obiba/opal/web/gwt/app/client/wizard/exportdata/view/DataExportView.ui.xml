@@ -44,6 +44,7 @@
       <o:WizardStep ui:field="unitStep">
         <g:FlowPanel>
         <g:Label ui:field="noUnitSelection" visible="false" addStyleNames="indent"><ui:msg description="Not Applicable label">Not Applicable.</ui:msg></g:Label>
+        <g:Label ui:field="noUnitLabel" visible="false" addStyleNames="indent"><ui:msg description="Participant Opal identifiers in file label">The participant identifiers in the file will be used as-is (no unit is defined).</ui:msg></g:Label>
         <g:HTMLPanel ui:field="unitSelection">
           <table cellspacing="10">
 	         <tbody>
