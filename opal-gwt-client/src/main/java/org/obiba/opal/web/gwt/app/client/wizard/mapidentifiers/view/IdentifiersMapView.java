@@ -29,6 +29,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -160,6 +161,7 @@ public class IdentifiersMapView extends Composite implements IdentifiersMapPrese
   @Override
   public void renderPendingConclusion() {
     conclusionStep.setStepTitle(translations.identifierMapPendingConclusion());
+    conclusionPanel.clear();
     dialog.setProgress(true);
     stepChain.onNext();
     dialog.setProgress(true);
@@ -168,9 +170,12 @@ public class IdentifiersMapView extends Composite implements IdentifiersMapPrese
   }
 
   @Override
-  public void renderCompletedConclusion() {
+  public void renderCompletedConclusion(String count) {
     dialog.setProgress(false);
     conclusionStep.setStepTitle(translations.identifierMapCompletedConclusion());
+    Label countLabel = new Label(translations.identifierMapUpdateCount() + ": " + count);
+    countLabel.addStyleName("indent");
+    conclusionPanel.add(countLabel);
     dialog.setCloseEnabled(true);
     dialog.setProgress(false);
   }

@@ -438,6 +438,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Identifier mapping job completed successfully.")
   String identifierMapCompletedConclusion();
 
+  @Description("Identifier map update count")
+  @DefaultStringValue("Number of Participants updated")
+  String identifierMapUpdateCount();
+
   @Description("Identifier map failed conclusion")
   @DefaultStringValue("Identifier mapping job failed.")
   String identifierMapFailedConclusion();

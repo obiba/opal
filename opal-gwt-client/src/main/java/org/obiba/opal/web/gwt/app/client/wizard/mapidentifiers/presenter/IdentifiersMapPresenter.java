@@ -80,7 +80,7 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
 
     void renderPendingConclusion();
 
-    void renderCompletedConclusion();
+    void renderCompletedConclusion(String count);
 
     void renderFailedConclusion();
 
@@ -257,7 +257,7 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
 
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == 200) {
-          getDisplay().renderCompletedConclusion();
+          getDisplay().renderCompletedConclusion(response.getText());
         } else {
           final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
           if(errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
