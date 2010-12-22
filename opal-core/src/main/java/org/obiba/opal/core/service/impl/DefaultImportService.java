@@ -35,6 +35,7 @@ import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.DatasourceCopier;
+import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
@@ -168,10 +169,10 @@ public class DefaultImportService implements ImportService {
     }
 
     try {
-      sourceDatasource.initialise();
-      copyValueTables(sourceDatasource, destinationDatasource, unit, STAGE_ATTRIBUTE_NAME);
+      // OPAL-903: do not multiplex when not importing Onyx data
+      copyValueTables(sourceDatasource, destinationDatasource, unit, null);
     } finally {
-      sourceDatasource.dispose();
+      safelyDisposeTransientDatasource(sourceDatasource);
     }
   }
 
@@ -218,20 +219,23 @@ public class DefaultImportService implements ImportService {
     }
 
     Datasource sourceDatasource = getDatasourceOrTransientDatasource(sourceDatasourceName);
-
-    for(ValueTable vt : sourceDatasource.getValueTables()) {
-      if(vt.getEntityType().equals(keysTableEntityType)) {
-        ValueTable sourceKeysTable = createPrivateView(vt, unit, select);
-        Variable unitKeyVariable = prepareKeysTable(sourceKeysTable, unit.getKeyVariableName());
-        PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(lookupKeysTable(), unitKeyVariable, participantIdentifier);
-        for(VariableEntity privateEntity : sourceKeysTable.getVariableEntities()) {
-          VariableEntity publicEntity = entityMap.publicEntity(privateEntity);
-          if(publicEntity == null) {
-            publicEntity = entityMap.createPublicEntity(privateEntity);
+    try {
+      for(ValueTable vt : sourceDatasource.getValueTables()) {
+        if(vt.getEntityType().equals(keysTableEntityType)) {
+          ValueTable sourceKeysTable = createPrivateView(vt, unit, select);
+          Variable unitKeyVariable = prepareKeysTable(sourceKeysTable, unit.getKeyVariableName());
+          PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(lookupKeysTable(), unitKeyVariable, participantIdentifier);
+          for(VariableEntity privateEntity : sourceKeysTable.getVariableEntities()) {
+            VariableEntity publicEntity = entityMap.publicEntity(privateEntity);
+            if(publicEntity == null) {
+              publicEntity = entityMap.createPublicEntity(privateEntity);
+            }
+            copyParticipantIdentifiers(entityMap.publicEntity(privateEntity), sourceKeysTable, unitKeyVariable, writeToKeysTable(), entityMap);
           }
-          copyParticipantIdentifiers(entityMap.publicEntity(privateEntity), sourceKeysTable, unitKeyVariable, writeToKeysTable(), entityMap);
         }
       }
+    } finally {
+      safelyDisposeTransientDatasource(sourceDatasource);
     }
   }
 
@@ -240,17 +244,21 @@ public class DefaultImportService implements ImportService {
     Assert.hasText(sourceDatasourceName, "sourceDatasourceName is null or empty");
 
     Datasource sourceDatasource = getDatasourceOrTransientDatasource(sourceDatasourceName);
-    if(sourceDatasource.getValueTables().size() == 0) {
-      throw new IllegalArgumentException("source identifiers datasource is empty (no tables)");
-    }
-    ValueTable sourceKeysTable = (sourceDatasource.getValueTables().size() > 1) ? sourceDatasource.getValueTable(getKeysTableName()) : sourceDatasource.getValueTables().iterator().next();
+    try {
+      if(sourceDatasource.getValueTables().size() == 0) {
+        throw new IllegalArgumentException("source identifiers datasource is empty (no tables)");
+      }
+      ValueTable sourceKeysTable = (sourceDatasource.getValueTables().size() > 1) ? sourceDatasource.getValueTable(getKeysTableName()) : sourceDatasource.getValueTables().iterator().next();
 
-    if(sourceKeysTable.getEntityType().equals(keysTableEntityType) == false) {
-      throw new IllegalArgumentException("source identifiers table has unexpected entity type '" + sourceKeysTable.getEntityType() + "' (expected '" + keysTableEntityType + "')");
-    }
+      if(sourceKeysTable.getEntityType().equals(keysTableEntityType) == false) {
+        throw new IllegalArgumentException("source identifiers table has unexpected entity type '" + sourceKeysTable.getEntityType() + "' (expected '" + keysTableEntityType + "')");
+      }
 
-    // Don't copy null values otherwise, we'll delete existing mappings
-    DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(sourceKeysTable, MagmaEngine.get().getDatasource(getKeysDatasourceName()));
+      // Don't copy null values otherwise, we'll delete existing mappings
+      DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(sourceKeysTable, MagmaEngine.get().getDatasource(getKeysDatasourceName()));
+    } finally {
+      safelyDisposeTransientDatasource(sourceDatasource);
+    }
   }
 
   private String getKeysDatasourceName() {
@@ -268,6 +276,12 @@ public class DefaultImportService implements ImportService {
       return MagmaEngine.get().getDatasource(datasourceName);
     } else {
       return MagmaEngine.get().getTransientDatasourceInstance(datasourceName);
+    }
+  }
+
+  private void safelyDisposeTransientDatasource(Datasource datasource) {
+    if(MagmaEngine.get().hasTransientDatasource(datasource.getName())) {
+      Disposables.dispose(datasource);
     }
   }
 
@@ -423,7 +437,7 @@ public class DefaultImportService implements ImportService {
   private DatasourceCopier.Builder newCopierForParticipants(final String dispatchAttribute, final ValueTable sourceTable) {
     return DatasourceCopier.Builder.newCopier() //
     .withLoggingListener().withThroughtputListener() //
-    .withMultiplexingStrategy(new VariableAttributeMutiplexingStrategy(dispatchAttribute, sourceTable.getName()))//
+    .withMultiplexingStrategy(dispatchAttribute != null ? new VariableAttributeMutiplexingStrategy(dispatchAttribute, sourceTable.getName()) : null)//
     .withVariableTransformer(new VariableTransformer() {
       /** Remove the dispatch attribute from the variable name. This is onyx-specific. See OPAL-170 */
       public Variable transform(Variable variable) {
