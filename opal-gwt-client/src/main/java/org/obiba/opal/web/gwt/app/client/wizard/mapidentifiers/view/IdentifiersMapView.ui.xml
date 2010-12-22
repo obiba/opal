@@ -15,7 +15,7 @@
       
       <o:WizardStep ui:field="formatStep">
         <g:FlowPanel>
-          <w:CsvOptionsView ui:field="csvOptions" />
+          <w:CsvOptionsView ui:field="csvOptions" advancedOptionsVisible="false"/>
         </g:FlowPanel>
       </o:WizardStep>
       

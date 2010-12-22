@@ -21,6 +21,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.ListBox;
@@ -75,6 +76,9 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
   @UiField
   TextBox charsetSpecifyTextBox;
 
+  @UiField
+  DisclosurePanel advancedOptions;
+
   //
   // Constructors
   //
@@ -87,6 +91,10 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
     charsetDefault.addValueChangeHandler(valueChangeHandler);
     charsetCommonList.addValueChangeHandler(valueChangeHandler);
     charsetSpecify.addValueChangeHandler(valueChangeHandler);
+  }
+
+  public void setAdvancedOptionsVisible(boolean visible) {
+    advancedOptions.setVisible(visible);
   }
 
   //

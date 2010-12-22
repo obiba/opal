@@ -18,7 +18,7 @@
         </tr>
         <tr>
           <td colspan="2">
-          <g:DisclosurePanel>
+          <g:DisclosurePanel ui:field="advancedOptions">
             <g:header><ui:msg description="Advanced Options label">Advanced Options</ui:msg></g:header>
               <g:HTMLPanel>
 	            <table cellspacing="5">
