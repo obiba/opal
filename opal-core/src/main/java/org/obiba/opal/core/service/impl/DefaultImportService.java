@@ -602,9 +602,7 @@ public class DefaultImportService implements ImportService {
 
     // look for the unit from the units list
     FunctionalUnit unit = null;
-    int unitIdx = -1;
     for(FunctionalUnit fu : units) {
-      unitIdx++;
       if(fu.getName().equals(unitName)) {
         unit = fu;
         break;
@@ -626,27 +624,11 @@ public class DefaultImportService implements ImportService {
     ValueTableWriter writer = writeToKeysTable();
 
     int count = 0;
+    int unitIdx = units.indexOf(unit);
     for(String[] map : mapping) {
-      VariableEntity publicEntity;
-      if(entityMap != null) {
-        publicEntity = entityMap.publicEntity(entityFor(map[unitIdx]));
-      } else {
-        publicEntity = entityFor(map[unitIdx]);
-        // do not create entities
-        if(!keysTable.hasValueSet(publicEntity)) {
-          publicEntity = null;
-        }
-      }
+      VariableEntity publicEntity = getPublicEntity(keysTable, entityMap, map[unitIdx]);
       if(publicEntity != null) {
-        ValueSetWriter vsw = writer.writeValueSet(publicEntity);
-        int idx = -1;
-        for(FunctionalUnit fu : units) {
-          idx++;
-          if(idx != unitIdx && !fu.getName().equals(FunctionalUnit.OPAL_INSTANCE)) {
-            vsw.writeValue(keysTable.getVariable(fu.getKeyVariableName()), TextType.get().valueOf(map[idx]));
-          }
-        }
-        vsw.close();
+        writeIdentifiers(keysTable, writer, publicEntity, units, unitIdx, map);
         count++;
       }
       // else ignore: do not create a opal entity
@@ -656,8 +638,34 @@ public class DefaultImportService implements ImportService {
     return count;
   }
 
+  private void writeIdentifiers(ValueTable keysTable, ValueTableWriter writer, VariableEntity publicEntity, List<FunctionalUnit> units, int unitIdx, String[] map) throws IOException {
+    ValueSetWriter vsw = writer.writeValueSet(publicEntity);
+    int idx = -1;
+    for(FunctionalUnit fu : units) {
+      idx++;
+      if(idx != unitIdx && !fu.getName().equals(FunctionalUnit.OPAL_INSTANCE)) {
+        vsw.writeValue(keysTable.getVariable(fu.getKeyVariableName()), TextType.get().valueOf(map[idx]));
+      }
+    }
+    vsw.close();
+  }
+
+  private VariableEntity getPublicEntity(ValueTable keysTable, PrivateVariableEntityMap entityMap, String identifier) {
+    VariableEntity publicEntity;
+    if(entityMap != null) {
+      publicEntity = entityMap.publicEntity(entityFor(identifier));
+    } else {
+      publicEntity = entityFor(identifier);
+      // do not create entities
+      if(!keysTable.hasValueSet(publicEntity)) {
+        publicEntity = null;
+      }
+    }
+    return publicEntity;
+  }
+
   private void prepareKeysTable(ValueTable keysTable, FunctionalUnit unit) {
-    if(keysTable.hasVariable(unit.getKeyVariableName()) == false) {
+    if(!unit.getName().equals(FunctionalUnit.OPAL_INSTANCE) && keysTable.hasVariable(unit.getKeyVariableName()) == false) {
       try {
         prepareKeysTable(null, unit.getKeyVariableName());
       } catch(IOException e) {
