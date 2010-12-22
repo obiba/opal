@@ -632,6 +632,10 @@ public class DefaultImportService implements ImportService {
         publicEntity = entityMap.publicEntity(entityFor(map[unitIdx]));
       } else {
         publicEntity = entityFor(map[unitIdx]);
+        // do not create entities
+        if(!keysTable.hasValueSet(publicEntity)) {
+          publicEntity = null;
+        }
       }
       if(publicEntity != null) {
         ValueSetWriter vsw = writer.writeValueSet(publicEntity);
