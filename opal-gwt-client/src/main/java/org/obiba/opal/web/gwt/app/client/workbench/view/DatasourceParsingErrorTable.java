@@ -22,7 +22,7 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.view.client.ListView;
+import com.google.gwt.view.client.ListDataProvider;
 
 /**
  *
@@ -34,9 +34,12 @@ public class DatasourceParsingErrorTable extends Table<DatasourceParsingErrorDto
 
   private static Translations translations = GWT.create(Translations.class);
 
+  private ListDataProvider<DatasourceParsingErrorDto> dataProvider = new ListDataProvider<DatasourceParsingErrorDto>();
+
   public DatasourceParsingErrorTable() {
     super();
     initTable();
+    dataProvider.addDataDisplay(this);
   }
 
   public void setErrors(final ClientErrorDto errorDto) {
@@ -44,18 +47,8 @@ public class DatasourceParsingErrorTable extends Table<DatasourceParsingErrorDto
   }
 
   public void setErrors(final List<DatasourceParsingErrorDto> errors) {
-    setDelegate(new Delegate<DatasourceParsingErrorDto>() {
-
-      public void onRangeChanged(ListView<DatasourceParsingErrorDto> listView) {
-        int start = listView.getRange().getStart();
-        int length = listView.getRange().getLength();
-        listView.setData(start, length, errors);
-      }
-    });
-
-    setData(0, getPageSize(), errors);
-    setDataSize(errors.size(), true);
-    redraw();
+    dataProvider.setList(errors);
+    dataProvider.refresh();
   }
 
   @SuppressWarnings("unchecked")
@@ -91,7 +84,6 @@ public class DatasourceParsingErrorTable extends Table<DatasourceParsingErrorDto
   }
 
   private void initTable() {
-    setSelectionEnabled(false);
     addTableColumns();
   }
 

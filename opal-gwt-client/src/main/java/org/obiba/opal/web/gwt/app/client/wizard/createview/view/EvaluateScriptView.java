@@ -41,6 +41,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListDataProvider;
 
 public class EvaluateScriptView extends Composite implements EvaluateScriptPresenter.Display {
 
@@ -134,10 +135,11 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
     testResults.add(new Label("Entities: " + count));
   }
 
-  private <T extends Object> void populateResultsTable(final List<T> results, CellTable<T> table) {
-    table.setData(0, results.size(), results);
-    table.setDataSize(results.size(), true);
-    table.redraw();
+  private void populateResultsTable(final List<Result> results, CellTable<Result> table) {
+    ListDataProvider<Result> dataProvider = new ListDataProvider<Result>();
+    dataProvider.addDataDisplay(table);
+    dataProvider.setList(results);
+    dataProvider.refresh();
   }
 
   public String getSelectedScript() {

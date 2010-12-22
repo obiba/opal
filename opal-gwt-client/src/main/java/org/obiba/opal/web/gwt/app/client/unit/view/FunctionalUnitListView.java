@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.unit.view;
 
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitListPresenter;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
@@ -23,8 +23,8 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
-import com.google.gwt.view.client.SelectionModel.SelectionChangeHandler;
 
 public class FunctionalUnitListView extends Composite implements FunctionalUnitListPresenter.Display {
 
@@ -38,6 +38,8 @@ public class FunctionalUnitListView extends Composite implements FunctionalUnitL
   CellTable<FunctionalUnitDto> functionalUnitTable;
 
   SingleSelectionModel<FunctionalUnitDto> selectionModel;
+
+  JsArrayDataProvider<FunctionalUnitDto> dataProvider = new JsArrayDataProvider<FunctionalUnitDto>();
 
   public FunctionalUnitListView() {
     selectionModel = new SingleSelectionModel<FunctionalUnitDto>();
@@ -63,9 +65,8 @@ public class FunctionalUnitListView extends Composite implements FunctionalUnitL
     clearSelection();
     int templateCount = templates.length();
     functionalUnitTable.setPageSize(templateCount);
-    functionalUnitTable.setDataSize(templateCount, true);
-    functionalUnitTable.setData(0, templateCount, JsArrays.toList(templates, 0, templateCount));
-
+    dataProvider.setArray(templates);
+    dataProvider.refresh();
     // Select the first element in the list.
     if(templates.length() > 0) {
       selectionModel.setSelected(templates.get(0), true);
@@ -92,12 +93,12 @@ public class FunctionalUnitListView extends Composite implements FunctionalUnitL
         return dto.getName();
       }
     });
-    functionalUnitTable.setSelectionEnabled(true);
     functionalUnitTable.setSelectionModel(selectionModel);
+    dataProvider.addDataDisplay(functionalUnitTable);
   }
 
   @Override
-  public HandlerRegistration addSelectFunctionalUnitHandler(SelectionChangeHandler handler) {
+  public HandlerRegistration addSelectFunctionalUnitHandler(SelectionChangeEvent.Handler handler) {
     return selectionModel.addSelectionChangeHandler(handler);
   }
 }

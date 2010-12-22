@@ -33,8 +33,6 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionModel;
-import com.google.gwt.view.client.SingleSelectionModel;
 
 /**
  *
@@ -56,8 +54,6 @@ public class JobDetailsView extends DialogBox implements Display {
 
   @UiField
   Button close;
-
-  SelectionModel<Message> selectionModel = new SingleSelectionModel<Message>();
 
   private Translations translations = GWT.create(Translations.class);
 
@@ -96,8 +92,8 @@ public class JobDetailsView extends DialogBox implements Display {
       jobMessages = (JsArray<Message>) JsArray.createArray();
     }
 
-    table.setData(0, jobMessages.length(), JsArrays.toList(jobMessages));
-    table.setDataSize(jobMessages.length(), true);
+    table.setRowData(0, JsArrays.toList(jobMessages));
+    table.setRowCount(jobMessages.length(), true);
 
     center();
     show();
@@ -122,9 +118,6 @@ public class JobDetailsView extends DialogBox implements Display {
   //
 
   private void initTable() {
-    table.setSelectionEnabled(false);
-    table.setSelectionModel(selectionModel);
-
     addTableColumns();
   }
 

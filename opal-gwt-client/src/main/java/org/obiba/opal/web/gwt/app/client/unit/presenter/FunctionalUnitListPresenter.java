@@ -26,8 +26,7 @@ import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.view.client.SelectionModel.SelectionChangeEvent;
-import com.google.gwt.view.client.SelectionModel.SelectionChangeHandler;
+import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.inject.Inject;
 
 public class FunctionalUnitListPresenter extends WidgetPresenter<FunctionalUnitListPresenter.Display> {
@@ -37,7 +36,7 @@ public class FunctionalUnitListPresenter extends WidgetPresenter<FunctionalUnitL
 
     FunctionalUnitDto getSelectedFunctionalUnit();
 
-    HandlerRegistration addSelectFunctionalUnitHandler(SelectionChangeHandler handler);
+    HandlerRegistration addSelectFunctionalUnitHandler(SelectionChangeEvent.Handler handler);
 
   }
 
@@ -102,7 +101,7 @@ public class FunctionalUnitListPresenter extends WidgetPresenter<FunctionalUnitL
 
   }
 
-  private class FunctionalUnitSelectionChangeHandler implements SelectionChangeHandler {
+  private class FunctionalUnitSelectionChangeHandler implements SelectionChangeEvent.Handler {
 
     @Override
     public void onSelectionChange(SelectionChangeEvent event) {

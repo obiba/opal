@@ -29,6 +29,8 @@ import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateListReceived
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Mode;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -69,7 +71,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
     void setProducedReports(JsArray<FileDto> reports);
 
-    HasActionHandler getActionColumn();
+    HasActionHandler<FileDto> getActionColumn();
 
     HandlerRegistration addReportDesignClickHandler(ClickHandler handler);
 
@@ -82,14 +84,6 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
     void setRunReportCommand(Command command);
 
     void setUpdateReportTemplateCommand(Command command);
-  }
-
-  public interface ActionHandler {
-    void doAction(FileDto dto, String actionName);
-  }
-
-  public interface HasActionHandler {
-    void setActionHandler(ActionHandler handler);
   }
 
   @Inject
@@ -137,7 +131,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
   }
 
   private void addHandlers() {
-    getDisplay().getActionColumn().setActionHandler(new ActionHandler() {
+    getDisplay().getActionColumn().setActionHandler(new ActionHandler<FileDto>() {
       public void doAction(FileDto dto, String actionName) {
         if(actionName != null) {
           doActionImpl(dto, actionName);

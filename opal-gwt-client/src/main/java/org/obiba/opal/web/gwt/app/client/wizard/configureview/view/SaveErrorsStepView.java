@@ -27,8 +27,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListView;
-import com.google.gwt.view.client.ListView.Delegate;
+import com.google.gwt.view.client.ListDataProvider;
 
 public class SaveErrorsStepView extends Composite implements SaveErrorsStepPresenter.Display {
   //
@@ -49,6 +48,8 @@ public class SaveErrorsStepView extends Composite implements SaveErrorsStepPrese
   @UiField
   CellTable<JavaScriptErrorDto> errorsTable;
 
+  ListDataProvider<JavaScriptErrorDto> dataProvider = new ListDataProvider<JavaScriptErrorDto>();
+
   //
   // Constructors
   //
@@ -68,18 +69,7 @@ public class SaveErrorsStepView extends Composite implements SaveErrorsStepPrese
   }
 
   public void setErrors(final List<JavaScriptErrorDto> errors) {
-    errorsTable.setDelegate(new Delegate<JavaScriptErrorDto>() {
-
-      public void onRangeChanged(ListView<JavaScriptErrorDto> listView) {
-        int start = listView.getRange().getStart();
-        int length = listView.getRange().getLength();
-        listView.setData(start, length, errors);
-      }
-    });
-
-    errorsTable.setData(0, errorsTable.getPageSize(), errors);
-    errorsTable.setDataSize(errors.size(), true);
-    errorsTable.redraw();
+    dataProvider.setList(errors);
   }
 
   public HandlerRegistration addBackClickHandler(ClickHandler handler) {
@@ -101,8 +91,8 @@ public class SaveErrorsStepView extends Composite implements SaveErrorsStepPrese
   //
 
   private void initTable() {
-    errorsTable.setSelectionEnabled(false);
     addTableColumns();
+    dataProvider.addDataDisplay(errorsTable);
   }
 
   private void addTableColumns() {

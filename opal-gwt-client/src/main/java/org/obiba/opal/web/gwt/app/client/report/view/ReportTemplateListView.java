@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.report.view;
 
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateListPresenter;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
@@ -23,8 +23,8 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
-import com.google.gwt.view.client.SelectionModel.SelectionChangeHandler;
 
 public class ReportTemplateListView extends Composite implements ReportTemplateListPresenter.Display {
 
@@ -38,6 +38,8 @@ public class ReportTemplateListView extends Composite implements ReportTemplateL
   CellTable<ReportTemplateDto> reportTemplateTable;
 
   SingleSelectionModel<ReportTemplateDto> selectionModel;
+
+  JsArrayDataProvider<ReportTemplateDto> dataProvider = new JsArrayDataProvider<ReportTemplateDto>();
 
   public ReportTemplateListView() {
     selectionModel = new SingleSelectionModel<ReportTemplateDto>();
@@ -62,9 +64,8 @@ public class ReportTemplateListView extends Composite implements ReportTemplateL
   public void setReportTemplates(JsArray<ReportTemplateDto> templates) {
     clearSelection();
     int templateCount = templates.length();
+    dataProvider.setArray(templates);
     reportTemplateTable.setPageSize(templateCount);
-    reportTemplateTable.setDataSize(templateCount, true);
-    reportTemplateTable.setData(0, templateCount, JsArrays.toList(templates, 0, templateCount));
 
     // Select the first element in the list.
     if(templates.length() > 0) {
@@ -81,7 +82,7 @@ public class ReportTemplateListView extends Composite implements ReportTemplateL
     }
 
     // Find and select specified template.
-    for(ReportTemplateDto r : reportTemplateTable.getDisplayedItems()) {
+    for(ReportTemplateDto r : reportTemplateTable.getVisibleItems()) {
       if(r.getName().equals(reportTemplateDto.getName())) {
         selectionModel.setSelected(r, true);
         break;
@@ -109,12 +110,12 @@ public class ReportTemplateListView extends Composite implements ReportTemplateL
         return dto.getName();
       }
     });
-    reportTemplateTable.setSelectionEnabled(true);
     reportTemplateTable.setSelectionModel(selectionModel);
+    dataProvider.addDataDisplay(reportTemplateTable);
   }
 
   @Override
-  public HandlerRegistration addSelectReportTemplateHandler(SelectionChangeHandler handler) {
+  public HandlerRegistration addSelectReportTemplateHandler(SelectionChangeEvent.Handler handler) {
     return selectionModel.addSelectionChangeHandler(handler);
   }
 }

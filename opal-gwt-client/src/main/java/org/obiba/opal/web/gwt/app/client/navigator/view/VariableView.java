@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.navigator.view;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
@@ -36,11 +37,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListView;
-import com.google.gwt.view.client.SingleSelectionModel;
-import com.google.gwt.view.client.ListView.Delegate;
 
 /**
  *
@@ -103,7 +100,10 @@ public class VariableView extends Composite implements VariablePresenter.Display
   @UiField
   CellTable<CategoryDto> categoryTable;
 
-  SimplePager<CategoryDto> categoryTablePager;
+  @UiField
+  SimplePager categoryTablePager;
+
+  JsArrayDataProvider<CategoryDto> categoryProvider = new JsArrayDataProvider<CategoryDto>();
 
   @UiField
   Anchor attributeTableTitle;
@@ -111,7 +111,10 @@ public class VariableView extends Composite implements VariablePresenter.Display
   @UiField
   CellTable<AttributeDto> attributeTable;
 
-  SimplePager<AttributeDto> attributeTablePager;
+  @UiField
+  SimplePager attributeTablePager;
+
+  JsArrayDataProvider<AttributeDto> attributeProvider = new JsArrayDataProvider<AttributeDto>();
 
   @UiField
   Panel summary;
@@ -146,58 +149,36 @@ public class VariableView extends Composite implements VariablePresenter.Display
   // VariablePresenter.Display Methods
   //
 
-  @SuppressWarnings("unchecked")
   public void renderCategoryRows(JsArray<CategoryDto> rows) {
-    final JsArray<CategoryDto> categoryRows = (rows != null) ? rows : (JsArray<CategoryDto>) JsArray.createArray();
+    categoryProvider.setArray(rows);
 
-    categoryTableTitle.setText(translations.categoriesLabel() + " (" + categoryRows.length() + ")");
+    int size = categoryProvider.getList().size();
 
-    categoryTable.setDelegate(new Delegate<CategoryDto>() {
-
-      @Override
-      public void onRangeChanged(ListView<CategoryDto> listView) {
-        int start = listView.getRange().getStart();
-        int length = listView.getRange().getLength();
-        listView.setData(start, length, JsArrays.toList(categoryRows, start, length));
-      }
-    });
+    categoryTableTitle.setText(translations.categoriesLabel() + " (" + size + ")");
 
     categoryTablePager.firstPage();
-    categoryTable.setData(0, categoryTable.getPageSize(), JsArrays.toList(categoryRows, 0, categoryTable.getPageSize()));
-    categoryTable.setDataSize(categoryRows.length(), true);
-    categoryTable.redraw();
-
-    categoryTablePager.setVisible(categoryRows.length() > 0);
-    categoryTable.setVisible(categoryRows.length() > 0);
-    noCategories.setVisible(categoryRows.length() == 0);
+    categoryTablePager.setVisible(size > 0);
+    categoryTable.setVisible(size > 0);
+    noCategories.setVisible(size <= 0);
+    categoryProvider.refresh();
   }
 
-  @SuppressWarnings("unchecked")
   public void renderAttributeRows(final JsArray<AttributeDto> rows) {
-    final JsArray<AttributeDto> attributeRows = (rows != null) ? rows : (JsArray<AttributeDto>) JsArray.createArray();
+    attributeProvider.setArray(rows);
 
-    attributeTableTitle.setText(translations.attributesLabel() + " (" + attributeRows.length() + ")");
+    int size = attributeProvider.getList().size();
 
-    attributeTable.setDelegate(new Delegate<AttributeDto>() {
-
-      @Override
-      public void onRangeChanged(ListView<AttributeDto> listView) {
-        int start = listView.getRange().getStart();
-        int length = listView.getRange().getLength();
-        listView.setData(start, length, JsArrays.toList(attributeRows, start, length));
-      }
-    });
+    attributeTableTitle.setText(translations.attributesLabel() + " (" + size + ")");
 
     attributeTablePager.firstPage();
-    attributeTable.setData(0, attributeTable.getPageSize(), JsArrays.toList(attributeRows, 0, attributeTable.getPageSize()));
-    attributeTable.setDataSize(attributeRows.length(), true);
-    attributeTable.redraw();
 
-    label.setText(getAttributeValue(attributeRows, LABEL_ATTRIBUTE_NAME));
+    label.setText(getAttributeValue(rows, LABEL_ATTRIBUTE_NAME));
 
-    attributeTablePager.setVisible(attributeRows.length() > 0);
-    attributeTable.setVisible(attributeRows.length() > 0);
-    noAttributes.setVisible(attributeRows.length() == 0);
+    attributeTablePager.setVisible(size > 0);
+    attributeTable.setVisible(size > 0);
+    noAttributes.setVisible(size == 0);
+
+    attributeProvider.refresh();
   }
 
   @Override
@@ -305,16 +286,12 @@ public class VariableView extends Composite implements VariablePresenter.Display
   private void initCategoryTable() {
 
     categoryTableTitle.setText(translations.categoriesLabel());
-    categoryTable.setSelectionEnabled(false);
-    categoryTable.setSelectionModel(new SingleSelectionModel<CategoryDto>());
 
     addCategoryTableColumns();
 
-    // Add a pager.
     categoryTable.setPageSize(50);
-    categoryTablePager = new SimplePager<CategoryDto>(categoryTable);
-    categoryTable.setPager(categoryTablePager);
-    ((VerticalPanel) categoryTable.getParent()).insert(categoryTablePager, 0);
+    categoryTablePager.setDisplay(categoryTable);
+    categoryProvider.addDataDisplay(categoryTable);
   }
 
   private void addCategoryTableColumns() {
@@ -376,16 +353,12 @@ public class VariableView extends Composite implements VariablePresenter.Display
 
   private void initAttributeTable() {
     attributeTableTitle.setText(translations.attributesLabel());
-    attributeTable.setSelectionEnabled(false);
-    attributeTable.setSelectionModel(new SingleSelectionModel<AttributeDto>());
 
     addAttributeTableColumns();
 
-    // Add a pager.
     attributeTable.setPageSize(50);
-    attributeTablePager = new SimplePager<AttributeDto>(attributeTable);
-    attributeTable.setPager(attributeTablePager);
-    ((VerticalPanel) attributeTable.getParent()).insert(attributeTablePager, 0);
+    attributeTablePager.setDisplay(attributeTable);
+    attributeProvider.addDataDisplay(attributeTable);
   }
 
   private void addAttributeTableColumns() {

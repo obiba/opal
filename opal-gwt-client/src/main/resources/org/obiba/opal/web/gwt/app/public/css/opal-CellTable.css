@@ -1,12 +1,12 @@
 
-.lastColumnFooter{}
-.firstColumnFooter{}
-.lastColumnHeader{}
-.loading{}
+.cellTableLastColumnFooter{}
+.cellTableFirstColumnFooter{}
+.cellTableLastColumnHeader{}
+.cellTableLoading{}
 
 
 
-.header {
+.cellTableHeader {
 	background-color: #F3F4EB;
 	padding: 4px 15px;
 	border-top: 1px solid #B4A291;
@@ -14,52 +14,68 @@
 	color: #333333;
 }
 
-.firstColumnHeader{}
+.cellTableFirstColumnHeader{}
 
-.footer{}
+.cellTableFooter{}
 
-.oddRow{
+.cellTableOddRow{
 	background-color: #EEEEEE;
 }
 
-.oddRow .firstColumn  {
+.cellTableOddRow .cellTableFirstColumn  {
 	background-color: #DDDDDD;
 }
 
-.evenRow{
+.cellTableEvenRow{
 	background-color: #FFFFFF;
 }
 
-.evenRow .firstColumn {
+.cellTableEvenRow .cellTableFirstColumn {
 	background-color: #EEEEEE;
 }
 
-.hoveredRow{}
+.cellTableHoveredRow{}
 
-.selectedRow, .selectedRow .firstColumn {
+.cellTableSelectedRow, .cellTableSelectedRow .cellTableFirstColumn {
 	background-color: #B1B1B1;
     color: #ffffff;
 }
 
 .cellTable{}
 
-.cell{
+.cellTableCell{
 	padding: 4px 15px;
 }
 
-.firstColumn{}
-.lastColumn{}
+.cellTableFirstColumn{}
+.cellTableLastColumn{}
+
+.cellTableWidget{}
+
+.cellTableSelectedRowCell{}
+
+.cellTableHoveredRowCell{}
+
+.cellTableOddRowCell{}
+
+.cellTableKeyboardSelectedRowCell{}
+
+ .cellTableEvenRowCell{}
+ 
+ .cellTableKeyboardSelectedCell{}
+ 
+ .cellTableKeyboardSelectedRow{}
 
 /* Specific tables */
 
-.folder-details .header {
+.folder-details .cellTableHeader {
 	border-top: none;
 }
 
-.selection-list .evenRow .firstColumn, .selection-list .oddRow .firstColumn {
+.selection-list .cellTableEvenRow .cellTableFirstColumn, .selection-list .cellTableOddRow .cellTableFirstColumn {
 	background-color: #ffffff;
 }
 
-.selection-list .selectedRow .firstColumn {
+.selection-list .cellTableSelectedRow .cellTableFirstColumn {
 	background-color: #B1B1B1;
 }

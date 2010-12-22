@@ -19,6 +19,8 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -65,7 +67,7 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
 
     this.jobDetailsPresenter = jobDetailsPresenter;
 
-    getDisplay().getActionsColumn().setActionHandler(new ActionHandler() {
+    getDisplay().getActionsColumn().setActionHandler(new ActionHandler<CommandStateDto>() {
       public void doAction(CommandStateDto dto, String actionName) {
         if(actionName != null) {
           doActionImpl(dto, actionName);
@@ -194,21 +196,11 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
 
     void showClearJobsButton(boolean show);
 
-    HasActionHandler getActionsColumn();
+    HasActionHandler<CommandStateDto> getActionsColumn();
 
     HandlerRegistration addClearButtonHandler(ClickHandler handler);
 
     HandlerRegistration addRefreshButtonHandler(ClickHandler handler);
-  }
-
-  public interface HasActionHandler {
-
-    void setActionHandler(ActionHandler handler);
-  }
-
-  public interface ActionHandler {
-
-    void doAction(CommandStateDto dto, String actionName);
   }
 
   class ClearButtonHandler implements ClickHandler {

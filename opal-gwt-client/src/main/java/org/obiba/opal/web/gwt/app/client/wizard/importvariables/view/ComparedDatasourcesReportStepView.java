@@ -10,7 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard.importvariables.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
@@ -40,8 +40,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListView;
-import com.google.gwt.view.client.ListView.Delegate;
 
 public class ComparedDatasourcesReportStepView extends Composite implements ComparedDatasourcesReportStepPresenter.Display {
   //
@@ -184,23 +182,29 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
 
   private void addConflictsTab(JsArray<ConflictDto> conflicts, HorizontalTabLayout variableChangesPanel) {
     CellTable<ConflictDto> variableConflictsDetails = setupColumnsForConflicts();
-    SimplePager<ConflictDto> variableConflictsPager = prepareVariableChangesTab(variableChangesPanel, translations.conflictedVariablesLabel(), variableConflictsDetails);
-    populateVariableChangesTable(conflicts, variableConflictsDetails, variableConflictsPager);
+    SimplePager variableConflictsPager = prepareVariableChangesTab(variableChangesPanel, translations.conflictedVariablesLabel(), variableConflictsDetails);
+
+    JsArrayDataProvider<ConflictDto> dataProvider = new JsArrayDataProvider<ConflictDto>();
+    dataProvider.addDataDisplay(variableConflictsDetails);
+    populateVariableChangesTable(conflicts, dataProvider, variableConflictsPager);
   }
 
   private void addVariablesTab(JsArray<VariableDto> variables, HorizontalTabLayout variableChangesPanel, String tabTitle) {
     CellTable<VariableDto> variablesDetails = setupColumnsForVariables();
-    SimplePager<VariableDto> variableDetailsPager = prepareVariableChangesTab(variableChangesPanel, tabTitle, variablesDetails);
-    populateVariableChangesTable(variables, variablesDetails, variableDetailsPager);
+    SimplePager variableDetailsPager = prepareVariableChangesTab(variableChangesPanel, tabTitle, variablesDetails);
+
+    JsArrayDataProvider<VariableDto> dataProvider = new JsArrayDataProvider<VariableDto>();
+    dataProvider.addDataDisplay(variablesDetails);
+    populateVariableChangesTable(variables, dataProvider, variableDetailsPager);
   }
 
-  private <T extends JavaScriptObject> SimplePager<T> prepareVariableChangesTab(HorizontalTabLayout variableChangesTabPanel, String tabTitle, CellTable<T> variableChangesTable) {
+  private <T extends JavaScriptObject> SimplePager prepareVariableChangesTab(HorizontalTabLayout variableChangesTabPanel, String tabTitle, CellTable<T> variableChangesTable) {
     variableChangesTable.addStyleName("variableChangesDetails");
     ScrollPanel variableChangesDetails = new ScrollPanel();
     VerticalPanel variableChangesDetailsVert = new VerticalPanel();
     variableChangesDetailsVert.setWidth("100%");
-    SimplePager<T> pager = new SimplePager<T>(variableChangesTable);
-    variableChangesTable.setPager(pager);
+    SimplePager pager = new SimplePager();
+    pager.setDisplay(variableChangesTable);
     variableChangesDetailsVert.add(initVariableChangesPager(variableChangesTable, pager));
     variableChangesDetailsVert.add(variableChangesTable);
     variableChangesDetailsVert.addStyleName("variableChangesDetailsVert");
@@ -209,7 +213,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     return pager;
   }
 
-  FlowPanel initVariableChangesPager(CellTable<? extends JavaScriptObject> table, SimplePager<? extends JavaScriptObject> pager) {
+  FlowPanel initVariableChangesPager(CellTable<? extends JavaScriptObject> table, SimplePager pager) {
     table.setPageSize(18);
     FlowPanel pagerPanel = new FlowPanel();
     pagerPanel.addStyleName("variableChangesPager");
@@ -217,22 +221,10 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     return pagerPanel;
   }
 
-  private <T extends JavaScriptObject> void populateVariableChangesTable(final JsArray<T> conflicts, CellTable<T> table, SimplePager<T> pager) {
-    table.setDelegate(new Delegate<T>() {
-
-      @Override
-      public void onRangeChanged(ListView<T> listView) {
-        int start = listView.getRange().getStart();
-        int length = listView.getRange().getLength();
-        listView.setData(start, length, JsArrays.toList(conflicts, start, length));
-      }
-
-    });
-
+  private <T extends JavaScriptObject> void populateVariableChangesTable(final JsArray<T> conflicts, JsArrayDataProvider<T> dataProvider, SimplePager pager) {
+    dataProvider.setArray(conflicts);
     pager.firstPage();
-    table.setDataSize(conflicts.length(), true);
-    table.setData(0, table.getPageSize(), JsArrays.toList(conflicts, 0, table.getPageSize()));
-    table.redraw();
+    dataProvider.refresh();
   }
 
   private CellTable<ConflictDto> setupColumnsForConflicts() {

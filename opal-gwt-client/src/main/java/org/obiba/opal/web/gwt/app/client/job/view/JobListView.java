@@ -12,49 +12,34 @@ package org.obiba.opal.web.gwt.app.client.job.view;
 import static org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter.CANCEL_ACTION;
 import static org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter.LOG_ACTION;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsProvider;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WorkbenchLayout;
 import org.obiba.opal.web.gwt.user.cellview.client.DateTimeColumn;
 import org.obiba.opal.web.model.client.opal.CommandStateDto;
 
-import com.google.gwt.cell.client.AbstractCell;
-import com.google.gwt.cell.client.Cell;
-import com.google.gwt.cell.client.ClickableTextCell;
-import com.google.gwt.cell.client.CompositeCell;
-import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.cell.client.HasCell;
-import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.InlineLabel;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListView;
+import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionModel;
-import com.google.gwt.view.client.SingleSelectionModel;
-import com.google.gwt.view.client.ListView.Delegate;
 
 /**
  *
@@ -79,13 +64,14 @@ public class JobListView extends Composite implements Display {
   @UiField
   Button clearButton;
 
-  SelectionModel<CommandStateDto> selectionModel = new SingleSelectionModel<CommandStateDto>();
+  @UiField
+  SimplePager pager;
 
-  SimplePager<CommandStateDto> pager;
+  ListDataProvider<CommandStateDto> dataProvider;
 
   private static Translations translations = GWT.create(Translations.class);
 
-  private HasActionHandler actionsColumn;
+  private ActionsColumn<CommandStateDto> actionsColumn;
 
   //
   // Constructors
@@ -106,32 +92,24 @@ public class JobListView extends Composite implements Display {
   }
 
   public void renderRows(final JsArray<CommandStateDto> rows) {
-    table.setDelegate(new Delegate<CommandStateDto>() {
 
-      @Override
-      public void onRangeChanged(ListView<CommandStateDto> listView) {
-        int start = listView.getRange().getStart();
-        int length = listView.getRange().getLength();
-        listView.setData(start, length, JsArrays.toList(rows, start, length));
-      }
-    });
+    boolean jobListIsVisible = rows.length() > 0;
 
-    pager.setVisible(rows.length() != 0); // OPAL-901
+    pager.setVisible(jobListIsVisible); // OPAL-901
     pager.firstPage();
-    table.setData(0, table.getPageSize(), JsArrays.toList(rows, 0, table.getPageSize()));
-    table.setDataSize(rows.length(), true);
-    table.redraw();
 
-    pager.setVisible(rows.length() > 0);
-    table.setVisible(rows.length() > 0);
-    noJobs.setVisible(rows.length() == 0);
+    dataProvider.setList(JsArrays.toList(rows));
+
+    pager.setVisible(jobListIsVisible);
+    table.setVisible(jobListIsVisible);
+    noJobs.setVisible(jobListIsVisible == false);
   }
 
   public void showClearJobsButton(boolean show) {
     clearButton.setEnabled(show);
   }
 
-  public HasActionHandler getActionsColumn() {
+  public HasActionHandler<CommandStateDto> getActionsColumn() {
     return actionsColumn;
   }
 
@@ -166,12 +144,11 @@ public class JobListView extends Composite implements Display {
   //
 
   private void initTable() {
-
-    table.setSelectionEnabled(false);
-    table.setSelectionModel(selectionModel);
-
     addTableColumns();
     addTablePager();
+
+    dataProvider = new ListDataProvider<CommandStateDto>();
+    dataProvider.addDataDisplay(table);
   }
 
   private void addTableColumns() {
@@ -217,140 +194,28 @@ public class JobListView extends Composite implements Display {
       }
     }, translations.statusLabel());
 
-    actionsColumn = new ActionsColumn();
-    table.addColumn((ActionsColumn) actionsColumn, translations.actionsLabel());
+    actionsColumn = new ActionsColumn<CommandStateDto>(new ActionsProvider<CommandStateDto>() {
+
+      @Override
+      public String[] allActions() {
+        return new String[] { LOG_ACTION, CANCEL_ACTION };
+      }
+
+      @Override
+      public String[] getActions(CommandStateDto value) {
+        if(value.getStatus().toString().equals("NOT_STARTED") || value.getStatus().toString().equals("IN_PROGRESS")) {
+          return new String[] { LOG_ACTION, CANCEL_ACTION };
+        } else {
+          return new String[] { LOG_ACTION };
+        }
+      }
+    });
+    table.addColumn(actionsColumn, translations.actionsLabel());
   }
 
   private void addTablePager() {
     table.setPageSize(50);
-    pager = new SimplePager<CommandStateDto>(table);
-    table.setPager(pager);
-    ((VerticalPanel) table.getParent()).insert(pager, 0);
-    DOM.removeElementAttribute(pager.getElement(), "style");
-    DOM.setStyleAttribute(pager.getElement(), "cssFloat", "right");
+    pager.setDisplay(table);
   }
 
-  //
-  // Inner Classes
-  //
-
-  static class ActionsColumn extends Column<CommandStateDto, CommandStateDto> implements HasActionHandler {
-    //
-    // Constructors
-    //
-
-    public ActionsColumn() {
-      super(new ActionsCell());
-    }
-
-    //
-    // Column Methods
-    //
-
-    public CommandStateDto getValue(CommandStateDto object) {
-      return object;
-    }
-
-    //
-    // HasActionHandler Methods
-    //
-
-    public void setActionHandler(ActionHandler actionHandler) {
-      ((ActionsCell) getCell()).setActionHandler(actionHandler);
-    }
-  }
-
-  static class ActionsCell extends AbstractCell<CommandStateDto> {
-    //
-    // Instance Variables
-    //
-
-    private CompositeCell<CommandStateDto> delegateCell;
-
-    private FieldUpdater<CommandStateDto, String> hasCellFieldUpdater;
-
-    private ActionHandler actionHandler;
-
-    //
-    // Constructors
-    //
-
-    public ActionsCell() {
-      hasCellFieldUpdater = new FieldUpdater<CommandStateDto, String>() {
-        public void update(int rowIndex, CommandStateDto object, String value) {
-          if(actionHandler != null) {
-            actionHandler.doAction(object, value);
-          }
-        }
-      };
-    }
-
-    //
-    // AbstractCell Methods
-    //
-
-    @Override
-    public Object onBrowserEvent(Element parent, CommandStateDto value, Object viewData, NativeEvent event, ValueUpdater<CommandStateDto> valueUpdater) {
-      refreshActions(value);
-
-      return delegateCell.onBrowserEvent(parent, value, viewData, event, valueUpdater);
-    }
-
-    @Override
-    public void render(CommandStateDto value, Object viewData, StringBuilder sb) {
-      refreshActions(value);
-
-      delegateCell.render(value, viewData, sb);
-    }
-
-    //
-    // Methods
-    //
-
-    public void setActionHandler(ActionHandler actionHandler) {
-      this.actionHandler = actionHandler;
-    }
-
-    private void refreshActions(CommandStateDto value) {
-      if(value.getStatus().toString().equals("NOT_STARTED") || value.getStatus().toString().equals("IN_PROGRESS")) {
-        delegateCell = createCompositeCell(LOG_ACTION, CANCEL_ACTION);
-      } else {
-        delegateCell = createCompositeCell(LOG_ACTION);
-      }
-    }
-
-    private CompositeCell<CommandStateDto> createCompositeCell(String... actionNames) {
-      List<HasCell<CommandStateDto, ?>> hasCells = new ArrayList<HasCell<CommandStateDto, ?>>();
-
-      final Cell<String> cell = new ClickableTextCell() {
-
-        @Override
-        public void render(String value, Object viewData, StringBuilder sb) {
-          super.render(translations.actionMap().get(value), viewData, sb);
-        }
-      };
-
-      for(final String actionName : actionNames) {
-        hasCells.add(new HasCell<CommandStateDto, String>() {
-
-          @Override
-          public Cell<String> getCell() {
-            return cell;
-          }
-
-          @Override
-          public FieldUpdater<CommandStateDto, String> getFieldUpdater() {
-            return hasCellFieldUpdater;
-          }
-
-          @Override
-          public String getValue(CommandStateDto object) {
-            return actionName;
-          }
-        });
-      }
-
-      return new CompositeCell<CommandStateDto>(hasCells);
-    }
-  }
 }

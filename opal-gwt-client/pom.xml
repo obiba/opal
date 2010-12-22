@@ -89,6 +89,7 @@
               <includes>
                 <include>org.obiba.**</include>
                 <include>opal</include>
+                <include>WEB-INF/lib/**</include>
               </includes>
             </fileset>
           </filesets>
@@ -97,7 +98,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>gwt-maven-plugin</artifactId>
-        <version>r12227</version>
+        <version>2.1.0-1</version>
         <executions>
           <execution>
             <goals>
@@ -109,6 +110,7 @@
         <configuration>
           <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
           <runTarget>org.obiba.opal.web.gwt.app.GwtApp/index.html</runTarget>
+          <hostedWebapp>war</hostedWebapp>
         </configuration>
       </plugin>
       <plugin>
@@ -141,7 +143,7 @@
     <maven.compiler.source>1.6</maven.compiler.source>
     <maven.compiler.target>1.6</maven.compiler.target>
 
-    <gwt.version>2.1.0.M2</gwt.version>
+    <gwt.version>2.1.1</gwt.version>
     <gwt-visualization.version>1.0.2</gwt-visualization.version>
     <gwt-presenter.version>1.0.0</gwt-presenter.version>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>

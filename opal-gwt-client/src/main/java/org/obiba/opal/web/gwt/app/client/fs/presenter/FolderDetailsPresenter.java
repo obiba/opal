@@ -28,9 +28,8 @@ import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.view.client.SelectionModel;
+import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
-import com.google.gwt.view.client.SelectionModel.SelectionChangeEvent;
 import com.google.inject.Inject;
 
 public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresenter.Display> {
@@ -80,7 +79,7 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
       }
     });
 
-    super.registerHandler(getDisplay().getTableSelectionModel().addSelectionChangeHandler(new SelectionModel.SelectionChangeHandler() {
+    super.registerHandler(getDisplay().getTableSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {

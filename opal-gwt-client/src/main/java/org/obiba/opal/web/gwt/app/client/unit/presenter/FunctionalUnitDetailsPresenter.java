@@ -25,6 +25,8 @@ import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitSelectedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.KeyPairCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
@@ -65,7 +67,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
   public interface Display extends WidgetDisplay {
     void setKeyPairs(JsArray<KeyPairDto> keyPairs);
 
-    HasActionHandler getActionColumn();
+    HasActionHandler<KeyPairDto> getActionColumn();
 
     void setFunctionalUnitDetails(FunctionalUnitDto FunctionalUnit);
 
@@ -89,14 +91,6 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
     void setAvailable(boolean available);
 
-  }
-
-  public interface ActionHandler {
-    void doAction(KeyPairDto dto, String actionName);
-  }
-
-  public interface HasActionHandler {
-    void setActionHandler(ActionHandler handler);
   }
 
   @Inject
@@ -142,7 +136,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
   }
 
   private void addHandlers() {
-    getDisplay().getActionColumn().setActionHandler(new ActionHandler() {
+    getDisplay().getActionColumn().setActionHandler(new ActionHandler<KeyPairDto>() {
       public void doAction(KeyPairDto dto, String actionName) {
         if(actionName != null) {
           doActionImpl(dto, actionName);

@@ -12,38 +12,25 @@ package org.obiba.opal.web.gwt.app.client.unit.view;
 import static org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitDetailsPresenter.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitDetailsPresenter.DOWNLOAD_ACTION;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitDetailsPresenter;
-import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitDetailsPresenter.ActionHandler;
-import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitDetailsPresenter.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ConstantActionsProvider;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.opal.KeyPairDto;
 
-import com.google.gwt.cell.client.AbstractCell;
-import com.google.gwt.cell.client.Cell;
-import com.google.gwt.cell.client.ClickableTextCell;
-import com.google.gwt.cell.client.CompositeCell;
-import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.cell.client.HasCell;
-import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
@@ -52,10 +39,7 @@ import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListView;
-import com.google.gwt.view.client.ListView.Delegate;
 
 public class FunctionalUnitDetailsView extends Composite implements FunctionalUnitDetailsPresenter.Display {
 
@@ -75,6 +59,9 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
 
   @UiField
   CellTable<KeyPairDto> keyPairsTable;
+
+  @UiField
+  SimplePager pager;
 
   @UiField
   InlineLabel noKeyPairs;
@@ -119,10 +106,9 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
 
   private MenuItem update;
 
-  SimplePager<KeyPairDto> pager;
+  JsArrayDataProvider<KeyPairDto> dataProvider = new JsArrayDataProvider<KeyPairDto>();
 
-  @SuppressWarnings("unused")
-  private HasActionHandler actionsColumn;
+  private ActionsColumn<KeyPairDto> actionsColumn;
 
   private FunctionalUnitDto functionalUnit;
 
@@ -152,18 +138,15 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
       }
     }, translations.aliasLabel());
 
-    actionsColumn = new ActionsColumn();
-    keyPairsTable.addColumn((ActionsColumn) actionsColumn, translations.actionsLabel());
+    actionsColumn = new ActionsColumn<KeyPairDto>(new ConstantActionsProvider<KeyPairDto>(DOWNLOAD_ACTION, DELETE_ACTION));
+    keyPairsTable.addColumn(actionsColumn, translations.actionsLabel());
     addTablePager();
+    dataProvider.addDataDisplay(keyPairsTable);
   }
 
   private void addTablePager() {
     keyPairsTable.setPageSize(10);
-    pager = new SimplePager<KeyPairDto>(keyPairsTable);
-    DOM.removeElementAttribute(pager.getElement(), "style");
-    DOM.setStyleAttribute(pager.getElement(), "cssFloat", "right");
-    keyPairsTable.setPager(pager);
-    ((VerticalPanel) keyPairsTable.getParent()).insert(pager, 0);
+    pager.setDisplay(keyPairsTable);
   }
 
   @Override
@@ -185,21 +168,9 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   }
 
   private void renderKeyPairs(final JsArray<KeyPairDto> kpList) {
-    keyPairsTable.setDelegate(new Delegate<KeyPairDto>() {
-
-      @Override
-      public void onRangeChanged(ListView<KeyPairDto> listView) {
-        int start = listView.getRange().getStart();
-        int length = listView.getRange().getLength();
-        listView.setData(start, length, JsArrays.toList(kpList, start, length));
-      }
-    });
-
+    dataProvider.setArray(kpList);
     pager.firstPage();
-    int pageSize = keyPairsTable.getPageSize();
-    keyPairsTable.setData(0, pageSize, JsArrays.toList(kpList, 0, pageSize));
-    keyPairsTable.setDataSize(kpList.length(), true);
-    keyPairsTable.redraw();
+    dataProvider.refresh();
 
     keyPairsTable.setVisible(kpList.length() > 0);
     pager.setVisible(kpList.length() > 0);
@@ -227,101 +198,8 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
 
   }
 
-  // TODO Extract the following ActionsColumn and ActionsCell cells class. These should be part of some generic
-  // component. JobListView should also be refactored because it includes similar classes.
-  static class ActionsColumn extends Column<KeyPairDto, KeyPairDto> implements HasActionHandler {
-
-    public ActionsColumn() {
-      super(new ActionsCell());
-    }
-
-    public KeyPairDto getValue(KeyPairDto object) {
-      return object;
-    }
-
-    public void setActionHandler(ActionHandler actionHandler) {
-      ((ActionsCell) getCell()).setActionHandler(actionHandler);
-    }
-  }
-
-  static class ActionsCell extends AbstractCell<KeyPairDto> {
-
-    private CompositeCell<KeyPairDto> delegateCell;
-
-    private FieldUpdater<KeyPairDto, String> hasCellFieldUpdater;
-
-    private ActionHandler actionHandler;
-
-    public ActionsCell() {
-      hasCellFieldUpdater = new FieldUpdater<KeyPairDto, String>() {
-        public void update(int rowIndex, KeyPairDto object, String value) {
-          if(actionHandler != null) {
-            actionHandler.doAction(object, value);
-          }
-        }
-      };
-    }
-
-    @Override
-    public Object onBrowserEvent(Element parent, KeyPairDto value, Object viewData, NativeEvent event, ValueUpdater<KeyPairDto> valueUpdater) {
-      refreshActions(value);
-
-      return delegateCell.onBrowserEvent(parent, value, viewData, event, valueUpdater);
-    }
-
-    @Override
-    public void render(KeyPairDto value, Object viewData, StringBuilder sb) {
-      refreshActions(value);
-
-      delegateCell.render(value, viewData, sb);
-    }
-
-    public void setActionHandler(ActionHandler actionHandler) {
-      this.actionHandler = actionHandler;
-    }
-
-    private void refreshActions(KeyPairDto value) {
-      delegateCell = createCompositeCell(DOWNLOAD_ACTION, DELETE_ACTION);
-    }
-
-    private CompositeCell<KeyPairDto> createCompositeCell(String... actionNames) {
-      List<HasCell<KeyPairDto, ?>> hasCells = new ArrayList<HasCell<KeyPairDto, ?>>();
-
-      final Cell<String> cell = new ClickableTextCell() {
-
-        @Override
-        public void render(String value, Object viewData, StringBuilder sb) {
-          super.render(translations.actionMap().get(value), viewData, sb);
-        }
-
-      };
-
-      for(final String actionName : actionNames) {
-        hasCells.add(new HasCell<KeyPairDto, String>() {
-
-          @Override
-          public Cell<String> getCell() {
-            return cell;
-          }
-
-          @Override
-          public FieldUpdater<KeyPairDto, String> getFieldUpdater() {
-            return hasCellFieldUpdater;
-          }
-
-          @Override
-          public String getValue(KeyPairDto object) {
-            return actionName;
-          }
-        });
-      }
-
-      return new CompositeCell<KeyPairDto>(hasCells);
-    }
-  }
-
   @Override
-  public HasActionHandler getActionColumn() {
+  public HasActionHandler<KeyPairDto> getActionColumn() {
     return actionsColumn;
   }
 

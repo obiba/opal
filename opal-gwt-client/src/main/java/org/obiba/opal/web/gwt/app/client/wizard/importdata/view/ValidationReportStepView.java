@@ -25,8 +25,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListView;
-import com.google.gwt.view.client.ListView.Delegate;
+import com.google.gwt.view.client.ListDataProvider;
 
 public class ValidationReportStepView extends Composite {
   //
@@ -50,6 +49,8 @@ public class ValidationReportStepView extends Composite {
   @UiField
   Label validationLabel;
 
+  private ListDataProvider<TableCompareError> dataProvider = new ListDataProvider<TableCompareError>();
+
   //
   // Constructors
   //
@@ -57,6 +58,7 @@ public class ValidationReportStepView extends Composite {
   public ValidationReportStepView() {
     initWidget(uiBinder.createAndBindUi(this));
     initTable();
+    dataProvider.addDataDisplay(validationTable);
   }
 
   //
@@ -66,19 +68,8 @@ public class ValidationReportStepView extends Composite {
   public void showTableCompareErrors(final List<TableCompareError> errors) {
     validationLabel.setVisible(true);
     validationTable.setVisible(true);
-    validationTable.setDelegate(new Delegate<TableCompareError>() {
-
-      @Override
-      public void onRangeChanged(ListView<TableCompareError> listView) {
-        int start = listView.getRange().getStart();
-        int length = listView.getRange().getLength();
-        listView.setData(start, length, errors);
-      }
-    });
-
-    validationTable.setData(0, validationTable.getPageSize(), errors);
-    validationTable.setDataSize(errors.size(), true);
-    validationTable.redraw();
+    dataProvider.setList(errors);
+    dataProvider.refresh();
   }
 
   public void showDatasourceParsingErrors(ClientErrorDto errorDto) {
@@ -93,7 +84,6 @@ public class ValidationReportStepView extends Composite {
   }
 
   private void initTable() {
-    validationTable.setSelectionEnabled(false);
     addValidationColumns();
   }
 

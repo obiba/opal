@@ -1,6 +1,6 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client"
+  xmlns:c="urn:import:com.google.gwt.user.cellview.client"
   xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
   ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
@@ -48,8 +48,9 @@
      
      <o:HorizontalTabLayout addStyleNames="small-indent top-margin not-so-full-width">
 	  <g:Anchor><ui:msg description="Variables label">Variables</ui:msg></g:Anchor>
-      <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_RIGHT">
+      <g:VerticalPanel width="100%">
         <g:InlineLabel ui:field="noVariables"><ui:msg description="No Variables label">No Variables</ui:msg></g:InlineLabel>
+        <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned" />
         <o:Table ui:field="table" width="100%" addStyleNames="left-aligned gwt-CellTable tableList"/>
         <g:Image ui:field="loading" url="image/loading.gif" addStyleNames="loading"/>
       </g:VerticalPanel>

@@ -29,6 +29,9 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -58,8 +61,6 @@ public class FolderDetailsView extends Composite implements Display {
   @UiField
   CellTable<FileDto> table;
 
-  private SingleSelectionModel<FileDto> tableSelectionModel;
-
   private FileNameColumn fileNameColumn;
 
   private Translations translations = GWT.create(Translations.class);
@@ -76,11 +77,13 @@ public class FolderDetailsView extends Composite implements Display {
   }
 
   public void setSelectionEnabled(boolean enabled) {
-    table.setSelectionEnabled(enabled);
+    if(enabled) {
+      table.setSelectionModel(new SingleSelectionModel<FileDto>());
+    }
   }
 
   public void clearSelection() {
-    if(table.isSelectionEnabled()) {
+    if(table.getSelectionModel() != null) {
       getTableSelectionModel().setSelected(getTableSelectionModel().getSelectedObject(), false);
     }
   }
@@ -97,8 +100,8 @@ public class FolderDetailsView extends Composite implements Display {
 
     int fileCount = children.length();
     table.setPageSize(fileCount);
-    table.setDataSize(fileCount, true);
-    table.setData(0, fileCount, sortFileList(JsArrays.toList(children, 0, fileCount)));
+    table.setRowCount(fileCount, true);
+    table.setRowData(0, sortFileList(JsArrays.toList(children, 0, fileCount)));
   }
 
   @SuppressWarnings("unchecked")
@@ -139,8 +142,6 @@ public class FolderDetailsView extends Composite implements Display {
     addTableColumns();
 
     table.addStyleName("folder-details");
-    tableSelectionModel = new SingleSelectionModel<FileDto>();
-    table.setSelectionModel(tableSelectionModel);
   }
 
   private void addTableColumns() {
@@ -243,7 +244,12 @@ public class FolderDetailsView extends Composite implements Display {
     private List<FileSelectionHandler> fileSelectionHandlers;
 
     public FileNameColumn() {
-      super(new ClickableTextCell());
+      super(new ClickableTextCell(new AbstractSafeHtmlRenderer<String>() {
+        @Override
+        public SafeHtml render(String object) {
+          return SafeHtmlUtils.fromTrustedString(object);
+        }
+      }));
 
       fileSelectionHandlers = new ArrayList<FileSelectionHandler>();
 
@@ -269,7 +275,7 @@ public class FolderDetailsView extends Composite implements Display {
   }
 
   public SingleSelectionModel<FileDto> getTableSelectionModel() {
-    return tableSelectionModel;
+    return (SingleSelectionModel<FileDto>) table.getSelectionModel();
   }
 
 }

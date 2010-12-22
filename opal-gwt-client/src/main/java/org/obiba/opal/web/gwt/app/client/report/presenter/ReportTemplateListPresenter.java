@@ -31,8 +31,7 @@ import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.view.client.SelectionModel.SelectionChangeEvent;
-import com.google.gwt.view.client.SelectionModel.SelectionChangeHandler;
+import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.inject.Inject;
 
 public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateListPresenter.Display> {
@@ -123,7 +122,7 @@ public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateL
 
     ReportTemplateDto getSelectedReportTemplate();
 
-    HandlerRegistration addSelectReportTemplateHandler(SelectionChangeHandler handler);
+    HandlerRegistration addSelectReportTemplateHandler(SelectionChangeEvent.Handler handler);
   }
 
   class ReportTemplateCreatedHandler implements ReportTemplateCreatedEvent.Handler {
@@ -142,7 +141,7 @@ public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateL
     }
   }
 
-  class ReportTemplateSelectionChangeHandler implements SelectionChangeHandler {
+  class ReportTemplateSelectionChangeHandler implements SelectionChangeEvent.Handler {
 
     @Override
     public void onSelectionChange(SelectionChangeEvent event) {

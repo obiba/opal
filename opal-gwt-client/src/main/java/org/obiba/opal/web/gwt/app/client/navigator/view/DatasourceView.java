@@ -28,19 +28,15 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuItem;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListView;
-import com.google.gwt.view.client.SelectionModel;
+import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
-import com.google.gwt.view.client.ListView.Delegate;
 
 public class DatasourceView extends Composite implements DatasourcePresenter.Display {
   @UiTemplate("DatasourceView.ui.xml")
@@ -61,17 +57,18 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   @UiField
   CellTable<TableDto> table;
 
-  SelectionModel<TableDto> selectionModel = new SingleSelectionModel<TableDto>();
-
-  SimplePager<TableDto> pager;
+  @UiField
+  SimplePager pager;
 
   @UiField
   FlowPanel toolbarPanel;
 
-  private NavigatorMenuBar toolbar;
-
   @UiField
   Image loading;
+
+  private NavigatorMenuBar toolbar;
+
+  private ListDataProvider<TableDto> dataProvider = new ListDataProvider<TableDto>();
 
   private TableNameColumn tableNameColumn;
 
@@ -118,15 +115,10 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
       }
     }, translations.entitiesCountLabel());
 
-    table.setSelectionEnabled(true);
-    table.setSelectionModel(selectionModel);
+    dataProvider.addDataDisplay(table);
+    table.setSelectionModel(new SingleSelectionModel<TableDto>());
     table.setPageSize(50);
-    pager = new SimplePager<TableDto>(table);
-    table.setPager(pager);
-    VerticalPanel p = ((VerticalPanel) table.getParent());
-    p.insert(pager, 0);
-    DOM.removeElementAttribute(pager.getElement(), "style");
-    DOM.setStyleAttribute(pager.getElement(), "cssFloat", "right");
+    pager.setDisplay(table);
   }
 
   @Override
@@ -148,10 +140,7 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
     if(pageIndex != pager.getPage()) {
       pager.setPage(pageIndex);
     }
-    selectionModel.setSelected(tableDto, true);
-    // int row = index - table.getPageSize() * pageIndex;
-    // System.out.println("row=" + row);
-    // table.getRowElement(row).addClassName("selected");
+    table.getSelectionModel().setSelected(tableDto, true);
   }
 
   @Override
@@ -164,32 +153,19 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
   @Override
   public void afterRenderRows() {
-    pager.setVisible(table.getDataSize() > 0);
-    table.setVisible(table.getDataSize() > 0);
-    toolbar.setExportDataItemVisible(table.getDataSize() > 0);
-    noTables.setVisible(table.getDataSize() == 0);
+    boolean tableIsVisible = table.getRowCount() > 0;
+    pager.setVisible(tableIsVisible);
+    table.setVisible(tableIsVisible);
+    toolbar.setExportDataItemVisible(tableIsVisible);
+    noTables.setVisible(tableIsVisible == false);
     loading.setVisible(false);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public void renderRows(final JsArray<TableDto> rows) {
-    final JsArray<TableDto> tableRows = (rows != null) ? rows : (JsArray<TableDto>) JsArray.createArray();
-
-    table.setDelegate(new Delegate<TableDto>() {
-
-      @Override
-      public void onRangeChanged(ListView<TableDto> listView) {
-        int start = listView.getRange().getStart();
-        int length = listView.getRange().getLength();
-        listView.setData(start, length, JsArrays.toList(tableRows, start, length));
-      }
-
-    });
+    dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
     pager.firstPage();
-    table.setData(0, table.getPageSize(), JsArrays.toList(tableRows, 0, table.getPageSize()));
-    table.setDataSize(tableRows.length(), true);
-    table.redraw();
+    dataProvider.refresh();
   }
 
   @Override

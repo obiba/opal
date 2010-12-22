@@ -15,8 +15,8 @@ import static org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.L
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.app.client.widgets.view.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.LocalizablesPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.LocalizablesPresenter.Localizable;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
@@ -34,11 +34,9 @@ import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListView;
-import com.google.gwt.view.client.ListView.Delegate;
+import com.google.gwt.view.client.ListDataProvider;
 
 public class LocalizablesView extends Composite implements LocalizablesPresenter.Display {
   //
@@ -62,7 +60,10 @@ public class LocalizablesView extends Composite implements LocalizablesPresenter
   @UiField
   CellTable<Localizable> localizablesTable;
 
-  SimplePager<Localizable> pager;
+  @UiField
+  SimplePager pager;
+
+  ListDataProvider<Localizable> dataProvider = new ListDataProvider<Localizable>();
 
   private HasActionHandler<Localizable> actionsColumn;
 
@@ -101,22 +102,10 @@ public class LocalizablesView extends Composite implements LocalizablesPresenter
 
   @Override
   public void setTableData(final List<Localizable> localizables) {
-
-    localizablesTable.setData(0, localizables.size(), localizables);
-    localizablesTable.setDelegate(new Delegate<Localizable>() {
-
-      @Override
-      public void onRangeChanged(ListView<Localizable> listView) {
-        int start = listView.getRange().getStart();
-        int length = listView.getRange().getLength();
-        listView.setData(start, length, localizables.subList(start, start + length));
-      }
-    });
-
+    dataProvider.setList(localizables);
     pager.setVisible(localizables.size() > localizablesTable.getPageSize());
     pager.firstPage();
-    localizablesTable.setDataSize(localizables.size(), true);
-    localizablesTable.redraw();
+    dataProvider.refresh();
   }
 
   @Override
@@ -152,17 +141,14 @@ public class LocalizablesView extends Composite implements LocalizablesPresenter
   //
 
   private void initTable() {
-    localizablesTable.setSelectionEnabled(false);
     addTableColumns();
     addPager();
+    dataProvider.addDataDisplay(localizablesTable);
   }
 
   private void addPager() {
     localizablesTable.setPageSize(5);
-    pager = new SimplePager<Localizable>(localizablesTable);
-    localizablesTable.setPager(pager);
-    pager.addStyleName("pager");
-    ((FlowPanel) localizablesTable.getParent()).insert(pager, 2);
+    pager.setDisplay(localizablesTable);
   }
 
   private void addTableColumns() {

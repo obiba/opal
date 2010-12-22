@@ -32,12 +32,10 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
-import com.google.gwt.user.client.ui.InsertPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.MenuItemSeparator;
@@ -45,10 +43,8 @@ import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
-import com.google.gwt.view.client.ListView;
-import com.google.gwt.view.client.SelectionModel;
+import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
-import com.google.gwt.view.client.ListView.Delegate;
 
 public class TableView extends Composite implements TablePresenter.Display {
 
@@ -81,17 +77,18 @@ public class TableView extends Composite implements TablePresenter.Display {
   @UiField
   CellTable<VariableDto> table;
 
+  @UiField
+  SimplePager pager;
+
   @UiField(provided = true)
   SuggestBox variableNameSuggestBox;
 
   MultiWordSuggestOracle suggestions;
 
-  SelectionModel<VariableDto> selectionModel = new SingleSelectionModel<VariableDto>();
-
-  SimplePager<VariableDto> pager;
-
   @UiField
   Image loading;
+
+  private ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
 
   private VariableNameColumn variableNameColumn;
 
@@ -147,15 +144,10 @@ public class TableView extends Composite implements TablePresenter.Display {
       }
     }, translations.unitLabel());
 
-    table.setSelectionEnabled(true);
-    table.setSelectionModel(selectionModel);
+    table.setSelectionModel(new SingleSelectionModel<VariableDto>());
     table.setPageSize(50);
-    pager = new SimplePager<VariableDto>(table);
-    table.setPager(pager);
-
-    ((InsertPanel) table.getParent()).insert(pager, 0);
-    DOM.removeElementAttribute(pager.getElement(), "style");
-    DOM.setStyleAttribute(pager.getElement(), "cssFloat", "right");
+    pager.setDisplay(table);
+    dataProvider.addDataDisplay(table);
   }
 
   @Override
@@ -169,32 +161,19 @@ public class TableView extends Composite implements TablePresenter.Display {
 
   @Override
   public void afterRenderRows() {
-    pager.setVisible(table.getDataSize() > 0);
-    table.setVisible(table.getDataSize() > 0);
-    toolbar.setExportDataItemVisible(table.getDataSize() > 0);
-    noVariables.setVisible(table.getDataSize() == 0);
+    boolean tableIsVisible = dataProvider.getList().size() > 0;
+    pager.setVisible(tableIsVisible);
+    table.setVisible(tableIsVisible);
+    toolbar.setExportDataItemVisible(tableIsVisible);
+    noVariables.setVisible(tableIsVisible == false);
     loading.setVisible(false);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public void renderRows(final JsArray<VariableDto> rows) {
-    final JsArray<VariableDto> variableRows = (rows != null) ? rows : (JsArray<VariableDto>) JsArray.createArray();
-
-    table.setDelegate(new Delegate<VariableDto>() {
-
-      @Override
-      public void onRangeChanged(ListView<VariableDto> listView) {
-        int start = listView.getRange().getStart();
-        int length = listView.getRange().getLength();
-        listView.setData(start, length, JsArrays.toList(variableRows, start, length));
-      }
-
-    });
+    dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
     pager.firstPage();
-    table.setData(0, table.getPageSize(), JsArrays.toList(variableRows, 0, table.getPageSize()));
-    table.setDataSize(variableRows.length(), true);
-    table.redraw();
+    dataProvider.refresh();
   }
 
   @Override
@@ -203,7 +182,7 @@ public class TableView extends Composite implements TablePresenter.Display {
     if(pageIndex != pager.getPage()) {
       pager.setPage(pageIndex);
     }
-    selectionModel.setSelected(variable, true);
+    table.getSelectionModel().setSelected(variable, true);
   }
 
   @Override

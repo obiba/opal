@@ -1,6 +1,6 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" 
+  xmlns:c="urn:import:com.google.gwt.user.cellview.client" 
   xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
   ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
@@ -20,8 +20,9 @@
 	    
 	    <o:HorizontalTabLayout addStyleNames="small-indent top-margin not-so-full-width">
 		  <g:Anchor><ui:msg description="Jobs label">Jobs</ui:msg></g:Anchor>
-	      <g:VerticalPanel width="100%" horizontalAlignment="ALIGN_RIGHT">
+	      <g:VerticalPanel width="100%">
 	        <g:InlineLabel ui:field="noJobs"><ui:msg description="No Jobs label">No Jobs</ui:msg></g:InlineLabel>
+            <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned" />
 	        <o:Table ui:field="table" width="100%" addStyleNames="left-aligned gwt-CellTable"/>
 	      </g:VerticalPanel>
 	    </o:HorizontalTabLayout>
