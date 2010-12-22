@@ -269,9 +269,9 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
       }
     };
 
-    String path = "/functional-units/entities/identifiers/map" + getSelectedCsvFile().getText() + "?unit=" + getDisplay().getSelectedUnitName();
+    String path = "/functional-unit/" + getDisplay().getSelectedUnitName() + "/entities/identifiers/map" + getSelectedCsvFile().getText();
 
-    ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource(path).post()//
+    ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource(path).put()//
     .withCallback(200, callbackHandler)//
     .withCallback(400, callbackHandler)//
     .withCallback(500, callbackHandler).send();

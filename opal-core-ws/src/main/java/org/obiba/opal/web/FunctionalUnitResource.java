@@ -11,6 +11,7 @@ package org.obiba.opal.web;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -44,9 +45,9 @@ import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.Disposables;
-import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ImportService;
@@ -69,13 +70,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import au.com.bytecode.opencsv.CSVReader;
+
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+
+import de.schlichtherle.io.FileReader;
 
 @Component
 @Scope("request")
 @Path("/functional-unit/{unit}")
-public class FunctionalUnitResource {
+public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
   private static final Logger log = LoggerFactory.getLogger(FunctionalUnitResource.class);
 
@@ -107,7 +112,7 @@ public class FunctionalUnitResource {
 
   @GET
   public Opal.FunctionalUnitDto getFunctionalUnit() {
-    FunctionalUnit functionalUnit = resolveFunctionalUnit();
+    FunctionalUnit functionalUnit = resolveFunctionalUnit(unit);
 
     Opal.FunctionalUnitDto.Builder fuBuilder = Opal.FunctionalUnitDto.newBuilder().//
     setName(functionalUnit.getName()). //
@@ -270,6 +275,42 @@ public class FunctionalUnitResource {
     return response;
   }
 
+  @PUT
+  @Path("/entities/identifiers/map/{path:.*}")
+  public Response mapIdentifiers(@PathParam("path") String path) throws IOException {
+    Response response = null;
+
+    // the file is expected to be of CSV format
+    File mapFile = resolveLocalFile(path);
+    CSVReader reader = new CSVReader(new FileReader(mapFile.getPath()));
+    List<FunctionalUnit> units = getUnitsFromIdentifiersMap(reader);
+
+    // master unit is the one that drives the mapping (not necessarily the first one)
+    int masterIndex = getUnitIndex(unit, units);
+    if(masterIndex == -1) {
+      throw new NoSuchFunctionalUnitException(unit);
+    }
+
+    ValueTable keysTable = getKeysTable();
+    ValueTableWriter keysTableWriter = keysTable.getDatasource().createWriter(keysTable.getName(), keysTable.getEntityType());
+    FunctionalUnitIdentifiers unitIdentifiers = new FunctionalUnitIdentifiers(keysTable, resolveFunctionalUnit(unit));
+
+    response = Response.ok().build();
+
+    return response;
+  }
+
+  private int getUnitIndex(String unit, List<FunctionalUnit> units) {
+    int idx = -1;
+    for(int i = 0; i < units.size(); i++) {
+      if(units.get(i).getName().equals(unit)) {
+        idx = i;
+        break;
+      }
+    }
+    return idx;
+  }
+
   //
   // Keystore
   //
@@ -376,7 +417,7 @@ public class FunctionalUnitResource {
   }
 
   private Iterable<VariableEntityDto> getUnitEntities() {
-    return Iterables.transform(new FunctionalUnitIdentifiers(getKeysTable(), resolveFunctionalUnit()).getUnitEntities(), Dtos.variableEntityAsDtoFunc);
+    return Iterables.transform(new FunctionalUnitIdentifiers(getKeysTable(), resolveFunctionalUnit(unit)).getUnitEntities(), Dtos.variableEntityAsDtoFunc);
   }
 
   private String getPEMCertificate(UnitKeyStore keystore, String alias) throws KeyStoreException, IOException {
@@ -408,7 +449,7 @@ public class FunctionalUnitResource {
 
   private void readUnitIdentifiers(final VectorCallback callback) {
     ValueTable keysTable = getKeysTable();
-    FunctionalUnit functionalUnit = resolveFunctionalUnit();
+    FunctionalUnit functionalUnit = resolveFunctionalUnit(unit);
     if(keysTable.hasVariable(functionalUnit.getKeyVariableName())) {
       for(UnitIdentifier unitId : new FunctionalUnitIdentifiers(keysTable, functionalUnit)) {
         // entities of the unit are the ones that have a non null for the unit identifier variable
@@ -417,20 +458,20 @@ public class FunctionalUnitResource {
     }
   }
 
-  private FunctionalUnit resolveFunctionalUnit() {
-    FunctionalUnit functionalUnit = opalRuntime.getFunctionalUnit(unit);
-    if(functionalUnit == null) throw new NoSuchFunctionalUnitException(unit);
-    return functionalUnit;
-  }
-
-  private ValueTable getKeysTable() {
-    return MagmaEngineTableResolver.valueOf(keysTableReference).resolveTable();
-  }
-
   private interface VectorCallback {
 
     public void onValue(UnitIdentifier unitIdentifier);
 
+  }
+
+  @Override
+  protected String getKeysTableReference() {
+    return keysTableReference;
+  }
+
+  @Override
+  protected OpalRuntime getOpalRuntime() {
+    return opalRuntime;
   }
 
 }
