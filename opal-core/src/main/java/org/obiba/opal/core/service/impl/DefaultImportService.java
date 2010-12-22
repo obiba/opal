@@ -11,6 +11,7 @@ package org.obiba.opal.core.service.impl;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ThreadFactory;
@@ -21,6 +22,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.NoSuchDatasourceException;
+import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
@@ -36,6 +38,7 @@ import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
+import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListener;
 import org.obiba.magma.support.DatasourceCopier.MultiplexingStrategy;
 import org.obiba.magma.support.DatasourceCopier.VariableTransformer;
@@ -592,4 +595,75 @@ public class DefaultImportService implements ImportService {
       });
     }
   }
+
+  @Override
+  public int importIdentifiersMapping(String unitName, List<FunctionalUnit> units, List<String[]> mapping) throws NoSuchDatasourceException, NoSuchValueTableException, IOException {
+    Assert.hasText(unitName, "unitName is null or empty");
+
+    // look for the unit from the units list
+    FunctionalUnit unit = null;
+    int unitIdx = -1;
+    for(FunctionalUnit fu : units) {
+      unitIdx++;
+      if(fu.getName().equals(unitName)) {
+        unit = fu;
+        break;
+      }
+    }
+    if(unit == null) {
+      throw new NoSuchFunctionalUnitException(unitName);
+    }
+
+    ValueTable keysTable = lookupKeysTable();
+    for(FunctionalUnit fu : units) {
+      prepareKeysTable(keysTable, fu);
+    }
+    PrivateVariableEntityMap entityMap = null;
+    if(!unitName.equals(FunctionalUnit.OPAL_INSTANCE)) {
+      entityMap = new OpalPrivateVariableEntityMap(keysTable, keysTable.getVariable(unit.getKeyVariableName()), participantIdentifier);
+    }
+
+    ValueTableWriter writer = writeToKeysTable();
+
+    int count = 0;
+    for(String[] map : mapping) {
+      VariableEntity publicEntity;
+      if(entityMap != null) {
+        publicEntity = entityMap.publicEntity(entityFor(map[unitIdx]));
+      } else {
+        publicEntity = entityFor(map[unitIdx]);
+      }
+      if(publicEntity != null) {
+        ValueSetWriter vsw = writer.writeValueSet(publicEntity);
+        int idx = -1;
+        for(FunctionalUnit fu : units) {
+          idx++;
+          if(idx != unitIdx) {
+            vsw.writeValue(keysTable.getVariable(fu.getKeyVariableName()), TextType.get().valueOf(map[idx]));
+          }
+        }
+        vsw.close();
+        count++;
+      }
+      // else ignore: do not create a opal entity
+    }
+    writer.close();
+
+    return count;
+  }
+
+  private void prepareKeysTable(ValueTable keysTable, FunctionalUnit unit) {
+    if(keysTable.hasVariable(unit.getKeyVariableName()) == false) {
+      try {
+        prepareKeysTable(null, unit.getKeyVariableName());
+      } catch(IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+
+  private VariableEntity entityFor(String identifier) {
+    return new VariableEntityBean(keysTableEntityType, identifier);
+  }
+
 }

@@ -10,11 +10,13 @@
 package org.obiba.opal.core.service;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.commons.vfs.FileObject;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
+import org.obiba.opal.core.unit.FunctionalUnit;
 
 /**
  * Service for import-related operations.
@@ -83,4 +85,17 @@ public interface ImportService {
    * @throws IOException on any I/O error
    */
   public void importIdentifiers(String sourceDatasourceName) throws NoSuchDatasourceException, NoSuchValueTableException, IOException;
+
+  /**
+   * Import identifiers mapping, do not add new entities.
+   * 
+   * @param unitName the unit to be used to retrieve the entities given the unit's identifier
+   * @param units the list of units which identifiers are to be updated (column headers)
+   * @param mapping the identifiers (rows in the same order as the list of units)
+   * @return
+   * @throws NoSuchDatasourceException
+   * @throws NoSuchValueTableException
+   * @throws IOException
+   */
+  public int importIdentifiersMapping(String unitName, List<FunctionalUnit> units, List<String[]> mapping) throws NoSuchDatasourceException, NoSuchValueTableException, IOException;
 }

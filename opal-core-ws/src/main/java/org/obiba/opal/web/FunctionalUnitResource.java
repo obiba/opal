@@ -45,7 +45,6 @@ import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.Disposables;
 import org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl;
@@ -277,38 +276,23 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
   @PUT
   @Path("/entities/identifiers/map/{path:.*}")
-  public Response mapIdentifiers(@PathParam("path") String path) throws IOException {
+  public Response mapIdentifiers(@PathParam("path") String path) {
     Response response = null;
 
-    // the file is expected to be of CSV format
-    File mapFile = resolveLocalFile(path);
-    CSVReader reader = new CSVReader(new FileReader(mapFile.getPath()));
-    List<FunctionalUnit> units = getUnitsFromIdentifiersMap(reader);
+    try {
+      // the file is expected to be of CSV format
+      File mapFile = resolveLocalFile(path);
+      CSVReader reader = new CSVReader(new FileReader(mapFile.getPath()));
+      List<FunctionalUnit> units = getUnitsFromIdentifiersMap(reader);
 
-    // master unit is the one that drives the mapping (not necessarily the first one)
-    int masterIndex = getUnitIndex(unit, units);
-    if(masterIndex == -1) {
-      throw new NoSuchFunctionalUnitException(unit);
+      int count = importService.importIdentifiersMapping(unit, units, reader.readAll());
+      response = Response.ok().entity(Integer.toString(count)).build();
+    } catch(Exception e) {
+      e.printStackTrace();
+      response = Response.status(Status.BAD_REQUEST).build();
     }
-
-    ValueTable keysTable = getKeysTable();
-    ValueTableWriter keysTableWriter = keysTable.getDatasource().createWriter(keysTable.getName(), keysTable.getEntityType());
-    FunctionalUnitIdentifiers unitIdentifiers = new FunctionalUnitIdentifiers(keysTable, resolveFunctionalUnit(unit));
-
-    response = Response.ok().build();
 
     return response;
-  }
-
-  private int getUnitIndex(String unit, List<FunctionalUnit> units) {
-    int idx = -1;
-    for(int i = 0; i < units.size(); i++) {
-      if(units.get(i).getName().equals(unit)) {
-        idx = i;
-        break;
-      }
-    }
-    return idx;
   }
 
   //
