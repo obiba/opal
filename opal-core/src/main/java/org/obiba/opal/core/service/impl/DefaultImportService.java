@@ -642,7 +642,7 @@ public class DefaultImportService implements ImportService {
         int idx = -1;
         for(FunctionalUnit fu : units) {
           idx++;
-          if(idx != unitIdx) {
+          if(idx != unitIdx && !fu.getName().equals(FunctionalUnit.OPAL_INSTANCE)) {
             vsw.writeValue(keysTable.getVariable(fu.getKeyVariableName()), TextType.get().valueOf(map[idx]));
           }
         }
