@@ -426,6 +426,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Select the file of identifiers to be mapped.")
   String identifiersMapFileStep();
 
+  @Description("Identifiers Map Unit Step")
+  @DefaultStringValue("Select which unit is to be used for retrieving the participants to be mapped.")
+  String identifiersMapUnitStep();
+
   @Description("Identifier map pending conclusion")
   @DefaultStringValue("Identifier mapping job is being launched.")
   String identifierMapPendingConclusion();

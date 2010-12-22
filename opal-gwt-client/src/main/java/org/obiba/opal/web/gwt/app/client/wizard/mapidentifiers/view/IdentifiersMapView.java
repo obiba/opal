@@ -85,7 +85,7 @@ public class IdentifiersMapView extends Composite implements IdentifiersMapPrese
     .title(translations.identifiersMapFileStep())//
 
     .append(unitStep)//
-    .title(translations.identifiersMapFileStep())//
+    .title(translations.identifiersMapUnitStep())//
 
     .append(conclusionStep)//
     .conclusion()//

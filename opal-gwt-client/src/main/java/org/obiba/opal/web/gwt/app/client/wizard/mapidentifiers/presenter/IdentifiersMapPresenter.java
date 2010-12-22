@@ -212,7 +212,7 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
     @Override
     public void onClick(ClickEvent arg0) {
       // get the units from the map file
-      String path = "/functional-units/entities/identifiers/map/" + getSelectedCsvFile().getText() + "/units";
+      String path = "/functional-units/entities/identifiers/map" + getSelectedCsvFile().getText() + "/units";
 
       ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>> newBuilder().forResource(path).get()//
       .withCallback(new GetMappedUnitsCompletedCallback())//
@@ -269,7 +269,7 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
       }
     };
 
-    String path = "/functional-units/entities/identifiers/map/" + getSelectedCsvFile().getText() + "?unit=" + getDisplay().getSelectedUnitName();
+    String path = "/functional-units/entities/identifiers/map" + getSelectedCsvFile().getText() + "?unit=" + getDisplay().getSelectedUnitName();
 
     ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource(path).post()//
     .withCallback(200, callbackHandler)//
