@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.wizard.importidentifiers.presenter;
+package org.obiba.opal.web.gwt.app.client.wizard.mapidentifiers.presenter;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -21,22 +21,20 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
-import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RegExValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.widgets.view.CsvOptionsView;
 import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ConclusionStepPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -46,6 +44,7 @@ import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErr
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -59,10 +58,10 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 
-public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImportPresenter.Display> implements Wizard {
+public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPresenter.Display> implements Wizard {
 
   @Inject
-  public IdentifiersImportPresenter(final Display display, final EventBus eventBus) {
+  public IdentifiersMapPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
   }
 
@@ -71,33 +70,13 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
 
     void hideDialog();
 
-    HandlerRegistration addNextClickHandler(ClickHandler handler);
-
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
 
     HandlerRegistration addCloseClickHandler(ClickHandler handler);
 
-    HandlerRegistration addPreviousClickHandler(ClickHandler handler);
-
     HandlerRegistration addFinishClickHandler(ClickHandler handler);
 
-    void setFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
-
     void setCsvOptionsFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
-
-    HasText getSelectedFile();
-
-    boolean isIdentifiersOnly();
-
-    boolean isIdentifiersPlusData();
-
-    ImportFormat getImportFormat();
-
-    /** Display no format options in the Format Options Step. The format chosen has no options. */
-    void setNoFormatOptions();
-
-    /** Display the CSV format options in the Format Options Step. */
-    void setCsvFormatOptions();
 
     void renderPendingConclusion();
 
@@ -109,34 +88,28 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
 
     void setDefaultCharset(String defaultCharset);
 
-  }
+    void renderMappedUnits(JsArray<FunctionalUnitDto> units);
 
-  @Inject
-  private FileSelectionPresenter fileSelectionPresenter;
+    void renderMappedUnitsFailed();
+
+    void setFileSelectionValidator(ValidationHandler handler);
+
+    HandlerRegistration addFileSelectedClickHandler(ClickHandler clickHandler);
+
+    String getSelectedUnitName();
+
+  }
 
   @Inject
   private FileSelectionPresenter csvOptionsFileSelectionPresenter;
 
-  private ImportData importData;
-
   private List<String> availableCharsets = new ArrayList<String>();
-
-  private FunctionalUnitDto functionalUnit;
 
   protected TableDto identifiersTable;
 
   @Override
   public void onWizardRequired(WizardRequiredEvent event) {
-    if(event.getEventParameters().length > 0) {
-      if(event.getEventParameters()[0] instanceof FunctionalUnitDto) {
-        functionalUnit = (FunctionalUnitDto) event.getEventParameters()[0];
-      } else {
-        throw new IllegalArgumentException("unexpected event parameter type (expected FunctionalUnitDto)");
-      }
-
-    } else {
-      throw new IllegalArgumentException("missing event parameter: unit name");
-    }
+    // nothing to do
   }
 
   @Override
@@ -154,20 +127,17 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
     getDefaultCharset();
     getAvailableCharsets();
 
-    fileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
-    fileSelectionPresenter.bind();
-    getDisplay().setFileSelectorWidgetDisplay(fileSelectionPresenter.getDisplay());
-
     csvOptionsFileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
     csvOptionsFileSelectionPresenter.bind();
     getDisplay().setCsvOptionsFileSelectorWidgetDisplay(csvOptionsFileSelectionPresenter.getDisplay());
+
+    getDisplay().setFileSelectionValidator(new FileValidator());
 
     addEventHandlers();
   }
 
   @Override
   protected void onUnbind() {
-    functionalUnit = null;
   }
 
   @Override
@@ -203,38 +173,19 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
 
       @Override
       public void onClick(ClickEvent arg0) {
-        eventBus.fireEvent(new FunctionalUnitUpdatedEvent(functionalUnit));
         getDisplay().hideDialog();
       }
     }));
-    super.registerHandler(getDisplay().addNextClickHandler(new ClickHandler() {
 
-      @Override
-      public void onClick(ClickEvent arg0) {
-        update();
-      }
-    }));
     super.registerHandler(getDisplay().addFinishClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
-        FileValidator validator = new FileValidator();
-        if(validator.validate()) {
-          finish();
-        }
+        finish();
       }
     }));
-  }
 
-  private void update() {
-    if(fileSelectionPresenter.getSelectedFile() != null && !fileSelectionPresenter.getSelectedFile().equals("")) {
-      csvOptionsFileSelectionPresenter.setSelectedFile(fileSelectionPresenter.getSelectedFile());
-    }
-    if(getDisplay().getImportFormat().equals(ImportFormat.CSV)) {
-      getDisplay().setCsvFormatOptions();
-    } else {
-      getDisplay().setNoFormatOptions();
-    }
+    super.registerHandler(getDisplay().addFileSelectedClickHandler(new FileSelectedHandler()));
   }
 
   class FileValidator extends AbstractValidationHandler {
@@ -247,42 +198,61 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
-      if(getDisplay().getImportFormat().equals(ImportFormat.CSV)) {
-        validators.add(new RequiredTextValidator(getSelectedCsvFile(), "NoFileSelected"));
-        validators.add(new RegExValidator(getDisplay().getCsvOptions().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
-        validators.add(new ConditionalValidator(getDisplay().getCsvOptions().isCharsetSpecify(), new RequiredTextValidator(getDisplay().getCsvOptions().getCharsetSpecifyText(), "SpecificCharsetNotIndicated")));
-        validators.add(new ConditionalValidator(getDisplay().getCsvOptions().isCharsetSpecify(), new ConditionValidator(isSpecificCharsetAvailable(), "CharsetNotAvailable")));
-      } else {
-        validators.add(new RequiredTextValidator(getDisplay().getSelectedFile(), "NoFileSelected"));
-      }
+      validators.add(new RegExValidator(getSelectedCsvFile(), ".csv$", "CSVFileRequired"));
+      validators.add(new RegExValidator(getDisplay().getCsvOptions().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
+      validators.add(new ConditionalValidator(getDisplay().getCsvOptions().isCharsetSpecify(), new RequiredTextValidator(getDisplay().getCsvOptions().getCharsetSpecifyText(), "SpecificCharsetNotIndicated")));
+      validators.add(new ConditionalValidator(getDisplay().getCsvOptions().isCharsetSpecify(), new ConditionValidator(isSpecificCharsetAvailable(), "CharsetNotAvailable")));
 
       return validators;
     }
   }
 
+  private final class FileSelectedHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent arg0) {
+      // get the units from the map file
+      String path = "/functional-units/entities/identifiers/map/" + getSelectedCsvFile().getText() + "/units";
+
+      ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>> newBuilder().forResource(path).get()//
+      .withCallback(new GetMappedUnitsCompletedCallback())//
+      .withCallback(Response.SC_NOT_FOUND, new GetMappedUnitsFailedCallback())//
+      .withCallback(Response.SC_BAD_REQUEST, new GetMappedUnitsFailedCallback())//
+      .send();
+    }
+  }
+
+  private final class GetMappedUnitsCompletedCallback implements ResourceCallback<JsArray<FunctionalUnitDto>> {
+    @Override
+    public void onResource(Response response, JsArray<FunctionalUnitDto> resource) {
+      JsArray<FunctionalUnitDto> units = JsArrays.toSafeArray(resource);
+      if(units.length() != 2) {
+        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "TwoMappedUnitsExpected", null));
+        getDisplay().renderMappedUnitsFailed();
+      } else {
+        getDisplay().renderMappedUnits(units);
+      }
+    }
+  }
+
+  private final class GetMappedUnitsFailedCallback implements ResponseCodeCallback {
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      if(response.getStatusCode() == Response.SC_NOT_FOUND) {
+        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "MappedUnitsCannotBeIdentified", null));
+      } else if(response.getStatusCode() == Response.SC_BAD_REQUEST) {
+        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "fileReadError", null));
+      }
+      getDisplay().renderMappedUnitsFailed();
+    }
+  }
+
   private void finish() {
     getDisplay().renderPendingConclusion();
-    populateImportData();
-    importIdentifiers();
+    mapIdentifiers();
   }
 
-  private void populateImportData() {
-    importData = new ImportData();
-    importData.setFormat(getDisplay().getImportFormat());
-    importData.setDestinationDatasourceName(null); // no ref table
-    importData.setDestinationTableName(identifiersTable.getName());
-    importData.setCsvFile(csvOptionsFileSelectionPresenter.getSelectedFile());
-    importData.setXmlFile(fileSelectionPresenter.getSelectedFile());
-    importData.setUnit(functionalUnit.getName());
-    importData.setCharacterSet(getDisplay().getCsvOptions().getSelectedCharacterSet());
-    importData.setRow(Integer.parseInt(getDisplay().getCsvOptions().getRowText().getText()));
-    importData.setQuote(getDisplay().getCsvOptions().getQuote());
-    importData.setField(getDisplay().getCsvOptions().getFieldSeparator());
-  }
-
-  private void importIdentifiers() {
-    final DatasourceFactoryDto factory = ConclusionStepPresenter.createDatasourceFactoryDto(importData);
-
+  private void mapIdentifiers() {
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
       public void onResponseCode(Request request, Response response) {
@@ -299,11 +269,9 @@ public class IdentifiersImportPresenter extends WidgetPresenter<IdentifiersImpor
       }
     };
 
-    // import only the identifiers, ignore identifying variables if any.
-    String path = "/functional-unit/" + functionalUnit.getName() + "/entities?select=false";
+    String path = "/functional-units/entities/identifiers/map/" + getSelectedCsvFile().getText() + "?unit=" + getDisplay().getSelectedUnitName();
 
     ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource(path).post()//
-    .withResourceBody(DatasourceFactoryDto.stringify(factory))//
     .withCallback(200, callbackHandler)//
     .withCallback(400, callbackHandler)//
     .withCallback(500, callbackHandler).send();

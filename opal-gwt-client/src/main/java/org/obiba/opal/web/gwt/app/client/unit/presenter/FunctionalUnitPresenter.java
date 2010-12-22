@@ -133,7 +133,7 @@ public class FunctionalUnitPresenter extends WidgetPresenter<FunctionalUnitPrese
   private final class ImportIdentifiersClickHandler implements ClickHandler {
     @Override
     public void onClick(ClickEvent arg0) {
-      eventBus.fireEvent(new WizardRequiredEvent(WizardType.IMPORT_IDENTIFIERS));
+      eventBus.fireEvent(new WizardRequiredEvent(WizardType.MAP_IDENTIFIERS));
     }
   }
 

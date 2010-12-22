@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.inject.client;
 
 import org.obiba.opal.web.gwt.app.client.wizard.importidentifiers.presenter.IdentifiersImportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importidentifiers.view.IdentifiersImportView;
+import org.obiba.opal.web.gwt.app.client.wizard.mapidentifiers.presenter.IdentifiersMapPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.mapidentifiers.view.IdentifiersMapView;
 
 import com.google.gwt.inject.client.AbstractGinModule;
 
@@ -22,6 +24,6 @@ public class ImportIdentifiersWizardModule extends AbstractGinModule {
   @Override
   protected void configure() {
     bind(IdentifiersImportPresenter.Display.class).to(IdentifiersImportView.class);
-
+    bind(IdentifiersMapPresenter.Display.class).to(IdentifiersMapView.class);
   }
 }

@@ -240,7 +240,9 @@ public interface Translations extends Constants {
   "IdentifiersGenerationCompleted", "Identifiers generation completed.",//
   "NoIdentifiersGenerated", "No Identifiers generated.",//
   "IdentifiersGenerationFailed", "Identifiers generation has failed.",//
-  "IdentifiersGenerationPending", "An Identifiers generation task is currently running."//
+  "IdentifiersGenerationPending", "An Identifiers generation task is currently running.",//
+  "MappedUnitsCannotBeIdentified", "Units to be mapped cannot be identified.",//
+  "TwoMappedUnitsExpected", "Exactly two Units to be mapped are expected."//
   })
   Map<String, String> userMessageMap();
 
@@ -419,6 +421,22 @@ public interface Translations extends Constants {
   @Description("Data import instructions conclusion")
   @DefaultStringValue("Data import job is launched.")
   String dataImportInstructionsConclusion();
+
+  @Description("Identifiers Map File Step")
+  @DefaultStringValue("Select the file of identifiers to be mapped.")
+  String identifiersMapFileStep();
+
+  @Description("Identifier map pending conclusion")
+  @DefaultStringValue("Identifier mapping job is being launched.")
+  String identifierMapPendingConclusion();
+
+  @Description("Identifier map completed conclusion")
+  @DefaultStringValue("Identifier mapping job completed successfully.")
+  String identifierMapCompletedConclusion();
+
+  @Description("Identifier map failed conclusion")
+  @DefaultStringValue("Identifier mapping job failed.")
+  String identifierMapFailedConclusion();
 
   @Description("Identifiers Import File Step")
   @DefaultStringValue("Select the file of identifiers to be imported.")

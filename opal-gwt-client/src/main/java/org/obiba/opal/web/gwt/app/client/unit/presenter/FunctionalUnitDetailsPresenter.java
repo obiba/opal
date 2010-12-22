@@ -85,8 +85,6 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
     void setGenerateIdentifiersCommand(Command command);
 
-    void setImportIdentifiersMappingCommand(Command command);
-
     void setImportIdentifiersFromDataCommand(Command command);
 
     void setAvailable(boolean available);
@@ -171,7 +169,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     getDisplay().setRemoveFunctionalUnitCommand(new RemoveFunctionalUnitCommand());
 
     getDisplay().setGenerateIdentifiersCommand(new GenerateIdentifiersCommand());
-    getDisplay().setImportIdentifiersMappingCommand(new ImportIdentifiersCommand());
+    getDisplay().setImportIdentifiersFromDataCommand(new ImportIdentifiersCommand());
 
     getDisplay().setAddKeyPairCommand(new AddKeyPairCommand());
 
@@ -370,7 +368,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
     @Override
     public void execute() {
-      eventBus.fireEvent(new WizardRequiredEvent(WizardType.IMPORT_IDENTIFIERS, functionalUnit.getName()));
+      eventBus.fireEvent(new WizardRequiredEvent(WizardType.IMPORT_IDENTIFIERS, functionalUnit));
     }
 
   }

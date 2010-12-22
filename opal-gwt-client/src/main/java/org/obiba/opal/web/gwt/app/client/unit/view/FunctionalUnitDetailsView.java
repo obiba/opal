@@ -370,6 +370,7 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   @Override
   public void setAddKeyPairCommand(Command command) {
     if(keyPair == null) {
+      addMenu.addSeparator(new MenuItemSeparator());
       addMenu.addItem(keyPair = new MenuItem(translations.addKeyPair(), command));
     } else {
       keyPair.setCommand(command);
@@ -391,15 +392,6 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
       addMenu.addItem(importIdentifiersFromData = new MenuItem(translations.importUnitIdentifiersFromData(), command));
     } else {
       importIdentifiersFromData.setCommand(command);
-    }
-  }
-
-  @Override
-  public void setImportIdentifiersMappingCommand(Command command) {
-    if(importIdentifiersMapping == null) {
-      addMenu.addItem(importIdentifiersMapping = new MenuItem(translations.importMappedUnitIdentifiers(), command));
-    } else {
-      importIdentifiersMapping.setCommand(command);
     }
   }
 

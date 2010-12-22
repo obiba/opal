@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportP
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importidentifiers.presenter.IdentifiersImportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.mapidentifiers.presenter.IdentifiersMapPresenter;
 
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.inject.Inject;
@@ -54,7 +55,10 @@ public class WizardManager {
 
   @Inject
   private Provider<IdentifiersImportPresenter> identifiersImportWizardProvider;
-  
+
+  @Inject
+  private Provider<IdentifiersMapPresenter> identifiersMapWizardProvider;
+
   @Inject
   private Provider<DataCopyPresenter> dataCopyWizardProvider;
 
@@ -85,6 +89,7 @@ public class WizardManager {
     wizardProviders.put(WizardType.IMPORT_DATA, dataImportWizardProvider);
     wizardProviders.put(WizardType.EXPORT_DATA, dataExportWizardProvider);
     wizardProviders.put(WizardType.IMPORT_IDENTIFIERS, identifiersImportWizardProvider);
+    wizardProviders.put(WizardType.MAP_IDENTIFIERS, identifiersMapWizardProvider);
     wizardProviders.put(WizardType.COPY_DATA, dataCopyWizardProvider);
 
     handlerRegistration = eventBus.addHandler(WizardRequiredEvent.getType(), new WizardRequiredEventHandler());

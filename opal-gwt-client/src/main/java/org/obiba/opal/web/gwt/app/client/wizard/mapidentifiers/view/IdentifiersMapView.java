@@ -7,35 +7,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.wizard.importidentifiers.view;
+package org.obiba.opal.web.gwt.app.client.wizard.mapidentifiers.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.widgets.view.CsvOptionsView;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
-import org.obiba.opal.web.gwt.app.client.wizard.importidentifiers.presenter.IdentifiersImportPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.mapidentifiers.presenter.IdentifiersMapPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
+import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
-public class IdentifiersImportView extends Composite implements IdentifiersImportPresenter.Display {
+public class IdentifiersMapView extends Composite implements IdentifiersMapPresenter.Display {
 
-  @UiTemplate("IdentifiersImportView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, IdentifiersImportView> {
+  @UiTemplate("IdentifiersMapView.ui.xml")
+  interface ViewUiBinder extends UiBinder<Widget, IdentifiersMapView> {
   }
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
@@ -46,34 +47,28 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   WizardDialogBox dialog;
 
   @UiField
-  WizardStep formatSelectionStep;
-
-  @UiField
-  SimplePanel selectFilePanel;
-
-  @UiField
-  ListBox formatListBox;
-
-  @UiField
   WizardStep formatStep;
 
   @UiField
-  HTMLPanel xmlOptions;
-
-  @UiField
-  CsvOptionsView csvOptions;
+  WizardStep unitStep;
 
   @UiField
   WizardStep conclusionStep;
 
   @UiField
-  SimplePanel conclusionPanel;
+  CsvOptionsView csvOptions;
 
-  private FileSelectionPresenter.Display fileSelection;
+  @UiField
+  ListBox unitListBox;
+
+  @UiField
+  SimplePanel conclusionPanel;
 
   private WizardStepChain stepChain;
 
-  public IdentifiersImportView() {
+  private ValidationHandler fileSelectionValidator;
+
+  public IdentifiersMapView() {
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
     initWidgets();
@@ -81,23 +76,21 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   }
 
   private void initWidgets() {
-    formatListBox.addItem(translations.csvLabel(), ImportFormat.CSV.name());
-    formatListBox.addItem(translations.opalXmlLabel(), ImportFormat.XML.name());
   }
 
   private void initWizardDialog() {
     stepChain = WizardStepChain.Builder.create(dialog)//
-    .append(formatSelectionStep)//
-    .title(translations.selectFileAndDataFormatLabel())//
 
     .append(formatStep)//
-    .title(translations.dataImportFileStep())//
+    .title(translations.identifiersMapFileStep())//
+
+    .append(unitStep)//
+    .title(translations.identifiersMapFileStep())//
 
     .append(conclusionStep)//
     .conclusion()//
 
-    .onNext().onPrevious().build();
-
+    .onPrevious().build();
   }
 
   @Override
@@ -126,16 +119,6 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   }
 
   @Override
-  public HandlerRegistration addNextClickHandler(ClickHandler handler) {
-    return dialog.addNextClickHandler(handler);
-  }
-
-  @Override
-  public HandlerRegistration addPreviousClickHandler(ClickHandler handler) {
-    return dialog.addPreviousClickHandler(handler);
-  }
-
-  @Override
   public HandlerRegistration addCancelClickHandler(ClickHandler handler) {
     return dialog.addCancelClickHandler(handler);
   }
@@ -151,25 +134,22 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   }
 
   @Override
-  public void setFileSelectorWidgetDisplay(Display display) {
-    selectFilePanel.setWidget(display.asWidget());
-    fileSelection = display;
-    fileSelection.setFieldWidth("20em");
-  }
+  public HandlerRegistration addFileSelectedClickHandler(final ClickHandler handler) {
+    return dialog.addNextClickHandler(new ClickHandler() {
 
-  @Override
-  public HasText getSelectedFile() {
-    return fileSelection.getFileText();
-  }
-
-  @Override
-  public boolean isIdentifiersOnly() {
-    return false;
-  }
-
-  @Override
-  public boolean isIdentifiersPlusData() {
-    return true;
+      @Override
+      public void onClick(ClickEvent evt) {
+        if(formatStep.isVisible()) {
+          if(fileSelectionValidator.validate()) {
+            handler.onClick(evt);
+            dialog.setProgress(true);
+            dialog.setNextEnabled(false);
+            dialog.setCancelEnabled(false);
+          }
+        } else
+          stepChain.onNext();
+      }
+    });
   }
 
   @Override
@@ -178,25 +158,8 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   }
 
   @Override
-  public ImportFormat getImportFormat() {
-    return ImportFormat.valueOf(formatListBox.getValue(formatListBox.getSelectedIndex()));
-  }
-
-  @Override
-  public void setNoFormatOptions() {
-    xmlOptions.setVisible(true);
-    csvOptions.setVisible(false);
-  }
-
-  @Override
-  public void setCsvFormatOptions() {
-    xmlOptions.setVisible(false);
-    csvOptions.setVisible(true);
-  }
-
-  @Override
   public void renderPendingConclusion() {
-    conclusionStep.setStepTitle(translations.identifierImportPendingConclusion());
+    conclusionStep.setStepTitle(translations.identifierMapPendingConclusion());
     dialog.setProgress(true);
     stepChain.onNext();
     dialog.setProgress(true);
@@ -207,7 +170,7 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   @Override
   public void renderCompletedConclusion() {
     dialog.setProgress(false);
-    conclusionStep.setStepTitle(translations.identifierImportCompletedConclusion());
+    conclusionStep.setStepTitle(translations.identifierMapCompletedConclusion());
     dialog.setCloseEnabled(true);
     dialog.setProgress(false);
   }
@@ -215,7 +178,7 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   @Override
   public void renderFailedConclusion() {
     dialog.setProgress(false);
-    conclusionStep.setStepTitle(translations.identifierImportFailedConclusion());
+    conclusionStep.setStepTitle(translations.identifierMapFailedConclusion());
     dialog.setCancelEnabled(true);
     dialog.setProgress(false);
   }
@@ -228,6 +191,34 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   @Override
   public void setDefaultCharset(String defaultCharset) {
     csvOptions.setDefaultCharset(defaultCharset);
+  }
+
+  @Override
+  public void renderMappedUnits(JsArray<FunctionalUnitDto> units) {
+    unitListBox.clear();
+    for(FunctionalUnitDto unit : JsArrays.toIterable(units)) {
+      unitListBox.addItem(unit.getName());
+    }
+    dialog.setProgress(false);
+    dialog.setCancelEnabled(true);
+    stepChain.onNext();
+  }
+
+  @Override
+  public void renderMappedUnitsFailed() {
+    dialog.setProgress(false);
+    dialog.setNextEnabled(true);
+    dialog.setCancelEnabled(true);
+  }
+
+  @Override
+  public void setFileSelectionValidator(ValidationHandler handler) {
+    fileSelectionValidator = handler;
+  }
+
+  @Override
+  public String getSelectedUnitName() {
+    return unitListBox.getItemText(unitListBox.getSelectedIndex());
   }
 
 }
