@@ -16,7 +16,7 @@ import com.google.gwt.user.client.Window;
  */
 public class HelpUtil {
 
-  private static String OPALDOC_URL = "http://wiki.obiba.org/confluence/display/OPALDOCDEV";
+  private static String OPALDOC_URL = "http://wiki.obiba.org/confluence/display/OPALDOC";
 
   private static String OPALDOC_USERGUIDE_PAGE = "Opal+Web+Application+User+Guide";
 
