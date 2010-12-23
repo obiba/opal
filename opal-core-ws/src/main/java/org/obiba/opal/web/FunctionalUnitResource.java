@@ -53,7 +53,9 @@ import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
+import org.obiba.opal.core.unit.FunctionalUnitIdentifierMapper;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers;
+import org.obiba.opal.core.unit.IllegalIdentifierAssociationException;
 import org.obiba.opal.core.unit.UnitKeyStore;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers.UnitIdentifier;
 import org.obiba.opal.web.magma.ClientErrorDtos;
@@ -214,8 +216,10 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
       @Override
       public void onValue(UnitIdentifier unitIdentifier) {
-        writer.append("\"").append(unitIdentifier.getOpalIdentifier()).append("\",")//
-        .append(unitIdentifier.hasUnitIdentifier() ? "\"" + unitIdentifier.getUnitIdentifier() + "\"" : "").append("\n");
+        if(unitIdentifier.hasUnitIdentifier()) {
+          writer.append("\"").append(unitIdentifier.getOpalIdentifier()).append("\",")//
+          .append(unitIdentifier.hasUnitIdentifier() ? "\"" + unitIdentifier.getUnitIdentifier() + "\"" : "").append("\n");
+        }
       }
 
     });
@@ -285,11 +289,34 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
       CSVReader reader = new CSVReader(new FileReader(mapFile.getPath()));
       List<FunctionalUnit> units = getUnitsFromIdentifiersMap(reader);
 
-      int count = importService.importIdentifiersMapping(unit, units, reader.readAll());
+      FunctionalUnit drivingUnit;
+      try {
+        drivingUnit = resolveFunctionalUnit(this.unit);
+        // When the driving unit is not Opal, the Opal unit cannot be present in the list of functional units
+        if(units.contains(FunctionalUnit.OPAL)) {
+          throw new IllegalIdentifierAssociationException("Cannot create Opal identifiers through this function.");
+        }
+      } catch(NoSuchFunctionalUnitException e) {
+        if(this.unit.equals(FunctionalUnit.OPAL_INSTANCE)) {
+          drivingUnit = FunctionalUnit.OPAL;
+        } else {
+          throw e;
+        }
+      }
+
+      int unitIdx = units.indexOf(drivingUnit);
+      FunctionalUnitIdentifierMapper mapper = new FunctionalUnitIdentifierMapper(getKeysTable(), drivingUnit, units);
+      int count = 0;
+      for(String[] map : (List<String[]>) reader.readAll()) {
+        if(map[unitIdx] != null && map[unitIdx].isEmpty() == false) {
+          count += mapper.associate(map[unitIdx], units, map);
+        }
+      }
+      mapper.write();
       response = Response.ok().entity(Integer.toString(count)).build();
     } catch(Exception e) {
-      e.printStackTrace();
-      response = Response.status(Status.BAD_REQUEST).build();
+      log.error("Mapping failed", e);
+      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "mappingFailed", e).build()).build();
     }
 
     return response;

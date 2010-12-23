@@ -38,9 +38,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
@@ -260,10 +258,13 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
           getDisplay().renderCompletedConclusion(response.getText());
         } else {
           final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-          if(errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
-            getDisplay().renderFailedConclusion();
-          } else {
-            eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "fileReadError", null));
+          getDisplay().renderFailedConclusion();
+          if(errorDto != null) {
+            // eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errorDto.getStatus(), null));
+            JsArrayString errors = JsArrays.toSafeArray(errorDto.getArgumentsArray());
+            for(int i = 0; i < errors.length(); i++) {
+              eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errors.get(i), null));
+            }
           }
         }
       }
@@ -271,8 +272,8 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
 
     String path = "/functional-unit/" + getDisplay().getSelectedUnitName() + "/entities/identifiers/map" + getSelectedCsvFile().getText();
 
-    ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource(path).put()//
-    .withCallback(200, callbackHandler)//
+    ResourceRequestBuilderFactory.newBuilder().forResource(path).put()//
+    .accept("application/x-protobuf+json").accept("text/plain").withCallback(200, callbackHandler)//
     .withCallback(400, callbackHandler)//
     .withCallback(500, callbackHandler).send();
   }

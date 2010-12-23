@@ -69,7 +69,7 @@ public abstract class AbstractFunctionalUnitResource {
       String unit = unitsHeader[i];
       FunctionalUnit functionalUnit;
       if(unit.equals(FunctionalUnit.OPAL_INSTANCE)) {
-        functionalUnit = new FunctionalUnit(FunctionalUnit.OPAL_INSTANCE, FunctionalUnit.OPAL_INSTANCE);
+        functionalUnit = FunctionalUnit.OPAL;
       } else {
         functionalUnit = resolveFunctionalUnit(unit);
       }

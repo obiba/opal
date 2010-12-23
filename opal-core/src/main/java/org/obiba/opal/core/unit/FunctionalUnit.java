@@ -24,6 +24,8 @@ public class FunctionalUnit {
 
   public static final String OPAL_INSTANCE = "OpalInstance";
 
+  public static final FunctionalUnit OPAL = new FunctionalUnit(OPAL_INSTANCE, OPAL_INSTANCE);
+
   //
   // Instance Variables
   //
@@ -49,6 +51,10 @@ public class FunctionalUnit {
   public FunctionalUnit(String name, String keyVariableName) {
     this.name = name;
     this.keyVariableName = keyVariableName;
+  }
+
+  boolean isOpal() {
+    return getName().equals(OPAL_INSTANCE);
   }
 
   //
