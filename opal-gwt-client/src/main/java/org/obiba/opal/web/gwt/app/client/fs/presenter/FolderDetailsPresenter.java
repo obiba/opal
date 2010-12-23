@@ -142,6 +142,18 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
     updateTable("/");
   }
 
+  public FileDto getCurrentFolder() {
+    return currentFolder;
+  }
+
+  public boolean hasSelection() {
+    return getDisplay().getTableSelectionModel().getSelectedObject() != null;
+  }
+
+  public FileDto getSelectedFile() {
+    return getDisplay().getTableSelectionModel().getSelectedObject();
+  }
+
   private void updateTable(String path) {
     getDisplay().clearSelection();
     ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta" + path).get().withCallback(new ResourceCallback<FileDto>() {

@@ -70,10 +70,6 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
   private Runnable actionRequiringConfirmation;
 
-  FileDto currentFolder;
-
-  private FileDto selectedFile;
-
   @Inject
   public FileExplorerPresenter(Display display, EventBus eventBus, FileSystemTreePresenter fileSystemTreePresenter, FolderDetailsPresenter folderDetailsPresenter, FileUploadDialogPresenter fileUploadDialogPresenter, CreateFolderDialogPresenter createFolderDialogPresenter) {
     super(display, eventBus);
@@ -108,7 +104,6 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
   @Override
   public void refreshDisplay() {
-    // fileSystemTreePresenter.refreshDisplay();
     folderDetailsPresenter.refreshDisplay();
   }
 
@@ -134,30 +129,29 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
     super.registerHandler(getDisplay().getFileDeleteButton().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        if(selectedFile == null) {
-          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "fileMustBeSelected", null));
-        } else {
-          actionRequiringConfirmation = new Runnable() {
-            public void run() {
-              deleteFile(selectedFile);
-            }
-          };
+        // We are either deleting a file or a folder
+        final FileDto fileToDelete = folderDetailsPresenter.hasSelection() ? folderDetailsPresenter.getSelectedFile() : folderDetailsPresenter.getCurrentFolder();
+        actionRequiringConfirmation = new Runnable() {
+          public void run() {
+            deleteFile(fileToDelete);
+          }
+        };
 
-          eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "deleteFile", "confirmDeleteFile"));
-        }
+        eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "deleteFile", "confirmDeleteFile"));
       }
     }));
 
     super.registerHandler(getDisplay().getFileDownloadButton().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        downloadFile(selectedFile);
+        downloadFile(folderDetailsPresenter.getSelectedFile());
       }
     }));
 
     super.registerHandler(getDisplay().getCreateFolderButton().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
+        FileDto currentFolder = folderDetailsPresenter.getCurrentFolder();
         createFolderDialogPresenter.setCurrentFolder(currentFolder);
         createFolderDialogPresenter.bind();
         createFolderDialogPresenter.revealDisplay();
@@ -168,6 +162,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
       @Override
       public void onClick(ClickEvent event) {
+        FileDto currentFolder = folderDetailsPresenter.getCurrentFolder();
         fileUploadDialogPresenter = fileUploadDialogPresenterProvider.get();
         fileUploadDialogPresenter.setCurrentFolder(currentFolder);
         fileUploadDialogPresenter.bind();
@@ -179,8 +174,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
       @Override
       public void onFileSelectionChange(FileSelectionChangeEvent event) {
-        selectedFile = event.getFile();
-        getDisplay().setEnabledFileDeleteButton(true);
+        getDisplay().setEnabledFileDeleteButton(folderDetailsPresenter.hasSelection());
       }
     }));
 
@@ -188,8 +182,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
       @Override
       public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
-        currentFolder = event.getFolder();
-        setEnableFileDeleteButton(currentFolder);
+        setEnableFileDeleteButton();
       }
 
     }));
@@ -198,8 +191,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
       @Override
       public void onFolderRefreshed(FolderRefreshedEvent event) {
-        currentFolder = event.getFolder();
-        setEnableFileDeleteButton(currentFolder);
+        setEnableFileDeleteButton();
       }
     }));
 
@@ -207,7 +199,8 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
   }
 
-  private void setEnableFileDeleteButton(FileDto folder) {
+  private void setEnableFileDeleteButton() {
+    FileDto folder = this.folderDetailsPresenter.getCurrentFolder();
     getDisplay().setEnabledFileDeleteButton(folder.getPath().equals("/") ? false : folder.getChildrenCount() == 0);
   }
 
@@ -229,7 +222,6 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
         if(response.getStatusCode() != Response.SC_OK) {
           eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
         } else {
-          selectedFile = null;
           eventBus.fireEvent(new FileDeletedEvent(file));
         }
       }
