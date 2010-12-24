@@ -22,6 +22,8 @@ import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.unit.IdentifierAssociations.IdentifierAssociation;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
 public class FunctionalUnitIdentifierMapper {
@@ -39,14 +41,32 @@ public class FunctionalUnitIdentifierMapper {
     this.drivingUnit = drivingUnit;
     this.units = units;
     prepareKeysTable();
-    this.associations = Maps.uniqueIndex(new IdentifierAssociations(identifiersTable, units), new Function<IdentifierAssociation, String>() {
+
+    final String drivingUnitName = this.drivingUnit.getName();
+
+    // Filters associations that don't have a identifier for the driving unit
+    Predicate<IdentifierAssociation> associationsOfDrivingUnit = new Predicate<IdentifierAssociation>() {
+
+      @Override
+      public boolean apply(IdentifierAssociation input) {
+        return input.hasUnitIdentifier(drivingUnitName);
+      }
+
+    };
+
+    // Returns the identifier of the driving unit. Used to build an index.
+    Function<IdentifierAssociation, String> identifierOfDrivingUnit = new Function<IdentifierAssociation, String>() {
 
       @Override
       public String apply(IdentifierAssociation from) {
-        return from.getUnitIdentifier(FunctionalUnitIdentifierMapper.this.drivingUnit.getName());
+        return from.getUnitIdentifier(drivingUnitName);
       }
 
-    });
+    };
+
+    // Builds an index with driving unit identifiers as keys and IdentifierAssociation as values. The index only
+    // contains associations that have an identifier for the driving unit.
+    this.associations = Maps.uniqueIndex(Iterables.filter(new IdentifierAssociations(identifiersTable, units), associationsOfDrivingUnit), identifierOfDrivingUnit);
   }
 
   public int associate(String drivingUnitIdentifier, List<FunctionalUnit> units, String[] identifiers) {
