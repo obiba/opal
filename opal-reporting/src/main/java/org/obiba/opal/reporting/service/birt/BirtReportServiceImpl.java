@@ -19,6 +19,7 @@ import org.obiba.opal.reporting.service.ReportException;
 import org.obiba.opal.reporting.service.ReportService;
 import org.obiba.opal.reporting.service.birt.common.BirtEngine;
 import org.obiba.opal.reporting.service.birt.common.BirtEngineException;
+import org.obiba.opal.reporting.service.birt.common.BirtReportFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -36,9 +37,10 @@ public class BirtReportServiceImpl implements ReportService {
   private BirtEngine engine;
 
   @Override
-  public void render(String format, Map<String, String> parameters, String reportDesign, String reportOutput) throws ReportException {
+  public void render(String formatName, Map<String, String> parameters, String reportDesign, String reportOutput) throws ReportException {
     try {
       if(isRunning()) {
+        BirtReportFormat format = BirtReportFormat.valueOf(formatName.toUpperCase());
         engine.render(format, parameters, reportDesign, reportOutput);
       }
     } catch(BirtEngineException e) {
@@ -108,8 +110,8 @@ public class BirtReportServiceImpl implements ReportService {
   }
 
   /**
-   * Creates a ClassLoader that will load classes from the BIRT dependencies and classes in the {@code
-   * org.obiba.opal.reporting.service.birt.common} package before loading a class from the Opal classpath.
+   * Creates a ClassLoader that will load classes from the BIRT dependencies and classes in the
+   * {@code org.obiba.opal.reporting.service.birt.common} package before loading a class from the Opal classpath.
    * <p>
    * Whenever BIRT and Opal have a common dependency (Rhino for example), this ClassLoader will "prefer" BIRT's version
    * over Opal's. This allows to "isolate" BIRT and its dependencies from Opal and still allow sharing exceptions.

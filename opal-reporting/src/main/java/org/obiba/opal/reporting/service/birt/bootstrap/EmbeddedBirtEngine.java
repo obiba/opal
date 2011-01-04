@@ -16,19 +16,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.birt.core.framework.Platform;
-import org.eclipse.birt.report.engine.api.EXCELRenderOption;
 import org.eclipse.birt.report.engine.api.EngineConfig;
 import org.eclipse.birt.report.engine.api.EngineException;
-import org.eclipse.birt.report.engine.api.HTMLRenderOption;
 import org.eclipse.birt.report.engine.api.IEngineTask;
 import org.eclipse.birt.report.engine.api.IReportEngine;
 import org.eclipse.birt.report.engine.api.IReportEngineFactory;
 import org.eclipse.birt.report.engine.api.IReportRunnable;
 import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
-import org.eclipse.birt.report.engine.api.PDFRenderOption;
 import org.eclipse.birt.report.engine.api.RenderOption;
 import org.obiba.opal.reporting.service.birt.common.BirtEngine;
 import org.obiba.opal.reporting.service.birt.common.BirtEngineException;
+import org.obiba.opal.reporting.service.birt.common.BirtReportFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -42,7 +40,7 @@ public class EmbeddedBirtEngine implements BirtEngine {
   private IReportEngine engine;
 
   @Override
-  public void render(String format, Map<String, String> parameters, String reportDesign, String reportOutput) throws BirtEngineException {
+  public void render(BirtReportFormat format, Map<String, String> parameters, String reportDesign, String reportOutput) throws BirtEngineException {
     if(isRunning() == false) {
       throw new BirtEngineException("Report engine not running. Please check startup logs for details.");
     }
@@ -107,7 +105,7 @@ public class EmbeddedBirtEngine implements BirtEngine {
     }
   }
 
-  private IRunAndRenderTask createTask(IReportRunnable design, Map<String, String> parameters, String format, String reportOutput) {
+  private IRunAndRenderTask createTask(IReportRunnable design, Map<String, String> parameters, BirtReportFormat format, String reportOutput) {
     IRunAndRenderTask task = engine.createRunAndRenderTask(design);
 
     // Set parameter values and validate
@@ -125,26 +123,8 @@ public class EmbeddedBirtEngine implements BirtEngine {
     return task;
   }
 
-  private RenderOption getOptions(String format, String reportOutput) {
-    RenderOption options;
-    if(format.equalsIgnoreCase("html")) {
-      // Setup rendering to HTML
-      HTMLRenderOption html = new HTMLRenderOption();
-      html.setOutputFormat("html");
-      // Setting this to true removes html and body tags
-      html.setEmbeddable(false);
-      options = html;
-    } else if(format.equalsIgnoreCase("pdf")) {
-      PDFRenderOption pdf = new PDFRenderOption();
-      pdf.setOutputFormat(format);
-      options = pdf;
-    } else if(format.equalsIgnoreCase("excel")) {
-      EXCELRenderOption xls = new EXCELRenderOption();
-      xls.setOutputFormat("xls");
-      options = xls;
-    } else {
-      throw new IllegalArgumentException("Unexpected report format: " + format);
-    }
+  private RenderOption getOptions(BirtReportFormat format, String reportOutput) {
+    RenderOption options = format.createRenderOption();
     options.setOutputFileName(reportOutput);
     return options;
   }
@@ -178,4 +158,5 @@ public class EmbeddedBirtEngine implements BirtEngine {
     birtLogger.setUseParentHandlers(false);
     config.setLogger(birtLogger);
   }
+
 }

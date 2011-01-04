@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public interface BirtEngine {
 
-  void render(String format, Map<String, String> parameters, String reportDesign, String reportOutput) throws BirtEngineException;
+  void render(BirtReportFormat format, Map<String, String> parameters, String reportDesign, String reportOutput) throws BirtEngineException;
 
   boolean isRunning();
 
