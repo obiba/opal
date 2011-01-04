@@ -80,26 +80,15 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
       return 1;
     }
 
-    // Render it.
-    Date reportDate = getCurrentTime();
-    FileObject reportOutput = null;
+    Date reportDate = new Date();
     try {
-      reportOutput = getReportOutput(reportTemplateName, reportTemplate.getFormat(), reportDate);
-      reportService.render(reportTemplate.getFormat(), reportTemplate.getParameters(), getLocalFile(getReportDesign(reportTemplate.getDesign())).getPath(), getLocalFile(reportOutput).getPath());
-    } catch(ReportException ex) {
-      getShell().printf("Error rendering report: '%s'\n", ex.getMessage());
-      deleteFileSilently(reportOutput);
-      return 2;
-    } catch(FileSystemException ex) {
-      getShell().printf("Invalid report output destination: '/reports/%s/%s'", reportTemplateName, getReportFileName(reportTemplateName, reportTemplate.getFormat(), reportDate));
-      return 3;
+      FileObject reportOutput = getReportOutput(reportTemplateName, reportTemplate.getFormat(), reportDate);
+      return renderAndSendEmail(reportTemplate, reportOutput);
+    } catch(FileSystemException e) {
+      getShell().printf("Cannot create report output: '/reports/%s/%s'", reportTemplateName, getReportFileName(reportTemplateName, reportTemplate.getFormat(), reportDate));
+      return 1;
     }
 
-    if(!reportTemplate.getEmailNotificationAddresses().isEmpty()) {
-      sendEmailNotification(reportTemplate, reportOutput);
-    }
-
-    return 0;
   }
 
   //
@@ -125,6 +114,22 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
   @Override
   public String toString() {
     return "report -n " + getOptions().getName();
+  }
+
+  private int renderAndSendEmail(ReportTemplate reportTemplate, FileObject reportOutput) throws FileSystemException {
+    try {
+      reportService.render(reportTemplate.getFormat(), reportTemplate.getParameters(), getLocalFile(getReportDesign(reportTemplate.getDesign())).getPath(), getLocalFile(reportOutput).getPath());
+    } catch(ReportException ex) {
+      getShell().printf("Error rendering report: '%s'\n", ex.getMessage());
+      deleteFileSilently(reportOutput);
+      return 1;
+    }
+
+    if(!reportTemplate.getEmailNotificationAddresses().isEmpty()) {
+      sendEmailNotification(reportTemplate, reportOutput);
+    }
+    return 0;
+
   }
 
   private FileObject getReportDesign(String reportDesign) throws FileSystemException {
