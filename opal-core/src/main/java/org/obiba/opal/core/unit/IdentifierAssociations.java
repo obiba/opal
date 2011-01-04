@@ -18,9 +18,9 @@ import java.util.TreeSet;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
+import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
-import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.type.TextType;
 
@@ -161,59 +161,62 @@ public class IdentifierAssociations implements Iterable<IdentifierAssociations.I
 
   @Override
   public Iterator<IdentifierAssociation> iterator() {
-    return new Iterator<IdentifierAssociation>() {
-
-      private Iterator<VariableEntity> opalEntities;
-
-      private Map<String, Iterator<Value>> unitIdentifiers = Maps.newHashMap();
-
-      {
-        TreeSet<VariableEntity> opalEntities = new TreeSet<VariableEntity>(identifiersTable.getVariableEntities());
-
-        Iterator<Value> idIterator;
-        for(FunctionalUnit unit : units) {
-          if(identifiersTable.hasVariable(unit.getKeyVariableName())) {
-            idIterator = identifiersTable.getVariableValueSource(unit.getKeyVariableName()).asVectorSource().getValues(opalEntities).iterator();
-          } else {
-            if(unit.isOpal()) {
-              idIterator = Iterables.transform(opalEntities, new Function<VariableEntity, Value>() {
-
-                @Override
-                public Value apply(VariableEntity from) {
-                  return TextType.get().valueOf(from.getIdentifier());
-                }
-              }).iterator();
-
-            } else {
-              // Make sure not to loop on iterators reuturned by this method call, or an infinite loop will happen
-              idIterator = Iterables.cycle(TextType.get().nullValue()).iterator();
-            }
-          }
-          unitIdentifiers.put(unit.getName(), idIterator);
-        }
-
-        this.opalEntities = opalEntities.iterator();
-      }
-
-      @Override
-      public boolean hasNext() {
-        return opalEntities.hasNext();
-      }
-
-      @Override
-      public IdentifierAssociation next() {
-        return new IdentifierAssociation(opalEntities.next().getIdentifier(), unitIdentifiers);
-      }
-
-      @Override
-      public void remove() {
-        throw new UnsupportedOperationException();
-      }
-
-    };
+    return new IdentifierAssociationIterator();
   }
 
   private VariableEntity entityFor(String identifier) {
     return new VariableEntityBean(identifiersTable.getEntityType(), identifier);
   }
+
+  private final class IdentifierAssociationIterator implements Iterator<IdentifierAssociation> {
+
+    private final Iterator<VariableEntity> opalEntities;
+
+    private final Map<String, Iterator<Value>> unitIdentifiers = Maps.newHashMap();
+
+    {
+      TreeSet<VariableEntity> opalEntities = new TreeSet<VariableEntity>(identifiersTable.getVariableEntities());
+
+      Iterator<Value> idIterator;
+      for(FunctionalUnit unit : units) {
+        if(identifiersTable.hasVariable(unit.getKeyVariableName())) {
+          idIterator = identifiersTable.getVariableValueSource(unit.getKeyVariableName()).asVectorSource().getValues(opalEntities).iterator();
+        } else {
+          if(unit.isOpal()) {
+            idIterator = Iterables.transform(opalEntities, new Function<VariableEntity, Value>() {
+
+              @Override
+              public Value apply(VariableEntity from) {
+                return TextType.get().valueOf(from.getIdentifier());
+              }
+            }).iterator();
+
+          } else {
+            // Make sure not to loop on iterators reuturned by this method call, or an infinite loop will happen
+            idIterator = Iterables.cycle(TextType.get().nullValue()).iterator();
+          }
+        }
+        unitIdentifiers.put(unit.getName(), idIterator);
+      }
+
+      this.opalEntities = opalEntities.iterator();
+    }
+
+    @Override
+    public boolean hasNext() {
+      return opalEntities.hasNext();
+    }
+
+    @Override
+    public IdentifierAssociation next() {
+      return new IdentifierAssociation(opalEntities.next().getIdentifier(), unitIdentifiers);
+    }
+
+    @Override
+    public void remove() {
+      throw new UnsupportedOperationException();
+    }
+
+  };
+
 }
