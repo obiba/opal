@@ -32,10 +32,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.bouncycastle.openssl.PEMWriter;
 import org.obiba.magma.Datasource;
@@ -55,15 +55,15 @@ import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifierMapper;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers;
+import org.obiba.opal.core.unit.FunctionalUnitIdentifiers.UnitIdentifier;
 import org.obiba.opal.core.unit.IllegalIdentifierAssociationException;
 import org.obiba.opal.core.unit.UnitKeyStore;
-import org.obiba.opal.core.unit.FunctionalUnitIdentifiers.UnitIdentifier;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
-import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
+import org.obiba.opal.web.model.Opal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -238,8 +238,6 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
     try {
       importService.importIdentifiers(unit, sourceDatasource.getName(), select);
       response = Response.ok().build();
-    } catch(NoSuchFunctionalUnitException ex) {
-      response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "FunctionalUnitNotFound", ex).build()).build();
     } catch(NoSuchDatasourceException ex) {
       response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
     } catch(NoSuchValueTableException ex) {
@@ -256,53 +254,31 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   @POST
   @Path("/entities/identifiers")
   public Response importIdentifiers(@QueryParam("size") Integer size, @QueryParam("zeros") Boolean zeros, @QueryParam("prefix") String prefix) {
-    Response response = null;
-
     try {
       DefaultParticipantIdentifierImpl pId = new DefaultParticipantIdentifierImpl();
       if(size != null) pId.setKeySize(size);
       if(zeros != null) pId.setAllowStartWithZero(zeros);
       if(prefix != null) pId.setPrefix(prefix);
       int count = importService.importIdentifiers(unit, pId);
-      response = Response.ok().entity(Integer.toString(count)).build();
-    } catch(NoSuchFunctionalUnitException ex) {
-      response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "FunctionalUnitNotFound", ex).build()).build();
+      return Response.ok().entity(Integer.toString(count)).build();
     } catch(NoSuchDatasourceException ex) {
-      response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
+      return Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
     } catch(NoSuchValueTableException ex) {
-      response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
+      return Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
     } catch(MagmaRuntimeException ex) {
-      response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "ImportIdentifiersError", ex).build()).build();
+      return Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "ImportIdentifiersError", ex).build()).build();
     }
-
-    return response;
   }
 
   @PUT
   @Path("/entities/identifiers/map/{path:.*}")
   public Response mapIdentifiers(@PathParam("path") String path) {
-    Response response = null;
-
     try {
       // the file is expected to be of CSV format
       File mapFile = resolveLocalFile(path);
       CSVReader reader = new CSVReader(new FileReader(mapFile.getPath()));
       List<FunctionalUnit> units = getUnitsFromIdentifiersMap(reader);
-
-      FunctionalUnit drivingUnit;
-      try {
-        drivingUnit = resolveFunctionalUnit(this.unit);
-        // When the driving unit is not Opal, the Opal unit cannot be present in the list of functional units
-        if(units.contains(FunctionalUnit.OPAL)) {
-          throw new IllegalIdentifierAssociationException("Cannot create Opal identifiers through this function.");
-        }
-      } catch(NoSuchFunctionalUnitException e) {
-        if(this.unit.equals(FunctionalUnit.OPAL_INSTANCE)) {
-          drivingUnit = FunctionalUnit.OPAL;
-        } else {
-          throw e;
-        }
-      }
+      FunctionalUnit drivingUnit = determineDrivingUnit(units);
 
       int unitIdx = units.indexOf(drivingUnit);
       FunctionalUnitIdentifierMapper mapper = new FunctionalUnitIdentifierMapper(getKeysTable(), drivingUnit, units);
@@ -313,13 +289,11 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
         }
       }
       mapper.write();
-      response = Response.ok().entity(Integer.toString(count)).build();
+      return Response.ok().entity(Integer.toString(count)).build();
     } catch(Exception e) {
       log.error("Mapping failed", e);
-      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "mappingFailed", e).build()).build();
+      return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "mappingFailed", e).build()).build();
     }
-
-    return response;
   }
 
   //
@@ -394,7 +368,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
   //
   // Private methods
-  // 
+  //
 
   private ResponseBuilder doCreateOrImportKeyPair(Opal.KeyPairForm kpForm) {
     ResponseBuilder response = null;
@@ -467,6 +441,24 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
         callback.onValue(unitId);
       }
     }
+  }
+
+  private FunctionalUnit determineDrivingUnit(List<FunctionalUnit> units) {
+    FunctionalUnit drivingUnit;
+    try {
+      drivingUnit = resolveFunctionalUnit(this.unit);
+      // When the driving unit is not Opal, the Opal unit cannot be present in the list of functional units
+      if(units.contains(FunctionalUnit.OPAL)) {
+        throw new IllegalIdentifierAssociationException("Cannot create Opal identifiers through this function.");
+      }
+    } catch(NoSuchFunctionalUnitException e) {
+      if(this.unit.equals(FunctionalUnit.OPAL_INSTANCE)) {
+        drivingUnit = FunctionalUnit.OPAL;
+      } else {
+        throw e;
+      }
+    }
+    return drivingUnit;
   }
 
   private interface VectorCallback {
