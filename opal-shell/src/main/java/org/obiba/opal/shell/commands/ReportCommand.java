@@ -80,7 +80,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
       return 1;
     }
 
-    Date reportDate = new Date();
+    Date reportDate = getCurrentTime();
     try {
       FileObject reportOutput = getReportOutput(reportTemplateName, reportTemplate.getFormat(), reportDate);
       return renderAndSendEmail(reportTemplate, reportOutput);
