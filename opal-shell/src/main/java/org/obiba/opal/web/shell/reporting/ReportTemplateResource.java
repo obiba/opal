@@ -118,7 +118,6 @@ public class ReportTemplateResource {
       updateOpalConfiguration(reportTemplateDto);
       updateSchedule(reportTemplateDto, isNew);
     } catch(Exception couldNotUpdateTheReportTemplate) {
-      couldNotUpdateTheReportTemplate.printStackTrace();
       return Response.status(Response.Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "CouldNotUpdateTheReportTemplate").build()).build();
     }
 
