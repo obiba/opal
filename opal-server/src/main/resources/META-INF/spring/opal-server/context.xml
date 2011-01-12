@@ -13,6 +13,6 @@
     <constructor-arg value="${org.obiba.opal.keystore.password}" />
   </bean>
 
-  <context:component-scan base-package="org.obiba.opal.server,org.obiba.opal.core,org.obiba.opal.service,org.obiba.opal.shell,org.obiba.opal.web.shell,org.obiba.opal.reporting" />
+  <context:component-scan base-package="org.obiba.opal.server,org.obiba.opal.core,org.obiba.opal.service,org.obiba.opal.shell,org.obiba.opal.web.shell,org.obiba.opal.reporting,org.obiba.opal.r" />
 
 </beans>

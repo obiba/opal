@@ -26,6 +26,7 @@
     <module>opal-server</module>
     <module>opal-fs</module>
     <module>opal-reporting</module>
+    <module>opal-r</module>
     <module>opal-httpd</module>
     <module>opal-ws</module>
     <module>opal-web-model</module>
