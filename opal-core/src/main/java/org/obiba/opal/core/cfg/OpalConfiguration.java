@@ -59,41 +59,8 @@ public class OpalConfiguration {
     this.magmaEngineFactory = magmaEngineFactory;
   }
 
-  public boolean hasFunctionalUnit(String unitName) {
-    return getFunctionalUnit(unitName) != null;
-  }
-
-  public void removeFunctionalUnit(String unitName) {
-    FunctionalUnit unit = getFunctionalUnit(unitName);
-    if(unit != null) {
-      functionalUnits.remove(unit);
-    }
-  }
-
-  public FunctionalUnit getFunctionalUnit(String unitName) {
-    for(FunctionalUnit unit : functionalUnits) {
-      if(unit.getName().equals(unitName)) {
-        return unit;
-      }
-    }
-    return null;
-  }
-
   public Set<FunctionalUnit> getFunctionalUnits() {
-    return Collections.unmodifiableSet(functionalUnits);
-  }
-
-  public void addOrReplaceFunctionalUnit(FunctionalUnit functionalUnit) {
-    FunctionalUnit unit = getFunctionalUnit(functionalUnit.getName());
-    if(unit != null) functionalUnits.remove(unit);
-    this.functionalUnits.add(functionalUnit);
-  }
-
-  public void setFunctionalUnits(Set<FunctionalUnit> functionalUnits) {
-    this.functionalUnits.clear();
-    if(functionalUnits != null) {
-      this.functionalUnits.addAll(functionalUnits);
-    }
+    return functionalUnits;
   }
 
   public Set<ReportTemplate> getReportTemplates() {

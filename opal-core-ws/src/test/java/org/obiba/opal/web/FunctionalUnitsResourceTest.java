@@ -25,12 +25,15 @@ import org.junit.Test;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
+import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.FunctionalUnitDto;
 
 public class FunctionalUnitsResourceTest {
 
   private OpalRuntime opalRuntimeMock;
+
+  private FunctionalUnitService functionalUnitServiceMock;
 
   private UnitKeyStoreService unitKeyStoreServiceMock;
 
@@ -39,6 +42,7 @@ public class FunctionalUnitsResourceTest {
   @Before
   public void setUp() {
     opalRuntimeMock = createMock(OpalRuntime.class);
+    functionalUnitServiceMock = createMock(FunctionalUnitService.class);
 
     unitKeyStoreServiceMock = createMock(UnitKeyStoreService.class);
 
@@ -52,11 +56,11 @@ public class FunctionalUnitsResourceTest {
   @Test
   public void testGetFunctionalUnits() {
 
-    expect(opalRuntimeMock.getFunctionalUnits()).andReturn(functionalUnits).once();
+    expect(functionalUnitServiceMock.getFunctionalUnits()).andReturn(functionalUnits).once();
 
-    replay(opalRuntimeMock);
+    replay(opalRuntimeMock, functionalUnitServiceMock);
 
-    FunctionalUnitsResource functionalUnitsResource = new FunctionalUnitsResource(opalRuntimeMock, unitKeyStoreServiceMock, null, null, "opal-keys.keys");
+    FunctionalUnitsResource functionalUnitsResource = new FunctionalUnitsResource(functionalUnitServiceMock, opalRuntimeMock, unitKeyStoreServiceMock, null, null, "opal-keys.keys");
     List<Opal.FunctionalUnitDto> functionalUnitDtoList = functionalUnitsResource.getFunctionalUnits();
     Assert.assertTrue(functionalUnitDtoList.size() == 3);
 
@@ -65,7 +69,7 @@ public class FunctionalUnitsResourceTest {
       Assert.assertTrue(functionalUnitDto.getKeyVariableName().startsWith("key"));
     }
 
-    verify(opalRuntimeMock);
+    verify(opalRuntimeMock, functionalUnitServiceMock);
 
   }
 }

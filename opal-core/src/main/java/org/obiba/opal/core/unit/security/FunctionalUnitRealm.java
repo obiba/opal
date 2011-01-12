@@ -26,8 +26,8 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.unit.FunctionalUnit;
+import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.obiba.opal.core.unit.UnitKeyStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +70,7 @@ public class FunctionalUnitRealm extends AuthorizingRealm {
   }
 
   @Autowired
-  private OpalRuntime opalRuntime;
+  private FunctionalUnitService functionalUnitService;
 
   private Multimap<FunctionalUnit, String> grants = HashMultimap.create();
 
@@ -93,7 +93,7 @@ public class FunctionalUnitRealm extends AuthorizingRealm {
   protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
     X509CertificateAuthenticationToken x509Token = (X509CertificateAuthenticationToken) token;
     X509Certificate x509Cert = x509Token.getCredentials();
-    for(FunctionalUnit unit : opalRuntime.getFunctionalUnits()) {
+    for(FunctionalUnit unit : functionalUnitService.getFunctionalUnits()) {
       UnitKeyStore keyStore = unit.getKeyStore();
       for(Certificate cert : keyStore.getCertficateEntries()) {
         try {
@@ -116,7 +116,7 @@ public class FunctionalUnitRealm extends AuthorizingRealm {
     for(Object principal : principals.fromRealm(getName())) {
       if(principal instanceof String) {
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(ImmutableSet.of((String) principal));
-        for(String perm : this.grants.get(opalRuntime.getFunctionalUnit((String) principal))) {
+        for(String perm : this.grants.get(functionalUnitService.getFunctionalUnit((String) principal))) {
           log.info("Allowing {}", perm);
           info.addStringPermission(perm);
         }

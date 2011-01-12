@@ -46,7 +46,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   public int execute() {
     int errorCode = 0;
 
-    if(options.isUnit() && getOpalRuntime().getFunctionalUnit(options.getUnit()) == null) {
+    if(options.isUnit() && getFunctionalUnitService().hasFunctionalUnit(options.getUnit()) == false) {
       getShell().printf("Functional unit '%s' does not exist.\n", options.getUnit());
       return 1; // error!
     }
@@ -243,7 +243,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       if(options.isUnit() && !options.isSource()) {
         // If we're importing from a datasource we don't want to read files from the unit directory.
         try {
-          filesToImport = getFilesInFolder(getOpalRuntime().getUnitDirectory(options.getUnit()));
+          filesToImport = getFilesInFolder(getFunctionalUnitService().getUnitDirectory(options.getUnit()));
         } catch(IOException ex) {
           throw new RuntimeException(ex);
         }
@@ -309,7 +309,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
 
   private FileObject getFileInUnitDirectory(String filePath) throws FileSystemException {
     if(options.isUnit()) {
-      FileObject unitDir = getOpalRuntime().getUnitDirectory(options.getUnit());
+      FileObject unitDir = getFunctionalUnitService().getUnitDirectory(options.getUnit());
       return unitDir.resolveFile(filePath);
     } else {
       return null;

@@ -26,9 +26,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
@@ -38,9 +38,9 @@ import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
+import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
-import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.type.TextType;
@@ -51,11 +51,12 @@ import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers.UnitIdentifier;
+import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.TableResource;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
-import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.FunctionalUnitDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +76,9 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   private static final Logger log = LoggerFactory.getLogger(FunctionalUnitsResource.class);
 
-  private OpalRuntime opalRuntime;
+  private final FunctionalUnitService functionalUnitService;
+
+  private final OpalRuntime opalRuntime;
 
   private final UnitKeyStoreService unitKeyStoreService;
 
@@ -86,8 +89,9 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
   private final String keysTableReference;
 
   @Autowired
-  public FunctionalUnitsResource(OpalRuntime opalRuntime, UnitKeyStoreService unitKeyStoreService, ImportService importService, DatasourceFactoryRegistry datasourceFactoryRegistry, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference) {
+  public FunctionalUnitsResource(FunctionalUnitService functionalUnitService, OpalRuntime opalRuntime, UnitKeyStoreService unitKeyStoreService, ImportService importService, DatasourceFactoryRegistry datasourceFactoryRegistry, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference) {
     super();
+    this.functionalUnitService = functionalUnitService;
     this.opalRuntime = opalRuntime;
     this.unitKeyStoreService = unitKeyStoreService;
     this.importService = importService;
@@ -102,7 +106,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
   @GET
   public List<Opal.FunctionalUnitDto> getFunctionalUnits() {
     final List<Opal.FunctionalUnitDto> functionalUnits = Lists.newArrayList();
-    for(FunctionalUnit functionalUnit : opalRuntime.getFunctionalUnits()) {
+    for(FunctionalUnit functionalUnit : getFunctionalUnitService().getFunctionalUnits()) {
       Opal.FunctionalUnitDto.Builder fuBuilder = Opal.FunctionalUnitDto.newBuilder().setName(functionalUnit.getName()).setKeyVariableName(functionalUnit.getKeyVariableName());
       if(functionalUnit.getSelect() instanceof JavascriptClause) {
         fuBuilder.setSelect(((JavascriptClause) functionalUnit.getSelect()).getScript());
@@ -115,7 +119,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   @POST
   public Response createFunctionalUnit(Opal.FunctionalUnitDto unit) {
-    if(opalRuntime.getOpalConfiguration().hasFunctionalUnit(unit.getName())) {
+    if(getFunctionalUnitService().hasFunctionalUnit(unit.getName())) {
       return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "FunctionalUnitAlreadyExists").build()).build();
     }
 
@@ -127,14 +131,13 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
       }
       functionalUnit.setUnitKeyStoreService(unitKeyStoreService);
 
-      opalRuntime.getOpalConfiguration().addOrReplaceFunctionalUnit(functionalUnit);
-      opalRuntime.writeOpalConfiguration();
+      getFunctionalUnitService().addOrReplaceFunctionalUnit(functionalUnit);
 
       try {
         prepareKeysTable(unit);
         response = Response.created(UriBuilder.fromPath("/").path(FunctionalUnitResource.class).build(unit.getName()));
       } catch(IOException e) {
-        opalRuntime.getOpalConfiguration().removeFunctionalUnit(unit.getName());
+        getFunctionalUnitService().removeFunctionalUnit(unit.getName());
         response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "FunctionalUnitCreationFailed", e).build());
       }
 
@@ -205,7 +208,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
     // header
     writer.append('"').append(FunctionalUnit.OPAL_INSTANCE).append('"');
-    for(FunctionalUnit functionalUnit : opalRuntime.getFunctionalUnits()) {
+    for(FunctionalUnit functionalUnit : getFunctionalUnitService().getFunctionalUnits()) {
       if(keysTable.hasVariable(functionalUnit.getKeyVariableName())) {
         unitIdIters.add(new FunctionalUnitIdentifiers(keysTable, functionalUnit).iterator());
         writer.append(",\"").append(functionalUnit.getName()).append('"');
@@ -316,4 +319,8 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
     return opalRuntime;
   }
 
+  @Override
+  protected FunctionalUnitService getFunctionalUnitService() {
+    return functionalUnitService;
+  }
 }

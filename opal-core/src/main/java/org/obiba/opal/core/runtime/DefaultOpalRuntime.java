@@ -21,15 +21,13 @@ import org.obiba.magma.views.ViewPersistenceStrategy;
 import org.obiba.magma.views.impl.DefaultViewManagerImpl;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.core.cfg.OpalConfiguration;
-import org.obiba.opal.core.cfg.OpalConfigurationIo;
-import org.obiba.opal.core.runtime.security.OpalSecurityManager;
-import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
-import org.obiba.opal.core.unit.FunctionalUnit;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.fs.impl.OpalFileSystemImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
@@ -40,13 +38,10 @@ import com.google.common.collect.ImmutableSet;
 /**
  *
  */
+@Component
 public class DefaultOpalRuntime implements OpalRuntime {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRuntime.class);
-
-  private final OpalConfigurationIo opalConfigIo;
-
-  private ViewPersistenceStrategy viewPersistenceStrategy;
 
   @Autowired
   private PlatformTransactionManager txManager;
@@ -55,21 +50,16 @@ public class DefaultOpalRuntime implements OpalRuntime {
   private Set<Service> services;
 
   @Autowired
-  private OpalSecurityManager opalSecurityManager;
+  private OpalConfigurationService opalConfigurationService;
 
-  private OpalConfiguration opalConfiguration;
+  @Autowired
+  private ViewPersistenceStrategy viewPersistenceStrategy;
 
   private ViewManager viewManager;
 
   private OpalFileSystem opalFileSystem;
 
-  private Object syncConfig = new Object();
-
   private Object syncFs = new Object();
-
-  public DefaultOpalRuntime(OpalConfigurationIo opalConfigIo) {
-    this.opalConfigIo = opalConfigIo;
-  }
 
   @Override
   public void start() {
@@ -78,8 +68,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
     new MagmaEngine().extend(new MagmaXStreamExtension()).extend(new MagmaJsExtension());
 
     readConfiguration();
-
-    initSecurityManager();
 
     initMagmaEngine();
 
@@ -119,8 +107,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
       }
     });
 
-    opalSecurityManager.stop();
-
   }
 
   @Override
@@ -130,18 +116,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   @Override
   public OpalConfiguration getOpalConfiguration() {
-    synchronized(syncConfig) {
-      while(opalConfiguration == null) {
-        try {
-          log.debug("Waiting for opalConfiguration...");
-          syncConfig.wait();
-        } catch(InterruptedException ex) {
-          ;
-        }
-      }
-    }
-    log.debug("Returning opalConfiguration");
-    return opalConfiguration;
+    return opalConfigurationService.getOpalConfiguration();
   }
 
   @Override
@@ -158,31 +133,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
     return opalFileSystem;
   }
 
-  @Override
-  public Set<FunctionalUnit> getFunctionalUnits() {
-    return opalConfiguration.getFunctionalUnits();
-  }
-
-  @Override
-  public FunctionalUnit getFunctionalUnit(String unitName) {
-    return opalConfiguration.getFunctionalUnit(unitName);
-  }
-
-  @Override
-  public FileObject getUnitDirectory(String unitName) throws NoSuchFunctionalUnitException, FileSystemException {
-    if(getFunctionalUnit(unitName) == null) {
-      throw new NoSuchFunctionalUnitException(unitName);
-    }
-
-    FileObject unitsDir = getFileSystem().getRoot().resolveFile("units");
-    unitsDir.createFolder();
-
-    FileObject unitDir = unitsDir.resolveFile(unitName);
-    unitDir.createFolder();
-
-    return unitDir;
-  }
-
   public ViewManager getViewManager() {
     if(viewManager == null) {
       viewManager = new DefaultViewManagerImpl(viewPersistenceStrategy);
@@ -191,21 +141,14 @@ public class DefaultOpalRuntime implements OpalRuntime {
   }
 
   private void readConfiguration() {
-    synchronized(syncConfig) {
-      opalConfiguration = opalConfigIo.readConfiguration();
-      syncConfig.notifyAll();
-    }
-  }
-
-  private void initSecurityManager() {
-    opalSecurityManager.start();
+    opalConfigurationService.readOpalConfiguration();
   }
 
   private void initMagmaEngine() {
     try {
       Runnable magmaEngineInit = new Runnable() {
         public void run() {
-          opalConfiguration.getMagmaEngineFactory().initialize(MagmaEngine.get());
+          getOpalConfiguration().getMagmaEngineFactory().initialize(MagmaEngine.get());
         }
       };
       new TransactionalThread(txManager, magmaEngineInit).start();
@@ -231,11 +174,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
   private void initFileSystem() {
     synchronized(syncFs) {
       try {
-        opalFileSystem = new OpalFileSystemImpl(opalConfiguration.getFileSystemRoot());
-        // Create the folders for each FunctionalUnit
-        for(FunctionalUnit unit : opalConfiguration.getFunctionalUnits()) {
-          getUnitDirectory(unit.getName());
-        }
+        opalFileSystem = new OpalFileSystemImpl(getOpalConfiguration().getFileSystemRoot());
 
         // Create tmp folder, if it does not exist.
         FileObject tmpFolder = getFileSystem().getRoot().resolveFile("tmp");
@@ -276,7 +215,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   @Override
   public void writeOpalConfiguration() {
-    opalConfigIo.writeConfiguration(opalConfiguration);
+    opalConfigurationService.writeOpalConfiguration();
   }
 
   public void setViewPersistenceStrategy(ViewPersistenceStrategy viewPersistenceStrategy) {

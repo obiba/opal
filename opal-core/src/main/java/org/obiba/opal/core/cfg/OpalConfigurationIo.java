@@ -24,12 +24,15 @@ import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 
+@Component
 public class OpalConfigurationIo {
   //
   // Instance Variables
@@ -41,7 +44,8 @@ public class OpalConfigurationIo {
   @Autowired
   private ApplicationContext applicationContext;
 
-  public OpalConfigurationIo(File opalConfigFile) {
+  @Autowired
+  public OpalConfigurationIo(@Value("${OPAL_HOME}/conf/opal-config.xml") File opalConfigFile) {
     this.configFile = opalConfigFile;
   }
 

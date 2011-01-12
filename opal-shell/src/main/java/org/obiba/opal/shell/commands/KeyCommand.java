@@ -13,11 +13,11 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.security.KeyStoreException;
 import java.security.KeyStore.Entry;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStore.SecretKeyEntry;
 import java.security.KeyStore.TrustedCertificateEntry;
+import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
@@ -330,7 +330,7 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   private UnitKeyStore getUnitKeyStore() {
     UnitKeyStore unitKeyStore = null;
     if(options.isUnit()) {
-      FunctionalUnit unit = getOpalRuntime().getFunctionalUnit(options.getUnit());
+      FunctionalUnit unit = getFunctionalUnitService().getFunctionalUnit(options.getUnit());
       unitKeyStore = unit.getKeyStore();
     } else {
       unitKeyStore = unitKeyStoreService.getUnitKeyStore(FunctionalUnit.OPAL_INSTANCE);
@@ -339,7 +339,7 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   }
 
   private boolean unitDoesNotExist(String unitName) {
-    return getOpalRuntime().getFunctionalUnit(unitName) == null;
+    return getFunctionalUnitService().hasFunctionalUnit(unitName) == false;
   }
 
   private boolean unitIsOpalInstance(String unitName) {

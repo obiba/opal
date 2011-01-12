@@ -24,19 +24,19 @@ import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.DatasourceCopier;
+import org.obiba.magma.support.DatasourceCopier.Builder;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
-import org.obiba.magma.support.DatasourceCopier.Builder;
 import org.obiba.magma.views.IncrementalWhereClause;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.magma.FunctionalUnitView;
 import org.obiba.opal.core.magma.FunctionalUnitView.Policy;
 import org.obiba.opal.core.magma.concurrent.LockingActionTemplate;
-import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ExportException;
 import org.obiba.opal.core.service.ExportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
+import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -53,7 +53,7 @@ public class DefaultExportServiceImpl implements ExportService {
 
   private final PlatformTransactionManager txManager;
 
-  private final OpalRuntime opalRuntime;
+  private final FunctionalUnitService functionalUnitService;
 
   /** Configured through org.obiba.opal.keys.tableReference */
   private final String keysTableReference;
@@ -62,14 +62,14 @@ public class DefaultExportServiceImpl implements ExportService {
   private final String keysTableEntityType;
 
   @Autowired
-  public DefaultExportServiceImpl(PlatformTransactionManager txManager, OpalRuntime opalRuntime, @org.springframework.beans.factory.annotation.Value("${org.obiba.opal.keys.tableReference}") String keysTableReference, @org.springframework.beans.factory.annotation.Value("${org.obiba.opal.keys.entityType}") String keysTableEntityType) {
+  public DefaultExportServiceImpl(PlatformTransactionManager txManager, FunctionalUnitService functionalUnitService, @org.springframework.beans.factory.annotation.Value("${org.obiba.opal.keys.tableReference}") String keysTableReference, @org.springframework.beans.factory.annotation.Value("${org.obiba.opal.keys.entityType}") String keysTableEntityType) {
     if(txManager == null) throw new IllegalArgumentException("txManager cannot be null");
-    if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
+    if(functionalUnitService == null) throw new IllegalArgumentException("functionalUnitService cannot be null");
     if(keysTableReference == null) throw new IllegalArgumentException("keysTableReference cannot be null");
     if(keysTableEntityType == null) throw new IllegalArgumentException("keysTableEntityType cannot be null");
 
     this.txManager = txManager;
-    this.opalRuntime = opalRuntime;
+    this.functionalUnitService = functionalUnitService;
     this.keysTableReference = keysTableReference;
     this.keysTableEntityType = keysTableEntityType;
   }
@@ -207,7 +207,7 @@ public class DefaultExportServiceImpl implements ExportService {
   }
 
   private FunctionalUnit validateFunctionalUnit(String unitName) {
-    FunctionalUnit unit = opalRuntime.getFunctionalUnit(unitName);
+    FunctionalUnit unit = functionalUnitService.getFunctionalUnit(unitName);
     if(unit == null) {
       throw new NoSuchFunctionalUnitException(unitName);
     }

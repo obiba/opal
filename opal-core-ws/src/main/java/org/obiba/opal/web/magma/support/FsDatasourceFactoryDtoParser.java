@@ -30,7 +30,7 @@ public class FsDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoPa
     factory.setFile(resolveLocalFile(fsDto.getFile()));
     if(fsDto.hasUnit()) {
       String unitName = fsDto.getUnit();
-      FunctionalUnit unit = getOpalRuntime().getFunctionalUnit(unitName);
+      FunctionalUnit unit = getFunctionalUnitService().getFunctionalUnit(unitName);
       if(unit == null) {
         throw new NoSuchFunctionalUnitException(unitName);
       }

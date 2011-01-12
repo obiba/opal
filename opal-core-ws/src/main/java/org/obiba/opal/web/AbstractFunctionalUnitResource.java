@@ -21,6 +21,7 @@ import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
+import org.obiba.opal.core.unit.FunctionalUnitService;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -28,6 +29,8 @@ import au.com.bytecode.opencsv.CSVReader;
  *
  */
 public abstract class AbstractFunctionalUnitResource {
+
+  protected abstract FunctionalUnitService getFunctionalUnitService();
 
   protected abstract OpalRuntime getOpalRuntime();
 
@@ -47,7 +50,7 @@ public abstract class AbstractFunctionalUnitResource {
   }
 
   protected FunctionalUnit resolveFunctionalUnit(String unit) {
-    FunctionalUnit functionalUnit = getOpalRuntime().getFunctionalUnit(unit);
+    FunctionalUnit functionalUnit = getFunctionalUnitService().getFunctionalUnit(unit);
     if(functionalUnit == null) throw new NoSuchFunctionalUnitException(unit);
     return functionalUnit;
   }

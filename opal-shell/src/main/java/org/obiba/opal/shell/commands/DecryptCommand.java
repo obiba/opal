@@ -79,7 +79,7 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
 
   private boolean validUnit() {
     if(options.isUnit()) {
-      if(getOpalRuntime().getFunctionalUnit(options.getUnit()) == null) {
+      if(getFunctionalUnitService().hasFunctionalUnit(options.getUnit()) == false) {
         getShell().printf("Functional unit '%s' does not exist. Cannot decrypt.\n", options.getUnit());
         return false;
       }
@@ -179,7 +179,7 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
   }
 
   private FileObject getFileInUnitDirectory(String filePath) throws FileSystemException {
-    FileObject unitDir = getOpalRuntime().getUnitDirectory(options.getUnit());
+    FileObject unitDir = getFunctionalUnitService().getUnitDirectory(options.getUnit());
     return unitDir.resolveFile(filePath);
   }
 

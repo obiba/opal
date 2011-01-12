@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.server;
 
-import org.obiba.opal.server.httpd.GrantCommand;
-import org.obiba.opal.server.httpd.GrantCommandOptions;
 import org.obiba.opal.shell.AbstractCommandRegistry;
 import org.obiba.opal.shell.commands.CopyCommand;
 import org.obiba.opal.shell.commands.DecryptCommand;
@@ -57,8 +55,6 @@ public class SecureShellCommandRegistry extends AbstractCommandRegistry {
     addAvailableCommand(CopyCommand.class, CopyCommandOptions.class);
     addAvailableCommand(SplitCommand.class, SplitCommandOptions.class);
     addAvailableCommand(EncryptCommand.class, EncryptCommandOptions.class);
-
-    addAvailableCommand(GrantCommand.class, GrantCommandOptions.class);
   }
 
 }

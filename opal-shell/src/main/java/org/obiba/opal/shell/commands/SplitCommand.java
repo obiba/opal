@@ -23,13 +23,18 @@ import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.opal.core.unit.FunctionalUnit;
+import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.obiba.opal.shell.commands.options.SplitCommandOptions;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
  */
 @CommandUsage(description = "Splits one or more ZIP files into multiple pieces.", syntax = "Syntax: split --unit unit --out DIR _FILE_...")
 public class SplitCommand extends AbstractOpalRuntimeDependentCommand<SplitCommandOptions> {
+
+  @Autowired
+  FunctionalUnitService functionalUnitService;
 
   public int execute() {
     // Ensure that options have been set.
@@ -48,13 +53,13 @@ public class SplitCommand extends AbstractOpalRuntimeDependentCommand<SplitComma
 
   private void innerExecute() throws FileSystemException {
 
-    FunctionalUnit unit = getOpalRuntime().getFunctionalUnit(options.getUnit());
+    FunctionalUnit unit = functionalUnitService.getFunctionalUnit(options.getUnit());
     if(unit == null) {
       getShell().printf("Functional unit '%s' does not exist.\n", options.getUnit());
       return;
     }
 
-    FileObject unitDir = getOpalRuntime().getUnitDirectory(options.getUnit());
+    FileObject unitDir = getFunctionalUnitService().getUnitDirectory(options.getUnit());
     FileObject outputDir = getOutputDir(unitDir);
     if(outputDir == null) {
       return;
@@ -168,8 +173,8 @@ public class SplitCommand extends AbstractOpalRuntimeDependentCommand<SplitComma
     }
 
     /**
-     * Initializes the destination for the specified {@code ValueTable}. This will create a new instance of {@code
-     * ValueTableWriter} and copy the variables to this new writer.
+     * Initializes the destination for the specified {@code ValueTable}. This will create a new instance of
+     * {@code ValueTableWriter} and copy the variables to this new writer.
      * @param source
      * @throws IOException
      */

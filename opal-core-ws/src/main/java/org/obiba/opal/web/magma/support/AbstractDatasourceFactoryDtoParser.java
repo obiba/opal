@@ -16,10 +16,14 @@ import org.apache.commons.vfs.FileSystemException;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractDatasourceFactoryDtoParser implements DatasourceFactoryDtoParser {
+
+  @Autowired
+  private FunctionalUnitService functionalUnitService;
 
   @Autowired
   private OpalRuntime opalRuntime;
@@ -34,12 +38,12 @@ public abstract class AbstractDatasourceFactoryDtoParser implements DatasourceFa
 
   protected abstract DatasourceFactory internalParse(DatasourceFactoryDto dto);
 
-  public void setOpalRuntime(OpalRuntime opalRuntime) {
-    this.opalRuntime = opalRuntime;
-  }
-
   protected OpalRuntime getOpalRuntime() {
     return opalRuntime;
+  }
+
+  protected FunctionalUnitService getFunctionalUnitService() {
+    return functionalUnitService;
   }
 
   protected FileObject resolveFileInFileSystem(String path) throws FileSystemException {

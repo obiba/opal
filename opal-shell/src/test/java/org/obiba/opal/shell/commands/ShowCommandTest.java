@@ -26,6 +26,7 @@ import org.obiba.magma.test.AbstractMagmaTest;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.unit.FunctionalUnit;
+import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.obiba.opal.shell.OpalShell;
 import org.obiba.opal.shell.commands.options.ShowCommandOptions;
 
@@ -80,14 +81,15 @@ public class ShowCommandTest extends AbstractMagmaTest {
     expect(mockOptions.getUnits()).andReturn(true).anyTimes();
 
     OpalRuntime mockRuntime = createMock(OpalRuntime.class);
-    recordExpectedOpalRuntimeExpectations(mockRuntime, units);
+    FunctionalUnitService mockUnitService = createMock(FunctionalUnitService.class);
+    recordExpectedOpalRuntimeExpectations(mockUnitService, units);
 
     OpalShell mockShell = createMock(OpalShell.class);
     recordExpectedShellOutputForUnits(mockShell, units);
 
-    replay(mockOptions, mockRuntime, mockShell);
+    replay(mockOptions, mockRuntime, mockShell, mockUnitService);
 
-    ShowCommand showCommand = createShowCommand(mockRuntime);
+    ShowCommand showCommand = createShowCommand(mockRuntime, mockUnitService);
     showCommand.setOptions(mockOptions);
     showCommand.setShell(mockShell);
     showCommand.execute();
@@ -100,15 +102,16 @@ public class ShowCommandTest extends AbstractMagmaTest {
     recordExpectedOperationsOnOptions(mockOptions);
 
     OpalRuntime mockRuntime = createMock(OpalRuntime.class);
-    recordExpectedOpalRuntimeExpectations(mockRuntime, units);
+    FunctionalUnitService mockUnitService = createMock(FunctionalUnitService.class);
+    recordExpectedOpalRuntimeExpectations(mockUnitService, units);
 
     OpalShell mockShell = createMock(OpalShell.class);
     recordExpectedShellOutputForDatasourcesAndTables(mockShell);
     recordExpectedShellOutputForUnits(mockShell, units);
 
-    replay(mockOptions, mockRuntime, mockShell);
+    replay(mockOptions, mockRuntime, mockShell, mockUnitService);
 
-    ShowCommand showCommand = createShowCommand(mockRuntime);
+    ShowCommand showCommand = createShowCommand(mockRuntime, mockUnitService);
     showCommand.setOptions(mockOptions);
     showCommand.setShell(mockShell);
     showCommand.execute();
@@ -116,11 +119,16 @@ public class ShowCommandTest extends AbstractMagmaTest {
     verify(mockOptions, mockShell);
   }
 
-  private ShowCommand createShowCommand(final OpalRuntime mockRuntime) {
+  private ShowCommand createShowCommand(final OpalRuntime mockRuntime, final FunctionalUnitService mockUnitService) {
     return new ShowCommand() {
       @Override
       protected OpalRuntime getOpalRuntime() {
         return mockRuntime;
+      }
+
+      @Override
+      protected FunctionalUnitService getFunctionalUnitService() {
+        return mockUnitService;
       }
 
       @Override
@@ -136,7 +144,7 @@ public class ShowCommandTest extends AbstractMagmaTest {
     expect(mockOptions.getUnits()).andReturn(false).anyTimes();
   }
 
-  private void recordExpectedOpalRuntimeExpectations(OpalRuntime mockRuntime, String... units) {
+  private void recordExpectedOpalRuntimeExpectations(FunctionalUnitService mockUnitService, String... units) {
     Set<FunctionalUnit> functionalUnits = new LinkedHashSet<FunctionalUnit>();
     if(units.length != 0) {
       for(String unitName : units) {
@@ -144,7 +152,7 @@ public class ShowCommandTest extends AbstractMagmaTest {
       }
     }
 
-    expect(mockRuntime.getFunctionalUnits()).andReturn(functionalUnits).atLeastOnce();
+    expect(mockUnitService.getFunctionalUnits()).andReturn(functionalUnits).atLeastOnce();
   }
 
   private void recordExpectedShellOutputForUnits(OpalShell mockShell, String... units) {

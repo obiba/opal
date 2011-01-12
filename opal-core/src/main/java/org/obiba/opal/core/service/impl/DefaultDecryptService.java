@@ -26,6 +26,7 @@ import org.obiba.opal.core.service.DecryptService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
+import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.obiba.opal.core.unit.UnitKeyStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,8 @@ public class DefaultDecryptService implements DecryptService {
   //
   // Instance Variables
   //
+  @Autowired
+  private FunctionalUnitService functionalUnitService;
 
   @Autowired
   private OpalRuntime opalRuntime;
@@ -66,7 +69,7 @@ public class DefaultDecryptService implements DecryptService {
     // Validate the datasource name.
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(datasourceName);
 
-    FunctionalUnit unit = opalRuntime.getFunctionalUnit(unitName);
+    FunctionalUnit unit = functionalUnitService.getFunctionalUnit(unitName);
     if(!FunctionalUnit.OPAL_INSTANCE.equals(unitName) && unit == null) {
       throw new NoSuchFunctionalUnitException(unitName);
     }

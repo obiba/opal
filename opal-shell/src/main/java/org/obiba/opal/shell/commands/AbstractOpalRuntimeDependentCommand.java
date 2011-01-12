@@ -15,6 +15,7 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -28,15 +29,19 @@ public abstract class AbstractOpalRuntimeDependentCommand<T> extends AbstractCom
   @Autowired
   private OpalRuntime opalRuntime;
 
+  @Autowired
+  private FunctionalUnitService functionalUnitService;
+
   //
   // Methods
   //
 
-  /**
-   * Initializes the {@link OpalRuntime} bean in the context.
-   */
   protected OpalRuntime getOpalRuntime() {
     return opalRuntime;
+  }
+
+  protected FunctionalUnitService getFunctionalUnitService() {
+    return functionalUnitService;
   }
 
   public FileObject getFileSystemRoot() {

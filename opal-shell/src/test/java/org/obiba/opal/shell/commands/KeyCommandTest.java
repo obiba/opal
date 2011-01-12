@@ -30,6 +30,7 @@ import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
+import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.obiba.opal.core.unit.UnitKeyStore;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.shell.OpalShell;
@@ -54,7 +55,7 @@ public class KeyCommandTest {
     KeyCommandOptions mockOptions = createMockOptionsForCreateAction("my-unit", "my-alias", "RSA", 2048);
 
     OpalRuntime mockRuntime = createMockRuntime();
-    expect(mockRuntime.getFunctionalUnit("my-unit")).andReturn(new FunctionalUnit("my-unit", null)).atLeastOnce();
+    FunctionalUnitService mockUnitService = createMockUnitService("my-unit");
 
     OpalShell mockShell = createMockShellForCreateAction("my-alias");
 
@@ -63,9 +64,9 @@ public class KeyCommandTest {
     mockUnitKeyStoreService.createOrUpdateKey("my-unit", "my-alias", "RSA", 2048, getCertificateInfoAsString(CERTIFICATE_INFO));
     expectLastCall().atLeastOnce();
 
-    replay(mockOptions, mockRuntime, mockShell, mockUnitKeyStoreService);
+    replay(mockOptions, mockRuntime, mockShell, mockUnitService, mockUnitKeyStoreService);
 
-    KeyCommand keyCommand = createKeyCommand(mockRuntime);
+    KeyCommand keyCommand = createKeyCommand(mockRuntime, mockUnitService);
     keyCommand.setOptions(mockOptions);
     keyCommand.setShell(mockShell);
     keyCommand.setUnitKeyStoreService(mockUnitKeyStoreService);
@@ -77,7 +78,7 @@ public class KeyCommandTest {
     KeyCommandOptions mockOptions = createMockOptionsForDeleteAction("my-unit", "my-alias");
 
     OpalRuntime mockRuntime = createMockRuntime();
-    expect(mockRuntime.getFunctionalUnit("my-unit")).andReturn(new FunctionalUnit("my-unit", null)).atLeastOnce();
+    FunctionalUnitService mockUnitService = createMockUnitService("my-unit");
 
     OpalShell mockShell = createMockShellForDeleteAction("my-unit", "my-alias");
 
@@ -86,9 +87,9 @@ public class KeyCommandTest {
     mockUnitKeyStoreService.deleteKey("my-unit", "my-alias");
     expectLastCall().atLeastOnce();
 
-    replay(mockOptions, mockRuntime, mockShell, mockUnitKeyStoreService);
+    replay(mockOptions, mockRuntime, mockShell, mockUnitKeyStoreService, mockUnitService);
 
-    KeyCommand keyCommand = createKeyCommand(mockRuntime);
+    KeyCommand keyCommand = createKeyCommand(mockRuntime, mockUnitService);
     keyCommand.setOptions(mockOptions);
     keyCommand.setShell(mockShell);
     keyCommand.setUnitKeyStoreService(mockUnitKeyStoreService);
@@ -108,8 +109,9 @@ public class KeyCommandTest {
 
     OpalFileSystem mockFileSystem = createMockFileSystem(mockFileSystemRoot);
 
+    FunctionalUnitService mockUnitService = createMockUnitService("my-unit");
+
     OpalRuntime mockRuntime = createMockRuntime();
-    expect(mockRuntime.getFunctionalUnit("my-unit")).andReturn(new FunctionalUnit("my-unit", null)).atLeastOnce();
     expect(mockRuntime.getFileSystem()).andReturn(mockFileSystem).atLeastOnce();
 
     OpalShell mockShell = createMockShellForImportAction("my-alias");
@@ -119,9 +121,9 @@ public class KeyCommandTest {
     mockUnitKeyStoreService.importKey("my-unit", "my-alias", privateFile, certificateFile);
     expectLastCall().atLeastOnce();
 
-    replay(mockOptions, mockFileSystemRoot, mockFileSystem, mockRuntime, mockShell, mockUnitKeyStoreService);
+    replay(mockOptions, mockFileSystemRoot, mockFileSystem, mockRuntime, mockShell, mockUnitKeyStoreService, mockUnitService);
 
-    KeyCommand keyCommand = createKeyCommand(mockRuntime);
+    KeyCommand keyCommand = createKeyCommand(mockRuntime, mockUnitService);
     keyCommand.setOptions(mockOptions);
     keyCommand.setShell(mockShell);
     keyCommand.setUnitKeyStoreService(mockUnitKeyStoreService);
@@ -153,14 +155,14 @@ public class KeyCommandTest {
 
     FunctionalUnit unit = new FunctionalUnit("my-unit", null);
     unit.setUnitKeyStoreService(mockUnitKeyStoreService);
+    FunctionalUnitService mockUnitService = createMockUnitService(unit);
 
     OpalRuntime mockRuntime = createMockRuntime();
-    expect(mockRuntime.getFunctionalUnit("my-unit")).andReturn(unit).atLeastOnce();
     expect(mockRuntime.getFileSystem()).andReturn(mockFileSystem).atLeastOnce();
 
-    replay(mockOptions, mockFileSystemRoot, mockFileSystem, certificateFile, mockFileContent, mockRuntime, mockShell, mockUnitKeyStoreService);
+    replay(mockOptions, mockFileSystemRoot, mockFileSystem, certificateFile, mockFileContent, mockRuntime, mockShell, mockUnitKeyStoreService, mockUnitService);
 
-    KeyCommand keyCommand = createKeyCommand(mockRuntime);
+    KeyCommand keyCommand = createKeyCommand(mockRuntime, mockUnitService);
     keyCommand.setOptions(mockOptions);
     keyCommand.setShell(mockShell);
     keyCommand.setUnitKeyStoreService(mockUnitKeyStoreService);
@@ -171,11 +173,16 @@ public class KeyCommandTest {
   // Helper Methods
   //
 
-  private KeyCommand createKeyCommand(final OpalRuntime mockRuntime) {
+  private KeyCommand createKeyCommand(final OpalRuntime mockRuntime, final FunctionalUnitService service) {
     return new KeyCommand() {
       @Override
       protected OpalRuntime getOpalRuntime() {
         return mockRuntime;
+      }
+
+      @Override
+      protected FunctionalUnitService getFunctionalUnitService() {
+        return service;
       }
 
       @Override
@@ -204,6 +211,17 @@ public class KeyCommandTest {
     OpalRuntime mockRuntime = createMock(OpalRuntime.class);
 
     return mockRuntime;
+  }
+
+  private FunctionalUnitService createMockUnitService(String unitName) {
+    return createMockUnitService(new FunctionalUnit(unitName, null));
+  }
+
+  private FunctionalUnitService createMockUnitService(FunctionalUnit unit) {
+    FunctionalUnitService mockService = createMock(FunctionalUnitService.class);
+    expect(mockService.hasFunctionalUnit(unit.getName())).andReturn(true).atLeastOnce();
+    expect(mockService.getFunctionalUnit(unit.getName())).andReturn(unit).anyTimes();
+    return mockService;
   }
 
   private OpalShell createMockShellForCreateAction(String alias) {

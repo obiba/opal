@@ -11,6 +11,9 @@ package org.obiba.opal.core.runtime.security;
 
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.realm.Realm;
@@ -28,10 +31,12 @@ public class OpalSecurityManager extends DefaultSecurityManager {
     super(ImmutableSet.<Realm> builder().add(new IniRealm(System.getProperty("OPAL_HOME") + "/conf/shiro.ini")).addAll(securityRealms).build());
   }
 
+  @PostConstruct
   public void start() {
     SecurityUtils.setSecurityManager(this);
   }
 
+  @PreDestroy
   public void stop() {
     // Destroy the security manager.
     SecurityUtils.setSecurityManager(null);

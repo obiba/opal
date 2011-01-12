@@ -183,7 +183,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   private boolean validateUnit() {
-    if(options.isUnit() && getOpalRuntime().getFunctionalUnit(options.getUnit()) == null) {
+    if(options.isUnit() && getFunctionalUnitService().hasFunctionalUnit(options.getUnit()) == false) {
       getShell().printf("Functional unit '%s' does not exist.\n", options.getUnit());
       return false;
     }
@@ -299,7 +299,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   private FileObject getFileInUnitDirectory(String filePath) throws FileSystemException {
-    FileObject unitDir = getOpalRuntime().getUnitDirectory(options.getUnit());
+    FileObject unitDir = getFunctionalUnitService().getUnitDirectory(options.getUnit());
     return unitDir.resolveFile(filePath);
   }
 

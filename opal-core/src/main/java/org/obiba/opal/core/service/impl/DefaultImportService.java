@@ -24,30 +24,30 @@ import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.Variable;
-import org.obiba.magma.VariableEntity;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
+import org.obiba.magma.Variable;
+import org.obiba.magma.VariableEntity;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.DatasourceCopier;
+import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListener;
+import org.obiba.magma.support.DatasourceCopier.MultiplexingStrategy;
+import org.obiba.magma.support.DatasourceCopier.VariableTransformer;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
-import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListener;
-import org.obiba.magma.support.DatasourceCopier.MultiplexingStrategy;
-import org.obiba.magma.support.DatasourceCopier.VariableTransformer;
 import org.obiba.magma.type.BooleanType;
 import org.obiba.magma.type.TextType;
 import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.magma.FunctionalUnitView;
-import org.obiba.opal.core.magma.PrivateVariableEntityMap;
 import org.obiba.opal.core.magma.FunctionalUnitView.Policy;
+import org.obiba.opal.core.magma.PrivateVariableEntityMap;
 import org.obiba.opal.core.magma.concurrent.LockingActionTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ImportService;
@@ -55,6 +55,7 @@ import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers.UnitIdentifier;
+import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,11 +80,9 @@ public class DefaultImportService implements ImportService {
   @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(DefaultImportService.class);
 
-  //
-  // Instance Variables
-  //
-
   private final TransactionTemplate txTemplate;
+
+  private final FunctionalUnitService functionalUnitService;
 
   private final OpalRuntime opalRuntime;
 
@@ -96,14 +95,16 @@ public class DefaultImportService implements ImportService {
   private final String keysTableEntityType;
 
   @Autowired
-  public DefaultImportService(TransactionTemplate txTemplate, OpalRuntime opalRuntime, IParticipantIdentifier participantIdentifier, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference, @Value("${org.obiba.opal.keys.entityType}") String keysTableEntityType) {
+  public DefaultImportService(TransactionTemplate txTemplate, FunctionalUnitService functionalUnitService, OpalRuntime opalRuntime, IParticipantIdentifier participantIdentifier, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference, @Value("${org.obiba.opal.keys.entityType}") String keysTableEntityType) {
     if(txTemplate == null) throw new IllegalArgumentException("txManager cannot be null");
+    if(functionalUnitService == null) throw new IllegalArgumentException("functionalUnitService cannot be null");
     if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
     if(participantIdentifier == null) throw new IllegalArgumentException("participantIdentifier cannot be null");
     if(keysTableReference == null) throw new IllegalArgumentException("keysTableReference cannot be null");
     if(keysTableEntityType == null) throw new IllegalArgumentException("keysTableEntityType cannot be null");
 
     this.opalRuntime = opalRuntime;
+    this.functionalUnitService = functionalUnitService;
     this.participantIdentifier = participantIdentifier;
     this.keysTableReference = keysTableReference;
     this.keysTableEntityType = keysTableEntityType;
@@ -136,7 +137,7 @@ public class DefaultImportService implements ImportService {
 
     FunctionalUnit unit = null;
     if(nonEmptyUnitName != null) {
-      unit = opalRuntime.getFunctionalUnit(nonEmptyUnitName);
+      unit = functionalUnitService.getFunctionalUnit(nonEmptyUnitName);
       if(unit == null) {
         throw new NoSuchFunctionalUnitException(nonEmptyUnitName);
       }
@@ -159,7 +160,7 @@ public class DefaultImportService implements ImportService {
 
     FunctionalUnit unit = null;
     if(nonEmptyUnitName != null) {
-      unit = opalRuntime.getFunctionalUnit(nonEmptyUnitName);
+      unit = functionalUnitService.getFunctionalUnit(nonEmptyUnitName);
       if(unit == null) {
         throw new NoSuchFunctionalUnitException(nonEmptyUnitName);
       }
@@ -177,7 +178,7 @@ public class DefaultImportService implements ImportService {
     Assert.hasText(unitName, "unitName is null or empty");
     IParticipantIdentifier participantIdentifier = pIdentifier != null ? pIdentifier : this.participantIdentifier;
 
-    FunctionalUnit unit = opalRuntime.getFunctionalUnit(unitName);
+    FunctionalUnit unit = functionalUnitService.getFunctionalUnit(unitName);
     if(unit == null) {
       throw new NoSuchFunctionalUnitException(unitName);
     }
@@ -210,7 +211,7 @@ public class DefaultImportService implements ImportService {
     Assert.hasText(unitName, "unitName is null or empty");
     Assert.hasText(sourceDatasourceName, "sourceDatasourceName is null or empty");
 
-    FunctionalUnit unit = opalRuntime.getFunctionalUnit(unitName);
+    FunctionalUnit unit = functionalUnitService.getFunctionalUnit(unitName);
     if(unit == null) {
       throw new NoSuchFunctionalUnitException(unitName);
     }
