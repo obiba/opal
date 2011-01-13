@@ -14,13 +14,13 @@ import org.rosuda.REngine.REXP;
 /**
  * Does the evaluation of a R script and stores the result.
  */
-public class SingleROperation extends AbstractROperation {
+public class ScriptROperation extends AbstractROperation {
 
   private String script;
 
   private REXP result;
 
-  public SingleROperation(String script) {
+  public ScriptROperation(String script) {
     super();
     if(script == null) throw new IllegalArgumentException("R script cannot be null");
 
