@@ -42,7 +42,23 @@ public class ScriptROperation extends AbstractROperation {
   public void doWithConnection() {
     result = null;
     if(getConnection() == null) throw new IllegalStateException("R connection cannot be null");
+    beforeEval();
     result = eval(script);
+    afterEval();
+  }
+
+  /**
+   * Called before R script evaluation.
+   */
+  protected void beforeEval() {
+
+  }
+
+  /**
+   * Called after R script evaluation.
+   */
+  protected void afterEval() {
+
   }
 
   /**
