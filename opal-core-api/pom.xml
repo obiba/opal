@@ -34,4 +34,8 @@
       <artifactId>shiro-core</artifactId>
     </dependency>
   </dependencies>
+
+  <properties>
+    <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
+  </properties>
 </project>
