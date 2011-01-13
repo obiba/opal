@@ -41,25 +41,29 @@ public class OpalRService implements Service, ROperationTemplate {
    * @return
    * @throws RserveException
    */
-  public RConnection newConnection() throws RserveException {
+  public RConnection newConnection() {
     RConnection conn;
 
-    if(host.trim().length() > 0) {
-      if(port != null) {
-        conn = new RConnection(host.trim(), port.intValue());
+    try {
+      if(host.trim().length() > 0) {
+        if(port != null) {
+          conn = new RConnection(host.trim(), port.intValue());
+        } else {
+          conn = new RConnection(host.trim());
+        }
       } else {
-        conn = new RConnection(host.trim());
+        conn = new RConnection();
       }
-    } else {
-      conn = new RConnection();
-    }
 
-    if(conn.needLogin()) {
-      conn.login(username, password);
-    }
+      if(conn.needLogin()) {
+        conn.login(username, password);
+      }
 
-    if(encoding != null) {
-      conn.setStringEncoding(encoding);
+      if(encoding != null) {
+        conn.setStringEncoding(encoding);
+      }
+    } catch(RserveException e) {
+      throw new RRuntimeException(e);
     }
 
     return conn;
@@ -74,13 +78,9 @@ public class OpalRService implements Service, ROperationTemplate {
    */
   @Override
   public void execute(ROperation rop) {
-    try {
-      RConnection connection = newConnection();
-      rop.doWithConnection(connection);
-      connection.close();
-    } catch(RserveException e) {
-      throw new RRuntimeException(e);
-    }
+    RConnection connection = newConnection();
+    rop.doWithConnection(connection);
+    connection.close();
   }
 
   //
