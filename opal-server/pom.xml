@@ -24,8 +24,15 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-core</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
       <artifactId>opal-reporting</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>
@@ -39,11 +46,13 @@
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-r</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-httpd</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>

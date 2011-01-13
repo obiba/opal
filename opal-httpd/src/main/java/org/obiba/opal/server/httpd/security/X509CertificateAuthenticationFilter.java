@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
-import org.obiba.opal.core.unit.security.FunctionalUnitRealm.X509CertificateAuthenticationToken;
+import org.obiba.opal.core.unit.security.X509CertificateAuthenticationToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;

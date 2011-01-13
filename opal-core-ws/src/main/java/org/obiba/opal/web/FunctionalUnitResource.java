@@ -12,6 +12,7 @@ package org.obiba.opal.web;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -76,8 +77,6 @@ import au.com.bytecode.opencsv.CSVReader;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-
-import de.schlichtherle.io.FileReader;
 
 @Component
 @Scope("request")

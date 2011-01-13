@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>opal</artifactId>
@@ -13,17 +14,7 @@
   <dependencies>
     <dependency>
       <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-ws</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-web-model</artifactId>
+      <artifactId>opal-core-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -46,15 +37,42 @@
       <artifactId>magma-datasource-null</artifactId>
     </dependency>
     <dependency>
-        <groupId>org.obiba.magma</groupId>
-        <artifactId>magma-datasource-csv</artifactId>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-datasource-csv</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-datasource-fs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-datasource-excel</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-js</artifactId>
     </dependency>
     <dependency>
       <groupId>org.quartz-scheduler</groupId>
       <artifactId>quartz</artifactId>
     </dependency>
+    <!-- MailSender and friends -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context-support</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
+      <version>1.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.velocity</groupId>
+      <artifactId>velocity</artifactId>
+      <version>1.6.4</version>
+    </dependency>
   </dependencies>
-  
+
   <properties>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
   </properties>

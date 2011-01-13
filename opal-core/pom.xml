@@ -26,7 +26,7 @@
 
     <dependency>
       <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-fs</artifactId>
+      <artifactId>opal-core-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -106,10 +106,6 @@
       <artifactId>spring-orm</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context-support</artifactId>
-    </dependency>
         
     <dependency>
       <groupId>org.hibernate</groupId>
@@ -170,17 +166,6 @@
       <artifactId>quartz</artifactId>
     </dependency>
      
-    <dependency>
-      <groupId>javax.mail</groupId>
-      <artifactId>mail</artifactId>
-      <version>1.4</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.apache.velocity</groupId>
-      <artifactId>velocity</artifactId>
-      <version>1.6.4</version>
-    </dependency>
     
     <dependency>
       <groupId>org.apache.commons</groupId>

@@ -20,12 +20,7 @@
   <dependencies>
     <dependency>
       <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-core-ws</artifactId>
+      <artifactId>opal-core-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -53,6 +48,11 @@
       <scope>provided</scope>
       <type>zip</type>
       <classifier>update-site</classifier>
+    </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -96,6 +96,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.2</version>
         <configuration>
           <descriptors>
             <descriptor>src/main/assembly/opal-reporting.xml</descriptor>

@@ -19,6 +19,7 @@
   </licenses>
 
   <modules>
+    <module>opal-core-api</module>
     <module>opal-core</module>
     <module>opal-core-ws</module>
     <module>opal-sshd</module>

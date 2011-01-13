@@ -31,8 +31,8 @@ import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.options.ReportCommandOptions;
 import org.obiba.opal.shell.service.CommandSchedulerService;
-import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
+import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.reporting.Dtos;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.slf4j.Logger;
@@ -118,7 +118,7 @@ public class ReportTemplateResource {
       updateOpalConfiguration(reportTemplateDto);
       updateSchedule(reportTemplateDto, isNew);
     } catch(Exception couldNotUpdateTheReportTemplate) {
-      return Response.status(Response.Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "CouldNotUpdateTheReportTemplate").build()).build();
+      return Response.status(Response.Status.BAD_REQUEST).entity(ClientErrorDto.newBuilder().setCode(Status.BAD_REQUEST.getStatusCode()).setStatus("CouldNotUpdateTheReportTemplate").build()).build();
     }
 
     return isNew ? Response.created(uriInfo.getAbsolutePath()).build() : Response.ok().build();

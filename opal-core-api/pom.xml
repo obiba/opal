@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>opal</artifactId>
+    <groupId>org.obiba.opal</groupId>
+    <version>1.5-SNAPSHOT</version>
+    <relativePath>../</relativePath>
+  </parent>
+  <artifactId>opal-core-api</artifactId>
+  <name>opal-core-api</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-crypt</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-fs</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-ext-jdk15</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-core</artifactId>
+    </dependency>
+  </dependencies>
+</project>

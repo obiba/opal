@@ -12,7 +12,7 @@
   <dependencies>
     <dependency>
       <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-core</artifactId>
+      <artifactId>opal-core-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -34,12 +34,40 @@
       <artifactId>magma-math</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-js</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-datasource-csv</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-datasource-excel</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-datasource-fs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-datasource-jdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-hibernate-datasource</artifactId>
+    </dependency>
+    <dependency>
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.ow2.spec.ee</groupId>
+      <artifactId>ow2-jta-1.1-spec</artifactId>
     </dependency>
     <dependency>
       <groupId>org.obiba.magma</groupId>
