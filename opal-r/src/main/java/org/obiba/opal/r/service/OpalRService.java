@@ -1,18 +1,20 @@
 package org.obiba.opal.r.service;
 
 import org.obiba.opal.core.runtime.Service;
+import org.obiba.opal.r.ROperation;
+import org.obiba.opal.r.ROperationTemplate;
+import org.obiba.opal.r.RRuntimeException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/**
+ * Gets connection to the R server.
+ */
 @Component
-public class OpalRService implements Service {
-
-  private static final Logger log = LoggerFactory.getLogger(OpalRService.class);
+public class OpalRService implements Service, ROperationTemplate {
 
   private String host;
 
@@ -34,6 +36,11 @@ public class OpalRService implements Service {
     this.encoding = encoding;
   }
 
+  /**
+   * Creates a new connection to R server.
+   * @return
+   * @throws RserveException
+   */
   public RConnection newConnection() throws RserveException {
     RConnection conn;
 
@@ -59,6 +66,24 @@ public class OpalRService implements Service {
   }
 
   //
+  // ROperationTemplate methods
+  //
+
+  /**
+   * Creates a new R connection, do the operation with it and closes the R connection when done.
+   */
+  @Override
+  public void execute(ROperation rop) {
+    try {
+      RConnection connection = newConnection();
+      rop.doWithConnection(connection);
+      connection.close();
+    } catch(RserveException e) {
+      throw new RRuntimeException(e);
+    }
+  }
+
+  //
   // Service methods
   //
 
@@ -69,7 +94,7 @@ public class OpalRService implements Service {
 
   @Override
   public void start() {
-    log.info("start R service: host={} port={} username={} password={} encoding={}", new Object[] { host, port, username, password, encoding });
+
   }
 
   @Override

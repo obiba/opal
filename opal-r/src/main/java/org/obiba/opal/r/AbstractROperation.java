@@ -14,17 +14,17 @@ import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
 
 /**
- *
+ * Handles a R connection and provides some utility methods to handle operations on it.
  */
-public class OpalROperationTemplate {
+public abstract class AbstractROperation implements ROperation {
 
   RConnection connection;
 
-  private OpalROperationTemplate() {
-    super();
-  }
-
-  public boolean isConnected() {
+  /**
+   * Check if connection is still operational.
+   * @return
+   */
+  protected boolean isConnected() {
     return connection.isConnected();
   }
 
@@ -34,7 +34,7 @@ public class OpalROperationTemplate {
    * @param ct content
    * @see RConnection#assign(String, String)
    */
-  public void assign(String sym, String ct) {
+  protected void assign(String sym, String ct) {
     try {
       connection.assign(sym, ct);
     } catch(RserveException e) {
@@ -47,7 +47,7 @@ public class OpalROperationTemplate {
    * @param script
    * @return result
    */
-  public REXP execute(String script) {
+  protected REXP eval(String script) {
     if(script == null) throw new IllegalArgumentException("R script cannot be null");
 
     REXP evaled;
@@ -64,16 +64,27 @@ public class OpalROperationTemplate {
     return evaled;
   }
 
-  //
-  // Builder
-  //
-
-  public static OpalROperationTemplate create(RConnection connection) {
-    if(connection == null) throw new IllegalArgumentException("R connection cannot be null");
-    if(!connection.isConnected()) throw new IllegalArgumentException("R connection must not be closed");
-    OpalROperationTemplate template = new OpalROperationTemplate();
-    template.connection = connection;
-    return template;
+  /**
+   * Get the current R connection.
+   * @return
+   */
+  protected RConnection getConnection() {
+    return connection;
   }
+
+  /**
+   * Set the R connection to make it available for operations.
+   */
+  @Override
+  public void doWithConnection(RConnection connection) {
+    if(connection == null) throw new IllegalArgumentException("R connection cannot be null");
+    this.connection = connection;
+    doWithConnection();
+  }
+
+  /**
+   * Does anything with the current R connection.
+   */
+  public abstract void doWithConnection();
 
 }
