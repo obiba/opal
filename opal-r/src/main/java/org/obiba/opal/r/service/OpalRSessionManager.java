@@ -42,6 +42,8 @@ public class OpalRSessionManager implements ROperationTemplate, SessionListener 
 
   private final Map<String, List<OpalRSession>> rSessionMap = new HashMap<String, List<OpalRSession>>();
 
+  private Map<String, OpalRSession> currentRSessionMap = new HashMap<String, OpalRSession>();
+
   @Autowired
   public OpalRSessionManager(OpalRService opalRService) {
     this.opalRService = opalRService;
@@ -53,22 +55,82 @@ public class OpalRSessionManager implements ROperationTemplate, SessionListener 
       doClearRSessions(sessionId);
     }
     rSessionMap.clear();
+    currentRSessionMap.clear();
+  }
+
+  /**
+   * Get the R session identifiers (for the invoking Opal user).
+   * @return
+   */
+  public List<String> getSubjectRSessionIds() {
+    List<String> ids = new ArrayList<String>();
+    for(OpalRSession rSession : getRSessions(getSubjectSessionId())) {
+      ids.add(rSession.getId());
+    }
+    return ids;
+  }
+
+  /**
+   * Get the current R session identifier (for the invoking Opal user).
+   * @return
+   */
+  public String getSubjectCurrentRSessionId() {
+    OpalRSession rSession = currentRSessionMap.get(getSubjectSessionId());
+    return rSession != null ? rSession.getId() : null;
+  }
+
+  /**
+   * Check if there is such a R session with the provided identifier (for the invoking Opal user).
+   */
+  public boolean hasSubjectRSession(String rSessionId) {
+    return getSubjectRSession(rSessionId) != null;
+  }
+
+  /**
+   * Remove the R session with the provided identifier (for the invoking Opal user).
+   * @param rSessionId
+   */
+  public synchronized void removeSubjectRSession(String rSessionId) {
+    OpalRSession rSession = getSubjectRSession(rSessionId);
+    if(rSession != null) {
+      String sessionId = getSubjectSessionId();
+      getRSessions(sessionId).remove(rSession);
+      if(rSession.equals(currentRSessionMap.get(sessionId))) {
+        currentRSessionMap.remove(sessionId);
+      }
+    }
+    // else ignore
+  }
+
+  /**
+   * Set the current R session with the provided identifier (for the invoking Opal user).
+   * @param rSessionId
+   */
+  public synchronized void setSubjectCurrentRSession(String rSessionId) {
+    OpalRSession rSession = getSubjectRSession(rSessionId);
+    String sessionId = getSubjectSessionId();
+    if(rSession != null) {
+      currentRSessionMap.put(sessionId, rSession);
+    } else
+      throw new IllegalArgumentException("No such R session: " + rSessionId + " (user session: " + sessionId + ")");
   }
 
   /**
    * Stores a new R session from the provided R connection and set it as the current one (for the invoking Opal user).
    * @param connection
+   * @return R session identifier
    */
-  public void setSubjectCurrentRSession(RConnection connection) {
-    setCurrentRSession(getSubjectSessionId(), connection);
+  public String setSubjectCurrentRSession(RConnection connection) {
+    return setCurrentRSession(getSubjectSessionId(), connection);
   }
 
   /**
    * Creates a new R connection, stores the corresponding R session and set it as the current one (for the invoking Opal
    * user).
+   * @return R session identifier
    */
-  public void newSubjectCurrentRSession() {
-    setCurrentRSession(getSubjectSessionId(), opalRService.newConnection());
+  public String newSubjectCurrentRSession() {
+    return setCurrentRSession(getSubjectSessionId(), opalRService.newConnection());
   }
 
   //
@@ -119,11 +181,21 @@ public class OpalRSessionManager implements ROperationTemplate, SessionListener 
   // private methods
   //
 
+  private OpalRSession getSubjectRSession(String rSessionId) {
+    for(OpalRSession rs : getRSessions(getSubjectSessionId())) {
+      if(rs.getId().equals(rSessionId)) {
+        return rs;
+      }
+    }
+    return null;
+  }
+
   private synchronized void clearRSessions(String sessionId) {
     log.info("clearRSessions({})", sessionId);
     if(rSessionMap.containsKey(sessionId)) {
       doClearRSessions(sessionId);
       rSessionMap.remove(sessionId);
+      currentRSessionMap.remove(sessionId);
     }
   }
 
@@ -137,9 +209,12 @@ public class OpalRSessionManager implements ROperationTemplate, SessionListener 
     }
   }
 
-  private void setCurrentRSession(String sessionId, RConnection connection) {
+  private synchronized String setCurrentRSession(String sessionId, RConnection connection) {
     List<OpalRSession> rSessions = getRSessions(sessionId);
-    rSessions.add(0, new OpalRSession(connection));
+    OpalRSession current = new OpalRSession(connection);
+    rSessions.add(current);
+    currentRSessionMap.put(sessionId, current);
+    return current.getId();
   }
 
   private OpalRSession getSubjectCurrentRSession() {
@@ -147,8 +222,7 @@ public class OpalRSessionManager implements ROperationTemplate, SessionListener 
   }
 
   private OpalRSession getCurrentRSession(String sessionId) {
-    List<OpalRSession> rSessions = getRSessions(sessionId);
-    return rSessions.size() == 0 ? null : rSessions.get(0);
+    return currentRSessionMap.get(sessionId);
   }
 
   private synchronized List<OpalRSession> getRSessions(String sessionId) {

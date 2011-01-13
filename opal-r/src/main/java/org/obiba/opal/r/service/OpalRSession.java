@@ -9,15 +9,19 @@
  ******************************************************************************/
 package org.obiba.opal.r.service;
 
+import java.util.UUID;
+
 import org.obiba.opal.r.RRuntimeException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RSession;
 import org.rosuda.REngine.Rserve.RserveException;
 
 /**
- *
+ * Reference to a R session.
  */
 public class OpalRSession {
+
+  private String id;
 
   private RSession rSession;
 
@@ -28,6 +32,11 @@ public class OpalRSession {
     } catch(RserveException e) {
       throw new RRuntimeException(e);
     }
+    this.id = UUID.randomUUID().toString();
+  }
+
+  public String getId() {
+    return id;
   }
 
   public RConnection newConnection() {
