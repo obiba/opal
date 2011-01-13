@@ -14,13 +14,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListener;
-import org.obiba.opal.core.runtime.security.OpalSecurityManager;
 import org.obiba.opal.r.ROperation;
 import org.obiba.opal.r.ROperationTemplate;
 import org.obiba.opal.r.RRuntimeException;
@@ -36,26 +34,17 @@ import org.springframework.stereotype.Component;
  * R session created.
  */
 @Component
-public class OpalRSessionManager implements ROperationTemplate {
+public class OpalRSessionManager implements ROperationTemplate, SessionListener {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRSessionManager.class);
 
-  private OpalRService opalRService;
+  private final OpalRService opalRService;
 
-  private OpalSecurityManager opalSecurityManager;
-
-  private Map<String, List<OpalRSession>> rSessionMap = new HashMap<String, List<OpalRSession>>();
+  private final Map<String, List<OpalRSession>> rSessionMap = new HashMap<String, List<OpalRSession>>();
 
   @Autowired
-  public OpalRSessionManager(OpalRService opalRService, OpalSecurityManager opalSecurityManager) {
-    super();
+  public OpalRSessionManager(OpalRService opalRService) {
     this.opalRService = opalRService;
-    this.opalSecurityManager = opalSecurityManager;
-  }
-
-  @PostConstruct
-  public void start() {
-    opalSecurityManager.addSessionListener(new OpalSessionListener());
   }
 
   @PreDestroy
@@ -111,6 +100,21 @@ public class OpalRSessionManager implements ROperationTemplate {
     }
   }
 
+  @Override
+  public void onStop(Session session) {
+    clearRSessions(session.getId().toString());
+  }
+
+  @Override
+  public void onStart(Session session) {
+
+  }
+
+  @Override
+  public void onExpiration(Session session) {
+    clearRSessions(session.getId().toString());
+  }
+
   //
   // private methods
   //
@@ -158,29 +162,5 @@ public class OpalRSessionManager implements ROperationTemplate {
 
   private String getSubjectSessionId() {
     return SecurityUtils.getSubject().getSession().getId().toString();
-  }
-
-  //
-  // Nested classes and interfaces
-  //
-
-  /**
-   * Opal session lifecycle callback: does housekeeping with R sessions that have no living Opal session.
-   */
-  private final class OpalSessionListener implements SessionListener {
-    @Override
-    public void onStop(Session session) {
-      clearRSessions(session.getId().toString());
-    }
-
-    @Override
-    public void onStart(Session session) {
-
-    }
-
-    @Override
-    public void onExpiration(Session session) {
-      clearRSessions(session.getId().toString());
-    }
   }
 }

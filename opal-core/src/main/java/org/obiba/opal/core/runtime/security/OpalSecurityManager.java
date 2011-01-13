@@ -29,12 +29,9 @@ import com.google.common.collect.ImmutableSet;
 public class OpalSecurityManager extends DefaultSecurityManager {
 
   @Autowired
-  public OpalSecurityManager(Set<Realm> securityRealms) {
+  public OpalSecurityManager(Set<Realm> securityRealms, Set<SessionListener> sessionListeners) {
     super(ImmutableSet.<Realm> builder().add(new IniRealm(System.getProperty("OPAL_HOME") + "/conf/shiro.ini")).addAll(securityRealms).build());
-  }
-
-  public void addSessionListener(SessionListener listener) {
-    ((DefaultSessionManager) getSessionManager()).getSessionListeners().add(listener);
+    ((DefaultSessionManager) getSessionManager()).setSessionListeners(sessionListeners);
   }
 
   @PostConstruct
