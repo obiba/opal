@@ -18,6 +18,8 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.text.IniRealm;
+import org.apache.shiro.session.SessionListener;
+import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +31,10 @@ public class OpalSecurityManager extends DefaultSecurityManager {
   @Autowired
   public OpalSecurityManager(Set<Realm> securityRealms) {
     super(ImmutableSet.<Realm> builder().add(new IniRealm(System.getProperty("OPAL_HOME") + "/conf/shiro.ini")).addAll(securityRealms).build());
+  }
+
+  public void addSessionListener(SessionListener listener) {
+    ((DefaultSessionManager) getSessionManager()).getSessionListeners().add(listener);
   }
 
   @PostConstruct
