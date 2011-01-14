@@ -21,6 +21,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.obiba.opal.r.ScriptROperation;
 import org.obiba.opal.r.service.OpalRSessionManager;
+import org.obiba.opal.web.model.OpalR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,11 @@ public class OpalRSessionResource {
   public OpalRSessionResource(OpalRSessionManager opalRSessionManager) {
     super();
     this.opalRSessionManager = opalRSessionManager;
+  }
+
+  @GET
+  public OpalR.RSessionDto getRSession() {
+    return Dtos.asDto(id);
   }
 
   @DELETE

@@ -47,7 +47,7 @@ public class OpalRSessionsResource {
   public List<OpalR.RSessionDto> getRSessionIds() {
     final List<OpalR.RSessionDto> rSessions = Lists.newArrayList();
     for(String id : opalRSessionManager.getSubjectRSessionIds()) {
-      rSessions.add(build(id));
+      rSessions.add(Dtos.asDto(id));
     }
     return rSessions;
   }
@@ -57,7 +57,7 @@ public class OpalRSessionsResource {
   public Response getCurrentRSessionId() {
     String id = opalRSessionManager.getSubjectCurrentRSessionId();
     if(id != null) {
-      return Response.ok(build(id)).build();
+      return Response.ok(Dtos.asDto(id)).build();
     } else {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -67,12 +67,6 @@ public class OpalRSessionsResource {
   public Response newCurrentRSession() {
     String id = opalRSessionManager.newSubjectCurrentRSession();
     UriBuilder ub = UriBuilder.fromPath("/").path(OpalRSessionResource.class);
-    return Response.created(ub.build(id)).entity(build(id)).build();
+    return Response.created(ub.build(id)).entity(Dtos.asDto(id)).build();
   }
-
-  private OpalR.RSessionDto build(String id) {
-    UriBuilder ub = UriBuilder.fromPath("/").path(OpalRSessionResource.class);
-    return OpalR.RSessionDto.newBuilder().setId(id).setLink(ub.build(id).toString()).build();
-  }
-
 }
