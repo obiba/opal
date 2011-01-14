@@ -73,9 +73,19 @@ public class OpalRSessionManager implements ROperationTemplate, SessionListener 
    * @return null if current R session is not set
    */
   public String getSubjectCurrentRSessionId() {
-    SubjectRSessions rSessions = getRSessions(getSubjectSessionId());
-    OpalRSession currentRSession = rSessions.getCurrentRSession();
-    return currentRSession != null ? currentRSession.getId() : null;
+    OpalRSession currentRSession = getRSessions(getSubjectSessionId()).getCurrentRSession();
+    if(currentRSession != null) {
+      return currentRSession.getId();
+    }
+    throw new NoSuchRSessionException();
+  }
+
+  /**
+   * Get if a current R session is defined (for the invoking Opal user).
+   * @return
+   */
+  public boolean hasSubjectCurrentRSession() {
+    return getRSessions(getSubjectSessionId()).hasCurrentRSession();
   }
 
   /**
@@ -124,27 +134,19 @@ public class OpalRSessionManager implements ROperationTemplate, SessionListener 
   //
 
   /**
-   * Executes the R operation on the current R session of the invoking Opal user. If no current R session is defined,
-   * creates a new one.
+   * Executes the R operation on the current R session of the invoking Opal user. If no current R session is defined, a
+   * {@link NoSuchRSessionException} is thrown.
+   * @see #hasSubjectCurrentRSession(), {@link #setSubjectCurrentRSession(String)}
    */
   @Override
   public void execute(ROperation rop) {
-    OpalRSession rSession = getSubjectCurrentRSession();
-    RConnection connection;
-    if(rSession == null) {
-      connection = opalRService.newConnection();
-    } else {
-      connection = rSession.newConnection();
-    }
+    if(!hasSubjectCurrentRSession()) throw new NoSuchRSessionException();
+    RConnection connection = getSubjectCurrentRSession().newConnection();
     rop.doWithConnection(connection);
-    if(rSession == null) {
-      addSubjectCurrentRSession(connection);
-    } else {
-      try {
-        connection.detach();
-      } catch(RserveException e) {
-        throw new RRuntimeException(e);
-      }
+    try {
+      connection.detach();
+    } catch(RserveException e) {
+      throw new RRuntimeException(e);
     }
   }
 
@@ -226,6 +228,10 @@ public class OpalRSessionManager implements ROperationTemplate, SessionListener 
     private List<OpalRSession> rSessions = new ArrayList<OpalRSession>();
 
     private OpalRSession currentRSession;
+
+    public boolean hasCurrentRSession() {
+      return currentRSession != null;
+    }
 
     public OpalRSession getCurrentRSession() {
       return currentRSession;

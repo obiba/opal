@@ -15,7 +15,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.opal.r.service.OpalRSessionManager;
@@ -50,17 +49,6 @@ public class OpalRSessionsResource {
       rSessions.add(Dtos.asDto(id));
     }
     return rSessions;
-  }
-
-  @GET
-  @Path("/current")
-  public Response getCurrentRSessionId() {
-    String id = opalRSessionManager.getSubjectCurrentRSessionId();
-    if(id != null) {
-      return Response.ok(Dtos.asDto(id)).build();
-    } else {
-      return Response.status(Status.NOT_FOUND).build();
-    }
   }
 
   @POST

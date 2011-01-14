@@ -18,6 +18,10 @@ public class NoSuchRSessionException extends RuntimeException {
 
   private String rSessionId;
 
+  public NoSuchRSessionException() {
+    super();
+  }
+
   public NoSuchRSessionException(String rSessionId) {
     super();
     this.rSessionId = rSessionId;

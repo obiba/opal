@@ -14,16 +14,10 @@ import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
-import org.obiba.opal.r.ScriptROperation;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.model.OpalR;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -35,8 +29,6 @@ import org.springframework.stereotype.Component;
 @Scope("request")
 @Path("/r/session/{id}")
 public class OpalRSessionResource {
-
-  private static final Logger log = LoggerFactory.getLogger(OpalRSessionResource.class);
 
   private OpalRSessionManager opalRSessionManager;
 
@@ -65,23 +57,6 @@ public class OpalRSessionResource {
   public Response setCurrentRSession() {
     opalRSessionManager.setSubjectCurrentRSession(id);
     return Response.ok().build();
-  }
-
-  @GET
-  @Path("/query")
-  @Produces("application/octet-stream")
-  public Response execute(@QueryParam("script") String script) {
-    if(script == null) return Response.status(Status.BAD_REQUEST).build();
-
-    opalRSessionManager.setSubjectCurrentRSession(id);
-    ScriptROperation rop = new ScriptROperation(script);
-    opalRSessionManager.execute(rop);
-    if(rop.hasResult() && rop.hasRawResult()) {
-      return Response.ok().entity(rop.getRawResult().asBytes()).build();
-    } else {
-      log.error("R Script '{}' has result: {}, has raw result: {}", new Object[] { script, rop.hasResult(), rop.hasRawResult() });
-      return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-    }
   }
 
 }
