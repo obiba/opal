@@ -68,7 +68,18 @@ public class OpalCurrentRSessionResource {
   @GET
   @Path("/query")
   @Produces("application/octet-stream")
-  public Response execute(@QueryParam("script") String script) {
+  public Response query(@QueryParam("script") String script) {
+    return executeScript(script);
+  }
+
+  @GET
+  @Path("/symbols")
+  @Produces("application/octet-stream")
+  public Response ls() {
+    return executeScript("ls()");
+  }
+
+  private Response executeScript(String script) {
     if(script == null) return Response.status(Status.BAD_REQUEST).build();
     if(!opalRSessionManager.hasSubjectCurrentRSession()) throw new NoSuchRSessionException();
 

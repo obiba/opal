@@ -22,9 +22,7 @@ import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListener;
 import org.obiba.opal.r.ROperation;
 import org.obiba.opal.r.ROperationTemplate;
-import org.obiba.opal.r.RRuntimeException;
 import org.rosuda.REngine.Rserve.RConnection;
-import org.rosuda.REngine.Rserve.RserveException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,13 +139,10 @@ public class OpalRSessionManager implements ROperationTemplate, SessionListener 
   @Override
   public void execute(ROperation rop) {
     if(!hasSubjectCurrentRSession()) throw new NoSuchRSessionException();
-    RConnection connection = getSubjectCurrentRSession().newConnection();
+    OpalRSession rSession = getSubjectCurrentRSession();
+    RConnection connection = rSession.newConnection();
     rop.doWithConnection(connection);
-    try {
-      connection.detach();
-    } catch(RserveException e) {
-      throw new RRuntimeException(e);
-    }
+    rSession.close(connection);
   }
 
   //

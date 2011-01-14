@@ -49,6 +49,15 @@ public class OpalRSession {
 
   public void close() {
     newConnection().close();
+    rSession = null;
+  }
+
+  public void close(RConnection connection) {
+    try {
+      rSession = connection.detach();
+    } catch(RserveException e) {
+      throw new RRuntimeException("Failed detaching connection of R session: " + id, e);
+    }
   }
 
 }
