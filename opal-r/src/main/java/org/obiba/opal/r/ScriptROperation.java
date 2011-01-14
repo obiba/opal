@@ -9,12 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.r;
 
+import java.util.NoSuchElementException;
+
 import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPRaw;
 
 /**
  * Does the evaluation of a R script and stores the result.
  */
-public class ScriptROperation extends AbstractROperation {
+public class ScriptROperation extends AbstractROperation implements ROperationWithResult {
 
   private String script;
 
@@ -66,7 +69,25 @@ public class ScriptROperation extends AbstractROperation {
    * @return
    */
   public REXP getResult() {
+    if(!hasResult()) throw new NoSuchElementException();
     return result;
+  }
+
+  @Override
+  public boolean hasResult() {
+    return result != null;
+  }
+
+  @Override
+  public boolean hasRawResult() {
+    return result != null && result.isRaw();
+  }
+
+  @Override
+  public REXPRaw getRawResult() {
+    if(!hasResult()) throw new NoSuchElementException();
+    if(!hasRawResult()) throw new NoSuchElementException();
+    return (REXPRaw) result;
   }
 
 }

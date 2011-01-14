@@ -52,13 +52,13 @@ public abstract class AbstractROperation implements ROperation {
 
     REXP evaled;
     try {
-      evaled = connection.eval("try({" + script + "})");
+      evaled = connection.eval("try(serialize({" + script + "}, NULL))");
     } catch(RserveException e) {
       throw new RRuntimeException("Failed evaluating: " + script, e);
     }
     if(evaled.inherits("try-error")) {
       // Deal with an error
-      throw new RRuntimeException("Error while evaluating: " + script);
+      throw new REvaluationRuntimeException("Error while evaluating: " + script, evaled);
     }
 
     return evaled;
