@@ -19,9 +19,12 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.opal.r.service.OpalRSessionManager;
+import org.obiba.opal.web.model.OpalR;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import com.google.common.collect.Lists;
 
 /**
  *
@@ -41,8 +44,12 @@ public class OpalRSessionsResource {
   }
 
   @GET
-  public List<String> getRSessionIds() {
-    return opalRSessionManager.getSubjectRSessionIds();
+  public List<OpalR.RSessionDto> getRSessionIds() {
+    final List<OpalR.RSessionDto> rSessions = Lists.newArrayList();
+    for(String id : opalRSessionManager.getSubjectRSessionIds()) {
+      rSessions.add(build(id));
+    }
+    return rSessions;
   }
 
   @GET
@@ -50,7 +57,7 @@ public class OpalRSessionsResource {
   public Response getCurrentRSessionId() {
     String id = opalRSessionManager.getSubjectCurrentRSessionId();
     if(id != null) {
-      return Response.ok(id).build();
+      return Response.ok(build(id)).build();
     } else {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -59,8 +66,13 @@ public class OpalRSessionsResource {
   @POST
   public Response newCurrentRSession() {
     String id = opalRSessionManager.newSubjectCurrentRSession();
-    UriBuilder ub = UriBuilder.fromPath("/r/session").path(id);
-    return Response.created(ub.build()).entity(id).build();
+    UriBuilder ub = UriBuilder.fromPath("/").path(OpalRSessionResource.class);
+    return Response.created(ub.build(id)).entity(build(id)).build();
+  }
+
+  private OpalR.RSessionDto build(String id) {
+    UriBuilder ub = UriBuilder.fromPath("/").path(OpalRSessionResource.class);
+    return OpalR.RSessionDto.newBuilder().setId(id).setLink(ub.build(id).toString()).build();
   }
 
 }

@@ -1,0 +1,9 @@
+import "Ws.proto";
+package OpalR;
+
+option java_package = "org.obiba.opal.web.model";
+
+message RSessionDto {
+  required string id = 1;
+  optional string link = 2;
+}
