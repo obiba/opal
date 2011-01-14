@@ -9,16 +9,20 @@
  ******************************************************************************/
 package org.obiba.opal.web.r;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.obiba.opal.r.AssignROperation;
 import org.obiba.opal.r.ScriptROperation;
 import org.obiba.opal.r.service.NoSuchRSessionException;
 import org.obiba.opal.r.service.OpalRSessionManager;
@@ -77,6 +81,14 @@ public class OpalCurrentRSessionResource {
   @Produces("application/octet-stream")
   public Response ls() {
     return executeScript("ls()");
+  }
+
+  @POST
+  @Path("/symbols")
+  @Consumes("application/x-www-form-urlencoded")
+  public Response assign(MultivaluedMap<String, String> symbols) {
+    opalRSessionManager.execute(new AssignROperation(symbols));
+    return Response.ok().build();
   }
 
   private Response executeScript(String script) {
