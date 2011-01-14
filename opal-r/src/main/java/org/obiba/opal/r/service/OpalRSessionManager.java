@@ -184,7 +184,7 @@ public class OpalRSessionManager implements ROperationTemplate, SessionListener 
       try {
         rSession.close();
       } catch(Exception e) {
-        log.warn("Failed closing R session of " + sessionId, e);
+        log.warn("Failed closing R session: " + rSession.getId(), e);
       }
     }
   }
@@ -255,6 +255,11 @@ public class OpalRSessionManager implements ROperationTemplate, SessionListener 
         currentRSession = null;
       }
       rSessions.remove(rSession);
+      try {
+        rSession.close();
+      } catch(Exception e) {
+        log.warn("Failed closing R session: " + rSessionId, e);
+      }
     }
 
     private OpalRSession getRSession(String rSessionId) {
@@ -263,7 +268,7 @@ public class OpalRSessionManager implements ROperationTemplate, SessionListener 
           return rs;
         }
       }
-      throw new IllegalArgumentException("No such R session with id: " + rSessionId);
+      throw new NoSuchRSessionException(rSessionId);
     }
 
     @Override
