@@ -112,7 +112,7 @@ public class IdentifierAssociations implements Iterable<IdentifierAssociations.I
     }
   }
 
-  private class UnitIdentifiers {
+  private static class UnitIdentifiers {
 
     private Map<String, String> unitIdentifierToOpalIdentifier = Maps.newHashMap();
 

@@ -218,7 +218,7 @@ public class OpalRSessionManager implements ROperationTemplate, SessionListener 
   // Nested classes
   //
 
-  private final class SubjectRSessions implements Iterable<OpalRSession> {
+  private static final class SubjectRSessions implements Iterable<OpalRSession> {
 
     private List<OpalRSession> rSessions = new ArrayList<OpalRSession>();
 
