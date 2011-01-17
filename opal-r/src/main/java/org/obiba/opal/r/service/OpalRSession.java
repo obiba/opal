@@ -72,6 +72,7 @@ public class OpalRSession {
    * @param connection
    */
   public void close(RConnection connection) {
+    if(connection == null) return;
     try {
       rSession = connection.detach();
     } catch(RserveException e) {

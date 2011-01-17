@@ -18,6 +18,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -72,21 +73,22 @@ public class OpalCurrentRSessionResource {
 
   @GET
   @Path("/query")
-  @Produces("application/octet-stream")
+  @Produces(MediaType.APPLICATION_OCTET_STREAM)
   public Response query(@QueryParam("script") String script) {
     return executeScript(script);
   }
 
   @GET
   @Path("/symbols")
-  @Produces("application/octet-stream")
+  @Produces(MediaType.APPLICATION_OCTET_STREAM)
   public Response ls() {
     return executeScript("ls()");
   }
 
   @POST
   @Path("/symbols")
-  @Consumes("application/x-www-form-urlencoded")
+  @Produces(MediaType.APPLICATION_OCTET_STREAM)
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   public Response assign(MultivaluedMap<String, String> symbols) {
     opalRSessionManager.execute(new AssignROperation(symbols));
     return Response.ok().build();

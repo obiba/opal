@@ -58,7 +58,7 @@ public abstract class AbstractROperation implements ROperation {
     }
     if(evaled.inherits("try-error")) {
       // Deal with an error
-      throw new REvaluationRuntimeException("Error while evaluating: " + script, evaled);
+      throw new REvaluationRuntimeException("Error while evaluating '" + script + "'", evaled);
     }
 
     return evaled;

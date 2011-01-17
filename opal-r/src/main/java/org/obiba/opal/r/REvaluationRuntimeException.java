@@ -9,7 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.r;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPMismatchException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Exception thrown when a R try-error statement fails.
@@ -17,6 +23,8 @@ import org.rosuda.REngine.REXP;
 public class REvaluationRuntimeException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
+
+  private static final Logger log = LoggerFactory.getLogger(REvaluationRuntimeException.class);
 
   private REXP result;
 
@@ -28,4 +36,17 @@ public class REvaluationRuntimeException extends RuntimeException {
   public REXP getResult() {
     return result;
   }
+
+  public List<String> getRMessages() {
+    String[] strs = null;
+    try {
+      if(result != null) strs = result.asStrings();
+    } catch(REXPMismatchException e) {
+      log.error("Not a REXP with strings", e);
+    }
+    if(strs == null) strs = new String[] {};
+
+    return Arrays.asList(strs);
+  }
+
 }
