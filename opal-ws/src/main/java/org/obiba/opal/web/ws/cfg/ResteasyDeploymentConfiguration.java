@@ -46,6 +46,11 @@ public class ResteasyDeploymentConfiguration {
           return null;
         }
 
+        @Override
+        public String getInitParameter(String arg0) {
+          return null;
+        }
+
       };
       deployment = restEasyBootstrap.createDeployment();
       deployment.start();
