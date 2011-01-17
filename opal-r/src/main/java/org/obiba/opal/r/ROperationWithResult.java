@@ -13,9 +13,9 @@ import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPRaw;
 
 /**
- *
+ * A {@link ROperation} that has a result.
  */
-public interface ROperationWithResult {
+public interface ROperationWithResult extends ROperation {
 
   public boolean hasResult();
 
