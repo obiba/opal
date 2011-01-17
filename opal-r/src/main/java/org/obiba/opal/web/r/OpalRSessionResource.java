@@ -16,6 +16,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import org.obiba.opal.r.service.NoSuchRSessionException;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.model.OpalR;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,7 @@ public class OpalRSessionResource {
 
   @GET
   public OpalR.RSessionDto getRSession() {
+    if(!opalRSessionManager.hasSubjectRSession(id)) throw new NoSuchRSessionException(id);
     return Dtos.asDto(id);
   }
 
