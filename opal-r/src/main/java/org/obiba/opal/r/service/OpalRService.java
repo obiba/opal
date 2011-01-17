@@ -79,8 +79,11 @@ public class OpalRService implements Service, ROperationTemplate {
   @Override
   public void execute(ROperation rop) {
     RConnection connection = newConnection();
-    rop.doWithConnection(connection);
-    connection.close();
+    try {
+      rop.doWithConnection(connection);
+    } finally {
+      connection.close();
+    }
   }
 
   //
