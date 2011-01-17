@@ -14,7 +14,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.obiba.opal.web.model.OpalR;
 
 /**
- *
+ * Utility class for building R related Dtos.
  */
 public class Dtos {
 

@@ -10,7 +10,8 @@
 package org.obiba.opal.r.service;
 
 /**
- *
+ * Exception thrown when a current R session is not defined at execution of an R operation or when no R session can be
+ * found from the provided identifier.
  */
 public class NoSuchRSessionException extends RuntimeException {
 

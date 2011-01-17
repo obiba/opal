@@ -25,6 +25,10 @@ public class OpalRSession {
 
   private RSession rSession;
 
+  /**
+   * Build a R session reference from a R connection.
+   * @param connection
+   */
   public OpalRSession(RConnection connection) {
     super();
     try {
@@ -35,10 +39,18 @@ public class OpalRSession {
     this.id = UUID.randomUUID().toString();
   }
 
+  /**
+   * Get the unique identifier of the R session.
+   * @return
+   */
   public String getId() {
     return id;
   }
 
+  /**
+   * Creates a new R connection from the last R session state.
+   * @return
+   */
   public RConnection newConnection() {
     try {
       return rSession.attach();
@@ -47,11 +59,18 @@ public class OpalRSession {
     }
   }
 
+  /**
+   * Close the R session.
+   */
   public void close() {
     newConnection().close();
     rSession = null;
   }
 
+  /**
+   * Detach the R connection and updates the R session.
+   * @param connection
+   */
   public void close(RConnection connection) {
     try {
       rSession = connection.detach();

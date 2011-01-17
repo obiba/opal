@@ -34,7 +34,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
- *
+ * Handles web services on the current R session of the invoking Opal user. A current R session must be defined,
+ * otherwise the web service calls will fail with a 404 status.
  */
 @Component
 @Scope("request")

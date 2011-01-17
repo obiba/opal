@@ -10,9 +10,11 @@
 package org.obiba.opal.r;
 
 /**
- *
+ * R related runtime errors.
  */
 public class RRuntimeException extends RuntimeException {
+
+  private static final long serialVersionUID = 1L;
 
   public RRuntimeException() {
     super();

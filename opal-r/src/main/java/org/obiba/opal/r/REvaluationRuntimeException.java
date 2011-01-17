@@ -12,7 +12,7 @@ package org.obiba.opal.r;
 import org.rosuda.REngine.REXP;
 
 /**
- *
+ * Exception thrown when a R try-error statement fails.
  */
 public class REvaluationRuntimeException extends RuntimeException {
 

@@ -26,9 +26,8 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.Lists;
 
 /**
- *
+ * Handles the list and the creation of the R sessions of the invoking Opal user.
  */
-
 @Component
 @Scope("request")
 @Path("/r/sessions")

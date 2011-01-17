@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
- *
+ * Handles web services on a particular R session of the invoking Opal user.
  */
 @Component
 @Scope("request")

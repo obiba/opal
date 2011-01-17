@@ -15,7 +15,7 @@ import java.util.Map.Entry;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
- *
+ * Assign symbols in R.
  */
 public class AssignROperation extends AbstractROperation {
 
