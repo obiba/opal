@@ -21,15 +21,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
-import org.obiba.opal.r.AssignROperation;
-import org.obiba.opal.r.ScriptROperation;
-import org.obiba.opal.r.service.NoSuchRSessionException;
+import org.obiba.opal.r.StringAssignROperation;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.model.OpalR;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -41,14 +36,12 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("request")
 @Path("/r/session/current")
-public class OpalCurrentRSessionResource {
-
-  private static final Logger log = LoggerFactory.getLogger(OpalCurrentRSessionResource.class);
+public class CurrentOpalRSessionResource extends AbstractCurrentOpalRSessionResource {
 
   private OpalRSessionManager opalRSessionManager;
 
   @Autowired
-  public OpalCurrentRSessionResource(OpalRSessionManager opalRSessionManager) {
+  public CurrentOpalRSessionResource(OpalRSessionManager opalRSessionManager) {
     super();
     this.opalRSessionManager = opalRSessionManager;
   }
@@ -90,26 +83,13 @@ public class OpalCurrentRSessionResource {
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   public Response assign(MultivaluedMap<String, String> symbols) {
-    opalRSessionManager.execute(new AssignROperation(symbols));
+    opalRSessionManager.execute(new StringAssignROperation(symbols));
     return Response.ok().build();
   }
 
-  private Response executeScript(String script) {
-    if(script == null) return Response.status(Status.BAD_REQUEST).build();
-    if(!opalRSessionManager.hasSubjectCurrentRSession()) throw new NoSuchRSessionException();
-
-    ScriptROperation rop = new ScriptROperation(script);
-    opalRSessionManager.execute(rop);
-    if(rop.hasResult() && rop.hasRawResult()) {
-      return Response.ok().entity(rop.getRawResult().asBytes()).build();
-    } else {
-      log.error("R Script '{}' has result: {}, has raw result: {}", new Object[] { script, rop.hasResult(), rop.hasRawResult() });
-      return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-    }
-  }
-
-  private String getCurrentRSessionId() {
-    return opalRSessionManager.getSubjectCurrentRSessionId();
+  @Override
+  protected OpalRSessionManager getOpalRSessionManager() {
+    return opalRSessionManager;
   }
 
 }

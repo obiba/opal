@@ -42,6 +42,14 @@ public abstract class AbstractROperation implements ROperation {
     }
   }
 
+  protected void assign(String sym, REXP ct) {
+    try {
+      connection.assign(sym, ct);
+    } catch(RserveException e) {
+      throw new RRuntimeException("Failed assigning '" + sym + "' with REXP");
+    }
+  }
+
   /**
    * Safe evaluation of a R script.
    * @param script

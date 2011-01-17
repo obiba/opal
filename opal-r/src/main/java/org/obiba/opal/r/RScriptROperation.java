@@ -17,13 +17,13 @@ import org.rosuda.REngine.REXPRaw;
 /**
  * Does the evaluation of a R script and stores the result.
  */
-public class ScriptROperation extends AbstractROperation implements ROperationWithResult {
+public class RScriptROperation extends AbstractROperation implements ROperationWithResult {
 
   private String script;
 
   private REXP result;
 
-  public ScriptROperation(String script) {
+  public RScriptROperation(String script) {
     super();
     if(script == null) throw new IllegalArgumentException("R script cannot be null");
 
@@ -45,23 +45,7 @@ public class ScriptROperation extends AbstractROperation implements ROperationWi
   public void doWithConnection() {
     result = null;
     if(getConnection() == null) throw new IllegalStateException("R connection cannot be null");
-    beforeEval();
     result = eval(script);
-    afterEval();
-  }
-
-  /**
-   * Called before R script evaluation.
-   */
-  protected void beforeEval() {
-
-  }
-
-  /**
-   * Called after R script evaluation.
-   */
-  protected void afterEval() {
-
   }
 
   /**

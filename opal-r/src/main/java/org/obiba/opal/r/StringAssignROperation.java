@@ -14,16 +14,24 @@ import java.util.Map.Entry;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
+
 /**
  * Assign symbols in R.
  */
-public class AssignROperation extends AbstractROperation {
+public class StringAssignROperation extends AbstractROperation {
 
   private MultivaluedMap<String, String> symbols;
 
-  public AssignROperation(MultivaluedMap<String, String> symbols) {
+  public StringAssignROperation(MultivaluedMap<String, String> symbols) {
     super();
     this.symbols = symbols;
+  }
+
+  public StringAssignROperation(String symbol, String content) {
+    super();
+    symbols = new MultivaluedMapImpl<String, String>();
+    symbols.putSingle(symbol, content);
   }
 
   @Override
