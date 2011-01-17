@@ -22,7 +22,6 @@ import org.obiba.opal.r.service.OpalRService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -30,7 +29,6 @@ import org.springframework.stereotype.Component;
  * otherwise the web service calls will fail with a 404 status.
  */
 @Component
-@Scope("request")
 @Path("/r")
 public class OpalRResource {
 
