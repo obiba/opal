@@ -19,7 +19,7 @@ public class RRuntimeExceptionMapper implements ExceptionMapper<RRuntimeExceptio
     if(exception.getCause() != null) {
       message = message + ": " + exception.getCause().getMessage();
     }
-    return Response.status(Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN).entity(message).build();
+    return Response.status(Status.INTERNAL_SERVER_ERROR).type(MediaType.TEXT_PLAIN).entity(message).build();
   }
 
 }

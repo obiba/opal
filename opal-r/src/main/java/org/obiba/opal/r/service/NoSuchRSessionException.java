@@ -32,4 +32,12 @@ public class NoSuchRSessionException extends RuntimeException {
     return rSessionId;
   }
 
+  @Override
+  public String getMessage() {
+    if(rSessionId != null) {
+      return "No such R session with identifier: " + rSessionId;
+    } else
+      return "No current R session";
+  }
+
 }
