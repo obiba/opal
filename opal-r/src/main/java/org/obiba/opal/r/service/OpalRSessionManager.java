@@ -140,11 +140,15 @@ public class OpalRSessionManager implements ROperationTemplate, SessionListener 
   public void execute(ROperation rop) {
     if(!hasSubjectCurrentRSession()) throw new NoSuchRSessionException();
     OpalRSession rSession = getSubjectCurrentRSession();
-    RConnection connection = rSession.newConnection();
+    rSession.lock();
+    RConnection connection = null;
+
     try {
+      connection = rSession.newConnection();
       rop.doWithConnection(connection);
     } finally {
-      rSession.close(connection);
+      if(connection != null) rSession.close(connection);
+      rSession.unlock();
     }
   }
 

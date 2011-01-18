@@ -10,6 +10,7 @@
 package org.obiba.opal.r.service;
 
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.obiba.opal.r.RRuntimeException;
 import org.rosuda.REngine.Rserve.RConnection;
@@ -24,6 +25,8 @@ public class OpalRSession {
   private String id;
 
   private RSession rSession;
+
+  private final ReentrantLock lock = new ReentrantLock();
 
   /**
    * Build a R session reference from a R connection.
@@ -78,6 +81,14 @@ public class OpalRSession {
     } catch(RserveException e) {
       throw new RRuntimeException("Failed detaching connection of R session: " + id, e);
     }
+  }
+
+  public void lock() {
+    lock.lock();
+  }
+
+  public void unlock() {
+    lock.unlock();
   }
 
 }
