@@ -71,48 +71,28 @@ public enum VectorType {
   datetimes(DateTimeType.get()) {
     @Override
     protected REXP asValuesVector(int size, Iterable<Value> values) {
-      String strings[] = new String[size];
-      int i = 0;
-      for(Value value : values) {
-        strings[i++] = value.toString();
-      }
-      return new REXPString(strings);
+      return asStringValuesVector(size, values);
     }
   },
 
   dates(DateType.get()) {
     @Override
     protected REXP asValuesVector(int size, Iterable<Value> values) {
-      String strings[] = new String[size];
-      int i = 0;
-      for(Value value : values) {
-        strings[i++] = value.toString();
-      }
-      return new REXPString(strings);
+      return asStringValuesVector(size, values);
     }
   },
 
   locales(LocaleType.get()) {
     @Override
     protected REXP asValuesVector(int size, Iterable<Value> values) {
-      String strings[] = new String[size];
-      int i = 0;
-      for(Value value : values) {
-        strings[i++] = value.toString();
-      }
-      return new REXPString(strings);
+      return asStringValuesVector(size, values);
     }
   },
 
   strings(TextType.get()) {
     @Override
     protected REXP asValuesVector(int size, Iterable<Value> values) {
-      String strings[] = new String[size];
-      int i = 0;
-      for(Value value : values) {
-        strings[i++] = value.toString();
-      }
-      return new REXPString(strings);
+      return asStringValuesVector(size, values);
     }
   },
 
@@ -143,6 +123,12 @@ public enum VectorType {
     throw new MagmaRRuntimeException("No VectorType for ValueType " + type);
   }
 
+  /**
+   * Build a type specific R vector.
+   * @param size
+   * @param values
+   * @return
+   */
   protected abstract REXP asValuesVector(int size, Iterable<Value> values);
 
   /**
@@ -159,6 +145,12 @@ public enum VectorType {
       return asValuesVector(size, values);
   }
 
+  /**
+   * Build a list of R vectors.
+   * @param size
+   * @param values
+   * @return
+   */
   private REXP asValueSequencesVector(int size, Iterable<Value> values) {
     REXP sequences[] = new REXP[size];
     int i = 0;
@@ -167,6 +159,22 @@ public enum VectorType {
       sequences[i++] = seq.isNull() ? null : asValuesVector(seq.getSize(), seq.getValue());
     }
     return new REXPList(new RList(sequences));
+  }
+
+  /**
+   * Build a R vector of strings.
+   * @param size
+   * @param values
+   * @return
+   */
+  protected REXP asStringValuesVector(int size, Iterable<Value> values) {
+    String strings[] = new String[size];
+    int i = 0;
+    for(Value value : values) {
+      String str = value.toString();
+      strings[i++] = (str != null && str.length() > 0) ? str : null;
+    }
+    return new REXPString(strings);
   }
 
 }
