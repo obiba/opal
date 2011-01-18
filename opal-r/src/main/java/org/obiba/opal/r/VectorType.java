@@ -1,6 +1,7 @@
 package org.obiba.opal.r;
 
 import org.obiba.magma.Value;
+import org.obiba.magma.ValueSequence;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.BooleanType;
@@ -26,7 +27,7 @@ public enum VectorType {
 
   booleans(BooleanType.get()) {
     @Override
-    public REXP asVector(int size, Iterable<Value> values) {
+    protected REXP asValuesVector(int size, Iterable<Value> values) {
       byte booleans[] = new byte[size];
       int i = 0;
       for(Value value : values) {
@@ -40,11 +41,12 @@ public enum VectorType {
       }
       return new REXPLogical(booleans);
     }
+
   },
 
   ints(IntegerType.get()) {
     @Override
-    public REXP asVector(int size, Iterable<Value> values) {
+    protected REXP asValuesVector(int size, Iterable<Value> values) {
       int ints[] = new int[size];
       int i = 0;
       for(Value value : values) {
@@ -56,7 +58,7 @@ public enum VectorType {
 
   doubles(DecimalType.get()) {
     @Override
-    public REXP asVector(int size, Iterable<Value> values) {
+    protected REXP asValuesVector(int size, Iterable<Value> values) {
       double doubles[] = new double[size];
       int i = 0;
       for(Value value : values) {
@@ -68,7 +70,7 @@ public enum VectorType {
 
   datetimes(DateTimeType.get()) {
     @Override
-    public REXP asVector(int size, Iterable<Value> values) {
+    protected REXP asValuesVector(int size, Iterable<Value> values) {
       String strings[] = new String[size];
       int i = 0;
       for(Value value : values) {
@@ -80,7 +82,7 @@ public enum VectorType {
 
   dates(DateType.get()) {
     @Override
-    public REXP asVector(int size, Iterable<Value> values) {
+    protected REXP asValuesVector(int size, Iterable<Value> values) {
       String strings[] = new String[size];
       int i = 0;
       for(Value value : values) {
@@ -92,7 +94,7 @@ public enum VectorType {
 
   locales(LocaleType.get()) {
     @Override
-    public REXP asVector(int size, Iterable<Value> values) {
+    protected REXP asValuesVector(int size, Iterable<Value> values) {
       String strings[] = new String[size];
       int i = 0;
       for(Value value : values) {
@@ -104,7 +106,7 @@ public enum VectorType {
 
   strings(TextType.get()) {
     @Override
-    public REXP asVector(int size, Iterable<Value> values) {
+    protected REXP asValuesVector(int size, Iterable<Value> values) {
       String strings[] = new String[size];
       int i = 0;
       for(Value value : values) {
@@ -116,7 +118,7 @@ public enum VectorType {
 
   binaries(BinaryType.get()) {
     @Override
-    public REXP asVector(int size, Iterable<Value> values) {
+    protected REXP asValuesVector(int size, Iterable<Value> values) {
       REXPRaw raws[] = new REXPRaw[size];
       int i = 0;
       for(Value value : values) {
@@ -141,6 +143,30 @@ public enum VectorType {
     throw new MagmaRRuntimeException("No VectorType for ValueType " + type);
   }
 
-  public abstract REXP asVector(int size, Iterable<Value> values);
+  protected abstract REXP asValuesVector(int size, Iterable<Value> values);
+
+  /**
+   * Build R vector from values.
+   * @param repeatable true if values are {@link ValueSequence}
+   * @param size number of values (including null values)
+   * @param values
+   * @return the R vector
+   */
+  public REXP asVector(boolean repeatable, int size, Iterable<Value> values) {
+    if(repeatable) {
+      return asValueSequencesVector(size, values);
+    } else
+      return asValuesVector(size, values);
+  }
+
+  private REXP asValueSequencesVector(int size, Iterable<Value> values) {
+    REXP sequences[] = new REXP[size];
+    int i = 0;
+    for(Value value : values) {
+      ValueSequence seq = value.asSequence();
+      sequences[i++] = seq.isNull() ? null : asValuesVector(seq.getSize(), seq.getValue());
+    }
+    return new REXPList(new RList(sequences));
+  }
 
 }

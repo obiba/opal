@@ -92,7 +92,7 @@ public class MagmaAssignROperation extends AbstractROperation {
 
     protected REXP getVector(SortedSet<VariableEntity> entities, VariableValueSource vvs) {
       VectorType vt = VectorType.forValueType(vvs.getValueType());
-      return vt.asVector(entities.size(), vvs.asVectorSource().getValues(entities));
+      return vt.asVector(vvs.getVariable().isRepeatable(), entities.size(), vvs.asVectorSource().getValues(entities));
     }
 
     /**
