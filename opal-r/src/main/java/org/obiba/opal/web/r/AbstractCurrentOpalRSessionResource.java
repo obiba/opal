@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Base class for handling current R session related web services.
  */
 public abstract class AbstractCurrentOpalRSessionResource {
 
@@ -27,6 +27,11 @@ public abstract class AbstractCurrentOpalRSessionResource {
 
   protected abstract OpalRSessionManager getOpalRSessionManager();
 
+  /**
+   * Executes a R script and set the REXP result in its serialized form in the Response.
+   * @param script
+   * @return
+   */
   protected Response executeScript(String script) {
     if(script == null) return Response.status(Status.BAD_REQUEST).build();
 
@@ -40,10 +45,17 @@ public abstract class AbstractCurrentOpalRSessionResource {
     }
   }
 
+  /**
+   * Check the current R session is defined for the invoking Opal user.
+   */
   protected void checkHasCurrentRSession() {
     if(!getOpalRSessionManager().hasSubjectCurrentRSession()) throw new NoSuchRSessionException();
   }
 
+  /**
+   * Get the current R session identifier for the invoking Opal user.
+   * @return
+   */
   protected String getCurrentRSessionId() {
     return getOpalRSessionManager().getSubjectCurrentRSessionId();
   }

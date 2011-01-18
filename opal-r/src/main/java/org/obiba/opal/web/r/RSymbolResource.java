@@ -16,20 +16,22 @@ import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import org.obiba.opal.r.MagmaAssignROperation;
 import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.StringAssignROperation;
-import org.obiba.opal.r.VariableAssignROperation;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
- *
+ * Handles web services on the symbols of the current R session of the invoking Opal user. A current R session must be
+ * defined, otherwise the web service calls will fail with a 404 status.
  */
 @Component
 @Scope("request")
@@ -48,6 +50,7 @@ public class RSymbolResource extends AbstractCurrentOpalRSessionResource {
   }
 
   @GET
+  @Produces(MediaType.APPLICATION_OCTET_STREAM)
   public Response getSymbol() {
     return executeScript(name);
   }
@@ -68,8 +71,8 @@ public class RSymbolResource extends AbstractCurrentOpalRSessionResource {
 
   @PUT
   @Consumes("application/x-opal")
-  public Response putOpal(String path) {
-    opalRSessionManager.execute(new VariableAssignROperation(name, path));
+  public Response putMagma(String path) {
+    opalRSessionManager.execute(new MagmaAssignROperation(name, path));
     return Response.created(getSymbolURI()).build();
   }
 

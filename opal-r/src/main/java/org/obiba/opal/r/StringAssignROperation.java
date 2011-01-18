@@ -17,7 +17,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 
 /**
- * Assign symbols in R.
+ * Assign textual values to symbols in R.
  */
 public class StringAssignROperation extends AbstractROperation {
 

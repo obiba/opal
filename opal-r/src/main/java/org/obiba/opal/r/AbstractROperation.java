@@ -42,6 +42,11 @@ public abstract class AbstractROperation implements ROperation {
     }
   }
 
+  /**
+   * Assign a REXP object to a symbol in R.
+   * @param sym
+   * @param ct
+   */
   protected void assign(String sym, REXP ct) {
     try {
       connection.assign(sym, ct);

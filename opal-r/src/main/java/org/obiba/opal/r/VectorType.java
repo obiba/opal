@@ -2,19 +2,45 @@ package org.obiba.opal.r;
 
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueType;
+import org.obiba.magma.type.BinaryType;
+import org.obiba.magma.type.BooleanType;
 import org.obiba.magma.type.DateTimeType;
+import org.obiba.magma.type.DateType;
 import org.obiba.magma.type.DecimalType;
 import org.obiba.magma.type.IntegerType;
+import org.obiba.magma.type.LocaleType;
 import org.obiba.magma.type.TextType;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPDouble;
 import org.rosuda.REngine.REXPInteger;
+import org.rosuda.REngine.REXPList;
+import org.rosuda.REngine.REXPLogical;
+import org.rosuda.REngine.REXPRaw;
 import org.rosuda.REngine.REXPString;
+import org.rosuda.REngine.RList;
 
 /**
  * A utility class for mapping {@code ValueType} to R {@code REXP}.
  */
 public enum VectorType {
+
+  booleans(BooleanType.get()) {
+    @Override
+    public REXP asVector(int size, Iterable<Value> values) {
+      byte booleans[] = new byte[size];
+      int i = 0;
+      for(Value value : values) {
+        if(value.isNull()) {
+          booleans[i++] = REXPLogical.NA;
+        } else if((Boolean) value.getValue()) {
+          booleans[i++] = REXPLogical.TRUE;
+        } else {
+          booleans[i++] = REXPLogical.FALSE;
+        }
+      }
+      return new REXPLogical(booleans);
+    }
+  },
 
   ints(IntegerType.get()) {
     @Override
@@ -40,7 +66,31 @@ public enum VectorType {
     }
   },
 
-  dates(DateTimeType.get()) {
+  datetimes(DateTimeType.get()) {
+    @Override
+    public REXP asVector(int size, Iterable<Value> values) {
+      String strings[] = new String[size];
+      int i = 0;
+      for(Value value : values) {
+        strings[i++] = value.toString();
+      }
+      return new REXPString(strings);
+    }
+  },
+
+  dates(DateType.get()) {
+    @Override
+    public REXP asVector(int size, Iterable<Value> values) {
+      String strings[] = new String[size];
+      int i = 0;
+      for(Value value : values) {
+        strings[i++] = value.toString();
+      }
+      return new REXPString(strings);
+    }
+  },
+
+  locales(LocaleType.get()) {
     @Override
     public REXP asVector(int size, Iterable<Value> values) {
       String strings[] = new String[size];
@@ -62,6 +112,18 @@ public enum VectorType {
       }
       return new REXPString(strings);
     }
+  },
+
+  binaries(BinaryType.get()) {
+    @Override
+    public REXP asVector(int size, Iterable<Value> values) {
+      REXPRaw raws[] = new REXPRaw[size];
+      int i = 0;
+      for(Value value : values) {
+        raws[i++] = new REXPRaw((byte[]) value.getValue());
+      }
+      return new REXPList(new RList(raws));
+    }
   };
 
   private ValueType type;
@@ -76,7 +138,7 @@ public enum VectorType {
         return v;
       }
     }
-    throw new IllegalArgumentException("No VectorType for ValueType " + type);
+    throw new MagmaRRuntimeException("No VectorType for ValueType " + type);
   }
 
   public abstract REXP asVector(int size, Iterable<Value> values);

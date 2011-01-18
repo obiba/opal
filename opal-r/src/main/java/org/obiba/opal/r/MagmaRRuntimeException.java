@@ -9,23 +9,21 @@
  ******************************************************************************/
 package org.obiba.opal.r;
 
+import org.obiba.magma.MagmaRuntimeException;
+
 /**
- * R related runtime errors.
+ * Magma to R related runtime errors.
  */
-public class RRuntimeException extends RuntimeException {
+public class MagmaRRuntimeException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
 
-  public RRuntimeException(String msg, Throwable cause) {
+  public MagmaRRuntimeException(String msg, MagmaRuntimeException cause) {
     super(msg, cause);
   }
 
-  public RRuntimeException(String msg) {
+  public MagmaRRuntimeException(String msg) {
     super(msg);
-  }
-
-  public RRuntimeException(Throwable cause) {
-    super(cause);
   }
 
 }
