@@ -12,6 +12,7 @@ package org.obiba.opal.web.security;
 import java.lang.annotation.Annotation;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response.Status;
@@ -27,6 +28,7 @@ import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.resteasy.spi.interception.PostProcessInterceptor;
 import org.jboss.resteasy.spi.interception.PreProcessInterceptor;
 import org.jboss.resteasy.util.HttpHeaderNames;
+import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,10 +54,25 @@ public class SecurityInterceptor extends AbstractSecurityComponent implements Pr
   public ServerResponse preProcess(HttpRequest request, ResourceMethod method) throws Failure, WebApplicationException {
     // Check authentication before processing. If resource requires authentication and user is not authenticated, return
     // "401: Unauthorized"
-    if(isWebServiceAuthenticated(method) && isUserAuthenticated() == false) {
-      return (ServerResponse) ServerResponse.status(Status.UNAUTHORIZED).header(HttpHeaders.WWW_AUTHENTICATE, X_OPAL_AUTH + " realm=\"Opal\"").build();
+
+    // If we have an authenticated user, let method through
+    if(isUserAuthenticated()) {
+      return null;
     }
-    return null;
+
+    // If resource is public, let method through
+    if(isWebServicePublic(method)) {
+      return null;
+    }
+
+    // If method allows authentication using the cookie only and a valid cookie is present
+    // let method through
+    if(isWebServiceAuthenticatedByCookie(method) && isOpalCookieValid(request)) {
+      return null;
+    }
+
+    // Not authorized: method requires proper authentication, and no user is authenticated
+    return (ServerResponse) ServerResponse.status(Status.UNAUTHORIZED).header(HttpHeaders.WWW_AUTHENTICATE, X_OPAL_AUTH + " realm=\"Opal\"").build();
   }
 
   @Override
@@ -80,7 +97,7 @@ public class SecurityInterceptor extends AbstractSecurityComponent implements Pr
   }
 
   /**
-   * Returns true when resource method or class is annotated with @NotAuthenticated, false otherwise.
+   * Returns true when resource method or class is annotated with {@link NotAuthenticated}, false otherwise.
    * @param method
    * @return
    */
@@ -89,17 +106,26 @@ public class SecurityInterceptor extends AbstractSecurityComponent implements Pr
   }
 
   /**
-   * Returns true when service is not public (see {@link #isWebServicePublic})
+   * Returns true when resource method or class is annotated with {@link AuthenticatedByCookie}, false otherwise.
    * @param method
    * @return
    */
-  private boolean isWebServiceAuthenticated(ResourceMethod method) {
-    return isWebServicePublic(method) == false;
+  private boolean isWebServiceAuthenticatedByCookie(ResourceMethod method) {
+    return method.getMethod().isAnnotationPresent(AuthenticatedByCookie.class) || method.getResourceClass().isAnnotationPresent(AuthenticatedByCookie.class);
+  }
+
+  private boolean isOpalCookieValid(HttpRequest request) {
+    Cookie cookie = request.getHttpHeaders().getCookies().get(OPAL_SESSION_ID_COOKIE_NAME);
+    if(cookie != null) {
+      return isValidSessionId(cookie.getValue());
+    }
+    return false;
   }
 
   private boolean isWebServiceAuthenticated(Annotation... annotations) {
     for(Annotation annotation : annotations) {
       if(annotation instanceof NotAuthenticated) return false;
+      if(annotation instanceof AuthenticatedByCookie) return false;
     }
     return true;
   }

@@ -17,7 +17,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.session.Session;
@@ -26,6 +25,7 @@ import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionKey;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
+import org.eclipse.jetty.http.HttpHeaders;
 import org.obiba.opal.web.security.HttpAuthorizationToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,19 +87,32 @@ public class AuthenticationFilter extends OncePerRequestFilter {
    * @param request
    */
   private void authenticateAndBind(HttpServletRequest request) {
-    String sessionId = extractSessionId(request);
-    String authorization = request.getHeader("Authorization");
-    if(isValidSessionId(sessionId)) {
-      Subject s = new Subject.Builder(getSecurityManager()).sessionId(sessionId).authenticated(true).buildSubject();
-      s.getSession().touch();
-      log.debug("Binding subject {} session {} to executing thread {}", new Object[] { s.getPrincipal(), sessionId, Thread.currentThread().getId() });
-      ThreadContext.bind(s);
-    } else if(authorization != null) {
-      HttpAuthorizationToken token = new HttpAuthorizationToken(X_OPAL_AUTH, authorization);
-      SecurityUtils.getSubject().login(token);
-      sessionId = SecurityUtils.getSubject().getSession().getId().toString();
-      log.info("Successfull session creation for user '{}' session ID is '{}'.", token.getUsername(), sessionId);
+
+    Subject subject = null;
+    if(hasOpalAuthHeader(request)) {
+      String opalAuthToken = getOpalAuthToken(request);
+      if(isValidSessionId(opalAuthToken)) {
+        subject = new Subject.Builder(getSecurityManager()).sessionId(opalAuthToken).authenticated(true).buildSubject();
+        ThreadContext.bind(subject);
+      }
     }
+
+    if(subject == null && hasAuthorizationHeader(request)) {
+      String authorization = getAuthorizationHeader(request);
+      String sessionId = extractSessionId(request);
+
+      HttpAuthorizationToken token = new HttpAuthorizationToken(X_OPAL_AUTH, authorization);
+      subject = new Subject.Builder(getSecurityManager()).sessionId(sessionId).buildSubject();
+      subject.login(token);
+    }
+
+    if(subject != null) {
+      Session session = subject.getSession();
+      log.debug("Binding subject {} session {} to executing thread {}", new Object[] { subject.getPrincipal(), session.getId(), Thread.currentThread().getId() });
+      session.touch();
+      return;
+    }
+
   }
 
   private void unbind() {
@@ -116,9 +129,27 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     }
   }
 
+  private boolean hasOpalAuthHeader(HttpServletRequest request) {
+    String header = getOpalAuthToken(request);
+    return header != null && header.isEmpty() == false;
+  }
+
+  private String getOpalAuthToken(HttpServletRequest request) {
+    return request.getHeader(X_OPAL_AUTH);
+  }
+
+  private boolean hasAuthorizationHeader(HttpServletRequest request) {
+    String header = getAuthorizationHeader(request);
+    return header != null && header.isEmpty() == false;
+  }
+
+  private String getAuthorizationHeader(HttpServletRequest request) {
+    return request.getHeader(HttpHeaders.AUTHORIZATION);
+  }
+
   private String extractSessionId(HttpServletRequest request) {
     String sessionId = request.getHeader(X_OPAL_AUTH);
-    if(sessionId == null && (request.getMethod().equalsIgnoreCase("GET") || request.getMethod().equalsIgnoreCase("POST"))) {
+    if(sessionId == null) {
       // Extract from the cookie (only used for GET or POST requests)
       Cookie cookie = findCookie(request, OPAL_SESSION_ID_COOKIE_NAME);
       if(cookie != null) {
