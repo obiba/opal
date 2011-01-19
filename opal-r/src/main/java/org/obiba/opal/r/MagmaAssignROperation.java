@@ -10,6 +10,7 @@
 package org.obiba.opal.r;
 
 import java.util.List;
+import java.util.Set;
 import java.util.SortedSet;
 
 import org.obiba.magma.Datasource;
@@ -38,102 +39,69 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   private final String path;
 
-  private MagmaVectorProvider magmaVector;
+  private Set<MagmaRConverter> magmaRConverters = Sets.newHashSet(new DatasourceRConverter(), new ValueTableRConverter(), new VariableRConverter());
 
   public MagmaAssignROperation(String symbol, String path) {
     super();
     this.symbol = symbol;
     this.path = path;
-    this.magmaVector = new DatasourceVectorProvider();
-    this.magmaVector.withNext(new ValueTableVectorProvider()).withNext(new VariableVectorProvider());
   }
 
   @Override
   public void doWithConnection() {
     try {
-      assign(symbol, magmaVector.getVector(path));
+      for(MagmaRConverter converter : magmaRConverters) {
+        if(converter.canResolve(path)) {
+          assign(symbol, converter.asVector(path));
+          return;
+        }
+      }
     } catch(MagmaRuntimeException e) {
       throw new MagmaRRuntimeException("Failed resolving path '" + path + "'", e);
     }
-
+    throw new MagmaRRuntimeException("Failed resolving path '" + path + "'");
   }
 
   //
-  // Magma Vector Providers
+  // Magma R Convectors
   //
 
   /**
-   * Provides a R vector from a Magma fully qualified path. Support for providers chaining.
+   * Provides a R vector from a Magma fully qualified path.
    */
-  private interface MagmaVectorProvider {
+  private interface MagmaRConverter {
 
     /**
      * Build a R vector from the Magma fully-qualified path.
      * @param path
      * @return
      */
-    public REXP getVector(String path);
-
-    /**
-     * Chain of providers.
-     * @param next
-     * @return the next provider
-     */
-    public MagmaVectorProvider withNext(MagmaVectorProvider next);
-
-  }
-
-  /**
-   * Base implementation of Magma vector providers.
-   */
-  private abstract class AbstractMagmaVectorProvider implements MagmaVectorProvider {
-
-    protected MagmaVectorProvider next;
-
-    protected REXP getVector(SortedSet<VariableEntity> entities, VariableValueSource vvs) {
-      VectorType vt = VectorType.forValueType(vvs.getValueType());
-      return vt.asVector(vvs.getVariable().isRepeatable(), entities.size(), vvs.asVectorSource().getValues(entities));
-    }
-
-    /**
-     * If Magma path can be resolved, build the corresponding R vector, else forward request to next Magma vector
-     * provider (if one is defined).
-     */
-    @Override
-    public REXP getVector(String path) {
-      if(canResolve(path)) return getVectorInternal(path);
-      else if(next != null) {
-        return next.getVector(path);
-      }
-      throw new MagmaRRuntimeException("Failed resolving path: " + path);
-    }
-
-    @Override
-    public MagmaVectorProvider withNext(MagmaVectorProvider next) {
-      this.next = next;
-      return next;
-    }
+    public REXP asVector(String path);
 
     /**
      * Check if path can be resolved as a datasource, table or variable.
      * @param path
      * @return
      */
-    protected abstract boolean canResolve(String path);
+    public boolean canResolve(String path);
 
-    /**
-     * Build a R vector depending on the Magma element resolved.
-     * @param path
-     * @return
-     */
-    protected abstract REXP getVectorInternal(String path);
+  }
 
+  /**
+   * Base implementation of Magma vector providers.
+   */
+  private abstract class AbstractMagmaRConverter implements MagmaRConverter {
+
+    protected REXP getVector(VariableValueSource vvs, SortedSet<VariableEntity> entities) {
+      VectorType vt = VectorType.forValueType(vvs.getValueType());
+      return vt.asVector(vvs, entities);
+    }
   }
 
   /**
    * Build a R vector from a datasource: list of vectors of tables.
    */
-  private class DatasourceVectorProvider extends AbstractMagmaVectorProvider {
+  private class DatasourceRConverter implements MagmaRConverter {
 
     @Override
     public boolean canResolve(String path) {
@@ -141,14 +109,14 @@ public class MagmaAssignROperation extends AbstractROperation {
     }
 
     @Override
-    protected REXP getVectorInternal(String path) {
+    public REXP asVector(String path) {
       Datasource datasource = MagmaEngine.get().getDatasource(path);
       // build a list of list of vectors
       List<REXP> contents = Lists.newArrayList();
       List<String> names = Lists.newArrayList();
       for(ValueTable vt : datasource.getValueTables()) {
-        ValueTableVectorProvider vtv = new ValueTableVectorProvider(vt);
-        contents.add(vtv.getVector());
+        ValueTableRConverter vtv = new ValueTableRConverter(vt);
+        contents.add(vtv.asVector());
         names.add(vt.getName());
       }
       return new REXPList(new RList(contents, names));
@@ -158,15 +126,15 @@ public class MagmaAssignROperation extends AbstractROperation {
   /**
    * Build a R vector from a table: list of vectors of variables.
    */
-  private class ValueTableVectorProvider extends AbstractMagmaVectorProvider {
+  private class ValueTableRConverter extends AbstractMagmaRConverter {
 
     private ValueTable table;
 
-    public ValueTableVectorProvider() {
+    public ValueTableRConverter() {
       super();
     }
 
-    public ValueTableVectorProvider(ValueTable table) {
+    public ValueTableRConverter(ValueTable table) {
       super();
       this.table = table;
     }
@@ -177,19 +145,25 @@ public class MagmaAssignROperation extends AbstractROperation {
     }
 
     @Override
-    protected REXP getVectorInternal(String path) {
+    public REXP asVector(String path) {
       resolvePath(path);
-      return getVector();
+      return asVector();
     }
 
-    REXP getVector() {
+    /**
+     * Build a R vector from an already set ValueTable.
+     * @return
+     */
+    REXP asVector() {
+      if(table == null) throw new IllegalStateException("Table must not be null");
+
       SortedSet<VariableEntity> entities = Sets.newTreeSet(table.getVariableEntities());
       // build a list of vectors
       List<REXP> contents = Lists.newArrayList();
       List<String> names = Lists.newArrayList();
       for(Variable v : table.getVariables()) {
         VariableValueSource vvs = table.getVariableValueSource(v.getName());
-        contents.add(getVector(entities, vvs));
+        contents.add(getVector(vvs, entities));
         names.add(vvs.getVariable().getName());
       }
       return new REXPList(new RList(contents, names));
@@ -212,7 +186,7 @@ public class MagmaAssignROperation extends AbstractROperation {
    * Build a R vector from a variable: vector of values.
    * @see VectorType
    */
-  private class VariableVectorProvider extends AbstractMagmaVectorProvider {
+  private class VariableRConverter extends AbstractMagmaRConverter {
 
     private ValueTable table;
 
@@ -244,11 +218,10 @@ public class MagmaAssignROperation extends AbstractROperation {
     }
 
     @Override
-    protected REXP getVectorInternal(String path) {
+    public REXP asVector(String path) {
       resolvePath(path);
-      SortedSet<VariableEntity> entities = Sets.newTreeSet(table.getVariableEntities());
       // build a vector
-      return getVector(entities, variableValueSource);
+      return getVector(variableValueSource, Sets.newTreeSet(table.getVariableEntities()));
     }
   }
 

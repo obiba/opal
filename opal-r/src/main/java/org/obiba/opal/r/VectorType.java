@@ -1,8 +1,13 @@
 package org.obiba.opal.r;
 
+import java.util.SortedSet;
+
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSequence;
 import org.obiba.magma.ValueType;
+import org.obiba.magma.Variable;
+import org.obiba.magma.VariableEntity;
+import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.BooleanType;
 import org.obiba.magma.type.DateTimeType;
@@ -13,11 +18,13 @@ import org.obiba.magma.type.LocaleType;
 import org.obiba.magma.type.TextType;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPDouble;
+import org.rosuda.REngine.REXPFactor;
 import org.rosuda.REngine.REXPInteger;
 import org.rosuda.REngine.REXPList;
 import org.rosuda.REngine.REXPLogical;
 import org.rosuda.REngine.REXPRaw;
 import org.rosuda.REngine.REXPString;
+import org.rosuda.REngine.RFactor;
 import org.rosuda.REngine.RList;
 
 /**
@@ -110,6 +117,8 @@ public enum VectorType {
 
   private ValueType type;
 
+  private Variable variable;
+
   private VectorType(ValueType type) {
     this.type = type;
   }
@@ -124,26 +133,28 @@ public enum VectorType {
   }
 
   /**
+   * Build R vector.
+   * @param vvs
+   * @param entities
+   * @return
+   */
+  public REXP asVector(VariableValueSource vvs, SortedSet<VariableEntity> entities) {
+    variable = vvs.getVariable();
+    int size = entities.size();
+    Iterable<Value> values = vvs.asVectorSource().getValues(entities);
+    if(variable.isRepeatable()) {
+      return asValueSequencesVector(size, values);
+    } else
+      return asValuesVector(size, values);
+  }
+
+  /**
    * Build a type specific R vector.
    * @param size
    * @param values
    * @return
    */
   protected abstract REXP asValuesVector(int size, Iterable<Value> values);
-
-  /**
-   * Build R vector from values.
-   * @param repeatable true if values are {@link ValueSequence}
-   * @param size number of values (including null values)
-   * @param values
-   * @return the R vector
-   */
-  public REXP asVector(boolean repeatable, int size, Iterable<Value> values) {
-    if(repeatable) {
-      return asValueSequencesVector(size, values);
-    } else
-      return asValuesVector(size, values);
-  }
 
   /**
    * Build a list of R vectors.
@@ -174,7 +185,10 @@ public enum VectorType {
       String str = value.toString();
       strings[i++] = (str != null && str.length() > 0) ? str : null;
     }
-    return new REXPString(strings);
+    if(variable.hasCategories()) {
+      return new REXPFactor(new RFactor(strings));
+    } else
+      return new REXPString(strings);
   }
 
 }
