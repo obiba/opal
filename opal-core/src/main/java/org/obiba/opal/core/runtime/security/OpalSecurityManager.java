@@ -23,14 +23,14 @@ import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableList;
 
 @Component
 public class OpalSecurityManager extends DefaultSecurityManager {
 
   @Autowired
   public OpalSecurityManager(Set<Realm> securityRealms, Set<SessionListener> sessionListeners) {
-    super(ImmutableSet.<Realm> builder().add(new IniRealm(System.getProperty("OPAL_HOME") + "/conf/shiro.ini")).addAll(securityRealms).build());
+    super(ImmutableList.<Realm> builder().add(new IniRealm(System.getProperty("OPAL_HOME") + "/conf/shiro.ini")).addAll(securityRealms).build());
     ((DefaultSessionManager) getSessionManager()).setSessionListeners(sessionListeners);
   }
 
