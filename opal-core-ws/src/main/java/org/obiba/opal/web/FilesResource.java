@@ -43,8 +43,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -72,9 +72,7 @@ public class FilesResource {
 
   private static final Logger log = LoggerFactory.getLogger(FilesResource.class);
 
-  private static final int NOT_IMPLEMENTED = 501;
-
-  private OpalRuntime opalRuntime;
+  private final OpalRuntime opalRuntime;
 
   private MimetypesFileTypeMap mimeTypes;
 
@@ -205,6 +203,7 @@ public class FilesResource {
 
     // Loop through all children.
     for(FileObject child : children) {
+      if(child.isReadable() == false) continue;
 
       // Build a FileDto representing the child.
       fileBuilder = Opal.FileDto.newBuilder();
