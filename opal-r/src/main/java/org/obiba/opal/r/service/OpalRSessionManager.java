@@ -63,18 +63,6 @@ public class OpalRSessionManager implements SessionListener {
   }
 
   /**
-   * Get the current R session identifier (for the invoking Opal user session).
-   * @return null if current R session is not set
-   */
-  public String getSubjectCurrentRSessionId() {
-    OpalRSession currentRSession = getRSessions(getSubjectSessionId()).getCurrentRSession();
-    if(currentRSession != null) {
-      return currentRSession.getId();
-    }
-    throw new NoSuchRSessionException();
-  }
-
-  /**
    * Get if a current R session is defined (for the invoking Opal user session).
    * @return
    */
@@ -118,7 +106,7 @@ public class OpalRSessionManager implements SessionListener {
   /**
    * Creates a new R connection, stores the corresponding R session and set it as the current one (for the invoking Opal
    * user session).
-   * @return R session identifier
+   * @return R session
    */
   public OpalRSession newSubjectCurrentRSession() {
     return addCurrentRSession(getSubjectSessionId(), opalRService.newConnection());
