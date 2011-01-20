@@ -12,6 +12,8 @@ package org.obiba.opal.r.service;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.obiba.opal.r.ROperation;
+import org.obiba.opal.r.ROperationTemplate;
 import org.obiba.opal.r.RRuntimeException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RSession;
@@ -20,7 +22,7 @@ import org.rosuda.REngine.Rserve.RserveException;
 /**
  * Reference to a R session.
  */
-public class OpalRSession {
+public class OpalRSession implements ROperationTemplate {
 
   private String id;
 
@@ -50,15 +52,26 @@ public class OpalRSession {
     return id;
   }
 
+  //
+  // ROperationTemplate methods
+  //
+
   /**
-   * Creates a new R connection from the last R session state.
-   * @return
+   * Executes the R operation on the current R session of the invoking Opal user. If no current R session is defined, a
+   * {@link NoSuchRSessionException} is thrown.
+   * @see #hasSubjectCurrentRSession(), {@link #setSubjectCurrentRSession(String)}
    */
-  public RConnection newConnection() {
+  @Override
+  public void execute(ROperation rop) {
+    lock.lock();
+    RConnection connection = null;
+
     try {
-      return rSession.attach();
-    } catch(RserveException e) {
-      throw new RRuntimeException(e);
+      connection = newConnection();
+      rop.doWithConnection(connection);
+    } finally {
+      if(connection != null) close(connection);
+      lock.unlock();
     }
   }
 
@@ -70,25 +83,33 @@ public class OpalRSession {
     rSession = null;
   }
 
+  //
+  // private methods
+  //
+
+  /**
+   * Creates a new R connection from the last R session state.
+   * @return
+   */
+  private RConnection newConnection() {
+    try {
+      return rSession.attach();
+    } catch(RserveException e) {
+      throw new RRuntimeException(e);
+    }
+  }
+
   /**
    * Detach the R connection and updates the R session.
    * @param connection
    */
-  public void close(RConnection connection) {
+  private void close(RConnection connection) {
     if(connection == null) return;
     try {
       rSession = connection.detach();
     } catch(RserveException e) {
       throw new RRuntimeException("Failed detaching connection of R session: " + id, e);
     }
-  }
-
-  public void lock() {
-    lock.lock();
-  }
-
-  public void unlock() {
-    lock.unlock();
   }
 
 }

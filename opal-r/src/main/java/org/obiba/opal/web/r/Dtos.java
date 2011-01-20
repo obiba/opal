@@ -11,6 +11,7 @@ package org.obiba.opal.web.r;
 
 import javax.ws.rs.core.UriBuilder;
 
+import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.web.model.OpalR;
 
 /**
@@ -18,9 +19,9 @@ import org.obiba.opal.web.model.OpalR;
  */
 public class Dtos {
 
-  public static OpalR.RSessionDto asDto(String rSessionId) {
-    UriBuilder ub = UriBuilder.fromPath("/").path(OpalRSessionResource.class);
-    return OpalR.RSessionDto.newBuilder().setId(rSessionId).setLink(ub.build(rSessionId).toString()).build();
+  public static OpalR.RSessionDto asDto(OpalRSession rSession) {
+    UriBuilder ub = UriBuilder.fromPath("/").path(OpalRSessionParentResource.class).path(OpalRSessionParentResource.class, "getOpalRSessionResource");
+    return OpalR.RSessionDto.newBuilder().setId(rSession.getId()).setLink(ub.build(rSession.getId()).toString()).build();
   }
 
 }

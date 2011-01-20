@@ -14,8 +14,6 @@ import java.net.URI;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -24,65 +22,54 @@ import javax.ws.rs.core.UriBuilder;
 import org.obiba.opal.r.MagmaAssignROperation;
 import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.StringAssignROperation;
-import org.obiba.opal.r.service.OpalRSessionManager;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import org.obiba.opal.r.service.OpalRSession;
 
 /**
  * Handles web services on the symbols of the current R session of the invoking Opal user. A current R session must be
  * defined, otherwise the web service calls will fail with a 404 status.
  */
-@Component
-@Scope("request")
-@Path("/r/session/current/symbol/{name}")
-public class RSymbolResource extends AbstractCurrentOpalRSessionResource {
+public class RSymbolResource extends AbstractOpalRSessionResource {
 
-  @PathParam("name")
   private String name;
 
-  private OpalRSessionManager opalRSessionManager;
+  private OpalRSession rSession;
 
-  @Autowired
-  public RSymbolResource(OpalRSessionManager opalRSessionManager) {
+  public RSymbolResource(OpalRSession rSession, String name) {
     super();
-    this.opalRSessionManager = opalRSessionManager;
+    this.rSession = rSession;
+    this.name = name;
   }
 
   @GET
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   public Response getSymbol() {
-    return executeScript(name);
+    return executeScript(rSession, name);
   }
 
   @PUT
   @Consumes(MediaType.TEXT_PLAIN)
   public Response putString(String content) {
-    opalRSessionManager.execute(new StringAssignROperation(name, content));
+    rSession.execute(new StringAssignROperation(name, content));
     return Response.created(getSymbolURI()).build();
   }
 
   @PUT
   @Consumes("application/x-rscript")
   public Response putRScript(String script) {
-    opalRSessionManager.execute(new RScriptROperation(name + "<-" + script));
+    rSession.execute(new RScriptROperation(name + "<-" + script));
     return Response.created(getSymbolURI()).build();
   }
 
   @PUT
   @Consumes("application/x-opal")
   public Response putMagma(String path) {
-    opalRSessionManager.execute(new MagmaAssignROperation(name, path));
+    rSession.execute(new MagmaAssignROperation(name, path));
     return Response.created(getSymbolURI()).build();
   }
 
-  @Override
-  protected OpalRSessionManager getOpalRSessionManager() {
-    return opalRSessionManager;
-  }
-
   private URI getSymbolURI() {
-    return UriBuilder.fromPath("/").path(RSymbolResource.class).build(name);
+    return UriBuilder.fromPath("/").path(OpalRSessionParentResource.class)//
+    .path(OpalRSessionParentResource.class, "getOpalRSessionResource")//
+    .path(OpalRSessionResource.class, "getRSymbolResource").build(rSession.getId(), name);
   }
-
 }

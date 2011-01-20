@@ -17,6 +17,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.model.OpalR;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,16 +45,16 @@ public class OpalRSessionsResource {
   @GET
   public List<OpalR.RSessionDto> getRSessionIds() {
     final List<OpalR.RSessionDto> rSessions = Lists.newArrayList();
-    for(String id : opalRSessionManager.getSubjectRSessionIds()) {
-      rSessions.add(Dtos.asDto(id));
+    for(OpalRSession rSession : opalRSessionManager.getSubjectRSessions()) {
+      rSessions.add(Dtos.asDto(rSession));
     }
     return rSessions;
   }
 
   @POST
   public Response newCurrentRSession() {
-    String id = opalRSessionManager.newSubjectCurrentRSession();
-    UriBuilder ub = UriBuilder.fromPath("/").path(OpalRSessionResource.class);
-    return Response.created(ub.build(id)).entity(Dtos.asDto(id)).build();
+    OpalRSession rSession = opalRSessionManager.newSubjectCurrentRSession();
+    UriBuilder ub = UriBuilder.fromPath("/").path(OpalRSessionParentResource.class).path(OpalRSessionParentResource.class, "getOpalRSessionResource");
+    return Response.created(ub.build(rSession.getId())).entity(Dtos.asDto(rSession)).build();
   }
 }

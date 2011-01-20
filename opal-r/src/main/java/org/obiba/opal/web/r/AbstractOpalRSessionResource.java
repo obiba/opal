@@ -13,51 +13,33 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.obiba.opal.r.RScriptROperation;
-import org.obiba.opal.r.service.NoSuchRSessionException;
-import org.obiba.opal.r.service.OpalRSessionManager;
+import org.obiba.opal.r.service.OpalRSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Base class for handling current R session related web services.
  */
-public abstract class AbstractCurrentOpalRSessionResource {
+public abstract class AbstractOpalRSessionResource {
 
-  private static final Logger log = LoggerFactory.getLogger(AbstractCurrentOpalRSessionResource.class);
-
-  protected abstract OpalRSessionManager getOpalRSessionManager();
+  private static final Logger log = LoggerFactory.getLogger(AbstractOpalRSessionResource.class);
 
   /**
    * Executes a R script and set the REXP result in its serialized form in the Response.
    * @param script
    * @return
    */
-  protected Response executeScript(String script) {
+  protected Response executeScript(OpalRSession rSession, String script) {
     if(script == null) return Response.status(Status.BAD_REQUEST).build();
 
     RScriptROperation rop = new RScriptROperation(script);
-    getOpalRSessionManager().execute(rop);
+    rSession.execute(rop);
     if(rop.hasResult() && rop.hasRawResult()) {
       return Response.ok().entity(rop.getRawResult().asBytes()).build();
     } else {
       log.error("R Script '{}' has result: {}, has raw result: {}", new Object[] { script, rop.hasResult(), rop.hasRawResult() });
       return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
-  }
-
-  /**
-   * Check the current R session is defined for the invoking Opal user.
-   */
-  protected void checkHasCurrentRSession() {
-    if(!getOpalRSessionManager().hasSubjectCurrentRSession()) throw new NoSuchRSessionException();
-  }
-
-  /**
-   * Get the current R session identifier for the invoking Opal user.
-   * @return
-   */
-  protected String getCurrentRSessionId() {
-    return getOpalRSessionManager().getSubjectCurrentRSessionId();
   }
 
 }
