@@ -87,6 +87,6 @@
     <jetty.version>7.0.2.v20100331</jetty.version>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
     <protobuf.version>2.3.0</protobuf.version>
-    <protobuf-java-format.version>1.2-r36p03</protobuf-java-format.version>
+    <protobuf-java-format.version>1.2-r36p04</protobuf-java-format.version>
   </properties>
 </project>
