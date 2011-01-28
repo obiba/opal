@@ -71,7 +71,7 @@ public class OpalRSessionResource extends AbstractOpalRSessionResource {
   @Path("/symbols")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   public Response ls() {
-    return executeScript(rSession, "ls()");
+    return executeScript(rSession, "base::ls()");
   }
 
   @POST
@@ -80,12 +80,16 @@ public class OpalRSessionResource extends AbstractOpalRSessionResource {
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   public Response assign(MultivaluedMap<String, String> symbols) {
     rSession.execute(new StringAssignROperation(symbols));
-    return Response.ok().build();
+    return ls();
   }
 
   @Path("/symbol/{name}")
   public RSymbolResource getRSymbolResource(@PathParam("name") String name) {
     return new RSymbolResource(rSession, name);
+  }
+
+  protected OpalRSession getOpalRSession() {
+    return rSession;
   }
 
 }

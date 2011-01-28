@@ -34,7 +34,7 @@ public class OpalRSession implements ROperationTemplate {
    * Build a R session reference from a R connection.
    * @param connection
    */
-  public OpalRSession(RConnection connection) {
+  OpalRSession(RConnection connection) {
     super();
     try {
       this.rSession = connection.detach();

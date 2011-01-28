@@ -10,11 +10,15 @@
 package org.obiba.opal.core.cfg;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.obiba.magma.support.MagmaEngineFactory;
 import org.obiba.opal.core.unit.FunctionalUnit;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class OpalConfiguration {
@@ -30,6 +34,8 @@ public class OpalConfiguration {
 
   private Set<ReportTemplate> reportTemplates;
 
+  private List<OpalConfigurationExtension> extensions;
+
   //
   // Constructors
   //
@@ -37,6 +43,7 @@ public class OpalConfiguration {
   public OpalConfiguration() {
     functionalUnits = Sets.newLinkedHashSet();
     reportTemplates = Sets.newLinkedHashSet();
+    extensions = Lists.newArrayList();
   }
 
   //
@@ -57,6 +64,14 @@ public class OpalConfiguration {
 
   public void setMagmaEngineFactory(MagmaEngineFactory magmaEngineFactory) {
     this.magmaEngineFactory = magmaEngineFactory;
+  }
+
+  public <T extends OpalConfigurationExtension> T getExtension(Class<T> type) {
+    try {
+      return Iterables.get(Iterables.filter(extensions, type), 0);
+    } catch(IndexOutOfBoundsException e) {
+      throw new NoSuchElementException();
+    }
   }
 
   public Set<FunctionalUnit> getFunctionalUnits() {

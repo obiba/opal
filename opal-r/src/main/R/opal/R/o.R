@@ -1,2 +1,4 @@
 source("opal.R")
-opal <- opal.login("http://localhost:8080", "administrator", "password")
+cag <- opal.login("http://localhost:8080", "administrator", "password")
+ohs <- opal.login("http://localhost:8080", "administrator", "password")
+opals<-list(CAG=cag, OHS=ohs)

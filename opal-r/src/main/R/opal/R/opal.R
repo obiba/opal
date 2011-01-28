@@ -1,20 +1,7 @@
-opal.login <- function(url,username,password) {
-  require(RCurl)
-  require(rjson)
-  opal <- new.env(parent=globalenv())
-  opal$url <- url
-
-  # cookielist="" activates the cookie engine
-  opal$curl <- curlSetOpt(verbose=TRUE, header=TRUE, httpheader=c(Accept="application/octet-stream, application/json", Authorization=.authToken(username, password)), cookielist="")
-  opal$reader <- dynCurlReader(curl=opal$curl)
-  class(opal) <- "opal"
-
-  return(opal)
-}
-
 # Utility method to build urls. Concatenates all arguments and adds a '/' separator between each element
 .url <- function(opal, ..., query=list()) {
-	.tmp <- paste(opal$url, "ws", paste(sapply(c(...), curlEscape), collapse="/"), sep="/")
+#	.tmp <- paste(opal$url, "ws", paste(sapply(c(...), curlEscape), collapse="/"), sep="/")
+	.tmp <- paste(opal$url, "ws", ..., sep="/")
 	if(length(query)) {
 		.params <- paste(sapply(names(query), function(id) paste(id, curlEscape(query[[id]]), sep = "=")), collapse = "&")
 		.tmp <- paste(.tmp, .params, sep="?")
@@ -29,30 +16,30 @@ opal.login <- function(url,username,password) {
 
 # Issues a request to opal for the specified resource
 .get <- function(opal, ..., query=list()) {
-	curlSetOpt(httpget=TRUE, customrequest=NULL, curl=opal$curl)
-	.perform(opal, .url(opal, ..., query=query))
+	opts = curlOptions(httpget=TRUE, customrequest=NULL, .opts=opal$opts)
+	.perform(opal, .url(opal, ..., query=query), opts)
 }
 
 .post <- function(opal, ..., params=c()) {
 	.nobody <- missing(params) || length(params) == 0
 	if(.nobody) {
 		# Act like a GET, but send a POST. This is required when posting without any body 
-		curlSetOpt(httpget=TRUE, customrequest="POST", curl=opal$curl)
+		opts = curlOptions(httpget=TRUE, customrequest="POST", .opts=opal$opts)
 	} else {
-		curlSetOpt(post=TRUE, header=TRUE, postfields=params, curl=opal$curl)
+		opts = curlOptions(post=TRUE, postfields=params, .opts=opal$opts)
 	}
-	.perform(opal, .url(opal, ...))
+	.perform(opal, .url(opal, ...), opts)
 }
 
-.put <- function(opal, ..., body='') {
-	.nobody <- missing(params) || length(params) == 0
+.put <- function(opal, ..., body='', contentType='application/x-rscript') {
+	.nobody <- missing(body) || length(body) == 0
 	if(.nobody) {
 		# Act like a GET, but send a PUT. This is required when posting without any body 
-		curlSetOpt(httpget=TRUE, customrequest="PUT", curl=opal$curl)
+		opts = curlOptions(httpget=TRUE, customrequest="PUT", .opts=opal$opts)
 	} else {
-		curlSetOpt(post=TRUE, header=TRUE, postfields=body, curl=opal$curl)
+		opts = curlOptions(post=TRUE, httpheader=c(opal$opts$httpheader, 'Content-Type'=contentType), postfields=body, customrequest="PUT", .opts=opal$opts)
 	}
-	.perform(opal, .url(opal, ...))
+	.perform(opal, .url(opal, ...), opts)
 }
 
 .delete <- function(opal, ...) {
@@ -61,11 +48,11 @@ opal.login <- function(url,username,password) {
 	.perform(opal, .url(opal, ...))
 }
 
-.perform <- function(opal, url) {
+.perform <- function(opal, url, opts) {
 	opal$reader <- dynCurlReader(opal$curl)
 
 	handle <- opal$curl
-	curlPerform(url=url, writefunction=opal$reader$update,  curl=handle)
+	curlPerform(url=url, .opts=opts, writefunction=opal$reader$update,  curl=handle)
 	content <- opal$reader$value()
 	header <- parseHTTPHeader(opal$reader$header())
 	info <- getCurlInfo(handle)
@@ -88,12 +75,35 @@ opal.login <- function(url,username,password) {
 	}
 }
 
-.extractJsonField <- function(json, fields) {
+.extractJsonField <- function(json, fields, isArray=TRUE) {
 	if(is.null(fields)) {
 	  json 
 	} else {
-	  lapply(json, function(obj) {obj[fields]})
+		if(isArray) {
+			lapply(json, function(obj) {obj[fields]})
+		} else {
+			json[fields]
+  		}
 	}
+}
+
+opal.login <- function(url,username,password) {
+	require(RCurl)
+	require(rjson)
+	opal <- new.env(parent=globalenv())
+	opal$url <- url
+	
+	# cookielist="" activates the cookie engine
+	opal$opts <- curlOptions(verbose=TRUE, header=TRUE, httpheader=c(Accept="application/octet-stream, application/json", Authorization=.authToken(username, password)), cookielist="")
+	opal$curl <- curlSetOpt(.opts=opal$opts)
+	opal$reader <- dynCurlReader(curl=opal$curl)
+	class(opal) <- "opal"
+	
+	return(opal)
+}
+
+opal.newSession <- function(opal) {
+	.extractJsonField(.post(opal, "r", "sessions"), c("id"), isArray=FALSE)
 }
 
 opal.datasources=function(opal, fields=NULL) {
@@ -108,17 +118,29 @@ opal.variables <- function(opal, datasource, table, fields=NULL) {
 	.extractJsonField(.get(opal, "datasource", datasource, "table", table, "variables"), fields)
 }
 
+datashield.newSession <- function(opal) {
+	UseMethod('datashield.newSession');
+}
+
+datashield.newSession.opal <- function(opal) {
+	opal.newSession(opal)
+}
+
+datashield.newSession.list <- function(opals) {
+	lapply(opals, FUN=datashield.newSession.opal)
+}
+
 # Sends a script, and calls "summary" on the result.
 datashield.summary=function(object, ...) {
   UseMethod('datashield.summary');
 }
 
-datashield.summary.opal=function(opal, expr, resultName="result") {
-  return(datashield.aggregate.opal(opal, "summary", expr, resultName))
+datashield.summary.opal=function(opal, expr) {
+  return(datashield.aggregate.opal(opal, "summary", expr))
 }
 
-datashield.summary.list=function(opals, expr, resultName="result") {
-  return(datashield.aggregate.list(opals, "summary", expr, resultName))
+datashield.summary.list=function(opals, expr) {
+	lapply(opals, FUN=datashield.summary.opal, expr)
 }
 
 # Sends a script, and calls "length" on the result.
@@ -126,36 +148,25 @@ datashield.length=function(object, ...) {
   UseMethod('datashield.length');
 }
 
-datashield.length.opal=function(opal, expr, resultName="result") {
-  return(datashield.aggregate.opal(opal, "length", expr, resultName))
+datashield.length.opal=function(opal, expr) {
+  return(datashield.aggregate.opal(opal, "length", expr))
 }
 
-datashield.length.list=function(opals, expr, resultName="result") {
-  r=datashield.aggregate.list(opals, "length", expr, resultName);
-  # Transform the list into a vector of ints
-  r=unlist(r);
-  # Assign names to the vector
-  names(r)=names(opals);
-  return(r);
+datashield.length.list=function(opals, expr) {
+	lapply(opals, FUN=datashield.length.opal, expr)
 }
 
-# Inner methods that sends a script, and aggregates the "result" symbol using the aggregation method
-datashield.aggregate.opal=function(opal, aggregation, expr, resultName="result") {
-  datashieldOpenSession(opal);
-
-  url=paste(opal$url,"/jersey/datashield/R/", opal$ds_sid, "/aggregate/", aggregation, sep="")
-  response=postForm(url, script=expr, aggregate=resultName, curl=opal$h, style="post");
-  opal$h <- getCurlHandle();
-  return(unserialize(response));
+datashield.aggregate=function(object, ...) {
+	UseMethod('datashield.aggregate');
 }
 
-datashield.aggregate.list=function(opals, aggregation, expr, resultName="result") {
-  o=list();
-  for(opal in names(opals)) {
-    print(paste("Evaluating for", opal));
-    o[[opal]]=datashield.aggregate.opal(opals[[opal]], aggregation, expr, resultName);
-  }
-  return(o);
+# Inner methods that sends a script, and aggregates the result using the specified aggregation method
+datashield.aggregate.opal=function(opal, aggregation, expr) {
+	.get(opal, "datashield", "current", "aggregate", aggregation, query=c(query=expr))
+}
+
+datashield.aggregate.list=function(opals, aggregation, expr) {
+	lapply(opals, FUN=datashield.aggregate.opal, aggregation, expr)
 }
 
 # Tells Datashield to assign Opal Variables to R symbols
@@ -163,23 +174,22 @@ datashield.assign=function(object, ...) {
   UseMethod('datashield.assign');
 }
 
-datashield.assign.opal=function(opal, ...) {
-  datashieldOpenSession(opal);
-  
-  url=paste(opal$url,"/jersey/datashield/R/", opal$ds_sid, "/assign", sep="")
-  response=postForm(url, curl=opal$h, .params=list(...), style="post");
-  opal$h <- getCurlHandle();
-  print(response);
+datashield.assign.opal=function(opal, symbol, value) {
+	.put(opal, "datashield", "current", "symbol", symbol, body=value)
 }
 
-# Opens a Datashield session if it doesn't already exists
-datashieldOpenSession=function(object, ...) {
-  UseMethod('datashieldOpenSession');
+datashield.assign.list=function(opal, symbol, value) {
+	lapply(opals, FUN=datashield.assign.opal, symbol, value)
 }
 
-datashieldOpenSession.opal=function(opal, ...) {
- if(is.null(opal$ds_sid)) {
-    response <- postForm(paste(opal$url, "/jersey/datashield/R", sep=""), bogus="value", curl=opal$h);
-    opal$ds_sid<-response[1];
-  }
+datashield.symbols=function(object, ...) {
+	UseMethod('datashield.symbols');
+}
+
+datashield.symbols.opal=function(opal) {
+	.get(opal, "datashield", "current", "symbols")
+}
+
+datashield.symbols.list=function(opals) {
+	lapply(opals, FUN=datashield.symbols.opal)
 }

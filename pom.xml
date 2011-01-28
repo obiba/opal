@@ -33,6 +33,7 @@
     <module>opal-web-model</module>
     <module>opal-gwt-client</module>
     <module>opal-rest-client</module>
+    <module>opal-datashield</module>
   </modules>
 
   <dependencyManagement>

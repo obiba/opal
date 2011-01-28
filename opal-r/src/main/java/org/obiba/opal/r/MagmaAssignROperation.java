@@ -210,10 +210,6 @@ public class MagmaAssignROperation extends AbstractROperation {
       Datasource ds = MagmaEngine.get().getDatasource(resolver.getDatasourceName());
 
       table = ds.getValueTable(resolver.getTableName());
-
-      if(!table.hasVariable(resolver.getVariableName())) {
-        throw new MagmaRRuntimeException("Variable is not defined: " + path);
-      }
       variableValueSource = table.getVariableValueSource(resolver.getVariableName());
     }
 

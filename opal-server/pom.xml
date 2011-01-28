@@ -50,6 +50,12 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-datashield</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
       <artifactId>opal-httpd</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>

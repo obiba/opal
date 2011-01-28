@@ -76,4 +76,22 @@
       -->      
     </factories>
   </magmaEngineFactory>
+  <extensions>
+    <org.obiba.opal.datashield.cfg.DatashieldConfiguration>
+      <aggregatingMethods>
+        <org.obiba.opal.datashield.RFunctionDataShieldMethod>
+          <name>length</name>
+          <function>length</function>
+        </org.obiba.opal.datashield.RFunctionDataShieldMethod>
+        <org.obiba.opal.datashield.RFunctionDataShieldMethod>
+          <name>summary</name>
+          <function>summary</function>
+        </org.obiba.opal.datashield.RFunctionDataShieldMethod>
+        <org.obiba.opal.datashield.CustomRScriptMethod>
+          <name>custom</name>
+          <script>function(data) { "custom!" }</script>
+        </org.obiba.opal.datashield.CustomRScriptMethod>
+      </aggregatingMethods>
+    </org.obiba.opal.datashield.cfg.DatashieldConfiguration>
+  </extensions>
 </org.obiba.opal.core.cfg.OpalConfiguration>
