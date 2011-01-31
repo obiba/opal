@@ -23,10 +23,12 @@ import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
+import org.obiba.opal.r.service.VariableEntitiesHolder;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPList;
 import org.rosuda.REngine.RList;
 
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -35,14 +37,20 @@ import com.google.common.collect.Sets;
  */
 public class MagmaAssignROperation extends AbstractROperation {
 
+  private final VariableEntitiesHolder holder;
+
   private final String symbol;
 
   private final String path;
 
-  private Set<MagmaRConverter> magmaRConverters = Sets.newHashSet(new DatasourceRConverter(), new ValueTableRConverter(), new VariableRConverter());
+  private final Set<MagmaRConverter> magmaRConverters = Sets.newHashSet(new DatasourceRConverter(), new ValueTableRConverter(), new VariableRConverter());
 
-  public MagmaAssignROperation(String symbol, String path) {
+  public MagmaAssignROperation(VariableEntitiesHolder holder, String symbol, String path) {
     super();
+    if(holder == null) throw new IllegalArgumentException("holder cannot be null");
+    if(symbol == null) throw new IllegalArgumentException("symbol cannot be null");
+    if(path == null) throw new IllegalArgumentException("path cannot be null");
+    this.holder = holder;
     this.symbol = symbol;
     this.path = path;
   }
@@ -60,6 +68,12 @@ public class MagmaAssignROperation extends AbstractROperation {
       throw new MagmaRRuntimeException("Failed resolving path '" + path + "'", e);
     }
     throw new MagmaRRuntimeException("Failed resolving path '" + path + "'");
+  }
+
+  void prepareEntities(ValueTable table) {
+    if(holder.hasEntities() == false) {
+      holder.setEntities(ImmutableSortedSet.copyOf(table.getVariableEntities()));
+    }
   }
 
   //
@@ -111,6 +125,15 @@ public class MagmaAssignROperation extends AbstractROperation {
     @Override
     public REXP asVector(String path) {
       Datasource datasource = MagmaEngine.get().getDatasource(path);
+
+      if(holder.hasEntities() == false) {
+        SortedSet<VariableEntity> entities = Sets.newTreeSet();
+        for(ValueTable vt : datasource.getValueTables()) {
+          entities.addAll(vt.getVariableEntities());
+        }
+        holder.setEntities(entities);
+      }
+
       // build a list of list of vectors
       List<REXP> contents = Lists.newArrayList();
       List<String> names = Lists.newArrayList();
@@ -156,14 +179,13 @@ public class MagmaAssignROperation extends AbstractROperation {
      */
     REXP asVector() {
       if(table == null) throw new IllegalStateException("Table must not be null");
-
-      SortedSet<VariableEntity> entities = Sets.newTreeSet(table.getVariableEntities());
+      prepareEntities(table);
       // build a list of vectors
       List<REXP> contents = Lists.newArrayList();
       List<String> names = Lists.newArrayList();
       for(Variable v : table.getVariables()) {
         VariableValueSource vvs = table.getVariableValueSource(v.getName());
-        contents.add(getVector(vvs, entities));
+        contents.add(getVector(vvs, holder.getEntities()));
         names.add(vvs.getVariable().getName());
       }
       return new REXPList(new RList(contents, names));
@@ -216,8 +238,8 @@ public class MagmaAssignROperation extends AbstractROperation {
     @Override
     public REXP asVector(String path) {
       resolvePath(path);
-      // build a vector
-      return getVector(variableValueSource, Sets.newTreeSet(table.getVariableEntities()));
+      prepareEntities(table);
+      return getVector(variableValueSource, holder.getEntities());
     }
   }
 

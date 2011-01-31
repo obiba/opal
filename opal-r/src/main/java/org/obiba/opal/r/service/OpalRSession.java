@@ -9,9 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.r.service;
 
+import java.util.SortedSet;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.obiba.magma.VariableEntity;
 import org.obiba.opal.r.ROperation;
 import org.obiba.opal.r.ROperationTemplate;
 import org.obiba.opal.r.RRuntimeException;
@@ -19,16 +21,20 @@ import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RSession;
 import org.rosuda.REngine.Rserve.RserveException;
 
+import com.google.common.collect.ImmutableSortedSet;
+
 /**
  * Reference to a R session.
  */
-public class OpalRSession implements ROperationTemplate {
+public class OpalRSession implements ROperationTemplate, VariableEntitiesHolder {
 
-  private String id;
+  private final String id;
+
+  private final ReentrantLock lock = new ReentrantLock();
 
   private RSession rSession;
 
-  private final ReentrantLock lock = new ReentrantLock();
+  private SortedSet<VariableEntity> entities;
 
   /**
    * Build a R session reference from a R connection.
@@ -50,6 +56,21 @@ public class OpalRSession implements ROperationTemplate {
    */
   public String getId() {
     return id;
+  }
+
+  @Override
+  public boolean hasEntities() {
+    return entities != null;
+  }
+
+  public SortedSet<VariableEntity> getEntities() {
+    if(entities == null) throw new IllegalStateException("call setEntities() first");
+    return entities;
+  }
+
+  public void setEntities(SortedSet<VariableEntity> entities) {
+    if(this.entities != null) throw new IllegalStateException("cannot invoke setEntities() more than once.");
+    this.entities = ImmutableSortedSet.copyOf(entities);
   }
 
   //

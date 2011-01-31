@@ -30,9 +30,9 @@ import org.obiba.opal.r.service.OpalRSession;
  */
 public class RSymbolResource extends AbstractOpalRSessionResource {
 
-  private String name;
+  private final String name;
 
-  private OpalRSession rSession;
+  private final OpalRSession rSession;
 
   public RSymbolResource(OpalRSession rSession, String name) {
     super();
@@ -63,7 +63,7 @@ public class RSymbolResource extends AbstractOpalRSessionResource {
   @PUT
   @Consumes("application/x-opal")
   public Response putMagma(String path) {
-    rSession.execute(new MagmaAssignROperation(name, path));
+    rSession.execute(new MagmaAssignROperation(rSession, name, path));
     return Response.created(getSymbolURI()).build();
   }
 
