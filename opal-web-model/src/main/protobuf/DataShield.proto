@@ -1,0 +1,24 @@
+import "Ws.proto";
+package DataShield;
+
+option java_package = "org.obiba.opal.web.model";
+
+message DataShieldMethodDto {
+  required string name = 1;
+  extensions 1000 to max;
+}
+
+message RFunctionDataShieldMethodDto {
+  required string function = 1;
+  extend DataShieldMethodDto {
+    optional RFunctionDataShieldMethodDto method = 1000;
+  }
+}
+
+
+message RScriptDataShieldMethodDto {
+  required string script = 1;
+  extend DataShieldMethodDto {
+    optional RScriptDataShieldMethodDto method = 1001;
+  }
+}
