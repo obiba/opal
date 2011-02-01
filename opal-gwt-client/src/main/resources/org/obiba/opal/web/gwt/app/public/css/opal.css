@@ -402,6 +402,23 @@ margin-left:0.8em;
     font-size: 1em;
 }
 
+.workbench .main .panel  {
+	width: 100%;
+	margin-bottom:1.6em;
+}
+
+.workbench .main .panel .title  {
+	font-weight: regular;
+	color: #444444;
+	border-bottom: solid 1px #444444;
+	margin-bottom:0.8em;
+	padding-bottom:0.8em;
+}
+
+.workbench .main .panel .content  {
+	
+}
+
 .workbench .main .p {
      padding: 0.8em;
 }
@@ -437,6 +454,12 @@ margin-left:0.8em;
 .workbench .information .title {
   font-weight: bold;
   font-size: 1em;
+}
+
+/* Administration */
+
+.administration {
+	padding: 1em;
 }
 
 /* Dashboard */

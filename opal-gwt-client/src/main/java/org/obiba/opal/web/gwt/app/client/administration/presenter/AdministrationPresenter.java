@@ -10,9 +10,16 @@ import com.google.inject.Inject;
 
 public class AdministrationPresenter extends WidgetPresenter<AdministrationPresenter.Display> {
 
+  public static final String DELETE_ACTION = "Delete";
+
+  public static final String EDIT_ACTION = "Edit";
+
   //
   // Instance Variables
   //
+
+  @Inject
+  private DataShieldAdministrationPresenter dataShieldAdministrationPresenter;
 
   //
   // Constructors
@@ -34,10 +41,8 @@ public class AdministrationPresenter extends WidgetPresenter<AdministrationPrese
 
   @Override
   protected void onBind() {
-    addEventHandlers();
-  }
-
-  private void addEventHandlers() {
+    dataShieldAdministrationPresenter.bind();
+    getDisplay().setDataShieldAdministrationDisplay(dataShieldAdministrationPresenter.getDisplay());
   }
 
   @Override
@@ -46,30 +51,30 @@ public class AdministrationPresenter extends WidgetPresenter<AdministrationPrese
 
   @Override
   protected void onUnbind() {
+    dataShieldAdministrationPresenter.unbind();
   }
 
   @Override
   public void refreshDisplay() {
+    dataShieldAdministrationPresenter.refreshDisplay();
   }
 
   @Override
   public void revealDisplay() {
-    // ResourceRequestBuilderFactory.newBuilder().forResource("/datashield/methods").get().withCallback(200, new
-    // ResponseCodeCallback() {
-    //
-    // @Override
-    // public void onResponseCode(Request request, Response response) {
-    //
-    // }
-    // }).send();
-
+    dataShieldAdministrationPresenter.revealDisplay();
   }
+
+  //
+  //
+  //
 
   //
   // Inner Classes / Interfaces
   //
 
   public interface Display extends WidgetDisplay {
+
+    void setDataShieldAdministrationDisplay(DataShieldAdministrationPresenter.Display display);
 
   }
 

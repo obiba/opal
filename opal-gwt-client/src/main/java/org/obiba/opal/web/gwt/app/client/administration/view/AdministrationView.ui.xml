@@ -1,5 +1,6 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
   xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+  xmlns:c="urn:import:com.google.gwt.user.cellview.client" 
   xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
   ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
@@ -11,8 +12,17 @@
     <g:FlowPanel>
       <o:HelpImage page="Administrating+Opal"></o:HelpImage>
     </g:FlowPanel>
-    <g:HTMLPanel>
-      
+    <g:HTMLPanel addStyleNames="administration">
+      <o:VerticalTabLayout ui:field="administrationTabs">
+        <g:Anchor>DataShield</g:Anchor>
+        <g:SimplePanel ui:field="datashieldAdministration"></g:SimplePanel>
+        
+        <g:Anchor>File System</g:Anchor>
+        <g:VerticalPanel width="100%">
+          
+        </g:VerticalPanel>
+        
+      </o:VerticalTabLayout>
     </g:HTMLPanel> 
   </o:WorkbenchLayout>
 </ui:UiBinder>

@@ -10,11 +10,15 @@
 package org.obiba.opal.web.gwt.app.client.administration.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.presenter.DataShieldAdministrationPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -36,9 +40,14 @@ public class AdministrationView extends Composite implements AdministrationPrese
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
+  private static Translations translations = GWT.create(Translations.class);
+
   //
   // Instance Variables
   //
+
+  @UiField
+  SimplePanel datashieldAdministration;
 
   //
   // Constructors
@@ -47,10 +56,11 @@ public class AdministrationView extends Composite implements AdministrationPrese
   public AdministrationView() {
     super();
     initWidget(uiBinder.createAndBindUi(this));
+
   }
 
   //
-  // DashboardPresenter.Display Methods
+  // AdministrationPresenter.Display Methods
   //
 
   @Override
@@ -66,6 +76,11 @@ public class AdministrationView extends Composite implements AdministrationPrese
   @Override
   public void stopProcessing() {
 
+  }
+
+  @Override
+  public void setDataShieldAdministrationDisplay(Display display) {
+    datashieldAdministration.setWidget(display.asWidget());
   }
 
   //
