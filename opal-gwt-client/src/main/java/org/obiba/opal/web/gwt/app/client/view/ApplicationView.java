@@ -52,6 +52,9 @@ public class ApplicationView implements ApplicationPresenter.Display {
   Anchor quit;
 
   @UiField
+  Anchor administration;
+
+  @UiField
   Anchor obiba;
 
   @UiField
@@ -116,6 +119,11 @@ public class ApplicationView implements ApplicationPresenter.Display {
   }
 
   @Override
+  public HasClickHandlers getAdministration() {
+    return administration;
+  }
+
+  @Override
   public void startProcessing() {
   }
 
@@ -143,8 +151,15 @@ public class ApplicationView implements ApplicationPresenter.Display {
     if(currentSelection != null) {
       currentSelection.removeStyleName("selected");
     }
-    selection.addStyleName("selected");
+    if(selection != null) {
+      selection.addStyleName("selected");
+    }
     currentSelection = selection;
+  }
+
+  @Override
+  public void clearSelection() {
+    setCurrentSelection(null);
   }
 
   @Override

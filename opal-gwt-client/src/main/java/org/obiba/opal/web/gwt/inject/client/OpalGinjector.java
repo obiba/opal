@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.inject.client;
 
 import net.customware.gwt.presenter.client.EventBus;
 
+import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileDownloadPresenter;
@@ -54,7 +55,7 @@ import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
 
-@GinModules({ OpalGinModule.class, DashboardModule.class, NavigatorModule.class, FileSystemModule.class, JobModule.class, ImportModule.class, ExportModule.class, ImportVariablesWizardModule.class, CreateViewWizardModule.class, ConfigureViewWizardModule.class, ReportsModule.class, UnitsModule.class, ImportIdentifiersWizardModule.class })
+@GinModules({ OpalGinModule.class, AdministrationModule.class, DashboardModule.class, NavigatorModule.class, FileSystemModule.class, JobModule.class, ImportModule.class, ExportModule.class, ImportVariablesWizardModule.class, CreateViewWizardModule.class, ConfigureViewWizardModule.class, ReportsModule.class, UnitsModule.class, ImportIdentifiersWizardModule.class })
 public interface OpalGinjector extends Ginjector {
 
   EventBus getEventBus();
@@ -62,6 +63,8 @@ public interface OpalGinjector extends Ginjector {
   RequestCredentials getRequestCredentials();
 
   ApplicationPresenter getApplicationPresenter();
+
+  AdministrationPresenter getAdministrationPresenter();
 
   DashboardPresenter getDashboardPresenter();
 

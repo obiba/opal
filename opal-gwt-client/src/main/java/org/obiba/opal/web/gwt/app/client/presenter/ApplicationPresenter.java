@@ -15,6 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
@@ -45,6 +46,8 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
     HasClickHandlers getHelp();
 
+    HasClickHandlers getAdministration();
+
     MenuItem getDatasourcesItem();
 
     void updateWorkbench(Widget workbench);
@@ -60,7 +63,13 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
     MenuItem getUnitsItem();
 
     void setCurrentSelection(MenuItem selection);
+
+    void clearSelection();
+
   }
+
+  @Inject
+  private Provider<AdministrationPresenter> administrationPresenter;
 
   @Inject
   private Provider<DashboardPresenter> dashboardPresenter;
@@ -169,6 +178,14 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       @Override
       public void onClick(ClickEvent event) {
         HelpUtil.openPage();
+      }
+    });
+
+    getDisplay().getAdministration().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        eventBus.fireEvent(new WorkbenchChangeEvent(administrationPresenter.get()));
+        getDisplay().clearSelection();
       }
     });
 
