@@ -9,7 +9,7 @@ message DataShieldMethodDto {
 }
 
 message RFunctionDataShieldMethodDto {
-  required string function = 1;
+  required string func = 1;
   extend DataShieldMethodDto {
     optional RFunctionDataShieldMethodDto method = 1000;
   }

@@ -29,7 +29,7 @@ public class RFunctionDataShieldMethodConverter extends AbstractDataShieldMethod
 
   @Override
   public DataShieldMethod parse(DataShieldMethodDto dto) {
-    return new RFunctionDataShieldMethod(dto.getName(), dto.getExtension(RFunctionDataShieldMethodDto.method).getFunction());
+    return new RFunctionDataShieldMethod(dto.getName(), dto.getExtension(RFunctionDataShieldMethodDto.method).getFunc());
   }
 
   @Override
@@ -40,7 +40,7 @@ public class RFunctionDataShieldMethodConverter extends AbstractDataShieldMethod
   @Override
   public DataShieldMethodDto asDto(DataShieldMethod method) {
     RFunctionDataShieldMethod rFunctionMethod = (RFunctionDataShieldMethod) method;
-    DataShield.RFunctionDataShieldMethodDto methodDto = DataShield.RFunctionDataShieldMethodDto.newBuilder().setFunction(rFunctionMethod.getFunction()).build();
+    DataShield.RFunctionDataShieldMethodDto methodDto = DataShield.RFunctionDataShieldMethodDto.newBuilder().setFunc(rFunctionMethod.getFunction()).build();
     return getDataShieldMethodDtoBuilder(method).setExtension(DataShield.RFunctionDataShieldMethodDto.method, methodDto).build();
   }
 
