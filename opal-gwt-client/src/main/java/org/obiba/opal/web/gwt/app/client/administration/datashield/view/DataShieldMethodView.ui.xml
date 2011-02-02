@@ -29,10 +29,7 @@
 	                <g:Label addStyleNames="key"><ui:msg description="Type label">Type</ui:msg>:</g:Label>          
 	              </td>
 	              <td>
-	                <g:ListBox ui:field="typeList" visibleItemCount="1">
-	                  <g:item value="RFUNCTION">R Function</g:item>
-	                  <g:item value="RSCRIPT">R Script</g:item>
-	                </g:ListBox>
+	                <g:ListBox ui:field="typeList" visibleItemCount="1"/>
 	              </td>
 	            </tr>
               <tr>

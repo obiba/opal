@@ -9,9 +9,32 @@
   <g:FlowPanel>
                   
     <g:FlowPanel addStyleNames="panel">
-      <g:Label addStyleNames="title"><ui:msg description="Aggregating methods label" >Aggregating Methods</ui:msg></g:Label>
+      <g:FlowPanel addStyleNames="title">
+        <g:InlineLabel><ui:msg description="Aggregating Methods label" >Aggregating Methods</ui:msg></g:InlineLabel>
+        <o:HelpImage imageSize="16" tooltipWidth="400px">
+          <g:HTMLPanel>
+            <g:Label addStyleNames="title"><ui:msg description="Aggregating Methods label">Aggregating Methods</ui:msg></g:Label>
+            <p>
+              <ui:msg description="Aggregating Methods information">
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+              </ui:msg>
+            </p>
+            <g:Label addStyleNames="title"><ui:msg description="R Function label">R Function</ui:msg></g:Label>
+            <p>
+              <ui:msg description="R Function information">
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+              </ui:msg>
+            </p>
+            <g:Label addStyleNames="title"><ui:msg description="R Script label">R Script</ui:msg></g:Label>
+            <p>
+              <ui:msg description="R Script information">
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+              </ui:msg>
+            </p>
+          </g:HTMLPanel>
+        </o:HelpImage>
+      </g:FlowPanel>
       <g:VerticalPanel width="100%" addStyleNames="content">
-        <g:InlineLabel ui:field="noMethods" visible="false"><ui:msg description="No Aggregating methods label">No Aggregating Methods</ui:msg></g:InlineLabel>
         <g:Button ui:field="addMethodButton"><ui:msg description="Add DataShield method label" >Add Method</ui:msg></g:Button>
         <c:SimplePager ui:field="methodsTablePager" location="CENTER" addStyleNames="right-aligned" visible="false" />
         <o:Table width="100%" ui:field="methodsTable" addStyleNames="gwt-CellTable" visible="false"/>

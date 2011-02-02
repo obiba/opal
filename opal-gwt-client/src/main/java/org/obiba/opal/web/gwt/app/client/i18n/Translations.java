@@ -835,4 +835,12 @@ public interface Translations extends Constants {
   @DefaultStringValue("Edit Method")
   String editDataShieldMethod();
 
+  @Description("R Script label")
+  @DefaultStringValue("R Script")
+  String rScriptLabel();
+
+  @Description("R Function label")
+  @DefaultStringValue("R Function")
+  String rFunctionLabel();
+
 }

@@ -34,7 +34,6 @@ import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -61,9 +60,6 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
   //
   // Instance Variables
   //
-
-  @UiField
-  InlineLabel noMethods;
 
   @UiField
   Button addMethodButton;
@@ -120,7 +116,6 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
     methodsTablePager.firstPage();
     methodsTablePager.setVisible(size > 0);
     methodsTable.setVisible(size > 0);
-    noMethods.setVisible(size <= 0);
     methodsProvider.refresh();
   }
 
@@ -154,9 +149,9 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
       @Override
       public String getValue(DataShieldMethodDto object) {
         if(object.getExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method) != null) {
-          return "R Script";
+          return translations.rScriptLabel();
         } else
-          return "R Function";
+          return translations.rFunctionLabel();
       }
     }, translations.typeLabel());
 

@@ -71,7 +71,13 @@ public class DataShieldMethodView extends Composite implements Display {
   public DataShieldMethodView() {
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
+    initWidgets();
+  }
+
+  private void initWidgets() {
     dialog.hide();
+    typeList.addItem(translations.rFunctionLabel(), MethodType.RFUNCTION.toString());
+    typeList.addItem(translations.rScriptLabel(), MethodType.RSCRIPT.toString());
   }
 
   @Override
