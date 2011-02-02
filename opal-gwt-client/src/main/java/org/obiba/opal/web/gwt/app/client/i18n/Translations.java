@@ -246,7 +246,9 @@ public interface Translations extends Constants {
   "TwoMappedUnitsExpected", "Exactly two Units to be mapped are expected.",//
   "DataShieldMethodAlreadyExistWithTheSpecifiedName", "A method already exists with the specified name.",//
   "DataShieldMethodNameIsRequired", "A name is required.",//
-  "DataShieldMethodIsRequired", "A method is required."//
+  "DataShieldMethodIsRequired", "A method is required.",//
+  "RIsAlive", "R server is alive.",//
+  "RConnectionFailed", "Connection with R server failed."//
   })
   Map<String, String> userMessageMap();
 

@@ -1,15 +1,21 @@
 package org.obiba.opal.web.gwt.app.client.administration.r.presenter;
 
-import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
-
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
+import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
 /**
@@ -54,8 +60,9 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
 
       @Override
       public void onClick(ClickEvent event) {
-        // TODO Auto-generated method stub
-
+        ResourceRequestBuilderFactory.newBuilder().forResource("/r/sessions").post()//
+        .withCallback(Response.SC_CREATED, new RSessionCreatedCallback())//
+        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, new RConnectionFailedCallback()).send();
       }
     }));
   }
@@ -84,6 +91,30 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
   //
   // Inner Classes / Interfaces
   //
+
+  private final class RSessionCreatedCallback implements ResponseCodeCallback {
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      eventBus.fireEvent(new NotificationEvent(NotificationType.INFO, "RIsAlive", null).nonSticky());
+      // clean up
+      ResponseCodeCallback ignore = new ResponseCodeCallback() {
+
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          // ignore
+        }
+      };
+      ResourceRequestBuilderFactory.newBuilder().forResource("/r/session/current").delete()//
+      .withCallback(Response.SC_OK, ignore).withCallback(Response.SC_INTERNAL_SERVER_ERROR, ignore).send();
+    }
+  }
+
+  private final class RConnectionFailedCallback implements ResponseCodeCallback {
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "RConnectionFailed", null));
+    }
+  }
 
   public interface Display extends WidgetDisplay {
 
