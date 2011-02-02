@@ -12,7 +12,7 @@
       <g:Label addStyleNames="title"><ui:msg description="Aggregating methods label" >Aggregating Methods</ui:msg></g:Label>
       <g:VerticalPanel width="100%" addStyleNames="content">
         <g:InlineLabel ui:field="noMethods" visible="false"><ui:msg description="No Aggregating methods label">No Aggregating Methods</ui:msg></g:InlineLabel>
-        <g:Button ui:field="addMethodButton"><ui:msg description="Add method label" >Add Method</ui:msg></g:Button>
+        <g:Button ui:field="addMethodButton"><ui:msg description="Add DataShield method label" >Add Method</ui:msg></g:Button>
         <c:SimplePager ui:field="methodsTablePager" location="CENTER" addStyleNames="right-aligned" visible="false" />
         <o:Table width="100%" ui:field="methodsTable" addStyleNames="gwt-CellTable" visible="false"/>
       </g:VerticalPanel>

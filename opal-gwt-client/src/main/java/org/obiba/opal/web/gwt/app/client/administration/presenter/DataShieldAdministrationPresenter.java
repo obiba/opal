@@ -5,6 +5,7 @@ import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
+import org.obiba.opal.web.gwt.app.client.administration.presenter.DataShieldMethodPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
@@ -40,13 +41,16 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
 
   private Runnable removeMethodConfirmation;
 
+  private DataShieldMethodPresenter dataShieldMethodPresenter;
+
   //
   // Constructors
   //
 
   @Inject
-  public DataShieldAdministrationPresenter(final Display display, final EventBus eventBus) {
+  public DataShieldAdministrationPresenter(final Display display, final EventBus eventBus, DataShieldMethodPresenter dataShieldMethodPresenter) {
     super(display, eventBus);
+    this.dataShieldMethodPresenter = dataShieldMethodPresenter;
   }
 
   @Override
@@ -81,8 +85,9 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
 
       @Override
       public void onClick(ClickEvent event) {
-        // TODO Auto-generated method stub
-
+        dataShieldMethodPresenter.bind();
+        dataShieldMethodPresenter.setDialogMode(Mode.CREATE);
+        dataShieldMethodPresenter.revealDisplay();
       }
     }));
   }

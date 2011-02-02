@@ -823,4 +823,12 @@ public interface Translations extends Constants {
   @DefaultStringValue("First column MUST be Opal identifiers.")
   String importOpalIdentifiersInstructions();
 
+  @Description("Add DataShield method label")
+  @DefaultStringValue("Add Method")
+  String addDataShieldMethod();
+
+  @Description("Edit DataShield method label")
+  @DefaultStringValue("Edit Method")
+  String editDataShieldMethod();
+
 }
