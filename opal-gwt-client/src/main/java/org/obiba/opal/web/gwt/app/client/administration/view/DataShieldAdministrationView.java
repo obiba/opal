@@ -23,6 +23,8 @@ import org.obiba.opal.web.model.client.datashield.RScriptDataShieldMethodDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -60,10 +62,10 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
   //
 
   @UiField
-  Button rTestButton;
+  InlineLabel noMethods;
 
   @UiField
-  InlineLabel noMethods;
+  Button addMethodButton;
 
   @UiField
   CellTable<DataShieldMethodDto> methodsTable;
@@ -102,6 +104,11 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
   @Override
   public void stopProcessing() {
 
+  }
+
+  @Override
+  public HandlerRegistration addMethodHandler(ClickHandler handler) {
+    return addMethodButton.addClickHandler(handler);
   }
 
   @Override
@@ -145,8 +152,9 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
     methodsTable.addColumn(new TextColumn<DataShieldMethodDto>() {
       @Override
       public String getValue(DataShieldMethodDto object) {
-        if(object.getExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method) != null) return "R Script";
-        else
+        if(object.getExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method) != null) {
+          return "R Script";
+        } else
           return "R Function";
       }
     }, translations.typeLabel());

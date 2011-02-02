@@ -6,14 +6,12 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
-  <o:WorkbenchLayout withInfo="false">
-    <g:Label><ui:msg description="Administration title" >Administration</ui:msg></g:Label>
-    <g:Label></g:Label>
-    <g:FlowPanel>
-      <o:HelpImage page="Administrating+Opal"></o:HelpImage>
+  <g:FlowPanel>
+        
+    <g:FlowPanel addStyleNames="panel">
+      <g:Label addStyleNames="title"><ui:msg description="R server admin label" >R Server</ui:msg></g:Label>
+      <g:Button ui:field="rTestButton" addStyleNames="content"><ui:msg description="R server test label" >Test connection with R</ui:msg></g:Button>
     </g:FlowPanel>
-    <g:HTMLPanel addStyleNames="administration">
-      <o:VerticalTabLayout ui:field="administrationDisplays" />
-    </g:HTMLPanel> 
-  </o:WorkbenchLayout>
+          
+  </g:FlowPanel>
 </ui:UiBinder>

@@ -1,18 +1,18 @@
 package org.obiba.opal.web.gwt.app.client.administration.presenter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class AdministrationPresenter extends WidgetPresenter<AdministrationPresenter.Display> {
-
-  public static final String DELETE_ACTION = "Delete";
-
-  public static final String EDIT_ACTION = "Edit";
 
   //
   // Instance Variables
@@ -21,6 +21,11 @@ public class AdministrationPresenter extends WidgetPresenter<AdministrationPrese
   @Inject
   private DataShieldAdministrationPresenter dataShieldAdministrationPresenter;
 
+  @Inject
+  private RAdministrationPresenter rAdministrationPresenter;
+
+  private List<ItemAdministrationPresenter> administrationPresenters = new ArrayList<ItemAdministrationPresenter>();
+
   //
   // Constructors
   //
@@ -28,6 +33,13 @@ public class AdministrationPresenter extends WidgetPresenter<AdministrationPrese
   @Inject
   public AdministrationPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
+  }
+
+  private void registerAdministrationPresenters() {
+    administrationPresenters.clear();
+    administrationPresenters.add(dataShieldAdministrationPresenter);
+    administrationPresenters.add(rAdministrationPresenter);
+    getDisplay().clearAdministrationDisplays();
   }
 
   //
@@ -41,8 +53,11 @@ public class AdministrationPresenter extends WidgetPresenter<AdministrationPrese
 
   @Override
   protected void onBind() {
-    dataShieldAdministrationPresenter.bind();
-    getDisplay().setDataShieldAdministrationDisplay(dataShieldAdministrationPresenter.getDisplay());
+    registerAdministrationPresenters();
+    for(ItemAdministrationPresenter admin : administrationPresenters) {
+      admin.bind();
+      getDisplay().addAdministrationDisplay(admin.getName(), admin.getWidget());
+    }
   }
 
   @Override
@@ -51,17 +66,24 @@ public class AdministrationPresenter extends WidgetPresenter<AdministrationPrese
 
   @Override
   protected void onUnbind() {
-    dataShieldAdministrationPresenter.unbind();
+    for(ItemAdministrationPresenter admin : administrationPresenters) {
+      admin.unbind();
+    }
+    administrationPresenters.clear();
   }
 
   @Override
   public void refreshDisplay() {
-    dataShieldAdministrationPresenter.refreshDisplay();
+    for(ItemAdministrationPresenter admin : administrationPresenters) {
+      admin.refreshDisplay();
+    }
   }
 
   @Override
   public void revealDisplay() {
-    dataShieldAdministrationPresenter.revealDisplay();
+    for(ItemAdministrationPresenter admin : administrationPresenters) {
+      admin.revealDisplay();
+    }
   }
 
   //
@@ -74,7 +96,9 @@ public class AdministrationPresenter extends WidgetPresenter<AdministrationPrese
 
   public interface Display extends WidgetDisplay {
 
-    void setDataShieldAdministrationDisplay(DataShieldAdministrationPresenter.Display display);
+    void addAdministrationDisplay(String name, Widget w);
+
+    void clearAdministrationDisplays();
 
   }
 

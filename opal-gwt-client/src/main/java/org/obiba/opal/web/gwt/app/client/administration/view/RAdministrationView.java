@@ -9,24 +9,26 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.view;
 
-import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.presenter.RAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.workbench.view.VerticalTabLayout;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
  *
  */
-public class AdministrationView extends Composite implements AdministrationPresenter.Display {
+public class RAdministrationView extends Composite implements RAdministrationPresenter.Display {
 
-  @UiTemplate("AdministrationView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, AdministrationView> {
+  @UiTemplate("RAdministrationView.ui.xml")
+  interface ViewUiBinder extends UiBinder<Widget, RAdministrationView> {
   }
 
   //
@@ -46,20 +48,19 @@ public class AdministrationView extends Composite implements AdministrationPrese
   //
 
   @UiField
-  VerticalTabLayout administrationDisplays;
+  Button rTestButton;
 
   //
   // Constructors
   //
 
-  public AdministrationView() {
+  public RAdministrationView() {
     super();
     initWidget(uiBinder.createAndBindUi(this));
-
   }
 
   //
-  // AdministrationPresenter.Display Methods
+  // RAdministrationPresenter.Display Methods
   //
 
   @Override
@@ -78,13 +79,8 @@ public class AdministrationView extends Composite implements AdministrationPrese
   }
 
   @Override
-  public void clearAdministrationDisplays() {
-    administrationDisplays.clear();
-  }
-
-  @Override
-  public void addAdministrationDisplay(String name, Widget w) {
-    administrationDisplays.add(w, name);
+  public HandlerRegistration addTestRServerHandler(ClickHandler handler) {
+    return rTestButton.addClickHandler(handler);
   }
 
   //

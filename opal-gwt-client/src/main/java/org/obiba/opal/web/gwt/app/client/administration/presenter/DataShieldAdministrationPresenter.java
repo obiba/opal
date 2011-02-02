@@ -4,27 +4,31 @@ import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
-public class DataShieldAdministrationPresenter extends WidgetPresenter<DataShieldAdministrationPresenter.Display> {
+/**
+ * DataShield related administration.
+ */
+public class DataShieldAdministrationPresenter extends ItemAdministrationPresenter<DataShieldAdministrationPresenter.Display> {
 
   public static final String DELETE_ACTION = "Delete";
 
@@ -43,6 +47,11 @@ public class DataShieldAdministrationPresenter extends WidgetPresenter<DataShiel
   @Inject
   public DataShieldAdministrationPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
+  }
+
+  @Override
+  public String getName() {
+    return "DataShield";
   }
 
   //
@@ -67,6 +76,15 @@ public class DataShieldAdministrationPresenter extends WidgetPresenter<DataShiel
         }
       }
     });
+    registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    registerHandler(getDisplay().addMethodHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        // TODO Auto-generated method stub
+
+      }
+    }));
   }
 
   @Override
@@ -122,8 +140,7 @@ public class DataShieldAdministrationPresenter extends WidgetPresenter<DataShiel
         if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_NOT_FOUND) {
           updateDataShield();
         } else {
-          ClientErrorDto error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, error.getStatus(), null));
+          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "Failed removing aggregating method.", null));
         }
       }
 
@@ -139,15 +156,25 @@ public class DataShieldAdministrationPresenter extends WidgetPresenter<DataShiel
   // Inner Classes / Interfaces
   //
 
-  public interface Display extends WidgetDisplay {
+  class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
-    //
-    // DataShield
-    //
+    @Override
+    public void onConfirmation(ConfirmationEvent event) {
+      if(removeMethodConfirmation != null && event.getSource().equals(removeMethodConfirmation) && event.isConfirmed()) {
+        removeMethodConfirmation.run();
+        removeMethodConfirmation = null;
+      }
+    }
+
+  }
+
+  public interface Display extends WidgetDisplay {
 
     void renderDataShieldMethodsRows(JsArray<DataShieldMethodDto> rows);
 
     HasActionHandler<DataShieldMethodDto> getDataShieldMethodActionsColumn();
+
+    HandlerRegistration addMethodHandler(ClickHandler handler);
 
   }
 
