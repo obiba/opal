@@ -7,9 +7,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.administration.view;
+package org.obiba.opal.web.gwt.app.client.administration.r.view;
 
-import org.obiba.opal.web.gwt.app.client.administration.presenter.RAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 
 import com.google.gwt.core.client.GWT;

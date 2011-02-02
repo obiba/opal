@@ -90,6 +90,7 @@ public interface Translations extends Constants {
   "Cancel", "Cancel", //
   "Delete", "Delete", //
   "Edit", "Edit", //
+  "Copy", "Copy", //
   "Download", "Download", //
   "DownloadCertificate", "Download Certificate" })
   Map<String, String> actionMap();
@@ -242,7 +243,10 @@ public interface Translations extends Constants {
   "IdentifiersGenerationFailed", "Identifiers generation has failed.",//
   "IdentifiersGenerationPending", "An Identifiers generation task is currently running.",//
   "MappedUnitsCannotBeIdentified", "Units to be mapped cannot be identified.",//
-  "TwoMappedUnitsExpected", "Exactly two Units to be mapped are expected."//
+  "TwoMappedUnitsExpected", "Exactly two Units to be mapped are expected.",//
+  "DataShieldMethodAlreadyExistWithTheSpecifiedName", "A method already exists with the specified name.",//
+  "DataShieldMethodNameIsRequired", "A name is required.",//
+  "DataShieldMethodIsRequired", "A method is required."//
   })
   Map<String, String> userMessageMap();
 

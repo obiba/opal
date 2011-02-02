@@ -3,6 +3,9 @@ package org.obiba.opal.web.gwt.app.client.administration.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;

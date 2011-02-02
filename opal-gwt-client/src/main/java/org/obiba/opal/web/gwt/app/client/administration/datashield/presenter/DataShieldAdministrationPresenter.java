@@ -1,11 +1,13 @@
-package org.obiba.opal.web.gwt.app.client.administration.presenter;
+package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
-import org.obiba.opal.web.gwt.app.client.administration.presenter.DataShieldMethodPresenter.Mode;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
@@ -34,6 +36,8 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
   public static final String DELETE_ACTION = "Delete";
 
   public static final String EDIT_ACTION = "Edit";
+
+  public static final String COPY_ACTION = "Copy";
 
   //
   // Instance Variables
@@ -86,9 +90,23 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
       @Override
       public void onClick(ClickEvent event) {
         dataShieldMethodPresenter.bind();
-        dataShieldMethodPresenter.setDialogMode(Mode.CREATE);
         dataShieldMethodPresenter.revealDisplay();
       }
+    }));
+    registerHandler(eventBus.addHandler(DataShieldMethodCreatedEvent.getType(), new DataShieldMethodCreatedEvent.Handler() {
+
+      @Override
+      public void onDataShieldMethodCreated(DataShieldMethodCreatedEvent event) {
+        updateDataShieldMethods();
+      }
+    }));
+    registerHandler(eventBus.addHandler(DataShieldMethodUpdatedEvent.getType(), new DataShieldMethodUpdatedEvent.Handler() {
+
+      @Override
+      public void onDataShieldMethodUpdated(DataShieldMethodUpdatedEvent event) {
+        updateDataShieldMethods();
+      }
+
     }));
   }
 
@@ -102,18 +120,19 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
 
   @Override
   public void refreshDisplay() {
+    updateDataShieldMethods();
   }
 
   @Override
   public void revealDisplay() {
-    updateDataShield();
+    updateDataShieldMethods();
   }
 
   //
   //
   //
 
-  private void updateDataShield() {
+  private void updateDataShieldMethods() {
     ResourceRequestBuilderFactory.<JsArray<DataShieldMethodDto>> newBuilder().forResource("/datashield/methods").get()//
     .withCallback(new ResourceCallback<JsArray<DataShieldMethodDto>>() {
 
@@ -126,7 +145,13 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
 
   protected void doDataShieldMethodActionImpl(final DataShieldMethodDto dto, String actionName) {
     if(actionName.equals(EDIT_ACTION)) {
-
+      dataShieldMethodPresenter.bind();
+      dataShieldMethodPresenter.updateMethod(dto);
+      dataShieldMethodPresenter.revealDisplay();
+    } else if(actionName.equals(COPY_ACTION)) {
+      dataShieldMethodPresenter.bind();
+      dataShieldMethodPresenter.copyMethod(dto);
+      dataShieldMethodPresenter.revealDisplay();
     } else if(actionName.equals(DELETE_ACTION)) {
       removeMethodConfirmation = new Runnable() {
         public void run() {
@@ -143,7 +168,7 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
       @Override
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_NOT_FOUND) {
-          updateDataShield();
+          updateDataShieldMethods();
         } else {
           eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "Failed removing aggregating method.", null));
         }

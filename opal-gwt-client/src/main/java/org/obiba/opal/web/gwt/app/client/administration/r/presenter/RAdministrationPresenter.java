@@ -1,4 +1,6 @@
-package org.obiba.opal.web.gwt.app.client.administration.presenter;
+package org.obiba.opal.web.gwt.app.client.administration.r.presenter;
+
+import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;

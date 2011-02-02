@@ -7,12 +7,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.administration.view;
+package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
 
-import static org.obiba.opal.web.gwt.app.client.administration.presenter.DataShieldAdministrationPresenter.DELETE_ACTION;
-import static org.obiba.opal.web.gwt.app.client.administration.presenter.DataShieldAdministrationPresenter.EDIT_ACTION;
+import static org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter.COPY_ACTION;
+import static org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter.DELETE_ACTION;
+import static org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter.EDIT_ACTION;
 
-import org.obiba.opal.web.gwt.app.client.administration.presenter.DataShieldAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
@@ -159,7 +160,7 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
       }
     }, translations.typeLabel());
 
-    methodActionsColumn = new ActionsColumn<DataShieldMethodDto>(new ConstantActionsProvider<DataShieldMethodDto>(EDIT_ACTION, DELETE_ACTION));
+    methodActionsColumn = new ActionsColumn<DataShieldMethodDto>(new ConstantActionsProvider<DataShieldMethodDto>(EDIT_ACTION, COPY_ACTION, DELETE_ACTION));
     methodsTable.addColumn(methodActionsColumn, translations.actionsLabel());
   }
 

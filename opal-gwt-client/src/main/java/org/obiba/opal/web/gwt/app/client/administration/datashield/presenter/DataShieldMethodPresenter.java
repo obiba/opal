@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.administration.presenter;
+package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -18,6 +18,8 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
@@ -76,6 +78,8 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
 
   @Override
   protected void onBind() {
+    setDialogMode(Mode.CREATE);
+    getDisplay().clear();
     addEventHandlers();
     this.methodValidationHandler = new MethodValidationHandler(eventBus);
   }
@@ -115,9 +119,34 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
 
   }
 
-  public void setDialogMode(Mode dialogMode) {
+  private void setDialogMode(Mode dialogMode) {
     this.dialogMode = dialogMode;
     getDisplay().setDialogMode(dialogMode);
+  }
+
+  public void updateMethod(DataShieldMethodDto dto) {
+    setDialogMode(Mode.UPDATE);
+    displayMethod(dto.getName(), dto);
+  }
+
+  public void copyMethod(DataShieldMethodDto dto) {
+    setDialogMode(Mode.CREATE);
+    displayMethod("copy_of_" + dto.getName(), dto);
+  }
+
+  private void displayMethod(String name, DataShieldMethodDto dto) {
+    getDisplay().setName(name);
+    MethodType type;
+    String method;
+    if(dto.getExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method) != null) {
+      type = MethodType.RSCRIPT;
+      method = ((RScriptDataShieldMethodDto) dto.getExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method)).getScript();
+    } else {
+      type = MethodType.RFUNCTION;
+      method = ((RFunctionDataShieldMethodDto) dto.getExtension(RFunctionDataShieldMethodDto.DataShieldMethodDtoExtensions.method)).getFunc();
+    }
+    getDisplay().setType(type);
+    getDisplay().setMethod(method);
   }
 
   private void updateMethod() {
@@ -179,6 +208,7 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
       if(validators == null) {
         validators = new LinkedHashSet<FieldValidator>();
         validators.add(new RequiredTextValidator(getDisplay().getName(), "DataShieldMethodNameIsRequired"));
+        validators.add(new RequiredTextValidator(getDisplay().getMethod(), "DataShieldMethodIsRequired"));
       }
       return validators;
     }
@@ -227,13 +257,12 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
     public void onResponseCode(Request request, Response response) {
       getDisplay().hideDialog();
       if(response.getStatusCode() == Response.SC_OK) {
-        // TODO eventBus.fireEvent(new DataShieldMethodUpdatedEvent(dto));
+        eventBus.fireEvent(new DataShieldMethodUpdatedEvent(dto));
       } else if(response.getStatusCode() == Response.SC_CREATED) {
-        // TODO eventBus.fireEvent(new DataShieldMethodCreatedEvent(dto));
+        eventBus.fireEvent(new DataShieldMethodCreatedEvent(dto));
       } else {
         eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
       }
-
     }
   }
 
@@ -252,11 +281,17 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
 
     void setName(String name);
 
+    void setType(MethodType type);
+
+    void setMethod(String method);
+
     HasText getName();
 
     MethodType getType();
 
     HasText getMethod();
+
+    void clear();
 
   }
 

@@ -7,11 +7,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.administration.view;
+package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
 
-import org.obiba.opal.web.gwt.app.client.administration.presenter.DataShieldMethodPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.administration.presenter.DataShieldMethodPresenter.MethodType;
-import org.obiba.opal.web.gwt.app.client.administration.presenter.DataShieldMethodPresenter.Mode;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodPresenter.MethodType;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 
 import com.google.gwt.core.client.GWT;
@@ -59,7 +59,7 @@ public class DataShieldMethodView extends Composite implements Display {
   TextBox name;
 
   @UiField
-  ListBox type;
+  ListBox typeList;
 
   @UiField
   TextArea method;
@@ -136,7 +136,7 @@ public class DataShieldMethodView extends Composite implements Display {
 
   @Override
   public MethodType getType() {
-    return MethodType.valueOf(type.getValue(type.getSelectedIndex()));
+    return MethodType.valueOf(typeList.getValue(typeList.getSelectedIndex()));
   }
 
   @Override
@@ -144,4 +144,25 @@ public class DataShieldMethodView extends Composite implements Display {
     return method;
   }
 
+  @Override
+  public void setType(MethodType type) {
+    for(int i = 0; i < typeList.getItemCount(); i++) {
+      if(typeList.getValue(i).equals(type.toString())) {
+        typeList.setSelectedIndex(i);
+        break;
+      }
+    }
+  }
+
+  @Override
+  public void setMethod(String method) {
+    this.method.setText(method);
+  }
+
+  @Override
+  public void clear() {
+    name.setText("");
+    typeList.setSelectedIndex(0);
+    method.setText("");
+  }
 }

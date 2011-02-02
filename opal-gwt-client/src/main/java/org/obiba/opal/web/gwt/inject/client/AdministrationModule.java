@@ -9,14 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.inject.client;
 
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldMethodView;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.presenter.DataShieldAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.presenter.DataShieldMethodPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.presenter.RAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.r.view.RAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.view.AdministrationView;
-import org.obiba.opal.web.gwt.app.client.administration.view.DataShieldAdministrationView;
-import org.obiba.opal.web.gwt.app.client.administration.view.DataShieldMethodView;
-import org.obiba.opal.web.gwt.app.client.administration.view.RAdministrationView;
 
 import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.inject.Singleton;
