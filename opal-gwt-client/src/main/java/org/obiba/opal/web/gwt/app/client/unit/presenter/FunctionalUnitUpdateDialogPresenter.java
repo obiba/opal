@@ -144,9 +144,9 @@ public class FunctionalUnitUpdateDialogPresenter extends WidgetPresenter<Functio
 
   private void updateFunctionalUnit() {
     if(validFunctionalUnit()) {
-      FunctionalUnitDto FunctionalUnit = getFunctionalUnitDto();
-      CreateOrUpdateFunctionalUnitCallBack callbackHandler = new CreateOrUpdateFunctionalUnitCallBack(FunctionalUnit);
-      ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + getDisplay().getName().getText()).put().withResourceBody(FunctionalUnitDto.stringify(FunctionalUnit)).withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+      FunctionalUnitDto functionalUnit = getFunctionalUnitDto();
+      CreateOrUpdateFunctionalUnitCallBack callbackHandler = new CreateOrUpdateFunctionalUnitCallBack(functionalUnit);
+      ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + getDisplay().getName().getText()).put().withResourceBody(FunctionalUnitDto.stringify(functionalUnit)).withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
     }
   }
 
