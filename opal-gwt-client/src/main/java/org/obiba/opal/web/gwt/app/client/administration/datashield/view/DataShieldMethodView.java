@@ -13,8 +13,11 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.Dat
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodPresenter.MethodType;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -24,6 +27,8 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
@@ -62,7 +67,16 @@ public class DataShieldMethodView extends Composite implements Display {
   ListBox typeList;
 
   @UiField
-  TextArea method;
+  Label scriptLabel;
+
+  @UiField
+  TextArea script;
+
+  @UiField
+  Label functionLabel;
+
+  @UiField
+  TextBox function;
 
   //
   // Constructors
@@ -78,6 +92,22 @@ public class DataShieldMethodView extends Composite implements Display {
     dialog.hide();
     typeList.addItem(translations.rFunctionLabel(), MethodType.RFUNCTION.toString());
     typeList.addItem(translations.rScriptLabel(), MethodType.RSCRIPT.toString());
+    script.setVisible(false);
+    typeList.setSelectedIndex(0);
+    typeList.addChangeHandler(new ChangeHandler() {
+
+      @Override
+      public void onChange(ChangeEvent event) {
+        updateForm(getType());
+      }
+    });
+  }
+
+  private void updateForm(MethodType type) {
+    script.setVisible(type.equals(MethodType.RSCRIPT));
+    scriptLabel.setVisible(type.equals(MethodType.RSCRIPT));
+    function.setVisible(type.equals(MethodType.RFUNCTION));
+    functionLabel.setVisible(type.equals(MethodType.RFUNCTION));
   }
 
   @Override
@@ -108,6 +138,7 @@ public class DataShieldMethodView extends Composite implements Display {
   @Override
   public void setDialogMode(Mode dialogMode) {
     name.setEnabled(Mode.CREATE.equals(dialogMode));
+    typeList.setEnabled(Mode.CREATE.equals(dialogMode));
     if(Mode.CREATE.equals(dialogMode)) {
       dialog.setText(translations.addDataShieldMethod());
     } else {
@@ -141,13 +172,8 @@ public class DataShieldMethodView extends Composite implements Display {
   }
 
   @Override
-  public MethodType getType() {
-    return MethodType.valueOf(typeList.getValue(typeList.getSelectedIndex()));
-  }
-
-  @Override
-  public HasText getMethod() {
-    return method;
+  public HasText getScript() {
+    return script;
   }
 
   @Override
@@ -158,17 +184,55 @@ public class DataShieldMethodView extends Composite implements Display {
         break;
       }
     }
+    updateForm(type);
   }
 
   @Override
-  public void setMethod(String method) {
-    this.method.setText(method);
+  public void setScript(String method) {
+    this.script.setText(method);
   }
 
   @Override
   public void clear() {
     name.setText("");
     typeList.setSelectedIndex(0);
-    method.setText("");
+    script.setText("");
+    function.setText("");
+    updateForm(MethodType.RFUNCTION);
+    typeList.setSelectedIndex(0);
+  }
+
+  @Override
+  public HasValue<Boolean> isFunction() {
+    return new HasBooleanValue() {
+      @Override
+      public Boolean getValue() {
+        return getType().equals(MethodType.RFUNCTION);
+      }
+    };
+  }
+
+  @Override
+  public HasValue<Boolean> isScript() {
+    return new HasBooleanValue() {
+      @Override
+      public Boolean getValue() {
+        return getType().equals(MethodType.RSCRIPT);
+      }
+    };
+  }
+
+  @Override
+  public void setFunction(String func) {
+    function.setText(func);
+  }
+
+  @Override
+  public HasText getFunction() {
+    return function;
+  }
+
+  private MethodType getType() {
+    return MethodType.valueOf(typeList.getValue(typeList.getSelectedIndex()));
   }
 }

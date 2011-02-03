@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShi
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
+import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -42,6 +43,7 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 
 public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodPresenter.Display> {
@@ -137,16 +139,14 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
   private void displayMethod(String name, DataShieldMethodDto dto) {
     getDisplay().setName(name);
     MethodType type;
-    String method;
     if(dto.getExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method) != null) {
       type = MethodType.RSCRIPT;
-      method = ((RScriptDataShieldMethodDto) dto.getExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method)).getScript();
+      getDisplay().setScript(((RScriptDataShieldMethodDto) dto.getExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method)).getScript());
     } else {
       type = MethodType.RFUNCTION;
-      method = ((RFunctionDataShieldMethodDto) dto.getExtension(RFunctionDataShieldMethodDto.DataShieldMethodDtoExtensions.method)).getFunc();
+      getDisplay().setFunction(((RFunctionDataShieldMethodDto) dto.getExtension(RFunctionDataShieldMethodDto.DataShieldMethodDtoExtensions.method)).getFunc());
     }
     getDisplay().setType(type);
-    getDisplay().setMethod(method);
   }
 
   private void updateMethod() {
@@ -178,13 +178,13 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
     DataShieldMethodDto dto = DataShieldMethodDto.create();
     dto.setName(getDisplay().getName().getText());
 
-    if(getDisplay().getType().equals(MethodType.RSCRIPT)) {
+    if(getDisplay().isScript().getValue()) {
       RScriptDataShieldMethodDto method = RScriptDataShieldMethodDto.create();
-      method.setScript(getDisplay().getMethod().getText());
+      method.setScript(getDisplay().getScript().getText());
       dto.setExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method, method);
     } else {
       RFunctionDataShieldMethodDto method = RFunctionDataShieldMethodDto.create();
-      method.setFunc(getDisplay().getMethod().getText());
+      method.setFunc(getDisplay().getFunction().getText());
       dto.setExtension(RFunctionDataShieldMethodDto.DataShieldMethodDtoExtensions.method, method);
     }
 
@@ -208,7 +208,8 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
       if(validators == null) {
         validators = new LinkedHashSet<FieldValidator>();
         validators.add(new RequiredTextValidator(getDisplay().getName(), "DataShieldMethodNameIsRequired"));
-        validators.add(new RequiredTextValidator(getDisplay().getMethod(), "DataShieldMethodIsRequired"));
+        validators.add(new ConditionalValidator(getDisplay().isScript(), new RequiredTextValidator(getDisplay().getScript(), "DataShieldRScriptIsRequired")));
+        validators.add(new ConditionalValidator(getDisplay().isFunction(), new RequiredTextValidator(getDisplay().getScript(), "DataShieldRFunctionIsRequired")));
       }
       return validators;
     }
@@ -283,13 +284,19 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
 
     void setType(MethodType type);
 
-    void setMethod(String method);
+    void setScript(String script);
+
+    void setFunction(String func);
 
     HasText getName();
 
-    MethodType getType();
+    HasValue<Boolean> isFunction();
 
-    HasText getMethod();
+    HasValue<Boolean> isScript();
+
+    HasText getScript();
+
+    HasText getFunction();
 
     void clear();
 

@@ -25,21 +25,31 @@
                 </td>
               </tr>
               <tr>
-	              <td>
-	                <g:Label addStyleNames="key"><ui:msg description="Type label">Type</ui:msg>:</g:Label>          
-	              </td>
-	              <td>
-	                <g:ListBox ui:field="typeList" visibleItemCount="1"/>
-	              </td>
-	            </tr>
+	            <td>
+	              <g:Label addStyleNames="key"><ui:msg description="Type label">Type</ui:msg>:</g:Label>          
+	            </td>
+	            <td>
+	              <g:ListBox ui:field="typeList" visibleItemCount="1"/>
+	            </td>
+	          </tr>
               <tr>
-                <td valign="top">
-                  <g:Label addStyleNames="key">
-                    <ui:msg description="DataShield method label">Method</ui:msg>:
+                <td>
+                  <g:Label addStyleNames="key" ui:field="functionLabel">
+                    <ui:msg description="DataShield function label">Function</ui:msg>:
                   </g:Label>
                 </td>
                 <td>
-                  <g:TextArea addStyleNames="text not-so-full-width" name="method" ui:field="method"/>
+                  <g:TextBox addStyleNames="text not-so-full-width" name="function" ui:field="function"/>
+                </td>
+              </tr>
+              <tr>
+                <td valign="top">
+                  <g:Label addStyleNames="key" ui:field="scriptLabel">
+                    <ui:msg description="DataShield script label">Script</ui:msg>:
+                  </g:Label>
+                </td>
+                <td>
+                  <g:TextArea addStyleNames="text not-so-full-width" name="script" ui:field="script"/>
                 </td>
               </tr>
             </table>
