@@ -66,6 +66,7 @@ import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
 import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -187,6 +188,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   @GET
   @Path("/entities/identifiers")
   @Produces("text/plain")
+  @AuthenticatedByCookie
   public Response getIdentifiers() {
     ByteArrayOutputStream ids = new ByteArrayOutputStream();
     final PrintWriter writer = new PrintWriter(ids);
@@ -208,6 +210,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   @GET
   @Path("/entities/csv")
   @Produces("text/csv")
+  @AuthenticatedByCookie
   public Response getCSVIdentifiers() throws MagmaRuntimeException, IOException {
     ByteArrayOutputStream ids = new ByteArrayOutputStream();
     final PrintWriter writer = new PrintWriter(ids);

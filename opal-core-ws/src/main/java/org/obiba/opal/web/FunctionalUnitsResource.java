@@ -59,6 +59,7 @@ import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.FunctionalUnitDto;
+import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -180,6 +181,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
   @GET
   @Path("/entities/csv")
   @Produces("text/csv")
+  @AuthenticatedByCookie
   public Response getCSVIdentifiers() throws MagmaRuntimeException, IOException {
     try {
       String destinationName = getKeysDatasourceName();
