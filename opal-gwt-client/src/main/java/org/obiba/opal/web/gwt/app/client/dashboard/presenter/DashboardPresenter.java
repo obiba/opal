@@ -21,8 +21,10 @@ import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitPresenter;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -78,7 +80,7 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
 
   private void addEventHandlers() {
 
-    super.registerHandler(getDisplay().getExploreVariablesLink().addClickHandler(new ClickHandler() {
+    super.registerHandler(getDisplay().getDatasourcesLink().addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
@@ -86,7 +88,7 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
       }
     }));
 
-    super.registerHandler(getDisplay().getExploreFilesLink().addClickHandler(new ClickHandler() {
+    super.registerHandler(getDisplay().getFilesLink().addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
@@ -94,7 +96,7 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
       }
     }));
 
-    super.registerHandler(getDisplay().getJobListLink().addClickHandler(new ClickHandler() {
+    super.registerHandler(getDisplay().getJobsLink().addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
@@ -134,6 +136,7 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
 
   @Override
   public void revealDisplay() {
+    authorize();
     ResourceRequestBuilderFactory.newBuilder().forResource("/participants/count").get().withCallback(200, new ResponseCodeCallback() {
 
       @Override
@@ -144,6 +147,14 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
 
   }
 
+  private void authorize() {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").get().authorize(getDisplay().getDatasourcesAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").get().authorize(getDisplay().getUnitsAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").get().authorize(getDisplay().getReportsAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta").get().authorize(getDisplay().getFilesAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/commands").get().authorize(getDisplay().getJobsAuthorizer()).send();
+  }
+
   //
   // Inner Classes / Interfaces
   //
@@ -151,15 +162,33 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
   public interface Display extends WidgetDisplay {
     void setParticipantCount(int count);
 
+    //
+    // Click handlers
+    //
+
     HasClickHandlers getUnitsLink();
 
-    HasClickHandlers getExploreVariablesLink();
+    HasClickHandlers getDatasourcesLink();
 
-    HasClickHandlers getExploreFilesLink();
+    HasClickHandlers getFilesLink();
 
-    HasClickHandlers getJobListLink();
+    HasClickHandlers getJobsLink();
 
     HasClickHandlers getReportsLink();
+
+    //
+    // Authorization
+    //
+
+    HasAuthorization getUnitsAuthorizer();
+
+    HasAuthorization getDatasourcesAuthorizer();
+
+    HasAuthorization getFilesAuthorizer();
+
+    HasAuthorization getJobsAuthorizer();
+
+    HasAuthorization getReportsAuthorizer();
 
   }
 

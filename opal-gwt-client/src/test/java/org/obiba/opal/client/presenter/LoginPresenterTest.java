@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -38,7 +39,8 @@ public class LoginPresenterTest {
     displayMock = createMock(LoginPresenter.Display.class);
     EventBus eventBus = createMock(EventBus.class);
     RequestCredentials credentials = new RequestCredentials();
-    loginPresenter = new LoginPresenter(displayMock, eventBus, credentials);
+    ResourceAuthorizationCache authorizationCache = new ResourceAuthorizationCache();
+    loginPresenter = new LoginPresenter(displayMock, eventBus, credentials, authorizationCache);
   }
 
   @Test

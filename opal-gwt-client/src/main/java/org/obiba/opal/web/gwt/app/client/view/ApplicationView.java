@@ -10,6 +10,8 @@
 package org.obiba.opal.web.gwt.app.client.view;
 
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -137,7 +139,7 @@ public class ApplicationView implements ApplicationPresenter.Display {
   }
 
   @Override
-  public MenuItem getFileExplorer() {
+  public MenuItem getFileExplorerItem() {
     return fileExplorer;
   }
 
@@ -170,6 +172,11 @@ public class ApplicationView implements ApplicationPresenter.Display {
   @Override
   public MenuItem getUnitsItem() {
     return unitsItem;
+  }
+
+  @Override
+  public HasAuthorization getAdministrationAuthorizer() {
+    return new WidgetAuthorizer(administration);
   }
 
 }

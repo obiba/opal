@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.rest.client;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,6 +40,8 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
 
   private static RequestCredentials credentials;
 
+  private static ResourceAuthorizationCache authorizationCache;
+
   private String uri;
 
   private String contentType;
@@ -56,16 +59,19 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
   // TODO: determine the implications fo this
   private ResponseCodeCallback[] codes;
 
-  private RequestBuilder.Method method;
+  private AuthorizationCallback authorizationCallback;
+
+  private HttpMethod method;
 
   private RequestBuilder builder;
 
   public DefaultResourceRequestBuilder() {
   }
 
-  public static void setup(RequestEventBus requestEventBus, RequestCredentials credentials) {
+  public static void setup(RequestEventBus requestEventBus, RequestCredentials credentials, ResourceAuthorizationCache authorizationCache) {
     DefaultResourceRequestBuilder.eventBus = requestEventBus;
     DefaultResourceRequestBuilder.credentials = credentials;
+    DefaultResourceRequestBuilder.authorizationCache = authorizationCache;
   }
 
   public DefaultResourceRequestBuilder<T> forResource(String resource) {
@@ -85,6 +91,12 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
       codes = new ResponseCodeCallback[505];
     }
     codes[code] = callback;
+    return this;
+  }
+
+  @Override
+  public ResourceRequestBuilder<T> withAuthorizationCallback(AuthorizationCallback callback) {
+    this.authorizationCallback = callback;
     return this;
   }
 
@@ -114,32 +126,37 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
   }
 
   public DefaultResourceRequestBuilder<T> get() {
-    method = RequestBuilder.GET;
+    method = HttpMethod.GET;
     return this;
   }
 
   public DefaultResourceRequestBuilder<T> head() {
-    method = RequestBuilder.HEAD;
+    method = HttpMethod.HEAD;
     return this;
   }
 
   public DefaultResourceRequestBuilder<T> post() {
-    method = RequestBuilder.POST;
+    method = HttpMethod.POST;
     return this;
   }
 
   public DefaultResourceRequestBuilder<T> put() {
-    method = RequestBuilder.PUT;
+    method = HttpMethod.PUT;
     return this;
   }
 
   public DefaultResourceRequestBuilder<T> delete() {
-    method = RequestBuilder.DELETE;
+    method = HttpMethod.DELETE;
+    return this;
+  }
+
+  public DefaultResourceRequestBuilder<T> options() {
+    method = HttpMethod.OPTIONS;
     return this;
   }
 
   public RequestBuilder build() {
-    builder = new RequestBuilder(method, uri);
+    builder = new InnerRequestBuilder(method, uri);
     builder.setCallback(new InnerCallback());
     if(this.accept.size() > 0) {
       builder.setHeader("Accept", buildAcceptHeader());
@@ -204,16 +221,55 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
       if(credentials.hasExpired(builder) || code == 401) {
         // this is fired even after a request for deleting the session
         eventBus.fireEvent(new RequestCredentialsExpiredEvent());
-      } else if(codes != null && codes[code] != null) {
-        codes[code].onResponseCode(request, response);
       } else {
-        if(resourceCallback != null && code < 400) {
+        cacheAuthorization(response);
+
+        if(authorizationCallback != null) {
+          authorizationCallback.onResponseCode(request, response, authorizationCache.get(uri));
+        }
+
+        if(codes != null && codes[code] != null) {
+          codes[code].onResponseCode(request, response);
+        } else if(resourceCallback != null && code < 400) {
           final T resource = (T) JsonUtils.unsafeEval(response.getText());
           resourceCallback.onResource(response, resource);
-        } else {
+        } else if(authorizationCallback == null) {
           eventBus.fireEvent(new UnhandledResponseEvent(request, response));
         }
       }
+
+    }
+
+    private void cacheAuthorization(Response response) {
+      Set<HttpMethod> allowed = getAllowedMethods(response);
+      if(allowed.size() > 0) {
+        // GWT.log(authorizationCache.toString());
+        authorizationCache.put(uri, allowed);
+      }
+    }
+
+    private Set<HttpMethod> getAllowedMethods(Response response) {
+      Set<HttpMethod> allowed = new LinkedHashSet<HttpMethod>();
+      String header = response.getHeader("Allow");
+      if(header != null && header.length() > 0) {
+        for(String string : header.split(",")) {
+          allowed.add(HttpMethod.valueOf(string.trim()));
+        }
+      }
+
+      return allowed;
+    }
+
+  }
+
+  private class InnerRequestBuilder extends RequestBuilder {
+
+    /**
+     * @param httpMethod
+     * @param url
+     */
+    protected InnerRequestBuilder(HttpMethod httpMethod, String url) {
+      super(httpMethod.toString(), url);
     }
 
   }

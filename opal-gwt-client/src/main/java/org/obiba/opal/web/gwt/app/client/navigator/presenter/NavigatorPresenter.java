@@ -20,6 +20,8 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEve
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -40,6 +42,12 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     HandlerRegistration addExportDataClickHandler(ClickHandler handler);
 
     HandlerRegistration addImportDataClickHandler(ClickHandler handler);
+
+    HasAuthorization getCreateDatasourceAuthorizer();
+
+    HasAuthorization getImportDataAuthorizer();
+
+    HasAuthorization getExportDataAuthorizer();
   }
 
   @Inject
@@ -134,6 +142,19 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
   @Override
   public void revealDisplay() {
     navigatorTreePresenter.revealDisplay();
+    authorize();
+  }
+
+  private void authorize() {
+    // create datasource
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").post().authorize(getDisplay().getCreateDatasourceAuthorizer()).send();
+
+    // import data
+    // ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").post().authorize(getDisplay().getImportDataAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/import").post().authorize(getDisplay().getImportDataAuthorizer()).send();
+
+    // export data
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().authorize(getDisplay().getExportDataAuthorizer()).send();
   }
 
   private void displayDetails(WidgetDisplay detailsDisplay) {

@@ -17,8 +17,10 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresente
 import org.obiba.opal.web.gwt.app.client.wizard.WizardManager;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.inject.client.OpalGinjector;
+import org.obiba.opal.web.gwt.rest.client.DefaultResourceAuthorizationRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.DefaultResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.event.RequestCredentialsExpiredEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
@@ -47,6 +49,7 @@ public class GwtApp implements EntryPoint {
   public void onModuleLoad() {
 
     final EventBus bus = opalGinjector.getEventBus();
+    ResourceAuthorizationCache authorizationCache = opalGinjector.getResourceAuthorizationCache();
     // TODO: is there a better way to provide the dependencies to instances created with GWT.create()?
     DefaultResourceRequestBuilder.setup(new RequestEventBus() {
 
@@ -54,7 +57,9 @@ public class GwtApp implements EntryPoint {
       public void fireEvent(GwtEvent<?> event) {
         bus.fireEvent(event);
       }
-    }, opalGinjector.getRequestCredentials());
+    }, opalGinjector.getRequestCredentials(), authorizationCache);
+
+    DefaultResourceAuthorizationRequestBuilder.setup(authorizationCache);
 
     OpalResources.INSTANCE.css().ensureInjected();
     OpalResources.INSTANCE.cssMongo().ensureInjected();

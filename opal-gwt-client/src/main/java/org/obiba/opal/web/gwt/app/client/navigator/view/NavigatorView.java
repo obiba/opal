@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.app.client.navigator.view;
 
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorTreePresenter;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -90,6 +92,21 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   @Override
   public HandlerRegistration addImportDataClickHandler(ClickHandler handler) {
     return importDataButton.addClickHandler(handler);
+  }
+
+  @Override
+  public HasAuthorization getCreateDatasourceAuthorizer() {
+    return new UIObjectAuthorizer(createDatasourceButton);
+  }
+
+  @Override
+  public HasAuthorization getImportDataAuthorizer() {
+    return new UIObjectAuthorizer(importDataButton);
+  }
+
+  @Override
+  public HasAuthorization getExportDataAuthorizer() {
+    return new UIObjectAuthorizer(exportDataButton);
   }
 
 }

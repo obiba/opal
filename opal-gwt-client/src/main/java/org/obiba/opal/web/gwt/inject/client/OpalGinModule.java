@@ -41,6 +41,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.view.TableSelectorView;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.view.EvaluateScriptView;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
 
 import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.inject.Singleton;
@@ -55,6 +56,7 @@ public class OpalGinModule extends AbstractGinModule {
     // Bind concrete implementations to interfaces
     bind(EventBus.class).to(DefaultEventBus.class).in(Singleton.class);
     bind(RequestCredentials.class).in(Singleton.class);
+    bind(ResourceAuthorizationCache.class).in(Singleton.class);
 
     bind(ApplicationPresenter.Display.class).to(ApplicationView.class).in(Singleton.class);
     bind(LoginPresenter.Display.class).to(LoginView.class).in(Singleton.class);

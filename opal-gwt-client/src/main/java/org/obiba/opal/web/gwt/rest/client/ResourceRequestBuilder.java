@@ -21,6 +21,8 @@ public interface ResourceRequestBuilder<T extends JavaScriptObject> {
 
   public ResourceRequestBuilder<T> withCallback(int code, ResponseCodeCallback callback);
 
+  public ResourceRequestBuilder<T> withAuthorizationCallback(AuthorizationCallback callback);
+
   public ResourceRequestBuilder<T> accept(String acceptHeader);
 
   public ResourceRequestBuilder<T> withBody(String contentType, String body);
@@ -38,6 +40,8 @@ public interface ResourceRequestBuilder<T extends JavaScriptObject> {
   public ResourceRequestBuilder<T> put();
 
   public ResourceRequestBuilder<T> delete();
+
+  public ResourceRequestBuilder<T> options();
 
   public RequestBuilder build();
 

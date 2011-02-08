@@ -119,6 +119,10 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
   @Override
   public void revealDisplay() {
+    authorize();
+  }
+
+  private void authorize() {
   }
 
   private void displayDatasource(DatasourceDto datasourceDto) {

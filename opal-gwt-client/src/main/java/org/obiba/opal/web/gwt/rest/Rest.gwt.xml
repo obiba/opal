@@ -7,6 +7,11 @@
     This tells GWT to use this concrete implementation whenever a call to GWT.create() is made for the interface type.
   -->
   
+  <!-- Authorization -->
+  <replace-with class="org.obiba.opal.web.gwt.rest.client.DefaultResourceAuthorizationRequestBuilder">
+    <when-type-assignable class="org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilder" />
+  </replace-with>
+  
   <!-- Fallthrough for all other browsers -->
   <replace-with class="org.obiba.opal.web.gwt.rest.client.DefaultResourceRequestBuilder">
     <when-type-assignable class="org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder" />

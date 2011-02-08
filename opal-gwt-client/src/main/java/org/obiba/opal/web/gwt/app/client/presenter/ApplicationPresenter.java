@@ -25,6 +25,8 @@ import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitPresenter;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -52,9 +54,11 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
     void updateWorkbench(Widget workbench);
 
+    HasAuthorization getAdministrationAuthorizer();
+
     MenuItem getListJobsItem();
 
-    MenuItem getFileExplorer();
+    MenuItem getFileExplorerItem();
 
     MenuItem getDashboardItem();
 
@@ -158,12 +162,12 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
       }
     });
 
-    getDisplay().getFileExplorer().setCommand(new Command() {
+    getDisplay().getFileExplorerItem().setCommand(new Command() {
 
       @Override
       public void execute() {
         eventBus.fireEvent(new WorkbenchChangeEvent(fileExplorerPresenter.get()));
-        getDisplay().setCurrentSelection(getDisplay().getFileExplorer());
+        getDisplay().setCurrentSelection(getDisplay().getFileExplorerItem());
       }
     });
 
@@ -208,8 +212,18 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
   @Override
   public void revealDisplay() {
+    authorize();
     eventBus.fireEvent(new WorkbenchChangeEvent(dashboardPresenter.get()));
     getDisplay().setCurrentSelection(getDisplay().getDashboardItem());
+  }
+
+  private void authorize() {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").get().authorize(getDisplay().getDatasourcesItem()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").get().authorize(getDisplay().getUnitsItem()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").get().authorize(getDisplay().getReportsItem()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta").get().authorize(getDisplay().getFileExplorerItem()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/commands").get().authorize(getDisplay().getListJobsItem()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/administration").get().authorize(getDisplay().getAdministrationAuthorizer()).send();
   }
 
   private void registerWorkbenchChangeEventHandler() {

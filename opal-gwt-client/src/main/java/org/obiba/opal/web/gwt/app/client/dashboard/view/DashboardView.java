@@ -10,6 +10,8 @@
 package org.obiba.opal.web.gwt.app.client.dashboard.view;
 
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -19,6 +21,7 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -58,6 +61,21 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   @UiField
   Anchor unitsLink;
 
+  @UiField
+  Panel datasources;
+
+  @UiField
+  Panel units;
+
+  @UiField
+  Panel files;
+
+  @UiField
+  Panel reports;
+
+  @UiField
+  Panel jobs;
+
   //
   // Instance Variables
   //
@@ -94,17 +112,17 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
     participantCount.setText(String.valueOf(count));
   }
 
-  public Anchor getExploreVariablesLink() {
+  public Anchor getDatasourcesLink() {
     return exploreVariablesLink;
   }
 
   @Override
-  public HasClickHandlers getExploreFilesLink() {
+  public HasClickHandlers getFilesLink() {
     return exploreFilesLink;
   }
 
   @Override
-  public HasClickHandlers getJobListLink() {
+  public HasClickHandlers getJobsLink() {
     return jobsLink;
   }
 
@@ -116,6 +134,31 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   @Override
   public HasClickHandlers getUnitsLink() {
     return unitsLink;
+  }
+
+  @Override
+  public HasAuthorization getUnitsAuthorizer() {
+    return new WidgetAuthorizer(units);
+  }
+
+  @Override
+  public HasAuthorization getDatasourcesAuthorizer() {
+    return new WidgetAuthorizer(datasources);
+  }
+
+  @Override
+  public HasAuthorization getFilesAuthorizer() {
+    return new WidgetAuthorizer(files);
+  }
+
+  @Override
+  public HasAuthorization getJobsAuthorizer() {
+    return new WidgetAuthorizer(jobs);
+  }
+
+  @Override
+  public HasAuthorization getReportsAuthorizer() {
+    return new WidgetAuthorizer(reports);
   }
 
   //

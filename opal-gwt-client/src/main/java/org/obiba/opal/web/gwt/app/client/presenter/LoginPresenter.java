@@ -17,6 +17,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 
@@ -56,10 +57,13 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
 
   private final RequestCredentials credentials;
 
+  private ResourceAuthorizationCache authorizationCache;
+
   @Inject
-  public LoginPresenter(Display display, EventBus eventBus, RequestCredentials credentials) {
+  public LoginPresenter(Display display, EventBus eventBus, RequestCredentials credentials, ResourceAuthorizationCache authorizationCache) {
     super(display, eventBus);
     this.credentials = credentials;
+    this.authorizationCache = authorizationCache;
   }
 
   @Override
@@ -113,6 +117,7 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
     // TODO: Temporarily commenting out the "focus on user name" behaviour.
     // This seems to lead to layout issues!
     // display.focusOnUserName();
+    authorizationCache.clear();
   }
 
   private void createSecurityResource(String username, String password) {
