@@ -209,7 +209,7 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
         validators = new LinkedHashSet<FieldValidator>();
         validators.add(new RequiredTextValidator(getDisplay().getName(), "DataShieldMethodNameIsRequired"));
         validators.add(new ConditionalValidator(getDisplay().isScript(), new RequiredTextValidator(getDisplay().getScript(), "DataShieldRScriptIsRequired")));
-        validators.add(new ConditionalValidator(getDisplay().isFunction(), new RequiredTextValidator(getDisplay().getScript(), "DataShieldRFunctionIsRequired")));
+        validators.add(new ConditionalValidator(getDisplay().isFunction(), new RequiredTextValidator(getDisplay().getFunction(), "DataShieldRFunctionIsRequired")));
       }
       return validators;
     }
