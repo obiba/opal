@@ -11,7 +11,7 @@ package org.obiba.opal.web.gwt.app.client.administration.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.workbench.view.VerticalTabLayout;
+import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -46,7 +46,7 @@ public class AdministrationView extends Composite implements AdministrationPrese
   //
 
   @UiField
-  VerticalTabLayout administrationDisplays;
+  HorizontalTabLayout administrationDisplays;
 
   //
   // Constructors

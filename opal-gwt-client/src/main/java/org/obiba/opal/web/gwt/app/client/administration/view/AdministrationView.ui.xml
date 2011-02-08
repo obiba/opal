@@ -13,7 +13,7 @@
       <o:HelpImage page="Administrating+Opal"></o:HelpImage>
     </g:FlowPanel>
     <g:HTMLPanel addStyleNames="administration">
-      <o:VerticalTabLayout ui:field="administrationDisplays" />
+      <o:HorizontalTabLayout ui:field="administrationDisplays" />
     </g:HTMLPanel> 
   </o:WorkbenchLayout>
 </ui:UiBinder>
