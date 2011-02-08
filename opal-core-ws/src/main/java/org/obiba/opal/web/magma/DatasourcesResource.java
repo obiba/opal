@@ -19,17 +19,18 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.DuplicateDatasourceNameException;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.support.DatasourceParsingException;
-import org.obiba.magma.support.Disposables;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.magma.support.NoSuchDatasourceFactoryException;
 import org.obiba.opal.web.model.Magma;
@@ -50,11 +51,14 @@ public class DatasourcesResource {
 
   private final DatasourceFactoryRegistry datasourceFactoryRegistry;
 
+  private final OpalRuntime opalRuntime;
+
   @Autowired
-  public DatasourcesResource(DatasourceFactoryRegistry datasourceFactoryRegistry) {
-    if(datasourceFactoryRegistry == null) {
-      throw new IllegalArgumentException("datasourceFactoryRegistry cannot be null");
-    }
+  public DatasourcesResource(DatasourceFactoryRegistry datasourceFactoryRegistry, OpalRuntime opalRuntime) {
+    if(datasourceFactoryRegistry == null) throw new IllegalArgumentException("datasourceFactoryRegistry cannot be null");
+    if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
+
+    this.opalRuntime = opalRuntime;
     this.datasourceFactoryRegistry = datasourceFactoryRegistry;
   }
 
@@ -74,32 +78,25 @@ public class DatasourcesResource {
 
   @POST
   public Response createDatasource(@Context final UriInfo uriInfo, Magma.DatasourceFactoryDto factoryDto) {
-    String uid = null;
     ResponseBuilder response = null;
     try {
       DatasourceFactory factory = datasourceFactoryRegistry.parse(factoryDto);
-      uid = MagmaEngine.get().addTransientDatasource(factory);
-      Datasource ds = MagmaEngine.get().getTransientDatasourceInstance(uid);
-      UriBuilder ub = UriBuilder.fromPath("/").path("datasource").path(uid);
+      Datasource ds = MagmaEngine.get().addDatasource(factory);
+      opalRuntime.getOpalConfiguration().getMagmaEngineFactory().withFactory(factory);
+      opalRuntime.writeOpalConfiguration();
+      UriBuilder ub = uriInfo.getBaseUriBuilder().path("datasource").path(ds.getName());
       response = Response.created(ub.build()).entity(Dtos.asDto(ds).build());
-      Disposables.silentlyDispose(ds);
-    } catch(NoSuchDatasourceFactoryException e) {
+    } catch(NoSuchDatasourceFactoryException noSuchDatasourceFactoryEx) {
       response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "UnidentifiedDatasourceFactory").build());
-    } catch(DatasourceParsingException pe) {
-      removeTransientDatasource(uid);
-      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed", pe).build());
-    } catch(MagmaRuntimeException e) {
-      removeTransientDatasource(uid);
-      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed", e).build());
+    } catch(DuplicateDatasourceNameException duplicateDsNameEx) {
+      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DuplicateDatasourceName").build());
+    } catch(DatasourceParsingException dsParsingEx) {
+      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed", dsParsingEx).build());
+    } catch(MagmaRuntimeException dsCreationFailedEx) {
+      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed", dsCreationFailedEx).build());
     }
 
     return response.build();
-  }
-
-  private void removeTransientDatasource(String uid) {
-    if(uid != null) {
-      MagmaEngine.get().removeTransientDatasource(uid);
-    }
   }
 
   private void sortByName(List<Magma.DatasourceDto> datasources) {

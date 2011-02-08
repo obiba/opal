@@ -28,29 +28,24 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
-import org.obiba.magma.DatasourceFactory;
-import org.obiba.magma.DuplicateDatasourceNameException;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.Variable;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
+import org.obiba.magma.Variable;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
-import org.obiba.magma.support.DatasourceParsingException;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
-import org.obiba.opal.web.magma.support.NoSuchDatasourceFactoryException;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
@@ -72,8 +67,6 @@ public class DatasourceResource {
   @PathParam("name")
   private String name;
 
-  private final DatasourceFactoryRegistry datasourceFactoryRegistry;
-
   private final OpalRuntime opalRuntime;
 
   private final ViewDtos viewDtos;
@@ -87,25 +80,22 @@ public class DatasourceResource {
   private Set<Locale> locales;
 
   @Autowired
-  public DatasourceResource(DatasourceFactoryRegistry datasourceFactoryRegistry, OpalRuntime opalRuntime, ViewDtos viewDtos) {
+  public DatasourceResource(OpalRuntime opalRuntime, ViewDtos viewDtos) {
     super();
-    if(datasourceFactoryRegistry == null) throw new IllegalArgumentException("datasourceFactoryRegistry cannot be null");
     if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
     if(viewDtos == null) throw new IllegalArgumentException("viewDtos cannot be null");
 
-    this.datasourceFactoryRegistry = datasourceFactoryRegistry;
     this.opalRuntime = opalRuntime;
     this.viewDtos = viewDtos;
   }
 
   // Used for testing
   DatasourceResource(String name) {
-    this(null, null, null, name);
+    this(null, null, name);
   }
 
   // Used for testing
-  DatasourceResource(DatasourceFactoryRegistry datasourceFactoryRegistry, OpalRuntime opalRuntime, ViewDtos viewDtos, String name) {
-    this.datasourceFactoryRegistry = datasourceFactoryRegistry;
+  DatasourceResource(OpalRuntime opalRuntime, ViewDtos viewDtos, String name) {
     this.opalRuntime = opalRuntime;
     this.viewDtos = viewDtos;
     this.name = name;
@@ -242,29 +232,6 @@ public class DatasourceResource {
   @Scope("request")
   public CompareResource getTableCompare() {
     return new CompareResource(getDatasource());
-  }
-
-  @PUT
-  public Response createDatasource(@Context final UriInfo uriInfo, Magma.DatasourceFactoryDto factoryDto) {
-    ResponseBuilder response = null;
-    try {
-      DatasourceFactory factory = datasourceFactoryRegistry.parse(factoryDto);
-      Datasource ds = MagmaEngine.get().addDatasource(factory);
-      opalRuntime.getOpalConfiguration().getMagmaEngineFactory().withFactory(factory);
-      opalRuntime.writeOpalConfiguration();
-      UriBuilder ub = uriInfo.getBaseUriBuilder().path("datasource").path(ds.getName());
-      response = Response.created(ub.build()).entity(Dtos.asDto(ds).build());
-    } catch(NoSuchDatasourceFactoryException noSuchDatasourceFactoryEx) {
-      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "UnidentifiedDatasourceFactory").build());
-    } catch(DuplicateDatasourceNameException duplicateDsNameEx) {
-      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DuplicateDatasourceName").build());
-    } catch(DatasourceParsingException dsParsingEx) {
-      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed", dsParsingEx).build());
-    } catch(MagmaRuntimeException dsCreationFailedEx) {
-      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed", dsCreationFailedEx).build());
-    }
-
-    return response.build();
   }
 
   @PUT

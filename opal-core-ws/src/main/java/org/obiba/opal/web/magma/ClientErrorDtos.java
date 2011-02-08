@@ -23,7 +23,7 @@ import org.obiba.opal.web.model.Ws.ClientErrorDto;
 public class ClientErrorDtos {
 
   public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus) {
-    return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus);
+    return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus != null ? errorStatus : "");
   }
 
   public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, Exception e) {
