@@ -19,6 +19,8 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -45,6 +47,12 @@ public class FunctionalUnitPresenter extends WidgetPresenter<FunctionalUnitPrese
     HandlerRegistration addExportIdentifiersClickHandler(ClickHandler handler);
 
     HandlerRegistration addImportIdentifiersClickHandler(ClickHandler handler);
+
+    HasAuthorization getAddFunctionalUnitAuthorizer();
+
+    HasAuthorization getExportIdentifiersAuthorizer();
+
+    HasAuthorization getImportIdentifiersAuthorizer();
   }
 
   @Inject
@@ -61,6 +69,16 @@ public class FunctionalUnitPresenter extends WidgetPresenter<FunctionalUnitPrese
 
   @Override
   public void revealDisplay() {
+    authorize();
+  }
+
+  private void authorize() {
+    // create unit
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").post().authorize(getDisplay().getAddFunctionalUnitAuthorizer()).send();
+    // export all identifiers
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units/entities/csv").get().authorize(getDisplay().getExportIdentifiersAuthorizer()).send();
+    // map identifiers
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units/entities/table").get().authorize(getDisplay().getImportIdentifiersAuthorizer()).send();
   }
 
   @Override

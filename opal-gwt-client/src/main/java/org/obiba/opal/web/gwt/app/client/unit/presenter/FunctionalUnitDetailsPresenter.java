@@ -31,9 +31,11 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.opal.KeyPairDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -90,6 +92,22 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     void setImportIdentifiersFromDataCommand(Command command);
 
     void setAvailable(boolean available);
+
+    HasAuthorization getRemoveFunctionalUnitAuthorizer();
+
+    HasAuthorization getDownloadIdentifiersAuthorizer();
+
+    HasAuthorization getExportIdentifiersAuthorizer();
+
+    HasAuthorization getGenerateIdentifiersAuthorizer();
+
+    HasAuthorization getImportIdentifiersFromDataAuthorizer();
+
+    HasAuthorization getAddKeyPairAuthorizer();
+
+    HasAuthorization getListKeyPairsAuthorizer();
+
+    HasAuthorization getUpdateFunctionalUnitAuthorizer();
 
   }
 
@@ -193,6 +211,28 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     .withCallback(Response.SC_OK, callbackHandler) //
     .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
     .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+  }
+
+  private void authorize() {
+    // export identifiers
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/entities/identifiers").get().authorize(getDisplay().getDownloadIdentifiersAuthorizer()).send();
+    // export identifiers mapping
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/entities/csv").get().authorize(getDisplay().getExportIdentifiersAuthorizer()).send();
+    // remove
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName()).delete().authorize(getDisplay().getRemoveFunctionalUnitAuthorizer()).send();
+
+    // generate identifiers
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/entities/identifiers").post().authorize(getDisplay().getGenerateIdentifiersAuthorizer()).send();
+    // add identifiers
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/entities").post().authorize(getDisplay().getImportIdentifiersFromDataAuthorizer()).send();
+    // add key pair
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/keys").post().authorize(getDisplay().getAddKeyPairAuthorizer()).send();
+
+    // edit
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName()).put().authorize(getDisplay().getUpdateFunctionalUnitAuthorizer()).send();
+
+    // display key pairs
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/keys").get().authorize(getDisplay().getListKeyPairsAuthorizer()).send();
   }
 
   protected void doActionImpl(final KeyPairDto dto, String actionName) {
@@ -409,6 +449,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
       functionalUnit = resource;
       getDisplay().setFunctionalUnitDetails(functionalUnit);
       updateCurrentCountOfIdentifiers();
+      authorize();
     }
   }
 

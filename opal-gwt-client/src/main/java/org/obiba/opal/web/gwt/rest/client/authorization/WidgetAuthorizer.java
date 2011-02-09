@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.rest.client.authorization;
 
-
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -36,7 +35,8 @@ public class WidgetAuthorizer implements HasAuthorization {
 
   @Override
   public void unauthorized() {
-    w.removeFromParent();
+    w.setVisible(false);
+    // w.removeFromParent();
   }
 
 }

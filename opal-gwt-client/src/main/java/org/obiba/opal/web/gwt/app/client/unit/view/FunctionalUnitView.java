@@ -10,6 +10,8 @@
 package org.obiba.opal.web.gwt.app.client.unit.view;
 
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitPresenter;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -85,6 +87,21 @@ public class FunctionalUnitView extends Composite implements FunctionalUnitPrese
   @Override
   public HandlerRegistration addImportIdentifiersClickHandler(ClickHandler handler) {
     return importButton.addClickHandler(handler);
+  }
+
+  @Override
+  public HasAuthorization getAddFunctionalUnitAuthorizer() {
+    return new UIObjectAuthorizer(functionalUnitButton);
+  }
+
+  @Override
+  public HasAuthorization getExportIdentifiersAuthorizer() {
+    return new UIObjectAuthorizer(exportButton);
+  }
+
+  @Override
+  public HasAuthorization getImportIdentifiersAuthorizer() {
+    return new UIObjectAuthorizer(importButton);
   }
 
 }

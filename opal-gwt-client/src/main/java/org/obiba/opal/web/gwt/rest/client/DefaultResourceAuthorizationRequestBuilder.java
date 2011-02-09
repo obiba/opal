@@ -76,8 +76,6 @@ public class DefaultResourceAuthorizationRequestBuilder implements ResourceAutho
   public void send() {
     beforeAuthorization();
 
-    GWT.log(resource + ": " + authorizationCache.get(resource));
-
     if(authorizationCache.contains(resource)) {
       apply(authorizationCache.get(resource));
     } else {
@@ -100,6 +98,7 @@ public class DefaultResourceAuthorizationRequestBuilder implements ResourceAutho
   }
 
   private void apply(Set<HttpMethod> allowed) {
+    GWT.log(resource + ": " + allowed);
     if(allowed != null && allowed.contains(method)) {
       authorized();
     } else {

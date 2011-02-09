@@ -19,6 +19,11 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ConstantActionsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.opal.KeyPairDto;
 
@@ -114,6 +119,14 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
 
   private Label functionalUnitName;
 
+  private MenuItem toolsItem;
+
+  private MenuItem addItem;
+
+  private MenuItemSeparator removeSeparator;
+
+  private MenuItemSeparator keyPairSeparator;
+
   public FunctionalUnitDetailsView() {
     initWidget(uiBinder.createAndBindUi(this));
     initKeystoreTable();
@@ -125,9 +138,11 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
     functionalUnitName.addStyleName("title");
     toolbarPanel.add(toolbar = new MenuBar());
     toolbar.setAutoOpen(true);
-    toolbar.addItem("", actionsMenu = new MenuBar(true)).addStyleName("tools");
+    toolsItem = toolbar.addItem("", actionsMenu = new MenuBar(true));
+    toolsItem.addStyleName("tools");
     actionsMenu.addStyleName("tools");
-    toolbar.addItem("", addMenu = new MenuBar(true)).addStyleName("add");
+    addItem = toolbar.addItem("", addMenu = new MenuBar(true));
+    addItem.addStyleName("add");
   }
 
   private void initKeystoreTable() {
@@ -211,6 +226,7 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   @Override
   public void setRemoveFunctionalUnitCommand(Command command) {
     if(remove == null) {
+      removeSeparator = actionsMenu.addSeparator(new MenuItemSeparator());
       actionsMenu.addItem(remove = new MenuItem(translations.removeLabel(), command));
     } else {
       remove.setCommand(command);
@@ -230,7 +246,6 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   public void setExportIdentifiersCommand(Command command) {
     if(exportIds == null) {
       actionsMenu.addItem(exportIds = new MenuItem(translations.exportUnitIdentifiersToExcel(), command));
-      actionsMenu.addSeparator(new MenuItemSeparator());
     } else {
       exportIds.setCommand(command);
     }
@@ -248,7 +263,7 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   @Override
   public void setAddKeyPairCommand(Command command) {
     if(keyPair == null) {
-      addMenu.addSeparator(new MenuItemSeparator());
+      keyPairSeparator = addMenu.addSeparator(new MenuItemSeparator());
       addMenu.addItem(keyPair = new MenuItem(translations.addKeyPair(), command));
     } else {
       keyPair.setCommand(command);
@@ -280,6 +295,70 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
     toolbarPanel.setVisible(available);
     propertiesPanel.setVisible(available);
     statusPanel.setVisible(available);
+  }
+
+  @Override
+  public HasAuthorization getRemoveFunctionalUnitAuthorizer() {
+    return new CompositeAuthorizer(new MenuItemAuthorizer(toolsItem), new MenuItemAuthorizer(remove), new UIObjectAuthorizer(removeSeparator)) {
+      @Override
+      public void unauthorized() {
+      }
+    };
+  }
+
+  @Override
+  public HasAuthorization getDownloadIdentifiersAuthorizer() {
+    return new CompositeAuthorizer(new MenuItemAuthorizer(toolsItem), new MenuItemAuthorizer(downloadIds)) {
+      @Override
+      public void unauthorized() {
+      }
+    };
+  }
+
+  @Override
+  public HasAuthorization getExportIdentifiersAuthorizer() {
+    return new CompositeAuthorizer(new MenuItemAuthorizer(toolsItem), new MenuItemAuthorizer(exportIds)) {
+      @Override
+      public void unauthorized() {
+      }
+    };
+  }
+
+  @Override
+  public HasAuthorization getGenerateIdentifiersAuthorizer() {
+    return new CompositeAuthorizer(new MenuItemAuthorizer(addItem), new MenuItemAuthorizer(generateIdentifiers)) {
+      @Override
+      public void unauthorized() {
+      }
+    };
+  }
+
+  @Override
+  public HasAuthorization getImportIdentifiersFromDataAuthorizer() {
+    return new CompositeAuthorizer(new MenuItemAuthorizer(addItem), new MenuItemAuthorizer(importIdentifiersFromData)) {
+      @Override
+      public void unauthorized() {
+      }
+    };
+  }
+
+  @Override
+  public HasAuthorization getAddKeyPairAuthorizer() {
+    return new CompositeAuthorizer(new MenuItemAuthorizer(addItem), new MenuItemAuthorizer(keyPair), new UIObjectAuthorizer(keyPairSeparator)) {
+      @Override
+      public void unauthorized() {
+      }
+    };
+  }
+
+  @Override
+  public HasAuthorization getListKeyPairsAuthorizer() {
+    return new WidgetAuthorizer(tabs);
+  }
+
+  @Override
+  public HasAuthorization getUpdateFunctionalUnitAuthorizer() {
+    return new MenuItemAuthorizer(update);
   }
 
 }
