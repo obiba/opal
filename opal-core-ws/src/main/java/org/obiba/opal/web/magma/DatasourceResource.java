@@ -194,7 +194,7 @@ public class DatasourceResource {
   @Bean
   @Scope("request")
   public ViewResource getViewResource(View view) {
-    return new ViewResource(view, viewDtos, getLocales());
+    return new ViewResource(opalRuntime, view, viewDtos, getLocales());
   }
 
   @Path("/compare")
@@ -215,28 +215,6 @@ public class DatasourceResource {
     opalRuntime.getViewManager().addView(getDatasource().getName(), viewDtos.fromDto(viewDto));
 
     return Response.created(UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getView").build(name, viewDto.getName())).build();
-  }
-
-  @PUT
-  @Path("/view/{viewName}")
-  public Response updateView(@PathParam("viewName") String viewName, ViewDto viewDto) {
-    if(!viewDto.hasName()) return Response.status(Status.BAD_REQUEST).build();
-    if(!viewDto.getName().equals(viewName)) return Response.status(Status.BAD_REQUEST).build();
-    if(!datasourceHasView(viewName)) return Response.status(Status.NOT_FOUND).build();
-
-    opalRuntime.getViewManager().addView(getDatasource().getName(), viewDtos.fromDto(viewDto));
-
-    return Response.ok().build();
-  }
-
-  @DELETE
-  @Path("/view/{viewName}")
-  public Response removeView(@PathParam("viewName") String viewName) {
-    if(!datasourceHasView(viewName)) return Response.status(Status.NOT_FOUND).build();
-
-    opalRuntime.getViewManager().removeView(getDatasource().getName(), viewName);
-
-    return Response.ok().build();
   }
 
   @Path("/view/{viewName}")
@@ -269,10 +247,6 @@ public class DatasourceResource {
 
   private boolean datasourceHasTable(String viewName) {
     return getDatasource().hasValueTable(viewName);
-  }
-
-  private boolean datasourceHasView(String viewName) {
-    return opalRuntime.getViewManager().hasView(getDatasource().getName(), viewName);
   }
 
   private Set<Locale> getLocales() {

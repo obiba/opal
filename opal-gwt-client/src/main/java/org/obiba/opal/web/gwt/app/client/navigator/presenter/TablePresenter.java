@@ -119,7 +119,6 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
   @Override
   public void revealDisplay() {
-    authorize();
   }
 
   private void authorize() {
@@ -149,6 +148,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     }
 
     updateVariables();
+    authorize();
   }
 
   private boolean isCurrentTable(TableDto tableDto) {

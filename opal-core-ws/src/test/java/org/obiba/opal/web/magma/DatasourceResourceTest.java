@@ -420,24 +420,28 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     expect(mockDatasource.getValueTable("fromTable")).andReturn(mockFromTable).atLeastOnce();
     mockDatasource.dispose();
 
+    expect(mockFromTable.getDatasource()).andReturn(mockDatasource).atLeastOnce();
+
     JavaScriptViewDto jsViewDto = JavaScriptViewDto.newBuilder().build();
     ViewDto viewDto = ViewDto.newBuilder().setName(viewName).addFrom(fqViewName).setExtension(JavaScriptViewDto.view, jsViewDto).build();
 
     ViewManager mockViewManager = createMock(ViewManager.class);
-    expect(mockViewManager.hasView(mockDatasourceName, viewName)).andReturn(true).atLeastOnce();
-    mockViewManager.addView(EasyMock.same(mockDatasourceName), eqView(new View(viewName, mockFromTable)));
+    View view = new View(viewName, mockFromTable);
+    expect(mockViewManager.getView(mockDatasourceName, viewName)).andReturn(view).atLeastOnce();
+    mockViewManager.addView(EasyMock.same(mockDatasourceName), eqView(view));
     expectLastCall().once();
 
     OpalRuntime mockOpalRuntime = createMock(OpalRuntime.class);
     expect(mockOpalRuntime.getViewManager()).andReturn(mockViewManager).atLeastOnce();
 
     DatasourceResource sut = createDatasourceResource(mockDatasourceName, mockDatasource, mockOpalRuntime);
+    sut.setLocalesProperty("en, fr");
 
     replay(mockDatasource, mockFromTable, mockViewManager, mockOpalRuntime);
 
     // Exercise
     MagmaEngine.get().addDatasource(mockDatasource);
-    Response response = sut.updateView(viewName, viewDto);
+    Response response = sut.getView(viewName).updateView(viewDto);
     MagmaEngine.get().removeDatasource(mockDatasource);
 
     // Verify state
@@ -448,85 +452,21 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
   }
 
   @Test
-  public void testCreateOrUpdateView_ReturnsNotFoundResponseIfDatasourceHasNoSuchView() {
-    // Setup
-    String mockDatasourceName = "mockDatasource";
-    String viewName = "viewToAdd";
-    String fqViewName = mockDatasourceName + "." + "fromTable";
-
-    ValueTable mockFromTable = createMock(ValueTable.class);
-
-    final Datasource mockDatasource = createMock(Datasource.class);
-    mockDatasource.initialise();
-    expect(mockDatasource.getName()).andReturn(mockDatasourceName).atLeastOnce();
-    expect(mockDatasource.hasValueTable(viewName)).andReturn(true).atLeastOnce();
-    mockDatasource.dispose();
-
-    JavaScriptViewDto jsViewDto = JavaScriptViewDto.newBuilder().build();
-    ViewDto viewDto = ViewDto.newBuilder().setName(viewName).addFrom(fqViewName).setExtension(JavaScriptViewDto.view, jsViewDto).build();
-
-    ViewManager mockViewManager = createMock(ViewManager.class);
-    expect(mockViewManager.hasView(mockDatasourceName, viewName)).andReturn(false).atLeastOnce();
-
-    OpalRuntime mockOpalRuntime = createMock(OpalRuntime.class);
-    expect(mockOpalRuntime.getViewManager()).andReturn(mockViewManager).atLeastOnce();
-
-    DatasourceResource sut = createDatasourceResource(mockDatasourceName, mockDatasource, mockOpalRuntime);
-
-    replay(mockDatasource, mockFromTable, mockViewManager, mockOpalRuntime);
-
-    // Exercise
-    MagmaEngine.get().addDatasource(mockDatasource);
-    Response response = sut.updateView(viewName, viewDto);
-    MagmaEngine.get().removeDatasource(mockDatasource);
-
-    // Verify state
-    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
-
-    // Verify behaviour
-    verify(mockViewManager);
-  }
-
-  @Test
-  public void testRemoveView_ReturnsNotFoundResponseWhenViewDoesNotExist() {
-    // Setup
-    String mockDatasourceName = "mockDatasource";
-    String bogusViewName = "bogusView";
-
-    final Datasource mockDatasource = createMock(Datasource.class);
-    expect(mockDatasource.getName()).andReturn(mockDatasourceName).atLeastOnce();
-
-    ViewManager mockViewManager = createMock(ViewManager.class);
-    expect(mockViewManager.hasView(mockDatasourceName, bogusViewName)).andReturn(false).atLeastOnce();
-
-    OpalRuntime mockOpalRuntime = createMock(OpalRuntime.class);
-    expect(mockOpalRuntime.getViewManager()).andReturn(mockViewManager).atLeastOnce();
-
-    DatasourceResource sut = createDatasourceResource(mockDatasourceName, mockDatasource, mockOpalRuntime);
-
-    replay(mockDatasource, mockViewManager, mockOpalRuntime);
-
-    // Exercise
-    Response response = sut.removeView(bogusViewName);
-
-    // Verify behaviour
-    verify(mockViewManager);
-
-    // Verify state
-    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
-  }
-
-  @Test
   public void testRemoveView_RemovesViewByDelegatingToViewManager() {
     // Setup
     String mockDatasourceName = "mockDatasource";
     String viewName = "viewToRemove";
 
+    ValueTable mockFromTable = createMock(ValueTable.class);
+
     final Datasource mockDatasource = createMock(Datasource.class);
     expect(mockDatasource.getName()).andReturn(mockDatasourceName).atLeastOnce();
 
+    expect(mockFromTable.getDatasource()).andReturn(mockDatasource).atLeastOnce();
+
     ViewManager mockViewManager = createMock(ViewManager.class);
-    expect(mockViewManager.hasView(mockDatasourceName, viewName)).andReturn(true).atLeastOnce();
+    View view = new View(viewName, mockFromTable);
+    expect(mockViewManager.getView(mockDatasourceName, viewName)).andReturn(view).atLeastOnce();
     mockViewManager.removeView(mockDatasourceName, viewName);
     expectLastCall().once();
 
@@ -534,11 +474,12 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     expect(mockOpalRuntime.getViewManager()).andReturn(mockViewManager).atLeastOnce();
 
     DatasourceResource sut = createDatasourceResource(mockDatasourceName, mockDatasource, mockOpalRuntime);
+    sut.setLocalesProperty("en, fr");
 
-    replay(mockDatasource, mockViewManager, mockOpalRuntime);
+    replay(mockDatasource, mockFromTable, mockViewManager, mockOpalRuntime);
 
     // Exercise
-    Response response = sut.removeView(viewName);
+    Response response = sut.getView(viewName).removeView();
 
     // Verify behaviour
     verify(mockViewManager);

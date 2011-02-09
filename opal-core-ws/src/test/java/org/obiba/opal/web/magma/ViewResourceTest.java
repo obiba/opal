@@ -19,6 +19,7 @@ import java.util.Locale;
 import org.junit.Test;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.views.View;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.web.magma.view.JavaScriptViewDtoExtension;
 import org.obiba.opal.web.magma.view.VariableListViewDtoExtension;
 import org.obiba.opal.web.magma.view.ViewDtoExtension;
@@ -38,9 +39,10 @@ public class ViewResourceTest {
   public void testConstructor_CallsSuperConstructorWithViewArgument() {
     // Setup
     View view = new View();
+    OpalRuntime mockOpalRuntime = createMock(OpalRuntime.class);
 
     // Exercise
-    ViewResource sut = new ViewResource(view, newViewDtos());
+    ViewResource sut = new ViewResource(mockOpalRuntime, view, newViewDtos());
 
     // Verify
     assertEquals(view, sut.getValueTable());
@@ -49,11 +51,12 @@ public class ViewResourceTest {
   @Test
   public void testGetFrom_ReturnsTableResourceForWrappedTable() {
     // Setup
+    OpalRuntime mockOpalRuntime = createMock(OpalRuntime.class);
     ValueTable fromTableMock = createMock(ValueTable.class);
     expect(fromTableMock.getName()).andReturn("fromTable").atLeastOnce();
 
     View view = new View("testView", fromTableMock);
-    ViewResource sut = new ViewResource(view, newViewDtos(), ImmutableSet.of(new Locale("en")));
+    ViewResource sut = new ViewResource(mockOpalRuntime, view, newViewDtos(), ImmutableSet.of(new Locale("en")));
 
     replay(fromTableMock);
 

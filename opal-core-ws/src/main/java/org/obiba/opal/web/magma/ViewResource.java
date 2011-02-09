@@ -13,12 +13,16 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.obiba.magma.views.View;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.springframework.context.annotation.Bean;
@@ -26,20 +30,40 @@ import org.springframework.context.annotation.Scope;
 
 public class ViewResource extends AbstractValueTableResource {
 
+  private final OpalRuntime opalRuntime;
+
   private ViewDtos viewDtos;
 
-  public ViewResource(View view, ViewDtos viewDtos, Set<Locale> locales) {
+  public ViewResource(OpalRuntime opalRuntime, View view, ViewDtos viewDtos, Set<Locale> locales) {
     super(view, locales);
     this.viewDtos = viewDtos;
+    this.opalRuntime = opalRuntime;
   }
 
-  public ViewResource(View view, ViewDtos viewDtos) {
-    this(view, viewDtos, Collections.<Locale> emptySet());
+  public ViewResource(OpalRuntime opalRuntime, View view, ViewDtos viewDtos) {
+    this(opalRuntime, view, viewDtos, Collections.<Locale> emptySet());
   }
 
   @GET
   public ViewDto getView() {
     return viewDtos.asDto(asView());
+  }
+
+  @PUT
+  public Response updateView(ViewDto viewDto) {
+    if(!viewDto.hasName()) return Response.status(Status.BAD_REQUEST).build();
+    if(!viewDto.getName().equals(getValueTable().getName())) return Response.status(Status.BAD_REQUEST).build();
+
+    opalRuntime.getViewManager().addView(getDatasource().getName(), viewDtos.fromDto(viewDto));
+
+    return Response.ok().build();
+  }
+
+  @DELETE
+  public Response removeView() {
+    opalRuntime.getViewManager().removeView(getDatasource().getName(), getValueTable().getName());
+
+    return Response.ok().build();
   }
 
   @GET
@@ -59,4 +83,5 @@ public class ViewResource extends AbstractValueTableResource {
   protected View asView() {
     return (View) getValueTable();
   }
+
 }

@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
 
+import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
 
 abstract class AbstractValueTableResource {
@@ -21,6 +22,10 @@ abstract class AbstractValueTableResource {
 
   ValueTable getValueTable() {
     return valueTable;
+  }
+
+  Datasource getDatasource() {
+    return valueTable.getDatasource();
   }
 
   Set<Locale> getLocales() {
