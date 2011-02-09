@@ -222,22 +222,28 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
         // this is fired even after a request for deleting the session
         eventBus.fireEvent(new RequestCredentialsExpiredEvent());
       } else {
-        cacheAuthorization(response);
-
-        if(authorizationCallback != null) {
-          authorizationCallback.onResponseCode(request, response, authorizationCache.get(uri));
-        }
-
-        if(codes != null && codes[code] != null) {
-          codes[code].onResponseCode(request, response);
-        } else if(resourceCallback != null && code < 400) {
-          final T resource = (T) JsonUtils.unsafeEval(response.getText());
-          resourceCallback.onResource(response, resource);
-        } else if(authorizationCallback == null) {
-          eventBus.fireEvent(new UnhandledResponseEvent(request, response));
-        }
+        processResponse(request, response);
       }
 
+    }
+
+    private void processResponse(Request request, Response response) {
+      int code = response.getStatusCode();
+
+      cacheAuthorization(response);
+
+      if(authorizationCallback != null) {
+        authorizationCallback.onResponseCode(request, response, authorizationCache.get(uri));
+      }
+
+      if(codes != null && codes[code] != null) {
+        codes[code].onResponseCode(request, response);
+      } else if(resourceCallback != null && code < 400) {
+        final T resource = (T) JsonUtils.unsafeEval(response.getText());
+        resourceCallback.onResource(response, resource);
+      } else if(authorizationCallback == null) {
+        eventBus.fireEvent(new UnhandledResponseEvent(request, response));
+      }
     }
 
     private void cacheAuthorization(Response response) {

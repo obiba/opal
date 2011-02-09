@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.rest.client;
 
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -27,7 +26,7 @@ public class DefaultResourceAuthorizationRequestBuilder implements ResourceAutho
 
   private HttpMethod method;
 
-  private Set<HasAuthorization> hasAuthorization = new LinkedHashSet<HasAuthorization>();
+  private HasAuthorization toAuthorize;
 
   private static ResourceAuthorizationCache authorizationCache;
 
@@ -37,7 +36,8 @@ public class DefaultResourceAuthorizationRequestBuilder implements ResourceAutho
 
   @Override
   public DefaultResourceAuthorizationRequestBuilder authorize(HasAuthorization toAuthorize) {
-    this.hasAuthorization.add(toAuthorize);
+    if(toAuthorize == null) throw new IllegalArgumentException("UI object to authorize cannot be null");
+    this.toAuthorize = toAuthorize;
     return this;
   }
 
@@ -88,6 +88,13 @@ public class DefaultResourceAuthorizationRequestBuilder implements ResourceAutho
           apply(allowed);
         }
 
+      })//
+      .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
+
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          unauthorized();
+        }
       }).send();
     }
   }
@@ -101,21 +108,15 @@ public class DefaultResourceAuthorizationRequestBuilder implements ResourceAutho
   }
 
   private void beforeAuthorization() {
-    for(HasAuthorization toAuthorize : hasAuthorization) {
-      toAuthorize.beforeAuthorization();
-    }
+    toAuthorize.beforeAuthorization();
   }
 
   private void authorized() {
-    for(HasAuthorization toAuthorize : hasAuthorization) {
-      toAuthorize.authorized();
-    }
+    toAuthorize.authorized();
   }
 
   private void unauthorized() {
-    for(HasAuthorization toAuthorize : hasAuthorization) {
-      toAuthorize.unauthorized();
-    }
+    toAuthorize.unauthorized();
   }
 
 }
