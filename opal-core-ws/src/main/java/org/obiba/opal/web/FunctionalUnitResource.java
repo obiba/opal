@@ -363,6 +363,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
   @GET
   @Path("/key/{alias}/certificate")
+  @AuthenticatedByCookie
   public Response getFunctionalUnitKeyPairCertificate(@PathParam("alias") String alias) throws KeyStoreException, IOException {
     UnitKeyStore keystore = unitKeyStoreService.getUnitKeyStore(unit);
 
