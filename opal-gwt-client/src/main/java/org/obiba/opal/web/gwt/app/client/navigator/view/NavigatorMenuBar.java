@@ -205,6 +205,14 @@ public class NavigatorMenuBar extends MenuBar {
     return addMenu;
   }
 
+  public MenuItem getAddUpdateTablesItem() {
+    return addUpdateTablesItem;
+  }
+
+  public MenuItem getAddViewItem() {
+    return addViewItem;
+  }
+
   public void setEditCommand(Command cmd) {
     if(cmd == null && editItem != null) {
       removeItem(editItem);
@@ -217,6 +225,10 @@ public class NavigatorMenuBar extends MenuBar {
     } else if(cmd != null) {
       editItem.setCommand(cmd);
     }
+  }
+
+  public MenuItem getEditItem() {
+    return editItem;
   }
 
   public void setExportDataItemVisible(boolean visible) {

@@ -33,7 +33,6 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
@@ -48,8 +47,6 @@ import org.obiba.magma.views.View;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
-import org.obiba.opal.web.model.Magma.TableDto;
-import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.obiba.opal.web.model.Opal.LocaleDto;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
@@ -200,33 +197,6 @@ public class DatasourceResource {
     return new ViewResource(view, viewDtos, getLocales());
   }
 
-  @POST
-  @Path("/tables")
-  public Response createTable(TableDto table) {
-
-    try {
-
-      Datasource datasource = MagmaEngine.get().getDatasource(name);
-
-      // ClientErrorDto errorDto;
-
-      // @TODO Verify that the datasource allows table creation (Magma does not offer this yet)
-      // if(datasource.isReadOnly()) {
-      // errorMessage = return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST,
-      // "CannotCreateTable")).build();
-      // } else
-
-      if(datasource.hasValueTable(table.getName())) {
-        return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists").build()).build();
-      } else {
-        writeVariablesToTable(table, datasource);
-        return Response.created(UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable").build(name, table.getName())).build();
-      }
-    } catch(Exception e) {
-      return Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, e.getMessage()).build()).build();
-    }
-  }
-
   @Path("/compare")
   @Bean
   @Scope("request")
@@ -234,13 +204,27 @@ public class DatasourceResource {
     return new CompareResource(getDatasource());
   }
 
-  @PUT
-  @Path("/view/{viewName}")
-  public Response createOrUpdateView(@PathParam("viewName") String viewName, ViewDto viewDto) {
-    if(datasourceHasTable(viewName) && !datasourceHasView(viewName)) {
+  @POST
+  @Path("/views")
+  public Response createView(ViewDto viewDto) {
+    if(!viewDto.hasName()) return Response.status(Status.BAD_REQUEST).build();
+
+    if(datasourceHasTable(viewDto.getName())) {
       return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists").build()).build();
     }
-    opalRuntime.getViewManager().addView(getDatasource().getName(), viewDtos.fromDto(viewName, viewDto));
+    opalRuntime.getViewManager().addView(getDatasource().getName(), viewDtos.fromDto(viewDto));
+
+    return Response.created(UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getView").build(name, viewDto.getName())).build();
+  }
+
+  @PUT
+  @Path("/view/{viewName}")
+  public Response updateView(@PathParam("viewName") String viewName, ViewDto viewDto) {
+    if(!viewDto.hasName()) return Response.status(Status.BAD_REQUEST).build();
+    if(!viewDto.getName().equals(viewName)) return Response.status(Status.BAD_REQUEST).build();
+    if(!datasourceHasView(viewName)) return Response.status(Status.NOT_FOUND).build();
+
+    opalRuntime.getViewManager().addView(getDatasource().getName(), viewDtos.fromDto(viewDto));
 
     return Response.ok().build();
   }
@@ -248,9 +232,8 @@ public class DatasourceResource {
   @DELETE
   @Path("/view/{viewName}")
   public Response removeView(@PathParam("viewName") String viewName) {
-    if(!datasourceHasView(viewName)) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
+    if(!datasourceHasView(viewName)) return Response.status(Status.NOT_FOUND).build();
+
     opalRuntime.getViewManager().removeView(getDatasource().getName(), viewName);
 
     return Response.ok().build();
@@ -282,19 +265,6 @@ public class DatasourceResource {
       transientDatasourceInstance = ds;
     }
     return ds;
-  }
-
-  private void writeVariablesToTable(TableDto table, Datasource datasource) {
-    VariableWriter vw = null;
-    try {
-      vw = datasource.createWriter(table.getName(), table.getEntityType()).writeVariables();
-
-      for(VariableDto dto : table.getVariablesList()) {
-        vw.writeVariable(Dtos.fromDto(dto));
-      }
-    } finally {
-      StreamUtil.silentSafeClose(vw);
-    }
   }
 
   private boolean datasourceHasTable(String viewName) {

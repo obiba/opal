@@ -325,7 +325,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     MagmaEngine.get().addDatasource(datasourceMock);
 
     DatasourceResource datasourceResource = new DatasourceResource(datasourceMock.getName());
-    Response response = datasourceResource.createTable(createTableDto());
+    Response response = datasourceResource.getTables().createTable(createTableDto());
 
     Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
     Assert.assertEquals("/datasource/testDatasource/table/table", response.getMetadata().getFirst("Location").toString());
@@ -351,7 +351,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     MagmaEngine.get().addDatasource(datasourceMock);
 
     DatasourceResource datasourceResource = new DatasourceResource(datasourceMock.getName());
-    Response response = datasourceResource.createTable(createTableDto());
+    Response response = datasourceResource.getTables().createTable(createTableDto());
 
     Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     Assert.assertEquals("TableAlreadyExists", ((ClientErrorDto) response.getEntity()).getStatus());
@@ -362,15 +362,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
   }
 
   @Test
-  public void testCreateTable_InternalServerError() {
-    DatasourceResource datasourceResource = new DatasourceResource("");
-    Response response = datasourceResource.createTable(null);
-
-    Assert.assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
-  }
-
-  @Test
-  public void testCreateOrUpdateView_AddsViewByDelegatingToViewManager() {
+  public void testCreateView_AddsViewByDelegatingToViewManager() {
     // Setup
     String mockDatasourceName = "mockDatasource";
     String viewName = "viewToAdd";
@@ -386,7 +378,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     mockDatasource.dispose();
 
     JavaScriptViewDto jsViewDto = JavaScriptViewDto.newBuilder().build();
-    ViewDto viewDto = ViewDto.newBuilder().addFrom(fqViewName).setExtension(JavaScriptViewDto.view, jsViewDto).build();
+    ViewDto viewDto = ViewDto.newBuilder().setName(viewName).addFrom(fqViewName).setExtension(JavaScriptViewDto.view, jsViewDto).build();
 
     ViewManager mockViewManager = createMock(ViewManager.class);
     mockViewManager.addView(EasyMock.same(mockDatasourceName), eqView(new View(viewName, mockFromTable)));
@@ -401,18 +393,19 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     // Exercise
     MagmaEngine.get().addDatasource(mockDatasource);
-    Response response = sut.createOrUpdateView(viewName, viewDto);
+    Response response = sut.createView(viewDto);
     MagmaEngine.get().removeDatasource(mockDatasource);
+
+    // Verify state
+    assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
 
     // Verify behaviour
     verify(mockViewManager);
 
-    // Verify state
-    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
   }
 
   @Test
-  public void testCreateOrUpdateView_UpdatesViewIfViewExistsByDelegatingToViewManager() {
+  public void testUpdateView_UpdatesViewIfViewExistsByDelegatingToViewManager() {
     // Setup
     String mockDatasourceName = "mockDatasource";
     String viewName = "viewToUpdate";
@@ -428,7 +421,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     mockDatasource.dispose();
 
     JavaScriptViewDto jsViewDto = JavaScriptViewDto.newBuilder().build();
-    ViewDto viewDto = ViewDto.newBuilder().addFrom(fqViewName).setExtension(JavaScriptViewDto.view, jsViewDto).build();
+    ViewDto viewDto = ViewDto.newBuilder().setName(viewName).addFrom(fqViewName).setExtension(JavaScriptViewDto.view, jsViewDto).build();
 
     ViewManager mockViewManager = createMock(ViewManager.class);
     expect(mockViewManager.hasView(mockDatasourceName, viewName)).andReturn(true).atLeastOnce();
@@ -444,18 +437,18 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     // Exercise
     MagmaEngine.get().addDatasource(mockDatasource);
-    Response response = sut.createOrUpdateView(viewName, viewDto);
+    Response response = sut.updateView(viewName, viewDto);
     MagmaEngine.get().removeDatasource(mockDatasource);
-
-    // Verify behaviour
-    verify(mockViewManager);
 
     // Verify state
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+    // Verify behaviour
+    verify(mockViewManager);
   }
 
   @Test
-  public void testCreateOrUpdateView_ReturnsBadRequestResponseIfDatasourceHasRegularTableWithSameName() {
+  public void testCreateOrUpdateView_ReturnsNotFoundResponseIfDatasourceHasNoSuchView() {
     // Setup
     String mockDatasourceName = "mockDatasource";
     String viewName = "viewToAdd";
@@ -470,7 +463,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     mockDatasource.dispose();
 
     JavaScriptViewDto jsViewDto = JavaScriptViewDto.newBuilder().build();
-    ViewDto viewDto = ViewDto.newBuilder().addFrom(fqViewName).setExtension(JavaScriptViewDto.view, jsViewDto).build();
+    ViewDto viewDto = ViewDto.newBuilder().setName(viewName).addFrom(fqViewName).setExtension(JavaScriptViewDto.view, jsViewDto).build();
 
     ViewManager mockViewManager = createMock(ViewManager.class);
     expect(mockViewManager.hasView(mockDatasourceName, viewName)).andReturn(false).atLeastOnce();
@@ -484,14 +477,14 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     // Exercise
     MagmaEngine.get().addDatasource(mockDatasource);
-    Response response = sut.createOrUpdateView(viewName, viewDto);
+    Response response = sut.updateView(viewName, viewDto);
     MagmaEngine.get().removeDatasource(mockDatasource);
+
+    // Verify state
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
 
     // Verify behaviour
     verify(mockViewManager);
-
-    // Verify state
-    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
   }
 
   @Test

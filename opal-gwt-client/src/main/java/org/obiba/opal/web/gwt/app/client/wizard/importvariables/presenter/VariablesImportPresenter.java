@@ -29,8 +29,8 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
-import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
+import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
@@ -273,7 +273,7 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
         }
       };
 
-      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasources").post().withResourceBody(DatasourceFactoryDto.stringify(factory)).withCallback(callback).withCallback(400, errorCallback).withCallback(500, errorCallback).send();
+      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/transient-datasources").post().withResourceBody(DatasourceFactoryDto.stringify(factory)).withCallback(callback).withCallback(400, errorCallback).withCallback(500, errorCallback).send();
     }
 
     private DatasourceFactoryDto createDatasourceFactoryDto(String tmpFilePath) {

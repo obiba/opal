@@ -14,12 +14,18 @@ import java.util.Comparator;
 import java.util.List;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
+import org.obiba.opal.web.model.Magma.VariableDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +53,42 @@ public class TablesResource {
     sortByName(tables);
 
     return tables;
+  }
+
+  @POST
+  public Response createTable(TableDto table) {
+
+    try {
+      // ClientErrorDto errorDto;
+
+      // @TODO Verify that the datasource allows table creation (Magma does not offer this yet)
+      // if(datasource.isReadOnly()) {
+      // errorMessage = return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST,
+      // "CannotCreateTable")).build();
+      // } else
+
+      if(datasource.hasValueTable(table.getName())) {
+        return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists").build()).build();
+      } else {
+        writeVariablesToTable(table);
+        return Response.created(UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable").build(datasource.getName(), table.getName())).build();
+      }
+    } catch(Exception e) {
+      return Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, e.getMessage()).build()).build();
+    }
+  }
+
+  private void writeVariablesToTable(TableDto table) {
+    VariableWriter vw = null;
+    try {
+      vw = datasource.createWriter(table.getName(), table.getEntityType()).writeVariables();
+
+      for(VariableDto dto : table.getVariablesList()) {
+        vw.writeVariable(Dtos.fromDto(dto));
+      }
+    } finally {
+      StreamUtil.silentSafeClose(vw);
+    }
   }
 
   private void sortByName(List<Magma.TableDto> tables) {

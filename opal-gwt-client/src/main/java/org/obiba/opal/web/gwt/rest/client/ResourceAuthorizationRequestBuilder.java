@@ -11,8 +11,6 @@ package org.obiba.opal.web.gwt.rest.client;
 
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
-import com.google.gwt.user.client.ui.UIObject;
-
 /**
  *
  */
@@ -27,8 +25,6 @@ public interface ResourceAuthorizationRequestBuilder {
   public ResourceAuthorizationRequestBuilder put();
 
   public ResourceAuthorizationRequestBuilder delete();
-
-  public ResourceAuthorizationRequestBuilder authorize(UIObject toAuthorize);
 
   public ResourceAuthorizationRequestBuilder authorize(HasAuthorization toAuthorize);
 

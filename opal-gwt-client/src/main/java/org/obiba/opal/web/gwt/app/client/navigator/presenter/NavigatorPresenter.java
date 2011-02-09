@@ -148,11 +148,8 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
   private void authorize() {
     // create datasource
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").post().authorize(getDisplay().getCreateDatasourceAuthorizer()).send();
-
     // import data
-    // ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").post().authorize(getDisplay().getImportDataAuthorizer()).send();
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/import").post().authorize(getDisplay().getImportDataAuthorizer()).send();
-
     // export data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().authorize(getDisplay().getExportDataAuthorizer()).send();
   }

@@ -36,8 +36,8 @@ import org.obiba.opal.web.gwt.app.client.validator.RequiredOptionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -189,7 +189,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     String viewName = getDisplay().getViewName().getText();
 
     // Build the ViewDto for the request.
-    ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().fromTables(tableListPresenter.getTables());
+    ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().setName(viewName).fromTables(tableListPresenter.getTables());
     if(getDisplay().getApplyGlobalVariableFilterOption().getValue()) {
       viewDtoBuilder.defaultJavaScriptView();
     } else if(getDisplay().getAddVariablesOneByOneOption().getValue()) {
@@ -206,8 +206,8 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
     // Create the resource request (the builder).
     ResourceRequestBuilder<JavaScriptObject> resourceRequestBuilder = ResourceRequestBuilderFactory.newBuilder()//
-    .put()//
-    .forResource("/datasource/" + datasourceName + "/view/" + viewName)//
+    .post()//
+    .forResource("/datasource/" + datasourceName + "/views")//
     .accept("application/x-protobuf+json").withResourceBody(ViewDto.stringify(viewDto))//
     .withCallback(Response.SC_CREATED, completed)//
     .withCallback(Response.SC_OK, completed)//

@@ -35,6 +35,11 @@ public class ViewDtoBuilder {
     viewDto = ViewDto.create();
   }
 
+  public ViewDtoBuilder setName(String name) {
+    viewDto.setName(name);
+    return this;
+  }
+
   public ViewDtoBuilder fromTables(List<TableDto> tableDtos) {
     JsArrayString fromTables = JavaScriptObject.createArray().cast();
     for(TableDto tableDto : tableDtos) {

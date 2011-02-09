@@ -36,9 +36,9 @@ public final class ViewDtos {
     this.extensions = ImmutableSet.copyOf(extensions);
   }
 
-  public View fromDto(String viewName, ViewDto viewDto) {
+  public View fromDto(ViewDto viewDto) {
     List<ValueTable> fromTables = getFromTables(viewDto);
-    View.Builder builder = View.Builder.newView(viewName, (ValueTable[]) fromTables.toArray(new ValueTable[fromTables.size()]));
+    View.Builder builder = View.Builder.newView(viewDto.getName(), (ValueTable[]) fromTables.toArray(new ValueTable[fromTables.size()]));
     for(ViewDtoExtension extension : extensions) {
       if(extension.isExtensionOf(viewDto)) {
         return extension.fromDto(viewDto, builder);

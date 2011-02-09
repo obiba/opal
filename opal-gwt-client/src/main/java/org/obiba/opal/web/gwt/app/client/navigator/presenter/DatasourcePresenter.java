@@ -28,9 +28,11 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
@@ -119,10 +121,13 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
   @Override
   public void revealDisplay() {
-    authorize();
   }
 
   private void authorize() {
+    // create tables
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName + "/tables").post().authorize(getDisplay().getAddUpdateTablesAuthorizer()).send();
+    // create views
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName + "/views").post().authorize(getDisplay().getAddViewAuthorizer()).send();
   }
 
   private void displayDatasource(DatasourceDto datasourceDto) {
@@ -154,6 +159,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     } else {
       updateTable(null);
     }
+    authorize();
   }
 
   private void displayDatasourceSiblings(DatasourceDto datasourceDto) {
@@ -501,6 +507,10 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     void setTableNameFieldUpdater(FieldUpdater<TableDto, String> updater);
 
     void setCopyDataCommand(Command cmd);
+
+    HasAuthorization getAddUpdateTablesAuthorizer();
+
+    HasAuthorization getAddViewAuthorizer();
 
   }
 }

@@ -44,7 +44,7 @@ public class CreateDatasourceConclusionStepPresenter extends WidgetPresenter<Cre
   }
 
   public void setDatasourceFactory(final DatasourceFactoryDto dto) {
-    ResourceRequestPresenter<DatasourceDto> resourceRequestPresenter = new ResourceRequestPresenter<DatasourceDto>(new ResourceRequestView(), eventBus, ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasource/" + dto.getName()).put().withResourceBody(DatasourceFactoryDto.stringify(dto)), new CreateDatasourceResponseCallback(dto));
+    ResourceRequestPresenter<DatasourceDto> resourceRequestPresenter = new ResourceRequestPresenter<DatasourceDto>(new ResourceRequestView(), eventBus, ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasources").post().withResourceBody(DatasourceFactoryDto.stringify(dto)), new CreateDatasourceResponseCallback(dto));
     resourceRequestPresenter.getDisplay().setResourceName(dto.getName());
     resourceRequestPresenter.getDisplay().setResourceClickHandler(new DatasourceLinkClickHandler());
     resourceRequestPresenter.setSuccessCodes(201);

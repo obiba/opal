@@ -13,6 +13,9 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer.MenuItemProvider;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
@@ -234,6 +237,28 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   @Override
   public void setAddUpdateTablesCommand(Command cmd) {
     toolbar.setAddUpdateTablesCommand(cmd);
+  }
+
+  @Override
+  public HasAuthorization getAddUpdateTablesAuthorizer() {
+    return new MenuItemAuthorizer(new MenuItemProvider() {
+
+      @Override
+      public MenuItem getMenuItem() {
+        return toolbar.getAddUpdateTablesItem();
+      }
+    });
+  }
+
+  @Override
+  public HasAuthorization getAddViewAuthorizer() {
+    return new MenuItemAuthorizer(new MenuItemProvider() {
+
+      @Override
+      public MenuItem getMenuItem() {
+        return toolbar.getAddViewItem();
+      }
+    });
   }
 
 }

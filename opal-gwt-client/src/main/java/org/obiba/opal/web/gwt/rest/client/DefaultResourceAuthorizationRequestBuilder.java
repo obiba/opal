@@ -13,12 +13,10 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.UIObject;
 
 /**
  *
@@ -37,11 +35,7 @@ public class DefaultResourceAuthorizationRequestBuilder implements ResourceAutho
     DefaultResourceAuthorizationRequestBuilder.authorizationCache = authorizationCache;
   }
 
-  public DefaultResourceAuthorizationRequestBuilder authorize(UIObject toAuthorize) {
-    authorize(new UIObjectAuthorizer(toAuthorize));
-    return this;
-  }
-
+  @Override
   public DefaultResourceAuthorizationRequestBuilder authorize(HasAuthorization toAuthorize) {
     this.hasAuthorization.add(toAuthorize);
     return this;

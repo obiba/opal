@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.rest.client.authorization;
 
-
 import com.google.gwt.user.client.ui.MenuItem;
 
 /**
@@ -17,26 +16,46 @@ import com.google.gwt.user.client.ui.MenuItem;
  */
 public class MenuItemAuthorizer implements HasAuthorization {
 
+  private MenuItemProvider menuProvider;
+
   private MenuItem menu;
 
-  public MenuItemAuthorizer(MenuItem m) {
+  public MenuItemAuthorizer(MenuItemProvider m) {
     super();
-    this.menu = m;
+    this.menuProvider = m;
+  }
+
+  public MenuItemAuthorizer(final MenuItem m) {
+    super();
+    this.menuProvider = new MenuItemProvider() {
+
+      @Override
+      public MenuItem getMenuItem() {
+        return m;
+      }
+
+    };
   }
 
   @Override
   public void beforeAuthorization() {
-    menu.setVisible(false);
+    menu = menuProvider.getMenuItem();
+    if(menu != null) menu.setVisible(false);
   }
 
   @Override
   public void authorized() {
-    menu.setVisible(true);
+    if(menu != null) menu.setVisible(true);
   }
 
   @Override
   public void unauthorized() {
-    menu.getParentMenu().removeItem(menu);
+    if(menu != null) menu.setVisible(false);
+    // if(menu != null && menu.getParentMenu() != null) menu.getParentMenu().removeItem(menu);
+  }
+
+  public interface MenuItemProvider {
+    public MenuItem getMenuItem();
   }
 
 }

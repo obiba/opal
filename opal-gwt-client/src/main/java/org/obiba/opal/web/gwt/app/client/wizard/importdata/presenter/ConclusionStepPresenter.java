@@ -35,10 +35,10 @@ import org.obiba.opal.web.model.client.magma.CsvDatasourceTableBundleDto;
 import org.obiba.opal.web.model.client.magma.DatasourceCompareDto;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.magma.FsDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.TableCompareDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.opal.ImportCommandOptionsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
@@ -123,7 +123,7 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
       }
     };
 
-    ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource("/datasources").post().withResourceBody(DatasourceFactoryDto.stringify(factory)).withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler).send();
+    ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource("/transient-datasources").post().withResourceBody(DatasourceFactoryDto.stringify(factory)).withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler).send();
   }
 
   public static DatasourceFactoryDto createDatasourceFactoryDto(ImportData importData) {

@@ -27,6 +27,7 @@ import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresente
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -218,11 +219,11 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
   }
 
   private void authorize() {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").get().authorize(getDisplay().getDatasourcesItem()).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").get().authorize(getDisplay().getUnitsItem()).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").get().authorize(getDisplay().getReportsItem()).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta").get().authorize(getDisplay().getFileExplorerItem()).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/commands").get().authorize(getDisplay().getListJobsItem()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").get().authorize(new UIObjectAuthorizer(getDisplay().getDatasourcesItem())).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").get().authorize(new UIObjectAuthorizer(getDisplay().getUnitsItem())).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").get().authorize(new UIObjectAuthorizer(getDisplay().getReportsItem())).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta").get().authorize(new UIObjectAuthorizer(getDisplay().getFileExplorerItem())).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/commands").get().authorize(new UIObjectAuthorizer(getDisplay().getListJobsItem())).send();
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/administration").get().authorize(getDisplay().getAdministrationAuthorizer()).send();
   }
 
