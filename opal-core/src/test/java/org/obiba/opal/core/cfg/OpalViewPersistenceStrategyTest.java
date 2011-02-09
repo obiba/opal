@@ -18,6 +18,7 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewPersistenceStrategy;
+import org.obiba.magma.xstream.MagmaXStreamExtension;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -33,7 +34,7 @@ public class OpalViewPersistenceStrategyTest {
   public void setUp() throws Exception {
     System.setProperty(OpalViewPersistenceStrategy.OPAL_HOME_SYSTEM_PROPERTY_NAME, getTestFilesRoot());
     viewPersistenceStrategy = new OpalViewPersistenceStrategy();
-    new MagmaEngine();
+    new MagmaEngine().extend(new MagmaXStreamExtension());
   }
 
   @After
