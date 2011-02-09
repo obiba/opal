@@ -13,8 +13,10 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -321,6 +323,21 @@ public class TableView extends Composite implements TablePresenter.Display {
   @Override
   public HasAuthorization getEditAuthorizer() {
     return new MenuItemAuthorizer(toolbar.getEditItem());
+  }
+
+  @Override
+  public HasAuthorization getExportDataAuthorizer() {
+    return new MenuItemAuthorizer(toolbar.getExportDataItem());
+  }
+
+  @Override
+  public HasAuthorization getCopyDataAuthorizer() {
+    return new MenuItemAuthorizer(toolbar.getCopyDataItem());
+  }
+
+  @Override
+  public HasAuthorization getRemoveAuthorizer() {
+    return new CompositeAuthorizer(new MenuItemAuthorizer(removeItem), new UIObjectAuthorizer(removeItemSeparator));
   }
 
 }

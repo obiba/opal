@@ -128,6 +128,12 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName + "/tables").post().authorize(getDisplay().getAddUpdateTablesAuthorizer()).send();
     // create views
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName + "/views").post().authorize(getDisplay().getAddViewAuthorizer()).send();
+    // export data
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().authorize(getDisplay().getExportDataAuthorizer()).send();
+    // copy data
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().authorize(getDisplay().getCopyDataAuthorizer()).send();
+    // remove
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName).delete().authorize(getDisplay().getRemoveDatasourceAuthorizer()).send();
   }
 
   private void displayDatasource(DatasourceDto datasourceDto) {
@@ -511,6 +517,12 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     HasAuthorization getAddUpdateTablesAuthorizer();
 
     HasAuthorization getAddViewAuthorizer();
+
+    HasAuthorization getExportDataAuthorizer();
+
+    HasAuthorization getRemoveDatasourceAuthorizer();
+
+    HasAuthorization getCopyDataAuthorizer();
 
   }
 }

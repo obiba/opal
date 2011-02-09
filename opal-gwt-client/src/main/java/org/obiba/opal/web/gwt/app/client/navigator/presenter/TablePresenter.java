@@ -122,6 +122,12 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   }
 
   private void authorize() {
+    // export data
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().authorize(getDisplay().getExportDataAuthorizer()).send();
+    // copy data
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().authorize(getDisplay().getCopyDataAuthorizer()).send();
+    // remove view
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/view/" + table.getName()).delete().authorize(getDisplay().getRemoveAuthorizer()).send();
     // edit view
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/view/" + table.getName()).put().authorize(getDisplay().getEditAuthorizer()).send();
   }
@@ -440,6 +446,12 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     HandlerRegistration addVariableSuggestionHandler(SelectionHandler<Suggestion> handler);
 
     void clearVariableSuggestion();
+
+    HasAuthorization getCopyDataAuthorizer();
+
+    HasAuthorization getExportDataAuthorizer();
+
+    HasAuthorization getRemoveAuthorizer();
 
     HasAuthorization getEditAuthorizer();
   }

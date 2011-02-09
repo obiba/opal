@@ -13,9 +13,10 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
-import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer.MenuItemProvider;
+import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
@@ -37,6 +38,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuItem;
+import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -70,6 +72,10 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   Image loading;
 
   private NavigatorMenuBar toolbar;
+
+  private MenuItem removeMenuItem;
+
+  private MenuItemSeparator removeMenuItemSeparator;
 
   private ListDataProvider<TableDto> dataProvider = new ListDataProvider<TableDto>();
 
@@ -204,8 +210,8 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
   @Override
   public void setRemoveDatasourceCommand(Command cmd) {
-    toolbar.getToolsMenu().addSeparator();
-    toolbar.getToolsMenu().addItem(new MenuItem(translations.removeLabel(), cmd));
+    removeMenuItemSeparator = toolbar.getToolsMenu().addSeparator();
+    removeMenuItem = toolbar.getToolsMenu().addItem(new MenuItem(translations.removeLabel(), cmd));
   }
 
   @Override
@@ -241,24 +247,35 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
   @Override
   public HasAuthorization getAddUpdateTablesAuthorizer() {
-    return new MenuItemAuthorizer(new MenuItemProvider() {
-
+    return new CompositeAuthorizer(new MenuItemAuthorizer(toolbar.getAddItem()), new MenuItemAuthorizer(toolbar.getAddUpdateTablesItem())) {
       @Override
-      public MenuItem getMenuItem() {
-        return toolbar.getAddUpdateTablesItem();
+      public void unauthorized() {
       }
-    });
+    };
   }
 
   @Override
   public HasAuthorization getAddViewAuthorizer() {
-    return new MenuItemAuthorizer(new MenuItemProvider() {
-
+    return new CompositeAuthorizer(new MenuItemAuthorizer(toolbar.getAddItem()), new MenuItemAuthorizer(toolbar.getAddViewItem())) {
       @Override
-      public MenuItem getMenuItem() {
-        return toolbar.getAddViewItem();
+      public void unauthorized() {
       }
-    });
+    };
+  }
+
+  @Override
+  public HasAuthorization getExportDataAuthorizer() {
+    return new MenuItemAuthorizer(toolbar.getExportDataItem());
+  }
+
+  @Override
+  public HasAuthorization getCopyDataAuthorizer() {
+    return new MenuItemAuthorizer(toolbar.getCopyDataItem());
+  }
+
+  @Override
+  public HasAuthorization getRemoveDatasourceAuthorizer() {
+    return new CompositeAuthorizer(new MenuItemAuthorizer(removeMenuItem), new UIObjectAuthorizer(removeMenuItemSeparator));
   }
 
 }

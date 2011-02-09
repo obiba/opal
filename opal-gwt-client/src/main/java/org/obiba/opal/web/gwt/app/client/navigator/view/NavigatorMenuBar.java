@@ -37,6 +37,8 @@ public class NavigatorMenuBar extends MenuBar {
 
   private MenuItem downloadViewItem;
 
+  private MenuItem addItem;
+
   private MenuItem addViewItem;
 
   private MenuItem addUpdateTablesItem;
@@ -88,11 +90,15 @@ public class NavigatorMenuBar extends MenuBar {
     if(addMenu == null) {
       ensureSeparation();
       addMenu = new MenuBar(true);
-      MenuItem addItem = new MenuItem("", addMenu);
+      addItem = new MenuItem("", addMenu);
       addItem.addStyleName("add");
       addItem(addItem);
     }
     return this;
+  }
+
+  public MenuItem getAddItem() {
+    return addItem;
   }
 
   public void setParentName(String name) {
@@ -152,6 +158,10 @@ public class NavigatorMenuBar extends MenuBar {
     }
   }
 
+  public MenuItem getExportDataItem() {
+    return exportDataItem;
+  }
+
   public void setCopyDataCommand(Command cmd) {
     if(copyDataItem == null) {
       copyDataItem = new MenuItem(translations.copyData(), cmd);
@@ -159,6 +169,10 @@ public class NavigatorMenuBar extends MenuBar {
     } else {
       copyDataItem.setCommand(cmd);
     }
+  }
+
+  public MenuItem getCopyDataItem() {
+    return copyDataItem;
   }
 
   public void setDownloadViewCommand(Command cmd) {
