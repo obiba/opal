@@ -9,10 +9,12 @@ import static org.junit.Assert.assertThat;
 import java.io.File;
 import java.util.Set;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.obiba.magma.Datasource;
+import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewPersistenceStrategy;
@@ -31,6 +33,12 @@ public class OpalViewPersistenceStrategyTest {
   public void setUp() throws Exception {
     System.setProperty(OpalViewPersistenceStrategy.OPAL_HOME_SYSTEM_PROPERTY_NAME, getTestFilesRoot());
     viewPersistenceStrategy = new OpalViewPersistenceStrategy();
+    new MagmaEngine();
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    MagmaEngine.get().shutdown();
   }
 
   @Test
