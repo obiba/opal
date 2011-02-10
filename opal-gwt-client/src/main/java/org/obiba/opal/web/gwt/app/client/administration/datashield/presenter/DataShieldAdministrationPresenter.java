@@ -15,9 +15,12 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -126,11 +129,29 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
   @Override
   public void revealDisplay() {
     updateDataShieldMethods();
+    authorize();
   }
 
   //
+  // private methods
   //
-  //
+
+  private void authorize() {
+    // create method
+    authorizeAddMethod(getDisplay().getAddMethodAuthorizer());
+  }
+
+  private void authorizeAddMethod(HasAuthorization authorizer) {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datashield/methods").post().authorize(authorizer).send();
+  }
+
+  private void authorizeEditMethod(DataShieldMethodDto dto, HasAuthorization authorizer) {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datashield/method/" + dto.getName()).put().authorize(authorizer).send();
+  }
+
+  private void authorizeDeleteMethod(DataShieldMethodDto dto, HasAuthorization authorizer) {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datashield/method/" + dto.getName()).delete().authorize(authorizer).send();
+  }
 
   private void updateDataShieldMethods() {
     ResourceRequestBuilderFactory.<JsArray<DataShieldMethodDto>> newBuilder().forResource("/datashield/methods").get()//
@@ -145,20 +166,38 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
 
   protected void doDataShieldMethodActionImpl(final DataShieldMethodDto dto, String actionName) {
     if(actionName.equals(EDIT_ACTION)) {
-      dataShieldMethodPresenter.bind();
-      dataShieldMethodPresenter.updateMethod(dto);
-      dataShieldMethodPresenter.revealDisplay();
-    } else if(actionName.equals(COPY_ACTION)) {
-      dataShieldMethodPresenter.bind();
-      dataShieldMethodPresenter.copyMethod(dto);
-      dataShieldMethodPresenter.revealDisplay();
-    } else if(actionName.equals(DELETE_ACTION)) {
-      removeMethodConfirmation = new Runnable() {
-        public void run() {
-          deleteDataShieldMethod(dto);
+      authorizeEditMethod(dto, new Authorizer(eventBus) {
+
+        @Override
+        public void authorized() {
+          dataShieldMethodPresenter.bind();
+          dataShieldMethodPresenter.updateMethod(dto);
+          dataShieldMethodPresenter.revealDisplay();
         }
-      };
-      eventBus.fireEvent(new ConfirmationRequiredEvent(removeMethodConfirmation, "deleteDataShieldMethod", "confirmDeleteDataShieldMethod"));
+      });
+    } else if(actionName.equals(COPY_ACTION)) {
+      authorizeAddMethod(new Authorizer(eventBus) {
+        @Override
+        public void authorized() {
+          dataShieldMethodPresenter.bind();
+          dataShieldMethodPresenter.copyMethod(dto);
+          dataShieldMethodPresenter.revealDisplay();
+        }
+      });
+
+    } else if(actionName.equals(DELETE_ACTION)) {
+      authorizeDeleteMethod(dto, new Authorizer(eventBus) {
+        @Override
+        public void authorized() {
+          removeMethodConfirmation = new Runnable() {
+            public void run() {
+              deleteDataShieldMethod(dto);
+            }
+          };
+          eventBus.fireEvent(new ConfirmationRequiredEvent(removeMethodConfirmation, "deleteDataShieldMethod", "confirmDeleteDataShieldMethod"));
+        }
+      });
+
     }
   }
 
@@ -205,6 +244,8 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
     HasActionHandler<DataShieldMethodDto> getDataShieldMethodActionsColumn();
 
     HandlerRegistration addMethodHandler(ClickHandler handler);
+
+    HasAuthorization getAddMethodAuthorizer();
 
   }
 

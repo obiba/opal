@@ -19,6 +19,8 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ConstantActionsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
 import org.obiba.opal.web.model.client.datashield.RScriptDataShieldMethodDto;
 
@@ -157,6 +159,11 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
 
     methodActionsColumn = new ActionsColumn<DataShieldMethodDto>(new ConstantActionsProvider<DataShieldMethodDto>(EDIT_ACTION, COPY_ACTION, DELETE_ACTION));
     methodsTable.addColumn(methodActionsColumn, translations.actionsLabel());
+  }
+
+  @Override
+  public HasAuthorization getAddMethodAuthorizer() {
+    return new WidgetAuthorizer(addMethodButton);
   }
 
 }
