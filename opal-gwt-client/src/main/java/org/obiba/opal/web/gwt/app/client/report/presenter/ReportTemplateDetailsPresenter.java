@@ -37,6 +37,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFac
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.ParameterDto;
@@ -195,16 +196,36 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta/reports/" + reportTemplate.getName()).get().authorize(getDisplay().getListReportsAuthorizer()).send();
   }
 
+  private void authorizeDownloadReport(FileDto dto, HasAuthorization authorizer) {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).get().authorize(authorizer).send();
+  }
+
+  private void authorizeDeleteReport(FileDto dto, HasAuthorization authorizer) {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).delete().authorize(authorizer).send();
+  }
+
   protected void doActionImpl(final FileDto dto, String actionName) {
     if(actionName.equals(DOWNLOAD_ACTION)) {
-      downloadFile(dto);
-    } else if(actionName.equals(DELETE_ACTION)) {
-      actionRequiringConfirmation = new Runnable() {
-        public void run() {
-          deleteFile(dto);
+      authorizeDownloadReport(dto, new Authorizer(eventBus) {
+
+        @Override
+        public void authorized() {
+          downloadFile(dto);
         }
-      };
-      eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "deleteFile", "confirmDeleteFile"));
+      });
+    } else if(actionName.equals(DELETE_ACTION)) {
+      authorizeDeleteReport(dto, new Authorizer(eventBus) {
+
+        @Override
+        public void authorized() {
+          actionRequiringConfirmation = new Runnable() {
+            public void run() {
+              deleteFile(dto);
+            }
+          };
+          eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "deleteFile", "confirmDeleteFile"));
+        }
+      });
     }
   }
 

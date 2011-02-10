@@ -214,7 +214,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
       @Override
       public void onFileSelectionChange(FileSelectionChangeEvent event) {
-        GWT.log("file: " + event.getFile().getPath());
+        // GWT.log("file: " + event.getFile().getPath());
         getDisplay().setEnabledFileDeleteButton(folderDetailsPresenter.hasSelection());
         if(folderDetailsPresenter.hasSelection()) {
           authorizeFile(event.getFile());
@@ -226,7 +226,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
       @Override
       public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
-        GWT.log("folder: " + event.getFolder().getPath());
+        // GWT.log("folder: " + event.getFolder().getPath());
         setEnableFileDeleteButton();
       }
 
@@ -236,7 +236,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
       @Override
       public void onFolderRefreshed(FolderRefreshedEvent event) {
-        GWT.log("refresh: " + event.getFolder().getPath());
+        // GWT.log("refresh: " + event.getFolder().getPath());
         authorizeFolder(event.getFolder());
       }
     }));
