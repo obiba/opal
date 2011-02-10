@@ -35,6 +35,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFac
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.opal.KeyPairDto;
@@ -235,16 +236,36 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/keys").get().authorize(getDisplay().getListKeyPairsAuthorizer()).send();
   }
 
+  private void authorizeDownloadCertificate(KeyPairDto dto, HasAuthorization authorizer) {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/key/" + dto.getAlias() + "/certificate").get().authorize(authorizer).send();
+  }
+
+  private void authorizeDeleteKeyPair(KeyPairDto dto, HasAuthorization authorizer) {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/keys/" + dto.getAlias()).delete().authorize(authorizer).send();
+  }
+
   protected void doActionImpl(final KeyPairDto dto, String actionName) {
     if(actionName.equals(DOWNLOAD_ACTION)) {
-      downloadCertificate(dto);
-    } else if(actionName.equals(DELETE_ACTION)) {
-      removeConfirmation = new Runnable() {
-        public void run() {
-          deleteKeyPair(dto);
+      authorizeDownloadCertificate(dto, new Authorizer(eventBus) {
+
+        @Override
+        public void authorized() {
+          downloadCertificate(dto);
         }
-      };
-      eventBus.fireEvent(new ConfirmationRequiredEvent(removeConfirmation, "deleteKeyPair", "confirmDeleteKeyPair"));
+      });
+    } else if(actionName.equals(DELETE_ACTION)) {
+      authorizeDeleteKeyPair(dto, new Authorizer(eventBus) {
+
+        @Override
+        public void authorized() {
+          removeConfirmation = new Runnable() {
+            public void run() {
+              deleteKeyPair(dto);
+            }
+          };
+          eventBus.fireEvent(new ConfirmationRequiredEvent(removeConfirmation, "deleteKeyPair", "confirmDeleteKeyPair"));
+        }
+      });
     }
   }
 

@@ -249,7 +249,8 @@ public interface Translations extends Constants {
   "DataShieldRScriptIsRequired", "A R script is required.",//
   "DataShieldRFunctionIsRequired", "A R function is required.",//
   "RIsAlive", "R server is alive.",//
-  "RConnectionFailed", "Connection with R server failed."//
+  "RConnectionFailed", "Connection with R server failed.", //
+  "UnauthorizedOperation", "You are not allowed to perform this operation."//
   })
   Map<String, String> userMessageMap();
 
