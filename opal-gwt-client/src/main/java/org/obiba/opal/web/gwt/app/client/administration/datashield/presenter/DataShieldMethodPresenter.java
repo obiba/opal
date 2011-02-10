@@ -165,6 +165,15 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
     }
   }
 
+  private void postMethod(DataShieldMethodDto dto) {
+    CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
+    ResourceRequestBuilderFactory.newBuilder().forResource("/datashield/methods").post()//
+    .withResourceBody(DataShieldMethodDto.stringify(dto))//
+    .withCallback(Response.SC_OK, callbackHandler)//
+    .withCallback(Response.SC_CREATED, callbackHandler)//
+    .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+  }
+
   private void putMethod(DataShieldMethodDto dto) {
     CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
     ResourceRequestBuilderFactory.newBuilder().forResource("/datashield/method/" + getDisplay().getName().getText()).put()//
@@ -229,7 +238,7 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      putMethod(getDataShieldMethodDto());
+      postMethod(getDataShieldMethodDto());
     }
   }
 

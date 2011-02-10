@@ -15,11 +15,11 @@ import java.util.List;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
@@ -61,12 +61,12 @@ public class DataShieldResource {
     this.methodConverterRegistry = methodConverterRegistry;
   }
 
-  @Path("/{id}")
+  @Path("/session/{id}")
   public OpalRSessionResource getSession(@PathParam("id") String id) {
     return new OpalDataShieldSessionResource(opalRService, opalRuntime, opalRSessionManager, opalRSessionManager.getSubjectRSession(id));
   }
 
-  @Path("/current")
+  @Path("/session/current")
   public OpalRSessionResource getCurrentSession() {
     if(opalRSessionManager.hasSubjectCurrentRSession() == false) {
       opalRSessionManager.newSubjectCurrentRSession();
@@ -85,6 +85,18 @@ public class DataShieldResource {
     return dtos;
   }
 
+  @POST
+  @Path("/methods")
+  public Response createDataShieldMethod(DataShield.DataShieldMethodDto dto) {
+    DatashieldConfiguration config = getDatashieldConfiguration();
+    if(config.hasDataShieldMethod(dto.getName())) return Response.status(Status.BAD_REQUEST).build();
+
+    config.addAggregatingMethod(methodConverterRegistry.parse(dto));
+    opalRuntime.writeOpalConfiguration();
+    UriBuilder ub = UriBuilder.fromPath("/").path(DataShieldResource.class).path(DataShieldResource.class, "getDataShieldMethod");
+    return Response.created(ub.build(dto.getName())).build();
+  }
+
   @GET
   @Path("/method/{name}")
   public Response getDataShieldMethod(@PathParam("name") String name) {
@@ -93,20 +105,16 @@ public class DataShieldResource {
 
   @PUT
   @Path("/method/{name}")
-  public Response createOrUpdateDataShieldMethod(@PathParam("name") String name, DataShield.DataShieldMethodDto dto) {
+  public Response updateDataShieldMethod(@PathParam("name") String name, DataShield.DataShieldMethodDto dto) {
     if(!name.equals(dto.getName())) return Response.status(Status.BAD_REQUEST).build();
 
-    ResponseBuilder response = Response.ok();
-
     DatashieldConfiguration config = getDatashieldConfiguration();
-    if(!config.hasDataShieldMethod(name)) {
-      UriBuilder ub = UriBuilder.fromPath("/").path(DataShieldResource.class).path(DataShieldResource.class, "getDataShieldMethod");
-      response = Response.created(ub.build(name));
-    }
+    if(!config.hasDataShieldMethod(name)) return Response.status(Status.NOT_FOUND).build();
+
     config.addAggregatingMethod(methodConverterRegistry.parse(dto));
     opalRuntime.writeOpalConfiguration();
 
-    return response.build();
+    return Response.ok().build();
   }
 
   @DELETE

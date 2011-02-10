@@ -224,7 +224,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").get().authorize(new UIObjectAuthorizer(getDisplay().getReportsItem())).send();
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta").get().authorize(new UIObjectAuthorizer(getDisplay().getFileExplorerItem())).send();
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/commands").get().authorize(new UIObjectAuthorizer(getDisplay().getListJobsItem())).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/administration").get().authorize(getDisplay().getAdministrationAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datashield/methods").get().authorize(getDisplay().getAdministrationAuthorizer()).send();
   }
 
   private void registerWorkbenchChangeEventHandler() {
