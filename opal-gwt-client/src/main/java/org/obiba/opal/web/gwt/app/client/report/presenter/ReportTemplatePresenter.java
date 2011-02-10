@@ -16,6 +16,8 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Mode;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -40,6 +42,8 @@ public class ReportTemplatePresenter extends WidgetPresenter<ReportTemplatePrese
     HandlerRegistration addReportTemplateClickHandler(ClickHandler handler);
 
     HandlerRegistration refreshClickHandler(ClickHandler handler);
+
+    HasAuthorization getAddReportTemplateAuthorizer();
   }
 
   @Inject
@@ -56,6 +60,7 @@ public class ReportTemplatePresenter extends WidgetPresenter<ReportTemplatePrese
 
   @Override
   public void revealDisplay() {
+    authorize();
   }
 
   @Override
@@ -100,6 +105,11 @@ public class ReportTemplatePresenter extends WidgetPresenter<ReportTemplatePrese
 
   @Override
   protected void onPlaceRequest(PlaceRequest request) {
+  }
+
+  private void authorize() {
+    // create report templates
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").post().authorize(getDisplay().getAddReportTemplateAuthorizer()).send();
   }
 
   public class AddReportTemplateClickHandler implements ClickHandler {

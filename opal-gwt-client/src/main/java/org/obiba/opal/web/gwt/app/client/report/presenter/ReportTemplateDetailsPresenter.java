@@ -33,9 +33,11 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.ParameterDto;
 import org.obiba.opal.web.model.client.opal.ReportCommandOptionsDto;
@@ -84,6 +86,14 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
     void setRunReportCommand(Command command);
 
     void setUpdateReportTemplateCommand(Command command);
+
+    HasAuthorization getRemoveReportTemplateAuthorizer();
+
+    HasAuthorization getRunReportAuthorizer();
+
+    HasAuthorization getUpdateReportTemplateAuthorizer();
+
+    HasAuthorization getListReportsAuthorizer();
   }
 
   @Inject
@@ -170,6 +180,19 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
     getDisplay().setRunReportCommand(new RunReportCommand());
     getDisplay().setRemoveReportTemplateCommand(new RemoveReportTemplateCommand());
     getDisplay().setUpdateReportTemplateCommand(new EditReportTemplateCommand());
+  }
+
+  private void authorize() {
+    // run report
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/report").post().authorize(getDisplay().getRunReportAuthorizer()).send();
+    // remove
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-template/" + reportTemplate.getName()).delete().authorize(getDisplay().getRemoveReportTemplateAuthorizer()).send();
+
+    // edit
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-template/" + reportTemplate.getName()).put().authorize(getDisplay().getUpdateReportTemplateAuthorizer()).send();
+
+    // display reports
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta/reports/" + reportTemplate.getName()).get().authorize(getDisplay().getListReportsAuthorizer()).send();
   }
 
   protected void doActionImpl(final FileDto dto, String actionName) {
@@ -345,6 +368,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
       reportTemplate = resource;
       getDisplay().setReportTemplateDetails(reportTemplate);
       refreshProducedReports(reportTemplate);
+      authorize();
     }
   }
 

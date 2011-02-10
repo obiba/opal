@@ -21,6 +21,11 @@ import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsP
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.ParameterDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
@@ -115,6 +120,10 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
 
   private Label reportTemplateName;
 
+  private MenuItem toolsItem;
+
+  private MenuItemSeparator removeSeparator;
+
   public ReportTemplateDetailsView() {
     initWidget(uiBinder.createAndBindUi(this));
     initProducedReportsTable();
@@ -126,7 +135,8 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
     reportTemplateName.addStyleName("title");
     toolbarPanel.add(toolbar = new MenuBar());
     toolbar.setAutoOpen(true);
-    toolbar.addItem("", actionsMenu = new MenuBar(true)).addStyleName("tools");
+    toolsItem = toolbar.addItem("", actionsMenu = new MenuBar(true));
+    toolsItem.addStyleName("tools");
     actionsMenu.addStyleName("tools");
   }
 
@@ -238,6 +248,7 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   @Override
   public void setRemoveReportTemplateCommand(Command command) {
     if(remove == null) {
+      removeSeparator = actionsMenu.addSeparator(new MenuItemSeparator());
       actionsMenu.addItem(remove = new MenuItem(translations.removeLabel(), command));
     } else {
       remove.setCommand(command);
@@ -248,7 +259,6 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   public void setRunReportCommand(Command command) {
     if(run == null) {
       actionsMenu.addItem(run = new MenuItem(translations.runLabel(), command));
-      actionsMenu.addSeparator(new MenuItemSeparator());
     } else {
       run.setCommand(command);
     }
@@ -261,6 +271,34 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
     } else {
       update.setCommand(command);
     }
+  }
+
+  @Override
+  public HasAuthorization getRemoveReportTemplateAuthorizer() {
+    return new CompositeAuthorizer(new MenuItemAuthorizer(toolsItem), new MenuItemAuthorizer(remove), new UIObjectAuthorizer(removeSeparator)) {
+      @Override
+      public void unauthorized() {
+      }
+    };
+  }
+
+  @Override
+  public HasAuthorization getRunReportAuthorizer() {
+    return new CompositeAuthorizer(new MenuItemAuthorizer(toolsItem), new MenuItemAuthorizer(run)) {
+      @Override
+      public void unauthorized() {
+      }
+    };
+  }
+
+  @Override
+  public HasAuthorization getUpdateReportTemplateAuthorizer() {
+    return new MenuItemAuthorizer(update);
+  }
+
+  @Override
+  public HasAuthorization getListReportsAuthorizer() {
+    return new WidgetAuthorizer(tabs);
   }
 
 }

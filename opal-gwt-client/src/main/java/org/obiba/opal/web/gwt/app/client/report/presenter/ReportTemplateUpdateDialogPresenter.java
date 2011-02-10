@@ -229,7 +229,7 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
 
   private void updateReportTemplate() {
     if(validReportTemplate()) {
-      createOrUpdateReportTemplate();
+      doUpdateReportTemplate();
     }
   }
 
@@ -290,10 +290,16 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
     return parameterStr.split("=")[1];
   }
 
-  private void createOrUpdateReportTemplate() {
+  private void doUpdateReportTemplate() {
     ReportTemplateDto reportTemplate = getReportTemplateDto();
     CreateOrUpdateReportTemplateCallBack callbackHandler = new CreateOrUpdateReportTemplateCallBack(reportTemplate);
     ResourceRequestBuilderFactory.newBuilder().forResource("/report-template/" + getDisplay().getName().getText()).put().withResourceBody(ReportTemplateDto.stringify(reportTemplate)).withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+  }
+
+  private void doCreateReportTemplate() {
+    ReportTemplateDto reportTemplate = getReportTemplateDto();
+    CreateOrUpdateReportTemplateCallBack callbackHandler = new CreateOrUpdateReportTemplateCallBack(reportTemplate);
+    ResourceRequestBuilderFactory.newBuilder().forResource("/report-templates").post().withResourceBody(ReportTemplateDto.stringify(reportTemplate)).withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
   }
 
   private class AlreadyExistReportTemplateCallBack implements ResourceCallback<ReportTemplateDto> {
@@ -309,7 +315,7 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      createOrUpdateReportTemplate();
+      doCreateReportTemplate();
     }
   }
 

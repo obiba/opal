@@ -10,6 +10,8 @@
 package org.obiba.opal.web.gwt.app.client.report.view;
 
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresenter;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -77,6 +79,11 @@ public class ReportTemplateView extends Composite implements ReportTemplatePrese
   @Override
   public HandlerRegistration refreshClickHandler(ClickHandler handler) {
     return refreshButton.addClickHandler(handler);
+  }
+
+  @Override
+  public HasAuthorization getAddReportTemplateAuthorizer() {
+    return new UIObjectAuthorizer(reportTemplateButton);
   }
 
 }
