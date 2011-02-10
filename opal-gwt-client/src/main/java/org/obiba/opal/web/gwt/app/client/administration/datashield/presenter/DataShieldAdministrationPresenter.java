@@ -136,6 +136,11 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
   // private methods
   //
 
+  @Override
+  public void authorize(HasAuthorization authorizer) {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datashield/methods").get().authorize(authorizer).send();
+  }
+
   private void authorize() {
     // create method
     authorizeAddMethod(getDisplay().getAddMethodAuthorizer());

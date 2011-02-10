@@ -13,6 +13,8 @@ import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -25,6 +27,8 @@ public abstract class ItemAdministrationPresenter<D extends WidgetDisplay> exten
   }
 
   public abstract String getName();
+
+  public abstract void authorize(HasAuthorization authorizer);
 
   public Widget getWidget() {
     return super.getDisplay().asWidget();
