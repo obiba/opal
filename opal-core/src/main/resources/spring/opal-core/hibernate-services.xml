@@ -7,16 +7,17 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
   <import resource="datasource.xml" />
   <import resource="hibernate-session.xml" />
 
+  <bean id="persistenceManager" class="org.obiba.core.service.impl.hibernate.PersistenceManagerHibernateImpl">
+    <qualifier value="opal-data"/>
+    <property name="sessionFactory" ref="opalSessionFactory" />
+  </bean>
+
   <bean id="importService" class="org.obiba.opal.core.service.impl.DefaultImportService" />
   <bean id="exportService" class="org.obiba.opal.core.service.impl.DefaultExportServiceImpl" />
   <bean id="decryptService" class="org.obiba.opal.core.service.impl.DefaultDecryptService"/>
 
   <bean id="unitKeyStoreService" class="org.obiba.opal.core.service.impl.DefaultUnitKeyStoreServiceImpl">
-    <property name="persistenceManager">
-      <bean class="org.obiba.core.service.impl.hibernate.PersistenceManagerHibernateImpl">
-        <property name="sessionFactory" ref="opalSessionFactory" />
-      </bean>
-    </property>
+    <property name="persistenceManager" ref="persistenceManager"/>
   </bean>
 
   <bean id="auditLogManager" class="org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager">

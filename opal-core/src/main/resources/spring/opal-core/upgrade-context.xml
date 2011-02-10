@@ -136,6 +136,12 @@
           <property name="scriptBasename" value="hibernate-datasource" />
           <property name="appliesTo" value="1.4.0" />
         </bean>
+        <bean class="org.obiba.runtime.upgrade.support.MethodInvokingUpgradeStep">
+          <property name="description" value="Upgrade Opal Schema." />
+          <property name="methodOwner" ref="&amp;opalSessionFactory" />
+          <property name="methodName" value="updateDatabaseSchema" />
+          <property name="appliesTo" value="1.5.0" />
+        </bean>
       </list>
     </property>
 

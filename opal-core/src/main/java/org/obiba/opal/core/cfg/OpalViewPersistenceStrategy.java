@@ -22,9 +22,10 @@ import java.util.regex.Pattern;
 
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
+import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewPersistenceStrategy;
-import org.obiba.magma.xstream.DefaultXStreamFactory;
+import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -66,7 +67,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     if(views.isEmpty()) {
       // Do nothing. The file containing the views has already been deleted.
     } else {
-      XStream xstream = new DefaultXStreamFactory().createXStream();
+      XStream xstream = getXStream();
       OutputStreamWriter writer = null;
       try {
         if(!getDatasourceFile(datasourceName).createNewFile()) throw new RuntimeException("Failed to create the views file '" + getDatasourceFile(datasourceName).getAbsolutePath() + "'.");
@@ -102,7 +103,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
       log.info("The views directory '" + viewsDirectory.getAbsolutePath() + "' does not exist.");
       return result;
     }
-    XStream xstream = new DefaultXStreamFactory().createXStream();
+    XStream xstream = getXStream();
     InputStreamReader reader = null;
     try {
       reader = new InputStreamReader(new FileInputStream(getDatasourceFile(datasourceName)), UTF8);
@@ -113,6 +114,10 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
       StreamUtil.silentSafeClose(reader);
     }
     return result;
+  }
+
+  protected XStream getXStream() {
+    return MagmaEngine.get().getExtension(MagmaXStreamExtension.class).getXStreamFactory().createXStream();
   }
 
   private String normalizeDatasourceName(String datasourceName) {
