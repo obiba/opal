@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.app.client.fs.view;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WorkbenchLayout;
+import org.obiba.opal.web.gwt.rest.client.authorization.FocusWidgetAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -95,6 +97,26 @@ public class FileExplorerView extends Composite implements Display {
   @Override
   public void setEnabledFileDeleteButton(boolean enabled) {
     fileDeleteButton.setEnabled(enabled);
+  }
+
+  @Override
+  public HasAuthorization getCreateFolderAuthorizer() {
+    return new FocusWidgetAuthorizer(createFolderButton);
+  }
+
+  @Override
+  public HasAuthorization getFileUploadAuthorizer() {
+    return new FocusWidgetAuthorizer(fileUploadButton);
+  }
+
+  @Override
+  public HasAuthorization getFileDownloadAuthorizer() {
+    return new FocusWidgetAuthorizer(fileDownloadButton);
+  }
+
+  @Override
+  public HasAuthorization getFileDeleteAuthorizer() {
+    return new FocusWidgetAuthorizer(fileDeleteButton);
   }
 
 }

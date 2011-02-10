@@ -24,8 +24,11 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FolderRefreshedEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
 import com.google.gwt.core.client.GWT;
@@ -54,6 +57,14 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
     public HasClickHandlers getCreateFolderButton();
 
     public void setEnabledFileDeleteButton(boolean enabled);
+
+    public HasAuthorization getCreateFolderAuthorizer();
+
+    public HasAuthorization getFileUploadAuthorizer();
+
+    public HasAuthorization getFileDownloadAuthorizer();
+
+    public HasAuthorization getFileDeleteAuthorizer();
 
   }
 
@@ -111,6 +122,35 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   public void revealDisplay() {
     fileSystemTreePresenter.revealDisplay();
     folderDetailsPresenter.revealDisplay();
+  }
+
+  private void authorizeFile(FileDto dto) {
+    // download
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).get().authorize(getDisplay().getFileDownloadAuthorizer()).send();
+    // delete
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).delete().authorize(getDisplay().getFileDeleteAuthorizer()).send();
+  }
+
+  private void authorizeFolder(FileDto dto) {
+    // create folder and upload
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).post()//
+    .authorize(new CompositeAuthorizer(getDisplay().getCreateFolderAuthorizer(), getDisplay().getFileUploadAuthorizer())).send();
+
+    if(!folderDetailsPresenter.hasSelection()) {
+      // download
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).get().authorize(getDisplay().getFileDownloadAuthorizer()).send();
+      // delete
+      setEnableFileDeleteButton();
+    }
+  }
+
+  private void setEnableFileDeleteButton() {
+    FileDto folder = folderDetailsPresenter.getCurrentFolder();
+    if(folder.getPath().equals("/") || folder.getChildrenCount() > 0) {
+      getDisplay().setEnabledFileDeleteButton(false);
+    } else {
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + folder.getPath()).delete().authorize(getDisplay().getFileDeleteAuthorizer()).send();
+    }
   }
 
   protected void initDisplayComponents() {
@@ -174,7 +214,11 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
       @Override
       public void onFileSelectionChange(FileSelectionChangeEvent event) {
+        GWT.log("file: " + event.getFile().getPath());
         getDisplay().setEnabledFileDeleteButton(folderDetailsPresenter.hasSelection());
+        if(folderDetailsPresenter.hasSelection()) {
+          authorizeFile(event.getFile());
+        }
       }
     }));
 
@@ -182,6 +226,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
       @Override
       public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
+        GWT.log("folder: " + event.getFolder().getPath());
         setEnableFileDeleteButton();
       }
 
@@ -191,17 +236,13 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
       @Override
       public void onFolderRefreshed(FolderRefreshedEvent event) {
-        setEnableFileDeleteButton();
+        GWT.log("refresh: " + event.getFolder().getPath());
+        authorizeFolder(event.getFolder());
       }
     }));
 
     super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
 
-  }
-
-  private void setEnableFileDeleteButton() {
-    FileDto folder = this.folderDetailsPresenter.getCurrentFolder();
-    getDisplay().setEnabledFileDeleteButton(folder.getPath().equals("/") ? false : folder.getChildrenCount() == 0);
   }
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {

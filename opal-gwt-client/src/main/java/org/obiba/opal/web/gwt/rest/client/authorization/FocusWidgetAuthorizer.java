@@ -9,33 +9,33 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.rest.client.authorization;
 
-import com.google.gwt.user.client.ui.UIObject;
+import com.google.gwt.user.client.ui.FocusWidget;
 
 /**
  *
  */
-public class UIObjectAuthorizer implements HasAuthorization {
+public class FocusWidgetAuthorizer implements HasAuthorization {
 
-  private UIObject o;
+  private FocusWidget w;
 
-  public UIObjectAuthorizer(UIObject o) {
+  public FocusWidgetAuthorizer(FocusWidget w) {
     super();
-    this.o = o;
+    this.w = w;
   }
 
   @Override
   public void beforeAuthorization() {
-    o.setVisible(false);
+    w.setEnabled(false);
   }
 
   @Override
   public void authorized() {
-    o.setVisible(true);
+    w.setEnabled(true);
   }
 
   @Override
   public void unauthorized() {
-    o.setVisible(false);
+    w.setEnabled(false);
   }
 
 }
