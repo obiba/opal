@@ -241,7 +241,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
   }
 
   private void authorizeDeleteKeyPair(KeyPairDto dto, HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/keys/" + dto.getAlias()).delete().authorize(authorizer).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/key/" + dto.getAlias()).delete().authorize(authorizer).send();
   }
 
   protected void doActionImpl(final KeyPairDto dto, String actionName) {
