@@ -23,7 +23,6 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
-import org.obiba.magma.views.View;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.AttributeDto;
 import org.obiba.opal.web.model.Magma.CategoryDto;
@@ -179,7 +178,7 @@ public final class Dtos {
     if(uriBuilder != null) {
       builder.setLink(uriBuilder.build(valueTable.getDatasource().getName(), valueTable.getName()).toString());
     }
-    if(valueTable instanceof View) {
+    if(valueTable.isView()) {
       UriBuilder viewLink = UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getView");
       builder.setViewLink(viewLink.build(valueTable.getDatasource().getName(), valueTable.getName()).toString());
     }
@@ -195,7 +194,7 @@ public final class Dtos {
     final List<String> viewNames = Lists.newArrayList();
     for(ValueTable table : datasource.getValueTables()) {
       tableNames.add(table.getName());
-      if(table instanceof View) {
+      if(table.isView()) {
         viewNames.add(table.getName());
       }
     }
