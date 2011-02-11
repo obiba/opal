@@ -11,17 +11,19 @@ package org.obiba.opal.core.service;
 
 public interface SubjectAclService {
 
-  void addSubjectPermissions(String node, String subject, Iterable<String> permissions);
+  void addSubjectPermissions(String domain, String node, String subject, Iterable<String> permissions);
 
-  void addSubjectPermission(String node, String subject, String permission);
+  void addSubjectPermission(String domain, String node, String subject, String permission);
 
   Iterable<SubjectPermission> getSubjectPermissions(String subject);
 
-  Iterable<NodePermission> getNodePermissions(String node);
+  Iterable<NodePermission> getNodePermissions(String domain, String node);
 
-  Iterable<String> getSubjectPermissions(String node, String subject);
+  Iterable<String> getSubjectPermissions(String domain, String node, String subject);
 
   public interface NodePermission {
+
+    String getDomain();
 
     String getSubject();
 
@@ -30,6 +32,8 @@ public interface SubjectAclService {
   }
 
   public interface SubjectPermission {
+
+    String getDomain();
 
     String getNode();
 

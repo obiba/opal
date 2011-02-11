@@ -18,6 +18,7 @@ import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.obiba.opal.core.service.SubjectAclService;
@@ -44,7 +45,7 @@ public class SpatialRealm extends AuthorizingRealm {
   private SubjectAclService subjectAclService;
 
   public SpatialRealm() {
-    super();
+    super(new MemoryConstrainedCacheManager());
     // super.setPermissionResolver(new SpatialPermissionResolver(new MapSpaceResolver(ImmutableMap.<String, Space>
     // of("magma", new NodeSpace(), "ws", new WsSpace())), new NodeResolver(), new SingleSpaceRelationProvider(new
     // NodeRelationProvider())));
@@ -71,7 +72,7 @@ public class SpatialRealm extends AuthorizingRealm {
     final List<String> perms = Lists.newArrayList();
     for(SubjectPermission sp : subjectAclService.getSubjectPermissions(principals.getPrimaryPrincipal().toString())) {
       for(String p : sp.getPermissions()) {
-        perms.add(sp.getNode() + ":" + p);
+        perms.add(sp.getDomain() + ":" + sp.getNode() + ":" + p);
       }
     }
     return perms;

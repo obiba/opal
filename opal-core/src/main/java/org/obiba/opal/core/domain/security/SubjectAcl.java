@@ -23,6 +23,10 @@ public class SubjectAcl extends AbstractEntity {
   private static final long serialVersionUID = 1L;
 
   @Column(nullable = false)
+  @Index(name = "domain_idx")
+  private String domain;
+
+  @Column(nullable = false)
   @Index(name = "node_idx")
   private String node;
 
@@ -37,10 +41,15 @@ public class SubjectAcl extends AbstractEntity {
 
   }
 
-  public SubjectAcl(String node, String subject, String permission) {
+  public SubjectAcl(String domain, String node, String subject, String permission) {
+    this.domain = domain;
     this.node = node;
     this.subject = subject;
     this.permission = permission;
+  }
+
+  public String getDomain() {
+    return domain;
   }
 
   public String getNode() {

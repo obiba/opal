@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ResteasyServletConfiguration {
 
-  private static final String WS_ROOT = "/ws";
+  public static final String WS_ROOT = "/ws";
 
   @Autowired
   private ServletContextHandler servletContextHandler;

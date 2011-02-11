@@ -9,6 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.ws.inject;
 
+import java.net.URI;
+
+import javax.ws.rs.core.UriInfo;
+
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
@@ -17,4 +21,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public interface RequestAttributesProvider {
 
   public ServletRequestAttributes currentRequestAttributes();
+
+  public UriInfo getUriInfo();
+
+  public String getResourcePath(URI uri);
 }

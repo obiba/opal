@@ -30,25 +30,25 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public void addSubjectPermissions(String node, String subject, Iterable<String> permissions) {
+  public void addSubjectPermissions(String domain, String node, String subject, Iterable<String> permissions) {
     for(String permission : permissions) {
-      addSubjectPermission(node, subject, permission);
+      addSubjectPermission(domain, node, subject, permission);
     }
   }
 
   @Override
-  public void addSubjectPermission(String node, String subject, String permission) {
+  public void addSubjectPermission(String domain, String node, String subject, String permission) {
     if(subject == null) throw new IllegalArgumentException("subject cannot be null");
     if(permission == null) throw new IllegalArgumentException("permission cannot be null");
-    persistenceManager.save(new SubjectAcl(node, subject, permission));
+    persistenceManager.save(new SubjectAcl(domain, node, subject, permission));
   }
 
   @Override
-  public Iterable<String> getSubjectPermissions(String node, String subject) {
+  public Iterable<String> getSubjectPermissions(String domain, String node, String subject) {
     if(node == null) throw new IllegalArgumentException("node cannot be null");
     if(subject == null) throw new IllegalArgumentException("subject cannot be null");
 
-    SubjectAcl template = new SubjectAcl(node, subject, null);
+    SubjectAcl template = new SubjectAcl(domain, node, subject, null);
     return Iterables.transform(persistenceManager.match(template), new Function<SubjectAcl, String>() {
 
       @Override
@@ -62,12 +62,17 @@ public class DefaultSubjectAclService implements SubjectAclService {
   @Override
   public Iterable<SubjectPermission> getSubjectPermissions(final String subject) {
 
-    SubjectAcl template = new SubjectAcl(null, subject, null);
+    SubjectAcl template = new SubjectAcl(null, null, subject, null);
     return Iterables.transform(persistenceManager.match(template), new Function<SubjectAcl, SubjectPermission>() {
 
       @Override
       public SubjectPermission apply(final SubjectAcl from) {
         return new SubjectPermission() {
+
+          @Override
+          public String getDomain() {
+            return from.getDomain();
+          }
 
           @Override
           public String getNode() {
@@ -76,7 +81,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
           @Override
           public Iterable<String> getPermissions() {
-            return getSubjectPermissions(from.getNode(), subject);
+            return getSubjectPermissions(from.getDomain(), from.getNode(), subject);
           }
 
         };
@@ -86,14 +91,19 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public Iterable<NodePermission> getNodePermissions(final String node) {
+  public Iterable<NodePermission> getNodePermissions(final String domain, final String node) {
 
-    SubjectAcl template = new SubjectAcl(node, null, null);
+    SubjectAcl template = new SubjectAcl(domain, node, null, null);
     return Iterables.transform(persistenceManager.match(template), new Function<SubjectAcl, NodePermission>() {
 
       @Override
       public NodePermission apply(final SubjectAcl from) {
         return new NodePermission() {
+
+          @Override
+          public String getDomain() {
+            return from.getDomain();
+          }
 
           @Override
           public String getSubject() {
@@ -102,7 +112,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
           @Override
           public Iterable<String> getPermissions() {
-            return getSubjectPermissions(node, from.getSubject());
+            return getSubjectPermissions(from.getDomain(), node, from.getSubject());
           }
 
         };
