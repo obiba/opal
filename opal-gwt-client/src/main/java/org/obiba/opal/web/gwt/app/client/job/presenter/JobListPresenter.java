@@ -23,9 +23,11 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.model.client.opal.CommandStateDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -135,11 +137,21 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
     }).send();
   }
 
-  private void doActionImpl(CommandStateDto dto, String actionName) {
+  private void authorizeCancelJob(CommandStateDto dto, Authorizer authorizer) {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/command/" + dto.getId() + "/status").put().authorize(authorizer).send();
+  }
+
+  private void doActionImpl(final CommandStateDto dto, String actionName) {
     if(LOG_ACTION.equals(actionName)) {
       jobDetailsPresenter.getDisplay().showDialog(dto);
     } else if(CANCEL_ACTION.equals(actionName)) {
-      cancelJob(dto);
+      authorizeCancelJob(dto, new Authorizer(eventBus) {
+
+        @Override
+        public void authorized() {
+          cancelJob(dto);
+        }
+      });
     }
   }
 
