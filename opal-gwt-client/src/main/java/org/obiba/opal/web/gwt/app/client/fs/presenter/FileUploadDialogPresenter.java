@@ -30,8 +30,8 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 
 public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogPresenter.Display> {
@@ -101,8 +101,7 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
   private void addEventHandlers() {
     super.registerHandler(getDisplay().getUploadButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
-        String filePath = currentFolder.getPath() + '/' + getDisplay().getFilename();
-        uploadFile(filePath);
+        uploadFile();
       }
     }));
 
@@ -145,11 +144,11 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
     return false;
   }
 
-  private void uploadFile(final String path) {
+  private void uploadFile() {
 
     actionRequiringConfirmation = new Runnable() {
       public void run() {
-        submitFile(path);
+        submitFile();
       }
     };
 
@@ -159,13 +158,13 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
     } else if(fileExist(fileName)) {
       eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "replaceExistingFile", "confirmReplaceExistingFile"));
     } else {
-      submitFile(path);
+      submitFile();
     }
 
   }
 
-  private void submitFile(final String path) {
-    String url = "/ws/files" + path;
+  private void submitFile() {
+    String url = "/ws/files" + currentFolder.getPath();
     getDisplay().submit(url);
   }
 

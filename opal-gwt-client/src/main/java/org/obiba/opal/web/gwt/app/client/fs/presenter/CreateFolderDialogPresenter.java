@@ -105,9 +105,9 @@ public class CreateFolderDialogPresenter extends WidgetPresenter<CreateFolderDia
           eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, translations.dotNamesAreInvalid(), null));
         } else {
           if(currentFolder.getPath().equals("/")) { // create under root
-            createFolder("/" + folderToCreate);
+            createFolder("/", folderToCreate);
           } else {
-            createFolder(currentFolder.getPath() + "/" + folderToCreate);
+            createFolder(currentFolder.getPath(), folderToCreate);
           }
         }
       }
@@ -128,13 +128,13 @@ public class CreateFolderDialogPresenter extends WidgetPresenter<CreateFolderDia
 
   }
 
-  private void createFolder(final String folder) {
+  private void createFolder(final String destination, final String folder) {
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
       @Override
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == 201) {
-          eventBus.fireEvent(new FolderCreationEvent(folder));
+          eventBus.fireEvent(new FolderCreationEvent(destination + "/" + folder));
           getDisplay().hideDialog();
         } else {
           GWT.log(response.getText());
@@ -143,7 +143,7 @@ public class CreateFolderDialogPresenter extends WidgetPresenter<CreateFolderDia
       }
     };
 
-    ResourceRequestBuilderFactory.newBuilder().forResource("/files" + folder).put().withCallback(201, callbackHandler).withCallback(403, callbackHandler).withCallback(500, callbackHandler).send();
+    ResourceRequestBuilderFactory.newBuilder().forResource("/files" + destination).post().withBody("text/plain", folder).withCallback(201, callbackHandler).withCallback(403, callbackHandler).withCallback(500, callbackHandler).send();
   }
 
   public void setCurrentFolder(FileDto currentFolder) {

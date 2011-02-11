@@ -16,8 +16,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,7 +34,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -88,6 +85,10 @@ public class FilesResource {
     this.mimeTypes = new MimetypesFileTypeMap();
   }
 
+  //
+  // files
+  //
+
   @GET
   @Path("/meta")
   public Response getFileSystemRootDetails() throws FileSystemException {
@@ -127,6 +128,151 @@ public class FilesResource {
       return getFolder(file);
     }
   }
+
+  @POST
+  @Path("/")
+  @Consumes("multipart/form-data")
+  @Produces("text/html")
+  @AuthenticatedByCookie
+  public Response uploadFile(@Context UriInfo uriInfo, @Context HttpServletRequest request) throws FileSystemException, FileUploadException {
+    return uploadFile("/", uriInfo, request);
+  }
+
+  // The POST method is required here to be compatible with Html forms which do not support the PUT method.
+  @POST
+  @Path("/{path:.*}")
+  @Consumes("multipart/form-data")
+  @Produces("text/html")
+  @AuthenticatedByCookie
+  public Response uploadFile(@PathParam("path") String path, @Context UriInfo uriInfo, @Context HttpServletRequest request) throws FileSystemException, FileUploadException {
+
+    String folderPath = getPathOfFileToWrite(path);
+    FileObject folder = resolveFileInFileSystem(folderPath);
+
+    if(folder == null || !folder.exists()) {
+      return getPathNotExistResponse(path);
+    } else if(folder.getType() != FileType.FOLDER) {
+      return Response.status(Status.FORBIDDEN).entity("Not a folder: " + path).build();
+    }
+
+    FileItem uploadedFile = getUploadedFile(request);
+
+    FileObject file = null;
+
+    if(uploadedFile == null) {
+      return Response.status(Status.BAD_REQUEST).entity("No file has been submitted. Please make sure that you are submitting a file with your resquest.").build();
+    }
+
+    String fileName = uploadedFile.getName();
+    file = folder.resolveFile(fileName);
+    if(file.exists()) {
+      return Response.status(Status.FORBIDDEN).entity("Could not upload the file, a file exist with that name at the specified path: " + path).build();
+    }
+
+    writeUploadedFileToFileSystem(uploadedFile, file);
+
+    log.info("The following file was uploaded to Opal file system : {}", file.getURL());
+
+    return Response.created(uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(fileName).build()).build();
+  }
+
+  @POST
+  @Path("/")
+  @Consumes("text/plain")
+  public Response createFolder(String folderName, @Context UriInfo uriInfo) throws FileSystemException {
+    return createFolder("/", folderName, uriInfo);
+  }
+
+  @POST
+  @Path("/{path:.*}")
+  @Consumes("text/plain")
+  public Response createFolder(@PathParam("path") String path, String folderName, @Context UriInfo uriInfo) throws FileSystemException {
+    if(folderName == null || folderName.trim().length() == 0) return Response.status(Status.BAD_REQUEST).build();
+    folderName = folderName.trim();
+
+    String folderPath = getPathOfFileToWrite(path);
+    FileObject folder = resolveFileInFileSystem(folderPath);
+
+    if(folder == null || !folder.exists()) {
+      return getPathNotExistResponse(path);
+    } else if(folder.getType() != FileType.FOLDER) {
+      return Response.status(Status.FORBIDDEN).entity("Not a folder: " + path).build();
+    }
+
+    FileObject file = folder.resolveFile(folderName);
+    // Folder or file already exist at specified path.
+    if(file.exists()) {
+      return Response.status(Status.FORBIDDEN).entity("cannotCreateFolderPathAlreadyExist").build();
+    }
+
+    // Parent folder is read-only.
+    if(!file.getParent().isWriteable()) {
+      return Response.status(Status.FORBIDDEN).entity("cannotCreateFolderParentIsReadOnly").build();
+    }
+
+    try {
+      file.createFolder();
+      return Response.created(uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(folderName).build()).build();
+    } catch(FileSystemException couldNotCreateTheFolder) {
+      return Response.status(Status.INTERNAL_SERVER_ERROR).entity("cannotCreatefolderUnexpectedError").build();
+    }
+  }
+
+  @DELETE
+  @Path("/{path:.*}")
+  public Response deleteFile(@PathParam("path") String path) throws FileSystemException {
+    FileObject file = resolveFileInFileSystem(path);
+
+    // File or folder does not exist.
+    if(!file.exists()) {
+      return getPathNotExistResponse(path);
+    }
+
+    // The path refers to a folder that contains one or many files or subfolders.
+    if(file.getType() == FileType.FOLDER && file.getChildren().length > 0) {
+      return Response.status(Status.FORBIDDEN).entity("cannotDeleteNotEmptyFolder").build();
+    }
+
+    // Read-only file or folder.
+    if(!file.isWriteable()) {
+      return Response.status(Status.FORBIDDEN).entity("cannotDeleteReadOnlyFile").build();
+    }
+
+    try {
+      file.delete();
+      return Response.ok("The following file or folder has been deleted : " + path).build();
+    } catch(FileSystemException couldNotDeleteFile) {
+      return Response.status(Status.INTERNAL_SERVER_ERROR).entity("couldNotDeleteFileError").build();
+    }
+  }
+
+  //
+  // charsets
+  //
+
+  @GET
+  @Cache
+  @Path("/charsets/available")
+  public Response getAvailableCharsets() {
+    SortedMap<String, Charset> charsets = java.nio.charset.Charset.availableCharsets();
+    List<String> names = new ArrayList<String>();
+    for(Charset charSet : charsets.values()) {
+      names.add(charSet.name());
+      names.addAll(charSet.aliases());
+    }
+    return Response.ok(new JSONArray(names).toString()).build();
+  }
+
+  @GET
+  @Cache
+  @Path("/charsets/default")
+  public Response getDefaultCharset() {
+    return Response.ok(new JSONArray(Arrays.asList(new String[] { defaultCharset })).toString()).build();
+  }
+
+  //
+  // private methods
+  //
 
   protected FileObject resolveFileInFileSystem(String path) throws FileSystemException {
     return opalRuntime.getFileSystem().getRoot().resolveFile(path);
@@ -226,41 +372,6 @@ public class FilesResource {
     }
   }
 
-  // TODO Refactoring required to merge uploadFile() with createFolder()
-  // @PUT
-  // The POST method is required here to be compatible with Html forms which do not support the PUT method.
-  @POST
-  @Path("/{path:.*}")
-  @Consumes("multipart/form-data")
-  @Produces("text/html")
-  @AuthenticatedByCookie
-  public Response uploadFile(@PathParam("path") String path, @Context UriInfo uriInfo, @Context HttpServletRequest request) throws FileSystemException, FileUploadException {
-
-    String fileToWritePath = getPathOfFileToWrite(path);
-    FileObject fileToWriteTo = resolveFileInFileSystem(fileToWritePath);
-    FileObject folderOfFileToWriteTo = fileToWriteTo.getParent();
-
-    FileItem uploadedFile = getUploadedFile(request, fileToWriteTo);
-
-    if(uploadedFile == null) {
-      return Response.status(Status.BAD_REQUEST).entity("No file has been submitted. Please make sure that you are submitting a file with your resquest.").build();
-
-      // A folder exist with that name at the specified path
-    } else if(fileToWriteTo.exists() && fileToWriteTo.getType() == FileType.FOLDER) {
-      return Response.status(Status.FORBIDDEN).entity("Could not upload the file, a folder exist with that name at the specified path: " + path).build();
-
-      // The parent folder does not exist (the specification says that we should not create folders)
-    } else if(folderOfFileToWriteTo != null && !folderOfFileToWriteTo.exists()) {
-      return getPathNotExistResponse(path);
-    }
-
-    writeUploadedFileToFileSystem(uploadedFile, fileToWriteTo);
-
-    log.info("The following file was uploaded to Opal file system : {}", fileToWritePath);
-
-    return Response.created(uriInfo.getBaseUri().resolve(toUrlEncoded(fileToWritePath))).entity(fileToWritePath).build();
-  }
-
   private String getPathOfFileToWrite(String path) {
     return path.startsWith("/tmp/") ? "/tmp/" + UUID.randomUUID().toString() + ".tmp" : path;
   }
@@ -270,7 +381,7 @@ public class FilesResource {
   }
 
   @SuppressWarnings("unchecked")
-  protected FileItem getUploadedFile(HttpServletRequest request, FileObject fileToWriteTo) throws FileUploadException {
+  protected FileItem getUploadedFile(HttpServletRequest request) throws FileUploadException {
     FileItemFactory factory = new DiskFileItemFactory();
     ServletFileUpload upload = new ServletFileUpload(factory);
     for(FileItem fileItem : (List<FileItem>) upload.parseRequest(request)) {
@@ -308,57 +419,6 @@ public class FilesResource {
 
   }
 
-  @DELETE
-  @Path("/{path:.*}")
-  public Response deleteFile(@PathParam("path") String path) throws FileSystemException {
-    FileObject file = resolveFileInFileSystem(path);
-
-    // File or folder does not exist.
-    if(!file.exists()) {
-      return getPathNotExistResponse(path);
-    }
-
-    // The path refers to a folder that contains one or many files or subfolders.
-    if(file.getType() == FileType.FOLDER && file.getChildren().length > 0) {
-      return Response.status(Status.FORBIDDEN).entity("cannotDeleteNotEmptyFolder").build();
-    }
-
-    // Read-only file or folder.
-    if(!file.isWriteable()) {
-      return Response.status(Status.FORBIDDEN).entity("cannotDeleteReadOnlyFile").build();
-    }
-
-    try {
-      file.delete();
-      return Response.ok("The following file or folder has been deleted : " + path).build();
-    } catch(FileSystemException couldNotDeleteFile) {
-      return Response.status(Status.INTERNAL_SERVER_ERROR).entity("couldNotDeleteFileError").build();
-    }
-  }
-
-  @PUT
-  @Path("/{path:.*}")
-  public Response createFolder(@PathParam("path") String path, @Context UriInfo uriInfo) throws FileSystemException {
-    FileObject file = resolveFileInFileSystem(path);
-
-    // Folder or file already exist at specified path.
-    if(file.exists()) {
-      return Response.status(Status.FORBIDDEN).entity("cannotCreateFolderPathAlreadyExist").build();
-    }
-
-    // Parent folder is read-only.
-    if(!file.getParent().isWriteable()) {
-      return Response.status(Status.FORBIDDEN).entity("cannotCreateFolderParentIsReadOnly").build();
-    }
-
-    try {
-      file.createFolder();
-      return Response.created(uriInfo.getAbsolutePath()).entity("Created the following folder: " + path).build();
-    } catch(FileSystemException couldNotCreateTheFolder) {
-      return Response.status(Status.INTERNAL_SERVER_ERROR).entity("cannotCreatefolderUnexpectedError").build();
-    }
-  }
-
   private void compressFolder(File compressedFile, FileObject folder) throws IOException {
     ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(compressedFile));
     addFolder(folder, outputStream);
@@ -391,35 +451,5 @@ public class FilesResource {
 
   private String getContentDispositionOfAttachment(String fileName) {
     return "attachment; filename=\"" + fileName + "\"";
-  }
-
-  @GET
-  @Cache
-  @Path("/charsets/available")
-  public Response getAvailableCharsets() {
-    SortedMap<String, Charset> charsets = java.nio.charset.Charset.availableCharsets();
-    List<String> names = new ArrayList<String>();
-    for(Charset charSet : charsets.values()) {
-      names.add(charSet.name());
-      names.addAll(charSet.aliases());
-    }
-    return Response.ok(new JSONArray(names).toString()).build();
-  }
-
-  @GET
-  @Cache
-  @Path("/charsets/default")
-  public Response getDefaultCharset() {
-    return Response.ok(new JSONArray(Arrays.asList(new String[] { defaultCharset })).toString()).build();
-  }
-
-  private String toUrlEncoded(String s) {
-    String encoded = null;
-    try {
-      encoded = URLEncoder.encode(s, "UTF-8");
-    } catch(UnsupportedEncodingException ex) {
-      encoded = s;
-    }
-    return encoded;
   }
 }

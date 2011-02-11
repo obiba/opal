@@ -185,13 +185,13 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
     super.registerHandler(getDisplay().addCancelButtonHandler(new CancelButtonHandler()));
   }
 
-  private void createFolder(final String folder) {
+  private void createFolder(final String destination, final String folder) {
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
       @Override
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == 201) {
-          eventBus.fireEvent(new FolderCreationEvent(folder));
+          eventBus.fireEvent(new FolderCreationEvent(destination + "/" + folder));
           getDisplay().clearNewFolderName();
         } else {
           eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
@@ -199,7 +199,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
       }
     };
 
-    ResourceRequestBuilderFactory.newBuilder().forResource("/files" + folder).put().withCallback(201, callbackHandler).withCallback(403, callbackHandler).withCallback(500, callbackHandler).send();
+    ResourceRequestBuilderFactory.newBuilder().forResource("/files" + destination).post().withBody("text/plain", folder).withCallback(201, callbackHandler).withCallback(403, callbackHandler).withCallback(500, callbackHandler).send();
   }
 
   private FileDto getCurrentFolder() {
@@ -282,13 +282,13 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
     public void onClick(ClickEvent event) {
       String newFolder = getDisplay().getCreateFolderName().getText().trim();
-      while(newFolder.startsWith("/")) {
-        newFolder = newFolder.substring(1);
-      }
       FileDto currentFolder = getCurrentFolder();
       if(currentFolder != null && newFolder.length() != 0) {
-        String path = currentFolder.getPath();
-        createFolder(path.endsWith("/") ? path + newFolder : path + '/' + newFolder);
+        if(currentFolder.getPath().equals("/")) { // create under root
+          createFolder("/", newFolder);
+        } else {
+          createFolder(currentFolder.getPath(), newFolder);
+        }
       }
     }
   }

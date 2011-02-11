@@ -20,7 +20,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,8 +32,8 @@ import java.util.zip.ZipFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import junit.framework.Assert;
 
@@ -43,7 +42,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
-import org.easymock.EasyMock;
+import org.jboss.resteasy.specimpl.UriBuilderImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -275,12 +274,13 @@ public class FilesResourceTest {
   @Test
   public void testUploadFileToFileSystem() throws FileUploadException, IOException, URISyntaxException {
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
+    expect(fileItemMock.getName()).andReturn("fileToUpload.txt").atLeastOnce();
     expect(fileItemMock.getInputStream()).andReturn(getClass().getResourceAsStream("/files-to-upload/fileToUpload.txt")).once();
-    expect(uriInfoMock.getBaseUri()).andReturn(new URI("http://localhost:8888")).once();
+    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromPath("/"));
 
     FilesResource fileResource = new FilesResource(opalRuntimeMock) {
       @Override
-      protected FileItem getUploadedFile(HttpServletRequest request, FileObject fileToWriteTo) throws FileUploadException {
+      protected FileItem getUploadedFile(HttpServletRequest request) throws FileUploadException {
         return fileItemMock;
       }
     };
@@ -288,18 +288,19 @@ public class FilesResourceTest {
     replay(opalRuntimeMock, fileItemMock, uriInfoMock);
 
     // Upload the file.
-    String uploadedFilePath = "/folder1/folder11/folder111/uploadedFile.txt";
-    Response response = fileResource.uploadFile(uploadedFilePath, uriInfoMock, null);
-    filesCreatedByTest.add(uploadedFilePath);
+    String destinationPath = "/folder1/folder11/folder111";
+    Response response = fileResource.uploadFile(destinationPath, uriInfoMock, null);
+    filesCreatedByTest.add(destinationPath);
 
-    // Verify that the service response is OK.
+    // Verify that the service response is CREATED.
     Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
-
-    // Verify that the file was uploaded at the right path in the file system.
-    Assert.assertTrue(fileSystem.getRoot().resolveFile("/folder1/folder11/folder111/uploadedFile.txt").exists());
 
     verify(opalRuntimeMock, fileItemMock, uriInfoMock);
 
+    // Verify that the file was uploaded at the right path in the file system.
+    Assert.assertTrue(fileSystem.getRoot().resolveFile("/folder1/folder11/folder111/fileToUpload.txt").exists());
+    // clean up
+    fileSystem.getRoot().resolveFile("/folder1/folder11/folder111/fileToUpload.txt").delete();
   }
 
   @Test
@@ -311,7 +312,7 @@ public class FilesResourceTest {
 
     FilesResource fileResource = new FilesResource(opalRuntimeMock) {
       @Override
-      protected FileItem getUploadedFile(HttpServletRequest request, FileObject fileToWriteTo) throws FileUploadException {
+      protected FileItem getUploadedFile(HttpServletRequest request) throws FileUploadException {
         return null;
       }
     };
@@ -324,60 +325,27 @@ public class FilesResourceTest {
   }
 
   @Test
-  public void testUploadFileWhenFolderExistWithThatNameAtSpecifiedPath() throws FileSystemException, FileUploadException, URISyntaxException {
-
-    expect(fileObjectMock.getType()).andReturn(FileType.FOLDER).once();
-    expect(fileObjectMock.exists()).andReturn(true).once();
-    expect(fileObjectMock.getParent()).andReturn(fileObjectMock);
-
-    replay(opalRuntimeMock, fileObjectMock);
+  public void testUploadFile_ReturnsNotFoundResponseWhenUploadDestinationDoesNotExist() throws IOException, FileSystemException, FileUploadException, URISyntaxException {
+    expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
 
     FilesResource fileResource = new FilesResource(opalRuntimeMock) {
       @Override
-      protected FileItem getUploadedFile(HttpServletRequest request, FileObject fileToWriteTo) throws FileUploadException {
+      protected FileItem getUploadedFile(HttpServletRequest request) throws FileUploadException {
         return fileItemMock;
-      }
-
-      @Override
-      protected FileObject resolveFileInFileSystem(String path) throws FileSystemException {
-        return fileObjectMock;
       }
     };
 
-    Response response = fileResource.uploadFile("/", uriInfoMock, null);
-    Assert.assertEquals(Status.FORBIDDEN.getStatusCode(), response.getStatus());
+    replay(opalRuntimeMock, fileItemMock, uriInfoMock);
 
-    verify(opalRuntimeMock, fileObjectMock);
-  }
+    // Upload the file.
+    String destinationPath = "/folder1/folder11/folder111/patate";
+    Response response = fileResource.uploadFile(destinationPath, uriInfoMock, null);
+    filesCreatedByTest.add(destinationPath);
 
-  @Test
-  public void testUploadFile_ReturnsNotFoundResponseWhenUploadDestinationDoesNotExist() throws FileSystemException, FileUploadException, URISyntaxException {
-    expect(fileObjectMock.getType()).andReturn(FileType.FILE).atLeastOnce();
-    expect(fileObjectMock.exists()).andReturn(true).atLeastOnce();
-
-    FileObject parentFolderMock = createMock(FileObject.class);
-    expect(parentFolderMock.exists()).andReturn(false).atLeastOnce();
-
-    expect(fileObjectMock.getParent()).andReturn(parentFolderMock).atLeastOnce();
-
-    replay(opalRuntimeMock, fileObjectMock, parentFolderMock);
-
-    FilesResource fileResource = new FilesResource(opalRuntimeMock) {
-      @Override
-      protected FileItem getUploadedFile(HttpServletRequest request, FileObject fileToWriteTo) throws FileUploadException {
-        return fileItemMock;
-      }
-
-      @Override
-      protected FileObject resolveFileInFileSystem(String path) throws FileSystemException {
-        return fileObjectMock;
-      }
-    };
-
-    Response response = fileResource.uploadFile("/invalid/path/fileToUpload.txt", uriInfoMock, null);
+    // Verify that the service response is CREATED.
     Assert.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
 
-    verify(opalRuntimeMock, fileObjectMock);
+    verify(opalRuntimeMock, fileItemMock, uriInfoMock);
   }
 
   @Test
@@ -466,11 +434,13 @@ public class FilesResourceTest {
 
   @Test
   public void testCreateFolder_CannotCreateFolderPathAlreadyExist() throws FileSystemException, URISyntaxException {
+    expect(fileObjectMock.getType()).andReturn(FileType.FOLDER).atLeastOnce();
     expect(fileObjectMock.exists()).andReturn(true).atLeastOnce();
+    expect(fileObjectMock.resolveFile("folder11")).andReturn(fileSystem.getRoot().resolveFile("/folder1/folder11")).atLeastOnce();
 
     replay(fileObjectMock);
 
-    Response response = getFileResource().createFolder("path", uriInfoMock);
+    Response response = getFileResource().createFolder("folder1", "folder11", uriInfoMock);
     Assert.assertEquals(Status.FORBIDDEN.getStatusCode(), response.getStatus());
     Assert.assertEquals("cannotCreateFolderPathAlreadyExist", response.getEntity());
 
@@ -479,53 +449,43 @@ public class FilesResourceTest {
 
   @Test
   public void testCreateFolder_CannotCreateFolderParentIsReadOnly() throws FileSystemException, URISyntaxException {
-    expect(fileObjectMock.exists()).andReturn(false).atLeastOnce();
+    expect(fileObjectMock.getType()).andReturn(FileType.FOLDER).atLeastOnce();
+    expect(fileObjectMock.exists()).andReturn(true).atLeastOnce();
+    FileObject childFolderMock = createMock(FileObject.class);
+    expect(childFolderMock.exists()).andReturn(false).atLeastOnce();
     FileObject parentFolderMock = createMock(FileObject.class);
-    expect(fileObjectMock.getParent()).andReturn(parentFolderMock).atLeastOnce();
+    expect(childFolderMock.getParent()).andReturn(parentFolderMock).atLeastOnce();
     expect(parentFolderMock.isWriteable()).andReturn(false).atLeastOnce();
+    expect(fileObjectMock.resolveFile("folder")).andReturn(childFolderMock).atLeastOnce();
 
-    replay(fileObjectMock, parentFolderMock);
+    replay(fileObjectMock, parentFolderMock, childFolderMock);
 
-    Response response = getFileResource().createFolder("path", uriInfoMock);
+    Response response = getFileResource().createFolder("folder1", "folder", uriInfoMock);
     Assert.assertEquals(Status.FORBIDDEN.getStatusCode(), response.getStatus());
     Assert.assertEquals("cannotCreateFolderParentIsReadOnly", response.getEntity());
 
-    verify(fileObjectMock, parentFolderMock);
-  }
-
-  @Test
-  public void testCreateFolder_CannotCreateFolderUnexpectedError() throws FileSystemException, URISyntaxException {
-    expect(fileObjectMock.exists()).andReturn(false).atLeastOnce();
-    FileObject parentFolderMock = createMock(FileObject.class);
-    expect(fileObjectMock.getParent()).andReturn(parentFolderMock).atLeastOnce();
-    expect(parentFolderMock.isWriteable()).andReturn(true).atLeastOnce();
-    fileObjectMock.createFolder();
-    EasyMock.expectLastCall().andThrow(new FileSystemException("test")).atLeastOnce();
-
-    replay(fileObjectMock, parentFolderMock);
-
-    Response response = getFileResource().createFolder("path", uriInfoMock);
-    Assert.assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
-
-    verify(fileObjectMock, fileObjectMock);
+    verify(fileObjectMock, parentFolderMock, childFolderMock);
   }
 
   @Test
   public void testCreateFolder_FolderCreatedSuccessfully() throws FileSystemException, URISyntaxException {
-    expect(fileObjectMock.exists()).andReturn(false).atLeastOnce();
+    expect(fileObjectMock.getType()).andReturn(FileType.FOLDER).atLeastOnce();
+    expect(fileObjectMock.exists()).andReturn(true).atLeastOnce();
+    FileObject childFolderMock = createMock(FileObject.class);
+    expect(childFolderMock.exists()).andReturn(false).atLeastOnce();
+    childFolderMock.createFolder();
     FileObject parentFolderMock = createMock(FileObject.class);
-    expect(fileObjectMock.getParent()).andReturn(parentFolderMock).atLeastOnce();
+    expect(childFolderMock.getParent()).andReturn(parentFolderMock).atLeastOnce();
     expect(parentFolderMock.isWriteable()).andReturn(true).atLeastOnce();
-    UriInfo uriInfoMock = createMock(UriInfo.class);
-    expect(uriInfoMock.getAbsolutePath()).andReturn(new URI("path"));
-    fileObjectMock.createFolder();
+    expect(fileObjectMock.resolveFile("folder")).andReturn(childFolderMock).atLeastOnce();
+    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromPath("/"));
 
-    replay(fileObjectMock, uriInfoMock, parentFolderMock);
+    replay(fileObjectMock, uriInfoMock, parentFolderMock, childFolderMock);
 
-    Response response = getFileResource().createFolder("path", uriInfoMock);
+    Response response = getFileResource().createFolder("folder1", "folder", uriInfoMock);
     Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
-    verify(fileObjectMock, uriInfoMock, fileObjectMock);
+    verify(fileObjectMock, uriInfoMock, parentFolderMock, childFolderMock);
   }
 
   @Test
