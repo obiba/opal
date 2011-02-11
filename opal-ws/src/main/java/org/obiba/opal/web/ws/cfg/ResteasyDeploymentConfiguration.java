@@ -11,6 +11,8 @@ package org.obiba.opal.web.ws.cfg;
 
 import java.net.URL;
 
+import javax.ws.rs.ext.ExceptionMapper;
+
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
 import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.plugins.server.servlet.ConfigurationBootstrap;
@@ -95,6 +97,10 @@ public class ResteasyDeploymentConfiguration {
         if(PostProcessInterceptor.class.isAssignableFrom(beanClass)) {
           log.info("Registring bean '{}' as post-process interceptor.", beanName);
           dispatcher.getProviderFactory().getServerPostProcessInterceptorRegistry().register((PostProcessInterceptor) bean);
+        }
+        if(ExceptionMapper.class.isAssignableFrom(beanClass)) {
+          log.info("Registring bean '{}' as exception mapper.", beanName);
+          dispatcher.getProviderFactory().addExceptionMapper((ExceptionMapper<?>) bean);
         }
       }
       return bean;

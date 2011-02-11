@@ -92,28 +92,6 @@ public class SecurityInterceptor extends AbstractSecurityComponent implements Pr
     }
   }
 
-  private boolean isUserAuthenticated() {
-    return SecurityUtils.getSubject().isAuthenticated();
-  }
-
-  /**
-   * Returns true when resource method or class is annotated with {@link NotAuthenticated}, false otherwise.
-   * @param method
-   * @return
-   */
-  private boolean isWebServicePublic(ResourceMethod method) {
-    return method.getMethod().isAnnotationPresent(NotAuthenticated.class) || method.getResourceClass().isAnnotationPresent(NotAuthenticated.class);
-  }
-
-  /**
-   * Returns true when resource method or class is annotated with {@link AuthenticatedByCookie}, false otherwise.
-   * @param method
-   * @return
-   */
-  private boolean isWebServiceAuthenticatedByCookie(ResourceMethod method) {
-    return method.getMethod().isAnnotationPresent(AuthenticatedByCookie.class) || method.getResourceClass().isAnnotationPresent(AuthenticatedByCookie.class);
-  }
-
   private boolean isOpalCookieValid(HttpRequest request) {
     Cookie cookie = request.getHttpHeaders().getCookies().get(OPAL_SESSION_ID_COOKIE_NAME);
     if(cookie != null) {

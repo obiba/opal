@@ -41,6 +41,10 @@
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
     </dependency>
     <dependency>
@@ -83,7 +87,7 @@
   </repositories>
 
   <properties>
-    <resteasy.version>2.1-beta-1</resteasy.version>
+    <resteasy.version>2.1.0.GA</resteasy.version>
     <jetty.version>7.0.2.v20100331</jetty.version>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
     <protobuf.version>2.3.0</protobuf.version>
