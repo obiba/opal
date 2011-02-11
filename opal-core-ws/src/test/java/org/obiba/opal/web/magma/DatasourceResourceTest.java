@@ -20,6 +20,8 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Locale;
 
@@ -362,7 +364,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
   }
 
   @Test
-  public void testCreateView_AddsViewByDelegatingToViewManager() {
+  public void testCreateView_AddsViewByDelegatingToViewManager() throws URISyntaxException {
     // Setup
     String mockDatasourceName = "mockDatasource";
     String viewName = "viewToAdd";
@@ -387,20 +389,23 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     OpalRuntime mockOpalRuntime = createMock(OpalRuntime.class);
     expect(mockOpalRuntime.getViewManager()).andReturn(mockViewManager).atLeastOnce();
 
+    UriInfo uriInfoMock = createMock(UriInfo.class);
+    expect(uriInfoMock.getBaseUri()).andReturn(new URI("http://localhost:8080/ws")).atLeastOnce();
+
     DatasourceResource sut = createDatasourceResource(mockDatasourceName, mockDatasource, mockOpalRuntime);
 
-    replay(mockDatasource, mockFromTable, mockViewManager, mockOpalRuntime);
+    replay(mockDatasource, mockFromTable, mockViewManager, mockOpalRuntime, uriInfoMock);
 
     // Exercise
     MagmaEngine.get().addDatasource(mockDatasource);
-    Response response = sut.createView(viewDto);
+    Response response = sut.createView(viewDto, uriInfoMock);
     MagmaEngine.get().removeDatasource(mockDatasource);
 
     // Verify state
     assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
 
     // Verify behaviour
-    verify(mockViewManager);
+    verify(mockViewManager, uriInfoMock);
 
   }
 

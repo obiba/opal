@@ -11,6 +11,7 @@ package org.obiba.opal.web.magma;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -21,7 +22,6 @@ import javax.annotation.PreDestroy;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -37,9 +37,6 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.ValueTableWriter.VariableWriter;
-import org.obiba.magma.Variable;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
@@ -159,27 +156,6 @@ public class DatasourceResource {
     return getTableResource(getDatasource().getValueTable(table));
   }
 
-  @PUT
-  @Path("/table/{table}")
-  public Response createTable(@Context UriInfo uri, @PathParam("table") String table, List<Variable> variables) throws IOException {
-    Datasource ds = getDatasource();
-    if(ds.hasValueTable(table)) {
-      throw new IllegalStateException("");
-    }
-
-    ValueTableWriter writer = ds.createWriter(table, variables.iterator().next().getEntityType());
-    try {
-      VariableWriter vw = writer.writeVariables();
-      for(Variable v : variables) {
-        vw.writeVariable(v);
-      }
-      vw.close();
-    } finally {
-      writer.close();
-    }
-    return Response.created(uri.getAbsolutePath()).build();
-  }
-
   @Path("/tables")
   public TablesResource getTables() {
     return new TablesResource(getDatasource());
@@ -206,7 +182,7 @@ public class DatasourceResource {
 
   @POST
   @Path("/views")
-  public Response createView(ViewDto viewDto) {
+  public Response createView(ViewDto viewDto, @Context UriInfo uriInfo) {
     if(!viewDto.hasName()) return Response.status(Status.BAD_REQUEST).build();
 
     if(datasourceHasTable(viewDto.getName())) {
@@ -214,7 +190,10 @@ public class DatasourceResource {
     }
     opalRuntime.getViewManager().addView(getDatasource().getName(), viewDtos.fromDto(viewDto));
 
-    return Response.created(UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getView").build(name, viewDto.getName())).build();
+    URI viewUri = UriBuilder.fromUri(uriInfo.getBaseUri().toString()).path(DatasourceResource.class).path(DatasourceResource.class, "getView").build(name, viewDto.getName());
+    URI tableUri = UriBuilder.fromUri(uriInfo.getBaseUri().toString()).path(DatasourceResource.class).path(DatasourceResource.class, "getTable").build(name, viewDto.getName());
+
+    return Response.created(viewUri).header("X-Alt-Location", tableUri).build();
   }
 
   @Path("/view/{viewName}")
