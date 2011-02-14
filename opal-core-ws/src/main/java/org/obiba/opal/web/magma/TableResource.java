@@ -32,9 +32,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Response.Status;
 
 import org.mozilla.javascript.Scriptable;
 import org.obiba.core.util.StreamUtil;
@@ -42,11 +42,11 @@ import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
-import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.JavascriptValueSource;
 import org.obiba.magma.js.JavascriptVariableBuilder;
@@ -71,8 +71,8 @@ import org.obiba.opal.web.model.Magma.VariableEntityDto;
 import org.obiba.opal.web.model.Opal.LocaleDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -81,6 +81,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
+@Component
+@Scope("prototype")
 public class TableResource extends AbstractValueTableResource {
 
   public TableResource(ValueTable valueTable, Set<Locale> locales) {
@@ -347,13 +349,10 @@ public class TableResource extends AbstractValueTableResource {
     }
   }
 
-  @Bean
-  @Scope("request")
   public VariableResource getVariableResource(VariableValueSource source) {
     return new VariableResource(this.getValueTable(), source);
   }
 
-  @Bean
   @Path("/compare")
   public CompareResource getTableCompare() {
     return new CompareResource(getValueTable());

@@ -15,6 +15,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.text.IniRealm;
@@ -32,6 +33,7 @@ public class OpalSecurityManager extends DefaultSecurityManager {
   public OpalSecurityManager(Set<Realm> securityRealms, Set<SessionListener> sessionListeners) {
     super(ImmutableList.<Realm> builder().add(new IniRealm(System.getProperty("OPAL_HOME") + "/conf/shiro.ini")).addAll(securityRealms).build());
     ((DefaultSessionManager) getSessionManager()).setSessionListeners(sessionListeners);
+    super.setCacheManager(new MemoryConstrainedCacheManager());
   }
 
   @PostConstruct

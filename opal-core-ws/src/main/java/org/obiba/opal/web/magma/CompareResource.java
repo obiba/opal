@@ -30,11 +30,9 @@ import org.obiba.opal.web.model.Magma.ConflictDto;
 import org.obiba.opal.web.model.Magma.DatasourceCompareDto;
 import org.obiba.opal.web.model.Magma.TableCompareDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
-import org.springframework.stereotype.Component;
 
 import com.google.common.annotations.VisibleForTesting;
 
-@Component
 public class CompareResource {
   //
   // Constants

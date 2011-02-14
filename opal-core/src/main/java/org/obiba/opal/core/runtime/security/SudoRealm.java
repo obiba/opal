@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.core.runtime.security;
 
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -27,7 +26,6 @@ public class SudoRealm extends AuthorizingRealm {
 
   public SudoRealm() {
     super();
-    super.setName("sudo-realm");
     // We don't care
     super.setCredentialsMatcher(null);
   }

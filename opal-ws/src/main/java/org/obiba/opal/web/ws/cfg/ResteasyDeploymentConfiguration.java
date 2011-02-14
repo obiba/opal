@@ -98,10 +98,10 @@ public class ResteasyDeploymentConfiguration {
           log.info("Registring bean '{}' as post-process interceptor.", beanName);
           dispatcher.getProviderFactory().getServerPostProcessInterceptorRegistry().register((PostProcessInterceptor) bean);
         }
-        if(ExceptionMapper.class.isAssignableFrom(beanClass)) {
-          log.info("Registring bean '{}' as exception mapper.", beanName);
-          dispatcher.getProviderFactory().addExceptionMapper((ExceptionMapper<?>) bean);
-        }
+      }
+      if(ExceptionMapper.class.isAssignableFrom(beanClass)) {
+        log.info("Registring bean '{}' as exception mapper.", beanName);
+        dispatcher.getProviderFactory().addExceptionMapper((ExceptionMapper<?>) bean);
       }
       return bean;
     }

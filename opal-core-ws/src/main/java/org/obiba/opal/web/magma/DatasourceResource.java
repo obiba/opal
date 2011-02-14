@@ -49,7 +49,6 @@ import org.obiba.opal.web.model.Opal.LocaleDto;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -161,21 +160,15 @@ public class DatasourceResource {
     return new TablesResource(getDatasource());
   }
 
-  @Bean
-  @Scope("request")
   public TableResource getTableResource(ValueTable table) {
     return new TableResource(table, getLocales());
   }
 
-  @Bean
-  @Scope("request")
   public ViewResource getViewResource(View view) {
     return new ViewResource(opalRuntime, view, viewDtos, getLocales());
   }
 
   @Path("/compare")
-  @Bean
-  @Scope("request")
   public CompareResource getTableCompare() {
     return new CompareResource(getDatasource());
   }

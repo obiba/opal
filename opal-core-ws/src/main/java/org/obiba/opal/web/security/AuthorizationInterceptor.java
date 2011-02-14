@@ -11,48 +11,40 @@ package org.obiba.opal.web.security;
 
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ExceptionMapper;
 
 import org.apache.shiro.mgt.SessionsSecurityManager;
-import org.jboss.resteasy.annotations.interception.Precedence;
-import org.jboss.resteasy.annotations.interception.ServerInterceptor;
 import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.DefaultOptionsMethodException;
-import org.jboss.resteasy.spi.Failure;
 import org.jboss.resteasy.spi.HttpRequest;
-import org.jboss.resteasy.spi.interception.PostProcessInterceptor;
-import org.jboss.resteasy.spi.interception.PreProcessInterceptor;
 import org.jboss.resteasy.util.IsHttpMethod;
 import org.obiba.opal.core.service.SubjectAclService;
 import org.obiba.opal.web.ws.inject.RequestAttributesProvider;
+import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestAttributes;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 @Component
-@ServerInterceptor
-@Precedence("HEADER_DECORATOR")
-public class AuthorizationInterceptor extends AbstractSecurityComponent implements PreProcessInterceptor, PostProcessInterceptor, ExceptionMapper<DefaultOptionsMethodException> {
+public class AuthorizationInterceptor extends AbstractSecurityComponent implements RequestCyclePostProcess, ExceptionMapper<DefaultOptionsMethodException> {
 
   private static final Logger log = LoggerFactory.getLogger(AuthorizationInterceptor.class);
-
-  private static final String OPAL_ALLOW_ATTR = "__OPAL_ALLOW__";
 
   private static final String ALLOW_HTTP_HEADER = "Allow";
 
@@ -68,20 +60,15 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent implemen
   }
 
   @Override
-  public ServerResponse preProcess(HttpRequest request, ResourceMethod method) throws Failure, WebApplicationException {
+  public void postProces(HttpRequest request, ResourceMethod resourceMethod, ServerResponse response) {
     if(HttpMethod.GET.equals(request.getHttpMethod())) {
-      computeAllowHeader(request, method);
+      Set<String> allowed = allowed(request, resourceMethod);
+      if(allowed != null && allowed.size() > 0) {
+        response.getMetadata().add(ALLOW_HTTP_HEADER, asHeader(allowed));
+      }
     } else if(HttpMethod.DELETE.equals(request.getHttpMethod())) {
       // TODO: delete acl entries for the resource and all sub-resources
-    }
-    return null;
-  }
-
-  @Override
-  public void postProcess(ServerResponse response) {
-    Set<String> allow = (Set<String>) requestAttributeProvider.currentRequestAttributes().getAttribute(OPAL_ALLOW_ATTR, RequestAttributes.SCOPE_REQUEST);
-    if(allow != null) {
-      response.getMetadata().add(ALLOW_HTTP_HEADER, asHeader(allow));
+      subjectAclService.deleteNodePermissions("magma", request.getUri().getPath());
     }
 
     if(response.getStatus() == 201) {
@@ -90,11 +77,13 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent implemen
       if(resourceUri == null) {
         throw new IllegalStateException("Missing Location header in 201 response");
       }
+      List<?> altLocations = response.getMetadata().get("X-Alt-Location");
 
-      String resource = requestAttributeProvider.getResourcePath(resourceUri);
-      if(getSubject().isPermitted("magma:" + resource + ":*") == false) {
-        subjectAclService.addSubjectPermission("magma", resource, getSubject().getPrincipal().toString(), "*:*");
+      Iterable<URI> locations = ImmutableList.of(resourceUri);
+      if(altLocations != null) {
+        locations = Iterables.concat(locations, (List<URI>) altLocations);
       }
+      addPermission(locations);
     }
   }
 
@@ -108,6 +97,15 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent implemen
     return allow(allowed(uri.getPath(), ImmutableSet.of(availableMethods.split(", "))));
   }
 
+  private void addPermission(Iterable<URI> resourceUris) {
+    for(URI resourceUri : resourceUris) {
+      String resource = requestAttributeProvider.getResourcePath(resourceUri);
+      if(getSubject().isPermitted("magma:" + resource + ":*") == false) {
+        subjectAclService.addSubjectPermission("magma", resource, getSubject().getPrincipal().toString(), "*:GET/*");
+      }
+    }
+  }
+
   private Response allow(Set<String> allowed) {
     return Response.ok().header(ALLOW_HTTP_HEADER, asHeader(allowed)).build();
   }
@@ -119,11 +117,6 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent implemen
       sb.append(s);
     }
     return sb.toString();
-  }
-
-  private void computeAllowHeader(HttpRequest request, ResourceMethod method) {
-    Set<String> allowed = allowed(request, method);
-    requestAttributeProvider.currentRequestAttributes().setAttribute(OPAL_ALLOW_ATTR, allowed, RequestAttributes.SCOPE_REQUEST);
   }
 
   private Set<String> allowed(final String uri, Set<String> availableMethods) {
@@ -165,11 +158,6 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent implemen
     return path != null ? path.value() : "";
   }
 
-  /**
-   * @param otherMethod
-   * @param path
-   * @return
-   */
   private boolean isSamePath(Method otherMethod, String path) {
     return path.equals(getPath(otherMethod));
   }

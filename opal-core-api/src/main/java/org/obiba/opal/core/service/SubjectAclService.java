@@ -11,6 +11,8 @@ package org.obiba.opal.core.service;
 
 public interface SubjectAclService {
 
+  void deleteNodePermissions(String domain, String node);
+
   void addSubjectPermissions(String domain, String node, String subject, Iterable<String> permissions);
 
   void addSubjectPermission(String domain, String node, String subject, String permission);

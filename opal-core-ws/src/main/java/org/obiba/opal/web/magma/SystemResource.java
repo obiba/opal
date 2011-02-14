@@ -20,14 +20,12 @@ import javax.ws.rs.Path;
 import org.obiba.opal.web.model.Opal.JdbcDriverDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  *
  */
 @Component
-@Scope("request")
 @Path("/system")
 public class SystemResource {
   //
