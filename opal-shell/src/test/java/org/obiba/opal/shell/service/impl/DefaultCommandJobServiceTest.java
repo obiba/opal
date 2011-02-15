@@ -24,11 +24,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executor;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
+import org.easymock.Capture;
 import org.easymock.EasyMock;
+import org.easymock.IAnswer;
 import org.easymock.IArgumentMatcher;
 import org.junit.Before;
 import org.junit.Test;
-import org.obiba.magma.audit.UserProvider;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.OpalShell;
 import org.obiba.opal.shell.commands.Command;
@@ -47,7 +51,7 @@ public class DefaultCommandJobServiceTest {
 
   private Executor mockExecutor;
 
-  private UserProvider mockUserProvider;
+  private Subject mockSubject;
 
   private CommandJob commandJob;
 
@@ -66,14 +70,31 @@ public class DefaultCommandJobServiceTest {
     expectLastCall().once();
     commandJob = new CommandJob(cmd);
 
+    mockSubject = createMock(Subject.class);
+
+    final Capture<Runnable> c = new Capture<Runnable>();
+    expect(mockSubject.associateWith(EasyMock.capture(c))).andAnswer(new IAnswer<Runnable>() {
+
+      @Override
+      public Runnable answer() throws Throwable {
+        return c.getValue();
+      }
+
+    }).anyTimes();
+
+    expect(mockSubject.getPrincipal()).andReturn("testUser").anyTimes();
+
+    ThreadContext.bind(mockSubject);
+    replay(mockSubject);
+
     // Expect commandJob executed once.
     mockExecutor = createMock(Executor.class);
-    mockExecutor.execute(eqFutureCommandJob(new FutureCommandJob(commandJob)));
+    mockExecutor.execute(eqFutureCommandJob(new FutureCommandJob(mockSubject, commandJob)));
     expectLastCall().once();
 
     // Expect current user is "testUser".
-    mockUserProvider = createMock(UserProvider.class);
-    expect(mockUserProvider.getUsername()).andReturn("testUser").atLeastOnce();
+    // mockUserProvider = createMock(UserProvider.class);
+    // expect(mockUserProvider.getUsername()).andReturn("testUser").atLeastOnce();
 
     sut = new DefaultCommandJobService() {
       protected List<FutureCommandJob> getFutureCommandJobs() {
@@ -85,9 +106,8 @@ public class DefaultCommandJobServiceTest {
       }
     };
     sut.setExecutor(mockExecutor);
-    sut.setUserProvider(mockUserProvider);
 
-    replay(cmd, mockExecutor, mockUserProvider);
+    replay(cmd, mockExecutor);
   }
 
   //
@@ -167,7 +187,7 @@ public class DefaultCommandJobServiceTest {
 
     verify(mockExecutor);
 
-    assertEquals("testUser", commandJob.getOwner());
+    assertEquals(SecurityUtils.getSubject().getPrincipal().toString(), commandJob.getOwner());
   }
 
   @Test
@@ -181,9 +201,9 @@ public class DefaultCommandJobServiceTest {
   public void testGetHistory_ReturnsAllJobsInReverseOrderOfSubmission() {
     // Test-specific setup
     futureCommandJobs = new ArrayList<FutureCommandJob>();
-    futureCommandJobs.add(new FutureCommandJob(createCommandJob(1, new Date(1), null)));
-    futureCommandJobs.add(new FutureCommandJob(createCommandJob(2, new Date(2), null)));
-    futureCommandJobs.add(new FutureCommandJob(createCommandJob(3, new Date(3), null)));
+    futureCommandJobs.add(new FutureCommandJob(mockSubject, createCommandJob(1, new Date(1), null)));
+    futureCommandJobs.add(new FutureCommandJob(mockSubject, createCommandJob(2, new Date(2), null)));
+    futureCommandJobs.add(new FutureCommandJob(mockSubject, createCommandJob(3, new Date(3), null)));
 
     // Exercise
     List<CommandJob> history = sut.getHistory();
@@ -255,9 +275,9 @@ public class DefaultCommandJobServiceTest {
     // Test-specific setup
 
     // Create some completed/terminated commands -- these SHOULD be deleted.
-    FutureCommandJob succeededJob = new FutureCommandJob(createCommandJob(1, new Date(1), Status.SUCCEEDED));
-    FutureCommandJob failedJob = new FutureCommandJob(createCommandJob(1, new Date(1), Status.FAILED));
-    FutureCommandJob cancelledJob = new FutureCommandJob(createCommandJob(1, new Date(1), Status.CANCELED));
+    FutureCommandJob succeededJob = new FutureCommandJob(mockSubject, createCommandJob(1, new Date(1), Status.SUCCEEDED));
+    FutureCommandJob failedJob = new FutureCommandJob(mockSubject, createCommandJob(1, new Date(1), Status.FAILED));
+    FutureCommandJob cancelledJob = new FutureCommandJob(mockSubject, createCommandJob(1, new Date(1), Status.CANCELED));
 
     // Put them in the list of future command jobs.
     futureCommandJobs = new ArrayList<FutureCommandJob>();
@@ -381,12 +401,12 @@ public class DefaultCommandJobServiceTest {
 
   private void initCommandJob(Status status) {
     commandJob.setId(1);
-    commandJob.setOwner("testUser");
+    // commandJob.setOwner("testUser");
     commandJob.setSubmitTime(new Date());
     commandJob.setStatus(status);
 
     futureCommandJobs = new ArrayList<FutureCommandJob>();
-    futureCommandJobs.add(new FutureCommandJob(commandJob));
+    futureCommandJobs.add(new FutureCommandJob(mockSubject, commandJob));
   }
 
   //

@@ -18,6 +18,9 @@ import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.easymock.EasyMock;
 import org.easymock.IArgumentMatcher;
 import org.junit.Test;
@@ -45,7 +48,11 @@ public class QuartzCommandSchedulerServiceImplTest {
     schedulerMock.addJob(eqJobDetail(expectedJobDetail), eq(true));
     expectLastCall().once();
 
-    replay(schedulerMock);
+    Subject mockSubject = createMock(Subject.class);
+    ThreadContext.bind(mockSubject);
+    expect(mockSubject.getPrincipals()).andReturn(createMock(PrincipalCollection.class)).anyTimes();
+
+    replay(schedulerMock, mockSubject);
 
     // Exercise
     QuartzCommandSchedulerServiceImpl sut = new QuartzCommandSchedulerServiceImpl(schedulerMock);

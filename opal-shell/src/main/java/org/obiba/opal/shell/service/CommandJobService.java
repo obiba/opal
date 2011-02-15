@@ -11,6 +11,7 @@ package org.obiba.opal.shell.service;
 
 import java.util.List;
 
+import org.apache.shiro.subject.Subject;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.shell.CommandJob;
 
@@ -26,7 +27,7 @@ public interface CommandJobService extends Service {
    * @param the command job's owner
    * @return the command job's id
    */
-  public Integer launchCommand(CommandJob commandJob, String owner);
+  public Integer launchCommand(CommandJob commandJob, Subject owner);
 
   /**
    * Assigns an id to a command job and submits it for asynchronous execution.

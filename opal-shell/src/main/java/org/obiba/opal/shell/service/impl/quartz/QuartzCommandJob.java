@@ -11,11 +11,15 @@ package org.obiba.opal.shell.service.impl.quartz;
 
 import java.util.Arrays;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.Subject;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.CommandLines;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.service.CommandJobService;
+import org.obiba.opal.web.shell.security.BackgroundJobServiceAuthToken;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -52,7 +56,7 @@ public class QuartzCommandJob implements Job {
     autowireSelf(context);
 
     CommandJob commandJob = new CommandJob(getCommand(context));
-    commandJobService.launchCommand(commandJob, "System");
+    commandJobService.launchCommand(commandJob, getSubject(context));
   }
 
   //
@@ -67,6 +71,15 @@ public class QuartzCommandJob implements Job {
       throw new JobExecutionException("applicationContext lookup failed", ex);
     }
     applicationContext.getAutowireCapableBeanFactory().autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_NO, false);
+  }
+
+  private Subject getSubject(JobExecutionContext context) {
+    PrincipalCollection principals = (PrincipalCollection) context.getJobDetail().getJobDataMap().get("subject");
+    if(principals == null) {
+      // Login as background job user
+      principals = SecurityUtils.getSecurityManager().authenticate(new BackgroundJobServiceAuthToken()).getPrincipals();
+    }
+    return new Subject.Builder().principals(principals).authenticated(true).buildSubject();
   }
 
   private Command<?> getCommand(JobExecutionContext context) throws JobExecutionException {

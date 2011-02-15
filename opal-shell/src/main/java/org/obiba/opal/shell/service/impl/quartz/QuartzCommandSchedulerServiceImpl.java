@@ -11,6 +11,7 @@ package org.obiba.opal.shell.service.impl.quartz;
 
 import java.text.ParseException;
 
+import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.service.CommandSchedulerService;
 import org.obiba.opal.shell.service.CommandSchedulerServiceException;
@@ -50,6 +51,7 @@ public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerServic
     JobDetail jobDetail = new JobDetail(name, group, QuartzCommandJob.class);
     jobDetail.setDurability(true); // OPAL-917
     jobDetail.getJobDataMap().put("command", command.toString());
+    jobDetail.getJobDataMap().put("subject", SecurityUtils.getSubject().getPrincipals());
 
     try {
       scheduler.addJob(jobDetail, true);

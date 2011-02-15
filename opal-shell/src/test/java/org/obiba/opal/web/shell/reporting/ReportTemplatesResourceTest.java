@@ -20,11 +20,9 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 
 import junit.framework.Assert;
 
-import org.jboss.resteasy.specimpl.UriBuilderImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.cfg.OpalConfiguration;
@@ -94,8 +92,6 @@ public class ReportTemplatesResourceTest {
 
   @Test
   public void testUpdateReportTemplate_NewReportTemplateCreated() {
-    UriInfo uriInfoMock = createMock(UriInfo.class);
-    expect(uriInfoMock.getAbsolutePath()).andReturn(UriBuilderImpl.fromUri(BASE_URI).build("")).atLeastOnce();
 
     opalRuntimeMock.writeOpalConfiguration();
     expectLastCall().once();
@@ -110,15 +106,15 @@ public class ReportTemplatesResourceTest {
 
     expect(commandRegistry.newCommand("report")).andReturn(commandMock);
 
-    replay(opalRuntimeMock, uriInfoMock, commandSchedulerServiceMock, commandRegistry);
+    replay(opalRuntimeMock, commandSchedulerServiceMock, commandRegistry);
 
     ReportTemplatesResource reportTemplatesResource = new ReportTemplatesResource(opalRuntimeMock, commandSchedulerServiceMock, commandRegistry);
-    Response response = reportTemplatesResource.createReportTemplate(uriInfoMock, Dtos.asDto(getReportTemplate("template9")));
+    Response response = reportTemplatesResource.createReportTemplate(Dtos.asDto(getReportTemplate("template9")));
 
     Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-    Assert.assertEquals(BASE_URI, response.getMetadata().get("location").get(0).toString());
+    Assert.assertEquals("/report-template/template9", response.getMetadata().get("location").get(0).toString());
 
-    verify(opalRuntimeMock, uriInfoMock, commandSchedulerServiceMock, commandRegistry);
+    verify(opalRuntimeMock, commandSchedulerServiceMock, commandRegistry);
   }
 
   private ReportTemplate getReportTemplate(String name) {

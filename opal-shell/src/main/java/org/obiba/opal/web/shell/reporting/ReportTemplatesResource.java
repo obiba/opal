@@ -5,10 +5,9 @@ import java.util.Set;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.opal.core.cfg.ReportTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
@@ -55,7 +54,7 @@ public class ReportTemplatesResource extends AbstractReportTemplateResource {
   }
 
   @POST
-  public Response createReportTemplate(@Context UriInfo uriInfo, ReportTemplateDto reportTemplateDto) {
+  public Response createReportTemplate(ReportTemplateDto reportTemplateDto) {
     if(reportTemplateDto == null || reportTemplateDto.getName().length() == 0 || reportTemplateExists(reportTemplateDto.getName())) {
       return Response.status(Status.BAD_REQUEST).build();
     }
@@ -68,7 +67,7 @@ public class ReportTemplatesResource extends AbstractReportTemplateResource {
       return Response.status(Response.Status.BAD_REQUEST).entity(ClientErrorDto.newBuilder().setCode(Status.BAD_REQUEST.getStatusCode()).setStatus("CouldNotCreateReportTemplate").build()).build();
     }
 
-    return Response.created(uriInfo.getAbsolutePath()).build();
+    return Response.created(UriBuilder.fromResource(ReportTemplateResource.class).build(reportTemplateDto.getName())).build();
   }
 
   private void addCommand(final String name) {

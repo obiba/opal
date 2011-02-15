@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.runtime.security;
+package org.obiba.opal.web.shell.security;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -18,40 +18,38 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.obiba.magma.security.shiro.SudoAuthToken;
-import org.springframework.stereotype.Component;
 
-@Component
-public class SudoRealm extends AuthorizingRealm {
+public class BackgroundJobRealm extends AuthorizingRealm {
 
-  public SudoRealm() {
+  public BackgroundJobRealm() {
     super();
     super.setCredentialsMatcher(new AllowAllCredentialsMatcher());
   }
 
   @Override
   public boolean supports(AuthenticationToken token) {
-    return token instanceof SudoAuthToken;
+    return token instanceof BackgroundJobServiceAuthToken;
   }
 
   @Override
   protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-    SudoAuthToken sudoToken = (SudoAuthToken) token;
-    // TODO: test some kind of permission to conditionally accept the sudo request:
-    // SecurityUtils.getSecurityManager().isPermitted(sudoToken.getSudoer(), "sudo")
-    return new SimpleAccount(new SudoPrincipal(), null, getName());
+    BackgroundJobServiceAuthToken jobToken = (BackgroundJobServiceAuthToken) token;
+    return new SimpleAccount(new SystemPrincipal(), null, getName());
   }
 
   @Override
   protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
     SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-    if(principals.oneByType(SudoPrincipal.class) != null) {
+    if(principals.oneByType(SystemPrincipal.class) != null) {
       info.addStringPermission("*");
     }
     return info;
   }
 
-  private static class SudoPrincipal {
-
+  private static class SystemPrincipal {
+    @Override
+    public String toString() {
+      return "opal/system";
+    }
   }
 }

@@ -21,15 +21,16 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.obiba.magma.audit.UserProvider;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.service.CommandJobService;
 import org.obiba.opal.shell.service.NoSuchCommandJobException;
 import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -47,16 +48,11 @@ public class DefaultCommandJobService implements CommandJobService {
   // Instance Variables
   //
 
-  @Autowired
-  private UserProvider userProvider;
-
   private Executor executor;
 
   private boolean isRunning;
 
-  private int lastJobId;
-
-  private Object jobIdLock;
+  private AtomicInteger lastJobId;
 
   /**
    * Jobs submitted for execution, but not yet executed.
@@ -83,7 +79,7 @@ public class DefaultCommandJobService implements CommandJobService {
   //
 
   public DefaultCommandJobService() {
-    jobIdLock = new Object();
+    lastJobId = new AtomicInteger();
     jobComparator = new CommandJobComparator();
 
     jobsNotStarted = new LinkedBlockingQueue<Runnable>(); // thread-safe
@@ -113,21 +109,19 @@ public class DefaultCommandJobService implements CommandJobService {
   // CommandJobService Methods
   //
 
-  public Integer launchCommand(CommandJob commandJob, String owner) {
-    Integer id = nextJobId();
-
-    commandJob.setId(id);
-    commandJob.setOwner(owner);
+  public Integer launchCommand(CommandJob commandJob, Subject owner) {
+    commandJob.setId(nextJobId());
+    commandJob.setOwner(owner.getPrincipal().toString());
     commandJob.setSubmitTime(getCurrentTime());
 
-    FutureCommandJob futureCommandJob = new FutureCommandJob(commandJob);
+    FutureCommandJob futureCommandJob = new FutureCommandJob(owner, commandJob);
     executor.execute(futureCommandJob);
 
-    return id;
+    return commandJob.getId();
   }
 
   public Integer launchCommand(CommandJob commandJob) {
-    return launchCommand(commandJob, userProvider.getUsername());
+    return launchCommand(commandJob, SecurityUtils.getSubject());
   }
 
   public CommandJob getCommand(Integer id) {
@@ -198,10 +192,6 @@ public class DefaultCommandJobService implements CommandJobService {
     this.executor = executor;
   }
 
-  public void setUserProvider(UserProvider userProvider) {
-    this.userProvider = userProvider;
-  }
-
   protected Executor createExecutor() {
     return new ThreadPoolExecutor(10, 10, 0, TimeUnit.MILLISECONDS, jobsNotStarted) {
       @Override
@@ -230,9 +220,7 @@ public class DefaultCommandJobService implements CommandJobService {
    * @return an id for a {@link CommandJob}
    */
   protected Integer nextJobId() {
-    synchronized(jobIdLock) {
-      return ++lastJobId;
-    }
+    return lastJobId.incrementAndGet();
   }
 
   protected Date getCurrentTime() {
@@ -294,8 +282,8 @@ public class DefaultCommandJobService implements CommandJobService {
 
     private CommandJob commandJob;
 
-    public FutureCommandJob(CommandJob commandJob) {
-      super(commandJob, null);
+    public FutureCommandJob(Subject subject, CommandJob commandJob) {
+      super(subject.associateWith(commandJob), null);
 
       this.commandJob = commandJob;
     }
