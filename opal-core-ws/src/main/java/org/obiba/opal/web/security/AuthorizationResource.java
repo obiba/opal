@@ -9,24 +9,27 @@
  ******************************************************************************/
 package org.obiba.opal.web.security;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 
 import org.obiba.opal.core.service.SubjectAclService;
+import org.obiba.opal.core.service.SubjectAclService.Permissions;
+import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.model.Opal.Acl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+
 @Component
 @Scope("request")
-@Path("/{resource:.*}/authz")
+@Path("/authz/{resource:.*}")
 public class AuthorizationResource {
 
   private final SubjectAclService subjectAclService;
@@ -40,20 +43,34 @@ public class AuthorizationResource {
   }
 
   @GET
-  @Produces("text/plain")
-  public Response get(@Context UriInfo uriInfo) {
-    return Response.ok(subjectAclService.getNodePermissions("magma", getNode(uriInfo))).build();
+  public Iterable<Opal.Acl> get() {
+    return Iterables.transform(subjectAclService.getNodePermissions("magma", getNode()), PermissionsToAclFunction.INSTANCE);
   }
 
   @PUT
-  @Produces("text/plain")
-  public Response add(@Context UriInfo uriInfo, @QueryParam("subject") String subject, @QueryParam("perm") String permission) {
-    subjectAclService.addSubjectPermission("magma", getNode(uriInfo), subject, permission);
-    return Response.created(uriInfo.getRequestUri()).build();
+  public Opal.Acl add(@QueryParam("subject") String subject, @QueryParam("perm") String permission) {
+    subjectAclService.addSubjectPermission("magma", getNode(), subject, permission);
+    return PermissionsToAclFunction.INSTANCE.apply(subjectAclService.getSubjectPermissions("magma", getNode(), subject));
   }
 
-  private String getNode(UriInfo uriInfo) {
+  @DELETE
+  public Opal.Acl delete(@QueryParam("subject") String subject) {
+    subjectAclService.deleteSubjectPermissions("magma", getNode(), subject);
+    return PermissionsToAclFunction.INSTANCE.apply(subjectAclService.getSubjectPermissions("magma", getNode(), subject));
+  }
+
+  private String getNode() {
     return '/' + resource;
   }
 
+  private static class PermissionsToAclFunction implements Function<Permissions, Opal.Acl> {
+
+    private static final PermissionsToAclFunction INSTANCE = new PermissionsToAclFunction();
+
+    @Override
+    public Acl apply(Permissions from) {
+      return Acl.newBuilder().setPrincipal(from.getSubject()).setResource(from.getNode()).addAllActions(from.getPermissions()).build();
+    }
+
+  }
 }

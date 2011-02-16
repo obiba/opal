@@ -74,3 +74,9 @@ message ParameterDto {
   required string key = 1;
   required string value = 2;
 }
+
+message Acl {
+  required string principal = 1;
+  required string resource = 2;
+  repeated string actions = 3;
+}

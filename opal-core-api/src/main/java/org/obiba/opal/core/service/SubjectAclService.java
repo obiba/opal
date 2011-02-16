@@ -11,21 +11,27 @@ package org.obiba.opal.core.service;
 
 public interface SubjectAclService {
 
+  void addListener(SubjectAclChangeCallback callback);
+
   void deleteNodePermissions(String domain, String node);
+
+  void deleteSubjectPermissions(String domain, String node, String subject);
 
   void addSubjectPermissions(String domain, String node, String subject, Iterable<String> permissions);
 
   void addSubjectPermission(String domain, String node, String subject, String permission);
 
-  Iterable<SubjectPermission> getSubjectPermissions(String subject);
+  Iterable<Permissions> getSubjectPermissions(String subject);
 
-  Iterable<NodePermission> getNodePermissions(String domain, String node);
+  Permissions getSubjectPermissions(String domain, String node, String subject);
 
-  Iterable<String> getSubjectPermissions(String domain, String node, String subject);
+  Iterable<Permissions> getNodePermissions(String domain, String node);
 
-  public interface NodePermission {
+  public interface Permissions {
 
     String getDomain();
+
+    String getNode();
 
     String getSubject();
 
@@ -33,13 +39,7 @@ public interface SubjectAclService {
 
   }
 
-  public interface SubjectPermission {
-
-    String getDomain();
-
-    String getNode();
-
-    Iterable<String> getPermissions();
-
+  public interface SubjectAclChangeCallback {
+    public void onSubjectAclChanged(String subject);
   }
 }

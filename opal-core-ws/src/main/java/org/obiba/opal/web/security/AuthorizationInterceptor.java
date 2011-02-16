@@ -18,6 +18,7 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ExceptionMapper;
 
@@ -30,6 +31,7 @@ import org.jboss.resteasy.util.IsHttpMethod;
 import org.obiba.opal.core.service.SubjectAclService;
 import org.obiba.opal.web.ws.inject.RequestAttributesProvider;
 import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
+import org.obiba.opal.web.ws.intercept.RequestCyclePreProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +44,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 @Component
-public class AuthorizationInterceptor extends AbstractSecurityComponent implements RequestCyclePostProcess, ExceptionMapper<DefaultOptionsMethodException> {
+public class AuthorizationInterceptor extends AbstractSecurityComponent implements RequestCyclePreProcess, RequestCyclePostProcess, ExceptionMapper<DefaultOptionsMethodException> {
 
   private static final Logger log = LoggerFactory.getLogger(AuthorizationInterceptor.class);
 
@@ -60,14 +62,23 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent implemen
   }
 
   @Override
-  public void postProces(HttpRequest request, ResourceMethod resourceMethod, ServerResponse response) {
+  public Response preProcess(HttpRequest request, ResourceMethod resourceMethod) {
+    if(isWebServicePublic(resourceMethod) == false) {
+      if(getSubject().isPermitted("magma:" + request.getUri().getPath() + ":" + request.getHttpMethod()) == false) {
+        return Response.status(Status.FORBIDDEN).build();
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public void postProcess(HttpRequest request, ResourceMethod resourceMethod, ServerResponse response) {
     if(HttpMethod.GET.equals(request.getHttpMethod())) {
       Set<String> allowed = allowed(request, resourceMethod);
       if(allowed != null && allowed.size() > 0) {
         response.getMetadata().add(ALLOW_HTTP_HEADER, asHeader(allowed));
       }
     } else if(HttpMethod.DELETE.equals(request.getHttpMethod())) {
-      // TODO: delete acl entries for the resource and all sub-resources
       subjectAclService.deleteNodePermissions("magma", request.getUri().getPath());
     }
 
@@ -119,8 +130,15 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent implemen
     return sb.toString();
   }
 
+  /**
+   * Returns a {@code Set} of allowed HTTP methods on the provided resource URI. Note that this method always includes
+   * "OPTIONS" in the set.
+   * @param uri
+   * @param availableMethods
+   * @return
+   */
   private Set<String> allowed(final String uri, Set<String> availableMethods) {
-    return ImmutableSet.copyOf(Iterables.filter(availableMethods, new Predicate<String>() {
+    return ImmutableSet.copyOf(Iterables.concat(Iterables.filter(availableMethods, new Predicate<String>() {
 
       @Override
       public boolean apply(String from) {
@@ -130,7 +148,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent implemen
         return permitted;
       }
 
-    }));
+    }), ImmutableSet.of(HttpMethod.OPTIONS)));
   }
 
   private Set<String> allowed(final HttpRequest request, ResourceMethod method) {

@@ -12,6 +12,7 @@ package org.obiba.opal.web.ws.intercept;
 import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.annotations.interception.SecurityPrecedence;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
@@ -35,17 +36,28 @@ public class RequestCycleInterceptor implements PreProcessInterceptor, PostProce
 
   private final RequestAttributesProvider requestAttributesProvider;
 
+  private final Set<RequestCyclePreProcess> preProcesses;
+
   private final Set<RequestCyclePostProcess> postProcesses;
 
   @Autowired
-  public RequestCycleInterceptor(RequestAttributesProvider provider, Set<RequestCyclePostProcess> postProcesses) {
+  public RequestCycleInterceptor(RequestAttributesProvider provider, Set<RequestCyclePreProcess> preProcesses, Set<RequestCyclePostProcess> postProcesses) {
     this.requestAttributesProvider = provider;
+    this.preProcesses = preProcesses;
     this.postProcesses = postProcesses;
   }
 
   @Override
   public ServerResponse preProcess(HttpRequest request, ResourceMethod method) throws Failure, WebApplicationException {
     new RequestCycle(request, method);
+
+    for(RequestCyclePreProcess p : preProcesses) {
+      Response r = p.preProcess(request, method);
+      if(r != null) {
+        return ServerResponse.copyIfNotServerResponse(r);
+      }
+    }
+
     return null;
   }
 
@@ -54,7 +66,7 @@ public class RequestCycleInterceptor implements PreProcessInterceptor, PostProce
     RequestCycle cycle = getCurrentCycle();
     if(cycle != null) {
       for(RequestCyclePostProcess p : postProcesses) {
-        p.postProces(cycle.request, cycle.resourceMethod, response);
+        p.postProcess(cycle.request, cycle.resourceMethod, response);
       }
     }
   }

@@ -9,20 +9,29 @@
  ******************************************************************************/
 package org.obiba.opal.core.service.impl;
 
+import java.util.Set;
+
 import org.obiba.core.service.PersistenceManager;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.SubjectAclService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 
 @Component
 public class DefaultSubjectAclService implements SubjectAclService {
 
+  private static final Logger log = LoggerFactory.getLogger(DefaultSubjectAclService.class);
+
   private final PersistenceManager persistenceManager;
+
+  private final Set<SubjectAclChangeCallback> callbacks = Sets.newHashSet();
 
   @Autowired
   public DefaultSubjectAclService(@Qualifier("opal-data") PersistenceManager persistenceManager) {
@@ -30,10 +39,26 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
+  public void addListener(SubjectAclChangeCallback callback) {
+    callbacks.add(callback);
+  }
+
+  @Override
   public void deleteNodePermissions(String domain, String node) {
+    Set<String> subjects = Sets.newTreeSet();
     for(SubjectAcl acl : persistenceManager.match(new SubjectAcl(domain, node, null, null))) {
+      subjects.add(acl.getSubject());
       persistenceManager.delete(acl);
     }
+    notifyListeners(subjects);
+  }
+
+  @Override
+  public void deleteSubjectPermissions(String domain, String node, String subject) {
+    for(SubjectAcl acl : persistenceManager.match(new SubjectAcl(domain, node, subject, null))) {
+      persistenceManager.delete(acl);
+    }
+    notifyListeners(subject);
   }
 
   @Override
@@ -48,33 +73,52 @@ public class DefaultSubjectAclService implements SubjectAclService {
     if(subject == null) throw new IllegalArgumentException("subject cannot be null");
     if(permission == null) throw new IllegalArgumentException("permission cannot be null");
     persistenceManager.save(new SubjectAcl(domain, node, subject, permission));
+    notifyListeners(subject);
   }
 
   @Override
-  public Iterable<String> getSubjectPermissions(String domain, String node, String subject) {
+  public Permissions getSubjectPermissions(final String domain, final String node, final String subject) {
     if(node == null) throw new IllegalArgumentException("node cannot be null");
     if(subject == null) throw new IllegalArgumentException("subject cannot be null");
 
-    SubjectAcl template = new SubjectAcl(domain, node, subject, null);
-    return Iterables.transform(persistenceManager.match(template), new Function<SubjectAcl, String>() {
+    return new Permissions() {
 
       @Override
-      public String apply(SubjectAcl from) {
-        return from.getPermission();
+      public String getDomain() {
+        return domain;
       }
 
-    });
+      @Override
+      public String getNode() {
+        return node;
+      }
+
+      @Override
+      public String getSubject() {
+        return subject;
+      }
+
+      @Override
+      public Iterable<String> getPermissions() {
+        return mergePermissions(new SubjectAcl(domain, node, subject, null));
+      }
+    };
   }
 
   @Override
-  public Iterable<SubjectPermission> getSubjectPermissions(final String subject) {
+  public Iterable<Permissions> getSubjectPermissions(final String subject) {
 
     SubjectAcl template = new SubjectAcl(null, null, subject, null);
-    return Iterables.transform(persistenceManager.match(template), new Function<SubjectAcl, SubjectPermission>() {
+    return Iterables.transform(persistenceManager.match(template), new Function<SubjectAcl, Permissions>() {
 
       @Override
-      public SubjectPermission apply(final SubjectAcl from) {
-        return new SubjectPermission() {
+      public Permissions apply(final SubjectAcl from) {
+        return new Permissions() {
+
+          @Override
+          public String getSubject() {
+            return subject;
+          }
 
           @Override
           public String getDomain() {
@@ -88,7 +132,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
           @Override
           public Iterable<String> getPermissions() {
-            return getSubjectPermissions(from.getDomain(), from.getNode(), subject);
+            return mergePermissions(new SubjectAcl(from.getDomain(), getNode(), from.getSubject(), null));
           }
 
         };
@@ -98,18 +142,23 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public Iterable<NodePermission> getNodePermissions(final String domain, final String node) {
+  public Iterable<Permissions> getNodePermissions(final String domain, final String node) {
 
     SubjectAcl template = new SubjectAcl(domain, node, null, null);
-    return Iterables.transform(persistenceManager.match(template), new Function<SubjectAcl, NodePermission>() {
+    return Iterables.transform(persistenceManager.match(template), new Function<SubjectAcl, Permissions>() {
 
       @Override
-      public NodePermission apply(final SubjectAcl from) {
-        return new NodePermission() {
+      public Permissions apply(final SubjectAcl from) {
+        return new Permissions() {
+
+          @Override
+          public String getNode() {
+            return node;
+          }
 
           @Override
           public String getDomain() {
-            return from.getDomain();
+            return domain;
           }
 
           @Override
@@ -119,12 +168,46 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
           @Override
           public Iterable<String> getPermissions() {
-            return getSubjectPermissions(from.getDomain(), node, from.getSubject());
+            return mergePermissions(new SubjectAcl(from.getDomain(), node, from.getSubject(), null));
           }
 
         };
       }
 
     });
+  }
+
+  /**
+   * @param subjects
+   */
+  private void notifyListeners(Set<String> subjects) {
+    for(String s : subjects)
+      notifyListeners(s);
+  }
+
+  /**
+   * @param subject
+   */
+  private void notifyListeners(String subject) {
+    for(SubjectAclChangeCallback c : callbacks) {
+      try {
+        c.onSubjectAclChanged(subject);
+      } catch(Exception e) {
+        log.warn("Ignoring exception during ACL callback", e);
+      }
+    }
+  }
+
+  private Iterable<String> mergePermissions(SubjectAcl template) {
+
+    return Iterables.transform(persistenceManager.match(template), new Function<SubjectAcl, String>() {
+
+      @Override
+      public String apply(SubjectAcl from) {
+        return from.getPermission();
+      }
+
+    });
+
   }
 }
