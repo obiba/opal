@@ -386,6 +386,7 @@ public class VariableView extends Composite implements VariablePresenter.Display
 
   @Override
   public void setDerivedVariable(boolean derived, String value) {
+    tabs.setTabVisible(2, derived);
     notDerived.setVisible(!derived);
     noScript.setVisible(derived && value.length() == 0);
     script.setVisible(derived && value.length() > 0);

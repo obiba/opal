@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.event;
 
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.event.shared.EventHandler;
@@ -27,6 +28,8 @@ public class VariableSelectionChangeEvent extends GwtEvent<VariableSelectionChan
 
   private static Type<Handler> TYPE;
 
+  private final TableDto table;
+
   private final VariableDto selection;
 
   private final VariableDto previous;
@@ -36,15 +39,19 @@ public class VariableSelectionChangeEvent extends GwtEvent<VariableSelectionChan
   /**
    * @param selectedItem
    */
-  public VariableSelectionChangeEvent(VariableDto selectedItem) {
-    this(selectedItem, null, null);
-
+  public VariableSelectionChangeEvent(TableDto table, VariableDto selectedItem) {
+    this(table, selectedItem, null, null);
   }
 
-  public VariableSelectionChangeEvent(VariableDto selectedItem, VariableDto previous, VariableDto next) {
+  public VariableSelectionChangeEvent(TableDto table, VariableDto selectedItem, VariableDto previous, VariableDto next) {
+    this.table = table;
     this.selection = selectedItem;
     this.previous = previous;
     this.next = next;
+  }
+
+  public TableDto getTable() {
+    return table;
   }
 
   public VariableDto getSelection() {

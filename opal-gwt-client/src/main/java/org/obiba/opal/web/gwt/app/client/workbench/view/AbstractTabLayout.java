@@ -124,6 +124,15 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
     selectedIndex = -1;
   }
 
+  public void setTabVisible(int index, boolean visible) {
+    checkIndex(index);
+    if(index == selectedIndex) {
+      return;
+    }
+
+    items.get(index).setVisible(visible);
+  }
+
   private void checkIndex(int index) {
     assert (index >= 0) && (index < contents.size()) : "Index out of bounds";
   }

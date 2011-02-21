@@ -126,10 +126,12 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().authorize(getDisplay().getExportDataAuthorizer()).send();
     // copy data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().authorize(getDisplay().getCopyDataAuthorizer()).send();
-    // remove view
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/view/" + table.getName()).delete().authorize(getDisplay().getRemoveAuthorizer()).send();
-    // edit view
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/view/" + table.getName()).put().authorize(getDisplay().getEditAuthorizer()).send();
+    if(table.hasViewLink()) {
+      // remove view
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/view/" + table.getName()).delete().authorize(getDisplay().getRemoveAuthorizer()).send();
+      // edit view
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/view/" + table.getName()).put().authorize(getDisplay().getEditAuthorizer()).send();
+    }
   }
 
   private void updateDisplay(TableDto tableDto, String previous, String next) {
@@ -221,7 +223,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       for(int i = 0; i < variables.length(); i++) {
         if(variables.get(i).getName().equals(value)) {
           VariableDto selection = variables.get(i);
-          eventBus.fireEvent(new VariableSelectionChangeEvent(selection, getPreviousVariable(i), getNextVariable(i)));
+          eventBus.fireEvent(new VariableSelectionChangeEvent(table, selection, getPreviousVariable(i), getNextVariable(i)));
           getDisplay().setVariableSelection(selection, i);
           getDisplay().clearVariableSuggestion();
           break;
@@ -359,7 +361,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   class VariableNameFieldUpdater implements FieldUpdater<VariableDto, String> {
     @Override
     public void update(int index, VariableDto variableDto, String value) {
-      eventBus.fireEvent(new VariableSelectionChangeEvent(variableDto, getPreviousVariable(index), getNextVariable(index)));
+      eventBus.fireEvent(new VariableSelectionChangeEvent(table, variableDto, getPreviousVariable(index), getNextVariable(index)));
     }
   }
 
@@ -386,7 +388,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       siblingSelection = variables.get(siblingIndex);
 
       getDisplay().setVariableSelection(siblingSelection, siblingIndex);
-      eventBus.fireEvent(new VariableSelectionChangeEvent(siblingSelection, getPreviousVariable(siblingIndex), getNextVariable(siblingIndex)));
+      eventBus.fireEvent(new VariableSelectionChangeEvent(table, siblingSelection, getPreviousVariable(siblingIndex), getNextVariable(siblingIndex)));
     }
   }
 
