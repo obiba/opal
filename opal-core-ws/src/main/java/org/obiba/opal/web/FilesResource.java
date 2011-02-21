@@ -188,7 +188,7 @@ public class FilesResource {
   @Consumes("text/plain")
   public Response createFolder(@PathParam("path") String path, String folderName, @Context UriInfo uriInfo) throws FileSystemException {
     if(folderName == null || folderName.trim().length() == 0) return Response.status(Status.BAD_REQUEST).build();
-    folderName = folderName.trim();
+    String folderStr = folderName.trim();
 
     String folderPath = getPathOfFileToWrite(path);
     FileObject folder = resolveFileInFileSystem(folderPath);
@@ -199,7 +199,7 @@ public class FilesResource {
       return Response.status(Status.FORBIDDEN).entity("Not a folder: " + path).build();
     }
 
-    FileObject file = folder.resolveFile(folderName);
+    FileObject file = folder.resolveFile(folderStr);
     // Folder or file already exist at specified path.
     if(file.exists()) {
       return Response.status(Status.FORBIDDEN).entity("cannotCreateFolderPathAlreadyExist").build();
@@ -212,7 +212,7 @@ public class FilesResource {
 
     try {
       file.createFolder();
-      return Response.created(uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(folderName).build()).build();
+      return Response.created(uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(folderStr).build()).build();
     } catch(FileSystemException couldNotCreateTheFolder) {
       return Response.status(Status.INTERNAL_SERVER_ERROR).entity("cannotCreatefolderUnexpectedError").build();
     }
