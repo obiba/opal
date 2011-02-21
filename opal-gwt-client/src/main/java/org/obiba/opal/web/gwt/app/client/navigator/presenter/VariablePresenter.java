@@ -22,8 +22,11 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEve
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.SummaryRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -122,7 +125,32 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
           }
         }
       }
+
+      authorize();
     }
+  }
+
+  private void authorize() {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(variable.getLink() + "/summary").get().authorize(new CompositeAuthorizer(getDisplay().getSummaryAuthorizer(), new HasAuthorization() {
+
+      @Override
+      public void unauthorized() {
+
+      }
+
+      @Override
+      public void beforeAuthorization() {
+
+      }
+
+      @Override
+      public void authorized() {
+        requestSummary(variable);
+        if(getDisplay().isSummaryTabSelected()) {
+          summaryTabPresenter.refreshDisplay();
+        }
+      }
+    })).send();
   }
 
   private boolean isCurrentVariable(VariableDto variableDto) {
@@ -190,10 +218,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     @Override
     public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
       updateDisplay(event.getTable(), event.getSelection(), event.getPrevious(), event.getNext());
-      requestSummary(event.getSelection());
-      if(getDisplay().isSummaryTabSelected()) {
-        summaryTabPresenter.refreshDisplay();
-      }
+
     }
   }
 
@@ -236,5 +261,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     boolean isSummaryTabSelected();
 
     void setSummaryTabWidget(WidgetDisplay widget);
+
+    HasAuthorization getSummaryAuthorizer();
   }
 }

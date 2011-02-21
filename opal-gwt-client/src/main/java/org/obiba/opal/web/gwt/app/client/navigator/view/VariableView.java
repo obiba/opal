@@ -17,6 +17,8 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.prettify.client.PrettyPrintLabel;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.TabAuthorizer;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 
@@ -51,6 +53,8 @@ public class VariableView extends Composite implements VariablePresenter.Display
   private static final String DEFAULT_LOCALE_NAME = "default";
 
   private static final String LABEL_ATTRIBUTE_NAME = "label";
+
+  private static final Integer SCRIPT_TAB_INDEX = 2;
 
   private static final Integer SUMMARY_TAB_INDEX = 3;
 
@@ -386,11 +390,15 @@ public class VariableView extends Composite implements VariablePresenter.Display
 
   @Override
   public void setDerivedVariable(boolean derived, String value) {
-    tabs.setTabVisible(2, derived);
+    tabs.setTabVisible(SCRIPT_TAB_INDEX, derived);
     notDerived.setVisible(!derived);
     noScript.setVisible(derived && value.length() == 0);
     script.setVisible(derived && value.length() > 0);
     script.setText(value);
   }
 
+  @Override
+  public HasAuthorization getSummaryAuthorizer() {
+    return new TabAuthorizer(tabs, SUMMARY_TAB_INDEX);
+  }
 }

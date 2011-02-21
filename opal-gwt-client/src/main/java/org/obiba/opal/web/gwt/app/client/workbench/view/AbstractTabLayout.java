@@ -124,13 +124,58 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
     selectedIndex = -1;
   }
 
+  /**
+   * Make a tab visible or not. In the case of the tab to hide is the selected one, make sure one of its visible
+   * neighbour is selected in place of it.
+   * @param index
+   * @param visible
+   */
   public void setTabVisible(int index, boolean visible) {
     checkIndex(index);
-    if(index == selectedIndex) {
-      return;
+    if(!visible && index == selectedIndex) {
+
+      // select the closest visible tab with lower index
+      boolean selectionChanged = false;
+      int idx = index - 1;
+      while(!selectionChanged || idx < 0) {
+        if(isTabVisible(idx)) {
+          setSelectedIndex(idx);
+          selectionChanged = true;
+        } else {
+          idx--;
+        }
+      }
+
+      // failed, so select the closest visible tab with higher index
+      if(!selectionChanged) {
+        idx = index + 1;
+        while(!selectionChanged || idx >= items.size()) {
+          if(isTabVisible(idx)) {
+            setSelectedIndex(idx);
+            selectionChanged = true;
+          } else {
+            idx++;
+          }
+        }
+      }
+
+      // failed, wont hide if selection cannot be replaced
+      if(!selectionChanged) {
+        return;
+      }
     }
 
     items.get(index).setVisible(visible);
+  }
+
+  /**
+   * Is the tab at provided index is visible.
+   * @param index
+   * @return
+   */
+  public boolean isTabVisible(int index) {
+    checkIndex(index);
+    return items.get(index).isVisible();
   }
 
   private void checkIndex(int index) {
