@@ -15,9 +15,10 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.obiba.opal.r.MagmaAssignROperation;
 import org.obiba.opal.r.RScriptROperation;
@@ -48,28 +49,26 @@ public class RSymbolResource extends AbstractOpalRSessionResource {
 
   @PUT
   @Consumes(MediaType.TEXT_PLAIN)
-  public Response putString(String content) {
+  public Response putString(@Context UriInfo uri, String content) {
     rSession.execute(new StringAssignROperation(name, content));
-    return Response.created(getSymbolURI()).build();
+    return Response.created(getSymbolURI(uri)).build();
   }
 
   @PUT
   @Consumes("application/x-rscript")
-  public Response putRScript(String script) {
+  public Response putRScript(@Context UriInfo uri, String script) {
     rSession.execute(new RScriptROperation(name + "<-" + script));
-    return Response.created(getSymbolURI()).build();
+    return Response.created(getSymbolURI(uri)).build();
   }
 
   @PUT
   @Consumes("application/x-opal")
-  public Response putMagma(String path) {
+  public Response putMagma(@Context UriInfo uri, String path) {
     rSession.execute(new MagmaAssignROperation(rSession, name, path));
-    return Response.created(getSymbolURI()).build();
+    return Response.created(getSymbolURI(uri)).build();
   }
 
-  private URI getSymbolURI() {
-    return UriBuilder.fromPath("/").path(OpalRSessionParentResource.class)//
-    .path(OpalRSessionParentResource.class, "getOpalRSessionResource")//
-    .path(OpalRSessionResource.class, "getRSymbolResource").build(rSession.getId(), name);
+  protected URI getSymbolURI(UriInfo info) {
+    return info.getRequestUri();
   }
 }

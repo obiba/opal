@@ -37,7 +37,6 @@ public class OpalRSessionResource extends AbstractOpalRSessionResource {
   private OpalRSession rSession;
 
   public OpalRSessionResource(OpalRSessionManager opalRSessionManager, OpalRSession rSession) {
-    super();
     this.opalRSessionManager = opalRSessionManager;
     this.rSession = rSession;
   }
@@ -85,6 +84,10 @@ public class OpalRSessionResource extends AbstractOpalRSessionResource {
 
   @Path("/symbol/{name}")
   public RSymbolResource getRSymbolResource(@PathParam("name") String name) {
+    return onGetRSymbolResource(name);
+  }
+
+  protected RSymbolResource onGetRSymbolResource(String name) {
     return new RSymbolResource(rSession, name);
   }
 

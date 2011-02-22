@@ -26,7 +26,7 @@
 		# Act like a GET, but send a POST. This is required when posting without any body 
 		opts = curlOptions(httpget=TRUE, customrequest="POST", .opts=opal$opts)
 	} else {
-		opts = curlOptions(post=TRUE, postfields=params, .opts=opal$opts)
+		opts = curlOptions(post=TRUE, customrequest=NULL, postfields=params, .opts=opal$opts)
 	}
 	.perform(opal, .url(opal, ...), opts)
 }
@@ -44,8 +44,8 @@
 
 .delete <- function(opal, ...) {
 	# Act like a GET, but send a DELETE.
-	curlSetOpt(httpget=TRUE, customrequest="DELETE", curl=opal$curl)
-	.perform(opal, .url(opal, ...))
+	opts = curlOptions(httpget=TRUE, customrequest="DELETE", .opts=opal$opts)
+	.perform(opal, .url(opal, ...), opts)
 }
 
 .perform <- function(opal, url, opts) {
@@ -61,10 +61,10 @@
 
 .handleResponse <- function(response) {
 	if(response$code >= 400 && response$code < 500) {
-		print(paste("Invalid request: ", response$code))
+		print(paste("Invalid request(", response$code, "):", response$content))
 		NULL
 	}	else if(response$code >= 500) {
-		print(paste("Server error: ", response$code))
+		print(paste("Server error: ", response$code, " ", response$content))
 		NULL
 	} else {
 		if(length(grep("octet-stream", response$content.type))) {
@@ -91,6 +91,7 @@ opal.login <- function(url,username,password) {
 	require(RCurl)
 	require(rjson)
 	opal <- new.env(parent=globalenv())
+	# TODO: strip trailing / if any
 	opal$url <- url
 	
 	# cookielist="" activates the cookie engine
@@ -123,7 +124,7 @@ datashield.newSession <- function(opal) {
 }
 
 datashield.newSession.opal <- function(opal) {
-	opal.newSession(opal)
+	.extractJsonField(.post(opal, "datashield", "sessions"), c("id"), isArray=FALSE)
 }
 
 datashield.newSession.list <- function(opals) {
@@ -162,24 +163,33 @@ datashield.aggregate=function(object, ...) {
 
 # Inner methods that sends a script, and aggregates the result using the specified aggregation method
 datashield.aggregate.opal=function(opal, aggregation, expr) {
-	.get(opal, "datashield", "current", "aggregate", aggregation, query=c(query=expr))
+	expression  = expr
+	if(is.language(expr)) expression = deparse(expr)
+	
+	.post(opal, "datashield", "session", "current", "aggregate", aggregation, params=expression)
 }
 
 datashield.aggregate.list=function(opals, aggregation, expr) {
 	lapply(opals, FUN=datashield.aggregate.opal, aggregation, expr)
 }
 
-# Tells Datashield to assign Opal Variables to R symbols
 datashield.assign=function(object, ...) {
   UseMethod('datashield.assign');
 }
 
 datashield.assign.opal=function(opal, symbol, value) {
-	.put(opal, "datashield", "current", "symbol", symbol, body=value)
+	if(is.language(value)) {
+		contentType <- "application/x-rscript"
+		body <- deparse(value)
+	} else {
+		contentType <- "application/x-opal"
+		body <- value
+	}
+	.put(opal, "datashield", "session", "current", "symbol", symbol, body=body, contentType=contentType)
 }
 
-datashield.assign.list=function(opal, symbol, value) {
-	lapply(opals, FUN=datashield.assign.opal, symbol, value)
+datashield.assign.list=function(opals, ...) {
+	lapply(opals, FUN=datashield.assign.opal, ...)
 }
 
 datashield.symbols=function(object, ...) {
@@ -187,7 +197,7 @@ datashield.symbols=function(object, ...) {
 }
 
 datashield.symbols.opal=function(opal) {
-	.get(opal, "datashield", "current", "symbols")
+	.get(opal, "datashield", "session", "current", "symbols")
 }
 
 datashield.symbols.list=function(opals) {

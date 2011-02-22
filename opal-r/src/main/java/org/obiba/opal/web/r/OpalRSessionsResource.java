@@ -9,36 +9,32 @@
  ******************************************************************************/
 package org.obiba.opal.web.r;
 
+import java.net.URI;
 import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.model.OpalR;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 /**
  * Handles the list and the creation of the R sessions of the invoking Opal user.
  */
-@Component
-@Scope("request")
-@Path("/r/sessions")
 public class OpalRSessionsResource {
 
-  private OpalRSessionManager opalRSessionManager;
+  private final OpalRSessionManager opalRSessionManager;
 
-  @Autowired
   public OpalRSessionsResource(OpalRSessionManager opalRSessionManager) {
-    super();
+    if(opalRSessionManager == null) throw new IllegalArgumentException("opalRSessionManager cannot be null");
     this.opalRSessionManager = opalRSessionManager;
   }
 
@@ -52,9 +48,21 @@ public class OpalRSessionsResource {
   }
 
   @POST
-  public Response newCurrentRSession() {
+  public Response newCurrentRSession(@Context UriInfo info) {
     OpalRSession rSession = opalRSessionManager.newSubjectCurrentRSession();
-    UriBuilder ub = UriBuilder.fromPath("/").path(OpalRSessionParentResource.class).path(OpalRSessionParentResource.class, "getOpalRSessionResource");
-    return Response.created(ub.build(rSession.getId())).entity(Dtos.asDto(rSession)).build();
+    List<URI> locations = getLocations(info, rSession.getId());
+    return Response.created(locations.get(0)).header("X-Alt-Location", locations.get(1)).entity(Dtos.asDto(rSession)).build();
+  }
+
+  protected List<URI> getLocations(UriInfo info, String id) {
+    List<PathSegment> segments = info.getPathSegments();
+    List<PathSegment> patate = segments.subList(0, segments.size() - 1);
+    StringBuilder root = new StringBuilder();
+    for(PathSegment s : patate) {
+      root.append('/').append(s.getPath());
+    }
+    root.append("/session");
+
+    return ImmutableList.of(info.getBaseUriBuilder().path(root.toString()).path(id).build(), info.getBaseUriBuilder().path(root.toString()).path("current").build());
   }
 }

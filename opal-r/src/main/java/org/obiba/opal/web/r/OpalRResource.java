@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.service.OpalRService;
+import org.obiba.opal.r.service.OpalRSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +35,15 @@ public class OpalRResource {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRResource.class);
 
-  private OpalRService opalRService;
+  private final OpalRService opalRService;
+
+  private final OpalRSessionManager opalRSessionManager;
 
   @Autowired
-  public OpalRResource(OpalRService opalRService) {
+  public OpalRResource(OpalRService opalRService, OpalRSessionManager opalRSessionManager) {
     super();
     this.opalRService = opalRService;
+    this.opalRSessionManager = opalRSessionManager;
   }
 
   @GET
@@ -56,6 +60,11 @@ public class OpalRResource {
       log.error("R Script '{}' has result: {}, has raw result: {}", new Object[] { script, rop.hasResult(), rop.hasRawResult() });
       return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
+  }
+
+  @Path("/sessions")
+  public OpalRSessionsResource getSessionsResource() {
+    return new OpalRSessionsResource(opalRSessionManager);
   }
 
 }

@@ -32,6 +32,7 @@ import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.datashield.support.DataShieldMethodConverterRegistry;
 import org.obiba.opal.web.model.DataShield;
 import org.obiba.opal.web.r.OpalRSessionResource;
+import org.obiba.opal.web.r.OpalRSessionsResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -59,6 +60,11 @@ public class DataShieldResource {
     this.opalRuntime = opalRuntime;
     this.opalRSessionManager = opalRSessionManager;
     this.methodConverterRegistry = methodConverterRegistry;
+  }
+
+  @Path("/sessions")
+  public OpalRSessionsResource getSessions() {
+    return new OpalRSessionsResource(opalRSessionManager);
   }
 
   @Path("/session/{id}")

@@ -10,10 +10,10 @@
 package org.obiba.opal.web.datashield;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -28,6 +28,7 @@ import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.r.OpalRSessionResource;
+import org.obiba.opal.web.r.RSymbolResource;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -54,10 +55,10 @@ public class OpalDataShieldSessionResource extends OpalRSessionResource {
     return Response.ok(listMethods()).build();
   }
 
-  @GET
+  @POST
   @Path("/aggregate/{method}")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
-  public Response aggregate(@PathParam("method") String methodName, @QueryParam("query") String script) {
+  public Response aggregate(@PathParam("method") String methodName, String script) {
     DataShieldMethod method = lookupMethod(methodName);
     RScriptROperation rop = new RScriptROperation(script);
     getOpalRSession().execute(rop);
@@ -67,6 +68,11 @@ public class OpalDataShieldSessionResource extends OpalRSessionResource {
       return Response.ok().entity(datashieldOperation.getRawResult().asBytes()).build();
     }
     return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+  }
+
+  @Override
+  protected RSymbolResource onGetRSymbolResource(String name) {
+    return new DataShieldSymbolResource(getOpalRSession(), name);
   }
 
   private Iterable<DataShieldMethod> listMethods() {
