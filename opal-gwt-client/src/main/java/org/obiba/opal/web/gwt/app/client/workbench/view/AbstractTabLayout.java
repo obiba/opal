@@ -135,28 +135,11 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
     if(!visible && index == selectedIndex) {
 
       // select the closest visible tab with lower index
-      boolean selectionChanged = false;
-      int idx = index - 1;
-      while(!selectionChanged || idx < 0) {
-        if(isTabVisible(idx)) {
-          setSelectedIndex(idx);
-          selectionChanged = true;
-        } else {
-          idx--;
-        }
-      }
+      boolean selectionChanged = selectClosestLowerVisibleTab(index);
 
       // failed, so select the closest visible tab with higher index
       if(!selectionChanged) {
-        idx = index + 1;
-        while(!selectionChanged || idx >= items.size()) {
-          if(isTabVisible(idx)) {
-            setSelectedIndex(idx);
-            selectionChanged = true;
-          } else {
-            idx++;
-          }
-        }
+        selectionChanged = selectClosestHigherVisibleTab(index);
       }
 
       // failed, wont hide if selection cannot be replaced
@@ -166,6 +149,44 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
     }
 
     items.get(index).setVisible(visible);
+  }
+
+  /**
+   * Select the closest visible tab with lower index.
+   * @param index
+   * @return true if selection changed
+   */
+  private boolean selectClosestLowerVisibleTab(int index) {
+    boolean selectionChanged = false;
+    int idx = index - 1;
+    while(!selectionChanged || idx < 0) {
+      if(isTabVisible(idx)) {
+        setSelectedIndex(idx);
+        selectionChanged = true;
+      } else {
+        idx--;
+      }
+    }
+    return selectionChanged;
+  }
+
+  /**
+   * Select the closest visible tab with higher index.
+   * @param index
+   * @return true if selection changed
+   */
+  private boolean selectClosestHigherVisibleTab(int index) {
+    boolean selectionChanged = false;
+    int idx = index + 1;
+    while(!selectionChanged || idx >= items.size()) {
+      if(isTabVisible(idx)) {
+        setSelectedIndex(idx);
+        selectionChanged = true;
+      } else {
+        idx++;
+      }
+    }
+    return selectionChanged;
   }
 
   /**

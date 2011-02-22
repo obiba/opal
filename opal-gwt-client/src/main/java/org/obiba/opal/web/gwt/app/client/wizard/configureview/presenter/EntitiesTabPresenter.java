@@ -232,21 +232,29 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
     VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
 
     if(jsViewDto != null) {
-      if(jsViewDto.hasWhere()) {
-        getDisplay().setEntitiesToView(EntitiesToView.SCRIPT);
-        getDisplay().setScript(jsViewDto.getWhere());
-      } else {
-        getDisplay().setEntitiesToView(EntitiesToView.ALL);
-        getDisplay().setScript("");
-      }
+      updateJavaScriptDisplay(jsViewDto);
     } else { // derived variables view
-      if(variableListDto.hasWhere()) {
-        getDisplay().setEntitiesToView(EntitiesToView.SCRIPT);
-        getDisplay().setScript(variableListDto.getWhere());
-      } else {
-        getDisplay().setEntitiesToView(EntitiesToView.ALL);
-        getDisplay().setScript("");
-      }
+      updateVariableListDisplay(variableListDto);
+    }
+  }
+
+  private void updateJavaScriptDisplay(JavaScriptViewDto jsViewDto) {
+    if(jsViewDto.hasWhere()) {
+      getDisplay().setEntitiesToView(EntitiesToView.SCRIPT);
+      getDisplay().setScript(jsViewDto.getWhere());
+    } else {
+      getDisplay().setEntitiesToView(EntitiesToView.ALL);
+      getDisplay().setScript("");
+    }
+  }
+
+  private void updateVariableListDisplay(VariableListViewDto variableListDto) {
+    if(variableListDto.hasWhere()) {
+      getDisplay().setEntitiesToView(EntitiesToView.SCRIPT);
+      getDisplay().setScript(variableListDto.getWhere());
+    } else {
+      getDisplay().setEntitiesToView(EntitiesToView.ALL);
+      getDisplay().setScript("");
     }
   }
 

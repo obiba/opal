@@ -100,57 +100,43 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   private void updateDisplay(TableDto table, VariableDto variableDto, VariableDto previous, VariableDto next) {
     if(variable == null || !isCurrentVariable(variableDto)) {
       variable = variableDto;
-      getDisplay().setVariableName(variableDto.getName());
-      getDisplay().setEntityType(variableDto.getEntityType());
-      getDisplay().setValueType(variableDto.getValueType());
-      getDisplay().setMimeType(variableDto.hasMimeType() ? variableDto.getMimeType() : "");
-      getDisplay().setUnit(variableDto.hasUnit() ? variableDto.getUnit() : "");
-      getDisplay().setRepeatable(variableDto.getIsRepeatable());
-      getDisplay().setOccurrenceGroup(variableDto.getIsRepeatable() ? variableDto.getOccurrenceGroup() : "");
+      getDisplay().setVariableName(variable.getName());
+      getDisplay().setEntityType(variable.getEntityType());
+      getDisplay().setValueType(variable.getValueType());
+      getDisplay().setMimeType(variable.hasMimeType() ? variable.getMimeType() : "");
+      getDisplay().setUnit(variable.hasUnit() ? variable.getUnit() : "");
+      getDisplay().setRepeatable(variable.getIsRepeatable());
+      getDisplay().setOccurrenceGroup(variable.getIsRepeatable() ? variable.getOccurrenceGroup() : "");
 
-      getDisplay().setParentName(variableDto.getParentLink().getRel());
+      getDisplay().setParentName(variable.getParentLink().getRel());
       getDisplay().setPreviousName(previous != null ? previous.getName() : "");
       getDisplay().setNextName(next != null ? next.getName() : "");
 
-      getDisplay().renderCategoryRows(variableDto.getCategoriesArray());
-      getDisplay().renderAttributeRows(variableDto.getAttributesArray());
+      getDisplay().renderCategoryRows(variable.getCategoriesArray());
+      getDisplay().renderAttributeRows(variable.getAttributesArray());
 
-      // table is a view, check for a script attribute
-      getDisplay().setDerivedVariable(false, "");
-      if(table != null && table.hasViewLink()) {
-        for(AttributeDto attr : JsArrays.toIterable(variable.getAttributesArray())) {
-          if(attr.getName().equals("script")) {
-            getDisplay().setDerivedVariable(true, attr.getValue());
-            break;
-          }
-        }
-      }
+      updateDerivedVariableDisplay(table);
 
       authorize();
     }
   }
 
+  private void updateDerivedVariableDisplay(TableDto table) {
+    // if table is a view, check for a script attribute
+    getDisplay().setDerivedVariable(false, "");
+    if(table == null || !table.hasViewLink()) return;
+
+    for(AttributeDto attr : JsArrays.toIterable(variable.getAttributesArray())) {
+      if(attr.getName().equals("script")) {
+        getDisplay().setDerivedVariable(true, attr.getValue());
+        break;
+      }
+    }
+  }
+
   private void authorize() {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(variable.getLink() + "/summary").get().authorize(new CompositeAuthorizer(getDisplay().getSummaryAuthorizer(), new HasAuthorization() {
-
-      @Override
-      public void unauthorized() {
-
-      }
-
-      @Override
-      public void beforeAuthorization() {
-
-      }
-
-      @Override
-      public void authorized() {
-        requestSummary(variable);
-        if(getDisplay().isSummaryTabSelected()) {
-          summaryTabPresenter.refreshDisplay();
-        }
-      }
-    })).send();
+    // summary
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(variable.getLink() + "/summary").get().authorize(new CompositeAuthorizer(getDisplay().getSummaryAuthorizer(), new SummaryUpdate())).send();
   }
 
   private boolean isCurrentVariable(VariableDto variableDto) {
@@ -167,6 +153,29 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   //
   // Interfaces and classes
   //
+
+  /**
+   * Update summary on authorization.
+   */
+  private final class SummaryUpdate implements HasAuthorization {
+    @Override
+    public void unauthorized() {
+
+    }
+
+    @Override
+    public void beforeAuthorization() {
+
+    }
+
+    @Override
+    public void authorized() {
+      requestSummary(variable);
+      if(getDisplay().isSummaryTabSelected()) {
+        summaryTabPresenter.refreshDisplay();
+      }
+    }
+  }
 
   /**
    *
