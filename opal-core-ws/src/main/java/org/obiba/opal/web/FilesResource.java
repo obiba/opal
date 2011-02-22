@@ -188,18 +188,34 @@ public class FilesResource {
   @Consumes("text/plain")
   public Response createFolder(@PathParam("path") String path, String folderName, @Context UriInfo uriInfo) throws FileSystemException {
     if(folderName == null || folderName.trim().length() == 0) return Response.status(Status.BAD_REQUEST).build();
-    String folderStr = folderName.trim();
 
     String folderPath = getPathOfFileToWrite(path);
     FileObject folder = resolveFileInFileSystem(folderPath);
+    Response response = validateFolder(folder, path);
+    if(response != null) return response;
 
+    FileObject file = folder.resolveFile(folderName);
+    response = validateFile(file);
+    if(response != null) return response;
+
+    try {
+      file.createFolder();
+      return Response.created(uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(folderName).build()).build();
+    } catch(FileSystemException couldNotCreateTheFolder) {
+      return Response.status(Status.INTERNAL_SERVER_ERROR).entity("cannotCreatefolderUnexpectedError").build();
+    }
+  }
+
+  private Response validateFolder(FileObject folder, String path) throws FileSystemException {
     if(folder == null || !folder.exists()) {
       return getPathNotExistResponse(path);
     } else if(folder.getType() != FileType.FOLDER) {
       return Response.status(Status.FORBIDDEN).entity("Not a folder: " + path).build();
     }
+    return null;
+  }
 
-    FileObject file = folder.resolveFile(folderStr);
+  private Response validateFile(FileObject file) throws FileSystemException {
     // Folder or file already exist at specified path.
     if(file.exists()) {
       return Response.status(Status.FORBIDDEN).entity("cannotCreateFolderPathAlreadyExist").build();
@@ -210,12 +226,7 @@ public class FilesResource {
       return Response.status(Status.FORBIDDEN).entity("cannotCreateFolderParentIsReadOnly").build();
     }
 
-    try {
-      file.createFolder();
-      return Response.created(uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(folderStr).build()).build();
-    } catch(FileSystemException couldNotCreateTheFolder) {
-      return Response.status(Status.INTERNAL_SERVER_ERROR).entity("cannotCreatefolderUnexpectedError").build();
-    }
+    return null;
   }
 
   @DELETE
