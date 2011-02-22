@@ -38,7 +38,7 @@ public class SecurityResourceTest {
 
   private SimpleAccountRealm mockRealm;
 
-  private SecurityResource securityResource;
+  private AuthenticationResource securityResource;
 
   String testSessionId = "test-session-id";
 
@@ -50,7 +50,7 @@ public class SecurityResourceTest {
 
     SecurityUtils.setSecurityManager(mockSecurityManager);
 
-    securityResource = new SecurityResource(mockSecurityManager);
+    securityResource = new AuthenticationResource(mockSecurityManager);
   }
 
   @Test
