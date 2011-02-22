@@ -32,12 +32,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Path("/auth")
-public class SecurityResource extends AbstractSecurityComponent {
+public class AuthenticationResource extends AbstractSecurityComponent {
 
-  private static final Logger log = LoggerFactory.getLogger(SecurityResource.class);
+  private static final Logger log = LoggerFactory.getLogger(AuthenticationResource.class);
 
   @Autowired
-  public SecurityResource(SessionsSecurityManager securityManager) {
+  public AuthenticationResource(SessionsSecurityManager securityManager) {
     super(securityManager);
   }
 
@@ -53,7 +53,7 @@ public class SecurityResource extends AbstractSecurityComponent {
     }
     String sessionId = SecurityUtils.getSubject().getSession().getId().toString();
     log.info("Successfull session creation for user '{}' session ID is '{}'.", username, sessionId);
-    return Response.created(UriBuilder.fromPath("/").path(SecurityResource.class).path(SecurityResource.class, "checkSession").build(sessionId)).build();
+    return Response.created(UriBuilder.fromPath("/").path(AuthenticationResource.class).path(AuthenticationResource.class, "checkSession").build(sessionId)).build();
   }
 
   @HEAD
