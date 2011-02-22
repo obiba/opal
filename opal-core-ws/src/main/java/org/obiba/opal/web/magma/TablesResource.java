@@ -9,23 +9,32 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
+import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
+import org.obiba.magma.datasource.excel.ExcelDatasource;
+import org.obiba.magma.support.DatasourceCopier;
+import org.obiba.magma.support.Disposables;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
+import org.obiba.opal.web.ws.security.AuthenticateResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +62,25 @@ public class TablesResource {
     sortByName(tables);
 
     return tables;
+  }
+
+  @GET
+  @Path("/excel")
+  @Produces("application/vnd.ms-excel")
+  @AuthenticateResource
+  public Response getExcelDictionary() throws MagmaRuntimeException, IOException {
+    String destinationName = datasource.getName() + "-dictionary";
+    ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
+    ExcelDatasource destinationDatasource = new ExcelDatasource(destinationName, excelOutput);
+
+    destinationDatasource.initialise();
+    try {
+      DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyValues().build();
+      copier.copy(datasource, destinationDatasource);
+    } finally {
+      Disposables.silentlyDispose(destinationDatasource);
+    }
+    return Response.ok(excelOutput.toByteArray(), "application/vnd.ms-excel").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".xlsx\"").build();
   }
 
   @POST

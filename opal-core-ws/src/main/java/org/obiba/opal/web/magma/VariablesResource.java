@@ -101,7 +101,7 @@ public class VariablesResource extends AbstractValueTableResource {
   }
 
   @GET
-  @Path("/xlsx")
+  @Path("/excel")
   @Produces("application/vnd.ms-excel")
   @AuthenticatedByCookie
   @AuthenticateResource

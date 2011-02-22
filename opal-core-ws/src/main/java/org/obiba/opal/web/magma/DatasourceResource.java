@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -24,7 +22,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -35,10 +32,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.datasource.excel.ExcelDatasource;
-import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.runtime.OpalRuntime;
@@ -46,7 +40,6 @@ import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.obiba.opal.web.model.Opal.LocaleDto;
-import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -129,25 +122,6 @@ public class DatasourceResource {
     }
 
     return response.build();
-  }
-
-  @GET
-  @Path("/variables/excel")
-  @Produces("application/vnd.ms-excel")
-  @NotAuthenticated
-  public Response getExcelDictionary() throws MagmaRuntimeException, IOException {
-    String destinationName = name + "-dictionary";
-    ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
-    ExcelDatasource destinationDatasource = new ExcelDatasource(destinationName, excelOutput);
-
-    destinationDatasource.initialise();
-    try {
-      DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyValues().build();
-      copier.copy(getDatasource(), destinationDatasource);
-    } finally {
-      Disposables.silentlyDispose(destinationDatasource);
-    }
-    return Response.ok(excelOutput.toByteArray(), "application/vnd.ms-excel").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".xlsx\"").build();
   }
 
   @Path("/table/{table}")

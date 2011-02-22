@@ -168,7 +168,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   }
 
   private void downloadMetadata() {
-    String downloadUrl = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "ws")).append(this.table.getLink()).append("/variables/xlsx").toString();
+    String downloadUrl = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "ws")).append(this.table.getLink()).append("/variables/excel").toString();
     eventBus.fireEvent(new FileDownloadEvent(downloadUrl));
   }
 
