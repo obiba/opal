@@ -47,6 +47,7 @@ import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
+import org.obiba.opal.web.ws.security.AuthenticateResource;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -103,6 +104,7 @@ public class VariablesResource extends AbstractValueTableResource {
   @Path("/xlsx")
   @Produces("application/vnd.ms-excel")
   @AuthenticatedByCookie
+  @AuthenticateResource
   public Response getExcelDictionary() throws MagmaRuntimeException, IOException {
     String destinationName = getValueTable().getDatasource().getName() + "." + getValueTable().getName() + "-dictionary";
     ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
@@ -121,6 +123,7 @@ public class VariablesResource extends AbstractValueTableResource {
 
   @GET
   @Path("/query")
+  @AuthenticateResource
   public Iterable<ValueDto> getVariablesQuery(@QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit) {
     if(script == null) {
       throw new InvalidRequestException("RequiredParameter", "script");
@@ -150,6 +153,7 @@ public class VariablesResource extends AbstractValueTableResource {
    */
   @GET
   @Path("/occurrenceGroup/{occurrenceGroup}")
+  @AuthenticateResource
   public Iterable<VariableDto> getOccurrenceGroupVariables(@Context final UriInfo uriInfo, @PathParam("occurrenceGroup") String occurrenceGroup) {
     ArrayList<PathSegment> segments = Lists.newArrayList(uriInfo.getPathSegments());
     final UriBuilder ub = uriInfo.getBaseUriBuilder();
