@@ -84,15 +84,14 @@ public class OpalRSession implements ROperationTemplate, VariableEntitiesHolder 
    */
   @Override
   public void execute(ROperation rop) {
-    lock.lock();
     RConnection connection = null;
-
+    lock.lock();
     try {
       connection = newConnection();
       rop.doWithConnection(connection);
     } finally {
-      if(connection != null) close(connection);
       lock.unlock();
+      if(connection != null) close(connection);
     }
   }
 

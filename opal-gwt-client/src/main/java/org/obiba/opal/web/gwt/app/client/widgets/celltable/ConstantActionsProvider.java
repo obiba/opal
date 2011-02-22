@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.celltable;
 
+
 /**
  *
  */
@@ -22,12 +23,20 @@ public final class ConstantActionsProvider<T> implements ActionsProvider<T> {
 
   @Override
   public String[] allActions() {
-    return this.actions;
+    return actionsCopy();
   }
 
   @Override
   public String[] getActions(T value) {
-    return this.actions;
+    return actionsCopy();
+  }
+
+  private String[] actionsCopy() {
+    String[] copy = new String[actions.length];
+    for(int i = 0; i < actions.length; i++) {
+      copy[i] = actions[i];
+    }
+    return copy;
   }
 
 }

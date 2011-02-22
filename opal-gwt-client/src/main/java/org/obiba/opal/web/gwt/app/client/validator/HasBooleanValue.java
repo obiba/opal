@@ -30,7 +30,7 @@ public class HasBooleanValue implements HasValue<Boolean> {
 
   @Override
   public Boolean getValue() {
-    return null;
+    return true;
   }
 
   @Override
