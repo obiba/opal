@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.core.runtime.security;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -48,9 +46,6 @@ public class SpatialRealm extends AuthorizingRealm {
 
   public SpatialRealm() {
     super();
-    // super.setPermissionResolver(new SpatialPermissionResolver(new MapSpaceResolver(ImmutableMap.<String, Space>
-    // of("magma", new NodeSpace(), "ws", new WsSpace())), new NodeResolver(), new SingleSpaceRelationProvider(new
-    // NodeRelationProvider())));
     super.setPermissionResolver(new SpatialPermissionResolver(new SingleSpaceResolver(new RestSpace()), new NodeResolver(), new SingleSpaceRelationProvider(new NodeRelationProvider())));
   }
 
@@ -143,41 +138,6 @@ public class SpatialRealm extends AuthorizingRealm {
       String a = lhs.getPathElem();
       String b = rhs.getPathElem();
       return a.equals(b + 's') || b.equals(a + 's');
-    }
-  }
-
-  // Unused for now
-  private static class WsSpace extends NodeSpace {
-
-    @Override
-    public Spatial project(Spatial spatial) {
-      if(spatial.getSpace() instanceof NodeSpace && spatial.getSpace() != this) {
-        Node node = (Node) spatial;
-        List<Node> magmaPath = node.getPath();
-        List<String> wsPath = new ArrayList<String>();
-        switch(magmaPath.size()) {
-        case 3:
-          wsPath.add(magmaPath.get(2).getPathElem());
-          wsPath.add("variable");
-        case 2:
-          wsPath.add(magmaPath.get(1).getPathElem());
-          wsPath.add("table");
-        case 1:
-          wsPath.add(magmaPath.get(0).getPathElem());
-          wsPath.add("datasource");
-          break;
-        default:
-          return null;
-        }
-        Collections.reverse(wsPath);
-
-        Node wsNode = getOrigin();
-        for(String s : wsPath) {
-          wsNode = new Node(wsNode, s);
-        }
-        return wsNode;
-      }
-      return super.project(spatial);
     }
   }
 }
