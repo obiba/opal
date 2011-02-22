@@ -34,7 +34,8 @@ import org.obiba.magma.support.Disposables;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
-import org.obiba.opal.web.ws.security.AuthenticateResource;
+import org.obiba.opal.web.ws.security.AuthorizeResource;
+import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +68,8 @@ public class TablesResource {
   @GET
   @Path("/excel")
   @Produces("application/vnd.ms-excel")
-  @AuthenticateResource
+  @AuthorizeResource
+  @AuthenticatedByCookie
   public Response getExcelDictionary() throws MagmaRuntimeException, IOException {
     String destinationName = datasource.getName() + "-dictionary";
     ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();

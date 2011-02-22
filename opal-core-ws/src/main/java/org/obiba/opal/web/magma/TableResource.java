@@ -75,7 +75,7 @@ public class TableResource extends AbstractValueTableResource {
 
   @Path("/variables")
   public VariablesResource getVariables() {
-    return new VariablesResource(getValueTable());
+    return new VariablesResource(getValueTable(), getLocales());
   }
 
   /**

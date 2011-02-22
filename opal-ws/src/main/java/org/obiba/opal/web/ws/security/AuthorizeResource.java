@@ -16,6 +16,6 @@ import java.lang.annotation.Target;
 
 @Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AuthenticateResource {
+public @interface AuthorizeResource {
 
 }

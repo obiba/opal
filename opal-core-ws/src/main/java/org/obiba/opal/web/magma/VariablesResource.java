@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -47,8 +48,8 @@ import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
-import org.obiba.opal.web.ws.security.AuthenticateResource;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
+import org.obiba.opal.web.ws.security.AuthorizeResource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -60,7 +61,7 @@ import com.google.common.collect.Lists;
 @Scope("prototype")
 public class VariablesResource extends AbstractValueTableResource {
 
-  public VariablesResource(ValueTable valueTable) {
+  public VariablesResource(ValueTable valueTable, Set<Locale> locales) {
     super(valueTable, Collections.<Locale> emptySet());
   }
 
@@ -104,7 +105,7 @@ public class VariablesResource extends AbstractValueTableResource {
   @Path("/excel")
   @Produces("application/vnd.ms-excel")
   @AuthenticatedByCookie
-  @AuthenticateResource
+  @AuthorizeResource
   public Response getExcelDictionary() throws MagmaRuntimeException, IOException {
     String destinationName = getValueTable().getDatasource().getName() + "." + getValueTable().getName() + "-dictionary";
     ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
@@ -123,7 +124,7 @@ public class VariablesResource extends AbstractValueTableResource {
 
   @GET
   @Path("/query")
-  @AuthenticateResource
+  @AuthorizeResource
   public Iterable<ValueDto> getVariablesQuery(@QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit) {
     if(script == null) {
       throw new InvalidRequestException("RequiredParameter", "script");
@@ -153,7 +154,7 @@ public class VariablesResource extends AbstractValueTableResource {
    */
   @GET
   @Path("/occurrenceGroup/{occurrenceGroup}")
-  @AuthenticateResource
+  @AuthorizeResource
   public Iterable<VariableDto> getOccurrenceGroupVariables(@Context final UriInfo uriInfo, @PathParam("occurrenceGroup") String occurrenceGroup) {
     ArrayList<PathSegment> segments = Lists.newArrayList(uriInfo.getPathSegments());
     final UriBuilder ub = uriInfo.getBaseUriBuilder();
