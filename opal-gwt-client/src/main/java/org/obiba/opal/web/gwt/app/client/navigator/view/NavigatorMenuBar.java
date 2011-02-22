@@ -149,6 +149,10 @@ public class NavigatorMenuBar extends MenuBar {
     }
   }
 
+  public MenuItem getExcelDownloadItem() {
+    return excelDownloadItem;
+  }
+
   public void setExportDataCommand(Command cmd) {
     if(exportDataItem == null) {
       exportDataItem = new MenuItem(translations.exportData(), cmd);

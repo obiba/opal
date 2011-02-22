@@ -122,6 +122,8 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   }
 
   private void authorize() {
+    // export variables in excel
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName() + "/variables/excel").get().authorize(getDisplay().getExcelDownloadAuthorizer()).send();
     // export data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().authorize(getDisplay().getExportDataAuthorizer()).send();
     // copy data
@@ -450,6 +452,8 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     void clearVariableSuggestion();
 
     HasAuthorization getCopyDataAuthorizer();
+
+    HasAuthorization getExcelDownloadAuthorizer();
 
     HasAuthorization getExportDataAuthorizer();
 

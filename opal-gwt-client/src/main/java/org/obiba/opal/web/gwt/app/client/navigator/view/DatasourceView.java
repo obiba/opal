@@ -278,4 +278,9 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
     return new CompositeAuthorizer(new MenuItemAuthorizer(removeMenuItem), new UIObjectAuthorizer(removeMenuItemSeparator));
   }
 
+  @Override
+  public HasAuthorization getExcelDownloadAuthorizer() {
+    return new MenuItemAuthorizer(toolbar.getExcelDownloadItem());
+  }
+
 }

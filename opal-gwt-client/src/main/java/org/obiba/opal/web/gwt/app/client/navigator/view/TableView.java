@@ -340,4 +340,9 @@ public class TableView extends Composite implements TablePresenter.Display {
     return new CompositeAuthorizer(new MenuItemAuthorizer(removeItem), new UIObjectAuthorizer(removeItemSeparator));
   }
 
+  @Override
+  public HasAuthorization getExcelDownloadAuthorizer() {
+    return new MenuItemAuthorizer(toolbar.getExcelDownloadItem());
+  }
+
 }

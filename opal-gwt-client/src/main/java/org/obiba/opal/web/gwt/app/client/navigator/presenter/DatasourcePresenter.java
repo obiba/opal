@@ -128,6 +128,8 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName + "/tables").post().authorize(getDisplay().getAddUpdateTablesAuthorizer()).send();
     // create views
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName + "/views").post().authorize(getDisplay().getAddViewAuthorizer()).send();
+    // export variables in excel
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName + "/tables/excel").get().authorize(getDisplay().getExcelDownloadAuthorizer()).send();
     // export data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().authorize(getDisplay().getExportDataAuthorizer()).send();
     // copy data
@@ -523,6 +525,8 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     HasAuthorization getRemoveDatasourceAuthorizer();
 
     HasAuthorization getCopyDataAuthorizer();
+
+    HasAuthorization getExcelDownloadAuthorizer();
 
   }
 }
