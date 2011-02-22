@@ -165,7 +165,7 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
     boolean tableIsVisible = table.getRowCount() > 0;
     pager.setVisible(tableIsVisible);
     table.setVisible(tableIsVisible);
-    toolbar.setExportDataItemVisible(tableIsVisible);
+    toolbar.setExportDataItemEnabled(tableIsVisible);
     noTables.setVisible(tableIsVisible == false);
     loading.setVisible(false);
   }

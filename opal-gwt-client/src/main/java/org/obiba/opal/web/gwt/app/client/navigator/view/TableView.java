@@ -168,7 +168,7 @@ public class TableView extends Composite implements TablePresenter.Display {
     boolean tableIsVisible = dataProvider.getList().size() > 0;
     pager.setVisible(tableIsVisible);
     table.setVisible(tableIsVisible);
-    toolbar.setExportDataItemVisible(tableIsVisible);
+    toolbar.setExportDataItemEnabled(tableIsVisible);
     noVariables.setVisible(tableIsVisible == false);
     loading.setVisible(false);
   }

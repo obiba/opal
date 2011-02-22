@@ -245,9 +245,9 @@ public class NavigatorMenuBar extends MenuBar {
     return editItem;
   }
 
-  public void setExportDataItemVisible(boolean visible) {
+  public void setExportDataItemEnabled(boolean enabled) {
     if(exportDataItem != null) {
-      exportDataItem.setVisible(visible);
+      exportDataItem.setEnabled(enabled);
     }
   }
 }
