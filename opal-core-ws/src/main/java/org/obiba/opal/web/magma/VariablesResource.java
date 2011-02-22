@@ -92,7 +92,7 @@ public class VariablesResource extends AbstractValueTableResource {
     String tableUri = tableub.build().toString();
     LinkDto.Builder tableLinkBuilder = LinkDto.newBuilder().setLink(tableUri).setRel(getValueTable().getName());
 
-    Iterable<Variable> variables = filterVariables(getValueTable(), script, offset, limit);
+    Iterable<Variable> variables = filterVariables(script, offset, limit);
     ArrayList<VariableDto> variableDtos = Lists.newArrayList(Iterables.transform(variables, Dtos.asDtoFunc(tableLinkBuilder.build(), ub)));
     sortVariableDtoByName(variableDtos);
 
@@ -198,28 +198,9 @@ public class VariablesResource extends AbstractValueTableResource {
     }
   }
 
-  private Iterable<Variable> filterVariables(ValueTable valueTable, String script, Integer offset, Integer limit) {
-    List<Variable> filteredVariables = null;
-
-    if(script != null) {
-      JavascriptClause jsClause = new JavascriptClause(script);
-      jsClause.initialise();
-
-      filteredVariables = new ArrayList<Variable>();
-      for(Variable variable : getValueTable().getVariables()) {
-        if(jsClause.select(variable)) {
-          filteredVariables.add(variable);
-        }
-      }
-    } else {
-      filteredVariables = Lists.newArrayList(getValueTable().getVariables());
-    }
-
-    int fromIndex = (offset < filteredVariables.size()) ? offset : filteredVariables.size();
-    int toIndex = (limit != null) ? Math.min(fromIndex + limit, filteredVariables.size()) : filteredVariables.size();
-
-    return filteredVariables.subList(fromIndex, toIndex);
-  }
+  //
+  // private methods
+  //
 
   private Iterable<Value> queryVariables(ValueTable valueTable, String script, Integer offset, Integer limit) {
     JavascriptClause jsClause = new JavascriptClause(script);

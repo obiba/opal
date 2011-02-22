@@ -12,7 +12,6 @@ package org.obiba.opal.web.magma;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -26,7 +25,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.mozilla.javascript.Scriptable;
@@ -41,21 +39,14 @@ import org.obiba.magma.js.JavascriptValueSource;
 import org.obiba.magma.js.JavascriptVariableBuilder;
 import org.obiba.magma.js.JavascriptVariableValueSource;
 import org.obiba.magma.js.MagmaContext;
-import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.ValueTableWrapper;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.type.BooleanType;
-import org.obiba.opal.web.magma.support.DefaultPagingVectorSourceImpl;
 import org.obiba.opal.web.magma.support.InvalidRequestException;
-import org.obiba.opal.web.magma.support.PagingVectorSource;
-import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.ValueSetDto;
-import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
-import org.obiba.opal.web.model.Opal.LocaleDto;
-import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -64,7 +55,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
 @Component
 @Scope("prototype")
@@ -116,7 +106,7 @@ public class TableResource extends AbstractValueTableResource {
   @Path("/valueSet/{identifier}")
   public ValueSetDto getValueSet(@PathParam("identifier") String identifier, @QueryParam("select") String select) {
     VariableEntity entity = new VariableEntityBean(this.getValueTable().getEntityType(), identifier);
-    Iterable<Variable> variables = filterVariables(getValueTable(), select, 0, null);
+    Iterable<Variable> variables = filterVariables(select, 0, null);
     return getValueSet(entity, variables);
   }
 
@@ -141,7 +131,7 @@ public class TableResource extends AbstractValueTableResource {
   @GET
   @Path("/valueSets")
   public Collection<ValueSetDto> getValueSets(@QueryParam("select") String select, @QueryParam("where") String where, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("100") int limit) {
-    Iterable<Variable> variables = filterVariables(getValueTable(), select, 0, null);
+    Iterable<Variable> variables = filterVariables(select, 0, null);
 
     List<VariableEntity> entities;
     if(where != null) {
@@ -177,20 +167,19 @@ public class TableResource extends AbstractValueTableResource {
   @Path("/variable/_transient")
   public VariableResource getTransient(@QueryParam("valueType") @DefaultValue("text") String valueTypeName, @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String script, @QueryParam("category") List<String> categories) {
     Variable transientVariable = buildTransientVariable(resolveValueType(valueTypeName), repeatable, script, categories == null ? ImmutableList.<String> of() : categories);
-    VariableValueSource vvs = getTransientVariableValueSource(transientVariable);
-    return getVariableResource(vvs);
-  }
-
-  VariableValueSource getTransientVariableValueSource(Variable transientVariable) {
     JavascriptVariableValueSource jvvs = new JavascriptVariableValueSource(transientVariable, getValueTable());
     jvvs.initialise();
-
-    return jvvs;
+    return getVariableResource(jvvs);
   }
 
-  PagingVectorSource getPagingVectorSource(VariableValueSource vvs) {
-    return new DefaultPagingVectorSourceImpl(getValueTable(), vvs);
+  @Path("/compare")
+  public CompareResource getTableCompare() {
+    return new CompareResource(getValueTable());
   }
+
+  //
+  // private methods
+  //
 
   private ValueType resolveValueType(String valueTypeName) {
     ValueType valueType = null;
@@ -202,65 +191,8 @@ public class TableResource extends AbstractValueTableResource {
     return valueType;
   }
 
-  public VariableResource getVariableResource(VariableValueSource source) {
+  private VariableResource getVariableResource(VariableValueSource source) {
     return new VariableResource(this.getValueTable(), source);
-  }
-
-  @Path("/compare")
-  public CompareResource getTableCompare() {
-    return new CompareResource(getValueTable());
-  }
-
-  @GET
-  @Path("/locales")
-  public Iterable<LocaleDto> getLocales(@QueryParam("locale") String displayLocale) {
-    List<LocaleDto> localeDtos = new ArrayList<LocaleDto>();
-    for(Locale locale : getLocales()) {
-      localeDtos.add(Dtos.asDto(locale, displayLocale != null ? new Locale(displayLocale) : null));
-    }
-
-    return localeDtos;
-  }
-
-  private Iterable<Variable> filterVariables(ValueTable valueTable, String script, Integer offset, Integer limit) {
-    List<Variable> filteredVariables = null;
-
-    if(script != null) {
-      JavascriptClause jsClause = new JavascriptClause(script);
-      jsClause.initialise();
-
-      filteredVariables = new ArrayList<Variable>();
-      for(Variable variable : getValueTable().getVariables()) {
-        if(jsClause.select(variable)) {
-          filteredVariables.add(variable);
-        }
-      }
-    } else {
-      filteredVariables = Lists.newArrayList(getValueTable().getVariables());
-    }
-
-    int fromIndex = (offset < filteredVariables.size()) ? offset : filteredVariables.size();
-    int toIndex = (limit != null) ? Math.min(fromIndex + limit, filteredVariables.size()) : filteredVariables.size();
-
-    return filteredVariables.subList(fromIndex, toIndex);
-  }
-
-  private Iterable<Value> queryVariables(ValueTable valueTable, String script, Integer offset, Integer limit) {
-    JavascriptClause jsClause = new JavascriptClause(script);
-    jsClause.initialise();
-
-    List<Variable> variables = Lists.newArrayList(valueTable.getVariables());
-    sortVariableByName(variables);
-
-    int fromIndex = (offset < variables.size()) ? offset : variables.size();
-    int toIndex = (limit != null) ? Math.min(fromIndex + limit, variables.size()) : variables.size();
-
-    List<Value> values = new ArrayList<Value>();
-    for(Variable variable : variables.subList(fromIndex, toIndex)) {
-      values.add(jsClause.query(variable));
-    }
-
-    return values;
   }
 
   private Iterable<VariableEntity> filterEntities(ValueTable valueTable, String script) {
@@ -305,7 +237,7 @@ public class TableResource extends AbstractValueTableResource {
     return jvs;
   }
 
-  Variable buildTransientVariable(ValueType valueType, boolean repeatable, String script, List<String> categories) {
+  private Variable buildTransientVariable(ValueType valueType, boolean repeatable, String script, List<String> categories) {
     Variable.Builder builder = new Variable.Builder("transient", valueType, getValueTable().getEntityType()).extend(JavascriptVariableBuilder.class).setScript(script);
 
     if(repeatable) {
@@ -314,33 +246,6 @@ public class TableResource extends AbstractValueTableResource {
     builder.addCategories(categories.toArray(new String[] {}));
 
     return builder.build();
-  }
-
-  private ClientErrorDto getErrorMessage(Status responseStatus, String errorStatus) {
-    return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus).build();
-  }
-
-  private void sortVariableByName(List<Variable> variables) {
-    Collections.sort(variables, new Comparator<Variable>() {
-
-      @Override
-      public int compare(Variable v1, Variable v2) {
-        return v1.getName().compareTo(v2.getName());
-      }
-
-    });
-  }
-
-  private void sortVariableDtoByName(List<Magma.VariableDto> variables) {
-    // sort alphabetically
-    Collections.sort(variables, new Comparator<Magma.VariableDto>() {
-
-      @Override
-      public int compare(VariableDto v1, VariableDto v2) {
-        return v1.getName().compareTo(v2.getName());
-      }
-
-    });
   }
 
 }
