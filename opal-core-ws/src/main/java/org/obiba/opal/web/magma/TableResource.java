@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,37 +22,26 @@ import java.util.TreeSet;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.mozilla.javascript.Scriptable;
-import org.obiba.core.util.StreamUtil;
-import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
-import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.JavascriptValueSource;
 import org.obiba.magma.js.JavascriptVariableBuilder;
 import org.obiba.magma.js.JavascriptVariableValueSource;
 import org.obiba.magma.js.MagmaContext;
 import org.obiba.magma.js.views.JavascriptClause;
-import org.obiba.magma.support.DatasourceCopier;
-import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.ValueTableWrapper;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.type.BooleanType;
@@ -62,7 +49,6 @@ import org.obiba.opal.web.magma.support.DefaultPagingVectorSourceImpl;
 import org.obiba.opal.web.magma.support.InvalidRequestException;
 import org.obiba.opal.web.magma.support.PagingVectorSource;
 import org.obiba.opal.web.model.Magma;
-import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.ValueSetDto;
@@ -70,7 +56,6 @@ import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
 import org.obiba.opal.web.model.Opal.LocaleDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
-import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -98,119 +83,9 @@ public class TableResource extends AbstractValueTableResource {
     return Dtos.asDto(getValueTable(), null).setLink(uriInfo.getPath()).build();
   }
 
-  @GET
-  @Path("/variables/xlsx")
-  @Produces("application/vnd.ms-excel")
-  @AuthenticatedByCookie
-  public Response getExcelDictionary() throws MagmaRuntimeException, IOException {
-    String destinationName = getValueTable().getDatasource().getName() + "." + getValueTable().getName() + "-dictionary";
-    ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
-    ExcelDatasource destinationDatasource = new ExcelDatasource(destinationName, excelOutput);
-
-    destinationDatasource.initialise();
-    try {
-      DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyValues().build();
-      copier.copy(getValueTable(), destinationDatasource);
-    } finally {
-      Disposables.silentlyDispose(destinationDatasource);
-    }
-
-    return Response.ok(excelOutput.toByteArray(), "application/vnd.ms-excel").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".xlsx\"").build();
-  }
-
-  /**
-   * Get a chunk of variables, optionally filtered by a script
-   * @param uriInfo
-   * @param script script for filtering the variables
-   * @param offset
-   * @param limit
-   * @return
-   */
-  @GET
   @Path("/variables")
-  public Iterable<VariableDto> getVariables(@Context final UriInfo uriInfo, @QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit) {
-    if(offset < 0) {
-      throw new InvalidRequestException("IllegalParameterValue", "offset", String.valueOf(limit));
-    }
-    if(limit != null && limit < 0) {
-      throw new InvalidRequestException("IllegalParameterValue", "limit", String.valueOf(limit));
-    }
-
-    ArrayList<PathSegment> segments = Lists.newArrayList(uriInfo.getPathSegments());
-    segments.remove(segments.size() - 1);
-    final UriBuilder ub = UriBuilder.fromPath("/");
-    final UriBuilder tableub = UriBuilder.fromPath("/");
-    for(PathSegment segment : segments) {
-      ub.segment(segment.getPath());
-      tableub.segment(segment.getPath());
-    }
-    ub.path(TableResource.class, "getVariable");
-    String tableUri = tableub.build().toString();
-    LinkDto.Builder tableLinkBuilder = LinkDto.newBuilder().setLink(tableUri).setRel(getValueTable().getName());
-
-    Iterable<Variable> variables = filterVariables(getValueTable(), script, offset, limit);
-    ArrayList<VariableDto> variableDtos = Lists.newArrayList(Iterables.transform(variables, Dtos.asDtoFunc(tableLinkBuilder.build(), ub)));
-    sortVariableDtoByName(variableDtos);
-
-    return variableDtos;
-  }
-
-  @GET
-  @Path("variables/query")
-  public Iterable<ValueDto> getVariablesQuery(@QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit) {
-    if(script == null) {
-      throw new InvalidRequestException("RequiredParameter", "script");
-    }
-    if(offset < 0) {
-      throw new InvalidRequestException("IllegalParameterValue", "offset", String.valueOf(limit));
-    }
-    if(limit != null && limit < 0) {
-      throw new InvalidRequestException("IllegalParameterValue", "limit", String.valueOf(limit));
-    }
-
-    Iterable<Value> values = queryVariables(getValueTable(), script, offset, limit);
-    ArrayList<ValueDto> valueDtos = Lists.newArrayList(Iterables.transform(values, new Function<Value, ValueDto>() {
-      public ValueDto apply(Value from) {
-        return Dtos.asDto(from).build();
-      }
-    }));
-
-    return valueDtos;
-  }
-
-  /**
-   * Get the variables in a occurrence group.
-   * @param uriInfo
-   * @param occurrenceGroup
-   * @return
-   */
-  @GET
-  @Path("/variables/occurrenceGroup/{occurrenceGroup}")
-  public Iterable<VariableDto> getOccurrenceGroupVariables(@Context final UriInfo uriInfo, @PathParam("occurrenceGroup") String occurrenceGroup) {
-    ArrayList<PathSegment> segments = Lists.newArrayList(uriInfo.getPathSegments());
-    final UriBuilder ub = uriInfo.getBaseUriBuilder();
-    final UriBuilder tableub = uriInfo.getBaseUriBuilder();
-    for(int i = 0; i < segments.size() - 3; i++) {
-      PathSegment segment = segments.get(i);
-      ub.segment(segment.getPath());
-      tableub.segment(segment.getPath());
-    }
-    ub.path(TableResource.class, "getVariable");
-    String tableUri = tableub.build().toString();
-    LinkDto.Builder tableLinkBuilder = LinkDto.newBuilder().setLink(tableUri).setRel(getValueTable().getName());
-
-    List<Variable> group = Lists.newArrayList();
-    for(Variable var : getValueTable().getVariables()) {
-      String gp = var.getOccurrenceGroup();
-      if(gp != null && gp.equals(occurrenceGroup)) {
-        group.add(var);
-      }
-    }
-
-    ArrayList<VariableDto> variables = Lists.newArrayList(Iterables.transform(group, Dtos.asDtoFunc(tableLinkBuilder.build(), ub)));
-    sortVariableDtoByName(variables);
-
-    return variables;
+  public VariablesResource getVariables() {
+    return new VariablesResource(getValueTable());
   }
 
   /**
@@ -325,28 +200,6 @@ public class TableResource extends AbstractValueTableResource {
       throw new InvalidRequestException("IllegalParameterValue", "valueType", valueTypeName);
     }
     return valueType;
-  }
-
-  @POST
-  @Path("/variables")
-  public Response addOrUpdateVariables(List<VariableDto> variables) {
-    VariableWriter vw = null;
-    try {
-
-      // @TODO Check if table can be modified and respond with "IllegalTableModification" (it seems like this cannot be
-      // done with the current Magma implementation).
-
-      vw = getValueTable().getDatasource().createWriter(getValueTable().getName(), getValueTable().getEntityType()).writeVariables();
-      for(VariableDto variable : variables) {
-        vw.writeVariable(Dtos.fromDto(variable));
-      }
-
-      return Response.ok().build();
-    } catch(Exception e) {
-      return Response.status(Status.INTERNAL_SERVER_ERROR).entity(getErrorMessage(Status.INTERNAL_SERVER_ERROR, e.toString())).build();
-    } finally {
-      StreamUtil.silentSafeClose(vw);
-    }
   }
 
   public VariableResource getVariableResource(VariableValueSource source) {

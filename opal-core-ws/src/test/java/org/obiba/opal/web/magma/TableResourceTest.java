@@ -25,8 +25,8 @@ import java.util.Locale;
 
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import junit.framework.Assert;
 
@@ -38,8 +38,8 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.Variable;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
+import org.obiba.magma.Variable;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
@@ -113,7 +113,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     replay(uriInfoMock);
     replay(segments.toArray());
 
-    List<VariableDto> dtos = Lists.newArrayList(resource.getVariables(uriInfoMock, null, 0, null));
+    List<VariableDto> dtos = Lists.newArrayList(resource.getVariables().getVariables(uriInfoMock, null, 0, null));
 
     verify(uriInfoMock);
     verify(segments.toArray());
@@ -181,7 +181,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
       variablesDto.add(VariableDto.newBuilder().setName("name").setEntityType("entityType").setValueType("text").setIsRepeatable(false).build());
     }
 
-    resource.addOrUpdateVariables(variablesDto);
+    resource.getVariables().addOrUpdateVariables(variablesDto);
 
     verify(valueTableMock, datasourceMock, valueTableWriterMock, variableWriterMock);
 
@@ -190,7 +190,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testAddOrUpdateVariables_InternalServerError() {
     TableResource resource = new TableResource(null);
-    Response response = resource.addOrUpdateVariables(null);
+    Response response = resource.getVariables().addOrUpdateVariables(null);
     Assert.assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
   }
 
