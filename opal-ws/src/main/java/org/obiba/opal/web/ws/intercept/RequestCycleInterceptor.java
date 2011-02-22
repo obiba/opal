@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.ws.intercept;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
@@ -24,6 +27,7 @@ import org.jboss.resteasy.spi.interception.PostProcessInterceptor;
 import org.jboss.resteasy.spi.interception.PreProcessInterceptor;
 import org.obiba.opal.web.ws.inject.RequestAttributesProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 
@@ -36,15 +40,17 @@ public class RequestCycleInterceptor implements PreProcessInterceptor, PostProce
 
   private final RequestAttributesProvider requestAttributesProvider;
 
-  private final Set<RequestCyclePreProcess> preProcesses;
+  private final List<RequestCyclePreProcess> preProcesses;
 
-  private final Set<RequestCyclePostProcess> postProcesses;
+  private final List<RequestCyclePostProcess> postProcesses;
 
   @Autowired
   public RequestCycleInterceptor(RequestAttributesProvider provider, Set<RequestCyclePreProcess> preProcesses, Set<RequestCyclePostProcess> postProcesses) {
     this.requestAttributesProvider = provider;
-    this.preProcesses = preProcesses;
-    this.postProcesses = postProcesses;
+    this.preProcesses = new ArrayList<RequestCyclePreProcess>(preProcesses);
+    this.postProcesses = new ArrayList<RequestCyclePostProcess>(postProcesses);
+    Collections.sort(this.preProcesses, new AnnotationAwareOrderComparator());
+    Collections.sort(this.postProcesses, new AnnotationAwareOrderComparator());
   }
 
   @Override

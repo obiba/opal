@@ -11,6 +11,7 @@ package org.obiba.opal.web.security;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.SessionsSecurityManager;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionException;
 import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionKey;
@@ -59,15 +60,18 @@ abstract class AbstractSecurityComponent {
   }
 
   protected boolean isValidSessionId(String sessionId) {
+    return getSession(sessionId) != null;
+  }
+
+  protected Session getSession(String sessionId) {
     if(sessionId != null) {
       SessionKey key = new DefaultSessionKey(sessionId);
       try {
-        return securityManager.getSessionManager().getSession(key) != null;
+        return securityManager.getSessionManager().getSession(key);
       } catch(SessionException e) {
         // Means that the session does not exist or has expired.
       }
     }
-    return false;
+    return null;
   }
-
 }

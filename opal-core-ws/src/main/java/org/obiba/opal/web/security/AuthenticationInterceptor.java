@@ -20,33 +20,35 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.session.Session;
-import org.jboss.resteasy.annotations.interception.ServerInterceptor;
+import org.apache.shiro.subject.Subject;
 import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.Failure;
 import org.jboss.resteasy.spi.HttpRequest;
-import org.jboss.resteasy.spi.interception.PostProcessInterceptor;
-import org.jboss.resteasy.spi.interception.PreProcessInterceptor;
 import org.jboss.resteasy.util.HttpHeaderNames;
+import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
+import org.obiba.opal.web.ws.intercept.RequestCyclePreProcess;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
-@ServerInterceptor
-public class SecurityInterceptor extends AbstractSecurityComponent implements PreProcessInterceptor, PostProcessInterceptor {
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public class AuthenticationInterceptor extends AbstractSecurityComponent implements RequestCyclePreProcess, RequestCyclePostProcess {
 
-  private static final Logger log = LoggerFactory.getLogger(SecurityInterceptor.class);
+  private static final Logger log = LoggerFactory.getLogger(AuthenticationInterceptor.class);
 
   private static final String X_OPAL_AUTH = "X-Opal-Auth";
 
   private static final String OPAL_SESSION_ID_COOKIE_NAME = "opalsid";
 
   @Autowired
-  public SecurityInterceptor(SessionsSecurityManager securityManager) {
+  public AuthenticationInterceptor(SessionsSecurityManager securityManager) {
     super(securityManager);
   }
 
@@ -68,6 +70,8 @@ public class SecurityInterceptor extends AbstractSecurityComponent implements Pr
     // If method allows authentication using the cookie only and a valid cookie is present
     // let method through
     if(isWebServiceAuthenticatedByCookie(method) && isOpalCookieValid(request)) {
+      // We need to login the user at this point
+      authenticateWithCookie(request);
       return null;
     }
 
@@ -76,7 +80,7 @@ public class SecurityInterceptor extends AbstractSecurityComponent implements Pr
   }
 
   @Override
-  public void postProcess(ServerResponse response) {
+  public void postProcess(HttpRequest request, ResourceMethod resourceMethod, ServerResponse response) {
     // Set the cookie if the user is still authenticated
     if(isUserAuthenticated()) {
       Session session = SecurityUtils.getSubject().getSession();
@@ -98,6 +102,15 @@ public class SecurityInterceptor extends AbstractSecurityComponent implements Pr
       return isValidSessionId(cookie.getValue());
     }
     return false;
+  }
+
+  private void authenticateWithCookie(HttpRequest request) {
+    Cookie sessionCookie = request.getHttpHeaders().getCookies().get(OPAL_SESSION_ID_COOKIE_NAME);
+    if(sessionCookie == null) throw new IllegalStateException("no cookie for authentication");
+
+    HttpCookieAuthenticationToken token = new HttpCookieAuthenticationToken(sessionCookie.getValue(), request.getUri().getRequestUri().toString());
+    Subject subject = new Subject.Builder(getSecurityManager()).sessionId(sessionCookie.getValue()).buildSubject();
+    subject.login(token);
   }
 
   private boolean isWebServiceAuthenticated(Annotation... annotations) {

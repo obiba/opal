@@ -27,6 +27,7 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.eclipse.jetty.http.HttpHeaders;
 import org.obiba.opal.web.security.HttpAuthorizationToken;
+import org.obiba.opal.web.security.HttpCookieAuthenticationToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -91,10 +92,9 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     Subject subject = null;
     if(hasOpalAuthHeader(request)) {
       String opalAuthToken = getOpalAuthToken(request);
-      if(isValidSessionId(opalAuthToken)) {
-        subject = new Subject.Builder(getSecurityManager()).sessionId(opalAuthToken).authenticated(true).buildSubject();
-        ThreadContext.bind(subject);
-      }
+      HttpCookieAuthenticationToken token = new HttpCookieAuthenticationToken(opalAuthToken, request.getRequestURI());
+      subject = new Subject.Builder(getSecurityManager()).sessionId(opalAuthToken).buildSubject();
+      subject.login(token);
     }
 
     if(subject == null && hasAuthorizationHeader(request)) {
