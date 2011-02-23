@@ -155,7 +155,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
       updateTable(tableDto != null ? tableDto.getName() : null);
 
       // make sure the list of datasources is initialized before looking for siblings
-      if(datasources == null || datasources.length() == 0) {
+      if(datasources == null || datasources.length() == 0 || getDatasourceIndex(datasourceDto) < 0) {
         ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
           @Override
           public void onResource(Response response, JsArray<DatasourceDto> resource) {
