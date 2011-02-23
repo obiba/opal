@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
 
-import static org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter.COPY_ACTION;
 import static org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter.EDIT_ACTION;
 
@@ -157,7 +156,7 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
       }
     }, translations.typeLabel());
 
-    methodActionsColumn = new ActionsColumn<DataShieldMethodDto>(new ConstantActionsProvider<DataShieldMethodDto>(EDIT_ACTION, COPY_ACTION, DELETE_ACTION));
+    methodActionsColumn = new ActionsColumn<DataShieldMethodDto>(new ConstantActionsProvider<DataShieldMethodDto>(EDIT_ACTION, DELETE_ACTION));
     methodsTable.addColumn(methodActionsColumn, translations.actionsLabel());
   }
 
