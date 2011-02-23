@@ -87,9 +87,11 @@
               <!-- Delete resources created by gwt:run -->
               <directory>war</directory>
               <includes>
-                <include>org.obiba.**</include>
+                <include>org.obiba.*/**/*</include>
+                <include>org.obiba.*</include>
+                <include>opal/**/*</include>
                 <include>opal</include>
-                <include>WEB-INF/lib/**</include>
+                <include>WEB-INF/lib/*</include>
               </includes>
             </fileset>
           </filesets>
