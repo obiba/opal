@@ -15,8 +15,6 @@ import org.obiba.opal.web.gwt.app.client.presenter.HelpUtil;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.MouseOverEvent;
-import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
@@ -55,10 +53,10 @@ public class HelpImage extends Image implements HasWidgets {
   private Tooltip getTooltip() {
     if(tooltip == null) {
       tooltip = new Tooltip();
-      addMouseOverHandler(new MouseOverHandler() {
+      addClickHandler(new ClickHandler() {
 
         @Override
-        public void onMouseOver(MouseOverEvent evt) {
+        public void onClick(ClickEvent evt) {
           tooltip.setPopupPosition(evt.getNativeEvent().getClientX(), evt.getNativeEvent().getClientY());
           tooltip.setSize(tooltipWidth, tooltipHeight);
           tooltip.show();

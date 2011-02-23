@@ -108,6 +108,7 @@ textarea {
 
 img.help {
     vertical-align: text-bottom;
+    cursor: pointer;
 }
 
 .gwt-MenuBar-horizontal .gwt-MenuItem {
