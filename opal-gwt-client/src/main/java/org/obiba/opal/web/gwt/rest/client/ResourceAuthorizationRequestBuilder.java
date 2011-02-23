@@ -26,6 +26,8 @@ public interface ResourceAuthorizationRequestBuilder {
 
   public ResourceAuthorizationRequestBuilder delete();
 
+  public ResourceAuthorizationRequestBuilder request(String resource, HttpMethod method);
+
   public ResourceAuthorizationRequestBuilder authorize(HasAuthorization toAuthorize);
 
   public void send();

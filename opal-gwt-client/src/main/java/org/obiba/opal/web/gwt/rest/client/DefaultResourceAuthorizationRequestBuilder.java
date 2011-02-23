@@ -42,6 +42,12 @@ public class DefaultResourceAuthorizationRequestBuilder implements ResourceAutho
   }
 
   @Override
+  public ResourceAuthorizationRequestBuilder request(String resource, HttpMethod method) {
+    forResource(resource);
+    return method(method);
+  }
+
+  @Override
   public ResourceAuthorizationRequestBuilder forResource(String resource) {
     if(resource == null) throw new IllegalArgumentException("path cannot be null");
     this.resource = resource;
@@ -50,25 +56,26 @@ public class DefaultResourceAuthorizationRequestBuilder implements ResourceAutho
 
   @Override
   public ResourceAuthorizationRequestBuilder get() {
-    this.method = HttpMethod.GET;
-    return this;
+    return method(HttpMethod.GET);
   }
 
   @Override
   public ResourceAuthorizationRequestBuilder post() {
-    this.method = HttpMethod.POST;
-    return this;
+    return method(HttpMethod.POST);
   }
 
   @Override
   public ResourceAuthorizationRequestBuilder put() {
-    this.method = HttpMethod.PUT;
-    return this;
+    return method(HttpMethod.PUT);
   }
 
   @Override
   public ResourceAuthorizationRequestBuilder delete() {
-    this.method = HttpMethod.DELETE;
+    return method(HttpMethod.DELETE);
+  }
+
+  private ResourceAuthorizationRequestBuilder method(HttpMethod method) {
+    this.method = method;
     return this;
   }
 

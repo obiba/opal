@@ -20,7 +20,9 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEve
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
+import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -151,7 +153,12 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     // import data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/import").post().authorize(getDisplay().getImportDataAuthorizer()).send();
     // export data
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().authorize(getDisplay().getExportDataAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post()//
+    .authorize(CascadingAuthorizer.newBuilder().request("/files/meta", HttpMethod.GET)//
+    .request("/functional-units", HttpMethod.GET)//
+    .request("/functional-units/entities/table", HttpMethod.GET)//
+    .authorize(getDisplay().getExportDataAuthorizer()).build())//
+    .send();
   }
 
   private void displayDetails(WidgetDisplay detailsDisplay) {
