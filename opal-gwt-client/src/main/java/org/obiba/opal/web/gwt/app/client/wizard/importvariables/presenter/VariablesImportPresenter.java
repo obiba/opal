@@ -33,7 +33,6 @@ import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErr
 import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -235,12 +234,8 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
   class DownloadExcelTemplateClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent event) {
-      String url = new StringBuilder(getUrlPrefix()).append("ws/templates").append(EXCEL_TEMPLATE).toString();
+      String url = new StringBuilder("/templates").append(EXCEL_TEMPLATE).toString();
       eventBus.fireEvent(new FileDownloadEvent(url));
-    }
-
-    String getUrlPrefix() {
-      return GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "");
     }
   }
 

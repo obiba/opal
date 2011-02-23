@@ -22,7 +22,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -141,8 +140,7 @@ public class FunctionalUnitPresenter extends WidgetPresenter<FunctionalUnitPrese
 
     @Override
     public void onClick(ClickEvent event) {
-      String url = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")) //
-      .append("ws/functional-units/entities/csv").toString();
+      String url = new StringBuilder("/functional-units/entities/csv").toString();
       eventBus.fireEvent(new FileDownloadEvent(url));
     }
 

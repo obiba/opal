@@ -39,7 +39,6 @@ import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -210,7 +209,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   }
 
   private void downloadMetadata(String datasource) {
-    String downloadUrl = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "ws")).append("/datasource/").append(datasource).append("/tables/excel").toString();
+    String downloadUrl = new StringBuilder("/datasource/").append(datasource).append("/tables/excel").toString();
     eventBus.fireEvent(new FileDownloadEvent(downloadUrl));
   }
 

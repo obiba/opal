@@ -31,7 +31,6 @@ import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -272,7 +271,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   }
 
   private void downloadFile(final FileDto file) {
-    String url = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")).append("ws/files").append(file.getPath()).toString();
+    String url = new StringBuilder("/files").append(file.getPath()).toString();
     eventBus.fireEvent(new FileDownloadEvent(url));
   }
 }

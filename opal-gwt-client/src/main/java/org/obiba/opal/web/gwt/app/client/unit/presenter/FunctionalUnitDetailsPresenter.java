@@ -41,7 +41,6 @@ import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.opal.KeyPairDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
@@ -291,8 +290,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
   }
 
   private void downloadCertificate(final KeyPairDto dto) {
-    String url = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")) //
-    .append("ws/functional-unit/").append(functionalUnit.getName()) //
+    String url = new StringBuilder("/functional-unit/").append(functionalUnit.getName()) //
     .append("/key/").append(dto.getAlias()).append("/certificate").toString();
     eventBus.fireEvent(new FileDownloadEvent(url));
   }
@@ -339,8 +337,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
   private final class DownloadIdentifiersCommand implements Command {
     @Override
     public void execute() {
-      String url = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")) //
-      .append("ws/functional-unit/").append(functionalUnit.getName()) //
+      String url = new StringBuilder("/functional-unit/").append(functionalUnit.getName()) //
       .append("/entities/identifiers").toString();
       eventBus.fireEvent(new FileDownloadEvent(url));
     }
@@ -382,8 +379,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
   private final class ExportIdentifiersCommand implements Command {
     @Override
     public void execute() {
-      String url = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")) //
-      .append("ws/functional-unit/").append(functionalUnit.getName()) //
+      String url = new StringBuilder("/functional-unit/").append(functionalUnit.getName()) //
       .append("/entities/csv").toString();
       eventBus.fireEvent(new FileDownloadEvent(url));
     }

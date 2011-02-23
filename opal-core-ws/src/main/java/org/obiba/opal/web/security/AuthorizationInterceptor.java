@@ -32,6 +32,7 @@ import org.obiba.opal.core.service.SubjectAclService;
 import org.obiba.opal.web.ws.inject.RequestAttributesProvider;
 import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
 import org.obiba.opal.web.ws.intercept.RequestCyclePreProcess;
+import org.obiba.opal.web.ws.security.AuthorizeResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +65,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent implemen
   @Override
   public Response preProcess(HttpRequest request, ResourceMethod resourceMethod) {
     if(isWebServicePublic(resourceMethod) == false && isWebServiceWithoutAuthorization(resourceMethod) == false) {
-      if(getSubject().isPermitted("magma:" + request.getUri().getPath() + ":" + request.getHttpMethod()) == false) {
+      if(getSubject().isPermitted("magma:" + getResourceMethodUri(request, resourceMethod) + ":" + request.getHttpMethod()) == false) {
         return Response.status(Status.FORBIDDEN).build();
       }
     }
@@ -106,6 +107,15 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent implemen
     String availableMethods = (String) response.getMetadata().getFirst(ALLOW_HTTP_HEADER);
     UriInfo uri = requestAttributeProvider.getUriInfo();
     return allow(allowed(uri.getPath(), ImmutableSet.of(availableMethods.split(", "))));
+  }
+
+  protected String getResourceMethodUri(HttpRequest request, ResourceMethod resourceMethod) {
+    UriInfo info = request.getUri();
+    if(resourceMethod.getMethod().isAnnotationPresent(AuthorizeResource.class)) {
+      return info.getPath();
+    } else {
+      return info.getPath();
+    }
   }
 
   private void addPermission(Iterable<URI> resourceUris) {

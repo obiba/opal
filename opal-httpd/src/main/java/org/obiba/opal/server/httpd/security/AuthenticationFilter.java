@@ -17,6 +17,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.session.Session;
@@ -26,8 +27,10 @@ import org.apache.shiro.session.mgt.SessionKey;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.eclipse.jetty.http.HttpHeaders;
+import org.eclipse.jetty.http.HttpStatus;
 import org.obiba.opal.web.security.HttpAuthorizationToken;
 import org.obiba.opal.web.security.HttpCookieAuthenticationToken;
+import org.obiba.opal.web.security.HttpHeaderAuthenticationToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -39,6 +42,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
   private static final String X_OPAL_AUTH = "X-Opal-Auth";
 
   private static final String OPAL_SESSION_ID_COOKIE_NAME = "opalsid";
+
+  private static final String OPAL_REQUEST_ID_COOKIE_NAME = "opalrid";
 
   private final SessionsSecurityManager securityManager;
 
@@ -59,6 +64,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     try {
       authenticateAndBind(request);
       filterChain.doFilter(request, response);
+    } catch(AuthenticationException e) {
+      response.setStatus(HttpStatus.UNAUTHORIZED_401);
     } finally {
       unbind();
     }
@@ -92,7 +99,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     Subject subject = null;
     if(hasOpalAuthHeader(request)) {
       String opalAuthToken = getOpalAuthToken(request);
-      HttpCookieAuthenticationToken token = new HttpCookieAuthenticationToken(opalAuthToken, request.getRequestURI());
+      HttpHeaderAuthenticationToken token = new HttpHeaderAuthenticationToken(opalAuthToken);
       subject = new Subject.Builder(getSecurityManager()).sessionId(opalAuthToken).buildSubject();
       subject.login(token);
     }
@@ -102,6 +109,14 @@ public class AuthenticationFilter extends OncePerRequestFilter {
       String sessionId = extractSessionId(request);
 
       HttpAuthorizationToken token = new HttpAuthorizationToken(X_OPAL_AUTH, authorization);
+      subject = new Subject.Builder(getSecurityManager()).sessionId(sessionId).buildSubject();
+      subject.login(token);
+    }
+
+    if(subject == null && hasOpalSessionCookie(request) && hasOpalRequestCookie(request)) {
+      String sessionId = extractSessionId(request);
+      String requestId = extractRequestId(request);
+      HttpCookieAuthenticationToken token = new HttpCookieAuthenticationToken(sessionId, request.getRequestURI(), requestId);
       subject = new Subject.Builder(getSecurityManager()).sessionId(sessionId).buildSubject();
       subject.login(token);
     }
@@ -138,6 +153,11 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     return request.getHeader(X_OPAL_AUTH);
   }
 
+  private boolean hasOpalSessionCookie(HttpServletRequest request) {
+    Cookie cookie = findCookie(request, OPAL_SESSION_ID_COOKIE_NAME);
+    return cookie != null && cookie.getValue() != null;
+  }
+
   private boolean hasAuthorizationHeader(HttpServletRequest request) {
     String header = getAuthorizationHeader(request);
     return header != null && header.isEmpty() == false;
@@ -157,6 +177,19 @@ public class AuthenticationFilter extends OncePerRequestFilter {
       }
     }
     return sessionId;
+  }
+
+  private boolean hasOpalRequestCookie(HttpServletRequest request) {
+    Cookie cookie = findCookie(request, OPAL_REQUEST_ID_COOKIE_NAME);
+    return cookie != null && cookie.getValue() != null;
+  }
+
+  private String extractRequestId(HttpServletRequest request) {
+    Cookie cookie = findCookie(request, OPAL_REQUEST_ID_COOKIE_NAME);
+    if(cookie != null) {
+      return cookie.getValue();
+    }
+    return null;
   }
 
   private Cookie findCookie(HttpServletRequest request, String cookieName) {

@@ -82,7 +82,7 @@ public class VariablesImportPresenterTest {
   @Test
   public void testDownloadExcelTemplateButton_FiresFileDownloadEvent() {
     // Setup
-    eventBusMock.fireEvent(eqFileDownloadEvent(new FileDownloadEvent("prefix/ws/templates/opalVariableTemplate.xls")));
+    eventBusMock.fireEvent(eqFileDownloadEvent(new FileDownloadEvent("/templates/opalVariableTemplate.xls")));
     expectLastCall().once();
 
     replay(displayMock, eventBusMock);
@@ -92,10 +92,6 @@ public class VariablesImportPresenterTest {
     // Exercise
     VariablesImportPresenter.DownloadExcelTemplateClickHandler sut = presenter.new DownloadExcelTemplateClickHandler() {
 
-      @Override
-      String getUrlPrefix() {
-        return "prefix/";
-      }
     };
     sut.onClick(new DummyClickEvent());
 

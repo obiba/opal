@@ -16,6 +16,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 
 import com.google.inject.Inject;
 
@@ -34,18 +35,13 @@ public class FileDownloadPresenter extends BasicPresenter<FileDownloadPresenter.
     public void setUrl(String url);
   }
 
-  //
-  // Constructors
-  //
+  private final RequestUrlBuilder urlBuilder;
 
   @Inject
-  public FileDownloadPresenter(Display display, EventBus eventBus) {
+  public FileDownloadPresenter(Display display, EventBus eventBus, RequestUrlBuilder urlBuilder) {
     super(display, eventBus);
+    this.urlBuilder = urlBuilder;
   }
-
-  //
-  // BasicPresenter Methods
-  //
 
   @Override
   protected void onBind() {
@@ -78,11 +74,8 @@ public class FileDownloadPresenter extends BasicPresenter<FileDownloadPresenter.
   public void revealDisplay() {
   }
 
-  //
-  // Methods
-  //
-
   public void downloadFile(String url) {
-    getDisplay().getFileDownloader().setUrl(url);
+    getDisplay().getFileDownloader().setUrl(urlBuilder.buildAbsoluteUrl(url));
   }
+
 }

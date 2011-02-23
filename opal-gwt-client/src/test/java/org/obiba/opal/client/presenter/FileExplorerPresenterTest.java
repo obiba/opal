@@ -34,6 +34,7 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.FileSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FolderCreationEvent;
+import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
@@ -71,6 +72,8 @@ public class FileExplorerPresenterTest extends AbstractGwtTestSetup {
 
   private CreateFolderDialogPresenter createFolderDialogPresenter;
 
+  private RequestUrlBuilder urlBuilderMock;
+
   @Before
   public void setUp() {
     eventBusMock = createMock(EventBus.class);
@@ -82,7 +85,8 @@ public class FileExplorerPresenterTest extends AbstractGwtTestSetup {
     folderDetailsPresenter = new FolderDetailsPresenter(folderDetailsDisplayMock, eventBusMock);
 
     fileUploadDialogDisplayMock = createMock(FileUploadDialogPresenter.Display.class);
-    fileUploadDialogPresenter = new FileUploadDialogPresenter(fileUploadDialogDisplayMock, eventBusMock);
+    urlBuilderMock = createMock(RequestUrlBuilder.class);
+    fileUploadDialogPresenter = new FileUploadDialogPresenter(fileUploadDialogDisplayMock, eventBusMock, urlBuilderMock);
 
     createFolderDialogDisplayMock = createMock(CreateFolderDialogPresenter.Display.class);
     createFolderDialogPresenter = new CreateFolderDialogPresenter(createFolderDialogDisplayMock, eventBusMock);

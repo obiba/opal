@@ -11,20 +11,14 @@ package org.obiba.opal.web.security;
 
 import org.apache.shiro.authc.AuthenticationToken;
 
-public class HttpCookieAuthenticationToken implements AuthenticationToken {
+public class HttpHeaderAuthenticationToken implements AuthenticationToken {
 
   private static final long serialVersionUID = 4520790559763117320L;
 
   private final String sessionId;
 
-  private final String url;
-
-  private final String hash;
-
-  public HttpCookieAuthenticationToken(String sessionId, String url, String hash) {
+  public HttpHeaderAuthenticationToken(String sessionId) {
     this.sessionId = sessionId;
-    this.url = url;
-    this.hash = hash;
   }
 
   @Override
@@ -34,19 +28,11 @@ public class HttpCookieAuthenticationToken implements AuthenticationToken {
 
   @Override
   public Object getCredentials() {
-    return getHash();
+    return null;
   }
 
   public String getSessionId() {
     return sessionId;
-  }
-
-  public String getUrl() {
-    return url;
-  }
-
-  public String getHash() {
-    return hash;
   }
 
 }

@@ -44,7 +44,6 @@ import org.obiba.opal.web.model.client.opal.ParameterDto;
 import org.obiba.opal.web.model.client.opal.ReportCommandOptionsDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -250,7 +249,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
   }
 
   private void downloadFile(String filePath) {
-    String url = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "")).append("ws/files").append(filePath).toString();
+    String url = new StringBuilder("/files").append(filePath).toString();
     eventBus.fireEvent(new FileDownloadEvent(url));
   }
 

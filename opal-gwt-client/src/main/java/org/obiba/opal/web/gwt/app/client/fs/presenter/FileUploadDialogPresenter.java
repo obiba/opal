@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
 import com.google.gwt.core.client.GWT;
@@ -60,9 +61,12 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
 
   private Runnable actionRequiringConfirmation;
 
+  private final RequestUrlBuilder urlBuilder;
+
   @Inject
-  public FileUploadDialogPresenter(Display display, EventBus eventBus) {
+  public FileUploadDialogPresenter(Display display, EventBus eventBus, RequestUrlBuilder urlBuilder) {
     super(display, eventBus);
+    this.urlBuilder = urlBuilder;
   }
 
   @Override
@@ -164,8 +168,7 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
   }
 
   private void submitFile() {
-    String url = "/ws/files" + currentFolder.getPath();
-    getDisplay().submit(url);
+    getDisplay().submit(urlBuilder.buildAbsoluteUrl("/files" + currentFolder.getPath()));
   }
 
   public void setCurrentFolder(FileDto currentFolder) {

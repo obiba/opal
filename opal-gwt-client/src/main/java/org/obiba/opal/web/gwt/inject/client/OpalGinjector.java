@@ -51,6 +51,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.IdentityArc
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.XmlFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
+import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
 
 import com.google.gwt.inject.client.GinModules;
@@ -64,6 +65,8 @@ public interface OpalGinjector extends Ginjector {
   ResourceAuthorizationCache getResourceAuthorizationCache();
 
   RequestCredentials getRequestCredentials();
+
+  RequestUrlBuilder getRequestUrlBuilder();
 
   ApplicationPresenter getApplicationPresenter();
 

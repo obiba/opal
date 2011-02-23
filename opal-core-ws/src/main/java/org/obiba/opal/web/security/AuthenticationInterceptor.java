@@ -20,7 +20,6 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.session.Session;
-import org.apache.shiro.subject.Subject;
 import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.Failure;
@@ -70,8 +69,6 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent impleme
     // If method allows authentication using the cookie only and a valid cookie is present
     // let method through
     if(isWebServiceAuthenticatedByCookie(method) && isOpalCookieValid(request)) {
-      // We need to login the user at this point
-      authenticateWithCookie(request);
       return null;
     }
 
@@ -102,15 +99,6 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent impleme
       return isValidSessionId(cookie.getValue());
     }
     return false;
-  }
-
-  private void authenticateWithCookie(HttpRequest request) {
-    Cookie sessionCookie = request.getHttpHeaders().getCookies().get(OPAL_SESSION_ID_COOKIE_NAME);
-    if(sessionCookie == null) throw new IllegalStateException("no cookie for authentication");
-
-    HttpCookieAuthenticationToken token = new HttpCookieAuthenticationToken(sessionCookie.getValue(), request.getUri().getRequestUri().toString());
-    Subject subject = new Subject.Builder(getSecurityManager()).sessionId(sessionCookie.getValue()).buildSubject();
-    subject.login(token);
   }
 
   private boolean isWebServiceAuthenticated(Annotation... annotations) {

@@ -44,7 +44,6 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -177,7 +176,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   }
 
   private void downloadMetadata() {
-    String downloadUrl = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "ws")).append(this.table.getLink()).append("/variables/excel").toString();
+    String downloadUrl = new StringBuilder(this.table.getLink()).append("/variables/excel").toString();
     eventBus.fireEvent(new FileDownloadEvent(downloadUrl));
   }
 
@@ -292,7 +291,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   final class DownloadViewCommand implements Command {
     @Override
     public void execute() {
-      String downloadUrl = new StringBuilder(GWT.getModuleBaseURL().replace(GWT.getModuleName() + "/", "ws")).append(table.getViewLink()).append("/xml").toString();
+      String downloadUrl = new StringBuilder(table.getViewLink()).append("/xml").toString();
       eventBus.fireEvent(new FileDownloadEvent(downloadUrl));
     }
   }

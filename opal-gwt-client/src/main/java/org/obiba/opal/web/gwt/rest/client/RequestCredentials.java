@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.rest.client;
 
+import java.util.Date;
+
+import com.google.gwt.core.client.impl.Md5Digest;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.user.client.Cookies;
 
@@ -22,11 +25,30 @@ public class RequestCredentials {
   /** Opal session id cookie name. */
   private static final String OPALSID = "opalsid";
 
+  /** Opal request id cookie name. */
+  private static final String OPALRID = "opalrid";
+
   public RequestBuilder provideCredentials(RequestBuilder builder) {
     if(hasCredentials()) {
       builder.setHeader("X-Opal-Auth", extractCredentials());
     }
     return builder;
+  }
+
+  /**
+   * Adds credentials to allow making a request to the specified URL without using AJAX.
+   * 
+   * @param url the URL to request (GET, POST)
+   */
+  public void provideCredentials(String url) {
+    if(hasCredentials()) {
+      Md5Digest digest = new Md5Digest();
+      digest.update(extractCredentials().getBytes());
+      String urlHash = toHexString(digest.digest(url.getBytes()));
+      long time = new Date().getTime();
+      // Cookie will be valid for 1 second
+      Cookies.setCookie(OPALRID, urlHash, new Date(time + 1000), null, "/", false);
+    }
   }
 
   /**
@@ -59,4 +81,14 @@ public class RequestCredentials {
   public String extractCredentials() {
     return Cookies.getCookie(RequestCredentials.OPALSID);
   }
+
+  private static String toHexString(byte[] bytes) {
+    StringBuilder buf = new StringBuilder();
+    for(int i = 0; i < bytes.length; ++i) {
+      String hex = Integer.toHexString(bytes[i] & 0xFF);
+      buf.append("00".substring(hex.length())).append(hex);
+    }
+    return buf.toString();
+  }
+
 }
