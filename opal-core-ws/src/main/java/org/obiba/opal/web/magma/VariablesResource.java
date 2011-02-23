@@ -50,15 +50,11 @@ import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.AuthorizeResource;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-@Component
-@Scope("prototype")
 public class VariablesResource extends AbstractValueTableResource {
 
   public VariablesResource(ValueTable valueTable, Set<Locale> locales) {

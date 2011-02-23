@@ -47,8 +47,6 @@ import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.ValueSetDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -56,8 +54,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
-@Component
-@Scope("prototype")
 public class TableResource extends AbstractValueTableResource {
 
   public TableResource(ValueTable valueTable, Set<Locale> locales) {
