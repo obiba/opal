@@ -151,7 +151,11 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     // create datasource
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").post().authorize(getDisplay().getCreateDatasourceAuthorizer()).send();
     // import data
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/import").post().authorize(getDisplay().getImportDataAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/import").post()//
+    .authorize(CascadingAuthorizer.newBuilder().request("/files/meta", HttpMethod.GET)//
+    .request("/functional-units", HttpMethod.GET)//
+    .authorize(getDisplay().getImportDataAuthorizer()).build())//
+    .send();
     // export data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post()//
     .authorize(CascadingAuthorizer.newBuilder().request("/files/meta", HttpMethod.GET)//
