@@ -57,6 +57,7 @@ import org.obiba.core.util.StreamUtil;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -264,6 +265,7 @@ public class FilesResource {
   @GET
   @Cache
   @Path("/charsets/available")
+  @NoAuthorization
   public Response getAvailableCharsets() {
     SortedMap<String, Charset> charsets = java.nio.charset.Charset.availableCharsets();
     List<String> names = new ArrayList<String>();
@@ -277,6 +279,7 @@ public class FilesResource {
   @GET
   @Cache
   @Path("/charsets/default")
+  @NoAuthorization
   public Response getDefaultCharset() {
     return Response.ok(new JSONArray(Arrays.asList(new String[] { defaultCharset })).toString()).build();
   }

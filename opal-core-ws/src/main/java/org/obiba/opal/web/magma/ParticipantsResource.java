@@ -19,6 +19,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -41,6 +42,7 @@ public class ParticipantsResource {
 
   @GET
   @Path("/count")
+  @NoAuthorization
   public Response getParticipantCount() {
     Set<Datasource> datasources = MagmaEngine.get().getDatasources();
     ImmutableSet.Builder<VariableEntity> participants = ImmutableSet.builder();

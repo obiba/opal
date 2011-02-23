@@ -16,6 +16,7 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.opal.web.model.Opal.LocaleDto;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 
 import com.google.common.collect.Lists;
 
@@ -45,6 +46,7 @@ abstract class AbstractValueTableResource {
 
   @GET
   @Path("/locales")
+  @NoAuthorization
   public Iterable<LocaleDto> getLocales(@QueryParam("locale") String displayLocale) {
     List<LocaleDto> localeDtos = new ArrayList<LocaleDto>();
     for(Locale locale : getLocales()) {

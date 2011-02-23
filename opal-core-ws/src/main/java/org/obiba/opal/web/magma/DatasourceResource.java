@@ -40,6 +40,7 @@ import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.obiba.opal.web.model.Opal.LocaleDto;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -171,6 +172,7 @@ public class DatasourceResource {
 
   @GET
   @Path("/locales")
+  @NoAuthorization
   public Iterable<LocaleDto> getLocales(@QueryParam("locale") String displayLocale) {
     List<LocaleDto> localeDtos = new ArrayList<LocaleDto>();
     for(Locale locale : getLocales()) {

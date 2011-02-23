@@ -18,6 +18,7 @@ import org.apache.shiro.session.mgt.SessionKey;
 import org.apache.shiro.subject.Subject;
 import org.jboss.resteasy.core.ResourceMethod;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 
 abstract class AbstractSecurityComponent {
@@ -48,6 +49,15 @@ abstract class AbstractSecurityComponent {
    */
   protected boolean isWebServicePublic(ResourceMethod method) {
     return method.getMethod().isAnnotationPresent(NotAuthenticated.class) || method.getResourceClass().isAnnotationPresent(NotAuthenticated.class);
+  }
+
+  /**
+   * Returns true when resource method or class is annotated with {@link NoAuthorization}, false otherwise.
+   * @param method
+   * @return
+   */
+  protected boolean isWebServiceWithoutAuthorization(ResourceMethod method) {
+    return method.getMethod().isAnnotationPresent(NoAuthorization.class) || method.getResourceClass().isAnnotationPresent(NoAuthorization.class);
   }
 
   /**

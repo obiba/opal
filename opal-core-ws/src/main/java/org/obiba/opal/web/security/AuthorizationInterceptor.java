@@ -63,7 +63,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent implemen
 
   @Override
   public Response preProcess(HttpRequest request, ResourceMethod resourceMethod) {
-    if(isWebServicePublic(resourceMethod) == false) {
+    if(isWebServicePublic(resourceMethod) == false && isWebServiceWithoutAuthorization(resourceMethod) == false) {
       if(getSubject().isPermitted("magma:" + request.getUri().getPath() + ":" + request.getHttpMethod()) == false) {
         return Response.status(Status.FORBIDDEN).build();
       }
