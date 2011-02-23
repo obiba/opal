@@ -22,7 +22,6 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FolderRefreshedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FolderCreationEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 
@@ -154,15 +153,17 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
     return getDisplay().getTableSelectionModel().getSelectedObject();
   }
 
-  private void updateTable(String path) {
+  private void updateTable(final String path) {
     getDisplay().clearSelection();
-    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta" + path).get().withCallback(new ResourceCallback<FileDto>() {
+
+    FileResourceRequest.newBuilder(eventBus).path(path).withCallback(new ResourceCallback<FileDto>() {
       @Override
-      public void onResource(Response response, FileDto resource) {
-        currentFolder = resource;
-        getDisplay().renderRows(resource);
+      public void onResource(Response response, FileDto file) {
+        currentFolder = file;
+        getDisplay().renderRows(file);
         eventBus.fireEvent(new FolderRefreshedEvent(currentFolder));
       }
     }).send();
+
   }
 }

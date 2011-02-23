@@ -112,12 +112,14 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
         getDisplay().selectFile(selectedFile, false);
 
         if(childrenNotAdded(selectedItem)) {
-          ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta" + selectedFile.getPath()).get().withCallback(new ResourceCallback<FileDto>() {
+
+          FileResourceRequest.newBuilder(eventBus).path(selectedFile.getPath()).withCallback(new ResourceCallback<FileDto>() {
             @Override
             public void onResource(Response response, FileDto file) {
               getDisplay().addBranch(selectedItem, file);
             }
           }).send();
+
         }
       }
 
@@ -170,7 +172,8 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
 
   private void refreshTreeNode(final TreeItem treeItem) {
     FileDto folder = (FileDto) treeItem.getUserObject();
-    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta" + folder.getPath()).get().withCallback(new ResourceCallback<FileDto>() {
+
+    FileResourceRequest.newBuilder(eventBus).path(folder.getPath()).withCallback(new ResourceCallback<FileDto>() {
       @Override
       public void onResource(Response response, FileDto file) {
         treeItem.removeItems();
@@ -178,5 +181,6 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
         getDisplay().selectFile(getDisplay().getSelectedFile(), false);
       }
     }).send();
+
   }
 }

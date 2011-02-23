@@ -232,16 +232,24 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
 
       cacheAuthorization(response);
 
+      boolean handled = false;
       if(authorizationCallback != null) {
+        handled = true;
         authorizationCallback.onResponseCode(request, response, authorizationCache.get(uri));
       }
 
       if(codes != null && codes[code] != null) {
+        handled = true;
         codes[code].onResponseCode(request, response);
-      } else if(resourceCallback != null && code < 400) {
+      }
+
+      if(resourceCallback != null && code < 400) {
+        handled = true;
         final T resource = (T) JsonUtils.unsafeEval(response.getText());
         resourceCallback.onResource(response, resource);
-      } else if(authorizationCallback == null) {
+      }
+
+      if(!handled) {
         eventBus.fireEvent(new UnhandledResponseEvent(request, response));
       }
     }
