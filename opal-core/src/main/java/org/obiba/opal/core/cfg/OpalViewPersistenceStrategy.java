@@ -20,6 +20,7 @@ import java.nio.charset.Charset;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.obiba.core.util.FileUtil;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
@@ -63,20 +64,25 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   @Override
   public void writeViews(String datasourceName, Set<View> views) {
     createViewsDirectory(); // Creates the views directory if it doesn't exist.
-    deleteViews(datasourceName); // Delete the old views before writing new ones.
     if(views.isEmpty()) {
       // Do nothing. The file containing the views has already been deleted.
     } else {
       XStream xstream = getXStream();
       OutputStreamWriter writer = null;
       try {
-        if(!getDatasourceFile(datasourceName).createNewFile()) throw new RuntimeException("Failed to create the views file '" + getDatasourceFile(datasourceName).getAbsolutePath() + "'.");
-        writer = new OutputStreamWriter(new FileOutputStream(getDatasourceFile(datasourceName)), UTF8);
+        File tmpFile = File.createTempFile(datasourceName, ".xml");
+        writer = new OutputStreamWriter(new FileOutputStream(tmpFile), UTF8);
         xstream.toXML(views, writer);
+
+        FileUtil.copyFile(tmpFile, getDatasourceViewsFile(datasourceName));
+        if(!tmpFile.delete()) {
+          // ignore;
+        }
+
       } catch(FileNotFoundException e) {
-        throw new RuntimeException("Could not find the views file '" + getDatasourceFile(datasourceName).getAbsolutePath() + "'. " + e);
+        throw new RuntimeException("Could not find the views file '" + getDatasourceViewsFile(datasourceName).getAbsolutePath() + "'. " + e);
       } catch(IOException e) {
-        throw new RuntimeException("Failed to create the views file '" + getDatasourceFile(datasourceName).getAbsolutePath() + "'. " + e);
+        throw new RuntimeException("Failed to create the views file '" + getDatasourceViewsFile(datasourceName).getAbsolutePath() + "'. " + e);
       } finally {
         StreamUtil.silentSafeClose(writer);
       }
@@ -86,12 +92,6 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   private void createViewsDirectory() {
     if(!viewsDirectory.isDirectory()) {
       if(!viewsDirectory.mkdirs()) throw new RuntimeException("The views directory '" + viewsDirectory.getAbsolutePath() + "' could not be created.");
-    }
-  }
-
-  private void deleteViews(String datasourceName) {
-    if(getDatasourceFile(datasourceName).exists()) {
-      if(!getDatasourceFile(datasourceName).delete()) throw new RuntimeException("Failed to delete the views file '" + getDatasourceFile(datasourceName).getAbsolutePath() + "'.");
     }
   }
 
@@ -106,7 +106,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     XStream xstream = getXStream();
     InputStreamReader reader = null;
     try {
-      reader = new InputStreamReader(new FileInputStream(getDatasourceFile(datasourceName)), UTF8);
+      reader = new InputStreamReader(new FileInputStream(getDatasourceViewsFile(datasourceName)), UTF8);
       result = (Set<View>) xstream.fromXML(reader);
     } catch(FileNotFoundException e) {
       return ImmutableSet.of();
@@ -125,7 +125,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     return escaper.matcher(datasourceName).replaceAll("");
   }
 
-  private File getDatasourceFile(String datasourceName) {
+  private File getDatasourceViewsFile(String datasourceName) {
     return new File(viewsDirectory, normalizeDatasourceName(datasourceName) + ".xml");
   }
 
