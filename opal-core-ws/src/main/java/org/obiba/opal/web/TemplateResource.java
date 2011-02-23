@@ -22,10 +22,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.stereotype.Component;
 
 @Component
 @Path("/templates")
+@NoAuthorization
 public class TemplateResource {
 
   private MimetypesFileTypeMap mimeTypes;
