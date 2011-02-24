@@ -10,25 +10,25 @@
                   
     <g:FlowPanel addStyleNames="panel">
       <g:FlowPanel addStyleNames="title">
-        <g:InlineLabel><ui:msg description="Aggregating Methods label" >Aggregating Methods</ui:msg></g:InlineLabel>
-        <o:HelpImage imageSize="16" tooltipWidth="400px">
+        <g:InlineLabel><ui:msg description="Aggregation Methods label" >Aggregation Methods</ui:msg></g:InlineLabel>
+        <o:HelpImage imageSize="16" tooltipWidth="500px" tooltipHeight="300px">
           <g:HTMLPanel>
-            <g:Label addStyleNames="title"><ui:msg description="Aggregating Methods label">Aggregating Methods</ui:msg></g:Label>
+            <g:Label addStyleNames="title"><ui:msg description="Aggregation Methods label">Aggregation Methods</ui:msg></g:Label>
             <p>
-              <ui:msg description="Aggregating Methods information">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              <ui:msg description="Aggregation Methods information">
+                The aggregation methods are used by DataShield in order to compile individual data. The same aggregation methods must be defined in each DataShield server that will be involved in a computation process. Each aggregation method is identified by a name that will be used from the R-DataShield client. 
               </ui:msg>
             </p>
             <g:Label addStyleNames="title"><ui:msg description="R Function label">R Function</ui:msg></g:Label>
             <p>
               <ui:msg description="R Function information">
-                Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                Some aggregation methods are already defined in R as functions. For security reasons, R functions should be fully named, i.e. including package name space. This way the aggregating function to be used can be unambiguously identified. For example use "base::summary" in place of "summary". 
               </ui:msg>
             </p>
             <g:Label addStyleNames="title"><ui:msg description="R Script label">R Script</ui:msg></g:Label>
             <p>
               <ui:msg description="R Script information">
-                Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                Any R script that does not return any individual data.
               </ui:msg>
             </p>
           </g:HTMLPanel>

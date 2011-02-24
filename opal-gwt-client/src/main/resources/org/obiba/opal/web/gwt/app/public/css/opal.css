@@ -318,6 +318,7 @@ margin-left:0.8em;
 	color: #cccccc;
 	-moz-border-radius-bottomleft: 0.5em; -webkit-border-bottom-left-radius: 0.5em; 
 	-moz-border-radius-bottomright: 0.5em; -webkit-border-bottom-right-radius: 0.5em;
+	-moz-box-shadow: 0.1em 0.05em 0.4em #888888;-webkit-box-shadow: 0.1em 0.05em 0.4em #888888;box-shadow: 0.1em 0.05em 0.4em #888888;
 }
 
 .top .gwt-MenuBar-horizontal .gwt-MenuItem.selected {
@@ -1024,7 +1025,7 @@ div.variablesListTabContent .form table {
 /* Tooltip */
 
 .tooltip, .tooltip a, .tooltip a:visited, .tooltip a:hover {
-	color: #ffffff;
+	color: #444444;
 }
 
 .tooltip a {
@@ -1032,13 +1033,16 @@ div.variablesListTabContent .form table {
 }
 
 .tooltip.gwt-PopupPanel {
-	border:0.2em solid #444444;
-	-moz-border-radius: 0 0 0 0; -webkit-border-radius: 0 0 0 0;
+	border:0.2em solid #402817;
+	-moz-border-radius: 0.5em 0.5em 0.5em 0.5em; -webkit-border-radius: 0.5em 0.5em 0.5em 0.5em;
+	-moz-box-shadow: 0.4em 0.4em 0.4em #CCCCCC; -webkit-box-shadow: 0.4em 0.4em 0.4em #CCCCCC; box-shadow: 0.4em 0.4em 0.4em #CCCCCC;
 	padding: 0;
 }
 
 .tooltip .header {
-	background-color: #666666;
+	-moz-border-radius: 0.5em 0.5em 0 0; -webkit-border-radius: 0.5em 0.5em 0 0;
+	background-color: #F3F4EB;
+	border-bottom: 1px solid #BBBBBB;
 	font-weight: bold;
 	padding-left: 0.4em;
 	padding-right: 0.4em;
@@ -1046,17 +1050,18 @@ div.variablesListTabContent .form table {
 }
 
 .tooltip .header a, .tooltip .header a:visited, .tooltip .header a:hover {
-	color: #ffffff;
+	color: #444444;
 	text-decoration: none;
 }
 
 .tooltip .content {
-	background-color: #888888;
+	background-color: #FFFFFF;
 	padding: 0.4em 0.4em 0 0.4em;
 }
 
 .tooltip .footer {
-	background-color: #888888;
+	background-color: #FFFFFF;
+	-moz-border-radius: 0 0 0.5em 0.5em; -webkit-border-radius: 0 0 0.5em 0.5em;
 }
 
 .tooltip .resizable-handle.resizable-se {
