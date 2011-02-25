@@ -189,7 +189,11 @@ public class FunctionalUnitUpdateDialogPresenter extends WidgetPresenter<Functio
       }
     };
 
-    ResourceRequestBuilderFactory.newBuilder().forResource("/files" + unitFolderPath).put().withCallback(201, callbackHandler).withCallback(403, callbackHandler).withCallback(500, callbackHandler).send();
+    ResourceRequestBuilderFactory.newBuilder()//
+    .forResource("/files/units").post().withBody("text/plain", unit)//
+    .withCallback(201, callbackHandler)//
+    .withCallback(403, callbackHandler)//
+    .withCallback(500, callbackHandler).send();
   }
 
   private FunctionalUnitDto getFunctionalUnitDto() {
