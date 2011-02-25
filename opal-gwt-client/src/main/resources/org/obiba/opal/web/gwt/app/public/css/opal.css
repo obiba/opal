@@ -1044,9 +1044,9 @@ div.variablesListTabContent .form table {
 	background-color: #F3F4EB;
 	border-bottom: 1px solid #BBBBBB;
 	font-weight: bold;
-	padding-left: 0.4em;
-	padding-right: 0.4em;
-	padding-top: 0.2em;
+	padding-left: 0.8em;
+	padding-right: 0.8em;
+	padding-top: 0.25em;
 }
 
 .tooltip .header a, .tooltip .header a:visited, .tooltip .header a:hover {
@@ -1056,7 +1056,7 @@ div.variablesListTabContent .form table {
 
 .tooltip .content {
 	background-color: #FFFFFF;
-	padding: 0.4em 0.4em 0 0.4em;
+	padding: 0.8em 0.8em 0 0.8em;
 }
 
 .tooltip .footer {
