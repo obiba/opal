@@ -11,7 +11,7 @@
     <g:FlowPanel addStyleNames="panel">
       <g:FlowPanel addStyleNames="title">
         <g:InlineLabel><ui:msg description="Aggregation Methods label" >Aggregation Methods</ui:msg></g:InlineLabel>
-        <o:HelpImage imageSize="16" tooltipWidth="500px" tooltipHeight="300px">
+        <o:HelpImage imageSize="16" tooltipWidth="500px" tooltipHeight="350px">
           <g:HTMLPanel>
             <g:Label addStyleNames="title"><ui:msg description="Aggregation Methods label">Aggregation Methods</ui:msg></g:Label>
             <p>
