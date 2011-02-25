@@ -125,8 +125,8 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   }
 
   private void authorize() {
-    // create tables
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName + "/tables").post().authorize(getDisplay().getAddUpdateTablesAuthorizer()).send();
+    // // create tables
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta").get().authorize(getDisplay().getAddUpdateTablesAuthorizer()).send();
     // create views
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName + "/views").post().authorize(getDisplay().getAddViewAuthorizer()).send();
     // export variables in excel
@@ -168,12 +168,12 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
         displayDatasourceSiblings(datasourceDto);
       }
 
+      authorize();
     } else if(tableDto != null) {
       selectTable(tableDto.getName());
     } else {
       updateTable(null);
     }
-    authorize();
   }
 
   private void displayDatasourceSiblings(DatasourceDto datasourceDto) {

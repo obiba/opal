@@ -268,7 +268,10 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
         }
       };
 
-      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/transient-datasources").post().withResourceBody(DatasourceFactoryDto.stringify(factory)).withCallback(callback).withCallback(400, errorCallback).withCallback(500, errorCallback).send();
+      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder()//
+      .forResource("/transient-datasources").post().withResourceBody(DatasourceFactoryDto.stringify(factory))//
+      .withCallback(callback)//
+      .withCallback(400, errorCallback).withCallback(500, errorCallback).send();
     }
 
     private DatasourceFactoryDto createDatasourceFactoryDto(String tmpFilePath) {

@@ -181,6 +181,7 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   public void setDatasource(DatasourceDto dto) {
     datasourceName.setText(dto.getName());
     datasourceType.setText(translations.datasourceTypeMap().get(dto.getType()));
+    toolbar.getAddItem().setVisible(false);
   }
 
   @Override
@@ -247,19 +248,27 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
   @Override
   public HasAuthorization getAddUpdateTablesAuthorizer() {
-    return new CompositeAuthorizer(new MenuItemAuthorizer(toolbar.getAddItem()), new MenuItemAuthorizer(toolbar.getAddUpdateTablesItem())) {
+    return new MenuItemAuthorizer(toolbar.getAddUpdateTablesItem()) {
+
       @Override
-      public void unauthorized() {
+      public void authorized() {
+        super.authorized();
+        toolbar.getAddItem().setVisible(true);
       }
+
     };
   }
 
   @Override
   public HasAuthorization getAddViewAuthorizer() {
-    return new CompositeAuthorizer(new MenuItemAuthorizer(toolbar.getAddItem()), new MenuItemAuthorizer(toolbar.getAddViewItem())) {
+    return new MenuItemAuthorizer(toolbar.getAddViewItem()) {
+
       @Override
-      public void unauthorized() {
+      public void authorized() {
+        super.authorized();
+        toolbar.getAddItem().setVisible(true);
       }
+
     };
   }
 

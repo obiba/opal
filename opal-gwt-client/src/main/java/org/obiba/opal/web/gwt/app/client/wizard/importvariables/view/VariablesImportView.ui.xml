@@ -25,10 +25,10 @@
 	            </tr>
 	            <tr>
                   <td>
-                    <g:InlineLabel ui:field="destinationLabel" addStyleNames="key"><ui:msg description="Destination Datasource label">Destination Datasource</ui:msg>:</g:InlineLabel>
+                    <g:InlineLabel ui:field="destinationLabel" addStyleNames="key" visible="false"><ui:msg description="Destination Datasource label">Destination Datasource</ui:msg>:</g:InlineLabel>
                   </td>
                   <td>
-                     <g:ListBox ui:field="datasources" name="datasources" />
+                     <g:ListBox ui:field="datasources" name="datasources" visible="false"/>
                   </td>
                 </tr>
 	            <tr>

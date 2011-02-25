@@ -84,18 +84,14 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
 
   @Override
   public void addTableCompareTab(TableCompareDto tableCompareData, ComparisonResult comparisonResult) {
+    tableChangesPanel.add(getTableCompareTabContent(tableCompareData), getTableCompareTabHeader(tableCompareData, comparisonResult));
+  }
 
-    FlowPanel tableComparePanel = new FlowPanel();
-
-    Label tableName = new Label(tableCompareData.getCompared().getName());
-    tableName.addStyleName("title");
-    tableComparePanel.add(tableName);
-
-    HorizontalTabLayout variableChangesPanel = initVariableChangesPanel(tableCompareData, tableComparePanel);
-
-    tableComparePanel.add(variableChangesPanel);
-    tableChangesPanel.add(tableComparePanel, getTableCompareTabHeader(tableCompareData, comparisonResult));
-    // tableChangesPanel.setHeight("730px");
+  @Override
+  public void addForbiddenTableCompareTab(TableCompareDto tableCompareData, ComparisonResult comparisonResult) {
+    Anchor tabHeader = getTableCompareTabHeader(tableCompareData, comparisonResult);
+    tabHeader.addStyleName("forbidden");
+    tableChangesPanel.add(getTableCompareTabContent(tableCompareData), tabHeader);
   }
 
   @Override
@@ -106,6 +102,20 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   @Override
   public void setEnabledIgnoreAllModifications(boolean enabled) {
     ignoreAllModifications.setEnabled(enabled);
+  }
+
+  private FlowPanel getTableCompareTabContent(TableCompareDto tableCompareData) {
+    FlowPanel tableComparePanel = new FlowPanel();
+
+    Label tableName = new Label(tableCompareData.getCompared().getName());
+    tableName.addStyleName("title");
+    tableComparePanel.add(tableName);
+
+    HorizontalTabLayout variableChangesPanel = initVariableChangesPanel(tableCompareData, tableComparePanel);
+
+    tableComparePanel.add(variableChangesPanel);
+
+    return tableComparePanel;
   }
 
   private Anchor getTableCompareTabHeader(TableCompareDto tableCompareData, ComparisonResult comparisonResult) {

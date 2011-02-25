@@ -141,9 +141,13 @@ public class JsArrays {
   }
 
   @SuppressWarnings("unchecked")
+  public static <T extends JavaScriptObject> JsArray<T> create() {
+    return (JsArray<T>) JsArray.createArray();
+  }
+
   public static <T extends JavaScriptObject> JsArray<T> toSafeArray(JsArray<T> array) {
     if(array == null) {
-      return (JsArray<T>) JsArray.createArray();
+      return create();
     }
     return array;
   }

@@ -20,9 +20,11 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter.Display.ComparisonResult;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.DatasourceCompareDto;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
@@ -30,7 +32,6 @@ import org.obiba.opal.web.model.client.magma.TableCompareDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
@@ -42,6 +43,8 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   private String targetDatasourceName;
 
   private TableCompareDto[] comparedTables;
+
+  private JsArray<TableCompareDto> authorizedComparedTables;
 
   private boolean conflictsExist;
 
@@ -64,12 +67,13 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   public void compare(String sourceDatasourceName, String targetDatasourceName, final org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter.Display display, final DatasourceFactoryDto factory, final DatasourceDto datasourceResource) {
     this.targetDatasourceName = targetDatasourceName;
     getDisplay().clearDisplay();
+    authorizedComparedTables = JsArrays.create();
 
     ResourceRequestBuilderFactory.<DatasourceCompareDto> newBuilder().forResource("/datasource/" + sourceDatasourceName + "/compare/" + targetDatasourceName).get().withCallback(new ResourceCallback<DatasourceCompareDto>() {
 
       @Override
       public void onResource(Response response, DatasourceCompareDto resource) {
-        
+
         comparedTables = JsArrays.toArray(resource.getTableComparisonsArray());
 
         sortComparedTables();
@@ -77,7 +81,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
         conflictsExist = false;
         for(TableCompareDto tableComparison : comparedTables) {
           ComparisonResult comparisonResult = getTableComparisonResult(tableComparison);
-          getDisplay().addTableCompareTab(tableComparison, comparisonResult);
+          addTableCompareTab(tableComparison, comparisonResult);
           if(comparisonResult == ComparisonResult.CONFLICT) {
             conflictsExist = true;
           } else if(tableComparison.getExistingVariablesArray() != null) {
@@ -133,7 +137,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
   @SuppressWarnings("unchecked")
   public void addUpdateVariablesResourceRequests(ConclusionStepPresenter conclusionStepPresenter) {
-    for(TableCompareDto tableCompareDto : comparedTables) {
+    for(TableCompareDto tableCompareDto : JsArrays.toIterable(authorizedComparedTables)) {
       JsArray<VariableDto> newVariables = (JsArray<VariableDto>) (tableCompareDto.getNewVariablesArray() != null ? tableCompareDto.getNewVariablesArray() : JsArray.createArray());
       JsArray<VariableDto> existingVariables = (JsArray<VariableDto>) (tableCompareDto.getExistingVariablesArray() != null ? tableCompareDto.getExistingVariablesArray() : JsArray.createArray());
 
@@ -170,10 +174,55 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
     }
   }
 
+  private void addTableCompareTab(TableCompareDto tableCompareDto, ComparisonResult comparisonResult) {
+    TableDto comparedTableDto = tableCompareDto.getCompared();
+    if(!tableCompareDto.hasWithTable()) {
+      ResourceAuthorizationRequestBuilderFactory.newBuilder()//
+      .forResource("/datasource/" + targetDatasourceName + "/tables").post()//
+      .authorize(new TableEditionAuthorizer(tableCompareDto, comparisonResult)).send();
+    } else {
+      ResourceAuthorizationRequestBuilderFactory.newBuilder()//
+      .forResource("/datasource/" + targetDatasourceName + "/table/" + comparedTableDto.getName() + "/variables").post()//
+      .authorize(new TableEditionAuthorizer(tableCompareDto, comparisonResult)).send();
+    }
+  }
+
   public static native String stringify(JavaScriptObject obj)
   /*-{
   return $wnd.JSON.stringify(obj);
   }-*/;
+
+  //
+  // Inner classes
+  //
+
+  private final class TableEditionAuthorizer implements HasAuthorization {
+
+    private final ComparisonResult comparisonResult;
+
+    private final TableCompareDto tableCompareDto;
+
+    public TableEditionAuthorizer(TableCompareDto tableCompareDto, ComparisonResult comparisonResult) {
+      super();
+      this.comparisonResult = comparisonResult;
+      this.tableCompareDto = tableCompareDto;
+    }
+
+    @Override
+    public void unauthorized() {
+      getDisplay().addForbiddenTableCompareTab(tableCompareDto, comparisonResult);
+    }
+
+    @Override
+    public void beforeAuthorization() {
+    }
+
+    @Override
+    public void authorized() {
+      authorizedComparedTables.push(tableCompareDto);
+      getDisplay().addTableCompareTab(tableCompareDto, comparisonResult);
+    }
+  }
 
   //
   // Interfaces
@@ -185,6 +234,8 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
     }
 
     void addTableCompareTab(TableCompareDto tableCompareData, ComparisonResult comparisonResult);
+
+    void addForbiddenTableCompareTab(TableCompareDto tableCompareData, ComparisonResult comparisonResult);
 
     void clearDisplay();
 

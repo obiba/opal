@@ -736,6 +736,12 @@ a.table.modification, a.table.modification:visited, a.table.modification:hover {
 	padding-left:20px;
 }
 
+a.table.forbidden, a.table.forbidden:visited, a.table.forbidden:hover {
+	background:transparent url(image/16/forbidden.png) no-repeat scroll left center !important;
+	height:18px;
+	padding-left:20px;
+}
+
 div.variableChanges {
   height:100%;
 }
