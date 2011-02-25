@@ -30,9 +30,11 @@ import org.obiba.opal.web.model.Magma.ConflictDto;
 import org.obiba.opal.web.model.Magma.DatasourceCompareDto;
 import org.obiba.opal.web.model.Magma.TableCompareDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 
 import com.google.common.annotations.VisibleForTesting;
 
+@NoAuthorization
 public class CompareResource {
   //
   // Constants
