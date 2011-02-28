@@ -35,9 +35,11 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter
 import org.obiba.opal.web.gwt.app.client.widgets.view.CsvOptionsView;
 import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -210,7 +212,7 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
     @Override
     public void onClick(ClickEvent arg0) {
       // get the units from the map file
-      String path = "/functional-units/entities/identifiers/map" + getSelectedCsvFile().getText() + "/units";
+      String path = "/functional-units/entities/identifiers/map/units?path=" + getSelectedCsvFile().getText();
 
       ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>> newBuilder().forResource(path).get()//
       .withCallback(new GetMappedUnitsCompletedCallback())//
@@ -246,8 +248,14 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
   }
 
   private void finish() {
-    getDisplay().renderPendingConclusion();
-    mapIdentifiers();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + getDisplay().getSelectedUnitName() + "/entities/identifiers/map").put().authorize(new Authorizer(eventBus) {
+
+      @Override
+      public void authorized() {
+        getDisplay().renderPendingConclusion();
+        mapIdentifiers();
+      }
+    }).send();
   }
 
   private void mapIdentifiers() {
@@ -270,7 +278,7 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
       }
     };
 
-    String path = "/functional-unit/" + getDisplay().getSelectedUnitName() + "/entities/identifiers/map" + getSelectedCsvFile().getText();
+    String path = "/functional-unit/" + getDisplay().getSelectedUnitName() + "/entities/identifiers/map?path=" + getSelectedCsvFile().getText();
 
     ResourceRequestBuilderFactory.newBuilder().forResource(path).put()//
     .accept("application/x-protobuf+json").accept("text/plain").withCallback(200, callbackHandler)//

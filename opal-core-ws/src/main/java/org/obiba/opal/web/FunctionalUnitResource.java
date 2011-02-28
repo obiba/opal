@@ -274,8 +274,8 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   }
 
   @PUT
-  @Path("/entities/identifiers/map/{path:.*}")
-  public Response mapIdentifiers(@PathParam("path") String path) {
+  @Path("/entities/identifiers/map")
+  public Response mapIdentifiers(@QueryParam("path") String path) {
     try {
       // the file is expected to be of CSV format
       File mapFile = resolveLocalFile(path);

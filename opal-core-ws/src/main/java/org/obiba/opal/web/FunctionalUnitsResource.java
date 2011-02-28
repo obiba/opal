@@ -24,8 +24,8 @@ import java.util.TreeSet;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -268,8 +268,8 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
   }
 
   @GET
-  @Path("/entities/identifiers/map/{path:.*}/units")
-  public List<FunctionalUnitDto> getUnitsFromIdentifiersMap(@PathParam("path") String path) throws IOException {
+  @Path("/entities/identifiers/map/units")
+  public List<FunctionalUnitDto> getUnitsFromIdentifiersMap(@QueryParam("path") String path) throws IOException {
     // check the headers
 
     File mapFile = resolveLocalFile(path);
