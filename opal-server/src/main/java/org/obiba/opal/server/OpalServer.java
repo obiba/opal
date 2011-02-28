@@ -29,6 +29,11 @@ public class OpalServer {
     // for details.
     System.setProperty("cmi.disabled", "true");
 
+    // Disable EHCache and Quartz usage tracker
+    // http://martijndashorst.com/blog/2011/02/21/ehcache-and-quartz-phone-home-during-startup/
+    System.setProperty("net.sf.ehcache.skipUpdateCheck", "true");
+    System.setProperty("org.terracotta.quartz.skipUpdateCheck", "true");
+
     if(options.isUpgrade()) {
       new UpgradeCommand().execute();
       System.out.println("Upgrade successful.");
