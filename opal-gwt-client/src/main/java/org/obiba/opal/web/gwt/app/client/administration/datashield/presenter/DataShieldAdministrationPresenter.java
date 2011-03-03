@@ -1,5 +1,7 @@
 package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
+import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.DELETE_ACTION;
+import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.EDIT_ACTION;
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -8,6 +10,8 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
@@ -36,12 +40,6 @@ import com.google.inject.Inject;
  */
 public class DataShieldAdministrationPresenter extends ItemAdministrationPresenter<DataShieldAdministrationPresenter.Display> {
 
-  public static final String DELETE_ACTION = "Delete";
-
-  public static final String EDIT_ACTION = "Edit";
-
-  public static final String COPY_ACTION = "Copy";
-
   //
   // Instance Variables
   //
@@ -50,14 +48,20 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
 
   private DataShieldMethodPresenter dataShieldMethodPresenter;
 
+  private AuthorizationPresenter userAuthorizationPresenter;
+
+  private AuthorizationPresenter administratorAuthorizationPresenter;
+
   //
   // Constructors
   //
 
   @Inject
-  public DataShieldAdministrationPresenter(final Display display, final EventBus eventBus, DataShieldMethodPresenter dataShieldMethodPresenter) {
+  public DataShieldAdministrationPresenter(final Display display, final EventBus eventBus, DataShieldMethodPresenter dataShieldMethodPresenter, AuthorizationPresenter userAuthorizationPresenter, AuthorizationPresenter administratorAuthorizationPresenter) {
     super(display, eventBus);
     this.dataShieldMethodPresenter = dataShieldMethodPresenter;
+    this.userAuthorizationPresenter = userAuthorizationPresenter;
+    this.administratorAuthorizationPresenter = administratorAuthorizationPresenter;
   }
 
   @Override
@@ -76,6 +80,14 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
 
   @Override
   protected void onBind() {
+    userAuthorizationPresenter.bind();
+    userAuthorizationPresenter.setAclRequest("Use", AclRequest.newBuilder("/datashield/sessions", "*:GET/*"));
+    getDisplay().setUserPermissionsDisplay(userAuthorizationPresenter.getDisplay());
+
+    administratorAuthorizationPresenter.bind();
+    administratorAuthorizationPresenter.setAclRequest("Administrate", AclRequest.newBuilder("/datashield/methods", "*:GET/*").and("/datashield/method", "*:GET/*").and("/authz/datashield", "*:GET/*"));
+    getDisplay().setAdministratorPermissionsDisplay(administratorAuthorizationPresenter.getDisplay());
+
     addEventHandlers();
   }
 
@@ -119,17 +131,23 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
 
   @Override
   protected void onUnbind() {
+    userAuthorizationPresenter.unbind();
+    administratorAuthorizationPresenter.unbind();
   }
 
   @Override
   public void refreshDisplay() {
     updateDataShieldMethods();
+    userAuthorizationPresenter.refreshDisplay();
+    administratorAuthorizationPresenter.refreshDisplay();
   }
 
   @Override
   public void revealDisplay() {
     updateDataShieldMethods();
     authorize();
+    userAuthorizationPresenter.revealDisplay();
+    administratorAuthorizationPresenter.revealDisplay();
   }
 
   //
@@ -144,6 +162,8 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
   private void authorize() {
     // create method
     authorizeAddMethod(getDisplay().getAddMethodAuthorizer());
+    // set permissions
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/authz/datashield").post().authorize(getDisplay().getPermissionsAuthorizer()).send();
   }
 
   private void authorizeAddMethod(HasAuthorization authorizer) {
@@ -177,15 +197,6 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
         public void authorized() {
           dataShieldMethodPresenter.bind();
           dataShieldMethodPresenter.updateMethod(dto);
-          dataShieldMethodPresenter.revealDisplay();
-        }
-      });
-    } else if(actionName.equals(COPY_ACTION)) {
-      authorizeAddMethod(new Authorizer(eventBus) {
-        @Override
-        public void authorized() {
-          dataShieldMethodPresenter.bind();
-          dataShieldMethodPresenter.copyMethod(dto);
           dataShieldMethodPresenter.revealDisplay();
         }
       });
@@ -246,11 +257,17 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
 
     void renderDataShieldMethodsRows(JsArray<DataShieldMethodDto> rows);
 
+    HasAuthorization getPermissionsAuthorizer();
+
     HasActionHandler<DataShieldMethodDto> getDataShieldMethodActionsColumn();
 
     HandlerRegistration addMethodHandler(ClickHandler handler);
 
     HasAuthorization getAddMethodAuthorizer();
+
+    void setUserPermissionsDisplay(WidgetDisplay display);
+
+    void setAdministratorPermissionsDisplay(WidgetDisplay display);
 
   }
 

@@ -9,8 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
 
-import static org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter.DELETE_ACTION;
-import static org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter.EDIT_ACTION;
+import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.DELETE_ACTION;
+import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.EDIT_ACTION;
+import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -35,6 +36,7 @@ import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -71,9 +73,18 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
   @UiField
   SimplePager methodsTablePager;
 
-  private JsArrayDataProvider<DataShieldMethodDto> methodsProvider = new JsArrayDataProvider<DataShieldMethodDto>();
+  @UiField
+  Panel permissionsPanel;
 
-  private ActionsColumn<DataShieldMethodDto> methodActionsColumn;
+  @UiField
+  Panel userPermissions;
+
+  @UiField
+  Panel administratorPermissions;
+
+  private JsArrayDataProvider<DataShieldMethodDto> methodsDataProvider = new JsArrayDataProvider<DataShieldMethodDto>();
+
+  private ActionsColumn<DataShieldMethodDto> actionsColumn;
 
   //
   // Constructors
@@ -111,18 +122,18 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
 
   @Override
   public void renderDataShieldMethodsRows(JsArray<DataShieldMethodDto> rows) {
-    methodsProvider.setArray(rows);
+    methodsDataProvider.setArray(rows);
 
-    int size = methodsProvider.getList().size();
+    int size = methodsDataProvider.getList().size();
     methodsTablePager.firstPage();
     methodsTablePager.setVisible(size > 0);
     methodsTable.setVisible(size > 0);
-    methodsProvider.refresh();
+    methodsDataProvider.refresh();
   }
 
   @Override
   public HasActionHandler<DataShieldMethodDto> getDataShieldMethodActionsColumn() {
-    return methodActionsColumn;
+    return actionsColumn;
   }
 
   //
@@ -135,7 +146,7 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
 
     methodsTable.setPageSize(50);
     methodsTablePager.setDisplay(methodsTable);
-    methodsProvider.addDataDisplay(methodsTable);
+    methodsDataProvider.addDataDisplay(methodsTable);
   }
 
   private void addMethodsTableColumns() {
@@ -156,13 +167,28 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
       }
     }, translations.typeLabel());
 
-    methodActionsColumn = new ActionsColumn<DataShieldMethodDto>(new ConstantActionsProvider<DataShieldMethodDto>(EDIT_ACTION, DELETE_ACTION));
-    methodsTable.addColumn(methodActionsColumn, translations.actionsLabel());
+    actionsColumn = new ActionsColumn<DataShieldMethodDto>(new ConstantActionsProvider<DataShieldMethodDto>(EDIT_ACTION, DELETE_ACTION));
+    methodsTable.addColumn(actionsColumn, translations.actionsLabel());
   }
 
   @Override
   public HasAuthorization getAddMethodAuthorizer() {
     return new WidgetAuthorizer(addMethodButton);
+  }
+
+  @Override
+  public void setUserPermissionsDisplay(WidgetDisplay display) {
+    userPermissions.add(display.asWidget());
+  }
+
+  @Override
+  public void setAdministratorPermissionsDisplay(WidgetDisplay display) {
+    administratorPermissions.add(display.asWidget());
+  }
+
+  @Override
+  public HasAuthorization getPermissionsAuthorizer() {
+    return new WidgetAuthorizer(permissionsPanel);
   }
 
 }

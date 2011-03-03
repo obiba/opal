@@ -847,4 +847,8 @@ public interface Translations extends Constants {
   @DefaultStringValue("R Function")
   String rFunctionLabel();
 
+  @Description("Who label")
+  @DefaultStringValue("Who")
+  String whoLabel();
+
 }

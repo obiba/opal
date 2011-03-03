@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.datashield;
 
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -49,12 +48,6 @@ public class OpalDataShieldSessionResource extends OpalRSessionResource {
     this.opalRuntime = opalRuntime;
   }
 
-  @GET
-  @Path("/methods")
-  public Response getMethods() {
-    return Response.ok(listMethods()).build();
-  }
-
   @POST
   @Path("/aggregate/{method}")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
@@ -73,6 +66,11 @@ public class OpalDataShieldSessionResource extends OpalRSessionResource {
   @Override
   protected RSymbolResource onGetRSymbolResource(String name) {
     return new DataShieldSymbolResource(getOpalRSession(), name);
+  }
+
+  @Override
+  public Response query(String script) {
+    return Response.noContent().build();
   }
 
   private Iterable<DataShieldMethod> listMethods() {

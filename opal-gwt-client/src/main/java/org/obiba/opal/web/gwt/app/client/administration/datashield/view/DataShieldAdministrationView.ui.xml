@@ -40,6 +40,18 @@
         <o:Table width="100%" ui:field="methodsTable" addStyleNames="gwt-CellTable" visible="false"/>
       </g:VerticalPanel>
     </g:FlowPanel>
-          
+    
+    <g:FlowPanel ui:field="permissionsPanel" addStyleNames="panel">
+      <g:FlowPanel addStyleNames="title">
+        <g:InlineLabel><ui:msg description="Permissions label" >Permissions</ui:msg></g:InlineLabel>
+      </g:FlowPanel>
+      <g:FlowPanel>
+        <g:Label><ui:msg description="DataShield Users label" >DataShield Users</ui:msg></g:Label>
+        <g:SimplePanel ui:field="userPermissions" addStyleNames="top-margin"></g:SimplePanel>
+        <g:Label addStyleNames="large-top-margin"><ui:msg description="DataShield Administrators label">DataShield Administrators</ui:msg></g:Label>
+        <g:SimplePanel ui:field="administratorPermissions" addStyleNames="top-margin"></g:SimplePanel>  
+      </g:FlowPanel>
+    </g:FlowPanel>
+    
   </g:FlowPanel>
 </ui:UiBinder>

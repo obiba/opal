@@ -1,0 +1,18 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+  xmlns:c="urn:import:com.google.gwt.user.cellview.client" 
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
+
+  <g:VerticalPanel>
+    <o:Table ui:field="table" addStyleNames="gwt-CellTable full-width" />
+    <g:FlowPanel addStyleNames="top-margin">
+      <g:InlineLabel addStyleNames="key">
+        <ui:msg description="Add principal label" >User or Group Name</ui:msg>:
+      </g:InlineLabel>
+      <g:TextBox ui:field="principal"/><g:Image ui:field="add" url="image/20/list-add.png" addStyleNames="clickable button"/>
+    </g:FlowPanel>
+  </g:VerticalPanel>
+</ui:UiBinder>

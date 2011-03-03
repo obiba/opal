@@ -11,7 +11,7 @@ package org.obiba.opal.web.security;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
@@ -47,7 +47,7 @@ public class AuthorizationResource {
     return Iterables.transform(subjectAclService.getNodePermissions("magma", getNode()), PermissionsToAclFunction.INSTANCE);
   }
 
-  @PUT
+  @POST
   public Opal.Acl add(@QueryParam("subject") String subject, @QueryParam("perm") String permission) {
     subjectAclService.addSubjectPermission("magma", getNode(), subject, permission);
     return PermissionsToAclFunction.INSTANCE.apply(subjectAclService.getSubjectPermissions("magma", getNode(), subject));
