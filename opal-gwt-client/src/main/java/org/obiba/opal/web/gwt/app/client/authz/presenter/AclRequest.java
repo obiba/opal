@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.Acl;
+import org.obiba.opal.web.model.client.opal.SubjectAcls;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
@@ -25,7 +26,7 @@ import com.google.gwt.http.client.Response;
  */
 public class AclRequest {
 
-  private String name;
+  private String header;
 
   private List<AclResource> acls;
 
@@ -35,20 +36,20 @@ public class AclRequest {
 
   private AclDeleteCallback aclDeleteCallback;
 
-  private AclRequest(String name, String resource, String perm) {
-    this.name = name;
+  private AclRequest(String header, String resource, String perm) {
+    this.header = header;
     getAcls().add(new AclResource(resource, perm));
   }
 
-  public String getName() {
-    return name;
+  public String getHeader() {
+    return header;
   }
 
   public void addResource(String resource, String perm) {
     getAcls().add(new AclResource(resource, perm));
   }
 
-  private List<AclResource> getAcls() {
+  public List<AclResource> getAcls() {
     return acls != null ? acls : (acls = new ArrayList<AclRequest.AclResource>());
   }
 
@@ -65,11 +66,15 @@ public class AclRequest {
   }
 
   public void get() {
-    AclResource acl = getAcls().get(0);
-    ResourceRequestBuilderFactory.<JsArray<Acl>> newBuilder().forResource("/authz" + acl.resource).get().withCallback(new ResourceCallback<JsArray<Acl>>() {
+    StringBuilder query = new StringBuilder();
+    for(int i = 0; i < acls.size(); i++) {
+      if(i > 0) query.append("&");
+      query.append("node=").append(acls.get(i).resource);
+    }
+    ResourceRequestBuilderFactory.<JsArray<SubjectAcls>> newBuilder().forResource("/authz/subjects?" + query.toString()).get().withCallback(new ResourceCallback<JsArray<SubjectAcls>>() {
 
       @Override
-      public void onResource(Response response, JsArray<Acl> resource) {
+      public void onResource(Response response, JsArray<SubjectAcls> resource) {
         if(response.getStatusCode() == Response.SC_OK) {
           aclGetCallback.onGet(JsArrays.toSafeArray(resource));
         } else {
@@ -135,15 +140,23 @@ public class AclRequest {
   // Inner classes
   //
 
-  private class AclResource {
-    String resource;
+  public class AclResource {
+    private String resource;
 
-    String perm;
+    private String perm;
 
     public AclResource(String resource, String perm) {
       super();
       this.resource = resource;
       this.perm = perm;
+    }
+
+    public String getResource() {
+      return resource;
+    }
+
+    public String getPerm() {
+      return perm;
     }
   }
 
@@ -170,7 +183,7 @@ public class AclRequest {
   //
 
   public interface AclGetCallback {
-    public void onGet(JsArray<Acl> resource);
+    public void onGet(JsArray<SubjectAcls> resource);
 
     public void onGetFailed(Response response);
   }

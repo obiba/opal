@@ -85,7 +85,7 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
     getDisplay().setUserPermissionsDisplay(userAuthorizationPresenter.getDisplay());
 
     administratorAuthorizationPresenter.bind();
-    administratorAuthorizationPresenter.addAclRequest(AclRequest.newBuilder("Administrate", "/datashield/methods", "*:GET/*").and("/datashield/method", "*:GET/*").and("/authz/datashield", "*:GET/*"));
+    administratorAuthorizationPresenter.addAclRequest(AclRequest.newBuilder("Administrate", "/datashield/method", "*:GET/*").and("/authz/datashield", "*:GET/*"));
     getDisplay().setAdministratorPermissionsDisplay(administratorAuthorizationPresenter.getDisplay());
 
     addEventHandlers();

@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest.AclGetCallba
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.model.client.opal.Acl;
+import org.obiba.opal.web.model.client.opal.SubjectAcls;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
@@ -31,7 +32,7 @@ public class DefaultAclCallback implements AclGetCallback, AclDeleteCallback, Ac
   }
 
   @Override
-  public void onGet(JsArray<Acl> resource) {
+  public void onGet(JsArray<SubjectAcls> resource) {
   }
 
   @Override
@@ -56,4 +57,5 @@ public class DefaultAclCallback implements AclGetCallback, AclDeleteCallback, Ac
   public void onAddFailed(Response response, String subject, String resource, String perm) {
     eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "Failed adding permissions of " + subject, null));
   }
+
 }

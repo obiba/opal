@@ -80,3 +80,8 @@ message Acl {
   required string resource = 2;
   repeated string actions = 3;
 }
+
+message SubjectAcls {
+  required string principal = 1;
+  repeated Acl acls = 2;
+}

@@ -12,6 +12,11 @@ package org.obiba.opal.web.gwt.app.client.authz.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest.AclAddCallback;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest.AclDeleteCallback;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest.AclGetCallback;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest.AclResource;
+
 /**
  *
  */
@@ -29,12 +34,46 @@ public class SubjectPermissionsRequest {
     return aclRequests.get(0);
   }
 
-  public Iterable<String> getNames() {
+  public Iterable<String> getResources(String header) {
+    List<String> resources = new ArrayList<String>();
+    for(AclRequest req : aclRequests) {
+      if(req.getHeader().equals(header)) {
+        for(AclResource res : req.getAcls()) {
+          resources.add(res.getResource());
+        }
+      }
+    }
+    return resources;
+  }
+
+  public Iterable<String> getHeaders() {
     List<String> names = new ArrayList<String>();
     for(AclRequest req : aclRequests) {
-      names.add(req.getName());
+      names.add(req.getHeader());
     }
     return names;
+  }
+
+  public void delete(String subject) {
+    for(int i = aclRequests.size() - 1; i >= 0; i--) {
+      aclRequests.get(i).delete(subject);
+    }
+  }
+
+  public void add(String subject) {
+    getMainAclRequest().add(subject);
+  }
+
+  public void setAclGetCallback(AclGetCallback callback) {
+    getMainAclRequest().setAclGetCallback(callback);
+  }
+
+  public void setAclDeleteCallback(AclDeleteCallback callback) {
+    getMainAclRequest().setAclDeleteCallback(callback);
+  }
+
+  public void setAclAddCallback(AclAddCallback callback) {
+    getMainAclRequest().setAclAddCallback(callback);
   }
 
 }
