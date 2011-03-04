@@ -81,11 +81,11 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
   @Override
   protected void onBind() {
     userAuthorizationPresenter.bind();
-    userAuthorizationPresenter.setAclRequest("Use", AclRequest.newBuilder("/datashield/sessions", "*:GET/*"));
+    userAuthorizationPresenter.addAclRequest(AclRequest.newBuilder("Use", "/datashield/sessions", "*:GET/*"));
     getDisplay().setUserPermissionsDisplay(userAuthorizationPresenter.getDisplay());
 
     administratorAuthorizationPresenter.bind();
-    administratorAuthorizationPresenter.setAclRequest("Administrate", AclRequest.newBuilder("/datashield/methods", "*:GET/*").and("/datashield/method", "*:GET/*").and("/authz/datashield", "*:GET/*"));
+    administratorAuthorizationPresenter.addAclRequest(AclRequest.newBuilder("Administrate", "/datashield/methods", "*:GET/*").and("/datashield/method", "*:GET/*").and("/authz/datashield", "*:GET/*"));
     getDisplay().setAdministratorPermissionsDisplay(administratorAuthorizationPresenter.getDisplay());
 
     addEventHandlers();

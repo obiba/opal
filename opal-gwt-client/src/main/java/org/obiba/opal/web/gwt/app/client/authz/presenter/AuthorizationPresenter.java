@@ -10,6 +10,10 @@
 package org.obiba.opal.web.gwt.app.client.authz.presenter;
 
 import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.DELETE_ACTION;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -29,7 +33,9 @@ import com.google.inject.Inject;
  */
 public class AuthorizationPresenter extends WidgetPresenter<AuthorizationPresenter.Display> {
 
-  private AclRequest acls;
+  private SubjectPermissionsRequest subjectPermissionsRequests;
+
+  private List<SubjectPermissions> subjectPermissions;
 
   //
   // Constructors
@@ -40,12 +46,20 @@ public class AuthorizationPresenter extends WidgetPresenter<AuthorizationPresent
     super(display, eventBus);
   }
 
-  public void setAclRequest(final String header, AclRequest.Builder builder) {
+  public void addAclRequest(AclRequest.Builder... builders) {
+    subjectPermissionsRequests = new SubjectPermissionsRequest(builders);
+
     DefaultAclCallback aclCallback = new DefaultAclCallback(eventBus) {
 
       @Override
       public void onGet(JsArray<Acl> resource) {
-        getDisplay().renderAcls(JsArrays.toSafeArray(resource));
+        subjectPermissions = new ArrayList<SubjectPermissions>();
+        for(Acl acl : JsArrays.toList(JsArrays.toSafeArray(resource))) {
+          SubjectPermissions perms = new SubjectPermissions(acl.getPrincipal());
+          perms.addPermission(subjectPermissionsRequests.getMainAclRequest().getName());
+          subjectPermissions.add(perms);
+        }
+        getDisplay().renderPermissions(subjectPermissionsRequests.getNames(), subjectPermissions);
       }
 
       @Override
@@ -59,31 +73,39 @@ public class AuthorizationPresenter extends WidgetPresenter<AuthorizationPresent
       }
     };
 
-    this.acls = builder.build();
-
-    acls.setAclGetCallback(aclCallback);
-    acls.setAclAddCallback(aclCallback);
-    acls.setAclDeleteCallback(aclCallback);
+    subjectPermissionsRequests.getMainAclRequest().setAclGetCallback(aclCallback);
+    subjectPermissionsRequests.getMainAclRequest().setAclAddCallback(aclCallback);
+    subjectPermissionsRequests.getMainAclRequest().setAclDeleteCallback(aclCallback);
   }
 
   private void addEventHandlers() {
-    getDisplay().getActionsColumn().setActionHandler(new ActionHandler<Acl>() {
-      public void doAction(Acl dto, String actionName) {
+    getDisplay().getActionsColumn().setActionHandler(new ActionHandler<SubjectPermissions>() {
+      public void doAction(SubjectPermissions perms, String actionName) {
         if(actionName != null && actionName.equals(DELETE_ACTION)) {
-          acls.delete(dto.getPrincipal());
+          // TODO delete others
+          subjectPermissionsRequests.getMainAclRequest().delete(perms.getSubject());
         }
       }
     });
     getDisplay().addHandler(new AddPrincipalHandler() {
 
       @Override
-      public void onAdd(String principal) {
-        if(principal.trim().length() > 0) {
-          acls.add(principal.trim());
+      public void onAdd(String subject) {
+        if(subject.trim().length() > 0) {
+          if(!hasSubject(subject)) {
+            subjectPermissionsRequests.getMainAclRequest().add(subject.trim());
+          }
           getDisplay().clear();
         }
       }
     });
+  }
+
+  private boolean hasSubject(String subject) {
+    for(SubjectPermissions perms : subjectPermissions) {
+      if(perms.getSubject().equals(subject)) return true;
+    }
+    return false;
   }
 
   //
@@ -92,12 +114,12 @@ public class AuthorizationPresenter extends WidgetPresenter<AuthorizationPresent
 
   @Override
   public void refreshDisplay() {
-    acls.get();
+    subjectPermissionsRequests.getMainAclRequest().get();
   }
 
   @Override
   public void revealDisplay() {
-    acls.get();
+    subjectPermissionsRequests.getMainAclRequest().get();
   }
 
   @Override
@@ -124,11 +146,11 @@ public class AuthorizationPresenter extends WidgetPresenter<AuthorizationPresent
 
   public interface Display extends WidgetDisplay {
 
-    void renderAcls(JsArray<Acl> acls);
+    void renderPermissions(Iterable<String> names, List<SubjectPermissions> subjectPermissions);
 
     void clear();
 
-    HasActionHandler<Acl> getActionsColumn();
+    HasActionHandler<SubjectPermissions> getActionsColumn();
 
     String getPrincipal();
 

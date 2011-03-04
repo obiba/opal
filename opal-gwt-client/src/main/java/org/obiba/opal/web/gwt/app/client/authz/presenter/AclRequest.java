@@ -25,6 +25,8 @@ import com.google.gwt.http.client.Response;
  */
 public class AclRequest {
 
+  private String name;
+
   private List<AclResource> acls;
 
   private AclGetCallback aclGetCallback;
@@ -33,8 +35,13 @@ public class AclRequest {
 
   private AclDeleteCallback aclDeleteCallback;
 
-  private AclRequest(String resource, String perm) {
+  private AclRequest(String name, String resource, String perm) {
+    this.name = name;
     getAcls().add(new AclResource(resource, perm));
+  }
+
+  public String getName() {
+    return name;
   }
 
   public void addResource(String resource, String perm) {
@@ -120,8 +127,8 @@ public class AclRequest {
     }).send();
   }
 
-  public static Builder newBuilder(String resource, String perm) {
-    return new Builder(resource, perm);
+  public static Builder newBuilder(String name, String resource, String perm) {
+    return new Builder(name, resource, perm);
   }
 
   //
@@ -143,8 +150,8 @@ public class AclRequest {
   public static class Builder {
     private AclRequest request;
 
-    Builder(String resource, String perm) {
-      request = new AclRequest(resource, perm);
+    Builder(String name, String resource, String perm) {
+      request = new AclRequest(name, resource, perm);
     }
 
     public Builder and(String resource, String perm) {

@@ -11,17 +11,18 @@ package org.obiba.opal.web.gwt.app.client.authz.view;
 
 import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.DELETE_ACTION;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter.AddPrincipalHandler;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectPermissions;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ConstantActionsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
-import org.obiba.opal.web.model.client.opal.Acl;
 
+import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -37,6 +38,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListDataProvider;
 
 /**
  *
@@ -44,7 +46,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class AuthorizationView extends Composite implements AuthorizationPresenter.Display {
 
   @UiField
-  CellTable<Acl> table;
+  CellTable<SubjectPermissions> table;
 
   @UiField
   TextBox principal;
@@ -52,11 +54,11 @@ public class AuthorizationView extends Composite implements AuthorizationPresent
   @UiField
   Image add;
 
-  private JsArrayDataProvider<Acl> aclsDataProvider = new JsArrayDataProvider<Acl>();
+  private ListDataProvider<SubjectPermissions> subjectPermissionsDataProvider = new ListDataProvider<SubjectPermissions>();
 
-  private Column<Acl, ?> permColumn;
+  private boolean permColumnAdded;
 
-  private ActionsColumn<Acl> actionsColumn;
+  private ActionsColumn<SubjectPermissions> actionsColumn;
 
   //
   // Static Variables
@@ -76,17 +78,18 @@ public class AuthorizationView extends Composite implements AuthorizationPresent
   }
 
   private void initAclsTable() {
-    table.addColumn(new TextColumn<Acl>() {
+    table.addColumn(new TextColumn<SubjectPermissions>() {
       @Override
-      public String getValue(Acl object) {
-        return object.getPrincipal();
+      public String getValue(SubjectPermissions object) {
+        return object.getSubject();
       }
     }, translations.whoLabel());
 
-    actionsColumn = new ActionsColumn<Acl>(new ConstantActionsProvider<Acl>(DELETE_ACTION));
-    table.addColumn(actionsColumn, translations.actionsLabel());
+    actionsColumn = new ActionsColumn<SubjectPermissions>(new ConstantActionsProvider<SubjectPermissions>(DELETE_ACTION));
 
-    aclsDataProvider.addDataDisplay(table);
+    permColumnAdded = false;
+
+    subjectPermissionsDataProvider.addDataDisplay(table);
   }
 
   //
@@ -110,14 +113,7 @@ public class AuthorizationView extends Composite implements AuthorizationPresent
   }
 
   @Override
-  public void renderAcls(JsArray<Acl> acls) {
-    aclsDataProvider.setArray(acls);
-    aclsDataProvider.refresh();
-    table.setVisible(acls.length() > 0);
-  }
-
-  @Override
-  public HasActionHandler<Acl> getActionsColumn() {
+  public HasActionHandler<SubjectPermissions> getActionsColumn() {
     return actionsColumn;
   }
 
@@ -150,6 +146,45 @@ public class AuthorizationView extends Composite implements AuthorizationPresent
   @Override
   public void clear() {
     principal.setText("");
+  }
+
+  @Override
+  public void renderPermissions(Iterable<String> names, List<SubjectPermissions> subjectPermissions) {
+    if(!permColumnAdded) {
+      for(String name : names) {
+        addPermissionColumn(name);
+      }
+      table.addColumn(actionsColumn, translations.actionsLabel());
+      permColumnAdded = true;
+    }
+    subjectPermissionsDataProvider.setList(subjectPermissions);
+    subjectPermissionsDataProvider.refresh();
+    table.setVisible(subjectPermissions.size() > 0);
+  }
+
+  private void addPermissionColumn(final String name) {
+    EnablableCheckboxCell cell = new EnablableCheckboxCell();
+    Column<SubjectPermissions, Boolean> column = new Column<SubjectPermissions, Boolean>(cell) {
+
+      @Override
+      public Boolean getValue(SubjectPermissions object) {
+        return object.hasPermission(name);
+      }
+    };
+
+    cell.setEnabled(false);
+
+    FieldUpdater<SubjectPermissions, Boolean> fieldUpdater = new FieldUpdater<SubjectPermissions, Boolean>() {
+
+      @Override
+      public void update(int index, SubjectPermissions object, Boolean value) {
+        // TODO
+        GWT.log(object.getSubject() + ":" + name + "=" + value);
+      }
+    };
+
+    column.setFieldUpdater(fieldUpdater);
+    table.addColumn(column, name);
   }
 
 }

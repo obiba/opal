@@ -55,13 +55,13 @@
             <g:Label addStyleNames="title"><ui:msg description="DataShield Users label">Users</ui:msg></g:Label>
             <p>
               <ui:msg description="DataShield Users information">
-                 DataShield Users are allowed to perform DataShield operations.
+                 DataShield Users are allowed to perform DataShield operations from their R client.
               </ui:msg>
             </p>
             <g:Label addStyleNames="title"><ui:msg description="DataShield Administrators label">Administrators</ui:msg></g:Label>
             <p>
               <ui:msg description="DataShield Administrators information">
-                DataShield Administrators are allowed to modify the set of aggregation methods.
+                DataShield Administrators are allowed to modify the set of aggregation methods and to grant DataShield user permissions.
               </ui:msg>
             </p>
           </g:HTMLPanel>
