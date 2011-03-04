@@ -6,13 +6,13 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
-  <g:VerticalPanel>
-    <o:Table ui:field="table" addStyleNames="gwt-CellTable full-width" />
-    <g:FlowPanel addStyleNames="top-margin">
+  <g:FlowPanel>
+    <g:HTMLPanel>
       <g:InlineLabel addStyleNames="key">
-        <ui:msg description="Add principal label" >User or Group Name</ui:msg>:
+        <ui:msg description="Add principal label" >User or Group Name</ui:msg>: 
       </g:InlineLabel>
       <g:TextBox ui:field="principal"/><g:Image ui:field="add" url="image/20/list-add.png" addStyleNames="clickable button"/>
-    </g:FlowPanel>
-  </g:VerticalPanel>
+    </g:HTMLPanel>
+    <o:Table ui:field="table" addStyleNames="gwt-CellTable top-margin" />
+  </g:FlowPanel>
 </ui:UiBinder>

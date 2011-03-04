@@ -44,13 +44,36 @@
     <g:FlowPanel ui:field="permissionsPanel" addStyleNames="panel">
       <g:FlowPanel addStyleNames="title">
         <g:InlineLabel><ui:msg description="Permissions label" >Permissions</ui:msg></g:InlineLabel>
+        <o:HelpImage imageSize="16" tooltipWidth="500px" tooltipHeight="350px">
+          <g:HTMLPanel>
+            <g:Label addStyleNames="title"><ui:msg description="DataShield Permissions label">DataShield Permissions</ui:msg></g:Label>
+            <p>
+              <ui:msg description="DataShield Permissions information">
+                 Permissions for accessing DataShield service should be specified. The permissions can be applied to a user or a group of users.
+              </ui:msg>
+            </p>
+            <g:Label addStyleNames="title"><ui:msg description="DataShield Users label">Users</ui:msg></g:Label>
+            <p>
+              <ui:msg description="DataShield Users information">
+                 DataShield Users are allowed to perform DataShield operations.
+              </ui:msg>
+            </p>
+            <g:Label addStyleNames="title"><ui:msg description="DataShield Administrators label">Administrators</ui:msg></g:Label>
+            <p>
+              <ui:msg description="DataShield Administrators information">
+                DataShield Administrators are allowed to modify the set of aggregation methods.
+              </ui:msg>
+            </p>
+          </g:HTMLPanel>
+        </o:HelpImage>
       </g:FlowPanel>
-      <g:FlowPanel>
-        <g:Label><ui:msg description="DataShield Users label" >DataShield Users</ui:msg></g:Label>
-        <g:SimplePanel ui:field="userPermissions" addStyleNames="top-margin"></g:SimplePanel>
-        <g:Label addStyleNames="large-top-margin"><ui:msg description="DataShield Administrators label">DataShield Administrators</ui:msg></g:Label>
-        <g:SimplePanel ui:field="administratorPermissions" addStyleNames="top-margin"></g:SimplePanel>  
-      </g:FlowPanel>
+      <o:HorizontalTabLayout>
+        <g:Anchor><ui:msg description="DataShield Users label" >Users</ui:msg></g:Anchor>
+        <g:SimplePanel ui:field="userPermissions"></g:SimplePanel>
+        
+        <g:Anchor><ui:msg description="DataShield Administrators label" >Administrators</ui:msg></g:Anchor>
+        <g:SimplePanel ui:field="administratorPermissions"></g:SimplePanel>
+      </o:HorizontalTabLayout>
     </g:FlowPanel>
     
   </g:FlowPanel>
