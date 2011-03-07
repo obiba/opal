@@ -46,7 +46,7 @@
       </table>
     </g:HTMLPanel>
      
-     <o:HorizontalTabLayout addStyleNames="small-indent top-margin not-so-full-width">
+     <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
 	  <g:Anchor><ui:msg description="Variables label">Variables</ui:msg></g:Anchor>
       <g:VerticalPanel width="100%">
         <g:InlineLabel ui:field="noVariables"><ui:msg description="No Variables label">No Variables</ui:msg></g:InlineLabel>
@@ -54,6 +54,10 @@
         <o:Table ui:field="table" width="100%" addStyleNames="left-aligned gwt-CellTable tableList"/>
         <g:Image ui:field="loading" url="image/loading.gif" addStyleNames="loading"/>
       </g:VerticalPanel>
+      
+      <g:Anchor><ui:msg description="Permissions label" >Permissions</ui:msg></g:Anchor>
+      <g:SimplePanel ui:field="permissions"></g:SimplePanel>
+      
      </o:HorizontalTabLayout>
      
   </g:VerticalPanel>

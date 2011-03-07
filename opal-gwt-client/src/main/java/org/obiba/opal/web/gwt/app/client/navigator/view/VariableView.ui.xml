@@ -125,6 +125,9 @@
          
 	    <g:Anchor><ui:msg description="Summary tab title">Summary</ui:msg></g:Anchor>
         <g:SimplePanel ui:field="summary" width="100%" />
+        
+        <g:Anchor><ui:msg description="Permissions label" >Permissions</ui:msg></g:Anchor>
+        <g:SimplePanel ui:field="permissions"></g:SimplePanel>
          
      </o:HorizontalTabLayout>
      

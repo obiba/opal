@@ -118,6 +118,9 @@ public class VariableView extends Composite implements VariablePresenter.Display
   @UiField
   SimplePager attributeTablePager;
 
+  @UiField
+  Panel permissions;
+
   JsArrayDataProvider<AttributeDto> attributeProvider = new JsArrayDataProvider<AttributeDto>();
 
   @UiField
@@ -400,5 +403,16 @@ public class VariableView extends Composite implements VariablePresenter.Display
   @Override
   public HasAuthorization getSummaryAuthorizer() {
     return new TabAuthorizer(tabs, SUMMARY_TAB_INDEX);
+  }
+
+  @Override
+  public void setPermissionsDisplay(WidgetDisplay display) {
+    permissions.clear();
+    permissions.add(display.asWidget());
+  }
+
+  @Override
+  public HasAuthorization getPermissionsAuthorizer() {
+    return new TabAuthorizer(tabs, SUMMARY_TAB_INDEX + 1);
   }
 }

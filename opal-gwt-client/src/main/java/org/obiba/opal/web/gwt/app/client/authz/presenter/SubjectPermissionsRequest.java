@@ -12,17 +12,23 @@ package org.obiba.opal.web.gwt.app.client.authz.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest.AclAddCallback;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest.AclDeleteCallback;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest.AclGetCallback;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest.AclResource;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.model.client.opal.Acls;
+
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Response;
 
 /**
- *
+ * Helper class that handles a set of {@link AclRequest}.
  */
 public class SubjectPermissionsRequest {
 
   private List<AclRequest> aclRequests = new ArrayList<AclRequest>();
+
+  private AclGetCallback aclGetCallback;
 
   public SubjectPermissionsRequest(AclRequest.Builder... builders) {
     for(AclRequest.Builder builder : builders) {
@@ -30,20 +36,47 @@ public class SubjectPermissionsRequest {
     }
   }
 
-  public AclRequest getMainAclRequest() {
+  public void get() {
+    StringBuilder query = new StringBuilder();
+    for(AclRequest req : aclRequests) {
+      for(AclResource res : req.getAclResources()) {
+        query.append("&").append("node=").append(res.getResource());
+      }
+    }
+
+    ResourceRequestBuilderFactory.<JsArray<Acls>> newBuilder().forResource("/authz/query?by=subject" + query.toString()).get().withCallback(new ResourceCallback<JsArray<Acls>>() {
+
+      @Override
+      public void onResource(Response response, JsArray<Acls> resource) {
+        if(response.getStatusCode() == Response.SC_OK) {
+          aclGetCallback.onGet(JsArrays.toSafeArray(resource));
+        } else {
+          aclGetCallback.onGetFailed(response);
+        }
+      }
+    }).send();
+  }
+
+  private AclRequest getMainAclRequest() {
     return aclRequests.get(0);
   }
 
-  public Iterable<String> getResources(String header) {
-    List<String> resources = new ArrayList<String>();
+  public boolean hasAclRequest(String header) {
     for(AclRequest req : aclRequests) {
       if(req.getHeader().equals(header)) {
-        for(AclResource res : req.getAcls()) {
-          resources.add(res.getResource());
-        }
+        return true;
       }
     }
-    return resources;
+    return false;
+  }
+
+  public AclRequest getAclRequest(String header) {
+    for(AclRequest req : aclRequests) {
+      if(req.getHeader().equals(header)) {
+        return req;
+      }
+    }
+    return null;
   }
 
   public Iterable<String> getHeaders() {
@@ -64,16 +97,35 @@ public class SubjectPermissionsRequest {
     getMainAclRequest().add(subject);
   }
 
-  public void setAclGetCallback(AclGetCallback callback) {
-    getMainAclRequest().setAclGetCallback(callback);
+  public void setAclCallback(AclCallback callback) {
+    this.aclGetCallback = callback;
+    for(AclRequest req : aclRequests) {
+      req.setAclDeleteCallback(callback);
+      req.setAclAddCallback(callback);
+    }
   }
 
-  public void setAclDeleteCallback(AclDeleteCallback callback) {
-    getMainAclRequest().setAclDeleteCallback(callback);
+  public boolean hasPermission(String header, Acls acls) {
+    if(hasAclRequest(header)) {
+      for(AclResource res : getAclRequest(header).getAclResources()) {
+        if(!res.hasPermission(acls)) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
-  public void setAclAddCallback(AclAddCallback callback) {
-    getMainAclRequest().setAclAddCallback(callback);
+  public void authorize(String subject, String header) {
+    if(hasAclRequest(header)) {
+      getAclRequest(header).add(subject);
+    }
+  }
+
+  public void unauthorize(String subject, String header) {
+    if(hasAclRequest(header)) {
+      getAclRequest(header).delete(subject);
+    }
   }
 
 }

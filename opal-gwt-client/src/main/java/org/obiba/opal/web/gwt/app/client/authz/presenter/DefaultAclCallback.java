@@ -11,18 +11,15 @@ package org.obiba.opal.web.gwt.app.client.authz.presenter;
 
 import net.customware.gwt.presenter.client.EventBus;
 
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest.AclAddCallback;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest.AclDeleteCallback;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest.AclGetCallback;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.model.client.opal.Acl;
-import org.obiba.opal.web.model.client.opal.SubjectAcls;
+import org.obiba.opal.web.model.client.opal.Acls;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
 
-public class DefaultAclCallback implements AclGetCallback, AclDeleteCallback, AclAddCallback {
+public class DefaultAclCallback implements AclCallback {
 
   private EventBus eventBus;
 
@@ -32,7 +29,7 @@ public class DefaultAclCallback implements AclGetCallback, AclDeleteCallback, Ac
   }
 
   @Override
-  public void onGet(JsArray<SubjectAcls> resource) {
+  public void onGet(JsArray<Acls> resource) {
   }
 
   @Override

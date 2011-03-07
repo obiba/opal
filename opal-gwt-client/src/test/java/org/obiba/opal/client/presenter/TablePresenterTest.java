@@ -18,6 +18,8 @@ import net.customware.gwt.presenter.client.EventBus;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter.AddPrincipalHandler;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
@@ -28,8 +30,8 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.GwtEvent.Type;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 
@@ -41,12 +43,18 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
 
   private TablePresenter presenter;
 
+  private AuthorizationPresenter.Display authzDisplayMock;
+
+  private AuthorizationPresenter authorizationPresenter;
+
   @Before
   public void setUp() {
     displayMock = createMock(TablePresenter.Display.class);
     eventBusMock = createMock(EventBus.class);
+    authzDisplayMock = createMock(AuthorizationPresenter.Display.class);
 
-    presenter = new TablePresenter(displayMock, eventBusMock);
+    authorizationPresenter = new AuthorizationPresenter(authzDisplayMock, eventBusMock);
+    presenter = new TablePresenter(displayMock, eventBusMock, authorizationPresenter);
   }
 
   @SuppressWarnings("unchecked")
@@ -66,10 +74,14 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     displayMock.setExportDataCommand((Command) EasyMock.anyObject());
     displayMock.setCopyDataCommand((Command) EasyMock.anyObject());
     displayMock.setVariableNameFieldUpdater((FieldUpdater<VariableDto, String>) EasyMock.anyObject());
+    displayMock.setPermissionsDisplay(authzDisplayMock);
 
-    replay(displayMock, eventBusMock);
+    expect(authzDisplayMock.getActionsColumn()).andReturn(null).once();
+    authzDisplayMock.addHandler((AddPrincipalHandler) EasyMock.anyObject());
+
+    replay(displayMock, eventBusMock, authzDisplayMock);
     presenter.bind();
 
-    verify(displayMock, eventBusMock);
+    verify(displayMock, eventBusMock, authzDisplayMock);
   }
 }

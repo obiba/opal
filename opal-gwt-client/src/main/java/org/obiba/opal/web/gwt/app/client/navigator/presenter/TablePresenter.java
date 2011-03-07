@@ -15,6 +15,8 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
@@ -37,6 +39,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -68,6 +71,8 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   @Inject
   private Provider<NavigatorPresenter> navigationPresenter;
 
+  private AuthorizationPresenter authorizationPresenter;
+
   private Runnable removeViewConfirmation;
 
   //
@@ -79,12 +84,16 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
    * @param eventBus
    */
   @Inject
-  public TablePresenter(final Display display, final EventBus eventBus) {
+  public TablePresenter(final Display display, final EventBus eventBus, AuthorizationPresenter authorizationPresenter) {
     super(display, eventBus);
+    this.authorizationPresenter = authorizationPresenter;
   }
 
   @Override
   protected void onBind() {
+    authorizationPresenter.bind();
+    getDisplay().setPermissionsDisplay(authorizationPresenter.getDisplay());
+
     super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
     super.registerHandler(eventBus.addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
     super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new RemoveViewConfirmationEventHandler()));
@@ -103,6 +112,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
   @Override
   protected void onUnbind() {
+    authorizationPresenter.unbind();
   }
 
   @Override
@@ -140,6 +150,25 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       // edit view
       ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/view/" + table.getName()).put().authorize(getDisplay().getEditAuthorizer()).send();
     }
+    // set permissions
+    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getDisplay().getPermissionsAuthorizer(), new HasAuthorization() {
+
+      @Override
+      public void unauthorized() {
+
+      }
+
+      @Override
+      public void beforeAuthorization() {
+
+      }
+
+      @Override
+      public void authorized() {
+        authorizationPresenter.setAclRequest(AclRequest.newBuilder("View", "/datasource/" + table.getDatasourceName() + "/table/" + table.getName(), "GET:GET/GET"));
+        authorizationPresenter.refreshDisplay();
+      }
+    })).send();
   }
 
   private void updateDisplay(TableDto tableDto, String previous, String next) {
@@ -415,6 +444,8 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
     void setVariableSelection(VariableDto variable, int index);
 
+    void setPermissionsDisplay(WidgetDisplay display);
+
     void beforeRenderRows();
 
     void renderRows(JsArray<VariableDto> rows);
@@ -466,6 +497,8 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     HasAuthorization getRemoveAuthorizer();
 
     HasAuthorization getEditAuthorizer();
+
+    HasAuthorization getPermissionsAuthorizer();
   }
 
 }

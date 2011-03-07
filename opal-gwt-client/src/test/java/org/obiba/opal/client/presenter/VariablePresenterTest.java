@@ -18,13 +18,15 @@ import net.customware.gwt.presenter.client.EventBus;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter.AddPrincipalHandler;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.GwtEvent.Type;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 
 public class VariablePresenterTest extends AbstractGwtTestSetup {
@@ -37,17 +39,24 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
 
   private VariablePresenter variablePresenter;
 
+  private AuthorizationPresenter.Display authzDisplayMock;
+
+  private AuthorizationPresenter authorizationPresenter;
+
   @Before
   public void setUp() {
     displayMock = createMock(VariablePresenter.Display.class);
     summaryTabMock = createMock(SummaryTabPresenter.Display.class);
     eventBusMock = createMock(EventBus.class);
+    authzDisplayMock = createMock(AuthorizationPresenter.Display.class);
+
+    authorizationPresenter = new AuthorizationPresenter(authzDisplayMock, eventBusMock);
     variablePresenter = new VariablePresenter(displayMock, eventBusMock, new SummaryTabPresenter(summaryTabMock, eventBusMock) {
       @Override
       public void bind() {
         // noop for testing
       }
-    });
+    }, authorizationPresenter);
   }
 
   @SuppressWarnings("unchecked")
@@ -61,12 +70,16 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
     displayMock.setParentCommand((Command) EasyMock.anyObject());
     displayMock.setSummaryTabCommand((Command) EasyMock.anyObject());
     displayMock.setSummaryTabWidget(summaryTabMock);
+    displayMock.setPermissionsDisplay(authzDisplayMock);
 
-    replay(displayMock, eventBusMock, summaryTabMock);
+    expect(authzDisplayMock.getActionsColumn()).andReturn(null).once();
+    authzDisplayMock.addHandler((AddPrincipalHandler) EasyMock.anyObject());
+
+    replay(displayMock, eventBusMock, summaryTabMock, authzDisplayMock);
 
     variablePresenter.bind();
 
-    verify(displayMock, eventBusMock, summaryTabMock);
+    verify(displayMock, eventBusMock, summaryTabMock, authzDisplayMock);
   }
 
 }

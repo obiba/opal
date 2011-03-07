@@ -18,6 +18,8 @@ import net.customware.gwt.presenter.client.EventBus;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter.AddPrincipalHandler;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingTableSelectionEvent;
@@ -41,12 +43,18 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
 
   private DatasourcePresenter datasourcePresenter;
 
+  private AuthorizationPresenter.Display authzDisplayMock;
+
+  private AuthorizationPresenter authorizationPresenter;
+
   @Before
   public void setUp() {
     displayMock = createMock(DatasourcePresenter.Display.class);
     eventBusMock = createMock(EventBus.class);
+    authzDisplayMock = createMock(AuthorizationPresenter.Display.class);
 
-    datasourcePresenter = new DatasourcePresenter(displayMock, eventBusMock);
+    authorizationPresenter = new AuthorizationPresenter(authzDisplayMock, eventBusMock);
+    datasourcePresenter = new DatasourcePresenter(displayMock, eventBusMock, authorizationPresenter);
   }
 
   @SuppressWarnings("unchecked")
@@ -69,10 +77,14 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
     displayMock.setNextCommand((Command) EasyMock.anyObject());
     displayMock.setPreviousCommand((Command) EasyMock.anyObject());
     displayMock.setTableNameFieldUpdater((FieldUpdater<TableDto, String>) EasyMock.anyObject());
+    displayMock.setPermissionsDisplay(authzDisplayMock);
 
-    replay(displayMock, eventBusMock);
+    expect(authzDisplayMock.getActionsColumn()).andReturn(null).once();
+    authzDisplayMock.addHandler((AddPrincipalHandler) EasyMock.anyObject());
+
+    replay(displayMock, eventBusMock, authzDisplayMock);
     datasourcePresenter.bind();
 
-    verify(displayMock, eventBusMock);
+    verify(displayMock, eventBusMock, authzDisplayMock);
   }
 }

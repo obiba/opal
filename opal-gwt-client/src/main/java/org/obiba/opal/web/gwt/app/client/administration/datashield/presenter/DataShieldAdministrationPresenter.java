@@ -81,11 +81,11 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
   @Override
   protected void onBind() {
     userAuthorizationPresenter.bind();
-    userAuthorizationPresenter.addAclRequest(AclRequest.newBuilder("Use", "/datashield/sessions", "*:GET/*"));
+    userAuthorizationPresenter.setAclRequest(AclRequest.newBuilder("Use", "/datashield/session", "*:GET/*"));
     getDisplay().setUserPermissionsDisplay(userAuthorizationPresenter.getDisplay());
 
     administratorAuthorizationPresenter.bind();
-    administratorAuthorizationPresenter.addAclRequest(AclRequest.newBuilder("Administrate", "/datashield/method", "*:GET/*").and("/authz/datashield", "*:GET/*"));
+    administratorAuthorizationPresenter.setAclRequest(AclRequest.newBuilder("Configuration", "/datashield/method", "*:GET/*"), AclRequest.newBuilder("Users", "/authz/datashield", "*:GET/*"));
     getDisplay().setAdministratorPermissionsDisplay(administratorAuthorizationPresenter.getDisplay());
 
     addEventHandlers();
@@ -163,7 +163,7 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
     // create method
     authorizeAddMethod(getDisplay().getAddMethodAuthorizer());
     // set permissions
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/authz/datashield").post().authorize(getDisplay().getPermissionsAuthorizer()).send();
+    AclRequest.newResourceAuthorizationRequestBuilder().authorize(getDisplay().getPermissionsAuthorizer()).send();
   }
 
   private void authorizeAddMethod(HasAuthorization authorizer) {

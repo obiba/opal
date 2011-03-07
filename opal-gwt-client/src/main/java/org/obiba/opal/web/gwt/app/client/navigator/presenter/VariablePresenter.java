@@ -15,6 +15,8 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingVariableSelectionEvent.Direction;
@@ -46,6 +48,8 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
   private VariableDto variable;
 
+  private AuthorizationPresenter authorizationPresenter;
+
   //
   // Constructors
   //
@@ -55,9 +59,10 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
    * @param eventBus
    */
   @Inject
-  public VariablePresenter(Display display, EventBus eventBus, SummaryTabPresenter summaryTabPresenter) {
+  public VariablePresenter(Display display, EventBus eventBus, SummaryTabPresenter summaryTabPresenter, AuthorizationPresenter authorizationPresenter) {
     super(display, eventBus);
     this.summaryTabPresenter = summaryTabPresenter;
+    this.authorizationPresenter = authorizationPresenter;
   }
 
   @Override
@@ -67,6 +72,9 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
   @Override
   protected void onBind() {
+    authorizationPresenter.bind();
+    getDisplay().setPermissionsDisplay(authorizationPresenter.getDisplay());
+
     super.registerHandler(eventBus.addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionHandler()));
     summaryTabPresenter.bind();
     getDisplay().setParentCommand(new ParentCommand());
@@ -82,6 +90,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
   @Override
   protected void onUnbind() {
+    authorizationPresenter.unbind();
     summaryTabPresenter.unbind();
   }
 
@@ -137,6 +146,25 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   private void authorize() {
     // summary
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(variable.getLink() + "/summary").get().authorize(new CompositeAuthorizer(getDisplay().getSummaryAuthorizer(), new SummaryUpdate())).send();
+    // set permissions
+    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getDisplay().getPermissionsAuthorizer(), new HasAuthorization() {
+
+      @Override
+      public void unauthorized() {
+
+      }
+
+      @Override
+      public void beforeAuthorization() {
+
+      }
+
+      @Override
+      public void authorized() {
+        authorizationPresenter.setAclRequest(AclRequest.newBuilder("View", variable.getLink(), "GET:GET"), AclRequest.newBuilder("Summary", variable.getLink() + "/summary", "GET:GET"));
+        authorizationPresenter.refreshDisplay();
+      }
+    })).send();
   }
 
   private boolean isCurrentVariable(VariableDto variableDto) {
@@ -272,5 +300,9 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     void setSummaryTabWidget(WidgetDisplay widget);
 
     HasAuthorization getSummaryAuthorizer();
+
+    HasAuthorization getPermissionsAuthorizer();
+
+    void setPermissionsDisplay(WidgetDisplay display);
   }
 }

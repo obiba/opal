@@ -81,7 +81,7 @@ message Acl {
   repeated string actions = 3;
 }
 
-message SubjectAcls {
-  required string principal = 1;
+message Acls {
+  required string name = 1;
   repeated Acl acls = 2;
 }

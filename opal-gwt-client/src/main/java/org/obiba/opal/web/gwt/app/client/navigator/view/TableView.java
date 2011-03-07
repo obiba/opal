@@ -9,13 +9,17 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
+import net.customware.gwt.presenter.client.widget.WidgetDisplay;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
+import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.TabAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -44,6 +48,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
@@ -79,6 +84,9 @@ public class TableView extends Composite implements TablePresenter.Display {
   InlineLabel noVariables;
 
   @UiField
+  HorizontalTabLayout tabs;
+
+  @UiField
   CellTable<VariableDto> table;
 
   @UiField
@@ -91,6 +99,9 @@ public class TableView extends Composite implements TablePresenter.Display {
 
   @UiField
   Image loading;
+
+  @UiField
+  Panel permissions;
 
   private ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
 
@@ -343,6 +354,17 @@ public class TableView extends Composite implements TablePresenter.Display {
   @Override
   public HasAuthorization getExcelDownloadAuthorizer() {
     return new MenuItemAuthorizer(toolbar.getExcelDownloadItem());
+  }
+
+  @Override
+  public void setPermissionsDisplay(WidgetDisplay display) {
+    permissions.clear();
+    permissions.add(display.asWidget());
+  }
+
+  @Override
+  public HasAuthorization getPermissionsAuthorizer() {
+    return new TabAuthorizer(tabs, 1);
   }
 
 }

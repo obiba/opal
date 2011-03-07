@@ -15,6 +15,8 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
@@ -34,6 +36,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -61,13 +64,16 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   @Inject
   private Provider<NavigatorPresenter> navigationPresenter;
 
+  private AuthorizationPresenter authorizationPresenter;
+
   //
   // Constructors
   //
 
   @Inject
-  public DatasourcePresenter(Display display, EventBus eventBus) {
+  public DatasourcePresenter(Display display, EventBus eventBus, AuthorizationPresenter authorizationPresenter) {
     super(display, eventBus);
+    this.authorizationPresenter = authorizationPresenter;
   }
 
   @Override
@@ -77,6 +83,9 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
   @Override
   protected void onBind() {
+    authorizationPresenter.bind();
+    getDisplay().setPermissionsDisplay(authorizationPresenter.getDisplay());
+
     super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionHandler()));
     super.registerHandler(eventBus.addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionHandler()));
     super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
@@ -98,6 +107,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
   @Override
   protected void onUnbind() {
+    authorizationPresenter.unbind();
   }
 
   private int getTableIndex(String tableName) {
@@ -125,7 +135,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   }
 
   private void authorize() {
-    // // create tables
+    // create tables
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta").get().authorize(getDisplay().getAddUpdateTablesAuthorizer()).send();
     // create views
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName + "/views").post().authorize(getDisplay().getAddViewAuthorizer()).send();
@@ -142,6 +152,25 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().authorize(getDisplay().getCopyDataAuthorizer()).send();
     // remove
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName).delete().authorize(getDisplay().getRemoveDatasourceAuthorizer()).send();
+    // set permissions
+    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getDisplay().getPermissionsAuthorizer(), new HasAuthorization() {
+
+      @Override
+      public void unauthorized() {
+
+      }
+
+      @Override
+      public void beforeAuthorization() {
+
+      }
+
+      @Override
+      public void authorized() {
+        authorizationPresenter.setAclRequest(AclRequest.newBuilder("View", "/datasource/" + datasourceName, "GET:GET/GET"));
+        authorizationPresenter.refreshDisplay();
+      }
+    })).send();
   }
 
   private void displayDatasource(DatasourceDto datasourceDto) {
@@ -492,6 +521,8 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
     void setTableSelection(TableDto variable, int index);
 
+    void setPermissionsDisplay(WidgetDisplay display);
+
     void beforeRenderRows();
 
     void renderRows(JsArray<TableDto> rows);
@@ -533,6 +564,8 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     HasAuthorization getCopyDataAuthorizer();
 
     HasAuthorization getExcelDownloadAuthorizer();
+
+    HasAuthorization getPermissionsAuthorizer();
 
   }
 }
