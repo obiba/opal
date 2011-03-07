@@ -1,0 +1,5 @@
+# This is where OPAL_HOME is located
+var/lib/opal
+
+# Store opal log here
+var/log/opal

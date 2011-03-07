@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -358,10 +359,8 @@
         </exclusions>
       </dependency>
 
-      <!--
-        JOTM requires javax.resource and javax.transaction Java APIs; these are missing due to the exclusions declared
-        above for the JOTM dependency.
-      -->
+      <!-- JOTM requires javax.resource and javax.transaction Java APIs; these are missing due to the exclusions declared 
+        above for the JOTM dependency. -->
       <!-- javax.resource -->
       <dependency>
         <groupId>org.ow2.spec.ee</groupId>
@@ -625,6 +624,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
         <configuration>
           <source>1.6</source>
           <target>1.6</target>
@@ -749,11 +749,8 @@
 
   <profiles>
     <profile>
-      <!--
-        A profile for the builds NOT performed by the continuous integration server. This profile is active by default,
-        which means that it will be deactivated if any other profile is specifically activated (ie: using mvn -P
-        build-id).
-      -->
+      <!-- A profile for the builds NOT performed by the continuous integration server. This profile is active by default, 
+        which means that it will be deactivated if any other profile is specifically activated (ie: using mvn -P build-id). -->
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
@@ -762,6 +759,7 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>buildnumber-maven-plugin</artifactId>
+            <version>1.0-beta-4</version>
             <executions>
               <execution>
                 <id>createBuildNumber</id>
@@ -770,6 +768,7 @@
                   <goal>create</goal>
                 </goals>
                 <configuration>
+                  <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
                   <!-- This configuation should allow machines without the SCM client to create a buildNumber property -->
                   <format>{0,date,yyyyMMddHHmmss}</format>
                   <items>
@@ -795,6 +794,7 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>buildnumber-maven-plugin</artifactId>
+            <version>1.0-beta-4</version>
             <executions>
               <execution>
                 <id>createBuildNumber</id>
@@ -804,6 +804,9 @@
                 </goals>
               </execution>
             </executions>
+            <configuration>
+              <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
+            </configuration>
           </plugin>
 
         </plugins>
