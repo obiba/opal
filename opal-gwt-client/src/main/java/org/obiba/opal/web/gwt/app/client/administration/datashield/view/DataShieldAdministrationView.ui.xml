@@ -61,7 +61,7 @@
             <g:Label addStyleNames="title"><ui:msg description="DataShield Administrators label">Administrators</ui:msg></g:Label>
             <p>
               <ui:msg description="DataShield Administrators information">
-                DataShield Administrators are allowed to modify the set of aggregation methods or to grant DataShield User permissions.
+                DataShield Administrators are allowed to configure the set of aggregation methods.
               </ui:msg>
             </p>
           </g:HTMLPanel>
