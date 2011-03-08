@@ -214,8 +214,8 @@
                   <target>
                     <property name="deb.version" value="${project.version}-b${buildNumber}" />
                     <!-- Deploy deb file in deb repo -->
-                    <copy todir="${obiba.deb.url}" file="target/opal_${deb.version}_all.deb" />
-                    <exec executable=".refresh.sh" dir="${obiba.deb.url}" osfamily="unix" />
+                    <copy todir="${obiba.deb.dir}" file="target/opal_${deb.version}_all.deb" />
+                    <exec executable=".refresh.sh" dir="${obiba.deb.dir}" osfamily="unix" />
                   </target>
                 </configuration>
               </execution>
