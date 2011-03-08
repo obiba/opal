@@ -137,9 +137,9 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName() + "/variables/excel").get().authorize(getDisplay().getExcelDownloadAuthorizer()).send();
     // export data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post()//
-    .authorize(CascadingAuthorizer.newBuilder().request("/files/meta", HttpMethod.GET)//
-    .request("/functional-units", HttpMethod.GET)//
-    .request("/functional-units/entities/table", HttpMethod.GET)//
+    .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
+    .and("/functional-units", HttpMethod.GET)//
+    .and("/functional-units/entities/table", HttpMethod.GET)//
     .authorize(getDisplay().getExportDataAuthorizer()).build())//
     .send();
     // copy data
@@ -151,24 +151,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/view/" + table.getName()).put().authorize(getDisplay().getEditAuthorizer()).send();
     }
     // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getDisplay().getPermissionsAuthorizer(), new HasAuthorization() {
-
-      @Override
-      public void unauthorized() {
-
-      }
-
-      @Override
-      public void beforeAuthorization() {
-
-      }
-
-      @Override
-      public void authorized() {
-        authorizationPresenter.setAclRequest(AclRequest.newBuilder("View", "/datasource/" + table.getDatasourceName() + "/table/" + table.getName(), "GET:GET/GET"));
-        authorizationPresenter.refreshDisplay();
-      }
-    })).send();
+    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getDisplay().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
   private void updateDisplay(TableDto tableDto, String previous, String next) {
@@ -250,6 +233,27 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   //
   // Interfaces and classes
   //
+
+  /**
+   * Update permissions on authorization.
+   */
+  private final class PermissionsUpdate implements HasAuthorization {
+    @Override
+    public void unauthorized() {
+
+    }
+
+    @Override
+    public void beforeAuthorization() {
+
+    }
+
+    @Override
+    public void authorized() {
+      authorizationPresenter.setAclRequest(AclRequest.newBuilder("View", "/datasource/" + table.getDatasourceName() + "/table/" + table.getName(), "GET:GET/GET"));
+      authorizationPresenter.refreshDisplay();
+    }
+  }
 
   private final class VariableSuggestionHandler implements SelectionHandler<Suggestion> {
 

@@ -228,7 +228,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     // add identifiers
     ResourceAuthorizationRequestBuilderFactory.newBuilder()//
     .forResource("/functional-unit/" + functionalUnit.getName() + "/entities").post()//
-    .authorize(CascadingAuthorizer.newBuilder().request("/functional-units/entities/table", HttpMethod.GET)//
+    .authorize(CascadingAuthorizer.newBuilder().and("/functional-units/entities/table", HttpMethod.GET)//
     .authorize(getDisplay().getImportIdentifiersFromDataAuthorizer()).build())//
     .send();
     // add key pair

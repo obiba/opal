@@ -143,9 +143,9 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName + "/tables/excel").get().authorize(getDisplay().getExcelDownloadAuthorizer()).send();
     // export data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post()//
-    .authorize(CascadingAuthorizer.newBuilder().request("/files/meta", HttpMethod.GET)//
-    .request("/functional-units", HttpMethod.GET)//
-    .request("/functional-units/entities/table", HttpMethod.GET)//
+    .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
+    .and("/functional-units", HttpMethod.GET)//
+    .and("/functional-units/entities/table", HttpMethod.GET)//
     .authorize(getDisplay().getExportDataAuthorizer()).build())//
     .send();
     // copy data
@@ -153,24 +153,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     // remove
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName).delete().authorize(getDisplay().getRemoveDatasourceAuthorizer()).send();
     // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getDisplay().getPermissionsAuthorizer(), new HasAuthorization() {
-
-      @Override
-      public void unauthorized() {
-
-      }
-
-      @Override
-      public void beforeAuthorization() {
-
-      }
-
-      @Override
-      public void authorized() {
-        authorizationPresenter.setAclRequest(AclRequest.newBuilder("View", "/datasource/" + datasourceName, "GET:GET/GET"));
-        authorizationPresenter.refreshDisplay();
-      }
-    })).send();
+    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getDisplay().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
   private void displayDatasource(DatasourceDto datasourceDto) {
@@ -292,6 +275,27 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   //
   // Interfaces and classes
   //
+
+  /**
+   * Update permissions on authorization.
+   */
+  private final class PermissionsUpdate implements HasAuthorization {
+    @Override
+    public void unauthorized() {
+
+    }
+
+    @Override
+    public void beforeAuthorization() {
+
+    }
+
+    @Override
+    public void authorized() {
+      authorizationPresenter.setAclRequest(AclRequest.newBuilder("View", "/datasource/" + datasourceName, "GET:GET/GET"));
+      authorizationPresenter.refreshDisplay();
+    }
+  }
 
   final class PreviousCommand implements Command {
     @Override

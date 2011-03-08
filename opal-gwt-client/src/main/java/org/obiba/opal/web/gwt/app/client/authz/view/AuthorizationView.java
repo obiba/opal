@@ -46,6 +46,8 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class AuthorizationView extends Composite implements AuthorizationPresenter.Display {
 
+  private static final int PAGER_SIZE = 20;
+
   @UiField
   CellTable<Acls> table;
 
@@ -93,9 +95,12 @@ public class AuthorizationView extends Composite implements AuthorizationPresent
 
     actionsColumnAdded = false;
 
-    table.setPageSize(20);
+    table.setPageSize(PAGER_SIZE);
     pager.setDisplay(table);
     subjectPermissionsDataProvider.addDataDisplay(table);
+
+    table.setVisible(false);
+    pager.setVisible(false);
   }
 
   //
@@ -170,9 +175,9 @@ public class AuthorizationView extends Composite implements AuthorizationPresent
     subjectPermissionsDataProvider.setArray(subjectPermissions);
     subjectPermissionsDataProvider.refresh();
 
-    boolean visible = subjectPermissions.length() > 0;
-    pager.setVisible(visible);
-    table.setVisible(visible);
+    int count = subjectPermissions.length();
+    pager.setVisible(count > PAGER_SIZE);
+    table.setVisible(count > 0);
   }
 
   private void addPermissionColumn(final String header, final PermissionSelectionHandler permHandler) {

@@ -17,11 +17,11 @@ import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFac
  * Cascade of authorizers: when authorization is received, request for a following authorization to be applied to the
  * provided authorizer.
  */
-public class CascadingAuthorizer implements HasAuthorization {
+public abstract class CascadingAuthorizer implements HasAuthorization {
 
-  HasAuthorization authorizer;
+  private HasAuthorization authorizer;
 
-  ResourceAuthorizationRequestBuilder request;
+  private ResourceAuthorizationRequestBuilder request;
 
   protected CascadingAuthorizer(ResourceAuthorizationRequestBuilder request, HasAuthorization authorizer) {
     super();
@@ -34,14 +34,12 @@ public class CascadingAuthorizer implements HasAuthorization {
     authorizer.beforeAuthorization();
   }
 
-  @Override
-  public void authorized() {
-    request.authorize(authorizer).send();
+  protected HasAuthorization getAuthorizer() {
+    return authorizer;
   }
 
-  @Override
-  public void unauthorized() {
-    authorizer.unauthorized();
+  protected ResourceAuthorizationRequestBuilder getRequest() {
+    return request;
   }
 
   public static Builder newBuilder() {
@@ -58,12 +56,23 @@ public class CascadingAuthorizer implements HasAuthorization {
 
     }
 
-    public Builder request(String resource, HttpMethod method) {
-      return request(ResourceAuthorizationRequestBuilderFactory.newBuilder().request(resource, method));
+    public Builder and(String resource, HttpMethod method) {
+      return and(ResourceAuthorizationRequestBuilderFactory.newBuilder().request(resource, method));
     }
 
-    public Builder request(ResourceAuthorizationRequestBuilder resourceAuthorizationRequestBuilder) {
-      CascadingAuthorizer newNext = new CascadingAuthorizer(resourceAuthorizationRequestBuilder, null);
+    public Builder and(ResourceAuthorizationRequestBuilder resourceAuthorizationRequestBuilder) {
+      return request(new AndAuthorizer(resourceAuthorizationRequestBuilder, null));
+    }
+
+    public Builder or(String resource, HttpMethod method) {
+      return or(ResourceAuthorizationRequestBuilderFactory.newBuilder().request(resource, method));
+    }
+
+    public Builder or(ResourceAuthorizationRequestBuilder resourceAuthorizationRequestBuilder) {
+      return request(new OrAuthorizer(resourceAuthorizationRequestBuilder, null));
+    }
+
+    private Builder request(CascadingAuthorizer newNext) {
       if(next != null) {
         next.authorizer = newNext;
       } else {

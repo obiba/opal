@@ -73,7 +73,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   @Override
   protected void onBind() {
     authorizationPresenter.bind();
-    getDisplay().setPermissionsDisplay(authorizationPresenter.getDisplay());
+    getDisplay().setPermissionsTabWidget(authorizationPresenter.getDisplay());
 
     super.registerHandler(eventBus.addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionHandler()));
     summaryTabPresenter.bind();
@@ -147,24 +147,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     // summary
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(variable.getLink() + "/summary").get().authorize(new CompositeAuthorizer(getDisplay().getSummaryAuthorizer(), new SummaryUpdate())).send();
     // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getDisplay().getPermissionsAuthorizer(), new HasAuthorization() {
-
-      @Override
-      public void unauthorized() {
-
-      }
-
-      @Override
-      public void beforeAuthorization() {
-
-      }
-
-      @Override
-      public void authorized() {
-        authorizationPresenter.setAclRequest(AclRequest.newBuilder("View", variable.getLink(), "GET:GET"), AclRequest.newBuilder("Summary", variable.getLink() + "/summary", "GET:GET"));
-        authorizationPresenter.refreshDisplay();
-      }
-    })).send();
+    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getDisplay().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
   private boolean isCurrentVariable(VariableDto variableDto) {
@@ -181,6 +164,27 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   //
   // Interfaces and classes
   //
+
+  /**
+   * Update permissions on authorization.
+   */
+  private final class PermissionsUpdate implements HasAuthorization {
+    @Override
+    public void unauthorized() {
+
+    }
+
+    @Override
+    public void beforeAuthorization() {
+
+    }
+
+    @Override
+    public void authorized() {
+      authorizationPresenter.setAclRequest(AclRequest.newBuilder("View", variable.getLink(), "GET:GET"), AclRequest.newBuilder("Summary", variable.getLink() + "/summary", "GET:GET"));
+      authorizationPresenter.refreshDisplay();
+    }
+  }
 
   /**
    * Update summary on authorization.
@@ -303,6 +307,6 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
     HasAuthorization getPermissionsAuthorizer();
 
-    void setPermissionsDisplay(WidgetDisplay display);
+    void setPermissionsTabWidget(WidgetDisplay display);
   }
 }

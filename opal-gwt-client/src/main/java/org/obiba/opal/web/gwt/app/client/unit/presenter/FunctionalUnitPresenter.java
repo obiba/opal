@@ -80,8 +80,8 @@ public class FunctionalUnitPresenter extends WidgetPresenter<FunctionalUnitPrese
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units/entities/csv").get().authorize(getDisplay().getExportIdentifiersAuthorizer()).send();
     // map identifiers
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units/entities/table").get()//
-    .authorize(CascadingAuthorizer.newBuilder().request("/files/meta", HttpMethod.GET)//
-    .request("/functional-units/entities/identifiers/map/units", HttpMethod.GET)//
+    .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
+    .and("/functional-units/entities/identifiers/map/units", HttpMethod.GET)//
     .authorize(getDisplay().getImportIdentifiersAuthorizer()).build())//
     .send();
   }

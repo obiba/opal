@@ -24,6 +24,8 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
 
@@ -48,20 +50,17 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
 
   private DataShieldMethodPresenter dataShieldMethodPresenter;
 
-  private AuthorizationPresenter userAuthorizationPresenter;
-
-  private AuthorizationPresenter administratorAuthorizationPresenter;
+  private AuthorizationPresenter authorizationPresenter;
 
   //
   // Constructors
   //
 
   @Inject
-  public DataShieldAdministrationPresenter(final Display display, final EventBus eventBus, DataShieldMethodPresenter dataShieldMethodPresenter, AuthorizationPresenter userAuthorizationPresenter, AuthorizationPresenter administratorAuthorizationPresenter) {
+  public DataShieldAdministrationPresenter(final Display display, final EventBus eventBus, DataShieldMethodPresenter dataShieldMethodPresenter, AuthorizationPresenter authorizationPresenter) {
     super(display, eventBus);
     this.dataShieldMethodPresenter = dataShieldMethodPresenter;
-    this.userAuthorizationPresenter = userAuthorizationPresenter;
-    this.administratorAuthorizationPresenter = administratorAuthorizationPresenter;
+    this.authorizationPresenter = authorizationPresenter;
   }
 
   @Override
@@ -80,13 +79,8 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
 
   @Override
   protected void onBind() {
-    userAuthorizationPresenter.bind();
-    userAuthorizationPresenter.setAclRequest(AclRequest.newBuilder("Use", "/datashield/session", "*:GET/*"));
-    getDisplay().setUserPermissionsDisplay(userAuthorizationPresenter.getDisplay());
-
-    administratorAuthorizationPresenter.bind();
-    administratorAuthorizationPresenter.setAclRequest(AclRequest.newBuilder("Configuration", "/datashield/method", "*:GET/*"), AclRequest.newBuilder("Users", "/authz/datashield", "*:GET/*"));
-    getDisplay().setAdministratorPermissionsDisplay(administratorAuthorizationPresenter.getDisplay());
+    authorizationPresenter.bind();
+    getDisplay().setPermissionsDisplay(authorizationPresenter.getDisplay());
 
     addEventHandlers();
   }
@@ -131,23 +125,18 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
 
   @Override
   protected void onUnbind() {
-    userAuthorizationPresenter.unbind();
-    administratorAuthorizationPresenter.unbind();
+    authorizationPresenter.unbind();
   }
 
   @Override
   public void refreshDisplay() {
     updateDataShieldMethods();
-    userAuthorizationPresenter.refreshDisplay();
-    administratorAuthorizationPresenter.refreshDisplay();
   }
 
   @Override
   public void revealDisplay() {
     updateDataShieldMethods();
     authorize();
-    userAuthorizationPresenter.revealDisplay();
-    administratorAuthorizationPresenter.revealDisplay();
   }
 
   //
@@ -156,14 +145,16 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
 
   @Override
   public void authorize(HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datashield/methods").get().authorize(authorizer).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datashield/methods").get().authorize(CascadingAuthorizer.newBuilder()//
+    .or(AclRequest.newResourceAuthorizationRequestBuilder())//
+    .authorize(authorizer).build()).send();
   }
 
   private void authorize() {
     // create method
     authorizeAddMethod(getDisplay().getAddMethodAuthorizer());
     // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder().authorize(getDisplay().getPermissionsAuthorizer()).send();
+    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getDisplay().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
   private void authorizeAddMethod(HasAuthorization authorizer) {
@@ -241,6 +232,29 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
   // Inner Classes / Interfaces
   //
 
+  /**
+   *
+   */
+  private final class PermissionsUpdate implements HasAuthorization {
+    @Override
+    public void unauthorized() {
+
+    }
+
+    @Override
+    public void beforeAuthorization() {
+
+    }
+
+    @Override
+    public void authorized() {
+      authorizationPresenter.setAclRequest(AclRequest.newBuilder("Use", "/datashield/session", "*:GET/*"),//
+      // AclRequest.newBuilder("Allow Users", "/authz/datashield", "*:GET/*")
+      AclRequest.newBuilder("Configure", "/datashield/method", "*:GET/*"));
+      authorizationPresenter.refreshDisplay();
+    }
+  }
+
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
     @Override
@@ -265,9 +279,7 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
 
     HasAuthorization getAddMethodAuthorizer();
 
-    void setUserPermissionsDisplay(WidgetDisplay display);
-
-    void setAdministratorPermissionsDisplay(WidgetDisplay display);
+    void setPermissionsDisplay(WidgetDisplay display);
 
   }
 

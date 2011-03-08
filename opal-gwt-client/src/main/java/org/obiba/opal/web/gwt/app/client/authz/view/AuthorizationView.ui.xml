@@ -13,7 +13,9 @@
       </g:InlineLabel>
       <g:TextBox ui:field="principal"/><g:Image ui:field="add" url="image/20/list-add.png" addStyleNames="clickable button"/>
     </g:HTMLPanel>
-    <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="top-margin"/>
-    <o:Table ui:field="table" addStyleNames="gwt-CellTable" />
+    <g:FlowPanel addStyleNames="top-margin">
+      <c:SimplePager ui:field="pager" location="CENTER"/>
+      <o:Table ui:field="table" addStyleNames="gwt-CellTable" />
+    </g:FlowPanel>
   </g:FlowPanel>
 </ui:UiBinder>

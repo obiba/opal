@@ -406,7 +406,7 @@ public class VariableView extends Composite implements VariablePresenter.Display
   }
 
   @Override
-  public void setPermissionsDisplay(WidgetDisplay display) {
+  public void setPermissionsTabWidget(WidgetDisplay display) {
     permissions.clear();
     permissions.add(display.asWidget());
   }

@@ -34,6 +34,8 @@ public class AuthorizationPresenter extends WidgetPresenter<AuthorizationPresent
 
   private JsArray<Acls> subjectPermissions;
 
+  private boolean initialized = false;
+
   //
   // Constructors
   //
@@ -44,13 +46,14 @@ public class AuthorizationPresenter extends WidgetPresenter<AuthorizationPresent
   }
 
   public void setAclRequest(AclRequest.Builder... builders) {
-    subjectPermissionsRequests = new SubjectPermissionsRequest(builders);
+    subjectPermissionsRequests = new SubjectPermissionsRequest(new AclCallbackImpl(eventBus), builders);
 
-    for(String header : subjectPermissionsRequests.getHeaders()) {
-      getDisplay().initColumn(header, new PermissionHandlerImpl());
+    if(!initialized) {
+      for(String header : subjectPermissionsRequests.getHeaders()) {
+        getDisplay().initColumn(header, new PermissionHandlerImpl());
+      }
+      initialized = true;
     }
-
-    subjectPermissionsRequests.setAclCallback(new AclCallbackImpl(eventBus));
   }
 
   private void addEventHandlers() {

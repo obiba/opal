@@ -70,7 +70,7 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
     displayMock.setParentCommand((Command) EasyMock.anyObject());
     displayMock.setSummaryTabCommand((Command) EasyMock.anyObject());
     displayMock.setSummaryTabWidget(summaryTabMock);
-    displayMock.setPermissionsDisplay(authzDisplayMock);
+    displayMock.setPermissionsTabWidget(authzDisplayMock);
 
     expect(authzDisplayMock.getActionsColumn()).andReturn(null).once();
     authzDisplayMock.addHandler((AddPrincipalHandler) EasyMock.anyObject());

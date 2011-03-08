@@ -30,10 +30,11 @@ public class SubjectPermissionsRequest {
 
   private AclGetCallback aclGetCallback;
 
-  public SubjectPermissionsRequest(AclRequest.Builder... builders) {
+  public SubjectPermissionsRequest(AclCallback callback, AclRequest.Builder... builders) {
     for(AclRequest.Builder builder : builders) {
       aclRequests.add(builder.build());
     }
+    setAclCallback(callback);
   }
 
   public void get() {
@@ -97,7 +98,7 @@ public class SubjectPermissionsRequest {
     getMainAclRequest().add(subject);
   }
 
-  public void setAclCallback(AclCallback callback) {
+  private void setAclCallback(AclCallback callback) {
     this.aclGetCallback = callback;
     for(AclRequest req : aclRequests) {
       req.setAclDeleteCallback(callback);

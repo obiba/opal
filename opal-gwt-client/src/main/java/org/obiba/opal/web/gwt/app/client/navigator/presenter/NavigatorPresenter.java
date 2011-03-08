@@ -152,15 +152,15 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").post().authorize(getDisplay().getCreateDatasourceAuthorizer()).send();
     // import data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/import").post()//
-    .authorize(CascadingAuthorizer.newBuilder().request("/files/meta", HttpMethod.GET)//
-    .request("/functional-units", HttpMethod.GET)//
+    .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
+    .and("/functional-units", HttpMethod.GET)//
     .authorize(getDisplay().getImportDataAuthorizer()).build())//
     .send();
     // export data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post()//
-    .authorize(CascadingAuthorizer.newBuilder().request("/files/meta", HttpMethod.GET)//
-    .request("/functional-units", HttpMethod.GET)//
-    .request("/functional-units/entities/table", HttpMethod.GET)//
+    .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
+    .and("/functional-units", HttpMethod.GET)//
+    .and("/functional-units/entities/table", HttpMethod.GET)//
     .authorize(getDisplay().getExportDataAuthorizer()).build())//
     .send();
   }

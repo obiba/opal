@@ -77,10 +77,7 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
   Panel permissionsPanel;
 
   @UiField
-  Panel userPermissions;
-
-  @UiField
-  Panel administratorPermissions;
+  Panel permissions;
 
   private JsArrayDataProvider<DataShieldMethodDto> methodsDataProvider = new JsArrayDataProvider<DataShieldMethodDto>();
 
@@ -177,13 +174,8 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
   }
 
   @Override
-  public void setUserPermissionsDisplay(WidgetDisplay display) {
-    userPermissions.add(display.asWidget());
-  }
-
-  @Override
-  public void setAdministratorPermissionsDisplay(WidgetDisplay display) {
-    administratorPermissions.add(display.asWidget());
+  public void setPermissionsDisplay(WidgetDisplay display) {
+    permissions.add(display.asWidget());
   }
 
   @Override
