@@ -2,7 +2,7 @@
 ### BEGIN INIT INFO
 # Provides:          opal
 # Required-Start:    $network $local_fs $remote_fs
-# Required-Stop:
+# Required-Stop:     $remote_fs
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: <Enter a short description of the sortware>

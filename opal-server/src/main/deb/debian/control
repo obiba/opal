@@ -9,5 +9,5 @@ Homepage: http://www.obiba.org
 Package: opal
 Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, daemon, adduser, psmisc, java6-runtime
-Description: Data integration application for biobanks
- Opal is a data integration and warehousing application for biobanks.
+Description: Data integration Web application for biobanks
+ Opal is a data integration and warehousing Web application for biobanks.
