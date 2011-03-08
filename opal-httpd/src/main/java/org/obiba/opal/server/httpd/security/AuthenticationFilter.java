@@ -98,27 +98,15 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     Subject subject = null;
     if(hasOpalAuthHeader(request)) {
-      String opalAuthToken = getOpalAuthToken(request);
-      HttpHeaderAuthenticationToken token = new HttpHeaderAuthenticationToken(opalAuthToken);
-      subject = new Subject.Builder(getSecurityManager()).sessionId(opalAuthToken).buildSubject();
-      subject.login(token);
+      subject = authenticateByOpalAuthHeader(request);
     }
 
     if(subject == null && hasAuthorizationHeader(request)) {
-      String authorization = getAuthorizationHeader(request);
-      String sessionId = extractSessionId(request);
-
-      HttpAuthorizationToken token = new HttpAuthorizationToken(X_OPAL_AUTH, authorization);
-      subject = new Subject.Builder(getSecurityManager()).sessionId(sessionId).buildSubject();
-      subject.login(token);
+      subject = authenticateByAuthorizationHeader(request);
     }
 
     if(subject == null && hasOpalSessionCookie(request) && hasOpalRequestCookie(request)) {
-      String sessionId = extractSessionId(request);
-      String requestId = extractRequestId(request);
-      HttpCookieAuthenticationToken token = new HttpCookieAuthenticationToken(sessionId, request.getRequestURI(), requestId);
-      subject = new Subject.Builder(getSecurityManager()).sessionId(sessionId).buildSubject();
-      subject.login(token);
+      subject = authenticateByCookie(request);
     }
 
     if(subject != null) {
@@ -128,6 +116,33 @@ public class AuthenticationFilter extends OncePerRequestFilter {
       return;
     }
 
+  }
+
+  private Subject authenticateByOpalAuthHeader(HttpServletRequest request) {
+    String opalAuthToken = getOpalAuthToken(request);
+    HttpHeaderAuthenticationToken token = new HttpHeaderAuthenticationToken(opalAuthToken);
+    Subject subject = new Subject.Builder(getSecurityManager()).sessionId(opalAuthToken).buildSubject();
+    subject.login(token);
+    return subject;
+  }
+
+  private Subject authenticateByAuthorizationHeader(HttpServletRequest request) {
+    String authorization = getAuthorizationHeader(request);
+    String sessionId = extractSessionId(request);
+
+    HttpAuthorizationToken token = new HttpAuthorizationToken(X_OPAL_AUTH, authorization);
+    Subject subject = new Subject.Builder(getSecurityManager()).sessionId(sessionId).buildSubject();
+    subject.login(token);
+    return subject;
+  }
+
+  private Subject authenticateByCookie(HttpServletRequest request) {
+    String sessionId = extractSessionId(request);
+    String requestId = extractRequestId(request);
+    HttpCookieAuthenticationToken token = new HttpCookieAuthenticationToken(sessionId, request.getRequestURI(), requestId);
+    Subject subject = new Subject.Builder(getSecurityManager()).sessionId(sessionId).buildSubject();
+    subject.login(token);
+    return subject;
   }
 
   private void unbind() {
