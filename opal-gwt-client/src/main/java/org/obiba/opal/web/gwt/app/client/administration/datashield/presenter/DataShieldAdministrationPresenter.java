@@ -130,12 +130,11 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
 
   @Override
   public void refreshDisplay() {
-    updateDataShieldMethods();
+    authorize();
   }
 
   @Override
   public void revealDisplay() {
-    updateDataShieldMethods();
     authorize();
   }
 
@@ -145,16 +144,22 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
 
   @Override
   public void authorize(HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datashield/methods").get().authorize(CascadingAuthorizer.newBuilder()//
+    authorizeMethods(CascadingAuthorizer.newBuilder()//
     .or(AclRequest.newResourceAuthorizationRequestBuilder())//
-    .authorize(authorizer).build()).send();
+    .authorize(authorizer).build());
   }
 
   private void authorize() {
+    // view methods
+    authorizeMethods(new CompositeAuthorizer(getDisplay().getMethodsAuthorizer(), new MethodsUpdate()));
     // create method
     authorizeAddMethod(getDisplay().getAddMethodAuthorizer());
     // set permissions
     AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getDisplay().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+  }
+
+  private void authorizeMethods(HasAuthorization authorizer) {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datashield/methods").get().authorize(authorizer).send();
   }
 
   private void authorizeAddMethod(HasAuthorization authorizer) {
@@ -235,6 +240,26 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
   /**
    *
    */
+  private final class MethodsUpdate implements HasAuthorization {
+    @Override
+    public void unauthorized() {
+
+    }
+
+    @Override
+    public void beforeAuthorization() {
+
+    }
+
+    @Override
+    public void authorized() {
+      updateDataShieldMethods();
+    }
+  }
+
+  /**
+   *
+   */
   private final class PermissionsUpdate implements HasAuthorization {
     @Override
     public void unauthorized() {
@@ -280,6 +305,8 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
     HasAuthorization getAddMethodAuthorizer();
 
     void setPermissionsDisplay(WidgetDisplay display);
+
+    HasAuthorization getMethodsAuthorizer();
 
   }
 

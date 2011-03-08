@@ -65,6 +65,9 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
   //
 
   @UiField
+  Panel methodsPanel;
+
+  @UiField
   Button addMethodButton;
 
   @UiField
@@ -181,6 +184,11 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
   @Override
   public HasAuthorization getPermissionsAuthorizer() {
     return new WidgetAuthorizer(permissionsPanel);
+  }
+
+  @Override
+  public HasAuthorization getMethodsAuthorizer() {
+    return new WidgetAuthorizer(methodsPanel);
   }
 
 }

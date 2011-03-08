@@ -8,7 +8,7 @@
 
   <g:FlowPanel>
                   
-    <g:FlowPanel addStyleNames="panel">
+    <g:FlowPanel ui:field="methodsPanel" addStyleNames="panel">
       <g:FlowPanel addStyleNames="title">
         <g:InlineLabel><ui:msg description="Aggregation Methods label" >Aggregation Methods</ui:msg></g:InlineLabel>
         <o:HelpImage imageSize="16" tooltipWidth="500px" tooltipHeight="350px">
