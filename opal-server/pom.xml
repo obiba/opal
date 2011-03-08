@@ -171,64 +171,55 @@
                 <goals>
                   <goal>run</goal>
                 </goals>
+                <configuration>
+                  <target>
+                    <property name="deb.dir" value="${basedir}/target/deb" />
+                    <property name="deb.version" value="${project.version}-b${buildNumber}" />
+                    <tstamp>
+                      <!-- http://www.debian.org/doc/debian-policy/ch-source.html -->
+                      <format property="deb.date" pattern="EEE, d MMM yyyy HH:mm:ss Z" locale="en" />
+                    </tstamp>
+
+                    <mkdir dir="${deb.dir}" />
+                    <mkdir dir="${deb.dir}/usr/share" />
+                    <mkdir dir="${deb.dir}/var/lib/opal" />
+                    <mkdir dir="${deb.dir}/etc" />
+
+                    <copy todir="${deb.dir}">
+                      <fileset dir="src/main/deb" />
+                      <filterset>
+                        <filter token="project.version" value="${deb.version}" />
+                        <filter token="date" value="${deb.date}" />
+                      </filterset>
+                    </copy>
+
+                    <unzip src="${basedir}/target/opal-server-${project.version}-dist.zip" dest="${deb.dir}/usr/share" />
+                    <move todir="${deb.dir}/etc/opal">
+                      <fileset dir="${deb.dir}/usr/share/opal-server-${project.version}/conf" />
+                    </move>
+
+                    <exec executable="debuild" dir="${deb.dir}" failonerror="true" osfamily="unix">
+                      <arg value="-b" />
+                    </exec>
+                  </target>
+                </configuration>
               </execution>
-            </executions>
-            <configuration>
-              <target>
-                <property name="deb.dir" value="${basedir}/target/deb" />
-                <property name="deb.version" value="${project.version}-b${buildNumber}" />
-                <tstamp>
-                  <!-- http://www.debian.org/doc/debian-policy/ch-source.html -->
-                  <format property="deb.date" pattern="EEE, d MMM yyyy HH:mm:ss Z" locale="en" />
-                </tstamp>
-
-                <mkdir dir="${deb.dir}" />
-                <mkdir dir="${deb.dir}/usr/share" />
-                <mkdir dir="${deb.dir}/var/lib/opal" />
-                <mkdir dir="${deb.dir}/etc" />
-
-                <copy todir="${deb.dir}">
-                  <fileset dir="src/main/deb" />
-                  <filterset>
-                    <filter token="project.version" value="${deb.version}" />
-                    <filter token="date" value="${deb.date}" />
-                  </filterset>
-                </copy>
-
-                <unzip src="${basedir}/target/opal-server-${project.version}-dist.zip" dest="${deb.dir}/usr/share" />
-                <move todir="${deb.dir}/etc/opal">
-                  <fileset dir="${deb.dir}/usr/share/opal-server-${project.version}/conf" />
-                </move>
-
-                <exec executable="debuild" dir="${deb.dir}" failonerror="true" osfamily="unix">
-                  <arg value="-i" />
-                  <arg value="-us" />
-                  <arg value="-uc" />
-                  <arg value="-b" />
-                </exec>
-              </target>
-            </configuration>
-          </plugin>
-          <plugin>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.6</version>
-            <executions>
               <execution>
                 <id>deploy-deb</id>
                 <phase>deploy</phase>
                 <goals>
                   <goal>run</goal>
                 </goals>
+                <configuration>
+                  <target>
+                    <property name="deb.version" value="${project.version}-b${buildNumber}" />
+                    <!-- Deploy deb file in deb repo -->
+                    <copy todir="${obiba.deb.url}" file="target/opal_${deb.version}_all.deb" />
+                    <exec executable=".refresh.sh" dir="${obiba.deb.url}" osfamily="unix" />
+                  </target>
+                </configuration>
               </execution>
             </executions>
-            <configuration>
-              <target>
-                <property name="deb.version" value="${project.version}-b${buildNumber}" />
-                <!-- Deploy deb file in deb repo -->
-                <copy todir="${obiba.deb.url}" file="target/opal_${deb.version}_all.deb" />
-                <exec executable=".refresh.sh" dir="${obiba.deb.url}" osfamily="unix" />
-              </target>
-            </configuration>
           </plugin>
         </plugins>
       </build>
