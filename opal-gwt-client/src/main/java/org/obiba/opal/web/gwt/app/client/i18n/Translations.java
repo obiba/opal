@@ -95,6 +95,13 @@ public interface Translations extends Constants {
   "DownloadCertificate", "Download Certificate" })
   Map<String, String> actionMap();
 
+  @Description("Permission map")
+  @DefaultStringMapValue({ "Use", "Use", //
+  "Administrate", "Administrate", //
+  "View", "View", //
+  "Summary", "Summary" })
+  Map<String, String> permissionMap();
+
   @Description("Size label")
   @DefaultStringValue("Size")
   String sizeLabel();

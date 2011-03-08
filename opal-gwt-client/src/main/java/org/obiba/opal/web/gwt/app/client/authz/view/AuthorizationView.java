@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.ConstantActionsProvid
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.model.client.opal.Acls;
 
+import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -181,8 +182,7 @@ public class AuthorizationView extends Composite implements AuthorizationPresent
   }
 
   private void addPermissionColumn(final String header, final PermissionSelectionHandler permHandler) {
-    EnablableCheckboxCell cell = new EnablableCheckboxCell();
-    Column<Acls, Boolean> column = new Column<Acls, Boolean>(cell) {
+    Column<Acls, Boolean> column = new Column<Acls, Boolean>(new CheckboxCell()) {
 
       @Override
       public Boolean getValue(Acls acls) {
@@ -190,22 +190,20 @@ public class AuthorizationView extends Composite implements AuthorizationPresent
       }
     };
 
-    // cell.setEnabled(false);
-
     FieldUpdater<Acls, Boolean> fieldUpdater = new FieldUpdater<Acls, Boolean>() {
 
       @Override
       public void update(int index, Acls object, Boolean value) {
-        // TODO
-        GWT.log(object.getName() + ":" + header + "=" + value);
-        if(value) permHandler.authorize(object.getName(), header);
-        else
+        if(value) {
+          permHandler.authorize(object.getName(), header);
+        } else {
           permHandler.unauthorize(object.getName(), header);
+        }
       }
     };
 
     column.setFieldUpdater(fieldUpdater);
-    table.addColumn(column, header);
+    table.addColumn(column, translations.permissionMap().get(header));
 
   }
 

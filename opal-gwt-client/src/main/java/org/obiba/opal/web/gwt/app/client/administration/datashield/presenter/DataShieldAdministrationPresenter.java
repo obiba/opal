@@ -250,7 +250,7 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
     public void authorized() {
       authorizationPresenter.setAclRequest(AclRequest.newBuilder("Use", "/datashield/session", "*:GET/*"),//
       // AclRequest.newBuilder("Allow Users", "/authz/datashield", "*:GET/*")
-      AclRequest.newBuilder("Configure", "/datashield/method", "*:GET/*"));
+      AclRequest.newBuilder("Administrate", "/datashield/method", "*:GET/*"));
       authorizationPresenter.refreshDisplay();
     }
   }
