@@ -67,6 +67,13 @@ public class OpalGinModule extends AbstractGinModule {
     bind(LoginPresenter.Display.class).to(LoginView.class).in(Singleton.class);
     bind(UnhandledResponseNotificationPresenter.Display.class).to(UnhandledResponseNotificationView.class).in(Singleton.class);
 
+    configureWidgets();
+
+    // Concrete classes (such as NavigatorPresenter) don't need to be "bound". Simply define a getter in the
+    // OpalGinjector interface and they'll "just work".
+  }
+
+  private void configureWidgets() {
     // Don't bind as singleton because the ApplicationPresenter expects a new instance on every display
     bind(NotificationPresenter.Display.class).to(NotificationView.class);
     bind(FileSelectorPresenter.Display.class).to(FileSelectorView.class).in(Singleton.class);
@@ -78,13 +85,8 @@ public class OpalGinModule extends AbstractGinModule {
     bind(CreateFolderDialogPresenter.Display.class).to(CreateFolderDialogView.class).in(Singleton.class);
     bind(EvaluateScriptPresenter.Display.class).to(EvaluateScriptView.class);
     bind(ItemSelectorPresenter.Display.class).to(ItemSelectorView.class);
-
     bind(SummaryTabPresenter.Display.class).to(SummaryTabView.class);
-
     bind(AuthorizationPresenter.Display.class).to(AuthorizationView.class);
-
-    // Concrete classes (such as NavigatorPresenter) don't need to be "bound". Simply define a getter in the
-    // OpalGinjector interface and they'll "just work".
   }
 
 }
