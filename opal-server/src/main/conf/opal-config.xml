@@ -1,81 +1,36 @@
 <org.obiba.opal.core.cfg.OpalConfiguration>
-  
-  <!-- Configure the path which will be the root of the Virtual File System used by Opal  -->
-  <fileSystemRoot>file://path/to/your/opal-filesystem</fileSystemRoot>
+
+  <secretKey>this will be generated during install</secretKey>
+
+  <fileSystemRoot>file://${OPAL_HOME}/fs</fileSystemRoot>
 
   <functionalUnits>
-    <org.obiba.opal.core.unit.FunctionalUnit>
-	  <name>my-unit</name>
-	  <keyVariableName>my-key</keyVariableName>
-      <!--
-        Unique identifier selection clause.
-        If not specified variables with an "identifier" attribute set to "true" will be chosen as unique identifiers. 
-        If a select clause is specified the default behaviour is overridden with the contents of the select clause.
-        In the example below the variable with the name "BoneDensity.InstrumentRun.Contraindication.code" will be
-        a unique identifier along will all the variables that contain an "identifier" attribute set to "true". Here
-        the select clause reproduces the default behaviour and marks one extra variable by name to be an identifier.
-      -->
-      <!--
-      <select class="org.obiba.magma.js.views.JavascriptClause">
-        <script>name().matches(/BoneDensity.InstrumentRun.Contraindication.code/).or(attribute('identifier').isNull().not().and(attribute('identifier').matches(/true/)))</script>
-      </select>
-      -->   
-	</org.obiba.opal.core.unit.FunctionalUnit>
   </functionalUnits>
 
   <magmaEngineFactory>
-  
+
     <extensions>
       <org.obiba.magma.js.MagmaJsExtension />
       <org.obiba.magma.xstream.MagmaXStreamExtension />
+      <org.obiba.magma.security.MagmaSecurityExtension />
     </extensions>
 
     <factories>
-
-      <!--
-        Configure available datasources in this section. Opal requires at least two datasources: one for the Participant
-        keys, one for the Participant Data.
-      -->
-
-      <!-- Two types of datasources can be configured here : Hibernate and JDBC -->
-
-      <!-- Opal keys storage -->
       <org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
         <name>opal-keys</name>
         <sessionFactoryProvider class="org.obiba.magma.datasource.hibernate.support.SpringBeanSessionFactoryProvider">
           <beanName>keySessionFactory</beanName>
         </sessionFactoryProvider>
       </org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
-
-      <!-- Opal data storage -->
       <org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
         <name>opal-data</name>
         <sessionFactoryProvider class="org.obiba.magma.datasource.hibernate.support.SpringBeanSessionFactoryProvider">
           <beanName>opalSessionFactory</beanName>
         </sessionFactoryProvider>
       </org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
-
-      <!-- An example JDBC Datasource configuration -->
-      <!--
-      <org.obiba.magma.datasource.jdbc.JdbcDatasourceFactory>
-        <name>sql-datasource</name>
-
-        <jdbcProperties>
-          <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-          <property name="url" value="jdbc:mysql://localhost:3306/opal" />
-          <property name="username" value="theUser" />
-          <property name="password" value="theirPassword" />
-        </jdbcProperties>
-
-        <settings>
-          <defaultEntityType>Participant</defaultEntityType>
-          <defaultCreatedTimestampColumnName>created</defaultCreatedTimestampColumnName>
-          <defaultUpdatedTimestampColumnName>updated</defaultUpdatedTimestampColumnName>
-        </settings>
-      </org.obiba.magma.datasource.jdbc.JdbcDatasourceFactory>
-      -->      
     </factories>
   </magmaEngineFactory>
+
   <extensions>
     <org.obiba.opal.datashield.cfg.DatashieldConfiguration>
       <aggregatingMethods>
@@ -84,8 +39,8 @@
           <function>length</function>
         </org.obiba.opal.datashield.RFunctionDataShieldMethod>
         <org.obiba.opal.datashield.RFunctionDataShieldMethod>
-          <name>summary</name>
-          <function>summary</function>
+          <name>coefficients</name>
+          <function>coefficients</function>
         </org.obiba.opal.datashield.RFunctionDataShieldMethod>
         <org.obiba.opal.datashield.CustomRScriptMethod>
           <name>custom</name>

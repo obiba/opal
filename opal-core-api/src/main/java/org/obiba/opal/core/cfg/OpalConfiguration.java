@@ -26,6 +26,8 @@ public class OpalConfiguration {
   // Instance Variables
   //
 
+  private String secretKey;
+
   private String fileSystemRoot;
 
   private MagmaEngineFactory magmaEngineFactory;
@@ -49,6 +51,9 @@ public class OpalConfiguration {
   //
   // Methods
   //
+  public String getSecretKey() {
+    return secretKey;
+  }
 
   public void setFileSystemRoot(String fileSystemRoot) {
     this.fileSystemRoot = fileSystemRoot;
