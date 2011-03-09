@@ -7,20 +7,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.fs;
+package org.obiba.opal.fs.impl;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
+import java.util.Map.Entry;
+import java.util.Properties;
 
-import org.springframework.stereotype.Component;
+final class Placeholders {
 
-@Component
-@Path("/fs")
-public class OpalFsResource {
+  private static final String PREFIX = "${";
 
-  @GET
-  public String get() {
-    return "Got";
+  private static final String POSTFIX = "}";
+
+  public static String replaceAll(String value) {
+    Properties sysProps = System.getProperties();
+    for(Entry<Object, Object> prop : sysProps.entrySet()) {
+      value = value.replace(PREFIX + prop.getKey() + POSTFIX, prop.getValue().toString());
+    }
+    return value;
   }
-
 }

@@ -29,18 +29,30 @@ public class OpalFileSystemImpl implements OpalFileSystem {
 
   private final String nativeRootURL;
 
-  public OpalFileSystemImpl(String root) {
+  public OpalFileSystemImpl(final String fsRoot) {
 
-    Assert.hasText(root, "You must specify a root directory for the Opal File System.");
+    Assert.hasText(fsRoot, "You must specify a root directory for the Opal File System.");
 
     try {
+      String root = Placeholders.replaceAll(fsRoot);
       log.info("Setting up Opal filesystem rooted at '{}'", root);
       FileSystemManager fsm = VFS.getManager();
       FileObject vfsRoot = fsm.resolveFile(root);
+
+      if(vfsRoot.exists() == false) {
+        log.info("Opal File System does not exist. Trying to create it.");
+        vfsRoot.createFolder();
+      }
       nativeRootURL = vfsRoot.getURL().toString() + "/";
 
-      Assert.isTrue(vfsRoot.isReadable(), "Opal File System is not readable.  Please check your Opal File System configuration.");
-      Assert.isTrue(vfsRoot.isWriteable(), "The root of the Opal File System is not writable.  Please reconfigure the Opal File System with a writable root.");
+      if(vfsRoot.isReadable() == false) {
+        log.error("Opal File System is not readable.  Please check your Opal File System configuration.");
+        throw new RuntimeException("Opal File System is not readable.  Please check your Opal File System configuration.");
+      }
+      if(vfsRoot.isWriteable() == false) {
+        log.error("The root of the Opal File System is not writable.  Please reconfigure the Opal File System with a writable root.");
+        throw new RuntimeException("The root of the Opal File System is not writable.  Please reconfigure the Opal File System with a writable root.");
+      }
 
       // This is similar to what chroot does. We obtain a "filesystem" that appears to be rooted at vfsRoot
       this.root = fsm.createVirtualFileSystem(vfsRoot);

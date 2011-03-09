@@ -19,13 +19,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-ws</artifactId>
-      <version>${project.version}</version>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-vfs</artifactId>
       <version>${commons-vfs.version}</version>
