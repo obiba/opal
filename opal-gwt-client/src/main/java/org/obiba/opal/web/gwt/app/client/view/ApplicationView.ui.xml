@@ -51,6 +51,7 @@
       <g:FlowPanel addStyleNames="footbar">
         <g:Label>copyright</g:Label>
         <g:Anchor ui:field="obiba">obiba.org</g:Anchor>
+        <g:Label ui:field="version" addStyleNames="right-aligned"/>
       </g:FlowPanel>
     </g:south>
   </g:DockLayoutPanel>

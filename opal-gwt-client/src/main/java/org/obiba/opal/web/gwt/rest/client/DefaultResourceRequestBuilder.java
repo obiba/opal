@@ -42,6 +42,8 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
 
   private static ResourceAuthorizationCache authorizationCache;
 
+  private static String version;
+
   private String uri;
 
   private String contentType;
@@ -218,6 +220,8 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
         throw new IllegalStateException("Invalid status code.");
       }
 
+      setOpalVersion(response);
+
       if(credentials.hasExpired(builder) || code == 401) {
         // this is fired even after a request for deleting the session
         eventBus.fireEvent(new RequestCredentialsExpiredEvent());
@@ -257,7 +261,6 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
     private void cacheAuthorization(Response response) {
       Set<HttpMethod> allowed = getAllowedMethods(response);
       if(allowed.size() > 0) {
-        // GWT.log(authorizationCache.toString());
         authorizationCache.put(uri, allowed);
       }
     }
@@ -274,6 +277,13 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
       return allowed;
     }
 
+    private void setOpalVersion(Response response) {
+      String header = response.getHeader("X-Opal-Version");
+      if(header != null && header.length() > 0) {
+        version = header;
+      }
+    }
+
   }
 
   private class InnerRequestBuilder extends RequestBuilder {
@@ -286,6 +296,11 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
       super(httpMethod.toString(), url);
     }
 
+  }
+
+  @Override
+  public String getVersion() {
+    return version;
   }
 
 }

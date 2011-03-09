@@ -47,4 +47,6 @@ public interface ResourceRequestBuilder<T extends JavaScriptObject> {
 
   public Request send();
 
+  public String getVersion();
+
 }

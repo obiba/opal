@@ -48,7 +48,8 @@
 .footbar {
   border-top: 1px solid #B4A291;
   margin-left: 0px;
-  padding-left: 1em;
+  padding-left: 0.8em;
+  padding-right: 0.8em;
   background: #F3F4EB;
   color: #402817;
 }
