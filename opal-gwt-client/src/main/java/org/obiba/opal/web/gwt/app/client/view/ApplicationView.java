@@ -23,6 +23,7 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Panel;
@@ -55,6 +56,9 @@ public class ApplicationView implements ApplicationPresenter.Display {
 
   @UiField
   Anchor administration;
+
+  @UiField
+  InlineLabel username;
 
   @UiField
   Anchor obiba;
@@ -177,6 +181,11 @@ public class ApplicationView implements ApplicationPresenter.Display {
   @Override
   public HasAuthorization getAdministrationAuthorizer() {
     return new UIObjectAuthorizer(administration);
+  }
+
+  @Override
+  public void setUsername(String username) {
+    this.username.setText(username);
   }
 
 }

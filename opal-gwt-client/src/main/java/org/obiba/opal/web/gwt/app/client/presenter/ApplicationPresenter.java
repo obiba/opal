@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitPresenter;
+import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
@@ -71,7 +72,12 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
     void clearSelection();
 
+    void setUsername(String username);
+
   }
+
+  @Inject
+  private RequestCredentials credentials;
 
   @Inject
   private Provider<AdministrationPresenter> administrationPresenter;
@@ -213,6 +219,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
   @Override
   public void revealDisplay() {
+    getDisplay().setUsername(credentials.getUsername());
     authorize();
     eventBus.fireEvent(new WorkbenchChangeEvent(dashboardPresenter.get()));
     getDisplay().setCurrentSelection(getDisplay().getDashboardItem());

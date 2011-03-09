@@ -120,7 +120,7 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
     authorizationCache.clear();
   }
 
-  private void createSecurityResource(String username, String password) {
+  private void createSecurityResource(final String username, String password) {
     ResponseCodeCallback authError = new ResponseCodeCallback() {
 
       @Override
@@ -136,6 +136,7 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
         // When a 201 happens, we should have credentials, but we'll test anyway.
         if(credentials.hasCredentials()) {
           display.clear();
+          credentials.setUsername(username);
           eventBus.fireEvent(new SessionCreatedEvent(response.getHeader("Location")));
         } else {
           display.showErrorMessageAndClearPassword();

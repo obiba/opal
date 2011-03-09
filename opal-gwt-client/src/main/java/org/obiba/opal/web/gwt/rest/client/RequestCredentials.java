@@ -28,11 +28,21 @@ public class RequestCredentials {
   /** Opal request id cookie name. */
   private static final String OPALRID = "opalrid";
 
+  private String username;
+
   public RequestBuilder provideCredentials(RequestBuilder builder) {
     if(hasCredentials()) {
       builder.setHeader("X-Opal-Auth", extractCredentials());
     }
     return builder;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
+  }
+
+  public String getUsername() {
+    return username;
   }
 
   /**

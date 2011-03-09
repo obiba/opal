@@ -297,13 +297,13 @@ margin-left:0.8em;
 	padding-top: 0.3em;
 }
 
-.topbar a {
+.topbar span, .topbar a {
     margin-right: 0.8em;
     float: right;
     padding-top: 0.6em;
 }
 
-.topbar a, .topbar a:visited, .topbar a:hover {
+.topbar span, .topbar a, .topbar a:visited, .topbar a:hover {
 	color:#ffffff;
 }
 
