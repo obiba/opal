@@ -31,6 +31,8 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -42,6 +44,9 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.SuggestBox;
+import com.google.gwt.user.client.ui.SuggestOracle;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -65,6 +70,8 @@ public class AuthorizationView extends Composite implements AuthorizationPresent
 
   private MultiWordSuggestOracle suggestions;
 
+  private SubjectSuggestionDisplay suggestionDisplay;
+
   private JsArrayDataProvider<Acls> subjectPermissionsDataProvider = new JsArrayDataProvider<Acls>();
 
   private boolean actionsColumnAdded;
@@ -84,7 +91,7 @@ public class AuthorizationView extends Composite implements AuthorizationPresent
   //
 
   public AuthorizationView() {
-    principal = new SuggestBox(suggestions = new MultiWordSuggestOracle());
+    principal = new SuggestBox(suggestions = new MultiWordSuggestOracle(), new TextBox(), suggestionDisplay = new SubjectSuggestionDisplay());
     initWidget(uiBinder.createAndBindUi(this));
     initAclsTable();
   }
@@ -125,6 +132,15 @@ public class AuthorizationView extends Composite implements AuthorizationPresent
   // UiBinder
   //
 
+  /**
+   *
+   */
+  private final class SubjectSuggestionDisplay extends SuggestBox.DefaultSuggestionDisplay {
+    public boolean hasSelection() {
+      return getCurrentSelection() != null;
+    }
+  }
+
   @UiTemplate("AuthorizationView.ui.xml")
   interface AuthorizationViewUiBinder extends UiBinder<Widget, AuthorizationView> {
   }
@@ -141,15 +157,26 @@ public class AuthorizationView extends Composite implements AuthorizationPresent
 
   @Override
   public void addHandler(final AddPrincipalHandler handler) {
+    principal.setAutoSelectEnabled(false);
+
     principal.addKeyDownHandler(new KeyDownHandler() {
 
       @Override
       public void onKeyDown(KeyDownEvent event) {
-        if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+        if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER && !suggestionDisplay.hasSelection()) {
           handler.onAdd(principal.getText());
         }
       }
     });
+
+    principal.addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
+
+      @Override
+      public void onSelection(SelectionEvent<Suggestion> event) {
+        handler.onAdd(principal.getText());
+      }
+    });
+
     add.addClickHandler(new ClickHandler() {
 
       @Override
