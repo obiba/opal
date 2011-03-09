@@ -58,6 +58,20 @@ public class SubjectPermissionsRequest {
     }).send();
   }
 
+  public void getSubjects(final AclGetCallback callback) {
+    ResourceRequestBuilderFactory.<JsArray<Acls>> newBuilder().forResource("/authz/query?by=subject").get().withCallback(new ResourceCallback<JsArray<Acls>>() {
+
+      @Override
+      public void onResource(Response response, JsArray<Acls> resource) {
+        if(response.getStatusCode() == Response.SC_OK) {
+          callback.onGet(JsArrays.toSafeArray(resource));
+        } else {
+          callback.onGetFailed(response);
+        }
+      }
+    }).send();
+  }
+
   private AclRequest getMainAclRequest() {
     return aclRequests.get(0);
   }

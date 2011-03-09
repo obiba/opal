@@ -11,7 +11,7 @@
       <g:InlineLabel addStyleNames="key">
         <ui:msg description="Add principal label" >User or Group Name</ui:msg>: 
       </g:InlineLabel>
-      <g:TextBox ui:field="principal"/><g:Image ui:field="add" url="image/20/list-add.png" addStyleNames="clickable button"/>
+      <g:SuggestBox ui:field="principal"/><g:Image ui:field="add" url="image/20/list-add.png" addStyleNames="clickable button"/>
     </g:HTMLPanel>
     <g:FlowPanel addStyleNames="top-margin">
       <c:SimplePager ui:field="pager" location="CENTER"/>

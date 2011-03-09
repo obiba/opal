@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter.
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter.PermissionSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ConstantActionsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
@@ -39,7 +40,8 @@ import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
+import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -55,11 +57,13 @@ public class AuthorizationView extends Composite implements AuthorizationPresent
   @UiField
   SimplePager pager;
 
-  @UiField
-  TextBox principal;
+  @UiField(provided = true)
+  SuggestBox principal;
 
   @UiField
   Image add;
+
+  private MultiWordSuggestOracle suggestions;
 
   private JsArrayDataProvider<Acls> subjectPermissionsDataProvider = new JsArrayDataProvider<Acls>();
 
@@ -80,6 +84,7 @@ public class AuthorizationView extends Composite implements AuthorizationPresent
   //
 
   public AuthorizationView() {
+    principal = new SuggestBox(suggestions = new MultiWordSuggestOracle());
     initWidget(uiBinder.createAndBindUi(this));
     initAclsTable();
   }
@@ -164,6 +169,14 @@ public class AuthorizationView extends Composite implements AuthorizationPresent
   public void initColumn(String header, PermissionSelectionHandler permHandler) {
     if(!actionsColumnAdded) {
       addPermissionColumn(header, permHandler);
+    }
+  }
+
+  @Override
+  public void renderSubjectSuggestions(JsArray<Acls> subjects) {
+    suggestions.clear();
+    for(Acls acls : JsArrays.toIterable(subjects)) {
+      suggestions.add(acls.getName());
     }
   }
 

@@ -16,6 +16,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest.AclGetCallback;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
@@ -23,6 +24,7 @@ import org.obiba.opal.web.model.client.opal.Acl;
 import org.obiba.opal.web.model.client.opal.Acls;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
 /**
@@ -94,11 +96,13 @@ public class AuthorizationPresenter extends WidgetPresenter<AuthorizationPresent
   @Override
   public void refreshDisplay() {
     subjectPermissionsRequests.get();
+    subjectPermissionsRequests.getSubjects(new SubjectSuggestionsCallback());
   }
 
   @Override
   public void revealDisplay() {
     subjectPermissionsRequests.get();
+    subjectPermissionsRequests.getSubjects(new SubjectSuggestionsCallback());
   }
 
   @Override
@@ -122,6 +126,22 @@ public class AuthorizationPresenter extends WidgetPresenter<AuthorizationPresent
   //
   // Interface and inner classes
   //
+
+  /**
+   *
+   */
+  private final class SubjectSuggestionsCallback implements AclGetCallback {
+    @SuppressWarnings("unchecked")
+    @Override
+    public void onGetFailed(Response response) {
+      getDisplay().renderSubjectSuggestions((JsArray<Acls>) JsArray.createArray());
+    }
+
+    @Override
+    public void onGet(JsArray<Acls> resource) {
+      getDisplay().renderSubjectSuggestions(resource);
+    }
+  }
 
   private final class AclCallbackImpl extends DefaultAclCallback {
 
@@ -179,6 +199,8 @@ public class AuthorizationPresenter extends WidgetPresenter<AuthorizationPresent
     String getPrincipal();
 
     void addHandler(AddPrincipalHandler handler);
+
+    void renderSubjectSuggestions(JsArray<Acls> subjects);
 
   }
 
