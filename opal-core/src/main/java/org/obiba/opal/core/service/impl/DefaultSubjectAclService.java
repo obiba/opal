@@ -10,6 +10,7 @@
 package org.obiba.opal.core.service.impl;
 
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.obiba.core.service.PersistenceManager;
 import org.obiba.opal.core.domain.security.SubjectAcl;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
@@ -177,6 +179,31 @@ public class DefaultSubjectAclService implements SubjectAclService {
     });
   }
 
+  @Override
+  public Iterable<String> getSubjects(final String domain) {
+    SubjectAcl template = new SubjectAcl(domain, null, null, null);
+
+    return Iterables.filter(Iterables.transform(persistenceManager.match(template), new Function<SubjectAcl, String>() {
+
+      @Override
+      public String apply(SubjectAcl from) {
+        return from.getSubject();
+      }
+
+    }), new Predicate<String>() {
+
+      TreeSet<String> set = new TreeSet<String>();
+
+      @Override
+      public boolean apply(String input) {
+        if(set.contains(input)) return false;
+
+        set.add(input);
+        return true;
+      }
+    });
+  }
+
   /**
    * @param subjects
    */
@@ -210,4 +237,5 @@ public class DefaultSubjectAclService implements SubjectAclService {
     });
 
   }
+
 }

@@ -27,6 +27,8 @@ public interface SubjectAclService {
 
   Iterable<Permissions> getNodePermissions(String domain, String node);
 
+  Iterable<String> getSubjects(String domain);
+
   public interface Permissions {
 
     String getDomain();

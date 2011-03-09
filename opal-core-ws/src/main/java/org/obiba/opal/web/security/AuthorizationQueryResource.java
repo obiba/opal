@@ -21,7 +21,6 @@ import javax.ws.rs.QueryParam;
 
 import org.obiba.opal.core.service.SubjectAclService;
 import org.obiba.opal.core.service.SubjectAclService.Permissions;
-import org.obiba.opal.web.magma.support.InvalidRequestException;
 import org.obiba.opal.web.model.Opal.Acl;
 import org.obiba.opal.web.model.Opal.Acls;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,9 +45,25 @@ public class AuthorizationQueryResource {
 
   @GET
   public Iterable<Acls> get(@QueryParam("node") List<String> nodes, @QueryParam("by") String by) {
-    if(nodes == null || nodes.size() == 0) throw new InvalidRequestException("At least one 'node' query param expected.");
+    if(nodes == null || nodes.size() == 0) return getSubjects();
 
     return getAclsGroupedBySubject(nodes);
+  }
+
+  public Iterable<Acls> getSubjects() {
+    List<Acls> acls = Lists.newArrayList();
+    for(String principal : subjectAclService.getSubjects("magma")) {
+      acls.add(Acls.newBuilder().setName(principal).build());
+    }
+    Collections.sort(acls, new Comparator<Acls>() {
+
+      @Override
+      public int compare(Acls o1, Acls o2) {
+        return o1.getName().compareTo(o2.getName());
+      }
+    });
+
+    return acls;
   }
 
   private Iterable<Acls> getAclsGroupedBySubject(List<String> nodes) {
