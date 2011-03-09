@@ -20,7 +20,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
 import org.obiba.opal.core.service.SubjectAclService;
-import org.obiba.opal.core.service.SubjectAclService.Permissions;
 import org.obiba.opal.web.model.Opal.Acl;
 import org.obiba.opal.web.model.Opal.Acls;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,17 +102,6 @@ public class AuthorizationQueryResource {
     public Acls apply(Acls.Builder from) {
       return from.build();
     }
-  }
-
-  private static class PermissionsToAclFunction implements Function<Permissions, Acl> {
-
-    private static final PermissionsToAclFunction INSTANCE = new PermissionsToAclFunction();
-
-    @Override
-    public Acl apply(Permissions from) {
-      return Acl.newBuilder().setPrincipal(from.getSubject()).setResource(from.getNode()).addAllActions(from.getPermissions()).build();
-    }
-
   }
 
 }

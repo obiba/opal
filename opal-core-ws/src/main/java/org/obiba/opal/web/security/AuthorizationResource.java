@@ -17,14 +17,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
 import org.obiba.opal.core.service.SubjectAclService;
-import org.obiba.opal.core.service.SubjectAclService.Permissions;
 import org.obiba.opal.web.model.Opal;
-import org.obiba.opal.web.model.Opal.Acl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 
 @Component
@@ -61,16 +58,5 @@ public class AuthorizationResource {
 
   private String getNode() {
     return '/' + resource;
-  }
-
-  private static class PermissionsToAclFunction implements Function<Permissions, Opal.Acl> {
-
-    private static final PermissionsToAclFunction INSTANCE = new PermissionsToAclFunction();
-
-    @Override
-    public Acl apply(Permissions from) {
-      return Acl.newBuilder().setPrincipal(from.getSubject()).setResource(from.getNode()).addAllActions(from.getPermissions()).build();
-    }
-
   }
 }
