@@ -6,11 +6,14 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -29,13 +32,16 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
   // Instance Variables
   //
 
+  private AuthorizationPresenter authorizationPresenter;
+
   //
   // Constructors
   //
 
   @Inject
-  public RAdministrationPresenter(final Display display, final EventBus eventBus) {
+  public RAdministrationPresenter(final Display display, final EventBus eventBus, AuthorizationPresenter authorizationPresenter) {
     super(display, eventBus);
+    this.authorizationPresenter = authorizationPresenter;
   }
 
   @Override
@@ -54,6 +60,9 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
 
   @Override
   protected void onBind() {
+    authorizationPresenter.bind();
+    getDisplay().setPermissionsDisplay(authorizationPresenter.getDisplay());
+
     addEventHandlers();
   }
 
@@ -75,6 +84,7 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
 
   @Override
   protected void onUnbind() {
+    authorizationPresenter.unbind();
   }
 
   @Override
@@ -92,12 +102,36 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
 
   @Override
   public void authorize(HasAuthorization authorizer) {
+    // test r
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/r/sessions").post().authorize(authorizer).send();
+    // set permissions
+    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getDisplay().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
   //
   // Inner Classes / Interfaces
   //
+
+  /**
+  *
+  */
+  private final class PermissionsUpdate implements HasAuthorization {
+    @Override
+    public void unauthorized() {
+
+    }
+
+    @Override
+    public void beforeAuthorization() {
+
+    }
+
+    @Override
+    public void authorized() {
+      authorizationPresenter.setAclRequest(AclRequest.newBuilder("Use", "/r/session", "*:GET/*"));
+      authorizationPresenter.refreshDisplay();
+    }
+  }
 
   private final class RSessionCreatedCallback implements ResponseCodeCallback {
     @Override
@@ -126,6 +160,10 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
   public interface Display extends WidgetDisplay {
 
     HandlerRegistration addTestRServerHandler(ClickHandler handler);
+
+    HasAuthorization getPermissionsAuthorizer();
+
+    void setPermissionsDisplay(WidgetDisplay display);
 
   }
 

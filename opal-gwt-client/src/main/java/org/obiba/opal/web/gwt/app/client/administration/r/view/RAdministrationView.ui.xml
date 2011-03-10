@@ -12,6 +12,29 @@
       <g:Label addStyleNames="title"><ui:msg description="R server admin label" >R Server</ui:msg></g:Label>
       <g:Button ui:field="rTestButton" addStyleNames="content"><ui:msg description="R server test label" >Test connection with R</ui:msg></g:Button>
     </g:FlowPanel>
+    
+    <g:FlowPanel ui:field="permissionsPanel" addStyleNames="panel">
+      <g:FlowPanel addStyleNames="title">
+        <g:InlineLabel><ui:msg description="Permissions label" >Permissions</ui:msg></g:InlineLabel>
+        <o:HelpImage imageSize="16" tooltipWidth="500px" tooltipHeight="350px">
+          <g:HTMLPanel>
+            <g:Label addStyleNames="title"><ui:msg description="R Permissions label">R Permissions</ui:msg></g:Label>
+            <p>
+              <ui:msg description="R Permissions information">
+                 Permissions for accessing R service should be specified. The permissions can be applied to a user or a group of users.
+              </ui:msg>
+            </p>
+            <g:Label addStyleNames="title"><ui:msg description="R Users label">Users</ui:msg></g:Label>
+            <p>
+              <ui:msg description="R Users information">
+                 R Users are allowed to perform R operations from their R client.
+              </ui:msg>
+            </p>
+          </g:HTMLPanel>
+        </o:HelpImage>
+      </g:FlowPanel>
+      <g:SimplePanel ui:field="permissions"></g:SimplePanel>
+    </g:FlowPanel>
           
   </g:FlowPanel>
 </ui:UiBinder>

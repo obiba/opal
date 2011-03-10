@@ -9,8 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.r.view;
 
+import net.customware.gwt.presenter.client.widget.WidgetDisplay;
+
 import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -20,6 +24,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -49,6 +54,12 @@ public class RAdministrationView extends Composite implements RAdministrationPre
 
   @UiField
   Button rTestButton;
+
+  @UiField
+  Panel permissionsPanel;
+
+  @UiField
+  Panel permissions;
 
   //
   // Constructors
@@ -81,6 +92,16 @@ public class RAdministrationView extends Composite implements RAdministrationPre
   @Override
   public HandlerRegistration addTestRServerHandler(ClickHandler handler) {
     return rTestButton.addClickHandler(handler);
+  }
+
+  @Override
+  public HasAuthorization getPermissionsAuthorizer() {
+    return new WidgetAuthorizer(permissionsPanel);
+  }
+
+  @Override
+  public void setPermissionsDisplay(WidgetDisplay display) {
+    permissions.add(display.asWidget());
   }
 
   //
