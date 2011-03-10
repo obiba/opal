@@ -642,6 +642,7 @@
           <tagBase>https://svn.obiba.org/opal/tags/releases</tagBase>
           <!-- Use parent version as modules' version -->
           <autoVersionSubmodules>true</autoVersionSubmodules>
+          <releaseProfiles>release</releaseProfiles>
         </configuration>
       </plugin>
 
