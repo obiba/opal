@@ -18,11 +18,13 @@ final class Placeholders {
 
   private static final String POSTFIX = "}";
 
-  public static String replaceAll(String value) {
+  public static String replaceAll(final String value) {
+    if(value == null || value.isEmpty()) return value;
+    String replaced = value;
     Properties sysProps = System.getProperties();
     for(Entry<Object, Object> prop : sysProps.entrySet()) {
-      value = value.replace(PREFIX + prop.getKey() + POSTFIX, prop.getValue().toString());
+      replaced = replaced.replace(PREFIX + prop.getKey() + POSTFIX, prop.getValue().toString());
     }
-    return value;
+    return replaced;
   }
 }
