@@ -10,7 +10,9 @@
 package org.obiba.opal.reporting.service.birt.bootstrap;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -24,6 +26,7 @@ import org.eclipse.birt.report.engine.api.IReportEngineFactory;
 import org.eclipse.birt.report.engine.api.IReportRunnable;
 import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
 import org.eclipse.birt.report.engine.api.RenderOption;
+import org.obiba.core.util.FileUtil;
 import org.obiba.opal.reporting.service.birt.common.BirtEngine;
 import org.obiba.opal.reporting.service.birt.common.BirtEngineException;
 import org.obiba.opal.reporting.service.birt.common.BirtReportFormat;
@@ -37,7 +40,13 @@ public class EmbeddedBirtEngine implements BirtEngine {
 
   private static final String BIRT_HOME_SYSTEM_PROPERTY_NAME = "BIRT_HOME";
 
+  private static final String OSGI_CONFIGURATION_AREA_PROPERTY_NAME = "osgi.configuration.area";
+
+  private static final String OSGI_INSTANCE_AREA_PROPERTY_NAME = "osgi.instance.area";
+
   private IReportEngine engine;
+
+  private File osgiHome;
 
   @Override
   public void render(BirtReportFormat format, Map<String, String> parameters, String reportDesign, String reportOutput) throws BirtEngineException {
@@ -82,6 +91,7 @@ public class EmbeddedBirtEngine implements BirtEngine {
 
       final EngineConfig config = new EngineConfig();
       config.setEngineHome(reportEngineHome.getAbsolutePath());
+      configureOsgi(config);
       bindLoggingToSlf4J(config);
 
       Platform.startup(config);
@@ -102,6 +112,13 @@ public class EmbeddedBirtEngine implements BirtEngine {
       log.warn("Exception during BIRT shutdown", e);
     } finally {
       engine = null;
+      try {
+        if(osgiHome != null) {
+          FileUtil.delete(osgiHome);
+        }
+      } catch(IOException e) {
+        // ignore
+      }
     }
   }
 
@@ -145,6 +162,20 @@ public class EmbeddedBirtEngine implements BirtEngine {
       throw new BirtEngineException(msgs);
     default:
     }
+  }
+
+  private void configureOsgi(EngineConfig config) throws IOException {
+    final File osgiHome = File.createTempFile("osgi", null);
+    osgiHome.delete();
+    if(osgiHome.mkdir() == false) {
+      throw new IOException("cannot create temp directory");
+    }
+
+    Map<String, String> osgiConfig = new HashMap<String, String>();
+    osgiConfig.put(OSGI_CONFIGURATION_AREA_PROPERTY_NAME, osgiHome + "/configuration");
+    osgiConfig.put(OSGI_INSTANCE_AREA_PROPERTY_NAME, osgiHome + "/workspace");
+    config.setOSGiConfig(osgiConfig);
+    this.osgiHome = osgiHome;
   }
 
   /**
