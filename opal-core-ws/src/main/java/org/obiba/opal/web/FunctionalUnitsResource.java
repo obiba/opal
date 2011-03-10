@@ -31,6 +31,8 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
@@ -135,6 +137,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
       try {
         prepareKeysTable(unit);
+        createUnitsDirectory(unit.getName());
         response = Response.created(UriBuilder.fromPath("/").path(FunctionalUnitResource.class).build(unit.getName()));
       } catch(IOException e) {
         getFunctionalUnitService().removeFunctionalUnit(unit.getName());
@@ -146,6 +149,11 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
     }
 
     return response.build();
+  }
+
+  private void createUnitsDirectory(String unitName) throws FileSystemException {
+    FileObject unitsDir = resolveFileInFileSystem("/units/" + unitName);
+    unitsDir.createFolder();
   }
 
   private void prepareKeysTable(Opal.FunctionalUnitDto unit) throws IOException {

@@ -26,7 +26,6 @@ import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.app.client.widgets.event.FolderCreationEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -176,26 +175,6 @@ public class FunctionalUnitUpdateDialogPresenter extends WidgetPresenter<Functio
     }
   }
 
-  private void createUnitFolder(final String unit) {
-    final String unitFolderPath = "/units/" + unit;
-
-    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
-
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == 201) {
-          eventBus.fireEvent(new FolderCreationEvent(unitFolderPath));
-        }
-      }
-    };
-
-    ResourceRequestBuilderFactory.newBuilder()//
-    .forResource("/files/units").post().withBody("text/plain", unit)//
-    .withCallback(201, callbackHandler)//
-    .withCallback(403, callbackHandler)//
-    .withCallback(500, callbackHandler).send();
-  }
-
   private FunctionalUnitDto getFunctionalUnitDto() {
     FunctionalUnitDto functionalUnit = FunctionalUnitDto.create();
     functionalUnit.setName(getDisplay().getName().getText());
@@ -253,7 +232,6 @@ public class FunctionalUnitUpdateDialogPresenter extends WidgetPresenter<Functio
         eventBus.fireEvent(new FunctionalUnitUpdatedEvent(functionalUnit));
       } else if(response.getStatusCode() == Response.SC_CREATED) {
         eventBus.fireEvent(new FunctionalUnitCreatedEvent(functionalUnit));
-        createUnitFolder(functionalUnit.getName());
       } else {
         eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
       }
