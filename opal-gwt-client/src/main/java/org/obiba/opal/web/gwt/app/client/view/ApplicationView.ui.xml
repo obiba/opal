@@ -10,7 +10,6 @@
             <g:Anchor ui:field="quit"><ui:msg description="Quit link text">Quit</ui:msg></g:Anchor>
             <g:Anchor ui:field="help"><ui:msg description="Help link text">Help</ui:msg></g:Anchor>
             <g:Anchor ui:field="administration"><ui:msg description="Administration link text">Administration</ui:msg></g:Anchor>
-            <g:InlineLabel>|</g:InlineLabel>
             <g:InlineLabel ui:field="username"></g:InlineLabel>
           </g:FlowPanel>
         </g:layer>
