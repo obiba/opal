@@ -147,7 +147,8 @@ public class ConfigureViewStepView extends Composite implements ConfigureViewSte
   @Override
   public void addEntitiesTabWidget(Widget widget) {
     entitiesTabPanel.clear();
-    entitiesTabPanel.add(widget);
+    viewTabs.setTabVisible(2, false);
+    // entitiesTabPanel.add(widget);
   }
 
   @Override
