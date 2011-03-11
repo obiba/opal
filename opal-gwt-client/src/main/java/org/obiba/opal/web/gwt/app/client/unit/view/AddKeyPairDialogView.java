@@ -134,7 +134,7 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
         return privateKeyValidators.validate();
       }
     }).append(publicKeyStep)//
-    .title(translations.publicKeyStep())// 
+    .title(translations.publicKeyStep())//
     .onPrevious().build();
 
     dialog.addNextClickHandler(new ClickHandler() {
@@ -234,8 +234,8 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   }
 
   private void clearPrivateKeyCreateForm() {
-    algo.setText("");
-    size.setText("512");
+    algo.setText("RSA");
+    size.setText("2048");
   }
 
   private void clearPrivateKeyImportForm() {
