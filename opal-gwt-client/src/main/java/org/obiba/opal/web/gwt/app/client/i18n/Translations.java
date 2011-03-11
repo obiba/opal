@@ -639,6 +639,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Run")
   String runLabel();
 
+  @Description("Download Report Design label")
+  @DefaultStringValue("Download Report Design")
+  String downloadReportDesignLabel();
+
   @Description("Paging of label")
   @DefaultStringValue("to")
   String toLabel();

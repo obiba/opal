@@ -110,6 +110,8 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
 
   private MenuItem run;
 
+  private MenuItem downloadReportDesign;
+
   private MenuItem update;
 
   JsArrayDataProvider<FileDto> dataProvider = new JsArrayDataProvider<FileDto>();
@@ -265,6 +267,15 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   }
 
   @Override
+  public void setDownloadReportDesignCommand(Command command) {
+    if(downloadReportDesign == null) {
+      actionsMenu.addItem(downloadReportDesign = new MenuItem(translations.downloadReportDesignLabel(), command));
+    } else {
+      downloadReportDesign.setCommand(command);
+    }
+  }
+
+  @Override
   public void setUpdateReportTemplateCommand(Command command) {
     if(update == null) {
       toolbar.addItem(update = new MenuItem("", command)).addStyleName("edit");
@@ -285,6 +296,15 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   @Override
   public HasAuthorization getRunReportAuthorizer() {
     return new CompositeAuthorizer(new MenuItemAuthorizer(toolsItem), new MenuItemAuthorizer(run)) {
+      @Override
+      public void unauthorized() {
+      }
+    };
+  }
+
+  @Override
+  public HasAuthorization getDownloadReportDesignAuthorizer() {
+    return new CompositeAuthorizer(new MenuItemAuthorizer(toolsItem), new MenuItemAuthorizer(downloadReportDesign)) {
       @Override
       public void unauthorized() {
       }

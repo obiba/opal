@@ -85,6 +85,8 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
     void setRunReportCommand(Command command);
 
+    void setDownloadReportDesignCommand(Command command);
+
     void setUpdateReportTemplateCommand(Command command);
 
     HasAuthorization getRemoveReportTemplateAuthorizer();
@@ -94,6 +96,8 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
     HasAuthorization getUpdateReportTemplateAuthorizer();
 
     HasAuthorization getListReportsAuthorizer();
+
+    HasAuthorization getDownloadReportDesignAuthorizer();
   }
 
   @Inject
@@ -178,6 +182,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
   private void setCommands() {
     getDisplay().setRunReportCommand(new RunReportCommand());
+    getDisplay().setDownloadReportDesignCommand(new DownloadReportDesignCommand());
     getDisplay().setRemoveReportTemplateCommand(new RemoveReportTemplateCommand());
     getDisplay().setUpdateReportTemplateCommand(new EditReportTemplateCommand());
   }
@@ -185,6 +190,8 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
   private void authorize() {
     // run report
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/report").post().authorize(getDisplay().getRunReportAuthorizer()).send();
+    // download report design
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + getDisplay().getReportTemplateDetails().getDesign()).get().authorize(getDisplay().getDownloadReportDesignAuthorizer()).send();
     // remove
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-template/" + reportTemplate.getName()).delete().authorize(getDisplay().getRemoveReportTemplateAuthorizer()).send();
 
@@ -272,6 +279,13 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
       ResourceRequestBuilderFactory.newBuilder().forResource("/shell/report").post().withResourceBody(ReportCommandOptionsDto.stringify(reportCommandOptions)).withCallback(Response.SC_CREATED, callbackHandler).send();
     }
 
+  }
+
+  private class DownloadReportDesignCommand implements Command {
+    @Override
+    public void execute() {
+      downloadFile(getDisplay().getReportTemplateDetails().getDesign());
+    }
   }
 
   private class EditReportTemplateCommand implements Command {
