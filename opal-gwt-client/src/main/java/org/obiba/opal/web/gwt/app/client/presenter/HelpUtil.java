@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.presenter;
 
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+
 import com.google.gwt.user.client.Window;
 
 /**
@@ -16,7 +18,9 @@ import com.google.gwt.user.client.Window;
  */
 public class HelpUtil {
 
-  private static String OPALDOC_URL = "http://wiki.obiba.org/confluence/display/OPALDOCDEV";
+  private static String OPALDOC_URL = "http://wiki.obiba.org/confluence/display/OPALDOC";
+
+  private static String OPALDOCDEV_URL = "http://wiki.obiba.org/confluence/display/OPALDOCDEV";
 
   private static String OPALDOC_USERGUIDE_PAGE = "Opal+Web+Application+User+Guide";
 
@@ -28,8 +32,13 @@ public class HelpUtil {
     Window.open(makePageUrl(page), "_blank", null);
   }
 
+  private static String getOpalDocUrl() {
+    String version = ResourceRequestBuilderFactory.newBuilder().getVersion();
+    return (version != null && version.contains("SNAPSHOT")) ? OPALDOCDEV_URL : OPALDOC_URL;
+  }
+
   private static String makePageUrl(String page) {
-    return OPALDOC_URL + "/" + page;
+    return getOpalDocUrl() + "/" + page;
   }
 
 }
