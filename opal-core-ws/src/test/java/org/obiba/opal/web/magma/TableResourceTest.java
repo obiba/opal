@@ -200,7 +200,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     TableResource sut = new TableResource(null, ImmutableSet.of(new Locale("en"), new Locale("fr")));
 
     // Exercise
-    Iterable<LocaleDto> localeDtos = sut.getLocales(null);
+    Iterable<LocaleDto> localeDtos = sut.getLocalesResource().getLocales(null);
 
     // Verify
     assertNotNull(localeDtos);
@@ -216,7 +216,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     TableResource sut = new TableResource(null, ImmutableSet.of(new Locale("en"), new Locale("fr")));
 
     // Exercise
-    Iterable<LocaleDto> localeDtos = sut.getLocales("en");
+    Iterable<LocaleDto> localeDtos = sut.getLocalesResource().getLocales("en");
 
     // Verify
     assertNotNull(localeDtos);
@@ -237,7 +237,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     TableResource sut = new TableResource(null, ImmutableSet.of(new Locale("en"), new Locale("fr")));
 
     // Exercise
-    Iterable<LocaleDto> localeDtos = sut.getLocales("fr");
+    Iterable<LocaleDto> localeDtos = sut.getLocalesResource().getLocales("fr");
 
     // Verify
     assertNotNull(localeDtos);

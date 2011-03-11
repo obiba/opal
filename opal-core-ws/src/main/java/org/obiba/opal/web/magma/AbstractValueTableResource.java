@@ -7,16 +7,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
-
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.js.views.JavascriptClause;
-import org.obiba.opal.web.model.Opal.LocaleDto;
-import org.obiba.opal.web.ws.security.NoAuthorization;
 
 import com.google.common.collect.Lists;
 
@@ -44,16 +38,8 @@ abstract class AbstractValueTableResource {
     return Collections.unmodifiableSet(locales);
   }
 
-  @GET
-  @Path("/locales")
-  @NoAuthorization
-  public Iterable<LocaleDto> getLocales(@QueryParam("locale") String displayLocale) {
-    List<LocaleDto> localeDtos = new ArrayList<LocaleDto>();
-    for(Locale locale : getLocales()) {
-      localeDtos.add(Dtos.asDto(locale, displayLocale != null ? new Locale(displayLocale) : null));
-    }
-
-    return localeDtos;
+  protected LocalesResource getLocalesResource() {
+    return new LocalesResource(locales);
   }
 
   protected Iterable<Variable> filterVariables(String script, Integer offset, Integer limit) {

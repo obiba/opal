@@ -173,6 +173,11 @@ public class TableResource extends AbstractValueTableResource {
     return new CompareResource(getValueTable());
   }
 
+  @Path("/locales")
+  public LocalesResource getLocalesResource() {
+    return super.getLocalesResource();
+  }
+
   //
   // private methods
   //

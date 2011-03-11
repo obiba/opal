@@ -199,6 +199,11 @@ public class VariablesResource extends AbstractValueTableResource {
     }
   }
 
+  @Path("/locales")
+  public LocalesResource getLocalesResource() {
+    return super.getLocalesResource();
+  }
+
   //
   // private methods
   //

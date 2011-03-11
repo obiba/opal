@@ -80,6 +80,11 @@ public class ViewResource extends AbstractValueTableResource {
     return new TableResource(asView().getWrappedValueTable(), getLocales());
   }
 
+  @Path("/locales")
+  public LocalesResource getLocalesResource() {
+    return super.getLocalesResource();
+  }
+
   protected View asView() {
     return (View) getValueTable();
   }
