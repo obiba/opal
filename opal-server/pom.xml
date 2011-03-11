@@ -182,7 +182,6 @@
 
                     <mkdir dir="${deb.dir}" />
                     <mkdir dir="${deb.dir}/usr/share" />
-                    <mkdir dir="${deb.dir}/var/lib/opal" />
                     <mkdir dir="${deb.dir}/etc" />
 
                     <copy todir="${deb.dir}">

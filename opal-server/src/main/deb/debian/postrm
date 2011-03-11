@@ -21,7 +21,7 @@ set -e
 
 case "$1" in
 	purge)
-        userdel opal || true
+        userdel -f opal || true
         rm -rf /var/lib/opal /var/log/opal /var/run/opal.pid /etc/opal /usr/share/opal
     ;;
 

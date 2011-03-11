@@ -1,0 +1,35 @@
+#!/bin/sh
+
+. /usr/share/debconf/confmodule
+
+if [ -n "$DEBIAN_SCRIPT_DEBUG" ]; then set -v -x; DEBIAN_SCRIPT_TRACE=1; fi
+${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
+
+# only ask this question on fresh installs ($2 is empty), during "reconfiguration"
+if [ "$1" = "configure" ] && [ -z "$2" ] || [ "$1" = "reconfigure" ]; then
+  while :; do
+    RET=""
+    db_input high opal-server/admin_password || true
+    db_go
+    db_get opal-server/admin_password
+    # if password isn't empty we ask for password verification
+    if [ -z "$RET" ]; then
+      db_fset opal-server/admin_password seen false
+      db_fset opal-server/admin_password_again seen false
+      break
+    fi
+    ROOT_PW="$RET"
+    db_input high opal-server/admin_password_again || true
+    db_go
+    db_get opal-server/admin_password_again
+    if [ "$RET" = "$ROOT_PW" ]; then
+      ROOT_PW=''
+      break
+    fi
+    db_fset mysql-server/password_mismatch seen false
+    db_input critical mysql-server/password_mismatch
+    db_set opal-server/admin_password "" 
+    db_set opal-server/admin_password_again ""
+    db_go
+  done
+fi

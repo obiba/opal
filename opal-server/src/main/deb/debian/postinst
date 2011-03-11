@@ -5,6 +5,8 @@
 
 set -e
 
+. /usr/share/debconf/confmodule
+
 # summary of how this script can be called:
 #        * <postinst> `configure' <most-recently-configured-version>
 #        * <old-postinst> `abort-upgrade' <new version>
@@ -20,7 +22,24 @@ set -e
 
 case "$1" in
     configure)
-    
+
+    	RET=""
+        db_get opal-server/admin_password
+
+        if [ "$RET" != "" ] ; then
+            echo Updating administrator password.
+            # We should really hash the password instead of storing in clear-text
+            #adminpw=`echo -n $RET | sha256sum | cut -d ' ' -f 1`
+            adminpw=$RET
+            tfile=`mktemp`
+	        if [ ! -f "$tfile" ]; then
+               return 1
+            fi
+			cat /etc/opal/shiro.ini | sed \
+			  -e "s/^administrator\s*=.*,/administrator=$adminpw,/" \
+			  > $tfile && mv $tfile /etc/opal/shiro.ini
+        fi
+
     	# Create opal user if it doesn't exist.
         if ! id opal > /dev/null 2>&1 ; then
             adduser --system --home /var/lib/opal --no-create-home \
