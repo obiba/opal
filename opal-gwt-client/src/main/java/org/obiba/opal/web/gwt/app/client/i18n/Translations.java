@@ -232,6 +232,7 @@ public interface Translations extends Constants {
   "NoVariablesToBeImported", "No variables are to be imported.",//
   "FunctionalUnitAlreadyExistWithTheSpecifiedName", "A unit with the same name already exists.",//
   "FunctionalUnitNameIsRequired", "Unit name is required.",//
+  "DuplicateFunctionalUnitNames", "Duplicate Unit names.",//
   "KeyPairAliasIsRequired", "Alias is required",//
   "KeyPairAlgorithmIsRequired", "Algorithm is required.",//
   "KeyPairKeySizeIsRequired", "Size is required.",//

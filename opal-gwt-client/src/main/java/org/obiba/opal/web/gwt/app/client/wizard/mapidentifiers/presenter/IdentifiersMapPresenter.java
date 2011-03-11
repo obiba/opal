@@ -241,7 +241,12 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
       if(response.getStatusCode() == Response.SC_NOT_FOUND) {
         eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "MappedUnitsCannotBeIdentified", null));
       } else if(response.getStatusCode() == Response.SC_BAD_REQUEST) {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "fileReadError", null));
+        try {
+          ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errorDto.getStatus(), null));
+        } catch(Exception e) {
+          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "fileReadError", null));
+        }
       }
       getDisplay().renderMappedUnitsFailed();
     }

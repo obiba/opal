@@ -22,6 +22,7 @@ import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
+import org.obiba.opal.web.magma.support.InvalidRequestException;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -68,16 +69,22 @@ public abstract class AbstractFunctionalUnitResource {
 
     // find the units
     List<FunctionalUnit> units = new ArrayList<FunctionalUnit>();
+    List<String> unitNames = new ArrayList<String>();
     for(int i = 0; i < unitsHeader.length; i++) {
       String unit = unitsHeader[i];
-      FunctionalUnit functionalUnit;
-      if(unit.equals(FunctionalUnit.OPAL_INSTANCE)) {
-        functionalUnit = FunctionalUnit.OPAL;
-      } else {
-        functionalUnit = resolveFunctionalUnit(unit);
-      }
+      if(!unitNames.contains(unit)) {
+        unitNames.add(unit);
+        FunctionalUnit functionalUnit;
+        if(unit.equals(FunctionalUnit.OPAL_INSTANCE)) {
+          functionalUnit = FunctionalUnit.OPAL;
+        } else {
+          functionalUnit = resolveFunctionalUnit(unit);
+        }
 
-      units.add(functionalUnit);
+        units.add(functionalUnit);
+      } else {
+        throw new InvalidRequestException("DuplicateFunctionalUnitNames");
+      }
     }
     return units;
   }
