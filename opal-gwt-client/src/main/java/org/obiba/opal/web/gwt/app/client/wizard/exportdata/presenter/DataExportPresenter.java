@@ -25,8 +25,8 @@ import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.Notific
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -298,7 +298,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
     @Override
     public void onClick(ClickEvent arg0) {
-      eventBus.fireEvent(new WorkbenchChangeEvent(jobListPresenter));
+      eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(jobListPresenter).forResource("/shell/commands").build());
     }
   }
 

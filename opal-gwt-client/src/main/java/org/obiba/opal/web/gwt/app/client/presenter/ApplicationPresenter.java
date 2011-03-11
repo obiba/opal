@@ -131,8 +131,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
       @Override
       public void execute() {
-        eventBus.fireEvent(new WorkbenchChangeEvent(dashboardPresenter.get()));
-        getDisplay().setCurrentSelection(getDisplay().getDashboardItem());
+        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(dashboardPresenter.get()).forResource("/participants/count").build());
       }
     });
 
@@ -140,8 +139,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
       @Override
       public void execute() {
-        eventBus.fireEvent(new WorkbenchChangeEvent(reportTemplatePresenter.get()));
-        getDisplay().setCurrentSelection(getDisplay().getReportsItem());
+        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(reportTemplatePresenter.get()).forResource("/report-templates").build());
       }
     });
 
@@ -149,8 +147,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
       @Override
       public void execute() {
-        eventBus.fireEvent(new WorkbenchChangeEvent(functionalUnitPresenter.get()));
-        getDisplay().setCurrentSelection(getDisplay().getUnitsItem());
+        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(functionalUnitPresenter.get()).forResource("/functional-units").build());
       }
     });
 
@@ -158,8 +155,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
       @Override
       public void execute() {
-        eventBus.fireEvent(new WorkbenchChangeEvent(navigationPresenter.get()));
-        getDisplay().setCurrentSelection(getDisplay().getDatasourcesItem());
+        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(navigationPresenter.get()).forResource("/datasources").build());
       }
     });
 
@@ -167,8 +163,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
       @Override
       public void execute() {
-        eventBus.fireEvent(new WorkbenchChangeEvent(jobListPresenter.get()));
-        getDisplay().setCurrentSelection(getDisplay().getListJobsItem());
+        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(jobListPresenter.get()).forResource("/shell/commands").build());
       }
     });
 
@@ -176,8 +171,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
       @Override
       public void execute() {
-        eventBus.fireEvent(new WorkbenchChangeEvent(fileExplorerPresenter.get()));
-        getDisplay().setCurrentSelection(getDisplay().getFileExplorerItem());
+        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(fileExplorerPresenter.get()).forResource("/files/meta").build());
       }
     });
 
@@ -198,8 +192,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
     getDisplay().getAdministration().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        eventBus.fireEvent(new WorkbenchChangeEvent(administrationPresenter.get()));
-        getDisplay().clearSelection();
+        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(administrationPresenter.get()).build());
       }
     });
 
@@ -225,8 +218,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
     getDisplay().setUsername(credentials.getUsername());
     getDisplay().setVersion(ResourceRequestBuilderFactory.newBuilder().getVersion());
     authorize();
-    eventBus.fireEvent(new WorkbenchChangeEvent(dashboardPresenter.get()));
-    getDisplay().setCurrentSelection(getDisplay().getDashboardItem());
+    eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(dashboardPresenter.get()).forResource("/participants/count").build());
   }
 
   private void authorize() {
@@ -262,6 +254,26 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
     WidgetDisplay wd = (WidgetDisplay) workbench.getDisplay();
     getDisplay().updateWorkbench(wd.asWidget());
     workbench.revealDisplay();
+
+    updateTabSelection(event);
+  }
+
+  private void updateTabSelection(WorkbenchChangeEvent event) {
+    if(event.resourceStartsWith("/files/meta")) {
+      getDisplay().setCurrentSelection(getDisplay().getFileExplorerItem());
+    } else if(event.resourceStartsWith("/shell/commands")) {
+      getDisplay().setCurrentSelection(getDisplay().getListJobsItem());
+    } else if(event.resourceStartsWith("/datasources")) {
+      getDisplay().setCurrentSelection(getDisplay().getDatasourcesItem());
+    } else if(event.resourceStartsWith("/functional-units")) {
+      getDisplay().setCurrentSelection(getDisplay().getUnitsItem());
+    } else if(event.resourceStartsWith("/report-templates")) {
+      getDisplay().setCurrentSelection(getDisplay().getReportsItem());
+    } else if(event.resourceStartsWith("/participants/count")) {
+      getDisplay().setCurrentSelection(getDisplay().getDashboardItem());
+    } else {
+      getDisplay().clearSelection();
+    }
   }
 
   private void registerUserMessageEventHandler() {

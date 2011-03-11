@@ -29,6 +29,8 @@ public class WorkbenchChangeEvent extends GwtEvent<WorkbenchChangeEvent.Handler>
 
   private final WidgetPresenter<?> workbench;
 
+  private String resource;
+
   private boolean bindWorkbench = true;
 
   private boolean unbindWorkbench = true;
@@ -36,14 +38,23 @@ public class WorkbenchChangeEvent extends GwtEvent<WorkbenchChangeEvent.Handler>
   /**
    * @param selectedItem
    */
-  public WorkbenchChangeEvent(WidgetPresenter<?> workbench) {
+  WorkbenchChangeEvent(WidgetPresenter<?> workbench) {
     this.workbench = workbench;
   }
 
-  public WorkbenchChangeEvent(WidgetPresenter<?> workbench, boolean bindWorkbench, boolean unbindWorkbench) {
+  WorkbenchChangeEvent(WidgetPresenter<?> workbench, boolean bindWorkbench, boolean unbindWorkbench) {
     this.workbench = workbench;
     this.bindWorkbench = bindWorkbench;
     this.unbindWorkbench = unbindWorkbench;
+  }
+
+  public boolean resourceStartsWith(String path) {
+    if(resource == null) return false;
+    return resource.startsWith(path);
+  }
+
+  public String getResource() {
+    return resource;
   }
 
   public WidgetPresenter<?> getWorkbench() {
@@ -70,5 +81,36 @@ public class WorkbenchChangeEvent extends GwtEvent<WorkbenchChangeEvent.Handler>
   @Override
   public Type<Handler> getAssociatedType() {
     return TYPE;
+  }
+
+  public static Builder newBuilder(WidgetPresenter<?> workbench) {
+    return new Builder(workbench);
+  }
+
+  public static class Builder {
+    WorkbenchChangeEvent event;
+
+    Builder(WidgetPresenter<?> workbench) {
+      event = new WorkbenchChangeEvent(workbench);
+    }
+
+    public Builder forResource(String resource) {
+      event.resource = resource;
+      return this;
+    }
+
+    public Builder noBind() {
+      event.bindWorkbench = false;
+      return this;
+    }
+
+    public Builder noUnbind() {
+      event.unbindWorkbench = false;
+      return this;
+    }
+
+    public WorkbenchChangeEvent build() {
+      return event;
+    }
   }
 }

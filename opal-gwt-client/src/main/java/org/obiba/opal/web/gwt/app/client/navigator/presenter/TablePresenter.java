@@ -218,7 +218,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
           String errorMessage = response.getText().length() != 0 ? response.getText() : "UnknownError";
           eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errorMessage, null));
         } else {
-          eventBus.fireEvent(new WorkbenchChangeEvent(navigationPresenter.get()));
+          eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(navigationPresenter.get()).forResource("/datasources").build());
         }
       }
     };

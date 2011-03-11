@@ -280,7 +280,7 @@ public class DataCopyPresenter extends WidgetPresenter<DataCopyPresenter.Display
 
     @Override
     public void onClick(ClickEvent arg0) {
-      eventBus.fireEvent(new WorkbenchChangeEvent(jobListPresenter));
+      eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(jobListPresenter).forResource("/shell/commands").build());
     }
   }
 

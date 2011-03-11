@@ -18,7 +18,6 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter.ResourceClickHandler;
@@ -32,19 +31,14 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPresenter.Display> {
   //
   // Instance Variables
   //
-
-  @Inject
-  private Provider<VariablesImportPresenter> uploadVariablesStepPresenter;
 
   /**
    * Resource requests.
@@ -143,13 +137,6 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
     void clearResourceRequests();
 
     void addResourceRequest(ResourceRequestPresenter.Display resourceRequestDisplay);
-  }
-
-  class ReturnClickHandler implements ClickHandler {
-
-    public void onClick(ClickEvent event) {
-      eventBus.fireEvent(new WorkbenchChangeEvent(uploadVariablesStepPresenter.get()));
-    }
   }
 
   class ImportVariablesResponseCodeCallback implements ResponseCodeCallback {

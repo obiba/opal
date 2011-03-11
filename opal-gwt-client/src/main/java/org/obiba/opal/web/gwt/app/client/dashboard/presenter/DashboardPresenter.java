@@ -84,7 +84,7 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
 
       @Override
       public void onClick(ClickEvent event) {
-        eventBus.fireEvent(new WorkbenchChangeEvent(navigationPresenter.get()));
+        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(navigationPresenter.get()).forResource("/datasources").build());
       }
     }));
 
@@ -92,7 +92,7 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
 
       @Override
       public void onClick(ClickEvent event) {
-        eventBus.fireEvent(new WorkbenchChangeEvent(fileExplorerPresenter.get()));
+        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(fileExplorerPresenter.get()).forResource("/files/meta").build());
       }
     }));
 
@@ -100,7 +100,7 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
 
       @Override
       public void onClick(ClickEvent event) {
-        eventBus.fireEvent(new WorkbenchChangeEvent(jobListPresenter.get()));
+        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(jobListPresenter.get()).forResource("/shell/commands").build());
       }
     }));
 
@@ -108,7 +108,7 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
 
       @Override
       public void onClick(ClickEvent event) {
-        eventBus.fireEvent(new WorkbenchChangeEvent(reportTemplatePresenter.get()));
+        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(reportTemplatePresenter.get()).forResource("/report-templates").build());
       }
     }));
 
@@ -116,7 +116,7 @@ public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Displ
 
       @Override
       public void onClick(ClickEvent event) {
-        eventBus.fireEvent(new WorkbenchChangeEvent(functionalUnitPresenter.get()));
+        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(functionalUnitPresenter.get()).forResource("/functional-units").build());
       }
     }));
 

@@ -301,7 +301,7 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
 
     @Override
     public void onClick(ClickEvent arg0) {
-      eventBus.fireEvent(new WorkbenchChangeEvent(jobListPresenter));
+      eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(jobListPresenter).forResource("/shell/commands").build());
     }
 
   }

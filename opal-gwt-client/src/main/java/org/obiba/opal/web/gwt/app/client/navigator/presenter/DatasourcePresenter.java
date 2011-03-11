@@ -238,7 +238,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
         if(response.getStatusCode() != Response.SC_OK) {
           eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
         } else {
-          eventBus.fireEvent(new WorkbenchChangeEvent(navigationPresenter.get()));
+          eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(navigationPresenter.get()).forResource("/datasources").build());
         }
       }
     };
