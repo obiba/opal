@@ -33,6 +33,8 @@ public class UnitKeyManager extends X509ExtendedKeyManager {
 
   private static final Logger log = LoggerFactory.getLogger(UnitKeyManager.class);
 
+  private static final String HTTPS = "https";
+
   private final UnitKeyStore unitKeyStore;
 
   public UnitKeyManager(final UnitKeyStore unitKeyStore) {
@@ -42,8 +44,11 @@ public class UnitKeyManager extends X509ExtendedKeyManager {
 
   @Override
   public String chooseClientAlias(String[] keyTypes, Principal[] issuers, Socket socket) {
-    log.info("chooseClientAlias({}, {}, socket)", keyTypes, issuers);
+    log.debug("chooseClientAlias({}, {}, socket)", keyTypes, issuers);
     for(String keyType : keyTypes) {
+      if(isKeyType(HTTPS, keyType)) {
+        return HTTPS;
+      }
       String alias = chooseServerAlias(keyType, issuers, socket);
       if(alias != null) {
         return alias;
@@ -54,21 +59,25 @@ public class UnitKeyManager extends X509ExtendedKeyManager {
 
   @Override
   public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket) {
-    log.info("Requested keyType: '{}'", keyType);
+    log.debug("Requested keyType: '{}'", keyType);
+    if(isKeyType(HTTPS, keyType)) {
+      log.debug("Selecting key '{}'", HTTPS);
+      return HTTPS;
+    }
     for(String alias : unitKeyStore.listKeyPairs()) {
       KeyPair pair = unitKeyStore.getKeyPair(alias);
       if(pair.getPrivate().getAlgorithm().equals(keyType)) {
-        log.info("Selecting key '{}'", alias);
+        log.debug("Selecting key '{}'", alias);
         return alias;
       }
     }
-    log.info("No appropriate key pair found.");
+    log.warn("No appropriate key pair found for SSL.");
     return null;
   }
 
   @Override
   public X509Certificate[] getCertificateChain(String alias) {
-    log.info("getCertificateChain({})", alias);
+    log.debug("getCertificateChain({})", alias);
     try {
       Certificate[] certs = this.unitKeyStore.getKeyStore().getCertificateChain(alias);
       // Convert Certificate[] to X509Certificate[]
@@ -80,13 +89,13 @@ public class UnitKeyManager extends X509ExtendedKeyManager {
 
   @Override
   public String[] getClientAliases(String keyType, Principal[] issuers) {
-    log.info("getClientAliases({}, {})", keyType, issuers);
+    log.debug("getClientAliases({}, {})", keyType, issuers);
     return null;
   }
 
   @Override
   public PrivateKey getPrivateKey(String alias) {
-    log.info("getPrivateKey({})", alias);
+    log.debug("getPrivateKey({})", alias);
     try {
       return unitKeyStore.getKeyPair(alias).getPrivate();
     } catch(RuntimeException e) {
@@ -96,19 +105,24 @@ public class UnitKeyManager extends X509ExtendedKeyManager {
 
   @Override
   public String[] getServerAliases(String keyType, Principal[] issuers) {
-    log.info("getServerAliases({}, {})", keyType, issuers);
+    log.debug("getServerAliases({}, {})", keyType, issuers);
     return unitKeyStore.listKeyPairs().toArray(new String[] {});
   }
 
   @Override
   public String chooseEngineClientAlias(String[] keyTypes, Principal[] issuers, SSLEngine engine) {
-    log.info("chooseEngineClientAlias({}, {})", keyTypes, issuers);
+    log.debug("chooseEngineClientAlias({}, {})", keyTypes, issuers);
     return chooseClientAlias(keyTypes, issuers, null);
   }
 
   @Override
   public String chooseEngineServerAlias(String keyType, Principal[] issuers, SSLEngine engine) {
-    log.info("chooseEngineServerAlias({}, {})", keyType, Arrays.toString(issuers));
+    log.debug("chooseEngineServerAlias({}, {})", keyType, Arrays.toString(issuers));
     return chooseServerAlias(keyType, issuers, null);
   }
+
+  private boolean isKeyType(String alias, String keyType) {
+    return unitKeyStore.hasKeyPair(alias) && unitKeyStore.getKeyPair(alias).getPrivate().getAlgorithm().equals(keyType);
+  }
+
 }
