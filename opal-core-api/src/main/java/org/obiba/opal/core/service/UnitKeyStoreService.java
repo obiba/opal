@@ -25,9 +25,8 @@ public interface UnitKeyStoreService {
    * 
    * @param unitName functional unit name
    * @return the unit's keystore (or <code>null</code> if no keystore exists for that unit)
-   * @throws NoSuchFunctionalUnitException if no unit exists with the specified name
    */
-  public UnitKeyStore getUnitKeyStore(String unitName) throws NoSuchFunctionalUnitException;
+  public UnitKeyStore getUnitKeyStore(String unitName);
 
   /**
    * Gets the {@link UnitKeyStore} for the specified {@link FunctionalUnit} or if it doesn't exist, create, persist and

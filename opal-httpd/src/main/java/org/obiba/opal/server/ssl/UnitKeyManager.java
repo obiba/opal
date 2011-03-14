@@ -33,7 +33,10 @@ public class UnitKeyManager extends X509ExtendedKeyManager {
 
   private static final Logger log = LoggerFactory.getLogger(UnitKeyManager.class);
 
-  private static final String HTTPS = "https";
+  /**
+   * The key alias to use first when looking up keypairs for serving HTTPs.
+   */
+  static final String HTTPS_ALIAS = "https";
 
   private final UnitKeyStore unitKeyStore;
 
@@ -46,8 +49,8 @@ public class UnitKeyManager extends X509ExtendedKeyManager {
   public String chooseClientAlias(String[] keyTypes, Principal[] issuers, Socket socket) {
     log.debug("chooseClientAlias({}, {}, socket)", keyTypes, issuers);
     for(String keyType : keyTypes) {
-      if(isKeyType(HTTPS, keyType)) {
-        return HTTPS;
+      if(isKeyType(HTTPS_ALIAS, keyType)) {
+        return HTTPS_ALIAS;
       }
       String alias = chooseServerAlias(keyType, issuers, socket);
       if(alias != null) {
@@ -60,9 +63,9 @@ public class UnitKeyManager extends X509ExtendedKeyManager {
   @Override
   public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket) {
     log.debug("Requested keyType: '{}'", keyType);
-    if(isKeyType(HTTPS, keyType)) {
-      log.debug("Selecting key '{}'", HTTPS);
-      return HTTPS;
+    if(isKeyType(HTTPS_ALIAS, keyType)) {
+      log.debug("Selecting key '{}'", HTTPS_ALIAS);
+      return HTTPS_ALIAS;
     }
     for(String alias : unitKeyStore.listKeyPairs()) {
       KeyPair pair = unitKeyStore.getKeyPair(alias);
@@ -121,6 +124,12 @@ public class UnitKeyManager extends X509ExtendedKeyManager {
     return chooseServerAlias(keyType, issuers, null);
   }
 
+  /**
+   * Returns true if the key {@code alias} exists and its algorithm is {@code keyType}
+   * @param alias
+   * @param keyType
+   * @return
+   */
   private boolean isKeyType(String alias, String keyType) {
     return unitKeyStore.hasKeyPair(alias) && unitKeyStore.getKeyPair(alias).getPrivate().getAlgorithm().equals(keyType);
   }
