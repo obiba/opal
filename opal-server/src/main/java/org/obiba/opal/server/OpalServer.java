@@ -35,6 +35,7 @@ public class OpalServer {
     System.setProperty("org.terracotta.quartz.skipUpdateCheck", "true");
 
     if(options.isUpgrade()) {
+      System.out.println("Upgrading Opal.");
       new UpgradeCommand().execute();
       System.out.println("Upgrade successful.");
     }
