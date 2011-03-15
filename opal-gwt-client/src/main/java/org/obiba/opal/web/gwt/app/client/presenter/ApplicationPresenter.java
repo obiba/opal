@@ -258,6 +258,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
     updateTabSelection(event);
   }
 
+  @SuppressWarnings({ "unchecked", "PMD.NcssMethodCount" })
   private void updateTabSelection(WorkbenchChangeEvent event) {
     if(event.resourceStartsWith("/files/meta")) {
       getDisplay().setCurrentSelection(getDisplay().getFileExplorerItem());
