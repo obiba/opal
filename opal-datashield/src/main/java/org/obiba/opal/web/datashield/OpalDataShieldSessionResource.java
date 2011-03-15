@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.datashield;
 
+import java.util.NoSuchElementException;
+
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -52,7 +54,13 @@ public class OpalDataShieldSessionResource extends OpalRSessionResource {
   @Path("/aggregate/{method}")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   public Response aggregate(@PathParam("method") String methodName, String script) {
-    DataShieldMethod method = lookupMethod(methodName);
+    DataShieldMethod method;
+    try {
+      method = lookupMethod(methodName);
+    } catch(NoSuchElementException e) {
+      return Response.status(Status.NOT_FOUND).entity("No such method: " + methodName).build();
+    }
+
     RScriptROperation rop = new RScriptROperation(script);
     getOpalRSession().execute(rop);
     if(rop.hasRawResult()) {
@@ -60,6 +68,7 @@ public class OpalDataShieldSessionResource extends OpalRSessionResource {
       clean.execute(datashieldOperation);
       return Response.ok().entity(datashieldOperation.getRawResult().asBytes()).build();
     }
+
     return Response.status(Status.INTERNAL_SERVER_ERROR).build();
   }
 
