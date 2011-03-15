@@ -132,16 +132,16 @@ datashield.newSession.list <- function(opals) {
 }
 
 # Sends a script, and calls "summary" on the result.
-datashield.summary=function(object, ...) {
-  UseMethod('datashield.summary');
+datashield.coefficients=function(object, ...) {
+  UseMethod('datashield.coefficients');
 }
 
-datashield.summary.opal=function(opal, expr) {
-  return(datashield.aggregate.opal(opal, "summary", expr))
+datashield.coefficients.opal=function(opal, expr) {
+  return(datashield.aggregate.opal(opal, "coefficients", expr))
 }
 
-datashield.summary.list=function(opals, expr) {
-	lapply(opals, FUN=datashield.summary.opal, expr)
+datashield.coefficients.list=function(opals, expr) {
+	lapply(opals, FUN=datashield.coefficients.opal, expr)
 }
 
 # Sends a script, and calls "length" on the result.
