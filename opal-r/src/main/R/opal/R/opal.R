@@ -1,7 +1,6 @@
 # Utility method to build urls. Concatenates all arguments and adds a '/' separator between each element
 .url <- function(opal, ..., query=list()) {
 	.tmp <- paste(opal$url, "ws", paste(sapply(c(...), curlEscape), collapse="/"), sep="/")
-#	.tmp <- paste(opal$url, "ws", ..., sep="/")
 	if(length(query)) {
 		.params <- paste(sapply(names(query), function(id) paste(id, curlEscape(query[[id]]), sep = "=")), collapse = "&")
 		.tmp <- paste(.tmp, .params, sep="?")
@@ -87,19 +86,20 @@
 	}
 }
 
-opal.login <- function(url,username,password) {
+opal.login <- function(url,username,password,opts=list()) {
 	require(RCurl)
 	require(rjson)
 	opal <- new.env(parent=globalenv())
-	# TODO: strip trailing / if any
-	opal$url <- url
-	
+
+	# Strip trailing slash
+	opal$url <- sub("/$", "", url)
+
 	# cookielist="" activates the cookie engine
-	opal$opts <- curlOptions(verbose=TRUE, header=TRUE, httpheader=c(Accept="application/octet-stream, application/json", Authorization=.authToken(username, password)), cookielist="")
+	opal$opts <- curlOptions(verbose=TRUE, header=TRUE, httpheader=c(Accept="application/octet-stream, application/json", Authorization=.authToken(username, password)), cookielist="", .opts=opts)
 	opal$curl <- curlSetOpt(.opts=opal$opts)
 	opal$reader <- dynCurlReader(curl=opal$curl)
 	class(opal) <- "opal"
-	
+
 	return(opal)
 }
 
@@ -117,89 +117,4 @@ opal.tables <- function(opal, datasource, fields=NULL) {
 
 opal.variables <- function(opal, datasource, table, fields=NULL) {
 	.extractJsonField(.get(opal, "datasource", datasource, "table", table, "variables"), fields)
-}
-
-datashield.newSession <- function(opal) {
-	UseMethod('datashield.newSession');
-}
-
-datashield.newSession.opal <- function(opal) {
-	.extractJsonField(.post(opal, "datashield", "sessions"), c("id"), isArray=FALSE)
-}
-
-datashield.newSession.list <- function(opals) {
-	lapply(opals, FUN=datashield.newSession.opal)
-}
-
-# Sends a script, and calls "summary" on the result.
-datashield.coefficients=function(object, ...) {
-  UseMethod('datashield.coefficients');
-}
-
-datashield.coefficients.opal=function(opal, expr) {
-  return(datashield.aggregate.opal(opal, "coefficients", expr))
-}
-
-datashield.coefficients.list=function(opals, expr) {
-	lapply(opals, FUN=datashield.coefficients.opal, expr)
-}
-
-# Sends a script, and calls "length" on the result.
-datashield.length=function(object, ...) {
-  UseMethod('datashield.length');
-}
-
-datashield.length.opal=function(opal, expr) {
-  return(datashield.aggregate.opal(opal, "length", expr))
-}
-
-datashield.length.list=function(opals, expr) {
-	lapply(opals, FUN=datashield.length.opal, expr)
-}
-
-datashield.aggregate=function(object, ...) {
-	UseMethod('datashield.aggregate');
-}
-
-# Inner methods that sends a script, and aggregates the result using the specified aggregation method
-datashield.aggregate.opal=function(opal, aggregation, expr) {
-	expression  = expr
-	if(is.language(expr)) expression = deparse(expr)
-	
-	.post(opal, "datashield", "session", "current", "aggregate", aggregation, params=expression)
-}
-
-datashield.aggregate.list=function(opals, aggregation, expr) {
-	lapply(opals, FUN=datashield.aggregate.opal, aggregation, expr)
-}
-
-datashield.assign=function(object, ...) {
-  UseMethod('datashield.assign');
-}
-
-datashield.assign.opal=function(opal, symbol, value) {
-	if(is.language(value)) {
-		contentType <- "application/x-rscript"
-		body <- deparse(value)
-	} else {
-		contentType <- "application/x-opal"
-		body <- value
-	}
-	.put(opal, "datashield", "session", "current", "symbol", symbol, body=body, contentType=contentType)
-}
-
-datashield.assign.list=function(opals, ...) {
-	lapply(opals, FUN=datashield.assign.opal, ...)
-}
-
-datashield.symbols=function(object, ...) {
-	UseMethod('datashield.symbols');
-}
-
-datashield.symbols.opal=function(opal) {
-	.get(opal, "datashield", "session", "current", "symbols")
-}
-
-datashield.symbols.list=function(opals) {
-	lapply(opals, FUN=datashield.symbols.opal)
 }
