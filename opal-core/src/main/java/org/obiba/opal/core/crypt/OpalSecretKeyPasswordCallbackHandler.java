@@ -35,7 +35,7 @@ public class OpalSecretKeyPasswordCallbackHandler implements CallbackHandler {
   }
 
   private char[] getPassword() {
-    if(customPassword == null || customPassword.isEmpty() || customPassword.equals("default-keystore-password")) {
+    if(customPassword == null || customPassword.isEmpty() || customPassword.equals("KEYSTORE_PASSWORD_NOT_SPECIFIED")) {
       return runtime.getOpalConfiguration().getSecretKey().toCharArray();
     } else {
       return customPassword.toCharArray();
