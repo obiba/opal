@@ -1,7 +1,7 @@
 # Utility method to build urls. Concatenates all arguments and adds a '/' separator between each element
 .url <- function(opal, ..., query=list()) {
-#	.tmp <- paste(opal$url, "ws", paste(sapply(c(...), curlEscape), collapse="/"), sep="/")
-	.tmp <- paste(opal$url, "ws", ..., sep="/")
+	.tmp <- paste(opal$url, "ws", paste(sapply(c(...), curlEscape), collapse="/"), sep="/")
+#	.tmp <- paste(opal$url, "ws", ..., sep="/")
 	if(length(query)) {
 		.params <- paste(sapply(names(query), function(id) paste(id, curlEscape(query[[id]]), sep = "=")), collapse = "&")
 		.tmp <- paste(.tmp, .params, sep="?")

@@ -45,20 +45,68 @@
       <artifactId>REngine</artifactId>
       <version>0.6-3</version>
     </dependency>
-    
   </dependencies>
-
+  
   <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.2.1</version>
+        <configuration>
+          <finalName>opal_${package.version}</finalName>
+          <appendAssemblyId>false</appendAssemblyId>
+          <descriptors>
+            <descriptor>src/main/assembly/r-package.xml</descriptor>
+          </descriptors>
+          <filters></filters>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 
+  <profiles>
+    <profile>
+      <!-- A profile for the builds performed by the continuous integration server -->
+      <id>ci-build</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>deploy-package</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target>
+                    <!-- Deploy R package file in R repo -->
+                    <copy todir="${obiba.cran.dir}" file="target/opal_${package.version}.tar.gz" />
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+
+    </profile>
+  </profiles>
   <properties>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
+    <!-- This is the R package version. It needs to be set manually because R has restrictions on the version string format. -->
+    <package.version>1.5.0-${buildNumber}</package.version>
   </properties>
 
 </project>
