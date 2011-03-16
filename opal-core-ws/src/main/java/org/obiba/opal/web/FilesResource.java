@@ -166,15 +166,16 @@ public class FilesResource {
 
     String fileName = uploadedFile.getName();
     file = folder.resolveFile(fileName);
-    if(file.exists()) {
-      return Response.status(Status.FORBIDDEN).entity("Could not upload the file, a file exist with that name at the specified path: " + path).build();
-    }
+    boolean overwrite = file.exists();
 
     writeUploadedFileToFileSystem(uploadedFile, file);
 
     log.info("The following file was uploaded to Opal file system : {}", file.getURL());
 
-    return Response.created(uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(fileName).build()).build();
+    if(overwrite) {
+      return Response.ok().build();
+    } else
+      return Response.created(uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(fileName).build()).build();
   }
 
   @POST
