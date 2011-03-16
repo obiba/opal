@@ -297,19 +297,26 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
         JsArray<AttributeDto> attributes = getNullAsEmptyArray(variable.getAttributesArray());
         AttributeDto attribute = null;
         StringBuilder labels = new StringBuilder();
+
         for(int i = 0; i < attributes.length(); i++) {
           attribute = attributes.get(i);
           if(attribute.getName().equals("label")) {
-            getLabelsString(attributes, attribute, labels, i);
+            appendLabel(attribute, labels);
           }
         }
+
         return labels.toString();
       }
 
-      private void getLabelsString(JsArray<AttributeDto> attributes, AttributeDto attribute, StringBuilder labels, int i) {
-        labels.append(attribute.getLocale().toString() + ":" + attribute.getValue());
-        if(i < attributes.length() - 1) {
-          labels.append(", ");
+      private void appendLabel(AttributeDto attr, StringBuilder labels) {
+        if(attr.hasValue() && attr.getValue().trim().length() > 0) {
+          if(labels.length() > 0) {
+            labels.append(", ");
+          }
+          if(attr.hasLocale() && attr.getLocale().trim().length() > 0) {
+            labels.append("(").append(attr.getLocale()).append(") ");
+          }
+          labels.append(attr.getValue());
         }
       }
     }, translations.labelLabel());
