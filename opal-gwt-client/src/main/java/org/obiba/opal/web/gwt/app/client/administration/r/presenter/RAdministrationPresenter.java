@@ -1,5 +1,7 @@
 package org.obiba.opal.web.gwt.app.client.administration.r.presenter;
 
+import java.util.Arrays;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -153,7 +155,7 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
   private final class RConnectionFailedCallback implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "RConnectionFailed", null));
+      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, Arrays.asList("RConnectionFailed", response.getText()), null));
     }
   }
 
