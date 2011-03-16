@@ -11,7 +11,7 @@ Architecture: all
 Pre-Depends: debconf, coreutils (>= 6.10)
 Depends: ${shlibs:Depends}, ${misc:Depends}, daemon, adduser, psmisc, java6-runtime
 Suggests: mysql-server, r-cran-rserve
-Description: Data integration Web application for biobanks
+Description: OBiBa Data integration Web application for biobanks
  Opal is OBiBa’s core database application for biobanks. Participant data, once
  collected from any data source, must be integrated and stored in a central
  data repository under a uniform model. Opal is such a central repository. It
