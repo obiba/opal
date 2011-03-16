@@ -12,11 +12,15 @@ package org.obiba.opal.r;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Handles a R connection and provides some utility methods to handle operations on it.
  */
 public abstract class AbstractROperation implements ROperation {
+
+  private static final Logger log = LoggerFactory.getLogger(AbstractROperation.class);
 
   RConnection connection;
 
@@ -38,7 +42,8 @@ public abstract class AbstractROperation implements ROperation {
     try {
       connection.assign(sym, ct);
     } catch(RserveException e) {
-      throw new RRuntimeException("Failed assigning '" + sym + "' with: " + ct);
+      log.warn("Failed assigning '" + sym + "' with: " + ct, e);
+      throw new RRuntimeException(e);
     }
   }
 
@@ -51,7 +56,8 @@ public abstract class AbstractROperation implements ROperation {
     try {
       connection.assign(sym, ct);
     } catch(RserveException e) {
-      throw new RRuntimeException("Failed assigning '" + sym + "' with REXP");
+      log.warn("Failed assigning '" + sym + "' with REXP", e);
+      throw new RRuntimeException(e);
     }
   }
 
@@ -67,7 +73,8 @@ public abstract class AbstractROperation implements ROperation {
     try {
       evaled = connection.eval("try(serialize({" + script + "}, NULL))");
     } catch(RserveException e) {
-      throw new RRuntimeException("Failed evaluating: " + script, e);
+      log.warn("Failed evaluating: " + script, e);
+      throw new RRuntimeException(e);
     }
     if(evaled.inherits("try-error")) {
       // Deal with an error

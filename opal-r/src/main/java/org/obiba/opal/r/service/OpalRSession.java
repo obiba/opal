@@ -20,6 +20,8 @@ import org.obiba.opal.r.RRuntimeException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RSession;
 import org.rosuda.REngine.Rserve.RserveException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSortedSet;
 
@@ -27,6 +29,8 @@ import com.google.common.collect.ImmutableSortedSet;
  * Reference to a R session.
  */
 public class OpalRSession implements ROperationTemplate, VariableEntitiesHolder {
+
+  private static final Logger log = LoggerFactory.getLogger(OpalRSession.class);
 
   private final String id;
 
@@ -45,6 +49,7 @@ public class OpalRSession implements ROperationTemplate, VariableEntitiesHolder 
     try {
       this.rSession = connection.detach();
     } catch(RserveException e) {
+      log.error("Error while detaching R session.", e);
       throw new RRuntimeException(e);
     }
     this.id = UUID.randomUUID().toString();
@@ -115,6 +120,7 @@ public class OpalRSession implements ROperationTemplate, VariableEntitiesHolder 
     try {
       return rSession.attach();
     } catch(RserveException e) {
+      log.error("Error while attaching R session.", e);
       throw new RRuntimeException(e);
     }
   }
@@ -128,7 +134,8 @@ public class OpalRSession implements ROperationTemplate, VariableEntitiesHolder 
     try {
       rSession = connection.detach();
     } catch(RserveException e) {
-      throw new RRuntimeException("Failed detaching connection of R session: " + id, e);
+      log.error("Error while detaching R session.", e);
+      throw new RRuntimeException(e);
     }
   }
 

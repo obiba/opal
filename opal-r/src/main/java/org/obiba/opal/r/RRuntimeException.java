@@ -16,16 +16,12 @@ public class RRuntimeException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
 
-  public RRuntimeException(String msg, Throwable cause) {
-    super(msg, cause);
-  }
-
   public RRuntimeException(String msg) {
     super(msg);
   }
 
   public RRuntimeException(Throwable cause) {
-    super(cause);
+    super(cause.getMessage(), cause);
   }
 
 }

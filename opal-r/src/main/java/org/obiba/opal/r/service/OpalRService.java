@@ -6,6 +6,8 @@ import org.obiba.opal.r.ROperationTemplate;
 import org.obiba.opal.r.RRuntimeException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class OpalRService implements Service, ROperationTemplate {
+
+  private static final Logger log = LoggerFactory.getLogger(OpalRService.class);
 
   private String host;
 
@@ -63,6 +67,7 @@ public class OpalRService implements Service, ROperationTemplate {
         conn.setStringEncoding(encoding);
       }
     } catch(RserveException e) {
+      log.error("Error while connecting to R.", e);
       throw new RRuntimeException(e);
     }
 
