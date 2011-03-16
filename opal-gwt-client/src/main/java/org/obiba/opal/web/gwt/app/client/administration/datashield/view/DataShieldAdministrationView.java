@@ -11,9 +11,9 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
 
 import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.EDIT_ACTION;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
@@ -177,7 +177,8 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
   }
 
   @Override
-  public void setPermissionsDisplay(WidgetDisplay display) {
+  public void setPermissionsDisplay(AuthorizationPresenter.Display display) {
+    display.setExplanation(translations.datashieldPermissions());
     permissions.add(display.asWidget());
   }
 

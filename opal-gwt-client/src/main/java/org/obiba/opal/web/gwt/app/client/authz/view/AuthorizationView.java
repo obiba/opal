@@ -42,6 +42,7 @@ import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle;
@@ -55,6 +56,9 @@ import com.google.gwt.user.client.ui.Widget;
 public class AuthorizationView extends Composite implements AuthorizationPresenter.Display {
 
   private static final int PAGER_SIZE = 20;
+
+  @UiField
+  Label explanation;
 
   @UiField
   CellTable<Acls> table;
@@ -245,6 +249,12 @@ public class AuthorizationView extends Composite implements AuthorizationPresent
     column.setFieldUpdater(fieldUpdater);
     table.addColumn(column, translations.permissionMap().get(header));
 
+  }
+
+  @Override
+  public void setExplanation(String text) {
+    explanation.setText(text);
+    explanation.setVisible(text != null && text.length() > 0);
   }
 
 }

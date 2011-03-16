@@ -88,6 +88,18 @@ textarea {
   margin-top: 1.2em;
 }
 
+.small-bottom-margin {
+  margin-bottom: 0.4em;
+}
+
+.bottom-margin {
+  margin-bottom: 0.8em;
+}
+
+.large-bottom-margin {
+  margin-bottom: 1.2em;
+}
+
 .loading {
 	display: block;
 	margin: auto;	
@@ -95,6 +107,7 @@ textarea {
 
 .title {
   font-size: 1.3em;
+  color: #444444;
 }
 
 .title-bold {

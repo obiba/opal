@@ -525,7 +525,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
     void setTableSelection(TableDto variable, int index);
 
-    void setPermissionsDisplay(WidgetDisplay display);
+    void setPermissionsDisplay(AuthorizationPresenter.Display display);
 
     void beforeRenderRows();
 

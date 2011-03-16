@@ -163,7 +163,7 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
 
     HasAuthorization getPermissionsAuthorizer();
 
-    void setPermissionsDisplay(WidgetDisplay display);
+    void setPermissionsDisplay(AuthorizationPresenter.Display display);
 
   }
 

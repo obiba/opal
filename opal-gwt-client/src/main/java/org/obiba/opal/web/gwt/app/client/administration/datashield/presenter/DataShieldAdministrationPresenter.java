@@ -304,7 +304,7 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
 
     HasAuthorization getAddMethodAuthorizer();
 
-    void setPermissionsDisplay(WidgetDisplay display);
+    void setPermissionsDisplay(AuthorizationPresenter.Display display);
 
     HasAuthorization getMethodsAuthorizer();
 

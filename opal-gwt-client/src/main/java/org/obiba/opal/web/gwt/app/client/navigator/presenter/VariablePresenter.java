@@ -307,6 +307,6 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
     HasAuthorization getPermissionsAuthorizer();
 
-    void setPermissionsTabWidget(WidgetDisplay display);
+    void setPermissionsTabWidget(AuthorizationPresenter.Display display);
   }
 }

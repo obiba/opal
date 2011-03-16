@@ -7,6 +7,7 @@
   ui:generateLocales="default">
 
   <g:FlowPanel>
+    <g:Label ui:field="explanation" addStyleNames="bottom-margin" visible="false"></g:Label>
     <g:HTMLPanel>
       <g:InlineLabel addStyleNames="key">
         <ui:msg description="Add principal label" >User or Group Name</ui:msg>: 

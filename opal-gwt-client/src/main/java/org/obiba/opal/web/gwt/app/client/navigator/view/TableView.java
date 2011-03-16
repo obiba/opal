@@ -9,8 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
@@ -357,7 +356,8 @@ public class TableView extends Composite implements TablePresenter.Display {
   }
 
   @Override
-  public void setPermissionsDisplay(WidgetDisplay display) {
+  public void setPermissionsDisplay(AuthorizationPresenter.Display display) {
+    display.setExplanation(translations.tablePermissions());
     permissions.clear();
     permissions.add(display.asWidget());
   }

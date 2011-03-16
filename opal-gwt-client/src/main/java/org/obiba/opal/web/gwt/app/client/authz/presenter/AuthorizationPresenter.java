@@ -190,6 +190,8 @@ public class AuthorizationPresenter extends WidgetPresenter<AuthorizationPresent
 
     void renderPermissions(JsArray<Acls> subjectPermissions);
 
+    void setExplanation(String text);
+
     void initColumn(String header, PermissionSelectionHandler permHandler);
 
     void clear();

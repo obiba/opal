@@ -863,4 +863,24 @@ public interface Translations extends Constants {
   @DefaultStringValue("Who")
   String whoLabel();
 
+  @Description("Datasource Permissions label")
+  @DefaultStringValue("Specify the access rights to the datasource and its content.")
+  String datasourcePermissions();
+
+  @Description("Table Permissions label")
+  @DefaultStringValue("Specify the access rights to the table and its content. Induces the visibility of the parent datasource.")
+  String tablePermissions();
+
+  @Description("Variable Permissions label")
+  @DefaultStringValue("Specify the access rights to the variable. Induces the visibility of the parent table and datasource.")
+  String variablePermissions();
+
+  @Description("DataShield Permissions label")
+  @DefaultStringValue("Specify the access rights to the DataShield services.")
+  String datashieldPermissions();
+
+  @Description("R Permissions label")
+  @DefaultStringValue("Specify the access rights to the R services.")
+  String rPermissions();
+
 }

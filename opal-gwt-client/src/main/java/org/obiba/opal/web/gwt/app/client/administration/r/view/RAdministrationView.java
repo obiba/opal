@@ -9,9 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.r.view;
 
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-
 import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
@@ -100,7 +99,8 @@ public class RAdministrationView extends Composite implements RAdministrationPre
   }
 
   @Override
-  public void setPermissionsDisplay(WidgetDisplay display) {
+  public void setPermissionsDisplay(AuthorizationPresenter.Display display) {
+    display.setExplanation(translations.rPermissions());
     permissions.add(display.asWidget());
   }
 

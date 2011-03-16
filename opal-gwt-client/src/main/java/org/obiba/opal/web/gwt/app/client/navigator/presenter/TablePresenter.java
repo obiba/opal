@@ -448,7 +448,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
     void setVariableSelection(VariableDto variable, int index);
 
-    void setPermissionsDisplay(WidgetDisplay display);
+    void setPermissionsDisplay(AuthorizationPresenter.Display display);
 
     void beforeRenderRows();
 

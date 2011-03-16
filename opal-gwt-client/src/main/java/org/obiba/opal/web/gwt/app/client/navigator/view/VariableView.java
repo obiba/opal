@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.navigator.view;
 
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -406,7 +407,8 @@ public class VariableView extends Composite implements VariablePresenter.Display
   }
 
   @Override
-  public void setPermissionsTabWidget(WidgetDisplay display) {
+  public void setPermissionsTabWidget(AuthorizationPresenter.Display display) {
+    display.setExplanation(translations.variablePermissions());
     permissions.clear();
     permissions.add(display.asWidget());
   }
