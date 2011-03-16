@@ -136,14 +136,22 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
   }
 
   private boolean fileExist(String fileName) {
+    // OPAL-1075 Chrome prefixes the file name with C:\fakepath\
+    int sep = fileName.lastIndexOf("\\");
+    String name = fileName;
+    if(sep != -1) {
+      name = fileName.substring(sep + 1);
+    }
     JsArray<FileDto> filesInCurrentDirectory = currentFolder.getChildrenArray();
     if(filesInCurrentDirectory != null) {
       for(int i = 0; i < filesInCurrentDirectory.length(); i++) {
-        if(fileName.equals(filesInCurrentDirectory.get(i).getName())) {
+        GWT.log(" " + i + ": " + filesInCurrentDirectory.get(i).getName());
+        if(name.equals(filesInCurrentDirectory.get(i).getName())) {
           return true;
         }
       }
     }
+
     return false;
   }
 
