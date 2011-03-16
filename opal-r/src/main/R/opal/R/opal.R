@@ -95,7 +95,7 @@ opal.login <- function(url,username,password,opts=list()) {
 	opal$url <- sub("/$", "", url)
 
 	# cookielist="" activates the cookie engine
-	opal$opts <- curlOptions(verbose=TRUE, header=TRUE, httpheader=c(Accept="application/octet-stream, application/json", Authorization=.authToken(username, password)), cookielist="", .opts=opts)
+	opal$opts <- curlOptions(header=TRUE, httpheader=c(Accept="application/octet-stream, application/json", Authorization=.authToken(username, password)), cookielist="", .opts=opts)
 	opal$curl <- curlSetOpt(.opts=opal$opts)
 	opal$reader <- dynCurlReader(curl=opal$curl)
 	class(opal) <- "opal"

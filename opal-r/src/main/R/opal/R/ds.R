@@ -67,6 +67,8 @@ datashield.assign.opal=function(opal, symbol, value) {
     return(print(paste("Invalid value type: '", class(value), "'. Use quote() to protect from early evaluation.", sep="")))
   }
   .put(opal, "datashield", "session", "current", "symbol", symbol, body=body, contentType=contentType)
+  # Return the new symbols length
+  datashield.length(opal, symbol)
 }
 
 datashield.assign.list=function(opals, ...) {
@@ -85,14 +87,20 @@ datashield.symbols.list=function(opals) {
   lapply(opals, FUN=datashield.symbols.opal)
 }
 
+datashield.lm=function(object, ...) {
+  UseMethod('datashield.lm');
+}
+
 datashield.lm.list=function(opals, formula, ...) {
 
   numstudies<-length(opals)
 
-  terms<-unlist(dimnames(attr(terms(formula), "factors"))[1])
-  numpara<-length(terms)
-  
-  print(numpara)
+  # for Y ~ X + Z, terms will be c("X", "Z")
+  # for Y ~ X * Z, terms will be c("X", "Z", "X:Z")
+  terms<-unlist(dimnames(attr(terms(formula), "factors"))[2])
+
+  # numpara includes Intercept
+  numpara<-length(terms)+1
 
   beta.s<-matrix(NA,nrow=numpara,ncol=numstudies)
   se.s<-matrix(NA,nrow=numpara,ncol=numstudies)
@@ -105,6 +113,7 @@ datashield.lm.list=function(opals, formula, ...) {
     se.s[,k]<-study.summary$coefficients[,2]
   }
 
+  # Fetch the length for each study 
   numsubs.study<-unlist(datashield.length(opals, terms[1]))
   numsubs<-sum(numsubs.study)
   analysis.wt<-numsubs.study/numsubs
@@ -117,21 +126,20 @@ datashield.lm.list=function(opals, formula, ...) {
   beta.overall<-beta.s%*%analysis.wt
   
   #convert standard errors into precisions
-  precision.s <-1/(se.s)^2
+  precision.s<-1/(se.s)^2
   
   #sum precisions across studies
   precision.overall<-precision.s%*%simple.sum
   
   #convert precisions back to standard errors
-  se.overall <-1/(precision.overall)^0.5 
-  
-  #round outputs
-  beta.overall<-round(beta.overall,digits=4)
-  se.overall<-round(se.overall,digits=4)
-  
+  se.overall<-1/(precision.overall)^0.5 
+
   #create output results matrix
   meta.analysis.results<-cbind(beta.overall,se.overall)
-  #TODO: fix the dimension names
-  dimnames(meta.analysis.results)<-list(c("Intercept","AGE","SNP"),c("Coefficients","SE"))
+
+  # Set dimension names
+  dimnames(meta.analysis.results)<-list(c("(Intercept)", terms),c("Coefficients","Std. Error"))
+
   meta.analysis.results
 }
+
