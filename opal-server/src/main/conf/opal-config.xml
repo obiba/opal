@@ -43,6 +43,17 @@
           <function>coefficients</function>
         </org.obiba.opal.datashield.RFunctionDataShieldMethod>
         <org.obiba.opal.datashield.CustomRScriptMethod>
+          <name>summary</name>
+          <script><![CDATA[function(data) {
+ if(is.vector(data) && length(data) == 1) {
+   "Vector too small."
+ } else {
+   base::summary(data);
+ }
+}]]>
+</script>
+        </org.obiba.opal.datashield.CustomRScriptMethod>
+        <org.obiba.opal.datashield.CustomRScriptMethod>
           <name>custom</name>
           <script>function(data) { "custom!" }</script>
         </org.obiba.opal.datashield.CustomRScriptMethod>

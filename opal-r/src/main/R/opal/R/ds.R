@@ -10,7 +10,7 @@ datashield.newSession.list <- function(opals) {
   lapply(opals, FUN=datashield.newSession.opal)
 }
 
-# Sends a script, and calls "summary" on the result.
+# Sends a script, and calls "coefficients" on the result.
 datashield.coefficients=function(object, ...) {
   UseMethod('datashield.coefficients');
 }
@@ -21,6 +21,19 @@ datashield.coefficients.opal=function(opal, expr) {
 
 datashield.coefficients.list=function(opals, expr) {
   lapply(opals, FUN=datashield.coefficients.opal, expr)
+}
+
+# Sends a script, and calls "summary" on the result.
+datashield.summary=function(object, ...) {
+  UseMethod('datashield.summary');
+}
+
+datashield.summary.opal=function(opal, expr) {
+  return(datashield.aggregate.opal(opal, "summary", expr))
+}
+
+datashield.summary.list=function(opals, expr) {
+  lapply(opals, FUN=datashield.summary.opal, expr)
 }
 
 # Sends a script, and calls "length" on the result.
@@ -143,3 +156,7 @@ datashield.lm.list=function(opals, formula, ...) {
   meta.analysis.results
 }
 
+
+datashield.glm.list=function(opals, formula, ...) {
+  
+}
