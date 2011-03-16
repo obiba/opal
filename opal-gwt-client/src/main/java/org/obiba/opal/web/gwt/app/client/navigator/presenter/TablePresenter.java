@@ -27,7 +27,6 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingVariableSelectio
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
@@ -216,7 +215,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() != Response.SC_OK) {
           String errorMessage = response.getText().length() != 0 ? response.getText() : "UnknownError";
-          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errorMessage, null));
+          eventBus.fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
         } else {
           eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(navigationPresenter.get()).forResource("/datasources").build());
         }

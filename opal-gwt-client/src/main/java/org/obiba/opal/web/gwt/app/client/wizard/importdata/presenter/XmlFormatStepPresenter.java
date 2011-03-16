@@ -16,7 +16,6 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
@@ -74,7 +73,7 @@ public class XmlFormatStepPresenter extends WidgetPresenter<XmlFormatStepPresent
   @Override
   public boolean validate() {
     if(getDisplay().getSelectedFile().isEmpty() || !getDisplay().getSelectedFile().endsWith(".zip")) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "ZipFileRequired", null));
+      eventBus.fireEvent(NotificationEvent.newBuilder().error("ZipFileRequired").build());
       return false;
     }
     return true;

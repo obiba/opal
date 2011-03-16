@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.job.presenter;
 
-import java.util.Arrays;
-
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -18,7 +16,6 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
@@ -163,9 +160,9 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
           @Override
           public void onResponseCode(Request request, Response response) {
             if(response.getStatusCode() == 200) {
-              eventBus.fireEvent(new NotificationEvent(NotificationType.INFO, "jobCancelled", Arrays.asList(new String[] { String.valueOf(dto.getId()) })));
+              eventBus.fireEvent(NotificationEvent.newBuilder().info("jobCancelled").build());
             } else {
-              eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
+              eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
             }
             refreshDisplay();
           }

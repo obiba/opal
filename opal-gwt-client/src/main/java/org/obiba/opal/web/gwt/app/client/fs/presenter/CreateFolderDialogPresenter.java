@@ -17,7 +17,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FolderCreationEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -100,9 +99,9 @@ public class CreateFolderDialogPresenter extends WidgetPresenter<CreateFolderDia
       public void onClick(ClickEvent event) {
         String folderToCreate = getDisplay().getFolderToCreate().getText();
         if(folderToCreate.equals("")) {
-          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, translations.folderNameIsRequired(), null));
+          eventBus.fireEvent(NotificationEvent.newBuilder().error(translations.folderNameIsRequired()).build());
         } else if(folderToCreate.equals(".") || folderToCreate.equals("..")) {
-          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, translations.dotNamesAreInvalid(), null));
+          eventBus.fireEvent(NotificationEvent.newBuilder().error(translations.dotNamesAreInvalid()).build());
         } else {
           if(currentFolder.getPath().equals("/")) { // create under root
             createFolder("/", folderToCreate);
@@ -138,7 +137,7 @@ public class CreateFolderDialogPresenter extends WidgetPresenter<CreateFolderDia
           getDisplay().hideDialog();
         } else {
           GWT.log(response.getText());
-          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
+          eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         }
       }
     };

@@ -1,7 +1,5 @@
 package org.obiba.opal.web.gwt.app.client.administration.r.presenter;
 
-import java.util.Arrays;
-
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -11,7 +9,6 @@ import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministra
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -138,7 +135,7 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
   private final class RSessionCreatedCallback implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.INFO, "RIsAlive", null).nonSticky());
+      eventBus.fireEvent(NotificationEvent.newBuilder().info("RIsAlive").nonSticky().build());
       // clean up
       ResponseCodeCallback ignore = new ResponseCodeCallback() {
 
@@ -155,7 +152,7 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
   private final class RConnectionFailedCallback implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, Arrays.asList("RConnectionFailed", response.getText()), null));
+      eventBus.fireEvent(NotificationEvent.newBuilder().error("RConnectionFailed", response.getText()).build());
     }
   }
 

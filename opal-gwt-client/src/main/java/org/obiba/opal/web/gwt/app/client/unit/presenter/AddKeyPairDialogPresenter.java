@@ -19,7 +19,6 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.unit.event.KeyPairCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
@@ -224,7 +223,7 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
         getDisplay().hideDialog();
       } else {
         ClientErrorDto error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, error.getStatus(), null));
+        eventBus.fireEvent(NotificationEvent.newBuilder().error(error.getStatus()).build());
       }
     }
   }

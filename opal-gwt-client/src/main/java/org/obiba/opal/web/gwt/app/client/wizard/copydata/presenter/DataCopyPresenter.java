@@ -24,7 +24,6 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
@@ -135,7 +134,7 @@ public class DataCopyPresenter extends WidgetPresenter<DataCopyPresenter.Display
         if(datasources != null && datasources.size() > 0) {
           getDisplay().setDatasources(datasources);
         } else {
-          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "NoDataToCopy", null));
+          eventBus.fireEvent(NotificationEvent.newBuilder().error("NoDataToCopy").build());
         }
       }
     }).send();
@@ -192,7 +191,7 @@ public class DataCopyPresenter extends WidgetPresenter<DataCopyPresenter.Display
     public boolean validate() {
       List<String> errors = formValidationErrors();
       if(errors.size() > 0) {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errors, null));
+        eventBus.fireEvent(NotificationEvent.newBuilder().error(errors).build());
         return false;
       }
       return true;
@@ -209,7 +208,7 @@ public class DataCopyPresenter extends WidgetPresenter<DataCopyPresenter.Display
     @Override
     public boolean validate() {
       if(tableListPresenter.getTables().size() == 0) {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "ExportDataMissingTables", null));
+        eventBus.fireEvent(NotificationEvent.newBuilder().error("ExportDataMissingTables").build());
         return false;
       }
       return true;
@@ -252,7 +251,7 @@ public class DataCopyPresenter extends WidgetPresenter<DataCopyPresenter.Display
   class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
+      eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
       getDisplay().renderFailedConclusion();
     }
   }

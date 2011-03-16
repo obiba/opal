@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.unit.presenter;
 
-import java.util.Arrays;
-
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -19,7 +17,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitSelectedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
@@ -283,7 +280,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
           refreshKeyPairs(functionalUnit);
         } else {
           ClientErrorDto error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, error.getStatus(), null));
+          eventBus.fireEvent(NotificationEvent.newBuilder().error(error.getStatus()).build());
         }
       }
 
@@ -332,7 +329,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     @Override
     public void execute() {
       if(generateConfirmation != null) {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "IdentifiersGenerationPending", null));
+        eventBus.fireEvent(NotificationEvent.newBuilder().error("IdentifiersGenerationPending").build());
       } else {
         generateConfirmation = new GenerateConfirmationRunnable();
         eventBus.fireEvent(new ConfirmationRequiredEvent(generateConfirmation, "generateFunctionalUnitIdentifiers", "confirmGenerateFunctionalUnitIdentifiers"));
@@ -362,12 +359,12 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
             } catch(NumberFormatException e) {
             }
             if(count > 0) {
-              eventBus.fireEvent(new NotificationEvent(NotificationType.INFO, "IdentifiersGenerationCompleted", Arrays.asList(functionalUnit.getName(), response.getText())).nonSticky());
+              eventBus.fireEvent(NotificationEvent.newBuilder().info("IdentifiersGenerationCompleted").args(functionalUnit.getName(), response.getText()).nonSticky().build());
             } else {
-              eventBus.fireEvent(new NotificationEvent(NotificationType.INFO, "NoIdentifiersGenerated", Arrays.asList(functionalUnit.getName())).nonSticky());
+              eventBus.fireEvent(NotificationEvent.newBuilder().info("NoIdentifiersGenerated").args(functionalUnit.getName()).nonSticky().build());
             }
           } else {
-            eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "IdentifiersGenerationFailed", Arrays.asList(functionalUnit.getName())));
+            eventBus.fireEvent(NotificationEvent.newBuilder().error("IdentifiersGenerationFailed").args(functionalUnit.getName()).build());
           }
           generateConfirmation = null;
           refreshDisplay();
@@ -488,15 +485,15 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
   private class FunctionalUnitNotFoundCallBack implements ResponseCodeCallback {
 
-    private String templateName;
+    private String functionalUnitName;
 
-    public FunctionalUnitNotFoundCallBack(String FunctionalUnitName) {
-      this.templateName = FunctionalUnitName;
+    public FunctionalUnitNotFoundCallBack(String functionalUnitName) {
+      this.functionalUnitName = functionalUnitName;
     }
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "FunctionalUnitCannotBeFound", Arrays.asList(new String[] { templateName })));
+      eventBus.fireEvent(NotificationEvent.newBuilder().error("FunctionalUnitCannotBeFound").args(functionalUnitName).build());
     }
 
   }

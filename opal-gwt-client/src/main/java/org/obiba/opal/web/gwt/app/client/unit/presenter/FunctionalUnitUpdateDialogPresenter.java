@@ -21,7 +21,6 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -168,7 +167,7 @@ public class FunctionalUnitUpdateDialogPresenter extends WidgetPresenter<Functio
     }
 
     if(messages.size() > 0) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, messages, null));
+      eventBus.fireEvent(NotificationEvent.newBuilder().error(messages).build());
       return false;
     } else {
       return true;
@@ -189,7 +188,7 @@ public class FunctionalUnitUpdateDialogPresenter extends WidgetPresenter<Functio
 
     @Override
     public void onResource(Response response, FunctionalUnitDto resource) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "FunctionalUnitAlreadyExistWithTheSpecifiedName", null));
+      eventBus.fireEvent(NotificationEvent.newBuilder().error("FunctionalUnitAlreadyExistWithTheSpecifiedName").build());
     }
 
   }
@@ -233,7 +232,7 @@ public class FunctionalUnitUpdateDialogPresenter extends WidgetPresenter<Functio
       } else if(response.getStatusCode() == Response.SC_CREATED) {
         eventBus.fireEvent(new FunctionalUnitCreatedEvent(functionalUnit));
       } else {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
+        eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
       }
 
     }

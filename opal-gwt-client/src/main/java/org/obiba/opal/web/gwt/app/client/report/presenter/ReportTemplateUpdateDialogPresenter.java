@@ -21,7 +21,6 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
@@ -252,7 +251,7 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
     }
 
     if(messages.size() > 0) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, messages, null));
+      eventBus.fireEvent(NotificationEvent.newBuilder().error(messages).build());
       return false;
     } else {
       return true;
@@ -306,7 +305,7 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
 
     @Override
     public void onResource(Response response, ReportTemplateDto resource) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "ReportTemplateAlreadyExistForTheSpecifiedName", null));
+      eventBus.fireEvent(NotificationEvent.newBuilder().error("ReportTemplateAlreadyExistForTheSpecifiedName").build());
     }
 
   }
@@ -364,7 +363,7 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
       } else if(response.getStatusCode() == Response.SC_CREATED) {
         eventBus.fireEvent(new ReportTemplateCreatedEvent(reportTemplate));
       } else {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
+        eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
       }
 
     }

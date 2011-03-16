@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.app.client.authz.presenter;
 import net.customware.gwt.presenter.client.EventBus;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.model.client.opal.Acl;
 import org.obiba.opal.web.model.client.opal.Acls;
 
@@ -34,7 +33,7 @@ public class DefaultAclCallback implements AclCallback {
 
   @Override
   public void onGetFailed(Response response) {
-    eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "Failed getting permissions", null));
+    eventBus.fireEvent(NotificationEvent.newBuilder().error("Failed getting permissions").build());
   }
 
   @Override
@@ -43,7 +42,7 @@ public class DefaultAclCallback implements AclCallback {
 
   @Override
   public void onDeleteFailed(Response response, String subject) {
-    eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "Failed deleting permissions of " + subject, null));
+    eventBus.fireEvent(NotificationEvent.newBuilder().error("Failed deleting permissions of " + subject).build());
   }
 
   @Override
@@ -52,7 +51,7 @@ public class DefaultAclCallback implements AclCallback {
 
   @Override
   public void onAddFailed(Response response, String subject, String resource, String perm) {
-    eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "Failed adding permissions of " + subject, null));
+    eventBus.fireEvent(NotificationEvent.newBuilder().error("Failed adding permissions of " + subject).build());
   }
 
 }

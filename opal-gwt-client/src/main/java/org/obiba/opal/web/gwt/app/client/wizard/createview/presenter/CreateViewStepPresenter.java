@@ -22,7 +22,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.HasCollection;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
@@ -309,7 +308,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
         }
       }
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, msg, null));
+      eventBus.fireEvent(NotificationEvent.newBuilder().error(msg).build());
       getDisplay().renderFailedConclusion(msg);
     }
   }
@@ -371,7 +370,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "ViewAlreadyExists", null));
+      eventBus.fireEvent(NotificationEvent.newBuilder().error("ViewAlreadyExists").build());
     }
   }
 

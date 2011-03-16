@@ -22,7 +22,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
@@ -227,7 +226,7 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
     public void onResource(Response response, JsArray<FunctionalUnitDto> resource) {
       JsArray<FunctionalUnitDto> units = JsArrays.toSafeArray(resource);
       if(units.length() != 2) {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "TwoMappedUnitsExpected", null));
+        eventBus.fireEvent(NotificationEvent.newBuilder().error("TwoMappedUnitsExpected").build());
         getDisplay().renderMappedUnitsFailed();
       } else {
         getDisplay().renderMappedUnits(units);
@@ -239,13 +238,13 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
     @Override
     public void onResponseCode(Request request, Response response) {
       if(response.getStatusCode() == Response.SC_NOT_FOUND) {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "MappedUnitsCannotBeIdentified", null));
+        eventBus.fireEvent(NotificationEvent.newBuilder().error("MappedUnitsCannotBeIdentified").build());
       } else if(response.getStatusCode() == Response.SC_BAD_REQUEST) {
         try {
           ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errorDto.getStatus(), null));
+          eventBus.fireEvent(NotificationEvent.newBuilder().error(errorDto.getStatus()).build());
         } catch(Exception e) {
-          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "fileReadError", null));
+          eventBus.fireEvent(NotificationEvent.newBuilder().error("fileReadError").build());
         }
       }
       getDisplay().renderMappedUnitsFailed();
@@ -273,10 +272,10 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
           final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
           getDisplay().renderFailedConclusion();
           if(errorDto != null) {
-            // eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errorDto.getStatus(), null));
+            // eventBus.fireEvent(NotificationEvent.newBuilder().error(errorDto.getStatus()).build());
             JsArrayString errors = JsArrays.toSafeArray(errorDto.getArgumentsArray());
             for(int i = 0; i < errors.length(); i++) {
-              eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errors.get(i), null));
+              eventBus.fireEvent(NotificationEvent.newBuilder().error(errors.get(i)).build());
             }
           }
         }

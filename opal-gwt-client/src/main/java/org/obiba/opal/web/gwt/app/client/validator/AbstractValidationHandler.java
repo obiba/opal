@@ -16,7 +16,6 @@ import java.util.Set;
 import net.customware.gwt.presenter.client.EventBus;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 
 public abstract class AbstractValidationHandler implements ValidationHandler {
 
@@ -41,7 +40,7 @@ public abstract class AbstractValidationHandler implements ValidationHandler {
     }
 
     if(messages.size() > 0) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, messages, null));
+      eventBus.fireEvent(NotificationEvent.newBuilder().error(messages).build());
       return false;
     } else {
       return true;

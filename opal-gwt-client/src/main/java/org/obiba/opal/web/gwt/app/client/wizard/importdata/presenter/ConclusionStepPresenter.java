@@ -22,7 +22,6 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
@@ -116,7 +115,7 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
           if(errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
             getDisplay().showDatasourceParsingErrors(errorDto);
           } else {
-            eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "fileReadError", null));
+            eventBus.fireEvent(NotificationEvent.newBuilder().error("fileReadError").build());
           }
           if(transientDatasourceCreatedCallback != null) transientDatasourceCreatedCallback.onFailure(factory, errorDto);
         }
@@ -263,7 +262,7 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
   class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
+      eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
     }
   }
 

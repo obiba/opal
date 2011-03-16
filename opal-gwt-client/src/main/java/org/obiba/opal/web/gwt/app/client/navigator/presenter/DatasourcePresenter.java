@@ -24,7 +24,6 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChan
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingTableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
@@ -236,7 +235,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
       @Override
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() != Response.SC_OK) {
-          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
+          eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         } else {
           eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(navigationPresenter.get()).forResource("/datasources").build());
         }

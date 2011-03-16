@@ -18,7 +18,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
@@ -158,7 +157,7 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
 
     String fileName = getDisplay().getFilename();
     if(fileName.equals("")) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, translations.fileMustBeSelected(), null));
+      eventBus.fireEvent(NotificationEvent.newBuilder().error(translations.fileMustBeSelected()).build());
     } else if(fileExist(fileName)) {
       eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "replaceExistingFile", "confirmReplaceExistingFile"));
     } else {

@@ -21,7 +21,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
@@ -183,7 +182,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     public boolean validate() {
       List<String> errors = formValidationErrors();
       if(errors.size() > 0) {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errors, null));
+        eventBus.fireEvent(NotificationEvent.newBuilder().error(errors).build());
         return false;
       }
       return true;
@@ -208,7 +207,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     @Override
     public boolean validate() {
       if(tableListPresenter.getTables().size() == 0) {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "ExportDataMissingTables", null));
+        eventBus.fireEvent(NotificationEvent.newBuilder().error("ExportDataMissingTables").build());
         return false;
       } else {
         boolean identifierEntityTable = false;
@@ -270,7 +269,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
+      eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
       getDisplay().renderFailedConclusion();
     }
   }

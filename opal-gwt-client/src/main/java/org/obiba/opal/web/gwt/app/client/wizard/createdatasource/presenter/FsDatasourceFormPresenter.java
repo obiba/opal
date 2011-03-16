@@ -15,7 +15,6 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
@@ -105,7 +104,7 @@ public class FsDatasourceFormPresenter extends WidgetPresenter<FsDatasourceFormP
   }
 
   private void fireErrorEvent(String error) {
-    eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, error, null));
+    eventBus.fireEvent(NotificationEvent.newBuilder().error(error).build());
   }
 
   @Override

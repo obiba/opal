@@ -21,7 +21,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
@@ -224,7 +223,7 @@ public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourceP
     public void onClick(ClickEvent arg0) {
       final String datasourceName = getDatasourceName();
       if(datasourceName.length() == 0) {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "DatasourceNameRequired", null));
+        eventBus.fireEvent(NotificationEvent.newBuilder().error("DatasourceNameRequired").build());
       } else {
         // check datasource name does not already exist
         ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
@@ -248,7 +247,7 @@ public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourceP
         for(int i = 0; i < datasources.length(); i++) {
           DatasourceDto ds = datasources.get(i);
           if(ds.getName().equals(datasourceName)) {
-            eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "DatasourceAlreadyExistsWithThisName", null));
+            eventBus.fireEvent(NotificationEvent.newBuilder().error("DatasourceAlreadyExistsWithThisName").build());
             return false;
           }
         }

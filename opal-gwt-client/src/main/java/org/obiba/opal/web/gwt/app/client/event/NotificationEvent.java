@@ -49,7 +49,7 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
   // Constructors
   //
 
-  public NotificationEvent(NotificationType notificationType, List<String> messages, List<String> messageArgs, NotificationCloseHandler notificationCloseHandler) {
+  private NotificationEvent(NotificationType notificationType, List<String> messages, List<String> messageArgs, NotificationCloseHandler notificationCloseHandler) {
     if(messages.isEmpty()) {
       throw new IllegalArgumentException("Missing message");
     }
@@ -60,15 +60,15 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
     this.notificationCloseHandler = notificationCloseHandler;
   }
 
-  public NotificationEvent(NotificationType notificationType, List<String> messages, List<String> messageArgs) {
+  private NotificationEvent(NotificationType notificationType, List<String> messages, List<String> messageArgs) {
     this(notificationType, messages, messageArgs, null);
   }
 
-  public NotificationEvent(NotificationType notificationType, String message, List<String> messageArgs, NotificationCloseHandler notificationCloseHandler) {
+  private NotificationEvent(NotificationType notificationType, String message, List<String> messageArgs, NotificationCloseHandler notificationCloseHandler) {
     this(notificationType, Arrays.asList(message), messageArgs, notificationCloseHandler);
   }
 
-  public NotificationEvent(NotificationType notificationType, String message, List<String> messageArgs) {
+  private NotificationEvent(NotificationType notificationType, String message, List<String> messageArgs) {
     this(notificationType, message, messageArgs, null);
   }
 
@@ -143,5 +143,54 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
   public NotificationEvent setNotificationCloseHandler(NotificationCloseHandler notificationCloseHandler) {
     this.notificationCloseHandler = notificationCloseHandler;
     return this;
+  }
+
+  //
+  // Builder
+  //
+
+  public static Builder newBuilder() {
+    return new Builder();
+  }
+
+  public static class Builder {
+    private NotificationEvent event;
+
+    Builder() {
+
+    }
+
+    public Builder error(List<String> messages) {
+      this.event = new NotificationEvent(NotificationType.ERROR, messages, null);
+      return this;
+    }
+
+    public Builder error(String... messages) {
+      return error(Arrays.asList(messages));
+    }
+
+    public Builder warn(String... messages) {
+      this.event = new NotificationEvent(NotificationType.WARNING, Arrays.asList(messages), null);
+      return this;
+    }
+
+    public Builder info(String... messages) {
+      this.event = new NotificationEvent(NotificationType.INFO, Arrays.asList(messages), null);
+      return this;
+    }
+
+    public Builder args(String... messageArgs) {
+      this.event.messageArgs = Arrays.asList(messageArgs);
+      return this;
+    }
+
+    public Builder nonSticky() {
+      this.event.nonSticky();
+      return this;
+    }
+
+    public NotificationEvent build() {
+      return event;
+    }
   }
 }

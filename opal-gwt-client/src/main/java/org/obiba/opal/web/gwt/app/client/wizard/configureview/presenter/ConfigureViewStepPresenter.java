@@ -17,7 +17,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
@@ -153,7 +152,7 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
       @Override
       public void onBeforeSelection(BeforeSelectionEvent<Integer> event) {
         if(viewSavePending) {
-          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "cannotSwitchTabBecauseOfUnsavedChanges", null));
+          eventBus.fireEvent(NotificationEvent.newBuilder().error("cannotSwitchTabBecauseOfUnsavedChanges").build());
           // Stop this event. If the user still wants to switch tabs we will handle it manually.
           event.cancel();
         }
@@ -260,7 +259,7 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
         @Override
         public void onResponseCode(Request request, Response response) {
           if(response.getStatusCode() == Response.SC_BAD_REQUEST) {
-            eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
+            eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
           } else {
             // Send event so save button and asterisk can be cleared.
             viewSavePending = false;

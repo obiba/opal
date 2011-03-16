@@ -14,7 +14,6 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
@@ -221,7 +220,7 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
         if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_NOT_FOUND) {
           updateDataShieldMethods();
         } else {
-          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "Failed removing aggregating method.", null));
+          eventBus.fireEvent(NotificationEvent.newBuilder().error("Failed removing aggregating method.").build());
         }
       }
 

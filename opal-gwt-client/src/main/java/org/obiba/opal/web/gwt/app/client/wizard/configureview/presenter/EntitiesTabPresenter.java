@@ -23,7 +23,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
@@ -159,7 +158,7 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
     }
 
     if(messages.size() > 0) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, messages, null));
+      eventBus.fireEvent(NotificationEvent.newBuilder().error(messages).build());
       return false;
     } else {
       return true;
@@ -179,7 +178,7 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
             if(statusCode == Response.SC_OK) {
               updateViewDto();
             } else {
-              eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, translations.scriptContainsErrorsAndWasNotSaved(), null));
+              eventBus.fireEvent(NotificationEvent.newBuilder().error(translations.scriptContainsErrorsAndWasNotSaved()).build());
             }
           }
         });

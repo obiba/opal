@@ -22,7 +22,6 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FolderCreationEvent;
@@ -194,7 +193,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
           eventBus.fireEvent(new FolderCreationEvent(destination + "/" + folder));
           getDisplay().clearNewFolderName();
         } else {
-          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
+          eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         }
       }
     };

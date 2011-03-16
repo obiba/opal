@@ -19,7 +19,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.CsvOptionsDisplay;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
@@ -165,7 +164,7 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
     errors.addAll(validateCharacterSet(getSelectedCharacterSet()));
 
     if(!errors.isEmpty()) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errors, null));
+      eventBus.fireEvent(NotificationEvent.newBuilder().error(errors).build());
     }
 
     return errors.size() == 0;

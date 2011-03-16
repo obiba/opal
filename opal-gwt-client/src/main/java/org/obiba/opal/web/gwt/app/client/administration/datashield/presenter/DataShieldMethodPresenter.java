@@ -21,7 +21,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -229,7 +228,7 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
 
     @Override
     public void onResource(Response response, DataShieldMethodDto resource) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "DataShieldMethodAlreadyExistWithTheSpecifiedName", null));
+      eventBus.fireEvent(NotificationEvent.newBuilder().error("DataShieldMethodAlreadyExistWithTheSpecifiedName").build());
     }
 
   }
@@ -271,7 +270,7 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
       } else if(response.getStatusCode() == Response.SC_CREATED) {
         eventBus.fireEvent(new DataShieldMethodCreatedEvent(dto));
       } else {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
+        eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
       }
     }
   }

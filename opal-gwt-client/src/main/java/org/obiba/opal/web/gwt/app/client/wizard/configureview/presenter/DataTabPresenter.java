@@ -24,7 +24,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.ui.HasCollection;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.MatchingTableEntitiesValidator;
@@ -137,7 +136,7 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
     public void onClick(ClickEvent event) {
       String errorMessageKey = validate();
       if(errorMessageKey != null) {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, errorMessageKey, null));
+        eventBus.fireEvent(NotificationEvent.newBuilder().error(errorMessageKey).build());
         return;
       }
       viewDto.clearFromArray();

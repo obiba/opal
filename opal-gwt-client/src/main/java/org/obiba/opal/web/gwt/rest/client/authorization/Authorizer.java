@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.rest.client.authorization;
 import net.customware.gwt.presenter.client.EventBus;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 
 /**
  * Dummy helper class with default implementation.
@@ -36,7 +35,7 @@ public abstract class Authorizer implements HasAuthorization {
   }
 
   protected void fireUnauthorizedOperationNotification() {
-    eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "UnauthorizedOperation", null));
+    eventBus.fireEvent(NotificationEvent.newBuilder().error("UnauthorizedOperation").build());
   }
 
 }

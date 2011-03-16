@@ -17,7 +17,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
@@ -170,14 +169,14 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
     @Override
     public boolean validate() {
       if(!comparedDatasourcesReportPresenter.canBeSubmitted()) {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "NotIgnoredConlicts", null));
+        eventBus.fireEvent(NotificationEvent.newBuilder().error("NotIgnoredConlicts").build());
         return false;
       }
 
       conclusionPresenter.clearResourceRequests();
       comparedDatasourcesReportPresenter.addUpdateVariablesResourceRequests(conclusionPresenter);
       if(conclusionPresenter.getResourceRequestCount() == 0) {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "NoVariablesToBeImported", null));
+        eventBus.fireEvent(NotificationEvent.newBuilder().error("NoVariablesToBeImported").build());
         return false;
       }
 
@@ -191,7 +190,7 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
       if(getDisplay().getSelectedFile().length() > 0 && (getDisplay().getSelectedFile().endsWith(".xls") || getDisplay().getSelectedFile().endsWith(".xlsx"))) {
         return true;
       } else {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "ExcelFileRequired", null));
+        eventBus.fireEvent(NotificationEvent.newBuilder().error("ExcelFileRequired").build());
         return false;
       }
     }
@@ -262,7 +261,7 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
           final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
 
           if(errorDto.getExtension(ClientErrorDtoExtensions.errors) == null) {
-            eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "fileReadError", null));
+            eventBus.fireEvent(NotificationEvent.newBuilder().error("fileReadError").build());
           }
           getDisplay().getDatasourceCreatedCallback().onFailure(factory, errorDto);
         }

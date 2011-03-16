@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.report.presenter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import net.customware.gwt.presenter.client.EventBus;
@@ -23,7 +22,6 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateListReceivedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
@@ -241,7 +239,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
       @Override
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() != Response.SC_OK) {
-          eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, response.getText(), null));
+          eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         } else {
           eventBus.fireEvent(new FileDeletedEvent(file));
         }
@@ -390,7 +388,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
     @Override
     public void onResponseCode(Request request, Response response) {
       if(response.getStatusCode() == Response.SC_CREATED) {
-        eventBus.fireEvent(new NotificationEvent(NotificationType.INFO, "ReportJobStarted", null));
+        eventBus.fireEvent(NotificationEvent.newBuilder().info("ReportJobStarted").build());
       }
     }
   }
@@ -416,9 +414,8 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, "ReportTemplateCannotBeFound", Arrays.asList(new String[] { templateName })));
+      eventBus.fireEvent(NotificationEvent.newBuilder().error("ReportTemplateCannotBeFound").args(templateName).build());
     }
-
   }
 
   private class RemoveReportTemplateResponseCallBack implements ResponseCodeCallback {

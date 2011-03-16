@@ -24,7 +24,6 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -342,7 +341,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     }
 
     if(messages.size() > 0) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, messages, null));
+      eventBus.fireEvent(NotificationEvent.newBuilder().error(messages).build());
       return false;
     } else {
       return true;
@@ -595,7 +594,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
                 updateViewDto();
                 refreshVariableSuggestions();
               } else {
-                eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, translations.scriptContainsErrorsAndWasNotSaved(), null));
+                eventBus.fireEvent(NotificationEvent.newBuilder().error(translations.scriptContainsErrorsAndWasNotSaved()).build());
               }
             }
           });

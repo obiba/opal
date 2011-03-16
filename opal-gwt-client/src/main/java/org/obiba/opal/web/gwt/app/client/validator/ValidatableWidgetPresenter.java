@@ -17,7 +17,6 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 
 public abstract class ValidatableWidgetPresenter<D extends WidgetDisplay> extends WidgetPresenter<D> {
 
@@ -39,7 +38,7 @@ public abstract class ValidatableWidgetPresenter<D extends WidgetDisplay> extend
     }
 
     if(messages.size() > 0) {
-      eventBus.fireEvent(new NotificationEvent(NotificationType.ERROR, messages, null));
+      eventBus.fireEvent(NotificationEvent.newBuilder().error(messages).build());
       return false;
     } else {
       return true;
