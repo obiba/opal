@@ -104,7 +104,7 @@ public class AuthorizationView extends Composite implements AuthorizationPresent
     table.addColumn(new TextColumn<Acls>() {
       @Override
       public String getValue(Acls object) {
-        return object.getName();
+        return object.getSubject().getPrincipal();
       }
     }, translations.whoLabel());
 
@@ -207,7 +207,7 @@ public class AuthorizationView extends Composite implements AuthorizationPresent
   public void renderSubjectSuggestions(JsArray<Acls> subjects) {
     suggestions.clear();
     for(Acls acls : JsArrays.toIterable(subjects)) {
-      suggestions.add(acls.getName());
+      suggestions.add(acls.getSubject().getPrincipal());
     }
   }
 
@@ -239,9 +239,9 @@ public class AuthorizationView extends Composite implements AuthorizationPresent
       @Override
       public void update(int index, Acls object, Boolean value) {
         if(value) {
-          permHandler.authorize(object.getName(), header);
+          permHandler.authorize(object.getSubject(), header);
         } else {
-          permHandler.unauthorize(object.getName(), header);
+          permHandler.unauthorize(object.getSubject(), header);
         }
       }
     };

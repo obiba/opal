@@ -42,13 +42,15 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
   @Override
   public void addListener(SubjectAclChangeCallback callback) {
-    callbacks.add(callback);
+    if(callback != null) {
+      callbacks.add(callback);
+    }
   }
 
   @Override
   public void deleteNodePermissions(String domain, String node) {
-    Set<String> subjects = Sets.newTreeSet();
-    for(SubjectAcl acl : persistenceManager.match(new SubjectAcl(domain, node, null, null))) {
+    Set<SubjectAclService.Subject> subjects = Sets.newTreeSet();
+    for(SubjectAcl acl : persistenceManager.match(new SubjectAcl(domain, node))) {
       subjects.add(acl.getSubject());
       persistenceManager.delete(acl);
     }
@@ -56,22 +58,22 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public void deleteSubjectPermissions(String domain, String node, String subject) {
-    for(SubjectAcl acl : persistenceManager.match(new SubjectAcl(domain, node, subject, null))) {
+  public void deleteSubjectPermissions(String domain, String node, SubjectAclService.Subject subject) {
+    for(SubjectAcl acl : persistenceManager.match(new SubjectAcl(domain, node, subject))) {
       persistenceManager.delete(acl);
     }
     notifyListeners(subject);
   }
 
   @Override
-  public void addSubjectPermissions(String domain, String node, String subject, Iterable<String> permissions) {
+  public void addSubjectPermissions(String domain, String node, SubjectAclService.Subject subject, Iterable<String> permissions) {
     for(String permission : permissions) {
       addSubjectPermission(domain, node, subject, permission);
     }
   }
 
   @Override
-  public void addSubjectPermission(String domain, String node, String subject, String permission) {
+  public void addSubjectPermission(String domain, String node, SubjectAclService.Subject subject, String permission) {
     if(subject == null) throw new IllegalArgumentException("subject cannot be null");
     if(permission == null) throw new IllegalArgumentException("permission cannot be null");
     persistenceManager.save(new SubjectAcl(domain, node, subject, permission));
@@ -79,7 +81,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public Permissions getSubjectPermissions(final String domain, final String node, final String subject) {
+  public Permissions getSubjectPermissions(final String domain, final String node, final SubjectAclService.Subject subject) {
     if(node == null) throw new IllegalArgumentException("node cannot be null");
     if(subject == null) throw new IllegalArgumentException("subject cannot be null");
 
@@ -96,21 +98,21 @@ public class DefaultSubjectAclService implements SubjectAclService {
       }
 
       @Override
-      public String getSubject() {
+      public Subject getSubject() {
         return subject;
       }
 
       @Override
       public Iterable<String> getPermissions() {
-        return mergePermissions(new SubjectAcl(domain, node, subject, null));
+        return mergePermissions(new SubjectAcl(domain, node, subject));
       }
     };
   }
 
   @Override
-  public Iterable<Permissions> getSubjectPermissions(final String subject) {
+  public Iterable<Permissions> getSubjectPermissions(final SubjectAclService.Subject subject) {
 
-    SubjectAcl template = new SubjectAcl(null, null, subject, null);
+    SubjectAcl template = new SubjectAcl(subject);
     return Iterables.transform(persistenceManager.match(template), new Function<SubjectAcl, Permissions>() {
 
       @Override
@@ -118,7 +120,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
         return new Permissions() {
 
           @Override
-          public String getSubject() {
+          public Subject getSubject() {
             return subject;
           }
 
@@ -134,7 +136,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
           @Override
           public Iterable<String> getPermissions() {
-            return mergePermissions(new SubjectAcl(from.getDomain(), getNode(), from.getSubject(), null));
+            return mergePermissions(new SubjectAcl(from.getDomain(), getNode(), from.getSubject()));
           }
 
         };
@@ -146,7 +148,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
   @Override
   public Iterable<Permissions> getNodePermissions(final String domain, final String node) {
 
-    SubjectAcl template = new SubjectAcl(domain, node, null, null);
+    SubjectAcl template = new SubjectAcl(domain, node);
     return Iterables.transform(persistenceManager.match(template), new Function<SubjectAcl, Permissions>() {
 
       @Override
@@ -164,13 +166,13 @@ public class DefaultSubjectAclService implements SubjectAclService {
           }
 
           @Override
-          public String getSubject() {
+          public Subject getSubject() {
             return from.getSubject();
           }
 
           @Override
           public Iterable<String> getPermissions() {
-            return mergePermissions(new SubjectAcl(from.getDomain(), node, from.getSubject(), null));
+            return mergePermissions(new SubjectAcl(from.getDomain(), node, from.getSubject()));
           }
 
         };
@@ -180,26 +182,24 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public Iterable<String> getSubjects(final String domain) {
-    SubjectAcl template = new SubjectAcl(domain, null, null, null);
+  public Iterable<SubjectAclService.Subject> getSubjects(final String domain) {
+    SubjectAcl template = new SubjectAcl(domain);
 
-    return Iterables.filter(Iterables.transform(persistenceManager.match(template), new Function<SubjectAcl, String>() {
+    return Iterables.filter(Iterables.transform(persistenceManager.match(template), new Function<SubjectAcl, SubjectAclService.Subject>() {
 
       @Override
-      public String apply(SubjectAcl from) {
+      public SubjectAclService.Subject apply(SubjectAcl from) {
         return from.getSubject();
       }
 
-    }), new Predicate<String>() {
+    }), new Predicate<SubjectAclService.Subject>() {
 
-      TreeSet<String> set = new TreeSet<String>();
+      final TreeSet<SubjectAclService.Subject> set = new TreeSet<SubjectAclService.Subject>();
 
       @Override
-      public boolean apply(String input) {
-        if(set.contains(input)) return false;
-
-        set.add(input);
-        return true;
+      public boolean apply(SubjectAclService.Subject input) {
+        // add returns false if the set already contains the element
+        return set.add(input);
       }
     });
   }
@@ -207,15 +207,15 @@ public class DefaultSubjectAclService implements SubjectAclService {
   /**
    * @param subjects
    */
-  private void notifyListeners(Set<String> subjects) {
-    for(String s : subjects)
+  private void notifyListeners(Set<SubjectAclService.Subject> subjects) {
+    for(SubjectAclService.Subject s : subjects)
       notifyListeners(s);
   }
 
   /**
    * @param subject
    */
-  private void notifyListeners(String subject) {
+  private void notifyListeners(SubjectAclService.Subject subject) {
     for(SubjectAclChangeCallback c : callbacks) {
       try {
         c.onSubjectAclChanged(subject);

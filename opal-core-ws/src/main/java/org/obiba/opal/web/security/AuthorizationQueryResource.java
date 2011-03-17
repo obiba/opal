@@ -20,6 +20,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
 import org.obiba.opal.core.service.SubjectAclService;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.Acl;
 import org.obiba.opal.web.model.Opal.Acls;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,47 +52,53 @@ public class AuthorizationQueryResource {
 
   public Iterable<Acls> getSubjects() {
     List<Acls> acls = Lists.newArrayList();
-    for(String principal : subjectAclService.getSubjects("magma")) {
-      acls.add(Acls.newBuilder().setName(principal).build());
+    for(SubjectAclService.Subject subject : subjectAclService.getSubjects("magma")) {
+      acls.add(newAcls(subject).build());
     }
-    Collections.sort(acls, new Comparator<Acls>() {
-
-      @Override
-      public int compare(Acls o1, Acls o2) {
-        return o1.getName().compareTo(o2.getName());
-      }
-    });
-
+    Collections.sort(acls, AclsComparator.INSTANCE);
     return acls;
   }
 
   private Iterable<Acls> getAclsGroupedBySubject(List<String> nodes) {
-    Map<String, Acls.Builder> aclMap = new HashMap<String, Acls.Builder>();
+    Map<Opal.Subject, Acls.Builder> aclMap = new HashMap<Opal.Subject, Acls.Builder>();
 
     for(String node : nodes) {
       for(Acl acl : Iterables.transform(subjectAclService.getNodePermissions("magma", node), PermissionsToAclFunction.INSTANCE)) {
         Acls.Builder acls;
-        if(aclMap.containsKey(acl.getPrincipal())) {
-          acls = aclMap.get(acl.getPrincipal());
+        if(aclMap.containsKey(acl.getSubject())) {
+          acls = aclMap.get(acl.getSubject());
         } else {
-          acls = Acls.newBuilder().setName(acl.getPrincipal());
-          aclMap.put(acl.getPrincipal(), acls);
+          acls = newAcls(acl.getSubject());
+          aclMap.put(acl.getSubject(), acls);
         }
         acls.addAcls(acl);
       }
     }
 
-    List<Acls.Builder> builders = Lists.newLinkedList(aclMap.values());
-    Collections.sort(builders, new Comparator<Acls.Builder>() {
+    List<Acls> acls = Lists.newLinkedList(Iterables.transform(aclMap.values(), AclsBuilderFunction.INSTANCE));
+    Collections.sort(acls, AclsComparator.INSTANCE);
+    return acls;
+  }
 
-      @Override
-      public int compare(Acls.Builder b1, Acls.Builder b2) {
-        return b1.getName().compareTo(b2.getName());
+  private Acls.Builder newAcls(Opal.Subject subject) {
+    return Acls.newBuilder().setSubject(subject);
+  }
+
+  private Acls.Builder newAcls(SubjectAclService.Subject subject) {
+    return Acls.newBuilder().setSubject(PermissionsToAclFunction.valueOf(subject));
+  }
+
+  private static final class AclsComparator implements Comparator<Acls> {
+
+    static final AclsComparator INSTANCE = new AclsComparator();
+
+    @Override
+    public int compare(Acls o1, Acls o2) {
+      if(o1.getSubject().getType() == o2.getSubject().getType()) {
+        return o1.getSubject().getPrincipal().compareTo(o2.getSubject().getPrincipal());
       }
-
-    });
-
-    return Iterables.transform(builders, AclsBuilderFunction.INSTANCE);
+      return o1.getSubject().getType().compareTo(o2.getSubject().getType());
+    }
   }
 
   private static final class AclsBuilderFunction implements Function<Acls.Builder, Acls> {

@@ -15,6 +15,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Index;
 import org.obiba.core.domain.AbstractEntity;
+import org.obiba.opal.core.service.SubjectAclService;
 
 @Entity
 @Table(name = "subject_acl")
@@ -31,8 +32,12 @@ public class SubjectAcl extends AbstractEntity {
   private String node;
 
   @Column(nullable = false)
-  @Index(name = "subject_idx")
-  private String subject;
+  @Index(name = "principal_idx")
+  private String principal;
+
+  @Column(nullable = false)
+  @Index(name = "type_idx")
+  private String type;
 
   @Column(nullable = false)
   private String permission;
@@ -41,10 +46,31 @@ public class SubjectAcl extends AbstractEntity {
 
   }
 
-  public SubjectAcl(String domain, String node, String subject, String permission) {
+  public SubjectAcl(String domain) {
+    this(domain, null);
+  }
+
+  public SubjectAcl(SubjectAclService.Subject subject) {
+    this(null, null, subject);
+  }
+
+  public SubjectAcl(String domain, String node) {
+    this(domain, node, null, null, null);
+  }
+
+  public SubjectAcl(String domain, String node, SubjectAclService.Subject subject) {
+    this(domain, node, subject.getPrincipal(), subject.getType().toString(), null);
+  }
+
+  public SubjectAcl(String domain, String node, SubjectAclService.Subject subject, String permission) {
+    this(domain, node, subject.getPrincipal(), subject.getType().toString(), permission);
+  }
+
+  private SubjectAcl(String domain, String node, String principal, String type, String permission) {
     this.domain = domain;
     this.node = node;
-    this.subject = subject;
+    this.principal = principal;
+    this.type = type;
     this.permission = permission;
   }
 
@@ -56,11 +82,19 @@ public class SubjectAcl extends AbstractEntity {
     return node;
   }
 
-  public String getSubject() {
-    return subject;
+  public String getPrincipal() {
+    return principal;
   }
 
   public String getPermission() {
     return permission;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public SubjectAclService.Subject getSubject() {
+    return SubjectAclService.SubjectType.valueOf(getType()).subjectFor(getPrincipal());
   }
 }

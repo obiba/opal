@@ -45,15 +45,15 @@ public class AuthorizationResource {
   }
 
   @POST
-  public Opal.Acl add(@QueryParam("subject") String subject, @QueryParam("perm") String permission) {
-    subjectAclService.addSubjectPermission("magma", getNode(), subject, permission);
-    return PermissionsToAclFunction.INSTANCE.apply(subjectAclService.getSubjectPermissions("magma", getNode(), subject));
+  public Opal.Acl add(@QueryParam("subject") String subject, @QueryParam("type") SubjectAclService.SubjectType type, @QueryParam("perm") String permission) {
+    subjectAclService.addSubjectPermission("magma", getNode(), type.subjectFor(subject), permission);
+    return PermissionsToAclFunction.INSTANCE.apply(subjectAclService.getSubjectPermissions("magma", getNode(), type.subjectFor(subject)));
   }
 
   @DELETE
-  public Opal.Acl delete(@QueryParam("subject") String subject) {
-    subjectAclService.deleteSubjectPermissions("magma", getNode(), subject);
-    return PermissionsToAclFunction.INSTANCE.apply(subjectAclService.getSubjectPermissions("magma", getNode(), subject));
+  public Opal.Acl delete(@QueryParam("subject") String subject, @QueryParam("type") SubjectAclService.SubjectType type) {
+    subjectAclService.deleteSubjectPermissions("magma", getNode(), type.subjectFor(subject));
+    return PermissionsToAclFunction.INSTANCE.apply(subjectAclService.getSubjectPermissions("magma", getNode(), type.subjectFor(subject)));
   }
 
   private String getNode() {

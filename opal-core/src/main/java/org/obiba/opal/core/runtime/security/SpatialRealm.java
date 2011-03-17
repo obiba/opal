@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.core.runtime.security;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -17,16 +18,25 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.authz.permission.RolePermissionResolver;
+import org.apache.shiro.cache.Cache;
+import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.obiba.opal.core.service.SubjectAclService;
 import org.obiba.opal.core.service.SubjectAclService.Permissions;
+import org.obiba.opal.core.service.SubjectAclService.Subject;
 import org.obiba.opal.core.service.SubjectAclService.SubjectAclChangeCallback;
+import org.obiba.opal.core.service.SubjectAclService.SubjectType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import eu.flatwhite.shiro.spatial.SingleSpaceRelationProvider;
@@ -41,23 +51,45 @@ import eu.flatwhite.shiro.spatial.finite.NodeSpace;
 @Component
 public class SpatialRealm extends AuthorizingRealm {
 
-  @Autowired
-  private SubjectAclService subjectAclService;
+  private final SubjectAclService subjectAclService;
 
-  public SpatialRealm() {
+  private Cache<Subject, Collection<Permission>> rolePermissionCache;
+
+  @Autowired
+  public SpatialRealm(SubjectAclService subjectAclService) {
     super();
+    if(subjectAclService == null) throw new IllegalArgumentException("subjectAclService cannot be null");
+    this.subjectAclService = subjectAclService;
+
     super.setPermissionResolver(new SpatialPermissionResolver(new SingleSpaceResolver(new RestSpace()), new NodeResolver(), new SingleSpaceRelationProvider(new NodeRelationProvider())));
+    super.setRolePermissionResolver(new GroupPermissionResolver());
   }
 
   @PostConstruct
   public void registerListener() {
-    subjectAclService.addListener(new SubjectAclChangeCallback() {
+    if(isAuthorizationCachingEnabled()) {
+      subjectAclService.addListener(new SubjectAclChangeCallback() {
 
-      @Override
-      public void onSubjectAclChanged(String subject) {
-        getAuthorizationCache().remove(subject);
-      }
-    });
+        @Override
+        public void onSubjectAclChanged(Subject subject) {
+          getAuthorizationCache().remove(subject);
+          getRolePermissionCache().remove(subject);
+        }
+      });
+    }
+  }
+
+  protected Cache<Subject, Collection<Permission>> getRolePermissionCache() {
+    return rolePermissionCache;
+  }
+
+  @Override
+  protected void afterCacheManagerSet() {
+    super.afterCacheManagerSet();
+    if(super.isAuthorizationCachingEnabled()) {
+      CacheManager cacheManager = getCacheManager();
+      this.rolePermissionCache = cacheManager.getCache(getAuthorizationCacheName() + "_role");
+    }
   }
 
   @Override
@@ -73,7 +105,7 @@ public class SpatialRealm extends AuthorizingRealm {
 
   @Override
   protected Object getAuthorizationCacheKey(PrincipalCollection principals) {
-    return principals.getPrimaryPrincipal().toString();
+    return getSubject(principals);
   }
 
   @Override
@@ -81,14 +113,52 @@ public class SpatialRealm extends AuthorizingRealm {
     return null;
   }
 
-  private Iterable<String> loadSubjectPermissions(PrincipalCollection principals) {
+  private Iterable<String> loadSubjectPermissions(SubjectAclService.Subject subject) {
     final List<String> perms = Lists.newArrayList();
-    for(Permissions sp : subjectAclService.getSubjectPermissions(principals.getPrimaryPrincipal().toString())) {
+    for(Permissions sp : subjectAclService.getSubjectPermissions(subject)) {
       for(String p : sp.getPermissions()) {
         perms.add(sp.getDomain() + ":" + sp.getNode() + ":" + p);
       }
     }
     return perms;
+  }
+
+  private Iterable<String> loadSubjectPermissions(PrincipalCollection principals) {
+    return loadSubjectPermissions(getSubject(principals));
+  }
+
+  private SubjectAclService.Subject getSubject(PrincipalCollection principals) {
+    return SubjectType.USER.subjectFor(principals.getPrimaryPrincipal().toString());
+  }
+
+  private final class GroupPermissionResolver implements RolePermissionResolver {
+
+    @Override
+    public Collection<Permission> resolvePermissionsInRole(String roleString) {
+      Subject group = SubjectType.GROUP.subjectFor(roleString);
+      if(isAuthorizationCachingEnabled()) {
+        Collection<Permission> cached = getRolePermissionCache().get(group);
+        if(cached != null) {
+          return cached;
+        }
+        cached = doGetGroupPermissions(group);
+        getRolePermissionCache().put(group, cached);
+        return cached;
+      } else {
+        return doGetGroupPermissions(group);
+      }
+    }
+
+    private Collection<Permission> doGetGroupPermissions(Subject group) {
+      return ImmutableList.copyOf(Iterables.transform(loadSubjectPermissions(group), new Function<String, Permission>() {
+
+        @Override
+        public Permission apply(String from) {
+          return getPermissionResolver().resolvePermission(from);
+        }
+      }));
+    }
+
   }
 
   /**

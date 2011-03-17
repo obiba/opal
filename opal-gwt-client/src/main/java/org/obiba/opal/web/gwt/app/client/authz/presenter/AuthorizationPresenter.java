@@ -22,6 +22,8 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.model.client.opal.Acl;
 import org.obiba.opal.web.model.client.opal.Acls;
+import org.obiba.opal.web.model.client.opal.Subject;
+import org.obiba.opal.web.model.client.opal.Subject.SubjectType;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
@@ -63,7 +65,7 @@ public class AuthorizationPresenter extends WidgetPresenter<AuthorizationPresent
       getDisplay().getActionsColumn().setActionHandler(new ActionHandler<Acls>() {
         public void doAction(Acls perms, String actionName) {
           if(actionName != null && actionName.equals(DELETE_ACTION)) {
-            subjectPermissionsRequests.delete(perms.getName());
+            subjectPermissionsRequests.delete(perms.getSubject());
           }
         }
       });
@@ -74,7 +76,10 @@ public class AuthorizationPresenter extends WidgetPresenter<AuthorizationPresent
       public void onAdd(String subject) {
         if(subject.trim().length() > 0) {
           if(!hasSubject(subject)) {
-            subjectPermissionsRequests.add(subject.trim());
+            Subject s = Subject.create();
+            s.setPrincipal(subject.trim());
+            s.setType(SubjectType.USER);
+            subjectPermissionsRequests.add(s);
           }
           getDisplay().clear();
         }
@@ -84,7 +89,7 @@ public class AuthorizationPresenter extends WidgetPresenter<AuthorizationPresent
 
   private boolean hasSubject(String subject) {
     for(Acls perms : JsArrays.toIterable(subjectPermissions)) {
-      if(perms.getName().equals(subject)) return true;
+      if(perms.getSubject().getPrincipal().equals(subject)) return true;
     }
     return false;
   }
@@ -156,7 +161,7 @@ public class AuthorizationPresenter extends WidgetPresenter<AuthorizationPresent
     }
 
     @Override
-    public void onDelete(String subject) {
+    public void onDelete(Subject subject) {
       refreshDisplay();
     }
 
@@ -171,7 +176,7 @@ public class AuthorizationPresenter extends WidgetPresenter<AuthorizationPresent
    */
   private final class PermissionHandlerImpl implements PermissionSelectionHandler {
     @Override
-    public void unauthorize(String subject, String header) {
+    public void unauthorize(Subject subject, String header) {
       subjectPermissionsRequests.unauthorize(subject, header);
     }
 
@@ -181,7 +186,7 @@ public class AuthorizationPresenter extends WidgetPresenter<AuthorizationPresent
     }
 
     @Override
-    public void authorize(String subject, String header) {
+    public void authorize(Subject subject, String header) {
       subjectPermissionsRequests.authorize(subject, header);
     }
   }
@@ -214,9 +219,9 @@ public class AuthorizationPresenter extends WidgetPresenter<AuthorizationPresent
 
     public Boolean hasPermission(String header, Acls acls);
 
-    public void authorize(String subject, String header);
+    public void authorize(Subject subject, String header);
 
-    public void unauthorize(String subject, String header);
+    public void unauthorize(Subject subject, String header);
 
   }
 

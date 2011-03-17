@@ -29,6 +29,7 @@ import org.jboss.resteasy.spi.DefaultOptionsMethodException;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.resteasy.util.IsHttpMethod;
 import org.obiba.opal.core.service.SubjectAclService;
+import org.obiba.opal.core.service.SubjectAclService.SubjectType;
 import org.obiba.opal.web.ws.inject.RequestAttributesProvider;
 import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
 import org.obiba.opal.web.ws.intercept.RequestCyclePreProcess;
@@ -122,7 +123,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent implemen
     for(URI resourceUri : resourceUris) {
       String resource = requestAttributeProvider.getResourcePath(resourceUri);
       if(getSubject().isPermitted("magma:" + resource + ":*") == false) {
-        subjectAclService.addSubjectPermission("magma", resource, getSubject().getPrincipal().toString(), "*:GET/*");
+        subjectAclService.addSubjectPermission("magma", resource, SubjectType.USER.subjectFor(getSubject().getPrincipal().toString()), "*:GET/*");
       }
     }
   }

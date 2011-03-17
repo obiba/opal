@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.Acl;
 import org.obiba.opal.web.model.client.opal.Acls;
+import org.obiba.opal.web.model.client.opal.Subject;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
@@ -60,13 +61,13 @@ public class AclRequest {
     this.aclAddCallback = aclAddCallback;
   }
 
-  public void add(final String subject) {
+  public void add(final Subject subject) {
     add(subject, 0);
   }
 
-  private void add(final String subject, final int index) {
+  private void add(final Subject subject, final int index) {
     final AclResource acl = getAclResources().get(index);
-    ResourceRequestBuilderFactory.<Acl> newBuilder().forResource("/authz" + acl.getResource() + "?subject=" + subject + "&perm=" + acl.getAction()).post()//
+    ResourceRequestBuilderFactory.<Acl> newBuilder().forResource("/authz" + acl.getResource() + "?subject=" + subject.getPrincipal() + "&type=" + subject.getType() + "&perm=" + acl.getAction()).post()//
     .withCallback(new ResourceCallback<Acl>() {
 
       @Override
@@ -84,13 +85,13 @@ public class AclRequest {
     }).send();
   }
 
-  public void delete(final String subject) {
+  public void delete(final Subject subject) {
     delete(subject, 0);
   }
 
-  private void delete(final String subject, final int index) {
+  private void delete(final Subject subject, final int index) {
     AclResource acl = getAclResources().get(index);
-    ResourceRequestBuilderFactory.<Acl> newBuilder().forResource("/authz" + acl.getResource() + "?subject=" + subject).delete()//
+    ResourceRequestBuilderFactory.<Acl> newBuilder().forResource("/authz" + acl.getResource() + "?subject=" + subject.getPrincipal() + "&type=" + subject.getType()).delete()//
     .withCallback(new ResourceCallback<Acl>() {
 
       @Override
@@ -149,14 +150,14 @@ public class AclRequest {
   }
 
   public interface AclDeleteCallback {
-    public void onDelete(String subject);
+    public void onDelete(Subject subject);
 
-    public void onDeleteFailed(Response response, String subject);
+    public void onDeleteFailed(Response response, Subject subject);
   }
 
   public interface AclAddCallback {
     public void onAdd(Acl resource);
 
-    public void onAddFailed(Response response, String subject, String resource, String perm);
+    public void onAddFailed(Response response, Subject subject, String resource, String perm);
   }
 }

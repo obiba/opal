@@ -14,6 +14,7 @@ import net.customware.gwt.presenter.client.EventBus;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.model.client.opal.Acl;
 import org.obiba.opal.web.model.client.opal.Acls;
+import org.obiba.opal.web.model.client.opal.Subject;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
@@ -37,11 +38,11 @@ public class DefaultAclCallback implements AclCallback {
   }
 
   @Override
-  public void onDelete(String subject) {
+  public void onDelete(Subject subject) {
   }
 
   @Override
-  public void onDeleteFailed(Response response, String subject) {
+  public void onDeleteFailed(Response response, Subject subject) {
     eventBus.fireEvent(NotificationEvent.newBuilder().error("Failed deleting permissions of " + subject).build());
   }
 
@@ -50,7 +51,7 @@ public class DefaultAclCallback implements AclCallback {
   }
 
   @Override
-  public void onAddFailed(Response response, String subject, String resource, String perm) {
+  public void onAddFailed(Response response, Subject subject, String resource, String perm) {
     eventBus.fireEvent(NotificationEvent.newBuilder().error("Failed adding permissions of " + subject).build());
   }
 

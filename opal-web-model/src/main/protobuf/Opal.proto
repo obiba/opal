@@ -75,13 +75,22 @@ message ParameterDto {
   required string value = 2;
 }
 
-message Acl {
+message Subject {
+  enum SubjectType {
+    USER = 0;
+    GROUP = 1;
+  }
   required string principal = 1;
+  required SubjectType type = 2;
+}
+
+message Acl {
+  required Subject subject = 1;
   required string resource = 2;
   repeated string actions = 3;
 }
 
 message Acls {
-  required string name = 1;
+  required Subject subject = 1;
   repeated Acl acls = 2;
 }

@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.Acls;
+import org.obiba.opal.web.model.client.opal.Subject;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
@@ -102,13 +103,13 @@ public class SubjectPermissionsRequest {
     return names;
   }
 
-  public void delete(String subject) {
+  public void delete(Subject subject) {
     for(int i = aclRequests.size() - 1; i >= 0; i--) {
       aclRequests.get(i).delete(subject);
     }
   }
 
-  public void add(String subject) {
+  public void add(Subject subject) {
     getMainAclRequest().add(subject);
   }
 
@@ -131,13 +132,13 @@ public class SubjectPermissionsRequest {
     return true;
   }
 
-  public void authorize(String subject, String header) {
+  public void authorize(Subject subject, String header) {
     if(hasAclRequest(header)) {
       getAclRequest(header).add(subject);
     }
   }
 
-  public void unauthorize(String subject, String header) {
+  public void unauthorize(Subject subject, String header) {
     if(hasAclRequest(header)) {
       getAclRequest(header).delete(subject);
     }
