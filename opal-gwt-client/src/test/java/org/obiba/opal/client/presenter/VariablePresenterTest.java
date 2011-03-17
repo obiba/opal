@@ -19,7 +19,9 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter.AddPrincipalHandler;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.AddPrincipalHandler;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
@@ -43,14 +45,20 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
 
   private AuthorizationPresenter authorizationPresenter;
 
+  private Display usersAuthzDisplayMock;
+
+  private Display groupsAuthzDisplayMock;
+
   @Before
   public void setUp() {
     displayMock = createMock(VariablePresenter.Display.class);
     summaryTabMock = createMock(SummaryTabPresenter.Display.class);
     eventBusMock = createMock(EventBus.class);
     authzDisplayMock = createMock(AuthorizationPresenter.Display.class);
+    usersAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
+    groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
 
-    authorizationPresenter = new AuthorizationPresenter(authzDisplayMock, eventBusMock);
+    authorizationPresenter = new AuthorizationPresenter(authzDisplayMock, eventBusMock, new SubjectAuthorizationPresenter(usersAuthzDisplayMock, eventBusMock), new SubjectAuthorizationPresenter(groupsAuthzDisplayMock, eventBusMock));
     variablePresenter = new VariablePresenter(displayMock, eventBusMock, new SummaryTabPresenter(summaryTabMock, eventBusMock) {
       @Override
       public void bind() {
@@ -72,14 +80,16 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
     displayMock.setSummaryTabWidget(summaryTabMock);
     displayMock.setPermissionsTabWidget(authzDisplayMock);
 
-    expect(authzDisplayMock.getActionsColumn()).andReturn(null).once();
-    authzDisplayMock.addHandler((AddPrincipalHandler) EasyMock.anyObject());
+    expect(usersAuthzDisplayMock.getActionsColumn()).andReturn(null).once();
+    usersAuthzDisplayMock.addPrincipalHandler((AddPrincipalHandler) EasyMock.anyObject());
 
-    replay(displayMock, eventBusMock, summaryTabMock, authzDisplayMock);
+    expect(groupsAuthzDisplayMock.getActionsColumn()).andReturn(null).once();
+    groupsAuthzDisplayMock.addPrincipalHandler((AddPrincipalHandler) EasyMock.anyObject());
 
+    replay(displayMock, eventBusMock, usersAuthzDisplayMock, groupsAuthzDisplayMock);
     variablePresenter.bind();
 
-    verify(displayMock, eventBusMock, summaryTabMock, authzDisplayMock);
+    verify(displayMock, eventBusMock, usersAuthzDisplayMock, groupsAuthzDisplayMock);
   }
 
 }

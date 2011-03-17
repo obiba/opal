@@ -7,12 +7,13 @@
   ui:generateLocales="default">
 
   <g:FlowPanel>
-    <g:Label ui:field="explanation" addStyleNames="bottom-margin" visible="false"></g:Label>
-    <o:HorizontalTabLayout addStyleNames="top-margin">
-	  <g:Anchor><ui:msg description="Users label">Users</ui:msg></g:Anchor>
-      <g:SimplePanel ui:field="users"></g:SimplePanel>
-      <g:Anchor><ui:msg description="Groups label">Groups</ui:msg></g:Anchor>
-      <g:SimplePanel ui:field="groups"></g:SimplePanel>
-    </o:HorizontalTabLayout>
+    <g:HTMLPanel>
+      <g:InlineLabel ui:field="typeLabel" addStyleNames="key"/>:
+      <g:SuggestBox ui:field="principal"/><g:Image ui:field="add" url="image/20/list-add.png" addStyleNames="clickable button"/>
+    </g:HTMLPanel>
+    <g:FlowPanel addStyleNames="top-margin">
+      <c:SimplePager ui:field="pager" location="CENTER"/>
+      <o:Table ui:field="table" addStyleNames="gwt-CellTable" />
+    </g:FlowPanel>
   </g:FlowPanel>
 </ui:UiBinder>

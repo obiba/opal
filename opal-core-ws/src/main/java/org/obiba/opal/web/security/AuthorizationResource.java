@@ -40,8 +40,8 @@ public class AuthorizationResource {
   }
 
   @GET
-  public Iterable<Opal.Acl> get() {
-    return Iterables.transform(subjectAclService.getNodePermissions("magma", getNode()), PermissionsToAclFunction.INSTANCE);
+  public Iterable<Opal.Acl> get(@QueryParam("type") SubjectAclService.SubjectType type) {
+    return Iterables.transform(subjectAclService.getNodePermissions("magma", getNode(), type), PermissionsToAclFunction.INSTANCE);
   }
 
   @POST

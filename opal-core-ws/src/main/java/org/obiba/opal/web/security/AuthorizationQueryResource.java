@@ -44,26 +44,26 @@ public class AuthorizationQueryResource {
   }
 
   @GET
-  public Iterable<Acls> get(@QueryParam("node") List<String> nodes, @QueryParam("by") String by) {
-    if(nodes == null || nodes.size() == 0) return getSubjects();
+  public Iterable<Acls> get(@QueryParam("type") SubjectAclService.SubjectType type, @QueryParam("node") List<String> nodes) {
+    if(nodes == null || nodes.size() == 0) return getSubjects(type);
 
-    return getAclsGroupedBySubject(nodes);
+    return getAclsGroupedBySubject(type, nodes);
   }
 
-  public Iterable<Acls> getSubjects() {
+  public Iterable<Acls> getSubjects(SubjectAclService.SubjectType type) {
     List<Acls> acls = Lists.newArrayList();
-    for(SubjectAclService.Subject subject : subjectAclService.getSubjects("magma")) {
+    for(SubjectAclService.Subject subject : subjectAclService.getSubjects("magma", type)) {
       acls.add(newAcls(subject).build());
     }
     Collections.sort(acls, AclsComparator.INSTANCE);
     return acls;
   }
 
-  private Iterable<Acls> getAclsGroupedBySubject(List<String> nodes) {
+  private Iterable<Acls> getAclsGroupedBySubject(@QueryParam("type") SubjectAclService.SubjectType type, List<String> nodes) {
     Map<Opal.Subject, Acls.Builder> aclMap = new HashMap<Opal.Subject, Acls.Builder>();
 
     for(String node : nodes) {
-      for(Acl acl : Iterables.transform(subjectAclService.getNodePermissions("magma", node), PermissionsToAclFunction.INSTANCE)) {
+      for(Acl acl : Iterables.transform(subjectAclService.getNodePermissions("magma", node, type), PermissionsToAclFunction.INSTANCE)) {
         Acls.Builder acls;
         if(aclMap.containsKey(acl.getSubject())) {
           acls = aclMap.get(acl.getSubject());

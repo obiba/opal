@@ -9,45 +9,17 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.authz.view;
 
-import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.DELETE_ACTION;
-
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter.AddPrincipalHandler;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter.PermissionSelectionHandler;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.ConstantActionsProvider;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
-import org.obiba.opal.web.model.client.opal.Acls;
 
-import com.google.gwt.cell.client.CheckboxCell;
-import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.SimplePager;
-import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
-import com.google.gwt.user.client.ui.SuggestBox;
-import com.google.gwt.user.client.ui.SuggestOracle;
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
-import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -55,32 +27,18 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class AuthorizationView extends Composite implements AuthorizationPresenter.Display {
 
-  private static final int PAGER_SIZE = 20;
-
   @UiField
   Label explanation;
 
   @UiField
-  CellTable<Acls> table;
+  SimplePanel users;
 
   @UiField
-  SimplePager pager;
+  SimplePanel groups;
 
-  @UiField(provided = true)
-  SuggestBox principal;
+  private Display usersDisplay;
 
-  @UiField
-  Image add;
-
-  private MultiWordSuggestOracle suggestions;
-
-  private SubjectSuggestionDisplay suggestionDisplay;
-
-  private JsArrayDataProvider<Acls> subjectPermissionsDataProvider = new JsArrayDataProvider<Acls>();
-
-  private boolean actionsColumnAdded;
-
-  private ActionsColumn<Acls> actionsColumn;
+  private Display groupsDisplay;
 
   //
   // Static Variables
@@ -95,29 +53,7 @@ public class AuthorizationView extends Composite implements AuthorizationPresent
   //
 
   public AuthorizationView() {
-    principal = new SuggestBox(suggestions = new MultiWordSuggestOracle(), new TextBox(), suggestionDisplay = new SubjectSuggestionDisplay());
     initWidget(uiBinder.createAndBindUi(this));
-    initAclsTable();
-  }
-
-  private void initAclsTable() {
-    table.addColumn(new TextColumn<Acls>() {
-      @Override
-      public String getValue(Acls object) {
-        return object.getSubject().getPrincipal();
-      }
-    }, translations.whoLabel());
-
-    actionsColumn = new ActionsColumn<Acls>(new ConstantActionsProvider<Acls>(DELETE_ACTION));
-
-    actionsColumnAdded = false;
-
-    table.setPageSize(PAGER_SIZE);
-    pager.setDisplay(table);
-    subjectPermissionsDataProvider.addDataDisplay(table);
-
-    table.setVisible(false);
-    pager.setVisible(false);
   }
 
   //
@@ -136,125 +72,34 @@ public class AuthorizationView extends Composite implements AuthorizationPresent
   // UiBinder
   //
 
-  /**
-   *
-   */
-  private final class SubjectSuggestionDisplay extends SuggestBox.DefaultSuggestionDisplay {
-    public boolean hasSelection() {
-      return getCurrentSelection() != null;
-    }
-  }
-
   @UiTemplate("AuthorizationView.ui.xml")
   interface AuthorizationViewUiBinder extends UiBinder<Widget, AuthorizationView> {
   }
 
   @Override
-  public HasActionHandler<Acls> getActionsColumn() {
-    return actionsColumn;
-  }
-
-  @Override
-  public String getPrincipal() {
-    return principal.getText();
-  }
-
-  @Override
-  public void addHandler(final AddPrincipalHandler handler) {
-    principal.setAutoSelectEnabled(false);
-
-    principal.addKeyDownHandler(new KeyDownHandler() {
-
-      @Override
-      public void onKeyDown(KeyDownEvent event) {
-        if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER && !suggestionDisplay.hasSelection()) {
-          handler.onAdd(principal.getText());
-        }
-      }
-    });
-
-    principal.addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
-
-      @Override
-      public void onSelection(SelectionEvent<Suggestion> event) {
-        handler.onAdd(principal.getText());
-      }
-    });
-
-    add.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        handler.onAdd(principal.getText());
-      }
-    });
-
-  }
-
-  @Override
   public void clear() {
-    principal.setText("");
-  }
-
-  @Override
-  public void initColumn(String header, PermissionSelectionHandler permHandler) {
-    if(!actionsColumnAdded) {
-      addPermissionColumn(header, permHandler);
-    }
-  }
-
-  @Override
-  public void renderSubjectSuggestions(JsArray<Acls> subjects) {
-    suggestions.clear();
-    for(Acls acls : JsArrays.toIterable(subjects)) {
-      suggestions.add(acls.getSubject().getPrincipal());
-    }
-  }
-
-  @Override
-  public void renderPermissions(JsArray<Acls> subjectPermissions) {
-    if(!actionsColumnAdded) {
-      table.addColumn(actionsColumn, translations.actionsLabel());
-      actionsColumnAdded = true;
-    }
-    subjectPermissionsDataProvider.setArray(subjectPermissions);
-    subjectPermissionsDataProvider.refresh();
-
-    int count = subjectPermissions.length();
-    pager.setVisible(count > PAGER_SIZE);
-    table.setVisible(count > 0);
-  }
-
-  private void addPermissionColumn(final String header, final PermissionSelectionHandler permHandler) {
-    Column<Acls, Boolean> column = new Column<Acls, Boolean>(new CheckboxCell()) {
-
-      @Override
-      public Boolean getValue(Acls acls) {
-        return permHandler.hasPermission(header, acls);
-      }
-    };
-
-    FieldUpdater<Acls, Boolean> fieldUpdater = new FieldUpdater<Acls, Boolean>() {
-
-      @Override
-      public void update(int index, Acls object, Boolean value) {
-        if(value) {
-          permHandler.authorize(object.getSubject(), header);
-        } else {
-          permHandler.unauthorize(object.getSubject(), header);
-        }
-      }
-    };
-
-    column.setFieldUpdater(fieldUpdater);
-    table.addColumn(column, translations.permissionMap().get(header));
-
+    usersDisplay.clear();
+    groupsDisplay.clear();
   }
 
   @Override
   public void setExplanation(String text) {
     explanation.setText(text);
     explanation.setVisible(text != null && text.length() > 0);
+  }
+
+  @Override
+  public void setUserAuthorizationDisplay(Display display) {
+    this.usersDisplay = display;
+    users.clear();
+    users.add(display.asWidget());
+  }
+
+  @Override
+  public void setGroupAuthorizationDisplay(Display display) {
+    this.groupsDisplay = display;
+    groups.clear();
+    groups.add(display.asWidget());
   }
 
 }

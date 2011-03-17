@@ -883,4 +883,8 @@ public interface Translations extends Constants {
   @DefaultStringValue("Specify the access rights to the R services.")
   String rPermissions();
 
+  @Description("Subject Type map")
+  @DefaultStringMapValue({ "USER", "User Name", //
+  "GROUP", "Group Name" })
+  Map<String, String> subjectTypeMap();
 }

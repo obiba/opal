@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.Acls;
 import org.obiba.opal.web.model.client.opal.Subject;
+import org.obiba.opal.web.model.client.opal.Subject.SubjectType;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
@@ -27,11 +28,14 @@ import com.google.gwt.http.client.Response;
  */
 public class SubjectPermissionsRequest {
 
+  private final SubjectType type;
+
   private List<AclRequest> aclRequests = new ArrayList<AclRequest>();
 
   private AclGetCallback aclGetCallback;
 
-  public SubjectPermissionsRequest(AclCallback callback, AclRequest.Builder... builders) {
+  public SubjectPermissionsRequest(SubjectType type, AclCallback callback, AclRequest.Builder... builders) {
+    this.type = type;
     for(AclRequest.Builder builder : builders) {
       aclRequests.add(builder.build());
     }
@@ -46,7 +50,7 @@ public class SubjectPermissionsRequest {
       }
     }
 
-    ResourceRequestBuilderFactory.<JsArray<Acls>> newBuilder().forResource("/authz/query?by=subject" + query.toString()).get().withCallback(new ResourceCallback<JsArray<Acls>>() {
+    ResourceRequestBuilderFactory.<JsArray<Acls>> newBuilder().forResource("/authz/query?type=" + type + query.toString()).get().withCallback(new ResourceCallback<JsArray<Acls>>() {
 
       @Override
       public void onResource(Response response, JsArray<Acls> resource) {
@@ -60,7 +64,7 @@ public class SubjectPermissionsRequest {
   }
 
   public void getSubjects(final AclGetCallback callback) {
-    ResourceRequestBuilderFactory.<JsArray<Acls>> newBuilder().forResource("/authz/query?by=subject").get().withCallback(new ResourceCallback<JsArray<Acls>>() {
+    ResourceRequestBuilderFactory.<JsArray<Acls>> newBuilder().forResource("/authz/query?type=" + type).get().withCallback(new ResourceCallback<JsArray<Acls>>() {
 
       @Override
       public void onResource(Response response, JsArray<Acls> resource) {

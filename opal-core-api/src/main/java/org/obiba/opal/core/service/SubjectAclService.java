@@ -25,9 +25,9 @@ public interface SubjectAclService {
 
   Permissions getSubjectPermissions(String domain, String node, Subject subject);
 
-  Iterable<Permissions> getNodePermissions(String domain, String node);
+  Iterable<Permissions> getNodePermissions(String domain, String node, SubjectType type);
 
-  Iterable<Subject> getSubjects(String domain);
+  Iterable<Subject> getSubjects(String domain, SubjectType type);
 
   public class Subject implements Comparable<Subject> {
 

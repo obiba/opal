@@ -58,6 +58,10 @@ public class SubjectAcl extends AbstractEntity {
     this(domain, node, null, null, null);
   }
 
+  public SubjectAcl(String domain, String node, SubjectAclService.SubjectType type) {
+    this(domain, node, null, type.toString(), null);
+  }
+
   public SubjectAcl(String domain, String node, SubjectAclService.Subject subject) {
     this(domain, node, subject.getPrincipal(), subject.getType().toString(), null);
   }

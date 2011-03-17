@@ -13,7 +13,9 @@ import net.customware.gwt.presenter.client.DefaultEventBus;
 import net.customware.gwt.presenter.client.EventBus;
 
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.view.AuthorizationView;
+import org.obiba.opal.web.gwt.app.client.authz.view.SubjectAuthorizationView;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.view.CreateFolderDialogView;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
@@ -87,6 +89,7 @@ public class OpalGinModule extends AbstractGinModule {
     bind(ItemSelectorPresenter.Display.class).to(ItemSelectorView.class);
     bind(SummaryTabPresenter.Display.class).to(SummaryTabView.class);
     bind(AuthorizationPresenter.Display.class).to(AuthorizationView.class);
+    bind(SubjectAuthorizationPresenter.Display.class).to(SubjectAuthorizationView.class);
   }
 
 }

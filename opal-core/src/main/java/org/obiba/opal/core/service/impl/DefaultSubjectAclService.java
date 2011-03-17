@@ -146,9 +146,9 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public Iterable<Permissions> getNodePermissions(final String domain, final String node) {
+  public Iterable<Permissions> getNodePermissions(final String domain, final String node, final SubjectType type) {
 
-    SubjectAcl template = new SubjectAcl(domain, node);
+    SubjectAcl template = new SubjectAcl(domain, node, type);
     return Iterables.transform(persistenceManager.match(template), new Function<SubjectAcl, Permissions>() {
 
       @Override
@@ -182,8 +182,8 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public Iterable<SubjectAclService.Subject> getSubjects(final String domain) {
-    SubjectAcl template = new SubjectAcl(domain);
+  public Iterable<SubjectAclService.Subject> getSubjects(final String domain, final SubjectType type) {
+    SubjectAcl template = new SubjectAcl(domain, null, type);
 
     return Iterables.filter(Iterables.transform(persistenceManager.match(template), new Function<SubjectAcl, SubjectAclService.Subject>() {
 

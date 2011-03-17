@@ -41,6 +41,13 @@ public class AclRequest {
     getAclResources().add(new AclResource(resource, action));
   }
 
+  private AclRequest(AclRequest copy) {
+    this.header = copy.header;
+    for(AclResource res : copy.getAclResources()) {
+      getAclResources().add(new AclResource(res.getResource(), res.getAction()));
+    }
+  }
+
   public String getHeader() {
     return header;
   }
@@ -134,7 +141,8 @@ public class AclRequest {
     }
 
     public AclRequest build() {
-      return request;
+      // make a copy to ensure callback are not conflicting between subject types
+      return new AclRequest(request);
     }
 
   }
