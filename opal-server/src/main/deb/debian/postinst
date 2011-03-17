@@ -54,8 +54,8 @@ case "$1" in
           ln -s /etc/opal /var/lib/opal/conf
         fi
 
-        chown -R opal:adm /var/lib/opal /var/log/opal /etc/opal
-        chmod -R 750      /var/lib/opal /var/log/opal /etc/opal
+        chown -R opal:adm /var/lib/opal /var/log/opal /etc/opal /tmp/opal
+        chmod -R 750      /var/lib/opal /var/log/opal /etc/opal /tmp/opal
     
     ;;
 

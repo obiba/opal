@@ -3,3 +3,6 @@ var/lib/opal
 
 # Store opal log here
 var/log/opal
+
+# Store opal.pid here
+tmp/opal

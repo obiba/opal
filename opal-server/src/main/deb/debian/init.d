@@ -21,7 +21,7 @@ OPAL_USER=opal        # User to use to run the service
 DAEMON=/usr/bin/daemon # Introduce the server's location here
 DAEMON_ARGS=""             # Arguments to run the daemon with
 MAIN_CLASS=org.obiba.opal.server.OpalServer
-PIDFILE=/var/run/$NAME.pid
+PIDFILE=/tmp/$NAME/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 
 # Exit if the package is not installed
@@ -37,7 +37,7 @@ SCRIPTNAME=/etc/init.d/$NAME
 # Depend on lsb-base (>= 3.0-6) to ensure that this file is present.
 . /lib/lsb/init-functions
 
-DAEMON_ARGS="--name=$NAME --user=$OPAL_USER --inherit --env=OPAL_HOME=$OPAL_HOME --env=OPAL_LOG=$OPAL_LOG --output=$OPAL_LOG/stdout.log --chdir=$OPAL_HOME"
+DAEMON_ARGS="--name=$NAME --user=$OPAL_USER --pidfile=$PIDFILE --inherit --env=OPAL_HOME=$OPAL_HOME --env=OPAL_LOG=$OPAL_LOG --output=$OPAL_LOG/stdout.log --chdir=$OPAL_HOME"
 CLASSPATH="$OPAL_HOME/conf:$OPAL_DIST/lib/*"
 
 # Get the status of the daemon process
@@ -51,11 +51,16 @@ get_running()
     return `ps -U $OPAL_USER --no-headers -f | egrep -e '(java|daemon)' | grep -c . `
 }
 
+get_running_daemon() 
+{
+    return `ps -U $OPAL_USER --no-headers -f | egrep -e '(daemon)' | grep -c . `
+}
+
 force_stop() 
 {
     get_running
     if [ $? -ne 0 ]; then 
-        killall -u $OPAL_USER java daemon || return 3
+        killall -u $OPAL_USER java || return 3
     fi
 }
 
@@ -88,8 +93,10 @@ do_stop()
         0) 
             $DAEMON $DAEMON_ARGS --stop || return 2
         # wait for the process to really terminate
-        for n in 1 2 3 4 5; do
+        echo -n "   "
+        for n in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
             sleep 1
+            echo -n "."
             $DAEMON $DAEMON_ARGS --running || break
         done
         if get_daemon_status; then
@@ -164,7 +171,7 @@ case "$1" in
       case "$?" in 
          0) echo "$DESC is running with the pid `cat $PIDFILE`";;
          *) 
-              get_running
+              get_running_daemon
               procs=$?
               if [ $procs -eq 0 ]; then 
                   echo -n "$DESC is not running"
@@ -173,9 +180,11 @@ case "$1" in
                   else 
                       echo
                   fi
-
+              elif [ $procs -eq 1 ]; then 
+                  echo "An instance of opal is running at the moment"
+                  echo "but the pidfile $PIDFILE is missing"
               else 
-                  echo "$procs instances of jenkins are running at the moment"
+                  echo "$procs instances of opal are running at the moment"
                   echo "but the pidfile $PIDFILE is missing"
               fi
               ;;
@@ -188,5 +197,4 @@ case "$1" in
 esac
 
 exit 0
-
 

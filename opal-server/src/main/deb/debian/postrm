@@ -22,7 +22,7 @@ set -e
 case "$1" in
 	purge)
         userdel -f opal || true
-        rm -rf /var/lib/opal /var/log/opal /var/run/opal.pid /etc/opal /usr/share/opal
+        rm -rf /var/lib/opal /var/log/opal /tmp/opal /etc/opal /usr/share/opal
     ;;
 
     remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
