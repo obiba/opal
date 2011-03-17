@@ -1,3 +1,8 @@
+.onLoad <- function(libname, pkgname) {
+  require(RCurl)
+  require(rjson)
+}
+
 # Utility method to build urls. Concatenates all arguments and adds a '/' separator between each element
 .url <- function(opal, ..., query=list()) {
 	.tmp <- paste(opal$url, "ws", paste(sapply(c(...), curlEscape), collapse="/"), sep="/")
@@ -87,8 +92,6 @@
 }
 
 opal.login <- function(url,username,password,opts=list()) {
-	require(RCurl)
-	require(rjson)
 	opal <- new.env(parent=globalenv())
 
 	# Strip trailing slash
