@@ -38,7 +38,16 @@
   <extend-property name='locale' values='en'/>
   <set-property-fallback name="locale" value="en"/>
 
+  <!-- Specific impl for IE -->
+  <replace-with class="org.obiba.opal.web.gwt.app.client.view.IELoginView">
+    <when-type-assignable class="org.obiba.opal.web.gwt.app.client.view.LoginView" />
+    <any>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
+    </any>
+  </replace-with>
+
   <!-- This will limit the compile to a single browser: Firefox 3.x -->
-  <!--  set-property name="user.agent" value="gecko1_8" /-->
+  <!-- set-property name="user.agent" value="gecko1_8" /-->
 
 </module>
