@@ -157,15 +157,16 @@ public class FilesResource {
     }
 
     FileItem uploadedFile = getUploadedFile(request);
-
-    FileObject file = null;
-
     if(uploadedFile == null) {
       return Response.status(Status.BAD_REQUEST).entity("No file has been submitted. Please make sure that you are submitting a file with your resquest.").build();
     }
 
+    return doUploadFile(folderPath, folder, uploadedFile, uriInfo);
+  }
+
+  private Response doUploadFile(String folderPath, FileObject folder, FileItem uploadedFile, UriInfo uriInfo) throws FileSystemException {
     String fileName = uploadedFile.getName();
-    file = folder.resolveFile(fileName);
+    FileObject file = folder.resolveFile(fileName);
     boolean overwrite = file.exists();
 
     writeUploadedFileToFileSystem(uploadedFile, file);
