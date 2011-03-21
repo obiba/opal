@@ -88,7 +88,7 @@ public class IELoginView extends LoginView {
     return new DummyHasKeyUpHandlers();
   }
 
-  private final class DummyHasValue implements HasValue<String> {
+  private static final class DummyHasValue implements HasValue<String> {
     @Override
     public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
       // TODO Auto-generated method stub
@@ -120,7 +120,7 @@ public class IELoginView extends LoginView {
     }
   }
 
-  private final class DummyHasKeyUpHandlers implements HasKeyUpHandlers {
+  private static final class DummyHasKeyUpHandlers implements HasKeyUpHandlers {
     @Override
     public void fireEvent(GwtEvent<?> event) {
       // TODO Auto-generated method stub
