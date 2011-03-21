@@ -49,9 +49,11 @@ import eu.flatwhite.shiro.spatial.finite.NodeResolver;
 import eu.flatwhite.shiro.spatial.finite.NodeSpace;
 
 @Component
-public class SpatialRealm extends AuthorizingRealm {
+public class SpatialRealm extends AuthorizingRealm implements RolePermissionResolver {
 
   private final SubjectAclService subjectAclService;
+
+  private final RolePermissionResolver rolePermissionResolver;
 
   private Cache<Subject, Collection<Permission>> rolePermissionCache;
 
@@ -62,7 +64,13 @@ public class SpatialRealm extends AuthorizingRealm {
     this.subjectAclService = subjectAclService;
 
     super.setPermissionResolver(new SpatialPermissionResolver(new SingleSpaceResolver(new RestSpace()), new NodeResolver(), new SingleSpaceRelationProvider(new NodeRelationProvider())));
-    super.setRolePermissionResolver(new GroupPermissionResolver());
+    rolePermissionResolver = new GroupPermissionResolver();
+  }
+
+  @Override
+  public boolean supports(AuthenticationToken token) {
+    // This realm is not used for authentication
+    return false;
   }
 
   @PostConstruct
@@ -77,6 +85,30 @@ public class SpatialRealm extends AuthorizingRealm {
         }
       });
     }
+  }
+
+  @Override
+  public Collection<Permission> resolvePermissionsInRole(String roleString) {
+    return getRolePermissionResolver().resolvePermissionsInRole(roleString);
+  }
+
+  /**
+   * Overriden because the OpalSecurityManager sets {@code this} as the {@code RolePermissionResolver} on all configured
+   * realms. This results the following object graph:
+   * 
+   * <pre>
+   * AuthorizingReam.rolePermissionResolver -> SpatialRealm (this)
+   *      ^
+   *      |
+   * SpatialRealm.rolePermissionResolver -> GroupPermissionResolver
+   * 
+   * <pre>
+   * By overriding this method, we prevent an infinite loop from occurring when
+   * {@code getRolePermissionResolver().resolvePermissionsInRole()} is called.
+   */
+  @Override
+  public RolePermissionResolver getRolePermissionResolver() {
+    return rolePermissionResolver;
   }
 
   protected Cache<Subject, Collection<Permission>> getRolePermissionCache() {
@@ -136,7 +168,7 @@ public class SpatialRealm extends AuthorizingRealm {
     @Override
     public Collection<Permission> resolvePermissionsInRole(String roleString) {
       Subject group = SubjectType.GROUP.subjectFor(roleString);
-      if(isAuthorizationCachingEnabled()) {
+      if(isAuthorizationCachingEnabled() && getRolePermissionCache() != null) {
         Collection<Permission> cached = getRolePermissionCache().get(group);
         if(cached != null) {
           return cached;
@@ -171,7 +203,7 @@ public class SpatialRealm extends AuthorizingRealm {
    * /parent/kid/1
    * </pre>
    */
-  private static class RestSpace extends NodeSpace {
+  static class RestSpace extends NodeSpace {
     @Override
     protected double calculateDistance(Spatial s1, Spatial s2) {
 
