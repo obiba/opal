@@ -50,7 +50,7 @@ public interface SubjectAclService {
 
     @Override
     public int compareTo(Subject o) {
-      int diff = type.compareTo(type);
+      int diff = type.compareTo(o.type);
       if(diff == 0) {
         diff = getPrincipal().compareTo(o.getPrincipal());
       }
