@@ -356,6 +356,9 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
     for(int i = 0; i < valueType.getItemCount(); i++) {
       valueType.setItemSelected(i, valueType.getValue(i).equals(variableDto.getValueType()));
     }
+    if(valueType.getSelectedIndex() == -1) {
+      valueType.setSelectedIndex(0);
+    }
   }
 
   private void setOccurrenceGroup(VariableDto variableDto) {

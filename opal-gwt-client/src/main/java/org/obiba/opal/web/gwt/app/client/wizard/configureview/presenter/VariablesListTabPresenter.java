@@ -763,6 +763,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       VariableDto variableDto = VariableDto.create();
       variableDto.setName(newDerivedVariableName);
       variableDto.setEntityType(entityType);
+      variableDto.setValueType("text");
       return variableDto;
     }
 
