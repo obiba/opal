@@ -21,7 +21,8 @@ OPAL_USER=opal        # User to use to run the service
 DAEMON=/usr/bin/daemon # Introduce the server's location here
 DAEMON_ARGS=""             # Arguments to run the daemon with
 MAIN_CLASS=org.obiba.opal.server.OpalServer
-PIDFILE=/tmp/$NAME/$NAME.pid
+TMPDIR=/tmp/$NAME
+PIDFILE=$TMPDIR/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 
 # Exit if the package is not installed
@@ -127,6 +128,15 @@ do_reload() {
 	return 0
 }
 
+#
+# Make sure opal tmp dir exists, otherwise daemon calls will fail
+#
+if [ ! -d $TMPDIR ]; then 
+  mkdir $TMPDIR
+  chown -R opal:adm $TMPDIR
+  chmod -R 750 $TMPDIR
+fi
+
 case "$1" in
   start)
     log_daemon_msg "Starting $DESC" "$NAME"
@@ -197,4 +207,5 @@ case "$1" in
 esac
 
 exit 0
+
 
