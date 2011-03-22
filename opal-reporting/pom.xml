@@ -38,13 +38,13 @@
     <dependency>
       <groupId>org.obiba.opal.birt</groupId>
       <artifactId>opal-oda-runtime</artifactId>
-      <version>1.1.0</version>
+      <version>1.1.1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.obiba.opal.birt</groupId>
       <artifactId>opal-oda</artifactId>
-      <version>1.1.0</version>
+      <version>1.1.1</version>
       <scope>provided</scope>
       <type>zip</type>
       <classifier>update-site</classifier>
