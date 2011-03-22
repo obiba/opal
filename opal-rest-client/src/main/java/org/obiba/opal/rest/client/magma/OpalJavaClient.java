@@ -9,10 +9,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.http.Header;
 import org.apache.http.HttpMessage;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.auth.params.AuthParams;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -35,8 +38,8 @@ public class OpalJavaClient {
 
   private final BasicHttpContext ctx;
 
-  private final BasicCookieStore cs;
-
+  private final Credentials credentials;
+  
   public OpalJavaClient(String uri, String username, String password) throws URISyntaxException {
     if(uri == null) throw new IllegalArgumentException("uri cannot be null");
     if(username == null) throw new IllegalArgumentException("username cannot be null");
@@ -45,14 +48,15 @@ public class OpalJavaClient {
     this.opalURI = new URI(uri.endsWith("/") ? uri : uri + "/");
 
     DefaultHttpClient httpClient = new DefaultHttpClient();
-    httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
+    httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, credentials = new UsernamePasswordCredentials(username, password));
     httpClient.getParams().setParameter("http.protocol.handle-authentication", Boolean.TRUE);
     httpClient.getParams().setParameter("http.auth.target-scheme-pref", Collections.singletonList(OpalAuthScheme.NAME));
     httpClient.getAuthSchemes().register(OpalAuthScheme.NAME, new OpalAuthScheme.Factory());
     ctx = new BasicHttpContext();
     ctx.setAttribute(ClientContext.AUTH_SCHEME_PREF, Collections.singletonList(OpalAuthScheme.NAME));
-    ctx.setAttribute(ClientContext.COOKIE_STORE, cs = new BasicCookieStore());
+    ctx.setAttribute(ClientContext.COOKIE_STORE, new BasicCookieStore());
     this.client = httpClient;
+    
   }
   
   public UriBuilder newUri() {
@@ -119,11 +123,7 @@ public class OpalJavaClient {
   }
 
   private void authenticate(HttpMessage msg) {
-    for(Cookie c : cs.getCookies()) {
-      if(c.getName().equalsIgnoreCase("opalsid")) {
-        msg.addHeader(OpalAuthScheme.NAME, c.getValue());
-      }
-    }
+	msg.addHeader(OpalAuthScheme.authenticate(credentials, AuthParams.getCredentialCharset(msg.getParams()), false));
   }
 
   private void closeQuietly(Closeable closable) {
