@@ -14,7 +14,6 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.prettify.client.PrettyPrintLabel;
@@ -50,10 +49,6 @@ public class VariableView extends Composite implements VariablePresenter.Display
   @UiTemplate("VariableView.ui.xml")
   interface VariableViewUiBinder extends UiBinder<Widget, VariableView> {
   }
-
-  private static final String DEFAULT_LOCALE_NAME = "default";
-
-  private static final String LABEL_ATTRIBUTE_NAME = "label";
 
   private static final Integer SCRIPT_TAB_INDEX = 2;
 
@@ -180,7 +175,7 @@ public class VariableView extends Composite implements VariablePresenter.Display
 
     attributeTablePager.firstPage();
 
-    label.setText(getAttributeValue(rows, LABEL_ATTRIBUTE_NAME));
+    label.setText(VariableViewHelper.getLabelValue(rows));
 
     attributeTablePager.setVisible(size > 0);
     attributeTable.setVisible(size > 0);
@@ -326,37 +321,7 @@ public class VariableView extends Composite implements VariablePresenter.Display
   }
 
   private String getCategoryLabel(CategoryDto categoryDto) {
-    return getAttributeValue(categoryDto.getAttributesArray(), LABEL_ATTRIBUTE_NAME);
-  }
-
-  private String getAttributeValue(JsArray<AttributeDto> attributes, String name) {
-    AttributeDto attribute = null;
-
-    JsArray<AttributeDto> notNull = JsArrays.toSafeArray(attributes);
-    for(int i = 0; i < notNull.length(); i++) {
-      AttributeDto att = notNull.get(i);
-      if(att.getName().equals(name)) {
-        if(!att.hasLocale()) {
-          attribute = att;
-        } else if(att.getLocale().equals(getCurrentLanguage())) {
-          attribute = att;
-          break;
-        }
-      }
-    }
-
-    return attribute != null ? attribute.getValue() : "";
-  }
-
-  private String getCurrentLanguage() {
-    String currentLocaleName = com.google.gwt.i18n.client.LocaleInfo.getCurrentLocale().getLocaleName();
-    if(currentLocaleName.equals(DEFAULT_LOCALE_NAME)) {
-      // No locale has been specified so the current locale is "default". Return English as the current language.
-      return "en";
-    }
-    int separatorIndex = currentLocaleName.indexOf('_');
-
-    return (separatorIndex != -1) ? currentLocaleName.substring(0, separatorIndex) : currentLocaleName;
+    return VariableViewHelper.getLabelValue(categoryDto.getAttributesArray());
   }
 
   private void initAttributeTable() {

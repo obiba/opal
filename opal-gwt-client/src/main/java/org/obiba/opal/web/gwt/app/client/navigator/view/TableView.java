@@ -20,7 +20,6 @@ import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
-import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
@@ -130,16 +129,7 @@ public class TableView extends Composite implements TablePresenter.Display {
     table.addColumn(new TextColumn<VariableDto>() {
       @Override
       public String getValue(VariableDto object) {
-        JsArray<AttributeDto> attributes = object.getAttributesArray();
-        if(attributes != null) {
-          for(int i = 0; i < attributes.length(); i++) {
-            AttributeDto attribute = attributes.get(i);
-            if(attribute.getName().equals("label")) {
-              return attribute.getValue();
-            }
-          }
-        }
-        return null;
+        return VariableViewHelper.getLabelValue(object.getAttributesArray());
       }
     }, translations.labelLabel());
 
