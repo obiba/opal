@@ -114,6 +114,7 @@
           <runTarget>org.obiba.opal.web.gwt.app.GwtApp/index.html</runTarget>
           <hostedWebapp>war</hostedWebapp>
           <extraParam>true</extraParam>
+          <!--style>PRETTY</style-->
         </configuration>
       </plugin>
       <plugin>
