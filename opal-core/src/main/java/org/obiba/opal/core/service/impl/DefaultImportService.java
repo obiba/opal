@@ -37,8 +37,6 @@ import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListe
 import org.obiba.magma.support.DatasourceCopier.MultiplexingStrategy;
 import org.obiba.magma.support.DatasourceCopier.VariableTransformer;
 import org.obiba.magma.support.Disposables;
-import org.obiba.magma.support.MagmaEngineReferenceResolver;
-import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
 import org.obiba.magma.type.BooleanType;
 import org.obiba.magma.type.TextType;
@@ -50,6 +48,7 @@ import org.obiba.opal.core.magma.FunctionalUnitView.Policy;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
 import org.obiba.opal.core.magma.concurrent.LockingActionTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
@@ -59,7 +58,6 @@ import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -88,26 +86,20 @@ public class DefaultImportService implements ImportService {
 
   private final IParticipantIdentifier participantIdentifier;
 
-  /** Configured through org.obiba.opal.keys.tableReference */
-  private final String keysTableReference;
-
-  /** Configured through org.obiba.opal.keys.entityType */
-  private final String keysTableEntityType;
+  private final IdentifiersTableService identifiersTableService;
 
   @Autowired
-  public DefaultImportService(TransactionTemplate txTemplate, FunctionalUnitService functionalUnitService, OpalRuntime opalRuntime, IParticipantIdentifier participantIdentifier, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference, @Value("${org.obiba.opal.keys.entityType}") String keysTableEntityType) {
+  public DefaultImportService(TransactionTemplate txTemplate, FunctionalUnitService functionalUnitService, OpalRuntime opalRuntime, IParticipantIdentifier participantIdentifier, IdentifiersTableService identifiersTableService) {
     if(txTemplate == null) throw new IllegalArgumentException("txManager cannot be null");
     if(functionalUnitService == null) throw new IllegalArgumentException("functionalUnitService cannot be null");
     if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
     if(participantIdentifier == null) throw new IllegalArgumentException("participantIdentifier cannot be null");
-    if(keysTableReference == null) throw new IllegalArgumentException("keysTableReference cannot be null");
-    if(keysTableEntityType == null) throw new IllegalArgumentException("keysTableEntityType cannot be null");
+    if(identifiersTableService == null) throw new IllegalArgumentException("identifiersTableService cannot be null");
 
     this.opalRuntime = opalRuntime;
     this.functionalUnitService = functionalUnitService;
     this.participantIdentifier = participantIdentifier;
-    this.keysTableReference = keysTableReference;
-    this.keysTableEntityType = keysTableEntityType;
+    this.identifiersTableService = identifiersTableService;
 
     this.txTemplate = txTemplate;
     this.txTemplate.setIsolationLevel(TransactionTemplate.ISOLATION_READ_COMMITTED);
@@ -185,7 +177,7 @@ public class DefaultImportService implements ImportService {
 
     int count = 0;
 
-    ValueTable keysTable = lookupKeysTable();
+    ValueTable keysTable = getIdentifiersValueTable();
     if(keysTable.hasVariable(unit.getKeyVariableName()) == false) {
       try {
         prepareKeysTable(null, unit.getKeyVariableName());
@@ -219,10 +211,10 @@ public class DefaultImportService implements ImportService {
     Datasource sourceDatasource = getDatasourceOrTransientDatasource(sourceDatasourceName);
     try {
       for(ValueTable vt : sourceDatasource.getValueTables()) {
-        if(vt.getEntityType().equals(keysTableEntityType)) {
+        if(vt.getEntityType().equals(identifiersTableService.getEntityType())) {
           ValueTable sourceKeysTable = createPrivateView(vt, unit, select);
           Variable unitKeyVariable = prepareKeysTable(sourceKeysTable, unit.getKeyVariableName());
-          PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(lookupKeysTable(), unitKeyVariable, participantIdentifier);
+          PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(getIdentifiersValueTable(), unitKeyVariable, participantIdentifier);
           for(VariableEntity privateEntity : sourceKeysTable.getVariableEntities()) {
             VariableEntity publicEntity = entityMap.publicEntity(privateEntity);
             if(publicEntity == null) {
@@ -246,27 +238,17 @@ public class DefaultImportService implements ImportService {
       if(sourceDatasource.getValueTables().size() == 0) {
         throw new IllegalArgumentException("source identifiers datasource is empty (no tables)");
       }
-      ValueTable sourceKeysTable = (sourceDatasource.getValueTables().size() > 1) ? sourceDatasource.getValueTable(getKeysTableName()) : sourceDatasource.getValueTables().iterator().next();
+      ValueTable sourceKeysTable = (sourceDatasource.getValueTables().size() > 1) ? sourceDatasource.getValueTable(getIdentifiersValueTable().getName()) : sourceDatasource.getValueTables().iterator().next();
 
-      if(sourceKeysTable.getEntityType().equals(keysTableEntityType) == false) {
-        throw new IllegalArgumentException("source identifiers table has unexpected entity type '" + sourceKeysTable.getEntityType() + "' (expected '" + keysTableEntityType + "')");
+      if(sourceKeysTable.getEntityType().equals(identifiersTableService.getEntityType()) == false) {
+        throw new IllegalArgumentException("source identifiers table has unexpected entity type '" + sourceKeysTable.getEntityType() + "' (expected '" + identifiersTableService.getEntityType() + "')");
       }
 
       // Don't copy null values otherwise, we'll delete existing mappings
-      DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(sourceKeysTable, MagmaEngine.get().getDatasource(getKeysDatasourceName()));
+      DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(sourceKeysTable, getIdentifiersValueTable().getDatasource());
     } finally {
       safelyDisposeTransientDatasource(sourceDatasource);
     }
-  }
-
-  private String getKeysDatasourceName() {
-    MagmaEngineReferenceResolver tableResolver = MagmaEngineTableResolver.valueOf(keysTableReference);
-    return tableResolver.getDatasourceName();
-  }
-
-  private String getKeysTableName() {
-    MagmaEngineReferenceResolver tableResolver = MagmaEngineTableResolver.valueOf(keysTableReference);
-    return tableResolver.getTableName();
   }
 
   private Datasource getDatasourceOrTransientDatasource(String datasourceName) {
@@ -319,7 +301,7 @@ public class DefaultImportService implements ImportService {
                   throw new InterruptedException("Thread interrupted");
                 }
 
-                if(valueTable.isForEntityType(keysTableEntityType)) {
+                if(valueTable.isForEntityType(identifiersTableService.getEntityType())) {
                   if(unit != null) {
                     copyParticipants(valueTable, source, destination, unit, dispatchAttribute);
                   } else {
@@ -353,10 +335,9 @@ public class DefaultImportService implements ImportService {
   private Set<VariableEntity> addMissingEntitiesToKeysTable(ValueTable valueTable) {
     Set<VariableEntity> nonExistentVariableEntities = Sets.newHashSet(valueTable.getVariableEntities());
 
-    MagmaEngineReferenceResolver tableResolver = MagmaEngineTableResolver.valueOf(keysTableReference);
-    if(MagmaEngine.get().getDatasource(tableResolver.getDatasourceName()).hasValueTable(tableResolver.getTableName())) {
+    if(identifiersTableService.hasValueTable()) {
       // Remove all entities that exist in the keys table. Whatever is left are the ones that don't exist...
-      Set<VariableEntity> entitiesInKeysTable = lookupKeysTable().getVariableEntities();
+      Set<VariableEntity> entitiesInKeysTable = getIdentifiersValueTable().getVariableEntities();
       nonExistentVariableEntities.removeAll(entitiesInKeysTable);
     }
 
@@ -383,13 +364,13 @@ public class DefaultImportService implements ImportService {
 
     for(ValueTable valueTable : source.getValueTables()) {
       tablesToLock.add(valueTable.getDatasource() + "." + valueTable.getName());
-      if(valueTable.getEntityType().equals(keysTableEntityType)) {
+      if(valueTable.getEntityType().equals(identifiersTableService.getEntityType())) {
         needToLockKeysTable = true;
       }
     }
 
     if(needToLockKeysTable) {
-      tablesToLock.add(keysTableReference);
+      tablesToLock.add(identifiersTableService.getTableReference());
     }
 
     return tablesToLock;
@@ -489,7 +470,7 @@ public class DefaultImportService implements ImportService {
    * @return
    */
   private FunctionalUnitView createPublicView(ValueTable participantTable, final FunctionalUnit unit) {
-    FunctionalUnitView publicTable = new FunctionalUnitView(unit, Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, participantTable, lookupKeysTable(), participantIdentifier);
+    FunctionalUnitView publicTable = new FunctionalUnitView(unit, Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, participantTable, getIdentifiersValueTable(), participantIdentifier);
     publicTable.setSelectClause(new SelectClause() {
 
       public boolean select(Variable variable) {
@@ -510,7 +491,7 @@ public class DefaultImportService implements ImportService {
    */
   private Variable prepareKeysTable(ValueTable privateView, String keyVariableName) throws IOException {
 
-    Variable keyVariable = Variable.Builder.newVariable(keyVariableName, TextType.get(), keysTableEntityType).build();
+    Variable keyVariable = Variable.Builder.newVariable(keyVariableName, TextType.get(), identifiersTableService.getEntityType()).build();
 
     ValueTableWriter writer = writeToKeysTable();
     try {
@@ -519,7 +500,7 @@ public class DefaultImportService implements ImportService {
         // Create private variables
         vw.writeVariable(keyVariable);
         if(privateView != null) {
-          DatasourceCopier.Builder.newCopier().dontCopyValues().build().copy(privateView, lookupKeysTable().getName(), vw);
+          DatasourceCopier.Builder.newCopier().dontCopyValues().build().copy(privateView, getIdentifiersValueTable().getName(), vw);
         }
       } finally {
         vw.close();
@@ -539,7 +520,7 @@ public class DefaultImportService implements ImportService {
     ValueSetWriter vsw = writer.writeValueSet(publicEntity);
     try {
       // Copy all other private variable values
-      DatasourceCopier.Builder.newCopier().dontCopyMetadata().build().copy(privateView, privateView.getValueSet(privateEntity), lookupKeysTable().getName(), vsw);
+      DatasourceCopier.Builder.newCopier().dontCopyMetadata().build().copy(privateView, privateView.getValueSet(privateEntity), getIdentifiersValueTable().getName(), vsw);
     } finally {
       try {
         vsw.close();
@@ -550,13 +531,12 @@ public class DefaultImportService implements ImportService {
     return publicEntity;
   }
 
-  private ValueTable lookupKeysTable() {
-    return MagmaEngineTableResolver.valueOf(keysTableReference).resolveTable();
+  private ValueTable getIdentifiersValueTable() {
+    return identifiersTableService.getValueTable();
   }
 
   private ValueTableWriter writeToKeysTable() {
-    MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(keysTableReference);
-    return MagmaEngine.get().getDatasource(resolver.getDatasourceName()).createWriter(resolver.getTableName(), keysTableEntityType);
+    return identifiersTableService.createValueTableWriter();
   }
 
   private boolean isIdentifierVariable(Variable variable) {

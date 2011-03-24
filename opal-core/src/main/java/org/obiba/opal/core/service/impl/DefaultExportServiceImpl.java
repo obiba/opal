@@ -34,6 +34,7 @@ import org.obiba.opal.core.magma.FunctionalUnitView.Policy;
 import org.obiba.opal.core.magma.concurrent.LockingActionTemplate;
 import org.obiba.opal.core.service.ExportException;
 import org.obiba.opal.core.service.ExportService;
+import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
@@ -55,23 +56,17 @@ public class DefaultExportServiceImpl implements ExportService {
 
   private final FunctionalUnitService functionalUnitService;
 
-  /** Configured through org.obiba.opal.keys.tableReference */
-  private final String keysTableReference;
-
-  /** Configured through org.obiba.opal.keys.entityType */
-  private final String keysTableEntityType;
+  private final IdentifiersTableService identifiersTableService;
 
   @Autowired
-  public DefaultExportServiceImpl(PlatformTransactionManager txManager, FunctionalUnitService functionalUnitService, @org.springframework.beans.factory.annotation.Value("${org.obiba.opal.keys.tableReference}") String keysTableReference, @org.springframework.beans.factory.annotation.Value("${org.obiba.opal.keys.entityType}") String keysTableEntityType) {
+  public DefaultExportServiceImpl(PlatformTransactionManager txManager, FunctionalUnitService functionalUnitService, IdentifiersTableService identifiersTableService) {
     if(txManager == null) throw new IllegalArgumentException("txManager cannot be null");
     if(functionalUnitService == null) throw new IllegalArgumentException("functionalUnitService cannot be null");
-    if(keysTableReference == null) throw new IllegalArgumentException("keysTableReference cannot be null");
-    if(keysTableEntityType == null) throw new IllegalArgumentException("keysTableEntityType cannot be null");
+    if(identifiersTableService == null) throw new IllegalArgumentException("identifiersTableService cannot be null");
 
     this.txManager = txManager;
     this.functionalUnitService = functionalUnitService;
-    this.keysTableReference = keysTableReference;
-    this.keysTableEntityType = keysTableEntityType;
+    this.identifiersTableService = identifiersTableService;
   }
 
   public Builder newCopier(Datasource destinationDatasource, Function<VariableEntity, VariableEntity> entityMapper) {
@@ -169,7 +164,7 @@ public class DefaultExportServiceImpl implements ExportService {
 
     // If the table contains an entity that requires key separation, create a "unit view" of the table (replace
     // public identifiers with private, unit-specific identifiers).
-    if((unit != null) && tableToCopy.isForEntityType(keysTableEntityType)) {
+    if((unit != null) && tableToCopy.isForEntityType(identifiersTableService.getEntityType())) {
       tableToCopy = getUnitView(unit, tableToCopy);
     }
 
@@ -185,11 +180,11 @@ public class DefaultExportServiceImpl implements ExportService {
 
   private FunctionalUnitView getUnitView(FunctionalUnit unit, ValueTable valueTable) {
     // Make a view that converts opal identifiers to unit identifiers
-    return new FunctionalUnitView(unit, Policy.UNIT_IDENTIFIERS_ARE_PUBLIC, valueTable, lookupKeysTable());
+    return new FunctionalUnitView(unit, Policy.UNIT_IDENTIFIERS_ARE_PUBLIC, valueTable, getIdentifiersValueTable());
   }
 
-  private ValueTable lookupKeysTable() {
-    return MagmaEngineTableResolver.valueOf(keysTableReference).resolveTable();
+  private ValueTable getIdentifiersValueTable() {
+    return identifiersTableService.getValueTable();
   }
 
   private Set<ValueTable> getValueTablesByName(List<String> tableNames) throws NoSuchDatasourceException, NoSuchValueTableException, ExportException {

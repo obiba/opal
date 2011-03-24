@@ -8,7 +8,7 @@
   <import resource="tx.xml" />
   <import resource="version.xml" />
   <import resource="hibernate-session.xml" />
-
+  
   <bean id="opalDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
     <property name="driverClassName" value="${org.obiba.opal.datasource.opal.driver}" />
     <property name="url" value="${org.obiba.opal.datasource.opal.url}" />
@@ -78,9 +78,6 @@
         <bean class="org.obiba.runtime.upgrade.InstallStepAdapter">
           <property name="upgradeStep" ref="quartzSchema-1.4.0" />
         </bean>
-        <bean class="org.obiba.opal.core.runtime.upgrade.CreateParticipantIdentifiersTableStep">
-          <property name="keysSessionFactory" ref="keySessionFactory" />
-        </bean>
         <bean class="org.obiba.opal.core.runtime.install.CreateOpalSecretKeyInstallStep"/>
       </list>
     </property>
@@ -122,6 +119,7 @@
           <property name="methodName" value="updateDatabaseSchema" />
           <property name="appliesTo" value="1.5.0" />
         </bean>
+        <bean class="org.obiba.opal.core.runtime.upgrade.IdentifiersTableUpgradeStep"/>
       </list>
     </property>
 

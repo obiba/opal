@@ -15,12 +15,8 @@ import java.util.Map;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.Decorator;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.support.MagmaEngineTableResolver;
-import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
@@ -30,23 +26,14 @@ public class FunctionalUnitDatasourceManager implements Decorator<Datasource> {
 
   private final OpalRuntime opalRuntime;
 
-  private final IParticipantIdentifier participantIdentifier;
-
-  /** Configured through org.obiba.opal.keys.tableReference */
-  private final String keysTableReference;
-
   private Map<String, FunctionalUnitDatasource> functionalUnitDatasourcesMap = new HashMap<String, FunctionalUnitDatasource>();
 
   @Autowired
-  public FunctionalUnitDatasourceManager(TransactionTemplate txTemplate, OpalRuntime opalRuntime, IParticipantIdentifier participantIdentifier, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference) {
+  public FunctionalUnitDatasourceManager(TransactionTemplate txTemplate, OpalRuntime opalRuntime) {
     super();
     if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
-    if(participantIdentifier == null) throw new IllegalArgumentException("participantIdentifier cannot be null");
-    if(keysTableReference == null) throw new IllegalArgumentException("keysTableReference cannot be null");
 
     this.opalRuntime = opalRuntime;
-    this.participantIdentifier = participantIdentifier;
-    this.keysTableReference = keysTableReference;
   }
 
   @Override
@@ -78,10 +65,6 @@ public class FunctionalUnitDatasourceManager implements Decorator<Datasource> {
     if(ds != null) {
       ds.mapIdentifiers();
     }
-  }
-
-  private ValueTable lookupKeysTable() {
-    return MagmaEngineTableResolver.valueOf(keysTableReference).resolveTable();
   }
 
 }

@@ -17,12 +17,6 @@
 
     <factories>
       <org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
-        <name>opal-keys</name>
-        <sessionFactoryProvider class="org.obiba.magma.datasource.hibernate.support.SpringBeanSessionFactoryProvider">
-          <beanName>keySessionFactory</beanName>
-        </sessionFactoryProvider>
-      </org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
-      <org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
         <name>opal-data</name>
         <sessionFactoryProvider class="org.obiba.magma.datasource.hibernate.support.SpringBeanSessionFactoryProvider">
           <beanName>opalSessionFactory</beanName>

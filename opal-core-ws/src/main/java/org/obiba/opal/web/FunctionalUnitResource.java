@@ -50,6 +50,7 @@ import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.Disposables;
 import org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
@@ -70,7 +71,6 @@ import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -96,19 +96,19 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
   private final DatasourceFactoryRegistry datasourceFactoryRegistry;
 
-  private final String keysTableReference;
+  private final IdentifiersTableService identifiersTableService;
 
   @PathParam("unit")
   private String unit;
 
   @Autowired
-  public FunctionalUnitResource(FunctionalUnitService functionalUnitService, OpalRuntime opalRuntime, UnitKeyStoreService unitKeyStoreService, ImportService importService, DatasourceFactoryRegistry datasourceFactoryRegistry, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference) {
+  public FunctionalUnitResource(FunctionalUnitService functionalUnitService, OpalRuntime opalRuntime, UnitKeyStoreService unitKeyStoreService, ImportService importService, DatasourceFactoryRegistry datasourceFactoryRegistry, IdentifiersTableService identifiersTableService) {
     this.functionalUnitService = functionalUnitService;
     this.opalRuntime = opalRuntime;
     this.unitKeyStoreService = unitKeyStoreService;
     this.importService = importService;
     this.datasourceFactoryRegistry = datasourceFactoryRegistry;
-    this.keysTableReference = keysTableReference;
+    this.identifiersTableService = identifiersTableService;
   }
 
   //
@@ -284,7 +284,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
       FunctionalUnit drivingUnit = determineDrivingUnit(units);
 
       int unitIdx = units.indexOf(drivingUnit);
-      FunctionalUnitIdentifierMapper mapper = new FunctionalUnitIdentifierMapper(getKeysTable(), drivingUnit, units);
+      FunctionalUnitIdentifierMapper mapper = new FunctionalUnitIdentifierMapper(identifiersTableService.getValueTable(), drivingUnit, units);
       int count = 0;
       for(String[] map : (List<String[]>) reader.readAll()) {
         if(map[unitIdx] != null && map[unitIdx].isEmpty() == false) {
@@ -406,7 +406,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   }
 
   private Iterable<VariableEntityDto> getUnitEntities() {
-    return Iterables.transform(new FunctionalUnitIdentifiers(getKeysTable(), resolveFunctionalUnit(unit)).getUnitEntities(), Dtos.variableEntityAsDtoFunc);
+    return Iterables.transform(new FunctionalUnitIdentifiers(identifiersTableService.getValueTable(), resolveFunctionalUnit(unit)).getUnitEntities(), Dtos.variableEntityAsDtoFunc);
   }
 
   private String getPEMCertificate(UnitKeyStore keystore, String alias) throws KeyStoreException, IOException {
@@ -437,7 +437,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   }
 
   private void readUnitIdentifiers(final VectorCallback callback) {
-    ValueTable keysTable = getKeysTable();
+    ValueTable keysTable = identifiersTableService.getValueTable();
     FunctionalUnit functionalUnit = resolveFunctionalUnit(unit);
     if(keysTable.hasVariable(functionalUnit.getKeyVariableName())) {
       for(UnitIdentifier unitId : new FunctionalUnitIdentifiers(keysTable, functionalUnit)) {
@@ -469,11 +469,6 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
     public void onValue(UnitIdentifier unitIdentifier);
 
-  }
-
-  @Override
-  protected String getKeysTableReference() {
-    return keysTableReference;
   }
 
   @Override

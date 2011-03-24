@@ -15,4 +15,8 @@
   <bean id="participantIdentifier" class="org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl">
   </bean>
   
+  <bean id="identifiersTableService" class="org.obiba.opal.core.service.impl.DefaultIdentifiersTableService">
+    <property name="keysSessionFactory" ref="keySessionFactory" />
+  </bean>
+  
 </beans>

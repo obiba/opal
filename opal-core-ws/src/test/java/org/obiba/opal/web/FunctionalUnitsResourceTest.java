@@ -23,6 +23,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
@@ -32,6 +33,8 @@ import org.obiba.opal.web.model.Opal.FunctionalUnitDto;
 public class FunctionalUnitsResourceTest {
 
   private OpalRuntime opalRuntimeMock;
+
+  private IdentifiersTableService identifiersTableResolverMock;
 
   private FunctionalUnitService functionalUnitServiceMock;
 
@@ -43,7 +46,7 @@ public class FunctionalUnitsResourceTest {
   public void setUp() {
     opalRuntimeMock = createMock(OpalRuntime.class);
     functionalUnitServiceMock = createMock(FunctionalUnitService.class);
-
+    identifiersTableResolverMock = createMock(IdentifiersTableService.class);
     unitKeyStoreServiceMock = createMock(UnitKeyStoreService.class);
 
     functionalUnits = new HashSet<FunctionalUnit>();
@@ -60,7 +63,7 @@ public class FunctionalUnitsResourceTest {
 
     replay(opalRuntimeMock, functionalUnitServiceMock);
 
-    FunctionalUnitsResource functionalUnitsResource = new FunctionalUnitsResource(functionalUnitServiceMock, opalRuntimeMock, unitKeyStoreServiceMock, null, null, "opal-keys.keys");
+    FunctionalUnitsResource functionalUnitsResource = new FunctionalUnitsResource(functionalUnitServiceMock, opalRuntimeMock, unitKeyStoreServiceMock, null, null, identifiersTableResolverMock);
     List<Opal.FunctionalUnitDto> functionalUnitDtoList = functionalUnitsResource.getFunctionalUnits();
     Assert.assertTrue(functionalUnitDtoList.size() == 3);
 

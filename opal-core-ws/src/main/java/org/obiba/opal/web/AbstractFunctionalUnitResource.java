@@ -16,8 +16,6 @@ import java.util.List;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
@@ -34,8 +32,6 @@ public abstract class AbstractFunctionalUnitResource {
   protected abstract FunctionalUnitService getFunctionalUnitService();
 
   protected abstract OpalRuntime getOpalRuntime();
-
-  protected abstract String getKeysTableReference();
 
   protected File resolveLocalFile(String path) {
     try {
@@ -54,14 +50,6 @@ public abstract class AbstractFunctionalUnitResource {
     FunctionalUnit functionalUnit = getFunctionalUnitService().getFunctionalUnit(unit);
     if(functionalUnit == null) throw new NoSuchFunctionalUnitException(unit);
     return functionalUnit;
-  }
-
-  protected ValueTable getKeysTable() {
-    return MagmaEngineTableResolver.valueOf(getKeysTableReference()).resolveTable();
-  }
-
-  protected String getKeysDatasourceName() {
-    return MagmaEngineTableResolver.valueOf(getKeysTableReference()).getDatasourceName();
   }
 
   protected List<FunctionalUnit> getUnitsFromIdentifiersMap(CSVReader reader) throws IOException {

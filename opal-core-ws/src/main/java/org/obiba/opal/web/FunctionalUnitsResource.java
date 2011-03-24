@@ -48,6 +48,7 @@ import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
@@ -65,7 +66,6 @@ import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -88,17 +88,17 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   private final DatasourceFactoryRegistry datasourceFactoryRegistry;
 
-  private final String keysTableReference;
+  private final IdentifiersTableService identifiersTableService;
 
   @Autowired
-  public FunctionalUnitsResource(FunctionalUnitService functionalUnitService, OpalRuntime opalRuntime, UnitKeyStoreService unitKeyStoreService, ImportService importService, DatasourceFactoryRegistry datasourceFactoryRegistry, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference) {
+  public FunctionalUnitsResource(FunctionalUnitService functionalUnitService, OpalRuntime opalRuntime, UnitKeyStoreService unitKeyStoreService, ImportService importService, DatasourceFactoryRegistry datasourceFactoryRegistry, IdentifiersTableService identifiersTableResolver) {
     super();
     this.functionalUnitService = functionalUnitService;
     this.opalRuntime = opalRuntime;
     this.unitKeyStoreService = unitKeyStoreService;
     this.importService = importService;
     this.datasourceFactoryRegistry = datasourceFactoryRegistry;
-    this.keysTableReference = keysTableReference;
+    this.identifiersTableService = identifiersTableResolver;
   }
 
   //
@@ -158,7 +158,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   private void prepareKeysTable(Opal.FunctionalUnitDto unit) throws IOException {
     // add unit key variable in identifiers table
-    ValueTable keysTable = getKeysTable();
+    ValueTable keysTable = identifiersTableService.getValueTable();
     if(!keysTable.hasVariable(unit.getKeyVariableName())) {
       Variable keyVariable = Variable.Builder.newVariable(unit.getKeyVariableName(), TextType.get(), keysTable.getEntityType()).build();
 
@@ -183,7 +183,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   @Path("/entities/table")
   public TableResource getEntitiesTable() {
-    return new TableResource(getKeysTable());
+    return new TableResource(identifiersTableService.getValueTable());
   }
 
   @GET
@@ -192,7 +192,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
   @AuthenticatedByCookie
   public Response getCSVIdentifiers() throws MagmaRuntimeException, IOException {
     try {
-      String destinationName = getKeysDatasourceName();
+      String destinationName = identifiersTableService.getValueTable().getDatasource().getName();
 
       ByteArrayOutputStream ids = new ByteArrayOutputStream();
       PrintWriter writer = new PrintWriter(ids);
@@ -212,7 +212,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
   }
 
   private List<Iterator<UnitIdentifier>> writeIdentifiersHeader(PrintWriter writer) {
-    ValueTable keysTable = getKeysTable();
+    ValueTable keysTable = identifiersTableService.getValueTable();
     List<Iterator<UnitIdentifier>> unitIdIters = new ArrayList<Iterator<UnitIdentifier>>();
 
     // header
@@ -246,7 +246,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   private void writeOpalIdentifiers(PrintWriter writer) {
     // no unit: list of opal ids
-    TreeSet<VariableEntity> opalEntities = new TreeSet<VariableEntity>(getKeysTable().getVariableEntities());
+    TreeSet<VariableEntity> opalEntities = new TreeSet<VariableEntity>(identifiersTableService.getValueTable().getVariableEntities());
     for(VariableEntity entity : opalEntities) {
       writer.append('\"').append(entity.getIdentifier()).append("\"\n");
     }
@@ -316,11 +316,6 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
       }
 
     });
-  }
-
-  @Override
-  protected String getKeysTableReference() {
-    return keysTableReference;
   }
 
   @Override
