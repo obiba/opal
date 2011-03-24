@@ -184,11 +184,6 @@ datashield.lm.list=function(opals, formula, lmparams=list()) {
 datashield.glm.list=function(opals, formula, glmparams=list(), maxit=10) {
 
   numstudies<-length(opals)
-  terms<-attr(terms(formula), "term.labels")
-
-  # Fetch the number of data points for each study 
-  nsubs.array<-as.array(unlist(datashield.length(opals, terms[1])))
-  nsubs.total<-sum(nsubs.array)
 
   datashield.assign(opals, 'glm.ds', .glm.ds)
 
@@ -224,7 +219,12 @@ datashield.glm.list=function(opals, formula, glmparams=list(), maxit=10) {
     info.matrix.total<-Reduce(f="+", lapply(study.summary, function(s) {s[['info.matrix']]}))
     score.vect.total<-Reduce(f="+", lapply(study.summary, function(s) {s[['score.vect']]}))
     dev.total<-Reduce(f="+", lapply(study.summary, function(s) {s[['dev']]}))
-    
+
+    if(iteration.count==1) {
+      # Sum participants only during first iteration.
+      nsubs.total<-Reduce(f="+", lapply(study.summary, function(s) {s[['numsubs']]}))
+    }
+
     #Create variance covariance matrix as inverse of information matrix
     #(solve() denotes matrix inversion in R )
     variance.covariance.matrix.total<-solve(info.matrix.total)
@@ -274,10 +274,11 @@ datashield.glm.list=function(opals, formula, glmparams=list(), maxit=10) {
     pval.vect.final<-2*pnorm(-abs(z.vect.final))
     parameter.names<-names(score.vect.total[,1])
     model.parameters<-cbind(beta.vect.final,se.vect.final,z.vect.final,pval.vect.final)
-    dimnames(model.parameters)<-list(parameter.names,c("Coefficient","SE","z-value","p-value"))
+    dimnames(model.parameters)<-list(parameter.names,c("Estimate","Std. Error","z-value","p-value"))
 
     glmds <- list(
-        model.parameters=model.parameters,
+        formula=formula,
+        coefficients=model.parameters,
         dev=dev.total,
         nsubs=nsubs.total,
         df=(nsubs.total-length(beta.vect.next)),
@@ -296,8 +297,10 @@ datashield.glm.list=function(opals, formula, glmparams=list(), maxit=10) {
 # Override print for the result of datashield.glm
 print.glmds <-function (x, digits = max(3, getOption("digits") - 3), ...) {
   #If converged print out final model summary
-  cat("\n\nFINAL MODEL UNDER DATASHIELD\n")
-  print.default(signif(x$model.parameters, digits=digits), print.gap = 2, quote=FALSE)
+  cat('Formula:\n')
+  print(x$formula)
+  cat("\nCoefficients:\n")
+  print.default(format(x$coefficients, digits = digits), print.gap = 2, quote = FALSE)
   cat("\nDeviance:",x$dev)
   cat("\nDegrees of Freedom:", x$df)
   cat("\nIterations:", x$iter, "\n")
