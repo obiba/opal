@@ -136,13 +136,13 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
 
       @Override
       protected void doInTransactionWithoutResult(TransactionStatus status) {
-        Initialisables.initialise(datasource);
-        if(datasource.hasValueTable(getTableName()) == false) {
-          try {
+        try {
+          Initialisables.initialise(datasource);
+          if(datasource.hasValueTable(getTableName()) == false) {
             datasource.createWriter(getTableName(), getEntityType()).close();
-          } catch(IOException e) {
-            throw new RuntimeException(e);
           }
+        } catch(IOException e) {
+          throw new RuntimeException(e);
         }
       }
     });
