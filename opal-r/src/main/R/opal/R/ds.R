@@ -112,6 +112,18 @@ datashield.symbols.list=function(opals) {
   lapply(opals, FUN=datashield.symbols.opal)
 }
 
+datashield.rm=function(object, ...) {
+  UseMethod('datashield.rm');
+}
+
+datashield.rm.list=function(opals, ...) {
+  lapply(opals, FUN=datashield.rm.opal, ...)
+}
+
+datashield.rm.opal=function(opal, symbol) {
+  .delete(opal, "datashield", "session", "current", "symbol", symbol)
+}
+
 datashield.lm=function(object, ...) {
   UseMethod('datashield.lm');
 }
@@ -171,7 +183,7 @@ datashield.lm.list=function(opals, formula, lmparams=list()) {
 # method required to add beta.vect to the result of the glm call.
 # beta.vect is then used in glm.ds aggregating function.
 # Alternatively, beta.vect could have been an additional paramater to the aggregating method, but is currently unsupported
-.glm.ds <-function(..., beta.vect=NULL) {
+.inner.glm.ds <-function(..., beta.vect=NULL) {
   glm.result<-glm(..., x=TRUE, control=glm.control(maxit=1))
   if(is.null(beta.vect)) {
     X.mat<-as.matrix(glm.result$x)
@@ -181,14 +193,21 @@ datashield.lm.list=function(opals, formula, lmparams=list()) {
   glm.result
 }
 
+datashield.glm=function(object, ...) {
+  UseMethod('datashield.glm');
+}
+
 datashield.glm.list=function(opals, formula, glmparams=list(), maxit=10) {
 
   numstudies<-length(opals)
+  
+  # the remote method name
+  inner.glm.ds<-'inner.glm.ds'
 
-  datashield.assign(opals, 'glm.ds', .glm.ds)
+  datashield.assign(opals, inner.glm.ds, .inner.glm.ds)
 
   beta.vect.next<-NULL
-  
+
   #Iterations need to be counted. Start off with the count at 0
   #and increment by 1 at each new iteration
   iteration.count<-0
@@ -205,14 +224,14 @@ datashield.glm.list=function(opals, formula, glmparams=list(), maxit=10) {
   epsilon<-1.0e-08
 
   while(!converge.state && iteration.count < maxit) {
-    
+
     iteration.count<-iteration.count+1
-    
+
     cat("--------------------------------------------\n")
     cat("Iteration", iteration.count, "\n")
 
     glmparams$beta.vect<-as.vector(beta.vect.next)
-    call<-as.call(c('glm.ds', formula, glmparams))
+    call<-as.call(c(inner.glm.ds, formula, glmparams))
 
     study.summary<-datashield.aggregate(opals, 'glm.ds', call)
 
@@ -226,10 +245,9 @@ datashield.glm.list=function(opals, formula, glmparams=list(), maxit=10) {
     }
 
     #Create variance covariance matrix as inverse of information matrix
-    #(solve() denotes matrix inversion in R )
     variance.covariance.matrix.total<-solve(info.matrix.total)
 
-    #Create beta vector update terms (see subsection S2)
+    #Create beta vector update terms
     beta.update.vect<-variance.covariance.matrix.total %*% score.vect.total
 
     #Add update terms to current beta vector to obtain new beta vector for next iteration
@@ -240,7 +258,6 @@ datashield.glm.list=function(opals, formula, glmparams=list(), maxit=10) {
     }
 
     #Calculate value of convergence statistic and test whether meets convergence criterion
-    #(see subsection S2)
     converge.value<-abs(dev.total-dev.old)/(abs(dev.total)+0.1)
     if(converge.value<=epsilon)converge.state<-TRUE
     if(converge.value>epsilon)dev.old<-dev.total
@@ -261,6 +278,9 @@ datashield.glm.list=function(opals, formula, glmparams=list(), maxit=10) {
     print(dev.total)
     cat("--------------------------------------------\n")    
   }
+
+  # cleanup
+  try(datashield.rm(opals, inner.glm.ds), silent=TRUE)
 
   #If convergence has been obtained, declare final (maximum likelihood) beta vector,
   #and calculate the corresponding standard errors, z scores and p values
