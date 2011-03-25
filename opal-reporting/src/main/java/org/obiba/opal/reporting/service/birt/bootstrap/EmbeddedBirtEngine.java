@@ -29,7 +29,6 @@ import org.eclipse.birt.report.engine.api.RenderOption;
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.reporting.service.birt.common.BirtEngine;
 import org.obiba.opal.reporting.service.birt.common.BirtEngineException;
-import org.obiba.opal.reporting.service.birt.common.BirtReportFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -49,10 +48,12 @@ public class EmbeddedBirtEngine implements BirtEngine {
   private File osgiHome;
 
   @Override
-  public void render(BirtReportFormat format, Map<String, String> parameters, String reportDesign, String reportOutput) throws BirtEngineException {
+  public void render(String formatName, Map<String, String> parameters, String reportDesign, String reportOutput) throws BirtEngineException {
     if(isRunning() == false) {
       throw new BirtEngineException("Report engine not running. Please check startup logs for details.");
     }
+
+    BirtReportFormat format = BirtReportFormat.valueOf(formatName.toUpperCase());
 
     try {
       // Open the report design

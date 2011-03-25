@@ -19,7 +19,6 @@ import org.obiba.opal.reporting.service.ReportException;
 import org.obiba.opal.reporting.service.ReportService;
 import org.obiba.opal.reporting.service.birt.common.BirtEngine;
 import org.obiba.opal.reporting.service.birt.common.BirtEngineException;
-import org.obiba.opal.reporting.service.birt.common.BirtReportFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -40,8 +39,7 @@ public class BirtReportServiceImpl implements ReportService {
   public void render(String formatName, Map<String, String> parameters, String reportDesign, String reportOutput) throws ReportException {
     try {
       if(isRunning()) {
-        BirtReportFormat format = BirtReportFormat.valueOf(formatName.toUpperCase());
-        engine.render(format, parameters, reportDesign, reportOutput);
+        engine.render(formatName, parameters, reportDesign, reportOutput);
       }
     } catch(BirtEngineException e) {
       throw new ReportException(e.getMessage(), e);
