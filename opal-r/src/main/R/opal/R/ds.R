@@ -1,8 +1,3 @@
-# Utility method to authenticate against multiple Opal instances using the same username and password
-datashield.login <- function(username, password, urls, opts=list()) {
-  lapply(urls, FUN=function(url){opal.login(url, username, password, opts=opts)})
-}
-
 datashield.newSession <- function(opal) {
   UseMethod('datashield.newSession');
 }
@@ -13,19 +8,6 @@ datashield.newSession.opal <- function(opal) {
 
 datashield.newSession.list <- function(opals) {
   lapply(opals, FUN=datashield.newSession.opal)
-}
-
-# Sends a script, and calls "coefficients" on the result.
-datashield.coefficients=function(object, ...) {
-  UseMethod('datashield.coefficients');
-}
-
-datashield.coefficients.opal=function(opal, expr) {
-  return(datashield.aggregate.opal(opal, "coefficients", expr))
-}
-
-datashield.coefficients.list=function(opals, expr) {
-  lapply(opals, FUN=datashield.coefficients.opal, expr)
 }
 
 # Sends a script, and calls "summary" on the result.
@@ -139,7 +121,7 @@ datashield.lm.list=function(opals, formula, lmparams=list()) {
 
   call<-as.call(c(quote(lm), formula, lmparams))
 
-  studies.summary<-datashield.summary(opals, call)
+  studies.summary<-datashield.aggregate(opals, 'lm.ds', call)
   cat("\nSUMMARY OF MODEL STATE FOR EACH STUDY")
   print(studies.summary)
 
@@ -147,7 +129,7 @@ datashield.lm.list=function(opals, formula, lmparams=list()) {
   se.s<-as.matrix(as.data.frame(lapply(studies.summary, function(i) {i$coefficients[,2]})))
 
   # Fetch the number of participants per study
-  numsubs.study<-unlist(lapply(studies.summary, function(i){length(i$residuals)}))
+  numsubs.study<-unlist(.select(studies.summary, 'numsubs'))
   analysis.wt<-numsubs.study/sum(numsubs.study)
 
   #set up a vector of 1s to use in summing precisions
@@ -230,13 +212,13 @@ datashield.glm.list=function(opals, formula, glmparams=list(), maxit=10) {
 
     study.summary<-datashield.aggregate(opals, 'glm.ds', call)
 
-    info.matrix.total<-Reduce(f="+", lapply(study.summary, function(s) {s$info.matrix}))
-    score.vect.total<-Reduce(f="+", lapply(study.summary, function(s) {s$score.vect}))
-    dev.total<-Reduce(f="+", lapply(study.summary, function(s) {s$dev}))
-
+    info.matrix.total<-Reduce(f="+", .select(study.summary, 'info.matrix'))
+    score.vect.total<-Reduce(f="+", .select(study.summary, 'score.vect'))
+    dev.total<-Reduce(f="+", .select(study.summary, 'dev'))
+    
     if(iteration.count==1) {
       # Sum participants only during first iteration.
-      nsubs.total<-Reduce(f="+", lapply(study.summary, function(s) {s$numsubs}))
+      nsubs.total<-Reduce(f="+", .select(study.summary, 'numsubs'))
     }
 
     #Create variance covariance matrix as inverse of information matrix

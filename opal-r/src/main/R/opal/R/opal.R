@@ -84,26 +84,39 @@
 	  json 
 	} else {
 		if(isArray) {
-			lapply(json, function(obj) {obj[fields]})
+          lapply(l, function(obj) {obj[fields]})
 		} else {
 			json[fields]
   		}
 	}
 }
 
-opal.login <- function(url,username,password,opts=list()) {
-	opal <- new.env(parent=globalenv())
+# returns a list r such that r[[i]] == l[[i]][field] for all i:length(l)
+.select <- function(l, field) {
+  lapply(l, function(obj) {obj[[field]]})
+}
 
-	# Strip trailing slash
-	opal$url <- sub("/$", "", url)
+.opal.login <- function(username,password,url,opts=list()) {
+  opal <- new.env(parent=globalenv())
+  
+  # Strip trailing slash
+  opal$url <- sub("/$", "", url)
+  
+  # cookielist="" activates the cookie engine
+  opal$opts <- curlOptions(header=TRUE, httpheader=c(Accept="application/octet-stream, application/json", Authorization=.authToken(username, password)), cookielist="", .opts=opts)
+  opal$curl <- curlSetOpt(.opts=opal$opts)
+  opal$reader <- dynCurlReader(curl=opal$curl)
+  class(opal) <- "opal"
+  
+  opal
+}
 
-	# cookielist="" activates the cookie engine
-	opal$opts <- curlOptions(header=TRUE, httpheader=c(Accept="application/octet-stream, application/json", Authorization=.authToken(username, password)), cookielist="", .opts=opts)
-	opal$curl <- curlSetOpt(.opts=opal$opts)
-	opal$reader <- dynCurlReader(curl=opal$curl)
-	class(opal) <- "opal"
-
-	return(opal)
+opal.login <- function(username,password,url,opts=list()) {
+  if(is.list(url)){
+    lapply(url, function(u){opal.login(username, password, u, opts=opts)})
+  } else {
+    .opal.login(username, password, url, opts)
+  }
 }
 
 opal.newSession <- function(opal) {

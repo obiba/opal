@@ -30,7 +30,7 @@
       <aggregatingMethods>
         <org.obiba.opal.datashield.RFunctionDataShieldMethod>
           <name>length</name>
-          <function>length</function>
+          <function>base::length</function>
         </org.obiba.opal.datashield.RFunctionDataShieldMethod>
         <org.obiba.opal.datashield.RFunctionDataShieldMethod>
           <name>coefficients</name>
@@ -39,13 +39,31 @@
         <org.obiba.opal.datashield.CustomRScriptMethod>
           <name>summary</name>
           <script><![CDATA[function(data) {
- if(is.vector(data) && length(data) == 1) {
-   "Vector too small."
- } else {
-   base::summary(data);
- }
-}]]>
+  if(is.vector(data)) {
+    if(length(data) == 1) {
+      "Vector too small."
+    } else {
+      base::summary(data);
+    }
+  }
+} ]]>
 </script>
+        </org.obiba.opal.datashield.CustomRScriptMethod>
+        <org.obiba.opal.datashield.CustomRScriptMethod>
+          <name>lm.ds</name>
+        <org.obiba.opal.datashield.CustomRScriptMethod>
+          <name>summary</name>
+          <script><![CDATA[function(data) {
+  if(inherits(data, 'lm')) {
+   sum.lm <- stats::summary.lm(data)
+   list(
+     coefficients=sum.lm$coefficients,
+     numsubs=length(sum.lm$residuals)
+   )
+ } else {
+  NULL
+ }
+}]]></script>
         </org.obiba.opal.datashield.CustomRScriptMethod>
         <org.obiba.opal.datashield.CustomRScriptMethod>
           <name>glm.ds</name>
@@ -74,8 +92,7 @@
 
   list(info.matrix=info.matrix, score.vect=score.vect, numsubs=numsubs, dev=dev)
 }
-]]>
-</script>
+]]></script>
         </org.obiba.opal.datashield.CustomRScriptMethod>
       </aggregatingMethods>
     </org.obiba.opal.datashield.cfg.DatashieldConfiguration>
