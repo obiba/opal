@@ -12,6 +12,7 @@ package org.obiba.opal.web.r;
 import java.net.URI;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Produces;
@@ -66,6 +67,12 @@ public class RSymbolResource extends AbstractOpalRSessionResource {
   public Response putMagma(@Context UriInfo uri, String path) {
     rSession.execute(new MagmaAssignROperation(rSession, name, path));
     return Response.created(getSymbolURI(uri)).build();
+  }
+
+  @DELETE
+  public Response rm() {
+    rSession.execute(new RScriptROperation("base::rm(" + name + ")"));
+    return Response.ok().build();
   }
 
   protected URI getSymbolURI(UriInfo info) {

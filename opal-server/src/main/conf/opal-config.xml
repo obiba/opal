@@ -58,21 +58,23 @@
 
   lp.vect<-X.mat%*%mod.glm.ds$beta.vect
 
-  f<-mod.glm.ds$family
-
-  mu.vect<-f$linkinv(lp.vect)
-  mu.eta.val <- f$mu.eta(lp.vect)
-  var.vect<-f$variance(mu.vect)
-  dev<-sum(f$dev.resids(y.vect, mu.vect, mod.glm.ds$weights))
-
-  W.mat <- diag(as.vector(mu.eta.val^2/var.vect))
+  if(mod.glm.ds$family$family=="binomial")
+  {
+    mu.vect<-exp(lp.vect)/(1+exp(lp.vect))
+    var.vect<-(mu.vect*(1-mu.vect))
+    g2.vect<-(1/(mu.vect*(1-mu.vect)))^2
+    W.mat<-diag(as.vector(1/(var.vect*g2.vect)))
+    log.L<-sum(y.vect*log(mu.vect) + (1-y.vect)*log(1-mu.vect))
+    dev<- -2*log.L
+  }
 
   info.matrix<-t(X.mat)%*%W.mat%*%X.mat
   u.vect<-(y.vect-mu.vect)*1/var.vect
   score.vect<-t(X.mat)%*%W.mat%*%u.vect
 
   list(info.matrix=info.matrix, score.vect=score.vect, numsubs=numsubs, dev=dev)
-}]]>
+}
+]]>
 </script>
         </org.obiba.opal.datashield.CustomRScriptMethod>
       </aggregatingMethods>

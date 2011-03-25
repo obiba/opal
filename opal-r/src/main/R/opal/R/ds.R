@@ -1,3 +1,8 @@
+# Utility method to authenticate against multiple Opal instances using the same username and password
+datashield.login <- function(username, password, urls, opts=list()) {
+  lapply(urls, FUN=function(url){opal.login(url, username, password, opts=opts)})
+}
+
 datashield.newSession <- function(opal) {
   UseMethod('datashield.newSession');
 }
