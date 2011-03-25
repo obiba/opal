@@ -138,18 +138,13 @@ datashield.lm.list=function(opals, formula, lmparams=list()) {
   numstudies<-length(opals)
 
   call<-as.call(c(quote(lm), formula, lmparams))
-  
+
   studies.summary<-datashield.summary(opals, call)
+  cat("\nSUMMARY OF MODEL STATE FOR EACH STUDY")
+  print(studies.summary)
 
-  parameter.names<-dimnames(studies.summary[[1]]$coefficients)[[1]]
-  numpara<-length(parameter.names)
-
-  beta.s<-matrix(NA,nrow=numpara,ncol=numstudies)
-  se.s<-matrix(NA,nrow=numpara,ncol=numstudies)
-  for(k in 1:numstudies) {
-    beta.s[,k]<-studies.summary[[k]]$coefficients[,1]
-    se.s[,k]<-studies.summary[[k]]$coefficients[,2]
-  }
+  beta.s<-as.matrix(as.data.frame(lapply(studies.summary, function(i) {i$coefficients[,1]})))
+  se.s<-as.matrix(as.data.frame(lapply(studies.summary, function(i) {i$coefficients[,2]})))
 
   # Fetch the number of participants per study
   numsubs.study<-unlist(lapply(studies.summary, function(i){length(i$residuals)}))
@@ -175,7 +170,7 @@ datashield.lm.list=function(opals, formula, lmparams=list()) {
   meta.analysis.results<-cbind(beta.overall,se.overall)
 
   # Set dimension names
-  dimnames(meta.analysis.results)<-list(c(parameter.names),c("Estimate","Std. Error"))
+  colnames(meta.analysis.results)<-c("Estimate","Std. Error")
 
   meta.analysis.results
 }
@@ -235,13 +230,13 @@ datashield.glm.list=function(opals, formula, glmparams=list(), maxit=10) {
 
     study.summary<-datashield.aggregate(opals, 'glm.ds', call)
 
-    info.matrix.total<-Reduce(f="+", lapply(study.summary, function(s) {s[['info.matrix']]}))
-    score.vect.total<-Reduce(f="+", lapply(study.summary, function(s) {s[['score.vect']]}))
-    dev.total<-Reduce(f="+", lapply(study.summary, function(s) {s[['dev']]}))
+    info.matrix.total<-Reduce(f="+", lapply(study.summary, function(s) {s$info.matrix}))
+    score.vect.total<-Reduce(f="+", lapply(study.summary, function(s) {s$score.vect}))
+    dev.total<-Reduce(f="+", lapply(study.summary, function(s) {s$dev}))
 
     if(iteration.count==1) {
       # Sum participants only during first iteration.
-      nsubs.total<-Reduce(f="+", lapply(study.summary, function(s) {s[['numsubs']]}))
+      nsubs.total<-Reduce(f="+", lapply(study.summary, function(s) {s$numsubs}))
     }
 
     #Create variance covariance matrix as inverse of information matrix
