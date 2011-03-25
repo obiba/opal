@@ -62,7 +62,7 @@ public class GwtApp implements EntryPoint {
     DefaultResourceAuthorizationRequestBuilder.setup(authorizationCache);
 
     OpalResources.INSTANCE.css().ensureInjected();
-    OpalResources.INSTANCE.cssMongo().ensureInjected();
+    OpalResources.INSTANCE.cssCustom().ensureInjected();
     initFileDownloadPresenter();
     initFileSelectorPresenter();
     initApplicationPresenter();
