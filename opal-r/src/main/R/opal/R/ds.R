@@ -137,28 +137,23 @@ datashield.lm.list=function(opals, formula, lmparams=list()) {
 
   numstudies<-length(opals)
 
-  # for Y ~ X + Z, terms will be c("X", "Z")
-  # for Y ~ X * Z, terms will be c("X", "Z", "X:Z")
-  terms<-attr(terms(formula), "term.labels")
+  call<-as.call(c(quote(lm), formula, lmparams))
+  
+  studies.summary<-datashield.summary(opals, call)
 
-  # numpara includes Intercept
-  numpara<-length(terms)+1
+  parameter.names<-dimnames(studies.summary[[1]]$coefficients)[[1]]
+  numpara<-length(parameter.names)
 
   beta.s<-matrix(NA,nrow=numpara,ncol=numstudies)
   se.s<-matrix(NA,nrow=numpara,ncol=numstudies)
-
-  call<-as.call(c(quote(lm), formula, lmparams))
-
   for(k in 1:numstudies) {
-    study.summary<-datashield.summary(opals[[k]], call)
-    beta.s[,k]<-study.summary$coefficients[,1]
-    se.s[,k]<-study.summary$coefficients[,2]
+    beta.s[,k]<-studies.summary[[k]]$coefficients[,1]
+    se.s[,k]<-studies.summary[[k]]$coefficients[,2]
   }
 
-  # Fetch the length for each study 
-  numsubs.study<-unlist(datashield.length(opals, terms[1]))
-  numsubs<-sum(numsubs.study)
-  analysis.wt<-numsubs.study/numsubs
+  # Fetch the number of participants per study
+  numsubs.study<-unlist(lapply(studies.summary, function(i){length(i$residuals)}))
+  analysis.wt<-numsubs.study/sum(numsubs.study)
 
   #set up a vector of 1s to use in summing precisions
   simple.sum<-rep(1,numstudies)
@@ -180,7 +175,7 @@ datashield.lm.list=function(opals, formula, lmparams=list()) {
   meta.analysis.results<-cbind(beta.overall,se.overall)
 
   # Set dimension names
-  dimnames(meta.analysis.results)<-list(c("(Intercept)", terms),c("Coefficients","SE"))
+  dimnames(meta.analysis.results)<-list(c(parameter.names),c("Estimate","Std. Error"))
 
   meta.analysis.results
 }
