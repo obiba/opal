@@ -28,14 +28,17 @@
   <extensions>
     <org.obiba.opal.datashield.cfg.DatashieldConfiguration>
       <aggregatingMethods>
+      
         <org.obiba.opal.datashield.RFunctionDataShieldMethod>
           <name>length</name>
           <function>base::length</function>
         </org.obiba.opal.datashield.RFunctionDataShieldMethod>
+        
         <org.obiba.opal.datashield.RFunctionDataShieldMethod>
           <name>coefficients</name>
           <function>coefficients</function>
         </org.obiba.opal.datashield.RFunctionDataShieldMethod>
+        
         <org.obiba.opal.datashield.CustomRScriptMethod>
           <name>summary</name>
           <script><![CDATA[function(data) {
@@ -49,8 +52,11 @@
 } ]]>
 </script>
         </org.obiba.opal.datashield.CustomRScriptMethod>
+        
         <org.obiba.opal.datashield.CustomRScriptMethod>
           <name>lm.ds</name>
+        </org.obiba.opal.datashield.CustomRScriptMethod>
+        
         <org.obiba.opal.datashield.CustomRScriptMethod>
           <name>summary</name>
           <script><![CDATA[function(data) {
@@ -65,6 +71,7 @@
  }
 }]]></script>
         </org.obiba.opal.datashield.CustomRScriptMethod>
+        
         <org.obiba.opal.datashield.CustomRScriptMethod>
           <name>glm.ds</name>
           <script><![CDATA[function (mod.glm.ds) {
@@ -94,6 +101,7 @@
 }
 ]]></script>
         </org.obiba.opal.datashield.CustomRScriptMethod>
+        
       </aggregatingMethods>
     </org.obiba.opal.datashield.cfg.DatashieldConfiguration>
   </extensions>
