@@ -55,10 +55,6 @@
         
         <org.obiba.opal.datashield.CustomRScriptMethod>
           <name>lm.ds</name>
-        </org.obiba.opal.datashield.CustomRScriptMethod>
-        
-        <org.obiba.opal.datashield.CustomRScriptMethod>
-          <name>summary</name>
           <script><![CDATA[function(data) {
   if(inherits(data, 'lm')) {
    sum.lm <- stats::summary.lm(data)
