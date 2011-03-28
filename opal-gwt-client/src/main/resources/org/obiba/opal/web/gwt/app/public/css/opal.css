@@ -13,7 +13,7 @@
 
 body {
   text-align: left;
-  background: url(image/background_tile.png) repeat;
+  background: url(../image/background_tile.png) repeat;
   overflow: hidden;
   height: 100%;
 }
@@ -530,17 +530,17 @@ margin-left:0.8em;
 /* Variable browser */
 
 .gwt-Tree .magma-datasource .gwt-TreeItem {
-	background:transparent url(image/16/bundle.png) no-repeat scroll left center;
+	background:transparent url(../image/16/bundle.png) no-repeat scroll left center;
 	padding-left:20px;
 }
 
 .gwt-Tree .magma-table .gwt-TreeItem {
-	background:transparent url(image/16/table.png) no-repeat scroll left center;
+	background:transparent url(../image/16/table.png) no-repeat scroll left center;
 	padding-left:20px;
 }
 
 .gwt-Tree .magma-view .gwt-TreeItem {
-	background:transparent url(image/16/view.png) no-repeat scroll left center;
+	background:transparent url(../image/16/view.png) no-repeat scroll left center;
 	padding-left:20px;
 }
 
@@ -597,7 +597,7 @@ margin-left:0.8em;
 }
 
 .navigator .toolbar .gwt-SuggestBox {
-	background: url("image/16/search.png") no-repeat scroll left center #ffffff;
+	background: url("../image/16/search.png") no-repeat scroll left center #ffffff;
 	border: 1px solid #bbbbbb;
 	padding-left: 20px;
 }
@@ -623,51 +623,51 @@ margin-left:0.8em;
 }
 
 .gwt-MenuItem.tools {
-	background:url("image/20/tools.png") no-repeat scroll left center transparent;
+	background:url("../image/20/tools.png") no-repeat scroll left center transparent;
 	height: 20px;
 	width:25px;
 }
 
 .gwt-MenuItem.add {
-	background:url("image/20/add-item.png") no-repeat scroll left center transparent;
+	background:url("../image/20/add-item.png") no-repeat scroll left center transparent;
 	height: 20px;
 	width:25px;
 }
 
 .gwt-MenuItem.edit {
-	background:url("image/20/edit.png") no-repeat scroll left center transparent;
+	background:url("../image/20/edit.png") no-repeat scroll left center transparent;
 	height: 20px;
 	width:25px;
 }
 
 .navigator .gwt-MenuItem.next {
-	background:url("image/20/next.png") no-repeat scroll left center transparent;
+	background:url("../image/20/next.png") no-repeat scroll left center transparent;
 	height: 20px;
 	width:25px;
 }
 
 .navigator .gwt-MenuItem.next.disabled {
-	background:url("image/20/next-disabled.png") no-repeat scroll left center transparent;
+	background:url("../image/20/next-disabled.png") no-repeat scroll left center transparent;
 }
 
 .navigator .gwt-MenuItem.previous {
-	background:url("image/20/previous.png") no-repeat scroll left center transparent;
+	background:url("../image/20/previous.png") no-repeat scroll left center transparent;
 	height: 20px;
 	width:25px;
 }
 
 .navigator .gwt-MenuItem.previous.disabled {
-	background:url("image/20/previous-disabled.png") no-repeat scroll left center transparent;
+	background:url("../image/20/previous-disabled.png") no-repeat scroll left center transparent;
 }
 
 .navigator .gwt-MenuItem.parent {
-	background:url("image/20/up.png") no-repeat scroll left center transparent;
+	background:url("../image/20/up.png") no-repeat scroll left center transparent;
 	height: 20px;
 	width:25px;
 }
 
 .navigator .gwt-MenuItem.parent.disabled {
-	background:url("image/20/up-disabled.png") no-repeat scroll left center transparent;
+	background:url("../image/20/up-disabled.png") no-repeat scroll left center transparent;
 }
 
 .gwt-MenuBar-vertical .gwt-MenuItem {
@@ -699,22 +699,22 @@ table.folder-details td:first-child span:hover {
 }
 
 .folder-details .folder {
-	background:transparent url(image/16/folder.png) no-repeat scroll left center;
+	background:transparent url(../image/16/folder.png) no-repeat scroll left center;
 	padding-left:20px;
 }
 
 .folder-details .file {
-	background:transparent url(image/16/document.png) no-repeat scroll left center;
+	background:transparent url(../image/16/document.png) no-repeat scroll left center;
 	padding-left:20px;
 }
 
 .gwt-Tree .folder .gwt-TreeItem {
-	background:transparent url(image/16/folder.png) no-repeat scroll left center;
+	background:transparent url(../image/16/folder.png) no-repeat scroll left center;
 	padding-left:20px;
 }
 
 .gwt-Tree .folder.expanded > table .gwt-TreeItem {
-	background:transparent url(image/16/folder-visiting.png) no-repeat scroll left center;
+	background:transparent url(../image/16/folder-visiting.png) no-repeat scroll left center;
 	padding-left:20px;
 }
 
@@ -742,25 +742,25 @@ table.folder-details td:first-child span:hover {
 }
 
 a.table.conflict, a.table.conflict:visited, a.table.conflict:hover {
-	background:transparent url(image/16/error.png) no-repeat scroll left center;
+	background:transparent url(../image/16/error.png) no-repeat scroll left center;
 	height:18px;
 	padding-left:20px;
 }
 
 a.table.creation, a.table.creation:visited, a.table.creation:hover {
-	background:transparent url(image/16/list-add.png) no-repeat scroll left center;
+	background:transparent url(../image/16/list-add.png) no-repeat scroll left center;
 	height:18px;
 	padding-left:20px;
 }
 
 a.table.modification, a.table.modification:visited, a.table.modification:hover {
-	background:transparent url(image/16/edit.png) no-repeat scroll left center;
+	background:transparent url(../image/16/edit.png) no-repeat scroll left center;
 	height:18px;
 	padding-left:20px;
 }
 
 a.table.forbidden, a.table.forbidden:visited, a.table.forbidden:hover {
-	background:transparent url(image/16/forbidden.png) no-repeat scroll left center !important;
+	background:transparent url(../image/16/forbidden.png) no-repeat scroll left center !important;
 	height:18px;
 	padding-left:20px;
 }
@@ -1019,7 +1019,7 @@ div.variablesListTabContent .form table {
     height:16px;
     position:relative;
     width:16px;
-    background-image: url(image/256x240_icons.png);
+    background-image: url(../image/256x240_icons.png);
     background-position:-84px -224px;
 }
 

@@ -10,7 +10,6 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FileDownloadPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
-import org.obiba.opal.web.gwt.app.client.resources.OpalResources;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
@@ -61,8 +60,6 @@ public class GwtApp implements EntryPoint {
 
     DefaultResourceAuthorizationRequestBuilder.setup(authorizationCache);
 
-    OpalResources.INSTANCE.css().ensureInjected();
-    OpalResources.INSTANCE.cssCustom().ensureInjected();
     initFileDownloadPresenter();
     initFileSelectorPresenter();
     initApplicationPresenter();

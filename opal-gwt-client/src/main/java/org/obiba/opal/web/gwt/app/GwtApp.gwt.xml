@@ -18,6 +18,10 @@
 
   <!--  inherit css based theme -->
   <inherits name='com.google.gwt.user.theme.standard.Standard' />
+  
+  <!--  Opal css style sheets -->
+  <stylesheet src="css/opal.css"/>
+  <stylesheet src="css/opal-custom.css"/>
 
   <!--  for ClientBundle -->
   <inherits name="com.google.gwt.resources.Resources" />
@@ -48,6 +52,6 @@
   </replace-with>
 
   <!-- This will limit the compile to a single browser: Firefox 3.x -->
-  <!-- set-property name="user.agent" value="gecko1_8" /-->
+  <!--set-property name="user.agent" value="gecko1_8" /-->
 
 </module>

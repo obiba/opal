@@ -1,29 +1,33 @@
-/* Custom Style: modify this style sheet to have a different opal theme. */
+/* An example of customized style with blue flavor */
+
+body {
+  background: #EEE;
+}
 
 .login {
-	color: #402817;
+	color: #222;
 }
 
 .login > table {
-	border-color: #402817;
+	border-color: #003366;
 	background-color: #F3F4EB;
 }
 
 .topbar {
-	background-color: #402817;
+	background-color: #003366;
 }
 
 .topbar span, .topbar a, .topbar a:hover {
-	color: #AA814D;
+	color: #FFFFFF;
 }
 
 .top .gwt-MenuBar-horizontal {
     margin-left: 0px;
-    background-color: #F6F4CD;
+    background-color: #EEE;
 }
 
 .top .gwt-MenuBar-horizontal .gwt-MenuItem.selected, .top .gwt-MenuBar-horizontal .gwt-MenuItem.gwt-MenuItem-selected.selected {
-	background-color: #402817;
+	background-color: #003366;
 }
 
 .top .gwt-MenuBar-horizontal .gwt-MenuItem.gwt-MenuItem-selected {
@@ -37,16 +41,20 @@
 }
 
 .workbench .top {
-    background-color:#F6F4CD;
-    color:#402817;
+    background-color:#EEE;
+    color:#003366;
 }
 
 .gwt-TabLayoutPanel .gwt-TabLayoutPanelTab.gwt-TabLayoutPanelTab-selected {
-	background-color: #402817;
+	background-color: #003366;
+}
+
+.gwt-SplitLayoutPanel-HDragger {
+    background-color: #AAAAAA;
 }
 
 .tooltip.gwt-PopupPanel {
-	border: 0.2em solid #402817;
+	border: 0.2em solid #003366;
 }
 
 .footbar {
@@ -54,10 +62,10 @@
   margin-left: 0px;
   padding-left: 0.8em;
   padding-right: 0.8em;
-  background: #F3F4EB;
-  color: #402817;
+  background: #EEE;
+  color: #222;
 }
 
 .footbar a {
-	color: #402817;
+	color: #222;
 }
