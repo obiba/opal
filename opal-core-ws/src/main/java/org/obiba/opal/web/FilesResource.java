@@ -396,12 +396,19 @@ public class FilesResource {
     return Response.status(Status.NOT_FOUND).entity("The path specified does not exist: " + path).build();
   }
 
+  /**
+   * Returns the first {@code FileItem} that is reprensents a file upload field. If no such field exists, this method
+   * returns null
+   * @param request
+   * @return
+   * @throws FileUploadException
+   */
   @SuppressWarnings("unchecked")
   protected FileItem getUploadedFile(HttpServletRequest request) throws FileUploadException {
     FileItemFactory factory = new DiskFileItemFactory();
     ServletFileUpload upload = new ServletFileUpload(factory);
     for(FileItem fileItem : (List<FileItem>) upload.parseRequest(request)) {
-      if(!fileItem.isFormField() && fileItem.getFieldName().equals("fileToUpload")) {
+      if(!fileItem.isFormField()) {
         return fileItem;
       }
     }
