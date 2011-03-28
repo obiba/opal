@@ -26,6 +26,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
+import org.obiba.opal.web.gwt.user.cellview.client.DateTimeColumn;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.ParameterDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
@@ -40,7 +41,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
-import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
@@ -143,10 +143,11 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   }
 
   private void initProducedReportsTable() {
-    producedReportsTable.addColumn(new TextColumn<FileDto>() {
+    producedReportsTable.addColumn(new DateTimeColumn<FileDto>() {
       @Override
-      public String getValue(FileDto file) {
-        return new Date((long) file.getLastModifiedTime()).toString();
+      public Date getValue(FileDto file) {
+        return new Date((long) file.getLastModifiedTime());
+        // return DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_TIME_MEDIUM).format(date);
       }
     }, translations.producedDate());
 
