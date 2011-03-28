@@ -6,7 +6,7 @@
   ui:generateLocales="default">
 
   
-  <o:WorkbenchLayout withInfo="false">
+  <o:WorkbenchLayout>
     <g:Label><ui:msg description="Datasources label">Datasources</ui:msg></g:Label>
     <g:Label></g:Label>
     <g:FlowPanel>

@@ -12,8 +12,6 @@ package org.obiba.opal.web.gwt.app.client.workbench.view;
 import java.util.Iterator;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -21,7 +19,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
@@ -53,16 +50,10 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
   SimplePanel controlContent;
 
   @UiField
-  ScrollPanel mainContent;
-
-  @UiField
-  Image closeInfo;
-
-  @UiField
-  ScrollPanel informationContent;
-
-  @UiField
   SplitLayoutPanel content;
+
+  @UiField
+  ScrollPanel mainContent;
 
   private WidgetCollection children = new WidgetCollection(this);
 
@@ -87,30 +78,6 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
   }
 
   private void addHandlers() {
-    closeInfo.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent arg0) {
-        // TODO set slider position
-      }
-    });
-    // http://code.google.com/p/google-web-toolkit/issues/detail?id=4489
-    closeInfo.setVisible(false);
-  }
-
-  public void setWithInfo(boolean withInfo) {
-    if(!withInfo) {
-      if(mainWidget instanceof DockLayoutPanel) {
-        mainWidget.removeFromParent();
-        workbench.remove(content);
-        workbench.add(mainWidget);
-      } else {
-        mainContent.removeFromParent();
-        workbench.remove(content);
-        mainContent.setStyleName("content", true);
-        workbench.add(mainContent);
-      }
-    }
   }
 
   public Widget getTitleWidget() {
@@ -166,12 +133,6 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
     }
   }
 
-  public void setInformationWidget(Widget w) {
-    children.add(w);
-    informationWidget = w;
-    informationContent.setWidget(informationWidget);
-  }
-
   //
   // HasWidgets methods
   //
@@ -188,8 +149,6 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
       setControlWidget(w);
     } else if(mainWidget == null) {
       setMainWidget(w);
-    } else if(informationWidget == null) {
-      setInformationWidget(w);
     } else {
       throw new IllegalArgumentException("Unexpected widget added.");
     }

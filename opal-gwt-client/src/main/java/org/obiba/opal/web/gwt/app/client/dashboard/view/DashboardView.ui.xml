@@ -5,7 +5,7 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
-  <o:WorkbenchLayout withInfo="false">
+  <o:WorkbenchLayout>
     <g:Label><ui:msg description="Dashboard title" >Study Dashboard</ui:msg></g:Label>
     <g:Label></g:Label>
     <g:FlowPanel>

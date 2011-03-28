@@ -452,39 +452,6 @@ margin-left:0.8em;
      padding: 0.8em;
 }
 
-.workbench .information .header {
-	color:#444444;
-	font-weight:bold;
-	height: 2em;
-	background:url("gwt/standard/images/hborder.png") repeat-x scroll 0 -2003px #E3E8F3;
-	border-bottom:1px solid #B4A291;
-}
-
-.workbench .information .header .gwt-Label {
-	padding-left:0.4em;
-	padding-top:0.4em;
-}
-
-.workbench .information .header img {
-  cursor:pointer;
-  padding-top: 0.4em;
-  margin-right: 0.4em;
-}
-
-.workbench .information .header .gwt-MenuItem {
-  cursor:default;
-  padding-top: 0.4em;
-}
-
-.workbench .information .content {
-  margin: 0.4em;
-}
-
-.workbench .information .title {
-  font-weight: bold;
-  font-size: 1em;
-}
-
 /* Administration */
 
 .administration {
