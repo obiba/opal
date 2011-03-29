@@ -920,7 +920,9 @@ table.itemSelector {
 }
 
 table.itemSelector tr + tr td {
-  background-color: #E5E5E5;
+  background-color: #F0F0F0;
+  padding-right: 0.4em;
+  color: #222222;
 }
 
 table.itemSelector .button {

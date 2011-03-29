@@ -74,7 +74,7 @@ public class KeyValueItemInputView extends Composite implements ItemInputDisplay
     String key = keyTextBox.getText().trim();
     String value = valueTextBox.getText().trim();
 
-    return (key.length() != 0 && value.length() != 0) ? keyTextBox.getText() + "=" + valueTextBox.getText() : "";
+    return (key.length() != 0 && value.length() != 0) ? keyTextBox.getText() + " = " + valueTextBox.getText() : "";
   }
 
   public Widget asWidget() {
