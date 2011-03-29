@@ -288,17 +288,11 @@ public class Seed {
 				String data = json.getString("data");
 				String dictionary = json.getString("dictionary");
 				String destination = json.getString("destination");
+				String unit = json.optString("unit", null);
 
-				List<TableDto> tables = opalClient.getResources(
-						TableDto.class,
-						opalClient.newUri()
-								.segment("datasource", destination, "tables")
-								.build(), TableDto.newBuilder());
-
-				if (tables.size() == 0) {
-					System.out.println("Importing CSV file " + data + " into " + destination);
-					importCsv(data, dictionary, destination);
-				}
+				System.out.println("Importing CSV file " + data + " into "
+						+ destination);
+				importCsv(data, dictionary, destination, unit);
 
 			}
 		}
@@ -308,6 +302,10 @@ public class Seed {
 			HttpResponse r = opalClient.post(
 					opalClient.newUri().segment("transient-datasources")
 							.build(), dto);
+			if (r.getStatusLine().getStatusCode() != 201) {
+				throw new IOException("Could not create datasource: "
+						+ r.getStatusLine().getReasonPhrase());
+			}
 			String uri = r.getFirstHeader("Location").getValue();
 			r.getEntity().consumeContent();
 			UriBuilder datasourceUri = opalClient.newUri(URI.create(uri));
@@ -315,33 +313,41 @@ public class Seed {
 					datasourceUri.build(), DatasourceDto.newBuilder());
 		}
 
-		private void copyTables(DatasourceDto source, String destination)
+		private void createTables(DatasourceDto source, String destination)
 				throws ClientProtocolException, IOException {
-			UriBuilder destinationUri = opalClient.newUri().segment(
-					"datasource", source.getName());
+			UriBuilder sourceUri = opalClient.newUri().segment("datasource",
+					source.getName());
 			for (String table : source.getTableList()) {
-				TableDto t = opalClient.getResource(TableDto.class,
-						destinationUri.newBuilder().segment("table", table)
-								.build(), TableDto.newBuilder());
-				List<VariableDto> v = opalClient.getResources(
-						VariableDto.class,
-						destinationUri.newBuilder()
-								.segment("table", table, "variables").build(),
-						VariableDto.newBuilder());
-				ignore(opalClient.post(
-						opalClient.newUri()
-								.segment("datasource", destination, "tables")
-								.build(), t));
-				ignore(opalClient.post(
-						opalClient
-								.newUri()
-								.segment("datasource", destination, "table",
-										table, "variables").build(), v));
+				HttpResponse r = opalClient.get(opalClient.newUri()
+						.segment("datasource", destination, "table", table)
+						.build());
+				r.getEntity().consumeContent();
+				if (r.getStatusLine().getStatusCode() == 404) {
+					TableDto t = opalClient.getResource(TableDto.class,
+							sourceUri.newBuilder().segment("table", table)
+									.build(), TableDto.newBuilder());
+					List<VariableDto> v = opalClient.getResources(
+							VariableDto.class,
+							sourceUri.newBuilder()
+									.segment("table", table, "variables")
+									.build(), VariableDto.newBuilder());
+					ignore(opalClient.post(
+							opalClient
+									.newUri()
+									.segment("datasource", destination,
+											"tables").build(), t));
+					ignore(opalClient.post(
+							opalClient
+									.newUri()
+									.segment("datasource", destination,
+											"table", table, "variables")
+									.build(), v));
+				}
 			}
 		}
 
 		private void importCsv(String data, String dictionary,
-				String destination) throws IOException {
+				String destination, String unit) throws IOException {
 			DatasourceDto variables = createTransientDatasource(DatasourceFactoryDto
 					.newBuilder()
 					.setName("none")
@@ -351,7 +357,9 @@ public class Seed {
 									.setFile(dictionary).setReadOnly(true)
 									.build()).build());
 
-			copyTables(variables, destination);
+			createTables(variables, destination);
+
+			String refTable = variables.getTable(0);
 
 			DatasourceDto csv = createTransientDatasource(DatasourceFactoryDto
 					.newBuilder()
@@ -366,17 +374,21 @@ public class Seed {
 									.addTables(
 											CsvDatasourceTableBundleDto
 													.newBuilder()
-													.setName("Demographics")
-													.setData(
-															"/public data/catchment-area.csv")
+													.setName(refTable)
+													.setData(data)
 													.setRefTable(
-															"Public Data.Demographics"))
+															destination + "."
+																	+ refTable))
 									.build()).build());
+			ImportCommandOptionsDto.Builder importCommand = ImportCommandOptionsDto
+					.newBuilder().setDestination(destination)
+					.setSource(csv.getName());
+			if (unit != null) {
+				importCommand.setUnit(unit);
+			}
 			ignore(opalClient.post(
 					opalClient.newUri().segment("shell", "import").build(),
-					ImportCommandOptionsDto.newBuilder()
-							.setDestination("Public Data")
-							.setSource(csv.getName()).build()));
+					importCommand.build()));
 
 		}
 	}
