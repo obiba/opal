@@ -42,14 +42,16 @@
         <org.obiba.opal.datashield.CustomRScriptMethod>
           <name>summary</name>
           <script><![CDATA[function(data) {
-  if(is.vector(data)) {
+  if(is.atomic(data)) {
     if(length(data) == 1) {
       "Vector too small."
     } else {
       base::summary(data);
     }
+  } else if(is.recursive(data)) {
+      base::summary.default(data);
   }
-} ]]>
+}]]>
 </script>
         </org.obiba.opal.datashield.CustomRScriptMethod>
         
