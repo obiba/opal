@@ -22,22 +22,16 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
-import org.jboss.resteasy.plugins.providers.jaxb.IgnoredMediaTypes;
-import org.jboss.resteasy.util.Types;
 import org.obiba.opal.web.ws.util.JsonIoUtil;
 import org.springframework.stereotype.Component;
 
 import com.google.protobuf.JsonFormat;
 import com.google.protobuf.Message;
 
-/**
- *
- */
 @Component
 @Provider
-// TODO: should also provide "application/x-protobuf" for native protobuf encoding
-@Produces( { "application/x-protobuf+json", "application/json" })
-public class ProtobufJsonWriterProvider implements MessageBodyWriter<Object> {
+@Produces({ "application/x-protobuf+json", "application/json" })
+public class ProtobufJsonWriterProvider extends AbstractProtobufProvider implements MessageBodyWriter<Object> {
 
   @Override
   public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
@@ -50,7 +44,7 @@ public class ProtobufJsonWriterProvider implements MessageBodyWriter<Object> {
   }
 
   @Override
-  @SuppressWarnings( { "unchecked", "PMD.ExcessiveParameterList" })
+  @SuppressWarnings({ "unchecked", "PMD.ExcessiveParameterList" })
   public void writeTo(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
     OutputStreamWriter output = new OutputStreamWriter(entityStream, "UTF-8");
     if(isWrapped(type, genericType, annotations, mediaType)) {
@@ -60,15 +54,6 @@ public class ProtobufJsonWriterProvider implements MessageBodyWriter<Object> {
       JsonFormat.print((Message) t, output);
     }
     output.flush();
-  }
-
-  protected boolean isWrapped(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-    if((Iterable.class.isAssignableFrom(type) || type.isArray()) && genericType != null) {
-      Class<?> baseType = Types.getCollectionBaseType(type, genericType);
-      if(baseType == null) return false;
-      return Message.class.isAssignableFrom(baseType) && !IgnoredMediaTypes.ignored(baseType, annotations, mediaType);
-    }
-    return false;
   }
 
 }
