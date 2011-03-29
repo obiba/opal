@@ -306,11 +306,7 @@ public class Seed {
 				throw new IOException("Could not create datasource: "
 						+ r.getStatusLine().getReasonPhrase());
 			}
-			String uri = r.getFirstHeader("Location").getValue();
-			r.getEntity().consumeContent();
-			UriBuilder datasourceUri = opalClient.newUri(URI.create(uri));
-			return opalClient.getResource(DatasourceDto.class,
-					datasourceUri.build(), DatasourceDto.newBuilder());
+			return DatasourceDto.newBuilder().mergeFrom(r.getEntity().getContent()).build();
 		}
 
 		private void createTables(DatasourceDto source, String destination)
