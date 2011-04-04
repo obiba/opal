@@ -136,7 +136,6 @@ datashield.lm.list=function(opals, formula, lmparams=list()) {
   simple.sum<-rep(1,numstudies)
 
   #calculate mean of regression coefficients weighted for study sample sizes
-  # “%*%” denotes vector multiplication 
   beta.overall<-beta.s%*%analysis.wt
 
   #convert standard errors into precisions
@@ -199,6 +198,8 @@ datashield.glm.list=function(opals, formula, glmparams=list(), maxit=10) {
   #Define a convergence criterion. This value of epsilon corresponds to that used
   #by default for GLMs in R (see section S3 for details)
   epsilon<-1.0e-08
+  
+  f<-NULL
 
   while(!converge.state && iteration.count < maxit) {
 
@@ -219,6 +220,8 @@ datashield.glm.list=function(opals, formula, glmparams=list(), maxit=10) {
     if(iteration.count==1) {
       # Sum participants only during first iteration.
       nsubs.total<-Reduce(f="+", .select(study.summary, 'numsubs'))
+      # Save family
+      f <- study.summary[[1]]$family
     }
 
     #Create variance covariance matrix as inverse of information matrix
@@ -266,7 +269,14 @@ datashield.glm.list=function(opals, formula, glmparams=list(), maxit=10) {
   if(converge.state)
   {
     beta.vect.final<-beta.vect.next
-    se.vect.final<-sqrt(diag(variance.covariance.matrix.total))
+
+    scale.par <- 1
+    if(f$family== 'gaussian') {
+      scale.par <- dev.total / (nsubs.total-length(beta.vect.next))
+    }
+
+    se.vect.final <- sqrt(diag(variance.covariance.matrix.total)) * sqrt(scale.par)
+
     z.vect.final<-beta.vect.final/se.vect.final
     pval.vect.final<-2*pnorm(-abs(z.vect.final))
     parameter.names<-names(score.vect.total[,1])
