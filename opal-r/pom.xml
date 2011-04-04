@@ -58,7 +58,7 @@
           <descriptors>
             <descriptor>src/main/assembly/r-package.xml</descriptor>
           </descriptors>
-          <filters></filters>
+          <filters />
         </configuration>
         <executions>
           <execution>
