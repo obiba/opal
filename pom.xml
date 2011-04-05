@@ -60,6 +60,12 @@
 
       <dependency>
         <groupId>org.obiba.magma</groupId>
+        <artifactId>magma-security</artifactId>
+        <version>${magma.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.obiba.magma</groupId>
         <artifactId>magma-xstream</artifactId>
         <version>${magma.version}</version>
       </dependency>
