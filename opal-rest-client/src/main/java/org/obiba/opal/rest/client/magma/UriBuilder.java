@@ -31,9 +31,9 @@ public class UriBuilder {
 		return this;
 	}
 
-	public UriBuilder query(String... segments) {
-		for (int i = 0; i < segments.length; i += 2) {
-			query(segments[i], segments[i + 1]);
+	public UriBuilder query(String... keyvalue) {
+		for (int i = 0; i < keyvalue.length; i += 2) {
+			query(keyvalue[i], keyvalue[i + 1]);
 		}
 		return this;
 	}
