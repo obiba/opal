@@ -33,7 +33,6 @@ public class ProtobufProviderHelper {
   private final ExtensionRegistryFactory extensionRegistryFactory = new ExtensionRegistryFactory();
 
   public ProtobufProviderHelper() {
-    log.info("patate!");
   }
 
   public BuilderFactory builders() {
