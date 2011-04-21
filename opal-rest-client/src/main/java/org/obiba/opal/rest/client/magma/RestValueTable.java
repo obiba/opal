@@ -16,10 +16,10 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.VectorSource;
 import org.obiba.magma.support.AbstractValueTable;
+import org.obiba.magma.support.NullTimestamps;
 import org.obiba.magma.support.ValueSetBean;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.support.VariableEntityProvider;
-import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.ValueSetDto;
@@ -163,18 +163,7 @@ class RestValueTable extends AbstractValueTable {
   }
 
   @Override
-  public Timestamps getTimestamps(ValueSet valueSet) {
-    return new Timestamps() {
-
-      @Override
-      public Value getLastUpdate() {
-        return DateTimeType.get().nullValue();
-      }
-
-      @Override
-      public Value getCreated() {
-        return DateTimeType.get().nullValue();
-      }
-    };
+  public Timestamps getTimestamps() {
+    return NullTimestamps.get();
   }
 }
