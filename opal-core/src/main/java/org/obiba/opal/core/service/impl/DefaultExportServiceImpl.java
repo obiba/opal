@@ -39,9 +39,6 @@ import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
@@ -52,19 +49,23 @@ import com.google.common.base.Function;
  */
 public class DefaultExportServiceImpl implements ExportService {
 
-  private final PlatformTransactionManager txManager;
+  private final ThreadFactory threadFactory;
+
+  private final TransactionTemplate txTemplate;
 
   private final FunctionalUnitService functionalUnitService;
 
   private final IdentifiersTableService identifiersTableService;
 
   @Autowired
-  public DefaultExportServiceImpl(PlatformTransactionManager txManager, FunctionalUnitService functionalUnitService, IdentifiersTableService identifiersTableService) {
-    if(txManager == null) throw new IllegalArgumentException("txManager cannot be null");
+  public DefaultExportServiceImpl(ThreadFactory threadFactory, TransactionTemplate txTemplate, FunctionalUnitService functionalUnitService, IdentifiersTableService identifiersTableService) {
+    if(threadFactory == null) throw new IllegalArgumentException("threadFactory cannot be null");
+    if(txTemplate == null) throw new IllegalArgumentException("txTemplate cannot be null");
     if(functionalUnitService == null) throw new IllegalArgumentException("functionalUnitService cannot be null");
     if(identifiersTableService == null) throw new IllegalArgumentException("identifiersTableService cannot be null");
 
-    this.txManager = txManager;
+    this.threadFactory = threadFactory;
+    this.txTemplate = txTemplate;
     this.functionalUnitService = functionalUnitService;
     this.identifiersTableService = identifiersTableService;
   }
@@ -112,7 +113,7 @@ public class DefaultExportServiceImpl implements ExportService {
 
         @Override
         protected TransactionTemplate getTransactionTemplate() {
-          return new TransactionTemplate(txManager);
+          return txTemplate;
         }
 
         @Override
@@ -169,13 +170,7 @@ public class DefaultExportServiceImpl implements ExportService {
     }
 
     // Go ahead and copy the result to the destination datasource.
-    MultithreadedDatasourceCopier.Builder.newCopier().from(tableToCopy).to(destinationDatasource).withCopier(datasourceCopier).withReaders(4).withThreads(new ThreadFactory() {
-
-      @Override
-      public Thread newThread(Runnable r) {
-        return new TransactionalThread(txManager, r);
-      }
-    }).build().copy();
+    MultithreadedDatasourceCopier.Builder.newCopier().from(tableToCopy).to(destinationDatasource).withCopier(datasourceCopier).withReaders(4).withThreads(threadFactory).build().copy();
   }
 
   private FunctionalUnitView getUnitView(FunctionalUnit unit, ValueTable valueTable) {
@@ -221,27 +216,6 @@ public class DefaultExportServiceImpl implements ExportService {
     IncrementalWhereClause whereClause = new IncrementalWhereClause(valueTable.getDatasource().getName() + "." + valueTable.getName(), destination.getName() + "." + valueTable.getName());
 
     return View.Builder.newView(valueTable.getName(), valueTable).where(whereClause).build();
-  }
-
-  static class TransactionalThread extends Thread {
-
-    private PlatformTransactionManager txManager;
-
-    private Runnable runnable;
-
-    public TransactionalThread(PlatformTransactionManager txManager, Runnable runnable) {
-      this.txManager = txManager;
-      this.runnable = runnable;
-    }
-
-    public void run() {
-      new TransactionTemplate(txManager).execute(new TransactionCallbackWithoutResult() {
-        @Override
-        protected void doInTransactionWithoutResult(TransactionStatus status) {
-          runnable.run();
-        }
-      });
-    }
   }
 
 }
