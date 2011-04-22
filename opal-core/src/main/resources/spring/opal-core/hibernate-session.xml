@@ -32,7 +32,9 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
             <prop key="hibernate.generate_statistics">true</prop>
             <prop key="hibernate.cache.use_structured_entries">true</prop>
             <prop key="hibernate.cache.use_query_cache">true</prop>
-            <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
+            <prop key="hibernate.cache.use_second_level_cache">true</prop>
+            <prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.EhCacheRegionFactory</prop>
+            <prop key="net.sf.ehcache.configurationResourceName">/opal-ehcache.xml</prop>
             <prop key="hibernate.dialect">${org.obiba.opal.datasource.key.dialect}</prop>
 
             <!-- Set the CurrentSessionContext to JTASessionContext: a Hibernate Session will be available when a transaction is active -->
@@ -79,7 +81,9 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
             <prop key="hibernate.generate_statistics">true</prop>
             <prop key="hibernate.cache.use_structured_entries">true</prop>
             <prop key="hibernate.cache.use_query_cache">true</prop>
-            <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
+            <prop key="hibernate.cache.use_second_level_cache">true</prop>
+            <prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.EhCacheRegionFactory</prop>
+            <prop key="net.sf.ehcache.configurationResourceName">/opal-ehcache.xml</prop>
             <prop key="hibernate.dialect">${org.obiba.opal.datasource.opal.dialect}</prop>
 
             <!-- Set the CurrentSessionContext to JTASessionContext: a Hibernate Session will be available when a transaction is active -->
