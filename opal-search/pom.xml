@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>opal</artifactId>
+    <groupId>org.obiba.opal</groupId>
+    <version>1.6-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>opal-search</artifactId>
+
+  <name>opal-search</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.elasticsearch</groupId>
+      <artifactId>elasticsearch</artifactId>
+      <version>0.16.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-core-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-ws</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-web-model</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
+  <properties>
+    <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+    <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
+  </properties>
+
+</project>
