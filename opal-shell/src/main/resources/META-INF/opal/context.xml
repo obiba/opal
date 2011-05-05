@@ -6,9 +6,6 @@
         http://www.springframework.org/schema/context 
         http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-  <import resource="config.xml" />
-  <import resource="classpath:spring/opal-core/context.xml" />
-
-  <context:component-scan base-package="org.obiba.opal.server,org.obiba.opal.core,org.obiba.opal.service" />
+  <context:component-scan base-package="org.obiba.opal.shell" />
 
 </beans>

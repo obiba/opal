@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.shell;
+package org.obiba.opal.shell.web;
 
 import org.obiba.opal.shell.AbstractCommandRegistry;
 import org.obiba.opal.shell.commands.CopyCommand;
