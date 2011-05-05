@@ -14,7 +14,6 @@ import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -40,6 +39,7 @@ import org.obiba.magma.type.DecimalType;
 import org.obiba.magma.type.IntegerType;
 import org.obiba.magma.type.LocaleType;
 import org.obiba.magma.type.TextType;
+import org.obiba.opal.core.runtime.security.BackgroundJobServiceAuthToken;
 import org.obiba.opal.search.IndexManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +70,7 @@ public class EsIndexManager implements IndexManager {
   private Subject getSubject() {
     // Login as background job user
     try {
-      PrincipalCollection principals = SecurityUtils.getSecurityManager().authenticate((AuthenticationToken) Class.forName("org.obiba.opal.web.shell.security.BackgroundJobServiceAuthToken").newInstance()).getPrincipals();
+      PrincipalCollection principals = SecurityUtils.getSecurityManager().authenticate(new BackgroundJobServiceAuthToken()).getPrincipals();
       return new Subject.Builder().principals(principals).authenticated(true).buildSubject();
     } catch(Exception e) {
       return null;
