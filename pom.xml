@@ -34,6 +34,7 @@
     <module>opal-gwt-client</module>
     <module>opal-rest-client</module>
     <module>opal-datashield</module>
+    <module>opal-search</module>
   </modules>
 
   <dependencyManagement>
