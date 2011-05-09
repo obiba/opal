@@ -22,7 +22,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.obiba.magma.views.View;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.springframework.context.annotation.Bean;
@@ -30,18 +30,18 @@ import org.springframework.context.annotation.Scope;
 
 public class ViewResource extends AbstractValueTableResource {
 
-  private final OpalRuntime opalRuntime;
+  private final ViewManager viewManager;
 
   private ViewDtos viewDtos;
 
-  public ViewResource(OpalRuntime opalRuntime, View view, ViewDtos viewDtos, Set<Locale> locales) {
+  public ViewResource(ViewManager viewManager, View view, ViewDtos viewDtos, Set<Locale> locales) {
     super(view, locales);
     this.viewDtos = viewDtos;
-    this.opalRuntime = opalRuntime;
+    this.viewManager = viewManager;
   }
 
-  public ViewResource(OpalRuntime opalRuntime, View view, ViewDtos viewDtos) {
-    this(opalRuntime, view, viewDtos, Collections.<Locale> emptySet());
+  public ViewResource(ViewManager viewManager, View view, ViewDtos viewDtos) {
+    this(viewManager, view, viewDtos, Collections.<Locale> emptySet());
   }
 
   @GET
@@ -54,14 +54,14 @@ public class ViewResource extends AbstractValueTableResource {
     if(!viewDto.hasName()) return Response.status(Status.BAD_REQUEST).build();
     if(!viewDto.getName().equals(getValueTable().getName())) return Response.status(Status.BAD_REQUEST).build();
 
-    opalRuntime.getViewManager().addView(getDatasource().getName(), viewDtos.fromDto(viewDto));
+    viewManager.addView(getDatasource().getName(), viewDtos.fromDto(viewDto));
 
     return Response.ok().build();
   }
 
   @DELETE
   public Response removeView() {
-    opalRuntime.getViewManager().removeView(getDatasource().getName(), getValueTable().getName());
+    viewManager.removeView(getDatasource().getName(), getValueTable().getName());
 
     return Response.ok().build();
   }

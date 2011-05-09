@@ -14,6 +14,7 @@ import static org.easymock.EasyMock.expect;
 
 import org.easymock.IExpectationSetters;
 import org.obiba.opal.core.cfg.OpalConfiguration;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.fs.OpalFileSystem;
 
@@ -27,6 +28,8 @@ public class OpalRuntimeMockBuilder {
 
   private OpalRuntime opalRuntimeMock;
 
+  private OpalConfigurationService opalConfigurationServiceMock;
+
   private IExpectationSetters<?> expectationSetters;
 
   //
@@ -35,6 +38,7 @@ public class OpalRuntimeMockBuilder {
 
   public OpalRuntimeMockBuilder() {
     opalRuntimeMock = createMock(OpalRuntime.class);
+    opalConfigurationServiceMock = createMock(OpalConfigurationService.class);
   }
 
   //
@@ -46,7 +50,7 @@ public class OpalRuntimeMockBuilder {
   }
 
   public OpalRuntimeMockBuilder withOpalConfiguration(OpalConfiguration opalConfiguration) {
-    expect(opalRuntimeMock.getOpalConfiguration()).andReturn(opalConfiguration).anyTimes();
+    expect(opalConfigurationServiceMock.getOpalConfiguration()).andReturn(opalConfiguration).anyTimes();
 
     return this;
   }

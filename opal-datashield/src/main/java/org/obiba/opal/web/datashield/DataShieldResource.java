@@ -24,7 +24,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.opal.core.cfg.OpalConfiguration;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.datashield.DataShieldMethod;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.r.service.OpalRService;
@@ -44,20 +44,20 @@ public class DataShieldResource {
 
   private final OpalRService opalRService;
 
-  private final OpalRuntime opalRuntime;
+  private final OpalConfigurationService configService;
 
   private final OpalRSessionManager opalRSessionManager;
 
   private final DataShieldMethodConverterRegistry methodConverterRegistry;
 
   @Autowired
-  public DataShieldResource(OpalRService opalRService, OpalRuntime opalRuntime, OpalRSessionManager opalRSessionManager, DataShieldMethodConverterRegistry methodConverterRegistry) {
+  public DataShieldResource(OpalRService opalRService, OpalConfigurationService configService, OpalRSessionManager opalRSessionManager, DataShieldMethodConverterRegistry methodConverterRegistry) {
     if(opalRService == null) throw new IllegalArgumentException("opalRService cannot be null");
-    if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
+    if(configService == null) throw new IllegalArgumentException("configService cannot be null");
     if(opalRSessionManager == null) throw new IllegalArgumentException("opalRSessionManager cannot be null");
     if(methodConverterRegistry == null) throw new IllegalArgumentException("methodConverterRegistry cannot be null");
     this.opalRService = opalRService;
-    this.opalRuntime = opalRuntime;
+    this.configService = configService;
     this.opalRSessionManager = opalRSessionManager;
     this.methodConverterRegistry = methodConverterRegistry;
   }
@@ -69,7 +69,7 @@ public class DataShieldResource {
 
   @Path("/session/{id}")
   public OpalRSessionResource getSession(@PathParam("id") String id) {
-    return new OpalDataShieldSessionResource(opalRService, opalRuntime, opalRSessionManager, opalRSessionManager.getSubjectRSession(id));
+    return new OpalDataShieldSessionResource(opalRService, configService, opalRSessionManager, opalRSessionManager.getSubjectRSession(id));
   }
 
   @Path("/session/current")
@@ -77,7 +77,7 @@ public class DataShieldResource {
     if(opalRSessionManager.hasSubjectCurrentRSession() == false) {
       opalRSessionManager.newSubjectCurrentRSession();
     }
-    return new OpalDataShieldSessionResource(opalRService, opalRuntime, opalRSessionManager, opalRSessionManager.getSubjectCurrentRSession());
+    return new OpalDataShieldSessionResource(opalRService, configService, opalRSessionManager, opalRSessionManager.getSubjectCurrentRSession());
   }
 
   @GET
@@ -98,7 +98,7 @@ public class DataShieldResource {
     if(config.hasDataShieldMethod(dto.getName())) return Response.status(Status.BAD_REQUEST).build();
 
     config.addAggregatingMethod(methodConverterRegistry.parse(dto));
-    opalRuntime.writeOpalConfiguration();
+    configService.writeOpalConfiguration();
     UriBuilder ub = UriBuilder.fromPath("/").path(DataShieldResource.class).path(DataShieldResource.class, "getDataShieldMethod");
     return Response.created(ub.build(dto.getName())).build();
   }
@@ -118,7 +118,7 @@ public class DataShieldResource {
     if(!config.hasDataShieldMethod(name)) return Response.status(Status.NOT_FOUND).build();
 
     config.addAggregatingMethod(methodConverterRegistry.parse(dto));
-    opalRuntime.writeOpalConfiguration();
+    configService.writeOpalConfiguration();
 
     return Response.ok().build();
   }
@@ -127,7 +127,7 @@ public class DataShieldResource {
   @Path("/method/{name}")
   public Response deleteDataShieldMethod(@PathParam("name") String name) {
     getDatashieldConfiguration().removeAggregatingMethod(name);
-    opalRuntime.writeOpalConfiguration();
+    configService.writeOpalConfiguration();
     return Response.ok().build();
   }
 
@@ -136,7 +136,7 @@ public class DataShieldResource {
   }
 
   private DatashieldConfiguration getDatashieldConfiguration() {
-    OpalConfiguration cfg = opalRuntime.getOpalConfiguration();
+    OpalConfiguration cfg = configService.getOpalConfiguration();
     return cfg.getExtension(DatashieldConfiguration.class);
   }
 

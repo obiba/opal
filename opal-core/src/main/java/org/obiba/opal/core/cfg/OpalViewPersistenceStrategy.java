@@ -29,7 +29,6 @@ import org.obiba.magma.views.ViewPersistenceStrategy;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import com.google.common.collect.ImmutableSet;
 import com.thoughtworks.xstream.XStream;
@@ -39,7 +38,6 @@ import com.thoughtworks.xstream.XStream;
  * Each XML file is named after a {@link Datasource} and contains all the Views that are associated with that
  * Datasource.
  */
-@Component
 public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
 
   private static final Logger log = LoggerFactory.getLogger(OpalViewPersistenceStrategy.class);

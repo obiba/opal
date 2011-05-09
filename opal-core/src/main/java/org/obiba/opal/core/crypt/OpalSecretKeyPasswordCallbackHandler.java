@@ -16,7 +16,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -24,19 +24,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class OpalSecretKeyPasswordCallbackHandler implements CallbackHandler {
 
-  private final OpalRuntime runtime;
+  private final OpalConfigurationService configService;
 
   private final String customPassword;
 
   @Autowired
-  public OpalSecretKeyPasswordCallbackHandler(OpalRuntime runtime, @Value("${org.obiba.opal.keystore.password}") String customPassword) {
-    this.runtime = runtime;
+  public OpalSecretKeyPasswordCallbackHandler(OpalConfigurationService configService, @Value("${org.obiba.opal.keystore.password}") String customPassword) {
+    this.configService = configService;
     this.customPassword = customPassword;
   }
 
   private char[] getPassword() {
     if(customPassword == null || customPassword.isEmpty() || customPassword.equals("KEYSTORE_PASSWORD_NOT_SPECIFIED")) {
-      return runtime.getOpalConfiguration().getSecretKey().toCharArray();
+      return configService.getOpalConfiguration().getSecretKey().toCharArray();
     } else {
       return customPassword.toCharArray();
     }

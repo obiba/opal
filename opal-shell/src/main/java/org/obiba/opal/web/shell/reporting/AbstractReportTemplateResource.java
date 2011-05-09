@@ -10,8 +10,8 @@
 package org.obiba.opal.web.shell.reporting;
 
 import org.obiba.opal.core.cfg.OpalConfiguration;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.ReportTemplate;
-import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.shell.service.CommandSchedulerService;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
 import org.obiba.opal.web.reporting.Dtos;
@@ -22,16 +22,16 @@ import org.obiba.opal.web.reporting.Dtos;
 public abstract class AbstractReportTemplateResource {
   protected static final String REPORT_SCHEDULING_GROUP = "reports";
 
-  protected abstract OpalRuntime getOpalRuntime();
+  protected abstract OpalConfigurationService getOpalConfigurationService();
 
   protected abstract CommandSchedulerService getCommandSchedulerService();
 
   protected boolean reportTemplateExists(String name) {
-    return name != null && getOpalRuntime().getOpalConfiguration().hasReportTemplate(name);
+    return name != null && getOpalConfigurationService().getOpalConfiguration().hasReportTemplate(name);
   }
 
   protected void updateOpalConfiguration(ReportTemplateDto dto) {
-    OpalConfiguration opalConfig = getOpalRuntime().getOpalConfiguration();
+    OpalConfiguration opalConfig = getOpalConfigurationService().getOpalConfiguration();
 
     ReportTemplate reportTemplate = opalConfig.getReportTemplate(dto.getName());
     if(reportTemplate != null) {
@@ -40,7 +40,7 @@ public abstract class AbstractReportTemplateResource {
 
     reportTemplate = Dtos.fromDto(dto);
     opalConfig.addReportTemplate(reportTemplate);
-    getOpalRuntime().writeOpalConfiguration();
+    getOpalConfigurationService().writeOpalConfiguration();
   }
 
   protected void updateSchedule(ReportTemplateDto reportTemplateDto) {

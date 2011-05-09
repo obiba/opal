@@ -30,7 +30,7 @@ import org.obiba.magma.DuplicateDatasourceNameException;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.support.DatasourceParsingException;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.magma.support.NoSuchDatasourceFactoryException;
 import org.obiba.opal.web.model.Magma;
@@ -51,14 +51,14 @@ public class DatasourcesResource {
 
   private final DatasourceFactoryRegistry datasourceFactoryRegistry;
 
-  private final OpalRuntime opalRuntime;
+  private final OpalConfigurationService configService;
 
   @Autowired
-  public DatasourcesResource(DatasourceFactoryRegistry datasourceFactoryRegistry, OpalRuntime opalRuntime) {
+  public DatasourcesResource(DatasourceFactoryRegistry datasourceFactoryRegistry, OpalConfigurationService configService) {
     if(datasourceFactoryRegistry == null) throw new IllegalArgumentException("datasourceFactoryRegistry cannot be null");
-    if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
+    if(configService == null) throw new IllegalArgumentException("configService cannot be null");
 
-    this.opalRuntime = opalRuntime;
+    this.configService = configService;
     this.datasourceFactoryRegistry = datasourceFactoryRegistry;
   }
 
@@ -82,8 +82,8 @@ public class DatasourcesResource {
     try {
       DatasourceFactory factory = datasourceFactoryRegistry.parse(factoryDto);
       Datasource ds = MagmaEngine.get().addDatasource(factory);
-      opalRuntime.getOpalConfiguration().getMagmaEngineFactory().withFactory(factory);
-      opalRuntime.writeOpalConfiguration();
+      configService.getOpalConfiguration().getMagmaEngineFactory().withFactory(factory);
+      configService.writeOpalConfiguration();
       UriBuilder ub = uriInfo.getBaseUriBuilder().path("datasource").path(ds.getName());
       response = Response.created(ub.build()).entity(Dtos.asDto(ds).build());
     } catch(NoSuchDatasourceFactoryException noSuchDatasourceFactoryEx) {

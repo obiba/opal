@@ -9,8 +9,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.ReportTemplate;
-import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.options.ReportCommandOptions;
@@ -33,23 +33,23 @@ public class ReportTemplatesResource extends AbstractReportTemplateResource {
   @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(ReportTemplatesResource.class);
 
-  private final OpalRuntime opalRuntime;
+  private final OpalConfigurationService configService;
 
   private final CommandSchedulerService commandSchedulerService;
 
   private final CommandRegistry commandRegistry;
 
   @Autowired
-  public ReportTemplatesResource(OpalRuntime opalRuntime, CommandSchedulerService commandSchedulerService, @Qualifier("web") CommandRegistry commandRegistry) {
+  public ReportTemplatesResource(OpalConfigurationService configService, CommandSchedulerService commandSchedulerService, @Qualifier("web") CommandRegistry commandRegistry) {
     super();
-    this.opalRuntime = opalRuntime;
+    this.configService = configService;
     this.commandSchedulerService = commandSchedulerService;
     this.commandRegistry = commandRegistry;
   }
 
   @GET
   public Set<ReportTemplateDto> getReportTemplates() {
-    Set<ReportTemplate> templates = opalRuntime.getOpalConfiguration().getReportTemplates();
+    Set<ReportTemplate> templates = configService.getOpalConfiguration().getReportTemplates();
     return Dtos.asDto(templates);
   }
 
@@ -89,8 +89,8 @@ public class ReportTemplatesResource extends AbstractReportTemplateResource {
   }
 
   @Override
-  protected OpalRuntime getOpalRuntime() {
-    return opalRuntime;
+  protected OpalConfigurationService getOpalConfigurationService() {
+    return configService;
   }
 
   @Override

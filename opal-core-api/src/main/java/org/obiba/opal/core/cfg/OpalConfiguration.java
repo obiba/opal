@@ -73,7 +73,7 @@ public class OpalConfiguration {
 
   public <T extends OpalConfigurationExtension> T getExtension(Class<T> type) {
     try {
-      return Iterables.get(Iterables.filter(extensions, type), 0);
+      return Iterables.getOnlyElement(Iterables.filter(extensions, type));
     } catch(IndexOutOfBoundsException e) {
       throw new NoSuchElementException();
     }

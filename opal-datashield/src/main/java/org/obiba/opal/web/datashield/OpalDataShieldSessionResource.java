@@ -20,7 +20,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.obiba.opal.core.cfg.OpalConfiguration;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.datashield.DataShieldMethod;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.r.ROperationTemplate;
@@ -36,7 +36,7 @@ import com.google.common.collect.Iterables;
 
 public class OpalDataShieldSessionResource extends OpalRSessionResource {
 
-  private final OpalRuntime opalRuntime;
+  private final OpalConfigurationService configService;
 
   private final ROperationTemplate clean;
 
@@ -44,10 +44,10 @@ public class OpalDataShieldSessionResource extends OpalRSessionResource {
    * @param opalRSessionManager
    * @param rSession
    */
-  public OpalDataShieldSessionResource(ROperationTemplate clean, OpalRuntime opalRuntime, OpalRSessionManager opalRSessionManager, OpalRSession rSession) {
+  public OpalDataShieldSessionResource(ROperationTemplate clean, OpalConfigurationService configService, OpalRSessionManager opalRSessionManager, OpalRSession rSession) {
     super(opalRSessionManager, rSession);
     this.clean = clean;
-    this.opalRuntime = opalRuntime;
+    this.configService = configService;
   }
 
   @POST
@@ -83,7 +83,7 @@ public class OpalDataShieldSessionResource extends OpalRSessionResource {
   }
 
   private Iterable<DataShieldMethod> listMethods() {
-    OpalConfiguration cfg = opalRuntime.getOpalConfiguration();
+    OpalConfiguration cfg = configService.getOpalConfiguration();
     DatashieldConfiguration datashieldConfig = cfg.getExtension(DatashieldConfiguration.class);
     return datashieldConfig.getAggregatingMethods();
   }

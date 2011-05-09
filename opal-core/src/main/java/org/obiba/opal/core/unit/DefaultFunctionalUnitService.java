@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +27,13 @@ import org.springframework.stereotype.Component;
  */
 public class DefaultFunctionalUnitService implements FunctionalUnitService {
 
+  private final OpalConfigurationService configService;
+
   private final ApplicationContext applicationContext;
 
   @Autowired
-  public DefaultFunctionalUnitService(ApplicationContext applicationContext) {
+  public DefaultFunctionalUnitService(ApplicationContext applicationContext, OpalConfigurationService configService) {
+    this.configService = configService;
     this.applicationContext = applicationContext;
   }
 
@@ -81,11 +85,11 @@ public class DefaultFunctionalUnitService implements FunctionalUnitService {
   }
 
   private void write() {
-    getOpalRuntime().writeOpalConfiguration();
+    configService.writeOpalConfiguration();
   }
 
   private Set<FunctionalUnit> getConfiguredFunctionalUnits() {
-    return getOpalRuntime().getOpalConfiguration().getFunctionalUnits();
+    return configService.getOpalConfiguration().getFunctionalUnits();
   }
 
   // We get the OpalRuntime this way in order to remove the circular dependency:

@@ -17,10 +17,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.js.MagmaJsExtension;
 import org.obiba.magma.views.ViewManager;
-import org.obiba.magma.views.ViewPersistenceStrategy;
-import org.obiba.magma.views.impl.DefaultViewManagerImpl;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
-import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.fs.impl.OpalFileSystemImpl;
@@ -53,8 +50,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
   private OpalConfigurationService opalConfigurationService;
 
   @Autowired
-  private ViewPersistenceStrategy viewPersistenceStrategy;
-
   private ViewManager viewManager;
 
   private OpalFileSystem opalFileSystem;
@@ -67,11 +62,9 @@ public class DefaultOpalRuntime implements OpalRuntime {
     // We need these two extensions to read the opal config file
     new MagmaEngine().extend(new MagmaXStreamExtension()).extend(new MagmaJsExtension());
 
-    readConfiguration();
+    opalConfigurationService.readOpalConfiguration();
 
     initMagmaEngine();
-
-    initViewManager();
 
     initServices();
 
@@ -115,11 +108,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
   }
 
   @Override
-  public OpalConfiguration getOpalConfiguration() {
-    return opalConfigurationService.getOpalConfiguration();
-  }
-
-  @Override
   public OpalFileSystem getFileSystem() {
     synchronized(syncFs) {
       while(opalFileSystem == null) {
@@ -133,32 +121,18 @@ public class DefaultOpalRuntime implements OpalRuntime {
     return opalFileSystem;
   }
 
-  public ViewManager getViewManager() {
-    if(viewManager == null) {
-      viewManager = new DefaultViewManagerImpl(viewPersistenceStrategy);
-    }
-    return viewManager;
-  }
-
-  private void readConfiguration() {
-    opalConfigurationService.readOpalConfiguration();
-  }
-
   private void initMagmaEngine() {
     try {
       Runnable magmaEngineInit = new Runnable() {
         public void run() {
-          getOpalConfiguration().getMagmaEngineFactory().initialize(MagmaEngine.get());
+          opalConfigurationService.getOpalConfiguration().getMagmaEngineFactory().initialize(MagmaEngine.get());
+          MagmaEngine.get().addDecorator(viewManager);
         }
       };
       new TransactionalThread(txManager, magmaEngineInit).start();
     } catch(RuntimeException e) {
       log.error("Could not create MagmaEngine.", e);
     }
-  }
-
-  private void initViewManager() {
-    MagmaEngine.get().addDecorator(getViewManager());
   }
 
   private void initServices() {
@@ -174,7 +148,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
   private void initFileSystem() {
     synchronized(syncFs) {
       try {
-        opalFileSystem = new OpalFileSystemImpl(getOpalConfiguration().getFileSystemRoot());
+        opalFileSystem = new OpalFileSystemImpl(opalConfigurationService.getOpalConfiguration().getFileSystemRoot());
 
         // Create tmp folder, if it does not exist.
         FileObject tmpFolder = getFileSystem().getRoot().resolveFile("tmp");
@@ -213,12 +187,4 @@ public class DefaultOpalRuntime implements OpalRuntime {
     }
   }
 
-  @Override
-  public void writeOpalConfiguration() {
-    opalConfigurationService.writeOpalConfiguration();
-  }
-
-  public void setViewPersistenceStrategy(ViewPersistenceStrategy viewPersistenceStrategy) {
-    this.viewPersistenceStrategy = viewPersistenceStrategy;
-  }
 }

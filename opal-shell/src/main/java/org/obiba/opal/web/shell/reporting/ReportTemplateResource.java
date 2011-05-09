@@ -21,6 +21,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.ReportTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.reporting.service.ReportService;
@@ -45,33 +46,37 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   @PathParam("name")
   private String name;
 
+  private final OpalConfigurationService configService;
+
   private final OpalRuntime opalRuntime;
 
   private final CommandSchedulerService commandSchedulerService;
 
   // Added for unit tests
-  public ReportTemplateResource(String name, OpalRuntime opalRuntime) {
-    this(name, opalRuntime, null);
+  ReportTemplateResource(String name, OpalRuntime opalRuntime, OpalConfigurationService configService) {
+    this(name, opalRuntime, configService, null);
   }
 
-  public ReportTemplateResource(String name, OpalRuntime opalRuntime, CommandSchedulerService commandSchedulerService) {
+  public ReportTemplateResource(String name, OpalRuntime opalRuntime, OpalConfigurationService configService, CommandSchedulerService commandSchedulerService) {
     super();
     this.name = name;
+    this.configService = configService;
     this.opalRuntime = opalRuntime;
     this.commandSchedulerService = commandSchedulerService;
 
   }
 
   @Autowired
-  public ReportTemplateResource(OpalRuntime opalRuntime, ReportService reportService, CommandSchedulerService commandSchedulerService) {
+  public ReportTemplateResource(OpalRuntime opalRuntime, ReportService reportService, OpalConfigurationService configService, CommandSchedulerService commandSchedulerService) {
     super();
     this.opalRuntime = opalRuntime;
+    this.configService = configService;
     this.commandSchedulerService = commandSchedulerService;
   }
 
   @GET
   public Response getReportTemplate() {
-    ReportTemplate reportTemplate = opalRuntime.getOpalConfiguration().getReportTemplate(name);
+    ReportTemplate reportTemplate = getOpalConfigurationService().getOpalConfiguration().getReportTemplate(name);
     if(reportTemplate == null) {
       return Response.status(Status.NOT_FOUND).build();
     } else {
@@ -81,11 +86,11 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
 
   @DELETE
   public Response deleteReportTemplate() {
-    ReportTemplate reportTemplateToRemove = opalRuntime.getOpalConfiguration().getReportTemplate(name);
+    ReportTemplate reportTemplateToRemove = getOpalConfigurationService().getOpalConfiguration().getReportTemplate(name);
     if(reportTemplateToRemove == null) {
       return Response.status(Status.NOT_FOUND).build();
     } else {
-      opalRuntime.getOpalConfiguration().removeReportTemplate(name);
+      getOpalConfigurationService().getOpalConfiguration().removeReportTemplate(name);
       commandSchedulerService.deleteCommand(name, REPORT_SCHEDULING_GROUP);
       return Response.ok().build();
     }
@@ -108,7 +113,7 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   }
 
   private boolean reportTemplateExists() {
-    return opalRuntime.getOpalConfiguration().hasReportTemplate(name);
+    return getOpalConfigurationService().getOpalConfiguration().hasReportTemplate(name);
   }
 
   protected FileObject resolveFileInFileSystem(String path) throws FileSystemException {
@@ -116,8 +121,8 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   }
 
   @Override
-  protected OpalRuntime getOpalRuntime() {
-    return opalRuntime;
+  protected OpalConfigurationService getOpalConfigurationService() {
+    return configService;
   }
 
   @Override

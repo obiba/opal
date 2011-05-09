@@ -15,31 +15,29 @@ import java.util.Map;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.Decorator;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  *
  */
 public class FunctionalUnitDatasourceManager implements Decorator<Datasource> {
 
-  private final OpalRuntime opalRuntime;
+  private final OpalConfigurationService configService;
 
-  private Map<String, FunctionalUnitDatasource> functionalUnitDatasourcesMap = new HashMap<String, FunctionalUnitDatasource>();
+  private final Map<String, FunctionalUnitDatasource> functionalUnitDatasourcesMap = new HashMap<String, FunctionalUnitDatasource>();
 
   @Autowired
-  public FunctionalUnitDatasourceManager(TransactionTemplate txTemplate, OpalRuntime opalRuntime) {
+  public FunctionalUnitDatasourceManager(OpalConfigurationService configService) {
     super();
-    if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
-
-    this.opalRuntime = opalRuntime;
+    if(configService == null) throw new IllegalArgumentException("opalRuntime cannot be null");
+    this.configService = configService;
   }
 
   @Override
   public Datasource decorate(Datasource datasource) {
     // FIXME too soon for DatasourceResource:250, the factory is not registered yet!
-    for(DatasourceFactory factory : opalRuntime.getOpalConfiguration().getMagmaEngineFactory().factories()) {
+    for(DatasourceFactory factory : configService.getOpalConfiguration().getMagmaEngineFactory().factories()) {
       if(factory.getName().equals(datasource.getName())) {
         // TODO get associated unit if defined
         // FunctionalUnit unit = opalRuntime.getFunctionalUnit(factory.getUnit());

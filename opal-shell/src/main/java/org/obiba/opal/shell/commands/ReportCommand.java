@@ -74,7 +74,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
   public int execute() {
     // Get the report template.
     String reportTemplateName = getOptions().getName();
-    ReportTemplate reportTemplate = this.getOpalRuntime().getOpalConfiguration().getReportTemplate(reportTemplateName);
+    ReportTemplate reportTemplate = getOpalConfiguration().getReportTemplate(reportTemplateName);
     if(reportTemplate == null) {
       getShell().printf("Report template '%s' does not exist.\n", reportTemplateName);
       return 1;

@@ -26,8 +26,8 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.cfg.OpalConfiguration;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.ReportTemplate;
-import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.service.CommandSchedulerService;
@@ -40,9 +40,9 @@ public class ReportTemplatesResourceTest {
 
   public static final String BASE_URI = "http://localhost:8888/ws";
 
-  private OpalRuntime opalRuntimeMock;
-
   private OpalConfiguration opalConfiguration;
+
+  private OpalConfigurationService opalConfigurationServiceMock;
 
   private CommandRegistry commandRegistry;
 
@@ -52,7 +52,7 @@ public class ReportTemplatesResourceTest {
 
   @Before
   public void setUp() {
-    opalRuntimeMock = createMock(OpalRuntime.class);
+    opalConfigurationServiceMock = createMock(OpalConfigurationService.class);
     opalConfiguration = new OpalConfiguration();
     commandRegistry = createMock(CommandRegistry.class);
 
@@ -67,14 +67,14 @@ public class ReportTemplatesResourceTest {
     reportTemplates.add(getReportTemplate("template4"));
     opalConfiguration.setReportTemplates(reportTemplates);
 
-    expect(opalRuntimeMock.getOpalConfiguration()).andReturn(opalConfiguration).anyTimes();
+    expect(opalConfigurationServiceMock.getOpalConfiguration()).andReturn(opalConfiguration).anyTimes();
   }
 
   @Test
   public void testGetReportTemplates_RetrieveSetOfTemplates() {
-    replay(opalRuntimeMock);
+    replay(opalConfigurationServiceMock);
 
-    ReportTemplatesResource reportTemplateResource = new ReportTemplatesResource(opalRuntimeMock, commandSchedulerServiceMock, commandRegistry);
+    ReportTemplatesResource reportTemplateResource = new ReportTemplatesResource(opalConfigurationServiceMock, commandSchedulerServiceMock, commandRegistry);
     Set<ReportTemplateDto> reportTemplatesDtos = reportTemplateResource.getReportTemplates();
 
     Assert.assertEquals(4, reportTemplates.size());
@@ -87,13 +87,13 @@ public class ReportTemplatesResourceTest {
     Assert.assertEquals("schedule", reportTemplateDto.getCron());
     Assert.assertEquals(2, reportTemplateDto.getParametersList().size());
 
-    verify(opalRuntimeMock);
+    verify(opalConfigurationServiceMock);
   }
 
   @Test
   public void testUpdateReportTemplate_NewReportTemplateCreated() {
 
-    opalRuntimeMock.writeOpalConfiguration();
+    opalConfigurationServiceMock.writeOpalConfiguration();
     expectLastCall().once();
 
     CommandSchedulerService commandSchedulerServiceMock = createMock(CommandSchedulerService.class);
@@ -106,15 +106,15 @@ public class ReportTemplatesResourceTest {
 
     expect(commandRegistry.newCommand("report")).andReturn(commandMock);
 
-    replay(opalRuntimeMock, commandSchedulerServiceMock, commandRegistry);
+    replay(opalConfigurationServiceMock, commandSchedulerServiceMock, commandRegistry);
 
-    ReportTemplatesResource reportTemplatesResource = new ReportTemplatesResource(opalRuntimeMock, commandSchedulerServiceMock, commandRegistry);
+    ReportTemplatesResource reportTemplatesResource = new ReportTemplatesResource(opalConfigurationServiceMock, commandSchedulerServiceMock, commandRegistry);
     Response response = reportTemplatesResource.createReportTemplate(Dtos.asDto(getReportTemplate("template9")));
 
     Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
     Assert.assertEquals("/report-template/template9", response.getMetadata().get("location").get(0).toString());
 
-    verify(opalRuntimeMock, commandSchedulerServiceMock, commandRegistry);
+    verify(opalConfigurationServiceMock, commandSchedulerServiceMock, commandRegistry);
   }
 
   private ReportTemplate getReportTemplate(String name) {

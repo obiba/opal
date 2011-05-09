@@ -7,20 +7,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.runtime;
+package org.obiba.opal.core.cfg;
 
-import java.util.Set;
+import org.obiba.magma.views.impl.DefaultViewManagerImpl;
+import org.springframework.stereotype.Component;
 
-import org.obiba.opal.fs.OpalFileSystem;
+@Component
+public class OpalViewManager extends DefaultViewManagerImpl {
 
-public interface OpalRuntime {
-
-  public Set<Service> getServices();
-
-  public OpalFileSystem getFileSystem();
-
-  public void start();
-
-  public void stop();
+  public OpalViewManager() {
+    super(new OpalViewPersistenceStrategy());
+  }
 
 }

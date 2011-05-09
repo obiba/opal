@@ -35,7 +35,8 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.views.View;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.magma.views.ViewManager;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.ViewDto;
@@ -54,7 +55,9 @@ public class DatasourceResource {
   @PathParam("name")
   private String name;
 
-  private final OpalRuntime opalRuntime;
+  private final OpalConfigurationService configService;
+
+  private final ViewManager viewManager;
 
   private final ViewDtos viewDtos;
 
@@ -67,23 +70,26 @@ public class DatasourceResource {
   private Set<Locale> locales;
 
   @Autowired
-  public DatasourceResource(OpalRuntime opalRuntime, ViewDtos viewDtos) {
+  public DatasourceResource(OpalConfigurationService configService, ViewManager viewManager, ViewDtos viewDtos) {
     super();
-    if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
+    if(configService == null) throw new IllegalArgumentException("configService cannot be null");
+    if(viewManager == null) throw new IllegalArgumentException("viewManager cannot be null");
     if(viewDtos == null) throw new IllegalArgumentException("viewDtos cannot be null");
 
-    this.opalRuntime = opalRuntime;
+    this.configService = configService;
+    this.viewManager = viewManager;
     this.viewDtos = viewDtos;
   }
 
   // Used for testing
   DatasourceResource(String name) {
-    this(null, null, name);
+    this(null, null, null, name);
   }
 
   // Used for testing
-  DatasourceResource(OpalRuntime opalRuntime, ViewDtos viewDtos, String name) {
-    this.opalRuntime = opalRuntime;
+  DatasourceResource(OpalConfigurationService configService, ViewManager viewManager, ViewDtos viewDtos, String name) {
+    this.configService = configService;
+    this.viewManager = viewManager;
     this.viewDtos = viewDtos;
     this.name = name;
   }
@@ -115,8 +121,8 @@ public class DatasourceResource {
       response = Response.ok();
     } else if(MagmaEngine.get().hasDatasource(name)) {
       MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource(name));
-      opalRuntime.getOpalConfiguration().getMagmaEngineFactory().removeFactory(name);
-      opalRuntime.writeOpalConfiguration();
+      configService.getOpalConfiguration().getMagmaEngineFactory().removeFactory(name);
+      configService.writeOpalConfiguration();
       response = Response.ok();
     } else {
       response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound"));
@@ -140,7 +146,7 @@ public class DatasourceResource {
   }
 
   public ViewResource getViewResource(View view) {
-    return new ViewResource(opalRuntime, view, viewDtos, getLocales());
+    return new ViewResource(viewManager, view, viewDtos, getLocales());
   }
 
   @Path("/compare")
@@ -156,7 +162,7 @@ public class DatasourceResource {
     if(datasourceHasTable(viewDto.getName())) {
       return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists").build()).build();
     }
-    opalRuntime.getViewManager().addView(getDatasource().getName(), viewDtos.fromDto(viewDto));
+    viewManager.addView(getDatasource().getName(), viewDtos.fromDto(viewDto));
 
     URI viewUri = UriBuilder.fromUri(uriInfo.getBaseUri().toString()).path(DatasourceResource.class).path(DatasourceResource.class, "getView").build(name, viewDto.getName());
     URI tableUri = UriBuilder.fromUri(uriInfo.getBaseUri().toString()).path(DatasourceResource.class).path(DatasourceResource.class, "getTable").build(name, viewDto.getName());
@@ -166,7 +172,7 @@ public class DatasourceResource {
 
   @Path("/view/{viewName}")
   public ViewResource getView(@PathParam("viewName") String viewName) {
-    View view = opalRuntime.getViewManager().getView(getDatasource().getName(), viewName);
+    View view = viewManager.getView(getDatasource().getName(), viewName);
     return getViewResource(view);
   }
 
