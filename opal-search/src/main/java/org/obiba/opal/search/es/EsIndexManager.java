@@ -177,7 +177,7 @@ public class EsIndexManager implements IndexManager {
               xcb.field(variables[i].getName(), values[i].getValue());
             }
             bulkRequest.add(esProvider.getClient().prepareIndex("opal", index.name, entity.getIdentifier()).setParent(entity.getIdentifier()).setSource(xcb.endObject()));
-            if(bulkRequest.numberOfActions() >= 2000) {
+            if(bulkRequest.numberOfActions() >= 100) {
               BulkResponse bulkResponse = bulkRequest.execute().actionGet();
               if(bulkResponse.hasFailures()) {
                 // process failures by iterating through each bulk response item

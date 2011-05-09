@@ -79,6 +79,10 @@ public class OpalConfiguration {
     }
   }
 
+  public <T extends OpalConfigurationExtension> boolean hasExtension(Class<T> type) {
+    return Iterables.size(Iterables.filter(extensions, type)) == 1;
+  }
+
   public Set<FunctionalUnit> getFunctionalUnits() {
     return functionalUnits;
   }
