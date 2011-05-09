@@ -16,6 +16,7 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.VectorSource;
 import org.obiba.magma.support.AbstractValueTable;
+import org.obiba.magma.support.NullTimestamps;
 import org.obiba.magma.support.ValueSetBean;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.support.VariableEntityProvider;
@@ -93,6 +94,11 @@ class RestValueTable extends AbstractValueTable {
     return new LazyValueSet(this, entity);
   }
 
+  @Override
+  public Timestamps getTimestamps() {
+    return NullTimestamps.get();
+  }
+
   OpalJavaClient getOpalClient() {
     return getDatasource().getOpalClient();
   }
@@ -162,19 +168,4 @@ class RestValueTable extends AbstractValueTable {
     }
   }
 
-  @Override
-  public Timestamps getTimestamps(ValueSet valueSet) {
-    return new Timestamps() {
-
-      @Override
-      public Value getLastUpdate() {
-        return DateTimeType.get().nullValue();
-      }
-
-      @Override
-      public Value getCreated() {
-        return DateTimeType.get().nullValue();
-      }
-    };
-  }
 }
