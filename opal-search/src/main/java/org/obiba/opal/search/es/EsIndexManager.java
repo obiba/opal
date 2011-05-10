@@ -14,11 +14,14 @@ import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.client.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.common.collect.Sets;
+import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.indices.IndexMissingException;
@@ -54,17 +57,27 @@ public class EsIndexManager implements IndexManager {
 
   private final ElasticSearchProvider esProvider;
 
+  private final ElasticSearchConfigurationService esConfig;
+
   private final ThreadFactory threadFactory;
 
   private final Set<ValueTableIndex> indices = Sets.newHashSet();
 
   private final Indexer indexer = new Indexer();
 
-  @Autowired
-  public EsIndexManager(ElasticSearchProvider esProvider, ThreadFactory threadFactory) {
-    this.esProvider = esProvider;
-    this.threadFactory = threadFactory;
+  private final Sync sync = new Sync();
 
+  @Autowired
+  public EsIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig, ThreadFactory threadFactory) {
+    this.esProvider = esProvider;
+    this.esConfig = esConfig;
+    this.threadFactory = threadFactory;
+  }
+
+  // Every ten seconds
+  @Scheduled(fixedDelay = 10 * 1000)
+  public void synchronizeIndices() {
+    getSubject().execute(sync);
   }
 
   private Subject getSubject() {
@@ -72,27 +85,10 @@ public class EsIndexManager implements IndexManager {
     try {
       PrincipalCollection principals = SecurityUtils.getSecurityManager().authenticate(new BackgroundJobServiceAuthToken()).getPrincipals();
       return new Subject.Builder().principals(principals).authenticated(true).buildSubject();
-    } catch(Exception e) {
-      return null;
+    } catch(AuthenticationException e) {
+      log.warn("Failed to obtain system user credentials: {}", e.getMessage());
+      throw new RuntimeException(e);
     }
-  }
-
-  // Every ten seconds
-  @Scheduled(fixedDelay = 10 * 1000)
-  public void synchronizeIndices() {
-    getSubject().execute(new Runnable() {
-
-      @Override
-      public void run() {
-        for(Datasource ds : MagmaEngine.get().getDatasources()) {
-          for(ValueTable vt : ds.getValueTables()) {
-            if(getIndex(vt).isUpToDate(vt) == false) {
-              indexer.update(vt, getIndex(vt));
-            }
-          }
-        }
-      }
-    });
   }
 
   private ValueTableIndex getIndex(ValueTable vt) {
@@ -112,6 +108,25 @@ public class EsIndexManager implements IndexManager {
     return vt.getDatasource().getName() + "." + vt.getName();
   }
 
+  private Settings getIndexSettings() {
+    return ImmutableSettings.settingsBuilder().put("number_of_shards", esConfig.getConfig().getShards()).put("number_of_replicas", esConfig.getConfig().getReplicas()).build();
+  }
+
+  private class Sync implements Runnable {
+
+    @Override
+    public void run() {
+      for(Datasource ds : MagmaEngine.get().getDatasources()) {
+        for(ValueTable vt : ds.getValueTables()) {
+          if(getIndex(vt).isUpToDate(vt) == false) {
+            indexer.update(vt, getIndex(vt));
+          }
+        }
+      }
+    }
+
+  }
+
   private class Indexer {
 
     public void update(ValueTable vt, ValueTableIndex index) {
@@ -119,7 +134,7 @@ public class EsIndexManager implements IndexManager {
       try {
         esProvider.getClient().admin().indices().prepareDeleteMapping("opal").setType(index.name).execute().actionGet();
       } catch(IndexMissingException e) {
-        esProvider.getClient().admin().indices().prepareCreate("opal").execute().actionGet();
+        esProvider.getClient().admin().indices().prepareCreate("opal").setSettings(getIndexSettings()).execute().actionGet();
       }
       index(vt, index);
     }

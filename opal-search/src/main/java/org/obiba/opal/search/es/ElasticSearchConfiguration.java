@@ -17,6 +17,10 @@ public class ElasticSearchConfiguration implements OpalConfigurationExtension {
 
   private Boolean dataNode;
 
+  private Integer shards;
+
+  private Integer replicas;
+
   private String esSettings;
 
   public String getClusterName(String defaultName) {
@@ -29,6 +33,14 @@ public class ElasticSearchConfiguration implements OpalConfigurationExtension {
 
   public String getEsSettings() {
     return esSettings != null ? esSettings : "";
+  }
+
+  public Integer getShards() {
+    return shards != null ? shards : 5;
+  }
+
+  public Integer getReplicas() {
+    return replicas != null ? replicas : 0;
   }
 
 }

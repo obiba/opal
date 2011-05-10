@@ -15,9 +15,9 @@ import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.elasticsearch.node.internal.InternalNode;
 import org.elasticsearch.rest.RestController;
-import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.search.es.ElasticSearchConfiguration;
+import org.obiba.opal.search.es.ElasticSearchConfigurationService;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,14 +25,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class OpalSearchService implements Service, ElasticSearchProvider {
 
-  private final OpalConfigurationService configService;
+  private final ElasticSearchConfigurationService configService;
 
   private Node esNode;
 
   private Client client;
 
   @Autowired
-  public OpalSearchService(OpalConfigurationService configService) {
+  public OpalSearchService(ElasticSearchConfigurationService configService) {
     if(configService == null) throw new IllegalArgumentException("configService cannot be null");
     this.configService = configService;
   }
@@ -44,12 +44,7 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
 
   @Override
   public void start() {
-    ElasticSearchConfiguration esConfig = new ElasticSearchConfiguration();
-
-    if(configService.getOpalConfiguration().hasExtension(ElasticSearchConfiguration.class)) {
-      esConfig = configService.getOpalConfiguration().getExtension(ElasticSearchConfiguration.class);
-    }
-
+    ElasticSearchConfiguration esConfig = configService.getConfig();
     esNode = NodeBuilder.nodeBuilder().client(true).settings(ImmutableSettings.settingsBuilder().loadFromSource(esConfig.getEsSettings()).put("http.enabled", false)).clusterName(esConfig.getClusterName("opal")).client(esConfig.isDataNode() == false).node();
     client = esNode.client();
   }
