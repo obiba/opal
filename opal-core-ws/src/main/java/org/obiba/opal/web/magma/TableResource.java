@@ -10,7 +10,6 @@
 package org.obiba.opal.web.magma;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -46,6 +45,7 @@ import org.obiba.opal.web.magma.support.InvalidRequestException;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.ValueSetDto;
+import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
 
 import com.google.common.base.Function;
@@ -126,8 +126,8 @@ public class TableResource extends AbstractValueTableResource {
    */
   @GET
   @Path("/valueSets")
-  public Collection<ValueSetDto> getValueSets(@QueryParam("select") String select, @QueryParam("where") String where, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("100") int limit) {
-    Iterable<Variable> variables = filterVariables(select, 0, null);
+  public ValueSetsDto getValueSets(@QueryParam("select") String select, @QueryParam("where") String where, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("100") int limit) {
+    final Iterable<Variable> variables = filterVariables(select, 0, null);
 
     List<VariableEntity> entities;
     if(where != null) {
@@ -137,11 +137,33 @@ public class TableResource extends AbstractValueTableResource {
     }
     int end = Math.min(offset + limit, entities.size());
 
-    ImmutableList.Builder<ValueSetDto> dtos = ImmutableList.builder();
-    for(VariableEntity entity : entities.subList(offset, end)) {
-      dtos.add(getValueSet(entity, variables));
-    }
-    return dtos.build();
+    ValueSetsDto.Builder valueSets = ValueSetsDto.newBuilder().addAllVariables(Iterables.transform(variables, new Function<Variable, String>() {
+
+      @Override
+      public String apply(Variable from) {
+        return from.getName();
+      }
+    })).addAllValueSets(Iterables.transform(entities.subList(offset, end), new Function<VariableEntity, ValueSetsDto.ValueSetDto>() {
+
+      @Override
+      public ValueSetsDto.ValueSetDto apply(VariableEntity from) {
+        final ValueSet valueSet = getValueTable().getValueSet(from);
+        return ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(from.getIdentifier()).addAllValues(Iterables.transform(variables, new Function<Variable, ValueSetsDto.ValueDto>() {
+
+          @Override
+          public ValueSetsDto.ValueDto apply(Variable from) {
+            Value value = getValueTable().getVariableValueSource(from.getName()).getValue(valueSet);
+            ValueSetsDto.ValueDto.Builder valueDto = ValueSetsDto.ValueDto.newBuilder();
+            if(value.isNull() == false) {
+              valueDto.setValue(value.toString());
+            }
+            return valueDto.build();
+          }
+        })).build();
+      }
+    }));
+
+    return valueSets.build();
   }
 
   @GET
