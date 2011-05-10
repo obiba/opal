@@ -36,7 +36,9 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
+import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.ViewDto;
@@ -121,8 +123,13 @@ public class DatasourceResource {
       response = Response.ok();
     } else if(MagmaEngine.get().hasDatasource(name)) {
       MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource(name));
-      configService.getOpalConfiguration().getMagmaEngineFactory().removeFactory(name);
-      configService.writeOpalConfiguration();
+      configService.modifyConfiguration(new ConfigModificationTask() {
+
+        @Override
+        public void doWithConfig(OpalConfiguration config) {
+          config.getMagmaEngineFactory().removeFactory(name);
+        }
+      });
       response = Response.ok();
     } else {
       response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound"));

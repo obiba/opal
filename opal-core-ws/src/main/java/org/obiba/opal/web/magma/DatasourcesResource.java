@@ -30,7 +30,9 @@ import org.obiba.magma.DuplicateDatasourceNameException;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.support.DatasourceParsingException;
+import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.magma.support.NoSuchDatasourceFactoryException;
 import org.obiba.opal.web.model.Magma;
@@ -80,10 +82,15 @@ public class DatasourcesResource {
   public Response createDatasource(@Context final UriInfo uriInfo, Magma.DatasourceFactoryDto factoryDto) {
     ResponseBuilder response = null;
     try {
-      DatasourceFactory factory = datasourceFactoryRegistry.parse(factoryDto);
+      final DatasourceFactory factory = datasourceFactoryRegistry.parse(factoryDto);
       Datasource ds = MagmaEngine.get().addDatasource(factory);
-      configService.getOpalConfiguration().getMagmaEngineFactory().withFactory(factory);
-      configService.writeOpalConfiguration();
+      configService.modifyConfiguration(new ConfigModificationTask() {
+
+        @Override
+        public void doWithConfig(OpalConfiguration config) {
+          config.getMagmaEngineFactory().withFactory(factory);
+        }
+      });
       UriBuilder ub = uriInfo.getBaseUriBuilder().path("datasource").path(ds.getName());
       response = Response.created(ub.build()).entity(Dtos.asDto(ds).build());
     } catch(NoSuchDatasourceFactoryException noSuchDatasourceFactoryEx) {

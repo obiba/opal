@@ -14,7 +14,9 @@ import java.util.Set;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
+import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,12 +43,17 @@ public class DefaultFunctionalUnitService implements FunctionalUnitService {
     return getFunctionalUnit(unitName) != null;
   }
 
-  public void removeFunctionalUnit(String unitName) {
-    FunctionalUnit unit = getFunctionalUnit(unitName);
-    if(unit != null) {
-      getConfiguredFunctionalUnits().remove(unit);
-    }
-    write();
+  public void removeFunctionalUnit(final String unitName) {
+    configService.modifyConfiguration(new ConfigModificationTask() {
+
+      @Override
+      public void doWithConfig(OpalConfiguration config) {
+        FunctionalUnit unit = getFunctionalUnit(unitName);
+        if(unit != null) {
+          config.getFunctionalUnits().remove(unit);
+        }
+      }
+    });
   }
 
   public FunctionalUnit getFunctionalUnit(String unitName) {
@@ -62,11 +69,16 @@ public class DefaultFunctionalUnitService implements FunctionalUnitService {
     return Collections.unmodifiableSet(getConfiguredFunctionalUnits());
   }
 
-  public void addOrReplaceFunctionalUnit(FunctionalUnit functionalUnit) {
-    FunctionalUnit unit = getFunctionalUnit(functionalUnit.getName());
-    if(unit != null) getConfiguredFunctionalUnits().remove(unit);
-    this.getConfiguredFunctionalUnits().add(functionalUnit);
-    write();
+  public void addOrReplaceFunctionalUnit(final FunctionalUnit functionalUnit) {
+    configService.modifyConfiguration(new ConfigModificationTask() {
+
+      @Override
+      public void doWithConfig(OpalConfiguration config) {
+        FunctionalUnit unit = getFunctionalUnit(functionalUnit.getName());
+        if(unit != null) config.getFunctionalUnits().remove(unit);
+        config.getFunctionalUnits().add(functionalUnit);
+      }
+    });
   }
 
   @Override
@@ -82,10 +94,6 @@ public class DefaultFunctionalUnitService implements FunctionalUnitService {
     unitDir.createFolder();
 
     return unitDir;
-  }
-
-  private void write() {
-    configService.writeOpalConfiguration();
   }
 
   private Set<FunctionalUnit> getConfiguredFunctionalUnits() {

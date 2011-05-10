@@ -24,12 +24,14 @@ import javax.ws.rs.core.UriInfo;
 
 import junit.framework.Assert;
 
+import org.easymock.EasyMock;
 import org.jboss.resteasy.specimpl.UriBuilderImpl;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.cfg.ReportTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.shell.commands.Command;
@@ -134,7 +136,7 @@ public class ReportTemplateResourceTest {
     UriInfo uriInfoMock = createMock(UriInfo.class);
     expect(uriInfoMock.getAbsolutePath()).andReturn(UriBuilderImpl.fromUri(BASE_URI).build("")).atLeastOnce();
 
-    opalConfigurationServiceMock.writeOpalConfiguration();
+    opalConfigurationServiceMock.modifyConfiguration((ConfigModificationTask) EasyMock.anyObject());
     expectLastCall().once();
 
     CommandSchedulerService commandSchedulerServiceMock = createMock(CommandSchedulerService.class);
@@ -158,7 +160,7 @@ public class ReportTemplateResourceTest {
 
   @Test
   public void testUpdateReportTemplate_ExistingReportTemplateUpdated() {
-    opalConfigurationServiceMock.writeOpalConfiguration();
+    opalConfigurationServiceMock.modifyConfiguration((ConfigModificationTask) EasyMock.anyObject());
     expectLastCall().once();
 
     CommandSchedulerService commandSchedulerServiceMock = createMock(CommandSchedulerService.class);

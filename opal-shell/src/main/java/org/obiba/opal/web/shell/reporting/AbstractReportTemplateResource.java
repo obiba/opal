@@ -11,6 +11,7 @@ package org.obiba.opal.web.shell.reporting;
 
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.cfg.ReportTemplate;
 import org.obiba.opal.shell.service.CommandSchedulerService;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
@@ -30,17 +31,23 @@ public abstract class AbstractReportTemplateResource {
     return name != null && getOpalConfigurationService().getOpalConfiguration().hasReportTemplate(name);
   }
 
-  protected void updateOpalConfiguration(ReportTemplateDto dto) {
-    OpalConfiguration opalConfig = getOpalConfigurationService().getOpalConfiguration();
+  protected void updateOpalConfiguration(final ReportTemplateDto dto) {
+    getOpalConfigurationService().modifyConfiguration(new ConfigModificationTask() {
 
-    ReportTemplate reportTemplate = opalConfig.getReportTemplate(dto.getName());
-    if(reportTemplate != null) {
-      opalConfig.removeReportTemplate(dto.getName());
-    }
+      @Override
+      public void doWithConfig(OpalConfiguration config) {
+        OpalConfiguration opalConfig = getOpalConfigurationService().getOpalConfiguration();
 
-    reportTemplate = Dtos.fromDto(dto);
-    opalConfig.addReportTemplate(reportTemplate);
-    getOpalConfigurationService().writeOpalConfiguration();
+        ReportTemplate reportTemplate = opalConfig.getReportTemplate(dto.getName());
+        if(reportTemplate != null) {
+          opalConfig.removeReportTemplate(dto.getName());
+        }
+
+        reportTemplate = Dtos.fromDto(dto);
+        opalConfig.addReportTemplate(reportTemplate);
+      }
+    });
+
   }
 
   protected void updateSchedule(ReportTemplateDto reportTemplateDto) {

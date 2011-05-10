@@ -21,7 +21,9 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
+import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.cfg.ReportTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.reporting.service.ReportService;
@@ -90,8 +92,14 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
     if(reportTemplateToRemove == null) {
       return Response.status(Status.NOT_FOUND).build();
     } else {
-      getOpalConfigurationService().getOpalConfiguration().removeReportTemplate(name);
-      commandSchedulerService.deleteCommand(name, REPORT_SCHEDULING_GROUP);
+      getOpalConfigurationService().modifyConfiguration(new ConfigModificationTask() {
+
+        @Override
+        public void doWithConfig(OpalConfiguration config) {
+          config.removeReportTemplate(name);
+          commandSchedulerService.deleteCommand(name, REPORT_SCHEDULING_GROUP);
+        }
+      });
       return Response.ok().build();
     }
   }

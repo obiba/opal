@@ -15,6 +15,10 @@ public interface OpalConfigurationService {
 
   public OpalConfiguration getOpalConfiguration();
 
-  public void writeOpalConfiguration();
+  public void modifyConfiguration(ConfigModificationTask task);
+
+  public interface ConfigModificationTask {
+    public void doWithConfig(OpalConfiguration config);
+  }
 
 }

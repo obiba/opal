@@ -49,6 +49,7 @@ import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.web.magma.support.DatasourceFactoryDtoParser;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.magma.support.ExcelDatasourceFactoryDtoParser;
@@ -106,11 +107,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     OpalConfigurationService opalruntimeMock = createMock(OpalConfigurationService.class);
     UriInfo uriInfoMock = createMock(UriInfo.class);
 
-    OpalConfiguration opalConfig = new OpalConfiguration();
-    opalConfig.setMagmaEngineFactory(new MagmaEngineFactory());
-
-    expect(opalruntimeMock.getOpalConfiguration()).andReturn(opalConfig);
-    opalruntimeMock.writeOpalConfiguration();
+    opalruntimeMock.modifyConfiguration((ConfigModificationTask) EasyMock.anyObject());
     expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromPath("/"));
 
     replay(uriInfoMock, opalruntimeMock);
@@ -154,7 +151,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     opalConfig.setMagmaEngineFactory(factory);
 
     expect(opalruntimeMock.getOpalConfiguration()).andReturn(opalConfig);
-    opalruntimeMock.writeOpalConfiguration();
+    opalruntimeMock.modifyConfiguration((ConfigModificationTask) EasyMock.anyObject());
 
     ViewManager viewManagerMock = createMock(ViewManager.class);
 
@@ -181,17 +178,14 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
   public void testDatasourcesPOST() {
     OpalConfigurationService opalruntimeMock = createMock(OpalConfigurationService.class);
 
-    OpalConfiguration opalConfig = new OpalConfiguration();
-    opalConfig.setMagmaEngineFactory(new MagmaEngineFactory());
-
     DatasourcesResource resource = new DatasourcesResource(newDatasourceFactoryRegistry(), opalruntimeMock);
 
     UriInfo uriInfoMock = createMock(UriInfo.class);
     expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromPath("/"));
 
     Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder().setName("patate").setExtension(ExcelDatasourceFactoryDto.params, Magma.ExcelDatasourceFactoryDto.newBuilder().setFile(getDatasourcePath(DATASOURCE1)).setReadOnly(true).build()).build();
-    expect(opalruntimeMock.getOpalConfiguration()).andReturn(opalConfig);
-    opalruntimeMock.writeOpalConfiguration();
+
+    opalruntimeMock.modifyConfiguration((ConfigModificationTask) EasyMock.anyObject());
 
     replay(uriInfoMock, opalruntimeMock);
     Response response = resource.createDatasource(uriInfoMock, factoryDto);

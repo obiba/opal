@@ -23,10 +23,12 @@ import javax.ws.rs.core.Response;
 
 import junit.framework.Assert;
 
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.cfg.ReportTemplate;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.commands.Command;
@@ -93,7 +95,7 @@ public class ReportTemplatesResourceTest {
   @Test
   public void testUpdateReportTemplate_NewReportTemplateCreated() {
 
-    opalConfigurationServiceMock.writeOpalConfiguration();
+    opalConfigurationServiceMock.modifyConfiguration((ConfigModificationTask) EasyMock.anyObject());
     expectLastCall().once();
 
     CommandSchedulerService commandSchedulerServiceMock = createMock(CommandSchedulerService.class);

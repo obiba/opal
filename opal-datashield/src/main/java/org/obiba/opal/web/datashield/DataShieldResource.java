@@ -25,6 +25,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.datashield.DataShieldMethod;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.r.service.OpalRService;
@@ -93,12 +94,17 @@ public class DataShieldResource {
 
   @POST
   @Path("/methods")
-  public Response createDataShieldMethod(DataShield.DataShieldMethodDto dto) {
+  public Response createDataShieldMethod(final DataShield.DataShieldMethodDto dto) {
     DatashieldConfiguration config = getDatashieldConfiguration();
     if(config.hasDataShieldMethod(dto.getName())) return Response.status(Status.BAD_REQUEST).build();
 
-    config.addAggregatingMethod(methodConverterRegistry.parse(dto));
-    configService.writeOpalConfiguration();
+    configService.modifyConfiguration(new ConfigModificationTask() {
+
+      @Override
+      public void doWithConfig(OpalConfiguration config) {
+        config.getExtension(DatashieldConfiguration.class).addAggregatingMethod(methodConverterRegistry.parse(dto));
+      }
+    });
     UriBuilder ub = UriBuilder.fromPath("/").path(DataShieldResource.class).path(DataShieldResource.class, "getDataShieldMethod");
     return Response.created(ub.build(dto.getName())).build();
   }
@@ -111,23 +117,34 @@ public class DataShieldResource {
 
   @PUT
   @Path("/method/{name}")
-  public Response updateDataShieldMethod(@PathParam("name") String name, DataShield.DataShieldMethodDto dto) {
+  public Response updateDataShieldMethod(@PathParam("name") String name, final DataShield.DataShieldMethodDto dto) {
     if(!name.equals(dto.getName())) return Response.status(Status.BAD_REQUEST).build();
 
     DatashieldConfiguration config = getDatashieldConfiguration();
     if(!config.hasDataShieldMethod(name)) return Response.status(Status.NOT_FOUND).build();
 
-    config.addAggregatingMethod(methodConverterRegistry.parse(dto));
-    configService.writeOpalConfiguration();
+    configService.modifyConfiguration(new ConfigModificationTask() {
+
+      @Override
+      public void doWithConfig(OpalConfiguration config) {
+        config.getExtension(DatashieldConfiguration.class).addAggregatingMethod(methodConverterRegistry.parse(dto));
+      }
+    });
 
     return Response.ok().build();
   }
 
   @DELETE
   @Path("/method/{name}")
-  public Response deleteDataShieldMethod(@PathParam("name") String name) {
-    getDatashieldConfiguration().removeAggregatingMethod(name);
-    configService.writeOpalConfiguration();
+  public Response deleteDataShieldMethod(final @PathParam("name") String name) {
+
+    configService.modifyConfiguration(new ConfigModificationTask() {
+
+      @Override
+      public void doWithConfig(OpalConfiguration config) {
+        config.getExtension(DatashieldConfiguration.class).removeAggregatingMethod(name);
+      }
+    });
     return Response.ok().build();
   }
 

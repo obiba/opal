@@ -58,7 +58,17 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
   }
 
   @Override
-  public void writeOpalConfiguration() {
+  public void modifyConfiguration(ConfigModificationTask task) {
+    opalConfigurationLock.lock();
+    try {
+      task.doWithConfig(getOpalConfiguration());
+      writeOpalConfiguration();
+    } finally {
+      opalConfigurationLock.unlock();
+    }
+  }
+
+  private void writeOpalConfiguration() {
     opalConfigurationLock.lock();
     try {
       opalConfigIo.writeConfiguration(opalConfiguration);
@@ -66,4 +76,5 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
       opalConfigurationLock.unlock();
     }
   }
+
 }
