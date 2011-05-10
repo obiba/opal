@@ -55,13 +55,18 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-ajp</artifactId>
+      <version>${jetty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
       <version>${jetty.version}</version>
     </dependency>
   </dependencies>
 
   <properties>
-    <jetty.version>7.0.2.v20100331</jetty.version>
+    <jetty.version>7.4.0.v20110414</jetty.version>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
   </properties>
 </project>

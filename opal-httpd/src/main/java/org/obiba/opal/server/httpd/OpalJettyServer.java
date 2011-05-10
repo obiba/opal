@@ -14,14 +14,13 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import javax.net.ssl.SSLContext;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.mgt.SecurityManager;
-import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.ajp.Ajp13SocketConnector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
@@ -71,30 +70,51 @@ public class OpalJettyServer implements Service {
   private ConfigurableApplicationContext webApplicationContext;
 
   @Autowired
-  public OpalJettyServer(final ApplicationContext ctx, final SecurityManager securityMgr, final SslContextFactory sslContextFactory, final PlatformTransactionManager txmgr, final @Value("${org.obiba.opal.http.port}") Integer httpPort, final @Value("${org.obiba.opal.https.port}") Integer httpsPort) {
+  public OpalJettyServer(final ApplicationContext ctx, final SecurityManager securityMgr, final SslContextFactory sslContextFactory, final PlatformTransactionManager txmgr, final @Value("${org.obiba.opal.http.port}") Integer httpPort, final @Value("${org.obiba.opal.https.port}") Integer httpsPort, final @Value("${org.obiba.opal.ajp.port}") Integer ajpPort) {
     Server server = new Server();
     server.setSendServerVersion(false);
     // OPAL-342: We will manually stop the Jetty server instead of relying its shutdown hook
     server.setStopAtShutdown(false);
 
-    SelectChannelConnector httpConnector = new SelectChannelConnector();
-    httpConnector.setPort(httpPort);
-    httpConnector.setMaxIdleTime(30000);
-    httpConnector.setRequestHeaderSize(8192);
+    if(httpPort != null && httpPort > 0) {
+      SelectChannelConnector httpConnector = new SelectChannelConnector();
+      httpConnector.setPort(httpPort);
+      httpConnector.setMaxIdleTime(30000);
+      httpConnector.setRequestHeaderSize(8192);
+      server.addConnector(httpConnector);
+    }
 
-    SslSelectChannelConnector sslConnector = new SslSelectChannelConnector() {
-      @Override
-      protected SSLContext createSSLContext() throws Exception {
-        return sslContextFactory.createSslContext();
-      }
-    };
-    sslConnector.setPort(httpsPort);
-    sslConnector.setWantClientAuth(true);
-    sslConnector.setNeedClientAuth(false);
-    sslConnector.setMaxIdleTime(30000);
-    sslConnector.setRequestHeaderSize(8192);
+    if(httpsPort != null && httpsPort > 0) {
 
-    server.setConnectors(new Connector[] { httpConnector, sslConnector });
+      org.eclipse.jetty.http.ssl.SslContextFactory jettySsl = new org.eclipse.jetty.http.ssl.SslContextFactory() {
+        @Override
+        protected void createSSLContext() throws Exception {
+          super.setSslContext(sslContextFactory.createSslContext());
+        }
+
+        @Override
+        public boolean checkConfig() {
+          return true;
+        }
+      };
+
+      jettySsl.setWantClientAuth(true);
+      jettySsl.setNeedClientAuth(false);
+
+      SslSelectChannelConnector sslConnector = new SslSelectChannelConnector(jettySsl);
+      sslConnector.setPort(httpsPort);
+      sslConnector.setMaxIdleTime(30000);
+      sslConnector.setRequestHeaderSize(8192);
+
+      server.addConnector(sslConnector);
+    }
+
+    if(ajpPort != null && ajpPort > 0) {
+      Ajp13SocketConnector ajp = new Ajp13SocketConnector();
+      ajp.setPort(ajpPort);
+      server.addConnector(ajp);
+    }
+
     HandlerList handlers = new HandlerList();
 
     // Add a file handler that points to the Opal GWT client directory
@@ -124,6 +144,7 @@ public class OpalJettyServer implements Service {
       log.info("Starting Opal HTTP/s Server on port {}", this.jettyServer.getConnectors()[0].getPort());
       this.jettyServer.start();
     } catch(Exception e) {
+      log.error("Error satrting jetty", e);
       throw new RuntimeException(e);
     }
   }
