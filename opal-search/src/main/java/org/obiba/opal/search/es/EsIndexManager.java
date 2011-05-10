@@ -30,20 +30,13 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.Timestamped;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.concurrent.ConcurrentValueTableReader;
 import org.obiba.magma.concurrent.ConcurrentValueTableReader.ConcurrentReaderCallback;
-import org.obiba.magma.type.BooleanType;
-import org.obiba.magma.type.DateTimeType;
-import org.obiba.magma.type.DateType;
-import org.obiba.magma.type.DecimalType;
-import org.obiba.magma.type.IntegerType;
-import org.obiba.magma.type.LocaleType;
-import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.runtime.security.BackgroundJobServiceAuthToken;
 import org.obiba.opal.search.IndexManager;
+import org.obiba.opal.search.es.mapping.ValueTableMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,8 +55,6 @@ public class EsIndexManager implements IndexManager {
   private final ThreadFactory threadFactory;
 
   private final Set<ValueTableIndex> indices = Sets.newHashSet();
-
-  private final Indexer indexer = new Indexer();
 
   private final Sync sync = new Sync();
 
@@ -119,7 +110,7 @@ public class EsIndexManager implements IndexManager {
       for(Datasource ds : MagmaEngine.get().getDatasources()) {
         for(ValueTable vt : ds.getValueTables()) {
           if(getIndex(vt).isUpToDate(vt) == false) {
-            indexer.update(vt, getIndex(vt));
+            new Indexer().update(vt, getIndex(vt));
           }
         }
       }
@@ -139,43 +130,9 @@ public class EsIndexManager implements IndexManager {
       index(vt, index);
     }
 
-    private String esTypeForValueType(ValueType type) {
-      if(TextType.get() == type) {
-        return "string";
-      } else if(IntegerType.get() == type) {
-        return "long";
-      } else if(DecimalType.get() == type) {
-        return "double";
-      } else if(BooleanType.get() == type) {
-        return "boolean";
-      } else if(DateType.get() == type || DateTimeType.get() == type) {
-        return "date";
-      } else if(LocaleType.get() == type) {
-        return "string";
-      }
-      throw new IllegalArgumentException("unknown type");
-    }
-
-    private XContentBuilder createMapping(String name, Iterable<Variable> variables) {
-      try {
-        XContentBuilder mapping = XContentFactory.jsonBuilder().startObject().startObject(name);
-        mapping.startObject("_all").field("enabled", false).endObject().startObject("_parent").field("type", "Participant").endObject();
-        mapping.startObject("properties");
-        for(Variable variable : variables) {
-          mapping.startObject(variable.getName()).field("type", esTypeForValueType(variable.getValueType())).field("store", "yes").endObject();
-        }
-
-        mapping.endObject().endObject().endObject();
-        log.info("mapping: {}", mapping.string());
-        return mapping;
-      } catch(IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
-
     private void index(final ValueTable valueTable, final ValueTableIndex index) {
 
-      XContentBuilder b = createMapping(index.name, valueTable.getVariables());
+      XContentBuilder b = new ValueTableMapping().createMapping(index.name, valueTable);
 
       esProvider.getClient().admin().indices().preparePutMapping("opal").setSource(b).execute().actionGet();
 

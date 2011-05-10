@@ -40,7 +40,7 @@ public class ElasticSearchConfiguration implements OpalConfigurationExtension {
   }
 
   public Integer getReplicas() {
-    return replicas != null ? replicas : 0;
+    return replicas != null ? replicas : 1;
   }
 
 }
