@@ -19,13 +19,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileSystemException;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.cfg.ReportTemplate;
-import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.reporting.service.ReportService;
 import org.obiba.opal.shell.service.CommandSchedulerService;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
@@ -50,28 +47,24 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
 
   private final OpalConfigurationService configService;
 
-  private final OpalRuntime opalRuntime;
-
   private final CommandSchedulerService commandSchedulerService;
 
   // Added for unit tests
-  ReportTemplateResource(String name, OpalRuntime opalRuntime, OpalConfigurationService configService) {
-    this(name, opalRuntime, configService, null);
+  ReportTemplateResource(String name, OpalConfigurationService configService) {
+    this(name, configService, null);
   }
 
-  public ReportTemplateResource(String name, OpalRuntime opalRuntime, OpalConfigurationService configService, CommandSchedulerService commandSchedulerService) {
+  public ReportTemplateResource(String name, OpalConfigurationService configService, CommandSchedulerService commandSchedulerService) {
     super();
     this.name = name;
     this.configService = configService;
-    this.opalRuntime = opalRuntime;
     this.commandSchedulerService = commandSchedulerService;
 
   }
 
   @Autowired
-  public ReportTemplateResource(OpalRuntime opalRuntime, ReportService reportService, OpalConfigurationService configService, CommandSchedulerService commandSchedulerService) {
+  public ReportTemplateResource(ReportService reportService, OpalConfigurationService configService, CommandSchedulerService commandSchedulerService) {
     super();
-    this.opalRuntime = opalRuntime;
     this.configService = configService;
     this.commandSchedulerService = commandSchedulerService;
   }
@@ -97,9 +90,9 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
         @Override
         public void doWithConfig(OpalConfiguration config) {
           config.removeReportTemplate(name);
-          commandSchedulerService.deleteCommand(name, REPORT_SCHEDULING_GROUP);
         }
       });
+      commandSchedulerService.deleteCommand(name, REPORT_SCHEDULING_GROUP);
       return Response.ok().build();
     }
   }
@@ -122,10 +115,6 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
 
   private boolean reportTemplateExists() {
     return getOpalConfigurationService().getOpalConfiguration().hasReportTemplate(name);
-  }
-
-  protected FileObject resolveFileInFileSystem(String path) throws FileSystemException {
-    return opalRuntime.getFileSystem().getRoot().resolveFile(path);
   }
 
   @Override
