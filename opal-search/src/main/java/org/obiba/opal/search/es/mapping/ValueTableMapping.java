@@ -40,9 +40,6 @@ public class ValueTableMapping {
 
       mapping.endObject() // type
       .endObject(); // mapping
-
-      System.out.println(mapping.string());
-
       return mapping;
     } catch(IOException e) {
       throw new RuntimeException(e);
