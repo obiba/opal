@@ -9,12 +9,21 @@
  ******************************************************************************/
 package org.obiba.opal.search;
 
-import org.obiba.magma.Timestamped;
+import org.obiba.magma.ValueTable;
 
-public interface ValueTableIndex extends Timestamped {
+public interface IndexSynchronization {
 
-  public IndexSynchronization update();
+  public ValueTableIndex getValueTableIndex();
 
-  public void delete();
+  public ValueTable getValueTable();
+
+  public boolean hasStarted();
+
+  public boolean isComplete();
+
+  /**
+   * A value between 0 and 1.
+   */
+  public float getProgress();
 
 }

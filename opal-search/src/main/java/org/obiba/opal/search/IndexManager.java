@@ -9,6 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.search;
 
+import org.obiba.magma.ValueTable;
+
 public interface IndexManager {
+
+  public ValueTableIndex getIndex(ValueTable valueTable);
 
 }

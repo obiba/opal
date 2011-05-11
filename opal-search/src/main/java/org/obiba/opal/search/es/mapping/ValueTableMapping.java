@@ -36,7 +36,24 @@ public class ValueTableMapping {
       }
       mapping.endObject();// properties
 
-      mapping.startObject("_meta").field("_created", DateTimeType.get().valueOf(new Date()).toString()).field("_updated", DateTimeType.get().valueOf(new Date()).toString()).endObject();
+      mapping.startObject("_meta")//
+      .field("_created", DateTimeType.get().valueOf(new Date()).toString())//
+      // .field("_updated", DateTimeType.get().valueOf(new Date()).toString())//
+      .field("_reference", valueTable.getDatasource().getName() + "." + valueTable.getName()).endObject();
+
+      mapping.endObject() // type
+      .endObject(); // mapping
+      return mapping;
+    } catch(IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public XContentBuilder updateTimestamps(String name) {
+    try {
+      XContentBuilder mapping = XContentFactory.jsonBuilder().startObject().startObject(name);
+
+      mapping.startObject("_meta").field("_updated", DateTimeType.get().valueOf(new Date()).toString()).endObject();
 
       mapping.endObject() // type
       .endObject(); // mapping

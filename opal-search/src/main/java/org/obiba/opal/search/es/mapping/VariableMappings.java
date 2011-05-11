@@ -21,7 +21,7 @@ public class VariableMappings {
 
   private ValueTypeMappings valueTypeMappings = new ValueTypeMappings();
 
-  private Iterable<VariableMapping> mappings = ImmutableList.<VariableMapping> of(new Categorical(), new Store());
+  private Iterable<VariableMapping> mappings = ImmutableList.<VariableMapping> of(new Categorical()/* , new Store() */);
 
   public XContentBuilder map(Variable variable, XContentBuilder builder) {
     try {
@@ -47,6 +47,9 @@ public class VariableMappings {
     }
   }
 
+  /**
+   * Used to prevent Lucene analyzers from running on categorical values
+   */
   private class Categorical implements VariableMapping {
 
     @Override
