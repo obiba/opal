@@ -16,8 +16,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Pattern;
 
 import org.obiba.core.util.FileUtil;
@@ -30,6 +32,7 @@ import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
 import com.thoughtworks.xstream.XStream;
 
@@ -48,28 +51,52 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
 
   public static final String VIEWS_DIRECTORY_NAME = "views";
 
-  private static final Charset UTF8 = Charset.forName("UTF-8");
-
-  private final String viewsDirectoryName;
-
   private final File viewsDirectory;
 
+  private final ReadWriteLock rwl = new ReentrantReadWriteLock(true);
+
+  private final Lock r = rwl.readLock();
+
+  private final Lock w = rwl.writeLock();
+
   public OpalViewPersistenceStrategy() {
-    viewsDirectoryName = System.getProperty(OPAL_HOME_SYSTEM_PROPERTY_NAME) + File.separator + CONF_DIRECTORY_NAME + File.separator + VIEWS_DIRECTORY_NAME;
+    String viewsDirectoryName = System.getProperty(OPAL_HOME_SYSTEM_PROPERTY_NAME) + File.separator + CONF_DIRECTORY_NAME + File.separator + VIEWS_DIRECTORY_NAME;
     viewsDirectory = new File(viewsDirectoryName);
   }
 
   @Override
   public void writeViews(String datasourceName, Set<View> views) {
+    w.lock();
+    try {
+      doWriteViews(datasourceName, views);
+    } finally {
+      w.unlock();
+    }
+  }
+
+  @Override
+  public Set<View> readViews(String datasourceName) {
+    r.lock();
+    try {
+      return doReadViews(datasourceName);
+    } finally {
+      r.unlock();
+    }
+  }
+
+  private void doWriteViews(String datasourceName, Set<View> views) {
     createViewsDirectory(); // Creates the views directory if it doesn't exist.
     if(views.isEmpty()) {
+      if(getDatasourceViewsFile(datasourceName).exists()) {
+        getDatasourceViewsFile(datasourceName).delete();
+      }
       // Do nothing. The file containing the views has already been deleted.
     } else {
       XStream xstream = getXStream();
       OutputStreamWriter writer = null;
       try {
         File tmpFile = File.createTempFile(datasourceName, ".xml");
-        writer = new OutputStreamWriter(new FileOutputStream(tmpFile), UTF8);
+        writer = new OutputStreamWriter(new FileOutputStream(tmpFile), Charsets.UTF_8);
         xstream.toXML(views, writer);
 
         FileUtil.copyFile(tmpFile, getDatasourceViewsFile(datasourceName));
@@ -87,15 +114,8 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     }
   }
 
-  private void createViewsDirectory() {
-    if(!viewsDirectory.isDirectory()) {
-      if(!viewsDirectory.mkdirs()) throw new RuntimeException("The views directory '" + viewsDirectory.getAbsolutePath() + "' could not be created.");
-    }
-  }
-
   @SuppressWarnings("unchecked")
-  @Override
-  public Set<View> readViews(String datasourceName) {
+  private Set<View> doReadViews(String datasourceName) {
     Set<View> result = ImmutableSet.of();
     if(!viewsDirectory.isDirectory()) {
       log.info("The views directory '" + viewsDirectory.getAbsolutePath() + "' does not exist.");
@@ -104,7 +124,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     XStream xstream = getXStream();
     InputStreamReader reader = null;
     try {
-      reader = new InputStreamReader(new FileInputStream(getDatasourceViewsFile(datasourceName)), UTF8);
+      reader = new InputStreamReader(new FileInputStream(getDatasourceViewsFile(datasourceName)), Charsets.UTF_8);
       result = (Set<View>) xstream.fromXML(reader);
     } catch(FileNotFoundException e) {
       return ImmutableSet.of();
@@ -116,6 +136,12 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
 
   protected XStream getXStream() {
     return MagmaEngine.get().getExtension(MagmaXStreamExtension.class).getXStreamFactory().createXStream();
+  }
+
+  private void createViewsDirectory() {
+    if(!viewsDirectory.isDirectory()) {
+      if(!viewsDirectory.mkdirs()) throw new RuntimeException("The views directory '" + viewsDirectory.getAbsolutePath() + "' could not be created.");
+    }
   }
 
   private String normalizeDatasourceName(String datasourceName) {
