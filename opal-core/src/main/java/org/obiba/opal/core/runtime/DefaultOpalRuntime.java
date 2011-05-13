@@ -125,8 +125,10 @@ public class DefaultOpalRuntime implements OpalRuntime {
     try {
       Runnable magmaEngineInit = new Runnable() {
         public void run() {
-          opalConfigurationService.getOpalConfiguration().getMagmaEngineFactory().initialize(MagmaEngine.get());
+          // This needs to be added BEFORE otherwise bad things happen. That really sucks.
           MagmaEngine.get().addDecorator(viewManager);
+
+          opalConfigurationService.getOpalConfiguration().getMagmaEngineFactory().initialize(MagmaEngine.get());
         }
       };
       new TransactionalThread(txManager, magmaEngineInit).start();
