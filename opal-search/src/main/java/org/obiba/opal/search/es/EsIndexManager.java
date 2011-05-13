@@ -10,6 +10,7 @@
 package org.obiba.opal.search.es;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.ThreadFactory;
@@ -22,6 +23,7 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.client.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
+import org.elasticsearch.common.base.Preconditions;
 import org.elasticsearch.common.collect.Sets;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
@@ -59,6 +61,9 @@ public class EsIndexManager implements IndexManager {
 
   private final int ES_BATCH_SIZE = 100;
 
+  // Grace period before reindexing (in seconds)
+  private final int GRACE_PERIOD = 300;
+
   private final ElasticSearchProvider esProvider;
 
   private final ElasticSearchConfigurationService esConfig;
@@ -71,6 +76,10 @@ public class EsIndexManager implements IndexManager {
 
   @Autowired
   public EsIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig, ThreadFactory threadFactory) {
+    Preconditions.checkNotNull(esProvider);
+    Preconditions.checkNotNull(esConfig);
+    Preconditions.checkNotNull(threadFactory);
+
     this.esProvider = esProvider;
     this.esConfig = esConfig;
     this.threadFactory = threadFactory;
@@ -94,6 +103,8 @@ public class EsIndexManager implements IndexManager {
   }
 
   public EsValueTableIndex getIndex(ValueTable vt) {
+    Preconditions.checkNotNull(vt);
+
     for(EsValueTableIndex i : this.indices) {
       if(i.isForTable(vt)) return i;
     }
@@ -131,19 +142,39 @@ public class EsIndexManager implements IndexManager {
       for(Datasource ds : MagmaEngine.get().getDatasources()) {
         for(ValueTable vt : ds.getValueTables()) {
 
+          // Check that the index is older than the ValueTable
           if(Timestampeds.lastUpdateComparator.compare(getIndex(vt), vt) < 0) {
-            new Indexer().update(vt, getIndex(vt));
+            // The index needs to be updated
+            Value value = vt.getTimestamps().getLastUpdate();
+            // Check that the last modification to the ValueTable is older than the gracePeriod
+            // If we don't know (null value), reindex
+            if(value.isNull() || value.compareTo(gracePeriod()) < 0) {
+              new Indexer().update(vt, getIndex(vt));
+            }
           }
 
         }
       }
+      // esProvider.getClient().admin().indices().prepareOptimize(OPAL_INDEX_NAME).setWaitForMerge(false).execute().actionGet();
     }
 
+    /**
+     * Returns a {@code Value} with the date and time at which things are reindexed.
+     * @return
+     */
+    private Value gracePeriod() {
+      // Now
+      Calendar gracePeriod = Calendar.getInstance();
+      // Move back in time by GRACE_PERIOD seconds
+      gracePeriod.add(Calendar.SECOND, -GRACE_PERIOD);
+      // Things modified before this value can be reindexed
+      return DateTimeType.get().valueOf(gracePeriod);
+    }
   }
 
   private class Indexer {
 
-    public void update(ValueTable vt, EsValueTableIndex index) {
+    void update(ValueTable vt, EsValueTableIndex index) {
       log.info("Updating ValueTable index {}", index.valueTableReference);
       try {
         esProvider.getClient().admin().indices().prepareDeleteMapping(OPAL_INDEX_NAME).setType(index.name).execute().actionGet();
