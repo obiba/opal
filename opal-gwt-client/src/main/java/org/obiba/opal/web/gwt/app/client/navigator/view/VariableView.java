@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.prettify.client.PrettyPrintLabel;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabAuthorizer;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
@@ -284,6 +285,16 @@ public class VariableView extends Composite implements VariablePresenter.Display
   @Override
   public void setPreviousCommand(Command cmd) {
     toolbar.setPreviousCommand(cmd);
+  }
+
+  @Override
+  public void setEditCommand(Command cmd) {
+    toolbar.setEditCommand(cmd);
+  }
+
+  @Override
+  public HasAuthorization getEditAuthorizer() {
+    return new MenuItemAuthorizer(toolbar.getEditItem());
   }
 
   private void initCategoryTable() {

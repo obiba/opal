@@ -466,6 +466,9 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     @Override
     public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
       VariablesListTabPresenter.this.setViewDto(event.getView());
+      if(event.getVariable() != null) {
+        VariablesListTabPresenter.this.updateAndDisplayVariable(event.getVariable().getName());
+      }
     }
   }
 

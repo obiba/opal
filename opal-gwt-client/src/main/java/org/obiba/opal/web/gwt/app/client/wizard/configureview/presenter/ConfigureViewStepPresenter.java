@@ -206,6 +206,9 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
       getDisplay().addVariablesTabWidget(getVariablesTabWidget());
 
       getDisplay().showDialog();
+      if(event.getVariable() != null) {
+        getDisplay().displayTab(1);
+      }
     }
 
     private Widget getVariablesTabWidget() {

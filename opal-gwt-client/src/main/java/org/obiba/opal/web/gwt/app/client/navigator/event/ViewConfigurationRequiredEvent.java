@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.event;
 
+import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.event.shared.EventHandler;
@@ -30,12 +31,19 @@ public class ViewConfigurationRequiredEvent extends GwtEvent<ViewConfigurationRe
 
   private ViewDto view;
 
+  private VariableDto variable;
+
   //
   // Constructors
   //
 
   public ViewConfigurationRequiredEvent(ViewDto view) {
     this.view = view;
+  }
+
+  public ViewConfigurationRequiredEvent(ViewDto view, VariableDto variable) {
+    this(view);
+    this.variable = variable;
   }
 
   //
@@ -62,6 +70,10 @@ public class ViewConfigurationRequiredEvent extends GwtEvent<ViewConfigurationRe
 
   public ViewDto getView() {
     return view;
+  }
+
+  public VariableDto getVariable() {
+    return variable;
   }
 
   //

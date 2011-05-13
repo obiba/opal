@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingVariableSelectio
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingVariableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.SummaryRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -33,22 +34,20 @@ import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
 import com.google.inject.Inject;
 
-/**
- *
- */
 public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display> {
 
   private final SummaryTabPresenter summaryTabPresenter;
 
-  private VariableDto variable;
+  private final AuthorizationPresenter authorizationPresenter;
 
-  private AuthorizationPresenter authorizationPresenter;
+  private VariableDto variable;
 
   //
   // Constructors
@@ -138,6 +137,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     for(AttributeDto attr : JsArrays.toIterable(variable.getAttributesArray())) {
       if(attr.getName().equals("script")) {
         getDisplay().setDerivedVariable(true, attr.getValue());
+        getDisplay().setEditCommand(new EditCommand());
         break;
       }
     }
@@ -146,6 +146,10 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   private void authorize() {
     // summary
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(variable.getLink() + "/summary").get().authorize(new CompositeAuthorizer(getDisplay().getSummaryAuthorizer(), new SummaryUpdate())).send();
+
+    // edit variable
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(getViewLink()).put().authorize(getDisplay().getEditAuthorizer()).send();
+
     // set permissions
     AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getDisplay().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
@@ -159,6 +163,10 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
    */
   private void requestSummary(final VariableDto selection) {
     eventBus.fireEvent(new SummaryRequiredEvent(selection.getLink() + "/summary"));
+  }
+
+  private String getViewLink() {
+    return variable.getParentLink().getLink().replaceFirst("/table/", "/view/");
   }
 
   //
@@ -255,6 +263,20 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     }
   }
 
+  final class EditCommand implements Command {
+    @Override
+    public void execute() {
+
+      ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource(getViewLink()).get().withCallback(new ResourceCallback<ViewDto>() {
+
+        @Override
+        public void onResource(Response response, ViewDto viewDto) {
+          eventBus.fireEvent(new ViewConfigurationRequiredEvent(viewDto, variable));
+        }
+      }).send();
+    }
+  }
+
   class VariableSelectionHandler implements VariableSelectionChangeEvent.Handler {
     @Override
     public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
@@ -305,8 +327,12 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
     HasAuthorization getSummaryAuthorizer();
 
+    HasAuthorization getEditAuthorizer();
+
     HasAuthorization getPermissionsAuthorizer();
 
     void setPermissionsTabWidget(AuthorizationPresenter.Display display);
+
+    void setEditCommand(Command cmd);
   }
 }
