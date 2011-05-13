@@ -130,6 +130,9 @@ public class DatasourceResource {
           config.getMagmaEngineFactory().removeFactory(name);
         }
       });
+
+      viewManager.removeAllViews(name);
+
       response = Response.ok();
     } else {
       response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound"));
