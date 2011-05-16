@@ -10,15 +10,10 @@
 package org.obiba.opal.search.es;
 
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.subject.Subject;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.client.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
@@ -30,8 +25,6 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.indices.IndexMissingException;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
@@ -39,9 +32,7 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.concurrent.ConcurrentValueTableReader;
 import org.obiba.magma.concurrent.ConcurrentValueTableReader.ConcurrentReaderCallback;
-import org.obiba.magma.support.Timestampeds;
 import org.obiba.magma.type.DateTimeType;
-import org.obiba.opal.core.runtime.security.BackgroundJobServiceAuthToken;
 import org.obiba.opal.search.IndexManager;
 import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.ValueTableIndex;
@@ -49,7 +40,6 @@ import org.obiba.opal.search.es.mapping.ValueTableMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -61,9 +51,6 @@ public class EsIndexManager implements IndexManager {
 
   private final int ES_BATCH_SIZE = 100;
 
-  // Grace period before reindexing (in seconds)
-  private final int GRACE_PERIOD = 300;
-
   private final ElasticSearchProvider esProvider;
 
   private final ElasticSearchConfigurationService esConfig;
@@ -71,8 +58,6 @@ public class EsIndexManager implements IndexManager {
   private final ThreadFactory threadFactory;
 
   private final Set<EsValueTableIndex> indices = Sets.newHashSet();
-
-  private final Sync sync = new Sync();
 
   @Autowired
   public EsIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig, ThreadFactory threadFactory) {
@@ -85,21 +70,9 @@ public class EsIndexManager implements IndexManager {
     this.threadFactory = threadFactory;
   }
 
-  // Every ten seconds
-  @Scheduled(fixedDelay = 10 * 1000)
-  public void synchronizeIndices() {
-    getSubject().execute(sync);
-  }
-
-  private Subject getSubject() {
-    // Login as background job user
-    try {
-      PrincipalCollection principals = SecurityUtils.getSecurityManager().authenticate(new BackgroundJobServiceAuthToken()).getPrincipals();
-      return new Subject.Builder().principals(principals).authenticated(true).buildSubject();
-    } catch(AuthenticationException e) {
-      log.warn("Failed to obtain system user credentials: {}", e.getMessage());
-      throw new RuntimeException(e);
-    }
+  @Override
+  public IndexSynchronization createSyncTask(final ValueTable table, final ValueTableIndex index) {
+    return new Indexer(table, (EsValueTableIndex) index);
   }
 
   public EsValueTableIndex getIndex(ValueTable vt) {
@@ -135,56 +108,34 @@ public class EsIndexManager implements IndexManager {
     return esProvider.getClient().admin().cluster().prepareState().setFilterIndices(OPAL_INDEX_NAME).execute().actionGet().getState().getMetaData().index(OPAL_INDEX_NAME);
   }
 
-  private class Sync implements Runnable {
+  private class Indexer implements IndexSynchronization {
+
+    private final ValueTable valueTable;
+
+    private final EsValueTableIndex index;
+
+    private final int total;
+
+    private int done = 0;
+
+    private Indexer(ValueTable table, EsValueTableIndex index) {
+      this.valueTable = table;
+      this.index = index;
+      this.total = valueTable.getVariableEntities().size();
+    }
 
     @Override
     public void run() {
-      for(Datasource ds : MagmaEngine.get().getDatasources()) {
-        for(ValueTable vt : ds.getValueTables()) {
-
-          // Check that the index is older than the ValueTable
-          if(Timestampeds.lastUpdateComparator.compare(getIndex(vt), vt) < 0) {
-            // The index needs to be updated
-            Value value = vt.getTimestamps().getLastUpdate();
-            // Check that the last modification to the ValueTable is older than the gracePeriod
-            // If we don't know (null value), reindex
-            if(value.isNull() || value.compareTo(gracePeriod()) < 0) {
-              new Indexer().update(vt, getIndex(vt));
-            }
-          }
-
-        }
-      }
-      // esProvider.getClient().admin().indices().prepareOptimize(OPAL_INDEX_NAME).setWaitForMerge(false).execute().actionGet();
-    }
-
-    /**
-     * Returns a {@code Value} with the date and time at which things are reindexed.
-     * @return
-     */
-    private Value gracePeriod() {
-      // Now
-      Calendar gracePeriod = Calendar.getInstance();
-      // Move back in time by GRACE_PERIOD seconds
-      gracePeriod.add(Calendar.SECOND, -GRACE_PERIOD);
-      // Things modified before this value can be reindexed
-      return DateTimeType.get().valueOf(gracePeriod);
-    }
-  }
-
-  private class Indexer {
-
-    void update(ValueTable vt, EsValueTableIndex index) {
       log.info("Updating ValueTable index {}", index.valueTableReference);
       try {
         esProvider.getClient().admin().indices().prepareDeleteMapping(OPAL_INDEX_NAME).setType(index.name).execute().actionGet();
       } catch(IndexMissingException e) {
         createIndex();
       }
-      index(vt, index);
+      index();
     }
 
-    private void index(final ValueTable valueTable, final EsValueTableIndex index) {
+    private void index() {
 
       XContentBuilder b = new ValueTableMapping().createMapping(index.name, valueTable);
 
@@ -203,6 +154,7 @@ public class EsIndexManager implements IndexManager {
               xcb.field(variables[i].getName(), values[i].getValue());
             }
             bulkRequest.add(esProvider.getClient().prepareIndex(OPAL_INDEX_NAME, index.name, entity.getIdentifier()).setParent(entity.getIdentifier()).setSource(xcb.endObject()));
+            done++;
             if(bulkRequest.numberOfActions() >= ES_BATCH_SIZE) {
               BulkResponse bulkResponse = bulkRequest.execute().actionGet();
               if(bulkResponse.hasFailures()) {
@@ -227,6 +179,31 @@ public class EsIndexManager implements IndexManager {
 
       }).build().read();
 
+    }
+
+    @Override
+    public ValueTableIndex getValueTableIndex() {
+      return index;
+    }
+
+    @Override
+    public ValueTable getValueTable() {
+      return valueTable;
+    }
+
+    @Override
+    public boolean hasStarted() {
+      return done > 0;
+    }
+
+    @Override
+    public boolean isComplete() {
+      return total > 0 && done >= total;
+    }
+
+    @Override
+    public float getProgress() {
+      return done / (float) total;
     }
   }
 
@@ -264,7 +241,7 @@ public class EsIndexManager implements IndexManager {
       };
     }
 
-    public void updateTimestamps() {
+    private void updateTimestamps() {
       try {
         EsMapping mapping = readMapping();
         mapping.meta().setString("_updated", DateTimeType.get().valueOf(new Date()).toString());
@@ -272,11 +249,6 @@ public class EsIndexManager implements IndexManager {
       } catch(IOException e) {
         throw new RuntimeException(e);
       }
-    }
-
-    @Override
-    public IndexSynchronization update() {
-      return null;
     }
 
     @Override

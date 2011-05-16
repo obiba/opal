@@ -15,4 +15,6 @@ public interface IndexManager {
 
   public ValueTableIndex getIndex(ValueTable valueTable);
 
+  public IndexSynchronization createSyncTask(ValueTable valueTable, ValueTableIndex index);
+
 }

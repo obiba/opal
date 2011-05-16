@@ -11,7 +11,12 @@ package org.obiba.opal.search;
 
 import org.obiba.magma.ValueTable;
 
-public interface IndexSynchronization {
+/**
+ * A {@code Runnable} that will synchronize an index when its {@code run} method is invoked.
+ * <p>
+ * Provides syncrhonization state through other methods.
+ */
+public interface IndexSynchronization extends Runnable {
 
   public ValueTableIndex getValueTableIndex();
 

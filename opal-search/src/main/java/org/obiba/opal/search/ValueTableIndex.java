@@ -11,9 +11,10 @@ package org.obiba.opal.search;
 
 import org.obiba.magma.Timestamped;
 
+/**
+ * An index of a {@code ValueTable}
+ */
 public interface ValueTableIndex extends Timestamped {
-
-  public IndexSynchronization update();
 
   public void delete();
 
