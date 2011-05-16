@@ -11,6 +11,7 @@ package org.obiba.opal.search.es;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 
@@ -145,6 +146,9 @@ public class EsIndexManager implements IndexManager {
 
         BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
 
+        public void onBegin(List<VariableEntity> entitiesToCopy, Variable[] variables) {
+        };
+
         @Override
         public void onValues(VariableEntity entity, Variable[] variables, Value[] values) {
           bulkRequest.add(esProvider.getClient().prepareIndex(OPAL_INDEX_NAME, valueTable.getEntityType(), entity.getIdentifier()).setSource("{\"identifier\":\"" + entity.getIdentifier() + "\"}"));
@@ -172,11 +176,6 @@ public class EsIndexManager implements IndexManager {
         public void onComplete() {
           index.updateTimestamps();
         }
-
-        @Override
-        public void onBegin() {
-        }
-
       }).build().read();
 
     }
