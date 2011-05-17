@@ -9,6 +9,10 @@
     <property name="password" value="${org.obiba.opal.datasource.key.password}" />
 
     <property name="maxIdle" value="10" />
+    <!-- Maximum number of borrowed connections -->
+    <property name="maxActive" value="100" />
+    <!-- Wait no more than 10 seconds to a connection -->
+    <property name="maxWait" value="10000" />
     <property name="initialSize" value="2" />
     <property name="validationQuery" value="${org.obiba.opal.datasource.validationQuery}"/>
     <property name="testOnBorrow" value="true"/>
@@ -22,6 +26,10 @@
     <property name="password" value="${org.obiba.opal.datasource.opal.password}" />
 
     <property name="maxIdle" value="10" />
+    <!-- Maximum number of borrowed connections. -1: unlimited -->
+    <property name="maxActive" value="100" />
+    <!-- Wait no more than 10 seconds to a connection -->
+    <property name="maxWait" value="10000" />
     <property name="initialSize" value="2" />
     <property name="validationQuery" value="${org.obiba.opal.datasource.validationQuery}"/>
     <property name="testOnBorrow" value="true"/>
