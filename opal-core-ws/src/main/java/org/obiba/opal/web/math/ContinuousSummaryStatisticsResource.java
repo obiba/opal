@@ -10,6 +10,7 @@
 package org.obiba.opal.web.math;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -17,9 +18,11 @@ import javax.ws.rs.QueryParam;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.ContinuousDistribution;
+import org.apache.commons.math.distribution.ExponentialDistributionImpl;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math.stat.descriptive.rank.Median;
+import org.obiba.magma.Category;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueType;
@@ -34,20 +37,25 @@ import org.obiba.opal.web.model.Math.IntervalFrequencyDto;
 import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Sets;
 
-/**
- *
- */
 public class ContinuousSummaryStatisticsResource extends AbstractSummaryStatisticsResource {
 
-  /**
-   * @param valueTable
-   * @param variable
-   * @param vectorSource
-   */
+  // Holds missing categories (the case of continuous variables that have "special" values such as 8888 or 9999 that
+  // indicate a missing value)
+  private final Set<Value> missing = Sets.newHashSet();
+
   public ContinuousSummaryStatisticsResource(ValueTable valueTable, Variable variable, VectorSource vectorSource) {
     super(valueTable, variable, vectorSource);
-    if(variable.getValueType().isNumeric() == false) throw new IllegalArgumentException("variable is not continuous");
+    if(variable.getValueType().isNumeric() == false) throw new IllegalArgumentException("continuous variables must be numeric");
+
+    if(variable.hasCategories()) {
+      for(Category c : variable.getCategories()) {
+        if(c.isMissing()) {
+          missing.add(variable.getValueType().valueOf(c.getName()));
+        }
+      }
+    }
   }
 
   @GET
@@ -58,10 +66,12 @@ public class ContinuousSummaryStatisticsResource extends AbstractSummaryStatisti
     } else { // default
       percentilesOrDefault = ImmutableList.<Double> of(0.05d, 0.5d, 5d, 10d, 15d, 20d, 25d, 30d, 35d, 40d, 45d, 50d, 55d, 60d, 65d, 70d, 75d, 80d, 85d, 90d, 95d, 99.5d, 99.95d);
     }
-    return SummaryStatisticsDto.newBuilder().setResource(getVariable().getName()).setExtension(ContinuousSummaryDto.continuous, distribution.calc(getVariable().getValueType(), getValues(), percentilesOrDefault, intervals).build()).build();
+    return SummaryStatisticsDto.newBuilder()//
+    .setResource(getVariable().getName())//
+    .setExtension(ContinuousSummaryDto.continuous, distribution.calc(getVariable().getValueType(), missing, getValues(), percentilesOrDefault, intervals).build()).build();
   }
 
-  public static enum Distribution {
+  public enum Distribution {
     normal {
       @Override
       public ContinuousDistribution getDistribution(DescriptiveStatistics ds) {
@@ -71,19 +81,19 @@ public class ContinuousSummaryStatisticsResource extends AbstractSummaryStatisti
         return null;
       }
     },
-    lognormal {
+    exponential {
       @Override
       public ContinuousDistribution getDistribution(DescriptiveStatistics ds) {
-        return new NormalDistributionImpl(ds.getMean(), ds.getStandardDeviation());
+        return new ExponentialDistributionImpl(ds.getMean());
       }
     };
 
     abstract ContinuousDistribution getDistribution(DescriptiveStatistics ds);
 
-    public ContinuousSummaryDto.Builder calc(ValueType type, Iterable<Value> values, List<Double> percentiles, int intervals) {
+    public ContinuousSummaryDto.Builder calc(ValueType type, Set<Value> missing, Iterable<Value> values, List<Double> percentiles, int intervals) {
       DescriptiveStatistics ds = new DescriptiveStatistics();
       for(Value value : values) {
-        addValue(ds, value);
+        addValue(ds, missing, value);
       }
 
       DescriptiveStatsDto.Builder builder = DescriptiveStatsDto.newBuilder().setMin(ds.getMin()).setMax(ds.getMax()).setN(ds.getN()).setMean(ds.getMean()).setSum(ds.getSum()).setSumsq(ds.getSumsq()).setStdDev(ds.getStandardDeviation()).setVariance(ds.getVariance()).setSkewness(ds.getSkewness()).setGeometricMean(ds.getGeometricMean()).setKurtosis(ds.getKurtosis()).setMedian(ds.apply(new Median()));
@@ -110,11 +120,11 @@ public class ContinuousSummaryStatisticsResource extends AbstractSummaryStatisti
       return continuous.setSummary(builder);
     }
 
-    private void addValue(DescriptiveStatistics ds, Value value) {
-      if(value.isNull() == false) {
+    private void addValue(DescriptiveStatistics ds, Set<Value> missing, Value value) {
+      if(value.isNull() == false && missing.contains(value) == false) {
         if(value.isSequence()) {
           for(Value v : value.asSequence().getValue()) {
-            addValue(ds, v);
+            addValue(ds, missing, v);
           }
         } else {
           ds.addValue(((Number) value.getValue()).doubleValue());

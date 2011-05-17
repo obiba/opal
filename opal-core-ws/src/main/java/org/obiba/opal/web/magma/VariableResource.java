@@ -16,14 +16,11 @@ import javax.ws.rs.QueryParam;
 
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableValueSource;
-import org.obiba.magma.VectorSource;
 import org.obiba.opal.web.magma.support.DefaultPagingVectorSourceImpl;
 import org.obiba.opal.web.magma.support.InvalidRequestException;
 import org.obiba.opal.web.magma.support.PagingVectorSource;
 import org.obiba.opal.web.math.AbstractSummaryStatisticsResource;
-import org.obiba.opal.web.math.CategoricalSummaryStatisticsResource;
-import org.obiba.opal.web.math.ContinuousSummaryStatisticsResource;
-import org.obiba.opal.web.math.DefaultSummaryStatisticsResource;
+import org.obiba.opal.web.math.SummaryStatisticsResourceFactory;
 import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 
@@ -58,16 +55,7 @@ public class VariableResource {
 
   @Path("/summary")
   public AbstractSummaryStatisticsResource getSummary() {
-    VectorSource vectorSource = vvs.asVectorSource();
-
-    if(vectorSource != null) {
-      if(vvs.getVariable().hasCategories()) {
-        return new CategoricalSummaryStatisticsResource(this.valueTable, this.vvs.getVariable(), this.vvs.asVectorSource());
-      } else if(vvs.getValueType().isNumeric()) {
-        return new ContinuousSummaryStatisticsResource(this.valueTable, this.vvs.getVariable(), this.vvs.asVectorSource());
-      }
-    }
-    return new DefaultSummaryStatisticsResource(this.valueTable, this.vvs.getVariable(), this.vvs.asVectorSource());
+    return new SummaryStatisticsResourceFactory().getResource(this.valueTable, this.vvs);
   }
 
   VariableValueSource getVariableValueSource() {
@@ -80,4 +68,5 @@ public class VariableResource {
     }
     return pagingVectorSource;
   }
+
 }
