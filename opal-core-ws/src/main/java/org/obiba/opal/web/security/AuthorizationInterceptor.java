@@ -155,7 +155,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent implemen
       public boolean apply(String from) {
         String perm = "magma:" + uri + ":" + from;
         boolean permitted = getSubject().isPermitted(perm);
-        log.info("isPermitted({}, {})=={}", new Object[] { getSubject().getPrincipal(), perm, permitted });
+        log.debug("isPermitted({}, {})=={}", new Object[] { getSubject().getPrincipal(), perm, permitted });
         return permitted;
       }
 
