@@ -26,9 +26,11 @@ import javax.ws.rs.core.UriBuilder;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
+import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.DataShieldMethod;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.r.service.OpalRService;
+import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.datashield.support.DataShieldMethodConverterRegistry;
 import org.obiba.opal.web.model.DataShield;
@@ -76,7 +78,8 @@ public class DataShieldResource {
   @Path("/session/current")
   public OpalRSessionResource getCurrentSession() {
     if(opalRSessionManager.hasSubjectCurrentRSession() == false) {
-      opalRSessionManager.newSubjectCurrentRSession();
+      OpalRSession session = opalRSessionManager.newSubjectCurrentRSession();
+      DataShieldLog.userLog("created a datashield session {}", session.getId());
     }
     return new OpalDataShieldSessionResource(opalRService, configService, opalRSessionManager, opalRSessionManager.getSubjectCurrentRSession());
   }
@@ -105,6 +108,7 @@ public class DataShieldResource {
         config.getExtension(DatashieldConfiguration.class).addAggregatingMethod(methodConverterRegistry.parse(dto));
       }
     });
+    DataShieldLog.adminLog("added aggregating method '{}'.", dto.getName());
     UriBuilder ub = UriBuilder.fromPath("/").path(DataShieldResource.class).path(DataShieldResource.class, "getDataShieldMethod");
     return Response.created(ub.build(dto.getName())).build();
   }
@@ -131,6 +135,8 @@ public class DataShieldResource {
       }
     });
 
+    DataShieldLog.adminLog("modified aggregating method '{}'.", name);
+
     return Response.ok().build();
   }
 
@@ -145,6 +151,7 @@ public class DataShieldResource {
         config.getExtension(DatashieldConfiguration.class).removeAggregatingMethod(name);
       }
     });
+    DataShieldLog.adminLog("deleted aggregating method '{}'.", name);
     return Response.ok().build();
   }
 

@@ -21,6 +21,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.DataShieldMethod;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.r.ROperationTemplate;
@@ -54,6 +55,8 @@ public class OpalDataShieldSessionResource extends OpalRSessionResource {
   @Path("/aggregate/{method}")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   public Response aggregate(@PathParam("method") String methodName, String script) {
+    DataShieldLog.userLog("aggregating with '{}' on '{}'", methodName, script);
+
     DataShieldMethod method;
     try {
       method = lookupMethod(methodName);
