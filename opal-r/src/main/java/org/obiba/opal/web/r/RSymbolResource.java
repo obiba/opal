@@ -42,6 +42,10 @@ public class RSymbolResource extends AbstractOpalRSessionResource {
     this.name = name;
   }
 
+  public String getName() {
+    return name;
+  }
+
   @GET
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   public Response getSymbol() {
