@@ -46,10 +46,9 @@ case "$1" in
 				 --disabled-password opal
         fi
 
-        if [ ! -e /usr/share/opal ] ; then
-          ln -s /usr/share/opal-* /usr/share/opal
-        fi
-        
+        rm -f /usr/share/opal
+        ln -s /usr/share/opal-* /usr/share/opal
+
         if [ ! -e /var/lib/opal/conf ] ; then
           ln -s /etc/opal /var/lib/opal/conf
         fi
