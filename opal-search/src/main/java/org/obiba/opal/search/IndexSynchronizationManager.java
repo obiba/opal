@@ -27,26 +27,28 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Manages {@code IndexSynchronization} tasks. This class will monitor the state of all indices periodically. When an
  * index is determined to be out of date, a {@code IndexSynchronization} task is created and run.
  */
 @Component
+@Transactional
 public class IndexSynchronizationManager {
 
   private static final Logger log = LoggerFactory.getLogger(IndexSynchronizationManager.class);
 
-  private final IndexManager indexManager;
+  @Autowired
+  private IndexManager indexManager;
 
   // Grace period before reindexing (in seconds)
   private final int GRACE_PERIOD = 300;
 
   private final Sync sync = new Sync();
 
-  @Autowired
-  public IndexSynchronizationManager(IndexManager indexManager) {
-    this.indexManager = indexManager;
+  public IndexSynchronizationManager() {
+    // this.indexManager = indexManager;
   }
 
   // Every ten seconds
