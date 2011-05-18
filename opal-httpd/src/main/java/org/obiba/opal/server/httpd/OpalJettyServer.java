@@ -70,6 +70,7 @@ public class OpalJettyServer implements Service {
   private ConfigurableApplicationContext webApplicationContext;
 
   @Autowired
+  @SuppressWarnings({ "unchecked", "PMD.ExcessiveParameterList" })
   public OpalJettyServer(final ApplicationContext ctx, final SecurityManager securityMgr, final SslContextFactory sslContextFactory, final PlatformTransactionManager txmgr, final @Value("${org.obiba.opal.http.port}") Integer httpPort, final @Value("${org.obiba.opal.https.port}") Integer httpsPort, final @Value("${org.obiba.opal.ajp.port}") Integer ajpPort) {
     Server server = new Server();
     server.setSendServerVersion(false);

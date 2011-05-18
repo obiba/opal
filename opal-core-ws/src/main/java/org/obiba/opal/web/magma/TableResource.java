@@ -128,14 +128,7 @@ public class TableResource extends AbstractValueTableResource {
   @Path("/valueSets")
   public ValueSetsDto getValueSets(@QueryParam("select") String select, @QueryParam("where") String where, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("100") int limit) {
     final Iterable<Variable> variables = filterVariables(select, 0, null);
-
-    List<VariableEntity> entities;
-    if(where != null) {
-      entities = ImmutableList.copyOf(getFilteredEntities(getValueTable(), where));
-    } else {
-      entities = new ArrayList<VariableEntity>(getValueTable().getVariableEntities());
-    }
-    int end = Math.min(offset + limit, entities.size());
+    final Iterable<VariableEntity> entities = filterEntities(getValueTable(), where, offset, limit);
 
     ValueSetsDto.Builder valueSets = ValueSetsDto.newBuilder().addAllVariables(Iterables.transform(variables, new Function<Variable, String>() {
 
@@ -143,7 +136,8 @@ public class TableResource extends AbstractValueTableResource {
       public String apply(Variable from) {
         return from.getName();
       }
-    })).addAllValueSets(Iterables.transform(entities.subList(offset, end), new Function<VariableEntity, ValueSetsDto.ValueSetDto>() {
+
+    })).addAllValueSets(Iterables.transform(entities, new Function<VariableEntity, ValueSetsDto.ValueSetDto>() {
 
       @Override
       public ValueSetsDto.ValueSetDto apply(VariableEntity from) {
@@ -219,11 +213,24 @@ public class TableResource extends AbstractValueTableResource {
   }
 
   private Iterable<VariableEntity> filterEntities(ValueTable valueTable, String script) {
-    if(script == null) {
-      return valueTable.getVariableEntities();
-    }
+    return filterEntities(valueTable, script, null, null);
+  }
 
-    return getFilteredEntities(valueTable, script);
+  private Iterable<VariableEntity> filterEntities(ValueTable valueTable, String script, Integer offset, Integer limit) {
+    Iterable<VariableEntity> entities;
+    if(script == null) {
+      entities = valueTable.getVariableEntities();
+    } else {
+      entities = getFilteredEntities(valueTable, script);
+    }
+    // Apply offset then limit (in that order)
+    if(offset != null) {
+      entities = Iterables.skip(entities, offset);
+    }
+    if(limit != null) {
+      entities = Iterables.limit(entities, limit);
+    }
+    return entities;
   }
 
   private Iterable<VariableEntity> getFilteredEntities(ValueTable valueTable, String script) {
