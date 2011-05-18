@@ -276,6 +276,7 @@ public class EsIndexManager implements IndexManager {
     public boolean equals(Object obj) {
       if(obj == null) return false;
       if(obj == this) return true;
+      if(obj instanceof EsValueTableIndex == false) return false;
 
       return ((EsValueTableIndex) obj).name.equals(this.name);
     }

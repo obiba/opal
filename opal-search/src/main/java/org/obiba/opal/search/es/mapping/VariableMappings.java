@@ -39,7 +39,7 @@ public class VariableMappings {
     }
   }
 
-  private class Store implements VariableMapping {
+  private static class Store implements VariableMapping {
 
     @Override
     public void map(Variable variable, XContentBuilder builder) throws IOException {
@@ -50,7 +50,7 @@ public class VariableMappings {
   /**
    * Used to prevent Lucene analyzers from running on categorical values
    */
-  private class Categorical implements VariableMapping {
+  private static class Categorical implements VariableMapping {
 
     @Override
     public void map(Variable variable, XContentBuilder builder) throws IOException {
