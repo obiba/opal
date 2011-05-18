@@ -27,7 +27,7 @@
     <dependencySet>
       <outputDirectory>birt-runtime-2_6_1/ReportEngine/plugins</outputDirectory>
       <includes>
-        <include>org.obiba.opal.birt:opal-oda-runtime:jar</include>
+        <include>org.obiba.opal.oda:org.obiba.opal.oda.runtime:jar</include>
       </includes>
       <scope>provided</scope>
     </dependencySet>
@@ -35,7 +35,7 @@
     <dependencySet>
       <outputDirectory>update-site</outputDirectory>
       <includes>
-        <include>org.obiba.opal.birt:opal-oda:*</include>
+        <include>org.obiba.opal.oda:update-site:*</include>
       </includes>
       <scope>provided</scope>
       <unpack>true</unpack>
