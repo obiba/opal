@@ -33,6 +33,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.resource.FileResource;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.server.httpd.security.AuthenticationFilter;
+import org.obiba.opal.server.httpd.security.X509CertificateAuthenticationFilter;
 import org.obiba.opal.server.ssl.SslContextFactory;
 import org.obiba.runtime.Version;
 import org.slf4j.Logger;
@@ -88,8 +89,9 @@ public class OpalJettyServer implements Service {
     if(httpsPort != null && httpsPort > 0) {
 
       org.eclipse.jetty.http.ssl.SslContextFactory jettySsl = new org.eclipse.jetty.http.ssl.SslContextFactory() {
+
         @Override
-        protected void createSSLContext() throws Exception {
+        protected void doStart() throws Exception {
           super.setSslContext(sslContextFactory.createSslContext());
         }
 
@@ -174,6 +176,7 @@ public class OpalJettyServer implements Service {
     contextHandler.setContextPath("/");
     contextHandler.addFilter(new FilterHolder(new OpalVersionFilter()), "/*", FilterMapping.DEFAULT);
     contextHandler.addFilter(new FilterHolder(new AuthenticationFilter(securityMgr)), "/ws/*", FilterMapping.DEFAULT);
+    contextHandler.addFilter(new FilterHolder(new X509CertificateAuthenticationFilter()), "/ws/*", FilterMapping.DEFAULT);
     // contextHandler.addFilter(new FilterHolder(new CrossOriginFilter()), "/*", FilterMapping.DEFAULT);
     contextHandler.addFilter(new FilterHolder(new RequestContextFilter()), "/*", FilterMapping.DEFAULT);
     contextHandler.addFilter(new FilterHolder(new TransactionFilter(txmgr)), "/*", FilterMapping.DEFAULT);
