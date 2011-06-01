@@ -22,16 +22,19 @@ import org.obiba.opal.web.model.Magma.CsvDatasourceTableBundleDto;
 import org.obiba.opal.web.model.Magma.DatasourceDto;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.ExcelDatasourceFactoryDto;
+import org.obiba.opal.web.model.Magma.FileViewDto;
+import org.obiba.opal.web.model.Magma.FsDatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.HibernateDatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
+import org.obiba.opal.web.model.Magma.ViewDto;
 import org.obiba.opal.web.model.Opal.FileDto;
 import org.obiba.opal.web.model.Opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
 
 public class Seed {
 
-  private final Seeder[] seeders = new Seeder[] { new FileSystemSeeder(), new FunctionalUnitsSeeder(), new ReportsSeeder(), new DatasourcesSeeder(), new CsvImportSeeder() };
+  private final Seeder[] seeders = new Seeder[] { new FileSystemSeeder(), new FunctionalUnitsSeeder(), new ReportsSeeder(), new DatasourcesSeeder(), new OpalXmlImportSeeder(), new CsvImportSeeder(), new ViewsSeeder() };
 
   private final OpalJavaClient opalClient;
 
@@ -74,6 +77,14 @@ public class Seed {
       }
     }
     System.out.println("All done.");
+  }
+
+  private DatasourceDto createTransientDatasource(DatasourceFactoryDto dto) throws IOException {
+    HttpResponse r = opalClient.post(opalClient.newUri().segment("transient-datasources").build(), dto);
+    if(r.getStatusLine().getStatusCode() != 201) {
+      throw new IOException("Could not create datasource: " + r.getStatusLine().getReasonPhrase());
+    }
+    return DatasourceDto.newBuilder().mergeFrom(r.getEntity().getContent()).build();
   }
 
   private interface Seeder {
@@ -224,6 +235,70 @@ public class Seed {
 
   }
 
+  private class ViewsSeeder extends ArraySeeder {
+
+    @Override
+    protected String getKey() {
+      return "views";
+    }
+
+    @Override
+    protected void onSeed(JSONArray seed) throws JSONException, IOException {
+      for(int i = 0; i < seed.length(); i++) {
+        JSONObject json = seed.getJSONObject(i);
+        String name = json.getString("name");
+        String destination = json.getString("destination");
+        Iterable<String> from = new JSONArrayIterable<String>(json.getJSONArray("from"));
+        String file = json.optString("file");
+
+        System.out.println(String.format("Creating view %s from file %s into %s", name, file, destination));
+        ViewDto dto = ViewDto.newBuilder().setName(name).addAllFrom(from).setExtension(FileViewDto.view, FileViewDto.newBuilder().setFilename(file).build()).build();
+
+        HttpResponse r = opalClient.post(opalClient.newUri().segment("datasource", destination, "views").build(), dto);
+        if(r.getStatusLine().getStatusCode() != 201) {
+          throw new IOException("Could not create view: " + r.getStatusLine().getReasonPhrase());
+        }
+      }
+
+    }
+  }
+
+  private class OpalXmlImportSeeder extends ArraySeeder {
+
+    @Override
+    protected String getKey() {
+      return "xmlImports";
+    }
+
+    @Override
+    protected void onSeed(JSONArray seed) throws JSONException, IOException {
+      for(int i = 0; i < seed.length(); i++) {
+        JSONObject json = seed.getJSONObject(i);
+        String data = json.getString("data");
+        String destination = json.getString("destination");
+        String unit = json.optString("unit", null);
+
+        System.out.println("Importing XML file " + data + " into " + destination);
+        importXml(data, destination, unit);
+      }
+
+    }
+
+    private void importXml(String data, String destination, String unit) throws IOException {
+      FsDatasourceFactoryDto.Builder fs = FsDatasourceFactoryDto.newBuilder().setFile(data);
+      if(unit != null) {
+        fs.setUnit(unit);
+      }
+      DatasourceDto csv = createTransientDatasource(DatasourceFactoryDto.newBuilder().setName("xml").setExtension(FsDatasourceFactoryDto.params, fs.build()).build());
+      ImportCommandOptionsDto.Builder importCommand = ImportCommandOptionsDto.newBuilder().setDestination(destination).setSource(csv.getName());
+      if(unit != null) {
+        importCommand.setUnit(unit);
+      }
+      ignore(opalClient.post(opalClient.newUri().segment("shell", "import").build(), importCommand.build()));
+
+    }
+  }
+
   private class CsvImportSeeder extends ArraySeeder {
 
     @Override
@@ -244,14 +319,6 @@ public class Seed {
         importCsv(data, dictionary, destination, unit);
 
       }
-    }
-
-    private DatasourceDto createTransientDatasource(DatasourceFactoryDto dto) throws IOException {
-      HttpResponse r = opalClient.post(opalClient.newUri().segment("transient-datasources").build(), dto);
-      if(r.getStatusLine().getStatusCode() != 201) {
-        throw new IOException("Could not create datasource: " + r.getStatusLine().getReasonPhrase());
-      }
-      return DatasourceDto.newBuilder().mergeFrom(r.getEntity().getContent()).build();
     }
 
     private void createTables(DatasourceDto source, String destination) throws ClientProtocolException, IOException {
