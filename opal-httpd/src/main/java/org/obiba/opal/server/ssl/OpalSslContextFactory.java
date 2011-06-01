@@ -11,7 +11,6 @@ package org.obiba.opal.server.ssl;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
@@ -26,8 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import com.google.common.collect.Lists;
 
 @Component
 public class OpalSslContextFactory implements SslContextFactory {
@@ -51,17 +48,9 @@ public class OpalSslContextFactory implements SslContextFactory {
   public SSLContext createSslContext() {
     UnitKeyStore opalKeystore = prepareServerKeystore();
 
-    List<UnitKeyStore> trustedKeyStores = Lists.newArrayList();
-    for(FunctionalUnit unit : functionalUnitService.getFunctionalUnits()) {
-      UnitKeyStore unitKeyStore = unit.getKeyStore(false);
-      if(unitKeyStore != null) {
-        trustedKeyStores.add(unitKeyStore);
-      }
-    }
-
     try {
       SSLContext ctx = SSLContext.getInstance("TLSv1");
-      ctx.init(new KeyManager[] { new UnitKeyManager(opalKeystore) }, new TrustManager[] { new UnitTrustManager(trustedKeyStores) }, null);
+      ctx.init(new KeyManager[] { new UnitKeyManager(opalKeystore) }, new TrustManager[] { new UnitTrustManager(functionalUnitService) }, null);
       return ctx;
     } catch(Exception e) {
       throw new RuntimeException(e);
