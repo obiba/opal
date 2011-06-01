@@ -29,6 +29,12 @@
                 </td>
               </tr>
               <tr>
+                <td><ui:msg description="Missing label">Missing</ui:msg>:</td>
+                <td>
+                  <g:CheckBox ui:field="isMissing"/>
+                </td>
+              </tr>
+              <tr>
                 <td valign="top"><ui:msg description="Label label">Label</ui:msg>:</td>
                 <td><g:SimplePanel ui:field="simplePanel"/></td>
               </tr>

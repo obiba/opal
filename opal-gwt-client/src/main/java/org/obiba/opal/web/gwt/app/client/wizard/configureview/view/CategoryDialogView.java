@@ -19,9 +19,11 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -55,6 +57,9 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
   private boolean categoryNameEditable;
 
   @UiField
+  CheckBox isMissing;
+
+  @UiField
   SimplePanel simplePanel;
 
   private LabelListPresenter.Display inputField;
@@ -84,6 +89,7 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
   public void clear() {
     categoryName.setText("");
     uneditableCategoryName.setText("");
+    isMissing.setValue(false);
 
     if(inputField != null) {
       inputField.clearAttributes();
@@ -123,6 +129,10 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
   @Override
   public HasText getCategoryName() {
     return categoryNameEditable ? categoryName : uneditableCategoryName;
+  }
+
+  public HasValue<Boolean> getMissing() {
+    return isMissing;
   }
 
   @SuppressWarnings("unchecked")

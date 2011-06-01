@@ -42,6 +42,7 @@ import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.inject.Inject;
 
@@ -66,6 +67,8 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
     void setCategoryNameEditable(boolean editable);
 
     HasText getCategoryName();
+
+    HasValue<Boolean> getMissing();
 
     HasCloseHandlers<DialogBox> getDialog();
 
@@ -141,6 +144,7 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
     if(isEdit()) {
       getDisplay().setCategoryNameEditable(false); // don't allow edits of category name
       getDisplay().getCategoryName().setText(categoryDto.getName());
+      getDisplay().getMissing().setValue(categoryDto.getIsMissing());
       labelListPresenter.setAttributes(categoryDto.getAttributesArray());
       labelListPresenter.updateFields();
     } else {
@@ -193,7 +197,7 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
   private CategoryDto getNewCategoryDto() {
     CategoryDto categoryDto = CategoryDto.create();
     categoryDto.setName(getDisplay().getCategoryName().getText());
-    categoryDto.setIsMissing(false);
+    categoryDto.setIsMissing(getDisplay().getMissing().getValue());
     @SuppressWarnings("unchecked")
     JsArray<AttributeDto> attributes = (JsArray<AttributeDto>) JsArray.createArray();
     Map<String, TextBox> labelMap = labelListPresenter.getDisplay().getLanguageLabelMap();
