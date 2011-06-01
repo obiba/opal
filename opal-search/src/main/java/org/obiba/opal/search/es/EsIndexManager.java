@@ -155,17 +155,18 @@ public class EsIndexManager implements IndexManager {
           try {
             XContentBuilder xcb = XContentFactory.jsonBuilder().startObject();
             for(int i = 0; i < variables.length; i++) {
-              xcb.field(variables[i].getName(), values[i].getValue());
+              if(values[i].isSequence() && values[i].isNull() == false) {
+                for(Value v : values[i].asSequence().getValue()) {
+                  xcb.field(variables[i].getName(), v.getValue());
+                }
+              } else {
+                xcb.field(variables[i].getName(), values[i].getValue());
+              }
             }
             bulkRequest.add(esProvider.getClient().prepareIndex(OPAL_INDEX_NAME, index.name, entity.getIdentifier()).setParent(entity.getIdentifier()).setSource(xcb.endObject()));
             done++;
             if(bulkRequest.numberOfActions() >= ES_BATCH_SIZE) {
-              BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-              if(bulkResponse.hasFailures()) {
-                // process failures by iterating through each bulk response item
-                throw new RuntimeException(bulkResponse.buildFailureMessage());
-              }
-              bulkRequest = esProvider.getClient().prepareBulk();
+              sendAndCheck();
             }
           } catch(IOException e) {
             throw new RuntimeException(e);
@@ -174,7 +175,19 @@ public class EsIndexManager implements IndexManager {
 
         @Override
         public void onComplete() {
+          sendAndCheck();
           index.updateTimestamps();
+        }
+
+        private void sendAndCheck() {
+          if(bulkRequest.numberOfActions() > 0) {
+            BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+            if(bulkResponse.hasFailures()) {
+              // process failures by iterating through each bulk response item
+              throw new RuntimeException(bulkResponse.buildFailureMessage());
+            }
+            bulkRequest = esProvider.getClient().prepareBulk();
+          }
         }
       }).build().read();
 
