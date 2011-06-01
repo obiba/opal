@@ -251,12 +251,16 @@ public class Seed {
         Iterable<String> from = new JSONArrayIterable<String>(json.getJSONArray("from"));
         String file = json.optString("file");
 
-        System.out.println(String.format("Creating view %s from file %s into %s", name, file, destination));
-        ViewDto dto = ViewDto.newBuilder().setName(name).addAllFrom(from).setExtension(FileViewDto.view, FileViewDto.newBuilder().setFilename(file).build()).build();
-
-        HttpResponse r = opalClient.post(opalClient.newUri().segment("datasource", destination, "views").build(), dto);
-        if(r.getStatusLine().getStatusCode() != 201) {
-          throw new IOException("Could not create view: " + r.getStatusLine().getReasonPhrase());
+        HttpResponse r = opalClient.get(opalClient.newUri().segment("datasource", destination, "view", name).build());
+        r.getEntity().consumeContent();
+        if(r.getStatusLine().getStatusCode() == 404) {
+          System.out.println(String.format("Creating view %s from file %s into %s", name, file, destination));
+          ViewDto dto = ViewDto.newBuilder().setName(name).addAllFrom(from).setExtension(FileViewDto.view, FileViewDto.newBuilder().setFilename(file).build()).build();
+          r = opalClient.post(opalClient.newUri().segment("datasource", destination, "views").build(), dto);
+          if(r.getStatusLine().getStatusCode() != 201) {
+            throw new IOException("Could not create view: " + r.getStatusLine().getReasonPhrase());
+          }
+          ignore(r);
         }
       }
 
