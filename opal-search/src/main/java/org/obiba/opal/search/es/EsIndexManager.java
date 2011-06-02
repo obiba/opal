@@ -140,7 +140,7 @@ public class EsIndexManager implements IndexManager {
 
       XContentBuilder b = new ValueTableMapping().createMapping(index.name, valueTable);
 
-      esProvider.getClient().admin().indices().preparePutMapping(OPAL_INDEX_NAME).setSource(b).execute().actionGet();
+      esProvider.getClient().admin().indices().preparePutMapping(OPAL_INDEX_NAME).setType(index.name).setSource(b).execute().actionGet();
 
       ConcurrentValueTableReader.Builder.newReader().withThreads(threadFactory).from(valueTable).to(new ConcurrentReaderCallback() {
 
@@ -257,7 +257,7 @@ public class EsIndexManager implements IndexManager {
       try {
         EsMapping mapping = readMapping();
         mapping.meta().setString("_updated", DateTimeType.get().valueOf(new Date()).toString());
-        esProvider.getClient().admin().indices().preparePutMapping(OPAL_INDEX_NAME).setSource(mapping.toXContent()).execute().actionGet();
+        esProvider.getClient().admin().indices().preparePutMapping(OPAL_INDEX_NAME).setType(name).setSource(mapping.toXContent()).execute().actionGet();
       } catch(IOException e) {
         throw new RuntimeException(e);
       }
