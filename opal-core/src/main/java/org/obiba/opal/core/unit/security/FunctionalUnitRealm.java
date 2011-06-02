@@ -12,7 +12,6 @@ package org.obiba.opal.core.unit.security;
 import java.security.GeneralSecurityException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -20,7 +19,6 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authz.AuthorizationInfo;
-import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
@@ -32,13 +30,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Multimap;
-
-/**
- *
- */
 @Component
 public class FunctionalUnitRealm extends AuthorizingRealm {
 
@@ -46,13 +37,6 @@ public class FunctionalUnitRealm extends AuthorizingRealm {
 
   @Autowired
   private FunctionalUnitService functionalUnitService;
-
-  private Multimap<FunctionalUnit, String> grants = HashMultimap.create();
-
-  public void grant(FunctionalUnit fu, String... permissions) {
-    grants.putAll(fu, Arrays.asList(permissions));
-    super.getAuthorizationCache().clear();
-  }
 
   @Override
   public String getName() {
@@ -74,8 +58,8 @@ public class FunctionalUnitRealm extends AuthorizingRealm {
         try {
           x509Cert.verify(cert.getPublicKey());
           SimplePrincipalCollection principals = new SimplePrincipalCollection();
-          principals.add(x509Token.getPrincipal(), getName());
           principals.add(unit.getName(), getName());
+          principals.add(x509Token.getPrincipal(), getName());
           return new SimpleAuthenticationInfo(principals, x509Token.getCredentials());
         } catch(GeneralSecurityException e) {
           // Ignore
@@ -88,16 +72,6 @@ public class FunctionalUnitRealm extends AuthorizingRealm {
 
   @Override
   protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-    for(Object principal : principals.fromRealm(getName())) {
-      if(principal instanceof String) {
-        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(ImmutableSet.of((String) principal));
-        for(String perm : this.grants.get(functionalUnitService.getFunctionalUnit((String) principal))) {
-          log.info("Allowing {}", perm);
-          info.addStringPermission(perm);
-        }
-        return info;
-      }
-    }
     return null;
   }
 
