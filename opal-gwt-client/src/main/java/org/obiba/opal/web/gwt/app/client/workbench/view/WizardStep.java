@@ -34,6 +34,10 @@ public class WizardStep extends FlowPanel {
     title.setText(text);
   }
 
+  public String getStepTitle() {
+    return title.getText();
+  }
+
   public void removeStepContent() {
     for(int i = 1; i < getChildren().size(); i++) {
       remove(i);

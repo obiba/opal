@@ -719,6 +719,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Name")
   String aliasLabel();
 
+  @Description("Select Key Type Step label")
+  @DefaultStringValue("Provide a name and a type for the new Encryption Key.")
+  String keyTypeStep();
+
   @Description("Private Key Step label")
   @DefaultStringValue("Provide a name for the Encryption Key Pair and the Private Key definition.")
   String privateKeyStep();

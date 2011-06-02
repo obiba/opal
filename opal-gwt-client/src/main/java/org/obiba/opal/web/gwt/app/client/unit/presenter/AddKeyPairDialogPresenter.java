@@ -95,6 +95,8 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
 
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
 
+    void setKeyTypeValidationHandler(ValidationHandler handler);
+
     void setPrivateKeyValidationHandler(ValidationHandler handler);
 
     void setPublicKeyValidationHandler(ValidationHandler handler);
@@ -135,6 +137,7 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
   }
 
   private void addValidators() {
+    getDisplay().setKeyTypeValidationHandler(new KeyTypeValidationHandler(eventBus));
     getDisplay().setPrivateKeyValidationHandler(new PrivateKeyValidationHandler(eventBus));
     getDisplay().setPublicKeyValidationHandler(new PublicKeyValidationHandler(eventBus));
   }
@@ -230,9 +233,19 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
     }
   }
 
-  //
-  // Validation
-  //
+  private class KeyTypeValidationHandler extends AbstractValidationHandler {
+
+    KeyTypeValidationHandler(EventBus eventBus) {
+      super(eventBus);
+    }
+
+    @Override
+    protected Set<FieldValidator> getValidators() {
+      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      validators.add(new RequiredTextValidator(getDisplay().getAlias(), "KeyPairAliasIsRequired"));
+      return validators;
+    }
+  }
 
   private class PrivateKeyValidationHandler extends AbstractValidationHandler {
 
@@ -243,7 +256,6 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
     @Override
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
-      validators.add(new RequiredTextValidator(getDisplay().getAlias(), "KeyPairAliasIsRequired"));
       validators.add(new ConditionalValidator(getDisplay().isPrivateKeyCreate(), new RequiredTextValidator(getDisplay().getAlgorithm(), "KeyPairAlgorithmIsRequired")));
       validators.add(new ConditionalValidator(getDisplay().isPrivateKeyCreate(), new RequiredTextValidator(getDisplay().getKeySize(), "KeyPairKeySizeIsRequired")));
       validators.add(new ConditionalValidator(getDisplay().isPrivateKeyImport(), new RequiredTextValidator(getDisplay().getPrivateKeyImport(), "KeyPairPrivateKeyPEMIsRequired")));

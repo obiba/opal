@@ -17,7 +17,92 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  *
  */
-class WizardStepControllerImpl implements WizardStepController {
+public class DefaultWizardStepController implements WizardStepController {
+
+  public static class Builder {
+
+    private final DefaultWizardStepController currentStepCtrl;
+
+    Builder(DefaultWizardStepController ctrl) {
+      this.currentStepCtrl = ctrl;
+    }
+
+    public static Builder create(WizardStep step, Widget help) {
+      return new Builder(new DefaultWizardStepController(step, help));
+    }
+
+    public static Builder create(WizardStep step) {
+      return create(step, null);
+    }
+
+    /**
+     * Set the title of the last appended step.
+     * @param text
+     * @return
+     */
+    public Builder title(String text) {
+      currentStepCtrl.getStep().setStepTitle(text);
+      return this;
+    }
+
+    /**
+     * Set a provider of help for the last appended step.
+     * @param provider
+     * @return
+     */
+    public Builder help(WidgetProvider provider) {
+      currentStepCtrl.setHelpProvider(provider);
+      return this;
+    }
+
+    /**
+     * Set if the last appended step is a conclusion: when entering this step the navigation buttons
+     * (next/previous/finish) will be hidden and close/cancel will be available.
+     * @return
+     */
+    public Builder conclusion() {
+      currentStepCtrl.setConclusion(true);
+      return this;
+    }
+
+    /**
+     * Callback that validates the current step before switching to the next step.
+     * @param validator
+     * @return
+     */
+    public Builder onValidate(ValidationHandler validator) {
+      currentStepCtrl.setValidator(validator);
+      return this;
+    }
+
+    /**
+     * Callback to ask for the step to reset its display.
+     * @param handler
+     * @return
+     */
+    public Builder onReset(ResetHandler handler) {
+      currentStepCtrl.setReset(handler);
+      return this;
+    }
+
+    /**
+     * Callback to execute some code before steping into this step
+     * @param handler
+     * @return
+     */
+    public Builder onStepIn(StepInHandler handler) {
+      currentStepCtrl.setStepInHandler(handler);
+      return this;
+    }
+
+    /**
+     * @return
+     */
+    public DefaultWizardStepController build() {
+      return currentStepCtrl;
+    }
+
+  }
 
   private WizardStep step;
 
@@ -27,6 +112,8 @@ class WizardStepControllerImpl implements WizardStepController {
 
   private WizardStepController previous;
 
+  private StepInHandler stepInHandler;
+
   private ValidationHandler validator;
 
   private ResetHandler reset;
@@ -35,7 +122,7 @@ class WizardStepControllerImpl implements WizardStepController {
 
   private boolean conclusion = false;
 
-  WizardStepControllerImpl(WizardStep step, final Widget help) {
+  DefaultWizardStepController(WizardStep step, final Widget help) {
     super();
     this.step = step;
     if(help != null) {
@@ -49,6 +136,10 @@ class WizardStepControllerImpl implements WizardStepController {
 
   void setPrevious(WizardStepController previous) {
     this.previous = previous;
+  }
+
+  public void setStepInHandler(StepInHandler stepInHandler) {
+    this.stepInHandler = stepInHandler;
   }
 
   void setValidator(ValidationHandler validator) {
@@ -81,12 +172,20 @@ class WizardStepControllerImpl implements WizardStepController {
     return step;
   }
 
+  public void onStepIn() {
+    if(stepInHandler != null) {
+      stepInHandler.onStepIn();
+    }
+  }
+
   @Override
   public WizardStepController onNext() {
+    WizardStepController next = getNext();
     if(next == null) throw new IllegalStateException("No next step");
     if(getStep().isVisible()) {
       if(!validate()) return this;
       getStep().setVisible(false);
+      next.onStepIn();
       next.getStep().setVisible(true);
       return next;
     }
@@ -132,12 +231,16 @@ class WizardStepControllerImpl implements WizardStepController {
 
   @Override
   public boolean isFinish() {
-    return finish || (next != null && next.isConclusion()) || (next == null);
+    return finish || (next != null && next.isConclusion()) || (hasNext() == false);
   }
 
   @Override
   public boolean isConclusion() {
     return conclusion;
+  }
+
+  protected WizardStepController getNext() {
+    return next;
   }
 
   private static class WidgetProviderImpl implements WidgetProvider {

@@ -12,7 +12,10 @@ package org.obiba.opal.web.gwt.app.client.unit.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.AddKeyPairDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
+import org.obiba.opal.web.gwt.app.client.wizard.BranchingWizardStepController;
+import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.NumericTextBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
@@ -56,6 +59,9 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   WizardDialogBox dialog;
 
   @UiField
+  WizardStep keyTypeStep;
+
+  @UiField
   WizardStep privateKeyStep;
 
   @UiField
@@ -63,6 +69,12 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
 
   @UiField
   TextBox alias;
+
+  @UiField
+  RadioButton keyPairType;
+
+  @UiField
+  RadioButton certificateType;
 
   @UiField
   RadioButton privateKeyCreated;
@@ -109,6 +121,8 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   @UiField
   TextArea publicKeyPEM;
 
+  private ValidationHandler keyTypeStepValidators;
+
   private ValidationHandler privateKeyValidators;
 
   private ValidationHandler publicKeyValidators;
@@ -124,37 +138,40 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   }
 
   private void initWizardDialog() {
-    stepChain = WizardStepChain.Builder.create(dialog)//
-    .append(privateKeyStep)//
+
+    DefaultWizardStepController p = BranchingWizardStepController.Builder.create(keyTypeStep) //
+    .branch(DefaultWizardStepController.Builder.create(privateKeyStep)//
     .title(translations.privateKeyStep())//
     .onValidate(new ValidationHandler() {
-
       @Override
       public boolean validate() {
         return privateKeyValidators.validate();
       }
-    }).append(publicKeyStep)//
-    .title(translations.publicKeyStep())//
-    .onPrevious().build();
-
-    dialog.addNextClickHandler(new ClickHandler() {
+    }).build(), keyPairType)//
+    .branch(DefaultWizardStepController.Builder.create(publicKeyStep).title(translations.publicKeyStep()).onStepIn(new StepInHandler() {
 
       @Override
-      public void onClick(ClickEvent evt) {
-        stepChain.onNext();
-        // update public key form according to private key form selections
-        if(publicKeyStep.isVisible()) {
-          publicKeyCreated.setVisible(privateKeyImported.getValue());
-          publicKeyImported.setVisible(privateKeyImported.getValue());
-          publicKeyPEM.setVisible(privateKeyImported.getValue());
-          if(privateKeyCreated.getValue()) {
-            publicKeyForm.removeStyleName("indent");
-          } else {
-            publicKeyForm.addStyleName("indent");
-          }
+      public void onStepIn() {
+        publicKeyCreated.setVisible(privateKeyImported.getValue());
+        publicKeyImported.setVisible(privateKeyImported.getValue());
+        publicKeyPEM.setVisible(privateKeyImported.getValue());
+        if(privateKeyCreated.getValue()) {
+          publicKeyForm.removeStyleName("indent");
+        } else {
+          publicKeyForm.addStyleName("indent");
         }
       }
-    });
+    }).build(), certificateType)//
+    .title(translations.keyTypeStep())//
+    .onValidate(new ValidationHandler() {
+
+      @Override
+      public boolean validate() {
+        return keyTypeStepValidators.validate();
+      }
+    }).build();
+
+    stepChain = WizardStepChain.Builder.create(dialog).append(p).onNext().onPrevious().build();
 
   }
 
@@ -265,7 +282,9 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
     clearPublicKeyCreateForm();
     clearPublicKeyImportForm();
 
-    privateKeyStep.setVisible(true);
+    keyTypeStep.setVisible(true);
+    keyPairType.setValue(true);
+    privateKeyStep.setVisible(false);
     privateKeyCreated.setValue(true, true);
     publicKeyCreated.setValue(true, true);
     publicKeyStep.setVisible(false);
@@ -394,6 +413,11 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   @Override
   public HandlerRegistration addCancelClickHandler(ClickHandler handler) {
     return dialog.addCancelClickHandler(handler);
+  }
+
+  @Override
+  public void setKeyTypeValidationHandler(ValidationHandler handler) {
+    this.keyTypeStepValidators = handler;
   }
 
   @Override

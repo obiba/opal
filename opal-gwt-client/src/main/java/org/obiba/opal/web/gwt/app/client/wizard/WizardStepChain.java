@@ -102,7 +102,7 @@ public class WizardStepChain {
 
     private WizardStepChain chain;
 
-    private WizardStepControllerImpl currentStepCtrl;
+    private DefaultWizardStepController currentStepCtrl;
 
     private HandlerRegistration registration;
 
@@ -132,31 +132,38 @@ public class WizardStepChain {
     }
 
     /**
-     * Append a step with its help.
-     * @param step
-     * @param help
-     * @return
-     */
-    public Builder append(WizardStep step, Widget help) {
-      WizardStepControllerImpl stepCtrl = new WizardStepControllerImpl(step, help);
-      if(currentStepCtrl != null) {
-        if(currentStepCtrl.isConclusion()) throw new IllegalArgumentException("Cannot have a step after conclusion.");
-        currentStepCtrl.setNext(stepCtrl);
-        stepCtrl.setPrevious(currentStepCtrl);
-      } else {
-        chain.first = stepCtrl;
-      }
-      currentStepCtrl = stepCtrl;
-      return this;
-    }
-
-    /**
-     * Append a step, without help.
+     * Append a step, without a help widget.
      * @param step
      * @return
      */
     public Builder append(WizardStep step) {
       return append(step, null);
+    }
+
+    /**
+     * Append a step with its help widget.
+     * @param step
+     * @param help
+     * @return
+     */
+    public Builder append(WizardStep step, Widget help) {
+      DefaultWizardStepController stepCtrl = new DefaultWizardStepController(step, help);
+      if(currentStepCtrl != null) {
+        if(currentStepCtrl.isConclusion()) throw new IllegalArgumentException("Cannot have a step after conclusion.");
+        currentStepCtrl.setNext(stepCtrl);
+        stepCtrl.setPrevious(currentStepCtrl);
+      }
+      return append(stepCtrl);
+    }
+
+    public Builder append(DefaultWizardStepController stepCtrl) {
+      if(currentStepCtrl != null) {
+        if(currentStepCtrl.isConclusion()) throw new IllegalArgumentException("Cannot have a step after conclusion.");
+      } else {
+        chain.first = stepCtrl;
+      }
+      currentStepCtrl = stepCtrl;
+      return this;
     }
 
     /**

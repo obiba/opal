@@ -26,6 +26,8 @@ public interface WizardStepController {
 
   public boolean hasPrevious();
 
+  public void onStepIn();
+
   public WizardStepController onNext();
 
   public WizardStepController onPrevious();
@@ -50,4 +52,9 @@ public interface WizardStepController {
 
   }
 
+  public interface StepInHandler {
+
+    public void onStepIn();
+
+  }
 }

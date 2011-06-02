@@ -17,7 +17,7 @@
       <ui:msg description="Add Key Pair dialog title">Add Key Pair</ui:msg>
     </g:caption>
     <g:FlowPanel>
-      <o:WizardStep ui:field="privateKeyStep">
+      <o:WizardStep ui:field="keyTypeStep">
         <g:HTMLPanel>
           <table class="full-width" cellspacing="10">
             <tr>
@@ -30,6 +30,27 @@
                 <g:TextBox addStyleNames="text not-so-full-width" name="alias" ui:field="alias"/>
               </td>
             </tr>
+            <tr>
+              <td>
+                <g:Label addStyleNames="key">
+                  <ui:msg description="Key type label">Key Type</ui:msg>:
+                </g:Label>
+              </td>
+              <td>
+                <g:RadioButton ui:field="keyPairType" name="keyType" addStyleNames="key">
+                  <ui:msg description="Create Key Pair label">create or import a new key pair</ui:msg>
+                </g:RadioButton>
+                <g:RadioButton ui:field="certificateType" name="keyType" addStyleNames="key">
+                  <ui:msg description="Create Certificate label">create or import a new certificate</ui:msg>
+                </g:RadioButton>
+              </td>
+            </tr>
+          </table>
+        </g:HTMLPanel>
+      </o:WizardStep>
+      <o:WizardStep ui:field="privateKeyStep">
+        <g:HTMLPanel>
+          <table class="full-width" cellspacing="10">
             <tr>
               <td valign="top">
                 <g:Label addStyleNames="key">
