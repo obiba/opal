@@ -37,7 +37,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -62,45 +61,35 @@ import org.obiba.opal.core.crypt.KeyProviderSecurityException;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.springframework.util.Assert;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 /**
  * A {@link FunctionalUnit}'s keystore.
  */
 public class UnitKeyStore implements KeyProvider {
-  //
-  // Constants
-  //
 
   private static final long serialVersionUID = 1L;
 
   private static final String PASSWORD_FOR = "Password for";
 
-  //
-  // Instance Variables
-  //
+  public enum UnitKeyType {
+    KEY_PAIR, CERTIFICATE;
+  }
 
-  private String unitName;
+  private final String unitName;
 
-  private KeyStore store;
+  private final KeyStore store;
 
   private CallbackHandler callbackHandler;
-
-  //
-  // Constructors
-  //
 
   public UnitKeyStore(String unitName, KeyStore store) {
     this.unitName = unitName;
     this.store = store;
   }
-
-  //
-  // KeyProvider Methods
-  //
 
   public Set<String> listAliases() {
     try {
@@ -134,18 +123,31 @@ public class UnitKeyStore implements KeyProvider {
   }
 
   public Set<String> listKeyPairs() {
-    Set<String> keyPairs = Sets.newLinkedHashSet();
-    try {
-      for(Iterator<String> iterator = Iterators.forEnumeration(this.store.aliases()); iterator.hasNext();) {
-        String alias = iterator.next();
-        if(this.store.entryInstanceOf(alias, PrivateKeyEntry.class)) {
-          keyPairs.add(alias);
+    return ImmutableSet.copyOf(Iterables.filter(listAliases(), new Predicate<String>() {
+
+      @Override
+      public boolean apply(String input) {
+        try {
+          return store.isKeyEntry(input) && store.entryInstanceOf(input, PrivateKeyEntry.class);
+        } catch(KeyStoreException e) {
+          throw new RuntimeException(e);
         }
       }
-    } catch(KeyStoreException e) {
-      throw new RuntimeException(e);
-    }
-    return keyPairs;
+    }));
+  }
+
+  public Set<String> listCertificates() {
+    return ImmutableSet.copyOf(Iterables.filter(listAliases(), new Predicate<String>() {
+
+      @Override
+      public boolean apply(String input) {
+        try {
+          return store.isCertificateEntry(input);
+        } catch(KeyStoreException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    }));
   }
 
   public boolean hasKeyPair(String alias) {
@@ -342,6 +344,15 @@ public class UnitKeyStore implements KeyProvider {
     } catch(KeyStoreException e) {
       throw new KeyProviderException(e);
     }
+  }
+
+  public UnitKeyType getKeyType(String alias) {
+    if(listKeyPairs().contains(alias)) {
+      return UnitKeyType.KEY_PAIR;
+    } else if(listCertificates().contains(alias)) {
+      return UnitKeyType.CERTIFICATE;
+    }
+    throw new IllegalArgumentException("unkown alias '" + alias + "'or key type");
   }
 
   public static void loadBouncyCastle() {
@@ -615,4 +626,5 @@ public class UnitKeyStore implements KeyProvider {
       return unitKeyStore;
     }
   }
+
 }

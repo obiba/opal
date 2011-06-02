@@ -9,26 +9,35 @@ message FunctionalUnitDto {
   optional string select = 3;
 }
 
-message KeyPairDto {
+enum KeyType {
+  KEY_PAIR = 0;
+  CERTIFICATE = 1;
+}
+ 
+message KeyDto {
   required string alias = 1;
   required string certificate = 2;
+  required KeyType keyType = 3;
 }
-
-message KeyPairForm {
+ 
+message KeyForm {
   required string alias = 1;
-  
+ 
   optional PrivateKeyForm privateForm = 2;
   optional string privateImport = 3;
-  
+ 
   optional PublicKeyForm publicForm = 4;
   optional string publicImport = 5;
+  optional string certificateFile = 6;
+ 
+  required KeyType keyType = 7;
 }
-
+ 
 message PrivateKeyForm {
   required string algo = 1;
   required int32 size = 2; 
 }
-
+ 
 message PublicKeyForm {
   required string name = 1;
   required string organizationalUnit = 2;

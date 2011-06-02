@@ -25,7 +25,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
-import org.obiba.opal.web.model.client.opal.KeyPairDto;
+import org.obiba.opal.web.model.client.opal.KeyDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -63,7 +63,7 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   HorizontalTabLayout tabs;
 
   @UiField
-  CellTable<KeyPairDto> keyPairsTable;
+  CellTable<KeyDto> keyPairsTable;
 
   @UiField
   SimplePager pager;
@@ -107,13 +107,11 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
 
   private MenuItem importIdentifiersFromData;
 
-  private MenuItem importIdentifiersMapping;
-
   private MenuItem update;
 
-  JsArrayDataProvider<KeyPairDto> dataProvider = new JsArrayDataProvider<KeyPairDto>();
+  JsArrayDataProvider<KeyDto> dataProvider = new JsArrayDataProvider<KeyDto>();
 
-  private ActionsColumn<KeyPairDto> actionsColumn;
+  private ActionsColumn<KeyDto> actionsColumn;
 
   private FunctionalUnitDto functionalUnit;
 
@@ -146,14 +144,21 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   }
 
   private void initKeystoreTable() {
-    keyPairsTable.addColumn(new TextColumn<KeyPairDto>() {
+    keyPairsTable.addColumn(new TextColumn<KeyDto>() {
       @Override
-      public String getValue(KeyPairDto keyPair) {
+      public String getValue(KeyDto keyPair) {
         return keyPair.getAlias();
       }
     }, translations.aliasLabel());
 
-    actionsColumn = new ActionsColumn<KeyPairDto>(new ConstantActionsProvider<KeyPairDto>(DOWNLOAD_ACTION, DELETE_ACTION));
+    keyPairsTable.addColumn(new TextColumn<KeyDto>() {
+      @Override
+      public String getValue(KeyDto keyPair) {
+        return translations.keyTypeMap().get(keyPair.getKeyType().getName());
+      }
+    }, translations.typeLabel());
+
+    actionsColumn = new ActionsColumn<KeyDto>(new ConstantActionsProvider<KeyDto>(DOWNLOAD_ACTION, DELETE_ACTION));
     keyPairsTable.addColumn(actionsColumn, translations.actionsLabel());
     addTablePager();
     dataProvider.addDataDisplay(keyPairsTable);
@@ -178,11 +183,11 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   }
 
   @Override
-  public void setKeyPairs(final JsArray<KeyPairDto> keyPairs) {
+  public void setKeyPairs(final JsArray<KeyDto> keyPairs) {
     renderKeyPairs(keyPairs);
   }
 
-  private void renderKeyPairs(final JsArray<KeyPairDto> kpList) {
+  private void renderKeyPairs(final JsArray<KeyDto> kpList) {
     dataProvider.setArray(kpList);
     pager.firstPage();
     dataProvider.refresh();
@@ -214,7 +219,7 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   }
 
   @Override
-  public HasActionHandler<KeyPairDto> getActionColumn() {
+  public HasActionHandler<KeyDto> getActionColumn() {
     return actionsColumn;
   }
 

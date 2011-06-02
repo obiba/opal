@@ -37,7 +37,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
-import org.obiba.opal.web.model.client.opal.KeyPairDto;
+import org.obiba.opal.web.model.client.opal.KeyDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -66,9 +66,9 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
   private Request countIdentifiersRequest;
 
   public interface Display extends WidgetDisplay {
-    void setKeyPairs(JsArray<KeyPairDto> keyPairs);
+    void setKeyPairs(JsArray<KeyDto> keyPairs);
 
-    HasActionHandler<KeyPairDto> getActionColumn();
+    HasActionHandler<KeyDto> getActionColumn();
 
     void setFunctionalUnitDetails(FunctionalUnitDto FunctionalUnit);
 
@@ -148,13 +148,13 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
   }
 
   private void initUiComponents() {
-    getDisplay().setKeyPairs((JsArray<KeyPairDto>) JsArray.createArray());
+    getDisplay().setKeyPairs((JsArray<KeyDto>) JsArray.createArray());
     getDisplay().setAvailable(false);
   }
 
   private void addHandlers() {
-    getDisplay().getActionColumn().setActionHandler(new ActionHandler<KeyPairDto>() {
-      public void doAction(KeyPairDto dto, String actionName) {
+    getDisplay().getActionColumn().setActionHandler(new ActionHandler<KeyDto>() {
+      public void doAction(KeyDto dto, String actionName) {
         if(actionName != null) {
           doActionImpl(dto, actionName);
         }
@@ -238,15 +238,15 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/keys").get().authorize(getDisplay().getListKeyPairsAuthorizer()).send();
   }
 
-  private void authorizeDownloadCertificate(KeyPairDto dto, HasAuthorization authorizer) {
+  private void authorizeDownloadCertificate(KeyDto dto, HasAuthorization authorizer) {
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/key/" + dto.getAlias() + "/certificate").get().authorize(authorizer).send();
   }
 
-  private void authorizeDeleteKeyPair(KeyPairDto dto, HasAuthorization authorizer) {
+  private void authorizeDeleteKeyPair(KeyDto dto, HasAuthorization authorizer) {
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/key/" + dto.getAlias()).delete().authorize(authorizer).send();
   }
 
-  protected void doActionImpl(final KeyPairDto dto, String actionName) {
+  protected void doActionImpl(final KeyDto dto, String actionName) {
     if(actionName.equals(DOWNLOAD_ACTION)) {
       authorizeDownloadCertificate(dto, new Authorizer(eventBus) {
 
@@ -271,7 +271,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     }
   }
 
-  private void deleteKeyPair(final KeyPairDto dto) {
+  private void deleteKeyPair(final KeyDto dto) {
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
       @Override
@@ -292,7 +292,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
   }
 
-  private void downloadCertificate(final KeyPairDto dto) {
+  private void downloadCertificate(final KeyDto dto) {
     String url = new StringBuilder("/functional-unit/").append(functionalUnit.getName()) //
     .append("/key/").append(dto.getAlias()).append("/certificate").toString();
     eventBus.fireEvent(new FileDownloadEvent(url));
@@ -310,7 +310,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
   private void refreshKeyPairs(FunctionalUnitDto functionalUnit) {
     String name = functionalUnit.getName();
-    ResourceRequestBuilderFactory.<JsArray<KeyPairDto>> newBuilder().forResource("/functional-unit/" + name + "/keys").get().withCallback(new KeyPairsCallback()).withCallback(Response.SC_NOT_FOUND, new FunctionalUnitNotFoundCallBack(name)).send();
+    ResourceRequestBuilderFactory.<JsArray<KeyDto>> newBuilder().forResource("/functional-unit/" + name + "/keys").get().withCallback(new KeyPairsCallback()).withCallback(Response.SC_NOT_FOUND, new FunctionalUnitNotFoundCallBack(name)).send();
   }
 
   private class AddKeyPairCommand implements Command {
@@ -473,11 +473,11 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     }
   }
 
-  private class KeyPairsCallback implements ResourceCallback<JsArray<KeyPairDto>> {
+  private class KeyPairsCallback implements ResourceCallback<JsArray<KeyDto>> {
 
     @Override
-    public void onResource(Response response, JsArray<KeyPairDto> resource) {
-      JsArray<KeyPairDto> keyPairs = (resource != null) ? resource : (JsArray<KeyPairDto>) JsArray.createArray();
+    public void onResource(Response response, JsArray<KeyDto> resource) {
+      JsArray<KeyDto> keyPairs = (resource != null) ? resource : (JsArray<KeyDto>) JsArray.createArray();
       getDisplay().setKeyPairs(keyPairs);
     }
 

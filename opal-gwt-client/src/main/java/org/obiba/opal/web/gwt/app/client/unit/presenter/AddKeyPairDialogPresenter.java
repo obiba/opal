@@ -28,7 +28,8 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
-import org.obiba.opal.web.model.client.opal.KeyPairForm;
+import org.obiba.opal.web.model.client.opal.KeyForm;
+import org.obiba.opal.web.model.client.opal.KeyType;
 import org.obiba.opal.web.model.client.opal.PrivateKeyForm;
 import org.obiba.opal.web.model.client.opal.PublicKeyForm;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -168,20 +169,21 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
   }
 
   private void createKeyPair() {
-    KeyPairForm dto = getKeyPairForm();
+    KeyForm dto = getKeyForm();
     CreateKeyPairCallBack callbackHandler = new CreateKeyPairCallBack(dto);
-    ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/keys").post().withResourceBody(KeyPairForm.stringify(dto)).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+    ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/keys").post().withResourceBody(KeyForm.stringify(dto)).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
   }
 
-  private KeyPairForm getKeyPairForm() {
-    KeyPairForm dto = KeyPairForm.create();
+  private KeyForm getKeyForm() {
+    KeyForm dto = KeyForm.create();
+    dto.setKeyType(KeyType.KEY_PAIR);
     dto.setAlias(getDisplay().getAlias().getText());
     setPrivateKey(dto);
     setPublicKey(dto);
     return dto;
   }
 
-  private void setPrivateKey(KeyPairForm dto) {
+  private void setPrivateKey(KeyForm dto) {
     if(getDisplay().isPrivateKeyCreate().getValue()) {
       PrivateKeyForm pkForm = PrivateKeyForm.create();
       pkForm.setAlgo(getDisplay().getAlgorithm().getText());
@@ -192,7 +194,7 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
     }
   }
 
-  private void setPublicKey(KeyPairForm dto) {
+  private void setPublicKey(KeyForm dto) {
     if(getDisplay().isPublicKeyCreate().getValue()) {
       PublicKeyForm pkForm = PublicKeyForm.create();
       pkForm.setName(getDisplay().getFirstAndLastName().getText());
@@ -209,17 +211,17 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
 
   private class CreateKeyPairCallBack implements ResponseCodeCallback {
 
-    KeyPairForm keyPairForm;
+    KeyForm KeyForm;
 
-    public CreateKeyPairCallBack(KeyPairForm keyPairForm) {
-      this.keyPairForm = keyPairForm;
+    public CreateKeyPairCallBack(KeyForm KeyForm) {
+      this.KeyForm = KeyForm;
     }
 
     @Override
     public void onResponseCode(Request request, Response response) {
 
       if(response.getStatusCode() == Response.SC_CREATED) {
-        eventBus.fireEvent(new KeyPairCreatedEvent(functionalUnit, keyPairForm.getAlias()));
+        eventBus.fireEvent(new KeyPairCreatedEvent(functionalUnit, KeyForm.getAlias()));
         getDisplay().hideDialog();
       } else {
         ClientErrorDto error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());

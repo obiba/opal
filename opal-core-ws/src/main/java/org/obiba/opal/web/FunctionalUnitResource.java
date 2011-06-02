@@ -305,13 +305,14 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
   @GET
   @Path("/keys")
-  public List<Opal.KeyPairDto> getFunctionalUnitKeyPairs() throws KeyStoreException, IOException {
-    final List<Opal.KeyPairDto> keyPairs = Lists.newArrayList();
+  public List<Opal.KeyDto> getFunctionalUnitKeyPairs() throws KeyStoreException, IOException {
+    final List<Opal.KeyDto> keyPairs = Lists.newArrayList();
 
     UnitKeyStore keystore = unitKeyStoreService.getUnitKeyStore(unit);
     if(keystore != null) {
       for(String alias : keystore.listAliases()) {
-        Opal.KeyPairDto.Builder kpBuilder = Opal.KeyPairDto.newBuilder().setAlias(alias);
+        Opal.KeyType type = Opal.KeyType.valueOf(keystore.getKeyType(alias).toString());
+        Opal.KeyDto.Builder kpBuilder = Opal.KeyDto.newBuilder().setAlias(alias).setKeyType(type);
 
         kpBuilder.setCertificate(getPEMCertificate(keystore, alias));
         keyPairs.add(kpBuilder.build());
@@ -325,7 +326,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
   @POST
   @Path("/keys")
-  public Response createFunctionalUnitKeyPair(Opal.KeyPairForm kpForm) {
+  public Response createFunctionalUnitKeyPair(Opal.KeyForm kpForm) {
     if(unitKeyStoreService.aliasExists(unit, kpForm.getAlias())) {
       return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "KeyPairAlreadyExists").build()).build();
     }
@@ -374,7 +375,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   // Private methods
   //
 
-  private ResponseBuilder doCreateOrImportKeyPair(Opal.KeyPairForm kpForm) {
+  private ResponseBuilder doCreateOrImportKeyPair(Opal.KeyForm kpForm) {
     ResponseBuilder response = null;
     if(kpForm.hasPrivateForm() && kpForm.hasPublicForm()) {
       unitKeyStoreService.createOrUpdateKey(unit, kpForm.getAlias(), kpForm.getPrivateForm().getAlgo(), kpForm.getPrivateForm().getSize(), getCertificateInfo(kpForm.getPublicForm()));
@@ -386,7 +387,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
     return response;
   }
 
-  private ResponseBuilder doImportKeyPair(Opal.KeyPairForm kpForm) {
+  private ResponseBuilder doImportKeyPair(Opal.KeyForm kpForm) {
     ResponseBuilder response = null;
     if(kpForm.hasPublicForm()) {
       unitKeyStoreService.importKey(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()), getCertificateInfo(kpForm.getPublicForm()));
@@ -424,12 +425,12 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
     return "CN=" + pkForm.getName() + ", OU=" + pkForm.getOrganizationalUnit() + ", O=" + pkForm.getOrganization() + ", L=" + pkForm.getLocality() + ", ST=" + pkForm.getState() + ", C=" + pkForm.getCountry();
   }
 
-  private void sortByName(List<Opal.KeyPairDto> units) {
+  private void sortByName(List<Opal.KeyDto> units) {
     // sort alphabetically
-    Collections.sort(units, new Comparator<Opal.KeyPairDto>() {
+    Collections.sort(units, new Comparator<Opal.KeyDto>() {
 
       @Override
-      public int compare(Opal.KeyPairDto d1, Opal.KeyPairDto d2) {
+      public int compare(Opal.KeyDto d1, Opal.KeyDto d2) {
         return d1.getAlias().compareTo(d2.getAlias());
       }
 

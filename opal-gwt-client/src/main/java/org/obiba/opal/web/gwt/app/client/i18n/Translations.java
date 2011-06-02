@@ -751,6 +751,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Help")
   String helpLabel();
 
+  @Description("KeyType map")
+  @DefaultStringMapValue({ "KEY_PAIR", "Key Pair", "CERTIFICATE", "Certificate" })
+  Map<String, String> keyTypeMap();
+
   @Description("Paste Private Key PEM label")
   @DefaultStringValue("(paste private key in PEM format)")
   String pastePrivateKeyPEM();
