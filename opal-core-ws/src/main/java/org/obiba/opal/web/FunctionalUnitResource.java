@@ -46,6 +46,7 @@ import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.crypt.MagmaCryptRuntimeException;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.Disposables;
 import org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl;
@@ -67,6 +68,7 @@ import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
 import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.model.Opal.KeyType;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -333,7 +335,11 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
     ResponseBuilder response = null;
     try {
-      response = doCreateOrImportKeyPair(kpForm);
+      if(kpForm.getKeyType() == KeyType.KEY_PAIR) {
+        response = doCreateOrImportKeyPair(kpForm);
+      } else {
+        response = doImportCertificate(kpForm);
+      }
       if(response == null) {
         response = Response.created(UriBuilder.fromPath("/").path(FunctionalUnitResource.class).path("/key/" + kpForm.getAlias()).build(unit));
       }
@@ -374,6 +380,15 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   //
   // Private methods
   //
+
+  private ResponseBuilder doImportCertificate(Opal.KeyForm kpForm) {
+    try {
+      unitKeyStoreService.importCertificate(this.unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPublicImport().getBytes()));
+    } catch(MagmaCryptRuntimeException e) {
+      return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "InvalidCertificate").build());
+    }
+    return null;
+  }
 
   private ResponseBuilder doCreateOrImportKeyPair(Opal.KeyForm kpForm) {
     ResponseBuilder response = null;

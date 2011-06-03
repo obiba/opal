@@ -61,6 +61,12 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
 
     HasText getAlias();
 
+    HasValue<Boolean> isKeyPair();
+
+    HasValue<Boolean> isCertificate();
+
+    HasText getCertificatePem();
+
     HasValue<Boolean> isPrivateKeyCreate();
 
     HasValue<Boolean> isPrivateKeyImport();
@@ -96,6 +102,8 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
 
     void setKeyTypeValidationHandler(ValidationHandler handler);
+
+    void setCertificateStepHandler(ValidationHandler handler);
 
     void setPrivateKeyValidationHandler(ValidationHandler handler);
 
@@ -138,6 +146,7 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
 
   private void addValidators() {
     getDisplay().setKeyTypeValidationHandler(new KeyTypeValidationHandler(eventBus));
+    getDisplay().setCertificateStepHandler(new CertificateStepValidationHandler(eventBus));
     getDisplay().setPrivateKeyValidationHandler(new PrivateKeyValidationHandler(eventBus));
     getDisplay().setPublicKeyValidationHandler(new PublicKeyValidationHandler(eventBus));
   }
@@ -147,7 +156,17 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
 
       @Override
       public void onClick(ClickEvent arg0) {
-        createKeyPair();
+        KeyForm form = null;
+        if(getDisplay().isKeyPair().getValue()) {
+          form = createKeyPair();
+        } else if(getDisplay().isCertificate().getValue()) {
+          form = createCertificate();
+        } else {
+          throw new IllegalStateException("unknown key type");
+        }
+
+        CreateKeyPairCallBack callbackHandler = new CreateKeyPairCallBack(form);
+        ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/keys").post().withResourceBody(KeyForm.stringify(form)).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
       }
 
     }));
@@ -171,13 +190,15 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
     this.functionalUnit = functionalUnit;
   }
 
-  private void createKeyPair() {
-    KeyForm dto = getKeyForm();
-    CreateKeyPairCallBack callbackHandler = new CreateKeyPairCallBack(dto);
-    ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/keys").post().withResourceBody(KeyForm.stringify(dto)).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+  private KeyForm createCertificate() {
+    KeyForm dto = KeyForm.create();
+    dto.setKeyType(KeyType.CERTIFICATE);
+    dto.setAlias(getDisplay().getAlias().getText());
+    dto.setPublicImport(getDisplay().getCertificatePem().getText());
+    return dto;
   }
 
-  private KeyForm getKeyForm() {
+  private KeyForm createKeyPair() {
     KeyForm dto = KeyForm.create();
     dto.setKeyType(KeyType.KEY_PAIR);
     dto.setAlias(getDisplay().getAlias().getText());
@@ -243,6 +264,19 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
       validators.add(new RequiredTextValidator(getDisplay().getAlias(), "KeyPairAliasIsRequired"));
+      return validators;
+    }
+  }
+
+  private class CertificateStepValidationHandler extends AbstractValidationHandler {
+    CertificateStepValidationHandler(EventBus eventBus) {
+      super(eventBus);
+    }
+
+    @Override
+    protected Set<FieldValidator> getValidators() {
+      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      validators.add(new RequiredTextValidator(getDisplay().getCertificatePem(), "KeyPairPublicKeyPEMIsRequired"));
       return validators;
     }
   }

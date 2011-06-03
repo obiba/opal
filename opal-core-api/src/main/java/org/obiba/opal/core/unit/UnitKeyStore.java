@@ -206,6 +206,16 @@ public class UnitKeyStore implements KeyProvider {
     return cert;
   }
 
+  public X509Certificate importCertificate(String alias, InputStream pem) {
+    X509Certificate cert = getCertificate(pem);
+    try {
+      this.store.setCertificateEntry(alias, cert);
+    } catch(KeyStoreException e) {
+      throw new MagmaCryptRuntimeException(e);
+    }
+    return cert;
+  }
+
   public List<Certificate> getCertficateEntries() {
     List<Certificate> certs = Lists.newArrayList();
     for(String alias : listAliases()) {

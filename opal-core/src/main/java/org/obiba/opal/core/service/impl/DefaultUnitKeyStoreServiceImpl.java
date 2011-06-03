@@ -193,6 +193,18 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     saveUnitKeyStore(unitKeyStore);
   }
 
+  @Override
+  public void importCertificate(String unitName, String alias, InputStream certStream) {
+    Assert.hasText(unitName, "unitName must not be null or empty");
+    Assert.hasText(alias, "alias must not be null or empty");
+    Assert.notNull(certStream, "certStream must not be null");
+
+    UnitKeyStore unitKeyStore = getOrCreateUnitKeyStore(unitName);
+    unitKeyStore.importCertificate(alias, certStream);
+
+    saveUnitKeyStore(unitKeyStore);
+  }
+
   private UnitKeyStore loadUnitKeyStore(String unitName, UnitKeyStoreState unitKeyStoreState) {
     CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName).prompt(getPasswordFor(unitName)).build();
 

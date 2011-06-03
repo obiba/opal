@@ -37,12 +37,25 @@
                 </g:Label>
               </td>
               <td>
-                <g:RadioButton ui:field="keyPairType" name="keyType" addStyleNames="key">
+                <g:RadioButton ui:field="keyPairType" name="keyType" addStyleNames="block small-top-margin">
                   <ui:msg description="Create Key Pair label">create or import a new key pair</ui:msg>
                 </g:RadioButton>
-                <g:RadioButton ui:field="certificateType" name="keyType" addStyleNames="key">
+                <g:RadioButton ui:field="certificateType" name="keyType" addStyleNames="block small-top-margin">
                   <ui:msg description="Create Certificate label">create or import a new certificate</ui:msg>
                 </g:RadioButton>
+              </td>
+            </tr>
+          </table>
+        </g:HTMLPanel>
+      </o:WizardStep>
+      <o:WizardStep ui:field="importCertificateStep">
+        <g:HTMLPanel>
+          <table class="full-width" cellspacing="10">
+            <tr>
+              <td colspan="2">
+                <div>
+                  <g:TextArea addStyleNames="text not-so-full-width" name="certificate" ui:field="certPEM"/>
+                </div>
               </td>
             </tr>
           </table>

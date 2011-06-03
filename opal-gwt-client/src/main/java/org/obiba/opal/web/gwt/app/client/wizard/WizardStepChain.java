@@ -78,6 +78,10 @@ public class WizardStepChain {
     }
   }
 
+  public boolean isValid() {
+    return this.current.validate();
+  }
+
   public HandlerRegistration getNextHandlerRegistration() {
     return nextHandlerRegistration;
   }

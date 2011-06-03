@@ -32,7 +32,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
@@ -45,7 +44,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  *
  */
-public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogPresenter.Display {
+public class AddKeyPairDialogView implements AddKeyPairDialogPresenter.Display {
 
   @UiTemplate("AddKeyPairDialogView.ui.xml")
   interface AddKeyPairDialogUiBinder extends UiBinder<DialogBox, AddKeyPairDialogView> {
@@ -62,6 +61,9 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   WizardStep keyTypeStep;
 
   @UiField
+  WizardStep importCertificateStep;
+
+  @UiField
   WizardStep privateKeyStep;
 
   @UiField
@@ -75,6 +77,9 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
 
   @UiField
   RadioButton certificateType;
+
+  @UiField
+  TextArea certPEM;
 
   @UiField
   RadioButton privateKeyCreated;
@@ -123,6 +128,8 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
 
   private ValidationHandler keyTypeStepValidators;
 
+  private ValidationHandler certificateStepValidators;
+
   private ValidationHandler privateKeyValidators;
 
   private ValidationHandler publicKeyValidators;
@@ -130,11 +137,7 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   private WizardStepChain stepChain;
 
   public AddKeyPairDialogView() {
-    initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
-    initWizardDialog();
-    initPrivateKeyStep();
-    initPublicKeyStep();
   }
 
   private void initWizardDialog() {
@@ -142,13 +145,8 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
     DefaultWizardStepController p = BranchingWizardStepController.Builder.create(keyTypeStep) //
     .branch(DefaultWizardStepController.Builder.create(privateKeyStep)//
     .title(translations.privateKeyStep())//
-    .onValidate(new ValidationHandler() {
-      @Override
-      public boolean validate() {
-        return privateKeyValidators.validate();
-      }
-    }).build(), keyPairType)//
-    .branch(DefaultWizardStepController.Builder.create(publicKeyStep).title(translations.publicKeyStep()).onStepIn(new StepInHandler() {
+    .onValidate(privateKeyValidators)//
+    .next(DefaultWizardStepController.Builder.create(publicKeyStep).title(translations.publicKeyStep()).onStepIn(new StepInHandler() {
 
       @Override
       public void onStepIn() {
@@ -161,18 +159,31 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
           publicKeyForm.addStyleName("indent");
         }
       }
-    }).build(), certificateType)//
+    }).onValidate(publicKeyValidators).build()).build(), keyPairType)//
+    .branch(DefaultWizardStepController.Builder.create(importCertificateStep)//
+    .title(translations.keyTypeMap()//
+    .get("CERTIFICATE")).onValidate(certificateStepValidators).build(), certificateType)//
     .title(translations.keyTypeStep())//
-    .onValidate(new ValidationHandler() {
-
-      @Override
-      public boolean validate() {
-        return keyTypeStepValidators.validate();
-      }
-    }).build();
+    .onValidate(keyTypeStepValidators).build();
 
     stepChain = WizardStepChain.Builder.create(dialog).append(p).onNext().onPrevious().build();
 
+    initCertificateStep();
+    initPrivateKeyStep();
+    initPublicKeyStep();
+  }
+
+  private void initCertificateStep() {
+    certPEM.addFocusHandler(new FocusHandler() {
+
+      @Override
+      public void onFocus(FocusEvent arg0) {
+        if(certPEM.getText().equals(translations.pastePublicKeyPEM())) {
+          certPEM.setText("");
+          certPEM.removeStyleName("default-text");
+        }
+      }
+    });
   }
 
   private void initPrivateKeyStep() {
@@ -250,6 +261,11 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
     });
   }
 
+  private void clearCertificateForm() {
+    certPEM.setText(translations.pastePublicKeyPEM());
+    certPEM.addStyleName("default-text");
+  }
+
   private void clearPrivateKeyCreateForm() {
     algo.setText("RSA");
     size.setText("2048");
@@ -277,6 +293,7 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   @Override
   public void clear() {
     alias.setText("");
+    clearCertificateForm();
     clearPrivateKeyCreateForm();
     clearPrivateKeyImportForm();
     clearPublicKeyCreateForm();
@@ -284,6 +301,7 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
 
     keyTypeStep.setVisible(true);
     keyPairType.setValue(true);
+    importCertificateStep.setVisible(false);
     privateKeyStep.setVisible(false);
     privateKeyCreated.setValue(true, true);
     publicKeyCreated.setValue(true, true);
@@ -298,6 +316,11 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   @Override
   public HasText getAlias() {
     return alias;
+  }
+
+  @Override
+  public HasText getCertificatePem() {
+    return this.certPEM;
   }
 
   @Override
@@ -351,6 +374,16 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   }
 
   @Override
+  public HasValue<Boolean> isKeyPair() {
+    return keyPairType;
+  }
+
+  @Override
+  public HasValue<Boolean> isCertificate() {
+    return this.certificateType;
+  }
+
+  @Override
   public HasValue<Boolean> isPrivateKeyCreate() {
     return privateKeyCreated;
   }
@@ -372,6 +405,10 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
 
   @Override
   public void showDialog() {
+    if(stepChain == null) {
+      initWizardDialog();
+    }
+
     stepChain.reset();
     clear();
     dialog.center();
@@ -385,7 +422,7 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
 
   @Override
   public Widget asWidget() {
-    return this;
+    return dialog;
   }
 
   @Override
@@ -403,7 +440,7 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
 
       @Override
       public void onClick(ClickEvent evt) {
-        if(publicKeyValidators.validate()) {
+        if(stepChain.isValid()) {
           handler.onClick(evt);
         }
       }
@@ -418,6 +455,11 @@ public class AddKeyPairDialogView extends Composite implements AddKeyPairDialogP
   @Override
   public void setKeyTypeValidationHandler(ValidationHandler handler) {
     this.keyTypeStepValidators = handler;
+  }
+
+  @Override
+  public void setCertificateStepHandler(ValidationHandler handler) {
+    this.certificateStepValidators = handler;
   }
 
   @Override

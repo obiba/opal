@@ -102,6 +102,16 @@ public class DefaultWizardStepController implements WizardStepController {
       return currentStepCtrl;
     }
 
+    /**
+     * @param build
+     * @return
+     */
+    public Builder next(DefaultWizardStepController next) {
+      currentStepCtrl.setNext(next);
+      next.setPrevious(currentStepCtrl);
+      return this;
+    }
+
   }
 
   private WizardStep step;

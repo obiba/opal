@@ -120,4 +120,11 @@ public interface UnitKeyStoreService {
    */
   public void importKey(String unitName, String alias, InputStream privateKey, String certificateInfo) throws NoSuchFunctionalUnitException;
 
+  /**
+   * @param unit
+   * @param alias
+   * @param byteArrayInputStream
+   */
+  public void importCertificate(String unit, String alias, InputStream byteArrayInputStream);
+
 }
