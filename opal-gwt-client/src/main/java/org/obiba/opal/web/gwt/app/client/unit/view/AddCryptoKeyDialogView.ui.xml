@@ -12,9 +12,9 @@
     .top-margin { margin-top: 0.5em; }
   </ui:style>
 
-  <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="35em" width="45em">
+  <o:WizardDialogBox autoHide="false" modal="true" height="35em" width="45em">
     <g:caption>
-      <ui:msg description="Add Key Pair dialog title">Add Key Pair</ui:msg>
+      <ui:msg description="Add Cryptographic Key dialog title">Add Cryptographic Key</ui:msg>
     </g:caption>
     <g:FlowPanel>
       <o:WizardStep ui:field="keyTypeStep">
@@ -33,15 +33,15 @@
             <tr>
               <td>
                 <g:Label addStyleNames="key">
-                  <ui:msg description="Key type label">Key Type</ui:msg>:
+                  <ui:msg description="Key Type label">Key Type</ui:msg>:
                 </g:Label>
               </td>
               <td>
                 <g:RadioButton ui:field="keyPairType" name="keyType" addStyleNames="block small-top-margin">
-                  <ui:msg description="Create Key Pair label">create or import a new key pair</ui:msg>
+                  <ui:msg description="Create Key Pair label">create or import a key pair (public-private cryptographic key)</ui:msg>
                 </g:RadioButton>
                 <g:RadioButton ui:field="certificateType" name="keyType" addStyleNames="block small-top-margin">
-                  <ui:msg description="Create Certificate label">create or import a new certificate</ui:msg>
+                  <ui:msg description="Certificate label">import a certificate (usable to identify this unit)</ui:msg>
                 </g:RadioButton>
               </td>
             </tr>

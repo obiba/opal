@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.validator;
 
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 
 /**
  *
@@ -28,6 +29,23 @@ public class RequiredTextValidator extends AbstractFieldValidator {
   public RequiredTextValidator(HasText textField, String errorMessageKey) {
     super(errorMessageKey);
     this.textField = textField;
+  }
+
+  public RequiredTextValidator(final HasValue<String> hasValue, String errorMessageKey) {
+    super(errorMessageKey);
+    this.textField = new HasText() {
+
+      @Override
+      public String getText() {
+        return hasValue.getValue();
+      }
+
+      @Override
+      public void setText(String text) {
+        hasValue.setValue(text);
+      }
+
+    };
   }
 
   //

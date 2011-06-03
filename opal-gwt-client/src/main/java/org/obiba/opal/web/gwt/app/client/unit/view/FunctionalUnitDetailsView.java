@@ -101,7 +101,7 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
 
   private MenuItem exportIds;
 
-  private MenuItem keyPair;
+  private MenuItem cryptoKey;
 
   private MenuItem generateIdentifiers;
 
@@ -267,11 +267,11 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
 
   @Override
   public void setAddKeyPairCommand(Command command) {
-    if(keyPair == null) {
+    if(cryptoKey == null) {
       keyPairSeparator = addMenu.addSeparator(new MenuItemSeparator());
-      addMenu.addItem(keyPair = new MenuItem(translations.addKeyPair(), command));
+      addMenu.addItem(cryptoKey = new MenuItem(translations.addCryptoKey(), command));
     } else {
-      keyPair.setCommand(command);
+      cryptoKey.setCommand(command);
     }
   }
 
@@ -349,7 +349,7 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
 
   @Override
   public HasAuthorization getAddKeyPairAuthorizer() {
-    return new CompositeAuthorizer(new MenuItemAuthorizer(addItem), new MenuItemAuthorizer(keyPair), new UIObjectAuthorizer(keyPairSeparator)) {
+    return new CompositeAuthorizer(new MenuItemAuthorizer(addItem), new MenuItemAuthorizer(cryptoKey), new UIObjectAuthorizer(keyPairSeparator)) {
       @Override
       public void unauthorized() {
       }

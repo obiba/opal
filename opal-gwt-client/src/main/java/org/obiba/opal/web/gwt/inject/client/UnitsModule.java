@@ -14,7 +14,7 @@ import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitDetailsPre
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitListPresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitPresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter;
-import org.obiba.opal.web.gwt.app.client.unit.view.AddKeyPairDialogView;
+import org.obiba.opal.web.gwt.app.client.unit.view.AddCryptoKeyDialogView;
 import org.obiba.opal.web.gwt.app.client.unit.view.FunctionalUnitDetailsView;
 import org.obiba.opal.web.gwt.app.client.unit.view.FunctionalUnitListView;
 import org.obiba.opal.web.gwt.app.client.unit.view.FunctionalUnitUpdateDialogView;
@@ -31,7 +31,7 @@ public class UnitsModule extends AbstractGinModule {
     bind(FunctionalUnitDetailsPresenter.Display.class).to(FunctionalUnitDetailsView.class).in(Singleton.class);
     bind(FunctionalUnitPresenter.Display.class).to(FunctionalUnitView.class).in(Singleton.class);
     bind(FunctionalUnitUpdateDialogPresenter.Display.class).to(FunctionalUnitUpdateDialogView.class).in(Singleton.class);
-    bind(AddKeyPairDialogPresenter.Display.class).to(AddKeyPairDialogView.class).in(Singleton.class);
+    bind(AddKeyPairDialogPresenter.Display.class).to(AddCryptoKeyDialogView.class).in(Singleton.class);
   }
 
 }

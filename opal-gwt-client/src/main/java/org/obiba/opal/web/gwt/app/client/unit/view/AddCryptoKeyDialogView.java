@@ -32,10 +32,10 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
@@ -44,18 +44,17 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  *
  */
-public class AddKeyPairDialogView implements AddKeyPairDialogPresenter.Display {
+public class AddCryptoKeyDialogView implements AddKeyPairDialogPresenter.Display {
 
-  @UiTemplate("AddKeyPairDialogView.ui.xml")
-  interface AddKeyPairDialogUiBinder extends UiBinder<DialogBox, AddKeyPairDialogView> {
+  @UiTemplate("AddCryptoKeyDialogView.ui.xml")
+  interface ViewUiBinder extends UiBinder<WizardDialogBox, AddCryptoKeyDialogView> {
   }
 
-  private static AddKeyPairDialogUiBinder uiBinder = GWT.create(AddKeyPairDialogUiBinder.class);
+  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private static Translations translations = GWT.create(Translations.class);
 
-  @UiField
-  WizardDialogBox dialog;
+  private final WizardDialogBox dialog;
 
   @UiField
   WizardStep keyTypeStep;
@@ -136,8 +135,8 @@ public class AddKeyPairDialogView implements AddKeyPairDialogPresenter.Display {
 
   private WizardStepChain stepChain;
 
-  public AddKeyPairDialogView() {
-    uiBinder.createAndBindUi(this);
+  public AddCryptoKeyDialogView() {
+    this.dialog = uiBinder.createAndBindUi(this);
   }
 
   private void initWizardDialog() {
@@ -153,6 +152,7 @@ public class AddKeyPairDialogView implements AddKeyPairDialogPresenter.Display {
         publicKeyCreated.setVisible(privateKeyImported.getValue());
         publicKeyImported.setVisible(privateKeyImported.getValue());
         publicKeyPEM.setVisible(privateKeyImported.getValue());
+        updateCertFields();
         if(privateKeyCreated.getValue()) {
           publicKeyForm.removeStyleName("indent");
         } else {
@@ -161,23 +161,22 @@ public class AddKeyPairDialogView implements AddKeyPairDialogPresenter.Display {
       }
     }).onValidate(publicKeyValidators).build()).build(), keyPairType)//
     .branch(DefaultWizardStepController.Builder.create(importCertificateStep)//
-    .title(translations.keyTypeMap()//
-    .get("CERTIFICATE")).onValidate(certificateStepValidators).build(), certificateType)//
+    .title(translations.importCertificateStep()).onValidate(certificateStepValidators).build(), certificateType)//
     .title(translations.keyTypeStep())//
     .onValidate(keyTypeStepValidators).build();
 
     stepChain = WizardStepChain.Builder.create(dialog).append(p).onNext().onPrevious().build();
 
-    initCertificateStep();
+    initImportCertificateStep();
     initPrivateKeyStep();
     initPublicKeyStep();
   }
 
-  private void initCertificateStep() {
+  private void initImportCertificateStep() {
     certPEM.addFocusHandler(new FocusHandler() {
 
       @Override
-      public void onFocus(FocusEvent arg0) {
+      public void onFocus(FocusEvent event) {
         if(certPEM.getText().equals(translations.pastePublicKeyPEM())) {
           certPEM.setText("");
           certPEM.removeStyleName("default-text");
@@ -210,16 +209,27 @@ public class AddKeyPairDialogView implements AddKeyPairDialogPresenter.Display {
         privateKeyCreated.setValue(!privateKeyImported.getValue(), true);
       }
     });
+
     privateKeyPEM.addFocusHandler(new FocusHandler() {
 
       @Override
       public void onFocus(FocusEvent arg0) {
-        if(privateKeyPEM.getText().equals(translations.pastePrivateKeyPEM())) {
+        if(privateKeyPEM.getText().equals(getDefaultPrivateKeyText())) {
           privateKeyPEM.setText("");
           privateKeyPEM.removeStyleName("default-text");
         }
       }
     });
+  }
+
+  private void updateCertFields() {
+    boolean enabled = publicKeyCreated.getValue() || privateKeyCreated.getValue();
+    names.setEnabled(enabled);
+    organizationalUnit.setEnabled(enabled);
+    organizationName.setEnabled(enabled);
+    city.setEnabled(enabled);
+    state.setEnabled(enabled);
+    country.setEnabled(enabled);
   }
 
   private void initPublicKeyStep() {
@@ -229,12 +239,7 @@ public class AddKeyPairDialogView implements AddKeyPairDialogPresenter.Display {
       public void onValueChange(ValueChangeEvent<Boolean> arg0) {
         publicKeyImported.setValue(!publicKeyCreated.getValue());
         publicKeyPEM.setEnabled(!publicKeyCreated.getValue());
-        names.setEnabled(publicKeyCreated.getValue());
-        organizationalUnit.setEnabled(publicKeyCreated.getValue());
-        organizationName.setEnabled(publicKeyCreated.getValue());
-        city.setEnabled(publicKeyCreated.getValue());
-        state.setEnabled(publicKeyCreated.getValue());
-        country.setEnabled(publicKeyCreated.getValue());
+        updateCertFields();
         if(publicKeyCreated.getValue()) {
           clearPublicKeyImportForm();
         } else {
@@ -272,7 +277,7 @@ public class AddKeyPairDialogView implements AddKeyPairDialogPresenter.Display {
   }
 
   private void clearPrivateKeyImportForm() {
-    privateKeyPEM.setText(translations.pastePrivateKeyPEM());
+    privateKeyPEM.setText(getDefaultPrivateKeyText());
     privateKeyPEM.addStyleName("default-text");
   }
 
@@ -300,7 +305,7 @@ public class AddKeyPairDialogView implements AddKeyPairDialogPresenter.Display {
     clearPublicKeyImportForm();
 
     keyTypeStep.setVisible(true);
-    keyPairType.setValue(true);
+    keyPairType.setValue(true, true);
     importCertificateStep.setVisible(false);
     privateKeyStep.setVisible(false);
     privateKeyCreated.setValue(true, true);
@@ -319,7 +324,7 @@ public class AddKeyPairDialogView implements AddKeyPairDialogPresenter.Display {
   }
 
   @Override
-  public HasText getCertificatePem() {
+  public HasValue<String> getCertificatePem() {
     return this.certPEM;
   }
 
@@ -334,7 +339,7 @@ public class AddKeyPairDialogView implements AddKeyPairDialogPresenter.Display {
   }
 
   @Override
-  public HasCloseHandlers getDialog() {
+  public HasCloseHandlers<PopupPanel> getDialog() {
     return dialog;
   }
 
@@ -359,13 +364,23 @@ public class AddKeyPairDialogView implements AddKeyPairDialogPresenter.Display {
   }
 
   @Override
-  public HasText getPrivateKeyImport() {
+  public HasValue<String> getPrivateKeyImport() {
     return privateKeyPEM;
   }
 
   @Override
-  public HasText getPublicKeyImport() {
+  public String getDefaultPrivateKeyText() {
+    return translations.pastePrivateKeyPEM();
+  }
+
+  @Override
+  public HasValue<String> getPublicKeyImport() {
     return publicKeyPEM;
+  }
+
+  @Override
+  public String getDefaultPublicKeyText() {
+    return translations.pastePublicKeyPEM();
   }
 
   @Override

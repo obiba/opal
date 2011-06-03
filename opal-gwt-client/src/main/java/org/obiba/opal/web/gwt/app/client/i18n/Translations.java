@@ -699,9 +699,13 @@ public interface Translations extends Constants {
   @DefaultStringValue("Export Identifiers Mapping")
   String exportUnitIdentifiersToExcel();
 
-  @Description("Add Key Pair label")
-  @DefaultStringValue("Add Encryption Keys")
-  String addKeyPair();
+  @Description("Add Cryptographic Key label")
+  @DefaultStringValue("Add Cryptographic Key")
+  String addAddCryptographicKey();
+
+  @Description("Add Cryptographic Key label")
+  @DefaultStringValue("Add Cryptographic Key")
+  String addCryptoKey();
 
   @Description("Generate Identifiers label")
   @DefaultStringValue("Generate Identifiers")
@@ -720,11 +724,15 @@ public interface Translations extends Constants {
   String aliasLabel();
 
   @Description("Select Key Type Step label")
-  @DefaultStringValue("Provide a name and a type for the new Encryption Key.")
+  @DefaultStringValue("Provide a name and a type for the cyrptographic key to add to this Unit.")
   String keyTypeStep();
 
+  @Description("Import Certificate label")
+  @DefaultStringValue("Provide the Public Certificate by pasting it here (PEM format).")
+  String importCertificateStep();
+
   @Description("Private Key Step label")
-  @DefaultStringValue("Provide a name for the Encryption Key Pair and the Private Key definition.")
+  @DefaultStringValue("Select how to add the private key of the key pair (create a new one or import an existing one)")
   String privateKeyStep();
 
   @Description("Public Key Step label")
