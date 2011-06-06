@@ -15,6 +15,8 @@ public class ElasticSearchConfiguration implements OpalConfigurationExtension {
 
   private String clusterName;
 
+  private String indexName;
+
   private Boolean dataNode;
 
   private Integer shards;
@@ -25,6 +27,10 @@ public class ElasticSearchConfiguration implements OpalConfigurationExtension {
 
   public String getClusterName(String defaultName) {
     return clusterName != null ? clusterName : defaultName;
+  }
+
+  public String getIndexName(String defaultName) {
+    return indexName != null ? indexName : defaultName;
   }
 
   public boolean isDataNode() {

@@ -48,7 +48,7 @@ public class EsIndexManager implements IndexManager {
 
   private static final Logger log = LoggerFactory.getLogger(EsIndexManager.class);
 
-  private final String OPAL_INDEX_NAME = "opal";
+  private final String DEFAULT_OPAL_INDEX_NAME = "opal";
 
   private final int ES_BATCH_SIZE = 100;
 
@@ -87,6 +87,10 @@ public class EsIndexManager implements IndexManager {
     return i;
   }
 
+  private String esIndexName() {
+    return esConfig.getConfig().getIndexName(DEFAULT_OPAL_INDEX_NAME);
+  }
+
   private String indexName(ValueTable vt) {
     return tableReference(vt).toLowerCase().replaceAll(" ", "_");
   }
@@ -100,13 +104,13 @@ public class EsIndexManager implements IndexManager {
   }
 
   private IndexMetaData getIndexMetaData() {
-    IndexMetaData imd = esProvider.getClient().admin().cluster().prepareState().setFilterIndices(OPAL_INDEX_NAME).execute().actionGet().getState().getMetaData().index(OPAL_INDEX_NAME);
+    IndexMetaData imd = esProvider.getClient().admin().cluster().prepareState().setFilterIndices(esIndexName()).execute().actionGet().getState().getMetaData().index(esIndexName());
     return imd != null ? imd : createIndex();
   }
 
   private IndexMetaData createIndex() {
-    esProvider.getClient().admin().indices().prepareCreate(OPAL_INDEX_NAME).setSettings(getIndexSettings()).execute().actionGet();
-    return esProvider.getClient().admin().cluster().prepareState().setFilterIndices(OPAL_INDEX_NAME).execute().actionGet().getState().getMetaData().index(OPAL_INDEX_NAME);
+    esProvider.getClient().admin().indices().prepareCreate(esIndexName()).setSettings(getIndexSettings()).execute().actionGet();
+    return esProvider.getClient().admin().cluster().prepareState().setFilterIndices(esIndexName()).execute().actionGet().getState().getMetaData().index(esIndexName());
   }
 
   private class Indexer implements IndexSynchronization {
@@ -129,7 +133,7 @@ public class EsIndexManager implements IndexManager {
     public void run() {
       log.info("Updating ValueTable index {}", index.valueTableReference);
       try {
-        esProvider.getClient().admin().indices().prepareDeleteMapping(OPAL_INDEX_NAME).setType(index.name).execute().actionGet();
+        esProvider.getClient().admin().indices().prepareDeleteMapping(esIndexName()).setType(index.name).execute().actionGet();
       } catch(IndexMissingException e) {
         createIndex();
       }
@@ -140,7 +144,7 @@ public class EsIndexManager implements IndexManager {
 
       XContentBuilder b = new ValueTableMapping().createMapping(index.name, valueTable);
 
-      esProvider.getClient().admin().indices().preparePutMapping(OPAL_INDEX_NAME).setType(index.name).setSource(b).execute().actionGet();
+      esProvider.getClient().admin().indices().preparePutMapping(esIndexName()).setType(index.name).setSource(b).execute().actionGet();
 
       ConcurrentValueTableReader.Builder.newReader().withThreads(threadFactory).from(valueTable).to(new ConcurrentReaderCallback() {
 
@@ -151,7 +155,7 @@ public class EsIndexManager implements IndexManager {
 
         @Override
         public void onValues(VariableEntity entity, Variable[] variables, Value[] values) {
-          bulkRequest.add(esProvider.getClient().prepareIndex(OPAL_INDEX_NAME, valueTable.getEntityType(), entity.getIdentifier()).setSource("{\"identifier\":\"" + entity.getIdentifier() + "\"}"));
+          bulkRequest.add(esProvider.getClient().prepareIndex(esIndexName(), valueTable.getEntityType(), entity.getIdentifier()).setSource("{\"identifier\":\"" + entity.getIdentifier() + "\"}"));
           try {
             XContentBuilder xcb = XContentFactory.jsonBuilder().startObject();
             for(int i = 0; i < variables.length; i++) {
@@ -163,7 +167,7 @@ public class EsIndexManager implements IndexManager {
                 xcb.field(variables[i].getName(), values[i].getValue());
               }
             }
-            bulkRequest.add(esProvider.getClient().prepareIndex(OPAL_INDEX_NAME, index.name, entity.getIdentifier()).setParent(entity.getIdentifier()).setSource(xcb.endObject()));
+            bulkRequest.add(esProvider.getClient().prepareIndex(esIndexName(), index.name, entity.getIdentifier()).setParent(entity.getIdentifier()).setSource(xcb.endObject()));
             done++;
             if(bulkRequest.numberOfActions() >= ES_BATCH_SIZE) {
               sendAndCheck();
@@ -257,7 +261,7 @@ public class EsIndexManager implements IndexManager {
       try {
         EsMapping mapping = readMapping();
         mapping.meta().setString("_updated", DateTimeType.get().valueOf(new Date()).toString());
-        esProvider.getClient().admin().indices().preparePutMapping(OPAL_INDEX_NAME).setType(name).setSource(mapping.toXContent()).execute().actionGet();
+        esProvider.getClient().admin().indices().preparePutMapping(esIndexName()).setType(name).setSource(mapping.toXContent()).execute().actionGet();
       } catch(IOException e) {
         throw new RuntimeException(e);
       }
@@ -265,7 +269,7 @@ public class EsIndexManager implements IndexManager {
 
     @Override
     public void delete() {
-      esProvider.getClient().admin().indices().prepareDeleteMapping(OPAL_INDEX_NAME).setType(name).execute().actionGet();
+      esProvider.getClient().admin().indices().prepareDeleteMapping(esIndexName()).setType(name).execute().actionGet();
     }
 
     boolean isForTable(ValueTable valueTable) {
