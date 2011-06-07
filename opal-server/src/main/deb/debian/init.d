@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ### BEGIN INIT INFO
 # Provides:          opal
 # Required-Start:    $network $local_fs $remote_fs
@@ -76,6 +76,10 @@ do_start()
     #   2 if daemon could not be started
     $DAEMON $DAEMON_ARGS --running && return 1
 
+    if [ -n "$MAXOPENFILES" ]; then
+        ulimit -n $MAXOPENFILES
+    fi
+    
     $DAEMON $DAEMON_ARGS -- $JAVA $JAVA_ARGS -cp $CLASSPATH -DOPAL_HOME=$OPAL_HOME -DOPAL_DIST=$OPAL_DIST -DBIRT_HOME=$OPAL_DIST/birt-runtime-2_6_1 -DOPAL_LOG=$OPAL_LOG $MAIN_CLASS $OPAL_ARGS || return 2
 }
 

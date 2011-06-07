@@ -11,6 +11,11 @@ JAVA=/usr/bin/java
 # arguments to pass to java
 JAVA_ARGS="-Xmx2048m -XX:MaxPermSize=256M"
 
+# ulimit
+# Increase maximum open files for the opal process
+# Comment this out to use the system default
+MAXOPENFILES=16384
+
 # user id (or id:gid) to be run as
 OPAL_USER=opal
 
