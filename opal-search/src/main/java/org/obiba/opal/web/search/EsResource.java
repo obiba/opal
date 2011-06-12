@@ -114,7 +114,7 @@ public class EsResource {
       String queryString = servletRequest.getQueryString();
       esUri = rawPath + (queryString != null ? ('?' + queryString) : "");
 
-      RestUtils.decodeQueryString(queryString, 0, params);
+      RestUtils.decodeQueryString(queryString != null ? queryString : "", 0, params);
     }
 
     @Override
