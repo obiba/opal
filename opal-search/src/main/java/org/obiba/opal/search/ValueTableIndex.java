@@ -16,6 +16,8 @@ import org.obiba.magma.Timestamped;
  */
 public interface ValueTableIndex extends Timestamped {
 
+  public String getName();
+
   public void delete();
 
 }

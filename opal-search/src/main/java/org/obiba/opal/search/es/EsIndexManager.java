@@ -235,6 +235,11 @@ public class EsIndexManager implements IndexManager {
     }
 
     @Override
+    public String getName() {
+      return name;
+    }
+
+    @Override
     public Timestamps getTimestamps() {
       return new Timestamps() {
 
