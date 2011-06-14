@@ -119,8 +119,7 @@ public class ValueTableIndexResource {
       this.body = body;
       this.servletRequest = servletRequest;
       this.params = Maps.newHashMap();
-
-      this.rawPath = "opal/" + tableIndex.getName() + "/" + path;
+      this.rawPath = tableIndex.getRequestPath() + "/" + path;
 
       // Reconstruct the uri
       String queryString = servletRequest.getQueryString();

@@ -16,6 +16,13 @@ import org.obiba.magma.Timestamped;
  */
 public interface ValueTableIndex extends Timestamped {
 
+  /**
+   * The full path of this index to make requests. TODO: this should be hidden in the implementation. Probably we should
+   * expose some sort of Request/Response api?
+   * @return
+   */
+  public String getRequestPath();
+
   public String getName();
 
   public void delete();

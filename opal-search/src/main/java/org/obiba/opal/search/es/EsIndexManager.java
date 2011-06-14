@@ -240,6 +240,11 @@ public class EsIndexManager implements IndexManager {
     }
 
     @Override
+    public String getRequestPath() {
+      return esIndexName() + "/" + getName();
+    }
+
+    @Override
     public Timestamps getTimestamps() {
       return new Timestamps() {
 
