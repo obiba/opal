@@ -9,7 +9,7 @@ NAME=opal
 JAVA=/usr/bin/java
 
 # arguments to pass to java
-JAVA_ARGS="-Xmx2048m -XX:MaxPermSize=256M"
+JAVA_ARGS="-Xmx2048m -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled"
 
 # ulimit
 # Increase maximum open files for the opal process
