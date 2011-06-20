@@ -1,7 +1,9 @@
 package org.obiba.opal.r;
 
+import java.util.Map;
 import java.util.SortedSet;
 
+import org.obiba.magma.Category;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSequence;
 import org.obiba.magma.ValueType;
@@ -26,6 +28,8 @@ import org.rosuda.REngine.REXPRaw;
 import org.rosuda.REngine.REXPString;
 import org.rosuda.REngine.RFactor;
 import org.rosuda.REngine.RList;
+
+import com.google.common.collect.Maps;
 
 /**
  * A utility class for mapping {@code ValueType} to R {@code REXP}.
@@ -179,16 +183,33 @@ public enum VectorType {
    * @return
    */
   protected REXP asStringValuesVector(int size, Iterable<Value> values) {
+    Map<String, Integer> code = Maps.newHashMap();
+    if(variable.hasCategories()) {
+      int i = 0;
+      for(Category c : variable.getCategories()) {
+        code.put(c.getName(), i++);
+      }
+    }
+
+    int codes[] = new int[size];
     String strings[] = new String[size];
+
     int i = 0;
     for(Value value : values) {
-      String str = value.toString();
-      strings[i++] = (str != null && str.length() > 0) ? str : null;
-    }
-    if(variable.hasCategories()) {
-      return new REXPFactor(new RFactor(strings));
-    } else
-      return new REXPString(strings);
-  }
+      if(i >= size) {
+        throw new IllegalStateException("unexpected value");
+      }
 
+      String str = value.toString();
+      strings[i] = (str != null && str.length() > 0) ? str : null;
+      codes[i] = code.get(str) != null ? code.get(str) : REXPInteger.NA;
+      i++;
+    }
+
+    if(variable.hasCategories()) {
+      return new REXPFactor(new RFactor(codes, strings));
+    } else {
+      return new REXPString(strings);
+    }
+  }
 }
