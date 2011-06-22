@@ -83,11 +83,13 @@
   var.vect<-f$variance(mu.vect)
   dev<-sum(f$dev.resids(y.vect, mu.vect, rep(1, length(y.vect))))
 
-  W.mat<-diag(as.vector(mu.eta.val^2/var.vect))
+  W.vect<-mu.eta.val^2/var.vect
+  WX.mat<-W.vect*X.mat
+  info.matrix<-t(X.mat)%*%WX.mat
 
-  info.matrix<-t(X.mat)%*%W.mat%*%X.mat
   u.vect<-(y.vect-mu.vect)*1/var.vect
-  score.vect<-t(X.mat)%*%W.mat%*%u.vect
+  W.u.mat<-matrix(W.vect*u.vect)
+  score.vect<-t(X.mat)%*%W.u.mat
 
   list(family=f, info.matrix=info.matrix, score.vect=score.vect, numsubs=numsubs, dev=dev)
 }]]></script>
