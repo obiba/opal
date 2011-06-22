@@ -23,6 +23,7 @@ import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
+import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.r.service.VariableEntitiesHolder;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPList;
@@ -239,7 +240,13 @@ public class MagmaAssignROperation extends AbstractROperation {
     public REXP asVector(String path) {
       resolvePath(path);
       prepareEntities(table);
-      return getVector(variableValueSource, holder.getEntities());
+      VariableNature nature = VariableNature.getNature(variableValueSource.getVariable());
+      switch(nature) {
+      case CATEGORICAL:
+        return VectorType.strings.asVector(variableValueSource, holder.getEntities());
+      default:
+        return getVector(variableValueSource, holder.getEntities());
+      }
     }
   }
 

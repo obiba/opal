@@ -12,6 +12,7 @@ package org.obiba.opal.web.math;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.VectorSource;
+import org.obiba.opal.core.domain.VariableNature;
 
 public class SummaryStatisticsResourceFactory {
 
