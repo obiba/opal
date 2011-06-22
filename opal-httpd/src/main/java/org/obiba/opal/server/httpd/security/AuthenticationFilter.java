@@ -10,6 +10,7 @@
 package org.obiba.opal.server.httpd.security;
 
 import java.io.IOException;
+import java.security.cert.X509Certificate;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -17,6 +18,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.mgt.SessionsSecurityManager;
@@ -28,6 +30,7 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.eclipse.jetty.http.HttpHeaders;
 import org.eclipse.jetty.http.HttpStatus;
+import org.obiba.opal.core.unit.security.X509CertificateAuthenticationToken;
 import org.obiba.opal.web.security.HttpAuthorizationToken;
 import org.obiba.opal.web.security.HttpCookieAuthenticationToken;
 import org.obiba.opal.web.security.HttpHeaderAuthenticationToken;
@@ -97,7 +100,12 @@ public class AuthenticationFilter extends OncePerRequestFilter {
   private void authenticateAndBind(HttpServletRequest request) {
 
     Subject subject = null;
-    if(hasOpalAuthHeader(request)) {
+
+    if(hasSslCert(request)) {
+      subject = authenticateBySslCert(request);
+    }
+
+    if(subject == null && hasOpalAuthHeader(request)) {
       subject = authenticateByOpalAuthHeader(request);
     }
 
@@ -116,6 +124,24 @@ public class AuthenticationFilter extends OncePerRequestFilter {
       return;
     }
 
+  }
+
+  private Subject authenticateBySslCert(HttpServletRequest request) {
+    X509Certificate[] chain = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+    for(X509Certificate cert : chain) {
+      X509CertificateAuthenticationToken token = new X509CertificateAuthenticationToken(cert);
+      String sessionId = extractSessionId(request);
+      Subject subject = new Subject.Builder(getSecurityManager()).sessionId(sessionId).buildSubject();
+      subject.login(token);
+      log.info("Successfully authenticated subject {}", SecurityUtils.getSubject().getPrincipal());
+      return subject;
+    }
+    return null;
+  }
+
+  private boolean hasSslCert(HttpServletRequest request) {
+    X509Certificate[] chain = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+    return chain != null && chain.length > 0;
   }
 
   private Subject authenticateByOpalAuthHeader(HttpServletRequest request) {

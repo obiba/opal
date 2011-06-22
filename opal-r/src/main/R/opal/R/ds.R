@@ -10,6 +10,18 @@ datashield.newSession.list <- function(opals) {
   lapply(opals, FUN=datashield.newSession.opal)
 }
 
+datashield.setSession <- function(opal, ...) {
+  UseMethod('datashield.setSession');
+}
+
+datashield.setSession.opal <- function(opal, sessionId) {
+  .put(opal, "datashield", "session", sessionId, "current");
+}
+
+datashield.setSession.list <- function(opals, sessionId) {
+  lapply(opals, FUN=datashield.setSession.opal, sessionId)
+}
+
 # Sends a script, and calls "summary" on the result.
 datashield.summary=function(object, ...) {
   UseMethod('datashield.summary');

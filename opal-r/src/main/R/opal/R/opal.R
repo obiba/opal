@@ -74,7 +74,11 @@
 		if(length(grep("octet-stream", response$content.type))) {
 			unserialize(response$content)
 		} else if(length(grep("json", response$content.type))) {
-			fromJSON(readChar(response$content, length(response$content)))
+          if(is.raw(response$content)) {
+            fromJSON(readChar(response$content, length(response$content)));
+          } else {
+            fromJSON(response$content);
+          }
 		}
 	}
 }
@@ -103,15 +107,19 @@
   opal$url <- sub("/$", "", url)
   
   # cookielist="" activates the cookie engine
-  opal$opts <- curlOptions(header=TRUE, httpheader=c(Accept="application/octet-stream, application/json", Authorization=.authToken(username, password)), cookielist="", .opts=opts)
+  headers <- c(Accept="application/octet-stream, application/json");
+  if(is.null(username) == FALSE) {
+    headers <- c(headers, Authorization=.authToken(username, password));
+  }
+  opal$opts <- curlOptions(header=TRUE, httpheader=headers, cookielist="", .opts=opts)
   opal$curl <- curlSetOpt(.opts=opal$opts)
   opal$reader <- dynCurlReader(curl=opal$curl)
   class(opal) <- "opal"
-  
+
   opal
 }
 
-opal.login <- function(username,password,url,opts=list()) {
+opal.login <- function(username = NULL,password = NULL,url,opts=list()) {
   if(is.list(url)){
     lapply(url, function(u){opal.login(username, password, u, opts=opts)})
   } else {
