@@ -22,9 +22,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class OpalConfiguration {
-  //
-  // Instance Variables
-  //
 
   private String secretKey;
 
@@ -38,19 +35,13 @@ public class OpalConfiguration {
 
   private List<OpalConfigurationExtension> extensions;
 
-  //
-  // Constructors
-  //
-
   public OpalConfiguration() {
+    secretKey = null;
     functionalUnits = Sets.newLinkedHashSet();
     reportTemplates = Sets.newLinkedHashSet();
     extensions = Lists.newArrayList();
   }
 
-  //
-  // Methods
-  //
   public String getSecretKey() {
     return secretKey;
   }
