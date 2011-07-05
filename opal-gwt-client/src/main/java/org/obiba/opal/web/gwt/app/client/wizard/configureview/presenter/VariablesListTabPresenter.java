@@ -609,9 +609,10 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       updateCategories();
       updateAttributes();
       if(!addVariable) {
-        deleteVariable(displayedVariableName); // The current variable is deleted for update and delete operations only.
+        updateVariable();
+      } else {
+        addVariable();
       }
-      updateVariable();
       displayedVariableName = currentVariableDto.getName(); // Must note this before form is refreshed.
       eventBus.fireEvent(new ViewSaveRequiredEvent(viewDto));
     }
@@ -650,18 +651,12 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     }
 
     private void updateVariable() {
+      variableListViewDto.getVariablesArray().set(getVariableIndex(displayedVariableName), currentVariableDto);
+    }
+
+    private void addVariable() {
       variableListViewDto.getVariablesArray().push(currentVariableDto);
     }
-
-    private void deleteVariable(String variableName) {
-      @SuppressWarnings("unchecked")
-      JsArray<VariableDto> result = (JsArray<VariableDto>) JsArray.createArray();
-      for(int i = 0; i < variableListViewDto.getVariablesArray().length(); i++) {
-        if(!variableName.equals(variableListViewDto.getVariablesArray().get(i).getName())) result.push(variableListViewDto.getVariablesArray().get(i));
-      }
-      variableListViewDto.setVariablesArray(result);
-    }
-
   }
 
   class VariableAddRequiredHandler implements VariableAddRequiredEvent.Handler {
