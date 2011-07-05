@@ -88,7 +88,9 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     createViewsDirectory(); // Creates the views directory if it doesn't exist.
     if(views.isEmpty()) {
       if(getDatasourceViewsFile(datasourceName).exists()) {
-        getDatasourceViewsFile(datasourceName).delete();
+        if(getDatasourceViewsFile(datasourceName).delete() == false) {
+          // Ignore, but this may be a problem.
+        }
       }
       // Do nothing. The file containing the views has already been deleted.
     } else {
