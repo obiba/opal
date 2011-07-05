@@ -167,9 +167,9 @@ public class EmbeddedBirtEngine implements BirtEngine {
 
   private void configureOsgi(EngineConfig config) throws IOException {
     final File osgiHome = File.createTempFile("osgi", null);
-    osgiHome.delete();
-    if(osgiHome.mkdir() == false) {
-      throw new IOException("cannot create temp directory");
+    // delete the file, create a directory instead
+    if(osgiHome.delete() == false || osgiHome.mkdir() == false) {
+      throw new IOException("cannot create temp directory: " + osgiHome.getAbsolutePath());
     }
 
     Map<String, String> osgiConfig = new HashMap<String, String>();
