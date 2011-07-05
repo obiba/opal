@@ -35,7 +35,7 @@ public class BackgroundJobRealm extends AuthorizingRealm {
 
   @Override
   protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-    BackgroundJobServiceAuthToken jobToken = (BackgroundJobServiceAuthToken) token;
+    // BackgroundJobServiceAuthToken jobToken = (BackgroundJobServiceAuthToken) token;
     return new SimpleAccount(new SystemPrincipal(), null, getName());
   }
 

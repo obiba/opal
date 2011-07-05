@@ -36,7 +36,7 @@ public class SudoRealm extends AuthorizingRealm {
 
   @Override
   protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-    SudoAuthToken sudoToken = (SudoAuthToken) token;
+    // SudoAuthToken sudoToken = (SudoAuthToken) token;
     // TODO: test some kind of permission to conditionally accept the sudo request:
     // SecurityUtils.getSecurityManager().isPermitted(sudoToken.getSudoer(), "sudo")
     return new SimpleAccount(new SudoPrincipal(), null, getName());
