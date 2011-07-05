@@ -296,7 +296,7 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
 
     AttributeDto attributeDto = AttributeDto.create();
     attributeDto.setName("script");
-    attributeDto.setValue(script.trim().length() != 0 ? script : "true"); // OPAL-891
+    attributeDto.setValue(script);
 
     JsArray<AttributeDto> attributes = JsArrays.toSafeArray(variableDto.getAttributesArray());
     attributes.push(attributeDto);
