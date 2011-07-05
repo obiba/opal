@@ -23,7 +23,6 @@ import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
-import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.r.service.VariableEntitiesHolder;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPList;
@@ -221,7 +220,7 @@ public class MagmaAssignROperation extends AbstractROperation {
     }
 
     private void resolvePath(String path) {
-      MagmaEngineReferenceResolver resolver = MagmaEngineVariableResolver.valueOf(path);
+      MagmaEngineVariableResolver resolver = MagmaEngineVariableResolver.valueOf(path);
 
       if(resolver.getVariableName() == null) {
         throw new MagmaRRuntimeException("Variable is not defined in path: " + path);
@@ -230,23 +229,15 @@ public class MagmaAssignROperation extends AbstractROperation {
       if(resolver.getDatasourceName() == null) {
         throw new MagmaRRuntimeException("Datasource is not defined in path: " + path);
       }
-      Datasource ds = MagmaEngine.get().getDatasource(resolver.getDatasourceName());
-
-      table = ds.getValueTable(resolver.getTableName());
-      variableValueSource = table.getVariableValueSource(resolver.getVariableName());
+      table = resolver.resolveTable((ValueTable) null);
+      variableValueSource = resolver.resolveSource();
     }
 
     @Override
     public REXP asVector(String path) {
       resolvePath(path);
       prepareEntities(table);
-      VariableNature nature = VariableNature.getNature(variableValueSource.getVariable());
-      switch(nature) {
-      case CATEGORICAL:
-        return VectorType.strings.asVector(variableValueSource, holder.getEntities());
-      default:
-        return getVector(variableValueSource, holder.getEntities());
-      }
+      return getVector(variableValueSource, holder.getEntities());
     }
   }
 

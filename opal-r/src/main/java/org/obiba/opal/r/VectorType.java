@@ -18,6 +18,7 @@ import org.obiba.magma.type.DecimalType;
 import org.obiba.magma.type.IntegerType;
 import org.obiba.magma.type.LocaleType;
 import org.obiba.magma.type.TextType;
+import org.obiba.opal.core.domain.VariableNature;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPDouble;
 import org.rosuda.REngine.REXPFactor;
@@ -26,7 +27,6 @@ import org.rosuda.REngine.REXPList;
 import org.rosuda.REngine.REXPLogical;
 import org.rosuda.REngine.REXPRaw;
 import org.rosuda.REngine.REXPString;
-import org.rosuda.REngine.RFactor;
 import org.rosuda.REngine.RList;
 
 import com.google.common.collect.Maps;
@@ -38,7 +38,7 @@ public enum VectorType {
 
   booleans(BooleanType.get()) {
     @Override
-    protected REXP asValuesVector(int size, Iterable<Value> values) {
+    protected REXP asConinuousVector(Variable variable, int size, Iterable<Value> values) {
       byte booleans[] = new byte[size];
       int i = 0;
       for(Value value : values) {
@@ -57,7 +57,7 @@ public enum VectorType {
 
   ints(IntegerType.get()) {
     @Override
-    protected REXP asValuesVector(int size, Iterable<Value> values) {
+    protected REXP asConinuousVector(Variable variable, int size, Iterable<Value> values) {
       int ints[] = new int[size];
       int i = 0;
       for(Value value : values) {
@@ -69,7 +69,7 @@ public enum VectorType {
 
   doubles(DecimalType.get()) {
     @Override
-    protected REXP asValuesVector(int size, Iterable<Value> values) {
+    protected REXP asConinuousVector(Variable variable, int size, Iterable<Value> values) {
       double doubles[] = new double[size];
       int i = 0;
       for(Value value : values) {
@@ -79,37 +79,17 @@ public enum VectorType {
     }
   },
 
-  datetimes(DateTimeType.get()) {
-    @Override
-    protected REXP asValuesVector(int size, Iterable<Value> values) {
-      return asStringValuesVector(size, values);
-    }
-  },
+  datetimes(DateTimeType.get()),
 
-  dates(DateType.get()) {
-    @Override
-    protected REXP asValuesVector(int size, Iterable<Value> values) {
-      return asStringValuesVector(size, values);
-    }
-  },
+  dates(DateType.get()),
 
-  locales(LocaleType.get()) {
-    @Override
-    protected REXP asValuesVector(int size, Iterable<Value> values) {
-      return asStringValuesVector(size, values);
-    }
-  },
+  locales(LocaleType.get()),
 
-  strings(TextType.get()) {
-    @Override
-    protected REXP asValuesVector(int size, Iterable<Value> values) {
-      return asStringValuesVector(size, values);
-    }
-  },
+  strings(TextType.get()),
 
   binaries(BinaryType.get()) {
     @Override
-    protected REXP asValuesVector(int size, Iterable<Value> values) {
+    protected REXP asConinuousVector(Variable variable, int size, Iterable<Value> values) {
       REXPRaw raws[] = new REXPRaw[size];
       int i = 0;
       for(Value value : values) {
@@ -120,8 +100,6 @@ public enum VectorType {
   };
 
   private ValueType type;
-
-  private Variable variable;
 
   private VectorType(ValueType type) {
     this.type = type;
@@ -143,22 +121,33 @@ public enum VectorType {
    * @return
    */
   public REXP asVector(VariableValueSource vvs, SortedSet<VariableEntity> entities) {
-    variable = vvs.getVariable();
+    Variable variable = vvs.getVariable();
     int size = entities.size();
     Iterable<Value> values = vvs.asVectorSource().getValues(entities);
     if(variable.isRepeatable()) {
-      return asValueSequencesVector(size, values);
+      return asValueSequencesVector(variable, size, values);
     } else
-      return asValuesVector(size, values);
+      return asValuesVector(variable, size, values);
   }
 
   /**
-   * Build a type specific R vector.
+   * Build a type specific R vector. Default behaviour is to check the variable if it defines categories
+   * 
    * @param size
    * @param values
    * @return
    */
-  protected abstract REXP asValuesVector(int size, Iterable<Value> values);
+  protected REXP asValuesVector(Variable variable, int size, Iterable<Value> values) {
+    switch(VariableNature.getNature(variable)) {
+    case CATEGORICAL:
+      return asFactors(variable, size, values);
+    }
+    return asConinuousVector(variable, size, values);
+  }
+
+  protected REXP asConinuousVector(Variable variable, int size, Iterable<Value> values) {
+    return asStringValuesVector(variable, size, values);
+  }
 
   /**
    * Build a list of R vectors.
@@ -166,14 +155,40 @@ public enum VectorType {
    * @param values
    * @return
    */
-  private REXP asValueSequencesVector(int size, Iterable<Value> values) {
+  private REXP asValueSequencesVector(Variable variable, int size, Iterable<Value> values) {
     REXP sequences[] = new REXP[size];
     int i = 0;
     for(Value value : values) {
       ValueSequence seq = value.asSequence();
-      sequences[i++] = seq.isNull() ? null : asValuesVector(seq.getSize(), seq.getValue());
+      sequences[i++] = seq.isNull() ? null : asValuesVector(variable, seq.getSize(), seq.getValue());
     }
     return new REXPList(new RList(sequences));
+  }
+
+  protected REXP asFactors(Variable variable, int size, Iterable<Value> values) {
+    String[] levels = new String[variable.getCategories().size()];
+    Map<String, Integer> codes = Maps.newHashMap();
+    // REXPFactor is one-based. That is, the ID the first level, is 1.
+    int i = 1;
+    for(Category c : variable.getCategories()) {
+      levels[i - 1] = c.getName();
+      codes.put(c.getName(), i++);
+    }
+
+    int ints[] = new int[size];
+
+    i = 0;
+    for(Value value : values) {
+      if(i >= size) {
+        throw new IllegalStateException("unexpected value");
+      }
+
+      String str = value.toString();
+      Integer code = codes.get(str);
+      ints[i] = code != null ? code : REXPInteger.NA;
+      i++;
+    }
+    return new REXPFactor(ints, levels);
   }
 
   /**
@@ -182,16 +197,7 @@ public enum VectorType {
    * @param values
    * @return
    */
-  protected REXP asStringValuesVector(int size, Iterable<Value> values) {
-    Map<String, Integer> code = Maps.newHashMap();
-    if(variable.hasCategories()) {
-      int i = 0;
-      for(Category c : variable.getCategories()) {
-        code.put(c.getName(), i++);
-      }
-    }
-
-    int codes[] = new int[size];
+  protected REXP asStringValuesVector(Variable variable, int size, Iterable<Value> values) {
     String strings[] = new String[size];
 
     int i = 0;
@@ -202,14 +208,9 @@ public enum VectorType {
 
       String str = value.toString();
       strings[i] = (str != null && str.length() > 0) ? str : null;
-      codes[i] = code.get(str) != null ? code.get(str) : REXPInteger.NA;
       i++;
     }
 
-    if(variable.hasCategories()) {
-      return new REXPFactor(new RFactor(codes, strings));
-    } else {
-      return new REXPString(strings);
-    }
+    return new REXPString(strings);
   }
 }
