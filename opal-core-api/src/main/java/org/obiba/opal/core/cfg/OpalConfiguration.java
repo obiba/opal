@@ -36,10 +36,13 @@ public class OpalConfiguration {
   private List<OpalConfigurationExtension> extensions;
 
   public OpalConfiguration() {
-    secretKey = null;
     functionalUnits = Sets.newLinkedHashSet();
     reportTemplates = Sets.newLinkedHashSet();
     extensions = Lists.newArrayList();
+  }
+
+  public void setSecretKey(String secretKey) {
+    this.secretKey = secretKey;
   }
 
   public String getSecretKey() {
