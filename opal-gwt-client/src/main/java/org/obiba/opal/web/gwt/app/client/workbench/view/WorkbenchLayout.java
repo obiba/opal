@@ -65,8 +65,6 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
 
   private Widget mainWidget;
 
-  private Widget informationWidget;
-
   //
   // Constructors
   //
@@ -94,10 +92,6 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
 
   public Widget getMainWidget() {
     return mainWidget;
-  }
-
-  public Widget getInformationWidget() {
-    return informationWidget;
   }
 
   public void setTitleWidget(Widget w) {
