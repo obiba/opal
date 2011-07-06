@@ -79,3 +79,8 @@
 .selection-list .cellTableSelectedRow .cellTableFirstColumn {
 	background-color: #B1B1B1;
 }
+
+.cellTableSortedHeaderAscending{}
+.cellTableSortedHeaderDescending{}
+.cellTableSortableHeader{}
+

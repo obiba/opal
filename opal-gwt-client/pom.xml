@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -37,6 +38,12 @@
       <artifactId>jetty-util</artifactId>
       <version>6.1.22</version>
       <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.gwt.inject</groupId>
+      <artifactId>gin</artifactId>
+      <version>1.5.0</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.google.gwt.google-apis</groupId>
@@ -100,7 +107,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>gwt-maven-plugin</artifactId>
-        <version>2.1.0-1</version>
+        <version>${gwt.version}</version>
         <executions>
           <execution>
             <goals>
@@ -114,7 +121,7 @@
           <runTarget>org.obiba.opal.web.gwt.app.GwtApp/index.html</runTarget>
           <hostedWebapp>war</hostedWebapp>
           <extraParam>true</extraParam>
-          <!--style>PRETTY</style-->
+          <!--style>PRETTY</style -->
         </configuration>
       </plugin>
       <plugin>
@@ -147,7 +154,7 @@
     <maven.compiler.source>1.6</maven.compiler.source>
     <maven.compiler.target>1.6</maven.compiler.target>
 
-    <gwt.version>2.1.1</gwt.version>
+    <gwt.version>2.3.0</gwt.version>
     <gwt-visualization.version>1.0.2</gwt-visualization.version>
     <gwt-presenter.version>1.0.0</gwt-presenter.version>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
