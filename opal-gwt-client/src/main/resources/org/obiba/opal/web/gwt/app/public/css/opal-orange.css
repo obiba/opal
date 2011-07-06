@@ -1,0 +1,71 @@
+/* An example of customized style with orange flavor */
+
+body {
+  background: #EEE;
+}
+
+.login {
+	color: #1E1E1E;
+}
+
+.login > table {
+	border-color: #EB8921;
+	background-color: #F3F4EB;
+}
+
+.topbar {
+	background-color: #EB8921;
+}
+
+.topbar span, .topbar a, .topbar a:hover {
+	color: #FFFFFF;
+}
+
+.top .gwt-MenuBar-horizontal {
+    margin-left: 0px;
+    background-color: #EEE;
+}
+
+.top .gwt-MenuBar-horizontal .gwt-MenuItem.selected, .top .gwt-MenuBar-horizontal .gwt-MenuItem.gwt-MenuItem-selected.selected {
+	background-color: #EB8921;
+}
+
+.top .gwt-MenuBar-horizontal .gwt-MenuItem.gwt-MenuItem-selected {
+	background-color: #888888;
+}
+
+.main-content {
+	border: none;
+	margin: 0 0 0;
+	-moz-border-radius: 0em; -webkit-border-radius: 0em;
+}
+
+.workbench .top {
+    background-color:#EEE;
+    color:#EB8921;
+}
+
+.gwt-TabLayoutPanel .gwt-TabLayoutPanelTab.gwt-TabLayoutPanelTab-selected {
+	background-color: #EB8921;
+}
+
+.gwt-SplitLayoutPanel-HDragger {
+    background-color: #AAAAAA;
+}
+
+.tooltip.gwt-PopupPanel {
+	border: 0.2em solid #EB8921;
+}
+
+.footbar {
+  border-top: 1px solid #B4A291;
+  margin-left: 0px;
+  padding-left: 0.8em;
+  padding-right: 0.8em;
+  background: #EEE;
+  color: #222;
+}
+
+.footbar a {
+	color: #222;
+}
