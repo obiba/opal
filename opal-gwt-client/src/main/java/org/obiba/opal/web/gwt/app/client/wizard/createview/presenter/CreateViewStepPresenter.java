@@ -45,6 +45,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.FileViewDto;
+import org.obiba.opal.web.model.client.magma.FileViewDto.FileViewType;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -193,9 +194,14 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
       viewDtoBuilder.defaultJavaScriptView();
     } else if(getDisplay().getAddVariablesOneByOneOption().getValue()) {
       viewDtoBuilder.defaultVariableListView();
-    } else if(getDisplay().getFileViewOption().getValue()) {
+    } else if(getDisplay().getFileViewOption().getValue() || getDisplay().getExcelFileOption().getValue()) {
       FileViewDto fileView = FileViewDto.create();
       fileView.setFilename(fileSelectionPresenter.getSelectedFile());
+      if(getDisplay().getFileViewOption().getValue()) {
+        fileView.setType(FileViewType.SERIALIZED_XML);
+      } else if(getDisplay().getExcelFileOption().getValue()) {
+        fileView.setType(FileViewType.EXCEL);
+      }
       viewDtoBuilder.fileView(fileView);
     }
     ViewDto viewDto = viewDtoBuilder.build();
@@ -207,7 +213,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     ResourceRequestBuilder<JavaScriptObject> resourceRequestBuilder = ResourceRequestBuilderFactory.newBuilder()//
     .post()//
     .forResource("/datasource/" + datasourceName + "/views")//
-    .accept("application/x-protobuf+json").withResourceBody(ViewDto.stringify(viewDto))//
+    .withResourceBody(ViewDto.stringify(viewDto))//
     .withCallback(Response.SC_CREATED, completed)//
     .withCallback(Response.SC_OK, completed)//
     .withCallback(Response.SC_BAD_REQUEST, failed)//
@@ -237,6 +243,8 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     HasValue<Boolean> getAddVariablesOneByOneOption();
 
     HasValue<Boolean> getFileViewOption();
+
+    HasValue<Boolean> getExcelFileOption();
 
     void setSelectTypeValidator(ValidationHandler validator);
 
@@ -332,8 +340,9 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
       validators.add(new RequiredTextValidator(getDisplay().getViewName(), "ViewNameRequired"));
       validators.add(new DisallowedCharactersValidator(getDisplay().getViewName(), new char[] { '.', ':' }, "ViewNameDisallowedChars"));
-      validators.add(new RequiredOptionValidator(RequiredOptionValidator.asSet(getDisplay().getApplyGlobalVariableFilterOption(), getDisplay().getAddVariablesOneByOneOption(), getDisplay().getFileViewOption()), "VariableDefinitionMethodRequired"));
-      validators.add(new ConditionalValidator(getDisplay().getFileViewOption(), new RequiredFileSelectionValidator()));
+      validators.add(new RequiredOptionValidator(RequiredOptionValidator.asSet(getDisplay().getApplyGlobalVariableFilterOption(), getDisplay().getAddVariablesOneByOneOption(), getDisplay().getFileViewOption(), getDisplay().getExcelFileOption()), "VariableDefinitionMethodRequired"));
+      validators.add(new ConditionalValidator(getDisplay().getFileViewOption(), new RequiredFileSelectionValidator("XMLFileRequired")));
+      validators.add(new ConditionalValidator(getDisplay().getExcelFileOption(), new RequiredFileSelectionValidator("ExcelFileRequired")));
       return validators;
     }
   }
@@ -384,8 +393,8 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
   class RequiredFileSelectionValidator extends AbstractFieldValidator {
 
-    public RequiredFileSelectionValidator() {
-      super("XMLFileRequired");
+    public RequiredFileSelectionValidator(String msg) {
+      super(msg);
     }
 
     @Override

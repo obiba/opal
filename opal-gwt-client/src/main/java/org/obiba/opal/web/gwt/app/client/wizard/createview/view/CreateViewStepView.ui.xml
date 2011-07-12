@@ -33,7 +33,9 @@
 	                <g:RadioButton name="variablesGroup" ui:field="applyingGlobalVariableFilterRadioButton" addStyleNames="block small-top-margin"><ui:msg description="Apply a global filter on the selected tables label">Apply a global filter on the selected tables</ui:msg></g:RadioButton>
 	                <g:RadioButton name="variablesGroup" ui:field="addingVariablesOneByOneRadioButton" addStyleNames="block small-top-margin"><ui:msg description="Add each variable one by one label">Add each variable one by one</ui:msg></g:RadioButton>
                     <g:RadioButton name="variablesGroup" ui:field="useAnExistingView" addStyleNames="block small-top-margin"><ui:msg description="Use an existing view">Use an existing view</ui:msg></g:RadioButton>
-                    <g:SimplePanel ui:field="fileSelectionPanel" addStyleNames="block indent"/>
+                    <g:SimplePanel ui:field="xmlFileSelectionPanel" addStyleNames="block indent"/>
+                    <g:RadioButton name="variablesGroup" ui:field="useAnExcelFile" addStyleNames="block small-top-margin"><ui:msg description="Use an existing dictionnary">Use an existing dictionary (Excel format)</ui:msg></g:RadioButton>
+                    <g:SimplePanel ui:field="excelFileSelectionPanel" addStyleNames="block indent"/>
 	              </td>
 	            </tr>
 	          </tbody>
@@ -97,6 +99,11 @@
            <li>
              <ui:msg description="Use an existing view definition for view creation">
              existing view definition: read a view definition from a file.
+             </ui:msg>
+           </li>
+           <li>
+             <ui:msg description="Use a dictionnary in Excel format">
+             existing dictionary: read variables from an Excel formated dictionary
              </ui:msg>
            </li>
          </ul>

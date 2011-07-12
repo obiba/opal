@@ -85,7 +85,13 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   RadioButton useAnExistingView;
 
   @UiField
-  SimplePanel fileSelectionPanel;
+  RadioButton useAnExcelFile;
+
+  @UiField
+  SimplePanel xmlFileSelectionPanel;
+
+  @UiField
+  SimplePanel excelFileSelectionPanel;
 
   @UiField
   Button configureLink;
@@ -112,12 +118,21 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
     ValueChangeHandler<Boolean> handler = new ValueChangeHandler<Boolean>() {
       @Override
       public void onValueChange(ValueChangeEvent<Boolean> event) {
-        fileSelection.setEnabled(useAnExistingView.getValue());
+        Widget w = fileSelection.asWidget();
+        excelFileSelectionPanel.setVisible(useAnExcelFile.getValue());
+        if(useAnExcelFile.getValue()) {
+          excelFileSelectionPanel.setWidget(w);
+        } else {
+          xmlFileSelectionPanel.setVisible(true);
+          xmlFileSelectionPanel.setWidget(w);
+        }
+        fileSelection.setEnabled(useAnExistingView.getValue() || useAnExcelFile.getValue());
       }
     };
     applyingGlobalVariableFilterRadioButton.addValueChangeHandler(handler);
     addingVariablesOneByOneRadioButton.addValueChangeHandler(handler);
     useAnExistingView.addValueChangeHandler(handler);
+    useAnExcelFile.addValueChangeHandler(handler);
   }
 
   private void initWizardDialog() {
@@ -182,9 +197,10 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
 
   @Override
   public void setFileSelectionDisplay(FileSelectionPresenter.Display display) {
-    fileSelectionPanel.setWidget(display.asWidget());
+    xmlFileSelectionPanel.setWidget(display.asWidget());
     fileSelection = display;
     fileSelection.setFieldWidth("20em");
+    fileSelection.setEnabled(false);
   }
 
   @Override
@@ -238,6 +254,11 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   @Override
   public HasValue<Boolean> getFileViewOption() {
     return this.useAnExistingView;
+  }
+
+  @Override
+  public HasValue<Boolean> getExcelFileOption() {
+    return this.useAnExcelFile;
   }
 
   @Override

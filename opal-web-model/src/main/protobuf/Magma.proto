@@ -201,8 +201,12 @@ message OutlierRemovingViewDto {
 
 message FileViewDto {
   required string filename = 1;
-  // Eventually:
-  // required string type = 2; (excel, xml, etc.)
+  enum FileViewType {
+    SERIALIZED_XML = 0;
+    EXCEL = 1;
+  }
+  optional FileViewType type = 2 [default = SERIALIZED_XML];
+  
   extend ViewDto {
     optional FileViewDto view = 1003;
   }
