@@ -11,7 +11,9 @@ package org.obiba.opal.search.es;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 
@@ -34,6 +36,7 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.concurrent.ConcurrentValueTableReader;
 import org.obiba.magma.concurrent.ConcurrentValueTableReader.ConcurrentReaderCallback;
 import org.obiba.magma.type.DateTimeType;
+import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.search.IndexManager;
 import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.ValueTableIndex;
@@ -148,9 +151,14 @@ public class EsIndexManager implements IndexManager {
 
       ConcurrentValueTableReader.Builder.newReader().withThreads(threadFactory).from(valueTable).to(new ConcurrentReaderCallback() {
 
-        BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
+        private BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
+
+        private Map<Variable, VariableNature> natures = new HashMap<Variable, VariableNature>();
 
         public void onBegin(List<VariableEntity> entitiesToCopy, Variable[] variables) {
+          for(Variable variable : variables) {
+            natures.put(variable, VariableNature.getNature(variable));
+          }
         };
 
         @Override
@@ -161,10 +169,10 @@ public class EsIndexManager implements IndexManager {
             for(int i = 0; i < variables.length; i++) {
               if(values[i].isSequence() && values[i].isNull() == false) {
                 for(Value v : values[i].asSequence().getValue()) {
-                  xcb.field(variables[i].getName(), v.getValue());
+                  xcb.field(variables[i].getName(), esValue(variables[i], v));
                 }
               } else {
-                xcb.field(variables[i].getName(), values[i].getValue());
+                xcb.field(variables[i].getName(), esValue(variables[i], values[i]));
               }
             }
             bulkRequest.add(esProvider.getClient().prepareIndex(esIndexName(), index.name, entity.getIdentifier()).setParent(entity.getIdentifier()).setSource(xcb.endObject()));
@@ -181,6 +189,22 @@ public class EsIndexManager implements IndexManager {
         public void onComplete() {
           sendAndCheck();
           index.updateTimestamps();
+        }
+
+        /**
+         * OPAL-1158: missing values are indexed as null for continuous variables
+         * @param variable
+         * @param value
+         * @return
+         */
+        private Object esValue(Variable variable, Value value) {
+          switch(natures.get(variable)) {
+          case CONTINUOUS:
+            if(variable.isMissingValue(value)) {
+              return null;
+            }
+          }
+          return value.getValue();
         }
 
         private void sendAndCheck() {
