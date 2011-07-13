@@ -274,7 +274,7 @@ public class VariablesResource extends AbstractValueTableResource {
           Object v2PropertyValue = PropertyAccessorFactory.forBeanPropertyAccess(v2).getPropertyValue(field);
           return ordering.compare(v1PropertyValue, v2PropertyValue);
         } catch(Exception e) {
-          throw new RuntimeException("invalid field");
+          throw new RuntimeException(e);
         }
       }
     });
