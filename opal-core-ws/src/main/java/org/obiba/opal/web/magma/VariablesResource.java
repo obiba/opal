@@ -48,12 +48,16 @@ import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
+import org.obiba.opal.web.ws.SortDir;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.AuthorizeResource;
+import org.springframework.beans.PropertyAccessorFactory;
 
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 
 public class VariablesResource extends AbstractValueTableResource {
 
@@ -70,7 +74,7 @@ public class VariablesResource extends AbstractValueTableResource {
    * @return
    */
   @GET
-  public Iterable<VariableDto> getVariables(@Context final UriInfo uriInfo, @QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit) {
+  public Iterable<VariableDto> getVariables(@Context final UriInfo uriInfo, @QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit, @QueryParam("sortField") @DefaultValue("index") String sortField, @QueryParam("sortDir") @DefaultValue("ASC") SortDir sortDir) {
     if(offset < 0) {
       throw new InvalidRequestException("IllegalParameterValue", "offset", String.valueOf(limit));
     }
@@ -92,8 +96,11 @@ public class VariablesResource extends AbstractValueTableResource {
 
     Iterable<Variable> variables = filterVariables(script, offset, limit);
     ArrayList<VariableDto> variableDtos = Lists.newArrayList(Iterables.transform(variables, Dtos.asDtoFunc(tableLinkBuilder.build(), ub)));
-    sortVariableDtoByName(variableDtos);
 
+    boolean sortRequired = !(sortField.equals("index") && sortDir.equals(SortDir.ASC));
+    if(sortRequired) {
+      sortVariableDtoByField(variableDtos, sortField, sortDir);
+    }
     return variableDtos;
   }
 
@@ -242,15 +249,34 @@ public class VariablesResource extends AbstractValueTableResource {
   }
 
   private void sortVariableDtoByName(List<Magma.VariableDto> variables) {
-    // sort alphabetically
+    sortVariableDtoByField(variables, "name", SortDir.ASC);
+  }
+
+  private void sortVariableDtoByField(List<Magma.VariableDto> variables, final String field, SortDir sortDir) {
+    Preconditions.checkNotNull(sortDir);
+    final Ordering<Object> ordering;
+    switch(sortDir) {
+    case DESC:
+      ordering = Ordering.usingToString().reverse();
+      break;
+    case ASC:
+      ordering = Ordering.usingToString();
+      break;
+    default:
+      throw new RuntimeException("invalid sortDir");
+    }
     Collections.sort(variables, new Comparator<Magma.VariableDto>() {
 
       @Override
       public int compare(VariableDto v1, VariableDto v2) {
-        return v1.getName().compareTo(v2.getName());
+        try {
+          Object v1PropertyValue = PropertyAccessorFactory.forBeanPropertyAccess(v1).getPropertyValue(field);
+          Object v2PropertyValue = PropertyAccessorFactory.forBeanPropertyAccess(v2).getPropertyValue(field);
+          return ordering.compare(v1PropertyValue, v2PropertyValue);
+        } catch(Exception e) {
+          throw new RuntimeException("invalid field");
+        }
       }
-
     });
   }
-
 }

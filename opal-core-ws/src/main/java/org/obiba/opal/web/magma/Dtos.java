@@ -63,15 +63,17 @@ public final class Dtos {
 
   public static Function<Variable, VariableDto> asDtoFunc(final LinkDto tableLink, final UriBuilder uriBuilder) {
     return new Function<Variable, VariableDto>() {
+
+      private int index = 0;
+
       @Override
       public VariableDto apply(Variable from) {
-        return asDto(tableLink, uriBuilder, from).build();
+        return asDto(tableLink, uriBuilder, from, index++).build();
       }
     };
   }
 
-  public static VariableDto.Builder asDto(final LinkDto tableLink, UriBuilder uriBuilder, Variable from) {
-
+  public static VariableDto.Builder asDto(final LinkDto tableLink, UriBuilder uriBuilder, Variable from, Integer index) {
     VariableDto.Builder var = VariableDto.newBuilder().setName(from.getName()).setEntityType(from.getEntityType()).setValueType(from.getValueType().getName()).setIsRepeatable(from.isRepeatable());
     if(from.getOccurrenceGroup() != null) {
       var.setOccurrenceGroup(from.getOccurrenceGroup());
@@ -91,13 +93,17 @@ public final class Dtos {
     for(Category category : from.getCategories()) {
       var.addCategories(asDto(category));
     }
-
     if(tableLink != null) {
       var.setParentLink(tableLink);
     }
-
+    if(index != null) {
+      var.setIndex(index);
+    }
     return var;
+  }
 
+  public static VariableDto.Builder asDto(final LinkDto tableLink, UriBuilder uriBuilder, Variable from) {
+    return asDto(tableLink, uriBuilder, from, null);
   }
 
   public static VariableDto.Builder asDto(Variable from) {

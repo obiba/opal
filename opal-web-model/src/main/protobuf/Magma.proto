@@ -120,6 +120,7 @@ message VariableDto {
   optional string unit = 10;
   optional LinkDto parentLink = 11;
   optional bool isNewVariable = 12;
+  optional int32 index = 13;
 }
 
 message CategoryDto {

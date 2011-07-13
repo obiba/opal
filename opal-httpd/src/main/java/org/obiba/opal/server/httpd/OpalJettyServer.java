@@ -147,7 +147,7 @@ public class OpalJettyServer implements Service {
       log.info("Starting Opal HTTP/s Server on port {}", this.jettyServer.getConnectors()[0].getPort());
       this.jettyServer.start();
     } catch(Exception e) {
-      log.error("Error satrting jetty", e);
+      log.error("Error starting jetty", e);
       throw new RuntimeException(e);
     }
   }
