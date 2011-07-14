@@ -74,7 +74,7 @@ public class VariablesResource extends AbstractValueTableResource {
    * @return
    */
   @GET
-  public Iterable<VariableDto> getVariables(@Context final UriInfo uriInfo, @QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit, @QueryParam("sortField") @DefaultValue("index") String sortField, @QueryParam("sortDir") @DefaultValue("ASC") SortDir sortDir) {
+  public Response getVariables(@Context final UriInfo uriInfo, @QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit, @QueryParam("sortField") @DefaultValue("index") String sortField, @QueryParam("sortDir") @DefaultValue("ASC") SortDir sortDir) {
     if(offset < 0) {
       throw new InvalidRequestException("IllegalParameterValue", "offset", String.valueOf(limit));
     }
@@ -97,11 +97,15 @@ public class VariablesResource extends AbstractValueTableResource {
     Iterable<Variable> variables = filterVariables(script, offset, limit);
     ArrayList<VariableDto> variableDtos = Lists.newArrayList(Iterables.transform(variables, Dtos.asDtoFunc(tableLinkBuilder.build(), ub)));
 
-    boolean sortRequired = !(sortField.equals("index") && sortDir.equals(SortDir.ASC));
-    if(sortRequired) {
-      sortVariableDtoByField(variableDtos, sortField, sortDir);
+    try {
+      boolean sortRequired = !(sortField.equals("index") && sortDir.equals(SortDir.ASC));
+      if(sortRequired) {
+        sortVariableDtoByField(variableDtos, sortField, sortDir);
+      }
+    } catch(RuntimeException e) {
+      return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "InvalidSortField")).build();
     }
-    return variableDtos;
+    return Response.ok(variableDtos).build();
   }
 
   @GET
@@ -263,19 +267,15 @@ public class VariablesResource extends AbstractValueTableResource {
       ordering = Ordering.usingToString();
       break;
     default:
-      throw new RuntimeException("invalid sortDir");
+      throw new IllegalArgumentException("invalid sortDir argument");
     }
     Collections.sort(variables, new Comparator<Magma.VariableDto>() {
 
       @Override
       public int compare(VariableDto v1, VariableDto v2) {
-        try {
-          Object v1PropertyValue = PropertyAccessorFactory.forBeanPropertyAccess(v1).getPropertyValue(field);
-          Object v2PropertyValue = PropertyAccessorFactory.forBeanPropertyAccess(v2).getPropertyValue(field);
-          return ordering.compare(v1PropertyValue, v2PropertyValue);
-        } catch(Exception e) {
-          throw new RuntimeException(e);
-        }
+        Object v1PropertyValue = PropertyAccessorFactory.forBeanPropertyAccess(v1).getPropertyValue(field);
+        Object v2PropertyValue = PropertyAccessorFactory.forBeanPropertyAccess(v2).getPropertyValue(field);
+        return ordering.compare(v1PropertyValue, v2PropertyValue);
       }
     });
   }
