@@ -132,4 +132,13 @@ public abstract class AbstractTransformingDatasourceWrapper implements Datasourc
     return getWrappedDatasource().hasAttributes();
   }
 
+  @Override
+  public boolean canDropTable(String name) {
+    return getWrappedDatasource().canDropTable(name);
+  }
+
+  @Override
+  public void dropTable(String name) {
+    getWrappedDatasource().dropTable(name);
+  };
 }
