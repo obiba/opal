@@ -74,7 +74,7 @@ public class VariablesResource extends AbstractValueTableResource {
    * @return
    */
   @GET
-  public Response getVariables(@Context final UriInfo uriInfo, @QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit, @QueryParam("sortField") @DefaultValue("index") String sortField, @QueryParam("sortDir") @DefaultValue("ASC") SortDir sortDir) {
+  public List<VariableDto> getVariables(@Context final UriInfo uriInfo, @QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit, @QueryParam("sortField") @DefaultValue("index") String sortField, @QueryParam("sortDir") @DefaultValue("ASC") SortDir sortDir) {
     if(offset < 0) {
       throw new InvalidRequestException("IllegalParameterValue", "offset", String.valueOf(limit));
     }
@@ -97,15 +97,17 @@ public class VariablesResource extends AbstractValueTableResource {
     Iterable<Variable> variables = filterVariables(script, offset, limit);
     ArrayList<VariableDto> variableDtos = Lists.newArrayList(Iterables.transform(variables, Dtos.asDtoFunc(tableLinkBuilder.build(), ub)));
 
-    try {
-      boolean sortRequired = !(sortField.equals("index") && sortDir.equals(SortDir.ASC));
-      if(sortRequired) {
-        sortVariableDtoByField(variableDtos, sortField, sortDir);
-      }
-    } catch(RuntimeException e) {
-      return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "InvalidSortField")).build();
+    // try {
+    boolean sortRequired = !(sortField.equals("index") && sortDir.equals(SortDir.ASC));
+    if(sortRequired) {
+      sortVariableDtoByField(variableDtos, sortField, sortDir);
     }
-    return Response.ok(variableDtos).build();
+    // } catch(RuntimeException e) {
+    // return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST,
+    // "InvalidRequest")).build();
+    // }
+    // return Response.ok(variableDtos);
+    return variableDtos;
   }
 
   @GET
