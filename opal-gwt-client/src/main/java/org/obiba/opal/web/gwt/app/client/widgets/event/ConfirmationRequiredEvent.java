@@ -26,11 +26,11 @@ public class ConfirmationRequiredEvent extends GwtEvent<ConfirmationRequiredEven
   // Instance Variables
   //
 
-  private Object source;
+  private final Object source;
 
-  private String title;
+  private final String title;
 
-  private String message;
+  private final String message;
 
   //
   // Constructors

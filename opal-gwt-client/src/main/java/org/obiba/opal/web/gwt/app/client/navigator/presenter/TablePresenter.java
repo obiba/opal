@@ -72,7 +72,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
   private AuthorizationPresenter authorizationPresenter;
 
-  private Runnable removeViewConfirmation;
+  private Runnable removeConfirmation;
 
   //
   // Constructors
@@ -95,7 +95,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
     super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
     super.registerHandler(eventBus.addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
-    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new RemoveViewConfirmationEventHandler()));
+    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler()));
     getDisplay().setExcelDownloadCommand(new ExcelDownloadCommand());
     getDisplay().setExportDataCommand(new ExportDataCommand());
     getDisplay().setCopyDataCommand(new CopyDataCommand());
@@ -148,7 +148,11 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/view/" + table.getName()).delete().authorize(getDisplay().getRemoveAuthorizer()).send();
       // edit view
       ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/view/" + table.getName()).put().authorize(getDisplay().getEditAuthorizer()).send();
+    } else {
+      // Drop table
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName()).delete().authorize(getDisplay().getRemoveAuthorizer()).send();
     }
+
     // set permissions
     AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getDisplay().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
@@ -163,14 +167,13 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     getDisplay().setParentName(tableDto.getDatasourceName());
     getDisplay().setPreviousName(previous);
     getDisplay().setNextName(next);
+    getDisplay().setRemoveCommand(new RemoveCommand());
 
     if(tableIsView()) {
       getDisplay().setDownloadViewCommand(new DownloadViewCommand());
-      getDisplay().setRemoveCommand(new RemoveCommand());
       getDisplay().setEditCommand(new EditCommand());
     } else {
       getDisplay().setDownloadViewCommand(null);
-      getDisplay().setRemoveCommand(null);
       getDisplay().setEditCommand(null);
     }
 
@@ -223,6 +226,24 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     };
 
     ResourceRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler).withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+  }
+
+  private void removeTable(String viewName) {
+
+    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        if(response.getStatusCode() != Response.SC_OK) {
+          String errorMessage = response.getText().length() != 0 ? response.getText() : "UnknownError";
+          eventBus.fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
+        } else {
+          eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(navigationPresenter.get()).forResource("/datasources").build());
+        }
+      }
+    };
+
+    ResourceRequestBuilderFactory.newBuilder().forResource(table.getLink()).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler).withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
   }
 
   private boolean tableIsView() {
@@ -331,22 +352,33 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   final class RemoveCommand implements Command {
     @Override
     public void execute() {
-      removeViewConfirmation = new Runnable() {
+      removeConfirmation = new Runnable() {
         public void run() {
-          removeView(table.getName());
+          if(tableIsView()) {
+            removeView(table.getName());
+          } else {
+            removeTable(table.getName());
+          }
         }
       };
 
-      eventBus.fireEvent(new ConfirmationRequiredEvent(removeViewConfirmation, "removeView", "confirmRemoveView"));
+      ConfirmationRequiredEvent event;
+      if(tableIsView()) {
+        event = new ConfirmationRequiredEvent(removeConfirmation, "removeView", "confirmRemoveView");
+      } else {
+        event = new ConfirmationRequiredEvent(removeConfirmation, "removeTable", "confirmRemoveTable");
+      }
+
+      eventBus.fireEvent(event);
     }
   }
 
-  class RemoveViewConfirmationEventHandler implements ConfirmationEvent.Handler {
+  class RemoveConfirmationEventHandler implements ConfirmationEvent.Handler {
 
     public void onConfirmation(ConfirmationEvent event) {
-      if(removeViewConfirmation != null && event.getSource().equals(removeViewConfirmation) && event.isConfirmed()) {
-        removeViewConfirmation.run();
-        removeViewConfirmation = null;
+      if(removeConfirmation != null && event.getSource().equals(removeConfirmation) && event.isConfirmed()) {
+        removeConfirmation.run();
+        removeConfirmation = null;
       }
     }
   }

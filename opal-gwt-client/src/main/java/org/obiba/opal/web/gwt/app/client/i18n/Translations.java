@@ -354,6 +354,7 @@ public interface Translations extends Constants {
   "deleteCategory", "Delete Category",//
   "deleteAttribute", "Delete Attribute",//
   "removeView", "Remove View",//
+  "removeTable", "Remove Table",//
   "deleteDataShieldMethod", "Delete Aggregating Method" })
   Map<String, String> confirmationTitleMap();
 
@@ -372,6 +373,7 @@ public interface Translations extends Constants {
   "confirmDeleteCategory", "Please confirm that you want to remove this category.",//
   "confirmDeleteAttribute", "Please confirm that you want to remove this attribute.",//
   "confirmRemoveView", "Please confirm that you want to remove the current view.",//
+  "confirmRemoveTable", "Please confirm that you want to remove the current table. This cannot be undone and all data associated with this table will be lost.",//
   "confirmGenerateFunctionalUnitIdentifiers", "Please confirm that you want to generate an identifier for each existing participant without identifier in the current unit.",//
   "confirmDeleteDataShieldMethod", "Please confirm that you want to remove this aggregating method." })
   Map<String, String> confirmationMessageMap();
