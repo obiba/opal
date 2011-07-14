@@ -152,6 +152,9 @@ public class DatasourceResource {
   }
 
   public TableResource getTableResource(ValueTable table) {
+    if(getDatasource().canDropTable(table.getName())) {
+      return new DroppableTableResource(table, getLocales());
+    }
     return new TableResource(table, getLocales());
   }
 
