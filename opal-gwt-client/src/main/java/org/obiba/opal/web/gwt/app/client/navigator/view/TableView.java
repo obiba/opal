@@ -131,7 +131,6 @@ public class TableView extends Composite implements TablePresenter.Display {
     };
     table.addColumn(variableIndexColumn, "#");
     table.setColumnWidth(variableIndexColumn, 1, Unit.PX);
-    table.setStyleName("th.clickable", true);
     variableIndexColumn.setSortable(true);
 
     table.addColumn(variableNameColumn = new VariableClickableColumn("name") {
