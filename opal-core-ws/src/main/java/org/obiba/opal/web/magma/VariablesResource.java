@@ -105,6 +105,9 @@ public class VariablesResource extends AbstractValueTableResource {
     } catch(RuntimeException e) {
       throw new InvalidRequestException("InvalidRequest");
     }
+    for(VariableDto v : variableDtos) {
+      System.out.println(v.getIndex());
+    }
     return variableDtos;
   }
 
@@ -258,13 +261,13 @@ public class VariablesResource extends AbstractValueTableResource {
 
   private void sortVariableDtoByField(List<Magma.VariableDto> variables, final String field, SortDir sortDir) {
     Preconditions.checkNotNull(sortDir);
-    final Ordering<Object> ordering;
+    final Ordering<Comparable<?>> ordering;
     switch(sortDir) {
     case DESC:
-      ordering = Ordering.usingToString().reverse();
+      ordering = Ordering.natural().reverse();
       break;
     case ASC:
-      ordering = Ordering.usingToString();
+      ordering = Ordering.natural();
       break;
     default:
       throw new IllegalArgumentException("invalid sortDir argument");
@@ -275,7 +278,7 @@ public class VariablesResource extends AbstractValueTableResource {
       public int compare(VariableDto v1, VariableDto v2) {
         Object v1PropertyValue = PropertyAccessorFactory.forBeanPropertyAccess(v1).getPropertyValue(field);
         Object v2PropertyValue = PropertyAccessorFactory.forBeanPropertyAccess(v2).getPropertyValue(field);
-        return ordering.compare(v1PropertyValue, v2PropertyValue);
+        return ordering.compare(Comparable.class.cast(v1PropertyValue), Comparable.class.cast(v2PropertyValue));
       }
     });
   }
