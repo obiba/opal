@@ -105,9 +105,6 @@ public class VariablesResource extends AbstractValueTableResource {
     } catch(RuntimeException e) {
       throw new InvalidRequestException("InvalidRequest");
     }
-    for(VariableDto v : variableDtos) {
-      System.out.println(v.getIndex());
-    }
     return variableDtos;
   }
 
