@@ -659,11 +659,7 @@ margin-left:0.8em;
     margin-top: 1em;
 }
 
-.clickableHeader th:first-child {
-	cursor: pointer;	
-}
-
-.clickableHeader th:nth-child(2) {
+.clickableVariableTable th:first-child, th:nth-child(2), td:nth-child(2) {
 	cursor: pointer;	
 }
 
