@@ -659,7 +659,15 @@ margin-left:0.8em;
     margin-top: 1em;
 }
 
-.clickableVariableTable th:first-child, th:nth-child(2), td:nth-child(2) {
+.clickableVariableTable th:first-child {
+	cursor: pointer;	
+}
+
+.clickableVariableTable th:nth-child(2) {
+	cursor: pointer;	
+}
+
+.clickableVariableTable td:nth-child(2) {
 	cursor: pointer;	
 }
 
