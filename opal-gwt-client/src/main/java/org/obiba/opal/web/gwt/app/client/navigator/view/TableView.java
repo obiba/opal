@@ -28,6 +28,7 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -35,6 +36,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
@@ -103,7 +105,9 @@ public class TableView extends Composite implements TablePresenter.Display {
 
   private ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
 
-  private VariableNameColumn variableNameColumn;
+  private VariableClickableColumn variableNameColumn;
+
+  private VariableClickableColumn variableIndexColumn;
 
   private Translations translations = GWT.create(Translations.class);
 
@@ -119,12 +123,24 @@ public class TableView extends Composite implements TablePresenter.Display {
   }
 
   private void addTableColumns() {
-    table.addColumn(variableNameColumn = new VariableNameColumn() {
+    variableIndexColumn = new VariableClickableColumn("index") {
+      @Override
+      public String getValue(VariableDto object) {
+        return object.getIndex() + 1 + "";
+      }
+    };
+    table.addColumn(variableIndexColumn, "#");
+    table.setColumnWidth(variableIndexColumn, 1, Unit.PX);
+    table.setStyleName("th.clickable", true);
+    variableIndexColumn.setSortable(true);
+
+    table.addColumn(variableNameColumn = new VariableClickableColumn("name") {
       @Override
       public String getValue(VariableDto object) {
         return object.getName();
       }
     }, translations.nameLabel());
+    variableNameColumn.setSortable(true);
 
     table.addColumn(new TextColumn<VariableDto>() {
       @Override
@@ -294,15 +310,29 @@ public class TableView extends Composite implements TablePresenter.Display {
     toolbar.setEditCommand(cmd);
   }
 
-  private abstract class VariableNameColumn extends Column<VariableDto, String> implements HasFieldUpdater<VariableDto, String> {
-    public VariableNameColumn() {
+  private abstract class VariableClickableColumn extends Column<VariableDto, String> implements HasFieldUpdater<VariableDto, String> {
+
+    private String name;
+
+    public VariableClickableColumn(String name) {
       super(new ClickableTextCell());
+      this.name = name;
     }
+
+    public String getName() {
+      return name;
+    }
+
   }
 
   @Override
   public void setVariableNameFieldUpdater(FieldUpdater<VariableDto, String> updater) {
     variableNameColumn.setFieldUpdater(updater);
+  }
+
+  @Override
+  public void setVariableIndexFieldUpdater(FieldUpdater<VariableDto, String> updater) {
+    variableIndexColumn.setFieldUpdater(updater);
   }
 
   @Override
@@ -313,6 +343,11 @@ public class TableView extends Composite implements TablePresenter.Display {
   @Override
   public HandlerRegistration addVariableSuggestionHandler(SelectionHandler<Suggestion> handler) {
     return variableNameSuggestBox.addSelectionHandler(handler);
+  }
+
+  @Override
+  public HandlerRegistration addVariableSortHandler(ColumnSortEvent.Handler handler) {
+    return table.addColumnSortHandler(handler);
   }
 
   @Override
@@ -357,4 +392,11 @@ public class TableView extends Composite implements TablePresenter.Display {
     return new TabAuthorizer(tabs, 1);
   }
 
+  @Override
+  public String getClickableColumnName(Column<?, ?> column) {
+    if(column instanceof VariableClickableColumn) {
+      return ((VariableClickableColumn) column).getName();
+    }
+    return null;
+  }
 }

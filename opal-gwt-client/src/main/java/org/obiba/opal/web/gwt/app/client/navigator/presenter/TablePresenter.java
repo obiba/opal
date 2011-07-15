@@ -52,6 +52,8 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.inject.Inject;
@@ -73,6 +75,10 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   private AuthorizationPresenter authorizationPresenter;
 
   private Runnable removeConfirmation;
+
+  private Boolean sortAscending;
+
+  private Column<?, ?> sortColumn;
 
   //
   // Constructors
@@ -102,8 +108,12 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     getDisplay().setParentCommand(new ParentCommand());
     getDisplay().setPreviousCommand(new PreviousCommand());
     getDisplay().setNextCommand(new NextCommand());
-    super.getDisplay().setVariableNameFieldUpdater(new VariableNameFieldUpdater());
+
+    VariableNameFieldUpdater updater = new VariableNameFieldUpdater();
+    super.getDisplay().setVariableNameFieldUpdater(updater);
+    super.getDisplay().setVariableIndexFieldUpdater(updater);
     super.registerHandler(getDisplay().addVariableSuggestionHandler(new VariableSuggestionHandler()));
+    super.registerHandler(getDisplay().addVariableSortHandler(new VariableSortHandler()));
 
     // OPAL-975
     super.registerHandler(eventBus.addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
@@ -186,7 +196,10 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   }
 
   private void updateVariables() {
-    ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(table.getLink() + "/variables").get().withCallback(new VariablesResourceCallback(table)).send();
+    String sortColumnName = getDisplay().getClickableColumnName(sortColumn);
+    String sortColumArg = (sortColumnName != null ? ("?sortField=" + sortColumnName) : "");
+    String sortDirArg = (sortAscending != null ? (sortAscending ? "&sortDir=ASC" : "&sortDir=DESC") : "");
+    ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(table.getLink() + "/variables" + sortColumArg + sortDirArg).get().withCallback(new VariablesResourceCallback(table)).send();
   }
 
   private void downloadMetadata() {
@@ -290,6 +303,16 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
           break;
         }
       }
+    }
+  }
+
+  private final class VariableSortHandler implements ColumnSortEvent.Handler {
+
+    @Override
+    public void onColumnSort(ColumnSortEvent event) {
+      sortAscending = event.isSortAscending();
+      sortColumn = event.getColumn();
+      updateDisplay(table, previous, next);
     }
   }
 
@@ -515,11 +538,15 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
     void setVariableNameFieldUpdater(FieldUpdater<VariableDto, String> updater);
 
+    void setVariableIndexFieldUpdater(FieldUpdater<VariableDto, String> updater);
+
     void setCopyDataCommand(Command cmd);
 
     void addVariableSuggestion(String suggestion);
 
     HandlerRegistration addVariableSuggestionHandler(SelectionHandler<Suggestion> handler);
+
+    HandlerRegistration addVariableSortHandler(ColumnSortEvent.Handler handler);
 
     void clearVariableSuggestion();
 
@@ -534,6 +561,9 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     HasAuthorization getEditAuthorizer();
 
     HasAuthorization getPermissionsAuthorizer();
+
+    String getClickableColumnName(Column<?, ?> column);
+
   }
 
 }
