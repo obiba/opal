@@ -34,6 +34,7 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 
@@ -75,6 +76,7 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     expect(eventBusMock.addHandler((Type<ViewSavedEvent.Handler>) EasyMock.anyObject(), (ViewSavedEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
 
     expect(displayMock.addVariableSuggestionHandler((SelectionHandler<Suggestion>) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
+    expect(displayMock.addVariableSortHandler((ColumnSortEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
     displayMock.setNextCommand((Command) EasyMock.anyObject());
     displayMock.setPreviousCommand((Command) EasyMock.anyObject());
     displayMock.setParentCommand((Command) EasyMock.anyObject());
@@ -82,6 +84,7 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     displayMock.setExportDataCommand((Command) EasyMock.anyObject());
     displayMock.setCopyDataCommand((Command) EasyMock.anyObject());
     displayMock.setVariableNameFieldUpdater((FieldUpdater<VariableDto, String>) EasyMock.anyObject());
+    displayMock.setVariableIndexFieldUpdater((FieldUpdater<VariableDto, String>) EasyMock.anyObject());
     displayMock.setPermissionsDisplay(authzDisplayMock);
 
     expect(usersAuthzDisplayMock.getActionsColumn()).andReturn(null).once();
