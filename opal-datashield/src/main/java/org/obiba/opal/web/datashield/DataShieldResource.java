@@ -95,6 +95,23 @@ public class DataShieldResource {
     return dtos;
   }
 
+  @DELETE
+  @Path("/methods")
+  public Response deleteDataShieldMethods() {
+    configService.modifyConfiguration(new ConfigModificationTask() {
+
+      @Override
+      public void doWithConfig(OpalConfiguration config) {
+        DatashieldConfiguration dsConfig = config.getExtension(DatashieldConfiguration.class);
+        for(DataShieldMethod method : dsConfig.getAggregatingMethods()) {
+          dsConfig.removeAggregatingMethod(method.getName());
+        }
+      }
+    });
+    DataShieldLog.adminLog("deleted all aggregating methods.");
+    return Response.ok().build();
+  }
+
   @POST
   @Path("/methods")
   public Response createDataShieldMethod(final DataShield.DataShieldMethodDto dto) {
