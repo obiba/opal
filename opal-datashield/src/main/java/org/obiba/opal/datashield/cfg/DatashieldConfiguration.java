@@ -15,6 +15,8 @@ import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.datashield.DataShieldMethod;
 import org.obiba.opal.datashield.NoSuchDataShieldMethodException;
 
+import com.google.common.collect.ImmutableList;
+
 public class DatashieldConfiguration implements OpalConfigurationExtension {
 
   private List<DataShieldMethod> aggregatingMethods;
@@ -24,7 +26,7 @@ public class DatashieldConfiguration implements OpalConfigurationExtension {
    * @return
    */
   public List<DataShieldMethod> getAggregatingMethods() {
-    return aggregatingMethods;
+    return ImmutableList.copyOf(aggregatingMethods);
   }
 
   /**
