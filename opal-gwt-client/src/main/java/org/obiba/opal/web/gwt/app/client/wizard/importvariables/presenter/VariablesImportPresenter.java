@@ -17,6 +17,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
@@ -42,15 +43,8 @@ import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
 public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPresenter.Display> implements Wizard {
-  //
-  // Constants
-  //
 
   private static final String EXCEL_TEMPLATE = "/opalVariableTemplate.xls";
-
-  //
-  // Instance Variables
-  //
 
   @Inject
   private ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter;
@@ -63,18 +57,10 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
 
   private String datasourceName;
 
-  //
-  // Constructors
-  //
-
   @Inject
   public VariablesImportPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
   }
-
-  //
-  // WidgetPresenter Methods
-  //
 
   @Override
   protected void onBind() {
@@ -102,7 +88,7 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
       ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasource/" + datasourceName).get().withCallback(new ResourceCallback<DatasourceDto>() {
         @Override
         public void onResource(Response response, DatasourceDto resource) {
-          JsArray<DatasourceDto> datasources = (JsArray<DatasourceDto>) JsArray.createArray();
+          JsArray<DatasourceDto> datasources = JsArray.createArray().cast();
           if(resource != null) {
             datasources.push(resource);
           }
@@ -113,8 +99,7 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
       ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
         @Override
         public void onResource(Response response, JsArray<DatasourceDto> resource) {
-          JsArray<DatasourceDto> datasources = resource != null ? resource : (JsArray<DatasourceDto>) JsArray.createArray();
-          getDisplay().setDatasources(datasources);
+          getDisplay().setDatasources(JsArrays.toSafeArray(resource));
         }
       }).send();
     }
@@ -147,23 +132,11 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
   protected void onPlaceRequest(PlaceRequest request) {
   }
 
-  //
-  // Wizard Methods
-  //
-
   public void onWizardRequired(WizardRequiredEvent event) {
-    if(event.getEventParameters().length != 0) {
-      if(event.getEventParameters()[0] instanceof String) {
-        datasourceName = (String) event.getEventParameters()[0];
-      } else {
-        throw new IllegalArgumentException("unexpected event parameter type (expected String)");
-      }
+    if(event.getEventParameters().length > 0) {
+      datasourceName = (String) event.getEventParameters()[0];
     }
   }
-
-  //
-  // Inner Classes / Interfaces
-  //
 
   private final class ImportableValidator implements ValidationHandler {
     @Override

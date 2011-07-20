@@ -9,8 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter;
 
-import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Set;
+import java.util.TreeSet;
 
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
@@ -42,8 +43,6 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
   private String targetDatasourceName;
 
-  private TableCompareDto[] comparedTables;
-
   private JsArray<TableCompareDto> authorizedComparedTables;
 
   private boolean conflictsExist;
@@ -64,7 +63,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   protected void onBind() {
   }
 
-  public void compare(String sourceDatasourceName, String targetDatasourceName, final org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter.Display display, final DatasourceFactoryDto factory, final DatasourceDto datasourceResource) {
+  public void compare(String sourceDatasourceName, String targetDatasourceName, final VariablesImportPresenter.Display display, final DatasourceFactoryDto factory, final DatasourceDto datasourceResource) {
     this.targetDatasourceName = targetDatasourceName;
     getDisplay().clearDisplay();
     authorizedComparedTables = JsArrays.create();
@@ -73,11 +72,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
       @Override
       public void onResource(Response response, DatasourceCompareDto resource) {
-
-        comparedTables = JsArrays.toArray(resource.getTableComparisonsArray());
-
-        sortComparedTables();
-
+        Set<TableCompareDto> comparedTables = sortComparedTables(JsArrays.toSafeArray(resource.getTableComparisonsArray()));
         conflictsExist = false;
         for(TableCompareDto tableComparison : comparedTables) {
           ComparisonResult comparisonResult = getTableComparisonResult(tableComparison);
@@ -92,13 +87,17 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
         display.getDatasourceCreatedCallback().onSuccess(factory, datasourceResource);
       }
 
-      private void sortComparedTables() {
-        Arrays.sort(comparedTables, new Comparator<TableCompareDto>() {
+      private TreeSet<TableCompareDto> sortComparedTables(JsArray<TableCompareDto> comparedTables) {
+        TreeSet<TableCompareDto> tree = new TreeSet<TableCompareDto>(new Comparator<TableCompareDto>() {
           @Override
           public int compare(TableCompareDto table1, TableCompareDto table2) {
             return table1.getCompared().getName().compareTo(table2.getCompared().getName());
           }
         });
+        for(int i = 0; i < comparedTables.length(); i++) {
+          tree.add(comparedTables.get(i));
+        }
+        return tree;
       }
 
     }).send();
@@ -138,26 +137,19 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   @SuppressWarnings("unchecked")
   public void addUpdateVariablesResourceRequests(ConclusionStepPresenter conclusionStepPresenter) {
     for(TableCompareDto tableCompareDto : JsArrays.toIterable(authorizedComparedTables)) {
-      JsArray<VariableDto> newVariables = (JsArray<VariableDto>) (tableCompareDto.getNewVariablesArray() != null ? tableCompareDto.getNewVariablesArray() : JsArray.createArray());
-      JsArray<VariableDto> existingVariables = (JsArray<VariableDto>) (tableCompareDto.getExistingVariablesArray() != null ? tableCompareDto.getExistingVariablesArray() : JsArray.createArray());
+      JsArray<VariableDto> newVariables = JsArrays.toSafeArray(tableCompareDto.getNewVariablesArray());
+      JsArray<VariableDto> existingVariables = JsArrays.toSafeArray(tableCompareDto.getExistingVariablesArray());
 
       JsArray<VariableDto> variablesToStringify = (JsArray<VariableDto>) JsArray.createArray();
-      addVariables(newVariables, variablesToStringify);
+      JsArrays.pushAll(variablesToStringify, newVariables);
       if(!getDisplay().ignoreAllModifications()) {
-        addVariables(existingVariables, variablesToStringify);
+        JsArrays.pushAll(variablesToStringify, existingVariables);
       }
 
       if(variablesToStringify.length() > 0) {
         conclusionStepPresenter.setTargetDatasourceName(targetDatasourceName);
         conclusionStepPresenter.addResourceRequest(tableCompareDto.getCompared().getName(), "/datasource/" + targetDatasourceName + "/table/" + tableCompareDto.getCompared().getName(), createResourceRequestBuilder(tableCompareDto.getCompared(), !tableCompareDto.hasWithTable(), variablesToStringify));
       }
-    }
-  }
-
-  private void addVariables(JsArray<VariableDto> variables, JsArray<VariableDto> variablesToStringify) {
-    for(int variableIndex = 0; variableIndex < variables.length(); variableIndex++) {
-      VariableDto variableDto = variables.get(variableIndex);
-      variablesToStringify.push(variableDto);
     }
   }
 
@@ -168,9 +160,9 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
       newTableDto.setEntityType(comparedTableDto.getEntityType());
       newTableDto.setVariablesArray(variables);
 
-      return ResourceRequestBuilderFactory.newBuilder().post().forResource("/datasource/" + targetDatasourceName + "/tables").accept("application/x-protobuf+json").withResourceBody(stringify(newTableDto));
+      return ResourceRequestBuilderFactory.newBuilder().post().forResource("/datasource/" + targetDatasourceName + "/tables").withResourceBody(stringify(newTableDto));
     } else {
-      return ResourceRequestBuilderFactory.newBuilder().post().forResource("/datasource/" + targetDatasourceName + "/table/" + comparedTableDto.getName() + "/variables").accept("application/x-protobuf+json").withResourceBody(stringify(variables));
+      return ResourceRequestBuilderFactory.newBuilder().post().forResource("/datasource/" + targetDatasourceName + "/table/" + comparedTableDto.getName() + "/variables").withResourceBody(stringify(variables));
     }
   }
 

@@ -125,8 +125,8 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
 
     @Override
     public void onResource(Response response, JsArray<VariableDto> resource) {
-      for(VariableDto variable : JsArrays.toArray(resource)) {
-        getDisplay().addVariableSuggestion(variable.getName());
+      for(int i = 0; i < resource.length(); i++) {
+        getDisplay().addVariableSuggestion(resource.get(i).getName());
       }
     }
   }

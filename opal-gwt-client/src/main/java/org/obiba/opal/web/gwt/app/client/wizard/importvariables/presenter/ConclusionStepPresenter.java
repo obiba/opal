@@ -162,7 +162,7 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
         }
       };
 
-      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().get().forResource("/datasource/" + targetDatasourceName).accept("application/x-protobuf+json").withCallback(resourceCallback).send();
+      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().get().forResource("/datasource/" + targetDatasourceName).withCallback(resourceCallback).send();
     }
   }
 
