@@ -25,7 +25,7 @@
     <dependency>
       <groupId>org.elasticsearch</groupId>
       <artifactId>elasticsearch</artifactId>
-      <version>0.16.4</version>
+      <version>0.17.6</version>
     </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>
