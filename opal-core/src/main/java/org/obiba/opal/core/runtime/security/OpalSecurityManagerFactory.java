@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.core.runtime.security;
 
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Set;
 
 import javax.annotation.PreDestroy;
@@ -21,18 +21,20 @@ import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.text.IniRealm;
 import org.apache.shiro.session.SessionListener;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
+import org.apache.shiro.util.LifecycleUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableList;
 
 @Component
-public class OpalSecurityManagerFactory implements FactoryBean<DefaultSecurityManager> {
+public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> {
 
   private final Set<Realm> realms;
 
@@ -40,7 +42,7 @@ public class OpalSecurityManagerFactory implements FactoryBean<DefaultSecurityMa
 
   private final RolePermissionResolver rolePermissionResolver;
 
-  private DefaultSecurityManager securityManager;
+  private SecurityManager securityManager;
 
   @Autowired
   public OpalSecurityManagerFactory(Set<Realm> securityRealms, Set<SessionListener> sessionListeners, RolePermissionResolver rolePermissionResolver) {
@@ -50,7 +52,7 @@ public class OpalSecurityManagerFactory implements FactoryBean<DefaultSecurityMa
   }
 
   @Override
-  public DefaultSecurityManager getObject() throws Exception {
+  public SecurityManager getObject() throws Exception {
     if(securityManager == null) {
       securityManager = doCreateSecurityManager();
       SecurityUtils.setSecurityManager(securityManager);
@@ -72,40 +74,53 @@ public class OpalSecurityManagerFactory implements FactoryBean<DefaultSecurityMa
   public void destroySecurityManager() {
     // Destroy the security manager.
     SecurityUtils.setSecurityManager(null);
-    securityManager.destroy();
+    LifecycleUtils.destroy(securityManager);
     securityManager = null;
   }
 
-  private DefaultSecurityManager doCreateSecurityManager() {
+  private SecurityManager doCreateSecurityManager() {
     IniSecurityManagerFactory f = new IniSecurityManagerFactory(System.getProperty("OPAL_HOME") + "/conf/shiro.ini") {
+
       @Override
-      protected boolean shouldImplicitlyCreateRealm(Ini ini) {
-        return false;
+      protected SecurityManager createDefaultInstance() {
+        DefaultSecurityManager dsm = new DefaultSecurityManager();
+
+        if(dsm.getCacheManager() == null) {
+          dsm.setCacheManager(new MemoryConstrainedCacheManager());
+        }
+
+        if(dsm.getSessionManager() instanceof DefaultSessionManager) {
+          ((DefaultSessionManager) dsm.getSessionManager()).setSessionListeners(sessionListeners);
+        }
+
+        if(dsm.getAuthorizer() instanceof ModularRealmAuthorizer) {
+          ((ModularRealmAuthorizer) dsm.getAuthorizer()).setRolePermissionResolver(rolePermissionResolver);
+          ((ModularRealmAuthorizer) dsm.getAuthorizer()).setPermissionResolver(new OpalPermissionResolver());
+        }
+        return dsm;
+      }
+
+      @Override
+      protected void applyRealmsToSecurityManager(Collection<Realm> shiroRealms, SecurityManager securityManager) {
+        super.applyRealmsToSecurityManager(ImmutableList.<Realm> builder().addAll(realms).addAll(shiroRealms).build(), securityManager);
+      }
+
+      @Override
+      protected Realm createRealm(final Ini ini) {
+        // Overridden to workaround issue https://issues.apache.org/jira/browse/SHIRO-322
+        IniRealm realm = new IniRealm(System.getProperty("OPAL_HOME") + "/conf/shiro.ini") {
+          @Override
+          protected void onInit() {
+            super.roles.clear();
+            super.users.clear();
+            super.onInit();
+          }
+        };
+        realm.setName(INI_REALM_NAME);
+        return realm;
       }
     };
 
-    DefaultSecurityManager dsm = (DefaultSecurityManager) f.createInstance();
-    if(dsm.getCacheManager() == null) {
-      dsm.setCacheManager(new MemoryConstrainedCacheManager());
-    }
-
-    if(dsm.getSessionManager() instanceof DefaultSessionManager) {
-      ((DefaultSessionManager) dsm.getSessionManager()).setSessionListeners(sessionListeners);
-    }
-
-    if(dsm.getAuthorizer() instanceof ModularRealmAuthorizer) {
-      ((ModularRealmAuthorizer) dsm.getAuthorizer()).setRolePermissionResolver(rolePermissionResolver);
-      ((ModularRealmAuthorizer) dsm.getAuthorizer()).setPermissionResolver(new OpalPermissionResolver());
-    }
-
-    Iterable<Realm> configuredRealms = dsm.getRealms() != null ? dsm.getRealms() : Collections.<Realm> emptyList();
-
-    IniRealm ir = new IniRealm();
-    ir.setResourcePath(System.getProperty("OPAL_HOME") + "/conf/shiro.ini");
-
-    dsm.setRealms(ImmutableSet.<Realm> builder().addAll(configuredRealms).add(ir).addAll(this.realms).build());
-
-    ir.init();
-    return dsm;
+    return f.createInstance();
   }
 }
