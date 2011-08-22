@@ -519,7 +519,7 @@
 
       <dependency>
         <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-ext-jdk15</artifactId>
+        <artifactId>bcprov-ext-jdk16</artifactId>
         <version>${bouncycastle.version}</version>
       </dependency>
 
@@ -764,7 +764,7 @@
     <ow2.spec.version>1.0.2</ow2.spec.version>
     <liquibase.version>1.9.4</liquibase.version>
     <shiro.version>1.1.0</shiro.version>
-    <bouncycastle.version>1.45</bouncycastle.version>
+    <bouncycastle.version>1.46</bouncycastle.version>
     <commons-fileupload.version>1.2.1</commons-fileupload.version>
     <commons-io.version>1.3.2</commons-io.version>
     <hsqldb.version>1.8.0.7</hsqldb.version>
