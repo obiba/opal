@@ -79,48 +79,52 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
   }
 
   private SecurityManager doCreateSecurityManager() {
-    IniSecurityManagerFactory f = new IniSecurityManagerFactory(System.getProperty("OPAL_HOME") + "/conf/shiro.ini") {
+    return new CustomIniSecurityManagerFactory(System.getProperty("OPAL_HOME") + "/conf/shiro.ini").createInstance();
+  }
 
-      @Override
-      protected SecurityManager createDefaultInstance() {
-        DefaultSecurityManager dsm = new DefaultSecurityManager();
+  private class CustomIniSecurityManagerFactory extends IniSecurityManagerFactory {
 
-        if(dsm.getCacheManager() == null) {
-          dsm.setCacheManager(new MemoryConstrainedCacheManager());
-        }
+    public CustomIniSecurityManagerFactory(String resourcePath) {
+      super(resourcePath);
+    }
 
-        if(dsm.getSessionManager() instanceof DefaultSessionManager) {
-          ((DefaultSessionManager) dsm.getSessionManager()).setSessionListeners(sessionListeners);
-        }
+    @Override
+    protected SecurityManager createDefaultInstance() {
+      DefaultSecurityManager dsm = new DefaultSecurityManager();
 
-        if(dsm.getAuthorizer() instanceof ModularRealmAuthorizer) {
-          ((ModularRealmAuthorizer) dsm.getAuthorizer()).setRolePermissionResolver(rolePermissionResolver);
-          ((ModularRealmAuthorizer) dsm.getAuthorizer()).setPermissionResolver(new OpalPermissionResolver());
-        }
-        return dsm;
+      if(dsm.getCacheManager() == null) {
+        dsm.setCacheManager(new MemoryConstrainedCacheManager());
       }
 
-      @Override
-      protected void applyRealmsToSecurityManager(Collection<Realm> shiroRealms, SecurityManager securityManager) {
-        super.applyRealmsToSecurityManager(ImmutableList.<Realm> builder().addAll(realms).addAll(shiroRealms).build(), securityManager);
+      if(dsm.getSessionManager() instanceof DefaultSessionManager) {
+        ((DefaultSessionManager) dsm.getSessionManager()).setSessionListeners(sessionListeners);
       }
 
-      @Override
-      protected Realm createRealm(final Ini ini) {
-        // Overridden to workaround issue https://issues.apache.org/jira/browse/SHIRO-322
-        IniRealm realm = new IniRealm(System.getProperty("OPAL_HOME") + "/conf/shiro.ini") {
-          @Override
-          protected void onInit() {
-            super.roles.clear();
-            super.users.clear();
-            super.onInit();
-          }
-        };
-        realm.setName(INI_REALM_NAME);
-        return realm;
+      if(dsm.getAuthorizer() instanceof ModularRealmAuthorizer) {
+        ((ModularRealmAuthorizer) dsm.getAuthorizer()).setRolePermissionResolver(rolePermissionResolver);
+        ((ModularRealmAuthorizer) dsm.getAuthorizer()).setPermissionResolver(new OpalPermissionResolver());
       }
-    };
+      return dsm;
+    }
 
-    return f.createInstance();
+    @Override
+    protected void applyRealmsToSecurityManager(Collection<Realm> shiroRealms, SecurityManager securityManager) {
+      super.applyRealmsToSecurityManager(ImmutableList.<Realm> builder().addAll(realms).addAll(shiroRealms).build(), securityManager);
+    }
+
+    @Override
+    protected Realm createRealm(final Ini ini) {
+      // Overridden to workaround issue https://issues.apache.org/jira/browse/SHIRO-322
+      IniRealm realm = new IniRealm(System.getProperty("OPAL_HOME") + "/conf/shiro.ini") {
+        @Override
+        protected void onInit() {
+          super.roles.clear();
+          super.users.clear();
+          super.onInit();
+        }
+      };
+      realm.setName(INI_REALM_NAME);
+      return realm;
+    }
   }
 }
