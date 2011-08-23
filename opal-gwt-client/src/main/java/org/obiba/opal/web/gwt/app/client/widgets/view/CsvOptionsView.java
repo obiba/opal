@@ -53,10 +53,10 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
   TextBox row;
 
   @UiField
-  ListBox field;
+  EditableListBox field;
 
   @UiField
-  ListBox quote;
+  EditableListBox quote;
 
   @UiField
   RadioButton charsetDefault;
@@ -91,6 +91,13 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
     charsetDefault.addValueChangeHandler(valueChangeHandler);
     charsetCommonList.addValueChangeHandler(valueChangeHandler);
     charsetSpecify.addValueChangeHandler(valueChangeHandler);
+
+    for(String s : new String[] { ",", ";", ":", "tab", "|" }) {
+      field.addItem(s);
+    }
+    for(String s : new String[] { "\"", "'" }) {
+      quote.addItem(s);
+    }
   }
 
   public void setAdvancedOptionsVisible(boolean visible) {
@@ -112,11 +119,11 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
   }
 
   public String getFieldSeparator() {
-    return field.getValue(field.getSelectedIndex());
+    return field.getValue();
   }
 
   public String getQuote() {
-    return quote.getItemText(quote.getSelectedIndex());
+    return quote.getValue();
   }
 
   public HasValue<Boolean> isDefaultCharacterSet() {
@@ -170,13 +177,12 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
 
   @Override
   public void resetFieldSeparator() {
-    field.setSelectedIndex(0);
-
+    field.setValue(",");
   }
 
   @Override
   public void resetQuote() {
-    quote.setSelectedIndex(0);
+    quote.setValue("\"");
   }
 
   @Override
@@ -212,6 +218,8 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
   private void populateField() {
     row.setSize("2em", "1em");
     row.setText("1");
+    field.setSize("2em", "1em");
+    quote.setSize("2em", "1em");
   }
 
   //
