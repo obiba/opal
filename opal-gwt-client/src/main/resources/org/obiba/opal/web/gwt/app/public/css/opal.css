@@ -149,7 +149,6 @@ img.clickable {
     background: none repeat scroll 0 0 transparent;
 }
 
-
 .gwt-TabLayoutPanel .gwt-TabLayoutPanelTab {
 	background:none repeat scroll 0 0 #888888;
 	color: #ffffff;
@@ -243,8 +242,6 @@ img.clickable {
 }
 
 /* CellTable */
-
-
 
 .gwt-CellTable {
 }
@@ -648,7 +645,7 @@ margin-left:0.8em;
 }
 
 .navigator .tableList td:first-child  {
-      text-decoration: underline;
+	text-decoration: underline;
 }
 
 .navigator .tableList td:first-child:hover {
@@ -657,18 +654,6 @@ margin-left:0.8em;
 
 .navigator .tableList .title-bold {
     margin-top: 1em;
-}
-
-.clickableVariableTable th:first-child {
-	cursor: pointer;	
-}
-
-.clickableVariableTable th:nth-child(2) {
-	cursor: pointer;	
-}
-
-.clickableVariableTable td:nth-child(2) {
-	cursor: pointer;	
 }
 
 /* File Explorer Styles */ 

@@ -82,5 +82,9 @@
 
 .cellTableSortedHeaderAscending{}
 .cellTableSortedHeaderDescending{}
-.cellTableSortableHeader{}
+.cellTableSortableHeader{
+  cursor: pointer;
+  cursor: hand;
+  text-decoration: underline;
+}
 

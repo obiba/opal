@@ -13,17 +13,16 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
-import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
+import org.obiba.opal.web.gwt.user.cellview.client.ClickableColumn;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -132,7 +131,6 @@ public class TableView extends Composite implements TablePresenter.Display {
     };
     table.addColumn(variableIndexColumn, "#");
     table.setColumnWidth(variableIndexColumn, 1, Unit.PX);
-    table.addStyleName("clickableVariableTable");
     variableIndexColumn.setSortable(true);
 
     table.addColumn(variableNameColumn = new VariableClickableColumn("name") {
@@ -312,12 +310,11 @@ public class TableView extends Composite implements TablePresenter.Display {
     toolbar.setEditCommand(cmd);
   }
 
-  private abstract class VariableClickableColumn extends Column<VariableDto, String> implements HasFieldUpdater<VariableDto, String> {
+  private abstract class VariableClickableColumn extends ClickableColumn<VariableDto> {
 
     private String name;
 
     public VariableClickableColumn(String name) {
-      super(new ClickableTextCell());
       this.name = name;
     }
 
