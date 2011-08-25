@@ -43,21 +43,16 @@ import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.opal.web.magma.support.InvalidRequestException;
-import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
-import org.obiba.opal.web.ws.SortDir;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.AuthorizeResource;
-import org.springframework.beans.PropertyAccessorFactory;
 
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
 
 public class VariablesResource extends AbstractValueTableResource {
 
@@ -74,7 +69,7 @@ public class VariablesResource extends AbstractValueTableResource {
    * @return
    */
   @GET
-  public Iterable<VariableDto> getVariables(@Context final UriInfo uriInfo, @QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit, @QueryParam("sortField") @DefaultValue("index") String sortField, @QueryParam("sortDir") @DefaultValue("ASC") SortDir sortDir) {
+  public Iterable<VariableDto> getVariables(@Context final UriInfo uriInfo, @QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit) {
     if(offset < 0) {
       throw new InvalidRequestException("IllegalParameterValue", "offset", String.valueOf(limit));
     }
@@ -82,30 +77,14 @@ public class VariablesResource extends AbstractValueTableResource {
       throw new InvalidRequestException("IllegalParameterValue", "limit", String.valueOf(limit));
     }
 
-    ArrayList<PathSegment> segments = Lists.newArrayList(uriInfo.getPathSegments());
-    segments.remove(segments.size() - 1);
-    final UriBuilder ub = UriBuilder.fromPath("/");
-    final UriBuilder tableub = UriBuilder.fromPath("/");
-    for(PathSegment segment : segments) {
-      ub.segment(segment.getPath());
-      tableub.segment(segment.getPath());
-    }
+    UriBuilder ub = tableUriBuilder(uriInfo);
+    String tableUri = ub.build().toString();
     ub.path(TableResource.class, "getVariable");
-    String tableUri = tableub.build().toString();
+
     LinkDto.Builder tableLinkBuilder = LinkDto.newBuilder().setLink(tableUri).setRel(getValueTable().getName());
 
     Iterable<Variable> variables = filterVariables(script, offset, limit);
-    ArrayList<VariableDto> variableDtos = Lists.newArrayList(Iterables.transform(variables, Dtos.asDtoFunc(tableLinkBuilder.build(), ub)));
-
-    try {
-      boolean sortRequired = !(sortField.equals("index") && sortDir.equals(SortDir.ASC));
-      if(sortRequired) {
-        sortVariableDtoByField(variableDtos, sortField, sortDir);
-      }
-    } catch(RuntimeException e) {
-      throw new InvalidRequestException("InvalidRequest");
-    }
-    return variableDtos;
+    return Iterables.transform(variables, Dtos.asDtoFunc(tableLinkBuilder.build(), ub));
   }
 
   @GET
@@ -183,10 +162,7 @@ public class VariablesResource extends AbstractValueTableResource {
       }
     }
 
-    ArrayList<VariableDto> variables = Lists.newArrayList(Iterables.transform(group, Dtos.asDtoFunc(tableLinkBuilder.build(), ub)));
-    sortVariableDtoByName(variables);
-
-    return variables;
+    return Iterables.transform(group, Dtos.asDtoFunc(tableLinkBuilder.build(), ub));
   }
 
   @POST
@@ -252,31 +228,4 @@ public class VariablesResource extends AbstractValueTableResource {
     });
   }
 
-  private void sortVariableDtoByName(List<Magma.VariableDto> variables) {
-    sortVariableDtoByField(variables, "name", SortDir.ASC);
-  }
-
-  private void sortVariableDtoByField(List<Magma.VariableDto> variables, final String field, SortDir sortDir) {
-    Preconditions.checkNotNull(sortDir);
-    final Ordering<Comparable<?>> ordering;
-    switch(sortDir) {
-    case DESC:
-      ordering = Ordering.natural().reverse();
-      break;
-    case ASC:
-      ordering = Ordering.natural();
-      break;
-    default:
-      throw new IllegalArgumentException("invalid sortDir argument");
-    }
-    Collections.sort(variables, new Comparator<Magma.VariableDto>() {
-
-      @Override
-      public int compare(VariableDto v1, VariableDto v2) {
-        Object v1PropertyValue = PropertyAccessorFactory.forBeanPropertyAccess(v1).getPropertyValue(field);
-        Object v2PropertyValue = PropertyAccessorFactory.forBeanPropertyAccess(v2).getPropertyValue(field);
-        return ordering.compare(Comparable.class.cast(v1PropertyValue), Comparable.class.cast(v2PropertyValue));
-      }
-    });
-  }
 }
