@@ -44,7 +44,6 @@ import org.obiba.magma.type.TextType;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Opal.LocaleDto;
-import org.obiba.opal.web.ws.SortDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,7 +113,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     replay(uriInfoMock);
     replay(segments.toArray());
 
-    List<VariableDto> dtos = Lists.newArrayList(resource.getVariables().getVariables(uriInfoMock, null, 0, null, "name", SortDir.ASC));
+    List<VariableDto> dtos = Lists.newArrayList(resource.getVariables().getVariables(uriInfoMock, null, 0, null));
 
     verify(uriInfoMock);
     verify(segments.toArray());
