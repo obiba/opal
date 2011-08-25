@@ -17,7 +17,6 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 import org.jboss.resteasy.spi.Registry;
-import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -31,14 +30,20 @@ public class ResteasyServletConfiguration {
   private ServletContextHandler servletContextHandler;
 
   @Autowired
-  private ResteasyDeployment resteasyDeployment;
+  private Dispatcher dispatcher;
+
+  @Autowired
+  private ResteasyProviderFactory factory;
+
+  @Autowired
+  private Registry registry;
 
   @PostConstruct
   public void configureResteasyServlet() {
     ServletContext servletContext = servletContextHandler.getServletContext();
-    servletContext.setAttribute(ResteasyProviderFactory.class.getName(), resteasyDeployment.getProviderFactory());
-    servletContext.setAttribute(Dispatcher.class.getName(), resteasyDeployment.getDispatcher());
-    servletContext.setAttribute(Registry.class.getName(), resteasyDeployment.getRegistry());
+    servletContext.setAttribute(ResteasyProviderFactory.class.getName(), factory);
+    servletContext.setAttribute(Dispatcher.class.getName(), dispatcher);
+    servletContext.setAttribute(Registry.class.getName(), registry);
 
     ServletHolder sh = new ServletHolder(new HttpServletDispatcher());
     sh.setInitParameter("resteasy.servlet.mapping.prefix", WS_ROOT);

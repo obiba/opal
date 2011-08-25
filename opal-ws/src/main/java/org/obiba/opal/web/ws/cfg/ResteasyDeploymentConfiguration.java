@@ -9,17 +9,16 @@
  ******************************************************************************/
 package org.obiba.opal.web.ws.cfg;
 
-import java.net.URL;
-
 import javax.ws.rs.ext.ExceptionMapper;
 
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
 import org.jboss.resteasy.core.Dispatcher;
-import org.jboss.resteasy.plugins.server.servlet.ConfigurationBootstrap;
-import org.jboss.resteasy.plugins.spring.SpringBeanProcessor;
-import org.jboss.resteasy.spi.ResteasyDeployment;
+import org.jboss.resteasy.core.SynchronousDispatcher;
+import org.jboss.resteasy.spi.Registry;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.jboss.resteasy.spi.interception.PostProcessInterceptor;
 import org.jboss.resteasy.spi.interception.PreProcessInterceptor;
+import org.jboss.resteasy.springmvc.ResteasyInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -30,44 +29,31 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ResteasyDeploymentConfiguration {
 
-  // http://jira.springframework.org/browse/SPR-7167
-  private ResteasyDeployment deployment;
-
   @Bean
-  public ResteasyDeployment resteasyDeployment() {
-    if(deployment == null) {
-      ConfigurationBootstrap restEasyBootstrap = new ConfigurationBootstrap() {
-
-        @Override
-        public String getParameter(String name) {
-          return null;
-        }
-
-        @Override
-        public URL[] getScanningUrls() {
-          return null;
-        }
-
-        @Override
-        public String getInitParameter(String arg0) {
-          return null;
-        }
-
-      };
-      deployment = restEasyBootstrap.createDeployment();
-      deployment.start();
-    }
-    return deployment;
+  public ResteasyProviderFactory providerFactory() {
+    ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
+    new ResteasyInitializer(factory);
+    return factory;
   }
 
   @Bean
-  public SpringBeanProcessor resteasyPostProcessor() {
-    return new SpringBeanProcessor(resteasyDeployment().getDispatcher());
+  public Dispatcher dispatcher() {
+    return new SynchronousDispatcher(providerFactory());
+  }
+
+  @Bean
+  public Registry registry() {
+    return dispatcher().getRegistry();
+  }
+
+  @Bean
+  public ResteasySpringListener listener() {
+    return new ResteasySpringListener(providerFactory(), registry());
   }
 
   @Bean
   public ServerInterceptorSpringBeanProcessor resteasyInterceptorPostProcessor() {
-    return new ServerInterceptorSpringBeanProcessor(resteasyDeployment().getDispatcher());
+    return new ServerInterceptorSpringBeanProcessor(dispatcher());
   }
 
   /**
