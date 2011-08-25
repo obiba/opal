@@ -120,6 +120,38 @@
           <property name="appliesTo" value="1.5.0" />
         </bean>
         <bean class="org.obiba.opal.core.runtime.upgrade.IdentifiersTableUpgradeStep"/>
+        
+        <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
+          <property name="description" value="Alter Opal's Datasource schema." />
+          <property name="dataSource" ref="opalDataSource" />
+          <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/1.6.0/" />
+          <property name="scriptBasename" value="hibernate-datasource" />
+          <property name="appliesTo" value="1.6.0" />
+        </bean>
+        <bean class="org.obiba.opal.core.runtime.upgrade.StoredProcedureUpgradeStep">
+          <property name="description" value="Update the variable_index column in variable table." />
+          <property name="dataSource" ref="opalDataSource" />
+          <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/1.6.0/" />
+          <property name="scriptBasename" value="update-var-index" />
+          <property name="appliesTo" value="1.6.0" />
+          <property name="procedureName" value="update_var_index"/>
+        </bean>
+
+        <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
+          <property name="description" value="Alter Opal's Identifier schema." />
+          <property name="dataSource" ref="keyDataSource" />
+          <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/1.6.0/" />
+          <property name="scriptBasename" value="hibernate-datasource" />
+          <property name="appliesTo" value="1.6.0" />
+        </bean>
+        <bean class="org.obiba.opal.core.runtime.upgrade.StoredProcedureUpgradeStep">
+          <property name="description" value="Update the variable_index column in variable table." />
+          <property name="dataSource" ref="keyDataSource" />
+          <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/1.6.0/" />
+          <property name="scriptBasename" value="update-var-index" />
+          <property name="appliesTo" value="1.6.0" />
+          <property name="procedureName" value="update_var_index"/>
+        </bean>
       </list>
     </property>
 
