@@ -51,7 +51,7 @@ public class ProtobufProviderHelper {
     return descriptorFactory;
   }
 
-  protected final class DescriptorFactory {
+  protected static final class DescriptorFactory {
 
     private final Map<Class<?>, Method> methodCache = new HashMap<Class<?>, Method>();
 
