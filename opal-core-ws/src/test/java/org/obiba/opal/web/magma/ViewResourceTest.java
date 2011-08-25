@@ -16,7 +16,10 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Locale;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
@@ -31,9 +34,16 @@ import com.google.common.collect.ImmutableSet;
  * Unit tests for {@link ViewResource}.
  */
 public class ViewResourceTest {
-  //
-  // Test Methods
-  //
+
+  @Before
+  public void start() {
+    new MagmaEngine();
+  }
+
+  @After
+  public void stop() {
+    MagmaEngine.get().shutdown();
+  }
 
   @Test
   public void testConstructor_CallsSuperConstructorWithViewArgument() {
