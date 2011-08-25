@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
+
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
@@ -63,5 +67,15 @@ abstract class AbstractValueTableResource {
     int toIndex = (limit != null) ? Math.min(fromIndex + limit, filteredVariables.size()) : filteredVariables.size();
 
     return filteredVariables.subList(fromIndex, toIndex);
+  }
+
+  protected UriBuilder tableUriBuilder(UriInfo uriInfo) {
+    ArrayList<PathSegment> segments = Lists.newArrayList(uriInfo.getPathSegments());
+    segments.remove(segments.size() - 1);
+    final UriBuilder ub = UriBuilder.fromPath("/");
+    for(PathSegment segment : segments) {
+      ub.segment(segment.getPath());
+    }
+    return ub;
   }
 }
