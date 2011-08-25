@@ -131,6 +131,12 @@
         <version>${magma.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>${guava.version}</version>
+      </dependency>
+      
       <!-- Definition of all Spring modules -->
       <dependency>
         <groupId>org.springframework</groupId>
@@ -745,6 +751,7 @@
 
     <obiba.commons.version>1.2.0</obiba.commons.version>
     <magma.version>1.2-SNAPSHOT</magma.version>
+    <guava.version>r09</guava.version>
     <spring.version>3.0.6.RELEASE</spring.version>
     <spring-batch.version>2.0.3.RELEASE</spring-batch.version>
     <slf4j.version>1.6.2</slf4j.version>
