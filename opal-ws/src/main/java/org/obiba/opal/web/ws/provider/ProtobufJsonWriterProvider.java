@@ -49,7 +49,7 @@ public class ProtobufJsonWriterProvider extends AbstractProtobufProvider impleme
     OutputStreamWriter output = new OutputStreamWriter(entityStream, "UTF-8");
     if(isWrapped(type, genericType, annotations, mediaType)) {
       // JsonFormat does not provide a printList method
-      JsonIoUtil.printCollection((Iterable<Message>) t, output);
+      JsonIoUtil.printCollection(sort(extractMessageType(type, genericType, annotations, mediaType), (Iterable<Message>) t), output);
     } else {
       JsonFormat.print((Message) t, output);
     }

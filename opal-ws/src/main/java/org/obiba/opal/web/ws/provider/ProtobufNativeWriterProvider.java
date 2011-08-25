@@ -25,9 +25,6 @@ import org.springframework.stereotype.Component;
 
 import com.google.protobuf.Message;
 
-/**
- *
- */
 @Component
 @Provider
 @Produces({ "application/x-protobuf" })
@@ -47,7 +44,8 @@ public class ProtobufNativeWriterProvider extends AbstractProtobufProvider imple
   @SuppressWarnings({ "unchecked", "PMD.ExcessiveParameterList" })
   public void writeTo(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
     if(isWrapped(type, genericType, annotations, mediaType)) {
-      for(Message m : (Iterable<Message>) t) {
+      Class<Message> messageType = extractMessageType(type, genericType, annotations, mediaType);
+      for(Message m : sort(messageType, (Iterable<Message>) t)) {
         m.writeDelimitedTo(entityStream);
       }
     } else {

@@ -33,9 +33,6 @@ import com.google.protobuf.Message.Builder;
 @Consumes({ "application/x-protobuf" })
 public class ProtobufNativeReaderProvider extends AbstractProtobufProvider implements MessageBodyReader<Object> {
 
-  // TODO: this should be injected. OPAL-1090
-  private final ProtobufProviderHelper helper = new ProtobufProviderHelper();
-
   @Override
   public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
     return Message.class.isAssignableFrom(type) || isWrapped(type, genericType, annotations, mediaType);
@@ -44,8 +41,8 @@ public class ProtobufNativeReaderProvider extends AbstractProtobufProvider imple
   @Override
   public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
     Class<Message> messageType = extractMessageType(type, genericType, annotations, mediaType);
-    final ExtensionRegistry extensionRegistry = helper.extensions().forMessage(messageType);
-    final Builder builder = helper.builders().forMessage(messageType);
+    final ExtensionRegistry extensionRegistry = protobuf().extensions().forMessage(messageType);
+    final Builder builder = protobuf().builders().forMessage(messageType);
     if(isWrapped(type, genericType, annotations, mediaType)) {
       ArrayList<Message> msgs = new ArrayList<Message>();
       Builder b = builder.clone();

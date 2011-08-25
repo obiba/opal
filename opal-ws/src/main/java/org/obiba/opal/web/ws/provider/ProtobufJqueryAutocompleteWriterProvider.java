@@ -13,12 +13,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -31,25 +27,19 @@ import javax.ws.rs.ext.Provider;
 
 import org.jboss.resteasy.plugins.providers.jaxb.IgnoredMediaTypes;
 import org.jboss.resteasy.util.Types;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.google.protobuf.Message;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor;
+import com.google.protobuf.Message;
 
 /**
  *
  */
 @Component
 @Provider
-@Produces( { "application/x-jquery-autocomplete+json" })
-public class ProtobufJqueryAutocompleteWriterProvider implements MessageBodyWriter<Object> {
-
-  private static final Logger log = LoggerFactory.getLogger(ProtobufJsonReaderProvider.class);
-
-  private final DescriptorFactory descriptorFactory = new DescriptorFactory();
+@Produces({ "application/x-jquery-autocomplete+json" })
+public class ProtobufJqueryAutocompleteWriterProvider extends AbstractProtobufProvider implements MessageBodyWriter<Object> {
 
   @Context
   private UriInfo uriInfo;
@@ -65,10 +55,10 @@ public class ProtobufJqueryAutocompleteWriterProvider implements MessageBodyWrit
   }
 
   @Override
-  @SuppressWarnings( { "unchecked", "PMD.ExcessiveParameterList" })
+  @SuppressWarnings({ "unchecked", "PMD.ExcessiveParameterList" })
   public void writeTo(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
     Class<Message> messageType = extractMessageType(type, genericType, annotations, mediaType);
-    final Descriptor descriptor = descriptorFactory.forMessage(messageType);
+    final Descriptor descriptor = protobuf().descriptors().forMessage(messageType);
     String valueProperty = uriInfo.getQueryParameters().getFirst("value");
     String labelProperty = uriInfo.getQueryParameters().getFirst("label");
     FieldDescriptor valueFd = descriptor.findFieldByName(valueProperty);
@@ -92,14 +82,6 @@ public class ProtobufJqueryAutocompleteWriterProvider implements MessageBodyWrit
       return Message.class.isAssignableFrom(baseType) && !IgnoredMediaTypes.ignored(baseType, annotations, mediaType);
     }
     return false;
-  }
-
-  private Class<Message> extractMessageType(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-    if(isWrapped(type, genericType, annotations, mediaType)) {
-      return Types.getCollectionBaseType(type, genericType);
-    } else {
-      return (Class<Message>) type;
-    }
   }
 
   private static final class AutocompletePrinter {
@@ -148,43 +130,4 @@ public class ProtobufJqueryAutocompleteWriterProvider implements MessageBodyWrit
     }
   }
 
-  private static final class DescriptorFactory {
-
-    private Map<Class<Message>, Method> methodCache = new HashMap<Class<Message>, Method>();
-
-    Descriptor forMessage(final Class<Message> messageType) {
-      if(messageType == null) throw new IllegalArgumentException("messageType cannot be null");
-
-      try {
-        return (Descriptor) extractMethod(messageType).invoke(null);
-      } catch(WebApplicationException e) {
-        throw e;
-      } catch(RuntimeException e) {
-        log.error("Error invoking 'getDescriptor' method for type " + messageType.getName(), e);
-        throw new WebApplicationException(500);
-      } catch(IllegalAccessException e) {
-        log.error("Error invoking 'getDescriptor' method for type " + messageType.getName(), e);
-        throw new WebApplicationException(500);
-      } catch(InvocationTargetException e) {
-        log.error("Error invoking 'getDescriptor' method for type " + messageType.getName(), e);
-        throw new WebApplicationException(500);
-      }
-    }
-
-    synchronized private Method extractMethod(final Class<Message> messageType) {
-
-      if(methodCache.containsKey(messageType) == false) {
-        try {
-          methodCache.put(messageType, messageType.getMethod("getDescriptor"));
-        } catch(SecurityException e) {
-          log.error("Error getting 'getDescriptor' method from type " + messageType.getName(), e);
-          throw new WebApplicationException(500);
-        } catch(NoSuchMethodException e) {
-          throw new IllegalStateException("The Message type " + messageType.getName() + " does not define a 'getDescriptor' static method.");
-        }
-      }
-      return methodCache.get(messageType);
-    }
-
-  }
 }

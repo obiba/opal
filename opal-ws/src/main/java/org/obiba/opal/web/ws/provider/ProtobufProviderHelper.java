@@ -18,12 +18,14 @@ import javax.ws.rs.WebApplicationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.ExtensionRegistry;
 import com.google.protobuf.Message;
 import com.google.protobuf.Message.Builder;
 
-//@Component
+@Component
 public class ProtobufProviderHelper {
 
   private static final Logger log = LoggerFactory.getLogger(ProtobufProviderHelper.class);
@@ -31,6 +33,8 @@ public class ProtobufProviderHelper {
   private final BuilderFactory builderFactory = new BuilderFactory();
 
   private final ExtensionRegistryFactory extensionRegistryFactory = new ExtensionRegistryFactory();
+
+  private final DescriptorFactory descriptorFactory = new DescriptorFactory();
 
   public ProtobufProviderHelper() {
   }
@@ -43,11 +47,26 @@ public class ProtobufProviderHelper {
     return extensionRegistryFactory;
   }
 
+  public DescriptorFactory descriptors() {
+    return descriptorFactory;
+  }
+
+  protected final class DescriptorFactory {
+
+    private final Map<Class<?>, Method> methodCache = new HashMap<Class<?>, Method>();
+
+    Descriptor forMessage(final Class<Message> messageType) {
+      if(messageType == null) throw new IllegalArgumentException("messageType cannot be null");
+      return (Descriptor) invokeStaticMethod(extractStaticMethod("getDescriptor", methodCache, messageType));
+    }
+
+  }
+
   protected static final class ExtensionRegistryFactory {
 
-    private Map<Class<?>, ExtensionRegistry> registryCache = new HashMap<Class<?>, ExtensionRegistry>();
+    private final Map<Class<?>, ExtensionRegistry> registryCache = new HashMap<Class<?>, ExtensionRegistry>();
 
-    private Map<Class<?>, Method> methodCache = new HashMap<Class<?>, Method>();
+    private final Map<Class<?>, Method> methodCache = new HashMap<Class<?>, Method>();
 
     ExtensionRegistry forMessage(final Class<Message> messageType) {
       if(messageType == null) throw new IllegalArgumentException("messageType cannot be null");
@@ -64,7 +83,7 @@ public class ProtobufProviderHelper {
 
   protected static final class BuilderFactory {
 
-    private Map<Class<?>, Method> methodCache = new HashMap<Class<?>, Method>();
+    private final Map<Class<?>, Method> methodCache = new HashMap<Class<?>, Method>();
 
     Builder forMessage(final Class<Message> messageType) {
       if(messageType == null) throw new IllegalArgumentException("messageType cannot be null");

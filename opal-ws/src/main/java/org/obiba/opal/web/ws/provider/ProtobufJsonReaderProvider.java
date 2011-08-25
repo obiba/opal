@@ -35,9 +35,6 @@ import com.google.protobuf.Message.Builder;
 @Consumes({ "application/x-protobuf+json", "application/json" })
 public class ProtobufJsonReaderProvider extends AbstractProtobufProvider implements MessageBodyReader<Object> {
 
-  // TODO: this should be injected. OPAL-1090
-  private final ProtobufProviderHelper helper = new ProtobufProviderHelper();
-
   @Override
   public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
     return Message.class.isAssignableFrom(type) || isWrapped(type, genericType, annotations, mediaType);
@@ -47,8 +44,8 @@ public class ProtobufJsonReaderProvider extends AbstractProtobufProvider impleme
   public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
     Class<Message> messageType = extractMessageType(type, genericType, annotations, mediaType);
 
-    final ExtensionRegistry extensionRegistry = helper.extensions().forMessage(messageType);
-    final Builder builder = helper.builders().forMessage(messageType);
+    final ExtensionRegistry extensionRegistry = protobuf().extensions().forMessage(messageType);
+    final Builder builder = protobuf().builders().forMessage(messageType);
 
     InputStreamReader input = new InputStreamReader(entityStream, "UTF-8");
     if(isWrapped(type, genericType, annotations, mediaType)) {
