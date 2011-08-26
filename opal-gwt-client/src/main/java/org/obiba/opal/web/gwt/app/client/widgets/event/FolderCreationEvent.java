@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.widgets.event;
 
 import org.obiba.opal.web.model.client.opal.FileDto;
-import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
@@ -29,19 +28,14 @@ public class FolderCreationEvent extends GwtEvent<FolderCreationEvent.Handler> {
   // Instance Variables
   //
 
-  private FileDto folder;
+  private final FileDto folder;
 
   //
   // Constructors
   //
 
-  public FolderCreationEvent(String folderPath) {
-    folder = FileDto.create();
-    folder.setType(FileType.FOLDER);
-    folder.setPath(folderPath);
-
-    int lastPathSeparatorIndex = folderPath.lastIndexOf('/');
-    folder.setName(lastPathSeparatorIndex != -1 ? folderPath.substring(lastPathSeparatorIndex + 1) : folderPath);
+  public FolderCreationEvent(FileDto dto) {
+    this.folder = dto;
   }
 
   //

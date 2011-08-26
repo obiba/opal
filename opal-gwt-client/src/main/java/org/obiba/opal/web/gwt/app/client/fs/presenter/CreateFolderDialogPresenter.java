@@ -18,6 +18,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FolderCreationEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FileDto;
@@ -26,8 +27,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.logical.shared.CloseEvent;
-import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -103,11 +102,7 @@ public class CreateFolderDialogPresenter extends WidgetPresenter<CreateFolderDia
         } else if(folderToCreate.equals(".") || folderToCreate.equals("..")) {
           eventBus.fireEvent(NotificationEvent.newBuilder().error(translations.dotNamesAreInvalid()).build());
         } else {
-          if(currentFolder.getPath().equals("/")) { // create under root
-            createFolder("/", folderToCreate);
-          } else {
-            createFolder(currentFolder.getPath(), folderToCreate);
-          }
+          createFolder(currentFolder.getPath(), folderToCreate);
         }
       }
     }));
@@ -118,31 +113,28 @@ public class CreateFolderDialogPresenter extends WidgetPresenter<CreateFolderDia
       }
     }));
 
-    getDisplay().getDialog().addCloseHandler(new CloseHandler<DialogBox>() {
-      @Override
-      public void onClose(CloseEvent<DialogBox> event) {
-        unbind();
-      }
-    });
-
   }
 
   private void createFolder(final String destination, final String folder) {
-    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+    ResourceCallback<FileDto> createdCallback = new ResourceCallback<FileDto>() {
 
       @Override
-      public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == 201) {
-          eventBus.fireEvent(new FolderCreationEvent(destination + "/" + folder));
-          getDisplay().hideDialog();
-        } else {
-          GWT.log(response.getText());
-          eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-        }
+      public void onResource(Response response, FileDto resource) {
+        eventBus.fireEvent(new FolderCreationEvent(resource));
+        getDisplay().hideDialog();
       }
     };
 
-    ResourceRequestBuilderFactory.newBuilder().forResource("/files" + destination).post().withBody("text/plain", folder).withCallback(201, callbackHandler).withCallback(403, callbackHandler).withCallback(500, callbackHandler).send();
+    ResponseCodeCallback error = new ResponseCodeCallback() {
+
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+      }
+    };
+
+    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files" + destination).post().withBody("text/plain", folder).withCallback(createdCallback).withCallback(403, error).withCallback(500, error).send();
   }
 
   public void setCurrentFolder(FileDto currentFolder) {

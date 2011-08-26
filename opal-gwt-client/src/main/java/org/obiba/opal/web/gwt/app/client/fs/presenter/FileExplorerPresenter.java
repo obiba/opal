@@ -109,6 +109,8 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
     getDisplay().getFolderDetailsPanel().remove(folderDetailsPresenter.getDisplay().asWidget());
     folderDetailsPresenter.unbind();
     fileSystemTreePresenter.unbind();
+    createFolderDialogPresenter.unbind();
+    // fileUploadDialogPresenter.unbind();
   }
 
   @Override
@@ -160,6 +162,8 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
     fileSystemTreePresenter.bind();
     folderDetailsPresenter.bind();
+    createFolderDialogPresenter.bind();
+    // fileUploadDialogPresenter.bind();
   }
 
   /**
@@ -199,7 +203,6 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
       public void onClick(ClickEvent event) {
         FileDto currentFolder = folderDetailsPresenter.getCurrentFolder();
         createFolderDialogPresenter.setCurrentFolder(currentFolder);
-        createFolderDialogPresenter.bind();
         createFolderDialogPresenter.revealDisplay();
       }
     }));
@@ -220,7 +223,6 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
       @Override
       public void onFileSelectionChange(FileSelectionChangeEvent event) {
-        // GWT.log("file: " + event.getFile().getPath());
         getDisplay().setEnabledFileDeleteButton(folderDetailsPresenter.hasSelection());
         if(folderDetailsPresenter.hasSelection()) {
           authorizeFile(event.getFile());
@@ -232,7 +234,6 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
       @Override
       public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
-        // GWT.log("folder: " + event.getFolder().getPath());
         setEnableFileDeleteButton();
       }
 
@@ -242,7 +243,6 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
       @Override
       public void onFolderRefreshed(FolderRefreshedEvent event) {
-        // GWT.log("refresh: " + event.getFolder().getPath());
         authorizeFolder(event.getFolder());
       }
     }));

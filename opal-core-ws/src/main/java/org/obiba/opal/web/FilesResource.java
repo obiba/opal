@@ -203,7 +203,8 @@ public class FilesResource {
 
     try {
       file.createFolder();
-      return Response.created(uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(folderName).build()).build();
+      Opal.FileDto dto = getBaseFolderBuilder(file).build();
+      return Response.created(uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(folderName).build()).entity(dto).build();
     } catch(FileSystemException couldNotCreateTheFolder) {
       return Response.status(Status.INTERNAL_SERVER_ERROR).entity("cannotCreatefolderUnexpectedError").build();
     }

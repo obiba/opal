@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FolderCreationEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FileDto;
@@ -185,20 +186,25 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   }
 
   private void createFolder(final String destination, final String folder) {
+
+    ResourceCallback<FileDto> createdCallback = new ResourceCallback<FileDto>() {
+
+      @Override
+      public void onResource(Response response, FileDto resource) {
+        eventBus.fireEvent(new FolderCreationEvent(resource));
+        getDisplay().clearNewFolderName();
+      }
+    };
+
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == 201) {
-          eventBus.fireEvent(new FolderCreationEvent(destination + "/" + folder));
-          getDisplay().clearNewFolderName();
-        } else {
-          eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-        }
+        eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
       }
     };
 
-    ResourceRequestBuilderFactory.newBuilder().forResource("/files" + destination).post().withBody("text/plain", folder).withCallback(201, callbackHandler).withCallback(403, callbackHandler).withCallback(500, callbackHandler).send();
+    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files" + destination).post().withBody("text/plain", folder).withCallback(createdCallback).withCallback(403, callbackHandler).withCallback(500, callbackHandler).send();
   }
 
   private FileDto getCurrentFolder() {
