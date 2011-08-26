@@ -145,7 +145,6 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
     JsArray<FileDto> filesInCurrentDirectory = currentFolder.getChildrenArray();
     if(filesInCurrentDirectory != null) {
       for(int i = 0; i < filesInCurrentDirectory.length(); i++) {
-        GWT.log(" " + i + ": " + filesInCurrentDirectory.get(i).getName());
         if(name.equals(filesInCurrentDirectory.get(i).getName())) {
           return true;
         }

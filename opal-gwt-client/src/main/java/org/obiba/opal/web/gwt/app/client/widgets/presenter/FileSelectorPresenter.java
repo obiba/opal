@@ -38,7 +38,6 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 /**
  *
@@ -49,8 +48,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
   FolderDetailsPresenter folderDetailsPresenter;
 
-  @Inject
-  Provider<FileUploadDialogPresenter> fileUploadDialogPresenterProvider;
+  FileUploadDialogPresenter fileUploadDialogPresenter;
 
   private Object fileSelectionSource;
 
@@ -59,12 +57,13 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   private List<SelectionResolver> selectionResolverChain;
 
   @Inject
-  public FileSelectorPresenter(Display display, EventBus eventBus, FileSystemTreePresenter fileSystemTreePresenter, FolderDetailsPresenter folderDetailsPresenter) {
+  public FileSelectorPresenter(Display display, EventBus eventBus, FileSystemTreePresenter fileSystemTreePresenter, FolderDetailsPresenter folderDetailsPresenter, FileUploadDialogPresenter fileUploadDialogPresenter) {
     super(display, eventBus);
 
     this.fileSystemTreePresenter = fileSystemTreePresenter;
     this.folderDetailsPresenter = folderDetailsPresenter;
     this.folderDetailsPresenter.getDisplay().setSelectionEnabled(true);
+    this.fileUploadDialogPresenter = fileUploadDialogPresenter;
 
     getDisplay().setTreeDisplay(fileSystemTreePresenter.getDisplay());
     getDisplay().setDetailsDisplay(folderDetailsPresenter.getDisplay());
@@ -85,6 +84,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   protected void onBind() {
     fileSystemTreePresenter.bind();
     folderDetailsPresenter.bind();
+    fileUploadDialogPresenter.bind();
 
     addEventHandlers();
   }
@@ -93,6 +93,7 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
   protected void onUnbind() {
     fileSystemTreePresenter.unbind();
     folderDetailsPresenter.unbind();
+    fileUploadDialogPresenter.unbind();
   }
 
   @Override
@@ -161,10 +162,8 @@ public class FileSelectorPresenter extends WidgetPresenter<FileSelectorPresenter
 
       @Override
       public void onClick(ClickEvent event) {
-        FileUploadDialogPresenter presenter = fileUploadDialogPresenterProvider.get();
-        presenter.setCurrentFolder(getCurrentFolder());
-        presenter.bind();
-        presenter.revealDisplay();
+        fileUploadDialogPresenter.setCurrentFolder(getCurrentFolder());
+        fileUploadDialogPresenter.revealDisplay();
       }
     }));
   }

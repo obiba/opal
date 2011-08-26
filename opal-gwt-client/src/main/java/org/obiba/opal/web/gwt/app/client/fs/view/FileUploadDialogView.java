@@ -82,6 +82,9 @@ public class FileUploadDialogView extends Composite implements Display {
 
   @Override
   public void showDialog() {
+    setUploading(false);
+    // Clears the fileUpload field as there's no way to do this on the widget itself.
+    form.reset();
     dialog.center();
     dialog.show();
   }
@@ -113,10 +116,7 @@ public class FileUploadDialogView extends Composite implements Display {
 
   @Override
   public void submit(String url) {
-    inputFieldPanel.setVisible(false);
-    uploadingText.setVisible(true);
-    cancelButton.setEnabled(false);
-    uploadButton.setEnabled(false);
+    setUploading(true);
     this.form.setAction(url);
     this.form.submit();
   }
@@ -124,6 +124,14 @@ public class FileUploadDialogView extends Composite implements Display {
   @Override
   public HasText getRemoteFolderName() {
     return remoteFolderName;
+  }
+
+  private void setUploading(boolean isUploading) {
+    inputFieldPanel.setVisible(isUploading == false);
+    cancelButton.setEnabled(isUploading == false);
+    uploadButton.setEnabled(isUploading == false);
+
+    uploadingText.setVisible(isUploading);
   }
 
 }

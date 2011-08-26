@@ -25,11 +25,13 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.SelectButtonHandler;
+import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -56,6 +58,8 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
 
   private FolderDetailsPresenterSpy folderDetailsPresenter;
 
+  private FileUploadDialogPresenterSpy fileUploadPresenter;
+
   //
   // Fixture Methods (setUp / tearDown)
   //
@@ -66,6 +70,7 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     displayMock = createDisplay();
     fileSystemTreePresenter = createFileSystemTreePresenter(eventBusMock);
     folderDetailsPresenter = createFolderDetailsPresenter(eventBusMock);
+    fileUploadPresenter = new FileUploadDialogPresenterSpy(null, eventBusMock, null);
 
     displayMock.setTreeDisplay(fileSystemTreePresenter.getDisplay());
     expectLastCall().once();
@@ -86,7 +91,7 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
 
     // Exercise
-    new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter);
+    new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
 
     // Verify
     verify(eventBusMock, displayMock, folderDetailsPresenter.getDisplay(), folderDetailsPresenter.getDisplay());
@@ -105,12 +110,13 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
 
     // Exercise
-    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter);
+    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
     sut.onBind();
 
     // Verify
     assertEquals(1, fileSystemTreePresenter.getBindCount());
     assertEquals(1, folderDetailsPresenter.getBindCount());
+    assertEquals(1, fileUploadPresenter.getBindCount());
     verify(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
   }
 
@@ -144,7 +150,7 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
 
     // Exercise
-    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter);
+    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
     sut.revealDisplay();
 
     // Verify
@@ -159,7 +165,7 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
 
     // Exercise
-    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter);
+    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
     sut.refreshDisplay();
 
     // Verify
@@ -248,7 +254,7 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
 
     // Exercise
-    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter);
+    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
     Object place = sut.getPlace();
 
     // Verify
@@ -271,7 +277,7 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
 
     replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
 
-    FileSelectorPresenter presenter = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter);
+    FileSelectorPresenter presenter = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
     presenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
 
     // Exercise
@@ -320,7 +326,7 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     // Setup
     replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
 
-    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter);
+    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
     sut.setFileSelectionType(fileSelectionType);
 
     // Exercise
@@ -334,7 +340,7 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     // Setup
     replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
 
-    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter);
+    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
     sut.setFileSelectionType(fileSelectionType);
 
     // Exercise
@@ -348,7 +354,7 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     // Setup
     replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
 
-    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter);
+    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
     sut.setFileSelectionType(fileSelectionType);
 
     // Exercise
@@ -407,6 +413,33 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
 
     public FolderDetailsPresenterSpy(FolderDetailsPresenter.Display display, EventBus eventBus) {
       super(display, eventBus);
+    }
+
+    protected void onBind() {
+      bindCount++;
+    }
+
+    public void revealDisplay() {
+      revealDisplayCount++;
+    }
+
+    public int getBindCount() {
+      return bindCount;
+    }
+
+    public int getRevealDisplayCount() {
+      return revealDisplayCount;
+    }
+  }
+
+  private static class FileUploadDialogPresenterSpy extends FileUploadDialogPresenter {
+
+    private int bindCount;
+
+    private int revealDisplayCount;
+
+    public FileUploadDialogPresenterSpy(FileUploadDialogPresenter.Display display, EventBus eventBus, RequestUrlBuilder urlBuilder) {
+      super(display, eventBus, urlBuilder);
     }
 
     protected void onBind() {

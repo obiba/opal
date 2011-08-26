@@ -37,7 +37,6 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter.Display> {
 
@@ -65,9 +64,6 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
     public HasAuthorization getFileDeleteAuthorizer();
 
   }
-
-  @Inject
-  Provider<FileUploadDialogPresenter> fileUploadDialogPresenterProvider;
 
   FileSystemTreePresenter fileSystemTreePresenter;
 
@@ -110,7 +106,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
     folderDetailsPresenter.unbind();
     fileSystemTreePresenter.unbind();
     createFolderDialogPresenter.unbind();
-    // fileUploadDialogPresenter.unbind();
+    fileUploadDialogPresenter.unbind();
   }
 
   @Override
@@ -163,7 +159,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
     fileSystemTreePresenter.bind();
     folderDetailsPresenter.bind();
     createFolderDialogPresenter.bind();
-    // fileUploadDialogPresenter.bind();
+    fileUploadDialogPresenter.bind();
   }
 
   /**
@@ -212,9 +208,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
       @Override
       public void onClick(ClickEvent event) {
         FileDto currentFolder = folderDetailsPresenter.getCurrentFolder();
-        fileUploadDialogPresenter = fileUploadDialogPresenterProvider.get();
         fileUploadDialogPresenter.setCurrentFolder(currentFolder);
-        fileUploadDialogPresenter.bind();
         fileUploadDialogPresenter.revealDisplay();
       }
     }));
