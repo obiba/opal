@@ -162,13 +162,21 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
     folderDetailsPresenter.bind();
   }
 
+  /**
+   * Returns the file currently selected or the current folder if no file is selected.
+   * @return
+   */
+  private FileDto getCurrentSelectionOrFolder() {
+    return folderDetailsPresenter.hasSelection() ? folderDetailsPresenter.getSelectedFile() : folderDetailsPresenter.getCurrentFolder();
+  }
+
   private void addEventHandlers() {
 
     super.registerHandler(getDisplay().getFileDeleteButton().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
         // We are either deleting a file or a folder
-        final FileDto fileToDelete = folderDetailsPresenter.hasSelection() ? folderDetailsPresenter.getSelectedFile() : folderDetailsPresenter.getCurrentFolder();
+        final FileDto fileToDelete = getCurrentSelectionOrFolder();
         actionRequiringConfirmation = new Runnable() {
           public void run() {
             deleteFile(fileToDelete);
@@ -182,7 +190,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
     super.registerHandler(getDisplay().getFileDownloadButton().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        downloadFile(folderDetailsPresenter.getSelectedFile());
+        downloadFile(getCurrentSelectionOrFolder());
       }
     }));
 
