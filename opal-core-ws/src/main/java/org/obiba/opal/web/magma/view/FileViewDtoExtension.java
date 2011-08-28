@@ -70,25 +70,8 @@ public class FileViewDtoExtension implements ViewDtoExtension {
     try {
       FileObject file = opalRuntime.getFileSystem().getRoot().resolveFile(fileDto.getFilename());
       if(file.exists()) {
-        switch(fileDto.getType()) {
-        case SERIALIZED_XML:
-          // Serialized view
-          View view = (View) MagmaEngine.get().getExtension(MagmaXStreamExtension.class).getXStreamFactory().createXStream().fromXML(is = file.getContent().getInputStream());
-          return viewBuilder.select(view.getSelectClause()).list(view.getListClause()).where(view.getWhereClause()).build();
-        case EXCEL:
-          ExcelDatasource ed = new ExcelDatasource("tmp", is = file.getContent().getInputStream());
-          try {
-            Initialisables.initialise(ed);
-            // Get the first table, whichever it is
-            ValueTable t = ed.getValueTables().iterator().next();
-            VariablesClause vc = new VariablesClause();
-            vc.setVariables(Sets.newLinkedHashSet(t.getVariables()));
-            return viewBuilder.select(new NoneClause()).list(vc).where(new AllClause()).build();
-
-          } finally {
-            Disposables.silentlyDispose(ed);
-          }
-        }
+        is = file.getContent().getInputStream();
+        return makeViewFromFile(viewBuilder, fileDto, is);
       }
       throw new RuntimeException("cannot find file specified '" + fileDto.getFilename() + "'");
     } catch(FileSystemException e) {
@@ -96,6 +79,28 @@ public class FileViewDtoExtension implements ViewDtoExtension {
     } finally {
       Closeables.closeQuietly(is);
     }
+  }
+
+  private View makeViewFromFile(Builder viewBuilder, FileViewDto fileDto, InputStream is) {
+    switch(fileDto.getType()) {
+    case SERIALIZED_XML:
+      // Serialized view
+      View view = (View) MagmaEngine.get().getExtension(MagmaXStreamExtension.class).getXStreamFactory().createXStream().fromXML(is);
+      return viewBuilder.select(view.getSelectClause()).list(view.getListClause()).where(view.getWhereClause()).build();
+    case EXCEL:
+      ExcelDatasource ed = new ExcelDatasource("tmp", is);
+      try {
+        Initialisables.initialise(ed);
+        // Get the first table, whichever it is
+        ValueTable t = ed.getValueTables().iterator().next();
+        VariablesClause vc = new VariablesClause();
+        vc.setVariables(Sets.newLinkedHashSet(t.getVariables()));
+        return viewBuilder.select(new NoneClause()).list(vc).where(new AllClause()).build();
+      } finally {
+        Disposables.silentlyDispose(ed);
+      }
+    }
+    throw new IllegalStateException("unknown view file type " + fileDto.getType());
   }
 
 }
