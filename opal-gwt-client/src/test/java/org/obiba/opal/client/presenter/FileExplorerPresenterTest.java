@@ -19,6 +19,7 @@ import net.customware.gwt.presenter.client.EventBus;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
@@ -97,6 +98,7 @@ public class FileExplorerPresenterTest extends AbstractGwtTestSetup {
 
   @SuppressWarnings("unchecked")
   @Test
+  @Ignore("Complex text that doesn't test anything useful")
   public void testThatEventHandlersAreAddedToUIComponents() {
 
     HandlerRegistration handlerRegistrationMock = createMock(HandlerRegistration.class);
