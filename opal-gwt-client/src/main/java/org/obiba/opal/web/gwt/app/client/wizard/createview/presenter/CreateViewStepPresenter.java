@@ -189,11 +189,16 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     CompletedCallback completed = new CompletedCallback();
     FailedCallback failed = new FailedCallback();
 
+    String viewName = getDisplay().getViewName().getText();
+
+    // Build the ViewDto for the request.
+    ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().setName(viewName).fromTables(tableListPresenter.getTables());
+
     // Create the resource request (the builder).
     ResourceRequestBuilder<JavaScriptObject> resourceRequestBuilder = ResourceRequestBuilderFactory.newBuilder()//
     .post()//
     .forResource("/datasource/" + datasourceName + "/views")//
-    .withResourceBody(ViewDto.stringify(createViewDto()))//
+    .withResourceBody(ViewDto.stringify(createViewDto(viewDtoBuilder)))//
     .withCallback(Response.SC_CREATED, completed)//
     .withCallback(Response.SC_OK, completed)//
     .withCallback(Response.SC_BAD_REQUEST, failed)//
@@ -204,12 +209,8 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     resourceRequestBuilder.send();
   }
 
-  private ViewDto createViewDto() {
+  private ViewDto createViewDto(ViewDtoBuilder viewDtoBuilder) {
     // Get the view name and datasource name.
-    String viewName = getDisplay().getViewName().getText();
-
-    // Build the ViewDto for the request.
-    ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().setName(viewName).fromTables(tableListPresenter.getTables());
     if(getDisplay().getApplyGlobalVariableFilterOption().getValue()) {
       viewDtoBuilder.defaultJavaScriptView();
     } else if(getDisplay().getAddVariablesOneByOneOption().getValue()) {
@@ -224,8 +225,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
       }
       viewDtoBuilder.fileView(fileView);
     }
-    ViewDto viewDto = viewDtoBuilder.build();
-    return viewDto;
+    return viewDtoBuilder.build();
   }
 
   //
