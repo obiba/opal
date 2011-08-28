@@ -185,6 +185,26 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
   private void createView() {
     getDisplay().renderPendingConclusion();
+
+    CompletedCallback completed = new CompletedCallback();
+    FailedCallback failed = new FailedCallback();
+
+    // Create the resource request (the builder).
+    ResourceRequestBuilder<JavaScriptObject> resourceRequestBuilder = ResourceRequestBuilderFactory.newBuilder()//
+    .post()//
+    .forResource("/datasource/" + datasourceName + "/views")//
+    .withResourceBody(ViewDto.stringify(createViewDto()))//
+    .withCallback(Response.SC_CREATED, completed)//
+    .withCallback(Response.SC_OK, completed)//
+    .withCallback(Response.SC_BAD_REQUEST, failed)//
+    .withCallback(Response.SC_NOT_FOUND, failed)//
+    .withCallback(Response.SC_METHOD_NOT_ALLOWED, failed)//
+    .withCallback(Response.SC_INTERNAL_SERVER_ERROR, failed);
+
+    resourceRequestBuilder.send();
+  }
+
+  private ViewDto createViewDto() {
     // Get the view name and datasource name.
     String viewName = getDisplay().getViewName().getText();
 
@@ -205,23 +225,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
       viewDtoBuilder.fileView(fileView);
     }
     ViewDto viewDto = viewDtoBuilder.build();
-
-    CompletedCallback completed = new CompletedCallback();
-    FailedCallback failed = new FailedCallback();
-
-    // Create the resource request (the builder).
-    ResourceRequestBuilder<JavaScriptObject> resourceRequestBuilder = ResourceRequestBuilderFactory.newBuilder()//
-    .post()//
-    .forResource("/datasource/" + datasourceName + "/views")//
-    .withResourceBody(ViewDto.stringify(viewDto))//
-    .withCallback(Response.SC_CREATED, completed)//
-    .withCallback(Response.SC_OK, completed)//
-    .withCallback(Response.SC_BAD_REQUEST, failed)//
-    .withCallback(Response.SC_NOT_FOUND, failed)//
-    .withCallback(Response.SC_METHOD_NOT_ALLOWED, failed)//
-    .withCallback(Response.SC_INTERNAL_SERVER_ERROR, failed);
-
-    resourceRequestBuilder.send();
+    return viewDto;
   }
 
   //
