@@ -39,6 +39,8 @@ import junit.framework.Assert;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.vfs.FileContent;
+import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -471,8 +473,20 @@ public class FilesResourceTest {
   public void testCreateFolder_FolderCreatedSuccessfully() throws FileSystemException, URISyntaxException {
     expect(fileObjectMock.getType()).andReturn(FileType.FOLDER).atLeastOnce();
     expect(fileObjectMock.exists()).andReturn(true).atLeastOnce();
+
     FileObject childFolderMock = createMock(FileObject.class);
+
+    FileName fileNameMock = createMock(FileName.class);
+    expect(fileNameMock.getBaseName()).andReturn("folder").atLeastOnce();
+    expect(fileNameMock.getPath()).andReturn("folder1/folder").atLeastOnce();
+
+    expect(childFolderMock.getName()).andReturn(fileNameMock).atLeastOnce();
     expect(childFolderMock.exists()).andReturn(false).atLeastOnce();
+
+    FileContent mockContent = createMock(FileContent.class);
+    expect(childFolderMock.getContent()).andReturn(mockContent).atLeastOnce();
+    expect(mockContent.getLastModifiedTime()).andReturn(new Long(1)).atLeastOnce();
+
     childFolderMock.createFolder();
     FileObject parentFolderMock = createMock(FileObject.class);
     expect(childFolderMock.getParent()).andReturn(parentFolderMock).atLeastOnce();
@@ -480,12 +494,12 @@ public class FilesResourceTest {
     expect(fileObjectMock.resolveFile("folder")).andReturn(childFolderMock).atLeastOnce();
     expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromPath("/"));
 
-    replay(fileObjectMock, uriInfoMock, parentFolderMock, childFolderMock);
+    replay(fileObjectMock, uriInfoMock, parentFolderMock, childFolderMock, fileNameMock, mockContent);
 
     Response response = getFileResource().createFolder("folder1", "folder", uriInfoMock);
     Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
-    verify(fileObjectMock, uriInfoMock, parentFolderMock, childFolderMock);
+    verify(fileObjectMock, uriInfoMock, parentFolderMock, childFolderMock, fileNameMock, mockContent);
   }
 
   @Test
