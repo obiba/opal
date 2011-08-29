@@ -116,7 +116,7 @@ public class DataShieldResource {
   @Path("/methods")
   public Response createDataShieldMethod(final DataShield.DataShieldMethodDto dto) {
     DatashieldConfiguration config = getDatashieldConfiguration();
-    if(config.hasDataShieldMethod(dto.getName())) return Response.status(Status.BAD_REQUEST).build();
+    if(config.hasAggregatingMethod(dto.getName())) return Response.status(Status.BAD_REQUEST).build();
 
     configService.modifyConfiguration(new ConfigModificationTask() {
 
@@ -133,7 +133,7 @@ public class DataShieldResource {
   @GET
   @Path("/method/{name}")
   public Response getDataShieldMethod(@PathParam("name") String name) {
-    return Response.ok().entity(methodConverterRegistry.asDto(getDatashieldConfiguration().getDataShieldMethod(name))).build();
+    return Response.ok().entity(methodConverterRegistry.asDto(getDatashieldConfiguration().getAggregatingMethod(name))).build();
   }
 
   @PUT
@@ -142,7 +142,7 @@ public class DataShieldResource {
     if(!name.equals(dto.getName())) return Response.status(Status.BAD_REQUEST).build();
 
     DatashieldConfiguration config = getDatashieldConfiguration();
-    if(!config.hasDataShieldMethod(name)) return Response.status(Status.NOT_FOUND).build();
+    if(!config.hasAggregatingMethod(name)) return Response.status(Status.NOT_FOUND).build();
 
     configService.modifyConfiguration(new ConfigModificationTask() {
 
