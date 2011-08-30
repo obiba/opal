@@ -67,14 +67,19 @@
         
         <org.obiba.opal.datashield.CustomRScriptMethod>
           <name>glm.ds</name>
-          <script><![CDATA[function (mod.glm.ds) {
+          <script><![CDATA[function (mod.glm.ds, beta.vect=NULL) {
+
+  if(is.null(beta.vect)) {
+    X.mat<-as.matrix(mod.glm.ds$x)
+    beta.vect<-rep(0,dim(X.mat)[2])
+  }
 
   X.mat<-as.matrix(mod.glm.ds$x)
   numsubs<-dim(X.mat)[1]
 
   y.vect<-as.vector(mod.glm.ds$y)
 
-  lp.vect<-X.mat%*%mod.glm.ds$beta.vect
+  lp.vect<-X.mat%*%beta.vect
 
   f<-mod.glm.ds$family
 
