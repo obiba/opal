@@ -29,7 +29,7 @@ import org.obiba.opal.web.model.Magma.JdbcDatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.JdbcDatasourceSettingsDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 
-import com.google.protobuf.JsonFormat;
+import com.googlecode.protobuf.format.JsonFormat;
 
 public class DtosTest {
 

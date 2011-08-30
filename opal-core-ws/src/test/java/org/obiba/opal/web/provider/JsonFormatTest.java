@@ -15,16 +15,12 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.obiba.opal.web.model.Magma.DatasourceDto;
 
-import com.google.protobuf.JsonFormat;
-import com.google.protobuf.JsonFormat.ParseException;
+import com.googlecode.protobuf.format.JsonFormat;
 
-/**
- *
- */
 public class JsonFormatTest {
 
   @Test
-  public void test_DtoContainsNonAsciiCharacters() throws ParseException {
+  public void test_DtoContainsNonAsciiCharacters() throws JsonFormat.ParseException {
     String testValue = "ªºÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâäãåæçèéêëìíî";
 
     String json = JsonFormat.printToString(DatasourceDto.newBuilder().setName(testValue).setType("type").build());
@@ -35,4 +31,5 @@ public class JsonFormatTest {
     JsonFormat.merge(json, builder);
     Assert.assertThat(builder.getName(), is(testValue));
   }
+
 }

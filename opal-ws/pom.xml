@@ -68,7 +68,7 @@
       <version>${protobuf.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.google.protobuf</groupId>
+      <groupId>com.googlecode.protobuf-java-format</groupId>
       <artifactId>protobuf-java-format</artifactId>
       <version>${protobuf-java-format.version}</version>
     </dependency>
@@ -85,10 +85,6 @@
 
   <repositories>
     <repository>
-      <id>protobuf-java-format</id>
-      <url>http://protobuf-java-format.googlecode.com/svn/trunk/repo/</url>
-    </repository>
-    <repository>
       <id>jboss.org</id>
       <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
     </repository>
@@ -99,6 +95,6 @@
     <jetty.version>7.0.2.v20100331</jetty.version>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
     <protobuf.version>2.3.0</protobuf.version>
-    <protobuf-java-format.version>1.2-r36p04</protobuf-java-format.version>
+    <protobuf-java-format.version>1.2</protobuf-java-format.version>
   </properties>
 </project>

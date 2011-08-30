@@ -5,9 +5,9 @@ import java.io.Reader;
 import java.util.ArrayList;
 
 import com.google.protobuf.ExtensionRegistry;
-import com.google.protobuf.JsonFormat;
 import com.google.protobuf.Message;
 import com.google.protobuf.Message.Builder;
+import com.googlecode.protobuf.format.JsonFormat;
 
 /**
  * Utility class that provides a simple way of writing collections of messages as a JSON array. This method will

@@ -26,9 +26,9 @@ import org.obiba.opal.web.ws.util.JsonIoUtil;
 import org.springframework.stereotype.Component;
 
 import com.google.protobuf.ExtensionRegistry;
-import com.google.protobuf.JsonFormat;
 import com.google.protobuf.Message;
 import com.google.protobuf.Message.Builder;
+import com.googlecode.protobuf.format.JsonFormat;
 
 @Component
 @Provider
