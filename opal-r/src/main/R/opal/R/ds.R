@@ -62,23 +62,20 @@ datashield.aggregate=function(object, ...) {
 }
 
 # Inner methods that sends a script, and aggregates the result using the specified aggregation method
-datashield.aggregate.opal=function(opal, aggregation, expr) {
-  expression  = expr
+datashield.aggregate.opal=function(opal, aggregation, expr, arguments=list()) {
+  expression = expr
   # convert a call to a string
   if(is.language(expr)) {
-    expression <- deparse(expr)
-    if(length(expression) > 1) {
-      expression = paste(expression, collapse='\n')
-    }
+    expression <- .deparse(expr)
   } else if(! is.character(expr) ) {
     return(print(paste("Invalid expression type: '", class(value), "'. Expected a call or character vector.", sep="")))
   }
 
-  .post(opal, "datashield", "session", "current", "aggregate", aggregation, params=expression)
+  .post(opal, "datashield", "session", "current", "aggregate", aggregation, query=arguments, body=expression)
 }
 
-datashield.aggregate.list=function(opals, aggregation, expr) {
-  lapply(opals, FUN=datashield.aggregate.opal, aggregation, expr)
+datashield.aggregate.list=function(opals, aggregation, expr, arguments=list()) {
+  lapply(opals, FUN=datashield.aggregate.opal, aggregation, expr, arguments)
 }
 
 datashield.assign=function(object, ...) {
@@ -88,10 +85,7 @@ datashield.assign=function(object, ...) {
 datashield.assign.opal=function(opal, symbol, value) {
   if(is.language(value) || is.function(value)) {
     contentType <- "application/x-rscript"
-    body <- deparse(value)
-    if(length(body) > 1) {
-      body = paste(body, collapse='\n')
-    }
+    body <- .deparse(value)
   } else if(is.character(value)) {
     contentType <- "application/x-opal"
     body <- value
@@ -177,19 +171,6 @@ datashield.lm.list=function(opals, formula, lmparams=list()) {
   meta.analysis.results
 }
 
-# method required to add beta.vect to the result of the glm call.
-# beta.vect is then used in glm.ds aggregating function.
-# Alternatively, beta.vect could have been an additional paramater to the aggregating method, but is currently unsupported
-.inner.glm.ds <-function(..., beta.vect=NULL) {
-  glm.result<-glm(..., x=TRUE, control=glm.control(maxit=1))
-  if(is.null(beta.vect)) {
-    X.mat<-as.matrix(glm.result$x)
-    beta.vect<-rep(0,dim(X.mat)[2])
-  }
-  glm.result$beta.vect<-beta.vect
-  glm.result
-}
-
 datashield.glm=function(object, ...) {
   UseMethod('datashield.glm');
 }
@@ -197,11 +178,6 @@ datashield.glm=function(object, ...) {
 datashield.glm.list=function(opals, formula, glmparams=list(), maxit=10) {
 
   numstudies<-length(opals)
-  
-  # the remote method name
-  inner.glm.ds<-'inner.glm.ds'
-
-  datashield.assign(opals, inner.glm.ds, .inner.glm.ds)
 
   beta.vect.next<-NULL
 
@@ -229,10 +205,10 @@ datashield.glm.list=function(opals, formula, glmparams=list(), maxit=10) {
     cat("--------------------------------------------\n")
     cat("Iteration", iteration.count, "\n")
 
-    glmparams$beta.vect<-as.vector(beta.vect.next)
-    call<-as.call(c(inner.glm.ds, formula, glmparams))
+    glmparams=list(x=TRUE, control=quote(glm.control(maxit=1)))
+    call<-as.call(c('glm', formula, glmparams))
 
-    study.summary<-datashield.aggregate(opals, 'glm.ds', call)
+    study.summary<-datashield.aggregate(opals, 'glm.ds', call, arguments=list(beta.vect=.deparse(as.vector(beta.vect.next))))
 
     info.matrix.total<-Reduce(f="+", .select(study.summary, 'info.matrix'))
     score.vect.total<-Reduce(f="+", .select(study.summary, 'score.vect'))
@@ -269,6 +245,9 @@ datashield.glm.list=function(opals, formula, glmparams=list(), maxit=10) {
         (nsubs.total-length(beta.vect.next)), "degrees of freedom",
         "\nConvergence criterion    ",converge.state," (", converge.value,")\n\n")
     
+    cat("beta\n")
+    print(as.vector(beta.vect.next))
+    
     cat("Information matrix overall\n")
     print(info.matrix.total)
     
@@ -279,9 +258,6 @@ datashield.glm.list=function(opals, formula, glmparams=list(), maxit=10) {
     print(dev.total)
     cat("--------------------------------------------\n")    
   }
-
-  # cleanup
-  try(datashield.rm(opals, inner.glm.ds), silent=TRUE)
 
   #If convergence has been obtained, declare final (maximum likelihood) beta vector,
   #and calculate the corresponding standard errors, z scores and p values
@@ -332,4 +308,12 @@ print.glmds <-function (x, digits = max(3, getOption("digits") - 3), ...) {
   cat("\nDeviance:",x$dev)
   cat("\nDegrees of Freedom:", x$df)
   cat("\nIterations:", x$iter, "\n")
+}
+
+.deparse <- function(expr) {
+  expression <- deparse(expr)
+  if(length(expression) > 1) {
+    expression = paste(expression, collapse='\n')
+  }
+  expression
 }

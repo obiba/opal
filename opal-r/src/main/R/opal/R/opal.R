@@ -16,7 +16,7 @@
 .url <- function(opal, ..., query=list()) {
 	.tmp <- paste(opal$url, "ws", paste(sapply(c(...), curlEscape), collapse="/"), sep="/")
 	if(length(query)) {
-		.params <- paste(sapply(names(query), function(id) paste(id, curlEscape(query[[id]]), sep = "=")), collapse = "&")
+		.params <- paste(sapply(names(query), function(id) paste(id, curlEscape(query[[id]]), sep = "="), simplify=FALSE), collapse = "&")
 		.tmp <- paste(.tmp, .params, sep="?")
 	}
 	.tmp
@@ -33,18 +33,18 @@
 	.perform(opal, .url(opal, ..., query=query), opts)
 }
 
-.post <- function(opal, ..., params=c()) {
-	.nobody <- missing(params) || length(params) == 0
+.post <- function(opal, ..., query=list(), body='') {
+	.nobody <- missing(body) || length(body) == 0
 	if(.nobody) {
 		# Act like a GET, but send a POST. This is required when posting without any body 
 		opts = curlOptions(httpget=TRUE, customrequest="POST", .opts=opal$opts)
 	} else {
-		opts = curlOptions(post=TRUE, customrequest=NULL, postfields=params, .opts=opal$opts)
+		opts = curlOptions(post=TRUE, customrequest=NULL, postfields=body, .opts=opal$opts)
 	}
-	.perform(opal, .url(opal, ...), opts)
+	.perform(opal, .url(opal, ..., query=query), opts)
 }
 
-.put <- function(opal, ..., body='', contentType='application/x-rscript') {
+.put <- function(opal, ..., query=list(), body='', contentType='application/x-rscript') {
 	.nobody <- missing(body) || length(body) == 0
 	if(.nobody) {
 		# Act like a GET, but send a PUT. This is required when posting without any body 
@@ -52,13 +52,13 @@
 	} else {
 		opts = curlOptions(post=TRUE, httpheader=c(opal$opts$httpheader, 'Content-Type'=contentType), postfields=body, customrequest="PUT", .opts=opal$opts)
 	}
-	.perform(opal, .url(opal, ...), opts)
+	.perform(opal, .url(opal, ..., query=query), opts)
 }
 
-.delete <- function(opal, ...) {
+.delete <- function(opal, ..., query=list()) {
 	# Act like a GET, but send a DELETE.
 	opts = curlOptions(httpget=TRUE, customrequest="DELETE", .opts=opal$opts)
-	.perform(opal, .url(opal, ...), opts)
+	.perform(opal, .url(opal, ..., query=query), opts)
 }
 
 .perform <- function(opal, url, opts) {

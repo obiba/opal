@@ -19,22 +19,13 @@ import org.rosuda.REngine.REXPRaw;
  */
 public class RScriptROperation extends AbstractROperation implements ROperationWithResult {
 
-  private String script;
+  private final String script;
 
   private REXP result;
 
   public RScriptROperation(String script) {
     super();
     if(script == null) throw new IllegalArgumentException("R script cannot be null");
-
-    this.script = script;
-  }
-
-  /**
-   * Set the R script to be evaluated.
-   * @param script
-   */
-  public void setScript(String script) {
     this.script = script;
   }
 
