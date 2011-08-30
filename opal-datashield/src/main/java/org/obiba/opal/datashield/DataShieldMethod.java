@@ -9,7 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.datashield;
 
+import java.util.Map;
+
 import org.obiba.opal.r.ROperationWithResult;
+import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPRaw;
 
 /**
@@ -19,6 +22,6 @@ public interface DataShieldMethod {
 
   public String getName();
 
-  public ROperationWithResult asOperation(REXPRaw argument);
+  public ROperationWithResult asOperation(REXPRaw result, Map<String, REXP> arguments);
 
 }

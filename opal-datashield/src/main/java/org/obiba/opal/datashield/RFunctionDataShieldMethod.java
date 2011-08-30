@@ -9,8 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.datashield;
 
+import java.util.Map;
+
 import org.obiba.opal.r.AbstractROperationWithResult;
 import org.obiba.opal.r.ROperationWithResult;
+import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPRaw;
 
 public class RFunctionDataShieldMethod implements DataShieldMethod {
@@ -37,13 +40,13 @@ public class RFunctionDataShieldMethod implements DataShieldMethod {
   }
 
   @Override
-  public ROperationWithResult asOperation(final REXPRaw argument) {
+  public ROperationWithResult asOperation(final REXPRaw argument, Map<String, REXP> arguments) {
     return new AbstractROperationWithResult() {
 
       @Override
       public void doWithConnection() {
         super.assign("agg", argument);
-        super.eval(getFunction() + "(unserialize(agg))");
+        super.eval(getFunction() + "(base::unserialize(agg))");
       }
     };
   }

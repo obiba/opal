@@ -9,9 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.datashield;
 
+import java.util.Map;
+
 import org.obiba.opal.r.AbstractROperationWithResult;
 import org.obiba.opal.r.ROperationWithResult;
+import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPList;
 import org.rosuda.REngine.REXPRaw;
+import org.rosuda.REngine.RList;
 
 public class CustomRScriptMethod implements DataShieldMethod {
 
@@ -37,15 +42,22 @@ public class CustomRScriptMethod implements DataShieldMethod {
   }
 
   @Override
-  public ROperationWithResult asOperation(final REXPRaw argument) {
+  public ROperationWithResult asOperation(final REXPRaw result, final Map<String, REXP> arguments) {
     return new AbstractROperationWithResult() {
 
       @Override
       public void doWithConnection() {
         super.assign("script", getScript());
-        super.eval("custom<-eval(base::parse(text=script))");
-        super.assign("agg", argument);
-        super.eval("custom(unserialize(agg))");
+        super.eval("custom<-base::eval(base::parse(text=script))");
+        super.assign("result", result);
+        super.assign("arguments", asList(arguments));
+        super.eval("base::do.call('custom', c(list(base::unserialize(result)), arguments))");
+      }
+
+      private REXPList asList(Map<String, REXP> map) {
+        RList list = new RList();
+        list.putAll(arguments);
+        return new REXPList(list);
       }
     };
   }
