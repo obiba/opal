@@ -19,7 +19,6 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.support.Timestampeds;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.core.runtime.security.BackgroundJobServiceAuthToken;
 import org.slf4j.Logger;
@@ -47,6 +46,8 @@ public class IndexSynchronizationManager {
 
   private final Sync sync = new Sync();
 
+  private IndexSynchronization currentTask;
+
   public IndexSynchronizationManager() {
     // this.indexManager = indexManager;
   }
@@ -55,6 +56,14 @@ public class IndexSynchronizationManager {
   @Scheduled(fixedDelay = 10 * 1000)
   public void synchronizeIndices() {
     getSubject().execute(sync);
+  }
+
+  public boolean hasTask() {
+    return currentTask != null;
+  }
+
+  public IndexSynchronization getCurrentTask() {
+    return currentTask;
   }
 
   private Subject getSubject() {
@@ -69,7 +78,12 @@ public class IndexSynchronizationManager {
   }
 
   private void submit(IndexSynchronization sync) {
-    sync.run();
+    currentTask = sync;
+    try {
+      sync.run();
+    } finally {
+      currentTask = null;
+    }
   }
 
   /**
@@ -95,7 +109,7 @@ public class IndexSynchronizationManager {
           ValueTableIndex index = indexManager.getIndex(vt);
 
           // Check that the index is older than the ValueTable
-          if(Timestampeds.lastUpdateComparator.compare(index, vt) < 0) {
+          if(index.isUpToDate() == false) {
             // The index needs to be updated
             Value value = vt.getTimestamps().getLastUpdate();
             // Check that the last modification to the ValueTable is older than the gracePeriod

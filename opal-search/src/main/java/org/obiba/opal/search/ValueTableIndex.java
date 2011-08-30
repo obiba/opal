@@ -25,6 +25,13 @@ public interface ValueTableIndex extends Timestamped {
 
   public String getName();
 
+  /**
+   * Returns true if the the lastUpdate timestamp of this index is more recent than that of its corresponding
+   * {@code ValueTable}
+   * @return true when this index is up to date, false otherwise
+   */
+  public boolean isUpToDate();
+
   public void delete();
 
 }

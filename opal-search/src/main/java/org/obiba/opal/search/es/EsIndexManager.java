@@ -35,6 +35,8 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.concurrent.ConcurrentValueTableReader;
 import org.obiba.magma.concurrent.ConcurrentValueTableReader.ConcurrentReaderCallback;
+import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.obiba.magma.support.Timestampeds;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.search.IndexManager;
@@ -269,6 +271,11 @@ public class EsIndexManager implements IndexManager {
     }
 
     @Override
+    public boolean isUpToDate() {
+      return Timestampeds.lastUpdateComparator.compare(this, resolveTable()) >= 0;
+    }
+
+    @Override
     public Timestamps getTimestamps() {
       return new Timestamps() {
 
@@ -289,6 +296,10 @@ public class EsIndexManager implements IndexManager {
         }
 
       };
+    }
+
+    private ValueTable resolveTable() {
+      return MagmaEngineTableResolver.valueOf(this.valueTableReference).resolveTable();
     }
 
     private void updateTimestamps() {
