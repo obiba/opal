@@ -220,7 +220,7 @@
                   <target>
                     <property name="deb.version" value="${project.version}-b${buildNumber}" />
                     <!-- Deploy deb file in deb repo -->
-                    <copy todir="${obiba.deb.dir}" file="target/opal_${deb.version}_all.deb" />
+                    <copy todir="${obiba.deb.dir}/${deb.deploy.dir}" file="target/opal_${deb.version}_all.deb" />
                   </target>
                 </configuration>
               </execution>
@@ -232,6 +232,7 @@
     </profile>
   </profiles>
   <properties>
+    <deb.deploy.dir>unstable</deb.deploy.dir>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
   </properties>
 </project>
