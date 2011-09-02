@@ -11,7 +11,7 @@ package org.obiba.opal.core.service;
 
 import java.io.InputStream;
 
-import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs2.FileObject;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.UnitKeyStore;
 

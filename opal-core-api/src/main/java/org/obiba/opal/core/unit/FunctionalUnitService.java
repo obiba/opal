@@ -11,8 +11,8 @@ package org.obiba.opal.core.unit;
 
 import java.util.Set;
 
-import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 
 /**

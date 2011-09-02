@@ -17,8 +17,8 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;

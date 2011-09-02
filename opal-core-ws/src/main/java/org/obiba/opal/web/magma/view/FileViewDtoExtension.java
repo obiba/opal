@@ -11,8 +11,8 @@ package org.obiba.opal.web.magma.view;
 
 import java.io.InputStream;
 
-import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.datasource.excel.ExcelDatasource;

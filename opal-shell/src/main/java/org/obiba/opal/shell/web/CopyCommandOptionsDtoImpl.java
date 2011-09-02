@@ -11,9 +11,9 @@ package org.obiba.opal.shell.web;
 
 import java.util.List;
 
-import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileSystemException;
-import org.apache.commons.vfs.FileType;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileType;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.obiba.opal.web.model.Commands.CopyCommandOptionsDto;

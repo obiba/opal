@@ -15,8 +15,8 @@ import java.security.KeyStoreException;
 import java.security.PublicKey;
 import java.util.List;
 
-import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.crypt.KeyProvider;
 import org.obiba.magma.crypt.KeyProviderSecurityException;

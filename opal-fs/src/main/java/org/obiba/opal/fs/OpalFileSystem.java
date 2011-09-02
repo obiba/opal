@@ -11,7 +11,7 @@ package org.obiba.opal.fs;
 
 import java.io.File;
 
-import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs2.FileObject;
 
 /**
  * Opal offers a "file system" in which users may manipulate files without having a user defined in the OS running Opal.

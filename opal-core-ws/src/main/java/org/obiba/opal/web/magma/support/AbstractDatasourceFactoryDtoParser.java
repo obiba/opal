@@ -11,8 +11,8 @@ package org.obiba.opal.web.magma.support;
 
 import java.io.File;
 
-import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.opal.core.runtime.OpalRuntime;

@@ -21,8 +21,8 @@ import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
-import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.bouncycastle.openssl.PEMWriter;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.opal.core.crypt.x509.X509PrettyPrinter;

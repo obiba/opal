@@ -11,7 +11,7 @@ package org.obiba.opal.core.service;
 
 import java.io.IOException;
 
-import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs2.FileObject;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;

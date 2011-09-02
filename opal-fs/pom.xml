@@ -20,7 +20,7 @@
 
     <dependency>
       <groupId>org.apache.commons</groupId>
-      <artifactId>commons-vfs</artifactId>
+      <artifactId>commons-vfs2</artifactId>
       <version>${commons-vfs.version}</version>
       <exclusions>
         <exclusion>
@@ -76,7 +76,7 @@
 
   <properties>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
-    <commons-vfs.version>2.0-r929316</commons-vfs.version>
+    <commons-vfs.version>2.0</commons-vfs.version>
     <commons-httpclient.version>3.1</commons-httpclient.version>
     <mockftpserver.version>2.1</mockftpserver.version>
   </properties>

@@ -12,8 +12,8 @@ package org.obiba.opal.shell.commands;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.opal.core.service.DecryptService;

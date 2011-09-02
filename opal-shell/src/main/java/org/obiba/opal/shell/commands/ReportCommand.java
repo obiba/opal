@@ -14,8 +14,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.apache.velocity.app.VelocityEngine;
 import org.obiba.opal.core.cfg.ReportTemplate;
 import org.obiba.opal.reporting.service.ReportException;
