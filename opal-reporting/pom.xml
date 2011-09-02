@@ -118,7 +118,7 @@
   <properties>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
     <birt.version>2.6.1</birt.version>
-    <opal.oda.version>1.2.0-SNAPSHOT</opal.oda.version>
+    <opal.oda.version>1.2.0</opal.oda.version>
   </properties>
 
 </project>
