@@ -763,15 +763,15 @@
 
     <pmd.ruleset.dir>${basedir}</pmd.ruleset.dir>
 
-    <obiba.commons.version>1.2-SNAPSHOT</obiba.commons.version>
-    <magma.version>1.2-SNAPSHOT</magma.version>
+    <obiba.commons.version>1.2.1</obiba.commons.version>
+    <magma.version>1.2.7</magma.version>
     <guava.version>r09</guava.version>
     <spring.version>3.0.6.RELEASE</spring.version>
     <spring-batch.version>2.0.3.RELEASE</spring-batch.version>
     <slf4j.version>1.6.2</slf4j.version>
     <jta.version>1.0.1B</jta.version>
     <jpa.version>1.0</jpa.version>
-    <hsqldb.version>2.2.4</hsqldb.version>
+    <hsqldb.version>r4405</hsqldb.version>
     <dbunit.version>2.2.2</dbunit.version>
     <junit.version>4.7</junit.version>
     <easymock.version>2.4</easymock.version>
