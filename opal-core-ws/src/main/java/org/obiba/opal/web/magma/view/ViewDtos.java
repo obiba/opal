@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.support.ValueTableReference;
 import org.obiba.magma.views.View;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,8 +60,7 @@ public final class ViewDtos {
     List<ValueTable> fromTables = new ArrayList<ValueTable>();
     for(int i = 0; i < viewDto.getFromCount(); i++) {
       String fromTable = viewDto.getFrom(i);
-      ValueTable vt = new ValueTableReference(fromTable);
-      fromTables.add(vt);
+      fromTables.add(MagmaEngine.get().createReference(fromTable));
     }
     return fromTables;
   }
