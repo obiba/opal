@@ -61,6 +61,11 @@
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
     </dependency>
+    <!-- required by commons-fileupload -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.ow2.spec.ee</groupId>
       <artifactId>ow2-jta-1.1-spec</artifactId>
