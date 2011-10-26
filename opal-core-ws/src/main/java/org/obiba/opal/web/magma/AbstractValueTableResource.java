@@ -26,8 +26,7 @@ abstract class AbstractValueTableResource {
 
   public AbstractValueTableResource(ValueTable valueTable, Set<Locale> locales) {
     this.valueTable = valueTable;
-    this.locales = new LinkedHashSet<Locale>();
-    this.locales.addAll(locales);
+    this.locales = new LinkedHashSet<Locale>(locales);
   }
 
   protected ValueTable getValueTable() {

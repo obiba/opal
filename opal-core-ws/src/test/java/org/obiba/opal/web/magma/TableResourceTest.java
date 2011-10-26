@@ -167,6 +167,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     expect(valueTableMock.getDatasource()).andReturn(datasourceMock);
     expect(valueTableMock.getName()).andReturn("name");
     expect(valueTableMock.getEntityType()).andReturn("entityType");
+    expect(valueTableMock.isView()).andReturn(false);
     expect(datasourceMock.createWriter("name", "entityType")).andReturn(valueTableWriterMock);
     expect(valueTableWriterMock.writeVariables()).andReturn(variableWriterMock);
 

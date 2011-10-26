@@ -109,7 +109,7 @@ public class ResourceRequestView extends Composite implements ResourceRequestPre
 
   @Override
   public void showErrorMessage(String status) {
-    String errorMessage = translations.statusMap().get(status);
+    String errorMessage = translations.userMessageMap().get(status);
     if(errorMessage == null) {
       errorMessage = status;
     }
