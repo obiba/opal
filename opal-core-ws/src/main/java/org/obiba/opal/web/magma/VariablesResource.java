@@ -57,7 +57,7 @@ import com.google.common.collect.Lists;
 public class VariablesResource extends AbstractValueTableResource {
 
   public VariablesResource(ValueTable valueTable, Set<Locale> locales) {
-    super(valueTable, Collections.<Locale> emptySet());
+    super(valueTable, locales);
   }
 
   /**
@@ -173,9 +173,14 @@ public class VariablesResource extends AbstractValueTableResource {
       // @TODO Check if table can be modified and respond with "IllegalTableModification" (it seems like this cannot be
       // done with the current Magma implementation).
 
-      vw = getValueTable().getDatasource().createWriter(getValueTable().getName(), getValueTable().getEntityType()).writeVariables();
-      for(VariableDto variable : variables) {
-        vw.writeVariable(Dtos.fromDto(variable));
+      if(getValueTable().isView() == false) {
+        vw = getValueTable().getDatasource().createWriter(getValueTable().getName(), getValueTable().getEntityType()).writeVariables();
+        for(VariableDto variable : variables) {
+          vw.writeVariable(Dtos.fromDto(variable));
+        }
+      } else {
+        // TODO: support this. We'll need to access the ViewManager to persist the modification though.
+        return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "CannotWriteToView")).build();
       }
 
       return Response.ok().build();
