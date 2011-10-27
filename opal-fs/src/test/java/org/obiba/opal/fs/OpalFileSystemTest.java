@@ -10,8 +10,8 @@
 package org.obiba.opal.fs;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
@@ -29,8 +29,9 @@ import org.mockftpserver.fake.filesystem.DirectoryEntry;
 import org.mockftpserver.fake.filesystem.FileEntry;
 import org.mockftpserver.fake.filesystem.FileSystem;
 import org.mockftpserver.fake.filesystem.WindowsFakeFileSystem;
-import org.obiba.core.util.StreamUtil;
-import org.obiba.opal.fs.impl.OpalFileSystemImpl;
+import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
+
+import com.google.common.io.CharStreams;
 
 public class OpalFileSystemTest {
 
@@ -47,7 +48,7 @@ public class OpalFileSystemTest {
   @Before
   public void setUp() throws FileSystemException {
 
-    fsLocal = new OpalFileSystemImpl("res:opal-file-system");
+    fsLocal = new DefaultOpalFileSystem("res:opal-file-system");
     fsLocalRoot = fsLocal.getRoot();
 
     // MockFtpServer blocks the execution of this test under the unix environment, so this test
@@ -65,7 +66,7 @@ public class OpalFileSystemTest {
 
       mockFtpServer.start();
 
-      fsFtp = new OpalFileSystemImpl("ftp://user:password@localhost:21");
+      fsFtp = new DefaultOpalFileSystem("ftp://user:password@localhost:21");
       fsFtpRoot = fsFtp.getRoot();
     }
 
@@ -89,7 +90,7 @@ public class OpalFileSystemTest {
     Assume.assumeTrue(runningOsIsWindows());
     Assert.assertFalse(fsFtp.isLocalFile(fsFtpRoot.resolveFile("/temp/file2.txt")));
     File localFile = fsFtp.getLocalFile(fsFtpRoot.resolveFile("/temp/file2.txt"));
-    List<String> lines = StreamUtil.readLines(new FileInputStream(localFile));
+    List<String> lines = CharStreams.readLines(new FileReader(localFile));
     Assert.assertEquals("this is the file content", lines.get(0));
   }
 

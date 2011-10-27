@@ -26,12 +26,13 @@ import org.eclipse.birt.report.engine.api.IReportEngineFactory;
 import org.eclipse.birt.report.engine.api.IReportRunnable;
 import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
 import org.eclipse.birt.report.engine.api.RenderOption;
-import org.obiba.core.util.FileUtil;
 import org.obiba.opal.reporting.service.birt.common.BirtEngine;
 import org.obiba.opal.reporting.service.birt.common.BirtEngineException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+
+import com.google.common.io.Files;
 
 public class EmbeddedBirtEngine implements BirtEngine {
 
@@ -115,7 +116,7 @@ public class EmbeddedBirtEngine implements BirtEngine {
       engine = null;
       try {
         if(osgiHome != null) {
-          FileUtil.delete(osgiHome);
+          Files.deleteRecursively(osgiHome);
         }
       } catch(IOException e) {
         // ignore
@@ -166,11 +167,7 @@ public class EmbeddedBirtEngine implements BirtEngine {
   }
 
   private void configureOsgi(EngineConfig config) throws IOException {
-    final File osgiHome = File.createTempFile("osgi", null);
-    // delete the file, create a directory instead
-    if(osgiHome.delete() == false || osgiHome.mkdir() == false) {
-      throw new IOException("cannot create temp directory: " + osgiHome.getAbsolutePath());
-    }
+    final File osgiHome = Files.createTempDir();
 
     Map<String, String> osgiConfig = new HashMap<String, String>();
     osgiConfig.put(OSGI_CONFIGURATION_AREA_PROPERTY_NAME, osgiHome + "/configuration");

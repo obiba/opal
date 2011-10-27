@@ -17,6 +17,12 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-fs</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
       <artifactId>opal-ws</artifactId>
       <version>${project.version}</version>
     </dependency>

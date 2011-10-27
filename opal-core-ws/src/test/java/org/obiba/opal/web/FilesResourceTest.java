@@ -50,7 +50,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.fs.OpalFileSystem;
-import org.obiba.opal.fs.impl.OpalFileSystemImpl;
+import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.web.model.Opal.FileDto;
 
 public class FilesResourceTest {
@@ -77,7 +77,7 @@ public class FilesResourceTest {
     opalRuntimeMock = createMock(OpalRuntime.class);
 
     String rootDir = getClass().getResource("/test-file-system").toURI().toString();
-    fileSystem = new OpalFileSystemImpl(rootDir);
+    fileSystem = new DefaultOpalFileSystem(rootDir);
     filesResource = new FilesResource(opalRuntimeMock);
 
     fileItemMock = createMock(FileItem.class);

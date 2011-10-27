@@ -24,7 +24,6 @@ import java.security.cert.X509Certificate;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.bouncycastle.openssl.PEMWriter;
-import org.obiba.core.util.StreamUtil;
 import org.obiba.opal.core.crypt.x509.X509PrettyPrinter;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
@@ -34,6 +33,8 @@ import org.obiba.opal.shell.commands.options.CertificateInfo;
 import org.obiba.opal.shell.commands.options.KeyCommandOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
+
+import com.google.common.io.Closeables;
 
 /**
  * Provides key management allowing for key creation, deletion, importing and exporting of keys.
@@ -226,7 +227,7 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
     } catch(IOException e) {
       throw new RuntimeException(e);
     } finally {
-      StreamUtil.silentSafeClose(certificateWriter);
+      Closeables.closeQuietly(certificateWriter);
     }
 
     return errorCode;

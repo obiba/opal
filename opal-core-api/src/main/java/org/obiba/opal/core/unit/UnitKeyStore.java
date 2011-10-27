@@ -48,7 +48,6 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PasswordFinder;
-import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.crypt.KeyProvider;
 import org.obiba.magma.crypt.MagmaCryptRuntimeException;
@@ -66,6 +65,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import com.google.common.io.Closeables;
 
 /**
  * A {@link FunctionalUnit}'s keystore.
@@ -477,7 +477,7 @@ public class UnitKeyStore implements KeyProvider {
     } catch(IOException e) {
       throw new RuntimeException(e);
     } finally {
-      StreamUtil.silentSafeClose(pemReader);
+      Closeables.closeQuietly(pemReader);
     }
   }
 
@@ -508,7 +508,7 @@ public class UnitKeyStore implements KeyProvider {
     } catch(IOException e) {
       throw new RuntimeException(e);
     } finally {
-      StreamUtil.silentSafeClose(pemReader);
+      Closeables.closeQuietly(pemReader);
     }
   }
 
@@ -553,7 +553,7 @@ public class UnitKeyStore implements KeyProvider {
     } catch(IOException e) {
       throw new RuntimeException(e);
     } finally {
-      StreamUtil.silentSafeClose(pemReader);
+      Closeables.closeQuietly(pemReader);
     }
   }
 

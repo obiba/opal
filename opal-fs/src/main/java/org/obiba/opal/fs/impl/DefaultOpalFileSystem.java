@@ -13,15 +13,19 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemManager;
 import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.VFS;
+import org.apache.commons.vfs2.impl.DecoratedFileObject;
 import org.apache.commons.vfs2.provider.DelegateFileObject;
 import org.apache.commons.vfs2.provider.local.LocalFile;
-import org.obiba.core.util.StreamUtil;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
-public class OpalFileSystemImpl implements OpalFileSystem {
+import com.google.common.base.Preconditions;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Closeables;
+
+public class DefaultOpalFileSystem implements OpalFileSystem {
 
   private static final Logger log = LoggerFactory.getLogger(OpalFileSystem.class);
 
@@ -29,8 +33,7 @@ public class OpalFileSystemImpl implements OpalFileSystem {
 
   private final String nativeRootURL;
 
-  public OpalFileSystemImpl(final String fsRoot) {
-
+  public DefaultOpalFileSystem(final String fsRoot) {
     Assert.hasText(fsRoot, "You must specify a root directory for the Opal File System.");
 
     try {
@@ -107,13 +110,13 @@ public class OpalFileSystemImpl implements OpalFileSystem {
       File localFile = getLocalTempFile(virtualFile);
       localFileOutputStream = new FileOutputStream(localFile);
       virtualFileInputStream = virtualFile.getContent().getInputStream();
-      StreamUtil.copy(virtualFileInputStream, localFileOutputStream);
+      ByteStreams.copy(virtualFileInputStream, localFileOutputStream);
       return localFile;
     } catch(Exception couldNotConvertFileToLocal) {
       throw new RuntimeException("Failed to convert FileObject (VFS) to a local File", couldNotConvertFileToLocal);
     } finally {
-      StreamUtil.silentSafeClose(virtualFileInputStream);
-      StreamUtil.silentSafeClose(localFileOutputStream);
+      Closeables.closeQuietly(virtualFileInputStream);
+      Closeables.closeQuietly(localFileOutputStream);
     }
 
   }
@@ -124,13 +127,14 @@ public class OpalFileSystemImpl implements OpalFileSystem {
   }
 
   public boolean isLocalFile(FileObject virtualFile) {
-
-    Assert.notNull(virtualFile, "A virtualFile is required.");
+    Preconditions.checkNotNull(virtualFile);
 
     FileObject currentFile = virtualFile;
     while(true) {
       if(currentFile instanceof DelegateFileObject) {
         currentFile = ((DelegateFileObject) virtualFile).getDelegateFile();
+      } else if(currentFile instanceof DecoratedFileObject) {
+        currentFile = ((DecoratedFileObject) virtualFile).getDecoratedFileObject();
       } else if(currentFile instanceof LocalFile) {
         return true;
       } else {
