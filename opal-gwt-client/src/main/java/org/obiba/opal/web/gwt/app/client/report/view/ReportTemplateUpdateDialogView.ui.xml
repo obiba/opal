@@ -17,7 +17,7 @@
     <g:caption>
       <ui:msg description="Report template update dialog title">Add/Edit Report Template</ui:msg>
     </g:caption>
-    <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="30em" width="50em">
+    <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="30em" width="60em">
       <g:center>
         <g:ScrollPanel>
           <g:HTMLPanel addStyleNames="main {style.optionsPanelMsg}">
@@ -197,10 +197,10 @@
       <g:south size="3.25">
         <g:FlowPanel addStyleNames="footer">
           <o:ResizeHandle ui:field="resizeHandle"></o:ResizeHandle>
-          <g:Button ui:field="cancelButton" addStyleNames="right-aligned small-top-margin">
+          <g:Button ui:field="cancelButton" addStyleNames="btn right-aligned small-top-margin">
             <ui:msg description="Cancel button label">Cancel</ui:msg>
           </g:Button>
-          <g:Button ui:field="updateReportTemplateButton" addStyleNames="right-aligned small-top-margin">
+          <g:Button ui:field="updateReportTemplateButton" addStyleNames="btn right-aligned small-top-margin">
             <ui:msg description="Save button label">Save</ui:msg>
           </g:Button>
         </g:FlowPanel>

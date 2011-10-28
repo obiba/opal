@@ -40,7 +40,7 @@
       	<tr>
       	  <td/>
       	  <td>
-      	    <g:Button visible="false" ui:field="login"><ui:msg description="Sign in button label">Sign In</ui:msg></g:Button>
+      	    <g:Button visible="false" ui:field="login" styleName="btn"><ui:msg description="Sign in button label">Sign In</ui:msg></g:Button>
       	  </td>
       	</tr>
       </table>

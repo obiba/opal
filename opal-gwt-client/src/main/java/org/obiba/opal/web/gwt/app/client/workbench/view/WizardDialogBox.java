@@ -129,6 +129,8 @@ public class WizardDialogBox extends DialogBox {
   private void initHelpControl(FlowPanel south) {
     south.add(help = new Button(translations.helpLabel()));
     help.addStyleName("help");
+    help.addStyleName("btn");
+    help.removeStyleName("gwt-Button");
     help.addStyleName("left-aligned");
     help.addStyleName("small-top-margin");
     help.setEnabled(false);
@@ -136,6 +138,8 @@ public class WizardDialogBox extends DialogBox {
 
   private void initControlStyle(Button button, String style) {
     button.addStyleName(style);
+    button.addStyleName("btn");
+    button.removeStyleName("gwt-Button");
     button.addStyleName("right-aligned");
     button.addStyleName("small-top-margin");
   }

@@ -24,7 +24,7 @@
   </ui:style>
   
   <g:FlowPanel>
-    <g:Button ui:field="addButton" addStyleNames="left-aligned">Add</g:Button>
+    <g:Button ui:field="addButton" styleName="btn left-aligned">Add</g:Button>
     <g:ListBox ui:field="localeListBox" addStyleNames="right-aligned" />
     <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned pager" />
     <o:Table ui:field="localizablesTable" addStyleNames="small-top-margin {style.localizablesTable}" />  

@@ -61,7 +61,7 @@
       </o:WizardStep>
       
       <o:WizardStep ui:field="conclusionStep">
-        <g:Button ui:field="configureLink" addStyleNames="small-indent"><ui:msg description="Configure View link">You can now configure the view.</ui:msg></g:Button>
+        <g:Button ui:field="configureLink" styleName="btn small-indent"><ui:msg description="Configure View link">You can now configure the view.</ui:msg></g:Button>
       </o:WizardStep>
       
        <g:HTMLPanel ui:field="selectTypeHelp">

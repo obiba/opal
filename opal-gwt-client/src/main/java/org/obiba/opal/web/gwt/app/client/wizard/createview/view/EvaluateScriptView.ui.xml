@@ -25,7 +25,7 @@
 		  </g:HTMLPanel>
         </td>
         <td align="right">
-          <g:Button ui:field="testScript"><ui:msg description="Test button label">Test</ui:msg></g:Button>
+          <g:Button ui:field="testScript" styleName="btn"><ui:msg description="Test button label">Test</ui:msg></g:Button>
         </td>
       </tr>
       <tr>

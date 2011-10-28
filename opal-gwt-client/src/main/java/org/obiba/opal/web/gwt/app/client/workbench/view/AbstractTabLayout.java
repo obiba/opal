@@ -47,7 +47,7 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
     super();
     menu = new UList();
     super.add(getMenu());
-    menu.addStyleName("tabs");
+    menu.addStyleName("tabz");
     super.add(content = new SimplePanel());
     content.addStyleName("content");
 

@@ -14,10 +14,10 @@
     <g:south size="3.25">
       <g:HTMLPanel addStyleNames="footer">
         <span class="{style.right-aligned} {style.top-margin}">
-          <g:Button ui:field="yesButton">
+          <g:Button ui:field="yesButton" styleName="btn">
             <ui:msg description="Yes label">Yes</ui:msg>
           </g:Button>
-          <g:Button ui:field="noButton">
+          <g:Button ui:field="noButton" styleName="btn">
             <ui:msg description="No label">No</ui:msg>
           </g:Button>
         </span>

@@ -2,7 +2,7 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
   <ui:style>
     .error { color: red; }
-    .applicationTitle { font-weight: bold; font-size: x-large; }
+    .applicationTitle { font-weight: bold; font-size: x-large; padding-bottom: 0.5em; }
   </ui:style>
 
   <g:HTMLPanel>
@@ -39,7 +39,7 @@
       	<tr>
       	  <td/>
       	  <td>
-      	    <g:Button ui:field="login"><ui:msg description="Sign in button label">Sign In</ui:msg></g:Button>
+      	    <g:Button ui:field="login" styleName="btn"><ui:msg description="Sign in button label">Sign In</ui:msg></g:Button>
       	  </td>
       	</tr>
       </table>

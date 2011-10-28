@@ -19,14 +19,14 @@
         <g:Anchor ui:field="next">
           <img src="image/16/next.png"/>
         </g:Anchor>
-        <g:Button ui:field="addButton" addStyleNames="small-indent">
+        <g:Button ui:field="addButton" styleName="btn small-indent">
           <ui:msg description="Add button label">Add</ui:msg>
         </g:Button>
-        <g:Button ui:field="removeButton" addStyleNames="small-indent">
+        <g:Button ui:field="removeButton" styleName="btn small-indent">
           <ui:msg description="Remove label">Remove</ui:msg>
         </g:Button>
       </g:FlowPanel>
-      <g:Button ui:field="saveChangesButton" addStyleNames="right-aligned">
+      <g:Button ui:field="saveChangesButton" styleName="btn right-aligned">
         <ui:msg description="Save changes button label">Save Changes</ui:msg>
       </g:Button>
     </g:FlowPanel>

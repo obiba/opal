@@ -14,7 +14,7 @@
   <g:HTMLPanel>
     <g:HorizontalPanel>
    	  <g:TextBox ui:field="fileField"/>
-   	  <g:Button ui:field="browseButton" addStyleNames="{style.button}"><ui:msg description="Browse button label">...</ui:msg></g:Button>	
+   	  <g:Button ui:field="browseButton" styleName="{style.button} btn"><ui:msg description="Browse button label">...</ui:msg></g:Button>	
     </g:HorizontalPanel>
   </g:HTMLPanel>
 </ui:UiBinder>

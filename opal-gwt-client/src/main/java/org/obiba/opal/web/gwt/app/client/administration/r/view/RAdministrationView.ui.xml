@@ -10,7 +10,7 @@
         
     <g:FlowPanel addStyleNames="panel">
       <g:Label addStyleNames="title"><ui:msg description="R server admin label" >R Server</ui:msg></g:Label>
-      <g:Button ui:field="rTestButton" addStyleNames="content"><ui:msg description="R server test label" >Test connection with R</ui:msg></g:Button>
+      <g:Button ui:field="rTestButton" styleName="content btn"><ui:msg description="R server test label" >Test connection with R</ui:msg></g:Button>
     </g:FlowPanel>
     
     <g:FlowPanel ui:field="permissionsPanel" addStyleNames="panel">

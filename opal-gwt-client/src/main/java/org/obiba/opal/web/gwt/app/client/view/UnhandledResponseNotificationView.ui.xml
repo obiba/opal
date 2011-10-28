@@ -18,7 +18,7 @@
       <tr>
         <td/>
         <td>
-          <g:Button ui:field="okay"><ui:msg description="Okay button label">Okay</ui:msg></g:Button>
+          <g:Button ui:field="okay" styleName="btn"><ui:msg description="Okay button label">Okay</ui:msg></g:Button>
         </td>
       </tr>
     </table>

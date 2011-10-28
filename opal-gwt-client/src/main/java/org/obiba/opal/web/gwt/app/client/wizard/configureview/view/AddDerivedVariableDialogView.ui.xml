@@ -36,10 +36,10 @@
       <g:south size="3">
         <g:HTMLPanel addStyleNames="footer">
           <span class="{style.right-aligned} {style.top-margin}">
-            <g:Button ui:field="addButton">
+            <g:Button ui:field="addButton" styleName="btn">
               <ui:msg description="Add button label">Add</ui:msg>
             </g:Button>
-            <g:Button ui:field="cancelButton">
+            <g:Button ui:field="cancelButton" styleName="btn">
               <ui:msg description="Cancel button label">Cancel</ui:msg>
             </g:Button>
           </span>

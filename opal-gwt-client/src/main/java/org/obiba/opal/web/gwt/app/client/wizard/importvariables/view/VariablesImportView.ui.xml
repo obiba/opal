@@ -20,7 +20,7 @@
 	            <tr>
 	              <td colspan="2">
 	                <ui:msg description="Supported variables file format information">The following file format is supported for describing the variables:</ui:msg>
-                    <g:Button ui:field="downloadExcelTemplateButton" addStyleNames="small-indent"><ui:msg description="Download Opal Variables Template button label">Download Opal Variables Template</ui:msg></g:Button>
+                    <g:Button ui:field="downloadExcelTemplateButton" styleName="btn small-indent"><ui:msg description="Download Opal Variables Template button label">Download Opal Variables Template</ui:msg></g:Button>
 	              </td>
 	            </tr>
 	            <tr>
