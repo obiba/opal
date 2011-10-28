@@ -34,7 +34,7 @@ public class DatashieldConfiguration implements OpalConfigurationExtension {
    * @param method
    */
   public void addAggregatingMethod(DataShieldMethod method) {
-    for(DataShieldMethod m : aggregatingMethods) {
+    for(DataShieldMethod m : getAggregatingMethods()) {
       if(m.getName().equals(method.getName())) {
         aggregatingMethods.remove(m);
         break;
@@ -49,13 +49,7 @@ public class DatashieldConfiguration implements OpalConfigurationExtension {
    * @throws NoSuchDataShieldMethodException
    */
   public void removeAggregatingMethod(String name) {
-    for(DataShieldMethod method : aggregatingMethods) {
-      if(method.getName().equals(name)) {
-        aggregatingMethods.remove(method);
-        return;
-      }
-    }
-    throw new NoSuchDataShieldMethodException(name);
+    aggregatingMethods.remove(getAggregatingMethod(name));
   }
 
   /**
