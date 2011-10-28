@@ -115,14 +115,14 @@ public class WizardDialogBox extends DialogBox {
     south.add(cancel = new Button(translations.cancelLabel()));
     initControlStyle(cancel, "cancel");
     south.add(close = new Button(translations.closeLabel()));
-    initControlStyle(close, "close");
+    initControlStyle(close, "primary close");
     close.setVisible(false);
     south.add(finish = new Button(translations.finishLabel()));
-    initControlStyle(finish, "finish");
+    initControlStyle(finish, "primary finish");
     south.add(next = new Button(translations.nextLabel()));
-    initControlStyle(next, "next");
+    initControlStyle(next, "info next");
     south.add(previous = new Button(translations.previousLabel()));
-    initControlStyle(previous, "previous");
+    initControlStyle(previous, "info previous");
     setPreviousEnabled(false);
   }
 

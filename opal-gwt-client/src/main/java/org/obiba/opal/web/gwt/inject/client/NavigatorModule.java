@@ -33,6 +33,8 @@ import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.ExcelDatas
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.FsDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.HibernateDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.JdbcDatasourceFormView;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveVariablePresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.view.DeriveVariableView;
 
 import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.inject.Singleton;
@@ -47,6 +49,7 @@ public class NavigatorModule extends AbstractGinModule {
     // Bind concrete implementations to interfaces
     bind(NavigatorPresenter.Display.class).to(NavigatorView.class).in(Singleton.class);
     bind(CreateDatasourcePresenter.Display.class).to(CreateDatasourceView.class);
+    bind(DeriveVariablePresenter.Display.class).to(DeriveVariableView.class);
 
     // Don't bind as singleton because the ApplicationPresenter expects a new instance on every display
     bind(NavigatorTreePresenter.Display.class).to(NavigatorTreeView.class);

@@ -42,6 +42,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.Hiber
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.JdbcDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.view.EvaluateScriptView;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveVariablePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.CsvFormatStepPresenter;
@@ -143,6 +144,8 @@ public interface OpalGinjector extends Ginjector {
   DataExportPresenter getDataExportPresenter();
 
   DataCopyPresenter getDataCopyPresenter();
+
+  DeriveVariablePresenter getDeriveVariablePresenter();
 
   WizardManager getWizardManager();
 }

@@ -167,6 +167,16 @@ img.clickable {
   vertical-align: text-bottom;
 }
 
+.input {
+  margin-top: 1em;
+}
+
+.help-inline, .help-block {
+  color: #888888;
+}
+
+/* GWT */
+
 .gwt-MenuBar-horizontal .gwt-MenuItem {
   padding-top:0.2em;
   padding-bottom:0.4em;

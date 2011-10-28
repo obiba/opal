@@ -1,0 +1,54 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
+
+  <o:WizardDialogBox autoHide="false" modal="true" height="50em" width="60em">
+    <g:caption>
+      <ui:msg description="Derive Variable title">Derive Variable</ui:msg>
+    </g:caption>
+    <g:FlowPanel>
+      <o:WizardStep ui:field="categoricalStep">
+        <g:FlowPanel>
+        </g:FlowPanel>
+      </o:WizardStep>
+      <o:WizardStep ui:field="summaryStep">
+      
+        <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
+             
+	      <g:Anchor><ui:msg description="Derived Summary tab title">Summary</ui:msg></g:Anchor>
+          <g:SimplePanel ui:field="summary" width="100%" />
+        
+          <g:Anchor><ui:msg description="Derived Values tab title" >Values</ui:msg></g:Anchor>
+          <g:SimplePanel ui:field="values"></g:SimplePanel>
+         
+        </o:HorizontalTabLayout>
+      
+      </o:WizardStep>
+      <o:WizardStep ui:field="conclusionStep">
+        <g:FlowPanel>
+          <g:FlowPanel styleName="input">
+            <g:Label addStyleNames="key"><ui:msg description="Derived Variable Name label">Derived Variable Name</ui:msg></g:Label>
+            <g:TextBox ui:field="derivedName"/>
+          </g:FlowPanel>
+          
+          <g:FlowPanel styleName="input">
+            <g:Label addStyleNames="key"><ui:msg description="Name label">Datasource</ui:msg></g:Label>
+            <g:ListBox ui:field="datasourceName"></g:ListBox>
+          </g:FlowPanel>
+          
+          <g:FlowPanel styleName="input">
+            <g:Label addStyleNames="key"><ui:msg description="Destination View Name label">Destination View Name</ui:msg></g:Label>
+            <g:SuggestBox ui:field="viewName"/>
+            <g:Label styleName="help-block">Select an existing view or provide a name for a new view</g:Label>
+          </g:FlowPanel>
+        </g:FlowPanel>
+      </o:WizardStep>
+    </g:FlowPanel>
+    
+  </o:WizardDialogBox>
+
+</ui:UiBinder>

@@ -25,6 +25,8 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChange
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.SummaryRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
+import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -82,8 +84,8 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     getDisplay().setSummaryTabCommand(new SummaryCommand());
     getDisplay().setSummaryTabWidget(summaryTabPresenter.getDisplay());
     // TODO
-    getDisplay().setDeriveCategorizeCommand(null);
-    getDisplay().setDeriveCustomCommand(null);
+    getDisplay().setDeriveCategorizeCommand(new DeriveCategorizeCommand());
+    getDisplay().setDeriveCustomCommand(new DeriveCustomCommand());
   }
 
   @Override
@@ -175,6 +177,20 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   //
   // Interfaces and classes
   //
+
+  final class DeriveCategorizeCommand implements Command {
+    @Override
+    public void execute() {
+      eventBus.fireEvent(new WizardRequiredEvent(WizardType.DERIVE_CATEGORIZE_VARIABLE, variable));
+    }
+  }
+
+  final class DeriveCustomCommand implements Command {
+    @Override
+    public void execute() {
+      eventBus.fireEvent(new WizardRequiredEvent(WizardType.DERIVE_CUSTOM_VARIABLE, variable));
+    }
+  }
 
   /**
    * Update permissions on authorization.

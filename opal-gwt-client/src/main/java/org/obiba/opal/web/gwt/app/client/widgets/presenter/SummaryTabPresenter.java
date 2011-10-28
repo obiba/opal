@@ -70,7 +70,7 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
 
   @Override
   public void refreshDisplay() {
-    if(hasSummaryOrPendingRequest() == false) {
+    if(resourceUri != null && hasSummaryOrPendingRequest() == false) {
       requestSummary(resourceUri);
     }
   }
@@ -82,6 +82,11 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
   public void forgetSummary() {
     cancelPendingSummaryRequest();
     this.summary = null;
+  }
+
+  public void setResourceUri(String resourceUri) {
+    cancelPendingSummaryRequest();
+    this.resourceUri = resourceUri;
   }
 
   /**
