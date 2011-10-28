@@ -81,6 +81,9 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     getDisplay().setPreviousCommand(new PreviousCommand());
     getDisplay().setSummaryTabCommand(new SummaryCommand());
     getDisplay().setSummaryTabWidget(summaryTabPresenter.getDisplay());
+    // TODO
+    getDisplay().setDeriveCategorizeCommand(null);
+    getDisplay().setDeriveCustomCommand(null);
   }
 
   @Override
@@ -334,5 +337,9 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     void setPermissionsTabWidget(AuthorizationPresenter.Display display);
 
     void setEditCommand(Command cmd);
+
+    void setDeriveCategorizeCommand(Command cmd);
+
+    void setDeriveCustomCommand(Command cmd);
   }
 }

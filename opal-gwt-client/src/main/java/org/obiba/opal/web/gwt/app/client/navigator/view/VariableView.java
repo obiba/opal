@@ -39,6 +39,8 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.MenuBar;
+import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -137,6 +139,8 @@ public class VariableView extends Composite implements VariablePresenter.Display
 
   @UiField
   InlineLabel notDerived;
+
+  private MenuBar deriveBar;
 
   //
   // Constructors
@@ -290,6 +294,23 @@ public class VariableView extends Composite implements VariablePresenter.Display
   @Override
   public void setEditCommand(Command cmd) {
     toolbar.setEditCommand(cmd);
+  }
+
+  @Override
+  public void setDeriveCategorizeCommand(Command cmd) {
+    withDeriveItem(new MenuItem(translations.deriveCategorizeLabel(), cmd));
+  }
+
+  @Override
+  public void setDeriveCustomCommand(Command cmd) {
+    withDeriveItem(new MenuItem(translations.deriveCustomLabel(), cmd));
+  }
+
+  private void withDeriveItem(MenuItem item) {
+    if(deriveBar == null) {
+      toolbar.getToolsMenu().addItem(translations.deriveLabel(), deriveBar = new MenuBar(true));
+    }
+    deriveBar.addItem(item);
   }
 
   @Override

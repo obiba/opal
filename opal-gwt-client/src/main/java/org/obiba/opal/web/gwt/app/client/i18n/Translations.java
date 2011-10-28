@@ -906,4 +906,16 @@ public interface Translations extends Constants {
   @DefaultStringMapValue({ "USER", "User Name", //
   "GROUP", "Group Name" })
   Map<String, String> subjectTypeMap();
+
+  @Description("Derive label")
+  @DefaultStringValue("Derive")
+  String deriveLabel();
+
+  @Description("Derive Categorize label")
+  @DefaultStringValue("Categorize")
+  String deriveCategorizeLabel();
+
+  @Description("Derive Custom label")
+  @DefaultStringValue("Custom")
+  String deriveCustomLabel();
 }
