@@ -1,0 +1,100 @@
+// Useful sources:
+// http://www.ibm.com/developerworks/xml/library/x-javacc2/index.html
+// http://www.docstoc.com/docs/22702393/Abstract-Syntax-Trees-Example-Creating-Syntax-Trees-Using-JJTree
+// http://www.ibm.com/developerworks/data/library/techarticle/dm-0401brereton/
+options{
+   IGNORE_CASE=false;
+   STATIC=false;
+   MULTI=true;
+   VISITOR=true;
+//   DEBUG_PARSER=true;
+}
+
+PARSER_BEGIN(DataShieldGrammar)
+package org.obiba.opal.datashield.expr;
+
+import java.io.*;
+import java.util.*;
+
+public class DataShieldGrammar {
+}
+
+PARSER_END(DataShieldGrammar)
+
+SKIP:
+{
+   " "
+|   "\t"
+|   "\r"
+|   "\n"
+}
+
+TOKEN : /* Numeric Constants */
+{
+       < S_NUMBER: <FLOAT>
+           | <FLOAT> ( ["e","E"] ([ "-","+"])? <FLOAT> )?
+       >
+ |     < #FLOAT: <INTEGER>
+           | <INTEGER> ( "." <INTEGER> )?
+           | "." <INTEGER>
+       >
+ |     < #INTEGER: ( <DIGIT> )+ >
+ |     < #DIGIT: ["0" - "9"] >
+}
+
+TOKEN:
+{
+      < S_IDENTIFIER: ( <LETTER> )+ ( <DIGIT> | <LETTER> |<SPECIAL_CHARS>)* >
+  |   < S_OPERATOR: (["+","-","*","/","%"])+ >
+  |   < #LETTER: ["a"-"z", "A"-"Z"] >
+  |   < #SPECIAL_CHARS: "$" | "_">
+  |   < S_CHAR_LITERAL: "'" (~["'"])* "'" ("'" (~["'"])* "'")*>
+  |   < S_QUOTED_IDENTIFIER: "\"" (~["\n","\r","\""])* "\"" >
+}
+
+SimpleNode root() #root :
+{}
+{
+  exp() [";"] <EOF>
+  { return jjtThis;}
+}
+
+void exp() #void :
+{Token op;}
+{
+ (
+  simpleExp() [ op=<S_OPERATOR> exp() {jjtThis.value=op.image;} #BinaryOp(2) ]
+ )
+}
+
+void simpleExp() #void :
+{}
+{
+  ( LOOKAHEAD(2)
+    funcCall()
+  | symbol()
+  | "(" exp() ")"
+  )
+}
+
+void funcCall() :
+{Token f;}
+{
+  f = <S_IDENTIFIER> "(" [ expList() ] ")" {jjtThis.value = f.image;}
+}
+
+void symbol() : 
+{Token s;}
+{
+ 
+ (
+    s=<S_IDENTIFIER>
+  | s=<S_NUMBER>
+ ) {jjtThis.value = s.image;}
+}
+
+void expList() #void :
+{}
+{
+  ( exp() [ "," expList() ] ) 
+}
