@@ -51,6 +51,10 @@
             <g:SuggestBox ui:field="viewNameBox"/>
             <g:Label styleName="help-block">Select an existing view or provide a name for a new view</g:Label>
           </g:FlowPanel>
+          
+          <g:FlowPanel styleName="input">
+            <g:CheckBox value="true" ui:field="openEditor"><ui:msg description="Open New Derived Variable Editor label">Open editor for this new derived variable</ui:msg></g:CheckBox>
+          </g:FlowPanel>
         </g:FlowPanel>
       </o:WizardStep>
     </g:FlowPanel>

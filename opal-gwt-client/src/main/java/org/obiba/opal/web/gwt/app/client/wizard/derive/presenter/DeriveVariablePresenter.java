@@ -414,6 +414,8 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     HandlerRegistration addPreviousPageClickHandler(ClickHandler handler);
 
     void setPageLimits(int low, int high);
+
+    boolean isOpenEditorSelected();
   }
 
 }

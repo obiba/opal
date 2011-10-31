@@ -41,6 +41,7 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -93,6 +94,9 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
 
   @UiField
   HorizontalTabLayout tabs;
+
+  @UiField
+  CheckBox openEditor;
 
   @UiField
   TextBox derivedNameBox;
@@ -309,6 +313,11 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
     previousPage.setEnabled(low > 1);
     pageLow.setText("" + low);
     pageHigh.setText("" + high);
+  }
+
+  @Override
+  public boolean isOpenEditorSelected() {
+    return openEditor.getValue();
   }
 
 }

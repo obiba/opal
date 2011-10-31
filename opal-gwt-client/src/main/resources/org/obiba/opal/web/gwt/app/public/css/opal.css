@@ -22,7 +22,7 @@ body {
   color: #111;
 }
 
-body, table td, select {
+body, table td, select, label, input, textarea {
   font-family: arial, verdana, sans-serif;
   font-size:12px;  
 }
