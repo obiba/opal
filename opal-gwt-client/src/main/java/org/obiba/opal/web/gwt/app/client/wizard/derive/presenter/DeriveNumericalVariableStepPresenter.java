@@ -16,17 +16,17 @@ import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.inject.Inject;
 
 /**
  *
  */
-public class DeriveNumericalVariableStepPresenter extends WidgetPresenter<DeriveNumericalVariableStepPresenter.Display> implements DeriveVariableStepPresenter {
+public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<DeriveNumericalVariableStepPresenter.Display> {
 
   @Inject
   public DeriveNumericalVariableStepPresenter(final Display display, final EventBus eventBus) {
@@ -48,6 +48,20 @@ public class DeriveNumericalVariableStepPresenter extends WidgetPresenter<Derive
     }).build());
 
     return stepCtrls;
+  }
+
+  @Override
+  VariableDto getDerivedVariable() {
+    VariableDto derived = copyOriginalVariable();
+
+    // set script
+    // TODO: mapping
+    setScript(derived, "$('" + originalVariable.getName() + "'");
+
+    // set categories
+    // TODO
+
+    return derived;
   }
 
   //

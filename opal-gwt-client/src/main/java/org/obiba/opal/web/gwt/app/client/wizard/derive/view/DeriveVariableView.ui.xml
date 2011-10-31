@@ -20,7 +20,16 @@
           <g:SimplePanel ui:field="summary" width="100%" />
         
           <g:Anchor><ui:msg description="Derived Values tab title" >Values</ui:msg></g:Anchor>
-          <g:SimplePanel ui:field="values"></g:SimplePanel>
+          <g:FlowPanel>
+            <g:FlowPanel addStyleNames="paging">
+              <g:Anchor ui:field="previousPage"><img src="image/16/previous.png" align="top"/></g:Anchor>
+		      <g:InlineLabel ui:field="pageLow">1</g:InlineLabel>
+		      <g:InlineLabel> ... </g:InlineLabel>
+		      <g:InlineLabel ui:field="pageHigh">10</g:InlineLabel>
+		      <g:Anchor ui:field="nextPage"><img src="image/16/next.png" align="top"/></g:Anchor>
+		    </g:FlowPanel>
+            <o:Table width="100%" ui:field="valuesTable" />
+          </g:FlowPanel>
          
         </o:HorizontalTabLayout>
       
@@ -29,17 +38,17 @@
         <g:FlowPanel>
           <g:FlowPanel styleName="input">
             <g:Label addStyleNames="key"><ui:msg description="Derived Variable Name label">Derived Variable Name</ui:msg></g:Label>
-            <g:TextBox ui:field="derivedName"/>
+            <g:TextBox ui:field="derivedNameBox"/>
           </g:FlowPanel>
           
           <g:FlowPanel styleName="input">
             <g:Label addStyleNames="key"><ui:msg description="Name label">Datasource</ui:msg></g:Label>
-            <g:ListBox ui:field="datasourceName"></g:ListBox>
+            <g:ListBox ui:field="datasourceNameBox"></g:ListBox>
           </g:FlowPanel>
           
           <g:FlowPanel styleName="input">
             <g:Label addStyleNames="key"><ui:msg description="Destination View Name label">Destination View Name</ui:msg></g:Label>
-            <g:SuggestBox ui:field="viewName"/>
+            <g:SuggestBox ui:field="viewNameBox"/>
             <g:Label styleName="help-block">Select an existing view or provide a name for a new view</g:Label>
           </g:FlowPanel>
         </g:FlowPanel>

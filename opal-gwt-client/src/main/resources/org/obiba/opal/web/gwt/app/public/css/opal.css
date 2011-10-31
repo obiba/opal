@@ -847,6 +847,14 @@ div.evaluateScriptPanel {
   margin-left:0px;
 }
 
+div.paging > a {
+  margin-right: 5px;
+}
+
+div.paging > span {
+  margin-right: 5px;
+}
+
 .evaluateScriptPanel div.paging {
   padding-top:0.8em;
   padding-bottom:0.8em;
