@@ -10,11 +10,8 @@
     <g:caption>
       <ui:msg description="Derive Variable title">Derive Variable</ui:msg>
     </g:caption>
-    <g:FlowPanel>
-      <o:WizardStep ui:field="categoricalStep">
-        <g:FlowPanel>
-        </g:FlowPanel>
-      </o:WizardStep>
+    <g:FlowPanel ui:field="stepsFlow">
+      
       <o:WizardStep ui:field="summaryStep">
       
         <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">

@@ -9,15 +9,18 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 
+import java.util.List;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -33,7 +36,14 @@ import com.google.inject.Inject;
  */
 public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePresenter.Display> implements Wizard {
 
-  private final SummaryTabPresenter summaryTabPresenter;
+  @Inject
+  private DeriveCategoricalVariableStepPresenter categoricalPresenter;
+
+  @Inject
+  private DeriveNumericalVariableStepPresenter numericalPresenter;
+
+  @Inject
+  private SummaryTabPresenter summaryTabPresenter;
 
   private VariableDto variable;
 
@@ -42,9 +52,8 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
   //
 
   @Inject
-  public DeriveVariablePresenter(final Display display, final EventBus eventBus, SummaryTabPresenter summaryTabPresenter) {
+  public DeriveVariablePresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
-    this.summaryTabPresenter = summaryTabPresenter;
   }
 
   //
@@ -64,7 +73,12 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     variable = (VariableDto) event.getEventParameters()[0];
     if(event.getWizardType() == WizardType.DERIVE_CATEGORIZE_VARIABLE) {
       // TODO
-
+      String valueType = variable.getValueType();
+      if(valueType.equals("integer") || valueType.equals("decimal")) {
+        getDisplay().appendWizardSteps(numericalPresenter.getWizardSteps());
+      } else if(valueType.equals("text")) {
+        getDisplay().appendWizardSteps(categoricalPresenter.getWizardSteps());
+      }
     } else {
       // TODO
     }
@@ -90,16 +104,22 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
 
   @Override
   protected void onBind() {
-    // TODO Auto-generated method stub
+    // TODO bind only the relevant one
+    categoricalPresenter.bind();
+    numericalPresenter.bind();
+
     summaryTabPresenter.bind();
     getDisplay().setSummaryTabWidget(summaryTabPresenter.getDisplay());
-    getDisplay().setDerivedVariableValidator(new DerivedVariableValidator());
+    getDisplay().setSummaryStepInHandler(new SummaryStepInHandler());
     addEventHandlers();
   }
 
   @Override
   protected void onUnbind() {
-    // TODO Auto-generated method stub
+    // TODO unbind only the relevant one
+    categoricalPresenter.unbind();
+    numericalPresenter.unbind();
+
     summaryTabPresenter.unbind();
   }
 
@@ -121,13 +141,11 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
   // Inner classes and Interfaces
   //
 
-  final class DerivedVariableValidator implements ValidationHandler {
+  final class SummaryStepInHandler implements StepInHandler {
     @Override
-    public boolean validate() {
-      // TODO
+    public void onStepIn() {
       requestSummary(variable);
       summaryTabPresenter.refreshDisplay();
-      return true;
     }
   }
 
@@ -159,7 +177,9 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
 
     void setSummaryTabWidget(WidgetDisplay widget);
 
-    void setDerivedVariableValidator(ValidationHandler validator);
+    void setSummaryStepInHandler(StepInHandler handler);
+
+    void appendWizardSteps(List<DefaultWizardStepController> stepCtrls);
   }
 
 }

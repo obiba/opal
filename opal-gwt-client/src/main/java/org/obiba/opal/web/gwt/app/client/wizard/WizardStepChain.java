@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.wizard;
 
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.WidgetProvider;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
@@ -151,18 +152,14 @@ public class WizardStepChain {
      * @return
      */
     public Builder append(WizardStep step, Widget help) {
-      DefaultWizardStepController stepCtrl = new DefaultWizardStepController(step, help);
-      if(currentStepCtrl != null) {
-        if(currentStepCtrl.isConclusion()) throw new IllegalArgumentException("Cannot have a step after conclusion.");
-        currentStepCtrl.setNext(stepCtrl);
-        stepCtrl.setPrevious(currentStepCtrl);
-      }
-      return append(stepCtrl);
+      return append(new DefaultWizardStepController(step, help));
     }
 
     public Builder append(DefaultWizardStepController stepCtrl) {
       if(currentStepCtrl != null) {
         if(currentStepCtrl.isConclusion()) throw new IllegalArgumentException("Cannot have a step after conclusion.");
+        currentStepCtrl.setNext(stepCtrl);
+        stepCtrl.setPrevious(currentStepCtrl);
       } else {
         chain.first = stepCtrl;
       }
@@ -207,6 +204,11 @@ public class WizardStepChain {
      */
     public Builder onValidate(ValidationHandler validator) {
       currentStepCtrl.setValidator(validator);
+      return this;
+    }
+
+    public Builder onStepIn(StepInHandler handler) {
+      currentStepCtrl.setStepInHandler(handler);
       return this;
     }
 
