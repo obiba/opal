@@ -40,6 +40,8 @@ public abstract class DerivationPresenter<D extends WidgetDisplay> extends Widge
     VariableDto derived = VariableDto.create();
     derived.setName(originalVariable.getName());
     derived.setValueType(originalVariable.getValueType());
+    derived.setEntityType(originalVariable.getEntityType());
+    derived.setIsRepeatable(originalVariable.getIsRepeatable());
 
     // set attributes
     derived.setAttributesArray(originalVariable.getAttributesArray());

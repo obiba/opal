@@ -20,20 +20,26 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -66,6 +72,10 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
   private JsArray<DatasourceDto> datasources;
 
   private DerivationPresenter<?> derivationPresenter;
+
+  private Runnable overwriteConfirmation;
+
+  private Runnable viewCreationConfirmation;
 
   //
   // Constructors
@@ -181,6 +191,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
   }
 
   protected void addEventHandlers() {
+    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
     super.registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
     super.registerHandler(getDisplay().addFinishClickHandler(new FinishClickHandler()));
   }
@@ -240,11 +251,100 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
   class FinishClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent arg0) {
+      // validation
+      List<String> errorMessages = validate();
+      if(errorMessages.size() > 0) {
+        eventBus.fireEvent(NotificationEvent.newBuilder().error(errorMessages).build());
+        return;
+      }
 
       final String datasourceName = getDisplay().getDatasourceName();
       final String viewName = getDisplay().getViewName();
+      final VariableDto derived = derivationPresenter.getDerivedVariable();
+      derived.setName(getDisplay().getDerivedName());
 
-      // validation
+      ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource("/datasource/" + datasourceName + "/view/" + viewName).get().withCallback(new ResourceCallback<ViewDto>() {
+
+        @Override
+        public void onResource(Response response, ViewDto resource) {
+          if(!hasTableInFrom(resource)) {
+            // TODO translate
+            eventBus.fireEvent(NotificationEvent.newBuilder().error("Not a valid destination view.").build());
+          } else {
+            saveVariable(resource, derived);
+          }
+        }
+
+      }).withCallback(404, new ResponseCodeCallback() {
+
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          viewCreationConfirmation = new Runnable() {
+            public void run() {
+              saveVariable(datasourceName, viewName, derived);
+            }
+          };
+          eventBus.fireEvent(new ConfirmationRequiredEvent(viewCreationConfirmation, "createView", "confirmCreateView"));
+        }
+      }).send();
+
+    }
+
+    private void saveVariable(ViewDto view, VariableDto derived) {
+      GWT.log("add variable to view: " + view.getName());
+      getDisplay().hideDialog();
+    }
+
+    private void saveVariable(String datasourceName, String viewName, VariableDto derived) {
+      GWT.log("view to be created: " + datasourceName + "." + viewName);
+
+      ResponseCodeCallback completed = new ResponseCodeCallback() {
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          // TODO Auto-generated method stub
+          getDisplay().hideDialog();
+        }
+      };
+      ResponseCodeCallback failed = new ResponseCodeCallback() {
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          // TODO Auto-generated method stub
+          eventBus.fireEvent(NotificationEvent.newBuilder().error("Failed creating a new view: " + response.getStatusCode()).build());
+        }
+      };
+
+      // Build the ViewDto for the request.
+      List<TableDto> tableDtos = new ArrayList<TableDto>();
+      tableDtos.add(table);
+      ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().setName(viewName).fromTables(tableDtos);
+      viewDtoBuilder.defaultVariableListView();
+      ViewDto viewDto = viewDtoBuilder.build();
+
+      // add derived variable
+      VariableListViewDto variableListViewDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+      JsArray<VariableDto> variables = JsArrays.create();
+      variables.push(derived);
+      variableListViewDto.setVariablesArray(variables);
+
+      // Create the resource request (the builder).
+      ResourceRequestBuilder<JavaScriptObject> resourceRequestBuilder = ResourceRequestBuilderFactory.newBuilder()//
+      .post()//
+      .forResource("/datasource/" + datasourceName + "/views")//
+      .withResourceBody(ViewDto.stringify(viewDto))//
+      .withCallback(Response.SC_CREATED, completed)//
+      .withCallback(Response.SC_OK, completed)//
+      .withCallback(Response.SC_BAD_REQUEST, failed)//
+      .withCallback(Response.SC_NOT_FOUND, failed)//
+      .withCallback(Response.SC_METHOD_NOT_ALLOWED, failed)//
+      .withCallback(Response.SC_INTERNAL_SERVER_ERROR, failed);
+
+      resourceRequestBuilder.send();
+    }
+
+    private List<String> validate() {
+      String datasourceName = getDisplay().getDatasourceName();
+      String viewName = getDisplay().getViewName();
+
       List<String> errorMessages = new ArrayList<String>();
       if(getDisplay().getDerivedName().isEmpty()) {
         // TODO translate
@@ -277,38 +377,18 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
           }
         }
       }
+      return errorMessages;
+    }
 
-      if(errorMessages.size() > 0) {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error(errorMessages).build());
-        return;
+  }
+
+  class ConfirmationEventHandler implements ConfirmationEvent.Handler {
+
+    public void onConfirmation(ConfirmationEvent event) {
+      if(viewCreationConfirmation != null && event.getSource().equals(viewCreationConfirmation) && event.isConfirmed()) {
+        viewCreationConfirmation.run();
+        viewCreationConfirmation = null;
       }
-
-      final VariableDto derived = derivationPresenter.getDerivedVariable();
-      derived.setName(getDisplay().getDerivedName());
-
-      ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource("/datasource/" + datasourceName + "/view/" + viewName).get().withCallback(new ResourceCallback<ViewDto>() {
-
-        @Override
-        public void onResource(Response response, ViewDto resource) {
-          if(!hasTableInFrom(resource)) {
-            // TODO translate
-            eventBus.fireEvent(NotificationEvent.newBuilder().error("Not a valid destination view.").build());
-          } else {
-            GWT.log("add variable to view: " + viewName);
-            getDisplay().hideDialog();
-          }
-        }
-
-      }).withCallback(404, new ResponseCodeCallback() {
-
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          // TODO
-          GWT.log("view to be created: " + viewName);
-          getDisplay().hideDialog();
-        }
-      }).send();
-
     }
   }
 

@@ -21,7 +21,6 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.inject.Inject;
 
 /**
@@ -41,7 +40,7 @@ public class DeriveCategoricalVariableStepPresenter extends DerivationPresenter<
     // set script
     // TODO: mapping
     setScript(derived, "$('" + originalVariable.getName() + "')");
-    GWT.log("script: " + getScript(derived));
+    // GWT.log("script: " + getScript(derived));
 
     // set categories
     // TODO: mapping
