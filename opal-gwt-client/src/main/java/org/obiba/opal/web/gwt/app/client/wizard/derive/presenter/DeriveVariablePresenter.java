@@ -20,7 +20,6 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
@@ -29,10 +28,8 @@ import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.ValueDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
@@ -44,7 +41,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
 
 /**
@@ -61,7 +57,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
   private DeriveNumericalVariableStepPresenter numericalPresenter;
 
   @Inject
-  private SummaryTabPresenter summaryTabPresenter;
+  private ScriptEvaluationPresenter scriptEvaluationPresenter;
 
   private VariableDto variable;
 
@@ -70,10 +66,6 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
   private JsArray<DatasourceDto> datasources;
 
   private DerivationPresenter<?> derivationPresenter;
-
-  private int currentOffset;
-
-  private String currentScript;
 
   //
   // Constructors
@@ -105,6 +97,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
       @Override
       public void onResource(Response response, TableDto resource) {
         table = resource;
+        scriptEvaluationPresenter.setTable(table);
       }
 
     }).send();
@@ -146,26 +139,6 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     return false;
   }
 
-  private void populateValues(final int offset) {
-    currentOffset = offset;
-    ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder() //
-    .forResource(table.getLink() + "/variable/_transient/values?limit=" + PAGE_SIZE + "&offset=" + offset + "&script=" + URL.encodeQueryString(currentScript)).get() //
-    .withCallback(new ResourceCallback<JsArray<ValueDto>>() {
-
-      @Override
-      public void onResource(Response response, JsArray<ValueDto> resource) {
-        int high = offset + PAGE_SIZE;
-        if(resource != null && resource.length() < high) {
-          high = offset + resource.length();
-        }
-        getDisplay().setPageLimits(offset + 1, high, table.getValueSetCount());
-        getDisplay().populateValues(resource);
-      }
-
-    })//
-    .send();
-  }
-
   //
   // WidgetPresenter Methods
   //
@@ -181,23 +154,21 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
 
   @Override
   protected void onBind() {
-    // TODO bind only the relevant one
     categoricalPresenter.bind();
     numericalPresenter.bind();
 
-    summaryTabPresenter.bind();
-    getDisplay().setSummaryTabWidget(summaryTabPresenter.getDisplay());
-    getDisplay().setSummaryStepInHandler(new SummaryStepInHandler());
+    scriptEvaluationPresenter.bind();
+    getDisplay().setScriptEvaluationWidget(scriptEvaluationPresenter.getDisplay());
+    getDisplay().setScriptEvaluationStepInHandler(new ScriptEvaluationStepInHandler());
     addEventHandlers();
   }
 
   @Override
   protected void onUnbind() {
-    // TODO unbind only the relevant one
     categoricalPresenter.unbind();
     numericalPresenter.unbind();
 
-    summaryTabPresenter.unbind();
+    scriptEvaluationPresenter.unbind();
   }
 
   @Override
@@ -212,35 +183,11 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
   protected void addEventHandlers() {
     super.registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
     super.registerHandler(getDisplay().addFinishClickHandler(new FinishClickHandler()));
-    super.registerHandler(getDisplay().addNextPageClickHandler(new NextPageClickHandler()));
-    super.registerHandler(getDisplay().addPreviousPageClickHandler(new PreviousPageClickHandler()));
   }
 
   //
   // Inner classes and Interfaces
   //
-
-  public class PreviousPageClickHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent event) {
-      if(currentOffset > 0) {
-        populateValues(currentOffset - PAGE_SIZE);
-      }
-    }
-
-  }
-
-  public class NextPageClickHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent event) {
-      if(currentOffset + PAGE_SIZE < table.getValueSetCount()) {
-        populateValues(currentOffset + PAGE_SIZE);
-      }
-    }
-
-  }
 
   private final class DatasourcesCallback implements ResourceCallback<JsArray<DatasourceDto>> {
     @Override
@@ -273,30 +220,14 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     }
   }
 
-  final class SummaryStepInHandler implements StepInHandler {
+  final class ScriptEvaluationStepInHandler implements StepInHandler {
     @Override
     public void onStepIn() {
       VariableDto derived = derivationPresenter.getDerivedVariable();
-      currentScript = derivationPresenter.getScript(derived);
-      requestSummary(derived);
-      populateValues(0);
+      String script = derivationPresenter.getScript(derived);
+      scriptEvaluationPresenter.setVariable(derived);
+      scriptEvaluationPresenter.refreshDisplay();
     }
-
-    private void requestSummary(final VariableDto derived) {
-      StringBuilder summaryLink = new StringBuilder(table.getLink() + "/variable/_transient/summary");
-      summaryLink.append("?valueType=" + derived.getValueType());
-      summaryLink.append("&script=" + URL.encodeQueryString(currentScript));
-
-      JsArray<CategoryDto> cats = derived.getCategoriesArray();
-      if(cats != null) {
-        for(int i = 0; i < cats.length(); i++) {
-          summaryLink.append("&category=" + URL.encodeQueryString(cats.get(i).getName()));
-        }
-      }
-      summaryTabPresenter.setResourceUri(summaryLink.toString());
-      summaryTabPresenter.refreshDisplay();
-    }
-
   }
 
   class CancelClickHandler implements ClickHandler {
@@ -397,13 +328,11 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
 
     void clear();
 
-    void setSummaryTabWidget(WidgetDisplay widget);
+    void setScriptEvaluationWidget(WidgetDisplay widget);
 
-    void setSummaryStepInHandler(StepInHandler handler);
+    void setScriptEvaluationStepInHandler(StepInHandler handler);
 
     void appendWizardSteps(List<DefaultWizardStepController> stepCtrls);
-
-    void populateValues(JsArray<ValueDto> values);
 
     void setDefaultDerivedName(String name);
 
@@ -412,12 +341,6 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     String getDatasourceName();
 
     String getViewName();
-
-    HandlerRegistration addNextPageClickHandler(ClickHandler handler);
-
-    HandlerRegistration addPreviousPageClickHandler(ClickHandler handler);
-
-    void setPageLimits(int low, int high, int count);
 
     boolean isOpenEditorSelected();
   }

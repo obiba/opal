@@ -17,17 +17,14 @@ import java.util.Map;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveVariablePresenter;
-import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
-import org.obiba.opal.web.model.client.magma.ValueDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -38,16 +35,11 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -69,31 +61,10 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
   FlowPanel stepsFlow;
 
   @UiField
-  WizardStep summaryStep;
+  WizardStep scriptEvaluationStep;
 
   @UiField
   WizardStep conclusionStep;
-
-  @UiField
-  Panel summary;
-
-  @UiField
-  CellTable<ValueDto> valuesTable;
-
-  @UiField
-  Anchor previousPage;
-
-  @UiField
-  Anchor nextPage;
-
-  @UiField
-  Label pageLow;
-
-  @UiField
-  Label pageHigh;
-
-  @UiField
-  HorizontalTabLayout tabs;
 
   @UiField
   CheckBox openEditor;
@@ -122,14 +93,6 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
   public DeriveVariableView() {
     viewNameBox = new SuggestBox(viewNameSuggestions = new MultiWordSuggestOracle());
     this.dialog = uiBinder.createAndBindUi(this);
-
-    valuesTable.addColumn(new TextColumn<ValueDto>() {
-
-      @Override
-      public String getValue(ValueDto value) {
-        return value.getValue();
-      }
-    }, "Value");
 
     datasourceNameBox.addChangeHandler(new ChangeHandler() {
 
@@ -174,8 +137,8 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
 
     stepChain = stepChainBuilder//
 
-    .append(summaryStep)//
-    .title("Summary")//
+    .append(scriptEvaluationStep)//
+    .title("Derived variable evaluation")//
     .onStepIn(new StepInHandler() {
 
       @Override
@@ -185,11 +148,11 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
     })//
 
     .append(conclusionStep)//
-    .title("Conclusion")//
+    .title("Save derived variable")//
 
     .onNext().onPrevious().build();
 
-    stepsFlow.add(summaryStep);
+    stepsFlow.add(scriptEvaluationStep);
     stepsFlow.add(conclusionStep);
 
     // reset
@@ -215,27 +178,18 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
 
   @Override
   public void clear() {
-    summaryStep.setVisible(false);
+    scriptEvaluationStep.setVisible(false);
     conclusionStep.setVisible(false);
   }
 
   @Override
-  public void setSummaryTabWidget(WidgetDisplay widget) {
-    summary.clear();
-    summary.add(widget.asWidget());
+  public void setScriptEvaluationWidget(WidgetDisplay widget) {
+    scriptEvaluationStep.add(widget.asWidget());
   }
 
   @Override
-  public void setSummaryStepInHandler(StepInHandler handler) {
+  public void setScriptEvaluationStepInHandler(StepInHandler handler) {
     summaryHandler = handler;
-  }
-
-  @Override
-  public void populateValues(JsArray<ValueDto> values) {
-    JsArrayDataProvider<ValueDto> dataProvider = new JsArrayDataProvider<ValueDto>();
-    dataProvider.addDataDisplay(valuesTable);
-    dataProvider.setArray(JsArrays.toSafeArray(values));
-    dataProvider.refresh();
   }
 
   @Override
@@ -296,32 +250,6 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
   @Override
   public String getViewName() {
     return viewNameBox.getText();
-  }
-
-  @Override
-  public HandlerRegistration addNextPageClickHandler(ClickHandler handler) {
-    return nextPage.addClickHandler(handler);
-  }
-
-  @Override
-  public HandlerRegistration addPreviousPageClickHandler(ClickHandler handler) {
-    return previousPage.addClickHandler(handler);
-  }
-
-  @Override
-  public void setPageLimits(int low, int high, int count) {
-    if(low == 1) {
-      previousPage.addStyleName("disabled");
-    } else {
-      previousPage.removeStyleName("disabled");
-    }
-    if(high >= count) {
-      nextPage.addStyleName("disabled");
-    } else {
-      nextPage.removeStyleName("disabled");
-    }
-    pageLow.setText(Integer.toString(low));
-    pageHigh.setText(Integer.toString(high));
   }
 
   @Override

@@ -1,0 +1,27 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
+
+  <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
+    <g:Anchor><ui:msg description="Derived Summary tab title">Summary</ui:msg></g:Anchor>
+    <g:SimplePanel ui:field="summary" width="100%" />
+        
+    <g:Anchor><ui:msg description="Derived Values tab title" >Values</ui:msg></g:Anchor>
+    <g:FlowPanel>
+      <g:FlowPanel addStyleNames="paging">
+        <g:Anchor ui:field="previousPage" addStyleNames="previous"></g:Anchor>
+		<g:InlineLabel ui:field="pageLow">1</g:InlineLabel>
+		<g:InlineLabel> ... </g:InlineLabel>
+		<g:InlineLabel ui:field="pageHigh">10</g:InlineLabel>
+		<g:Anchor ui:field="nextPage" addStyleNames="next"></g:Anchor>
+      </g:FlowPanel>
+      <o:Table width="100%" ui:field="valuesTable" />
+    </g:FlowPanel>
+         
+  </o:HorizontalTabLayout>
+
+</ui:UiBinder>

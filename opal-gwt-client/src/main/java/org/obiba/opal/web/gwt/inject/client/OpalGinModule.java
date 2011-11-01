@@ -44,6 +44,8 @@ import org.obiba.opal.web.gwt.app.client.widgets.view.TableListView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.TableSelectorView;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.view.EvaluateScriptView;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ScriptEvaluationView;
 import org.obiba.opal.web.gwt.rest.client.DefaultRequestUrlBuilder;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
@@ -88,6 +90,7 @@ public class OpalGinModule extends AbstractGinModule {
     bind(EvaluateScriptPresenter.Display.class).to(EvaluateScriptView.class);
     bind(ItemSelectorPresenter.Display.class).to(ItemSelectorView.class);
     bind(SummaryTabPresenter.Display.class).to(SummaryTabView.class);
+    bind(ScriptEvaluationPresenter.Display.class).to(ScriptEvaluationView.class);
     bind(AuthorizationPresenter.Display.class).to(AuthorizationView.class);
     bind(SubjectAuthorizationPresenter.Display.class).to(SubjectAuthorizationView.class);
   }

@@ -12,28 +12,7 @@
     </g:caption>
     <g:FlowPanel ui:field="stepsFlow">
       
-      <o:WizardStep ui:field="summaryStep">
-      
-        <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
-             
-	      <g:Anchor><ui:msg description="Derived Summary tab title">Summary</ui:msg></g:Anchor>
-          <g:SimplePanel ui:field="summary" width="100%" />
-        
-          <g:Anchor><ui:msg description="Derived Values tab title" >Values</ui:msg></g:Anchor>
-          <g:FlowPanel>
-            <g:FlowPanel addStyleNames="paging">
-              <g:Anchor ui:field="previousPage" addStyleNames="previous"></g:Anchor>
-		      <g:InlineLabel ui:field="pageLow">1</g:InlineLabel>
-		      <g:InlineLabel> ... </g:InlineLabel>
-		      <g:InlineLabel ui:field="pageHigh">10</g:InlineLabel>
-		      <g:Anchor ui:field="nextPage" addStyleNames="next"></g:Anchor>
-		    </g:FlowPanel>
-            <o:Table width="100%" ui:field="valuesTable" />
-          </g:FlowPanel>
-         
-        </o:HorizontalTabLayout>
-      
-      </o:WizardStep>
+      <o:WizardStep ui:field="scriptEvaluationStep"></o:WizardStep>
       <o:WizardStep ui:field="conclusionStep">
         <g:FlowPanel>
           <g:FlowPanel styleName="input">
