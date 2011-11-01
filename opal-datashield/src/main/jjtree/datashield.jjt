@@ -44,12 +44,12 @@ TOKEN : /* Numeric Constants */
 
 TOKEN:
 {
-      < S_IDENTIFIER: ( <LETTER> )+ ( <DIGIT> | <LETTER> |<SPECIAL_CHARS>)* >
-  |   < S_OPERATOR: (["+","-","*","/","%"])+ >
+      < S_IDENTIFIER: ( <LETTER> )+ ( <DIGIT> | <LETTER> | <UNDERSCORE>)* >
+  |   < S_OPERATOR: (["/", "!"]) | "%*%">
+  |   < F_OPERATOR: ([":"] | "%in%") >
+  |   < COMMON_OPERATOR: (["+","-","*"]) >
   |   < #LETTER: ["a"-"z", "A"-"Z"] >
-  |   < #SPECIAL_CHARS: "$" | "_">
-  |   < S_CHAR_LITERAL: "'" (~["'"])* "'" ("'" (~["'"])* "'")*>
-  |   < S_QUOTED_IDENTIFIER: "\"" (~["\n","\r","\""])* "\"" >
+  |   < #UNDERSCORE: "_">
 }
 
 SimpleNode root() #root :
@@ -62,19 +62,21 @@ SimpleNode root() #root :
 void exp() #void :
 {Token op;}
 {
- (
-  simpleExp() [ op=<S_OPERATOR> exp() {jjtThis.value=op.image;} #BinaryOp(2) ]
+ (  LOOKAHEAD(2)
+    // Parse a formula as much as possible (A~B+C must not be parsed as (A~B) + C). This is why it comes first here.
+    formula()
+  | simpleExp() [ (op=<S_OPERATOR> | op=<COMMON_OPERATOR>) exp() {jjtThis.value=op.image;} #BinaryOp(2) ]
  )
 }
 
 void simpleExp() #void :
 {}
 {
-  ( LOOKAHEAD(2)
-    funcCall()
-  | symbol()
-  | "(" exp() ")"
-  )
+ ( LOOKAHEAD(2)
+     funcCall()
+   | symbol()
+   | "(" exp() ")"
+ )
 }
 
 void funcCall() :
@@ -84,13 +86,40 @@ void funcCall() :
 }
 
 void symbol() : 
-{Token s;}
+{Token s=null;}
 {
- 
  (
     s=<S_IDENTIFIER>
   | s=<S_NUMBER>
  ) {jjtThis.value = s.image;}
+}
+
+void formula() #symbol :
+{Token t;
+ StringBuilder ft;
+ StringBuilder sb = new StringBuilder();}
+{
+  (
+    t=<S_IDENTIFIER> "~" {sb.append(t.image).append("~");}
+    (
+        ft=formulaTerm() {sb.append(ft);}
+    )
+    
+  ) {jjtThis.value = sb.toString();}
+}
+
+StringBuilder formulaTerm() #void :
+{
+  Token t;
+  StringBuilder sb,ft;
+}
+{
+  (
+      "(" sb=formulaTerm() ")"  {sb.insert(0, '(').append(')');}
+    | t=<S_IDENTIFIER> {sb = new StringBuilder(t.image);}
+  ) [ "^" t=<S_NUMBER> {sb.append("^").append(t.image);}]
+    [ (t=<COMMON_OPERATOR> | t=<F_OPERATOR>) ft=formulaTerm() {sb.append(t.image).append(ft);} ]
+  {return sb;}
 }
 
 void expList() #void :

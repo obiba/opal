@@ -19,16 +19,20 @@ import com.google.common.collect.ImmutableMap;
 public class DataShieldExprTest {
 
   private static final Map<String, String> tests = ImmutableMap.<String, String> builder() //
-  .put("A single symbol", "A")//
-  .put("A single function invocation", "A()")//
+  .put("A symbol", "A")//
+  .put("A number", "1.0")//
+  .put("A formula", "A ~ B")//
+  .put("A function invocation", "A()")//
   .put("An operator on symbols", "A + B")//
   .put("Operator chaining", "A + B * C")//
   .put("Operator on functions", "A() + B * C")//
-  .put("Allows paren", "(A + B) * (C - D)")//
+  .put("A formula with operators", "A ~ B + (C * D)^4 : E %in% F")//
+  .put("Grouping", "(A + B) * (C - D)")//
   .put("Function with a single parameter", "A(B)")//
   .put("Function with a function invocation as parameter", "A(B())")//
   .put("Function with multiple parameters", "A(B, C)")//
   .put("Function with multiple kinds of parameters", "A(B, C(), D, E(F(G/H)), A + B * C())")//
+  .put("Function with forumla as argument", "glm(A ~ B + C:D, poisson)")//
   .build();
 
   @Test
@@ -70,13 +74,13 @@ public class DataShieldExprTest {
       @Override
       public Object visit(ASTBinaryOp node, Object data) {
         StringBuilder sb = (StringBuilder) data;
-        sb.append('(').append(node.value);
+        sb.append(node.value).append("( ");
         for(int i = 0; i < node.jjtGetNumChildren(); i++) {
           Node child = node.jjtGetChild(i);
-          sb.append(' ');
+          if(i > 0) sb.append(' ');
           child.jjtAccept(this, sb);
         }
-        sb.append(')');
+        sb.append(" )");
         return sb;
       }
 
@@ -93,7 +97,7 @@ public class DataShieldExprTest {
       }
     };
 
-    String test = "A %*% (B(C * D()) * 1/F)";
+    String test = "A %*% (B(C ~ A + (G+D)^2 : H, C * D()) * 1/F)";
     DataShieldGrammar g = new DataShieldGrammar(new StringReader(test));
     StringBuilder b = (StringBuilder) g.root().jjtAccept(visitor, new StringBuilder());
     System.out.println(test + " --> " + b.toString());
