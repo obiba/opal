@@ -374,6 +374,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
       ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().setName(viewName).fromTables(tableDtos);
       viewDtoBuilder.defaultVariableListView();
       final ViewDto view = viewDtoBuilder.build();
+      view.setDatasourceName(datasourceName);
 
       // add derived variable
       VariableListViewDto variableListViewDto = (VariableListViewDto) view.getExtension(VariableListViewDto.ViewDtoExtensions.view);
