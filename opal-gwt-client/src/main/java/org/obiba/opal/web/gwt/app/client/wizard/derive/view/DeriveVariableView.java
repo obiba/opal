@@ -138,7 +138,7 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
     stepChain = stepChainBuilder//
 
     .append(scriptEvaluationStep)//
-    .title("Derived variable evaluation")//
+    .title(translations.derivedVariableEvaluation())//
     .onStepIn(new StepInHandler() {
 
       @Override
@@ -148,7 +148,7 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
     })//
 
     .append(conclusionStep)//
-    .title("Save derived variable")//
+    .title(translations.saveDerivedVariable())//
 
     .onNext().onPrevious().build();
 

@@ -922,4 +922,28 @@ public interface Translations extends Constants {
   @Description("Derive Custom label")
   @DefaultStringValue("Custom")
   String deriveCustomLabel();
+
+  @Description("Invalid Destination View label")
+  @DefaultStringValue("Not a valid destination view.")
+  String invalidDestinationView();
+
+  @Description("Derived Variable Name Required label")
+  @DefaultStringValue("Derived variable name is required.")
+  String derivedVariableNameRequired();
+
+  @Description("Destination View Name Required label")
+  @DefaultStringValue("Destination view name is required.")
+  String destinationViewNameRequired();
+
+  @Description("Add Derived Variable To View Only label")
+  @DefaultStringValue("A derived variable can only be added to a view.")
+  String addDerivedVariableToViewOnly();
+
+  @Description("Derived Variable Evaluation label")
+  @DefaultStringValue("Review the summary and the values of the derived variable.")
+  String derivedVariableEvaluation();
+
+  @Description("Save Derived Variable label")
+  @DefaultStringValue("Name the derived variable and select the view in which it will appear.")
+  String saveDerivedVariable();
 }

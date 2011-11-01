@@ -21,14 +21,14 @@
           </g:FlowPanel>
           
           <g:FlowPanel styleName="input">
-            <g:Label addStyleNames="key"><ui:msg description="Name label">Datasource</ui:msg></g:Label>
+            <g:Label addStyleNames="key"><ui:msg description="Datasource label">Datasource</ui:msg></g:Label>
             <g:ListBox ui:field="datasourceNameBox"></g:ListBox>
           </g:FlowPanel>
           
           <g:FlowPanel styleName="input">
             <g:Label addStyleNames="key"><ui:msg description="Destination View Name label">Destination View Name</ui:msg></g:Label>
             <g:SuggestBox ui:field="viewNameBox"/>
-            <g:Label styleName="help-block">Select an existing view or provide a name for a new view</g:Label>
+            <g:Label styleName="help-block"><ui:msg description="Destination View Name help label">Select an existing view or provide a name for a new view</ui:msg></g:Label>
           </g:FlowPanel>
           
           <g:FlowPanel styleName="input">

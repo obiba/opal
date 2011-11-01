@@ -19,6 +19,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
@@ -39,6 +40,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -54,6 +56,8 @@ import com.google.inject.Inject;
 public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePresenter.Display> implements Wizard {
 
   public static final int PAGE_SIZE = 20;
+
+  private static Translations translations = GWT.create(Translations.class);
 
   @Inject
   private DeriveCategoricalVariableStepPresenter categoricalPresenter;
@@ -267,8 +271,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
         @Override
         public void onResource(Response response, final ViewDto resource) {
           if(!hasTableInFrom(resource)) {
-            // TODO translate
-            eventBus.fireEvent(NotificationEvent.newBuilder().error("Not a valid destination view.").build());
+            eventBus.fireEvent(NotificationEvent.newBuilder().error(translations.invalidDestinationView()).build());
           } else {
             if(getVariablePosition(resource, derived) != -1) {
               overwriteConfirmation = new Runnable() {
@@ -422,12 +425,10 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
 
       List<String> errorMessages = new ArrayList<String>();
       if(getDisplay().getDerivedName().isEmpty()) {
-        // TODO translate
-        errorMessages.add("Derived variable name is required.");
+        errorMessages.add(translations.derivedVariableNameRequired());
       }
       if(viewName.isEmpty()) {
-        // TODO translate
-        errorMessages.add("Destination view name is required.");
+        errorMessages.add(translations.destinationViewNameRequired());
       } else {
         // if destination table exists, it must be a view
         for(DatasourceDto ds : JsArrays.toIterable(datasources)) {
@@ -443,8 +444,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
                   }
                 }
                 if(!isView) {
-                  // TODO translate
-                  errorMessages.add("A derived variable can only be added to a view.");
+                  errorMessages.add(translations.addDerivedVariableToViewOnly());
                 }
                 break;
               }
