@@ -354,6 +354,7 @@ public interface Translations extends Constants {
   "generateFunctionalUnitIdentifiers", "Generate Unit Identifiers",//
   "deleteCategory", "Delete Category",//
   "deleteAttribute", "Delete Attribute",//
+  "overwriteVariable", "Overwrite Variable",//
   "createView", "Create View",//
   "removeView", "Remove View",//
   "removeTable", "Remove Table",//
@@ -374,6 +375,7 @@ public interface Translations extends Constants {
   "confirmDeleteFunctionalUnit", "Please confirm that you want to remove the current Unit from Opal configuration. All encrypted material will not be accessible anymore",//
   "confirmDeleteCategory", "Please confirm that you want to remove this category.",//
   "confirmDeleteAttribute", "Please confirm that you want to remove this attribute.",//
+  "confirmOverwriteVariable", "A variable with the same name already exists. Please confirm that you want to overwrite this variable.",//
   "confirmCreateView", "Please confirm that you want to create a new view.",//
   "confirmRemoveView", "Please confirm that you want to remove the current view.",//
   "confirmRemoveTable", "Please confirm that you want to remove the current table. This cannot be undone and all data associated with this table will be lost.",//

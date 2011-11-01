@@ -27,9 +27,9 @@ import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -38,8 +38,6 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -266,12 +264,21 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
       ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource("/datasource/" + datasourceName + "/view/" + viewName).get().withCallback(new ResourceCallback<ViewDto>() {
 
         @Override
-        public void onResource(Response response, ViewDto resource) {
+        public void onResource(Response response, final ViewDto resource) {
           if(!hasTableInFrom(resource)) {
             // TODO translate
             eventBus.fireEvent(NotificationEvent.newBuilder().error("Not a valid destination view.").build());
           } else {
-            saveVariable(resource, derived);
+            if(getVariablePosition(resource, derived) != -1) {
+              overwriteConfirmation = new Runnable() {
+                public void run() {
+                  saveVariable(resource, derived);
+                }
+              };
+              eventBus.fireEvent(new ConfirmationRequiredEvent(overwriteConfirmation, "overwriteVariable", "confirmOverwriteVariable"));
+            } else {
+              saveVariable(resource, derived);
+            }
           }
         }
 
@@ -290,26 +297,84 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
 
     }
 
-    private void saveVariable(ViewDto view, VariableDto derived) {
-      GWT.log("add variable to view: " + view.getName());
-      getDisplay().hideDialog();
+    /**
+     * Get the position of the variable with the same name in the view
+     * @param view
+     * @param derived
+     * @return -1 if not found
+     */
+    private int getVariablePosition(ViewDto view, VariableDto derived) {
+      VariableListViewDto variableListViewDto = (VariableListViewDto) view.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+      JsArray<VariableDto> variables = JsArrays.toSafeArray(variableListViewDto.getVariablesArray());
+      int pos = -1;
+      for(int i = 0; i < variables.length(); i++) {
+        VariableDto var = variables.get(i);
+        if(var.getName().equals(derived.getName())) {
+          pos = i;
+          break;
+        }
+      }
+      return pos;
     }
 
-    private void saveVariable(String datasourceName, String viewName, VariableDto derived) {
-      GWT.log("view to be created: " + datasourceName + "." + viewName);
+    /**
+     * Update a view with the derived variable.
+     * @param view
+     * @param derived
+     */
+    private void saveVariable(ViewDto view, VariableDto derived) {
+      getDisplay().hideDialog();
 
-      ResponseCodeCallback completed = new ResponseCodeCallback() {
+      ResponseCodeCallback callback = new ResponseCodeCallback() {
+
         @Override
         public void onResponseCode(Request request, Response response) {
-          // TODO Auto-generated method stub
-          getDisplay().hideDialog();
+          if(response.getStatusCode() == Response.SC_OK) {
+            close();
+          } else {
+            eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+          }
         }
       };
-      ResponseCodeCallback failed = new ResponseCodeCallback() {
+
+      // add or update derived variable
+      int pos = getVariablePosition(view, derived);
+      VariableListViewDto variableListViewDto = (VariableListViewDto) view.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+      JsArray<VariableDto> variables = JsArrays.toSafeArray(variableListViewDto.getVariablesArray());
+      if(pos != -1) {
+        variables.set(pos, derived);
+      } else {
+        variables.push(derived);
+      }
+      variableListViewDto.setVariablesArray(variables);
+
+      ResourceRequestBuilderFactory.newBuilder() //
+      .put() //
+      .forResource("/datasource/" + view.getDatasourceName() + "/view/" + view.getName()) //
+      .accept("application/x-protobuf+json").withResourceBody(ViewDto.stringify(view)) //
+      .withCallback(Response.SC_OK, callback) //
+      .withCallback(Response.SC_BAD_REQUEST, callback)//
+      .withCallback(Response.SC_NOT_FOUND, callback)//
+      .withCallback(Response.SC_METHOD_NOT_ALLOWED, callback)//
+      .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback) //
+      .send();
+    }
+
+    /**
+     * Create a view with the derived variable.
+     * @param datasourceName
+     * @param viewName
+     * @param derived
+     */
+    private void saveVariable(String datasourceName, String viewName, VariableDto derived) {
+      ResponseCodeCallback callback = new ResponseCodeCallback() {
         @Override
         public void onResponseCode(Request request, Response response) {
-          // TODO Auto-generated method stub
-          eventBus.fireEvent(NotificationEvent.newBuilder().error("Failed creating a new view: " + response.getStatusCode()).build());
+          if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_CREATED) {
+            close();
+          } else {
+            eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+          }
         }
       };
 
@@ -318,27 +383,31 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
       tableDtos.add(table);
       ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().setName(viewName).fromTables(tableDtos);
       viewDtoBuilder.defaultVariableListView();
-      ViewDto viewDto = viewDtoBuilder.build();
+      ViewDto view = viewDtoBuilder.build();
 
       // add derived variable
-      VariableListViewDto variableListViewDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+      VariableListViewDto variableListViewDto = (VariableListViewDto) view.getExtension(VariableListViewDto.ViewDtoExtensions.view);
       JsArray<VariableDto> variables = JsArrays.create();
       variables.push(derived);
       variableListViewDto.setVariablesArray(variables);
 
       // Create the resource request (the builder).
-      ResourceRequestBuilder<JavaScriptObject> resourceRequestBuilder = ResourceRequestBuilderFactory.newBuilder()//
+      ResourceRequestBuilderFactory.newBuilder()//
       .post()//
       .forResource("/datasource/" + datasourceName + "/views")//
-      .withResourceBody(ViewDto.stringify(viewDto))//
-      .withCallback(Response.SC_CREATED, completed)//
-      .withCallback(Response.SC_OK, completed)//
-      .withCallback(Response.SC_BAD_REQUEST, failed)//
-      .withCallback(Response.SC_NOT_FOUND, failed)//
-      .withCallback(Response.SC_METHOD_NOT_ALLOWED, failed)//
-      .withCallback(Response.SC_INTERNAL_SERVER_ERROR, failed);
+      .accept("application/x-protobuf+json").withResourceBody(ViewDto.stringify(view))//
+      .withCallback(Response.SC_CREATED, callback)//
+      .withCallback(Response.SC_OK, callback)//
+      .withCallback(Response.SC_BAD_REQUEST, callback)//
+      .withCallback(Response.SC_NOT_FOUND, callback)//
+      .withCallback(Response.SC_METHOD_NOT_ALLOWED, callback)//
+      .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback) //
+      .send();
+    }
 
-      resourceRequestBuilder.send();
+    private void close() {
+      getDisplay().hideDialog();
+      eventBus.fireEvent(new ViewSavedEvent());
     }
 
     private List<String> validate() {
@@ -388,6 +457,9 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
       if(viewCreationConfirmation != null && event.getSource().equals(viewCreationConfirmation) && event.isConfirmed()) {
         viewCreationConfirmation.run();
         viewCreationConfirmation = null;
+      } else if(overwriteConfirmation != null && event.getSource().equals(overwriteConfirmation) && event.isConfirmed()) {
+        overwriteConfirmation.run();
+        overwriteConfirmation = null;
       }
     }
   }
