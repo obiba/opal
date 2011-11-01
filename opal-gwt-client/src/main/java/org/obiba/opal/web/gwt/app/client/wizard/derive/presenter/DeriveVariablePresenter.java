@@ -20,6 +20,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
@@ -28,7 +29,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
-import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -387,6 +387,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
         @Override
         public void onResponseCode(Request request, Response response) {
           if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_CREATED) {
+            eventBus.fireEvent(new DatasourceUpdatedEvent(view.getDatasourceName()));
             close(view, derived);
           } else {
             eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
@@ -410,7 +411,6 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
 
     private void close(ViewDto view, VariableDto derived) {
       getDisplay().hideDialog();
-      eventBus.fireEvent(new ViewSavedEvent());
       if(getDisplay().isOpenEditorSelected()) {
         eventBus.fireEvent(new ViewConfigurationRequiredEvent(view, derived));
       }

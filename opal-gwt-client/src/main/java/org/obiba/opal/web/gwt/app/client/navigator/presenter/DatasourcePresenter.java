@@ -155,6 +155,17 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getDisplay().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
+  private void displayDatasource(String datasourceName) {
+    if(datasources == null) return;
+
+    for(int i = 0; i < datasources.length(); i++) {
+      if(datasources.get(i).getName().equals(datasourceName)) {
+        displayDatasource(datasources.get(i));
+        break;
+      }
+    }
+  }
+
   private void displayDatasource(DatasourceDto datasourceDto) {
     displayDatasource(datasourceDto, null);
   }
@@ -499,8 +510,8 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
     @Override
     public void onDatasourceUpdated(DatasourceUpdatedEvent event) {
-      if(event.getSelection().getName().equals(datasourceName)) {
-        displayDatasource(event.getSelection());
+      if(event.getDatasourceName().equals(datasourceName)) {
+        displayDatasource(event.getDatasourceName());
       }
     }
   }

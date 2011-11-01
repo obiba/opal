@@ -26,7 +26,6 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
@@ -70,8 +69,9 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
 
       @Override
       public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
-        if(!getDisplay().hasDatasource(event.getSelection().getName())) updateTree(event.getSelection().getName());
-        else
+        if(!getDisplay().hasDatasource(event.getSelection().getName())) {
+          updateTree(event.getSelection().getName(), false);
+        } else
           getDisplay().selectDatasource(event.getSelection().getName());
       }
 
@@ -81,7 +81,7 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
 
       @Override
       public void onDatasourceUpdated(DatasourceUpdatedEvent event) {
-        updateTree(event.getSelection().getName());
+        updateTree(event.getDatasourceName(), true);
       }
 
     }));
@@ -97,15 +97,15 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
 
   @Override
   public void refreshDisplay() {
-    updateTree(null);
+    updateTree(null, true);
   }
 
   @Override
   public void revealDisplay() {
-    updateTree(null);
+    updateTree(null, false);
   }
 
-  private void updateTree(final String datasourceName) {
+  private void updateTree(final String datasourceName, final boolean keepCurrentSelection) {
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
       public void onResource(Response response, JsArray<DatasourceDto> datasources) {
@@ -113,9 +113,11 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
           ArrayList<TreeItem> items = new ArrayList<TreeItem>(datasources.length());
           addDatasources(datasources, items);
           getDisplay().setItems(items);
-          if(datasourceName != null) getDisplay().selectDatasource(datasourceName);
-          else
-            getDisplay().selectFirstDatasource();
+          if(!keepCurrentSelection) {
+            if(datasourceName != null) getDisplay().selectDatasource(datasourceName);
+            else
+              getDisplay().selectFirstDatasource();
+          }
         }
       }
 

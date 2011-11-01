@@ -24,17 +24,21 @@ public class DatasourceUpdatedEvent extends GwtEvent<DatasourceUpdatedEvent.Hand
 
   private static Type<Handler> TYPE;
 
-  private final DatasourceDto datasourceDto;
+  private final String datasourceName;
 
   /**
    * @param selectedItem
    */
   public DatasourceUpdatedEvent(DatasourceDto datasourceDto) {
-    this.datasourceDto = datasourceDto;
+    this.datasourceName = datasourceDto.getName();
   }
 
-  public DatasourceDto getSelection() {
-    return datasourceDto;
+  public DatasourceUpdatedEvent(String datasourceName) {
+    this.datasourceName = datasourceName;
+  }
+
+  public String getDatasourceName() {
+    return datasourceName;
   }
 
   public static Type<Handler> getType() {

@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorTreePresenter;
@@ -48,9 +49,40 @@ public class NavigatorTreeView implements NavigatorTreePresenter.Display {
 
   @Override
   public void setItems(List<TreeItem> items) {
+    // update items and keep tree state as much as possible
+    List<String> expandedItems = new ArrayList<String>();
+    for(int i = 0; i < tree.getItemCount(); i++) {
+      TreeItem item = tree.getItem(i);
+      if(item.getState()) {
+        expandedItems.add(item.getText());
+      }
+    }
     tree.clear();
     for(TreeItem item : items) {
+      item.setState(expandedItems.contains(item.getText()));
       tree.addItem(item);
+    }
+    if(currentSelection == null) return;
+
+    if(currentSelection.getParentItem() != null) {
+      String datasourceName = currentSelection.getParentItem().getText();
+      currentSelection = getTableItem(datasourceName, currentSelection.getText());
+      if(currentSelection == null) {
+        selectDatasource(datasourceName);
+      } else {
+        // soft selection (do not trigger event)
+        currentSelection.addStyleName("selected");
+        tree.setSelectedItem(currentSelection, false);
+      }
+    } else {
+      currentSelection = getDatasourceItem(currentSelection.getText());
+      if(currentSelection == null) {
+        selectFirstDatasource();
+      } else {
+        // soft selection (do not trigger event)
+        currentSelection.addStyleName("selected");
+        tree.setSelectedItem(currentSelection, false);
+      }
     }
   }
 
@@ -85,13 +117,10 @@ public class NavigatorTreeView implements NavigatorTreePresenter.Display {
   @Override
   public void selectTable(String datasourceName, String tableName) {
     if(!isTableSelected(datasourceName, tableName)) {
-      for(int i = 0; i < tree.getItemCount(); i++) {
-        TreeItem dsItem = tree.getItem(i);
-        if(dsItem.getText().equals(datasourceName)) {
-          dsItem.setState(true);
-          selectChildren(tableName, dsItem);
-          break;
-        }
+      TreeItem dsItem = getDatasourceItem(datasourceName);
+      if(dsItem != null) {
+        dsItem.setState(true);
+        selectChildren(tableName, dsItem);
       }
     }
   }
@@ -109,14 +138,34 @@ public class NavigatorTreeView implements NavigatorTreePresenter.Display {
   @Override
   public void selectDatasource(String datasourceName) {
     if(!isDatasourceSelected(datasourceName)) {
-      for(int i = 0; i < tree.getItemCount(); i++) {
-        TreeItem dsItem = tree.getItem(i);
-        if(dsItem.getText().equals(datasourceName)) {
-          tree.setSelectedItem(dsItem);
-          break;
+      TreeItem dsItem = getDatasourceItem(datasourceName);
+      if(dsItem != null) {
+        tree.setSelectedItem(dsItem);
+      }
+    }
+  }
+
+  private TreeItem getDatasourceItem(String datasourceName) {
+    for(int i = 0; i < tree.getItemCount(); i++) {
+      TreeItem dsItem = tree.getItem(i);
+      if(dsItem.getText().equals(datasourceName)) {
+        return dsItem;
+      }
+    }
+    return null;
+  }
+
+  private TreeItem getTableItem(String datasourceName, String tableName) {
+    TreeItem dsItem = getDatasourceItem(datasourceName);
+    if(dsItem != null) {
+      for(int j = 0; j < dsItem.getChildCount(); j++) {
+        TreeItem tableItem = dsItem.getChild(j);
+        if(tableName.equals(tableItem.getText())) {
+          return tableItem;
         }
       }
     }
+    return null;
   }
 
   private boolean isDatasourceSelected(String datasourceName) {
