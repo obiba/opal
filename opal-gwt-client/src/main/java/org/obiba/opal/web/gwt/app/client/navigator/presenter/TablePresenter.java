@@ -18,9 +18,9 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingTableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingTableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingVariableSelectionEvent;
@@ -233,7 +233,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
           String errorMessage = response.getText().length() != 0 ? response.getText() : "UnknownError";
           eventBus.fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
         } else {
-          eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(navigationPresenter.get()).forResource("/datasources").build());
+          eventBus.fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
         }
       }
     };
@@ -251,7 +251,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
           String errorMessage = response.getText().length() != 0 ? response.getText() : "UnknownError";
           eventBus.fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
         } else {
-          eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(navigationPresenter.get()).forResource("/datasources").build());
+          eventBus.fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
         }
       }
     };
