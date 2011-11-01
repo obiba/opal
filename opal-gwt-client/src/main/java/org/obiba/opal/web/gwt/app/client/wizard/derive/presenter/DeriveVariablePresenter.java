@@ -52,7 +52,7 @@ import com.google.inject.Inject;
  */
 public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePresenter.Display> implements Wizard {
 
-  public static final int PAGE_SIZE = 12;
+  public static final int PAGE_SIZE = 20;
 
   @Inject
   private DeriveCategoricalVariableStepPresenter categoricalPresenter;
