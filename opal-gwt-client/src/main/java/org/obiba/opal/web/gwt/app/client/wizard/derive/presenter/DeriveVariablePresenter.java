@@ -20,6 +20,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
@@ -322,21 +323,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
      * @param view
      * @param derived
      */
-    private void saveVariable(ViewDto view, VariableDto derived) {
-      getDisplay().hideDialog();
-
-      ResponseCodeCallback callback = new ResponseCodeCallback() {
-
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          if(response.getStatusCode() == Response.SC_OK) {
-            close();
-          } else {
-            eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-          }
-        }
-      };
-
+    private void saveVariable(final ViewDto view, final VariableDto derived) {
       // add or update derived variable
       int pos = getVariablePosition(view, derived);
       VariableListViewDto variableListViewDto = (VariableListViewDto) view.getExtension(VariableListViewDto.ViewDtoExtensions.view);
@@ -348,6 +335,20 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
       }
       variableListViewDto.setVariablesArray(variables);
 
+      // request callback
+      ResponseCodeCallback callback = new ResponseCodeCallback() {
+
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          if(response.getStatusCode() == Response.SC_OK) {
+            close(view, derived);
+          } else {
+            eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+          }
+        }
+      };
+
+      // update view request
       ResourceRequestBuilderFactory.newBuilder() //
       .put() //
       .forResource("/datasource/" + view.getDatasourceName() + "/view/" + view.getName()) //
@@ -366,24 +367,13 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
      * @param viewName
      * @param derived
      */
-    private void saveVariable(String datasourceName, String viewName, VariableDto derived) {
-      ResponseCodeCallback callback = new ResponseCodeCallback() {
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_CREATED) {
-            close();
-          } else {
-            eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-          }
-        }
-      };
-
+    private void saveVariable(String datasourceName, String viewName, final VariableDto derived) {
       // Build the ViewDto for the request.
       List<TableDto> tableDtos = new ArrayList<TableDto>();
       tableDtos.add(table);
       ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().setName(viewName).fromTables(tableDtos);
       viewDtoBuilder.defaultVariableListView();
-      ViewDto view = viewDtoBuilder.build();
+      final ViewDto view = viewDtoBuilder.build();
 
       // add derived variable
       VariableListViewDto variableListViewDto = (VariableListViewDto) view.getExtension(VariableListViewDto.ViewDtoExtensions.view);
@@ -391,7 +381,19 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
       variables.push(derived);
       variableListViewDto.setVariablesArray(variables);
 
-      // Create the resource request (the builder).
+      // request callback
+      ResponseCodeCallback callback = new ResponseCodeCallback() {
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_CREATED) {
+            close(view, derived);
+          } else {
+            eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+          }
+        }
+      };
+
+      // create view request
       ResourceRequestBuilderFactory.newBuilder()//
       .post()//
       .forResource("/datasource/" + datasourceName + "/views")//
@@ -405,9 +407,12 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
       .send();
     }
 
-    private void close() {
+    private void close(ViewDto view, VariableDto derived) {
       getDisplay().hideDialog();
       eventBus.fireEvent(new ViewSavedEvent());
+      if(getDisplay().isOpenEditorSelected()) {
+        eventBus.fireEvent(new ViewConfigurationRequiredEvent(view, derived));
+      }
     }
 
     private List<String> validate() {
