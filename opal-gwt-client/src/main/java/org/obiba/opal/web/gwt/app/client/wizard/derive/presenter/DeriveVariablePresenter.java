@@ -52,7 +52,7 @@ import com.google.inject.Inject;
  */
 public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePresenter.Display> implements Wizard {
 
-  private static final int pageSize = 10;
+  public static final int PAGE_SIZE = 12;
 
   @Inject
   private DeriveCategoricalVariableStepPresenter categoricalPresenter;
@@ -149,12 +149,16 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
   private void populateValues(final int offset) {
     currentOffset = offset;
     ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder() //
-    .forResource(table.getLink() + "/variable/_transient/values?limit=" + pageSize + "&offset=" + offset + "&script=" + URL.encodeQueryString(currentScript)).get() //
+    .forResource(table.getLink() + "/variable/_transient/values?limit=" + PAGE_SIZE + "&offset=" + offset + "&script=" + URL.encodeQueryString(currentScript)).get() //
     .withCallback(new ResourceCallback<JsArray<ValueDto>>() {
 
       @Override
       public void onResource(Response response, JsArray<ValueDto> resource) {
-        getDisplay().setPageLimits(offset + 1, offset + pageSize);
+        int high = offset + PAGE_SIZE;
+        if(resource != null && resource.length() < high) {
+          high = offset + resource.length();
+        }
+        getDisplay().setPageLimits(offset + 1, high, table.getValueSetCount());
         getDisplay().populateValues(resource);
       }
 
@@ -221,7 +225,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     @Override
     public void onClick(ClickEvent event) {
       if(currentOffset > 0) {
-        populateValues(currentOffset - pageSize);
+        populateValues(currentOffset - PAGE_SIZE);
       }
     }
 
@@ -231,8 +235,8 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
 
     @Override
     public void onClick(ClickEvent event) {
-      if(currentOffset + pageSize < table.getValueSetCount()) {
-        populateValues(currentOffset + pageSize);
+      if(currentOffset + PAGE_SIZE < table.getValueSetCount()) {
+        populateValues(currentOffset + PAGE_SIZE);
       }
     }
 
@@ -413,7 +417,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
 
     HandlerRegistration addPreviousPageClickHandler(ClickHandler handler);
 
-    void setPageLimits(int low, int high);
+    void setPageLimits(int low, int high, int count);
 
     boolean isOpenEditorSelected();
   }

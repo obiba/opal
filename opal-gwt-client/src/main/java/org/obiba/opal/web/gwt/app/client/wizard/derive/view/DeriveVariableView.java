@@ -309,10 +309,19 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
   }
 
   @Override
-  public void setPageLimits(int low, int high) {
-    previousPage.setEnabled(low > 1);
-    pageLow.setText("" + low);
-    pageHigh.setText("" + high);
+  public void setPageLimits(int low, int high, int count) {
+    if(low == 1) {
+      previousPage.addStyleName("disabled");
+    } else {
+      previousPage.removeStyleName("disabled");
+    }
+    if(high >= count) {
+      nextPage.addStyleName("disabled");
+    } else {
+      nextPage.removeStyleName("disabled");
+    }
+    pageLow.setText(Integer.toString(low));
+    pageHigh.setText(Integer.toString(high));
   }
 
   @Override

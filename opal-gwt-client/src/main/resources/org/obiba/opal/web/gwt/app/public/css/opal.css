@@ -851,6 +851,26 @@ div.paging > a {
   margin-right: 5px;
 }
 
+div.paging > a.previous {
+  background: url("../image/16/previous.png") no-repeat scroll left center transparent;
+  padding-left: 20px;
+}
+
+div.paging > a.previous.disabled {
+  background: url("../image/16/previous-disabled.png") no-repeat scroll left center transparent;
+  cursor: auto;
+}
+
+div.paging > a.next {
+  background: url("../image/16/next.png") no-repeat scroll left center transparent;
+  padding-left: 20px;
+}
+
+div.paging > a.next.disabled {
+  background: url("../image/16/next-disabled.png") no-repeat scroll left center transparent;
+  cursor: auto;
+}
+
 div.paging > span {
   margin-right: 5px;
 }

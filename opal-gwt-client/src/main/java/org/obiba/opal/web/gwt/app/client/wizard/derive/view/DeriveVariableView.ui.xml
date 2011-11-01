@@ -22,11 +22,11 @@
           <g:Anchor><ui:msg description="Derived Values tab title" >Values</ui:msg></g:Anchor>
           <g:FlowPanel>
             <g:FlowPanel addStyleNames="paging">
-              <g:Anchor ui:field="previousPage"><img src="image/16/previous.png" align="top"/></g:Anchor>
+              <g:Anchor ui:field="previousPage" addStyleNames="previous"></g:Anchor>
 		      <g:InlineLabel ui:field="pageLow">1</g:InlineLabel>
 		      <g:InlineLabel> ... </g:InlineLabel>
 		      <g:InlineLabel ui:field="pageHigh">10</g:InlineLabel>
-		      <g:Anchor ui:field="nextPage"><img src="image/16/next.png" align="top"/></g:Anchor>
+		      <g:Anchor ui:field="nextPage" addStyleNames="next"></g:Anchor>
 		    </g:FlowPanel>
             <o:Table width="100%" ui:field="valuesTable" />
           </g:FlowPanel>

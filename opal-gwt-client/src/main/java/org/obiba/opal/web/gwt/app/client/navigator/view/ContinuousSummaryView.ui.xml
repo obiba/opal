@@ -3,7 +3,7 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <ui:style>
-    .title { font-size: small; }
+    .title { font-size: small; margin-right: 1em; }
     .title-light { color: gray; font-size: small; }
     .plot { width:400px;float:left;margin-right:2em }
   </ui:style>
