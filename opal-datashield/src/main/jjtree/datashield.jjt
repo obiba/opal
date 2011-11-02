@@ -31,7 +31,7 @@ SKIP:
 
 TOKEN : /* Numeric Constants */
 {
-       < S_NUMBER: <FLOAT>
+       < NUMBER: <FLOAT>
            | <FLOAT> ( ["e","E"] ([ "-","+"])? <FLOAT> )?
        >
  |     < #FLOAT: <INTEGER>
@@ -44,8 +44,8 @@ TOKEN : /* Numeric Constants */
 
 TOKEN:
 {
-      < S_IDENTIFIER: ( <LETTER> )+ ( <DIGIT> | <LETTER> | <UNDERSCORE>)* >
-  |   < S_OPERATOR: (["/", "!"]) | "%*%">
+      < R_IDENTIFIER: ( <LETTER> )+ ( <DIGIT> | <LETTER> | <UNDERSCORE>)* >
+  |   < R_OPERATOR: (["/", "!", "^"]) | "%*%">
   |   < F_OPERATOR: ([":"] | "%in%") >
   |   < COMMON_OPERATOR: (["+","-","*"]) >
   |   < #LETTER: ["a"-"z", "A"-"Z"] >
@@ -65,7 +65,7 @@ void exp() #void :
  (  LOOKAHEAD(2)
     // Parse a formula as much as possible (A~B+C must not be parsed as (A~B) + C). This is why it comes first here.
     formula()
-  | simpleExp() [ (op=<S_OPERATOR> | op=<COMMON_OPERATOR>) exp() {jjtThis.value=op.image;} #BinaryOp(2) ]
+  | simpleExp() [ (op=<R_OPERATOR> | op=<COMMON_OPERATOR>) exp() {jjtThis.value=op.image;} #BinaryOp(2) ]
  )
 }
 
@@ -82,15 +82,15 @@ void simpleExp() #void :
 void funcCall() :
 {Token f;}
 {
-  f = <S_IDENTIFIER> "(" [ expList() ] ")" {jjtThis.value = f.image;}
+  f = <R_IDENTIFIER> "(" [ expList() ] ")" {jjtThis.value = f.image;}
 }
 
 void symbol() : 
 {Token s=null;}
 {
  (
-    s=<S_IDENTIFIER>
-  | s=<S_NUMBER>
+    s=<R_IDENTIFIER>
+  | s=<NUMBER>
  ) {jjtThis.value = s.image;}
 }
 
@@ -100,7 +100,7 @@ void formula() #symbol :
  StringBuilder sb = new StringBuilder();}
 {
   (
-    t=<S_IDENTIFIER> "~" {sb.append(t.image).append("~");}
+    t=<R_IDENTIFIER> "~" {sb.append(t.image).append("~");}
     (
         ft=formulaTerm() {sb.append(ft);}
     )
@@ -116,8 +116,8 @@ StringBuilder formulaTerm() #void :
 {
   (
       "(" sb=formulaTerm() ")"  {sb.insert(0, '(').append(')');}
-    | t=<S_IDENTIFIER> {sb = new StringBuilder(t.image);}
-  ) [ "^" t=<S_NUMBER> {sb.append("^").append(t.image);}]
+    | t=<R_IDENTIFIER> {sb = new StringBuilder(t.image);}
+  ) [ "^" t=<NUMBER> {sb.append("^").append(t.image);}]
     [ (t=<COMMON_OPERATOR> | t=<F_OPERATOR>) ft=formulaTerm() {sb.append(t.image).append(ft);} ]
   {return sb;}
 }

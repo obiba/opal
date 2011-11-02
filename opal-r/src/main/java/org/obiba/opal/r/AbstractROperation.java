@@ -105,6 +105,6 @@ public abstract class AbstractROperation implements ROperation {
   /**
    * Does anything with the current R connection.
    */
-  public abstract void doWithConnection();
+  protected abstract void doWithConnection();
 
 }

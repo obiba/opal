@@ -48,4 +48,9 @@ public abstract class AbstractROperationWithResult extends AbstractROperation im
   protected REXP eval(String script) {
     return this.result = super.eval(script);
   }
+
+  protected void setResult(REXP result) {
+    this.result = result;
+  }
+
 }

@@ -9,14 +9,21 @@
  ******************************************************************************/
 package org.obiba.opal.web.datashield;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.obiba.opal.datashield.DataShieldLog;
+import org.obiba.opal.datashield.RestrictedRScriptROperation;
+import org.obiba.opal.datashield.expr.ParseException;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.web.r.RSymbolResource;
 
 public class DataShieldSymbolResource extends RSymbolResource {
+
+  // TODO: Extract from configuration
+  private boolean restricted = false;
 
   public DataShieldSymbolResource(OpalRSession rSession, String name) {
     super(rSession, name);
@@ -31,6 +38,9 @@ public class DataShieldSymbolResource extends RSymbolResource {
   @Override
   public Response putRScript(UriInfo uri, String script) {
     DataShieldLog.userLog("creating symbol '{}' from R script '{}'", getName(), script);
+    if(restricted) {
+      return putRestrictedRScript(uri, script);
+    }
     return super.putRScript(uri, script);
   }
 
@@ -49,7 +59,17 @@ public class DataShieldSymbolResource extends RSymbolResource {
   /**
    * Overridden to prevent accessing individual-level data
    */
+  @Override
   public Response getSymbol() {
     return Response.noContent().build();
+  }
+
+  protected Response putRestrictedRScript(UriInfo uri, String content) {
+    try {
+      getRSession().execute(new RestrictedRScriptROperation(getName(), content));
+      return Response.created(getSymbolURI(uri)).build();
+    } catch(ParseException e) {
+      return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
+    }
   }
 }

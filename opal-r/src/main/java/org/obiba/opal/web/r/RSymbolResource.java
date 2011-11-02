@@ -82,4 +82,8 @@ public class RSymbolResource extends AbstractOpalRSessionResource {
   protected URI getSymbolURI(UriInfo info) {
     return info.getRequestUri();
   }
+
+  protected OpalRSession getRSession() {
+    return rSession;
+  }
 }
