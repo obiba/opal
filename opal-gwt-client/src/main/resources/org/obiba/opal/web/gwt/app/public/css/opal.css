@@ -79,6 +79,10 @@ input[type="checkbox"], input[type="radio"] {
   cursor: pointer;
 }
 
+.clear {
+  clear: both;
+}
+
 .right-aligned {
   float: right;
 }

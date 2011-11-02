@@ -128,7 +128,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
       }
 
       if(derivationPresenter != null) {
-        derivationPresenter.setOriginalVariable(variable);
+        derivationPresenter.initialize(variable);
         getDisplay().appendWizardSteps(derivationPresenter.getWizardSteps());
       }
     } else {
@@ -238,7 +238,6 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     @Override
     public void onStepIn() {
       VariableDto derived = derivationPresenter.getDerivedVariable();
-      String script = derivationPresenter.getScript(derived);
       scriptEvaluationPresenter.setVariable(derived);
       scriptEvaluationPresenter.refreshDisplay();
     }

@@ -15,9 +15,7 @@ import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
-import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 public abstract class DerivationPresenter<D extends WidgetDisplay> extends WidgetPresenter<D> {
@@ -28,51 +26,16 @@ public abstract class DerivationPresenter<D extends WidgetDisplay> extends Widge
     super(display, eventBus);
   }
 
-  void setOriginalVariable(VariableDto variable) {
+  void initialize(VariableDto variable) {
     this.originalVariable = variable;
   }
 
-  abstract VariableDto getDerivedVariable();
+  public VariableDto getOriginalVariable() {
+    return originalVariable;
+  }
+
+  public abstract VariableDto getDerivedVariable();
 
   abstract List<DefaultWizardStepController> getWizardSteps();
-
-  protected VariableDto copyOriginalVariable() {
-    VariableDto derived = VariableDto.create();
-    derived.setName(originalVariable.getName());
-    derived.setValueType(originalVariable.getValueType());
-    derived.setEntityType(originalVariable.getEntityType());
-    derived.setIsRepeatable(originalVariable.getIsRepeatable());
-
-    // set attributes
-    derived.setAttributesArray(originalVariable.getAttributesArray());
-
-    return derived;
-  }
-
-  protected void setScript(VariableDto derived, String script) {
-    AttributeDto scriptAttr = getScriptAttribute(derived);
-    scriptAttr.setValue(script);
-  }
-
-  public String getScript(VariableDto derived) {
-    return getScriptAttribute(derived).getValue();
-  }
-
-  private AttributeDto getScriptAttribute(VariableDto derived) {
-    AttributeDto scriptAttr = null;
-    for(AttributeDto attr : JsArrays.toIterable(derived.getAttributesArray())) {
-      if(attr.getName().equals("script")) {
-        scriptAttr = attr;
-        break;
-      }
-    }
-    if(scriptAttr == null) {
-      scriptAttr = AttributeDto.create();
-      scriptAttr.setName("script");
-      scriptAttr.setValue("null");
-      derived.getAttributesArray().push(scriptAttr);
-    }
-    return scriptAttr;
-  }
 
 }

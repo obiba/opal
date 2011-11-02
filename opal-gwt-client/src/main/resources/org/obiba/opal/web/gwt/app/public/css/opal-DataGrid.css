@@ -1,0 +1,91 @@
+
+.dataGridLastColumnFooter{}
+.dataGridFirstColumnFooter{}
+.dataGridLastColumnHeader{}
+.dataGridLoading{}
+
+
+
+.dataGridHeader {
+	background-color: #F3F4EB;
+	padding: 4px 15px;
+	border-top: 1px solid #B4A291;
+	border-bottom: 1px solid #B4A291;
+	color: #333333;
+}
+
+.dataGridFirstColumnHeader{}
+
+.dataGridFooter{}
+
+.dataGridOddRow{
+	background-color: #EEEEEE;
+}
+
+.dataGridOddRow .dataGridFirstColumn  {
+	background-color: #DDDDDD;
+}
+
+.dataGridEvenRow{
+	background-color: #FFFFFF;
+}
+
+.dataGridEvenRow .dataGridFirstColumn {
+	background-color: #EEEEEE;
+}
+
+.dataGridHoveredRow{}
+
+.dataGridSelectedRow, .dataGridSelectedRow .dataGridFirstColumn {
+	background-color: #B1B1B1;
+    color: #ffffff;
+}
+
+.dataGrid{}
+
+.dataGridCell{
+	padding: 4px 15px;
+	height: 20px;
+}
+
+.dataGridFirstColumn{}
+.dataGridLastColumn{}
+
+.dataGridWidget{}
+
+.dataGridSelectedRowCell{}
+
+.dataGridHoveredRowCell{}
+
+.dataGridOddRowCell{}
+
+.dataGridKeyboardSelectedRowCell{}
+
+ .dataGridEvenRowCell{}
+ 
+ .dataGridKeyboardSelectedCell{}
+ 
+ .dataGridKeyboardSelectedRow{}
+
+/* Specific tables */
+
+.folder-details .dataGridHeader {
+	border-top: none;
+}
+
+.selection-list .dataGridEvenRow .dataGridFirstColumn, .selection-list .dataGridOddRow .dataGridFirstColumn {
+	background-color: #ffffff;
+}
+
+.selection-list .dataGridSelectedRow .dataGridFirstColumn {
+	background-color: #B1B1B1;
+}
+
+.dataGridSortedHeaderAscending{}
+.dataGridSortedHeaderDescending{}
+.dataGridSortableHeader{
+  cursor: pointer;
+  cursor: hand;
+  text-decoration: underline;
+}
+

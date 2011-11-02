@@ -19,6 +19,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DuplicationHelper;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.inject.Inject;
@@ -28,9 +29,18 @@ import com.google.inject.Inject;
  */
 public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<DeriveNumericalVariableStepPresenter.Display> {
 
+  private DuplicationHelper derivationHelper;
+
   @Inject
   public DeriveNumericalVariableStepPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
+  }
+
+  @Override
+  void initialize(VariableDto variable) {
+    super.initialize(variable);
+    // TODO initialize when method is chosen
+    derivationHelper = new DuplicationHelper(variable);
   }
 
   @Override
@@ -51,17 +61,8 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
   }
 
   @Override
-  VariableDto getDerivedVariable() {
-    VariableDto derived = copyOriginalVariable();
-
-    // set script
-    // TODO: mapping
-    setScript(derived, "$('" + originalVariable.getName() + "'");
-
-    // set categories
-    // TODO
-
-    return derived;
+  public VariableDto getDerivedVariable() {
+    return derivationHelper.getDerivedVariable();
   }
 
   //

@@ -19,6 +19,8 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.CategoricalVariableDerivationHelper;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.inject.Inject;
@@ -28,25 +30,27 @@ import com.google.inject.Inject;
  */
 public class DeriveCategoricalVariableStepPresenter extends DerivationPresenter<DeriveCategoricalVariableStepPresenter.Display> {
 
+  private CategoricalVariableDerivationHelper derivationHelper;
+
   @Inject
   public DeriveCategoricalVariableStepPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
   }
 
+  //
+  // DerivationPresenter methods
+  //
+
+  @Override
+  void initialize(VariableDto variable) {
+    super.initialize(variable);
+    derivationHelper = new CategoricalVariableDerivationHelper(variable);
+    getDisplay().populateValues(derivationHelper.getValueMapEntries());
+  }
+
   @Override
   public VariableDto getDerivedVariable() {
-    VariableDto derived = copyOriginalVariable();
-
-    // set script
-    // TODO: mapping
-    setScript(derived, "$('" + originalVariable.getName() + "')");
-    // GWT.log("script: " + getScript(derived));
-
-    // set categories
-    // TODO: mapping
-    derived.setCategoriesArray(originalVariable.getCategoriesArray());
-
-    return derived;
+    return derivationHelper.getDerivedVariable();
   }
 
   @Override
@@ -101,6 +105,8 @@ public class DeriveCategoricalVariableStepPresenter extends DerivationPresenter<
   public interface Display extends WidgetDisplay {
 
     DefaultWizardStepController.Builder getMapStepController();
+
+    void populateValues(List<ValueMapEntry> valuesMap);
 
   }
 

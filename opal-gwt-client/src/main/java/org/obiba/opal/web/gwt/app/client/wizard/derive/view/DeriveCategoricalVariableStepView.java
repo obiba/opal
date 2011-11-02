@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveCategoricalVariableStepPresenter;
@@ -18,6 +20,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -37,17 +40,29 @@ public class DeriveCategoricalVariableStepView extends Composite implements Deri
   @UiField
   WizardStep mapStep;
 
+  @UiField
+  ValueMapGrid valuesMapGrid;
+
+  @UiField
+  SimplePager pager;
+
   //
   // Constructors
   //
 
   public DeriveCategoricalVariableStepView() {
     initWidget(uiBinder.createAndBindUi(this));
+    pager.setDisplay(valuesMapGrid);
   }
 
   @Override
   public DefaultWizardStepController.Builder getMapStepController() {
     return DefaultWizardStepController.Builder.create(mapStep).title("Categorical");
+  }
+
+  @Override
+  public void populateValues(List<ValueMapEntry> valuesMap) {
+    valuesMapGrid.populate(valuesMap);
   }
 
   //
