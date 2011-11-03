@@ -28,6 +28,7 @@ public class ValueMapEntry {
     super();
     this.value = value;
     this.newValue = newValue;
+    this.missing = missing;
   }
 
   public String getValue() {

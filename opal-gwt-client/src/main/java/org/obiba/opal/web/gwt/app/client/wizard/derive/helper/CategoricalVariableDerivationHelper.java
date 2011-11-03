@@ -20,6 +20,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.regexp.shared.RegExp;
 
 /**
  *
@@ -35,8 +36,27 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     int index = 1;
     for(CategoryDto cat : JsArrays.toIterable(originalVariable.getCategoriesArray())) {
       boolean missing = cat.hasIsMissing() ? cat.getIsMissing() : false;
-      ValueMapEntry map = new ValueMapEntry(cat.getName(), Integer.toString(index++), missing);
-      valueMapEntries.add(map);
+      ValueMapEntry entry = new ValueMapEntry(cat.getName(), "", missing);
+
+      if(RegExp.compile("^\\d+$").test(cat.getName())) {
+        entry.setNewValue(cat.getName());
+      } else if(RegExp.compile("^N$|^NO$|^NONE$|^NEVER$", "i").test(cat.getName())) {
+        entry.setNewValue("0");
+      } else if(RegExp.compile("^Y$|^YES$|^MALE$", "i").test(cat.getName())) {
+        entry.setNewValue("1");
+        index++;
+      } else if(cat.getName().equalsIgnoreCase("FEMALE")) {
+        entry.setNewValue("2");
+        index++;
+      } else {
+        entry.setNewValue(Integer.toString(index++));
+      }
+
+      if(RegExp.compile("^DNK$|^DK-NA$|^PNA$|^REFUSED$|^NONE$|^NEVER$", "i").test(cat.getName())) {
+        entry.setMissing(true);
+      }
+
+      valueMapEntries.add(entry);
     }
   }
 

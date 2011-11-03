@@ -20,6 +20,8 @@ public class Grid<T> extends DataGrid<T> {
 
   private static final int DEFAULT_PAGESIZE = 15;
 
+  private static final GridResources resources = GWT.<GridResources> create(GridResources.class);
+
   public interface GridResources extends DataGrid.Resources {
     @NotStrict
     @Source("org/obiba/opal/web/gwt/app/public/css/opal-DataGrid.css")
@@ -27,14 +29,14 @@ public class Grid<T> extends DataGrid<T> {
   }
 
   public Grid() {
-    super(DEFAULT_PAGESIZE, GWT.<GridResources> create(GridResources.class));
+    this(DEFAULT_PAGESIZE);
   }
 
   /**
    * @param pageSize
    */
   public Grid(int pageSize) {
-    super(pageSize, GWT.<GridResources> create(GridResources.class));
+    super(pageSize, resources);
+    setStyleName(resources.dataGridStyle().dataGridWidget());
   }
-
 }

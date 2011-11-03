@@ -20,6 +20,8 @@ public class Table<T> extends CellTable<T> {
 
   private static final int DEFAULT_PAGESIZE = 15;
 
+  private static final TableResources resources = GWT.<TableResources> create(TableResources.class);
+
   public interface TableResources extends CellTable.Resources {
     @NotStrict
     @Source("org/obiba/opal/web/gwt/app/public/css/opal-CellTable.css")
@@ -27,14 +29,14 @@ public class Table<T> extends CellTable<T> {
   }
 
   public Table() {
-    super(DEFAULT_PAGESIZE, GWT.<TableResources> create(TableResources.class));
+    this(DEFAULT_PAGESIZE);
   }
 
   /**
    * @param pageSize
    */
   public Table(int pageSize) {
-    super(pageSize, GWT.<TableResources> create(TableResources.class));
+    super(pageSize, resources);
   }
 
 }

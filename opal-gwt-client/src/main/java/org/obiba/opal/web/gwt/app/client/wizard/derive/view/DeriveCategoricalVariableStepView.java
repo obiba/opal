@@ -20,7 +20,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -43,16 +42,12 @@ public class DeriveCategoricalVariableStepView extends Composite implements Deri
   @UiField
   ValueMapGrid valuesMapGrid;
 
-  @UiField
-  SimplePager pager;
-
   //
   // Constructors
   //
 
   public DeriveCategoricalVariableStepView() {
     initWidget(uiBinder.createAndBindUi(this));
-    pager.setDisplay(valuesMapGrid);
   }
 
   @Override

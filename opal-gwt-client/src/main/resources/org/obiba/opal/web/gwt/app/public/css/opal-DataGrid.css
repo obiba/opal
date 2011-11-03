@@ -1,51 +1,54 @@
+.dataGridWidget {
+  border-bottom: 1px solid #B4A291;
+}
 
 .dataGridLastColumnFooter{}
 .dataGridFirstColumnFooter{}
 .dataGridLastColumnHeader{}
 .dataGridLoading{}
 
-
-
 .dataGridHeader {
-	background-color: #F3F4EB;
-	padding: 4px 15px;
-	border-top: 1px solid #B4A291;
-	border-bottom: 1px solid #B4A291;
-	color: #333333;
+  background-color: #F3F4EB;
+  padding: 4px 15px;
+  border-top: 1px solid #B4A291;
+  border-bottom: 1px solid #B4A291;
+  color: #333333;
 }
 
 .dataGridFirstColumnHeader{}
 
-.dataGridFooter{}
+.dataGridFooter{
+  border-top: 1px solid #B4A291;
+}
 
 .dataGridOddRow{
-	background-color: #EEEEEE;
+  background-color: #EEEEEE;
 }
 
 .dataGridOddRow .dataGridFirstColumn  {
-	background-color: #DDDDDD;
+  background-color: #DDDDDD;
 }
 
 .dataGridEvenRow{
-	background-color: #FFFFFF;
+  background-color: #FFFFFF;
 }
 
 .dataGridEvenRow .dataGridFirstColumn {
-	background-color: #EEEEEE;
+  background-color: #EEEEEE;
 }
 
 .dataGridHoveredRow{}
 
 .dataGridSelectedRow, .dataGridSelectedRow .dataGridFirstColumn {
-	background-color: #B1B1B1;
+  background-color: #B1B1B1;
     color: #ffffff;
 }
 
 .dataGrid{}
 
 .dataGridCell{
-	padding: 4px 15px;
-	height: 20px;
+  padding: 4px 15px;
+  height: 20px;
 }
 
 .dataGridFirstColumn{}
@@ -70,15 +73,15 @@
 /* Specific tables */
 
 .folder-details .dataGridHeader {
-	border-top: none;
+  border-top: none;
 }
 
 .selection-list .dataGridEvenRow .dataGridFirstColumn, .selection-list .dataGridOddRow .dataGridFirstColumn {
-	background-color: #ffffff;
+  background-color: #ffffff;
 }
 
 .selection-list .dataGridSelectedRow .dataGridFirstColumn {
-	background-color: #B1B1B1;
+  background-color: #B1B1B1;
 }
 
 .dataGridSortedHeaderAscending{}

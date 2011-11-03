@@ -8,12 +8,9 @@
   ui:generateLocales="default">
 
   <g:FlowPanel>
-     <o:WizardStep ui:field="mapStep">
-        <g:FlowPanel>
-          <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned" />
-          <o2:ValueMapGrid width="100%" ui:field="valuesMapGrid" pageSize="10" addStyleNames="clear"/>
-        </g:FlowPanel>
-      </o:WizardStep>
+    <o:WizardStep ui:field="mapStep">
+      <o2:ValueMapGrid width="100%" ui:field="valuesMapGrid" pageSizeMin="10" pageSizeMax="100"/>
+    </o:WizardStep>
   </g:FlowPanel>
   
 </ui:UiBinder>

@@ -1,51 +1,52 @@
+.cellTableWidget {
+  border-bottom: 1px solid #B4A291;
+}
 
 .cellTableLastColumnFooter{}
 .cellTableFirstColumnFooter{}
 .cellTableLastColumnHeader{}
 .cellTableLoading{}
 
-
-
 .cellTableHeader {
-	background-color: #F3F4EB;
-	padding: 4px 15px;
-	border-top: 1px solid #B4A291;
-	border-bottom: 1px solid #B4A291;
-	color: #333333;
+  background-color: #F3F4EB;
+  padding: 4px 15px;
+  border-top: 1px solid #B4A291;
+  border-bottom: 1px solid #B4A291;
+  color: #333333;
 }
 
 .cellTableFirstColumnHeader{}
 
-.cellTableFooter{}
+.cellTableFooter{
+  border-top: 1px solid #B4A291;
+}
 
 .cellTableOddRow{
-	background-color: #EEEEEE;
+  background-color: #EEEEEE;
 }
 
 .cellTableOddRow .cellTableFirstColumn  {
-	background-color: #DDDDDD;
+  background-color: #DDDDDD;
 }
 
 .cellTableEvenRow{
-	background-color: #FFFFFF;
+  background-color: #FFFFFF;
 }
 
 .cellTableEvenRow .cellTableFirstColumn {
-	background-color: #EEEEEE;
+  background-color: #EEEEEE;
 }
 
 .cellTableHoveredRow{}
 
 .cellTableSelectedRow, .cellTableSelectedRow .cellTableFirstColumn {
-	background-color: #B1B1B1;
+  background-color: #B1B1B1;
     color: #ffffff;
 }
 
-.cellTable{}
-
 .cellTableCell{
-	padding: 4px 15px;
-	height: 20px;
+  padding: 4px 15px;
+  height: 20px;
 }
 
 .cellTableFirstColumn{}
@@ -70,15 +71,15 @@
 /* Specific tables */
 
 .folder-details .cellTableHeader {
-	border-top: none;
+  border-top: none;
 }
 
 .selection-list .cellTableEvenRow .cellTableFirstColumn, .selection-list .cellTableOddRow .cellTableFirstColumn {
-	background-color: #ffffff;
+  background-color: #ffffff;
 }
 
 .selection-list .cellTableSelectedRow .cellTableFirstColumn {
-	background-color: #B1B1B1;
+  background-color: #B1B1B1;
 }
 
 .cellTableSortedHeaderAscending{}
