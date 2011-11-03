@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.helper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -28,36 +29,65 @@ import com.google.gwt.regexp.shared.RegExp;
  */
 public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
+  private static final String MISSING_REGEXP = "^DNK$|^DK-NA$|^PNA$|^REFUSED$";
+
+  private static final String NONE_REGEXP = "^NONE$|^NEVER$";
+
+  private static final String YES_REGEXP = "^Y$|^YES$";
+
+  private static final String NO_REGEXP = "^N$|^NO$";
+
+  private static final String MALE_REGEXP = "^MALE$";
+
+  private static final String FEMALE_REGEXP = "^FEMALE$";
+
   public CategoricalVariableDerivationHelper(VariableDto originalVariable) {
     super(originalVariable);
   }
 
   protected void initializeValueMapEntries() {
     this.valueMapEntries = new ArrayList<ValueMapEntry>();
+    List<ValueMapEntry> missingValueMapEntries = new ArrayList<ValueMapEntry>();
     int index = 1;
+
+    // recode non-missing values and identify missing values
     for(CategoryDto cat : JsArrays.toIterable(originalVariable.getCategoriesArray())) {
-      boolean missing = cat.hasIsMissing() ? cat.getIsMissing() : false;
-      ValueMapEntry entry = new ValueMapEntry(ValueMapEntryType.CATEGORY_NAME, cat.getName(), "", missing);
+      ValueMapEntry entry = new ValueMapEntry(ValueMapEntryType.CATEGORY_NAME, cat.getName());
 
-      if(RegExp.compile("^\\d+$").test(cat.getName())) {
-        entry.setNewValue(cat.getName());
-      } else if(RegExp.compile("^N$|^NO$|^NONE$|^NEVER$", "i").test(cat.getName())) {
-        entry.setNewValue("0");
-      } else if(RegExp.compile("^Y$|^YES$|^MALE$", "i").test(cat.getName())) {
-        entry.setNewValue("1");
-        index++;
-      } else if(cat.getName().equalsIgnoreCase("FEMALE")) {
-        entry.setNewValue("2");
-        index++;
-      } else {
-        entry.setNewValue(Integer.toString(index++));
-      }
-
-      if(RegExp.compile("^DNK$|^DK-NA$|^PNA$|^REFUSED$|^NONE$|^NEVER$", "i").test(cat.getName())) {
+      if(estimateIsMissing(cat)) {
+        missingValueMapEntries.add(entry);
         entry.setMissing(true);
-      }
+      } else {
+        valueMapEntries.add(entry);
 
-      valueMapEntries.add(entry);
+        if(RegExp.compile("^\\d+$").test(cat.getName())) {
+          entry.setNewValue(cat.getName());
+        } else if(RegExp.compile(NO_REGEXP + "|" + NONE_REGEXP, "i").test(cat.getName())) {
+          entry.setNewValue("0");
+        } else if(RegExp.compile(YES_REGEXP + "|" + MALE_REGEXP, "i").test(cat.getName())) {
+          entry.setNewValue("1");
+          index++;
+        } else if(RegExp.compile(FEMALE_REGEXP, "i").test(cat.getName())) {
+          entry.setNewValue("2");
+          index++;
+        } else {
+          entry.setNewValue(Integer.toString(index++));
+        }
+      }
+    }
+
+    // recode missing values
+    if(missingValueMapEntries.size() > 0) {
+      int missIndex = 10 - missingValueMapEntries.size();
+      int factor = 1;
+      while(missIndex * factor < index + 1) {
+        factor = factor * 10 + 1;
+      }
+      for(ValueMapEntry entry : missingValueMapEntries) {
+        entry.setNewValue(Integer.toString(missIndex * factor));
+        missIndex++;
+      }
+      valueMapEntries.addAll(missingValueMapEntries);
     }
 
     valueMapEntries.add(new ValueMapEntry(ValueMapEntryType.EMPTY_VALUES, translations.emptyValuesLabel(), "", true));
@@ -161,5 +191,22 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     } else {
       scriptBuilder.append("null");
     }
+  }
+
+  private boolean estimateIsMissing(CategoryDto cat) {
+    boolean missing = false;
+
+    if(estimateIsMissing(cat.getName())) {
+      missing = true;
+    } else if(cat.hasIsMissing()) {
+      missing = cat.getIsMissing();
+    }
+
+    return missing;
+  }
+
+  private boolean estimateIsMissing(String value) {
+    if(value == null || value.isEmpty()) return true;
+    return RegExp.compile(MISSING_REGEXP, "i").test(value);
   }
 }
