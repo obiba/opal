@@ -16,17 +16,20 @@ import javax.ws.rs.core.UriInfo;
 
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.RestrictedRScriptROperation;
+import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.datashield.expr.ParseException;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.web.r.RSymbolResource;
 
+import com.google.common.base.Supplier;
+
 public class DataShieldSymbolResource extends RSymbolResource {
 
-  // TODO: Extract from configuration
-  private boolean restricted = false;
+  private final Supplier<DatashieldConfiguration> configSupplier;
 
-  public DataShieldSymbolResource(OpalRSession rSession, String name) {
+  public DataShieldSymbolResource(Supplier<DatashieldConfiguration> configSupplier, OpalRSession rSession, String name) {
     super(rSession, name);
+    this.configSupplier = configSupplier;
   }
 
   @Override
@@ -38,10 +41,15 @@ public class DataShieldSymbolResource extends RSymbolResource {
   @Override
   public Response putRScript(UriInfo uri, String script) {
     DataShieldLog.userLog("creating symbol '{}' from R script '{}'", getName(), script);
-    if(restricted) {
+    switch(configSupplier.get().getLevel()) {
+    case FIRM:
+      return Response.status(Status.FORBIDDEN).build();
+    case FLEXIBLE:
       return putRestrictedRScript(uri, script);
+    case FREEDOM:
+      return super.putRScript(uri, script);
     }
-    return super.putRScript(uri, script);
+    throw new IllegalStateException("Unknown script interpretation level");
   }
 
   @Override

@@ -19,7 +19,17 @@ import com.google.common.collect.ImmutableList;
 
 public class DatashieldConfiguration implements OpalConfigurationExtension {
 
+  public enum Level {
+    FREEDOM, FLEXIBLE, FIRM
+  }
+
+  private Level level;
+
   private List<DataShieldMethod> aggregatingMethods;
+
+  public Level getLevel() {
+    return level != null ? level : Level.FIRM;
+  }
 
   /**
    * Get the registered aggregating methods.

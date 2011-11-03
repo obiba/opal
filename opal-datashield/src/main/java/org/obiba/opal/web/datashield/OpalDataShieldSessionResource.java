@@ -23,11 +23,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import org.obiba.opal.core.cfg.OpalConfiguration;
-import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.DataShieldMethod;
-import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
+import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
 import org.obiba.opal.r.ROperation;
 import org.obiba.opal.r.ROperationTemplate;
 import org.obiba.opal.r.ROperationWithResult;
@@ -46,7 +44,7 @@ import com.google.common.collect.Maps;
 
 public class OpalDataShieldSessionResource extends OpalRSessionResource {
 
-  private final OpalConfigurationService configService;
+  private final DatashieldConfigurationSupplier configurationSupplier;
 
   private final ROperationTemplate clean;
 
@@ -54,10 +52,10 @@ public class OpalDataShieldSessionResource extends OpalRSessionResource {
    * @param opalRSessionManager
    * @param rSession
    */
-  public OpalDataShieldSessionResource(ROperationTemplate clean, OpalConfigurationService configService, OpalRSessionManager opalRSessionManager, OpalRSession rSession) {
+  public OpalDataShieldSessionResource(ROperationTemplate clean, DatashieldConfigurationSupplier configurationSupplier, OpalRSessionManager opalRSessionManager, OpalRSession rSession) {
     super(opalRSessionManager, rSession);
     this.clean = clean;
-    this.configService = configService;
+    this.configurationSupplier = configurationSupplier;
   }
 
   @POST
@@ -108,7 +106,7 @@ public class OpalDataShieldSessionResource extends OpalRSessionResource {
 
   @Override
   protected RSymbolResource onGetRSymbolResource(String name) {
-    return new DataShieldSymbolResource(getOpalRSession(), name);
+    return new DataShieldSymbolResource(this.configurationSupplier, getOpalRSession(), name);
   }
 
   @Override
@@ -117,9 +115,7 @@ public class OpalDataShieldSessionResource extends OpalRSessionResource {
   }
 
   private Iterable<DataShieldMethod> listMethods() {
-    OpalConfiguration cfg = configService.getOpalConfiguration();
-    DatashieldConfiguration datashieldConfig = cfg.getExtension(DatashieldConfiguration.class);
-    return datashieldConfig.getAggregatingMethods();
+    return configurationSupplier.get().getAggregatingMethods();
   }
 
   private DataShieldMethod lookupMethod(final String methodName) {
