@@ -99,6 +99,8 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
   }
 
   private void populateValues(final int offset) {
+    getDisplay().setScript(script);
+
     currentOffset = offset;
     ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder() //
     .forResource(table.getLink() + "/variable/_transient/values?limit=" + PAGE_SIZE + "&offset=" + offset + "&script=" + URL.encodeQueryString(script)).get() //
@@ -207,6 +209,8 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
     void setSummaryTabWidget(WidgetDisplay widget);
 
     void populateValues(JsArray<ValueDto> values);
+
+    void setScript(String text);
 
     HandlerRegistration addNextPageClickHandler(ClickHandler handler);
 

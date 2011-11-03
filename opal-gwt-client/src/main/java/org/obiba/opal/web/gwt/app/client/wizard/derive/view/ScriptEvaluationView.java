@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
+import org.obiba.opal.web.gwt.prettify.client.PrettyPrintLabel;
 import org.obiba.opal.web.model.client.magma.ValueDto;
 
 import com.google.gwt.core.client.GWT;
@@ -67,6 +68,9 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
   @UiField
   HorizontalTabLayout tabs;
 
+  @UiField
+  PrettyPrintLabel script;
+
   public ScriptEvaluationView() {
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -92,6 +96,11 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
     dataProvider.addDataDisplay(valuesTable);
     dataProvider.setArray(JsArrays.toSafeArray(values));
     dataProvider.refresh();
+  }
+
+  @Override
+  public void setScript(String text) {
+    script.setText(text);
   }
 
   //

@@ -700,10 +700,10 @@ margin-left:0.8em;
   color:#535353;
 }
 
-.navigator pre.prettyprint {
-  border:none;
-    padding:0;
-    margin:0;
+.navigator pre.prettyprint, .main pre.prettyprint {
+  border: 1px dashed #CCCCCC;
+  padding:10px;
+  margin:0;
 }
 
 .navigator .tableList td:first-child  {
