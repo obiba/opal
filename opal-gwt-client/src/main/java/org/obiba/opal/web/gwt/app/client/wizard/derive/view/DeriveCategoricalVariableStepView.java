@@ -52,7 +52,7 @@ public class DeriveCategoricalVariableStepView extends Composite implements Deri
 
   @Override
   public DefaultWizardStepController.Builder getMapStepController() {
-    return DefaultWizardStepController.Builder.create(mapStep).title("Categorical");
+    return DefaultWizardStepController.Builder.create(mapStep).title(translations.recodeStepTitle());
   }
 
   @Override

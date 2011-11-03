@@ -16,12 +16,18 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.cell.client.TextInputCell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.regexp.shared.MatchResult;
+import com.google.gwt.regexp.shared.RegExp;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
 import com.google.gwt.user.cellview.client.AbstractCellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
-import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.view.client.ListDataProvider;
 
@@ -43,6 +49,8 @@ public class ValueMapGrid extends FlowPanel {
 
   private int pageSizeMax = DEFAULT_PAGE_SIZE_MAX;
 
+  private String gridHeight = "30em";
+
   public ValueMapGrid() {
     super();
     this.pager = new SimplePager();
@@ -57,8 +65,11 @@ public class ValueMapGrid extends FlowPanel {
   }
 
   public void setPageSizeMax(int pageSizeMax) {
-    GWT.log("setPageSizeMax=" + pageSizeMax);
     this.pageSizeMax = pageSizeMax;
+  }
+
+  public void setGridHeight(String gridHeight) {
+    this.gridHeight = gridHeight;
   }
 
   public void populate(List<ValueMapEntry> valueMapEntries) {
@@ -69,6 +80,8 @@ public class ValueMapGrid extends FlowPanel {
     dataProvider = new ListDataProvider<ValueMapEntry>(valueMapEntries);
     dataProvider.addDataDisplay(table);
     dataProvider.refresh();
+
+    addStyleName("value-map");
   }
 
   private void initializeTable() {
@@ -79,12 +92,11 @@ public class ValueMapGrid extends FlowPanel {
 
     if(valueMapEntries.size() > pageSizeMin) {
       table = new Grid<ValueMapEntry>(pager.getPageSize());
-      table.setHeight("23em");
+      table.setHeight(gridHeight);
     } else {
       table = new Table<ValueMapEntry>(pager.getPageSize());
     }
     table.addStyleName("clear");
-    GWT.log("pageSize=" + pageSizeMax);
     table.setPageSize(pageSizeMax);
     table.setWidth("100%");
     add(table);
@@ -97,11 +109,22 @@ public class ValueMapGrid extends FlowPanel {
 
   private void initializeColumns() {
     // Value
-    Column<ValueMapEntry, String> valueColumn = new TextColumn<ValueMapEntry>() {
+    Column<ValueMapEntry, String> valueColumn = new Column<ValueMapEntry, String>(new TextCell(new TrustedHtmlRenderer())) {
 
       @Override
       public String getValue(ValueMapEntry entry) {
-        return entry.getValue();
+        switch(entry.getType()) {
+        case CATEGORY_NAME:
+          return "<span class='category'>" + entry.getValue() + "</span>";
+        case DISTINCT_VALUE:
+          return "<span class='distinct'>" + entry.getValue() + "</span>";
+        case OTHER_VALUES:
+          return "<span class='special others'>" + entry.getValue() + "</span>";
+        case EMPTY_VALUES:
+          return "<span class='special empties'>" + entry.getValue() + "</span>";
+        default:
+          return entry.getValue();
+        }
       }
     };
     table.addColumn(valueColumn, "Value");
@@ -147,4 +170,28 @@ public class ValueMapGrid extends FlowPanel {
     }
   }
 
+  /**
+   * Escape user string, not ours.
+   */
+  private final class TrustedHtmlRenderer extends AbstractSafeHtmlRenderer<String> {
+
+    private final RegExp rg = RegExp.compile("(^<span class='[\\w\\s]+'>)(.*)(</span>$)");
+
+    @Override
+    public SafeHtml render(String object) {
+      if(object == null) return SafeHtmlUtils.EMPTY_SAFE_HTML;
+
+      MatchResult res = rg.exec(object);
+      if(res.getGroupCount() == 4) {
+        SafeHtmlBuilder builder = new SafeHtmlBuilder();
+        builder.append(SafeHtmlUtils.fromTrustedString(res.getGroup(1)));
+        builder.appendEscaped(res.getGroup(2));
+        builder.append(SafeHtmlUtils.fromTrustedString(res.getGroup(3)));
+        return builder.toSafeHtml();
+      } else {
+        return SafeHtmlUtils.fromString(object);
+      }
+
+    }
+  }
 }

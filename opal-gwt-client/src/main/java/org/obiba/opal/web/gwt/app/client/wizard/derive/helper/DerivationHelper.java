@@ -11,8 +11,10 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.helper;
 
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -24,6 +26,8 @@ import com.google.gwt.core.client.JsArray;
  *
  */
 public abstract class DerivationHelper {
+
+  protected Translations translations = GWT.create(Translations.class);
 
   protected List<ValueMapEntry> valueMapEntries;
 
@@ -96,6 +100,24 @@ public abstract class DerivationHelper {
         return entry;
       }
       // GWT.log(entry.getValue() + "," + entry.getNewValue() + "," + entry.isMissing());
+    }
+    return null;
+  }
+
+  protected ValueMapEntry getOtherValuesMapEntry() {
+    for(ValueMapEntry entry : valueMapEntries) {
+      if(entry.isType(ValueMapEntryType.OTHER_VALUES)) {
+        return entry;
+      }
+    }
+    return null;
+  }
+
+  protected ValueMapEntry getEmptyValuesMapEntry() {
+    for(ValueMapEntry entry : valueMapEntries) {
+      if(entry.isType(ValueMapEntryType.EMPTY_VALUES)) {
+        return entry;
+      }
     }
     return null;
   }

@@ -15,10 +15,11 @@ import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
+import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.regexp.shared.RegExp;
 
@@ -36,7 +37,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     int index = 1;
     for(CategoryDto cat : JsArrays.toIterable(originalVariable.getCategoriesArray())) {
       boolean missing = cat.hasIsMissing() ? cat.getIsMissing() : false;
-      ValueMapEntry entry = new ValueMapEntry(cat.getName(), "", missing);
+      ValueMapEntry entry = new ValueMapEntry(ValueMapEntryType.CATEGORY_NAME, cat.getName(), "", missing);
 
       if(RegExp.compile("^\\d+$").test(cat.getName())) {
         entry.setNewValue(cat.getName());
@@ -58,12 +59,15 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
       valueMapEntries.add(entry);
     }
+
+    valueMapEntries.add(new ValueMapEntry(ValueMapEntryType.EMPTY_VALUES, translations.emptyValuesLabel(), "", true));
+    valueMapEntries.add(new ValueMapEntry(ValueMapEntryType.OTHER_VALUES, translations.otherValuesLabel()));
   }
 
   public VariableDto getDerivedVariable() {
     VariableDto derived = copyVariable(originalVariable);
 
-    Map<String, CategoryDto> newValuesMap = new HashMap<String, CategoryDto>();
+    Map<String, CategoryDto> newCategoriesMap = new HashMap<String, CategoryDto>();
 
     StringBuilder scriptBuilder = new StringBuilder("$('" + originalVariable.getName() + "').map({");
 
@@ -73,48 +77,89 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
       CategoryDto origCat = origCats.get(i);
       ValueMapEntry entry = getValueMapEntry(origCat.getName());
 
-      // script
-      scriptBuilder.append("\n  '").append(entry.getValue()).append("': ");
-      if(!entry.getNewValue().isEmpty()) {
-        scriptBuilder.append("'").append(entry.getNewValue()).append("'");
-      } else {
-        scriptBuilder.append("null");
-      }
-      if(i < origCats.length() - 1) {
-        scriptBuilder.append(",");
-      } else {
-        scriptBuilder.append("\n");
-      }
+      if(entry.isType(ValueMapEntryType.CATEGORY_NAME, ValueMapEntryType.DISTINCT_VALUE)) {
+        // script
+        scriptBuilder.append("\n    '").append(entry.getValue()).append("': ");
+        appendValue(scriptBuilder, entry.getNewValue());
 
-      // new category
-      if(!entry.getNewValue().isEmpty()) {
-        CategoryDto cat = newValuesMap.get(entry.getNewValue());
-        if(cat == null) {
-          cat = CategoryDto.create();
-          cat.setName(entry.getNewValue());
-          cat.setIsMissing(entry.isMissing());
-          cat.setAttributesArray(copyAttributes(origCat.getAttributesArray()));
-          newValuesMap.put(cat.getName(), cat);
+        if(i < origCats.length() - 1) {
+          scriptBuilder.append(",");
         } else {
-          // merge attributes
-          mergeAttributes(origCat.getAttributesArray(), cat.getAttributesArray());
+          scriptBuilder.append("\n");
+        }
+
+        // new category
+        if(!entry.getNewValue().isEmpty()) {
+          CategoryDto cat = newCategoriesMap.get(entry.getNewValue());
+          if(cat == null) {
+            cat = CategoryDto.create();
+            cat.setName(entry.getNewValue());
+            cat.setIsMissing(entry.isMissing());
+            cat.setAttributesArray(copyAttributes(origCat.getAttributesArray()));
+            newCategoriesMap.put(cat.getName(), cat);
+          } else {
+            // merge attributes
+            mergeAttributes(origCat.getAttributesArray(), cat.getAttributesArray());
+          }
         }
       }
     }
-    scriptBuilder.append("});");
-
-    GWT.log(scriptBuilder.toString());
+    scriptBuilder.append("  }");
+    appendSpecialValuesEntry(scriptBuilder, newCategoriesMap, getOtherValuesMapEntry());
+    appendSpecialValuesEntry(scriptBuilder, newCategoriesMap, getEmptyValuesMapEntry());
+    scriptBuilder.append(");");
 
     // new categories
     JsArray<CategoryDto> cats = JsArrays.create();
-    for(CategoryDto cat : newValuesMap.values()) {
+    for(CategoryDto cat : newCategoriesMap.values()) {
       cats.push(cat);
     }
     derived.setCategoriesArray(cats);
 
-    // set script
+    // set script in derived variable
     setScript(derived, scriptBuilder.toString());
 
     return derived;
+  }
+
+  private void appendSpecialValuesEntry(StringBuilder scriptBuilder, Map<String, CategoryDto> newCategoriesMap, ValueMapEntry entry) {
+    if(entry == null) return;
+
+    scriptBuilder.append(",\n  ");
+    appendValue(scriptBuilder, entry.getNewValue());
+
+    if(!entry.getNewValue().isEmpty()) {
+      CategoryDto cat = newCategoriesMap.get(entry.getNewValue());
+      if(cat == null) {
+        cat = CategoryDto.create();
+        cat.setName(entry.getNewValue());
+        cat.setIsMissing(entry.isMissing());
+
+        AttributeDto labelDto = AttributeDto.create();
+        labelDto.setName("label");
+        // TODO set the translation locale
+        labelDto.setLocale("en");
+        labelDto.setValue(entry.getValue());
+        JsArray<AttributeDto> attrs = JsArrays.create();
+        attrs.push(labelDto);
+        cat.setAttributesArray(attrs);
+
+        newCategoriesMap.put(cat.getName(), cat);
+      }
+    }
+  }
+
+  private void appendValue(StringBuilder scriptBuilder, String value) {
+    if(value == null) return;
+
+    if(!value.isEmpty()) {
+      // if(RegExp.compile("^\\d+$").test(entry.getNewValue())) {
+      // scriptBuilder.append(entry.getNewValue());
+      // } else {
+      scriptBuilder.append("'").append(value).append("'");
+      // }
+    } else {
+      scriptBuilder.append("null");
+    }
   }
 }
