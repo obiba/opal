@@ -69,6 +69,9 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
   private DeriveNumericalVariableStepPresenter numericalPresenter;
 
   @Inject
+  private DeriveTemporalVariableStepPresenter temporalPresenter;
+
+  @Inject
   private ScriptEvaluationPresenter scriptEvaluationPresenter;
 
   private VariableDto variable;
@@ -126,6 +129,8 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
       derivationPresenter = null;
       if(valueType.equals("integer") || valueType.equals("decimal")) {
         derivationPresenter = numericalPresenter;
+      } else if(valueType.equals("date") || valueType.equals("datetime")) {
+        derivationPresenter = temporalPresenter;
       } else if(valueType.equals("text") && variable.getCategoriesArray() != null && variable.getCategoriesArray().length() > 0) {
         derivationPresenter = categoricalPresenter;
       } else if(valueType.equals("boolean")) {
@@ -175,6 +180,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     categoricalPresenter.bind();
     booleanPresenter.bind();
     numericalPresenter.bind();
+    temporalPresenter.bind();
 
     scriptEvaluationPresenter.bind();
     getDisplay().setScriptEvaluationWidget(scriptEvaluationPresenter.getDisplay());
@@ -187,6 +193,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     categoricalPresenter.unbind();
     booleanPresenter.unbind();
     numericalPresenter.unbind();
+    temporalPresenter.unbind();
 
     scriptEvaluationPresenter.unbind();
   }

@@ -117,6 +117,8 @@ public abstract class DerivationHelper {
   }
 
   protected AttributeDto newLabelAttribute(ValueMapEntry entry) {
+    if(entry.getLabel() == null || entry.getLabel().isEmpty()) return null;
+
     AttributeDto labelDto = AttributeDto.create();
     labelDto.setName("label");
     labelDto.setLocale(VariableViewHelper.getCurrentLanguage());
@@ -126,8 +128,10 @@ public abstract class DerivationHelper {
 
   protected JsArray<AttributeDto> newAttributes(AttributeDto... attrs) {
     JsArray<AttributeDto> nattrs = JsArrays.create();
-    for(AttributeDto attr : attrs) {
-      nattrs.push(attr);
+    if(attrs != null) {
+      for(AttributeDto attr : attrs) {
+        nattrs.push(attr);
+      }
     }
     return nattrs;
   }

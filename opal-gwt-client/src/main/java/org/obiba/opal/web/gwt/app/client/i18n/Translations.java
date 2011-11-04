@@ -974,4 +974,12 @@ public interface Translations extends Constants {
   @Description("False label")
   @DefaultStringValue("False")
   String falseLabel();
+
+  @Description("Recode Temporal Method Step title")
+  @DefaultStringValue("Dates and times can be grouped together using the following criteria:")
+  String recodeTemporalMethodStepTitle();
+
+  @Description("Recode Temporal Map Step title")
+  @DefaultStringValue("Map each time range to a new value:")
+  String recodeTemporalMapStepTitle();
 }

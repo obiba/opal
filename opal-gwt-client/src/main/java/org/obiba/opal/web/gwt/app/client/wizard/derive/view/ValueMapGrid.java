@@ -60,6 +60,7 @@ public class ValueMapGrid extends FlowPanel {
     this.pager = new SimplePager();
     this.pager.setPageSize(DEFAULT_PAGE_SIZE_MAX);
     this.pager.addStyleName("right-aligned");
+    this.pager.setVisible(false);
     add(pager);
     this.table = null;
   }
