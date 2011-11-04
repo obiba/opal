@@ -15,7 +15,7 @@
       <o:WizardStep ui:field="scriptEvaluationStep"></o:WizardStep>
       <o:WizardStep ui:field="conclusionStep">
         <g:FlowPanel>
-          <g:FlowPanel styleName="input">
+          <g:FlowPanel ui:field="derivedNameInput" styleName="input">
             <g:Label addStyleNames="key"><ui:msg description="Derived Variable Name label">Derived Variable Name</ui:msg></g:Label>
             <g:TextBox ui:field="derivedNameBox"/>
           </g:FlowPanel>
@@ -25,7 +25,7 @@
             <g:ListBox ui:field="datasourceNameBox"></g:ListBox>
           </g:FlowPanel>
           
-          <g:FlowPanel styleName="input">
+          <g:FlowPanel ui:field="viewNameInput" styleName="input">
             <g:Label addStyleNames="key"><ui:msg description="Destination View Name label">Destination View Name</ui:msg></g:Label>
             <g:SuggestBox ui:field="viewNameBox"/>
             <g:Label styleName="help-block"><ui:msg description="Destination View Name help label">Select an existing view or provide a name for a new view</ui:msg></g:Label>

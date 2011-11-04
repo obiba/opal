@@ -73,10 +73,16 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
   TextBox derivedNameBox;
 
   @UiField
+  FlowPanel derivedNameInput;
+
+  @UiField
   ListBox datasourceNameBox;
 
   @UiField(provided = true)
   SuggestBox viewNameBox;
+
+  @UiField
+  FlowPanel viewNameInput;
 
   MultiWordSuggestOracle viewNameSuggestions;
 
@@ -255,6 +261,24 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
   @Override
   public boolean isOpenEditorSelected() {
     return openEditor.getValue();
+  }
+
+  @Override
+  public void setDerivedNameError(boolean error) {
+    if(error) {
+      derivedNameInput.addStyleName("error");
+    } else {
+      derivedNameInput.removeStyleName("error");
+    }
+  }
+
+  @Override
+  public void setViewNameError(boolean error) {
+    if(error) {
+      viewNameInput.addStyleName("error");
+    } else {
+      viewNameInput.removeStyleName("error");
+    }
   }
 
 }

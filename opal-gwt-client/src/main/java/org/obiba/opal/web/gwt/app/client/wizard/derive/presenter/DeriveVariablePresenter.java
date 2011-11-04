@@ -419,14 +419,18 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     }
 
     private List<String> validate() {
+      getDisplay().setDerivedNameError(false);
+      getDisplay().setViewNameError(false);
       String datasourceName = getDisplay().getDatasourceName();
       String viewName = getDisplay().getViewName();
 
       List<String> errorMessages = new ArrayList<String>();
       if(getDisplay().getDerivedName().isEmpty()) {
+        getDisplay().setDerivedNameError(true);
         errorMessages.add(translations.derivedVariableNameRequired());
       }
       if(viewName.isEmpty()) {
+        getDisplay().setViewNameError(true);
         errorMessages.add(translations.destinationViewNameRequired());
       } else {
         // if destination table exists, it must be a view
@@ -443,6 +447,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
                   }
                 }
                 if(!isView) {
+                  getDisplay().setViewNameError(true);
                   errorMessages.add(translations.addDerivedVariableToViewOnly());
                 }
                 break;
@@ -453,7 +458,6 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
       }
       return errorMessages;
     }
-
   }
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
@@ -500,6 +504,10 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     String getViewName();
 
     boolean isOpenEditorSelected();
+
+    void setDerivedNameError(boolean error);
+
+    void setViewNameError(boolean error);
   }
 
 }
