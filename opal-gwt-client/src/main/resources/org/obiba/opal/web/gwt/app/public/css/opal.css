@@ -1270,6 +1270,10 @@ ul.tabz li a, ul.tabz li a:visited, ul.tabz li a:hover {
   font-weight: bold;
 }
 
+.value-map .new-value input[type="text"] {
+  width: 8em;
+}
+
 /* Inputs */
 
 div.input {

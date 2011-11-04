@@ -9,39 +9,29 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 
+import org.obiba.opal.web.gwt.app.client.navigator.view.VariableViewHelper;
+import org.obiba.opal.web.model.client.magma.CategoryDto;
+
 public class ValueMapEntry {
   public enum ValueMapEntryType {
-    CATEGORY_NAME, DISTINCT_VALUE, EMPTY_VALUES, OTHER_VALUES
+    CATEGORY_NAME, DISTINCT_VALUE, RANGE, EMPTY_VALUES, OTHER_VALUES
   }
 
   private ValueMapEntryType type;
 
   private String value;
 
+  private String label;
+
   private String newValue;
 
   private boolean missing;
 
-  public ValueMapEntry(String value) {
-    this(ValueMapEntryType.DISTINCT_VALUE, value, "", false);
-  }
-
-  public ValueMapEntry(ValueMapEntryType type, String value) {
-    this(type, value, "", false);
-  }
-
-  public ValueMapEntry(String value, String newValue) {
-    this(ValueMapEntryType.DISTINCT_VALUE, value, newValue, false);
-  }
-
-  public ValueMapEntry(String value, String newValue, boolean missing) {
-    this(ValueMapEntryType.DISTINCT_VALUE, value, newValue, missing);
-  }
-
-  public ValueMapEntry(ValueMapEntryType type, String value, String newValue, boolean missing) {
+  private ValueMapEntry(ValueMapEntryType type, String value, String label, String newValue, boolean missing) {
     super();
     this.type = type;
     this.value = value;
+    this.label = value;
     this.newValue = newValue;
     this.missing = missing;
   }
@@ -61,6 +51,10 @@ public class ValueMapEntry {
     return value;
   }
 
+  public String getLabel() {
+    return label;
+  }
+
   public String getNewValue() {
     return newValue;
   }
@@ -75,5 +69,57 @@ public class ValueMapEntry {
 
   public void setMissing(boolean missing) {
     this.missing = missing;
+  }
+
+  public static Builder fromCategory(CategoryDto cat) {
+    return new Builder(ValueMapEntryType.CATEGORY_NAME).value(cat.getName()).label(VariableViewHelper.getLabelValue(cat.getAttributesArray()));
+  }
+
+  public static Builder fromDistinct(String value) {
+    return new Builder(ValueMapEntryType.DISTINCT_VALUE).value(value).label("");
+  }
+
+  public static Builder createEmpties(String label) {
+    return new Builder(ValueMapEntryType.EMPTY_VALUES).value("null").label(label).missing();
+  }
+
+  public static Builder createOthers(String label) {
+    return new Builder(ValueMapEntryType.OTHER_VALUES).value("*").label(label);
+  }
+
+  public static Builder create(ValueMapEntryType type) {
+    return new Builder(type);
+  }
+
+  public static class Builder {
+    private ValueMapEntry entry;
+
+    private Builder(ValueMapEntryType type) {
+      entry = new ValueMapEntry(type, "", "", "", false);
+    }
+
+    public Builder value(String value) {
+      entry.value = value;
+      return this;
+    }
+
+    public Builder label(String label) {
+      entry.label = label;
+      return this;
+    }
+
+    public Builder newValue(String newValue) {
+      entry.newValue = newValue;
+      return this;
+    }
+
+    public Builder missing() {
+      entry.missing = true;
+      return this;
+    }
+
+    public ValueMapEntry build() {
+      return entry;
+    }
   }
 }

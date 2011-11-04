@@ -295,6 +295,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Value")
   String valueLabel();
 
+  @Description("New Value label")
+  @DefaultStringValue("New Value")
+  String newValueLabel();
+
   @Description("Code label")
   @DefaultStringValue("Code")
   String codeLabel();

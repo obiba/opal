@@ -52,46 +52,54 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
     // recode non-missing values and identify missing values
     for(CategoryDto cat : JsArrays.toIterable(originalVariable.getCategoriesArray())) {
-      ValueMapEntry entry = new ValueMapEntry(ValueMapEntryType.CATEGORY_NAME, cat.getName());
+      ValueMapEntry.Builder builder = ValueMapEntry.fromCategory(cat);
 
       if(estimateIsMissing(cat)) {
-        missingValueMapEntries.add(entry);
-        entry.setMissing(true);
+        builder.missing();
+        missingValueMapEntries.add(builder.build());
       } else {
-        valueMapEntries.add(entry);
-
         if(RegExp.compile("^\\d+$").test(cat.getName())) {
-          entry.setNewValue(cat.getName());
+          builder.newValue(cat.getName());
         } else if(RegExp.compile(NO_REGEXP + "|" + NONE_REGEXP, "i").test(cat.getName())) {
-          entry.setNewValue("0");
+          builder.newValue("0");
         } else if(RegExp.compile(YES_REGEXP + "|" + MALE_REGEXP, "i").test(cat.getName())) {
-          entry.setNewValue("1");
-          index++;
+          builder.newValue("1");
+          if(index < 2) {
+            index = 2;
+          }
         } else if(RegExp.compile(FEMALE_REGEXP, "i").test(cat.getName())) {
-          entry.setNewValue("2");
-          index++;
+          builder.newValue("2");
+          if(index < 3) {
+            index = 3;
+          }
         } else {
-          entry.setNewValue(Integer.toString(index++));
+          builder.newValue(Integer.toString(index++));
         }
+
+        valueMapEntries.add(builder.build());
       }
     }
 
     // recode missing values
-    if(missingValueMapEntries.size() > 0) {
-      int missIndex = 10 - missingValueMapEntries.size();
-      int factor = 1;
-      while(missIndex * factor < index + 1) {
-        factor = factor * 10 + 1;
-      }
-      for(ValueMapEntry entry : missingValueMapEntries) {
-        entry.setNewValue(Integer.toString(missIndex * factor));
-        missIndex++;
-      }
-      valueMapEntries.addAll(missingValueMapEntries);
-    }
+    recodeMissingValues(missingValueMapEntries, index);
+    valueMapEntries.addAll(missingValueMapEntries);
 
-    valueMapEntries.add(new ValueMapEntry(ValueMapEntryType.EMPTY_VALUES, translations.emptyValuesLabel(), "", true));
-    valueMapEntries.add(new ValueMapEntry(ValueMapEntryType.OTHER_VALUES, translations.otherValuesLabel()));
+    valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).build());
+    valueMapEntries.add(ValueMapEntry.createOthers(translations.otherValuesLabel()).build());
+  }
+
+  private void recodeMissingValues(List<ValueMapEntry> missingValueMapEntries, int indexMax) {
+    if(missingValueMapEntries.size() == 0) return;
+
+    int missIndex = 10 - missingValueMapEntries.size();
+    int factor = 1;
+    while(missIndex * factor < indexMax + 1) {
+      factor = factor * 10 + 1;
+    }
+    for(ValueMapEntry entry : missingValueMapEntries) {
+      entry.setNewValue(Integer.toString(missIndex * factor));
+      missIndex++;
+    }
   }
 
   public VariableDto getDerivedVariable() {

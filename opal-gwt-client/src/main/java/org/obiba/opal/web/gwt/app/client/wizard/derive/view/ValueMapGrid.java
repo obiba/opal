@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Grid;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 
@@ -36,6 +38,8 @@ public class ValueMapGrid extends FlowPanel {
   private static final int DEFAULT_PAGE_SIZE_MIN = 10;
 
   private static final int DEFAULT_PAGE_SIZE_MAX = 100;
+
+  private static Translations translations = GWT.create(Translations.class);
 
   private SimplePager pager;
 
@@ -109,25 +113,28 @@ public class ValueMapGrid extends FlowPanel {
 
   private void initializeColumns() {
     // Value
-    Column<ValueMapEntry, String> valueColumn = new Column<ValueMapEntry, String>(new TextCell(new TrustedHtmlRenderer())) {
+    Column<ValueMapEntry, String> valueColumn = new WrappedTextColumn() {
 
       @Override
-      public String getValue(ValueMapEntry entry) {
-        switch(entry.getType()) {
-        case CATEGORY_NAME:
-          return "<span class='category'>" + entry.getValue() + "</span>";
-        case DISTINCT_VALUE:
-          return "<span class='distinct'>" + entry.getValue() + "</span>";
-        case OTHER_VALUES:
-          return "<span class='special others'>" + entry.getValue() + "</span>";
-        case EMPTY_VALUES:
-          return "<span class='special empties'>" + entry.getValue() + "</span>";
-        default:
-          return entry.getValue();
-        }
+      protected String getText(ValueMapEntry entry) {
+        return entry.getValue();
       }
+
     };
-    table.addColumn(valueColumn, "Value");
+    valueColumn.setCellStyleNames("value");
+    table.addColumn(valueColumn, translations.valueLabel());
+
+    // Label
+    Column<ValueMapEntry, String> labelColumn = new WrappedTextColumn() {
+
+      @Override
+      protected String getText(ValueMapEntry entry) {
+        return entry.getLabel();
+      }
+
+    };
+    labelColumn.setCellStyleNames("value-label");
+    table.addColumn(labelColumn, translations.labelLabel());
 
     // New Value
     Column<ValueMapEntry, String> newValueColumn = new Column<ValueMapEntry, String>(new TextInputCell()) {
@@ -136,7 +143,9 @@ public class ValueMapGrid extends FlowPanel {
         return entry.getNewValue();
       }
     };
-    table.addColumn(newValueColumn, "New Value");
+    newValueColumn.setCellStyleNames("new-value");
+    table.addColumn(newValueColumn, translations.newValueLabel());
+    table.setColumnWidth(newValueColumn, "10em");
     newValueColumn.setFieldUpdater(new FieldUpdater<ValueMapEntry, String>() {
       public void update(int index, ValueMapEntry entry, String value) {
         entry.setNewValue(value);
@@ -152,7 +161,9 @@ public class ValueMapGrid extends FlowPanel {
         return entry.isMissing();
       }
     };
-    table.addColumn(missingColumn, "Missing");
+    missingColumn.setCellStyleNames("missing");
+    table.addColumn(missingColumn, translations.missingLabel());
+    table.setColumnWidth(missingColumn, "8em");
     missingColumn.setFieldUpdater(new FieldUpdater<ValueMapEntry, Boolean>() {
       @Override
       public void update(int index, ValueMapEntry entry, Boolean value) {
@@ -167,6 +178,37 @@ public class ValueMapGrid extends FlowPanel {
     int i = 1;
     for(ValueMapEntry entry : valueMapEntries) {
       GWT.log((i++) + ": " + entry.getValue() + ", " + entry.getNewValue() + ", " + entry.isMissing());
+    }
+  }
+
+  private abstract class WrappedTextColumn extends Column<ValueMapEntry, String> {
+
+    public WrappedTextColumn() {
+      super(new TextCell(new TrustedHtmlRenderer()));
+    }
+
+    protected abstract String getText(ValueMapEntry entry);
+
+    @Override
+    public String getValue(ValueMapEntry entry) {
+      return wrapText(entry.getType(), getText(entry));
+    }
+
+    private String wrapText(ValueMapEntryType type, String text) {
+      switch(type) {
+      case CATEGORY_NAME:
+        return "<span class='category'>" + text + "</span>";
+      case DISTINCT_VALUE:
+        return "<span class='distinct'>" + text + "</span>";
+      case RANGE:
+        return "<span class='range'>" + text + "</span>";
+      case OTHER_VALUES:
+        return "<span class='special others'>" + text + "</span>";
+      case EMPTY_VALUES:
+        return "<span class='special empties'>" + text + "</span>";
+      default:
+        return text;
+      }
     }
   }
 
