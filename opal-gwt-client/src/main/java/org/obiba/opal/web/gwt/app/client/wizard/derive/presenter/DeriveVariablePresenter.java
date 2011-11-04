@@ -63,6 +63,9 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
   private DeriveCategoricalVariableStepPresenter categoricalPresenter;
 
   @Inject
+  private DeriveBooleanVariableStepPresenter booleanPresenter;
+
+  @Inject
   private DeriveNumericalVariableStepPresenter numericalPresenter;
 
   @Inject
@@ -125,6 +128,8 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
         derivationPresenter = numericalPresenter;
       } else if(valueType.equals("text") && variable.getCategoriesArray() != null && variable.getCategoriesArray().length() > 0) {
         derivationPresenter = categoricalPresenter;
+      } else if(valueType.equals("boolean")) {
+        derivationPresenter = booleanPresenter;
       }
 
       if(derivationPresenter != null) {
@@ -168,6 +173,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
   @Override
   protected void onBind() {
     categoricalPresenter.bind();
+    booleanPresenter.bind();
     numericalPresenter.bind();
 
     scriptEvaluationPresenter.bind();
@@ -179,6 +185,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
   @Override
   protected void onUnbind() {
     categoricalPresenter.unbind();
+    booleanPresenter.unbind();
     numericalPresenter.unbind();
 
     scriptEvaluationPresenter.unbind();

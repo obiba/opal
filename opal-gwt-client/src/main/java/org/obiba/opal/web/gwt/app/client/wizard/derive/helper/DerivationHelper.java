@@ -10,9 +10,11 @@
 package org.obiba.opal.web.gwt.app.client.wizard.derive.helper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.navigator.view.VariableViewHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
@@ -94,12 +96,69 @@ public abstract class DerivationHelper {
     return scriptAttr;
   }
 
+  protected void appendSpecialValuesEntry(StringBuilder scriptBuilder, Map<String, CategoryDto> newCategoriesMap, ValueMapEntry entry) {
+    if(entry == null) {
+      scriptBuilder.append(",\n  null");
+    } else {
+      scriptBuilder.append(",\n  ");
+      appendNewValue(scriptBuilder, entry);
+
+      if(!entry.getNewValue().isEmpty()) {
+        CategoryDto cat = newCategoriesMap.get(entry.getNewValue());
+        if(cat == null) {
+          cat = CategoryDto.create();
+          cat.setName(entry.getNewValue());
+          cat.setIsMissing(entry.isMissing());
+          cat.setAttributesArray(newAttributes(newLabelAttribute(entry)));
+          newCategoriesMap.put(cat.getName(), cat);
+        }
+      }
+    }
+  }
+
+  protected AttributeDto newLabelAttribute(ValueMapEntry entry) {
+    AttributeDto labelDto = AttributeDto.create();
+    labelDto.setName("label");
+    labelDto.setLocale(VariableViewHelper.getCurrentLanguage());
+    labelDto.setValue(entry.getLabel());
+    return labelDto;
+  }
+
+  protected JsArray<AttributeDto> newAttributes(AttributeDto... attrs) {
+    JsArray<AttributeDto> nattrs = JsArrays.create();
+    for(AttributeDto attr : attrs) {
+      nattrs.push(attr);
+    }
+    return nattrs;
+  }
+
+  protected void appendNewValue(StringBuilder scriptBuilder, ValueMapEntry entry) {
+    String value = entry.getNewValue();
+    if(value != null && !value.isEmpty()) {
+      // if(RegExp.compile("^\\d+$").test(entry.getNewValue())) {
+      // scriptBuilder.append(entry.getNewValue());
+      // } else {
+      scriptBuilder.append("'").append(value).append("'");
+      // }
+    } else {
+      scriptBuilder.append("null");
+    }
+  }
+
+  protected ValueMapEntry appendValueEntry(StringBuilder scriptBuilder, String value) {
+    ValueMapEntry entry = getValueMapEntry(value);
+    if(entry != null) {
+      scriptBuilder.append("\n    '").append(value).append("': ");
+      appendNewValue(scriptBuilder, entry);
+    }
+    return entry;
+  }
+
   protected ValueMapEntry getValueMapEntry(String value) {
     for(ValueMapEntry entry : valueMapEntries) {
       if(entry.getValue().equals(value)) {
         return entry;
       }
-      // GWT.log(entry.getValue() + "," + entry.getNewValue() + "," + entry.isMissing());
     }
     return null;
   }
@@ -120,6 +179,13 @@ public abstract class DerivationHelper {
       }
     }
     return null;
+  }
+
+  protected CategoryDto newCategory(ValueMapEntry entry) {
+    CategoryDto cat = CategoryDto.create();
+    cat.setName(entry.getNewValue());
+    cat.setIsMissing(entry.isMissing());
+    return cat;
   }
 
   protected JsArray<CategoryDto> copyCategories(JsArray<CategoryDto> origCats) {

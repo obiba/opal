@@ -951,15 +951,23 @@ public interface Translations extends Constants {
   @DefaultStringValue("Name the derived variable and select the view in which it will appear.")
   String saveDerivedVariable();
 
-  @Description("Recode Step title")
+  @Description("Recode Categorie Step title")
   @DefaultStringValue("Recode categories and observed distinct values to new values.")
-  String recodeStepTitle();
+  String recodeCategoriesStepTitle();
 
-  @Description("Empty Values label")
-  @DefaultStringValue("Empty values")
+  @Description("Empty Value label")
+  @DefaultStringValue("Empty value")
   String emptyValuesLabel();
 
-  @Description("Other Values label")
-  @DefaultStringValue("Other values")
+  @Description("Other Value label")
+  @DefaultStringValue("Other value")
   String otherValuesLabel();
+
+  @Description("True label")
+  @DefaultStringValue("True")
+  String trueLabel();
+
+  @Description("False label")
+  @DefaultStringValue("False")
+  String falseLabel();
 }

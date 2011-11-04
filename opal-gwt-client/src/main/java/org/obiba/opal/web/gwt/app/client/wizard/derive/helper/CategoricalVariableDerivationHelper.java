@@ -17,7 +17,6 @@ import java.util.Map;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
-import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
@@ -33,9 +32,9 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   private static final String NONE_REGEXP = "^NONE$|^NEVER$";
 
-  private static final String YES_REGEXP = "^Y$|^YES$";
+  private static final String YES_REGEXP = "^Y$|^YES|TRUE$";
 
-  private static final String NO_REGEXP = "^N$|^NO$";
+  private static final String NO_REGEXP = "^N$|^NO|FALSE$";
 
   private static final String MALE_REGEXP = "^MALE$";
 
@@ -118,7 +117,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
       if(entry.isType(ValueMapEntryType.CATEGORY_NAME, ValueMapEntryType.DISTINCT_VALUE)) {
         // script
         scriptBuilder.append("\n    '").append(entry.getValue()).append("': ");
-        appendValue(scriptBuilder, entry.getNewValue());
+        appendNewValue(scriptBuilder, entry);
 
         if(i < origCats.length() - 1) {
           scriptBuilder.append(",");
@@ -130,9 +129,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
         if(!entry.getNewValue().isEmpty()) {
           CategoryDto cat = newCategoriesMap.get(entry.getNewValue());
           if(cat == null) {
-            cat = CategoryDto.create();
-            cat.setName(entry.getNewValue());
-            cat.setIsMissing(entry.isMissing());
+            cat = newCategory(entry);
             cat.setAttributesArray(copyAttributes(origCat.getAttributesArray()));
             newCategoriesMap.put(cat.getName(), cat);
           } else {
@@ -158,47 +155,6 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     setScript(derived, scriptBuilder.toString());
 
     return derived;
-  }
-
-  private void appendSpecialValuesEntry(StringBuilder scriptBuilder, Map<String, CategoryDto> newCategoriesMap, ValueMapEntry entry) {
-    if(entry == null) return;
-
-    scriptBuilder.append(",\n  ");
-    appendValue(scriptBuilder, entry.getNewValue());
-
-    if(!entry.getNewValue().isEmpty()) {
-      CategoryDto cat = newCategoriesMap.get(entry.getNewValue());
-      if(cat == null) {
-        cat = CategoryDto.create();
-        cat.setName(entry.getNewValue());
-        cat.setIsMissing(entry.isMissing());
-
-        AttributeDto labelDto = AttributeDto.create();
-        labelDto.setName("label");
-        // TODO set the translation locale
-        labelDto.setLocale("en");
-        labelDto.setValue(entry.getValue());
-        JsArray<AttributeDto> attrs = JsArrays.create();
-        attrs.push(labelDto);
-        cat.setAttributesArray(attrs);
-
-        newCategoriesMap.put(cat.getName(), cat);
-      }
-    }
-  }
-
-  private void appendValue(StringBuilder scriptBuilder, String value) {
-    if(value == null) return;
-
-    if(!value.isEmpty()) {
-      // if(RegExp.compile("^\\d+$").test(entry.getNewValue())) {
-      // scriptBuilder.append(entry.getNewValue());
-      // } else {
-      scriptBuilder.append("'").append(value).append("'");
-      // }
-    } else {
-      scriptBuilder.append("null");
-    }
   }
 
   private boolean estimateIsMissing(CategoryDto cat) {

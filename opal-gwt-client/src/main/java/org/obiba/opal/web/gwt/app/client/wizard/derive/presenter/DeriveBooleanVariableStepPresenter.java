@@ -19,7 +19,8 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.VariableDuplicationHelper;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.BooleanVariableDerivationHelper;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.inject.Inject;
@@ -27,27 +28,35 @@ import com.google.inject.Inject;
 /**
  *
  */
-public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<DeriveNumericalVariableStepPresenter.Display> {
+public class DeriveBooleanVariableStepPresenter extends DerivationPresenter<DeriveBooleanVariableStepPresenter.Display> {
 
-  private VariableDuplicationHelper derivationHelper;
+  private BooleanVariableDerivationHelper derivationHelper;
 
   @Inject
-  public DeriveNumericalVariableStepPresenter(final Display display, final EventBus eventBus) {
+  public DeriveBooleanVariableStepPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
   }
+
+  //
+  // DerivationPresenter methods
+  //
 
   @Override
   void initialize(VariableDto variable) {
     super.initialize(variable);
-    // TODO initialize when method is chosen
-    derivationHelper = new VariableDuplicationHelper(variable);
+    derivationHelper = new BooleanVariableDerivationHelper(variable);
+    getDisplay().populateValues(derivationHelper.getValueMapEntries());
+  }
+
+  @Override
+  public VariableDto getDerivedVariable() {
+    return derivationHelper.getDerivedVariable();
   }
 
   @Override
   public List<DefaultWizardStepController> getWizardSteps() {
     List<DefaultWizardStepController> stepCtrls = new ArrayList<DefaultWizardStepController>();
 
-    stepCtrls.add(getDisplay().getMethodStepController().build());
     stepCtrls.add(getDisplay().getMapStepController().onValidate(new ValidationHandler() {
 
       @Override
@@ -58,11 +67,6 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
     }).build());
 
     return stepCtrls;
-  }
-
-  @Override
-  public VariableDto getDerivedVariable() {
-    return derivationHelper.getDerivedVariable();
   }
 
   //
@@ -100,9 +104,9 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
 
   public interface Display extends WidgetDisplay {
 
-    DefaultWizardStepController.Builder getMethodStepController();
-
     DefaultWizardStepController.Builder getMapStepController();
+
+    void populateValues(List<ValueMapEntry> valuesMap);
 
   }
 

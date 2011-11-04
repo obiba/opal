@@ -33,9 +33,11 @@ import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.ExcelDatas
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.FsDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.HibernateDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.JdbcDatasourceFormView;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveBooleanVariableStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveCategoricalVariableStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveNumericalVariableStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveVariablePresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.view.DeriveBooleanVariableStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.DeriveCategoricalVariableStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.DeriveNumericalVariableStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.DeriveVariableView;
@@ -70,6 +72,7 @@ public class NavigatorModule extends AbstractGinModule {
 
     bind(DeriveCategoricalVariableStepPresenter.Display.class).to(DeriveCategoricalVariableStepView.class);
     bind(DeriveNumericalVariableStepPresenter.Display.class).to(DeriveNumericalVariableStepView.class);
+    bind(DeriveBooleanVariableStepPresenter.Display.class).to(DeriveBooleanVariableStepView.class);
   }
 
 }

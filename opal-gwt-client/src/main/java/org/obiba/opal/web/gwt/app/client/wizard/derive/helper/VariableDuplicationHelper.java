@@ -11,9 +11,9 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.helper;
 
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
-public class DuplicationHelper extends DerivationHelper {
+public class VariableDuplicationHelper extends DerivationHelper {
 
-  public DuplicationHelper(VariableDto originalVariable) {
+  public VariableDuplicationHelper(VariableDto originalVariable) {
     super(originalVariable);
   }
 

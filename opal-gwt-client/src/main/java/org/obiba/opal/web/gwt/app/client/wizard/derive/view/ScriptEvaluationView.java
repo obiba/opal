@@ -80,7 +80,7 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
       public String getValue(ValueDto value) {
         return value.getValue();
       }
-    }, "Value");
+    }, translations.valueLabel());
 
   }
 

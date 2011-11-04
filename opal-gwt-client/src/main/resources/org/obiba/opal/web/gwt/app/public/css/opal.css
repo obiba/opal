@@ -1263,6 +1263,10 @@ ul.tabz li a, ul.tabz li a:visited, ul.tabz li a:hover {
 }
 
 .value-map span.distinct {
+
+}
+
+.value-map .value span.distinct {
   font-style: italic;
 }
 
@@ -1283,17 +1287,17 @@ div.input {
 div.input.error input,
 div.input.error select,
 div.input.error textarea {
-	border-color:#c87872;
-	-webkit-box-shadow:0 0 3px rgba(171, 41, 32, 0.25);
-	-moz-box-shadow:0 0 3px rgba(171, 41, 32, 0.25);
-	box-shadow:0 0 3px rgba(171, 41, 32, 0.25);
+  border-color:#c87872;
+  -webkit-box-shadow:0 0 3px rgba(171, 41, 32, 0.25);
+  -moz-box-shadow:0 0 3px rgba(171, 41, 32, 0.25);
+  box-shadow:0 0 3px rgba(171, 41, 32, 0.25);
 }
 
 div.input.error input:focus,
 div.input.error select:focus,
 div.input.error textarea:focus {
-	border-color:#b9554d;
-	-webkit-box-shadow:0 0 6px rgba(171, 41, 32, 0.5);
-	-moz-box-shadow:0 0 6px rgba(171, 41, 32, 0.5);
-	box-shadow:0 0 6px rgba(171, 41, 32, 0.5);
+  border-color:#b9554d;
+  -webkit-box-shadow:0 0 6px rgba(171, 41, 32, 0.5);
+  -moz-box-shadow:0 0 6px rgba(171, 41, 32, 0.5);
+  box-shadow:0 0 6px rgba(171, 41, 32, 0.5);
 }

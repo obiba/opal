@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveCategoricalVariableStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveBooleanVariableStepPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 
 import com.google.gwt.core.client.GWT;
@@ -26,10 +26,10 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  *
  */
-public class DeriveCategoricalVariableStepView extends Composite implements DeriveCategoricalVariableStepPresenter.Display {
+public class DeriveBooleanVariableStepView extends Composite implements DeriveBooleanVariableStepPresenter.Display {
 
-  @UiTemplate("DeriveCategoricalVariableStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, DeriveCategoricalVariableStepView> {
+  @UiTemplate("DeriveBooleanVariableStepView.ui.xml")
+  interface ViewUiBinder extends UiBinder<Widget, DeriveBooleanVariableStepView> {
   }
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
@@ -46,7 +46,7 @@ public class DeriveCategoricalVariableStepView extends Composite implements Deri
   // Constructors
   //
 
-  public DeriveCategoricalVariableStepView() {
+  public DeriveBooleanVariableStepView() {
     initWidget(uiBinder.createAndBindUi(this));
   }
 
