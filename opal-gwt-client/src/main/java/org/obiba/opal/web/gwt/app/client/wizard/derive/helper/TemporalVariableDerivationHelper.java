@@ -97,14 +97,14 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
   private void addDayOfMonthEntries() {
     for(int i = 1; i < 32; i++) {
       String str = Integer.toString(i);
-      valueMapEntries.add(ValueMapEntry.fromDistinct(str).newValue(str).build());
+      valueMapEntries.add(ValueMapEntry.fromDistinct(str).label("Day " + str).newValue(str).build());
     }
   }
 
   private void addDayOfYearEntries() {
     for(int i = 1; i < 366; i++) {
       String str = Integer.toString(i);
-      valueMapEntries.add(ValueMapEntry.fromDistinct(str).newValue(str).build());
+      valueMapEntries.add(ValueMapEntry.fromDistinct(str).label("Day " + str).newValue(str).build());
     }
   }
 
