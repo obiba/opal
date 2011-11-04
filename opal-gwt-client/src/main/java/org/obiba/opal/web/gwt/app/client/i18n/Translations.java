@@ -955,6 +955,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Recode categories and observed distinct values to new values.")
   String recodeCategoriesStepTitle();
 
+  @Description("Recode Boolean Step title")
+  @DefaultStringValue("Recode logical values to new values.")
+  String recodeBooleanStepTitle();
+
   @Description("Empty Value label")
   @DefaultStringValue("Empty value")
   String emptyValuesLabel();

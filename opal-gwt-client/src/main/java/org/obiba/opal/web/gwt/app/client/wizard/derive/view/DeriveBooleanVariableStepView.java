@@ -52,7 +52,7 @@ public class DeriveBooleanVariableStepView extends Composite implements DeriveBo
 
   @Override
   public DefaultWizardStepController.Builder getMapStepController() {
-    return DefaultWizardStepController.Builder.create(mapStep).title(translations.recodeCategoriesStepTitle());
+    return DefaultWizardStepController.Builder.create(mapStep).title(translations.recodeBooleanStepTitle());
   }
 
   @Override
