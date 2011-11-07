@@ -1,23 +1,38 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
   xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+  xmlns:g2="com.google.gwt.user.datepicker.client"
   xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
   xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.wizard.derive.view"
   ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
+  <ui:style>
+    .right-aligned { float: right; }
+    .top-margin { margin-top: 0.5em; }
+  </ui:style>
+
   <g:FlowPanel>
-     <o:WizardStep ui:field="methodStep">
-      <g:FlowPanel styleName="input">
-        <g:Label addStyleNames="key"><ui:msg description="Date and time group mehtods label">Date and time group methods</ui:msg></g:Label>
-        <g:ListBox ui:field="groupBox"></g:ListBox>
+    <o:WizardStep ui:field="methodStep">
+      <g:FlowPanel>
+        <g:FlowPanel styleName="input">
+          <g:Label addStyleNames="key"><ui:msg description="Date and time group mehtods label">Date and time group methods</ui:msg></g:Label>
+          <g:ListBox ui:field="groupBox"></g:ListBox>
+        </g:FlowPanel>
+        <g:FlowPanel styleName="input" ui:field="range">
+          <g:Label addStyleNames="key"><ui:msg description="Date Range label">Date range</ui:msg></g:Label>
+          <g:FlowPanel ui:field="dates">
+            <g:InlineLabel addStyleNames="key"><ui:msg description="From label">From</ui:msg>:</g:InlineLabel>
+            <g:InlineLabel addStyleNames="key"><ui:msg description="To label">To</ui:msg>:</g:InlineLabel>
+          </g:FlowPanel>
+        </g:FlowPanel>
       </g:FlowPanel>
-     </o:WizardStep>
-     <o:WizardStep ui:field="mapStep">
+    </o:WizardStep>
+    <o:WizardStep ui:field="mapStep">
       <g:FlowPanel>
         <o2:ValueMapGrid width="100%" ui:field="valuesMapGrid" pageSizeMin="13" pageSizeMax="100" gridHeight="40em"/>
       </g:FlowPanel>
-     </o:WizardStep>
+    </o:WizardStep>
   </g:FlowPanel>
   
 </ui:UiBinder>

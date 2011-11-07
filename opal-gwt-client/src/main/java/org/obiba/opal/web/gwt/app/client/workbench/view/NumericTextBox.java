@@ -42,7 +42,7 @@ public class NumericTextBox extends TextBox {
       }
     }
 
-    @SuppressWarnings( { "unchecked", "PMD.NcssMethodCount" })
+    @SuppressWarnings({ "unchecked", "PMD.NcssMethodCount" })
     private boolean processKeyCode(int keyCode) {
       switch(keyCode) {
       case KeyCodes.KEY_LEFT:
@@ -209,6 +209,10 @@ public class NumericTextBox extends TextBox {
     } catch(Exception ex) {
       // Do Nothing
     }
+  }
+
+  public long getNumericValue() {
+    return parseValue(getValue());
   }
 
   /**

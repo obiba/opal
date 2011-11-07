@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import net.customware.gwt.presenter.client.EventBus;
@@ -17,8 +18,8 @@ import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.TemporalVariableDerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -38,31 +39,19 @@ public class DeriveTemporalVariableStepPresenter extends DerivationPresenter<Der
   }
 
   @Override
-  void initialize(VariableDto variable) {
-    super.initialize(variable);
-    // TODO initialize when method is chosen
-
-  }
-
-  @Override
   public List<DefaultWizardStepController> getWizardSteps() {
     List<DefaultWizardStepController> stepCtrls = new ArrayList<DefaultWizardStepController>();
 
-    stepCtrls.add(getDisplay().getMethodStepController().onValidate(new ValidationHandler() {
+    stepCtrls.add(getDisplay().getMethodStepController().build());
+    stepCtrls.add(getDisplay().getMapStepController().onStepIn(new StepInHandler() {
 
       @Override
-      public boolean validate() {
-        derivationHelper = new TemporalVariableDerivationHelper(originalVariable, getDisplay().getGroupMethod());
-        getDisplay().populateValues(derivationHelper.getValueMapEntries());
-        return true;
-      }
-    }).build());
-    stepCtrls.add(getDisplay().getMapStepController().onValidate(new ValidationHandler() {
-
-      @Override
-      public boolean validate() {
-        // TODO
-        return true;
+      public void onStepIn() {
+        // do not re-populate if group method selection has not changed
+        if(derivationHelper == null || !derivationHelper.getGroupMethod().toString().equalsIgnoreCase(getDisplay().getGroupMethod())) {
+          derivationHelper = new TemporalVariableDerivationHelper(originalVariable, getDisplay().getGroupMethod(), getDisplay().getFromDate(), getDisplay().getToDate());
+          getDisplay().populateValues(derivationHelper.getValueMapEntries());
+        }
       }
     }).build());
 
@@ -116,6 +105,10 @@ public class DeriveTemporalVariableStepPresenter extends DerivationPresenter<Der
     String getGroupMethod();
 
     void populateValues(List<ValueMapEntry> valuesMap);
+
+    Date getFromDate();
+
+    Date getToDate();
 
   }
 

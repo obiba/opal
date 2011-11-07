@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 
+import java.util.Date;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -18,12 +19,15 @@ import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveTemporalV
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.datepicker.client.DateBox;
 
 /**
  *
@@ -50,6 +54,13 @@ public class DeriveTemporalVariableStepView extends Composite implements DeriveT
   @UiField
   ValueMapGrid valuesMapGrid;
 
+  @UiField
+  FlowPanel dates;
+
+  private DateBox fromDate;
+
+  private DateBox toDate;
+
   //
   // Constructors
   //
@@ -57,15 +68,22 @@ public class DeriveTemporalVariableStepView extends Composite implements DeriveT
   public DeriveTemporalVariableStepView() {
     initWidget(uiBinder.createAndBindUi(this));
 
-    groupBox.addItem("Day of Week", GroupMethod.DAY_OF_WEEK.toString());
-    groupBox.addItem("Day of Month", GroupMethod.DAY_OF_MONTH.toString());
-    groupBox.addItem("Day of Year", GroupMethod.DAY_OF_YEAR.toString());
-    groupBox.addItem("Week of Month", GroupMethod.WEEK_OF_MONTH.toString());
-    groupBox.addItem("Week of Year", GroupMethod.WEEK_OF_YEAR.toString());
-    groupBox.addItem("Month", GroupMethod.MONTH.toString());
-    groupBox.addItem("Quarter", GroupMethod.QUARTER.toString());
-    groupBox.addItem("Semester", GroupMethod.SEMESTER.toString());
-    groupBox.addItem("Year", GroupMethod.YEAR.toString());
+    for(GroupMethod method : GroupMethod.values()) {
+      // TODO translate
+      groupBox.addItem(translations.timeGroupMap().get(method.toString()), method.toString());
+    }
+    DateTimeFormat dateFormat = DateTimeFormat.getFormat("yyyy-MM-dd");
+
+    this.fromDate = new DateBox();
+    this.fromDate.setFormat(new DateBox.DefaultFormat(dateFormat));
+    fromDate.setValue(new Date());
+    dates.insert(fromDate, 1);
+
+    this.toDate = new DateBox();
+    this.toDate.setFormat(new DateBox.DefaultFormat(dateFormat));
+    toDate.setValue(new Date());
+    dates.insert(toDate, 3);
+
   }
 
   @Override
@@ -103,6 +121,18 @@ public class DeriveTemporalVariableStepView extends Composite implements DeriveT
   @Override
   public void populateValues(List<ValueMapEntry> valuesMap) {
     valuesMapGrid.populate(valuesMap);
+  }
+
+  @Override
+  public Date getFromDate() {
+    return fromDate.getValue();
+    // return Long.parseLong(DateTimeFormat.getFormat(PredefinedFormat.YEAR).format(fromDate.getValue()));
+  }
+
+  @Override
+  public Date getToDate() {
+    return toDate.getValue();
+    // return Long.parseLong(DateTimeFormat.getFormat(PredefinedFormat.YEAR).format(toDate.getValue()));
   }
 
 }

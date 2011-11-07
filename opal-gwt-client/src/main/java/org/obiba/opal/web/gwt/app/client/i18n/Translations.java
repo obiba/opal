@@ -982,4 +982,61 @@ public interface Translations extends Constants {
   @Description("Recode Temporal Map Step title")
   @DefaultStringValue("Map each time range to a new value:")
   String recodeTemporalMapStepTitle();
+
+  @Description("Time map")
+  @DefaultStringMapValue({ "Monday", "Monday", //
+  "Tuesday", "Tuesday", //
+  "Wednesday", "Wednesday", //
+  "Thursday", "Thursday", //
+  "Friday", "Friday", //
+  "Saturday", "Saturday", //
+  "Sunday", "Sunday", //
+  "January", "January", //
+  "February", "February", //
+  "March", "March", //
+  "April", "April", //
+  "May", "May", //
+  "June", "June", //
+  "July", "July", //
+  "August", "August", //
+  "September", "September", //
+  "October", "October", //
+  "November", "November", //
+  "December", "December", //
+  "Second", "Second", //
+  "Minute", "Minute", //
+  "Hour", "Hour", //
+  "Day", "Day", //
+  "Week", "Week", //
+  "Month", "Month", //
+  "Quarter", "Quarter", //
+  "Semester", "Semester", //
+  "Year", "Year", //
+  "Lustrum", "Lustrum", //
+  "Decade", "Decade", //
+  "Century", "Century", //
+  "Millenium", "Millenium", //
+  "Era", "Era" //
+  })
+  Map<String, String> timeMap();
+
+  @Description("Time Group map")
+  @DefaultStringMapValue({ //
+  "DAY_OF_WEEK", "Day of Week", //
+  "DAY_OF_MONTH", "Day of Month", //
+  "DAY_OF_YEAR", "Day of Year", //
+  "WEEK_OF_MONTH", "Week of Month", //
+  "WEEK_OF_YEAR", "Week of Year", //
+  "MONTH", "Month", //
+  "MONTH_OF_YEAR", "Month of Year", //
+  "QUARTER_OF_YEAR", "Quarter of Year", //
+  "QUARTER", "Quarter", //
+  "SEMESTER_OF_YEAR", "Semester of Year", //
+  "SEMESTER", "Semester", //
+  "YEAR", "Year", //
+  "LUSTRUM", "Lustrum (5 years period)", //
+  "DECADE", "Decade (10 years period)", //
+  "CENTURY", "Century" //
+  })
+  Map<String, String> timeGroupMap();
 }
