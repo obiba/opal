@@ -45,9 +45,9 @@ TOKEN : /* Numeric Constants */
 TOKEN:
 {
       < R_IDENTIFIER: ( <LETTER> )+ ( <DIGIT> | <LETTER> | <UNDERSCORE>)* >
-  |   < R_OPERATOR: (["/", "!", "^"]) | "%*%">
+  |   < R_OPERATOR: (["/", "!"]) | "%*%">
   |   < F_OPERATOR: ([":"] | "%in%") >
-  |   < COMMON_OPERATOR: (["+","-","*"]) >
+  |   < COMMON_OPERATOR: (["+","-","*", "^"]) >
   |   < #LETTER: ["a"-"z", "A"-"Z"] >
   |   < #UNDERSCORE: "_">
 }
@@ -117,7 +117,8 @@ StringBuilder formulaTerm() #void :
   (
       "(" sb=formulaTerm() ")"  {sb.insert(0, '(').append(')');}
     | t=<R_IDENTIFIER> {sb = new StringBuilder(t.image);}
-  ) [ "^" t=<NUMBER> {sb.append("^").append(t.image);}]
+    | t=<NUMBER> {sb = new StringBuilder(t.image);}
+  )
     [ (t=<COMMON_OPERATOR> | t=<F_OPERATOR>) ft=formulaTerm() {sb.append(t.image).append(ft);} ]
   {return sb;}
 }
