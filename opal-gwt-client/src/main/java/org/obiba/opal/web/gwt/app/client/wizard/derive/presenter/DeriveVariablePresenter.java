@@ -34,6 +34,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -70,6 +71,9 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
 
   @Inject
   private DeriveTemporalVariableStepPresenter temporalPresenter;
+
+  @Inject
+  private DeriveOpenTextualVariableStepPresenter openTextualPresenter;
 
   @Inject
   private ScriptEvaluationPresenter scriptEvaluationPresenter;
@@ -127,7 +131,9 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
       // TODO
       String valueType = variable.getValueType();
       derivationPresenter = null;
-      if(valueType.equals("integer") || valueType.equals("decimal")) {
+      if(valueType.equals("text") && allCategoriesMissing(variable)) {
+        derivationPresenter = openTextualPresenter;
+      } else if(valueType.equals("integer") || valueType.equals("decimal")) {
         derivationPresenter = numericalPresenter;
       } else if(valueType.equals("date") || valueType.equals("datetime")) {
         derivationPresenter = temporalPresenter;
@@ -135,6 +141,8 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
         derivationPresenter = categoricalPresenter;
       } else if(valueType.equals("boolean")) {
         derivationPresenter = booleanPresenter;
+      } else if(allCategoriesMissing(variable)) {
+        derivationPresenter = openTextualPresenter;
       }
 
       if(derivationPresenter != null) {
@@ -144,6 +152,20 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     } else {
       // TODO
     }
+  }
+
+  /**
+   * Return false if variableDto contains at least one non-missing category, otherwise true
+   * @param variableDto
+   * @return
+   */
+  private boolean allCategoriesMissing(VariableDto variableDto) {
+    JsArray<CategoryDto> categoriesArray = variableDto.getCategoriesArray();
+    if(categoriesArray == null) return true;
+    for(int i = 0; i < categoriesArray.length(); i++) {
+      if(!categoriesArray.get(i).getIsMissing()) return false;
+    }
+    return true;
   }
 
   private void updateDatasources() {
@@ -181,6 +203,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     booleanPresenter.bind();
     numericalPresenter.bind();
     temporalPresenter.bind();
+    openTextualPresenter.bind();
 
     scriptEvaluationPresenter.bind();
     getDisplay().setScriptEvaluationWidget(scriptEvaluationPresenter.getDisplay());
@@ -194,6 +217,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     booleanPresenter.unbind();
     numericalPresenter.unbind();
     temporalPresenter.unbind();
+    openTextualPresenter.unbind();
 
     scriptEvaluationPresenter.unbind();
   }

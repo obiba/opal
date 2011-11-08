@@ -1,0 +1,26 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+  xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.wizard.derive.view"
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
+
+  <g:FlowPanel>
+     <o:WizardStep ui:field="methodStep">
+      <g:FlowPanel>
+      	<g:RadioButton ui:field="auto" name="group-method" />
+      	<g:Label ui:field="labelAuto" addStyleNames="key"></g:Label>
+      </g:FlowPanel>
+      <g:FlowPanel>
+      	<g:RadioButton ui:field="manual" name="group-method" />
+      	<g:Label ui:field="labelManual" addStyleNames="key"></g:Label>
+      </g:FlowPanel>
+     </o:WizardStep>
+     <o:WizardStep ui:field="mapStep">
+     	<g:TextBox ui:field="value"/><g:TextBox ui:field="newValue"/><g:Button ui:field="addButton" styleName="btn"/>
+     	<o2:ValueMapGrid width="100%" ui:field="valuesMapGrid" pageSizeMin="13" pageSizeMax="100" gridHeight="40em"/>
+     </o:WizardStep>
+  </g:FlowPanel>
+  
+</ui:UiBinder>

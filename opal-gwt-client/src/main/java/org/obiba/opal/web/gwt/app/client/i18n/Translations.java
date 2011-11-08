@@ -992,6 +992,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Map each range or discrete value to a new value:")
   String recodeNumericalMapStepTitle();
 
+  @Description("Recode Open Textual Method Step Title")
+  @DefaultStringValue("Group the values using the following method")
+  String recodeOpenTextualMethodStepTitle();
+
+  @Description("Recode Open Textual Map Step Title")
+  @DefaultStringValue("Map a value to a new value")
+  String recodeOpenTextualMapStepTitle();
+
   @Description("Time map")
   @DefaultStringMapValue({ //
   "Hour", "Hour", //
