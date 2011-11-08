@@ -34,7 +34,7 @@
             <g:ListBox ui:field="rangeBox" enabled="false"></g:ListBox>
           </g:FlowPanel>
           <g:FlowPanel styleName="input">
-            <g:Label addStyleNames="key"><ui:msg description="Date Range label">Date range definition</ui:msg></g:Label>
+            <g:Label addStyleNames="key"><ui:msg description="Date Range label">Date range definition (YYYY-MM-DD)</ui:msg></g:Label>
             <g:FlowPanel ui:field="dates">
               <g:FlowPanel ui:field="from" addStyleNames="inline">
                 <g:Label styleName="help-block"><ui:msg description="From label">From</ui:msg></g:Label>  
