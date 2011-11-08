@@ -216,7 +216,7 @@ public class ValueMapGrid extends FlowPanel {
   /**
    * Escape user string, not ours.
    */
-  private final class TrustedHtmlRenderer extends AbstractSafeHtmlRenderer<String> {
+  private static final class TrustedHtmlRenderer extends AbstractSafeHtmlRenderer<String> {
 
     private final RegExp rg = RegExp.compile("(^<span class='[\\w\\s]+'>)(.*)(</span>$)");
 

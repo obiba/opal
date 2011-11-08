@@ -36,8 +36,8 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
   public TemporalVariableDerivationHelper(VariableDto originalVariable, String groupMethod, Date fromDate, Date toDate) {
     super(originalVariable);
     this.groupMethod = GroupMethod.valueOf(groupMethod);
-    this.fromDate = fromDate;
-    this.toDate = toDate;
+    this.fromDate = new Date(fromDate.getTime());
+    this.toDate = new Date(toDate.getTime());
     initializeValueMapEntries();
   }
 
@@ -46,7 +46,7 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
   }
 
   public Date getFromDate() {
-    return fromDate;
+    return new Date(fromDate.getTime());
   }
 
   public int getFromYear() {
@@ -58,7 +58,7 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
   }
 
   public Date getToDate() {
-    return toDate;
+    return new Date(toDate.getTime());
   }
 
   public int getToYear() {
