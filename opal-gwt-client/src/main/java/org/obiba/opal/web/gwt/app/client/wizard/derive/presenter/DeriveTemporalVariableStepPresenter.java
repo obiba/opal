@@ -18,6 +18,8 @@ import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.TemporalVariableDerivationHelper;
@@ -48,7 +50,15 @@ public class DeriveTemporalVariableStepPresenter extends DerivationPresenter<Der
   public List<DefaultWizardStepController> getWizardSteps() {
     List<DefaultWizardStepController> stepCtrls = new ArrayList<DefaultWizardStepController>();
 
-    stepCtrls.add(getDisplay().getMethodStepController().build());
+    stepCtrls.add(getDisplay().getMethodStepController().onValidate(new ValidationHandler() {
+
+      @Override
+      public boolean validate() {
+        if(getDisplay().getFromDate() != null && getDisplay().getToDate() != null) return true;
+        eventBus.fireEvent(NotificationEvent.newBuilder().error("DatesRangeInvalid").build());
+        return false;
+      }
+    }).build());
     stepCtrls.add(getDisplay().getMapStepController().onStepIn(new StepInHandler() {
 
       @Override

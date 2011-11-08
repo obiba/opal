@@ -259,7 +259,8 @@ public interface Translations extends Constants {
   "RIsAlive", "R server is alive.",//
   "RConnectionFailed", "Connection with R server failed.", //
   "UnauthorizedOperation", "You are not allowed to perform this operation.",//
-  "CannotWriteToView", "Cannot modify a View using this operation. Use the View editor."//
+  "CannotWriteToView", "Cannot modify a View using this operation. Use the View editor.",//
+  "DatesRangeInvalid", "The range of dates is invalid."//
   })
   Map<String, String> userMessageMap();
 
