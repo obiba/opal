@@ -66,13 +66,19 @@ input:focus,textarea:focus,select:focus{
 
 label {
   float: none;
-  padding-left: 0.2em;
+  padding-left: 0.8em;
 }
 
 input[type="checkbox"], input[type="radio"] {
   margin: 0;
   padding: 0;
   vertical-align: text-top;
+}
+
+input[disabled], 
+select[disabled], 
+textarea[disabled] {
+  color: #888888;
 }
 
 .clickable:hover {
@@ -1282,6 +1288,15 @@ ul.tabz li a, ul.tabz li a:visited, ul.tabz li a:hover {
 
 div.input {
   margin-top: 1em;
+}
+
+div.input div.input {
+  margin-left: 2em;
+}
+
+div.input div.inline {
+  display: inline-block;
+  margin-right: 1em;
 }
 
 div.input.error input,

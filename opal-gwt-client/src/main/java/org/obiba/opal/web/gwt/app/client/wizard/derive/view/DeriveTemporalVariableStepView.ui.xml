@@ -7,23 +7,42 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
-  <ui:style>
-    .right-aligned { float: right; }
-    .top-margin { margin-top: 0.5em; }
-  </ui:style>
-
   <g:FlowPanel>
     <o:WizardStep ui:field="methodStep">
       <g:FlowPanel>
+        
         <g:FlowPanel styleName="input">
-          <g:Label addStyleNames="key"><ui:msg description="Date and time group mehtods label">Date and time group methods</ui:msg></g:Label>
-          <g:ListBox ui:field="groupBox"></g:ListBox>
+          <g:RadioButton name="method" ui:field="spanRadio" value="true">
+            <ui:msg description="Group by type of time span label">Group by type of time span</ui:msg>
+          </g:RadioButton>
+          <g:FlowPanel styleName="input">
+            <g:Label addStyleNames="key">
+              <ui:msg description="Time span type label">Time span type</ui:msg>
+            </g:Label>
+            <g:ListBox ui:field="spanBox"></g:ListBox>
+          </g:FlowPanel>
         </g:FlowPanel>
+        
         <g:FlowPanel styleName="input" ui:field="range">
-          <g:Label addStyleNames="key"><ui:msg description="Date Range label">Date range</ui:msg></g:Label>
-          <g:FlowPanel ui:field="dates">
-            <g:InlineLabel addStyleNames="key"><ui:msg description="From label">From</ui:msg>:</g:InlineLabel>
-            <g:InlineLabel addStyleNames="key"><ui:msg description="To label">To</ui:msg>:</g:InlineLabel>
+          <g:RadioButton name="method" ui:field="rangeRadio">
+            <ui:msg description="Group by date ranges label">Group by date ranges</ui:msg>
+          </g:RadioButton>
+          <g:FlowPanel styleName="input">
+            <g:Label addStyleNames="key">
+              <ui:msg description="Time span type label">Date range type</ui:msg>
+            </g:Label>
+            <g:ListBox ui:field="rangeBox" enabled="false"></g:ListBox>
+          </g:FlowPanel>
+          <g:FlowPanel styleName="input">
+            <g:Label addStyleNames="key"><ui:msg description="Date Range label">Date range definition</ui:msg></g:Label>
+            <g:FlowPanel ui:field="dates">
+              <g:FlowPanel ui:field="from" addStyleNames="inline">
+                <g:Label styleName="help-block"><ui:msg description="From label">From</ui:msg></g:Label>  
+              </g:FlowPanel>
+              <g:FlowPanel ui:field="to" addStyleNames="inline">
+                <g:Label styleName="help-block"><ui:msg description="To label">To</ui:msg></g:Label>
+              </g:FlowPanel>
+            </g:FlowPanel>
           </g:FlowPanel>
         </g:FlowPanel>
       </g:FlowPanel>

@@ -11,7 +11,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.helper;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -78,7 +78,7 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
     VariableDto derived = copyVariable(originalVariable, true);
     derived.setValueType("text");
 
-    Map<String, CategoryDto> newCategoriesMap = new HashMap<String, CategoryDto>();
+    Map<String, CategoryDto> newCategoriesMap = new LinkedHashMap<String, CategoryDto>();
 
     StringBuilder scriptBuilder = new StringBuilder("$('" + originalVariable.getName() + "')");
     scriptBuilder.append(".").append(groupMethod.getScript(this));
@@ -119,6 +119,31 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
   }
 
   public enum GroupMethod {
+    HOUR_OF_DAY {
+      @Override
+      public void initializeValueMapEntries(TemporalVariableDerivationHelper helper) {
+        String hour = translateTime("Hour") + " ";
+        for(int i = 0; i < 24; i++) {
+          String str = Integer.toString(i);
+          addValueMapEntry(helper, ValueMapEntry.fromDistinct(str).label(hour + (i + 1)).newValue(str).build());
+        }
+      }
+
+      @Override
+      public String getScript(TemporalVariableDerivationHelper helper) {
+        return "hourOfDay()";
+      }
+
+      @Override
+      public boolean isTimeSpan() {
+        return true;
+      }
+
+      @Override
+      public boolean isForTimeType(String valueType) {
+        return valueType.equals("datetime");
+      }
+    },
     DAY_OF_WEEK {
       @Override
       public void initializeValueMapEntries(TemporalVariableDerivationHelper helper) {
@@ -135,6 +160,11 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
       public String getScript(TemporalVariableDerivationHelper helper) {
         return "dayOfWeek()";
       }
+
+      @Override
+      public boolean isTimeSpan() {
+        return true;
+      }
     },
     DAY_OF_MONTH {
       @Override
@@ -149,6 +179,11 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
       @Override
       public String getScript(TemporalVariableDerivationHelper helper) {
         return "dayOfMonth()";
+      }
+
+      @Override
+      public boolean isTimeSpan() {
+        return true;
       }
     },
     DAY_OF_YEAR {
@@ -165,6 +200,11 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
       public String getScript(TemporalVariableDerivationHelper helper) {
         return "dayOfYear()";
       }
+
+      @Override
+      public boolean isTimeSpan() {
+        return true;
+      }
     },
     WEEK_OF_MONTH {
       @Override
@@ -179,6 +219,11 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
       @Override
       public String getScript(TemporalVariableDerivationHelper helper) {
         return "weekOfMonth()";
+      }
+
+      @Override
+      public boolean isTimeSpan() {
+        return true;
       }
     },
     WEEK_OF_YEAR {
@@ -196,6 +241,11 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
       public String getScript(TemporalVariableDerivationHelper helper) {
         return "weekOfYear()";
       }
+
+      @Override
+      public boolean isTimeSpan() {
+        return true;
+      }
     },
     MONTH_OF_YEAR {
       @Override
@@ -210,22 +260,10 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
       public String getScript(TemporalVariableDerivationHelper helper) {
         return "month()";
       }
-    },
-    MONTH {
-      @Override
-      public void initializeValueMapEntries(TemporalVariableDerivationHelper helper) {
-        int idx = 1;
-        for(long i = helper.getFromYear(); i < helper.getToYear(); i++) {
-          for(int j = 1; j < 13; j++) {
-            String value = i + "-" + (j < 10 ? "0" : "") + j;
-            addValueMapEntry(helper, ValueMapEntry.fromDistinct(value).label(translateMonth(j) + ", " + i).newValue(Integer.toString(idx++)).build());
-          }
-        }
-      }
 
       @Override
-      public String getScript(TemporalVariableDerivationHelper helper) {
-        return "format('yyyy-MM')";
+      public boolean isTimeSpan() {
+        return true;
       }
     },
     QUARTER_OF_YEAR {
@@ -242,7 +280,55 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
       @Override
       public String getScript(TemporalVariableDerivationHelper helper) {
         // TODO quarterOfYear()
-        return "month().map({1:1,2:1,3:1,4:2,5:2,6:2,7:3,8:3,9:3,10:4,11:4,12:4})";
+        return "month().map({1:1,2:1,3:1,4:2,5:2,6:2,7:3,8:3,9:3,10:4,11:4,12:4},null)";
+      }
+
+      @Override
+      public boolean isTimeSpan() {
+        return true;
+      }
+    },
+    SEMESTER_OF_YEAR {
+      @Override
+      public void initializeValueMapEntries(TemporalVariableDerivationHelper helper) {
+        String semester = translateTime("Semester") + " ";
+        for(int i = 1; i < 3; i++) {
+          String str = Integer.toString(i);
+          addValueMapEntry(helper, ValueMapEntry.fromDistinct(str).label(semester + str).newValue(str).build());
+        }
+      }
+
+      @Override
+      public String getScript(TemporalVariableDerivationHelper helper) {
+        // TODO semesterOfYear()
+        return "month().map({1:1,2:1,3:1,4:1,5:1,6:1,7:2,8:2,9:2,10:2,11:2,12:2},null)";
+      }
+
+      @Override
+      public boolean isTimeSpan() {
+        return true;
+      }
+    }, //
+    MONTH {
+      @Override
+      public void initializeValueMapEntries(TemporalVariableDerivationHelper helper) {
+        int idx = 1;
+        for(long i = helper.getFromYear(); i < helper.getToYear(); i++) {
+          for(int j = 1; j < 13; j++) {
+            String value = i + "-" + (j < 10 ? "0" : "") + j;
+            addValueMapEntry(helper, ValueMapEntry.fromDistinct(value).label(translateMonth(j) + ", " + i).newValue(Integer.toString(idx++)).build());
+          }
+        }
+      }
+
+      @Override
+      public String getScript(TemporalVariableDerivationHelper helper) {
+        return "format('yyyy-MM')";
+      }
+
+      @Override
+      public boolean isTimeSpan() {
+        return false;
       }
     },
     QUARTER {
@@ -280,26 +366,15 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
             }
           }
         }
-        builder.append("})");
+        builder.append("},null)");
         return builder.toString();
-      }
-    },
-    SEMESTER_OF_YEAR {
-      @Override
-      public void initializeValueMapEntries(TemporalVariableDerivationHelper helper) {
-        String semester = translateTime("Semester") + " ";
-        for(int i = 1; i < 3; i++) {
-          String str = Integer.toString(i);
-          addValueMapEntry(helper, ValueMapEntry.fromDistinct(str).label(semester + str).newValue(str).build());
-        }
       }
 
       @Override
-      public String getScript(TemporalVariableDerivationHelper helper) {
-        // TODO semesterOfYear()
-        return "month().map({1:1,2:1,3:1,4:1,5:1,6:1,7:2,8:2,9:2,10:2,11:2,12:2})";
+      public boolean isTimeSpan() {
+        return false;
       }
-    }, //
+    },
     SEMESTER {
 
       @Override
@@ -331,8 +406,13 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
             }
           }
         }
-        builder.append("})");
+        builder.append("},null)");
         return builder.toString();
+      }
+
+      @Override
+      public boolean isTimeSpan() {
+        return false;
       }
 
     },
@@ -350,6 +430,11 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
       @Override
       public String getScript(TemporalVariableDerivationHelper helper) {
         return "year()";
+      }
+
+      @Override
+      public boolean isTimeSpan() {
+        return false;
       }
     },
     LUSTRUM {
@@ -381,6 +466,11 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
         builder.append("})");
         return builder.toString();
       }
+
+      @Override
+      public boolean isTimeSpan() {
+        return false;
+      }
     },
     DECADE {
       @Override
@@ -411,13 +501,24 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
         builder.append("})");
         return builder.toString();
       }
+
+      @Override
+      public boolean isTimeSpan() {
+        return false;
+      }
     };
 
     protected Translations translations = GWT.create(Translations.class);
 
+    public abstract boolean isTimeSpan();
+
     public abstract String getScript(TemporalVariableDerivationHelper helper);
 
     public abstract void initializeValueMapEntries(TemporalVariableDerivationHelper helper);
+
+    public boolean isForTimeType(String valueType) {
+      return valueType.equals("date") || valueType.equals("datetime");
+    }
 
     protected String translateTime(String text) {
       return translations.timeMap().get(text);

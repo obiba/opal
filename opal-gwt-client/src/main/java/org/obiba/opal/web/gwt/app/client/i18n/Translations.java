@@ -984,7 +984,9 @@ public interface Translations extends Constants {
   String recodeTemporalMapStepTitle();
 
   @Description("Time map")
-  @DefaultStringMapValue({ "Monday", "Monday", //
+  @DefaultStringMapValue({ //
+  "Hour", "Hour", //
+  "Monday", "Monday", //
   "Tuesday", "Tuesday", //
   "Wednesday", "Wednesday", //
   "Thursday", "Thursday", //
@@ -1022,6 +1024,7 @@ public interface Translations extends Constants {
 
   @Description("Time Group map")
   @DefaultStringMapValue({ //
+  "HOUR_OF_DAY", "Hour of Day", //
   "DAY_OF_WEEK", "Day of Week", //
   "DAY_OF_MONTH", "Day of Month", //
   "DAY_OF_YEAR", "Day of Year", //

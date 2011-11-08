@@ -39,6 +39,12 @@ public class DeriveTemporalVariableStepPresenter extends DerivationPresenter<Der
   }
 
   @Override
+  void initialize(VariableDto variable) {
+    super.initialize(variable);
+    getDisplay().setTimeType(variable.getValueType());
+  }
+
+  @Override
   public List<DefaultWizardStepController> getWizardSteps() {
     List<DefaultWizardStepController> stepCtrls = new ArrayList<DefaultWizardStepController>();
 
@@ -99,6 +105,8 @@ public class DeriveTemporalVariableStepPresenter extends DerivationPresenter<Der
   public interface Display extends WidgetDisplay {
 
     DefaultWizardStepController.Builder getMethodStepController();
+
+    void setTimeType(String valueType);
 
     DefaultWizardStepController.Builder getMapStepController();
 

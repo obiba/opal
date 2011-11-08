@@ -19,6 +19,8 @@ import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveTemporalV
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -26,7 +28,10 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.gwt.user.datepicker.client.DateBox;
 
 /**
@@ -49,17 +54,34 @@ public class DeriveTemporalVariableStepView extends Composite implements DeriveT
   WizardStep mapStep;
 
   @UiField
-  ListBox groupBox;
+  RadioButton spanRadio;
+
+  @UiField
+  ListBox spanBox;
+
+  @UiField
+  RadioButton rangeRadio;
+
+  @UiField
+  ListBox rangeBox;
 
   @UiField
   ValueMapGrid valuesMapGrid;
 
   @UiField
-  FlowPanel dates;
+  Panel dates;
+
+  @UiField
+  FlowPanel from;
+
+  @UiField
+  FlowPanel to;
 
   private DateBox fromDate;
 
   private DateBox toDate;
+
+  private String timeType;
 
   //
   // Constructors
@@ -68,22 +90,49 @@ public class DeriveTemporalVariableStepView extends Composite implements DeriveT
   public DeriveTemporalVariableStepView() {
     initWidget(uiBinder.createAndBindUi(this));
 
-    for(GroupMethod method : GroupMethod.values()) {
-      // TODO translate
-      groupBox.addItem(translations.timeGroupMap().get(method.toString()), method.toString());
-    }
     DateTimeFormat dateFormat = DateTimeFormat.getFormat("yyyy-MM-dd");
 
     this.fromDate = new DateBox();
     this.fromDate.setFormat(new DateBox.DefaultFormat(dateFormat));
-    fromDate.setValue(new Date());
-    dates.insert(fromDate, 1);
+    Date now = new Date();
+    CalendarUtil.addDaysToDate(now, -3650);
+    CalendarUtil.setToFirstDayOfMonth(now);
+    fromDate.setValue(now);
+    fromDate.setWidth("6em");
+    from.insert(fromDate, 0);
 
     this.toDate = new DateBox();
     this.toDate.setFormat(new DateBox.DefaultFormat(dateFormat));
-    toDate.setValue(new Date());
-    dates.insert(toDate, 3);
+    now = new Date();
+    toDate.setValue(now);
+    toDate.setWidth("6em");
+    to.insert(toDate, 0);
 
+    setSpanEnabled(true);
+
+    spanRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<Boolean> event) {
+        setSpanEnabled(true);
+      }
+    });
+
+    rangeRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<Boolean> event) {
+        setSpanEnabled(false);
+      }
+    });
+
+  }
+
+  private void setSpanEnabled(boolean enabled) {
+    spanBox.setEnabled(enabled);
+    rangeBox.setEnabled(!enabled);
+    fromDate.setEnabled(!enabled);
+    toDate.setEnabled(!enabled);
   }
 
   @Override
@@ -115,7 +164,11 @@ public class DeriveTemporalVariableStepView extends Composite implements DeriveT
 
   @Override
   public String getGroupMethod() {
-    return groupBox.getValue(groupBox.getSelectedIndex());
+    if(spanRadio.getValue()) {
+      return spanBox.getValue(spanBox.getSelectedIndex());
+    } else {
+      return rangeBox.getValue(rangeBox.getSelectedIndex());
+    }
   }
 
   @Override
@@ -126,13 +179,27 @@ public class DeriveTemporalVariableStepView extends Composite implements DeriveT
   @Override
   public Date getFromDate() {
     return fromDate.getValue();
-    // return Long.parseLong(DateTimeFormat.getFormat(PredefinedFormat.YEAR).format(fromDate.getValue()));
   }
 
   @Override
   public Date getToDate() {
     return toDate.getValue();
-    // return Long.parseLong(DateTimeFormat.getFormat(PredefinedFormat.YEAR).format(toDate.getValue()));
+  }
+
+  @Override
+  public void setTimeType(String valueType) {
+    this.timeType = valueType;
+    spanBox.clear();
+    rangeBox.clear();
+    for(GroupMethod method : GroupMethod.values()) {
+      if(method.isForTimeType(timeType)) {
+        if(method.isTimeSpan()) {
+          spanBox.addItem(translations.timeGroupMap().get(method.toString()), method.toString());
+        } else {
+          rangeBox.addItem(translations.timeGroupMap().get(method.toString()), method.toString());
+        }
+      }
+    }
   }
 
 }
