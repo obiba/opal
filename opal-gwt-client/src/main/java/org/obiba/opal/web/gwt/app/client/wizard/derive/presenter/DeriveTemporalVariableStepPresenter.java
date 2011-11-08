@@ -54,7 +54,10 @@ public class DeriveTemporalVariableStepPresenter extends DerivationPresenter<Der
       @Override
       public void onStepIn() {
         // do not re-populate if group method selection has not changed
-        if(derivationHelper == null || !derivationHelper.getGroupMethod().toString().equalsIgnoreCase(getDisplay().getGroupMethod())) {
+        if(derivationHelper == null //
+            || !derivationHelper.getGroupMethod().toString().equalsIgnoreCase(getDisplay().getGroupMethod()) //
+            || !derivationHelper.getFromDate().equals(getDisplay().getFromDate()) //
+            || !derivationHelper.getToDate().equals(getDisplay().getToDate())) {
           derivationHelper = new TemporalVariableDerivationHelper(originalVariable, getDisplay().getGroupMethod(), getDisplay().getFromDate(), getDisplay().getToDate());
           getDisplay().populateValues(derivationHelper.getValueMapEntries());
         }

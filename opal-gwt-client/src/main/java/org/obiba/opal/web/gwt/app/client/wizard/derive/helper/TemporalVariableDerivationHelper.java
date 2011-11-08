@@ -24,7 +24,6 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 
 public class TemporalVariableDerivationHelper extends DerivationHelper {
 
@@ -51,7 +50,11 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
   }
 
   public int getFromYear() {
-    return Integer.parseInt(DateTimeFormat.getFormat(PredefinedFormat.YEAR).format(fromDate));
+    return Integer.parseInt(DateTimeFormat.getFormat("yyyy").format(fromDate));
+  }
+
+  public int getFromMonth() {
+    return Integer.parseInt(DateTimeFormat.getFormat("MM").format(fromDate));
   }
 
   public Date getToDate() {
@@ -59,7 +62,11 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
   }
 
   public int getToYear() {
-    return Integer.parseInt(DateTimeFormat.getFormat(PredefinedFormat.YEAR).format(toDate));
+    return Integer.parseInt(DateTimeFormat.getFormat("yyyy").format(toDate));
+  }
+
+  public int getToMonth() {
+    return Integer.parseInt(DateTimeFormat.getFormat("MM").format(toDate));
   }
 
   @Override
@@ -313,8 +320,10 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
       @Override
       public void initializeValueMapEntries(TemporalVariableDerivationHelper helper) {
         int idx = 1;
-        for(long i = helper.getFromYear(); i < helper.getToYear(); i++) {
-          for(int j = 1; j < 13; j++) {
+        for(long i = helper.getFromYear(); i <= helper.getToYear(); i++) {
+          int firstMonth = (i == helper.getFromYear()) ? helper.getFromMonth() : 1;
+          int lastMonth = (i == helper.getToYear()) ? helper.getToMonth() : 12;
+          for(int j = firstMonth; j <= lastMonth; j++) {
             String value = i + "-" + (j < 10 ? "0" : "") + j;
             addValueMapEntry(helper, ValueMapEntry.fromDistinct(value).label(translateMonth(j) + ", " + i).newValue(Integer.toString(idx++)).build());
           }
@@ -337,31 +346,38 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
       public void initializeValueMapEntries(TemporalVariableDerivationHelper helper) {
         String quarter = translateTime("Quarter") + " ";
         int idx = 1;
-        for(long i = helper.getFromYear(); i < helper.getToYear(); i++) {
-          for(int j = 1; j < 5; j++) {
+        for(long i = helper.getFromYear(); i <= helper.getToYear(); i++) {
+          int firstQuarter = (i == helper.getFromYear()) ? monthToQuarter(helper.getFromMonth()) : 1;
+          int lastQuarter = (i == helper.getToYear()) ? monthToQuarter(helper.getToMonth()) : 4;
+          for(int j = firstQuarter; j <= lastQuarter; j++) {
             String value = i + "-" + j;
             addValueMapEntry(helper, ValueMapEntry.fromDistinct(value).label(quarter + j + ", " + i).newValue(Integer.toString(idx++)).build());
           }
         }
       }
 
+      private int monthToQuarter(int month) {
+        if(month <= 3) {
+          return 1;
+        } else if(month <= 6) {
+          return 2;
+        } else if(month <= 9) {
+          return 3;
+        } else {
+          return 4;
+        }
+      }
+
       @Override
       public String getScript(TemporalVariableDerivationHelper helper) {
         StringBuilder builder = new StringBuilder("format('yyyy-MM').map({");
-        for(long i = helper.getFromYear(); i < helper.getToYear(); i++) {
-          for(int j = 1; j < 13; j++) {
+        for(long i = helper.getFromYear(); i <= helper.getToYear(); i++) {
+          int firstMonth = (i == helper.getFromYear()) ? helper.getFromMonth() : 1;
+          int lastMonth = (i == helper.getToYear()) ? helper.getToMonth() : 12;
+          for(int j = firstMonth; j <= lastMonth; j++) {
             String value = i + "-" + (j < 10 ? "0" : "") + j;
-            builder.append("'").append(value).append("':'");
-            if(j <= 3) {
-              builder.append(i).append("-1'");
-            } else if(j <= 6) {
-              builder.append(i).append("-2'");
-            } else if(j <= 9) {
-              builder.append(i).append("-3'");
-            } else {
-              builder.append(i).append("-4'");
-            }
-            if(j < 12 || i < helper.getToYear() - 1) {
+            builder.append("'").append(value).append("':'").append(i).append("-").append(monthToQuarter(j)).append("'");
+            if(j < lastMonth || i < helper.getToYear()) {
               builder.append(", ");
             }
           }
@@ -381,27 +397,34 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
       public void initializeValueMapEntries(TemporalVariableDerivationHelper helper) {
         String quarter = translateTime("Semester") + " ";
         int idx = 1;
-        for(long i = helper.getFromYear(); i < helper.getToYear(); i++) {
-          for(int j = 1; j < 3; j++) {
+        for(long i = helper.getFromYear(); i <= helper.getToYear(); i++) {
+          int firstSemester = (i == helper.getFromYear()) ? monthToSemester(helper.getFromMonth()) : 1;
+          int lastSemester = (i == helper.getToYear()) ? monthToSemester(helper.getToMonth()) : 4;
+          for(int j = firstSemester; j <= lastSemester; j++) {
             String value = i + "-" + j;
             addValueMapEntry(helper, ValueMapEntry.fromDistinct(value).label(quarter + j + ", " + i).newValue(Integer.toString(idx++)).build());
           }
         }
       }
 
+      private int monthToSemester(int month) {
+        if(month <= 6) {
+          return 1;
+        } else {
+          return 2;
+        }
+      }
+
       @Override
       public String getScript(TemporalVariableDerivationHelper helper) {
         StringBuilder builder = new StringBuilder("format('yyyy-MM').map({");
-        for(long i = helper.getFromYear(); i < helper.getToYear(); i++) {
-          for(int j = 1; j < 13; j++) {
+        for(long i = helper.getFromYear(); i <= helper.getToYear(); i++) {
+          int firstMonth = (i == helper.getFromYear()) ? helper.getFromMonth() : 1;
+          int lastMonth = (i == helper.getToYear()) ? helper.getToMonth() : 12;
+          for(int j = firstMonth; j <= lastMonth; j++) {
             String value = i + "-" + (j < 10 ? "0" : "") + j;
-            builder.append("'").append(value).append("':'");
-            if(j <= 6) {
-              builder.append(i).append("-1'");
-            } else {
-              builder.append(i).append("-2'");
-            }
-            if(j < 12 || i < helper.getToYear() - 1) {
+            builder.append("'").append(value).append("':'").append(i).append("-").append(monthToSemester(j)).append("'");
+            if(j < lastMonth || i < helper.getToYear()) {
               builder.append(", ");
             }
           }
@@ -421,7 +444,7 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
       public void initializeValueMapEntries(TemporalVariableDerivationHelper helper) {
         String year = translateTime("Year") + " ";
         int idx = 1;
-        for(long i = helper.getFromYear(); i < helper.getToYear(); i++) {
+        for(long i = helper.getFromYear(); i <= helper.getToYear(); i++) {
           String str = Long.toString(i);
           addValueMapEntry(helper, ValueMapEntry.fromDistinct(str).label(year + str).newValue(Integer.toString(idx++)).build());
         }
