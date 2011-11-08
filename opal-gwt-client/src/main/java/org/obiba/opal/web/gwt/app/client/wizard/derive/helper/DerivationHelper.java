@@ -38,7 +38,6 @@ public abstract class DerivationHelper {
   public DerivationHelper(VariableDto originalVariable) {
     super();
     this.originalVariable = originalVariable;
-    initializeValueMapEntries();
   }
 
   protected abstract void initializeValueMapEntries();

@@ -27,6 +27,7 @@ public class BooleanVariableDerivationHelper extends DerivationHelper {
 
   public BooleanVariableDerivationHelper(VariableDto originalVariable) {
     super(originalVariable);
+    initializeValueMapEntries();
   }
 
   protected void initializeValueMapEntries() {

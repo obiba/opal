@@ -42,6 +42,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   public CategoricalVariableDerivationHelper(VariableDto originalVariable) {
     super(originalVariable);
+    initializeValueMapEntries();
   }
 
   protected void initializeValueMapEntries() {
