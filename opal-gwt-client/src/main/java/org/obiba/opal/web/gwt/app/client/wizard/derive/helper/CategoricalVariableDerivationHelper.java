@@ -10,7 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard.derive.helper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -104,7 +104,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
   public VariableDto getDerivedVariable() {
     VariableDto derived = copyVariable(originalVariable);
 
-    Map<String, CategoryDto> newCategoriesMap = new HashMap<String, CategoryDto>();
+    Map<String, CategoryDto> newCategoriesMap = new LinkedHashMap<String, CategoryDto>();
 
     StringBuilder scriptBuilder = new StringBuilder("$('" + originalVariable.getName() + "').map({");
 
