@@ -104,13 +104,13 @@ public abstract class DerivationHelper {
       appendNewValue(scriptBuilder, entry);
 
       if(!entry.getNewValue().isEmpty()) {
-        CategoryDto cat = newCategoriesMap.get(entry.getNewValue());
-        if(cat == null) {
-          cat = CategoryDto.create();
-          cat.setName(entry.getNewValue());
-          cat.setIsMissing(entry.isMissing());
-          cat.setAttributesArray(newAttributes(newLabelAttribute(entry)));
-          newCategoriesMap.put(cat.getName(), cat);
+        CategoryDto cat = newCategory(entry);
+        cat.setAttributesArray(newAttributes(newLabelAttribute(entry)));
+        if(newCategoriesMap.containsKey(cat.getName())) {
+          // merge attributes
+          mergeAttributes(cat.getAttributesArray(), newCategoriesMap.get(cat.getName()).getAttributesArray());
+        } else {
+          newCategoriesMap.put(entry.getNewValue(), cat);
         }
       }
     }

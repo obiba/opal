@@ -102,9 +102,17 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
         scriptBuilder.append("\n    '").append(entry.getValue()).append("': ");
         appendNewValue(scriptBuilder, entry);
 
-        CategoryDto cat = newCategory(entry);
-        cat.setAttributesArray(newAttributes(newLabelAttribute(entry)));
-        newCategoriesMap.put(entry.getNewValue(), cat);
+        // new category
+        if(!entry.getNewValue().isEmpty()) {
+          CategoryDto cat = newCategory(entry);
+          cat.setAttributesArray(newAttributes(newLabelAttribute(entry)));
+          if(newCategoriesMap.containsKey(cat.getName())) {
+            // merge attributes
+            mergeAttributes(cat.getAttributesArray(), newCategoriesMap.get(cat.getName()).getAttributesArray());
+          } else {
+            newCategoriesMap.put(entry.getNewValue(), cat);
+          }
+        }
       }
     }
 
