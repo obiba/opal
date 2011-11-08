@@ -9,16 +9,22 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveNumericalVariableStepPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.NumericTextBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -40,22 +46,95 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
   @UiField
   WizardStep mapStep;
 
+  @UiField
+  ValueMapGrid valuesMapGrid;
+
+  @UiField
+  RadioButton rangeRadio;
+
+  @UiField
+  RadioButton discreteRadio;
+
+  @UiField
+  NumericTextBox fromBox;
+
+  @UiField
+  NumericTextBox toBox;
+
+  @UiField
+  RadioButton lengthRadio;
+
+  @UiField
+  NumericTextBox lengthBox;
+
+  @UiField
+  RadioButton numberRadio;
+
+  @UiField
+  NumericTextBox numberBox;
+
   //
   // Constructors
   //
 
   public DeriveNumericalVariableStepView() {
     initWidget(uiBinder.createAndBindUi(this));
+
+    setRangeEnabled(true);
+
+    rangeRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<Boolean> event) {
+        setRangeEnabled(true);
+      }
+    });
+
+    discreteRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<Boolean> event) {
+        setRangeEnabled(false);
+      }
+    });
+
+    lengthRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+      @Override
+      public void onValueChange(ValueChangeEvent<Boolean> event) {
+        setLengthEnabled(true);
+      }
+    });
+
+    numberRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+      @Override
+      public void onValueChange(ValueChangeEvent<Boolean> event) {
+        setLengthEnabled(false);
+      }
+    });
+  }
+
+  private void setRangeEnabled(boolean enabled) {
+    fromBox.setEnabled(enabled);
+    toBox.setEnabled(enabled);
+    lengthRadio.setEnabled(enabled);
+    numberRadio.setEnabled(enabled);
+    lengthBox.setEnabled(enabled && lengthRadio.getValue());
+    numberBox.setEnabled(enabled && numberRadio.getValue());
+  }
+
+  private void setLengthEnabled(boolean enabled) {
+    lengthBox.setEnabled(enabled);
+    numberBox.setEnabled(!enabled);
   }
 
   @Override
   public DefaultWizardStepController.Builder getMethodStepController() {
-    return DefaultWizardStepController.Builder.create(methodStep).title("Numerical: method");
+    return DefaultWizardStepController.Builder.create(methodStep).title(translations.recodeNumericalMethodStepTitle());
   }
 
   @Override
   public DefaultWizardStepController.Builder getMapStepController() {
-    return DefaultWizardStepController.Builder.create(mapStep).title("Numerical: map");
+    return DefaultWizardStepController.Builder.create(mapStep).title(translations.recodeNumericalMapStepTitle());
   }
 
   //
@@ -73,6 +152,11 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
 
   @Override
   public void stopProcessing() {
+  }
+
+  @Override
+  public void populateValues(List<ValueMapEntry> valuesMap) {
+    valuesMapGrid.populate(valuesMap);
   }
 
 }

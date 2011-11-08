@@ -984,6 +984,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Map each time range to a new value:")
   String recodeTemporalMapStepTitle();
 
+  @Description("Recode Numerical Method Step title")
+  @DefaultStringValue("Numerical values can be grouped together using the following method:")
+  String recodeNumericalMethodStepTitle();
+
+  @Description("Recode Numerical Map Step title")
+  @DefaultStringValue("Map each range or discrete value to a new value:")
+  String recodeNumericalMapStepTitle();
+
   @Description("Time map")
   @DefaultStringMapValue({ //
   "Hour", "Hour", //
@@ -1043,4 +1051,5 @@ public interface Translations extends Constants {
   "CENTURY", "Century" //
   })
   Map<String, String> timeGroupMap();
+
 }

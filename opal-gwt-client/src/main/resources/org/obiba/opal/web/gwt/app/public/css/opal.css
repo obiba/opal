@@ -67,6 +67,7 @@ input:focus,textarea:focus,select:focus{
 label {
   float: none;
   padding-left: 0.8em;
+  padding-right: 0.8em;
 }
 
 input[type="checkbox"], input[type="radio"] {

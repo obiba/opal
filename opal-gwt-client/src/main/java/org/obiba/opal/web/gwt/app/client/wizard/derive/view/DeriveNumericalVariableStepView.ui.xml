@@ -1,6 +1,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
   xmlns:g="urn:import:com.google.gwt.user.client.ui" 
   xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+  xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.wizard.derive.view"
   ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
@@ -8,10 +9,97 @@
   <g:FlowPanel>
      <o:WizardStep ui:field="methodStep">
       <g:FlowPanel>
+      
+        <g:FlowPanel styleName="input">
+          <g:RadioButton name="method" ui:field="rangeRadio" value="true">
+            <ui:msg description="Group by ranges of values label">Group by ranges of values</ui:msg>
+          </g:RadioButton>
+          
+          <g:FlowPanel styleName="input">
+            <g:Label addStyleNames="key"><ui:msg description="Date Range label">Value limits</ui:msg></g:Label>
+            <g:FlowPanel>
+              <g:FlowPanel addStyleNames="inline">
+                <o:NumericTextBox ui:field="fromBox" width="6em"></o:NumericTextBox>
+                <g:Label styleName="help-block"><ui:msg description="From label">From</ui:msg></g:Label>  
+              </g:FlowPanel>
+              <g:FlowPanel addStyleNames="inline">
+                <o:NumericTextBox ui:field="toBox" width="6em"></o:NumericTextBox>
+                <g:Label styleName="help-block"><ui:msg description="To label">To</ui:msg></g:Label>
+              </g:FlowPanel>
+            </g:FlowPanel>
+          </g:FlowPanel>
+          
+          <g:FlowPanel styleName="input">
+            <g:Label addStyleNames="key"><ui:msg description="Ranges definition label">Ranges definition</ui:msg></g:Label>
+            
+            <g:Grid>
+              <g:row>
+                <g:customCell>
+                  <g:RadioButton name="range" ui:field="lengthRadio" value="true">
+                    <ui:msg description="Ranges length label">Ranges length</ui:msg>
+                  </g:RadioButton>
+                </g:customCell>
+                <g:customCell>
+                  <o:NumericTextBox ui:field="lengthBox" width="6em"></o:NumericTextBox>
+                </g:customCell>
+              </g:row>
+              <g:row>
+                <g:customCell>
+                  <g:RadioButton name="range" ui:field="numberRadio">
+                    <ui:msg description="Number of ranges label">Number of ranges</ui:msg>
+                  </g:RadioButton>
+                </g:customCell>
+                <g:customCell>
+                  <o:NumericTextBox ui:field="numberBox" width="6em"></o:NumericTextBox>
+                </g:customCell>
+              </g:row>
+            </g:Grid>
+            	
+          </g:FlowPanel>
+          
+        </g:FlowPanel>
+        
+        <g:FlowPanel styleName="input">
+          <g:RadioButton name="method" ui:field="discreteRadio">
+            <ui:msg description="Map discrete values label">Map discrete values</ui:msg>
+          </g:RadioButton>
+        </g:FlowPanel>
+      
       </g:FlowPanel>
      </o:WizardStep>
      <o:WizardStep ui:field="mapStep">
       <g:FlowPanel>
+        <g:HorizontalPanel>
+          <g:Grid>
+            <g:row>
+              <g:customCell>
+                <g:RadioButton name="add" ui:field="addRangeRadio" value="true">
+                  <ui:msg description="Range label">Range</ui:msg>
+                </g:RadioButton>
+              </g:customCell>
+              <g:customCell>
+                <g:HorizontalPanel>
+                    <o:NumericTextBox ui:field="addFromBox" width="6em"></o:NumericTextBox>
+                    <g:InlineLabel>-</g:InlineLabel>
+                    <o:NumericTextBox ui:field="addToBox" width="6em"></o:NumericTextBox>
+                </g:HorizontalPanel>
+              </g:customCell>
+            </g:row>
+            <g:row>
+              <g:customCell>
+                <g:RadioButton name="add" ui:field="addDiscreteRadio">
+                  <ui:msg description="Value label">Value</ui:msg>
+                </g:RadioButton>
+              </g:customCell>
+              <g:customCell>
+                <o:NumericTextBox ui:field="valueBox" width="6em"></o:NumericTextBox>
+              </g:customCell>
+            </g:row>
+          </g:Grid>
+          <g:TextBox ui:field="newValueBox" width="6em"></g:TextBox>
+          <g:Button styleName="btn"><ui:msg description="Add label">Add</ui:msg></g:Button>
+        </g:HorizontalPanel>
+        <o2:ValueMapGrid width="100%" ui:field="valuesMapGrid" pageSizeMin="13" pageSizeMax="100" gridHeight="40em"/>
       </g:FlowPanel>
      </o:WizardStep>
   </g:FlowPanel>

@@ -17,9 +17,10 @@ import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.VariableDuplicationHelper;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.NumericalVariableDerivationHelper;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.inject.Inject;
@@ -29,7 +30,7 @@ import com.google.inject.Inject;
  */
 public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<DeriveNumericalVariableStepPresenter.Display> {
 
-  private VariableDuplicationHelper derivationHelper;
+  private NumericalVariableDerivationHelper derivationHelper;
 
   @Inject
   public DeriveNumericalVariableStepPresenter(final Display display, final EventBus eventBus) {
@@ -40,7 +41,6 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
   void initialize(VariableDto variable) {
     super.initialize(variable);
     // TODO initialize when method is chosen
-    derivationHelper = new VariableDuplicationHelper(variable);
   }
 
   @Override
@@ -48,12 +48,12 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
     List<DefaultWizardStepController> stepCtrls = new ArrayList<DefaultWizardStepController>();
 
     stepCtrls.add(getDisplay().getMethodStepController().build());
-    stepCtrls.add(getDisplay().getMapStepController().onValidate(new ValidationHandler() {
+    stepCtrls.add(getDisplay().getMapStepController().onStepIn(new StepInHandler() {
 
       @Override
-      public boolean validate() {
-        // TODO
-        return true;
+      public void onStepIn() {
+        derivationHelper = new NumericalVariableDerivationHelper(originalVariable);
+        getDisplay().populateValues(derivationHelper.getValueMapEntries());
       }
     }).build());
 
@@ -103,6 +103,8 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
     DefaultWizardStepController.Builder getMethodStepController();
 
     DefaultWizardStepController.Builder getMapStepController();
+
+    void populateValues(List<ValueMapEntry> valuesMap);
 
   }
 
