@@ -53,6 +53,8 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
 
   private int currentOffset;
 
+  private boolean repeatable;
+
   //
   // Constructors
   //
@@ -73,6 +75,7 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
   public void setVariable(VariableDto variable) {
     this.variable = variable;
     this.valueType = variable.getValueType();
+    this.repeatable = variable.getIsRepeatable();
     this.script = getScript(variable);
   }
 
@@ -81,9 +84,10 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
    * @param valueType
    * @param script
    */
-  public void setScript(String valueType, String script) {
+  public void setScript(String valueType, String script, boolean repeatable) {
     this.variable = null;
     this.valueType = valueType;
+    this.repeatable = repeatable;
     this.script = script;
   }
 
@@ -102,8 +106,12 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
     getDisplay().setScript(script);
 
     currentOffset = offset;
+    StringBuilder link = new StringBuilder(table.getLink())//
+    .append("/variable/_transient/values?limit=").append(PAGE_SIZE)//
+    .append("&offset=").append(offset).append("&");
+    appendVariableArguments(link);
     ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder() //
-    .forResource(table.getLink() + "/variable/_transient/values?limit=" + PAGE_SIZE + "&offset=" + offset + "&script=" + URL.encodeQueryString(script)).get() //
+    .forResource(link.toString()).get() //
     .withCallback(new ResourceCallback<JsArray<ValueDto>>() {
 
       @Override
@@ -121,21 +129,25 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
   }
 
   private void requestSummary() {
-    StringBuilder summaryLink = new StringBuilder(table.getLink() + "/variable/_transient/summary");
-    summaryLink.append("?valueType=" + valueType);
-    summaryLink.append("&script=" + URL.encodeQueryString(script));
+    StringBuilder link = new StringBuilder(table.getLink()).append("/variable/_transient/summary?");
+    appendVariableArguments(link);
 
     if(variable != null) {
       JsArray<CategoryDto> cats = variable.getCategoriesArray();
       if(cats != null) {
         for(int i = 0; i < cats.length(); i++) {
-          summaryLink.append("&category=" + URL.encodeQueryString(cats.get(i).getName()));
+          link.append("&category=" + URL.encodeQueryString(cats.get(i).getName()));
         }
       }
     }
-    summaryTabPresenter.setResourceUri(summaryLink.toString());
+    summaryTabPresenter.setResourceUri(link.toString());
     summaryTabPresenter.refreshDisplay();
+  }
 
+  private void appendVariableArguments(StringBuilder link) {
+    link.append("valueType=" + valueType) //
+    .append("&repeatable=" + repeatable) //
+    .append("&script=" + URL.encodeQueryString(script));
   }
 
   //
