@@ -128,29 +128,34 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     updateDatasources();
 
     if(event.getWizardType() == WizardType.DERIVE_CATEGORIZE_VARIABLE) {
-      // TODO
-      String valueType = variable.getValueType();
-      derivationPresenter = null;
-      if(valueType.equals("text") && allCategoriesMissing(variable)) {
-        derivationPresenter = openTextualPresenter;
-      } else if(valueType.equals("integer") || valueType.equals("decimal")) {
-        derivationPresenter = numericalPresenter;
-      } else if(valueType.equals("date") || valueType.equals("datetime")) {
-        derivationPresenter = temporalPresenter;
-      } else if(valueType.equals("text") && variable.getCategoriesArray() != null && variable.getCategoriesArray().length() > 0) {
-        derivationPresenter = categoricalPresenter;
-      } else if(valueType.equals("boolean")) {
-        derivationPresenter = booleanPresenter;
-      } else if(allCategoriesMissing(variable)) {
-        derivationPresenter = openTextualPresenter;
-      }
-
-      if(derivationPresenter != null) {
-        derivationPresenter.initialize(variable);
-        getDisplay().appendWizardSteps(derivationPresenter.getWizardSteps());
-      }
+      updateDerivationPresenter();
     } else {
       // TODO
+    }
+  }
+
+  @SuppressWarnings({ "unchecked", "PMD.NcssMethodCount" })
+  private void updateDerivationPresenter() {
+    // TODO
+    String valueType = variable.getValueType();
+    derivationPresenter = null;
+    if(valueType.equals("text") && allCategoriesMissing(variable)) {
+      derivationPresenter = openTextualPresenter;
+    } else if(valueType.equals("integer") || valueType.equals("decimal")) {
+      derivationPresenter = numericalPresenter;
+    } else if(valueType.equals("date") || valueType.equals("datetime")) {
+      derivationPresenter = temporalPresenter;
+    } else if(valueType.equals("text") && variable.getCategoriesArray() != null && variable.getCategoriesArray().length() > 0) {
+      derivationPresenter = categoricalPresenter;
+    } else if(valueType.equals("boolean")) {
+      derivationPresenter = booleanPresenter;
+    } else if(allCategoriesMissing(variable)) {
+      derivationPresenter = openTextualPresenter;
+    }
+
+    if(derivationPresenter != null) {
+      derivationPresenter.initialize(variable);
+      getDisplay().appendWizardSteps(derivationPresenter.getWizardSteps());
     }
   }
 
@@ -459,7 +464,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     private List<String> validate() {
       getDisplay().setDerivedNameError(false);
       getDisplay().setViewNameError(false);
-      String datasourceName = getDisplay().getDatasourceName();
+
       String viewName = getDisplay().getViewName();
 
       List<String> errorMessages = new ArrayList<String>();
@@ -472,30 +477,45 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
         errorMessages.add(translations.destinationViewNameRequired());
       } else {
         // if destination table exists, it must be a view
-        for(DatasourceDto ds : JsArrays.toIterable(datasources)) {
-          if(ds.getName().equals(datasourceName)) {
-            for(int i = 0; i < ds.getTableArray().length(); i++) {
-              String tName = ds.getTableArray().get(i);
-              if(tName.equals(viewName)) {
-                boolean isView = false;
-                for(int j = 0; j < ds.getViewArray().length(); j++) {
-                  String vName = ds.getViewArray().get(j);
-                  if(vName.equals(viewName)) {
-                    isView = true;
-                  }
-                }
-                if(!isView) {
-                  getDisplay().setViewNameError(true);
-                  errorMessages.add(translations.addDerivedVariableToViewOnly());
-                }
-                break;
-              }
-            }
-          }
-        }
+        validateDestinationView(errorMessages);
       }
       return errorMessages;
     }
+
+    private void validateDestinationView(List<String> errorMessages) {
+      String datasourceName = getDisplay().getDatasourceName();
+      for(DatasourceDto ds : JsArrays.toIterable(datasources)) {
+        if(ds.getName().equals(datasourceName)) {
+          validateDestinationView(errorMessages, ds);
+        }
+      }
+    }
+
+    private void validateDestinationView(List<String> errorMessages, DatasourceDto ds) {
+      String viewName = getDisplay().getViewName();
+      for(int i = 0; i < ds.getTableArray().length(); i++) {
+        String tName = ds.getTableArray().get(i);
+        if(tName.equals(viewName)) {
+          if(!isView(ds, viewName)) {
+            getDisplay().setViewNameError(true);
+            errorMessages.add(translations.addDerivedVariableToViewOnly());
+          }
+          break;
+        }
+      }
+    }
+
+    private boolean isView(DatasourceDto ds, String viewName) {
+      boolean isView = false;
+      for(int j = 0; j < ds.getViewArray().length(); j++) {
+        String vName = ds.getViewArray().get(j);
+        if(vName.equals(viewName)) {
+          isView = true;
+        }
+      }
+      return isView;
+    }
+
   }
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {

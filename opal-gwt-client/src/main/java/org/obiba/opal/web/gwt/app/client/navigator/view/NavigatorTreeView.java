@@ -65,24 +65,32 @@ public class NavigatorTreeView implements NavigatorTreePresenter.Display {
     if(currentSelection == null) return;
 
     if(currentSelection.getParentItem() != null) {
-      String datasourceName = currentSelection.getParentItem().getText();
-      currentSelection = getTableItem(datasourceName, currentSelection.getText());
-      if(currentSelection == null) {
-        selectDatasource(datasourceName);
-      } else {
-        // soft selection (do not trigger event)
-        currentSelection.addStyleName("selected");
-        tree.setSelectedItem(currentSelection, false);
-      }
+      reselectTable();
     } else {
-      currentSelection = getDatasourceItem(currentSelection.getText());
-      if(currentSelection == null) {
-        selectFirstDatasource();
-      } else {
-        // soft selection (do not trigger event)
-        currentSelection.addStyleName("selected");
-        tree.setSelectedItem(currentSelection, false);
-      }
+      reselectDatasource();
+    }
+  }
+
+  private void reselectTable() {
+    String datasourceName = currentSelection.getParentItem().getText();
+    currentSelection = getTableItem(datasourceName, currentSelection.getText());
+    if(currentSelection == null) {
+      selectDatasource(datasourceName);
+    } else {
+      // soft selection (do not trigger event)
+      currentSelection.addStyleName("selected");
+      tree.setSelectedItem(currentSelection, false);
+    }
+  }
+
+  private void reselectDatasource() {
+    currentSelection = getDatasourceItem(currentSelection.getText());
+    if(currentSelection == null) {
+      selectFirstDatasource();
+    } else {
+      // soft selection (do not trigger event)
+      currentSelection.addStyleName("selected");
+      tree.setSelectedItem(currentSelection, false);
     }
   }
 

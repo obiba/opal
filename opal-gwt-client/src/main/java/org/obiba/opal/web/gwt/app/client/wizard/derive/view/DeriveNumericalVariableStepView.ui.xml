@@ -96,7 +96,7 @@
               </g:customCell>
             </g:row>
           </g:Grid>
-          <g:TextBox ui:field="newValueBox" width="6em"></g:TextBox>
+          <g:TextBox ui:field="newValueBox" width="8em"></g:TextBox>
           <g:Button styleName="btn"><ui:msg description="Add label">Add</ui:msg></g:Button>
         </g:HorizontalPanel>
         <o2:ValueMapGrid width="100%" ui:field="valuesMapGrid" pageSizeMin="13" pageSizeMax="100" gridHeight="40em"/>

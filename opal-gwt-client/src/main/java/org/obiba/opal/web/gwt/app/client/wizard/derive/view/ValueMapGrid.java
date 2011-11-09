@@ -113,6 +113,13 @@ public class ValueMapGrid extends FlowPanel {
   }
 
   private void initializeColumns() {
+    initializeValueColumn();
+    initializeLabelColumn();
+    initializeNewValueColumn();
+    initializeMissingColumn();
+  }
+
+  private void initializeValueColumn() {
     // Value
     Column<ValueMapEntry, String> valueColumn = new WrappedTextColumn() {
 
@@ -124,7 +131,9 @@ public class ValueMapGrid extends FlowPanel {
     };
     valueColumn.setCellStyleNames("value");
     table.addColumn(valueColumn, translations.valueLabel());
+  }
 
+  private void initializeLabelColumn() {
     // Label
     Column<ValueMapEntry, String> labelColumn = new WrappedTextColumn() {
 
@@ -136,6 +145,9 @@ public class ValueMapGrid extends FlowPanel {
     };
     labelColumn.setCellStyleNames("value-label");
     table.addColumn(labelColumn, translations.labelLabel());
+  }
+
+  private void initializeNewValueColumn() {
 
     // New Value
     Column<ValueMapEntry, String> newValueColumn = new Column<ValueMapEntry, String>(new TextInputCell()) {
@@ -153,7 +165,9 @@ public class ValueMapGrid extends FlowPanel {
         debug();
       }
     });
+  }
 
+  private void initializeMissingColumn() {
     // Missing
     Column<ValueMapEntry, Boolean> missingColumn = new Column<ValueMapEntry, Boolean>(new CheckboxCell()) {
 

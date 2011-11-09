@@ -85,7 +85,9 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
    * @param builder
    * @return current index value
    */
+  @SuppressWarnings({ "unchecked", "PMD.NcssMethodCount" })
   private int initializeNonMissingCategoryValueMapEntry(int index, CategoryDto cat, ValueMapEntry.Builder builder) {
+    int newIndex = index;
     if(RegExp.compile("^\\d+$").test(cat.getName())) {
       builder.newValue(cat.getName());
     } else if(RegExp.compile(NO_REGEXP + "|" + NONE_REGEXP, "i").test(cat.getName())) {
@@ -93,20 +95,20 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     } else if(RegExp.compile(YES_REGEXP + "|" + MALE_REGEXP, "i").test(cat.getName())) {
       builder.newValue("1");
       if(index < 2) {
-        index = 2;
+        newIndex = 2;
       }
     } else if(RegExp.compile(FEMALE_REGEXP, "i").test(cat.getName())) {
       builder.newValue("2");
       if(index < 3) {
-        index = 3;
+        newIndex = 3;
       }
     } else {
-      builder.newValue(Integer.toString(index++));
+      builder.newValue(Integer.toString(newIndex++));
     }
 
     valueMapEntries.add(builder.build());
 
-    return index;
+    return newIndex;
   }
 
   /**
