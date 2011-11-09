@@ -44,25 +44,10 @@ public class BooleanVariableDerivationHelper extends DerivationHelper {
     derived.setValueType("text");
 
     Map<String, CategoryDto> newCategoriesMap = new LinkedHashMap<String, CategoryDto>();
-
     StringBuilder scriptBuilder = new StringBuilder("$('" + originalVariable.getName() + "').map({");
 
-    ValueMapEntry trueEntry = appendValueEntry(scriptBuilder, Boolean.TRUE.toString());
-    scriptBuilder.append(",");
-    if(!trueEntry.getNewValue().isEmpty()) {
-      CategoryDto cat = newCategory(trueEntry);
-      cat.setAttributesArray(newAttributes(newLabelAttribute(trueEntry)));
-      newCategoriesMap.put(cat.getName(), cat);
-    }
-
-    ValueMapEntry falseEntry = appendValueEntry(scriptBuilder, Boolean.FALSE.toString());
-    scriptBuilder.append("\n").append("  }");
-    if(!falseEntry.getNewValue().isEmpty()) {
-      CategoryDto cat = newCategory(falseEntry);
-      cat.setAttributesArray(newAttributes(newLabelAttribute(falseEntry)));
-      newCategoriesMap.put(cat.getName(), cat);
-    }
-
+    appendBooleanValueMapEntries(scriptBuilder, newCategoriesMap);
+    scriptBuilder.append("  }");
     appendSpecialValuesEntry(scriptBuilder, newCategoriesMap, getOtherValuesMapEntry());
     appendSpecialValuesEntry(scriptBuilder, newCategoriesMap, getEmptyValuesMapEntry());
     scriptBuilder.append(");");
@@ -78,6 +63,16 @@ public class BooleanVariableDerivationHelper extends DerivationHelper {
     setScript(derived, scriptBuilder.toString());
 
     return derived;
+  }
+
+  private void appendBooleanValueMapEntries(StringBuilder scriptBuilder, Map<String, CategoryDto> newCategoriesMap) {
+    ValueMapEntry trueEntry = appendValueMapEntry(scriptBuilder, Boolean.TRUE.toString());
+    scriptBuilder.append(",");
+    addNewCategory(newCategoriesMap, trueEntry);
+
+    ValueMapEntry falseEntry = appendValueMapEntry(scriptBuilder, Boolean.FALSE.toString());
+    scriptBuilder.append("\n");
+    addNewCategory(newCategoriesMap, falseEntry);
   }
 
 }

@@ -115,6 +115,19 @@ public abstract class DerivationHelper {
     }
   }
 
+  protected void addNewCategory(Map<String, CategoryDto> newCategoriesMap, ValueMapEntry entry) {
+    if(!entry.getNewValue().isEmpty()) {
+      CategoryDto cat = newCategory(entry);
+      cat.setAttributesArray(newAttributes(newLabelAttribute(entry)));
+      if(newCategoriesMap.containsKey(cat.getName())) {
+        // merge attributes
+        mergeAttributes(cat.getAttributesArray(), newCategoriesMap.get(cat.getName()).getAttributesArray());
+      } else {
+        newCategoriesMap.put(entry.getNewValue(), cat);
+      }
+    }
+  }
+
   protected AttributeDto newLabelAttribute(ValueMapEntry entry) {
     if(entry.getLabel() == null || entry.getLabel().isEmpty()) return null;
 
@@ -148,7 +161,7 @@ public abstract class DerivationHelper {
     }
   }
 
-  protected ValueMapEntry appendValueEntry(StringBuilder scriptBuilder, String value) {
+  protected ValueMapEntry appendValueMapEntry(StringBuilder scriptBuilder, String value) {
     ValueMapEntry entry = getValueMapEntry(value);
     if(entry != null) {
       scriptBuilder.append("\n    '").append(value).append("': ");

@@ -90,32 +90,7 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
     StringBuilder scriptBuilder = new StringBuilder("$('" + originalVariable.getName() + "')");
     scriptBuilder.append(".").append(groupMethod.getScript(this));
     scriptBuilder.append(".map({");
-
-    boolean first = true;
-    for(ValueMapEntry entry : valueMapEntries) {
-      if(entry.getType().equals(ValueMapEntryType.DISTINCT_VALUE)) {
-        if(first) {
-          first = false;
-        } else {
-          scriptBuilder.append(",");
-        }
-        scriptBuilder.append("\n    '").append(entry.getValue()).append("': ");
-        appendNewValue(scriptBuilder, entry);
-
-        // new category
-        if(!entry.getNewValue().isEmpty()) {
-          CategoryDto cat = newCategory(entry);
-          cat.setAttributesArray(newAttributes(newLabelAttribute(entry)));
-          if(newCategoriesMap.containsKey(cat.getName())) {
-            // merge attributes
-            mergeAttributes(cat.getAttributesArray(), newCategoriesMap.get(cat.getName()).getAttributesArray());
-          } else {
-            newCategoriesMap.put(entry.getNewValue(), cat);
-          }
-        }
-      }
-    }
-
+    appendDistinctValueMapEntries(scriptBuilder, newCategoriesMap);
     scriptBuilder.append("\n").append("  }");
     appendSpecialValuesEntry(scriptBuilder, newCategoriesMap, getOtherValuesMapEntry());
     appendSpecialValuesEntry(scriptBuilder, newCategoriesMap, getEmptyValuesMapEntry());
@@ -131,6 +106,24 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
     derived.setCategoriesArray(cats);
 
     return derived;
+  }
+
+  private void appendDistinctValueMapEntries(StringBuilder scriptBuilder, Map<String, CategoryDto> newCategoriesMap) {
+    boolean first = true;
+    for(ValueMapEntry entry : valueMapEntries) {
+      if(entry.getType().equals(ValueMapEntryType.DISTINCT_VALUE)) {
+        if(first) {
+          first = false;
+        } else {
+          scriptBuilder.append(",");
+        }
+        scriptBuilder.append("\n    '").append(entry.getValue()).append("': ");
+        appendNewValue(scriptBuilder, entry);
+
+        // new category
+        addNewCategory(newCategoriesMap, entry);
+      }
+    }
   }
 
   public enum GroupMethod {
@@ -555,6 +548,7 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
       return translations.timeMap().get(text);
     }
 
+    @SuppressWarnings({ "unchecked", "PMD.NcssMethodCount" })
     protected String translateMonth(int i) {
       switch(i) {
       case 1:
