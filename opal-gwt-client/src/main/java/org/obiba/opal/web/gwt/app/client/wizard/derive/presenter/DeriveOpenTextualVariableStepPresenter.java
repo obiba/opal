@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandl
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.OpenTextualVariableDerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.OpenTextualVariableDerivationHelper.Method;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapGrid;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -77,6 +78,7 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
 
   @Override
   protected void onBind() {
+    getDisplay().getValueMapGrid().enableRowDeletion(true);
     getDisplay().getAddButton().addClickHandler(new ClickHandler() {
 
       @Override
@@ -113,6 +115,8 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
     void populateValues(List<ValueMapEntry> valueMapEntries);
 
     HasClickHandlers getAddButton();
+
+    ValueMapGrid getValueMapGrid();
 
     String getValue();
 

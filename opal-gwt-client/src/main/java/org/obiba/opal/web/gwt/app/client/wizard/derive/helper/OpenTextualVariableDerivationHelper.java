@@ -17,7 +17,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 /**
  *
  */
-public class OpenTextualVariableDerivationHelper extends DerivationHelper {
+public class OpenTextualVariableDerivationHelper extends VariableDuplicationHelper {
 
   private final Method method;
 
@@ -35,12 +35,6 @@ public class OpenTextualVariableDerivationHelper extends DerivationHelper {
       valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).build());
       valueMapEntries.add(ValueMapEntry.createOthers(translations.otherValuesLabel()).build());
     }
-  }
-
-  @Override
-  public VariableDto getDerivedVariable() {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   public boolean addEntry(String value, String newValue) {

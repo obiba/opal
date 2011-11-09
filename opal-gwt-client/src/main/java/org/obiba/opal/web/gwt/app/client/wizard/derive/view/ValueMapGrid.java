@@ -12,6 +12,8 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Grid;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
@@ -54,6 +56,8 @@ public class ValueMapGrid extends FlowPanel {
   private int pageSizeMax = DEFAULT_PAGE_SIZE_MAX;
 
   private String gridHeight = "30em";
+
+  private boolean allowRowDeletion = false;
 
   public ValueMapGrid() {
     super();
@@ -112,11 +116,32 @@ public class ValueMapGrid extends FlowPanel {
     initializeColumns();
   }
 
+  private ActionsColumn<ValueMapEntry> createDeletionColumn() {
+    ActionsColumn<ValueMapEntry> deleteColumn = new ActionsColumn<ValueMapEntry>(ActionsColumn.DELETE_ACTION);
+    deleteColumn.setActionHandler(new ActionHandler<ValueMapEntry>() {
+
+      @Override
+      public void doAction(ValueMapEntry object, String actionName) {
+        valueMapEntries.remove(object);
+        populate(valueMapEntries);
+      }
+    });
+    return deleteColumn;
+  }
+
   private void initializeColumns() {
     initializeValueColumn();
     initializeLabelColumn();
     initializeNewValueColumn();
     initializeMissingColumn();
+    initializeDeleteColumn();
+  }
+
+  private void initializeDeleteColumn() {
+    if(allowRowDeletion) {
+      ActionsColumn<ValueMapEntry> deleteColumn = createDeletionColumn();
+      table.addColumn(deleteColumn, translations.actionsLabel());
+    }
   }
 
   private void initializeValueColumn() {
@@ -187,6 +212,10 @@ public class ValueMapGrid extends FlowPanel {
 
       }
     });
+  }
+
+  public void enableRowDeletion(boolean enable) {
+    allowRowDeletion = enable;
   }
 
   private void debug() {

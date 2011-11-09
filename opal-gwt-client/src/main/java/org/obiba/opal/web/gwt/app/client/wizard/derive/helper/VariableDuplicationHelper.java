@@ -15,7 +15,6 @@ public class VariableDuplicationHelper extends DerivationHelper {
 
   public VariableDuplicationHelper(VariableDto originalVariable) {
     super(originalVariable);
-    initializeValueMapEntries();
   }
 
   @Override

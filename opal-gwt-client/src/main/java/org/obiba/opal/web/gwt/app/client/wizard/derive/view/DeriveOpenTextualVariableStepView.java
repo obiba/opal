@@ -141,4 +141,10 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
     value.setValue(null);
     newValue.setValue(null);
   }
+
+  @Override
+  public ValueMapGrid getValueMapGrid() {
+    return valuesMapGrid;
+  }
+
 }
