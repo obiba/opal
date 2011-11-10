@@ -69,8 +69,9 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
 
       @Override
       public void onStepIn() {
-        derivationHelper = new OpenTextualVariableDerivationHelper(originalVariable, getDisplay().getMethod());
-        getDisplay().populateValues(derivationHelper.getValueMapEntries());
+        if(derivationHelper == null || derivationHelper.getMethod() != getDisplay().getMethod()) {
+          derivationHelper = new OpenTextualVariableDerivationHelper(originalVariable, getDisplay());
+        }
       }
     }).build());
     return stepCtrls;
