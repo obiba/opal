@@ -22,7 +22,7 @@ public class HsqlDialectOverride extends PropertiesFactoryBean {
     Properties props = super.createProperties();
     String dialect = props.getProperty(Environment.DIALECT);
     if(dialect != null && dialect.equals(org.hibernate.dialect.HSQLDialect.class.getName())) {
-      props.setProperty(Environment.DIALECT, HSQLDialect.class.getName());
+      props.setProperty(Environment.DIALECT, MagmaHSQLDialect.class.getName());
     }
     return props;
   }
