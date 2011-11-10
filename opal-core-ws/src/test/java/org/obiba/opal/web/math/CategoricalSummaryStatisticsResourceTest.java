@@ -96,7 +96,7 @@ public class CategoricalSummaryStatisticsResourceTest {
 
     replay(mockTable, mockSource);
     CategoricalSummaryStatisticsResource resource = new CategoricalSummaryStatisticsResource(mockTable, variable, mockSource);
-    SummaryStatisticsDto dto = resource.compute();
+    SummaryStatisticsDto dto = resource.compute(false);
     verify(mockTable, mockSource);
 
     assertThat(dto, notNullValue());

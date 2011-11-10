@@ -16,11 +16,11 @@ import org.obiba.opal.core.domain.VariableNature;
 
 public class SummaryStatisticsResourceFactory {
 
-  public AbstractSummaryStatisticsResource getResource(ValueTable valueTable, VariableValueSource vvs) {
+  public AbstractSummaryStatisticsResource getResource(ValueTable valueTable, VariableValueSource vvs, String natureStr) {
     VectorSource vectorSource = vvs.asVectorSource();
 
     if(vectorSource != null) {
-      VariableNature nature = VariableNature.getNature(vvs.getVariable());
+      VariableNature nature = (natureStr != null ? VariableNature.valueOf(natureStr.toUpperCase()) : VariableNature.getNature(vvs.getVariable()));
       switch(nature) {
       case CATEGORICAL:
         return new CategoricalSummaryStatisticsResource(valueTable, vvs.getVariable(), vectorSource);
@@ -33,4 +33,5 @@ public class SummaryStatisticsResourceFactory {
     }
     return new DefaultSummaryStatisticsResource(valueTable, vvs.getVariable(), vectorSource);
   }
+
 }

@@ -9,7 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.math;
 
+import java.util.Iterator;
+
 import javax.ws.rs.GET;
+import javax.ws.rs.QueryParam;
 
 import org.apache.commons.math.stat.Frequency;
 import org.obiba.magma.Category;
@@ -24,6 +27,7 @@ import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 
 /**
  *
@@ -42,15 +46,24 @@ public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatist
   }
 
   @GET
-  public SummaryStatisticsDto compute() {
+  public SummaryStatisticsDto compute(@QueryParam("distinct") boolean distinct) {
     Frequency freq = computeFrequencyDistribution();
     CategoricalSummaryDto.Builder builder = CategoricalSummaryDto.newBuilder();
     long max = 0;
     // Mode is the most frequent value
     String mode = NULL_NAME;
-    // Iterate over all category names with an additional one for the null values. The loop will also determine the mode
+    Iterator<String> concat;
+    if(distinct) {
+      // category names, null values and distinct values
+      concat = freqNames(freq);
+    } else {
+      // category names and null values
+      concat = Iterators.concat(categoryNames(), ImmutableList.of(NULL_NAME).iterator());
+    }
+    // Iterate over all category names including or not distinct values. The loop will also determine the mode
     // of the distribution (most frequent value)
-    for(String value : Iterables.concat(categoryNames(), ImmutableList.of(NULL_NAME))) {
+    while(concat.hasNext()) {
+      String value = concat.next();
       long count = freq.getCount(value);
       if(count > max) {
         max = count;
@@ -89,9 +102,9 @@ public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatist
   }
 
   /**
-   * Returns an iterable of category names
+   * Returns an iterator of category names
    */
-  private Iterable<String> categoryNames() {
+  private Iterator<String> categoryNames() {
     return Iterables.transform(getVariable().getCategories(), new Function<Category, String>() {
 
       @Override
@@ -99,6 +112,19 @@ public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatist
         return from.getName();
       }
 
+    }).iterator();
+  }
+
+  /**
+   * Returns an iterator of frequency names
+   */
+  private Iterator<String> freqNames(Frequency freq) {
+    return Iterators.transform(freq.valuesIterator(), new Function<Comparable<?>, String>() {
+
+      @Override
+      public String apply(Comparable<?> input) {
+        return input.toString();
+      }
     });
   }
 

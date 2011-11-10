@@ -54,8 +54,8 @@ public class VariableResource {
   }
 
   @Path("/summary")
-  public AbstractSummaryStatisticsResource getSummary() {
-    return new SummaryStatisticsResourceFactory().getResource(this.valueTable, this.vvs);
+  public AbstractSummaryStatisticsResource getSummary(@QueryParam("nature") String nature) {
+    return new SummaryStatisticsResourceFactory().getResource(this.valueTable, this.vvs, nature);
   }
 
   VariableValueSource getVariableValueSource() {
