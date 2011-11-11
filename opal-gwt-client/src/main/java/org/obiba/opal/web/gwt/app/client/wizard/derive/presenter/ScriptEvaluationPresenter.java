@@ -25,6 +25,7 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -140,6 +141,7 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
         }
       }
     }
+    
     summaryTabPresenter.setResourceUri(link.toString());
     summaryTabPresenter.refreshDisplay();
   }
@@ -147,7 +149,9 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
   private void appendVariableArguments(StringBuilder link) {
     link.append("valueType=" + valueType) //
     .append("&repeatable=" + repeatable) //
-    .append("&script=" + URL.encodeQueryString(script));
+    .append("&script=" + URL.encodeQueryString(script))//
+    .append("&nature=categorical")//
+    .append("&distinct=true");
   }
 
   //

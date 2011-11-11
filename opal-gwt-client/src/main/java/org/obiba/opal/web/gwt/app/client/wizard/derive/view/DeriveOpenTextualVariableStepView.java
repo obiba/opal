@@ -24,6 +24,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextBox;
@@ -62,6 +63,10 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
   Label labelManual;
 
   // --- Map fields ---
+
+  @UiField
+  InlineLabel labelValue;
+
   @UiField
   TextBox value;
 
@@ -78,6 +83,7 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
     initWidget(uiBinder.createAndBindUi(this));
 
     // TODO localized
+    labelValue.setText(translations.valueLabel() + ": ");
     auto.setText(Method.AUTOMATICALLY.toString());
     auto.setValue(true);
     labelAuto.setText("Similar disctinct values will be grouped together");

@@ -123,8 +123,9 @@ public class ValueMapGrid extends FlowPanel {
       @Override
       public void doAction(ValueMapEntry object, String actionName) {
         valueMapEntries.remove(object);
-        populate(valueMapEntries);
+        dataProvider.refresh();
       }
+
     });
     return deleteColumn;
   }

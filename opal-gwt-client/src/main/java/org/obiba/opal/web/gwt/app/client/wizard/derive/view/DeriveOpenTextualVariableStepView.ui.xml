@@ -5,6 +5,11 @@
   ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
+  
+  <ui:style>
+     .padding { padding-left:5px }
+  </ui:style>
+  
 
   <g:FlowPanel>
      <o:WizardStep ui:field="methodStep">
@@ -18,9 +23,25 @@
       </g:FlowPanel>
      </o:WizardStep>
      <o:WizardStep ui:field="mapStep">
-     	<g:TextBox ui:field="value"/><g:TextBox ui:field="newValue"/><g:Button ui:field="addButton" styleName="btn"/>
+      	<g:HTMLPanel>
+      		<table>
+      			<tr>
+      				<td>
+     					<g:InlineLabel ui:field="labelValue"/>
+     				</td>
+     				<td class="{style.padding}">
+     					<g:TextBox ui:field="value"/>
+     				</td>
+     				<td class="{style.padding}">
+     					<g:TextBox ui:field="newValue"/>
+     				</td>
+     				<td class="{style.padding}">
+     					<g:Button ui:field="addButton" styleName="btn"/>
+     				</td>
+     			</tr>
+     		</table>
+     	</g:HTMLPanel>
      	<o2:ValueMapGrid width="100%" addStyleNames="gwt-CellTable" ui:field="valuesMapGrid" pageSizeMin="13" pageSizeMax="100" gridHeight="38em"/>
      </o:WizardStep>
   </g:FlowPanel>
-  
 </ui:UiBinder>
